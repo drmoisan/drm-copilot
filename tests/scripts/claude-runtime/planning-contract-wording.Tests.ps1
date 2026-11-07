@@ -34,6 +34,13 @@ BeforeDiscovery {
         @{ Check = 'LIGHT-ROUTE'; Section = 'MCP Surfaces Run the Installed Extension'; Required = @('invariant 8') }
         @{ Check = 'LIGHT-CONTRACT-TEST'; Section = 'Contract Tests That Pin Mirrored Files'; Required = @('light-remediation-skill-contract.Tests.ps1') }
     )
+    # The two planner agents and their bundles restate the G13 guideline.
+    $script:PlannerAgent = @(
+        @{ Id = 'CLAUDE-PLANNER'; Path = '.claude/agents/atomic-planner.md' }
+        @{ Id = 'CLAUDE-PLANNER-BUNDLE'; Path = "$resources/claude-customizations/.claude/agents/atomic-planner.md" }
+        @{ Id = 'COPILOT-PLANNER'; Path = '.github/agents/atomic_planning.agent.md' }
+        @{ Id = 'COPILOT-PLANNER-BUNDLE'; Path = "$resources/customizations/.github/agents/atomic_planning.agent.md" }
+    )
     $script:ModeSurface = @(
         @{ Id = 'HANDOFF-CLAUDE'; Path = '.claude/skills/remediation-handoff-atomic-planner/SKILL.md' }
         @{ Id = 'HANDOFF-AGENTS'; Path = '.agents/skills/remediation-handoff-atomic-planner/SKILL.md' }
@@ -167,6 +174,31 @@ Describe 'Planning contract wording' {
         $guideline | Should -BeGreaterOrEqual 0 -Because "$Path must keep the size guideline bullet"
         $target | Should -BeGreaterThan $guideline -Because "$Path must place the task target after the size guideline"
         $range | Should -BeGreaterThan $target -Because "$Path must state the 15 to 20 task target in that bullet"
+    }
+
+    It 'PCW-SIZE-GUIDELINE-<Copy> states the lowered guideline and its cutoff in the size bullet' -ForEach $script:ContractCopy {
+        # Arrange
+        $text = Get-PcwSurfaceText -RelativePath $Path
+        $guideline = $text.IndexOf('**Size guideline.**', [System.StringComparison]::Ordinal)
+        $target = $text.IndexOf('**Task target.**', [System.StringComparison]::Ordinal)
+
+        # Act
+        $bullet = if ($guideline -ge 0 -and $target -gt $guideline) { $text.Substring($guideline, $target - $guideline) } else { '' }
+
+        # Assert
+        $bullet | Should -Not -BeNullOrEmpty -Because "$Path must keep the size guideline bullet before the task target"
+        $bullet.Contains('20 canonical tasks and 250 physical lines') | Should -BeTrue -Because "$Path must state the lowered guideline"
+        $bullet.Contains('PLAN_GUIDELINE_CUTOFF') | Should -BeTrue -Because "$Path must name the cutoff that keeps older plans on the legacy pair"
+        $text.Contains('40 tasks or 400 lines') | Should -BeFalse -Because "$Path must not state the superseded guideline"
+    }
+
+    It 'PCW-SIZE-AGENT-<Id> states the lowered guideline with its cutoff' -ForEach $script:PlannerAgent {
+        # Arrange / Act
+        $text = Get-PcwSurfaceText -RelativePath $Path
+
+        # Assert
+        $text.Contains('PLAN_GUIDELINE_CUTOFF') | Should -BeTrue -Because "$Path must name the cutoff"
+        $text.Contains('40 tasks or 400 lines') | Should -BeFalse -Because "$Path must not state the superseded guideline"
     }
 
     It 'PCW-POLICY-READ-REMOVED-<Copy> carries no routine policy-read requirement' -ForEach $script:ContractCopy {

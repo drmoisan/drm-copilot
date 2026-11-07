@@ -101,7 +101,10 @@ def validate_plan_text(text: str) -> list[str]:
 
 
 def validate_plan_text_with_warnings(
-    text: str, *, context: PlanGateContext | None = None
+    text: str,
+    *,
+    context: PlanGateContext | None = None,
+    plan_path: str | None = None,
 ) -> tuple[list[str], list[str]]:
     """Validate plan structure and gates on two severity channels.
 
@@ -114,6 +117,8 @@ def validate_plan_text_with_warnings(
         text (str): Full plan document text.
         context (PlanGateContext | None): Repository seam. When `None` only the
             context-free gate rules run.
+        plan_path (str | None): Plan-file path whose stamp selects the G13
+            guideline; `None` applies the current guideline.
 
     Returns:
         tuple[list[str], list[str]]: Element 0 is the structural errors
@@ -127,7 +132,7 @@ def validate_plan_text_with_warnings(
         May query the injected `git` seam via the supplied context.
     """
 
-    report = evaluate_plan_gates(text, context=context)
+    report = evaluate_plan_gates(text, context=context, plan_path=plan_path)
     return _plan_structure_errors(text) + report.blocking, report.warnings
 
 
@@ -371,7 +376,7 @@ def _plan_channels(args: argparse.Namespace) -> tuple[list[str], list[str]]:
 
     text = _read_text(Path(args.path))
     context = build_plan_gate_context(Path(getattr(args, "workspace_root", ".")))
-    return validate_plan_text_with_warnings(text, context=context)
+    return validate_plan_text_with_warnings(text, context=context, plan_path=args.path)
 
 
 def _validate_from_args_with_warnings(

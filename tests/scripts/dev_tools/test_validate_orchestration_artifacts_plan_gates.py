@@ -333,16 +333,19 @@ def test_plan_branch_builds_context_and_calls_two_channel_entry_point(
     # Arrange
     monkeypatch.setattr(validator, "_read_text", build_read_text_stub(_CLEAN_PLAN))
     builder_calls: list[Path] = []
-    entry_point_calls: list[bool] = []
+    entry_point_calls: list[tuple[bool, str | None]] = []
 
     def _fake_builder(workspace_root: Path) -> PlanGateContext:
         builder_calls.append(workspace_root)
         return _stub_context()
 
     def _fake_entry_point(
-        text: str, *, context: PlanGateContext | None = None
+        text: str,
+        *,
+        context: PlanGateContext | None = None,
+        plan_path: str | None = None,
     ) -> tuple[list[str], list[str]]:
-        entry_point_calls.append(context is not None)
+        entry_point_calls.append((context is not None, plan_path))
         return [], []
 
     monkeypatch.setattr(validator, "build_plan_gate_context", _fake_builder)
@@ -357,7 +360,7 @@ def test_plan_branch_builds_context_and_calls_two_channel_entry_point(
     assert exit_code == 0
     assert len(builder_calls) == 1
     assert builder_calls[0] == Path("sub/root")
-    assert entry_point_calls == [True]
+    assert entry_point_calls == [(True, "ignored.md")]
 
 
 def test_non_plan_route_returns_an_empty_warning_channel(
