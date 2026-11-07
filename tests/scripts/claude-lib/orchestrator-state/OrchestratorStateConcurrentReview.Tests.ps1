@@ -22,11 +22,7 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    $libDir = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/orchestrator-state").Path
-    Import-Module (Join-Path $libDir 'OrchestratorState.psm1') -Force
-    Import-Module (Join-Path $libDir 'OrchestratorStateCompletion.psm1') -Force
-    Import-Module (Join-Path $libDir 'OrchestratorStateCompletionChecks.psm1') -Force
-
+    $script:LibDir = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/orchestrator-state").Path
     $script:SharedModuleName = 'OrchestratorState'
     $script:ReviewError = 'Checkpoint completion validation failed: review_mode concurrent requires a last review_outcomes entry with verdict PASS.'
 
@@ -102,6 +98,10 @@ BeforeAll {
 }
 
 Describe 'review_mode concurrent corpus (issue #1097)' {
+    BeforeAll {
+        Import-Module (Join-Path $script:LibDir 'OrchestratorStateCompletionChecks.psm1') -Force
+    }
+
     It 'OCR-CORPUS-FLOOR discovers at least <MinimumCount> fixture files' -ForEach $script:CorpusFloor {
         $DiscoveredCount | Should -BeGreaterOrEqual $MinimumCount
     }
@@ -121,6 +121,11 @@ Describe 'review_mode concurrent corpus (issue #1097)' {
 }
 
 Describe 'review_mode concurrent readiness (issue #1097)' {
+    BeforeAll {
+        # A fresh instance, so the mocks and the readiness functions share one module scope.
+        Import-Module (Join-Path $script:LibDir 'OrchestratorState.psm1') -Force
+    }
+
     It 'OCR-READINESS-ALLOWS-PENDING-STEP7-UNDER-KEY' {
         Register-ReviewCheckpointFixture -Json (Get-ReviewCheckpointJson -Change @{ step7_status = 'pending'; review_mode = 'concurrent' })
 
@@ -180,6 +185,12 @@ Describe 'review_mode concurrent readiness (issue #1097)' {
 }
 
 Describe 'review_mode concurrent completion (issue #1097)' {
+    BeforeAll {
+        # The completion module re-imports the shared module, which the mocks then target.
+        Import-Module (Join-Path $script:LibDir 'OrchestratorState.psm1') -Force
+        Import-Module (Join-Path $script:LibDir 'OrchestratorStateCompletion.psm1') -Force
+    }
+
     It 'OCR-COMPLETION-REPORTS-REVIEW-ERROR-UNDER-KEY' {
         # Arrange: the same checkpoint with and without the key.
         $without = Get-ReviewCompletionLine -Json (Get-ReviewCheckpointJson)
