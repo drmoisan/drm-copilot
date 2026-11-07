@@ -106,7 +106,7 @@
 - [x] [P3-T6] Update the canonical entry's comment-based help: `.PARAMETER` entries for `ResetBaseline` and `PairSamples`, `StartUtc` described as optional with its resolution order, the new `StatePath` default, both examples rewritten to the `CANON` path with `-EpicFolder example-epic`, and a `-ResetBaseline` example; `.NOTES` keeps the read-only statement.
   - Tests updated: `documents every parameter in comment-based help` expects 15 parameters; `carries at least one example` unchanged in assertion.
   - Acceptance: both cases pass.
-- [ ] [P3-T7] Add the entry-suite case `prints the Full golden for a legacy four-sample state` using the P0-T2 fixture, with the 26 expected lines pasted verbatim from `<FEATURE>/evidence/baseline/full-golden-legacy-state.<timestamp>.md`.
+- [x] [P3-T7] Add the entry-suite case `prints the Full golden for a legacy four-sample state` using the P0-T2 fixture, with the 26 expected lines pasted verbatim from `<FEATURE>/evidence/baseline/full-golden-legacy-state.<timestamp>.md`.
   - Acceptance: the named case passes, the four existing golden cases (`composes the four TL;DR lines`, `composes the Full lines in recovered order`, `prints the four TL;DR lines in TLDR mode`, `prints the TL;DR block followed by the Full sections in Full mode`) pass with expected strings unchanged from the merge base, and the entry suite stays below 700 physical lines.
 
 ### Phase 4 — Forwarder

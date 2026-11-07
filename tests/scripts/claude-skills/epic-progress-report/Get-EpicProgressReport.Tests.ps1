@@ -380,6 +380,47 @@ Describe 'Invoke-EpicProgressReport' {
         Should -Invoke Test-EpicProgressPath -Times 0 -Exactly
         Should -Invoke Invoke-GitExe -Times 0 -Exactly
     }
+
+    It 'prints the Full golden for a legacy four-sample state' {
+        # Expected lines captured from the merged tool before any edit (evidence/baseline/full-golden-legacy-state.*.md).
+        $script:existingPaths = @($script:checkpointPath, $script:livePlanPath, $script:statePath)
+        # Legacy array: samples at fixed now minus 10800, 7200, 3600, and 60 seconds with done 0, 1, 2, and 3.
+        $script:fileText[$script:statePath] = "[{`"ts`":$($script:fixedNowUnix - 10800),`"done`":0},{`"ts`":$($script:fixedNowUnix - 7200),`"done`":1},{`"ts`":$($script:fixedNowUnix - 3600),`"done`":2},{`"ts`":$($script:fixedNowUnix - 60),`"done`":3}]"
+        $expected = @(
+            '**TL;DR:** Epic #42 is at 3 of 10 tasks (30%). 1 of 3 features are done. #12345 is running (1 of 5).'
+            '**Elapsed:** 3 h 00 min, with about 10 hours left on the wave-parallel estimate. **Weekly** quota is at 42.5%.'
+            '**Avg Velocity:** 1 tasks / hr. **Recent Velocity:** 1 tasks / hr since last check-in. (SD of recent velocity: 0, from 3 intervals)'
+            '**Estimated time remaining:** 09:22 hrs to 09:39 hrs'
+            ''
+            '## Epic #42 example-epic: status at 12:00 UTC, Jan 5'
+            ''
+            '**Elapsed:** 3 h 00 min since 09:00 UTC. **Progress:** 3 of 10 tasks complete, **30%**.'
+            ''
+            '| State | Features |'
+            '|---|---|'
+            '| Completed | #12 |'
+            '| Running | #12345 (wave 2, large): 1 of 5 tasks (20%). Now at: Phase 1 - Build. PR #8 OPEN. |'
+            '| Pending, wave 3 | #77 (3) |'
+            ''
+            '| Wave | Children | Tasks | Done |'
+            '|---|---|---|---|'
+            '| 1 | 1 | 2 | 2 |'
+            '| 2 | 1 | 5 | 1 |'
+            '| 3 | 1 | 3 | 0 |'
+            '| **Total** | **3** | **10** | **3** |'
+            ''
+            "**Velocity:** 1 tasks per hour (one child's pace). **Remaining:** 7 tasks."
+            '- Straight line, no parallelism: about 7 h 00 min (upper bound).'
+            '- Wave-parallel (longest chain 7 tasks plus about 1.25 h per open wave for review and CI): about **9 h 30 min**.'
+            "**Weekly quota (active account):** 42.5% used, +42.5 points since the epic started. This pool also covers the other runs in this session, so it is not the epic's cost alone."
+        )
+
+        $lines = Get-TestReportLine
+
+        $lines.Count | Should -Be 26
+        ($lines -join "`n") | Should -Be ($expected -join "`n")
+        $script:stateWrites.Count | Should -Be 0
+    }
 }
 
 Describe 'Get-EpicProgressReport.ps1 repository constraints' {
