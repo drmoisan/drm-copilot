@@ -1,6 +1,6 @@
 ---
 name: invoke-python-engineer
-description: Invoke the python-typed-engineer worker to design, implement, and verify Python changes within typed repository boundaries. Applies Black, Ruff, Pyright, and Pytest with a 1-3 production-file direct-mode budget, routing to the orchestrated large path above it, and quality gates read from the single gate run.
+description: Invoke the python-typed-engineer worker to design, implement, and verify Python changes within typed repository boundaries. Applies Black, Ruff, Pyright, and Pytest with a 1-3 production-file direct-mode budget, routing to the orchestrated large path above it, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
 ---
 
 # Implement Python Skill
@@ -27,7 +27,7 @@ If the estimated scope is more than 3 production files, this skill defers to the
 ## Output Paths
 
 - Python source and test files within the approved scope.
-- Static baseline evidence under `<FEATURE>/evidence/baseline/<timestamp>/` and final gate evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
+- Baseline evidence (static and `Phase 0 baseline` test-suite) under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
 - This location is canonical per evidence-and-timestamp-conventions and is not overridable. See `.agents/skills/evidence-and-timestamp-conventions/SKILL.md` for the canonical evidence path authority.
 - Plan artifacts under the active feature folder when the task is feature-scoped.
 
@@ -36,10 +36,10 @@ If the estimated scope is more than 3 production files, this skill defers to the
 The worker must return the `python-qa-gate` reporting block:
 
 1. Scope (exact file list).
-2. Baseline (Ruff and Pyright findings).
+2. Baseline (Ruff, Pyright, Pytest, coverage status).
 3. Plan (design and test strategy).
 4. Diffs (patch-style or full-file replacements).
-5. QA Gate Results (Ruff and Pyright deltas, failures in the single gate run, and per-file coverage against the thresholds, or clearly marked **unverified**).
+5. QA Gate Results (Ruff, Pyright, Pytest, and coverage deltas against the baseline, with failures and per-file coverage read from the single gate run, or clearly marked **unverified**).
 
 ## Worker Routing
 

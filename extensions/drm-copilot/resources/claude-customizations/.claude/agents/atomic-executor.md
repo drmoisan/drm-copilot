@@ -84,6 +84,8 @@ Use the scoped tool patterns for quality gates:
 
 Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
 
+The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
+
 ## Scratch Location
 
 Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.

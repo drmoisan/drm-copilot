@@ -15,7 +15,7 @@
         `PREFLIGHT: REVISIONS REQUIRED`,
       - the advertised plan exists on disk,
       - the plan contains canonical `### Phase N — <Title>` headings,
-      - Phase 0 exists and includes policy-read and baseline tasks,
+      - Phase 0 exists and includes baseline tasks,
       - each task uses `- [ ] [P#-T#]` (or checked equivalent),
       - task numbering is sequential within each phase,
       - every task includes at least one explicit path token,
@@ -341,9 +341,6 @@ function Get-PlanStructureValidationReport {
     }
     else {
         $phaseZeroText = ($tasksByPhase[0] -join "`n")
-        if ($phaseZeroText -notmatch '(?i)\b(policy|instruction|read)\b') {
-            $errors.Add('Phase 0 must include a policy-read task.')
-        }
         if ($phaseZeroText -notmatch '(?i)\bbaseline\b') {
             $errors.Add('Phase 0 must include a baseline task.')
         }

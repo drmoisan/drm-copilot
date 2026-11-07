@@ -267,7 +267,7 @@ function Get-RemediationCycleError {
     # preflight cannot satisfy it. An exact light cycle runs no preflight and is
     # checked by invariant 8 instead.
     $executionStatus = (Get-CheckpointObjectMember -Owner $Cycle -Name 'execution_status').Value
-    $remediationPath = (Get-CheckpointObjectMember -Owner $Cycle -Name 'remediation_path').Value
+    $remediationPath = (Get-CheckpointObjectOrdinalMember -Owner $Cycle -Name 'remediation_path').Value
     $isLightCycle = ($remediationPath -is [string]) -and ([string]$remediationPath -ceq 'light')
     if (-not $isLightCycle -and $executionStatus -is [string] -and
         ($script:EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT -contains [string]$executionStatus)) {

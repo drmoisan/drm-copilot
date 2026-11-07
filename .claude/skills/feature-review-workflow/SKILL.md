@@ -42,7 +42,7 @@ Always apply:
   - `code-review-template` for `code-review.<timestamp>.md`
   - `feature-audit-template` for `feature-audit.<timestamp>.md`
 - The MCP-resolved asset is the authoritative template source for review artifacts in this workflow.
-- When an installed template older than this change carries baseline fields, each baseline field is recorded as `N/A - no pre-change run`, and the comparison line reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
+- Baseline fields are read from the plan's `Phase 0 baseline` artifact. A baseline field is recorded as `N/A - no pre-change run` only for a language or file with no pre-change run (a new file, or an item whose plan predates the `Phase 0 baseline` rule and captured static baselines only), and the comparison line then reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
 
 ### No silent fixes
 
@@ -117,9 +117,9 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
         - Python: `poetry run pytest -n auto --cov-report=term-missing --cov` → artifact: `artifacts/python/lcov.info`
         - PowerShell: one `Invoke-PoshQCParallelTest` run → artifact: `artifacts/pester/powershell-coverage.xml`
         - C#: `dotnet test --collect:"XPlat Code Coverage"` → artifact: `artifacts/csharp/coverage.xml`
-        - Coverage thresholds (threshold precedence per `.claude/rules/quality-tiers.md` and `.claude/rules/general-unit-test.md`: when the repository's root `CLAUDE.md` states line or branch coverage thresholds, those thresholds govern; otherwise the default thresholds below govern; each metric falls back independently, so a root `CLAUDE.md` that states only one of the two thresholds governs only that metric). The branch threshold applies only to branch-capable languages — TypeScript, Python, and C#. PowerShell is a coverage language and is fully subject to the line threshold, but Pester measures command (instruction) coverage and line coverage only, so no branch percentage exists to evaluate and no branch threshold applies to it (see `.claude/rules/powershell.md`). Do not flag a missing PowerShell branch figure as FAIL:
+        - Coverage thresholds (threshold precedence per `.claude/rules/quality-tiers.md` and `.claude/rules/general-unit-test.md`: when the repository's root `CLAUDE.md` states line or branch coverage thresholds, those thresholds govern; otherwise the default thresholds below govern; each metric falls back independently, so a root `CLAUDE.md` that states only one of the two thresholds governs only that metric). The branch threshold applies only to branch-capable languages — TypeScript, Python, and C#. PowerShell is a coverage language and is fully subject to the line threshold and the no-regression requirement, but Pester measures command (instruction) coverage and line coverage only, so no branch percentage exists to evaluate and no branch threshold applies to it (see `.claude/rules/powershell.md`). Do not flag a missing PowerShell branch figure as FAIL:
           - New code files (added in this feature): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages. Flag as FAIL otherwise.
-          - Modified files (changed but previously existing): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages, read from the single gate run, and new behavior is tested. Flag as FAIL otherwise.
+          - Modified files (changed but previously existing): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages, read from the single gate run, new behavior is tested, and no regression on changed lines relative to the `Phase 0 baseline`. Flag as FAIL otherwise.
           - Repo-wide per language: line coverage >= 85%, and branch coverage >= 75% for branch-capable languages. Flag as FAIL otherwise.
         - If coverage artifacts already exist from the executor run, inspect them instead of re-running.
         - If no coverage artifact exists for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
@@ -155,7 +155,7 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
      - toolchain checks fail
      - the code review contains blockers
      - required acceptance criteria are FAIL or PARTIAL
-     - coverage below the governing thresholds defined in step 5 (repo-wide per language, modified files, or new files)
+     - coverage below the governing thresholds defined in step 5 (repo-wide per language, modified files including any regression on changed lines against the `Phase 0 baseline`, or new files)
      - coverage artifact absent for any language that has changed files
    - Classify each blocking finding before triggering remediation: each receives one remediability class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated). A published MCP runtime that lags the repository contract is classified `external_dependency`.
    - Trigger the remediation handoff only when at least one blocking finding is `autonomous`. When every blocking finding is non-remediable, write the remediation inputs with the `HALT_NON_REMEDIABLE` or `AWAITING_CI` verdict and create no remediation plan target.
