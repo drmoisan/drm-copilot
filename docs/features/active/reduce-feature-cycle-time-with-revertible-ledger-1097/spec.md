@@ -38,6 +38,15 @@ No decision in this spec weakens these conditions.
 - **D9. Installed MCP lags the branch.** Installed is 1.1.22 and the repository is 1.1.26, and this run pushes no tags. Until a release is installed, new validator rules are exercised through the repository's Python CLI route, and the skills say so in the same form used for G11 through G13. The routes are `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan <path>` and the `orchestrator-state` subcommand of the same module. Installing a release is an owner action outside this item. Consequence: `atomic-planner` has only the MCP route, so its self-check applies the installed rules, and the new rules first apply at preflight.
 - **D10. Limit of the merge control.** The GitHub ruleset requires only `CI Required Gate`, with 0 approvals. No ruleset change is proposed. Green CI is therefore enforced by GitHub, and passing review is enforced only by a hook-level, policy-level control. A same-session writer can edit the checkpoint, a merge outside the Bash hook surface is not gated, and a merge whose item target does not resolve sees no key, which leaves the parallel skill step as the only backstop. A text scan cannot read every merge: a script file performing the merge cannot be read, and neither can encoded or run-time composed text, a `gh` alias or shell function from an earlier call, or an endpoint held in a variable. A merge through a tool other than Bash is not gated: the Claude PowerShell tool and `mcp__*` tools, because the gate is registered on the `Bash` matcher only, and the Codex `shell_command` tool, because the gate is registered under `^Bash$` and returns for any other tool name. An already-queued auto-merge fires with no command, and `gh pr merge <PR> --disable-auto` removes it. A direct push to the base branch is not a pull-request merge, and the gate does not read it. A number-less merge text sees only the session checkpoint, so a key in another worktree is not found. The extra checkpoint read of the shape rule is best-effort: a failed read sees no key and keeps the decision of a run without the key. The extra read covers at most the first 4 numbers of the text, so a key held only by an item named after them is not found. Under the key the rule is fail-closed, so prose containing `pr merge` is denied in any command, including `git commit -m` and `grep`. The trigger is wider than `pr merge`: prose such as `pr (#12)` or `pr $HOME` is denied the same way, and a plain merge followed by a line feed or `;` is denied, because a bound merge must be the whole text. This trade is accepted because only concurrent runs carry the key and a merge is issued in its own call. Reason: the guard follows the precedent of the authorization record and is not a security control.
 
+The decisions below were relayed by the coordinator on 2026-11-07. Each names its source. They add to D1 through D10 and do not reword them.
+
+- **D11. Policy-read bullet in the review prompt (Owner, 2026-11-07).** The policy-read bullet in `review-feature.prompt.md` is outside the baseline hold. Removing it is not a reduction of a baseline task, baseline evidence, or baseline comparison.
+- **D12. Restore the test baseline, stage E2 (Owner, 2026-11-07).** Plans capture a test-suite baseline in Phase 0 with one parallel run (`Invoke-PoshQCParallelTest` and `pytest -n auto`, recording results and coverage), and the final gate compares coverage and results against that baseline. This is a partial revert of ledger entry `0001` from its stored prior text. It keeps the parallel-only change and is recorded in the ledger, so the partial revert is itself revertible. It is stage E2, ahead of F. It ships in the same PR as stage E because stage E's commits were already on the branch. Older plans and checkpoints still validate.
+- **D13. Less evidence keeps the baseline (Owner, 2026-11-07).** Stage G (less evidence) must not reduce any baseline task, baseline evidence, or baseline comparison. This includes the Phase 0 test-suite baseline and the final-gate comparison restored by D12.
+- **D14. Stale review coverage hook (Owner, 2026-11-07).** The stale review coverage hook is a separate issue and is not fixed in this item.
+- **D15. No ruleset change (Owner, 2026-11-07).** No GitHub ruleset change and no new required checks are made in this item.
+- **D16. Review verdict status, stage J (Coordinator, 2026-11-07).** After a review returns PASS for the current PR head, the orchestrator posts the commit status context `review/verdict`, state `success`, on that head SHA through `gh api repos/{owner}/{repo}/statuses/{sha}`, with a description naming the review artifact. A new push leaves the new head without the status, so review must pass again. Records go in before posting, or a narrow tested rule re-posts for a records-only head after checking that the diff is records-only. Main syncs into integration branches, records-only PRs, and promotion-record PRs get the status from narrow tested rules on the diff and the branch pattern. It adds no CI run, no CI job, no committed verdict file, and no ruleset change. The coordinator will make it required later. Limit: anyone with write access, including any agent with `gh`, can post it; it records a passing review and does not prove one. It adds a control, so it takes a ledger entry only if it reduces process.
+
 ## Clarifications
 
 These follow from the conditions and decisions above. They were not separately decided, so a reviewer should confirm them.
@@ -141,12 +150,16 @@ Each stage is one small PR into main from `feature/reduce-feature-cycle-time`, o
 | C | Merge guard commit, then concurrent review reduction commit with entry. Includes the skill text and the parallel merge-on-green step | A | PR C |
 | D | Light remediation reduction commit with entry | A | PR D |
 | E | #1094 back-fill entry, planning-side standing rule, smaller-plans text, policy-read removal with its hook edit (own commit and entry), and wording deferred from earlier stages | A, #1094 merged | PR E |
+| E2 | Test baseline restored (D12): Phase 0 test-suite baseline with one parallel run, final-gate comparison, partial revert of ledger entry `0001` recorded in the ledger | E | PR E (same PR as stage E) |
 | F | G13 and the cutoff (own commit and entry) | A, #1094 merged | PR F |
 | G | Less evidence and the CI cross-check (own commit and entry) | C, E | PR G |
 | H | Design check. Adds a check, so no ledger entry | #1094 merged | PR H |
 | I | Early dependent starts, including re-baselined frozen hashes (own commit and entry) | A | PR I |
+| J | `review/verdict` commit status (D16). Adds a control, so a ledger entry only if it reduces process | C | PR J |
 
 The column lists content dependencies. PRs still merge in letter order, one after the other.
+
+The final stage order is E with E2, then F, G, H, I, J. Stage E2 ships in the same PR as stage E, because stage E's commits were already on the branch. J is now the final stage, so the whole-item closing checks (the closing criteria tagged `[I]`) are verified at J. The `[I]` closing criteria themselves are unchanged.
 
 Stages A to D and I do not touch `execution-environment` or `atomic-plan-contract`, except as named. Any wording in those two skills moves to stage E or later. If a stage alters a fact the `execution-environment` brief states, that brief edit waits for #1094 too (K6).
 
@@ -179,12 +192,18 @@ Unsafe orderings are listed in research section 10. The guard precedes the readi
 - [x] [E] The policy-read task, its artifact requirement, and the hook's policy-read check are removed in one commit with its entry; a plan that keeps the task stays valid; and every baseline requirement string named in research section 3 is present before and after.
 - [x] [E] Applying one entry's revert steps to a test copy restores the prior behavior for at least one sample reduction: in memory, the reverted `Get-PlanStructureValidationReport` returns the policy-read error and the live function does not.
 - [x] [E] Wording deferred from stages A to D has landed, with each affected ledger entry updated in the same commit.
+- [ ] [E2] Plans capture a test-suite baseline in Phase 0 with one parallel run (`Invoke-PoshQCParallelTest` and `pytest -n auto`) that records results and coverage.
+- [ ] [E2] The final gate compares coverage and results against the Phase 0 baseline.
+- [ ] [E2] No serial, single-process, seeded-shuffle, reversed-order, or comparison run is restored; the parallel-only change stays.
+- [ ] [E2] The partial revert of ledger entry `0001` is made from its stored prior text and recorded in the ledger, so that the partial revert is itself revertible.
+- [ ] [E2] Older plans and checkpoints still validate.
 - [ ] [F] G13 reports at the new guideline of 20 tasks and 250 physical lines in both validators, with parity, at the guideline and one above it, with and without a justification.
 - [ ] [F] Parity tests run both sides of `PLAN_GUIDELINE_CUTOFF` and the no-path case, cover each stamp shape in K4, and prove that a plan with absent repository wiring keeps its stamp result.
 - [ ] [F] The finding message states the guideline that applied, the rule file's scope section describes the cutoff, and G13 lands as its own commit with its entry.
 - [ ] [G] The evidence requirements marked Reduce in research section 4 are removed from the skills and templates, and those marked Keep remain.
 - [ ] [G] The reviewer writes `## CI Cross-check`, and a mismatch at the join becomes a synthetic Blocking finding that blocks merge, as in K7.
 - [ ] [G] The less-evidence reduction lands as its own commit with its entry.
+- [ ] [G] The less-evidence reduction does not reduce any baseline task, baseline evidence, or baseline comparison, including the Phase 0 test-suite baseline and the final-gate comparison restored at stage E2.
 - [ ] [H] The named design-check pass is in single-pass preflight, adds no delegation, and is pinned by a contract test.
 - [ ] [H] All 6 copies of the atomic-plan-contract skill describe the new rules, and contract tests pin them.
 - [ ] [I] Layer 1 and layer 2 honor `early_start` only for the named dependency; a dependent at `pr_open` or later requires the dependency merged and a string `synced_at`; and without the key both layers are unchanged.
@@ -194,6 +213,12 @@ Unsafe orderings are listed in research section 10. The guard precedes the readi
 - [ ] [I] No baseline task, evidence, or comparison requirement is removed.
 - [ ] [I] Older checkpoints and plans still validate: existing fixtures pass unchanged, and no Epic #1019 feature folder or admitted plan is edited.
 - [ ] [I] Merge is still impossible without a passing review and green CI, within the limit stated in D10.
+- [ ] [J] The `review/verdict` status, state `success`, is posted through `gh api repos/{owner}/{repo}/statuses/{sha}` only after a review returns PASS for the current PR head, with a description naming the review artifact; a test shows that no status is posted for any other verdict or for a non-current head.
+- [ ] [J] A new push leaves the new head without the `review/verdict` status, so review must pass again before the status is posted on that head.
+- [ ] [J] Records are committed before the status is posted, or a narrow tested rule re-posts the status for a records-only head after checking that the diff between the reviewed head and the new head is records-only; tests cover a records-only diff and negative cases such as a diff that includes a non-record path.
+- [ ] [J] The rules that post the status for a main sync into an integration branch, a records-only PR, and a promotion-record PR are each narrow, keyed on the diff and the branch pattern, and tested with positive and negative cases.
+- [ ] [J] The skill text states the limit: anyone with write access, including any agent with `gh`, can post the status, and it records a passing review and does not prove one.
+- [ ] [J] The status adds no CI run, no CI job, no workflow file, no committed verdict file, and no GitHub ruleset change.
 
 ## Definition of Done
 
