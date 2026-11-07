@@ -31,6 +31,25 @@ Describe 'Get-EpicProgressStepTypeCatalog and ConvertTo-EpicProgressStepType' {
         ConvertTo-EpicProgressStepType -StageName 'review' | Should -Be 'review'
     }
 
+    It 'maps each live stage alias to its step type' {
+        # The eleven live names recorded by the orchestrator; ' Feature_Review ' checks case and blanks.
+        $expected = [ordered]@{
+            ' Feature_Review ' = 'review'; S7_feature_review = 'review'; atomic_execution = 'execution'; S5_atomic_execution = 'execution'
+            S2_research = 'research'; S3_spec = 'spec'; S4_atomic_planning = 'plan'; S4_preflight = 'preflight'
+            S8_create_pr = 'pr'; S9_ci_gate = 'ci'; S9_ci_green = 'ci'
+        }
+
+        $actual = @($expected.Keys | ForEach-Object { "$($_.Trim())=$(ConvertTo-EpicProgressStepType -StageName $_)" })
+
+        $expected.Count | Should -Be 11
+        ($actual -join ',') | Should -Be 'Feature_Review=review,S7_feature_review=review,atomic_execution=execution,S5_atomic_execution=execution,S2_research=research,S3_spec=spec,S4_atomic_planning=plan,S4_preflight=preflight,S8_create_pr=pr,S9_ci_gate=ci,S9_ci_green=ci'
+    }
+
+    It 'keeps unknown S-prefixed and promotion names unmapped' {
+        ConvertTo-EpicProgressStepType -StageName 'S6_unknown' | Should -Be 'unmapped'
+        ConvertTo-EpicProgressStepType -StageName 'promotion' | Should -Be 'unmapped'
+    }
+
     It 'returns the eleven catalog types' {
         $catalog = @(Get-EpicProgressStepTypeCatalog)
 

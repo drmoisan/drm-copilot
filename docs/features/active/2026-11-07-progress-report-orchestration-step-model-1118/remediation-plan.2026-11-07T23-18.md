@@ -40,7 +40,7 @@
 
 ### Phase 1 — RF1 to RF3 Fixes
 
-- [ ] [P1-T1] RF1 aliases: extend `ConvertTo-EpicProgressStepType` in `SKILLDIR/Get-EpicProgressReport.Stages.ps1` with the alias table of `## Execution Terms` (its `.DESCRIPTION` lists the aliases); add tests to `TESTDIR/Get-EpicProgressReport.Stages.Tests.ps1`.
+- [x] [P1-T1] RF1 aliases: extend `ConvertTo-EpicProgressStepType` in `SKILLDIR/Get-EpicProgressReport.Stages.ps1` with the alias table of `## Execution Terms` (its `.DESCRIPTION` lists the aliases); add tests to `TESTDIR/Get-EpicProgressReport.Stages.Tests.ps1`.
   - New tests: 'maps each live stage alias to its step type' (all eleven alias names, one in mixed case, each against its type); 'keeps unknown S-prefixed and promotion names unmapped' (`S6_unknown` and `promotion`).
   - Existing dispositions: 'maps planning and plan to the plan type', 'maps remediation and remediation_cycle_2 to composite', 'maps promotion to unmapped', and 'returns the eleven catalog types' unchanged (their names are not aliases). `ConvertFrom-EpicProgressStageTiming` and `Get-EpicProgressStageSample` consume the new types unchanged; no Durations test uses an alias name.
 - [ ] [P1-T2] RF1 fallbacks: in `SKILLDIR/Get-EpicProgressReport.Steps.ps1`, let `Test-EpicProgressCompletedStep` take a `[string[]] $Prefix` (any match counts), pass `S2_research` and `S3b_research` for the research entry of `$fallback` in `Get-EpicProgressItemStep`, and add `S3b_research` to its `next_step` prefix map; add tests to `TESTDIR/Get-EpicProgressReport.Steps.Tests.ps1`.
