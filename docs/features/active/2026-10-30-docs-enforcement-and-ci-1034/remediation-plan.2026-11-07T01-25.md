@@ -19,6 +19,7 @@
 - `FEATURE` is `docs/features/active/2026-10-30-docs-enforcement-and-ci-1034`.
 - `SCRATCH` is `<session scratchpad>/issue-1034/`; scratch file names start with `issue-1034-`, and evidence records the token `SCRATCH`, never a host path.
 - `MERGE_BASE` is the live output of `git merge-base origin/epic/documentation-estate-tooling-integration HEAD`, derived in P0-T2 and re-derived before each scope comparison.
+- `PLAN_HEAD` is the commit that added this plan, the output of `git log --diff-filter=A --format=%H -- FEATURE/remediation-plan.2026-11-07T01-25.md`. The `## Acceptance Criteria` sections differ from `MERGE_BASE` by check-offs made before this cycle, so the no-change acceptances of `spec.md` and `user-story.md` compare with `PLAN_HEAD`.
 - `HOOK` is `.claude/hooks/enforce-docs-complete-gate.ps1`, and `HOOK_BUNDLE` is `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate.ps1`.
 - `HOOK_SUITE` is `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`.
 - `TOUCHED_SUITES` are `HOOK_SUITE`, `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1`, `tests/scripts/claude-lib/docs/DocsSurfaceDelta.Tests.ps1`, `tests/scripts/claude-lib/docs/Invoke-DocsCommand.RevisionContext.Tests.ps1`, `tests/scripts/claude-lib/docs/DocsInitTemplate.DocsWorkflow.Tests.ps1` and `tests/scripts/claude-lib/docs/DocsPageTemplates.Tests.ps1`.
@@ -108,7 +109,7 @@ Found by searching `tests/` for `Get-DocsCompleteGateFileText`, `Get-DocsComplet
 - [ ] [P1-T1] [expect-fail] In `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`, add the helper `Set-TestTargetSeam` and the Contexts `merge target binding (F1)` and `merge target controls`.
   - The stand-in mocks `Invoke-DocsOnlyGhExe` and answers by the joined `GhArgs`, each ending in the fixed `--json` suffix: no selector returns head `feature/current-branch` into `development`; `99` returns a non-integration pull request; `12`, `epic/x-integration`, `https://github.com/o/r/pull/12` and `12 --repo other/repo` return head `epic/x-integration` into `main`; every other argument list exits 1. Each row runs with an enabled profile and no receipt.
   - `merge target binding (F1)` holds one row per sweep form that changes behavior. Rows that resolve assert deny `RECEIPT_ABSENT` and the exact lookup string. Rows that cannot resolve assert deny `PR_UNRESOLVED` and zero `gh` calls. Every example of a form whose disposition is not `unchanged` in the `## F1 Target Form Sweep` table is a row, using `other/repo` as the repository, except the REST placeholder, which is a control. A row for the URL exemption pairs `cd ../other` with the URL selector and asserts the URL lookup.
-  - `merge target controls` holds the forms that do not change: number, bare, `--merge=12`, `gh pr merge 12 --merge 2>&1`, `gh pr merge 12 --merge; echo done`, `gh pr view 12; gh pr merge 12 --merge`, `gh pr merge --help`, the quoted REST placeholder, `gh pr merge 12 --disable-auto` (allow, zero `gh` calls), and a GraphQL query with no merge mutation (allow, zero `gh` calls).
+  - `merge target controls` holds the forms that do not change: number, bare, `--merge=12`, `gh pr merge 12 --merge 2>&1`, `gh pr merge 12 --merge; echo done`, `gh pr view 12; gh pr merge 12 --merge`, `gh pr merge --help`, the quoted REST placeholder, `gh pr merge 12 --disable-auto` (allow, zero `gh` calls), a GraphQL query with no merge mutation (allow, zero `gh` calls), and the N6 row of `## Open Questions`, in which a full-length uppercase `headRefOid` denies `PR_UNRESOLVED`.
   - Acceptance: the file parses and every row of `merge target controls` passes; P1-T3 records the failing rows.
 - [ ] [P1-T2] [expect-fail] In `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`, add the Context `read failures (F2)` and the seam rows.
   - `read failures (F2)` rows: a throwing profile read denies `PROFILE_UNREADABLE` with zero `gh` calls; a throwing receipt read denies `RECEIPT_UNREADABLE` and the reason does not contain `RECEIPT_ABSENT`; a throwing `Invoke-DocsOnlyGhExe` denies `PR_UNRESOLVED`; `Invoke-DocsCompleteGateEntryPoint -ReadPayload { throw 'read failed' }` returns 0 and emits a `PAYLOAD_ANOMALY` deny. Each deny asserts the reason contains no path separator.
@@ -138,7 +139,7 @@ Found by searching `tests/` for `Get-DocsCompleteGateFileText`, `Get-DocsComplet
   - Acceptance: the step script exits 0 only when all four outcomes hold, and the artifact records each decision text with host paths replaced by the token `SCRATCH`.
 - [ ] [P2-T5] Update the non-criterion hook design text of `FEATURE/spec.md`.
   - Edits, each keeping its physical line count: `### Hook enforce-docs-complete-gate.ps1` reuse list, decision steps 3 and 4 and residual limits; the `RECEIPT_ABSENT` and `RECEIPT_UNREADABLE` table rows, stating that a read failure on an existing file is `RECEIPT_UNREADABLE`; `## Constraints & Risks` file-size bullet, stating that target reading stays in the hook because it depends on hook-loaded functions. `## Acceptance Criteria` is not touched.
-  - Acceptance: `## Acceptance Criteria` keeps its line position, and `git diff MERGE_BASE -- FEATURE/spec.md` together with `git status --porcelain -- FEATURE/spec.md` shows no change to any line of that section.
+  - Acceptance: `## Acceptance Criteria` keeps its line position, and `git diff PLAN_HEAD -- FEATURE/spec.md` together with `git status --porcelain -- FEATURE/spec.md` shows no change to any line of that section.
 
 ### Phase 3 — Notes N1 to N5
 
@@ -158,7 +159,7 @@ Found by searching `tests/` for `Get-DocsCompleteGateFileText`, `Get-DocsComplet
 - [ ] [P3-T6] (N5) Reconcile the non-criterion text of `FEATURE/spec.md` with `## Notes` of `FEATURE/plan.2026-10-30T18-40.md` and the owner decision on OQ-1. This task runs only after `## Open Questions` is resolved.
   - Edits, each keeping its physical line count: `## Scope`, `### DocsSurfaceDeltaCommands.psm1 and the dispatch row`, `### Workflow template _docs-quality.yml` and `## Implementation Strategy` name the merged `1034` anchors; the `Get-DocsInitTemplate` row becomes the merged repository-relative form; `### Command-context extension for base-revision reads (provisional, OQ-1)` body, `## Artifact Classification` and `## Upstream Contract Notes` state that OQ-1 resolved to option (a) on 2026-11-04; `## Owner Questions` marks OQ-1 resolved and leaves OQ-2 to OQ-7 provisional; and the metadata block records the update. That heading text stays, because `FEATURE/plan.2026-10-30T18-40.md` cites it.
   - Under option A of `## Open Questions`, append `## Reconciliation Notes` after `## Seeded Test Conditions (from potential)`, stating for each stale criterion how it was evaluated. Under option B, follow the orchestrator's instruction.
-  - Acceptance: `## Acceptance Criteria` keeps its line position; `git diff MERGE_BASE -- FEATURE/spec.md` together with `git status --porcelain -- FEATURE/spec.md` shows no changed line in that section under option A.
+  - Acceptance: `## Acceptance Criteria` keeps its line position; `git diff PLAN_HEAD -- FEATURE/spec.md` together with `git status --porcelain -- FEATURE/spec.md` shows no changed line in that section under option A.
 - [ ] [P3-T7] (N5) In `## Owner Questions` of `FEATURE/user-story.md`, state that OQ-1 is resolved and that OQ-2 to OQ-7 remain provisional, with the line count preserved, and update the metadata block. Under option A of `## Open Questions`, append `## Reconciliation Notes` for the story criterion. This task runs only after `## Open Questions` is resolved.
   - Acceptance: `## Acceptance Criteria` keeps its line position and shows no changed line under option A.
 
@@ -212,6 +213,7 @@ E1 is the first epic criterion, present in both `spec.md` and `user-story.md`. U
 | N3 | Any non-zero exit code is blocking | P3-T4 | P4-T5, P4-T6 | `mirror-hashes` |
 | N4 | Template description and upload note | P3-T5 | P3-T5, P4-T5 | `mirror-hashes` |
 | N5 | Spec and story reconciled | P2-T5, P3-T6, P3-T7 | Not applicable; text only | `scope-check` |
+| N6 | Uppercase head revision is unresolved | Existing `-cnotmatch` check | P1-T1, P2-T3 | `gate-rows` |
 
 ## Open Questions
 
