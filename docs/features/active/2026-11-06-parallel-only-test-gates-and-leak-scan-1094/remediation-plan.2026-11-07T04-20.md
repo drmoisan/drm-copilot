@@ -85,7 +85,7 @@ Static stages run first, so that a suite is not re-run for a formatting change. 
   - The launcher computes the worktree path at run time in the host's native absolute form, sets `PYTHONPATH` for this one command, and records the value as `<worktree>/packages/discovery-runtime/src`.
   - A PowerShell step script under `SCRATCH` reads the JSON `totals` and sums `LH`/`LF` and `BRH`/`BRF` from `artifacts/python/lcov.info`, whose write time must not precede the run start.
   - Acceptance: `EXIT_CODE: 0`, zero failures and errors, and JSON and lcov totals at or above 85% line and 75% branch. If a total is below, the step exits non-zero, and the executor stops and returns to the orchestrator. Nothing is excluded.
-- [ ] [P2-T4] Check branch scope, copy equality, the removed text, and evidence content, and write `<FEATURE>/evidence/qa-gates/scope-check.<timestamp>.md`.
+- [x] [P2-T4] Check branch scope, copy equality, the removed text, and evidence content, and write `<FEATURE>/evidence/qa-gates/scope-check.<timestamp>.md`.
   - Scope uses `git diff --name-only` from the merge base, with `git status --porcelain` as its companion. Neither may list a path in `## Execution Rules` under **Scope**. Every `tools:` entry is unchanged in the diff of the agent files against the merge base.
   - Copies: a hash comparison shows the six edited agents equal their Copilot bundle copies and the bug template equals its bundle copy.
   - Text: a case-insensitive search of the `$script:SweepRoot` folders for the five P1-T4 tokens finds no hit. The test file sits outside those folders.
