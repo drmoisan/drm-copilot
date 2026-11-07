@@ -132,4 +132,116 @@ Describe 'Parallel gate wording' {
         $missing | Should -BeNullOrEmpty -Because "$Path must state the parallel gates"
         $held | Should -BeNullOrEmpty -Because "$Path must not name a removed run"
     }
+
+    Context 'Class sweep' {
+        BeforeAll {
+            # The removed-class tokens. `baseline coverage` is not listed, because the
+            # policy-audit template keeps it as a validator anchor.
+            $script:SweepToken = @(
+                'zero-regression', 'numeric baseline', 'coverage delta', 'coverage-comparison', 'coverage-bearing',
+                'captured baseline', 'Phase A baseline', 'coverage baseline', '>= baseline', 'baseline/post',
+                'regression on changed lines', 'regressed from baseline', 'test deltas', 'coverage deltas',
+                'failing tests delta', 'failing-test delta', 'failing-tests delta', 'Pester delta', 'Pytest delta',
+                'xUnit delta', 'Delta Requirements'
+            )
+
+            $resources = 'extensions/drm-copilot/resources'
+            $script:SweepRoot = @(
+                '.claude/skills', '.claude/agents', '.agents/skills', '.github/agents', '.github/skills', '.github/prompts',
+                '.github/codex', '.codex/agents', 'docs/features/templates',
+                "$resources/claude-customizations", "$resources/codex-and-agents-customizations", "$resources/customizations",
+                "$resources/templates/policy_audit", "$resources/feature-templates"
+            )
+
+            # Each entry matches a path segment, so it covers the base file, its
+            # bundle copy, and any bundle variant of the same folder.
+            $script:SweepExclusion = @(
+                @{ Segment = '/.claude/rules/'; Reason = 'Policy file; this item does not edit policy files.' }
+                @{ Segment = '/.claude-variants/csharp-legacy/rules/'; Reason = 'Bundle variant of a policy file.' }
+                @{ Segment = '/.github/instructions/'; Reason = 'Policy file; this item does not edit policy files.' }
+                @{ Segment = '/.agents/skills/powershell/'; Reason = 'Mirror of a policy rule.' }
+                @{ Segment = '/.agents/skills/python/'; Reason = 'Mirror of a policy rule.' }
+                @{ Segment = '/.agents/skills/csharp/'; Reason = 'Mirror of a policy rule.' }
+                @{ Segment = '/.agents-variants/csharp-legacy/skills/csharp/'; Reason = 'Bundle variant of a mirror of a policy rule.' }
+                @{ Segment = '/.agents/skills/typescript/'; Reason = 'Mirror of a policy rule.' }
+                @{ Segment = '/.agents/skills/quality-tiers/'; Reason = 'Mirror of a policy rule.' }
+                @{ Segment = '/skills/benchmark-baselines/'; Reason = 'A performance baseline, not a test-suite baseline.' }
+                @{ Segment = '/skills/translate-copilot-to-claude/'; Reason = 'Lists zero-regression as a phrase to translate, not a requirement.' }
+            )
+
+            <#
+            .SYNOPSIS
+                Returns the removed-class tokens that a text holds.
+            .PARAMETER Content
+                The text to search.
+            .OUTPUTS
+                [string[]] The sweep tokens found in the text.
+            #>
+            function Get-PgwSweepHit {
+                [CmdletBinding()]
+                [OutputType([string[]])]
+                param(
+                    [Parameter(Mandatory = $true)]
+                    [AllowEmptyString()]
+                    [string] $Content
+                )
+
+                return @(Get-PgwTokenHit -Content $Content -SearchToken $script:SweepToken)
+            }
+
+            <#
+            .SYNOPSIS
+                Returns the repository-relative paths of the swept surface files.
+            .OUTPUTS
+                [string[]] The relative paths, with forward slashes.
+            #>
+            function Get-PgwSweepFile {
+                [CmdletBinding()]
+                [OutputType([string[]])]
+                param()
+
+                $files = foreach ($folder in $script:SweepRoot) {
+                    $path = Join-Path -Path $script:RepoRoot -ChildPath $folder
+                    Get-ChildItem -LiteralPath $path -Recurse -File -Force | Where-Object { $_.Extension -in '.md', '.toml' }
+                }
+                $relative = @($files | ForEach-Object { [System.IO.Path]::GetRelativePath($script:RepoRoot, $_.FullName).Replace('\', '/') })
+                return @($relative | Where-Object {
+                        $candidate = "/$_"
+                        -not ($script:SweepExclusion | Where-Object { $candidate.Contains($_.Segment) })
+                    })
+            }
+        }
+
+        It 'PGW-SWEEP-SURFACES finds no removed-class token in any surface' {
+            # Arrange
+            $files = Get-PgwSweepFile
+
+            # Act
+            $offending = @(foreach ($file in $files) {
+                    $hits = @(Get-PgwSweepHit -Content (Get-PgwSurfaceText -RelativePath $file))
+                    if ($hits.Count -gt 0) { '{0}: {1}' -f $file, ($hits -join ', ') }
+                })
+
+            # Assert
+            $files.Count | Should -BeGreaterThan 0 -Because 'the sweep must read the surfaces'
+            $offending | Should -BeNullOrEmpty -Because 'a removed requirement must not return to a skill, agent, or template'
+        }
+
+        It 'PGW-SWEEP-HELPER finds each removed-class token in in-memory text' {
+            # Arrange
+            $tokens = $script:SweepToken
+
+            # Act
+            # Fold case in the text, because the sweep ignores case. A longer token can also
+            # hold a shorter one, so each token is checked for presence, not for equality.
+            $missed = @(foreach ($token in $tokens) {
+                    $hits = @(Get-PgwSweepHit -Content "A surface that states $($token.ToUpperInvariant()) in prose.")
+                    if ($hits -cnotcontains $token) { $token }
+                })
+
+            # Assert
+            $tokens.Count | Should -Be 21 -Because 'the plan names 21 sweep tokens'
+            $missed | Should -BeNullOrEmpty -Because 'a reintroduced token must fail the sweep'
+        }
+    }
 }
