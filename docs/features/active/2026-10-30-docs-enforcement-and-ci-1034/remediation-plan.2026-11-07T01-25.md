@@ -2,7 +2,7 @@
 
 - **Issue:** #1034
 - **Branch:** `feature/docs-enforcement-and-ci-1034-r2`
-- **Status:** Reduced by owner directive to F1 and F2. Unchecked tasks are waived, not done; see `FEATURE/evidence/other/owner-waiver.2026-11-07T01-53.md`.
+- **Status:** Reduced by owner directive to F1 and F2. Unchecked tasks are waived, not done; see `FEATURE/evidence/other/owner-waiver.2026-11-07T01-51.md`.
 - **Inputs:** `docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/remediation-inputs.2026-11-07T01-25.md`, and `policy-audit`, `code-review` and `feature-audit` artifacts of the same stamp.
 - **Scope:** F1, F2 and notes N1 to N6. N7 is outside this cycle.
 
