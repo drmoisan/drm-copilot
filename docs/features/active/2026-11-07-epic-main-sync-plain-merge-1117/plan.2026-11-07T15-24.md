@@ -1,63 +1,68 @@
-# epic-main-sync-plain-merge - Refactor Plan
+# epic-main-sync-plain-merge - Minimal-Audit Plan
 
 - **Issue:** #1117
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-11-07T15-24
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 1.0
 
-## Required References (read, do not restate)
+## Requirements Source and Environment
 
-- Coding workflow and standards: [`docs/code-change.instructions.md`](../../code-change.instructions.md)
-- Unit test policy: [`docs/unit-test-policy.md`](../../unit-test-policy.md)
-
-## Strategy
-
-Brief approach to reach the target structure while keeping behavior stable.
-
-Fail-closed evidence rule: include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
-
-Evidence accounting rule: record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+- Sole requirements source: `docs/features/active/2026-11-07-epic-main-sync-plain-merge-1117/issue.md`, section `## Acceptance Criteria` (four criteria, inventoried in the Pre-Mortem `Evidence` bullet and mapped in the planner record). Its `## Proposed Behavior` gives the replacement text and test changes. `issue.md` is not edited. No `spec.md`, `user-story.md`, or `research.md` is required.
+- `<FEATURE>` is `docs/features/active/2026-11-07-epic-main-sync-plain-merge-1117`. `SCRATCH` is `<session scratchpad>/issue-1117/`, and every helper script or staged copy lives there.
+- Tool routes, launchers, hook limits, and the batch budget are owned by the `execution-environment` skill; this plan does not restate them. Two environment notes: run every Poetry command with `env -u VIRTUAL_ENV` from the worktree root, never run an unqualified `poetry install`, and set `PYTHONPATH` to the worktree's `packages/discovery-runtime/src` for pytest coverage runs.
+- Owner ruling (binding): make exactly the change `issue.md` states. No new sync rules, gates, routes, or conflict handling.
+- Premise correction: `issue.md` keeps the pinned fragment "before the wave launches", but the replacement text spells it "Before the wave launches" at a sentence start, and `contains_phrase` in the contract test is case-sensitive. P1-T5 therefore makes `contains_phrase` casefold both sides so the retained fragment matches the replacement text verbatim.
+- Codex replacement text (not in `issue.md`; the Codex section has no numbered steps): "A non-zero count means `origin/main` has commits the integration branch lacks. Before the wave launches, `epic-orchestrator` merges `origin/main` into the integration branch (`git merge --no-ff origin/main`, resolving any conflicts; no rebase, no force-push), pushes the integration branch, re-fetches the integration tip, and launches the wave. Commits that reach `origin/main` afterwards are picked up by the next wave's check or by the final integration PR."
+- Tests that assert the changed text, found by searching the test tree for the changed phrases and file names: `tests/scripts/dev_tools/test_epic_orchestrate_main_sync_contract.py` (updated in P1-T5: fragments, new removed-phrase tests, casefold) and `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` consumed by `test_frozen_epic_surface_matches_pinned_baseline_digest` in `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py` (skill digest re-baselined in P1-T4; the agent digest and its case are unchanged because the epic agent file is untouched). The push-down resource contract tests assert bundle equality and stay unchanged because the bundles are edited identically. No other test names the changed text.
 
 ## Work Breakdown
 
-### Phase 1: Inventory & Plan [0%]
-- [ ] Enumerate current entry points/paths/imports to touch
-- [ ] Confirm invariants and non-goals
+### Phase 0 — Baseline Capture
 
-### Phase 2: Execute Structural Changes [0%]
-- [ ] Apply moves/renames to reach the target layout
-- [ ] Update imports/tooling/entry points
-- [ ] Remove or redirect legacy paths
+No production code language is touched (two Markdown skills, their bundles, and one Python test module plus one Python test-support module), so per-file production coverage is not applicable; repo-wide figures are recorded and compared. Each artifact is `<FEATURE>/evidence/baseline/<name>.<timestamp>.md` and carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
 
-### Phase 3: Verification & Cleanup [0%]
-- [ ] Run tests/type checks; fix fallout
-- [ ] Update docs/tasks/initiative references
-- [ ] Final pass for stray references to old locations
+- [x] [P0-T1] Run Black in check mode on `tests/scripts/dev_tools/test_epic_orchestrate_main_sync_contract.py` and `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, and write `<FEATURE>/evidence/baseline/black.<timestamp>.md`. Acceptance: the artifact exists with all four fields and `Output Summary:` records the success-case line "2 files would be left unchanged".
+- [x] [P0-T2] Run Ruff check on the same two files and write `<FEATURE>/evidence/baseline/ruff.<timestamp>.md`. Acceptance: the artifact exists with all four fields and `Output Summary:` records the success-case line "All checks passed!".
+- [x] [P0-T3] Run Pyright on the same two files and write `<FEATURE>/evidence/baseline/pyright.<timestamp>.md`. Acceptance: the artifact exists with all four fields and `Output Summary:` records the error count printed by Pyright (expected "0 errors").
+- [x] [P0-T4] Run one `Invoke-PoshQCParallelTest` baseline and write `<FEATURE>/evidence/baseline/pester.<timestamp>.md`. Acceptance: `Output Summary:` records pass and fail counts read from the merged Pester JUnit report and the repo-wide line coverage read from the merged PowerShell coverage report, and states that per-file production coverage is not applicable.
+- [x] [P0-T5] Run one `pytest -n auto` baseline with coverage (`--cov`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:SCRATCH/issue-1117-coverage-baseline.json`) and write `<FEATURE>/evidence/baseline/pytest.<timestamp>.md`. Acceptance: `Output Summary:` records pass and fail counts, the repo-wide line and branch coverage (the terminal table prints one combined column, so the line and branch percentages are computed from the `totals` object of the JSON report: `covered_lines` over `num_statements`, and `covered_branches` over `num_branches`), and states that per-file production coverage is not applicable.
+
+### Phase 1 — Constrained Small-Path Implementation
+
+- [x] [P1-T1] Hand the Phase 1 edit tasks below to the small-path implementation engineer with `docs/features/active/2026-11-07-epic-main-sync-plain-merge-1117/issue.md` as the sole requirements source. Acceptance: tasks P1-T2 through P1-T9 are complete, each exactly as stated, with no edit outside the files they name.
+- [x] [P1-T2] In `.claude/skills/epic-orchestrate/SKILL.md`, step 3 of `## Epic Integration Branch Lifecycle`, replace everything from "A non-zero count means" through "PR in step 6." with the `issue.md` replacement text verbatim, wrapped to the step's indentation (continuation lines indented three spaces, no continuation line beginning with a digit and a period). Apply the identical edit to the bundle `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md`. Acceptance: `test_push_down_claude_resource_contracts.py` passes (bundle text equal to canonical), and the sentence "A zero count proceeds directly to the wave." and steps 1, 2, 4, 5, and 6 are unchanged.
+- [x] [P1-T3] In `.agents/skills/epic-orchestrate/SKILL.md`, section `## Integration Branch and Child Worktrees`, replace the paragraph text from "A non-zero count runs the main-sync" through "then re-fetch the integration tip." with the Codex replacement text quoted above; the paragraph stays one paragraph beginning "Before each wave launches". Apply the identical edit to the bundle `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md`. Acceptance: `test_push_down_codex_and_agents_resource_contracts.py` passes, and `test_contract_fails_when_codex_main_sync_paragraph_removed` still passes in P1-T6.
+- [x] [P1-T4] In `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, replace only the digest of `.claude/skills/epic-orchestrate/SKILL.md` in `PINNED_FROZEN_SURFACE_HASHES` with the digest computed by `file_sha256` (the helper used by `test_frozen_epic_surface_matches_pinned_baseline_digest`) over the edited canonical file, and add a comment paragraph `# RE-BASELINED by issue #1117.` after the issue 952 paragraph in the existing style, stating that the change replaced step 3's dedicated sync child with a plain merge by `epic-orchestrator`, that only the skill digest moved, and that the pin stays live for both entries. Acceptance: the agent digest is unchanged and `test_frozen_epic_surface_matches_pinned_baseline_digest` passes for both parametrized entries in P1-T6.
+- [x] [P1-T5] In `tests/scripts/dev_tools/test_epic_orchestrate_main_sync_contract.py`: (a) remove the six phrases "dedicated chore child item", "`epic-852-main-sync`", "PR into the integration branch", "`features[]`", "manifest child's issue number", and "one main-sync child" from `MAIN_SYNC_FRAGMENTS`, keep the five listed fragments, and add "pushes the integration branch" and "no rebase, no force-push"; (b) update the module docstring and the fragment-count comment to match; (c) make `contains_phrase` casefold both sides and update its docstring; (d) add a tuple `REMOVED_CHILD_ITEM_PHRASES` of the six removed phrases, a function that asserts none appears in a section body, a test `test_child_item_wording_absent_from_lifecycle_section` parametrized over `SURFACES`, and a negative test `test_contract_fails_when_child_item_wording_returns` that inserts one removed phrase into in-memory section text and asserts the check raises `AssertionError`. Acceptance: no temporary file is created, and the module passes in P1-T6.
+- [x] [P1-T6] Run `tests/scripts/dev_tools/test_epic_orchestrate_main_sync_contract.py`, `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py`, `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, and `test_push_down_claude_pack_manifest_completeness.py` under `tests/scripts/dev_tools/`, as focused verification runs (not gates). Acceptance: zero failures; the contract module's existing tests `test_main_sync_step_present_in_lifecycle_section`, `test_main_sync_step_sits_between_integration_fetch_and_child_branching`, `test_lifecycle_steps_are_numbered_one_through_six`, `test_contract_fails_when_claude_main_sync_step_removed`, and `test_contract_fails_when_codex_main_sync_paragraph_removed` pass unchanged alongside the two new tests.
+- [x] [P1-T7] Create `docs/engineering/process-reductions/0007-epic-main-sync-plain-merge.md` in the format that `docs/engineering/process-reductions/README.md` defines: `## Summary` with `reduction: 0007`, `Date: 2026-11-07`, `Issue: #1117`, and `Merge commit: pending (PR #1117)` (the canonical issue number is the stand-in until the pull request exists, as entry 0005 did; the orchestrator replaces it with the pull request number after PR creation and a later records commit back-fills the merge commit identifier); `## Reason and Evidence` citing the owner ruling and the Epic 1019 timing in `issue.md`; `## Files Changed` listing the two canonical skills, the two byte-identical bundle copies, the expectations module, the contract test, the entry, and the README row; `## Prior Text` with one `### Revert Block:` for `.claude/skills/epic-orchestrate/SKILL.md` and one for `.agents/skills/epic-orchestrate/SKILL.md` only, each `Current` fence copied from the edited file and each `Prior` fence copied from the pre-edit text in `HEAD` (no block for the bundles); `## Revert Steps` naming the six README labels in order, where re-copy covers both bundles, Codex variants is not applicable, restoring pinned hashes names the skill digest, and restoring contract-test literals names `MAIN_SYNC_FRAGMENTS`, `REMOVED_CHILD_ITEM_PHRASES`, and the casefold in `contains_phrase`; and `## Revert Signals`. Acceptance: the file exists with all six sections non-blank and `Test-ProcessReductionEntry` reports it valid in P1-T9.
+- [x] [P1-T8] Add the index row `| [0007](0007-epic-main-sync-plain-merge.md) | Epic main-sync as a plain merge | 2026-11-07 | #1117 | Active |` to the table in `docs/engineering/process-reductions/README.md`. Acceptance: the table has seven data rows and the row's link label equals the entry file number.
+- [x] [P1-T9] From `scripts/dev-tools/ProcessReductionLedger.psm1`, run `Test-ProcessReductionEntry` on the new entry, `Read-ProcessReductionLedger` followed by `Test-ProcessReductionLedger` on the ledger folder, and `Invoke-ProcessReductionRevert` in memory for each of the two Revert Blocks against the live file text, through a launcher stored under `SCRATCH`. Acceptance: the entry check and the ledger check both report `IsValid` true with zero errors and `RowCount` 7, and each in-memory revert returns text that contains the old `Prior` text and none of the new replacement sentence, with no file written.
+- [x] [P1-T10] Stage the Phase 1 files (`.claude/skills/epic-orchestrate/SKILL.md`, `.agents/skills/epic-orchestrate/SKILL.md`, their two bundle copies under `extensions/drm-copilot/resources/`, `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, `tests/scripts/dev_tools/test_epic_orchestrate_main_sync_contract.py`, `docs/engineering/process-reductions/0007-epic-main-sync-plain-merge.md`, and `docs/engineering/process-reductions/README.md`) and commit them together with a subject containing `reduction: 0007`, so the entry lands in the same commit as the reduction. Acceptance: `git status --porcelain` is empty for the staged set and `git log -1 --format=%s` contains `reduction: 0007`.
+
+### Phase 2 — Final QC Loop
+
+If any step fails or changes files, fix the cause and restart the loop from P2-T1; the two test gates re-run only after a fix. Final-QC artifacts are `<FEATURE>/evidence/qa-gates/<name>.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+
+- [x] [P2-T1] Run Black in check mode on the two changed Python files and write `<FEATURE>/evidence/qa-gates/black.<timestamp>.md`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` records "2 files would be left unchanged".
+- [x] [P2-T2] Run Ruff check on the two changed Python files and write `<FEATURE>/evidence/qa-gates/ruff.<timestamp>.md`. Acceptance: `EXIT_CODE: 0` and `Output Summary:` records "All checks passed!".
+- [x] [P2-T3] Run Pyright on the two changed Python files and write `<FEATURE>/evidence/qa-gates/pyright.<timestamp>.md`. Acceptance: `Output Summary:` records "0 errors".
+- [x] [P2-T4] Run one final `pytest -n auto` with coverage (`--cov`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:SCRATCH/issue-1117-coverage-final.json`) and write `<FEATURE>/evidence/qa-gates/pytest.<timestamp>.md`. Acceptance: zero failures (AC 4), no failing test beyond the Phase 0 baseline, and repo-wide line and branch coverage (computed from the JSON report `totals` as in P0-T5) at or above the Phase 0 baseline figures read from the greatest `pytest.*.md` under `<FEATURE>/evidence/baseline/`, with both figures and the delta recorded.
+- [x] [P2-T5] Run one final `Invoke-PoshQCParallelTest` and write `<FEATURE>/evidence/qa-gates/pester.<timestamp>.md`. Acceptance: zero failures (AC 4), no failing test beyond the Phase 0 baseline, and repo-wide line coverage at or above the greatest `pester.*.md` under `<FEATURE>/evidence/baseline/`, with both figures and the delta recorded.
+- [x] [P2-T6] Hand off to the reduced audit and write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`: walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base of `origin/main` and `HEAD` (`git diff --name-only origin/main...HEAD` with `git status --porcelain` for untracked files), with one PASS, FAIL, or N/A row per checklist item. Acceptance: the artifact exists, the diff lists only the files named in P1-T2 through P1-T8 plus the plan and evidence, no row is FAIL, and each of the four `issue.md` acceptance criteria has a PASS row citing its artifact; a FAIL row is fixed and Phase 2 re-run before the artifact is rewritten.
+
+## Size and Pre-Mortem
+
+- Plan size: 21 tasks, above the 15 to 20 target by one because Phase 0 and Phase 2 each need one artifact per static tool command; no justification section is needed under the 40-task guideline.
 
 ## Pre-Mortem
 
-<!-- One bullet per label; state how the next review or CI run could fail on that dimension and the mitigation, or "not applicable" with the reason. -->
-- Review checklists:
-- Coverage:
-- Mirror parity:
-- File size:
-- Test isolation:
-- CI-only behavior:
-- Evidence:
-
-## Test Plan
-
-- Unit/Integration: impacted modules and any regression tests for invariants
-- CLI/Workflow: end-to-end commands/tasks expected to remain stable
-- Tooling: lint/type checks after path updates
-- Coverage evidence: list baseline artifact paths, post-change artifact paths, and comparison artifact paths for each in-scope language
-
-## Rollback / Contingency
-
-How to revert or isolate if the refactor breaks downstream consumers (e.g., keep branch snapshot, git move plan).
-
-## Open Questions / Notes
-
-Capture decisions, risks, and follow-ups.
+- Review checklists: P2-T6 walks the policy-audit, code-review, and feature-audit templates against the merge-base diff and fixes every FAIL row before completion; the plan adds no sync rule, gate, route, or conflict handling beyond `issue.md`, so scope reviewers find nothing outside the stated change.
+- Coverage: no production code language is touched, so per-file production coverage is not applicable; P0-T4, P0-T5, P2-T4, and P2-T5 record repo-wide figures from one run each and compare them with the Phase 0 baseline, and the new tests in P1-T5 exercise the new behavior.
+- Mirror parity: both bundles are edited identically to their canonical files in P1-T2 and P1-T3 and proven by the push-down resource contract tests in P1-T6; the pinned skill digest is re-baselined in P1-T4; the `execution-environment` brief states no fact this change alters (no CI job, required context, tool route, or batch-budget rule), so no brief-update task is needed.
+- File size: the contract test module is about 310 lines and gains well under 60, the expectations module gains one comment paragraph, and Markdown is exempt, so no file approaches the 500-line guidance.
+- Test isolation: the gates are one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run, re-run only after a fix; the new tests read committed text and in-memory strings only and create no temporary file; the P1-T6 focused runs are verification, not gates.
+- CI-only behavior: the new tests use repository-relative paths joined with `REPO_ROOT` and read gitignored state nowhere; the integration branch receives no CI on a direct merge push, which `issue.md` records as a known fact and this plan leaves unchanged.
+- Evidence: every command task writes an artifact under `<FEATURE>/evidence/baseline/` or `<FEATURE>/evidence/qa-gates/` with the four required fields; the four acceptance criteria (AC-1 four copies carry the replacement text, AC-2 contract test passes and fails if child-item wording returns, AC-3 ledger entry with prior text and revert steps, AC-4 both gates pass with zero failures) are covered by P1-T2/T3/T6, P1-T5/T6, P1-T7 through P1-T9, and P2-T4/T5.

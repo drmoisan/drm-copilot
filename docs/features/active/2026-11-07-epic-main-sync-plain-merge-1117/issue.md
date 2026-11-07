@@ -49,10 +49,10 @@ Add a process-reduction ledger entry under `docs/engineering/process-reductions/
 
 ## Acceptance Criteria
 
-- [ ] All four copies carry the replacement text and nothing else of the old sync procedure.
-- [ ] The contract test passes, and fails if the child-item wording returns.
-- [ ] A ledger entry records the reduction with its prior text and revert steps.
-- [ ] `Invoke-PoshQCParallelTest` and `pytest -n auto` pass with zero failures.
+- [x] All four copies carry the replacement text and nothing else of the old sync procedure.
+- [x] The contract test passes, and fails if the child-item wording returns.
+- [x] A ledger entry records the reduction with its prior text and revert steps.
+- [x] `Invoke-PoshQCParallelTest` and `pytest -n auto` pass with zero failures.
 
 ## Next Step
 
