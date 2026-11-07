@@ -545,13 +545,13 @@ Testable criteria:
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to Pester suites, contract tests or evidence files
+- [x] Acceptance criteria documented and mapped to Pester suites, contract tests or evidence files
 - [ ] Behavior matches acceptance criteria on PowerShell 7.4 or later on Windows and Linux
-- [ ] Edge cases covered: absent profile, invalid profile JSON, absent receipt, receipt revision case and length mismatch, `--match-head-commit` mismatch, unresolved base, absent base snapshot, stale snapshot, option-injection `-Base`
-- [ ] Touched suites pass in three seeded shuffled file-order runs and a fresh single-process run over `tests/scripts`, with evidence under `<FEATURE>/evidence/regression-testing/`
-- [ ] Toolchain pass completed (format, lint with PSScriptAnalyzer, architecture and contract tests, Pester) in a single clean pass
-- [ ] Forbidden-token scan with bracket-class patterns over every changed file reports no match
-- [ ] Evidence written under `docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/<kind>/`
+- [x] Edge cases covered: absent profile, invalid profile JSON, absent receipt, receipt revision case and length mismatch, `--match-head-commit` mismatch, unresolved base, absent base snapshot, stale snapshot, option-injection `-Base`
+- [x] Touched suites pass in three seeded shuffled file-order runs and a fresh single-process run over `tests/scripts`, with evidence under `<FEATURE>/evidence/regression-testing/`
+- [x] Toolchain pass completed (format, lint with PSScriptAnalyzer, architecture and contract tests, Pester) in a single clean pass
+- [x] Forbidden-token scan with bracket-class patterns over every changed file reports no match
+- [x] Evidence written under `docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/evidence/<kind>/`
 
 ## Seeded Test Conditions (from potential)
 

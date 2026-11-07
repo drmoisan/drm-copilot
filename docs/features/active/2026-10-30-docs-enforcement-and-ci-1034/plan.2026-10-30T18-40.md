@@ -241,7 +241,7 @@ Any failing step, or any step that changes a file, restarts the loop from P7-T1.
   - Acceptance: every check reports zero matches or a passing count.
 - [ ] [P7-T11] After the branch is pushed, record the conclusions of `poshqc / PowerShell QC`, `poshqc / PowerShell hook suites (Linux)` and `quality-checks7 / Code Quality & Tests (3.11)`, `(3.12)` and `(3.13)` from the newest `ci.yml` run whose head commit equals the branch head (a pull-request run into the integration branch when the pull request exists, otherwise a `workflow_dispatch` run of `ci.yml` on the branch, which is a full run), and write `FEATURE/evidence/qa-gates/ci-checks.<timestamp>.md`.
   - Acceptance: every listed context reports `success` on a full run (`CI full run` succeeded); the hook suite is evidenced on `ubuntu-latest` by `poshqc / PowerShell hook suites (Linux)` (no coverage) and coverage by `poshqc / PowerShell QC` on `windows-latest`.
-- [ ] [P7-T12] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md` and `feature-audit.yyyy-MM-ddTHH-mm.md` against the branch diff from `MERGE_BASE` and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md`.
+- [x] [P7-T12] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md` and `feature-audit.yyyy-MM-ddTHH-mm.md` against the branch diff from `MERGE_BASE` and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md`.
   - Acceptance: one PASS, FAIL or N/A row per checklist item and no FAIL row; a FAIL is fixed, the loop re-run from P7-T1, and the self-review rewritten.
 
 ## Acceptance Criteria Traceability
