@@ -82,7 +82,7 @@ criteria, R to criteria the research shows are necessary.
 - [x] (E3) The helper never imports, executes, compiles or evaluates analyzed code; `ast.parse` is its only parsing entry, verified by a source-inspection test and a behavioral test.
 - [x] (E4) The Python helper is listed only in the Claude python pack manifest; the core pack lists no `.py` file and lists the PowerShell adapter.
 - [x] (E5) Python line coverage >= 85% and branch coverage >= 75% per helper file; Pester line coverage >= 85% per PowerShell production file this feature adds or edits.
-- [ ] (E5) Black, Ruff and Pyright (strict) report no findings for the helper and its tests, and the Python tests pass on the Python 3.11 floor, verified by the CI matrix (3.11, 3.12 and 3.13).
+- [x] (E5) Black, Ruff and Pyright (strict) report no findings for the helper and its tests, and the Python tests pass on the Python 3.11 floor, verified by the CI matrix (3.11, 3.12 and 3.13).
 - [x] (R) Every inventory element records `analysis_method` (`native` or `scanner`); `config-files` and non-`.py` elements always record `scanner`.
 - [x] (R) Element identifiers and digests have a single implementation in PowerShell (`Get-DocsElementId` and the shared declaration-digest function); the helper computes neither.
 - [x] (R) The native provider is registered as four 1020-form rows under the anchor `# --- 1031: Python-native analyzers ---` in `DocsAnalyzerRegistry.psm1` without changing any other anchor or row.
@@ -94,7 +94,7 @@ criteria, R to criteria the research shows are necessary.
 - [x] (R) No test creates a temporary file.
 - [x] (R) Helper output is deterministic and ASCII-only.
 - [x] (R) No production file added or edited exceeds 500 logical lines; module conventions and quality-tier checks pass.
-- [ ] (CI-dependent) `poshqc / PowerShell QC` and the Python quality jobs on every matrix entry (3.11, 3.12 and 3.13, where 3.11 is the helper floor) pass on the pull request head.
+- [x] (CI-dependent) `poshqc / PowerShell QC` and the Python quality jobs on every matrix entry (3.11, 3.12 and 3.13, where 3.11 is the helper floor) pass on the pull request head.
 
 ## Non-Goals
 
