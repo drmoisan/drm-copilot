@@ -1,7 +1,7 @@
 # Remediation Inputs: parallel-only-test-gates-and-leak-scan (#1094)
 
 Review-Verdict: REMEDIATION_REQUIRED
-Remediation-Mode: proportionate
+Remediation-Mode: design
 
 Timestamp: 2026-11-07T03-22
 Branch: `feature/parallel-only-test-gates-and-leak-scan-1094`, head `f59b9caab5344611ee11008dc2af5bd3fb924fb5`
