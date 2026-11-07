@@ -107,6 +107,7 @@ Run these after editing any mirrored or bundled file; each is under `tests/scrip
 - `test_typescript_toolchain_instruction_contracts.py`: no reference to another test framework, and every backticked npm script token in the pinned mirrors exists in the root `package.json`.
 - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
 - `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
+- `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
 
 ## Preflight Defect Classes the Validator Cannot See
 

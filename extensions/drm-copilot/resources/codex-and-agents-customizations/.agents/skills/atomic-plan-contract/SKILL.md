@@ -37,6 +37,12 @@ Rules:
 
 This section takes precedence over the literal-quoting rules of `## Wrap-Tolerant Assertion Authoring (Mandatory)`: those rules govern the asserted value of an acceptance condition, not context.
 
+## Process-Reduction Ledger
+
+- This rule applies only when `docs/engineering/process-reductions/` exists, so a repository without that folder is unaffected.
+- A change that reduces evidence, plan tasks, gates, or review process adds its ledger entry in the same commit, in the format of that folder's `README.md`.
+- One-off waivers for a single item are not entries.
+
 ## Short-Path Minimal Plan Contract
 
 When orchestration selects short path, a minimal plan is still mandatory and must include these blocks:
