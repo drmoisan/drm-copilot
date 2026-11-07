@@ -285,7 +285,8 @@ function Get-ExecutorOutputBlockDecision {
         Returns @{ Ok = $true; Message = $null } to allow, or a hashtable with Ok = $false, a
         Repairable boolean, and Message. Repairable is $false for a non-preflight BLOCKED claim
         and for a plan with no task checkboxes; every other block is repairable by the subagent.
-        TranscriptPath and ReadTranscriptHead feed Test-IsPreflightRun. An execution run that
+        TranscriptPath and ReadTranscriptHead feed Test-IsPreflightRun and the target resolution;
+        the transcript head is read at most once per invocation. An execution run that
         stops with the canonical preflight BLOCKED text, a plan delta, and no checked task is a
         preflight block inside a combined proportionate run and is allowed.
         plan-path and preflight-fix-record are resolved once against the item worktree that
@@ -318,8 +319,17 @@ function Get-ExecutorOutputBlockDecision {
     $recordMatch = [regex]::Match($agentOutput, '(?im)^\s*preflight-fix-record:\s*`?(?<Path>[^\s`]+)`?\s*$')
     if ($recordMatch.Success) { $advertised.Add($recordMatch.Groups['Path'].Value) }
     $transcriptEnvelope = if ([string]::IsNullOrWhiteSpace($TranscriptPath)) { $null } else { [pscustomobject]@{ agent_transcript_path = $TranscriptPath } }
+    # Issue #1105 (F2): the transcript head is read once per invocation, and the resolver and the run
+    # classifier both receive a reader that returns those lines; a thrown read counts as no transcript.
+    $headReader = $ReadTranscriptHead
+    if ($null -ne $transcriptEnvelope) {
+        if ($null -eq $ReadTranscriptHead) { $ReadTranscriptHead = ${function:Read-TranscriptHead} }
+        $transcriptHead = $null
+        try { $transcriptHead = & $ReadTranscriptHead $TranscriptPath } catch { $transcriptHead = $null }
+        $headReader = { param([string] $Path) $null = $Path; $transcriptHead }.GetNewClosure()
+    }
     $targetArguments = @{ Envelope = $transcriptEnvelope; AdvertisedPath = $advertised.ToArray(); SessionRoot = $root }
-    if ($null -ne $ReadTranscriptHead) { $targetArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
+    if ($null -ne $headReader) { $targetArguments['ReadTranscriptHead'] = $headReader }
     if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
     $target = Resolve-SubagentStopTargetWorktree @targetArguments
     $probePath = (Resolve-SubagentStopArtifactLocation -Path $planPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root).ProbePath
@@ -330,7 +340,7 @@ function Get-ExecutorOutputBlockDecision {
     }
 
     $runArguments = @{ AgentOutput = $agentOutput; PlanLines = [string[]]@($file.Lines); TranscriptPath = $TranscriptPath }
-    if ($null -ne $ReadTranscriptHead) { $runArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
+    if ($null -ne $headReader) { $runArguments['ReadTranscriptHead'] = $headReader }
     if (Test-IsPreflightRun @runArguments) {
         if ($agentOutput -cnotmatch 'BLOCKED' -and -not (Test-HasPreflightSignal -AgentOutput $agentOutput)) {
             return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: preflight output must include `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`.' }

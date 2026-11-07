@@ -132,6 +132,38 @@ Describe 'validate-executor-output plan-path target worktree (issue #1105)' {
         # Assert
         $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*the session root was probed.'
     }
+
+    It 'reads the transcript head once and still classifies the run from the delegation prompt' {
+        # Arrange
+        Mock Get-PlanFileContent { param([string] $Path) @{ Exists = ($Path -eq $script:PlanItem); Lines = $script:CheckedPlan } }
+        $lines = [string[]]@((@{ type = 'user'; message = @{ role = 'user'; content = "DIRECTIVE: PREFLIGHT VALIDATION ONLY`n$script:Identity" } } | ConvertTo-Json -Compress -Depth 5))
+        $readCalls = [System.Collections.Generic.List[string]]::new()
+        $countingReader = { param([string] $Path) $readCalls.Add($Path); $lines }.GetNewClosure()
+
+        # Act
+        $result = Get-ExecutorOutputBlockDecision -AgentOutput "plan-path: $script:PlanRelative`n$script:CompleteOutput" -TranscriptPath 'transcripts/subagents/agent-1105.jsonl' -ReadTranscriptHead $countingReader -SessionRoot $script:SessionRoot -WorktreeListInvoker $script:ListInvoker
+
+        # Assert
+        $readCalls.Count | Should -Be 1 -Because 'one invocation reads the transcript head once'
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike '*preflight output must include*' -Because 'the prompt directive classifies the run as preflight'
+        Should -Invoke Get-PlanFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:PlanItem }
+    }
+
+    It 'invokes a throwing transcript reader once and treats the run as having no transcript' {
+        # Arrange
+        Mock Get-PlanFileContent { param([string] $Path) @{ Exists = ($Path -eq $script:PlanRelative); Lines = $script:CheckedPlan } }
+        $readCalls = [System.Collections.Generic.List[string]]::new()
+        $throwingReader = { param([string] $Path) $readCalls.Add($Path); throw "unreadable transcript $Path" }.GetNewClosure()
+
+        # Act
+        $result = Get-ExecutorOutputBlockDecision -AgentOutput "plan-path: $script:PlanRelative`n$script:CompleteOutput" -TranscriptPath 'transcripts/subagents/agent-1105.jsonl' -ReadTranscriptHead $throwingReader -SessionRoot $script:SessionRoot -WorktreeListInvoker $script:ListInvoker
+
+        # Assert
+        $readCalls.Count | Should -Be 1
+        $result.Ok | Should -BeTrue -Because $result.Message
+        Should -Invoke Get-PlanFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:PlanRelative }
+    }
 }
 
 Describe 'validate-executor-output preflight-fix-record target worktree (issue #1105)' {
