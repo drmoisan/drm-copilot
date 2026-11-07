@@ -254,7 +254,9 @@ def run_powershell_branch(
     emit_status_transition: Callable[[str, str], None],
     api: ModuleType,
 ) -> BranchResult:
-    """Run the PowerShell PoshQC format, analyze, and test branch via pwsh.
+    """Run the PowerShell PoshQC format, analyze, leak-scan, and test branch via pwsh.
+
+    The four steps run in order and the branch stops at the first failure.
 
     Args:
         factory: Builds a ``CommandRunner`` for a named branch and logger.
@@ -263,7 +265,7 @@ def run_powershell_branch(
             run_simple_step).
 
     Returns:
-        BranchResult: Success when all three steps pass, else failure tagged
+        BranchResult: Success when all four steps pass, else failure tagged
             with the first failing step.
 
     Side Effects:
@@ -332,13 +334,15 @@ def run_powershell_branch(
             failed_step="PoshQC: analyze",
         )
 
-    emit_status_transition("powershell", "PoshQC: test")
+    # The static leak scan (issue #1096) runs no test, so it gates the branch
+    # before the Pester step and stops the branch on any unallowlisted finding.
+    emit_status_transition("powershell", "PoshQC: leak scan")
     if not api.run_simple_step(
         step_number=3,
-        description="Running PowerShell tests (Pester)...",
-        step_name="PoshQC: test",
-        success_message="PowerShell tests passed",
-        failure_message="PowerShell tests failed. Please review errors above.",
+        description="Scanning Pester tests for leaked state (Invoke-PoshQCLeakScan)...",
+        step_name="PoshQC: leak scan",
+        success_message="PowerShell leak scan passed",
+        failure_message="PowerShell leak scan failed. Please review findings above.",
         command=[
             "pwsh",
             "-NoLogo",
@@ -347,7 +351,38 @@ def run_powershell_branch(
             "Bypass",
             "-Command",
             "Import-Module './scripts/powershell/PoshQC'; "
-            "Invoke-PoshQCTest -Root '.'",
+            "Invoke-PoshQCLeakScan -Root '.'",
+        ],
+        runner=branch_runner,
+        logger=branch_logger,
+    ):
+        output = branch_stream.getvalue()
+        emit_status_transition("powershell", "FAIL")
+        return api.BranchResult(
+            name="powershell",
+            success=False,
+            output=output,
+            failed_step="PoshQC: leak scan",
+        )
+
+    emit_status_transition("powershell", "PoshQC: test")
+    if not api.run_simple_step(
+        step_number=4,
+        description="Running PowerShell tests (Pester, parallel shards)...",
+        step_name="PoshQC: test",
+        success_message="PowerShell tests passed",
+        failure_message="PowerShell tests failed. Please review errors above.",
+        # The gate is one Invoke-PoshQCParallelTest run; the process exits with
+        # the run's ExitCode so a failed shard fails the step (issue #1096).
+        command=[
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            "Import-Module './scripts/powershell/PoshQC'; "
+            "exit (Invoke-PoshQCParallelTest -Root '.').ExitCode",
         ],
         runner=branch_runner,
         logger=branch_logger,

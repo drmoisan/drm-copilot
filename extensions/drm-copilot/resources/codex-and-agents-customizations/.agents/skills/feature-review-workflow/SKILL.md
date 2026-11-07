@@ -42,7 +42,7 @@ Always apply:
   - `code-review-template` for `code-review.<timestamp>.md`
   - `feature-audit-template` for `feature-audit.<timestamp>.md`
 - The MCP-resolved asset is the authoritative template source for review artifacts in this workflow.
-- When an installed template older than this change carries baseline fields, each baseline field is recorded as `N/A - no pre-change run`, and the comparison line reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
+- Baseline fields are read from the plan's `Phase 0 baseline` artifact. A baseline field is recorded as `N/A - no pre-change run` only for a language or file with no pre-change run (a new file, or an item whose plan predates the `Phase 0 baseline` rule and captured static baselines only), and the comparison line then reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
 
 ### No silent fixes
 
@@ -117,7 +117,7 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
         - Python: `poetry run pytest -n auto --cov-report=term-missing --cov` → artifact: `artifacts/python/lcov.info`
         - PowerShell: one `Invoke-PoshQCParallelTest` run → artifact: `artifacts/pester/powershell-coverage.xml`
         - C#: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` → artifact: `artifacts/csharp/coverage.xml`
-        - Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured), read from the single gate run, and new behavior is tested. Repo-wide coverage per language must meet the governing thresholds. Flag as FAIL otherwise.
+        - Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured), read from the single gate run, and new behavior is tested; modified files must also show no regression on changed lines against the `Phase 0 baseline`. Repo-wide coverage per language must meet the governing thresholds. Flag as FAIL otherwise.
         - If coverage artifacts already exist from the executor run, inspect them instead of re-running.
         - If no coverage artifact exists for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
    - A focused run of one test file to debug a specific failure is debugging only; a review check does not rest on it.
@@ -151,7 +151,7 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
      - toolchain checks fail
      - the code review contains blockers
      - required acceptance criteria are FAIL or PARTIAL
-     - coverage below the governing thresholds defined in step 5 (repo-wide per language, modified files, or new files)
+     - coverage below the governing thresholds defined in step 5 (repo-wide per language, modified files including any regression on changed lines against the `Phase 0 baseline`, or new files)
      - coverage artifact absent for any language that has changed files
    - Classify each blocking finding before triggering remediation: every blocking finding receives one `Remediability` class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated).
    - Trigger remediation only for `autonomous` findings. When no blocking finding is `autonomous`, write the remediation inputs, report `HALT_NON_REMEDIABLE` (at least one `external_dependency`, `policy_hold`, or `human_decision_required` finding) or `AWAITING_CI` (every finding `awaiting_ci`) with `REMEDIATION_PLAN: NONE`, create no remediation plan target, and do not hand off to `atomic-planner`.

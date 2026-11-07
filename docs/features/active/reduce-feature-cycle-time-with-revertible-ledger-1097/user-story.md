@@ -68,18 +68,24 @@ The tag on each criterion names the delivery stage that owes it, as defined in `
 - [x] [D] A cycle with a design-level finding or no `scope` fails on the light path and still requires the full chain, and a full-path cycle with no preflight fails invariant 2.
 - [x] [D] Invariant 8 also rejects a light cycle with findings above the threshold, a consecutive light cycle, and a light cycle carrying a `preflight` object.
 - [x] [D] The reviewer's `Remediation-Path` choice can be moved only heavier, the skills state the threshold and the Python CLI route of D9, and the light reduction lands as its own commit with its entry.
-- [ ] [E] An entry for #1094, the parallel-only test gates, exists with the prior text from its pre-merge state.
-- [ ] [E] The planning skill and all its mirrored copies state the standing rule.
-- [ ] [E] The smaller-plans text states the design-level target of 15 to 20 tasks and lands as its own commit with its entry.
-- [ ] [E] The policy-read task, its artifact requirement, and the hook's policy-read check are removed in one commit with its entry; a plan that keeps the task stays valid; and every baseline requirement string named in research section 3 is present before and after.
-- [ ] [E] Applying one entry's revert steps to a test copy restores the prior behavior for at least one sample reduction: in memory, the reverted `Get-PlanStructureValidationReport` returns the policy-read error and the live function does not.
-- [ ] [E] Wording deferred from stages A to D has landed, with each affected ledger entry updated in the same commit.
+- [x] [E] An entry for #1094, the parallel-only test gates, exists with the prior text from its pre-merge state.
+- [x] [E] The planning skill and all its mirrored copies state the standing rule.
+- [x] [E] The smaller-plans text states the design-level target of 15 to 20 tasks and lands as its own commit with its entry.
+- [x] [E] The policy-read task, its artifact requirement, and the hook's policy-read check are removed in one commit with its entry; a plan that keeps the task stays valid; and every baseline requirement string named in research section 3 is present before and after.
+- [x] [E] Applying one entry's revert steps to a test copy restores the prior behavior for at least one sample reduction: in memory, the reverted `Get-PlanStructureValidationReport` returns the policy-read error and the live function does not.
+- [x] [E] Wording deferred from stages A to D has landed, with each affected ledger entry updated in the same commit.
+- [x] [E2] Plans capture a test-suite baseline in Phase 0 with one parallel run (`Invoke-PoshQCParallelTest` and `pytest -n auto`) that records results and coverage.
+- [x] [E2] The final gate compares coverage and results against the Phase 0 baseline.
+- [x] [E2] No serial, single-process, seeded-shuffle, reversed-order, or comparison run is restored; the parallel-only change stays.
+- [x] [E2] The partial revert of ledger entry `0001` is made from its stored prior text and recorded in the ledger, so that the partial revert is itself revertible.
+- [x] [E2] Older plans and checkpoints still validate.
 - [ ] [F] G13 reports at the new guideline of 20 tasks and 250 physical lines in both validators, with parity, at the guideline and one above it, with and without a justification.
 - [ ] [F] Parity tests run both sides of `PLAN_GUIDELINE_CUTOFF` and the no-path case, cover each stamp shape in K4, and prove that a plan with absent repository wiring keeps its stamp result.
 - [ ] [F] The finding message states the guideline that applied, the rule file's scope section describes the cutoff, and G13 lands as its own commit with its entry.
 - [ ] [G] The evidence requirements marked Reduce in research section 4 are removed from the skills and templates, and those marked Keep remain.
 - [ ] [G] The reviewer writes `## CI Cross-check`, and a mismatch at the join becomes a synthetic Blocking finding that blocks merge, as in K7.
 - [ ] [G] The less-evidence reduction lands as its own commit with its entry.
+- [ ] [G] The less-evidence reduction does not reduce any baseline task, baseline evidence, or baseline comparison, including the Phase 0 test-suite baseline and the final-gate comparison restored at stage E2.
 - [ ] [H] The named design-check pass is in single-pass preflight, adds no delegation, and is pinned by a contract test.
 - [ ] [H] All 6 copies of the atomic-plan-contract skill describe the new rules, and contract tests pin them.
 - [ ] [I] Layer 1 and layer 2 honor `early_start` only for the named dependency; a dependent at `pr_open` or later requires the dependency merged and a string `synced_at`; and without the key both layers are unchanged.
@@ -89,6 +95,12 @@ The tag on each criterion names the delivery stage that owes it, as defined in `
 - [ ] [I] No baseline task, evidence, or comparison requirement is removed.
 - [ ] [I] Older checkpoints and plans still validate: existing fixtures pass unchanged, and no Epic #1019 feature folder or admitted plan is edited.
 - [ ] [I] Merge is still impossible without a passing review and green CI, within the limit stated in D10.
+- [ ] [J] The `review/verdict` status, state `success`, is posted through `gh api repos/{owner}/{repo}/statuses/{sha}` only after a review returns PASS for the current PR head, with a description naming the review artifact; a test shows that no status is posted for any other verdict or for a non-current head.
+- [ ] [J] A new push leaves the new head without the `review/verdict` status, so review must pass again before the status is posted on that head.
+- [ ] [J] Records are committed before the status is posted, or a narrow tested rule re-posts the status for a records-only head after checking that the diff between the reviewed head and the new head is records-only; tests cover a records-only diff and negative cases such as a diff that includes a non-record path.
+- [ ] [J] The rules that post the status for a main sync into an integration branch, a records-only PR, and a promotion-record PR are each narrow, keyed on the diff and the branch pattern, and tested with positive and negative cases.
+- [ ] [J] The skill text states the limit: anyone with write access, including any agent with `gh`, can post the status, and it records a passing review and does not prove one.
+- [ ] [J] The status adds no CI run, no CI job, no workflow file, no committed verdict file, and no GitHub ruleset change.
 
 ## Non-Goals
 

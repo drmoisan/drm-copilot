@@ -46,7 +46,7 @@ Generate plans using the atomic plan contract defined in the `atomic-plan-contra
 - Phase headings: `### Phase N — <Title>`
 - Task IDs: `- [ ] [P#-T#] <description>`
 - Sequential task numbering within each phase
-- Phase 0: baseline capture (repo-policy reading tasks + language-specific static tool baselines; no test suite runs)
+- Phase 0: baseline capture (language-specific static tool baselines and one parallel test-suite baseline run per gate, the `Phase 0 baseline`)
 - Final phase: full QA loop for each applicable language, ending with the self-review task that writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`
 
 Every plan is design-level per `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: tasks name files, symbols, behavior, tests, and acceptance; anchors are symbols, headings, or test names, never line numbers or commit SHAs; literals appear only where they are the asserted value; tool routes and launchers are not restated because the `execution-environment` skill owns them; and a plan above 40 tasks or 400 lines carries a `## Size Justification` section. Every plan carries a `## Pre-Mortem` section with one bullet for each of `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`; the planner SubagentStop hook blocks a plan without it.
@@ -55,7 +55,7 @@ Every plan is design-level per `## Design-Level Plan Contract (Mandatory)` in th
 
 1. Every task must be atomic: one binary outcome, one verifiable acceptance criterion.
 2. Every task must include explicit file paths.
-3. Include explicit static baseline tasks and final-QA coverage tasks for each language where policy requires coverage, with per-file coverage read from the single gate run.
+3. Include explicit coverage-bearing baseline and final-QA testing tasks for each language where policy requires coverage: static baseline tasks, one `Phase 0 baseline` run of each test gate, and final-QA coverage tasks with per-file coverage read from the single gate run and compared with the `Phase 0 baseline`.
 4. Do not add bucket tasks (e.g., "Refactor module" or "Write tests") that cannot be completed as a single binary outcome.
 5. Do not execute implementation; produce the plan only.
 

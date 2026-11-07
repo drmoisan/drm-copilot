@@ -30,8 +30,8 @@
 
 | Language | Files Changed | Tests | Test Result | Baseline Coverage | Post-Change Coverage | New Code Coverage |
 |----------|--------------|-------|-------------|-------------------|---------------------|-------------------|
-| Python | [N] files | [N] tests | [✅/❌] [N] pass, [N] fail | N/A - no pre-change run | [N]% lines, [N]% funcs | [N]% |
-| PowerShell | [N] files | [N] tests | [✅/❌] [N] pass, [N] fail | N/A - no pre-change run | [N]% cmds, [N]% funcs | [N]% |
+| Python | [N] files | [N] tests | [✅/❌] [N] pass, [N] fail | [N]% lines, [N]% funcs | [N]% lines, [N]% funcs | [N]% |
+| PowerShell | [N] files | [N] tests | [✅/❌] [N] pass, [N] fail | [N]% cmds, [N]% funcs | [N]% cmds, [N]% funcs | [N]% |
 | Bash | [N] files | [N/A] tests | [✅/❌/N/A] | N/A (no coverage) | N/A (no coverage) | N/A |
 | JSON | [N] files | N/A | [✅/❌] validation | N/A (config files) | N/A (config files) | N/A |
 
@@ -39,15 +39,17 @@
 
 ### Coverage Evidence Checklist
 
-- TypeScript baseline coverage artifact: N/A - no pre-change run
+- TypeScript baseline coverage artifact: [path or `N/A - out of scope`]
 - TypeScript post-change coverage artifact: [path or `N/A - out of scope`]
-- PowerShell baseline coverage artifact: N/A - no pre-change run
+- PowerShell baseline coverage artifact: [path or `N/A - out of scope`]
 - PowerShell post-change coverage artifact: [path or `N/A - out of scope`]
 - Per-language comparison summary: [section reference or artifact path]
 
-**Non-negotiable verdict rule:** No policy audit may report PASS unless it includes numeric post-change coverage metrics for every language in scope, plus changed/new-code coverage when required.
+Baseline coverage is read from the plan's `Phase 0 baseline` artifact, one run of the language's gate. A baseline cell or field records `N/A - no pre-change run` only for a new file or for a plan written before the `Phase 0 baseline` rule that captured static baselines only.
 
-**Fail-closed rule:** If any required QA artifact or post-change coverage metric is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
+**Non-negotiable verdict rule:** No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope (or `N/A - no pre-change run` where that record applies), plus changed/new-code coverage when required.
+
+**Fail-closed rule:** If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
 
 **Evidence rule:** Do not synthesize or backfill missing audit evidence from memory or inference. If evidence is missing, stop and list the exact missing artifact paths.
 
@@ -94,6 +96,8 @@
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
+| **Baseline Coverage Documented** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Baseline:** [N]% lines, [N]% functions, read from the `Phase 0 baseline` artifact (or `N/A - no pre-change run`)<br>**Command:** `Invoke-PoshQCParallelTest` or `poetry run pytest -n auto` (one run of the gate)<br>**Artifact:** [path]<br>**Timestamp:** [YYYY-MM-DD HH:MM] |
+| **No Coverage Regression** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Post-change coverage:** [N]% lines, [N]% functions, read from the single gate run<br>**Change:** [+/-N]% lines, [+/-N]% functions against the `Phase 0 baseline`<br>**Status:** [No regression / Regression detected: justification]<br>**Example:** "Baseline: 85.2% → Post-change: 87.1% (+1.9%) ✅ PASS" |
 | **Changed Files Meet Thresholds** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Post-change coverage:** [N]% lines, [N]% functions, read from the single gate run<br>**Thresholds:** [line and branch thresholds that apply]<br>**Status:** [All changed files meet the thresholds / Files below a threshold: list]<br>**Example:** "Post-change: 87.1% against the 85% line threshold ✅ PASS" |
 | **New Code Coverage ≥90%** | [✅/❌/N/A] [PASS/FAIL/N/A] | **New/modified files:** [list files]<br>**New code coverage:** [N]% (must be ≥90%)<br>**Calculation method:** [describe how new code was isolated for measurement]<br>**Example:** "New module `foo.py`: 127/135 lines covered = 94.1% ✅ PASS" |
 | **Comprehensive Coverage** | [✅/❌/N/A] [PASS/FAIL/N/A] | **All functions/classes tested:**<br>- `function_name()` (lines X-Y): [N] tests<br>- `ClassName` (lines A-B): [N] tests<br>**Untested code:** [list with justification]<br>**Example:**<br>- `parse_config()` (lines 45-67): 3 tests<br>- `ConfigLoader` (lines 100-150): 5 tests<br>- Untested: `__repr__()` (trivial representation, no business logic) |
@@ -108,7 +112,7 @@
 
 Repeat one bullet per in-scope language that has coverage requirements. Keep the checklist above even when a language is out of scope, but use `N/A - out of scope` for the artifact path.
 
-- [Language]: Baseline: N/A - no pre-change run -> Post-change: [N]% [unit]. Change: N/A. New/changed-code coverage: [N]% or `N/A - out of scope`. Disposition: [PASS/FAIL/N/A]. Evidence: [artifact path(s)].
+- [Language]: Baseline: [N]% [unit] (from the `Phase 0 baseline` artifact, or `N/A - no pre-change run`) -> Post-change: [N]% [unit]. Change: [+/-N]% [unit delta] (or N/A). New/changed-code coverage: [N]% or `N/A - out of scope`. Disposition: [PASS/FAIL/N/A]. Evidence: [artifact path(s)].
 
 ### 1.3 Test Structure and Diagnostics
 
@@ -352,7 +356,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Use Pester v5.x** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe Pester v5 features used (BeforeAll, BeforeEach, Describe/Context/It, modern Should syntax).] |
+| **Use Pester v6.x** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe Pester v6 features used (BeforeAll, BeforeEach, Describe/Context/It, modern Should syntax).] |
 | **Use PoshQC Configuration** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCParallelTest -Root .`<br>**Config:** `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`<br>[Describe configuration updates if any.] |
 | **PowerShell 5.1 & 7.6+ Compatible** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe compatibility testing. Note any version-specific features.] |
 
@@ -514,7 +518,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 
 [Provide a brief summary of overall compliance status and any major findings.]
 
-**Fail-closed reminder:** Do not mark the audit PASS, fully compliant, or ready for merge when any required QA artifact or post-change coverage metric is missing.
+**Fail-closed reminder:** Do not mark the audit PASS, fully compliant, or ready for merge when any required baseline artifact, QA artifact, coverage metric, or coverage-comparison artifact is missing.
 
 ---
 

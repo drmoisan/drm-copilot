@@ -63,7 +63,7 @@ The orchestrator authors `remediation/<entry-ts>/remediation-inputs.md` with:
 - Enumerated fix list with file paths, expected behavior, and verification commands.
 - A "do not do" list (no scope creep, no policy weakening, no silent skips).
 - A pointer to the audit artifacts that produced the findings.
-- Exactly one mode line, `Remediation-Mode: proportionate` or `Remediation-Mode: design`. The cycle is proportionate when every `autonomous` finding can be fixed without changing a spec acceptance criterion, a public interface, or the item's file inventory beyond the files already in the branch diff plus their tests and mirrors; otherwise it is design. CI-failure findings are normally proportionate.
+- Exactly one mode line, `Remediation-Mode: proportionate` or `Remediation-Mode: design`. The cycle is proportionate when every `autonomous` finding can be fixed without changing a spec acceptance criterion, a public interface, or the item's file inventory beyond the files already in the branch diff plus their tests and mirrors; otherwise it is design. CI-failure findings are normally proportionate. `Remediation-Mode: light` is the orchestrate skill's third value: a light cycle has no planner delegation and never reaches this handoff, and a light cycle that falls back to R1 has its line rewritten to `Remediation-Mode: proportionate` or `Remediation-Mode: design` first.
 
 Proportionate cycle. One `atomic-planner` delegation writes a short plan; one `atomic-executor` delegation then runs single-pass preflight with in-place trivial fixes and executes the plan in the same run. The orchestrator records `preflight: {iterations: 1, final_status: "clear"}` on the cycle before `execution_status`. When that preflight finds a substantive defect, the executor stops with `BLOCKED at preflight (before [P0-T1])`, a plan delta, and no checked task, and the orchestrator converts the cycle to design mode by rewriting the mode line to `Remediation-Mode: design` before one planner revision.
 
@@ -98,7 +98,7 @@ A comprehensive or final sweep in a remediation cycle covers that cycle's own pl
 
 - Phase headings: `### Phase N — <Title>`.
 - Tasks: `- [ ] [P#-T#]` with sequential per-phase IDs.
-- Phase 0 captures policy reads and static baseline results per `policy-compliance-order` and `evidence-and-timestamp-conventions`.
+- Phase 0 captures static baseline results and the `Phase 0 baseline` test-suite run per `evidence-and-timestamp-conventions`.
 - Final phase runs the full toolchain QA loop in the order specified by `atomic-plan-contract` and records numeric coverage values where the repository policy requires coverage.
 - Evidence paths resolve to `<FEATURE>/evidence/<kind>/` per the non-overridable evidence path clause.
 - The plan is design-level per `## Design-Level Plan Contract (Mandatory)` in `atomic-plan-contract`, carries a `## Pre-Mortem` section, and ends with the final-phase self-review task. A proportionate plan covers only the listed findings and stays short.

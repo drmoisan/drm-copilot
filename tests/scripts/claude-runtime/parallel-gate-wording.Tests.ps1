@@ -1,24 +1,26 @@
 Set-StrictMode -Version Latest
 
-# Contract guard for issue #1094: the mirrored skills, agents, prompts, and
-# templates name only the parallel test gates and read coverage from the single
-# gate run. Each `PGW-` row holds one file with its required and forbidden
-# tokens, so a removed requirement that returns to any mirrored copy fails that
-# copy's row. Files are read in place; the suite writes nothing.
+# Contract guard for issue #1094, with the test-suite baseline restored by issue
+# #1097: the mirrored skills, agents, prompts, and templates name only the
+# parallel test gates, read coverage from the single gate run, and compare it
+# with the Phase 0 baseline, which is one run of the same parallel gate. Each
+# `PGW-` row holds one file with its required and forbidden tokens, so a removed
+# serial or targeted run that returns to any mirrored copy fails that copy's row.
+# Files are read in place; the suite writes nothing.
 
 BeforeDiscovery {
-    $script:ContractForbidden = @('baseline test-step', 'baseline and final-QC coverage', 'delta/threshold verification', 'baseline coverage')
-    $script:QaGateForbidden = @('Phase A baseline', 'Delta Requirements', 'zero-regression', 'baseline coverage', 'Targeted runs are allowed')
+    $script:ContractForbidden = @('no test suite runs', 'no earlier figure')
+    $script:QaGateForbidden = @('Targeted runs are allowed')
     $script:PowerShellQaGateForbidden = $script:QaGateForbidden + @('run_poshqc_test')
     $script:PythonQaGateForbidden = $script:QaGateForbidden + @('poetry run pytest --cov')
-    $script:ReviewRequired = @('debugging only', 'N/A - no pre-change run')
-    $script:ReviewForbidden = @('smallest relevant subset', 'regression on changed lines')
+    $script:ReviewRequired = @('debugging only', 'N/A - no pre-change run', 'Phase 0 baseline')
+    $script:ReviewForbidden = @('smallest relevant subset')
     $script:ReviewCommandForbidden = $script:ReviewForbidden + @('run_poshqc_test')
     $script:ExecutorListForbidden = @('`mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`')
     $script:CopilotPesterForbidden = @('mcp_drmcopilotext_run_poshqc_test')
     $script:CopilotFocusedForbidden = @('-k slug_extraction')
-    $script:AuditRequired = @('N/A - no pre-change run', 'poetry run pytest -n auto', 'Invoke-PoshQCParallelTest')
-    $script:AuditForbidden = @('numeric baseline', 'Baseline (pre-development)', 'Invoke-PoshQCTest')
+    $script:AuditRequired = @('N/A - no pre-change run', 'poetry run pytest -n auto', 'Invoke-PoshQCParallelTest', 'Phase 0 baseline')
+    $script:AuditForbidden = @('Invoke-PoshQCTest')
 }
 
 Describe 'Parallel gate wording' {
@@ -74,20 +76,20 @@ Describe 'Parallel gate wording' {
     }
 
     It 'PGW-<Id> carries the required wording and no forbidden wording' -ForEach @(
-        @{ Id = 'PLAN-CLAUDE'; Path = '.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run'); Forbidden = $script:ContractForbidden }
-        @{ Id = 'PLAN-AGENTS'; Path = '.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run'); Forbidden = $script:ContractForbidden }
-        @{ Id = 'PLAN-GITHUB'; Path = '.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run'); Forbidden = $script:ContractForbidden }
-        @{ Id = 'PLAN-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run'); Forbidden = $script:ContractForbidden }
-        @{ Id = 'PLAN-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run'); Forbidden = $script:ContractForbidden }
-        @{ Id = 'PLAN-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run'); Forbidden = $script:ContractForbidden }
-        @{ Id = 'QA-PS-CLAUDE'; Path = '.claude/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only'); Forbidden = $script:PowerShellQaGateForbidden }
-        @{ Id = 'QA-PS-AGENTS'; Path = '.agents/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only'); Forbidden = $script:PowerShellQaGateForbidden }
-        @{ Id = 'QA-PS-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only'); Forbidden = $script:PowerShellQaGateForbidden }
-        @{ Id = 'QA-PS-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only'); Forbidden = $script:PowerShellQaGateForbidden }
-        @{ Id = 'QA-PY-CLAUDE'; Path = '.claude/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only'); Forbidden = $script:PythonQaGateForbidden }
-        @{ Id = 'QA-PY-AGENTS'; Path = '.agents/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only'); Forbidden = $script:PythonQaGateForbidden }
-        @{ Id = 'QA-PY-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only'); Forbidden = $script:PythonQaGateForbidden }
-        @{ Id = 'QA-PY-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only'); Forbidden = $script:PythonQaGateForbidden }
+        @{ Id = 'PLAN-CLAUDE'; Path = '.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline'); Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-AGENTS'; Path = '.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline'); Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-GITHUB'; Path = '.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline'); Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline'); Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline'); Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline'); Forbidden = $script:ContractForbidden }
+        @{ Id = 'QA-PS-CLAUDE'; Path = '.claude/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PowerShellQaGateForbidden }
+        @{ Id = 'QA-PS-AGENTS'; Path = '.agents/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PowerShellQaGateForbidden }
+        @{ Id = 'QA-PS-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PowerShellQaGateForbidden }
+        @{ Id = 'QA-PS-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PowerShellQaGateForbidden }
+        @{ Id = 'QA-PY-CLAUDE'; Path = '.claude/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PythonQaGateForbidden }
+        @{ Id = 'QA-PY-AGENTS'; Path = '.agents/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PythonQaGateForbidden }
+        @{ Id = 'QA-PY-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PythonQaGateForbidden }
+        @{ Id = 'QA-PY-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PythonQaGateForbidden }
         @{ Id = 'REVIEW-CLAUDE'; Path = '.claude/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewCommandForbidden }
         @{ Id = 'REVIEW-AGENTS'; Path = '.agents/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewCommandForbidden }
         @{ Id = 'REVIEW-GITHUB'; Path = '.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
@@ -96,9 +98,9 @@ Describe 'Parallel gate wording' {
         @{ Id = 'REVIEW-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
         @{ Id = 'ADAPTER-AGENTS'; Path = '.agents/skills/repo-automation-adapter/SKILL.md'; Required = @('not a validation gate', 'Invoke-PoshQCParallelTest'); Forbidden = @() }
         @{ Id = 'ADAPTER-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/repo-automation-adapter/SKILL.md'; Required = @('not a validation gate', 'Invoke-PoshQCParallelTest'); Forbidden = @() }
-        @{ Id = 'EXEC-CLAUDE'; Path = '.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto'); Forbidden = $script:ExecutorListForbidden }
-        @{ Id = 'EXEC-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto'); Forbidden = $script:ExecutorListForbidden }
-        @{ Id = 'EXEC-CODEX'; Path = '.codex/agents/atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto'); Forbidden = $script:ExecutorListForbidden }
+        @{ Id = 'EXEC-CLAUDE'; Path = '.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto', 'Phase 0 baseline'); Forbidden = $script:ExecutorListForbidden }
+        @{ Id = 'EXEC-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto', 'Phase 0 baseline'); Forbidden = $script:ExecutorListForbidden }
+        @{ Id = 'EXEC-CODEX'; Path = '.codex/agents/atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto', 'Phase 0 baseline'); Forbidden = $script:ExecutorListForbidden }
         @{ Id = 'EXEC-CODEX-POWERSHELL'; Path = '.codex/agents/powershell-atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = @('run_poshqc_test') }
         @{ Id = 'COPILOT-EXEC'; Path = '.github/agents/atomic_executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
         @{ Id = 'COPILOT-EXEC-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/atomic_executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
@@ -126,8 +128,8 @@ Describe 'Parallel gate wording' {
         @{ Id = 'COPILOT-STAGED-REVIEW-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/staged-review.agent.md'; Required = @('Invoke-PoshQCParallelTest', 'pytest -n auto', 'debugging only'); Forbidden = @() }
         @{ Id = 'AUDIT-TEMPLATE'; Path = 'docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
         @{ Id = 'AUDIT-TEMPLATE-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
-        @{ Id = 'AUDIT-AGENTS'; Path = 'docs/features/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest'); Forbidden = @('Document baseline coverage') }
-        @{ Id = 'AUDIT-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest'); Forbidden = @('Document baseline coverage') }
+        @{ Id = 'AUDIT-AGENTS'; Path = 'docs/features/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest', 'Phase 0 baseline'); Forbidden = @() }
+        @{ Id = 'AUDIT-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest', 'Phase 0 baseline'); Forbidden = @() }
     ) {
         # Arrange
         $text = Get-PgwSurfaceText -RelativePath $Path
@@ -143,18 +145,13 @@ Describe 'Parallel gate wording' {
 
     Context 'Class sweep' {
         BeforeAll {
-            # The removed-class tokens. `baseline coverage` is not listed, because the
-            # policy-audit template keeps it as a validator anchor.
+            # The removed run-class tokens: targeted, per-batch, and subset test runs.
+            # Baseline wording is not swept, because issue #1097 restored the Phase 0
+            # baseline as one run of the parallel gate.
             $script:SweepToken = @(
-                'zero-regression', 'numeric baseline', 'coverage delta', 'coverage-comparison', 'coverage-bearing',
-                'captured baseline', 'Phase A baseline', 'coverage baseline', '>= baseline', 'baseline/post',
-                'regression on changed lines', 'regressed from baseline', 'test deltas', 'coverage deltas',
-                'failing tests delta', 'failing-test delta', 'failing-tests delta', 'Pester delta', 'Pytest delta',
-                'xUnit delta', 'Delta Requirements', 'does not regress', 'compared to baseline',
-                'no decrease in coverage', 'maintained or improved', 'targeted Pester', 'targeted Pytest',
-                'targeted xUnit', 'targeted MSTest', 'targeted tests', 'run tests after each',
-                'relevant tests using', 'running tests frequently', 'smallest applicable subset',
-                'relevant tests pass', 'baseline, targeted, and end-state', 'repro and regression test',
+                'targeted Pester', 'targeted Pytest', 'targeted xUnit', 'targeted MSTest', 'targeted tests',
+                'run tests after each', 'relevant tests using', 'running tests frequently',
+                'smallest applicable subset', 'relevant tests pass', 'repro and regression test',
                 'Run the regression to confirm'
             )
 
@@ -253,7 +250,7 @@ Describe 'Parallel gate wording' {
                 })
 
             # Assert
-            $tokens.Count | Should -Be 38 -Because 'the plan names 38 sweep tokens'
+            $tokens.Count | Should -Be 12 -Because 'the plan names 12 run-class sweep tokens'
             $missed | Should -BeNullOrEmpty -Because 'a reintroduced token must fail the sweep'
         }
     }

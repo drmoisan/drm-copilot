@@ -2,11 +2,9 @@ Set-StrictMode -Version Latest
 
 Describe "run-actionlint.ps1" {
     BeforeAll {
-        # Record whether the global Import-ScriptFunction helper and the Microsoft.PowerShell.Archive module
-        # (auto-loaded by the Expand-Archive mock) exist before this file runs, so the Describe AfterAll removes
-        # only what this file added (issue #1066). TestHelpers.ps1 is dot-sourced here rather than at file scope,
-        # because file-scope code runs during discovery, before this capture.
-        $script:describeHadImportScriptFunction = $ExecutionContext.SessionState.InvokeProvider.Item.Exists('Function:\Import-ScriptFunction')
+        # Record whether the Microsoft.PowerShell.Archive module (auto-loaded by the Expand-Archive mock) is
+        # loaded before this file runs, so the Describe AfterAll removes it only when this file added it
+        # (issue #1066).
         $script:describeHadArchiveModule = $null -ne (Get-Module -Name Microsoft.PowerShell.Archive)
         . ([System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, '..', 'powershell', 'Support', 'TestHelpers.ps1')))
 
@@ -45,13 +43,9 @@ Describe "run-actionlint.ps1" {
         }
     }
 
-    # Remove the global helper and the Archive module only when they were absent before this file ran. No command
-    # mocked in a Context is called here.
+    # Remove the Archive module only when it was absent before this file ran. No command mocked in a Context is
+    # called here.
     AfterAll {
-        $functionPath = 'Function:\Import-ScriptFunction'
-        if (-not $script:describeHadImportScriptFunction -and $ExecutionContext.SessionState.InvokeProvider.Item.Exists($functionPath)) {
-            $ExecutionContext.SessionState.InvokeProvider.Item.Remove($functionPath, $false)
-        }
         if (-not $script:describeHadArchiveModule -and $null -ne (Get-Module -Name Microsoft.PowerShell.Archive)) {
             Remove-Module -Name Microsoft.PowerShell.Archive
         }

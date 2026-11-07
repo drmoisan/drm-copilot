@@ -313,7 +313,7 @@ function Get-RemediationLightCycleError {
     for ($index = 0; $index -lt $cycleItems.Count; $index++) {
         $item = $cycleItems[$index]
         if (-not (Test-CheckpointObjectValue -Value $item)) { continue }
-        $member = Get-CheckpointObjectMember -Owner $item -Name $script:REMEDIATION_PATH_KEY
+        $member = Get-CheckpointObjectOrdinalMember -Owner $item -Name $script:REMEDIATION_PATH_KEY
         if (-not $member.Present) { continue }
 
         # Rule 1 routes by exact value: full has no further rule, and anything other
@@ -327,16 +327,16 @@ function Get-RemediationLightCycleError {
         }
 
         $prefix = "Checkpoint remediation cycle #$index remediation_path is light but"
-        if ((Get-CheckpointObjectMember -Owner $item -Name 'preflight').Present) {
+        if ((Get-CheckpointObjectOrdinalMember -Owner $item -Name 'preflight').Present) {
             $errors.Add("$prefix the cycle carries preflight.")
         }
 
-        $opened = Get-CheckpointObjectMember -Owner $item -Name $script:OPENED_BY_REVIEW_KEY
+        $opened = Get-CheckpointObjectOrdinalMember -Owner $item -Name $script:OPENED_BY_REVIEW_KEY
         if (-not $opened.Present -or -not (Test-RemediationOpenedByReview -OpenedByReview $opened.Value -Outcomes $Outcomes)) {
             $errors.Add("$prefix opened_by_review does not name its opening review.")
         } else {
             $outcome = @($Outcomes)[[int]$opened.Value]
-            $findings = (Get-CheckpointObjectMember -Owner $outcome -Name 'findings').Value
+            $findings = (Get-CheckpointObjectOrdinalMember -Owner $outcome -Name 'findings').Value
             $findingList = @()
             if (Test-CheckpointListValue -Value $findings) { $findingList = @($findings) }
             if ($findingList.Count -gt $script:LIGHT_FINDING_LIMIT) {
@@ -349,7 +349,7 @@ function Get-RemediationLightCycleError {
                 for ($findingIndex = 0; $findingIndex -lt $findingList.Count; $findingIndex++) {
                     $finding = $findingList[$findingIndex]
                     $value = $null
-                    if (Test-CheckpointObjectValue -Value $finding) { $value = (Get-CheckpointObjectMember -Owner $finding -Name $key).Value }
+                    if (Test-CheckpointObjectValue -Value $finding) { $value = (Get-CheckpointObjectOrdinalMember -Owner $finding -Name $key).Value }
                     if (-not (($value -is [string]) -and ([string]$value -ceq $required))) {
                         $suffix = if ($key -ceq 'remediability') { 'is not autonomous.' } else { 'scope is not contained.' }
                         $errors.Add("$prefix finding #$findingIndex $suffix")
@@ -360,7 +360,7 @@ function Get-RemediationLightCycleError {
 
         # Rule 7: two light cycles may not run back to back.
         if ($index -gt 0 -and (Test-CheckpointObjectValue -Value $cycleItems[$index - 1])) {
-            $priorPath = (Get-CheckpointObjectMember -Owner $cycleItems[$index - 1] -Name $script:REMEDIATION_PATH_KEY).Value
+            $priorPath = (Get-CheckpointObjectOrdinalMember -Owner $cycleItems[$index - 1] -Name $script:REMEDIATION_PATH_KEY).Value
             if (($priorPath -is [string]) -and ([string]$priorPath -ceq $script:LIGHT_REMEDIATION_PATH)) {
                 $errors.Add("$prefix the prior cycle is light.")
             }

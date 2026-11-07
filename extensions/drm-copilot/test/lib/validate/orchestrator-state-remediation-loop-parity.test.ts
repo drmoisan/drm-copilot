@@ -46,7 +46,7 @@ const CORPUS_DIR = path.resolve(
 const CORPUS_SUFFIX = ".json";
 
 /** Floor on corpus size, equal to the Python and Pester floors. */
-const MINIMUM_CORPUS_COUNT = 55;
+const MINIMUM_CORPUS_COUNT = 58;
 
 /** Family filter restated from the spec. */
 const FAMILY_SUBSTRING = "remediation";

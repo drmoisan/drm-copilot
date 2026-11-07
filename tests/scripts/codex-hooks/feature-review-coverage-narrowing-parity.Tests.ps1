@@ -99,6 +99,8 @@ Describe 'feature-review coverage narrowing parity (issue #1094)' {
         # Baseline isolation for the closure seams of the two hooks (epic-state discovery guard): no
         # seam reads live repository state. The cases call only the row rule.
         . $script:ClaudeHook
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
         Mock Get-ArtifactFileContent { $null }
         if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Mock Get-ChangedLanguageSet { $null } }
         if (Get-Command Get-JacocoRepoCoverage -ErrorAction SilentlyContinue) { Mock Get-JacocoRepoCoverage { $null } }
@@ -126,6 +128,8 @@ Describe 'feature-review coverage narrowing parity (issue #1094)' {
             return ($definitions[0].Extent.Text -replace "`r`n", "`n")
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 
     It 'FRN-ACCEPT: <Surface> accepts <Case>' -ForEach $script:AcceptCases {
         # Act

@@ -1,0 +1,15 @@
+# Stage F1 Patch Rebase — Entry 0006
+
+Timestamp: 2026-11-07T16-34
+Command: SCRATCH/f1/issue-1097-f1-pathcheck.py (per-path git apply -R --check of the stored 0006 patch against the merged working tree); SCRATCH/f1/issue-1097-f1-preimage.py (for each failing path: git merge-file of the patch's preimage blob with PR #1108's diff, merge base of origin/main and the pre-merge head to origin/main; git hash-object -w); SCRATCH/f1/issue-1097-f1-rebase0006.sh (GIT_INDEX_FILE under SCRATCH seeded by git read-tree HEAD; git apply -R --cached of the old patch excluding the failing paths; git update-index --cacheinfo of the new pre-images; git write-tree; git diff --binary --no-renames <tree> HEAD over the 217 Files Changed paths); git apply -R --check of the installed patch; SCRATCH/f1/issue-1097-f1-replay.ps1 -BaseRef <rebased pre-0006 tree> (Test-ProcessReductionLedger over Read-ProcessReductionLedger, Invoke-ProcessReductionRevert of every 0006 Revert Block compared per path with the pre-0006 tree, every Current fence of every entry counted)
+EXIT_CODE: 0
+Output Summary:
+  Old patch against the merged tree: 217 paths, 12 failing the reverse check: the ten conflicted paths plus .github/agents/powershell-typed-engineer.agent.md and its bundle copy (PR #1108 renamed Pester v5 to Pester v6 in hunk context there).
+  Pre-images for the 12 paths: git merge-file conflicts 0; each new pre-image differs from the old one by PR #1108's renames only (xUnit to MSTest in the three C# sources and bundles; v5 to v6 in the three PowerShell sources and bundles). For all 12 the old pre-image equals the merge-base text and the new pre-image equals the origin/main text.
+  Scratch index: reverse apply of the 205 passing paths exit 0; cacheinfo updates 12; tree written.
+  New patch: 217 diff sections over the 217 Files Changed paths (path set unchanged); 8045 lines, as before. Apart from index lines, every changed line of the patch is a hunk line whose only difference is an xUnit/MSTest or v5/v6 token (38 lines); no hunk was added or removed. Patch carries no CR characters.
+  git apply -R --check of the installed patch against the working tree: exit 0.
+  Entry text: `## Stored Patch` and `## Reason and Evidence` each gain the sentence recording the rebase over PR #1108 (issue #1106); the Stored Patch first sentence now reads "It was generated as" because the patch was regenerated.
+  Revert Blocks: 25 blocks of 0006 replay to their Prior text; per-path comparison with the rebased pre-0006 tree equal for all 5 paths (.agents, .claude, .github atomic-plan-contract, the brief, the policy-audit template). Blocks edited: none. Current fences of all six entries: 155 checked, each unique in its target, failures 0.
+  Ledger: Test-ProcessReductionLedger IsValid=True, 6 rows, 6 entries.
+  Asserting tests (search of tests for 0006-test-suite-baseline-restored): ProcessReductionLedger.Index.Tests.ps1 reads the entry structure and the index row; the heading set is unchanged, so it is unchanged.

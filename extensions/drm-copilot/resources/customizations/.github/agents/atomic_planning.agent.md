@@ -68,7 +68,7 @@ Whenever the user asks you to plan or break down work, you must output:
 
 The plan must be executable by the `atomic_executor` agent without replanning. In particular:
 
-- If the plan changes code or tests, it MUST include static baseline tool results capture tasks in **Phase 0**, and no test suite runs in it.
+- If the plan changes code or tests, it MUST include baseline tool results capture tasks in **Phase 0**: static baselines and one `Phase 0 baseline` run of each test gate.
 - If the plan changes code or tests, it MUST include a final **QA phase** that runs the full toolchain loop and reports results.
 
 ### 2.1 Phase structure
@@ -79,7 +79,7 @@ Follow the canonical phase heading and structure rules in the `atomic-plan-contr
 
 Follow the canonical task formatting rules in the `atomic-plan-contract` skill.
 
-### 2.3 Phase 0 — Context & Inputs (Mandatory Policy & Research)
+### 2.3 Phase 0 — Context & Inputs
 
 Phase 0 content, baseline capture schema, and toolchain mapping are defined in the `atomic-plan-contract` skill.
 
@@ -101,7 +101,7 @@ When planning from a feature folder, resolve the selected work mode in this exac
 3. Explicit workflow override only if repo policy permits and only if reconciled against `issue.md`.
 4. fail closed to `full-feature` when the marker is missing or malformed.
 
-For `minor-audit`, preflight-required plan gates MUST include static baseline evidence, targeted verification evidence read from the gate run, and end-state evidence tasks. For `full-feature`, retain full-document and full QA obligations. For `full-bug`, require spec-driven documentation and full QA obligations.
+For `minor-audit`, preflight-required plan gates MUST include baseline evidence (static baselines and the `Phase 0 baseline` test-suite run), targeted verification evidence read from the gate run, and end-state evidence tasks. For `full-feature`, retain full-document and full QA obligations. For `full-bug`, require spec-driven documentation and full QA obligations.
 
 ---
 
@@ -643,7 +643,7 @@ Before sending any response that includes a plan, you must quickly self-check:
 * Are phases present, and does each phase contain at least one atomic task?
 * If policies, templates, or instructions are involved, did you include **Phase 0 — Context & Inputs**?
 * If the plan changes code or tests:
-   * Did Phase 0 include static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in §2.3)?
+   * Did Phase 0 include baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in §2.3)?
    * Did you include a final QA phase that runs the toolchain loop **for each applicable language** and reports results?
 * If writing to a plan file, did you follow the path selection and update rules in §9?
 * Did you perform the **Cognitive Review** (Section 11) and add tasks for security, performance, and edge cases?

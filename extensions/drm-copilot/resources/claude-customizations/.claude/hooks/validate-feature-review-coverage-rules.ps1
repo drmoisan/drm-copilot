@@ -49,6 +49,8 @@ function Get-ReviewArtifactPathFromOutput {
 }
 
 function Get-ReviewArtifactInfo {
+    # Path is the repository-relative value: the hook converts an absolute path inside the resolved
+    # item worktree with Resolve-SubagentStopArtifactLocation before this rule runs (issue #1105).
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(

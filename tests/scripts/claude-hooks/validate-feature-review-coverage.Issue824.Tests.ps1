@@ -21,6 +21,8 @@
 
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-feature-review-coverage.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
     $script:RealGetArtifactFileContent = ${function:Get-ArtifactFileContent}
     $script:RealGetChangedLanguageSet = ${function:Get-ChangedLanguageSet}
     $script:RealGetJacocoRepoCoverage = ${function:Get-JacocoRepoCoverage}
@@ -264,4 +266,8 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
             $result.Message | Should -Match $Pattern
         }
     }
+}
+
+Describe 'epic-state baseline isolation (issue #1105)' {
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 }

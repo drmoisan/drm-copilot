@@ -98,6 +98,33 @@ Describe 'Checkpoint member accessor' {
     }
 }
 
+Describe 'Checkpoint ordinal member accessor' {
+    # Issue #1097 review item N1: Python and TypeScript read keys ordinally, so the
+    # light-path keys must not match a case variant in PowerShell either.
+
+    It 'reports an exactly named member as present with its value' {
+        $result = Get-CheckpointObjectOrdinalMember -Owner ('{"scope":"contained"}' | ConvertFrom-Json) -Name 'scope'
+        $result.Present | Should -BeTrue
+        $result.Value | Should -Be 'contained'
+    }
+
+    It 'reports a member whose name differs only in case as absent' {
+        $result = Get-CheckpointObjectOrdinalMember -Owner ('{"Scope":"contained"}' | ConvertFrom-Json) -Name 'scope'
+        $result.Present | Should -BeFalse
+        $result.Value | Should -BeNullOrEmpty
+    }
+
+    It 'reports a present null member as present with a null value' {
+        $result = Get-CheckpointObjectOrdinalMember -Owner ('{"remediation_path":null}' | ConvertFrom-Json) -Name 'remediation_path'
+        $result.Present | Should -BeTrue
+        $result.Value | Should -BeNullOrEmpty
+    }
+
+    It 'reports a member as absent when the owner is not an object' {
+        (Get-CheckpointObjectOrdinalMember -Owner 'scalar' -Name 'scope').Present | Should -BeFalse
+    }
+}
+
 Describe 'Ordinal key sorting' {
 
     It 'orders uppercase before lowercase, matching Python sorted()' {

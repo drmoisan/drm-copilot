@@ -14,7 +14,7 @@ handoffs:
     send: true
   - label: Small-scope implementation path
     agent: python-typed-engineer
-    prompt: "Estimate and confirm scope (1-3 production Python files + corresponding tests). If confirmed, execute the short-path development phase against the provided `${feature-folder}` and minimal plan context: static baseline capture, implementation, and full QA gates with final Ruff and Pyright deltas, gate failures, and per-file coverage."
+    prompt: "Estimate and confirm scope (1-3 production Python files + corresponding tests). If confirmed, execute the short-path development phase against the provided `${feature-folder}` and minimal plan context: baseline capture, implementation, and full QA gates with final Ruff/Pyright/test/coverage deltas."
     send: true
   - label: Validate small-path delivery and post-QC docs
     agent: atomic_executor
@@ -38,11 +38,11 @@ handoffs:
     send: true
   - label: Build atomic plan (preflight all clear)
     agent: atomic_planner
-    prompt: "You are atomic_planner.\n\nUse the prompt structure and requirements from `.github/prompts/generate-atomic-plan.prompt.md` as the canonical template.\nThe calling agent provides a REQUIRED target plan path `${plan-path}`; update this file in place and do NOT create additional `plan.*.md` siblings during drafting or preflight revision loops.\n\nContext package:\n- objective + expected outcome\n- `${promotion-type}` and `${issue-num}` when available\n- `${feature-folder}`\n- `${feature-folder}/issue.md`\n- `${feature-folder}/spec.md`\n- `${feature-folder}/user-story.md` (or explicit `NONE`)\n- latest research artifact path(s)\n- constraints/APIs/invariants to preserve\n\nCore requirements:\n- Generate a deterministic phased atomic plan (planning only).\n- Require single-pass validation-only preflight through `atomic_executor` (trivial defects fixed in place, at most one return to the planner) ending in `PREFLIGHT: ALL CLEAR` while preserving the same target path `${plan-path}`.\n- Follow the design-level plan contract and include a `## Pre-Mortem` section.\n- Plan MUST include explicit static baseline tasks and final-QC coverage tasks for each language in scope where policy requires coverage; coverage MUST NOT be left as UNVERIFIED for PASS outcomes.\n- Return the finalized plan path and final preflight signal; do not execute implementation."
+    prompt: "You are atomic_planner.\n\nUse the prompt structure and requirements from `.github/prompts/generate-atomic-plan.prompt.md` as the canonical template.\nThe calling agent provides a REQUIRED target plan path `${plan-path}`; update this file in place and do NOT create additional `plan.*.md` siblings during drafting or preflight revision loops.\n\nContext package:\n- objective + expected outcome\n- `${promotion-type}` and `${issue-num}` when available\n- `${feature-folder}`\n- `${feature-folder}/issue.md`\n- `${feature-folder}/spec.md`\n- `${feature-folder}/user-story.md` (or explicit `NONE`)\n- latest research artifact path(s)\n- constraints/APIs/invariants to preserve\n\nCore requirements:\n- Generate a deterministic phased atomic plan (planning only).\n- Require single-pass validation-only preflight through `atomic_executor` (trivial defects fixed in place, at most one return to the planner) ending in `PREFLIGHT: ALL CLEAR` while preserving the same target path `${plan-path}`.\n- Follow the design-level plan contract and include a `## Pre-Mortem` section.\n- Plan MUST include explicit coverage-bearing baseline (the `Phase 0 baseline`, one run of each test gate) and final-QC testing tasks for each language in scope where policy requires coverage; coverage MUST NOT be left as UNVERIFIED for PASS outcomes.\n- Return the finalized plan path and final preflight signal; do not execute implementation."
     send: true
   - label: Execute approved atomic plan
     agent: atomic_executor
-    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce quality gates and suppression constraints from applicable repo policies.\n4) Complete final QA loop for every language command task explicitly present in the approved plan and report lint and type-check deltas, gate failures, and per-file coverage; do not treat SKIPPED as success for final-QC command tasks unless the plan task text explicitly authorizes SKIPPED.\n5) When language policy requires coverage, execute coverage-enabled test commands and produce numeric per-file coverage results from the single gate run; if those metrics are missing, mark execution as remediation-required rather than PASS.\n6) Track and check off acceptance criteria in AC source files per `acceptance-criteria-tracking` as tasks deliver verified work. Include AC Status Summary at completion.\n\nOutput requirements:\n- execution summary\n- QA summary\n- lint and type-check deltas, gate failures, and per-file coverage\n- AC Status Summary\n- updated plan checklist state"
+    prompt: "Execute the approved atomic plan exactly as written (no replanning, no task reordering).\n\nInputs to use:\n- `${feature-folder}`\n- approved `plan-path` returned by planning handoff\n- constraints/APIs/invariants to preserve\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce quality gates and suppression constraints from applicable repo policies.\n4) Complete final QA loop for every language command task explicitly present in the approved plan and report lint/type/test/coverage deltas; do not treat SKIPPED as success for final-QC command tasks unless the plan task text explicitly authorizes SKIPPED.\n5) When language policy requires coverage, execute coverage-enabled test commands and produce numeric baseline/post/new-code coverage results (baseline from the Phase 0 baseline artifact, post-change and per-file values from the single gate run); if those metrics are missing, mark execution as remediation-required rather than PASS.\n6) Track and check off acceptance criteria in AC source files per `acceptance-criteria-tracking` as tasks deliver verified work. Include AC Status Summary at completion.\n\nOutput requirements:\n- execution summary\n- QA summary\n- lint/type/test/coverage deltas\n- AC Status Summary\n- updated plan checklist state"
     send: true
   - label: Preflight remediation plan clearance
     agent: atomic_executor
@@ -54,7 +54,7 @@ handoffs:
     send: true
   - label: Execute remediation plan
     agent: atomic_executor
-    prompt: "Execute the remediation plan at `${remediation-plan-path}` exactly as written for `${feature-folder}`. Do not replan or reorder tasks.\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved remediation plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce the repo-standard quality gates for every affected language.\n4) Report execution summary, QA summary, lint and type-check deltas, gate failures, and per-file coverage, and updated remediation-plan checklist state.\n5) When policy requires coverage, include numeric per-file coverage from the single gate run.\n6) Synchronize completed work back to the original feature plan when the remediation plan requires status-sync tasks.\n\nOutput requirements:\n- execution summary\n- QA summary\n- lint and type-check deltas, gate failures, and per-file coverage\n- updated remediation-plan checklist state"
+    prompt: "Execute the remediation plan at `${remediation-plan-path}` exactly as written for `${feature-folder}`. Do not replan or reorder tasks.\n\nExecution requirements:\n1) Run mandatory preflight ingestion checks for the approved remediation plan.\n2) Execute tasks in order with binary acceptance checks.\n3) Enforce the repo-standard quality gates for every affected language.\n4) Report execution summary, QA summary, lint/type/test/coverage deltas, and updated remediation-plan checklist state.\n5) When policy requires coverage, include numeric baseline/post/new-code coverage metrics (baseline from the Phase 0 baseline artifact, post-change and per-file values from the single gate run).\n6) Synchronize completed work back to the original feature plan when the remediation plan requires status-sync tasks.\n\nOutput requirements:\n- execution summary\n- QA summary\n- lint/type/test/coverage deltas\n- updated remediation-plan checklist state"
     send: true
   - label: Write remediation commit message
     agent: commit_steward
@@ -237,7 +237,7 @@ S4.1 Delegate handoff **Execute Phase 0 only** using approved `plan-path`.
 Hard enforcement for S4:
 - Execute only Phase 0.
 - Persist checkpoint with Phase 0 completion evidence.
-- Do not mark S4 complete unless `phase0-instructions-read.md` and the baseline command-step artifacts referenced by the plan exist on disk, and the corresponding Phase 0 checklist items are checked from execution evidence rather than inferred summary text.
+- Do not mark S4 complete unless the baseline command-step artifacts referenced by the plan exist on disk, and the corresponding Phase 0 checklist items are checked from execution evidence rather than inferred summary text.
 
 ### Step S5 — Branch by bootstrap mode
 
@@ -253,9 +253,9 @@ S5.2 Otherwise continue automated small development:
 Delegate to `python-typed-engineer` using handoff **Small-scope implementation path**.
 
 Required delegation expectations:
-- static baseline + implementation + QA closure,
+- baseline + implementation + QA closure,
 - strict QA gates,
-- final Ruff and Pyright deltas, gate failures, and per-file coverage,
+- final Ruff/Pyright/test/coverage deltas,
 - completion report referencing `${feature-folder}` and the minimal plan.
 
 ### Step S7 — Validate delivery and post-QC documentation
@@ -352,7 +352,7 @@ Delegate to `atomic_planner` via handoff **Build atomic plan (preflight all clea
 Hard enforcement for Step 4:
 - The planning route MUST be `atomic_planner -> atomic_executor` for preflight validation.
 - The planner MUST update `${plan-path}` in place and MUST NOT create additional `plan.*.md` files for revisions.
-- The approved plan MUST include explicit final-QC coverage capture tasks for each language in scope where policy requires coverage.
+- The approved plan MUST include explicit coverage capture tasks (baseline and final QC) for each language in scope where policy requires coverage.
 - Do not mark Step 4 complete until delegate output includes both a concrete `plan-path` and final `PREFLIGHT: ALL CLEAR`.
 
 ### Step 5 — Execute approved atomic plan
@@ -360,7 +360,7 @@ Hard enforcement for Step 4:
 Delegate to `atomic_executor` via handoff **Execute approved atomic plan** using the Step 4 approved `plan-path`.
 
 Hard enforcement for Step 5:
-- Do not mark Step 5 complete until execution output includes execution summary, QA summary, lint and type-check deltas, gate failures, and per-file coverage, and numeric per-file coverage from the single gate run where policy requires them.
+- Do not mark Step 5 complete until execution output includes execution summary, QA summary, lint/type/test/coverage deltas, and numeric baseline/post/new-code coverage metrics where policy requires them.
 
 ### Step 6 — Post-implementation review
 
@@ -381,7 +381,7 @@ Apply this exact loop after the first feature-review result and after every re-r
    - `REVIEW_STATUS: REMEDIATION_REQUIRED`
    - `REMEDIATION_INPUTS: <path>`
    - `REMEDIATION_PLAN: <path>`
-2. Persist `${review-status}`, `${remediation-inputs-path}`, `${remediation-plan-path}`, and `${remediation-pass}` in the checkpoint. Confirm that `${remediation-inputs-path}` carries exactly one line `Remediation-Mode: proportionate` or `Remediation-Mode: design`: proportionate when every autonomous finding can be fixed without changing a spec acceptance criterion, a public interface, or the file inventory beyond the branch diff plus tests and mirrors (CI-failure findings are normally proportionate), otherwise design.
+2. Persist `${review-status}`, `${remediation-inputs-path}`, `${remediation-plan-path}`, and `${remediation-pass}` in the checkpoint. Confirm that `${remediation-inputs-path}` carries exactly one line `Remediation-Mode: proportionate` or `Remediation-Mode: design`: proportionate when every autonomous finding can be fixed without changing a spec acceptance criterion, a public interface, or the file inventory beyond the branch diff plus tests and mirrors (CI-failure findings are normally proportionate), otherwise design. This orchestrator does not run the light path, so a review's `Remediation-Path: light` gets `Remediation-Mode: proportionate` or `Remediation-Mode: design` by the rule above: a heavier mode than the orchestrate skill's `Remediation-Mode: light`, which is always permitted.
 3. Delegate handoff **Preflight remediation plan clearance** against `${remediation-plan-path}`, with the preflight directive in the handoff prompt only. Preflight is single-pass: trivial defects are fixed in place. For `Remediation-Mode: proportionate`, the clearance and execution may run as one executor delegation that stops with `BLOCKED at preflight (before [P0-T1])` on a substantive defect; that converts the cycle to `Remediation-Mode: design`.
 4. If preflight returns `PREFLIGHT: REVISIONS REQUIRED`, delegate handoff **Revise remediation plan in place** once with the full `PREFLIGHT-DEFECT:` list and then run Step 3 once more against the same `${remediation-plan-path}`. If that confirming preflight still reports a substantive defect, record `blocked_preflight_iteration_limit` and stop; a plan returns to the planner at most once.
 5. Delegate handoff **Execute remediation plan** only after the exact preflight signal is `PREFLIGHT: ALL CLEAR`.
@@ -426,7 +426,7 @@ Checkpoint writes are mandatory after each completed sub-step in the large and s
 Artifact verification gate before mission completion (small path):
 - At least one short-path `policy-audit.<timestamp>.md` exists under `${feature-folder}`.
 - At least one short-path `feature-audit.<timestamp>.md` exists under `${feature-folder}`.
-- `phase0-instructions-read.md` and baseline command-step artifacts required by the approved plan exist under `${feature-folder}`.
+- baseline command-step artifacts required by the approved plan exist under `${feature-folder}`.
 - If remediation triggered, `remediation-inputs.<timestamp>.md` and `remediation-plan.<timestamp>.md` must exist, at least one remediation execution receipt and one remediation commit receipt must exist, and the latest re-audit must return `REVIEW_STATUS: PASS`.
 
 Artifact verification gate before mission completion (large path):
