@@ -224,14 +224,36 @@ Describe 'Invoke-ProcessReductionChain' {
         $result.FinalText['docs/a.md'] | Should -BeExactly "a later line`nthe old rule`n"
     }
 
-    It 'PRC-CHAIN-CREATED-FILE-ENDS-ABSENT removes a created file edited after creation and restores a deleted one' {
+    It 'PRC-CHAIN-REPORTS-STALE-CREATED-FILE reports <Case>' -ForEach @(
+        @{ Case = 'an edited created file'; Live = "created`nedited later`n"; Marker = @(); Expected = '0001-a.md: docs/new.md: the file the entry created differs from its create hunk.' },
+        @{ Case = 'an absent created file'; Live = $null; Marker = @(); Expected = '0001-a.md: docs/new.md: the file the entry created is absent at this step.' },
+        @{ Case = 'no error for an unchanged created file without a trailing newline'; Live = 'created'; Marker = @('\ No newline at end of file'); Expected = $null },
+        @{ Case = 'no error for an unchanged created file with a BOM and CRLF'; Live = "$([char]0xFEFF)created`r`n"; Marker = @(); Expected = $null }
+    ) {
+        # Arrange
+        $patch = (@('diff --git a/docs/new.md b/docs/new.md', 'new file mode 100644', '--- /dev/null', '+++ b/docs/new.md', '@@ -0,0 +1 @@', '+created') + $Marker) -join "`n"
+        $entry = Get-TestEntry -Name '0001-a.md' -Patch
+
+        # Act
+        $result = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{ '0001-a.patch' = $patch } -LiveText @{ 'docs/new.md' = $Live }
+
+        # Assert
+        if ($null -eq $Expected) {
+            $result.IsValid | Should -BeTrue -Because ($result.Errors -join '; ')
+        } else {
+            $result.IsValid | Should -BeFalse
+            @($result.Errors) | Should -Be @($Expected)
+        }
+    }
+
+    It 'PRC-CHAIN-CREATED-FILE-ENDS-ABSENT removes an unedited created file and restores a deleted one' {
         # Arrange
         $patch = @(
             'diff --git a/docs/new.md b/docs/new.md', 'new file mode 100644', '--- /dev/null', '+++ b/docs/new.md', '@@ -0,0 +1 @@', '+created',
             'diff --git a/docs/old.md b/docs/old.md', 'deleted file mode 100644', '--- a/docs/old.md', '+++ /dev/null', '@@ -1 +0,0 @@', '-kept'
         ) -join "`n"
         $entry = Get-TestEntry -Name '0001-a.md' -Patch
-        $liveText = @{ 'docs/new.md' = "created`nedited later`n"; 'docs/old.md' = $null }
+        $liveText = @{ 'docs/new.md' = "created`n"; 'docs/old.md' = $null }
 
         # Act
         $result = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{ '0001-a.patch' = $patch } -LiveText $liveText
