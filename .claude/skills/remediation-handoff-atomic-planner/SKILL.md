@@ -98,7 +98,7 @@ A comprehensive or final sweep in a remediation cycle covers that cycle's own pl
 
 - Phase headings: `### Phase N — <Title>`.
 - Tasks: `- [ ] [P#-T#]` with sequential per-phase IDs.
-- Phase 0 captures policy reads and static baseline results per `policy-compliance-order` and `evidence-and-timestamp-conventions`.
+- Phase 0 captures static baseline results per `evidence-and-timestamp-conventions`.
 - Final phase runs the full toolchain QA loop in the order specified by `atomic-plan-contract` and records numeric coverage values where the repository policy requires coverage.
 - Evidence paths resolve to `<FEATURE>/evidence/<kind>/` per the non-overridable evidence path clause.
 - The plan is design-level per `## Design-Level Plan Contract (Mandatory)` in `atomic-plan-contract`, carries a `## Pre-Mortem` section, and ends with the final-phase self-review task. A proportionate plan covers only the listed findings and stays short.

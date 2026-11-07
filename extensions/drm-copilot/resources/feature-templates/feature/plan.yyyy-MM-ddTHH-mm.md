@@ -27,9 +27,8 @@
 > - Name the expected artifact path or location in each evidence-producing task's acceptance criteria.
 > - If any required static baseline artifact, QA artifact, or per-file coverage figure is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
 
-### Phase 0: Compliance & Context
-- [ ] [P0-T1] Confirm alignment with repo policies by reading `.github/instructions/general-code-change.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, and `.github/instructions/python-unit-test.instructions.md` before touching code
-  - Acceptance: Development log contains policy review timestamp prior to Phase 1 commits
+### Phase 0: Context & Inputs
+- [ ] [P0-T1] <Atomic task>
 
 ### Phase 1: <Phase Name>
 - [ ] [P1-T1] <Atomic task with strong verb>

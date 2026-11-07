@@ -46,7 +46,7 @@ Generate plans using the atomic plan contract defined in the `atomic-plan-contra
 - Phase headings: `### Phase N — <Title>`
 - Task IDs: `- [ ] [P#-T#] <description>`
 - Sequential task numbering within each phase
-- Phase 0: baseline capture (repo-policy reading tasks + language-specific static tool baselines; no test suite runs)
+- Phase 0: baseline capture (language-specific static tool baselines; no test suite runs)
 - Final phase: full QA loop for each applicable language, ending with the self-review task that writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`
 
 Every plan is design-level per `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: tasks name files, symbols, behavior, tests, and acceptance; anchors are symbols, headings, or test names, never line numbers or commit SHAs; literals appear only where they are the asserted value; tool routes and launchers are not restated because the `execution-environment` skill owns them; and a plan above 40 tasks or 400 lines carries a `## Size Justification` section. Every plan carries a `## Pre-Mortem` section with one bullet for each of `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`; the planner SubagentStop hook blocks a plan without it.

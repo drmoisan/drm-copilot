@@ -140,7 +140,7 @@ Describe 'validate-planner-output.ps1' {
             $result.Message | Should -Match 'no file exists'
         }
 
-        It 'blocks when Phase 0 baseline and policy-read tasks are missing' {
+        It 'blocks when Phase 0 baseline tasks are missing' {
             Mock -CommandName Get-PlanFileContent -MockWith {
                 @{
                     Exists = $true
@@ -273,7 +273,8 @@ Describe 'validate-planner-output.ps1' {
             ($errors -match 'canonical task lines').Count | Should -BeGreaterThan 0
         }
 
-        It 'reports an error when Phase 0 mentions baseline but no policy-read wording' {
+        It 'accepts Phase 0 with baseline wording and no policy-read wording' {
+            # Issue #1097 removed the routine policy-read requirement; a baseline task alone satisfies Phase 0.
             $lines = @(
                 "### Phase 0 `u{2014} Baseline",
                 '- [ ] [P0-T1] Capture baseline for docs/features/active/foo/issue.md',
@@ -283,7 +284,22 @@ Describe 'validate-planner-output.ps1' {
 
             $errors = @(Get-PlanStructureValidationReport -Lines $lines)
 
-            ($errors -match 'policy-read task').Count | Should -BeGreaterThan 0
+            $errors | Should -BeNullOrEmpty -Because 'Phase 0 needs only a baseline task'
+        }
+
+        It 'accepts a plan that keeps the policy-read task' {
+            # A plan written before the removal, or one that still reads policy in Phase 0, stays valid.
+            $lines = @(
+                "### Phase 0 `u{2014} Baseline",
+                '- [ ] [P0-T1] Read policy files and record docs/features/active/foo/evidence/baseline/phase0-instructions-read.md',
+                '- [ ] [P0-T2] Capture baseline for docs/features/active/foo/issue.md',
+                "### Phase 1 `u{2014} QA",
+                '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+            )
+
+            $errors = @(Get-PlanStructureValidationReport -Lines $lines)
+
+            $errors | Should -BeNullOrEmpty -Because 'a kept policy-read task is not an error'
         }
 
         It 'reports an error when Phase 0 mentions policy but no baseline wording' {

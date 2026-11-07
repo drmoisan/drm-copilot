@@ -218,7 +218,7 @@ Based on the checkpoint state, the orchestrator delegates planning to the `atomi
 
 **Step 4 — `atomic-planner` writes plan**
 
-The `atomic-planner` produces a phased plan file at `docs/features/active/<feature>/plan.md`. The plan follows the format defined in the `atomic-plan-contract` skill, with Phase 0 policy reads, implementation phases, and a final QA loop. The planner's `SubagentStop` hook (defined in `.claude/settings.json`) blocks termination unless the planner's output includes a plan file path.
+The `atomic-planner` produces a phased plan file at `docs/features/active/<feature>/plan.md`. The plan follows the format defined in the `atomic-plan-contract` skill, with Phase 0, implementation phases, and a final QA loop. The planner's `SubagentStop` hook (defined in `.claude/settings.json`) blocks termination unless the planner's output includes a plan file path.
 
 **Step 5 — Orchestrator delegates to `atomic-executor`**
 

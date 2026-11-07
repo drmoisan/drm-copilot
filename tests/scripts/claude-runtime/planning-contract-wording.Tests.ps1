@@ -15,6 +15,32 @@ BeforeDiscovery {
         @{ Copy = 'AGENTS-BUNDLE'; Path = "$resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md" }
         @{ Copy = 'GITHUB-BUNDLE'; Path = "$resources/customizations/.github/skills/atomic-plan-contract/SKILL.md" }
     )
+
+    # Every policy-read surface outside the contract; the Copilot review prompt is held
+    # by the coordinator and is deliberately absent.
+    $surfaceForbidden = @(
+        'repo-policy reading', 'phase0-instructions-read', 'captures policy reads',
+        'Phase 0 tasks that cover', 'Mandatory Policy & Research', 'Compliance & Context'
+    )
+    $script:PolicyReadSurface = @(
+        @{ Id = 'HANDOFF-CLAUDE'; Path = '.claude/skills/remediation-handoff-atomic-planner/SKILL.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'COPILOT-EXEC'; Path = '.github/agents/atomic_executor.agent.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'COPILOT-CS-EXEC'; Path = '.github/agents/csharp-atomic-executor.agent.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'COPILOT-PS-EXEC'; Path = '.github/agents/powershell-atomic-executor.agent.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'COPILOT-PY-EXEC'; Path = '.github/agents/python-atomic-executor.agent.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'COPILOT-ORCH'; Path = '.github/agents/orchestrator.agent.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'COPILOT-CS-ORCH'; Path = '.github/agents/csharp-orchestrator.agent.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'COPILOT-PS-ORCH'; Path = '.github/agents/powershell-orchestrator.agent.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'COPILOT-PY-ORCH'; Path = '.github/agents/python-orchestrator.agent.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'COPILOT-PLANNING'; Path = '.github/agents/atomic_planning.agent.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'COPILOT-CS-PLANNING'; Path = '.github/agents/csharp-atomic-planning.agent.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'COPILOT-PS-PLANNING'; Path = '.github/agents/powershell-atomic-planning.agent.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'COPILOT-PY-PLANNING'; Path = '.github/agents/python-atomic-planning.agent.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'HARD-LOCK-PROMPT'; Path = '.github/prompts/execute-hard-lock.prompt.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'HARD-LOCK-CODEX'; Path = '.github/codex/execute-hard-lock.prompt.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'PLAN-TEMPLATE'; Path = 'docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'ARCHITECTURE-DOC'; Path = 'docs/engineering/claude-code-architecture.md'; Forbidden = $surfaceForbidden + @('Phase 0 policy reads') }
+    )
 }
 
 Describe 'Planning contract wording' {
@@ -73,5 +99,35 @@ Describe 'Planning contract wording' {
         $guideline | Should -BeGreaterOrEqual 0 -Because "$Path must keep the size guideline bullet"
         $target | Should -BeGreaterThan $guideline -Because "$Path must place the task target after the size guideline"
         $range | Should -BeGreaterThan $target -Because "$Path must state the 15 to 20 task target in that bullet"
+    }
+
+    It 'PCW-POLICY-READ-REMOVED-<Copy> carries no routine policy-read requirement' -ForEach $script:ContractCopy {
+        # Arrange
+        $forbidden = @(
+            'policy reading',
+            'policy reads in required order',
+            'policy-read evidence artifact',
+            'tasks to read policy files',
+            'phase0-instructions-read.md'
+        )
+
+        # Act
+        $text = Get-PcwSurfaceText -RelativePath $Path
+        $held = @($forbidden | Where-Object { $text.IndexOf($_, [System.StringComparison]::OrdinalIgnoreCase) -ge 0 })
+
+        # Assert
+        $held | Should -BeNullOrEmpty -Because "$Path must not require the routine policy-read task"
+        $text.Contains('stays valid') | Should -BeTrue -Because "$Path must state that a plan that keeps the task stays valid"
+    }
+
+    It 'PCW-SURFACE-<Id> carries no routine policy-read requirement' -ForEach $script:PolicyReadSurface {
+        # Arrange
+        $text = Get-PcwSurfaceText -RelativePath $Path
+
+        # Act
+        $held = @($Forbidden | Where-Object { $text.IndexOf($_, [System.StringComparison]::OrdinalIgnoreCase) -ge 0 })
+
+        # Assert
+        $held | Should -BeNullOrEmpty -Because "$Path must not require the routine policy-read task or its artifact"
     }
 }

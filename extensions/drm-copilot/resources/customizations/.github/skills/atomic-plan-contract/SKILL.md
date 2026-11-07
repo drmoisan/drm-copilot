@@ -12,7 +12,7 @@ Shared rules for atomic plan formatting, Phase 0 requirements, baseline capture,
 Use this skill when:
 - Creating or validating atomic plans.
 - Executing plans with strict format requirements.
-- Enforcing Phase 0 policy reading + baseline capture and final QA loops.
+- Enforcing Phase 0 baseline capture and final QA loops.
 
 ## Canonical Plan Format
 
@@ -49,10 +49,8 @@ This section takes precedence over the literal-quoting rules of `## Wrap-Toleran
 When orchestration selects short path, a minimal plan is still mandatory and must include these blocks:
 
 1) Baseline capture block
-- policy reads in required order,
 - static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
 - required artifacts:
-	- a Phase 0 policy-read evidence artifact in the canonical evidence location defined by `evidence-and-timestamp-conventions`
 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
 	- each baseline step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
 
@@ -113,12 +111,11 @@ When a fully automated equivalent is unavailable, the plan MUST fail closed by r
 
 ## Phase 0 Requirements
 
-Phase 0 must include tasks to read policy files in the order defined in `policy-compliance-order`.
+Phase 0 carries no routine policy-read task. Agents still follow the reading order defined in `policy-compliance-order`, and a plan that keeps a policy-read task stays valid.
 
 Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched, and no test suite runs in it. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
 
-For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both artifacts exist:
-- `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
+For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these artifacts exist:
 - baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
 - approved-plan checklist state MUST remain unchecked for any Phase 0 task whose artifact is absent or whose artifact fields are incomplete.
 

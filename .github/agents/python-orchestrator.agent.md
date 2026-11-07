@@ -196,7 +196,7 @@ S4.1 Delegate handoff **Execute Phase 0 only** using approved `plan-path`.
 Hard enforcement for S4:
 - Execute only Phase 0.
 - Persist checkpoint with Phase 0 completion evidence.
-- Do not mark S4 complete unless `phase0-instructions-read.md` and the baseline command-step artifacts referenced by the plan exist on disk, and the corresponding Phase 0 checklist items are checked from execution evidence rather than inferred summary text.
+- Do not mark S4 complete unless the baseline command-step artifacts referenced by the plan exist on disk, and the corresponding Phase 0 checklist items are checked from execution evidence rather than inferred summary text.
 
 ### Step S5 — Branch by bootstrap mode
 
@@ -355,7 +355,7 @@ Checkpoint writes are mandatory after each completed sub-step in the large and s
 Artifact verification gate before mission completion (small path):
 - At least one short-path `policy-audit.<timestamp>.md` exists under `${feature-folder}`.
 - At least one short-path `feature-audit.<timestamp>.md` exists under `${feature-folder}`.
-- `phase0-instructions-read.md` and baseline command-step artifacts required by the approved plan exist under `${feature-folder}`.
+- baseline command-step artifacts required by the approved plan exist under `${feature-folder}`.
 - If remediation triggered, `remediation-inputs.<timestamp>.md` and `remediation-plan.<timestamp>.md` must exist and the latest re-audit must pass.
 
 Artifact verification gate before mission completion (large path):

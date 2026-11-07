@@ -79,7 +79,7 @@ Follow the canonical phase heading and structure rules in the `atomic-plan-contr
 
 Follow the canonical task formatting rules in the `atomic-plan-contract` skill.
 
-### 2.3 Phase 0 — Context & Inputs (Mandatory Policy & Research)
+### 2.3 Phase 0 — Context & Inputs
 
 Phase 0 content, baseline capture schema, and toolchain mapping are defined in the `atomic-plan-contract` skill.
 

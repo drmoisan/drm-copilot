@@ -15,7 +15,6 @@ SUPREMACY & PRECONDITIONS (NON-NEGOTIABLE)
   3) .github/instructions/general-unit-test.instructions.md
   4) Any applicable language-specific policies
 - If Phase 0 does not include:
-  - Repo-policy reading tasks, AND
   - Static baseline capture for each language touched by the plan,
   the plan is INVALID and execution must not begin.
 
@@ -35,7 +34,6 @@ You must validate ALL of the following; otherwise STOP:
 - Each task is a markdown checkbox with valid [P#-T#]
 - Phase numbers and task IDs are consistent
 - Phase 0 exists and includes:
-  - Repo-policy reading
   - Static baseline runs for each language touched
 - A final QA phase exists with full toolchain loops per touched language
 - Any TDD red tests are tagged [expect-fail]
