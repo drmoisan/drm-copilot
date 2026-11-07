@@ -70,6 +70,13 @@ Describe 'Get-ProcessReductionSection' {
         $result | Should -BeLike '*## Not a heading*'
         $result | Should -BeLike '*after the fence'
     }
+
+    It 'PRL-SECTION-ENDS-AT-LEVEL-ONE-HEADING ends the body at a level-one heading' {
+        $result = Get-ProcessReductionSection -Text "## One`n`nbody`n`n# Top`n`nafter`n" -Heading 'One'
+
+        $result | Should -BeExactly 'body'
+        $result | Should -Not -BeLike '*after*'
+    }
 }
 
 Describe 'Get-ProcessReductionRevertBlock' {
@@ -103,6 +110,22 @@ Describe 'Get-ProcessReductionRevertBlock' {
 
         $blocks[0].Current | Should -BeExactly 'new text'
         $null -eq $blocks[0].Prior | Should -BeTrue
+    }
+
+    It 'PRL-FENCE-INFO-LINE-DOES-NOT-CLOSE keeps a fence line with an info string as body text' {
+        $text = "### Revert Block: docs/a.md`n`n$($script:Fence)Current`nfirst`n$($script:Fence)extra`nlater`n$($script:Fence)`n"
+
+        $blocks = @(Get-ProcessReductionRevertBlock -Text $text)
+
+        $blocks[0].Current | Should -BeExactly "first`n$($script:Fence)extra`nlater"
+    }
+
+    It 'PRL-BLOCK-FIRST-REPEATED-LABEL-WINS uses the first fence when a label repeats' {
+        $text = "### Revert Block: docs/a.md`n`n$($script:Fence)Current`nfirst body`n$($script:Fence)`n`n$($script:Fence)Current`nsecond body`n$($script:Fence)`n"
+
+        $blocks = @(Get-ProcessReductionRevertBlock -Text $text)
+
+        $blocks[0].Current | Should -BeExactly 'first body'
     }
 }
 
