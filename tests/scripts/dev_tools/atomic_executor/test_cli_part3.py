@@ -125,15 +125,14 @@ class TestPreflightQC:
         monkeypatch: "MonkeyPatch",
     ) -> None:
         """The pytest step of _run_preflight_qc_with_capture passes -n auto."""
-        from scripts.dev_tools.atomic_executor.cli import (
-            _run_preflight_qc_with_capture,
-        )
+        from scripts.dev_tools.atomic_executor.cli import _run_preflight_qc_with_capture
 
         argvs: list[list[str]] = []
 
         def mock_run(
             argv: list[str], **kwargs: object
         ) -> subprocess.CompletedProcess[str]:
+            """Record each argv and report success for every step."""
             argvs.append(list(argv))
             return subprocess.CompletedProcess(
                 args=argv, returncode=0, stdout="OK", stderr=""
@@ -143,6 +142,7 @@ class TestPreflightQC:
 
         _run_preflight_qc_with_capture(mem_fs_path)
 
+        # The first recorded argv that names pytest is the pytest step.
         pytest_argv = next(argv for argv in argvs if "pytest" in argv)
         start = pytest_argv.index("pytest")
         assert pytest_argv[start : start + 3] == ["pytest", "-n", "auto"]

@@ -706,15 +706,14 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
         monkeypatch: "MonkeyPatch",
     ) -> None:
         """The pytest step of _run_preflight_qc_with_capture passes -n auto."""
-        from scripts.dev_tools.atomic_executor.cli import (
-            _run_preflight_qc_with_capture,
-        )
+        from scripts.dev_tools.atomic_executor.cli import _run_preflight_qc_with_capture
 
         argvs: list[list[str]] = []
 
         def mock_run(
             argv: list[str], **kwargs: object
         ) -> subprocess.CompletedProcess[str]:
+            """Record each argv and report success for every step."""
             argvs.append(list(argv))
             return subprocess.CompletedProcess(
                 args=argv, returncode=0, stdout="OK", stderr=""
@@ -724,6 +723,7 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
 
         _run_preflight_qc_with_capture(mem_fs_path)
 
+        # The first recorded argv that names pytest is the pytest step.
         pytest_argv = next(argv for argv in argvs if "pytest" in argv)
         start = pytest_argv.index("pytest")
         assert pytest_argv[start : start + 3] == ["pytest", "-n", "auto"]
@@ -753,6 +753,7 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
         pytest_argv: list[str] = []
 
         def fake_run_and_record(*args: object, **kwargs: object) -> QCToolResult:
+            """Record the pytest argv and report success for every step."""
             argv = kwargs.get("argv")
             if isinstance(argv, list) and "pytest" in argv:
                 pytest_argv.extend(cast("list[str]", argv))
@@ -761,12 +762,14 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
         def fake_diff_signature(
             *args: object, **kwargs: object
         ) -> tuple[tuple[str, str, str], ...]:
+            """Report an unchanged tree so the loop ends after one pass."""
             return ()
 
         runner = QCRunner(mem_fs_path)
         monkeypatch.setattr(runner, "_diff_signature", fake_diff_signature)
         monkeypatch.setattr(runner, "_run_and_record", fake_run_and_record)
 
+        # Map each toolchain step to an in-memory artifact path.
         runner.run_full_loop_with_artifacts(
             artifact_paths={
                 step: mem_fs_path / f"artifacts/{step}.txt"
