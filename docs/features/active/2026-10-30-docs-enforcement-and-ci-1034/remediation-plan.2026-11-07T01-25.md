@@ -169,7 +169,7 @@ Any failing step, or any step that changes a file, restarts the loop from P4-T1.
 
 - [x] [P4-T1] Run the PoshQC formatter over `.claude/hooks/enforce-docs-complete-gate.ps1`, `HOOK_SUITE`, `tests/scripts/claude-lib/docs/DocsSurfaceDelta.Tests.ps1` and `tests/scripts/claude-lib/docs/Invoke-DocsCommand.RevisionContext.Tests.ps1`, and write `FEATURE/evidence/qa-gates/format.<timestamp>.md`.
   - Acceptance: the SHA-256 of each target and the `git status --porcelain` output captured before and after the run are identical, and both comparisons are recorded.
-- [ ] [P4-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the P4-T1 files and write `FEATURE/evidence/qa-gates/pssa.<timestamp>.md`.
+- [x] [P4-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the P4-T1 files and write `FEATURE/evidence/qa-gates/pssa.<timestamp>.md`.
   - Acceptance: zero findings for each file, compared against P0-T3.
 - [ ] [P4-T3] Run branch-current Pester with coverage over `-ScanFolders` `tests/scripts/claude-hooks` and `tests/scripts/claude-lib`, and write `FEATURE/evidence/qa-gates/pester-coverage.<timestamp>.md`.
   - Acceptance: the baseline-relative rule holds, and `.claude/hooks/enforce-docs-complete-gate.ps1` has line coverage of at least 85% in `artifacts/pester/powershell-coverage.xml`, recorded numerically. `config/poshqc-coverage.json` shows no change against `MERGE_BASE`. No branch gate applies to Pester.
