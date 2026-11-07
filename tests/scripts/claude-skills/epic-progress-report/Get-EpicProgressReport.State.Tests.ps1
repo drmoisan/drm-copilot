@@ -192,3 +192,70 @@ Describe 'ConvertFrom-EpicProgressStateText and ConvertTo-EpicProgressStateJson'
         (ConvertFrom-EpicProgressStateText -Text $json).Samples.Count | Should -Be 1
     }
 }
+
+Describe 'Resolve-EpicProgressBaseline' {
+    BeforeAll {
+        $script:baseNow = [datetime]::new(2026, 1, 5, 12, 0, 0, [System.DateTimeKind]::Utc)
+        $script:passedStart = [datetime]::new(2026, 1, 5, 9, 0, 0, [System.DateTimeKind]::Utc)
+        # 1767600000 is 2026-01-05T08:00:00Z.
+        $script:storedState = [pscustomobject]@{ StartUnixSeconds = [long] 1767600000; BaselineDone = 11; BaselineWeeklyPct = 30.5; Samples = [object[]] @() }
+        $script:emptyState = [pscustomobject]@{ StartUnixSeconds = $null; BaselineDone = $null; BaselineWeeklyPct = $null; Samples = [object[]] @() }
+    }
+
+    It 'prefers passed values' {
+        $result = Resolve-EpicProgressBaseline -StartUtc $script:passedStart -StartUtcPassed -BaselineDone 4 -BaselineDonePassed -BaselineWeeklyPct 12 -BaselineWeeklyPctPassed -State $script:storedState -NowUtc $script:baseNow
+
+        $result.StartUtc | Should -Be $script:passedStart
+        $result.BaselineDone | Should -Be 4
+        $result.BaselineWeeklyPct | Should -Be 12
+        $result.UseCurrentDone | Should -BeFalse
+    }
+
+    It 'uses stored values' {
+        $result = Resolve-EpicProgressBaseline -State $script:storedState -NowUtc $script:baseNow
+
+        $result.StartUtc | Should -Be ([datetime]::new(2026, 1, 5, 8, 0, 0, [System.DateTimeKind]::Utc))
+        $result.StartUtc.Kind | Should -Be ([System.DateTimeKind]::Utc)
+        $result.BaselineDone | Should -Be 11
+        $result.BaselineWeeklyPct | Should -Be 30.5
+        $result.UseCurrentDone | Should -BeFalse
+    }
+
+    It 'resets to now and the current done count' {
+        # A stored start and baseline are discarded by the reset.
+        $result = Resolve-EpicProgressBaseline -State $script:storedState -ResetBaseline -NowUtc $script:baseNow
+
+        $result.StartUtc | Should -Be $script:baseNow
+        $result.UseCurrentDone | Should -BeTrue
+    }
+
+    It 'keeps a passed start on reset' {
+        $result = Resolve-EpicProgressBaseline -StartUtc $script:passedStart -StartUtcPassed -BaselineDone 6 -BaselineDonePassed -State $script:storedState -ResetBaseline -NowUtc $script:baseNow
+
+        $result.StartUtc | Should -Be $script:passedStart
+        $result.BaselineDone | Should -Be 6
+        $result.UseCurrentDone | Should -BeFalse
+    }
+
+    It 'throws without a start and without reset' {
+        { Resolve-EpicProgressBaseline -State $script:emptyState -NowUtc $script:baseNow } | Should -Throw -ExpectedMessage '*-StartUtc*-ResetBaseline*'
+    }
+
+    It 'keeps the weekly baseline on reset' {
+        $stored = Resolve-EpicProgressBaseline -State $script:storedState -ResetBaseline -NowUtc $script:baseNow
+        $empty = Resolve-EpicProgressBaseline -State $script:emptyState -ResetBaseline -NowUtc $script:baseNow
+        $passed = Resolve-EpicProgressBaseline -BaselineWeeklyPct 7.5 -BaselineWeeklyPctPassed -State $script:storedState -ResetBaseline -NowUtc $script:baseNow
+
+        $stored.BaselineWeeklyPct | Should -Be 30.5
+        $empty.BaselineWeeklyPct | Should -Be 0
+        $passed.BaselineWeeklyPct | Should -Be 7.5
+    }
+
+    It 'defaults the baseline done count to 0 without a passed or stored value' {
+        $result = Resolve-EpicProgressBaseline -StartUtc $script:passedStart -StartUtcPassed -State $script:emptyState -NowUtc $script:baseNow
+
+        $result.BaselineDone | Should -Be 0
+        $result.BaselineWeeklyPct | Should -Be 0
+        $result.UseCurrentDone | Should -BeFalse
+    }
+}

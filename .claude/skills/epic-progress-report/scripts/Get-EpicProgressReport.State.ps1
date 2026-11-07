@@ -189,3 +189,77 @@ function ConvertTo-EpicProgressStateJson {
     }
     return ConvertTo-Json -InputObject $document -Depth 4
 }
+
+function Resolve-EpicProgressBaseline {
+    <#
+    .SYNOPSIS
+        Resolve the start instant and the baseline values from the passed values, the stored state, and the reset switch.
+    .DESCRIPTION
+        Start: the passed value, else (with ResetBaseline) NowUtc, else the stored value; with
+        none of these a terminating error names -StartUtc and -ResetBaseline. Baseline done:
+        the passed value, else (with ResetBaseline) the current done count, else the stored
+        value, else 0. Weekly baseline: the passed value, else the stored value, else 0; a
+        reset does not capture it. The current done count is not known before the git calls,
+        so UseCurrentDone is $true when the caller must substitute it for BaselineDone.
+    .PARAMETER StartUtc
+        The passed start instant; read only when StartUtcPassed is set.
+    .PARAMETER StartUtcPassed
+        Whether -StartUtc was passed to the report.
+    .PARAMETER BaselineDone
+        The passed baseline done count; read only when BaselineDonePassed is set.
+    .PARAMETER BaselineDonePassed
+        Whether -BaselineDone was passed to the report.
+    .PARAMETER BaselineWeeklyPct
+        The passed weekly baseline; read only when BaselineWeeklyPctPassed is set.
+    .PARAMETER BaselineWeeklyPctPassed
+        Whether -BaselineWeeklyPct was passed to the report.
+    .PARAMETER State
+        The parsed state from ConvertFrom-EpicProgressStateText.
+    .PARAMETER ResetBaseline
+        Whether the run resets the baseline.
+    .PARAMETER NowUtc
+        The current instant (UTC).
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [datetime] $StartUtc,
+        [switch] $StartUtcPassed,
+        [int] $BaselineDone,
+        [switch] $BaselineDonePassed,
+        [double] $BaselineWeeklyPct,
+        [switch] $BaselineWeeklyPctPassed,
+        [Parameter(Mandatory = $true)] [pscustomobject] $State,
+        [switch] $ResetBaseline,
+        [Parameter(Mandatory = $true)] [datetime] $NowUtc
+    )
+
+    if ($StartUtcPassed) {
+        $start = $StartUtc.ToUniversalTime()
+    } elseif ($ResetBaseline) {
+        $start = $NowUtc.ToUniversalTime()
+    } elseif ($null -ne $State.StartUnixSeconds) {
+        $start = [DateTimeOffset]::FromUnixTimeSeconds([long] $State.StartUnixSeconds).UtcDateTime
+    } else {
+        throw 'The start instant could not be resolved: pass -StartUtc, or pass -ResetBaseline to start the measurement now; the state file holds no start.'
+    }
+
+    $useCurrentDone = $false
+    $done = 0
+    if ($BaselineDonePassed) {
+        $done = $BaselineDone
+    } elseif ($ResetBaseline) {
+        $useCurrentDone = $true
+    } elseif ($null -ne $State.BaselineDone) {
+        $done = [int] $State.BaselineDone
+    }
+
+    $weekly = 0.0
+    if ($BaselineWeeklyPctPassed) {
+        $weekly = $BaselineWeeklyPct
+    } elseif ($null -ne $State.BaselineWeeklyPct) {
+        $weekly = [double] $State.BaselineWeeklyPct
+    }
+
+    return [pscustomobject]@{ StartUtc = $start; BaselineDone = $done; BaselineWeeklyPct = $weekly; UseCurrentDone = $useCurrentDone }
+}
