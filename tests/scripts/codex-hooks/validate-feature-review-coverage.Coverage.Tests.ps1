@@ -22,6 +22,7 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
         if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChangedLanguageSet' -Surface 'Codex' }
         if (Get-Command Get-JacocoRepoCoverage -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-JacocoRepoCoverage' -Surface 'Codex' }
         if (Get-Command Get-LcovRepoCoverage -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-LcovRepoCoverage' -Surface 'Codex' }
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
 
         function Invoke-CodexReviewEntry {
             # Drives the entry point with the given stdin; stdin and stderr are restored in finally.
@@ -45,6 +46,8 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
         $script:ReviewStop = '{"hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false}'
         $script:ReviewStopActive = '{"hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":true}'
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 
     Context 'readers and parsers' {
         BeforeAll {

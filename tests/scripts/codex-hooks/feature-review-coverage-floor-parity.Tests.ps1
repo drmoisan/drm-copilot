@@ -25,6 +25,8 @@ Describe 'feature-review coverage floor parity (issue #896)' {
         # Baseline isolation for the closure seams of the two hooks (epic-state discovery guard): no
         # seam reads live repository state. The parity cases call only the resolver and the row rule.
         . $script:ClaudeHook
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
         Mock Get-ArtifactFileContent { $null }
         if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Mock Get-ChangedLanguageSet { $null } }
         if (Get-Command Get-JacocoRepoCoverage -ErrorAction SilentlyContinue) { Mock Get-JacocoRepoCoverage { $null } }
@@ -50,6 +52,8 @@ Describe 'feature-review coverage floor parity (issue #896)' {
             return (& { param($HookPath, $Text) . $HookPath; $t = Get-FeatureReviewCoverageThreshold -ClaudeMdText $Text; (Test-LanguageCoverageRow -AuditText 'Python coverage PASS' -Language 'Python' -RepoWidePct 60 -LineFloor $t.Line).Reason } $script:CodexHook $ClaudeMdText)
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 
     It 'E4-PX1: <Label> reports line floor <Floor> on both surfaces' -ForEach @(
         @{ Label = 'no figure'; Text = 'Project notes without coverage figures.'; Floor = 85 }
