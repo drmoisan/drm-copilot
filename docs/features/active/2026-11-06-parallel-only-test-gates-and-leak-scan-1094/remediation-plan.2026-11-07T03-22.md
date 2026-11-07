@@ -46,7 +46,7 @@ No test suite runs in this phase.
   - Neither `node_modules` folder exists in the item worktree. Install from the lockfiles, as `_root-typescript-tests.yml` and `_drm-copilot-extension-tests.yml` do: `npm ci` and `npm --prefix extensions/drm-copilot ci`, both from the item worktree root under **Working directory**. The step stops before the first `npm` command if the current folder is not the item worktree root. Both targets are gitignored.
   - If the runner denies the install, stop and return to the orchestrator, naming the missing paths.
   - Acceptance: both files exist, and `git status --porcelain` shows no tracked file changed, including either `package-lock.json`.
-- [ ] [P0-T4] Capture the TypeScript static baseline for `extensions/drm-copilot/test/lib/validate/policy-audit-artifact.test.ts` in `<FEATURE>/evidence/remediation-baseline/typescript-format.<timestamp>.md`, `<FEATURE>/evidence/remediation-baseline/typescript-lint.<timestamp>.md`, and `<FEATURE>/evidence/remediation-baseline/typescript-typecheck.<timestamp>.md`.
+- [x] [P0-T4] Capture the TypeScript static baseline for `extensions/drm-copilot/test/lib/validate/policy-audit-artifact.test.ts` in `<FEATURE>/evidence/remediation-baseline/typescript-format.<timestamp>.md`, `<FEATURE>/evidence/remediation-baseline/typescript-lint.<timestamp>.md`, and `<FEATURE>/evidence/remediation-baseline/typescript-typecheck.<timestamp>.md`.
   - From `extensions/drm-copilot/`: `npx prettier --check` and `npx eslint` over that one file, and `npm run typecheck`. CI runs no ESLint stage for this folder, so lint is scoped to the file.
   - Acceptance: each artifact records the tool's real exit code and a numeric finding count.
 
