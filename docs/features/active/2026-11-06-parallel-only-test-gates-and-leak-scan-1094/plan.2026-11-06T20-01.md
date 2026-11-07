@@ -160,7 +160,7 @@ Cheap stages run first, so that a suite is not re-run for a formatting change. A
 - [x] [P2-T6] Check the locally verifiable criteria in `docs/features/active/2026-11-06-parallel-only-test-gates-and-leak-scan-1094/spec.md` and `docs/features/active/2026-11-06-parallel-only-test-gates-and-leak-scan-1094/user-story.md` against the evidence.
   - Each box is checked only when the evidence named in `## Acceptance Criteria Traceability` exists and passes. The `CI-dependent:` criterion stays unchecked.
   - Acceptance: every locally verifiable box is checked in both files, and the CI-dependent box is unchecked in both.
-- [ ] [P2-T7] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base of `origin/main` and `HEAD`, and write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`.
+- [x] [P2-T7] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base of `origin/main` and `HEAD`, and write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`.
   - The artifact has one PASS, FAIL, or N/A row per checklist item, and it lists spec Decision 1 for the owner report. A FAIL row is fixed, the QA loop re-runs from P2-T1, and the self-review is rewritten.
   - Acceptance: the artifact holds no FAIL row.
 
