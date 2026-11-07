@@ -78,7 +78,7 @@ Output Summary: no FAIL row. Every [C] criterion and the [A] test-gate criterion
 | 3B PowerShell tooling, design, safety | PASS | Advanced functions, `CmdletBinding`, typed parameters, no global state, analyzer findings 0 |
 | 3B PowerShell structure, naming, comments | PASS | Approved verbs, singular nouns; no help line begins with a dot |
 | 3C Bash | N/A | No bash file in the diff |
-| 3D JSON | PASS | Two manifests gain one sorted-position entry each; corpus files parse in three runtimes |
+| 3D JSON | PASS | Two manifests gain one entry each, beside the sibling gate entries; corpus files parse in three runtimes |
 | 4A Python unit test policy | PASS | Pytest, parametrization for the matrix, Arrange and Act and Assert comments, docstrings with Args and Returns |
 | 4B PowerShell unit test policy | PASS | Pester, `-ForEach` over shared rows, wrapper seams mocked, never the executables |
 | 5 Test coverage detail | PASS | Suite counts 67, 22, 47, 23, and 42, plus 23 Python and 16 Jest cases |
