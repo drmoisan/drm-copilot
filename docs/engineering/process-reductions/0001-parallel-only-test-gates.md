@@ -5,7 +5,7 @@
 reduction: 0001
 Date: 2026-11-07
 Issue: #1094
-Merge commit: pending (PR #1101)
+Merge commit: pending (PR #1102)
 
 Removes the repeated test runs that each item performed before review. The Pester, pytest, and Jest gates are now one parallel run each, re-run only after a fix: the local serial and order-varying runs are gone from `## Test Isolation Checks`, plans capture static baselines with no test-suite baseline, and coverage is read from the single gate run against the thresholds, with no earlier figure compared. Test independence remains policy under `.claude/rules/general-unit-test.md`.
 
