@@ -135,7 +135,7 @@ No tracked file outside `FEATURE/evidence/` changes in this phase.
 
 Any failing step, or any step that changes a file, restarts the loop from P2-T2. The parallel Pester and `pytest -n auto` runs are re-run only after a fix.
 
-- [ ] [P2-T1] (N17, optional and text-only) In the criterion of `## Acceptance Criteria` of `FEATURE/spec.md` that names `<FEATURE>/evidence/coverage/`, replace that path with `<FEATURE>/evidence/qa-gates/`, where the coverage figures are recorded as `coverage-delta.*`.
+- [x] [P2-T1] (N17, optional and text-only) In the criterion of `## Acceptance Criteria` of `FEATURE/spec.md` that names `<FEATURE>/evidence/coverage/`, replace that path with `<FEATURE>/evidence/qa-gates/`, where the coverage figures are recorded as `coverage-delta.*`.
   - The checkbox and every other word of the criterion are unchanged. If the edit cannot be made within that one physical line, the task records `not applied` and changes nothing.
   - Acceptance: the physical line count of `SPEC` and the line number of `## Acceptance Criteria` equal the P0-T2 values; `git diff -U0 CYCLE_START -- FEATURE/spec.md` shows the two lines of P1-T2 plus, when applied, this one line and no other; when applied, `SPEC` contains `evidence/qa-gates/` in that criterion and no longer contains `evidence/coverage/`.
 - [ ] [P2-T2] Run the PoshQC formatter over `HOOK` and write `FEATURE/evidence/qa-gates/format.<timestamp>.md`.
