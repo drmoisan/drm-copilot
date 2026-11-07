@@ -63,7 +63,7 @@ Found by searching `tests/` for `ProcessReductionLedger`, `process-reductions`, 
 | --- | --- |
 | `tests/scripts/dev-tools/ProcessReductionLedger.Tests.ps1` (all `PRL-*`) | Unchanged: `ProcessReductionLedger.psm1` is not edited |
 | `ProcessReductionLedger.Index.Tests.ps1` `PRL-REAL-LEDGER-AGREES` | Unchanged; it re-validates every entry edited by [P0-T4], [P1-T7] and [P1-T8] (the three `Merge commit:` back-fills accept the merged form; `pending (PR #N)` was also accepted), whose `## Stored Patch` sections keep naming their patch path |
-| same file, `PRL-PARTIAL-REVERT-LINKED` | Unchanged: the `0001` index row, the `0001` `## Partial Revert` section, and the `0006` `## Summary` are not edited; a gap fix in [P1-T8] may not edit them |
+| same file, `PRL-PARTIAL-REVERT-LINKED` | Unchanged: the `0001` index row, the `0001` `## Partial Revert` section, and the `0006` `## Summary` sentence naming entry `0001` are not edited (the [P0-T4] back-fill changes only the `0006` `Merge commit:` line); a gap fix in [P1-T8] may not edit them |
 | same file, `PRL-README-EXAMPLE-IS-VALID` | Unchanged: `## Revert Order` is inserted before `## Worked Example`, whose text is not edited |
 | `ProcessReductionLedger.Replay.Tests.ps1` (the `PRR-*` replay sample) | Unchanged: it reverts the `0005` hook blocks alone on the live hook, which the new rule permits because no later entry names `.claude/hooks/validate-planner-output.ps1`; [P1-T8] may not add a later block on that hook |
 | `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1` | Unchanged: no skill is edited |
