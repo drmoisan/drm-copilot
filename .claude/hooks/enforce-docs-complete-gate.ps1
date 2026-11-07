@@ -17,7 +17,9 @@
       3. The profile is read through Get-DocsCompleteGateFileText under the root from
          Get-DocsCompleteGateRepositoryRoot. Absent or disabled allows; a profile that cannot be
          read or parsed denies PROFILE_UNREADABLE.
-      4. One bounded gh pr view [<N>] --json baseRefName,headRefName,headRefOid through
+      4. Get-DocsCompleteGateMergeTarget binds the command to one pull request; a target it
+         cannot resolve denies PR_UNRESOLVED with no gh call. One bounded gh pr view [<selector>]
+         [--repo <value>] --json baseRefName,headRefName,headRefOid then runs through
          Invoke-DocsOnlyGhExe. A failed, throwing or unreadable lookup denies PR_UNRESOLVED; a
          --match-head-commit value other than headRefOid denies MATCH_HEAD_MISMATCH.
       5. A pull request that is not an epic integration branch merging into main allows.
@@ -30,10 +32,12 @@
     the session worktree may hold a different commit than the pull request head.
 
     Residual limits: the profile and receipt are read from the local working tree; an ambient
-    GH_REPO selects the repository and is not visible in the command text; a push after the
-    lookup is not observed unless --match-head-commit is passed; a GraphQL mutation supplied
-    from a file is not visible; a direct git push to main is outside gh scope. This is a
-    policy-level control, not a cryptographic one.
+    GH_REPO or GH_HOST and a directory change made by an earlier Bash call are not visible in
+    the command text; a gh alias is not visible; Test-EpicMergeGateCommandInScope does not admit
+    a mutation supplied from a file, a merge endpoint whose number is a variable, or an unquoted
+    {owner} endpoint; a GET on the merge endpoint is treated as a merge; a push after the lookup
+    is not observed unless --match-head-commit is passed; a direct git push to main is outside
+    gh scope. This is a policy-level control, not a cryptographic one.
 
 .NOTES
     Issue #1034. Compatible with PowerShell 7+. Filesystem reads and the repository root go
@@ -50,7 +54,7 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/docs/DocsCompleteGate.psm1'
 # Shared command-line parser and structural invocation matcher (issues #545 and #952).
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
-# Merge and enqueue scope predicate and the PR selector reader (issue #952).
+# Merge and enqueue scope predicate, its two match predicates and the value-flag table (issue #952).
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-command.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-command.ps1' -ErrorRecord $_ }
 # Bounded gh seam Invoke-DocsOnlyGhExe (issue #927).
 try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDependencyFailure -Name 'hook-docs-only-diff.ps1' -ErrorRecord $_ }
@@ -147,6 +151,194 @@ function Get-DocsCompleteGateFileText {
     }
 }
 
+function Read-DocsCompleteGateMergeOperand {
+    <#
+    .SYNOPSIS
+        Reads the selector, repository values and head pin of one gh pr merge record.
+    .DESCRIPTION
+        Walks the tokens with a closed flag table and returns @{ Readable; Selector; Repository;
+        MatchHeadCommit }. A flag outside the table, a value flag with no value, more than one
+        selector, and a dash-led or non-literal selector are unreadable. Redirection tokens are
+        not operands. A short cluster is read letter by letter; a value letter takes the rest
+        of the token, without one leading '=', or the next token.
+    .PARAMETER Token
+        The record tokens.
+    .PARAMETER StartIndex
+        The position just past the subcommand path.
+    .OUTPUTS
+        System.Collections.Hashtable
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory)] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $Token,
+        [Parameter(Mandatory)] [int] $StartIndex
+    )
+
+    $standalone = @('--merge', '-m', '--squash', '-s', '--rebase', '-r', '-d', '--delete-branch', '--auto', '--admin', '--disable-auto', '--help', '-h')
+    $unreadable = @{ Readable = $false; Selector = $null; Repository = @(); MatchHeadCommit = $null }
+    $positional = [System.Collections.Generic.List[string]]::new()
+    $repository = [System.Collections.Generic.List[string]]::new()
+    $pin = $null
+    $afterSeparator = $false
+    $index = $StartIndex
+    while ($index -lt $Token.Count) {
+        $current = $Token[$index]
+        if ($current -match '^(<|>|\d*>|&>)') {
+            $index += if ($current -match '^(\d*[<>]{1,2}&?|&>{1,2})$') { 2 } else { 1 }
+            continue
+        }
+        $index++
+        if ($afterSeparator -or -not $current.StartsWith('-') -or $current -ceq '-') { $positional.Add($current); continue }
+        if ($current -ceq '--') { $afterSeparator = $true; continue }
+
+        $name = Get-EpicMergeGateFlagName -Token $current
+        $value = if ($name.Length -lt $current.Length) { $current.Substring($name.Length + 1) } else { $null }
+        if (-not $current.StartsWith('--')) {
+            $name = $null
+            $value = $null
+            for ($position = 1; $position -lt $current.Length -and $null -eq $name; $position++) {
+                $letter = "-$($current[$position])"
+                if ($script:EpicMergeGateValueFlags -ccontains $letter) {
+                    $name = $letter
+                    if ($position + 1 -lt $current.Length) { $value = $current.Substring($position + 1) -replace '^=', '' }
+                } elseif ($standalone -cnotcontains $letter) {
+                    return $unreadable
+                }
+            }
+            if ($null -eq $name) { continue }
+        }
+        if ($standalone -ccontains $name) {
+            if ($name -ceq '--merge' -and $null -ne (ConvertFrom-EpicMergeGateSelector -Selector ([string] $value))) { $positional.Add($value) }
+            continue
+        }
+        if ($script:EpicMergeGateValueFlags -cnotcontains $name) { return $unreadable }
+        if ($null -eq $value) {
+            if ($index -ge $Token.Count) { return $unreadable }
+            $value = $Token[$index]
+            $index++
+        }
+        if ($name -ceq '-R' -or $name -ceq '--repo') { $repository.Add($value) }
+        if ($name -ceq '--match-head-commit') { $pin = $value }
+    }
+
+    if ($positional.Count -gt 1) { return $unreadable }
+    $selector = if ($positional.Count -eq 1) { $positional[0] } else { $null }
+    if ($null -ne $selector -and ($selector.Length -eq 0 -or $selector.StartsWith('-') -or -not (Test-CommandLineTokenLiteral -Token $selector))) { return $unreadable }
+    return @{ Readable = $true; Selector = $selector; Repository = $repository.ToArray(); MatchHeadCommit = $pin }
+}
+
+function Read-DocsCompleteGateApiTarget {
+    <#
+    .SYNOPSIS
+        Reads the pull request and repository of one gated gh api record.
+    .DESCRIPTION
+        Readable only for exactly one anchored repos/<owner>/<repo>/pulls/<n>/merge token, with an
+        optional leading slash; {owner} and {repo} placeholders mean the local repository. A
+        GraphQL mutation names a node identifier with no selector, so it is unreadable, as are
+        --hostname and any other token that names a merge path.
+    .PARAMETER Token
+        The record tokens.
+    .PARAMETER StartIndex
+        The position just past the api subcommand.
+    .OUTPUTS
+        System.Collections.Hashtable
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory)] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $Token,
+        [Parameter(Mandatory)] [int] $StartIndex
+    )
+
+    $unreadable = @{ Readable = $false; Selector = $null; Repository = @(); MatchHeadCommit = $null }
+    $endpoints = [System.Collections.Generic.List[string]]::new()
+    for ($index = $StartIndex; $index -lt $Token.Count; $index++) {
+        $current = $Token[$index]
+        if ($current -ceq 'graphql' -or (Get-EpicMergeGateFlagName -Token $current) -ceq '--hostname') { return $unreadable }
+        if ($current -match $script:EpicMergeGateRestMergePattern) { $endpoints.Add($current) }
+    }
+    if ($endpoints.Count -ne 1) { return $unreadable }
+    $endpoint = [regex]::Match($endpoints[0], '^/?repos/([^/]+)/([^/]+)/pulls/(\d+)/merge$')
+    if (-not $endpoint.Success) { return $unreadable }
+    $owner = $endpoint.Groups[1].Value
+    $name = $endpoint.Groups[2].Value
+    $repository = if ($owner -ceq '{owner}' -and $name -ceq '{repo}') { @() } else { @("$owner/$name") }
+    return @{ Readable = $true; Selector = $endpoint.Groups[3].Value; Repository = $repository; MatchHeadCommit = $null }
+}
+
+function Test-DocsCompleteGateContextChange {
+    <#
+    .SYNOPSIS
+        Reports whether the command visibly changes the directory or the gh repository context.
+    .DESCRIPTION
+        True for a cd, pushd, chdir, Set-Location, Push-Location or sl command, and for a GH_REPO
+        or GH_HOST assignment, in any record of the command.
+    .PARAMETER CommandText
+        The Bash command text.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)] [string] $CommandText)
+
+    $changers = @('cd', 'pushd', 'chdir', 'set-location', 'push-location', 'sl')
+    foreach ($record in @(Read-CommandLineInvocationSegment -CommandText $CommandText)) {
+        $tokens = [string[]]@($record.Tokens)
+        if (@($tokens -match '^GH_(?:REPO|HOST)=').Count -gt 0) { return $true }
+        $start = (Skip-CommandLineTransparentWrapper -Token $tokens).Index
+        if ($start -lt $tokens.Count -and $changers -contains (ConvertTo-CommandLineLeafWord -Word $tokens[$start])) { return $true }
+    }
+    return $false
+}
+
+function Get-DocsCompleteGateMergeTarget {
+    <#
+    .SYNOPSIS
+        Binds a gated command to the pull request it merges.
+    .DESCRIPTION
+        Collects the gated invocations with the two loops of Test-EpicMergeGateCommandInScope, so
+        a --disable-auto-only or ungated sibling does not count. Returns @{ Reason; Message;
+        Selector; Repository; MatchHeadCommit }. Reason is $null when exactly one Structural,
+        non-injected invocation has readable operands, one OWNER/REPO or HOST/OWNER/REPO value at
+        most, and no visible context change (a URL selector names its own repository); every
+        other case is PR_UNRESOLVED, and no gh call is made.
+    .PARAMETER CommandText
+        The Bash command text.
+    .OUTPUTS
+        System.Collections.Hashtable
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([Parameter(Mandatory)] [string] $CommandText)
+
+    $unresolved = @{ Reason = 'PR_UNRESOLVED'; Message = 'The command does not name one pull request the gate can resolve; the gate fails closed. Run one literal gh pr merge with its selector and repository, with no directory or GH_REPO change in the command.'; Selector = $null; Repository = $null; MatchHeadCommit = $null }
+    $gated = [System.Collections.Generic.List[pscustomobject]]::new()
+    foreach ($match in @(Get-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('pr', 'merge'))) {
+        if ($match.Status -ne 'Structural' -or -not (Test-EpicMergeGateDisableAutoOnly -Match $match)) { $gated.Add($match) }
+    }
+    $mergeCount = $gated.Count
+    foreach ($match in @(Get-CommandLineInvocation -CommandText $CommandText -CommandWord 'gh' -SubcommandPath @('api'))) {
+        if (Test-EpicMergeGateApiMutationText -Text (@($match.Segment.Tokens) -join ' ')) { $gated.Add($match) }
+    }
+    if ($gated.Count -ne 1 -or $gated[0].Status -ne 'Structural' -or $gated[0].Segment.ArgumentInjected) { return $unresolved }
+
+    $tokens = [string[]]@($gated[0].Segment.Tokens)
+    $operand = if ($mergeCount -eq 1) {
+        Read-DocsCompleteGateMergeOperand -Token $tokens -StartIndex $gated[0].OperandIndex
+    } else {
+        Read-DocsCompleteGateApiTarget -Token $tokens -StartIndex $gated[0].OperandIndex
+    }
+    if (-not $operand.Readable) { return $unresolved }
+
+    $repositories = @(@(@($gated[0].GlobalOptions | ForEach-Object { [string] $_.Value }) + @($operand.Repository)) | Select-Object -Unique)
+    if ($repositories.Count -gt 1 -or ($repositories.Count -eq 1 -and $repositories[0] -cnotmatch '^[\w.-]+/[\w.-]+(?:/[\w.-]+)?$')) { return $unresolved }
+    if ([string] $operand.Selector -notmatch '^https?://' -and (Test-DocsCompleteGateContextChange -CommandText $CommandText)) { return $unresolved }
+    $repository = if ($repositories.Count -eq 1) { $repositories[0] } else { $null }
+    return @{ Reason = $null; Message = $null; Selector = $operand.Selector; Repository = $repository; MatchHeadCommit = $operand.MatchHeadCommit }
+}
+
 function Get-DocsCompleteGatePullRequest {
     <#
     .SYNOPSIS
@@ -154,10 +346,10 @@ function Get-DocsCompleteGatePullRequest {
     .DESCRIPTION
         Returns @{ Reason; Message; BaseRefName; HeadRefName; HeadRefOid }. Reason is $null on
         success, PR_UNRESOLVED when gh fails or returns no readable pull request with a full
-        lowercase head revision, and MATCH_HEAD_MISMATCH when a --match-head-commit value in the
-        command differs from headRefOid.
-    .PARAMETER CommandText
-        The Bash command text.
+        lowercase head revision, and MATCH_HEAD_MISMATCH when the target --match-head-commit
+        value differs from headRefOid.
+    .PARAMETER Target
+        The resolved target from Get-DocsCompleteGateMergeTarget.
     .PARAMETER RepositoryRoot
         The directory gh runs in.
     .OUTPUTS
@@ -166,14 +358,14 @@ function Get-DocsCompleteGatePullRequest {
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
-        [Parameter(Mandatory)] [string] $CommandText,
+        [Parameter(Mandatory)] [hashtable] $Target,
         [Parameter(Mandatory)] [string] $RepositoryRoot
     )
 
-    $prNumber = Get-EpicMergeGateSelectorPrNumber -CommandText $CommandText
     $ghArgs = [System.Collections.Generic.List[string]]::new()
     $ghArgs.AddRange([string[]]@('pr', 'view'))
-    if ($null -ne $prNumber) { $ghArgs.Add([string] $prNumber) }
+    if ($null -ne $Target.Selector) { $ghArgs.Add([string] $Target.Selector) }
+    if ($null -ne $Target.Repository) { $ghArgs.AddRange([string[]]@('--repo', [string] $Target.Repository)) }
     $ghArgs.AddRange([string[]]@('--json', 'baseRefName,headRefName,headRefOid'))
     $unresolved = @{ Reason = 'PR_UNRESOLVED'; Message = 'gh pr view did not return a readable pull request with a full head revision; the gate fails closed. Check gh authentication and the pull request selector.'; BaseRefName = $null; HeadRefName = $null; HeadRefOid = $null }
     try { $lookup = Invoke-DocsOnlyGhExe -WorkingRoot $RepositoryRoot -GhArgs $ghArgs.ToArray() } catch { return $unresolved }
@@ -186,12 +378,9 @@ function Get-DocsCompleteGatePullRequest {
     if ($names -notcontains 'headRefOid' -or $names -notcontains 'baseRefName' -or $names -notcontains 'headRefName') { return $unresolved }
     $head = [string] $pr.headRefOid
     if ($head -cnotmatch '^(?:[0-9a-f]{40}|[0-9a-f]{64})$') { return $unresolved }
-    $subcommandPath = @('pr', 'merge')
-    if (Test-CommandLineFlag -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath -FlagName '--match-head-commit') {
-        $pinned = Get-CommandLineFlagValue -CommandText $CommandText -CommandWord 'gh' -SubcommandPath $subcommandPath -FlagName '--match-head-commit'
-        if (-not [string]::Equals([string] $pinned, $head, [System.StringComparison]::Ordinal)) {
-            return @{ Reason = 'MATCH_HEAD_MISMATCH'; Message = "--match-head-commit '$pinned' does not equal the pull request head revision '$head'; pass the current head revision."; BaseRefName = $null; HeadRefName = $null; HeadRefOid = $null }
-        }
+    $pinned = $Target.MatchHeadCommit
+    if ($null -ne $pinned -and -not [string]::Equals([string] $pinned, $head, [System.StringComparison]::Ordinal)) {
+        return @{ Reason = 'MATCH_HEAD_MISMATCH'; Message = "--match-head-commit '$pinned' does not equal the pull request head revision '$head'; pass the current head revision."; BaseRefName = $null; HeadRefName = $null; HeadRefOid = $null }
     }
     return @{ Reason = $null; Message = $null; BaseRefName = [string] $pr.baseRefName; HeadRefName = [string] $pr.headRefName; HeadRefOid = $head }
 }
@@ -239,7 +428,9 @@ function Invoke-DocsCompleteGateDecision {
     if ($null -ne $enabled.Reason) { return Get-DocsCompleteGateBlockDecision -Code $enabled.Reason -Message $enabled.Message }
     if (-not $enabled.Enabled) { return Get-DocsCompleteGateAllowDecision }
 
-    $pr = Get-DocsCompleteGatePullRequest -CommandText $commandText -RepositoryRoot $root
+    $target = Get-DocsCompleteGateMergeTarget -CommandText $commandText
+    if ($null -ne $target.Reason) { return Get-DocsCompleteGateBlockDecision -Code $target.Reason -Message $target.Message }
+    $pr = Get-DocsCompleteGatePullRequest -Target $target -RepositoryRoot $root
     if ($null -ne $pr.Reason) { return Get-DocsCompleteGateBlockDecision -Code $pr.Reason -Message $pr.Message }
     if (-not (Test-DocsCompleteGateIntegrationTarget -BaseRefName $pr.BaseRefName -HeadRefName $pr.HeadRefName)) { return Get-DocsCompleteGateAllowDecision }
 
