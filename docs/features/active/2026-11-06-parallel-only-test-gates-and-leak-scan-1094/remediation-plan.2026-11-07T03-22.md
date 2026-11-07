@@ -90,7 +90,7 @@ Static stages run first, so that a suite is not re-run for a formatting change. 
 - [x] [P2-T1] Run format and analyze for `tests/scripts/claude-runtime` on the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and write `<FEATURE>/evidence/qa-gates/powershell-format.<timestamp>.md` and `<FEATURE>/evidence/qa-gates/powershell-analyze.<timestamp>.md`.
   - Format output carries `Already formatted:` and `Formatted:` lines. A `Formatted:` line means a file changed: commit it and repeat this task.
   - Acceptance: zero `Formatted:` lines, a non-zero `Already formatted:` count, and zero analyzer findings, with `EXIT_CODE:` carrying both.
-- [ ] [P2-T2] Run the P0-T4 stages for `extensions/drm-copilot/test/lib/validate/policy-audit-artifact.test.ts` and write `<FEATURE>/evidence/qa-gates/typescript-format.<timestamp>.md`, `<FEATURE>/evidence/qa-gates/typescript-lint.<timestamp>.md`, and `<FEATURE>/evidence/qa-gates/typescript-typecheck.<timestamp>.md`.
+- [x] [P2-T2] Run the P0-T4 stages for `extensions/drm-copilot/test/lib/validate/policy-audit-artifact.test.ts` and write `<FEATURE>/evidence/qa-gates/typescript-format.<timestamp>.md`, `<FEATURE>/evidence/qa-gates/typescript-lint.<timestamp>.md`, and `<FEATURE>/evidence/qa-gates/typescript-typecheck.<timestamp>.md`.
   - Prettier runs in check mode, and a clean file prints `All matched files use Prettier code style!`. A failure is fixed in the file and this task repeats.
   - Each artifact's step compares its finding count with the P0-T4 value and exits non-zero when the count is higher. `Output Summary:` states both numbers.
   - Acceptance: each `EXIT_CODE:` is 0.
