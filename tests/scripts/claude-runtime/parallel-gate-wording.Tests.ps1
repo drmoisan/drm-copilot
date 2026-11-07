@@ -116,6 +116,14 @@ Describe 'Parallel gate wording' {
         @{ Id = 'COPILOT-PLANNING-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/atomic_planning.agent.md'; Required = @('pytest -n auto'); Forbidden = $script:CopilotFocusedForbidden }
         @{ Id = 'COPILOT-PS-PLANNING'; Path = '.github/agents/powershell-atomic-planning.agent.md'; Required = @('pytest -n auto'); Forbidden = $script:CopilotFocusedForbidden }
         @{ Id = 'COPILOT-PS-PLANNING-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/powershell-atomic-planning.agent.md'; Required = @('pytest -n auto'); Forbidden = $script:CopilotFocusedForbidden }
+        @{ Id = 'COPILOT-TDD-GREEN'; Path = '.github/agents/tdd-green.agent.md'; Required = @('debugging only'); Forbidden = @() }
+        @{ Id = 'COPILOT-TDD-GREEN-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/tdd-green.agent.md'; Required = @('debugging only'); Forbidden = @() }
+        @{ Id = 'COPILOT-TDD-RED'; Path = '.github/agents/tdd-red.agent.md'; Required = @('debugging only'); Forbidden = @() }
+        @{ Id = 'COPILOT-TDD-RED-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/tdd-red.agent.md'; Required = @('debugging only'); Forbidden = @() }
+        @{ Id = 'COPILOT-TS-ENGINEER'; Path = '.github/agents/typescript-engineer.agent.md'; Required = @('debugging only'); Forbidden = @() }
+        @{ Id = 'COPILOT-TS-ENGINEER-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/typescript-engineer.agent.md'; Required = @('debugging only'); Forbidden = @() }
+        @{ Id = 'COPILOT-STAGED-REVIEW'; Path = '.github/agents/staged-review.agent.md'; Required = @('Invoke-PoshQCParallelTest', 'pytest -n auto', 'debugging only'); Forbidden = @() }
+        @{ Id = 'COPILOT-STAGED-REVIEW-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/staged-review.agent.md'; Required = @('Invoke-PoshQCParallelTest', 'pytest -n auto', 'debugging only'); Forbidden = @() }
         @{ Id = 'AUDIT-TEMPLATE'; Path = 'docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
         @{ Id = 'AUDIT-TEMPLATE-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
         @{ Id = 'AUDIT-AGENTS'; Path = 'docs/features/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest'); Forbidden = @('Document baseline coverage') }
@@ -145,7 +153,9 @@ Describe 'Parallel gate wording' {
                 'xUnit delta', 'Delta Requirements', 'does not regress', 'compared to baseline',
                 'no decrease in coverage', 'maintained or improved', 'targeted Pester', 'targeted Pytest',
                 'targeted xUnit', 'targeted MSTest', 'targeted tests', 'run tests after each',
-                'relevant tests using', 'running tests frequently'
+                'relevant tests using', 'running tests frequently', 'smallest applicable subset',
+                'relevant tests pass', 'baseline, targeted, and end-state', 'repro and regression test',
+                'Run the regression to confirm'
             )
 
             $resources = 'extensions/drm-copilot/resources'
@@ -243,7 +253,7 @@ Describe 'Parallel gate wording' {
                 })
 
             # Assert
-            $tokens.Count | Should -Be 33 -Because 'the plan names 33 sweep tokens'
+            $tokens.Count | Should -Be 38 -Because 'the plan names 38 sweep tokens'
             $missed | Should -BeNullOrEmpty -Because 'a reintroduced token must fail the sweep'
         }
     }
