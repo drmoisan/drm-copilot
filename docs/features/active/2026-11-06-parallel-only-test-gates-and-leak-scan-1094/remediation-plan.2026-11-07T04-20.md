@@ -75,7 +75,7 @@ No test suite runs in this phase.
 
 Static stages run first, so that a suite is not re-run for a formatting change. Each pass writes new artifacts.
 
-- [ ] [P2-T1] Run format and analyze for `tests/scripts/claude-runtime` on the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and write `<FEATURE>/evidence/qa-gates/powershell-format.<timestamp>.md` and `<FEATURE>/evidence/qa-gates/powershell-analyze.<timestamp>.md`.
+- [x] [P2-T1] Run format and analyze for `tests/scripts/claude-runtime` on the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and write `<FEATURE>/evidence/qa-gates/powershell-format.<timestamp>.md` and `<FEATURE>/evidence/qa-gates/powershell-analyze.<timestamp>.md`.
   - Format output carries `Already formatted:` and `Formatted:` lines. A `Formatted:` line means a file changed: commit it and repeat this task.
   - Acceptance: zero `Formatted:` lines, a non-zero `Already formatted:` count, and zero analyzer findings, with `EXIT_CODE:` carrying both.
 - [ ] [P2-T2] Run the Pester gate with one background `Invoke-PoshQCParallelTest` run and write `<FEATURE>/evidence/qa-gates/pester-parallel.<timestamp>.md`.
