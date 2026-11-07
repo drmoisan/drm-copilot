@@ -35,7 +35,7 @@
 
 ### Phase 0 — Baseline Reference
 
-- [ ] [P0-T1] Write `FEATURE/evidence/remediation-baseline/baseline-reference.<timestamp>.md` naming the baseline artifacts this cycle compares with (the lexicographically greatest `FEATURE/evidence/baseline/pester-parallel-baseline.*.md`, `pytest-parallel-baseline.*.md`, `format-baseline.*.md`, and `pssa-baseline.*.md`) and copying from them the pass and fail counts, the repo-wide coverage, and the line coverage of `SKILLDIR/Get-EpicProgressReport.Render.ps1`; state that `Get-EpicProgressReport.Stages.ps1`, `Get-EpicProgressReport.Steps.ps1`, and `Get-EpicProgressReport.Gather.ps1` are new on the branch and have no pre-change run.
+- [x] [P0-T1] Write `FEATURE/evidence/remediation-baseline/baseline-reference.<timestamp>.md` naming the baseline artifacts this cycle compares with (the lexicographically greatest `FEATURE/evidence/baseline/pester-parallel-baseline.*.md`, `pytest-parallel-baseline.*.md`, `format-baseline.*.md`, and `pssa-baseline.*.md`) and copying from them the pass and fail counts, the repo-wide coverage, and the line coverage of `SKILLDIR/Get-EpicProgressReport.Render.ps1`; state that `Get-EpicProgressReport.Stages.ps1`, `Get-EpicProgressReport.Steps.ps1`, and `Get-EpicProgressReport.Gather.ps1` are new on the branch and have no pre-change run.
   - Acceptance: the artifact carries `Timestamp:`, `Command:` (`none - reference only`), `EXIT_CODE: 0`, and `Output Summary:` with the copied figures; no test run is made.
 
 ### Phase 1 — RF1 to RF3 Fixes
