@@ -2,6 +2,7 @@
 
 Timestamp: 2026-11-07T01-41
 Review-Verdict: REMEDIATION_REQUIRED
+Remediation-Mode: proportionate
 Source review artifacts:
 - `docs/features/active/2026-11-06-epic-progress-report-skill-1093/policy-audit.2026-11-07T01-41.md`
 - `docs/features/active/2026-11-06-epic-progress-report-skill-1093/code-review.2026-11-07T01-41.md`
@@ -33,3 +34,7 @@ Remediability-Evidence: The fix is one added Pester case in a test file of this 
 - If any canonical script changes, re-copy it to the bundle byte-identically and re-run the skill contract suite.
 - Per-file line coverage stays at or above 85%; record new evidence under `evidence/qa-gates/` and `evidence/regression-testing/`.
 - The five CI-dependent criteria (AC-12, AC-30, AC-31, US-AC-11, US-AC-15) stay unchecked until the S9 CI gate.
+
+## Orchestrator Addendum (related, non-blocking, fixed in this cycle)
+
+- OA-1: spec.md parameter table states the start-time resolution order with the stored start before the reset, which conflicts with AC-14 and the entry-suite reset test (a reset discards the stored start: passed value, then now on -ResetBaseline, then stored value). Correct the parameter table prose to match AC-14 and the implementation. Do not change any acceptance-criterion text.
