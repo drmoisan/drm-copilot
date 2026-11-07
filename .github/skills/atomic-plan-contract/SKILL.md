@@ -12,7 +12,7 @@ Shared rules for atomic plan formatting, Phase 0 requirements, baseline capture,
 Use this skill when:
 - Creating or validating atomic plans.
 - Executing plans with strict format requirements.
-- Enforcing Phase 0 policy reading + baseline capture and final QA loops.
+- Enforcing Phase 0 baseline capture and final QA loops.
 
 ## Canonical Plan Format
 
@@ -32,22 +32,28 @@ Rules:
 - **Tool routes are not restated.** Tool routes, launchers, wrapper scripts, command-text restrictions, the batch budget, hook context, and CI shape are owned by the `execution-environment` skill. A plan references that skill instead of restating its content.
 - **Changed existing behavior names its asserting tests.** A task that changes the observable behavior of an existing function, script, fixture, or test stub (its signature, argv, output, exit status, or the files it writes) names every existing test that asserts that behavior and states each test's disposition: unchanged because it is unaffected, or updated, with the reason for the update. The tests are found by searching the test tree for the symbol, the file name, and the asserted output. A test that asserts the current behavior and is outside the task's file set fails once the change lands, and the plan's own acceptance condition then cannot be met. The planner's adversarial self-review includes this search for every task that changes existing behavior.
 - **Size guideline.** A plan stays within 40 canonical tasks and 400 physical lines. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task.
+- **Task target.** A plan targets 15 to 20 canonical tasks. The target is authoring guidance that no validator checks; the limit the validator enforces is the one the `Size guideline` bullet states.
 - **Pre-Mortem.** Every plan carries a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the plan prevents that failure class, or states "not applicable" followed by the reason. The `Test isolation` bullet names the parallel gates the plan uses: one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers, each re-run only after a fix. The `Mirror parity` bullet also covers the execution-environment brief: a plan that alters a fact the brief states (for example, it adds or renames a CI job, changes a required status context, a tool route, or a batch-budget rule) includes a task that updates the brief in the same change, in all six byte-identical copies, and the bullet names that task. Without that task the brief states a superseded fact once the change lands, which breaks the brief's own maintenance rule. The planner SubagentStop hook blocks a plan without a complete section.
 - **Final-phase self-review.** The final phase of every plan contains a self-review task that walks the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base and writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item. A FAIL row is fixed and the QA loop is re-run before the self-review is rewritten; the plan does not complete with a FAIL row.
 
 This section takes precedence over the literal-quoting rules of `## Wrap-Tolerant Assertion Authoring (Mandatory)`: those rules govern the asserted value of an acceptance condition, not context.
+
+## Process-Reduction Ledger
+
+- This rule applies only when `docs/engineering/process-reductions/` exists, so a repository without that folder is unaffected.
+- A change that reduces evidence, plan tasks, gates, or review process adds its ledger entry in the same commit, in the format of that folder's `README.md`.
+- One-off waivers for a single item are not entries.
 
 ## Short-Path Minimal Plan Contract
 
 When orchestration selects short path, a minimal plan is still mandatory and must include these blocks:
 
 1) Baseline capture block
-- policy reads in required order,
-- static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
+- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
 - required artifacts:
-	- a Phase 0 policy-read evidence artifact in the canonical evidence location defined by `evidence-and-timestamp-conventions`
 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
 	- each baseline step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
+	- baseline test-step artifacts for languages with mandatory coverage policy MUST include the pass and fail counts and numeric coverage headline values in `Output Summary:` (repo-wide percent and the percent of each in-scope file), read from the one parallel gate run.
 
 2) Delegated implementation block
 - explicit handoff task to the small-path implementation engineer,
@@ -58,7 +64,7 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
 - rerun behavior when any step changes files or fails.
 - one final-QC artifact per QC command step (no aggregate-only final-QC artifact)
 - each final-QC step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
-- final-QC test commands for languages with mandatory coverage policy MUST run in coverage mode and record numeric coverage values from the single gate run in `Output Summary:`.
+- final-QC test commands for languages with mandatory coverage policy MUST run in coverage mode and record numeric post-change coverage values from the single gate run in `Output Summary:`, compared with the `Phase 0 baseline` run of the same gate.
 - final-QC command tasks that are present in the approved plan MUST execute their stated commands; `SKIPPED` is invalid unless the task text itself explicitly authorizes a skip condition.
 
 4) Reduced audit block
@@ -106,12 +112,13 @@ When a fully automated equivalent is unavailable, the plan MUST fail closed by r
 
 ## Phase 0 Requirements
 
-Phase 0 must include tasks to read policy files in the order defined in `policy-compliance-order`.
+Phase 0 carries no routine policy-read task. Agents still follow the reading order defined in `policy-compliance-order`, and a plan that keeps a policy-read task stays valid.
 
-Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched, and no test suite runs in it. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
+Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched and, for each language in scope with coverage policy, one `Phase 0 baseline` run of its test gate: one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, and one Jest coverage run where TypeScript is in scope. Each test-suite baseline artifact records the pass and fail counts, the repo-wide coverage, and the coverage of each in-scope file. The final gate's run of the same gate is compared with it: no new failing test, no per-file or repo-wide coverage drop, the thresholds still apply, and new behavior is tested. A new file has no pre-change run and is judged against the thresholds. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
 
-For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both artifacts exist:
-- `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
+A plan written before this rule that captures static baselines only stays valid: preflight does not return it as a defect, its final gate reads coverage against the thresholds, and its audit records `N/A - no pre-change run`.
+
+For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these artifacts exist:
 - baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
 - approved-plan checklist state MUST remain unchecked for any Phase 0 task whose artifact is absent or whose artifact fields are incomplete.
 
@@ -125,9 +132,13 @@ Plans name evidence artifacts `<name>.<timestamp>.md` and never fix a plan-time 
 
 For any language in scope where repository policy requires coverage validation:
 
-- The approved plan MUST include an explicit final-QC coverage capture task.
-- The final-QC artifact MUST record numeric coverage values (not placeholders such as `UNVERIFIED`).
-- The plan MUST include a threshold task that reports each changed file from the single gate run against the coverage thresholds. New behavior is tested. No earlier figure is compared.
+- The approved plan MUST include explicit baseline and final-QC coverage capture tasks: the `Phase 0 baseline` run and the final gate run, each one run of the language's parallel gate.
+- Baseline and final-QC artifacts MUST record numeric coverage values (not placeholders such as `UNVERIFIED`).
+- Where policy requires no-regression and new-code thresholds, the plan MUST include a delta/threshold verification task that reports, with post-change figures from the single gate run:
+	- baseline coverage, from the `Phase 0 baseline` artifact,
+	- post-change coverage,
+	- new/changed-code coverage.
+- Each changed file meets the coverage thresholds and shows no drop against the `Phase 0 baseline`; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
 - If required coverage values are unavailable, the plan outcome MUST be remediation-required and MUST NOT be reported as PASS.
 
 ## Final QA Loop (Required for Code/Test Changes)
@@ -180,6 +191,8 @@ Output format. After the `PREFLIGHT:` signal, the return carries one line per de
 
 At most one return. On `PREFLIGHT: REVISIONS REQUIRED`, the orchestrator delegates one planner revision carrying the full `PREFLIGHT-DEFECT:` list and runs one more preflight. If that preflight still reports a substantive defect, the orchestrator halts with `blocked_reason: "validator_failed"` during planning, or records `final_status: "blocked_preflight_iteration_limit"` in a remediation cycle.
 
+Light cycles. A remediation cycle recorded with `Remediation-Mode: light` has no remediation plan and no preflight; its executor runs the inputs file directly. When that executor stops with `BLOCKED at preflight (before [P0-T1])` before the first task, the cycle converts to the design chain, and the remediation plan it then receives follows this section.
+
 ## Validator Gate (Mandatory)
 
 Before a plan can be treated as approved:
@@ -214,7 +227,7 @@ When a plan is generated or validated from a feature folder, resolve selected mo
 
 ## Mode-Specific Mandatory Plan Gates
 
-- `minor-audit` plans MUST include static baseline evidence tasks, targeted verification evidence tasks read from the gate run, and end-state evidence tasks.
+- `minor-audit` plans MUST include baseline evidence tasks (static baselines and the `Phase 0 baseline` test-suite run), targeted verification evidence tasks read from the gate run, and end-state evidence tasks.
 - `minor-audit` plans MUST require `${feature-folder}/issue.md` to contain an explicit `## Acceptance Criteria` section; do not infer acceptance criteria from other `issue.md` sections.
 - `minor-audit` plans MUST NOT treat missing `spec.md` or `user-story.md` as automatic blockers.
 - `minor-audit` execution/validation/audit MUST fail closed when `spec.md` or `user-story.md` exists unexpectedly in the active folder, when the explicit `## Acceptance Criteria` section is missing from `issue.md`, when required Phase 0 artifacts are missing, or when checklist state contradicts evidence on disk.

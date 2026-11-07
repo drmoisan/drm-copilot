@@ -19,10 +19,16 @@
 
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-feature-review-coverage.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
     Mock Get-ArtifactFileContent { $null }
     if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Mock Get-ChangedLanguageSet { $null } }
     if (Get-Command Get-JacocoRepoCoverage -ErrorAction SilentlyContinue) { Mock Get-JacocoRepoCoverage { $null } }
     if (Get-Command Get-LcovRepoCoverage -ErrorAction SilentlyContinue) { Mock Get-LcovRepoCoverage { $null } }
+}
+
+Describe 'epic-state baseline isolation (issue #1105)' {
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 }
 
 Describe 'validate-feature-review-coverage.ps1 thresholds dot-source guard (issue #852)' {
@@ -54,6 +60,12 @@ Describe 'validate-feature-review-coverage.ps1 thresholds dot-source guard (issu
             $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
             $script:HookDependencyGuardLoadFailed = $false
         }
+    }
+
+    AfterAll {
+        # Issue #1105: the bundle hook copy imports the bundle lib modules, which load beside the repository
+        # copies of the same names; remove them so a later suite in this process sees one copy of each module.
+        Get-Module | Where-Object { ([string]$_.Path -replace '\\', '/') -like '*/extensions/drm-copilot/resources/claude-customizations/*' } | Remove-Module -Force
     }
 
     It 'TG1: <Copy> exits 2 naming feature-review-coverage-thresholds.ps1 when the thresholds dot-source fails' -ForEach @(

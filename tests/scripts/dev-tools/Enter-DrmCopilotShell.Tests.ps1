@@ -117,22 +117,23 @@ Describe "DrmCopilotPromptSupport.ps1" {
 
     Context "Get-DrmCopilotNormalizedPath" {
         It "resolves a relative path against the PowerShell location, not the process directory" {
-            # Arrange: Set-Location does not move the process directory, so the two differ here.
-            $priorProcessDirectory = [Environment]::CurrentDirectory
-            Push-Location -LiteralPath $PSScriptRoot
-            try {
-                [Environment]::CurrentDirectory = [System.IO.Path]::GetPathRoot($PSScriptRoot)
+            # Arrange: the location seam supplies a fixture base, so neither the PowerShell location nor
+            # the process directory is read or changed (issue #1096).
+            $base = $script:FixtureRoot
 
-                # Act
-                $result = Get-DrmCopilotNormalizedPath -Path 'relative-repo'
+            # Act
+            $result = Get-DrmCopilotNormalizedPath -Path 'relative-repo' -GetLocationPath { $base }.GetNewClosure()
 
-                # Assert
-                $result | Should -BeExactly (Join-Path $PSScriptRoot 'relative-repo')
-            }
-            finally {
-                [Environment]::CurrentDirectory = $priorProcessDirectory
-                Pop-Location
-            }
+            # Assert
+            $result | Should -BeExactly (Join-Path $script:FixtureRoot 'relative-repo')
+        }
+
+        It "resolves a relative path against the current PowerShell location by default" {
+            # Act: the default seam reads the PowerShell location.
+            $result = Get-DrmCopilotNormalizedPath -Path 'relative-repo'
+
+            # Assert
+            $result | Should -BeExactly (Join-Path $PWD.ProviderPath 'relative-repo')
         }
 
         It "returns an absolute path unchanged apart from a trimmed trailing separator" {
@@ -144,24 +145,29 @@ Describe "DrmCopilotPromptSupport.ps1" {
 
     Context "Resolve-DrmCopilotActivationScriptPath" {
         It "resolves a relative virtual environment path against the PowerShell location, not the process directory" {
+            # Arrange: no real path is read; the existence probe is mocked and the location seam supplies
+            # a fixture base (issue #1096).
+            Mock Test-Path { $true }
+            $base = $script:FixtureRoot
+            $expected = Join-Path $script:FixtureRoot (Join-Path -Path 'relative-venv' -ChildPath "Scripts\Activate.ps1")
+
+            # Act
+            $result = Resolve-DrmCopilotActivationScriptPath -RepoRootPath $script:RepoRoot -VirtualEnvironmentPath 'relative-venv' -GetLocationPath { $base }.GetNewClosure()
+
+            # Assert
+            $result | Should -BeExactly $expected
+        }
+
+        It "resolves a relative virtual environment path against the current PowerShell location by default" {
             # Arrange: no real path is read; the existence probe is mocked.
             Mock Test-Path { $true }
-            $expected = Join-Path $PSScriptRoot (Join-Path -Path 'relative-venv' -ChildPath "Scripts\Activate.ps1")
-            $priorProcessDirectory = [Environment]::CurrentDirectory
-            Push-Location -LiteralPath $PSScriptRoot
-            try {
-                [Environment]::CurrentDirectory = [System.IO.Path]::GetPathRoot($PSScriptRoot)
+            $expected = Join-Path $PWD.ProviderPath (Join-Path -Path 'relative-venv' -ChildPath "Scripts\Activate.ps1")
 
-                # Act
-                $result = Resolve-DrmCopilotActivationScriptPath -RepoRootPath $script:RepoRoot -VirtualEnvironmentPath 'relative-venv'
+            # Act
+            $result = Resolve-DrmCopilotActivationScriptPath -RepoRootPath $script:RepoRoot -VirtualEnvironmentPath 'relative-venv'
 
-                # Assert
-                $result | Should -BeExactly $expected
-            }
-            finally {
-                [Environment]::CurrentDirectory = $priorProcessDirectory
-                Pop-Location
-            }
+            # Assert
+            $result | Should -BeExactly $expected
         }
 
         It "throws when the activation script is absent" {

@@ -337,8 +337,8 @@ The repository defines a separate, fully specified quality toolchain for each su
 |---|---|---|---|---|---|
 | Python | Black | Ruff | Pyright (strict) | Pytest | pytest-cov |
 | TypeScript | Prettier | ESLint (typescript-eslint) | `tsc` | Vitest (Jest in the bundled extension) | c8 / coverage provider |
-| PowerShell | PoshQC `Invoke-Formatter` | PSScriptAnalyzer (PoshQC) | n/a | Pester v5 | Pester + kcov export |
-| Modern C# (.NET 8+, No-COM) | CSharpier | .NET / Roslyn analyzers | Nullable reference types | xUnit + NSubstitute + FluentAssertions | XPlat Code Coverage |
+| PowerShell | PoshQC `Invoke-Formatter` | PSScriptAnalyzer (PoshQC) | n/a | Pester v6 | Pester + kcov export |
+| Modern C# (.NET 8+, No-COM) | CSharpier | .NET / Roslyn analyzers | Nullable reference types | MSTest + NSubstitute + FluentAssertions | XPlat Code Coverage |
 | Legacy VSTO C# (.NET Framework) | CSharpier | .NET analyzers via `msbuild` | Nullable via `msbuild` | MSTest via `vstest.console.exe` | `/EnableCodeCoverage` |
 | Bash / shell | shfmt | shellcheck | n/a | Bats | kcov |
 
@@ -369,7 +369,7 @@ Canonical rule: [.claude/rules/powershell.md](.claude/rules/powershell.md). All 
 
 - format: `mcp__drm-copilot__run_poshqc_format` (or `Invoke-PoshQCFormat`)
 - analyze: `mcp__drm-copilot__run_poshqc_analyze` (autofix: `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-- test (Pester v5): `mcp__drm-copilot__run_poshqc_test` (or `Invoke-PoshQCTest`)
+- test (Pester v6): `mcp__drm-copilot__run_poshqc_test` (or `Invoke-PoshQCTest`)
 - full suite: `mcp__drm-copilot__run_poshqc_suite`
 
 There is no type-check stage for PowerShell. Pester runs use the repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
@@ -381,9 +381,9 @@ Canonical rule: [.claude/rules/csharp.md](.claude/rules/csharp.md). This ecosyst
 - format: `dotnet tool restore` then `dotnet csharpier check .` (auto-format with `dotnet csharpier .`)
 - lint + nullable: `dotnet build` (analyzers and `Nullable=enable` enforced as errors via `Directory.Build.props`)
 - architecture: `NetArchTest.Rules` in `*.ArchitectureTests` projects
-- test: `dotnet test --collect:"XPlat Code Coverage"` (xUnit + NSubstitute + FluentAssertions)
+- test: `dotnet test --collect:"XPlat Code Coverage"` (MSTest + NSubstitute + FluentAssertions)
 
-Determinism is enforced through an injected `TimeProvider` (`FakeTimeProvider` in tests); `DateTime.Now`, `DateTime.UtcNow`, `Random.Shared`, `Thread.Sleep`, and `Task.Delay` are banned via `BannedApiAnalyzers`. T1/T2 modules add `CsCheck` property tests, T1 modules add `Stryker.NET` mutation testing, and T1 classifier modules add `Verify.Xunit` golden tests.
+Determinism is enforced through an injected `TimeProvider` (`FakeTimeProvider` in tests); `DateTime.Now`, `DateTime.UtcNow`, `Random.Shared`, `Thread.Sleep`, and `Task.Delay` are banned via `BannedApiAnalyzers`. T1/T2 modules add `CsCheck` property tests, T1 modules add `Stryker.NET` mutation testing, and T1 classifier modules add `Verify.MSTest` golden tests.
 
 ### Legacy VSTO C# (.NET Framework)
 

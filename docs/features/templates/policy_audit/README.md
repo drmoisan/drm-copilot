@@ -72,7 +72,7 @@ Copy-Item docs/features/templates/policy_audit/PolicyAudit.template.md `
 
 Replace placeholders in the header:
 
-- `[Component Name]` - Name of what you're auditing (e.g., "fix-all.ps1 Unit Tests", "Lexile Analyzer Module")
+- `[Component Name]` - Name of what you're auditing (e.g., "fix-all.ps1 Unit Tests", "Text Analyzer Module")
 - `[YYYY-MM-DD]` - Today's date
 - `[path/to/test_file]` - Test file location (if applicable)
 - `[path/to/code_file]` - Source code location

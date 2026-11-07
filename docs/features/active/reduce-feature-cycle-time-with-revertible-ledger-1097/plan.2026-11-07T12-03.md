@@ -1,0 +1,146 @@
+# reduce-feature-cycle-time-with-revertible-ledger - Plan (Stage R)
+
+- **Issue:** #1097
+- **Branch:** feature/reduce-feature-cycle-time
+- **Last Updated:** 2026-11-07T12-03
+- **Status:** Draft
+
+## Scope
+
+Stage R, inserted after the PR carrying stages E and E2 (PR #1110) merges and before stage F. It makes the owner's revertibility condition hold for every ledger entry under `docs/engineering/process-reductions/`, and keeps it holding as later entries land. The defect: `patches/0001-parallel-only-test-gates.patch` does not reverse-apply on the live tree for 44 paths that entries `0002` to `0005` edited later (`FEATURE/evidence/other/stage-f1-patch-rebase-0001.2026-11-07T16-39.md`), no entry or README text states the order in which entries are reverted, and no test walks that order.
+
+One exception to the live-tree explanation of those failures is recorded by re-audit finding RF1 (`code-review.2026-11-07T17-13.md`): a stage E commit that added a rule rather than reducing process, so it has no ledger entry, added the `planning-contract-wording.Tests.ps1` line inside the context of the `0001` hunk for `.claude/skills/execution-environment/SKILL.md` (the brief's contract-test list). That hunk would still fail after every later entry is reverted, so it is repaired by this stage and not by reverting (`## Known Gaps`, [P1-T8]).
+
+General rule the exception exposes: a commit that adds a rule inside a ledgered region, with no entry of its own, breaks the chain. The chain test catches it on CI, and the fix is to rebase the affected hunk (or record a block) in the same change.
+
+## Known Gaps
+
+- **Brief hunk (RF1).** The `0001` stored patch hunk over the brief's contract-test list has a context that lacks the line a non-ledgered stage E commit added. It fails `git apply -R --check` even on the tree after `0006` to `0002` are reverted, so it is not covered by the live-tree explanation. Its byte-identical copies (the `.agents` and `.github` skill copies and the three bundled copies) carry the same context in their patch sections. Handling: [P1-T8] rebases the hunk context in the `0001` stored patch for the source and for each of the five copies so the added line is in both images (the R5 remedy), in one commit with the `reduction: 0001` token. The chain test names it in [P1-T4] and holds without exception in [P1-T9].
+- **Unrecoverable priors.** Any other gap the chain reports that no record edit can close stops the stage ([P1-T8]).
+
+This stage adds no reduction, so it adds no ledger entry. A commit that edits an entry carries that entry's `reduction: NNNN` token in its subject.
+
+Out of scope: `.claude/rules/`, `.github/instructions/`, every skill, agent, mirror, bundle, and the `execution-environment` brief; `scripts/dev-tools/ProcessReductionLedger.psm1` (unchanged); production Python and TypeScript; every other plan file in this folder; Epic #1019 folders and admitted plans.
+
+## Execution Terms
+
+- `FEATURE` is `docs/features/active/reduce-feature-cycle-time-with-revertible-ledger-1097`. `SCRATCH` resolves to `<session scratchpad>/issue-1097/r/`; artifacts record the token, never a host path. Evidence names carry the prefix `stage-r-`; a consumer selects the greatest `stage-r-<name>.*.md`.
+- Tool routes, launchers, command-text restrictions, the batch budget, hook context, and CI shape come from the `execution-environment` skill and are not restated. One new production PowerShell file is created, so direct mode applies.
+- Testing (owner's standing instruction, overriding any contract text): one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run per gate, each re-run only after a fix. No single-process, seeded-shuffle, reversed-order, or comparison run. TypeScript is out of scope, so no Jest run is made. No unqualified `poetry install` from the worktree; if a gate cannot run, stop and report.
+- Commits: commit and push after each task. No tag, no history rewrite. Only [P1-T7] and [P1-T8] edit entries, each entry edit in its own commit whose subject carries that entry's token.
+- Failure outside the branch: a failing test whose file and subject are both absent from the diff from the merge base of `origin/main` and `HEAD`. The artifact names the test, file, and subject; `EXIT_CODE:` stays non-zero, the test is not edited, and the executor returns these facts. Any other failure is fixed and the loop restarts from [P2-T1].
+
+## Design
+
+**R1. Revert order (README rule, not per-entry lists).** A new README section `## Revert Order` states: entries are reverted newest-first; an entry may be reverted alone only when no later entry names any of its paths; a reader finds the later entries that touch a path by searching the `## Files Changed` sections of the higher-numbered entries for that path (every entry lists every path it changed, by contract). Each entry's `## Revert Steps` does not list its dependants, because a per-entry list would make every new entry edit each earlier entry it overlaps; that edit lands next to the earlier entry's own region (as `0006` did to `0001`, which is why the `0006` patch carries `0001-parallel-only-test-gates.md`), adds a second record that can drift, and a forgotten edit is invisible. The README rule is derivable at revert time and the chain test below enforces it. The existing `0001` step 1 sentence naming `0006` first stays: it is consistent with the rule and lies inside a `0006` hunk region, so editing it would force a rebase of that hunk.
+
+**R2. Mechanism: keep the stored patches and read each hunk as a revert block.** A hunk's context and `+` lines are its `Current`; its context and `-` lines are its `Prior`. Options weighed:
+- Rebase each stored patch onto the tree after reverting later entries: not needed. Each patch already records its own pre-image and post-image; after the later entries are reverted, its regions hold its post-image again. The 44 failing paths fail because the check runs on the live tree, with one exception: the brief hunk of `## Known Gaps`, whose context was changed by a non-ledgered commit and which is rebased in [P1-T8].
+- Replace stored patches with revert blocks: rejected. The two patches hold 455 sections, most of them mirrors, bundle copies, and generated variants; converting them adds thousands of entry lines that duplicate the patch, and a hunk read as a block is already the by-hand form.
+- Per-entry patches against each entry's successor state: rejected. Under the order rule this equals the existing patch and adds a second record.
+
+The chosen option is the one a reader applies by hand months later: revert the later entries, then `git apply -R` the patch; a hunk that does not apply is a block, applied by replacing its `Current` lines with its `Prior` lines. The README `## Stored Patch` paragraph and the `0001` and `0006` `## Stored Patch` check sentences are amended to say the check runs on the tree after every later entry that touches the patch's paths is reverted, not on the live tree.
+
+**Derived paths.** A byte-identical mirror or bundle copy, and a generated Codex variant, is re-created by revert steps 2 and 3, so its patch section is not part of the chain. `Get-ProcessReductionDerivedSource` maps a path to its source by fixed rules: the bundle prefixes `extensions/drm-copilot/resources/claude-customizations/`, `codex-and-agents-customizations/`, and `customizations/` map to the repository path below them; `feature-templates/` and `templates/` map under `docs/features/templates/`; `.agents/skills/<n>/SKILL.md` and `.github/skills/<n>/SKILL.md` map to `.claude/skills/<n>/SKILL.md`. A mapped path is derived only when its live text equals its source's live text after line-ending normalization; otherwise it is a source (for example the non-identical `atomic-plan-contract` copies and the `csharp-legacy` bundle variants). A name ending in `-c1.toml` to `-c4.toml` or `-c3-elevated.toml` under `.codex/agents/`, and its bundle copy, is a generated variant and is derived.
+
+**R3. Chain test, in memory.** `scripts/dev-tools/ProcessReductionChain.psm1` (new; it imports `ProcessReductionLedger.psm1` into its own scope and reuses `Get-ProcessReductionRevertBlock` and `Invoke-ProcessReductionRevert`):
+- `Get-ProcessReductionPatchHunk` parses a stored patch into one object per hunk with `Path`, `Kind` (modify, create, delete), `Current`, `Prior`, and the recorded post-image start. It takes the path from the `+++ b/` line (`--- a/` for a deletion), keeps spaces in names, ignores the no-newline marker, and throws naming the section for a binary section or a quoted path.
+- `Invoke-ProcessReductionHunkRevert` matches the hunk's `Current` as a line-aligned sequence of whole lines, chooses the occurrence nearest the recorded start (the `git apply` rule), throws when none is found or two are equally near, and returns the text with `Prior` in its place. Hunks of one file are reverted from the bottom up.
+- `Invoke-ProcessReductionChain` is pure. It takes entry texts, patch texts, and live texts keyed by path (a missing file is `$null`), sorts entries by number, and for each entry newest-first: parses that entry's blocks from the chain-state text of its own file (a later entry may have edited it, as `0006` edits `0001` and `0005`); for a block entry applies each block; for a patch entry checks that each block `Current` occurs before the step, applies every hunk of every non-derived path, then checks that each non-empty block `Prior` occurs after it. A create hunk reverts to absent whatever the file now holds; a delete hunk requires an absent file and restores its pre-image. After the oldest entry, it checks the end state: each path created by the oldest entry that touches it is absent, and each non-empty pre-image of that entry is present. It returns `IsValid`, `Errors` (each naming entry, path, and reason), and `FinalText`.
+- `Read-ProcessReductionChainInput` is the one read seam: it calls `Read-ProcessReductionLedger`, reads each stored patch, and reads the live text of every path any block or patch section names and of each mapped source path. It writes nothing.
+
+The pre-0001 state is recorded in the ledger only as pre-images and `Prior` fences, so the end-state check above is the strongest form a test can make without git. The evidence gate [P1-T10] adds the git-level check: `git apply -R --check` of each stored patch at its point in the chain, and a per-path comparison of the chain's end state with the first parent of the `0001` merge commit recorded in `0001` `## Summary`, each difference attributed to a commit outside the ledger. It is a gate, not a test, because it needs git, a scratch index, and the Codex generator, and tests create no temporary files.
+
+**R4. No new checker rule.** A static rule requiring each new entry's `Current` to cover an earlier entry's region was weighed and rejected: blocks carry no positions, so the rule would re-derive regions by text search, which is what the chain does, and a positional heuristic would fail on edits that the chain accepts. The chain test fails exactly when a later change inside an earlier region lacks a record that restores it. It runs on every full CI run in the PowerShell shards, and a change under `docs/engineering/` is outside the docs-only allowlist, so every ledger edit gets a full run.
+
+**R5. Scoping for back-compat.** The test reads only paths that a block or patch section names, compares only a block's `Current` or a hunk's post-image, and never compares a whole file, so an edit outside every region leaves it green. A hunk's region includes its context lines, because the patch must stay `git apply`-able by hand. An edit inside a region fails CI; a commit that adds a rule inside a ledgered region with no entry of its own breaks the chain, as the brief hunk of `## Known Gaps` shows. The README states the remedy: the same commit updates that entry's record (the block, or the hunk regenerated so it carries the edit in both images), with the entry's token, as the stage F1 rebase over PR #1108 did.
+
+## Test Dispositions
+
+Found by searching `tests/` for `ProcessReductionLedger`, `process-reductions`, `0001-parallel-only-test-gates`, `0006-test-suite-baseline-restored`, and `Invoke-ProcessReductionRevert`.
+
+| Test | Disposition |
+| --- | --- |
+| `tests/scripts/dev-tools/ProcessReductionLedger.Tests.ps1` (all `PRL-*`) | Unchanged: `ProcessReductionLedger.psm1` is not edited |
+| `ProcessReductionLedger.Index.Tests.ps1` `PRL-REAL-LEDGER-AGREES` | Unchanged; it re-validates every entry edited by [P1-T7] and [P1-T8], whose `## Stored Patch` sections keep naming their patch path |
+| same file, `PRL-PARTIAL-REVERT-LINKED` | Unchanged: the `0001` index row, the `0001` `## Partial Revert` section, and the `0006` `## Summary` are not edited; a gap fix in [P1-T8] may not edit them |
+| same file, `PRL-README-EXAMPLE-IS-VALID` | Unchanged: `## Revert Order` is inserted before `## Worked Example`, whose text is not edited |
+| `ProcessReductionLedger.Replay.Tests.ps1` (the `PRR-*` replay sample) | Unchanged: it reverts the `0005` hook blocks alone on the live hook, which the new rule permits because no later entry names `.claude/hooks/validate-planner-output.ps1`; [P1-T8] may not add a later block on that hook |
+| `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1` | Unchanged: no skill is edited |
+| `FEATURE/evidence/other/stage-*-ledger-replay.*.md` replay records | Unchanged: historical evidence |
+| `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1`, `ProcessReductionChain.Ledger.Tests.ps1` | New |
+
+## Implementation Plan (Atomic Tasks)
+
+### Phase 0 — Baseline Capture
+
+- [ ] [P0-T1] Capture the PowerShell static baseline for `scripts/dev-tools/ProcessReductionLedger.psm1` and `tests/scripts/dev-tools/ProcessReductionLedger*.Tests.ps1`, writing `FEATURE/evidence/baseline/stage-r-powershell-static.<timestamp>.md`.
+  - PoshQC format in check mode (no file written) and a direct analyzer run with the repository settings.
+  - Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the files needing format and the analyzer finding count.
+- [ ] [P0-T2] Run one `Invoke-PoshQCParallelTest` as the `Phase 0 baseline` and write `FEATURE/evidence/baseline/stage-r-powershell-test-baseline.<timestamp>.md` with the figures read from the Pester reports.
+  - `EXIT_CODE:` records the returned `ExitCode`. Output Summary: total, passed, and failed counts read from `artifacts/pester/pester-junit.xml` (from `artifacts/pester/parallel/shard-<i>/` when non-zero, naming each failing test), the counts of the three `ProcessReductionLedger` suites, the repo-wide line percentage, and the line percentage of `scripts/dev-tools/ProcessReductionLedger.psm1` read from `artifacts/pester/powershell-coverage.xml`, or `coverage unavailable` after a failed run.
+  - Acceptance: every field and figure is present; no figure comes from MCP output.
+- [ ] [P0-T3] Run one `poetry run pytest -n auto --cov --cov-branch --cov-report=term-missing` from the worktree root with `PYTHONPATH` set to this worktree's `packages/discovery-runtime/src`, and write `FEATURE/evidence/baseline/stage-r-python-test-baseline.<timestamp>.md`.
+  - Output Summary: passed and failed counts, each failing test named, and the total line and branch percentages read from the terminal table and the `BRF`/`BRH` records of `artifacts/python/lcov.info`.
+  - Acceptance: every field and figure is present.
+
+### Phase 1 — Chain Mechanism, Rule, and Records
+
+- [ ] [P1-T1] Record stage R in `FEATURE/spec.md`: a `## Delivery Stages` row `R` (content: revert order, chain test, patch-as-blocks reading; depends on E2; PR R), the final-order paragraph naming R between E2 and F, and five `## Acceptance Criteria` items tagged `[R]` stating R1 to R5 of this plan's `## Design`.
+  - No other spec text changes; `- [x]` states of earlier criteria are unchanged.
+  - Acceptance: `spec.md` holds exactly five lines beginning `- [ ] [R]` and one table row beginning `| R |`.
+- [ ] [P1-T2] Create `scripts/dev-tools/ProcessReductionChain.psm1` with `Get-ProcessReductionPatchHunk` and `Invoke-ProcessReductionHunkRevert` (R3), and `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1` with in-memory fixtures.
+  - Tests: `PRC-HUNK-PARSES-SECTIONS` (two hunks, a path with spaces, a create, a delete, the no-newline marker), `PRC-HUNK-REJECTS-UNSUPPORTED` (binary section, quoted path), `PRC-HUNK-REVERT-RESTORES-PREIMAGE`, `PRC-HUNK-REVERT-LINE-ALIGNED` (a match inside a longer line is not a match), `PRC-HUNK-REVERT-NEAREST-OCCURRENCE` (nearest of two wins; an equal tie throws), `PRC-HUNK-REVERT-THROWS-WHEN-ABSENT`.
+  - Acceptance: both files exist; the module exports both functions with `CmdletBinding` and mandatory parameters; the six tests are present. [P2-T2] proves them.
+- [ ] [P1-T3] Add `Get-ProcessReductionDerivedSource` to `scripts/dev-tools/ProcessReductionChain.psm1` with the mapping of R2 `Derived paths`, and add `PRC-DERIVED-MAPS-<Case>` (`-ForEach` over each bundle prefix, both skill-mirror forms, a generated variant and its bundle copy, a non-identical copy, and an unmapped path) to `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1`.
+  - The function takes the path and a live-text lookup and returns the source path, `generated`, or `$null`.
+  - Acceptance: the function and the test cases are present. [P2-T2] proves them.
+- [ ] [P1-T4] Add `Invoke-ProcessReductionChain` (R3) to `scripts/dev-tools/ProcessReductionChain.psm1` and its tests to `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1`.
+  - Tests: `PRC-CHAIN-NEWEST-FIRST` (entries supplied oldest-first still revert newest-first), `PRC-CHAIN-REPORTS-MISSING-LATER-RECORD` (a later edit inside an earlier region with no later block gives one error naming the earlier entry and the path), `PRC-CHAIN-IGNORES-EDIT-OUTSIDE-REGIONS`, `PRC-CHAIN-CREATED-FILE-ENDS-ABSENT` (content edited after creation), `PRC-CHAIN-ENTRY-TEXT-FROM-CHAIN-STATE` (a later patch edits an earlier entry's fence), `PRC-CHAIN-PATCH-ENTRY-BLOCKS-CONSISTENT` (a patch entry's block whose `Current` is absent is reported), `PRC-CHAIN-SKIPS-DERIVED-PATHS`, `PRC-CHAIN-END-STATE-PREIMAGES` (a missing oldest pre-image is reported), `PRC-CHAIN-REPORTS-UNLEDGERED-CONTEXT-EDIT` (a line added by a commit with no entry inside a hunk's context gives one error naming the entry and the path, and the same fixture with the hunk rebased gives none).
+  - Acceptance: the function and the nine tests are present; the module stays under 500 logical lines. [P2-T2] proves them.
+- [ ] [P1-T5] Add `Read-ProcessReductionChainInput` (R3) to `scripts/dev-tools/ProcessReductionChain.psm1` and `PRC-READ-COLLECTS-INPUT` to `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1`, mocking the filesystem cmdlets inside `InModuleScope` as `PRL-READ-COLLECTS-ENTRIES-AND-PATCHES` does.
+  - The test asserts that a path named only by a patch, a path named only by a block, and a mapped source path are read, and that a missing file is `$null`.
+  - Acceptance: the function and the test are present; no test creates a file; the module stays under 500 logical lines. [P2-T2] proves it.
+- [ ] [P1-T6] Add `## Revert Order` before `## Worked Example` in `docs/engineering/process-reductions/README.md`, stating R1 (newest-first, the alone condition, the `## Files Changed` search), the hunk-as-block reading and by-hand route of R2, the derived-path rule, the R5 remedy for an edit inside a region (including the general rule that a commit adding a rule inside a ledgered region with no entry of its own breaks the chain, the chain test catches it on CI, and the fix is to rebase the affected hunk in the same change), and that the chain test enforces the order; amend the `## Stored Patch` paragraph of `## Entry Format` so the check runs after later entries are reverted.
+  - The section carries the tokens `newest-first` and `ProcessReductionChain.Ledger.Tests.ps1`. `## Index` and `## Worked Example` text is unchanged.
+  - Acceptance: `PRL-README-EXAMPLE-IS-VALID` and the new `PRC-README-REVERT-ORDER-STATED` ([P1-T9]) pass in [P2-T2].
+- [ ] [P1-T7] Amend the check sentence of `## Stored Patch` in `docs/engineering/process-reductions/0001-parallel-only-test-gates.md` and `docs/engineering/process-reductions/0006-test-suite-baseline-restored.md` per R2, so the check runs after every later entry that touches the patch's paths is reverted, naming README `## Revert Order`.
+  - Both edits lie outside every hunk region of the `0006` patch, and the sentence naming the patch path stays. Each is its own commit, subjects carrying `reduction: 0001` and `reduction: 0006`.
+  - Acceptance: both sentences name `## Revert Order`; `git log` of the two commits shows the two tokens; `PRL-REAL-LEDGER-AGREES` passes in [P2-T2].
+- [ ] [P1-T8] Run `Invoke-ProcessReductionChain` over `Read-ProcessReductionChainInput` from a script under `SCRATCH` (not a test run), close every reported gap, and write `FEATURE/evidence/other/stage-r-chain-gaps.<timestamp>.md`.
+  - Allowed fixes, per gap: add the missing block for a source path to the later entry that changed the region, or regenerate a stale hunk of a stored patch so both images carry the later non-ledgered wording (the stage F1 method). Each edited entry or patch is committed alone with its entry's token. A gap that no record edit can close (a reduction whose prior state is not recoverable from the ledger) stops the stage and is reported.
+  - Named gap: the brief hunk of `## Known Gaps` must appear among the first run's errors, naming entry `0001` and `.claude/skills/execution-environment/SKILL.md`; it is closed by regenerating the `0001` patch sections of the brief and its five copies so the added `planning-contract-wording.Tests.ps1` line is in both images, in one commit with `reduction: 0001`. The brief itself is not edited. If the first run does not report it, the task stops and reports.
+  - Output Summary: the first run's error count and each error; per gap, the entry, path, and fix; the final run's error count.
+  - Acceptance: `EXIT_CODE:` is 0 only when the final run reports zero errors and `IsValid` true; `PRL-PARTIAL-REVERT-LINKED` targets are untouched.
+- [ ] [P1-T9] Create `tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1`, reading the committed ledger read-only through `Read-ProcessReductionChainInput`.
+  - Tests: `PRC-LEDGER-CHAIN-HOLDS` (`IsValid` true, errors joined in the `-Because` text), `PRC-LEDGER-END-STATE-RECORDED` (no end-state error, and at least one created path ends absent), `PRC-README-REVERT-ORDER-STATED` (the README `## Revert Order` section exists and carries `newest-first`), `PRC-LEDGER-NO-EXCEPTIONS` (the chain `Errors` hold no entry naming `.claude/skills/execution-environment/SKILL.md`, and the test file carries no skip list or allowed-error list).
+  - Acceptance: the file and the four tests exist; [P2-T2] proves them.
+- [ ] [P1-T10] Run the git-level chain gate from scripts under `SCRATCH` and write `FEATURE/evidence/other/stage-r-patch-chain-gate.<timestamp>.md`.
+  - Build a scratch index from `HEAD` (`GIT_INDEX_FILE` under `SCRATCH`). For `0006` and then `0001`, load into it the state before that entry's revert, taken as the `FinalText` of `Invoke-ProcessReductionChain` over the newer entries only, with each byte-identical derived path holding its source's text; then run `git apply -R --cached --check` of the stored patch with generated-variant paths excluded. Then compare each source path's chain end state with the first parent of the `0001` merge commit recorded in `0001` `## Summary`, listing for each difference the commits that changed the path after that merge whose subjects carry no `reduction:` token.
+  - Output Summary: both check exit codes, the excluded generated-variant count, and the equal, attributed, and unattributed path counts.
+  - Acceptance: `EXIT_CODE:` is 0 only when both checks exit 0 and the unattributed count is 0.
+
+### Phase 2 — Final QA
+
+- [ ] [P2-T1] Format and analyze `scripts/dev-tools/ProcessReductionChain.psm1`, `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1`, and `tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1`, writing `FEATURE/evidence/qa-gates/stage-r-powershell-format-lint.<timestamp>.md`.
+  - PoshQC format then a direct analyzer run with the repository settings. A clean pass is observed as `git status --porcelain` empty after the formatter and zero analyzer findings; a formatter change is committed and the loop restarts.
+  - Acceptance: zero findings and no formatter change in the recorded pass.
+- [ ] [P2-T2] Run one `Invoke-PoshQCParallelTest` and write `FEATURE/evidence/qa-gates/stage-r-powershell-test.<timestamp>.md`, compared with the greatest `stage-r-powershell-test-baseline.*.md`.
+  - Output Summary: total, passed, and failed counts read from `artifacts/pester/pester-junit.xml`; the counts of `ProcessReductionChain.Tests.ps1` and `ProcessReductionChain.Ledger.Tests.ps1` and of the three `ProcessReductionLedger` suites; repo-wide line percentage; per-file line percentages of `scripts/dev-tools/ProcessReductionChain.psm1` and `scripts/dev-tools/ProcessReductionLedger.psm1` read from `artifacts/pester/powershell-coverage.xml`; and the comparison: no new failing test, no repo-wide or per-file drop.
+  - Acceptance: zero failures, `PRC-LEDGER-CHAIN-HOLDS` passed, `ProcessReductionChain.psm1` at or above 85% (new file, no pre-change run), and no drop against the baseline.
+- [ ] [P2-T3] Run one `poetry run pytest -n auto --cov --cov-branch --cov-report=term-missing` with `PYTHONPATH` set to this worktree's `packages/discovery-runtime/src`, and write `FEATURE/evidence/qa-gates/stage-r-python-test.<timestamp>.md`, compared with the greatest `stage-r-python-test-baseline.*.md`.
+  - Output Summary: passed and failed counts, total line and branch percentages, and the comparison.
+  - Acceptance: zero failures and no total line or branch drop against the baseline.
+- [ ] [P2-T4] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the diff from the merge base of `origin/main` and `HEAD`, and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
+  - Rows include: each entry-editing commit carries its token; no Epic #1019 folder or admitted plan is in the diff; no skill, mirror, or brief is in the diff; `## Test Dispositions` holds.
+  - Acceptance: no FAIL row; a FAIL is fixed and the loop restarts from [P2-T1].
+
+## Pre-Mortem
+
+- Review checklists: [P2-T4] walks all three templates against the merge-base diff; the token-per-entry-commit and no-Epic-#1019 rows are explicit.
+- Coverage: the new module is pure apart from one read seam that is mocked in `PRC-READ-COLLECTS-INPUT`, and the committed-ledger test exercises every branch the real patches reach; [P2-T2] reads its per-file percentage against 85% from the single gate run, and `ProcessReductionLedger.psm1` is compared with the `Phase 0 baseline`.
+- Mirror parity: not applicable. No skill, agent, template, bundle, or the brief is edited; no CI job, required context, tool route, or batch-budget rule changes, so no brief update is owed. The README under `docs/engineering/` has no mirror.
+- File size: `ProcessReductionLedger.psm1` stands at about 550 lines and is not extended; the new logic goes into `ProcessReductionChain.psm1`, held under 500 by [P1-T4] and [P1-T5]; entry files are Markdown and exempt.
+- Test isolation: fixtures are in-memory strings, the committed-ledger test reads tracked files only, and no test creates a file. The new module imports `ProcessReductionLedger.psm1` into its own scope, and each new test file removes the module it imports in `AfterAll`. Gates are one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run, each re-run only after a fix; no Jest run, because TypeScript is out of scope.
+- CI-only behavior: texts are compared after line-ending normalization; patch context lines that hold a single space must survive, so the executor never reformats a `.patch` file; paths are built with `Join-Path` and exact case; the suites run in the Windows PowerShell shards only, and `docs/engineering/` changes always get a full run.
+- Evidence: every artifact is under `FEATURE/evidence/<kind>/` with write-time stamps; [P1-T8] and [P1-T10] record every gap, fix, and git check result, and `SCRATCH` appears as a token only.

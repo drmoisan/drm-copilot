@@ -22,6 +22,8 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
         }
 
         . (Join-Path $PSScriptRoot 'SubagentStopEnvelope.Helpers.ps1')
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
 
         function Invoke-PrdFeatureOutputStdinEntry {
             # Drives the hook through the & route with stdin and stderr redirected; both are restored in finally.
@@ -46,6 +48,8 @@ Describe 'validate-prd-feature-output entry point (stdin envelope, issue #905)' 
             return [pscustomobject]@{ ExitCode = $exitCode; Stderr = $errorWriter.ToString(); Thrown = $thrown }
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 
     It 'exits 2 with a stderr reason when last_assistant_message lacks an existing spec-path' -Tag 'E3-Entry' {
         # Arrange

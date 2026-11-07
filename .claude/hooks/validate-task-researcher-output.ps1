@@ -31,6 +31,7 @@ param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'premortem-section.ps1') } catch { Add-HookDependencyFailure -Name 'premortem-section.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-target-worktree.ps1' -ErrorRecord $_ }
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -246,10 +247,23 @@ function Test-NumericDerivationEvidence {
 }
 
 function Invoke-TaskResearcherOutputValidation {
+    <#
+    .SYNOPSIS
+        Reads the SubagentStop envelope and validates the advertised research artifact.
+    .DESCRIPTION
+        The research-path value is resolved against the item worktree that produced it
+        (Resolve-SubagentStopTargetWorktree, issue #1105): the shape rules read the
+        repository-relative value and every file probe reads the item copy only. SessionRoot,
+        ReadTranscriptHead, and WorktreeListInvoker are test seams; SessionRoot defaults to
+        the hook process directory.
+    #>
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
-        [AllowNull()] [AllowEmptyString()] [string] $InputText
+        [AllowNull()] [AllowEmptyString()] [string] $InputText,
+        [AllowNull()] [AllowEmptyString()] [string] $SessionRoot,
+        [scriptblock] $ReadTranscriptHead,
+        [scriptblock] $WorktreeListInvoker
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-task-researcher-output:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
@@ -265,31 +279,44 @@ function Invoke-TaskResearcherOutputValidation {
         return @{ Ok = $false; Message = 'task-researcher hook: agent output does not advertise a research-path. Researcher must report `research-path: <path>` pointing to docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off).' }
     }
 
-    if (-not (Test-IsUnderResearchRoot -Path $researchPath)) {
+    # Issue #1105: resolve the item worktree once; shape rules read the repository-relative value.
+    $root = if ([string]::IsNullOrWhiteSpace($SessionRoot)) { (Get-Location).Path } else { $SessionRoot }
+    $targetArguments = @{ Envelope = $envelope.Envelope; AdvertisedPath = @($researchPath); SessionRoot = $root }
+    if ($null -ne $ReadTranscriptHead) { $targetArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
+    if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+    $target = Resolve-SubagentStopTargetWorktree @targetArguments
+    $location = Resolve-SubagentStopArtifactLocation -Path $researchPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root
+    if ($location.Rejected) {
+        return @{ Ok = $false; Message = "task-researcher hook: research-path '$researchPath' is rejected: $($location.RejectionDetail)." }
+    }
+    $shapePath = $location.RelativePath
+    $probePath = $location.ProbePath
+
+    if (-not (Test-IsUnderResearchRoot -Path $shapePath)) {
         return @{ Ok = $false; Message = "task-researcher hook: research-path '$researchPath' is not under a tracked research root. All research artifacts must be written to docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off)." }
     }
 
-    if (-not (Test-IsValidResearchFileName -Path $researchPath)) {
+    if (-not (Test-IsValidResearchFileName -Path $shapePath)) {
         return @{ Ok = $false; Message = "task-researcher hook: research-path '$researchPath' does not match the required filename convention `<timestamp>-<short-name>-research.md` under docs/features/<feature>/research/ or docs/research/." }
     }
 
-    if (-not (Test-ResearchFile -Path $researchPath)) {
-        return @{ Ok = $false; Message = "task-researcher hook: researcher advertised research-path '$researchPath' but no file exists at that location." }
+    if (-not (Test-ResearchFile -Path $probePath)) {
+        return @{ Ok = $false; Message = "task-researcher hook: researcher advertised research-path '$researchPath' but no file exists at that location.$(Get-SubagentStopTargetNote -Target $target -ProbePath $probePath -SessionRoot $root)" }
     }
 
-    $feasibilityResult = Test-AutomationFeasibilitySection -ResearchFilePath $researchPath -AgentOutput $assistantMessage
+    $feasibilityResult = Test-AutomationFeasibilitySection -ResearchFilePath $probePath -AgentOutput $assistantMessage
     if (-not $feasibilityResult.Ok) {
         return @{ Ok = $false; Message = $feasibilityResult.Message }
     }
 
-    try { $researchContent = Get-ResearchFileContent -Path $researchPath } catch { return @{ Ok = $false; Message = "task-researcher hook: failed to read research-path '$researchPath': $($_.Exception.Message)" } }
+    try { $researchContent = Get-ResearchFileContent -Path $probePath } catch { return @{ Ok = $false; Message = "task-researcher hook: failed to read research-path '$researchPath': $($_.Exception.Message)" } }
     if ($null -ne $researchContent) {
         $numericEvidenceResult = Test-NumericDerivationEvidence -Content $researchContent
         if (-not $numericEvidenceResult.Ok) {
             return $numericEvidenceResult
         }
         # Issue #964: feature research carries a Pre-Mortem; one-off research under docs/research/ is exempt.
-        if ((($researchPath -replace '\\', '/') -replace '^\./', '').StartsWith('docs/features/', [System.StringComparison]::OrdinalIgnoreCase)) {
+        if ((($shapePath -replace '\\', '/') -replace '^\./', '').StartsWith('docs/features/', [System.StringComparison]::OrdinalIgnoreCase)) {
             $preMortem = Test-PreMortemSection -Content ([string]$researchContent)
             if (-not $preMortem.Ok) { return @{ Ok = $false; Message = "task-researcher hook: feature research '$researchPath' $($preMortem.Message)" } }
         }

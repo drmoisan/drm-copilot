@@ -45,7 +45,7 @@ Additional guardrails (for quality + determinism):
 - Tests must be deterministic and isolated: no network, no external processes, no mutable machine state assumptions, and no runtime filesystem temp files.
 - Do not weaken type checking to “make Pyright pass” (e.g., broad `Any`, loosening config, or blanket ignores). Prefer minimal typed adapters and line-specific ignores with justification.
 
-If the plan does not include Phase 0 tasks that cover the above, treat the plan as **invalid** and request a corrected plan. (Do not “silently add” Phase 0; that is replanning.)
+If the plan does not include Phase 0, treat the plan as **invalid** and request a corrected plan. (Do not “silently add” Phase 0; that is replanning.)
 
 Plan format, Phase 0 requirements, baseline capture schema, and final QA loop rules are defined in the `atomic-plan-contract` skill.
 
@@ -86,7 +86,7 @@ During preflight (before [P0-T1]), resolve work mode from feature `issue.md` mar
 
 If the marker is missing or malformed, fail closed to `full-feature`.
 
-When selected mode is `minor-audit`, preflight MUST reject plans that do not include explicit static baseline evidence tasks, targeted verification evidence tasks read from the gate run, and end-state evidence tasks. In these cases return:
+When selected mode is `minor-audit`, preflight MUST reject plans that do not include explicit baseline evidence tasks (static baselines and the `Phase 0 baseline` test-suite run), targeted verification evidence tasks read from the gate run, and end-state evidence tasks. In these cases return:
 
 `PREFLIGHT: REVISIONS REQUIRED`
 
@@ -147,9 +147,9 @@ Confirm all of the following; otherwise stop and request a corrected plan:
   `- [ ] [P#-T#] ...` or `- [x] [P#-T#] ...`
 - Phase numbers in IDs match the phase heading.
 - Task numbers are sequential within each phase.
-- Phase 0 exists and contains the repo-policy reading tasks in the required order.
-- For plans that change code or tests: Phase 0 also includes static baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
-- Phase 0 static baseline capture tasks specify artifacts stored in the canonical baseline location defined in `atomic-plan-contract`, and include `Timestamp`, `Command`, and `EXIT_CODE` fields.
+- Phase 0 exists.
+- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0): static baselines and one `Phase 0 baseline` run of each test gate.
+- Phase 0 baseline capture tasks specify artifacts stored in the canonical baseline location defined in `atomic-plan-contract`, and include `Timestamp`, `Command`, and `EXIT_CODE` fields.
 - For plans that change code or tests: a final QA phase exists that runs the full toolchain loop **for each applicable language** and reports results.
 - Any **TDD Red** regression-test task (i.e., a test task whose acceptance criteria expects `pytest` to fail) is tagged with the exact flag `[expect-fail]` in the task title text (after the task ID).
 - No task is a “bucket task” (e.g., “Refactor module”, “Write tests”) that cannot be completed as a single binary outcome.
