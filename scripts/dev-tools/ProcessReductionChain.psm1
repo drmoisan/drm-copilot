@@ -324,6 +324,18 @@ function Invoke-ProcessReductionPatchStep {
         foreach ($item in @($group.Group | Sort-Object -Property Start -Descending)) {
             $prior = [string[]]@($item.Prior)
             if ($item.Kind -ceq 'create') {
+                if ($null -eq $State[$path]) {
+                    $ErrorList.Add("${Name}: ${path}: the file the entry created is absent at this step.")
+                } else {
+                    $createdText = (ConvertTo-ProcessReductionChainLf -Text $State[$path]).TrimStart([char]0xFEFF)
+                    $hunkText = (([string[]]@($item.Current) -join "`n")).TrimStart([char]0xFEFF)
+                    if ($createdText.EndsWith("`n", [System.StringComparison]::Ordinal)) {
+                        $createdText = $createdText.Substring(0, $createdText.Length - 1)
+                    }
+                    if ($createdText -cne $hunkText) {
+                        $ErrorList.Add("${Name}: ${path}: the file the entry created differs from its create hunk.")
+                    }
+                }
                 $State[$path] = $null
                 Add-ProcessReductionTouch -Touched $Touched -Name $Name -Path $path -PreImage ''
             } elseif ($item.Kind -ceq 'delete' -and $null -ne $State[$path]) {

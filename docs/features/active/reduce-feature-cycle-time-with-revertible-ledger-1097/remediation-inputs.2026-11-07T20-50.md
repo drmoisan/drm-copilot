@@ -53,7 +53,7 @@ Finding-Scope: contained
 
 ## Light Fix Tasks
 
-- [ ] [P0-T1] `scripts/dev-tools/ProcessReductionChain.psm1`: F1, in the `create` branch of `Invoke-ProcessReductionPatchStep`, report an absent created file and a created file whose chain-state text differs from its create hunk, before setting the path absent.
+- [x] [P0-T1] `scripts/dev-tools/ProcessReductionChain.psm1`: F1, in the `create` branch of `Invoke-ProcessReductionPatchStep`, report an absent created file and a created file whose chain-state text differs from its create hunk, before setting the path absent.
 - [ ] [P0-T2] `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1`: F1, make `PRC-CHAIN-CREATED-FILE-ENDS-ABSENT` use an unedited created file and add `PRC-CHAIN-REPORTS-STALE-CREATED-FILE` for the edited, absent, and unchanged no-trailing-newline cases; then run the gates under F1 "Verification required" and record them under `evidence/qa-gates/`.
 
 ## Constraints
