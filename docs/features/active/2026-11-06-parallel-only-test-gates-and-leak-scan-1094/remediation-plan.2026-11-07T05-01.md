@@ -47,7 +47,7 @@ No test suite runs in this phase.
 
 ### Phase 1 — Hook Fix and Spec Note
 
-- [ ] [P1-T1] Add the function `Get-CoverageNarrowingLine` to `.claude/hooks/validate-feature-review-coverage-rules.ps1`, call it from `Test-LanguageCoverageRow`, copy the file to the Claude bundle copy, and add the function to the rules-file `Functions` row of `E4-ST4` in `tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1`.
+- [x] [P1-T1] Add the function `Get-CoverageNarrowingLine` to `.claude/hooks/validate-feature-review-coverage-rules.ps1`, call it from `Test-LanguageCoverageRow`, copy the file to the Claude bundle copy, and add the function to the rules-file `Functions` row of `E4-ST4` in `tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1`.
   - The function takes `-Lines`, `-LabelPattern`, and `-Language`, and returns the original text of each narrowing line. `-Lines` accepts empty strings, because audit text holds blank lines. It holds the current `$narrowingPattern` loop, with the pattern text unchanged, so `\bN/A\b` stays. It keeps the `## Rejected Scope Narrowing` section tracking and the PowerShell branch-line exception.
   - The label and coverage tests read the original line. The narrowing test reads the line after the removals below, each case-sensitive:
     - The record is removed only in these three positions, an allow-list, and stays everywhere else:
