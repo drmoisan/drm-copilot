@@ -97,7 +97,7 @@ Static stages run first, so that a suite is not re-run for a formatting change. 
 - [x] [P2-T3] Run Black in check mode, Ruff, and Pyright over `test_discovery_documentation_contracts.py`, `test_execution_environment_brief_contracts.py`, `test_single_pass_preflight_contracts.py`, `test_codex_orchestration_contracts.py`, and `test_validate_policy_audit_artifact.py` under `tests/scripts/dev_tools/`, run `poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check`, and write `<FEATURE>/evidence/qa-gates/python-black.<timestamp>.md`, `<FEATURE>/evidence/qa-gates/python-ruff.<timestamp>.md`, `<FEATURE>/evidence/qa-gates/python-pyright.<timestamp>.md`, and `<FEATURE>/evidence/qa-gates/codex-generator.<timestamp>.md`.
   - These cover the merge commit at the reviewed head, which postdates the earlier artifacts.
   - Acceptance: each `EXIT_CODE:` is 0.
-- [ ] [P2-T4] Run the Pester gate with one background `Invoke-PoshQCParallelTest` run and write `<FEATURE>/evidence/qa-gates/pester-parallel.<timestamp>.md`.
+- [x] [P2-T4] Run the Pester gate with one background `Invoke-PoshQCParallelTest` run and write `<FEATURE>/evidence/qa-gates/pester-parallel.<timestamp>.md`.
   - The launcher exits with `.ExitCode`. Counts come from merged `artifacts/pester/pester-junit.xml`.
   - Acceptance: `EXIT_CODE: 0`, zero failed tests, and the JUnit file holds `PGW-SWEEP-SURFACES` and `PGW-SWEEP-HELPER`, both passed. The artifact lists the `PGW-` count.
 - [ ] [P2-T5] Run the Jest gate with one background `npm run test:unit:coverage` run at the repository root, with `--json` and `--outputFile` under `SCRATCH`, and write `<FEATURE>/evidence/qa-gates/jest-coverage.<timestamp>.md`.
