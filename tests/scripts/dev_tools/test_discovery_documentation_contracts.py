@@ -451,7 +451,8 @@ def test_execution_environment_fact_is_unchanged_across_copies() -> None:
     copies = sorted(
         path
         for path in REPO_ROOT.rglob("execution-environment/SKILL.md")
-        if not {"node_modules", ".git", "packages", "worktrees"} & set(path.parts)
+        if not {"node_modules", ".git", "packages", "worktrees"}
+        & set(path.relative_to(REPO_ROOT).parts)
     )
     assert len(copies) == 6, [str(path) for path in copies]
     for path in copies:

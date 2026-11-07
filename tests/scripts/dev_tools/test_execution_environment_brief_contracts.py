@@ -94,10 +94,10 @@ def _collapse(text: str) -> str:
     return _WHITESPACE.sub(" ", text)
 
 
-def _section(heading: str) -> str:
-    """Return the whitespace-collapsed body of one `## ` section of the brief."""
+def _section(heading: str, relative_path: str = _BRIEF) -> str:
+    """Return the whitespace-collapsed body of one `## ` section of a brief copy."""
 
-    text = _read(_BRIEF)
+    text = _read(relative_path)
     start = text.index(f"\n{heading}\n") + len(heading) + 2
     end = text.find("\n## ", start)
     return _collapse(text[start : end if end != -1 else len(text)])
@@ -440,8 +440,8 @@ def test_brief_npm_run_tokens_exist_in_package_json() -> None:
     assert "vitest" not in _read(_BRIEF).lower()
 
 
-def test_brief_test_isolation_requires_seeded_pester_shuffle() -> None:
-    """The isolation section requires seeded Jest, reversed Python, seeded Pester."""
+def test_brief_test_isolation_states_parallel_gates() -> None:
+    """The isolation section states the parallel gates and the debugging exception."""
 
     # Arrange
     section = _section("## Test Isolation Checks")
@@ -450,19 +450,88 @@ def test_brief_test_isolation_requires_seeded_pester_shuffle() -> None:
     missing = _missing(
         section,
         (
-            "`node run-jest.cjs --randomize --seed=<n>`",
-            "with the seed recorded",
-            "reversed-order run of the new or changed Python test modules",
-            "seeded shuffled file-order run of the touched Pester suites",
-            "at least three seeds",
-            "each seed and its file order recorded",
-            "concurrent-shard",
+            "Invoke-PoshQCParallelTest",
             "pytest -n auto",
+            "normal parallel workers",
+            "re-run only after a fix",
+            "debugging only",
+            "never a gate or evidence",
+            "parallel gates govern",
         ),
     )
 
     # Assert
     assert missing == [], f"Test Isolation Checks lacks {missing}"
+
+
+def test_brief_copies_carry_no_removed_run_tokens() -> None:
+    """No brief copy names a test run that the parallel gates replaced."""
+
+    # Arrange
+    tokens = (
+        "single-process",
+        "seeded",
+        "shuffled",
+        "reversed-order",
+        "--randomize",
+        "at least three seeds",
+        "which is the CI shape",
+        "isolation reference",
+        "in addition to the serial runs",
+    )
+
+    # Act
+    # Fold case and collapse wrapping per copy, so a reintroduced token fails
+    # in whichever mirrored copy holds it.
+    found = {
+        path: [
+            token
+            for token in tokens
+            if token.casefold() in _collapse(_read(path)).casefold()
+        ]
+        for path in _BRIEF_COPIES
+    }
+    offending = {path: hits for path, hits in found.items() if hits}
+
+    # Assert
+    assert offending == {}, f"brief copies name removed runs: {offending}"
+
+
+def test_brief_passages_state_parallel_gate_facts() -> None:
+    """Every copy carries the other edited passages of the parallel-gate change."""
+
+    # Arrange
+    passages = {
+        "## CI-Only Failure Classes": (
+            "Files in one shard share a process",
+            "a leak surfaces when shard contents change",
+        ),
+        "## PowerShell Route and PoshQC MCP Limits": (
+            "`Invoke-PoshQCParallelTest`",
+            "`ExitCode`",
+            "only after a fully green run",
+            "`artifacts/pester/parallel/shard-<i>/`",
+        ),
+        "## Contract Tests That Pin Mirrored Files": (
+            "`tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`",
+        ),
+        "## Coverage and File-Size Gates": (
+            "single gate run",
+            "no earlier figure is compared",
+        ),
+    }
+
+    # Act
+    # Check each passage in each copy, because the copies are the mirrored surface.
+    missing = {
+        (path, heading): lacking
+        for path in _BRIEF_COPIES
+        for heading, tokens in passages.items()
+        if (lacking := _missing(_section(heading, path), tokens))
+    }
+
+    # Assert
+    assert missing == {}, f"brief passages lack parallel-gate facts: {missing}"
 
 
 def test_brief_test_runtime_section_orders_diagnosis_before_parallelism() -> None:
