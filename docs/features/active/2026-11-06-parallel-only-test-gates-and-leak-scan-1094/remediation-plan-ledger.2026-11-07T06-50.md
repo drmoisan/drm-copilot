@@ -38,7 +38,7 @@ No test suite and no language baseline runs in this phase, because no code chang
 
 ### Phase 1 — Ledger Entry
 
-- [ ] [P1-T1] Create the entry and the patch, add one data row to `## Index` in `docs/engineering/process-reductions/README.md`, and commit those three files alone with the subject `docs(process-reductions): record parallel-only test gates (#1094), reduction: 0001`.
+- [x] [P1-T1] Create the entry and the patch, add one data row to `## Index` in `docs/engineering/process-reductions/README.md`, and commit those three files alone with the subject `docs(process-reductions): record parallel-only test gates (#1094), reduction: 0001`.
   - The row sits directly under the table's separator row: `| [0001](0001-parallel-only-test-gates.md) | Parallel-only test gates | 2026-11-07 | #1094 | Active |`.
   - `# 0001: Parallel-only test gates` is the entry's title. `## Summary` carries four lines of their own, with no list marker: `reduction: 0001`, `Date: 2026-11-07`, `Issue: #1094`, and `Merge commit: pending (PR #1101)`. Its prose states what was reduced, that the reduction landed across this branch's commits before the ledger rule reached the branch, and that the entry's own commit carries the token.
   - `## Reason and Evidence`: the owner decision of 2026-11-06 and the three measured figures in spec `## Overview`: the 8-shard run time, the single-process run time range, and the 3-shard CI repeat.
@@ -62,7 +62,7 @@ No test suite and no language baseline runs in this phase, because no code chang
 
 ### Phase 2 — Ledger Check and Self-Review
 
-- [ ] [P2-T1] Run the ledger checks on the committed state in one step script, write `<FEATURE>/evidence/qa-gates/ledger-check.<timestamp>.md`, and commit it with this plan.
+- [x] [P2-T1] Run the ledger checks on the committed state in one step script, write `<FEATURE>/evidence/qa-gates/ledger-check.<timestamp>.md`, and commit it with this plan.
   - The step throws on any failed item, so the exit code carries acceptance. `Test-ProcessReductionLedger` returns an object and does not itself fail.
   1. Checker: import `scripts/dev-tools/ProcessReductionLedger.psm1` from the branch, pass the result of `Read-ProcessReductionLedger` over the ledger to `Test-ProcessReductionLedger`, and require `IsValid` true, zero `Errors`, and `RowCount` 1.
   2. Index agreement: the row's title, date, and issue cells equal the entry's title, `Date:` line, and `Issue:` line.
