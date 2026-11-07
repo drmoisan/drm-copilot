@@ -1,6 +1,6 @@
 # QA gate: final gates versus Phase 0 baseline (issue 1105)
 
-Timestamp: 2026-11-07T15-24
+Timestamp: 2026-11-07T15-23
 Task: [P4-T4]
 Command: comparison of `evidence/baseline/pester-parallel.2026-11-07T14-41.md` and `evidence/baseline/pytest-parallel.2026-11-07T14-43.md` with `evidence/qa-gates/pester-parallel.2026-11-07T15-20.md` and `evidence/qa-gates/pytest-parallel.2026-11-07T15-23.md` (the greatest file of each name); changed-line coverage from sh SCRATCH/issue-1105-changedlines.sh final1 (`git diff -U0 <merge base of origin/main and HEAD> -- <file>` new-side line numbers matched against the JaCoCo `line` elements of the baseline and final `powershell-coverage.xml`)
 EXIT_CODE: 0
