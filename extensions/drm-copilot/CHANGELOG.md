@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Claude core pack skill `/epic-progress-report` (issue #1093): the core pack now carries
+  `.claude/skills/epic-progress-report/SKILL.md` and its five bundled PowerShell scripts under
+  `.claude/skills/epic-progress-report/scripts/` (the report entry script and its Logic, State,
+  Metrics, and Render files). The skill schedules the coordinator's TL;DR and hourly epic
+  progress reports, and the script keeps its baseline and samples in
+  `.claude/state/epic-progress-<epic-folder>.json`. A destination repository receives the skill
+  through the push-down only after the extension is rebuilt and reinstalled.
+
 ### Changed
 
 - PoshQC code-coverage population (issue #527): `Invoke-PoshQCTest` derives the measured
