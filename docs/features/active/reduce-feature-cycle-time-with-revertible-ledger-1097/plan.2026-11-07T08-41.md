@@ -127,7 +127,7 @@ Found by searching `tests/` and `extensions/drm-copilot/test/` for `no test suit
 
 ### Phase 2 — Final QA and Baseline Comparison
 
-- [ ] [P2-T1] Run format and lint over every `.ps1` and `.py` file in the diff from the merge base of `origin/main` and `HEAD`, including `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, plus the Codex generator `--check`, and write `FEATURE/evidence/qa-gates/stage-e2-format-lint.<timestamp>.md`.
+- [x] [P2-T1] Run format and lint over every `.ps1` and `.py` file in the diff from the merge base of `origin/main` and `HEAD`, including `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, plus the Codex generator `--check`, and write `FEATURE/evidence/qa-gates/stage-e2-format-lint.<timestamp>.md`.
   - Acceptance: the PoshQC log holds an `Already formatted: ` line and no `Formatted: ` line per file, Black reports no file to reformat, and the analyzer, Ruff, and Pyright report zero findings; `EXIT_CODE:` is non-zero otherwise, and a repair restarts this task.
 - [ ] [P2-T2] Run one `Invoke-PoshQCParallelTest` and write `FEATURE/evidence/qa-gates/stage-e2-powershell-test.<timestamp>.md` comparing it with the greatest `stage-e2-powershell-test-baseline.*.md`.
   - Output Summary: total, passed, and failed counts, the `parallel-gate-wording` and `ProcessReductionLedger.Index` counts, the repo-wide line percentage, and each difference from the baseline.
