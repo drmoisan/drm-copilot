@@ -403,6 +403,29 @@ Describe 'Invoke-EpicProgressReport' {
         (@($written.samples.ts) -join ',') | Should -Be "$($script:fixedNowUnix - 1200),$($script:fixedNowUnix - 600),$($script:fixedNowUnix)"
     }
 
+    It 'pairs and writes the stored samples with -PairSamples within 90 seconds of the last sample' {
+        # The newest stored sample is 30 seconds old, so the sample rule adds nothing and only the -PairSamples term of the write condition in Invoke-EpicProgressReport causes the write.
+        $script:existingPaths = @($script:checkpointPath, $script:livePlanPath, $script:statePath)
+        $stored = @(1230, 930, 630, 330, 30 | ForEach-Object { "{`"ts`":$($script:fixedNowUnix - $_),`"done`":2}" }) -join ','
+        # 1767600000 is the stored start, 2026-01-05T08:00:00Z, which differs from the fixture -StartUtc.
+        $script:fileText[$script:statePath] = "{`"version`":1,`"startUnixSeconds`":1767600000,`"baselineDone`":1,`"baselineWeeklyPct`":12.5,`"samples`":[$stored]}"
+        $arguments = $script:reportParameter.Clone()
+        $arguments.Remove('StartUtc')
+        $arguments['PairSamples'] = $true
+        $arguments['Mode'] = 'TLDR'
+
+        $null = Invoke-EpicProgressReport @arguments
+
+        Should -Invoke Write-EpicProgressState -Times 1 -Exactly
+        $script:stateWrites.Count | Should -Be 1
+        $script:stateWrites[0].Path | Should -Be $script:statePath
+        $written = ConvertFrom-Json -InputObject $script:stateWrites[0].Content
+        (@($written.samples.ts) -join ',') | Should -Be "$($script:fixedNowUnix - 1230),$($script:fixedNowUnix - 630),$($script:fixedNowUnix - 30)"
+        $written.startUnixSeconds | Should -Be 1767600000
+        $written.baselineDone | Should -Be 1
+        $written.baselineWeeklyPct | Should -Be 12.5
+    }
+
     It 'throws before any I/O when -ResetBaseline and -PairSamples are combined' {
         { Get-TestReportLine -Extra @{ ResetBaseline = $true; PairSamples = $true } } | Should -Throw -ExpectedMessage '*-ResetBaseline*-PairSamples*'
 
