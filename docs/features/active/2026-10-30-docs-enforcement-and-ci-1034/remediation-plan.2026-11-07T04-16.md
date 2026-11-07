@@ -266,7 +266,7 @@ A `SCRATCH` driver dot-sources the `HOOK` of a consumer copy with an enabled pro
 
 Any failing step, or any step that changes a file, restarts the loop from P4-T1. The parallel Pester and `pytest -n auto` runs are re-run only after a fix.
 
-- [ ] [P4-T1] Run the PoshQC formatter over `.claude/hooks/enforce-docs-complete-gate.ps1`, `.claude/hooks/enforce-docs-complete-gate-target.ps1`, `.claude/lib/docs/Invoke-DocsCommand.ps1`, `COMPOUND_SUITE` and `HELPER_SUITE`, and write `FEATURE/evidence/qa-gates/format.<timestamp>.md`.
+- [x] [P4-T1] Run the PoshQC formatter over `.claude/hooks/enforce-docs-complete-gate.ps1`, `.claude/hooks/enforce-docs-complete-gate-target.ps1`, `.claude/lib/docs/Invoke-DocsCommand.ps1`, `COMPOUND_SUITE` and `HELPER_SUITE`, and write `FEATURE/evidence/qa-gates/format.<timestamp>.md`.
   - Acceptance: the SHA-256 of each target and the `git status --porcelain` output captured before and after the run are identical, and both comparisons are recorded.
 - [ ] [P4-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the P4-T1 files and write `FEATURE/evidence/qa-gates/pssa.<timestamp>.md`.
   - Acceptance: zero findings for each file, compared against P0-T3.
