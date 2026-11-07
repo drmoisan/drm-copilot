@@ -1,0 +1,8 @@
+[
+  {"stage": "atomic_execution", "attempt": 1, "started_at": "2026-11-07T20:25:00Z", "ended_at": "2026-11-07T22:03:00Z"},
+  {"stage": "feature_review", "attempt": 1, "started_at": "2026-11-07T22:05:00Z", "ended_at": "2026-11-07T22:30:00Z"},
+  {"stage": "remediation_cycle", "attempt": 1, "started_at": "2026-11-07T22:32:00Z", "ended_at": "2026-11-07T23:13:00Z"},
+  {"stage": "feature_review", "attempt": 2, "started_at": "2026-11-07T23:14:00Z", "ended_at": "2026-11-07T23:22:00Z"},
+  {"stage": "pr_creation", "attempt": 1, "started_at": "2026-11-07T23:23:00Z", "ended_at": "2026-11-07T23:26:00Z"},
+  {"stage": "ci_gate", "attempt": 1, "started_at": "2026-11-07T23:26:00Z", "ended_at": "2026-11-07T23:48:00Z"}
+]

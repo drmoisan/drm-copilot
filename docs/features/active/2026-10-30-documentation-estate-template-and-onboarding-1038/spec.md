@@ -406,7 +406,7 @@ Provisional defaults stand; this child does not wait on them.
 - [x] No test creates temporary files: a scan of every new test and support file finds no `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`, and no new test starts a process.
 - [x] A neutrality scan using the 1020 consumer-identifier digest list reports no match in the template pair or the onboarding pages under `docs/engineering/documentation-estate/`.
 - [x] No file of this child is Python or TypeScript, and no file under `.claude/`, `extensions/drm-copilot/src/` or `extensions/drm-copilot/resources/claude-customizations/` is created or edited.
-- [ ] The new suites `EndToEndDocumentationEstate.Tests.ps1`, `DocumentationEstateEpicTemplate.Tests.ps1` and `DocumentationEstateOnboarding.Tests.ps1` pass in the CI job `poshqc / PowerShell QC`, three seeded shuffled file-order runs and one fresh single-process run over `tests/scripts` pass with evidence under `evidence/regression-testing/`, and changed-line coverage of `.claude/lib/docs/` does not decrease against the baseline recorded under `evidence/baseline/`.
+- [x] The new suites `EndToEndDocumentationEstate.Tests.ps1`, `DocumentationEstateEpicTemplate.Tests.ps1` and `DocumentationEstateOnboarding.Tests.ps1` pass in the CI job `poshqc / PowerShell QC`, three seeded shuffled file-order runs and one fresh single-process run over `tests/scripts` pass with evidence under `evidence/regression-testing/`, and changed-line coverage of `.claude/lib/docs/` does not decrease against the baseline recorded under `evidence/baseline/`.
 - [x] Every new Pester and support file is below 500 logical lines, and the seven-stage toolchain passes in a single pass.
 
 ## Definition of Done
