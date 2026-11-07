@@ -461,7 +461,6 @@
 			"args": [
 				"run",
 				"pytest",
-				"--cov=src/lexile_corpus_tuner",
 				"--cov=scripts/dev_tools",
 				"--cov-report=term-missing",
 				"--cov-report=lcov:artifacts/python/lcov.info"

@@ -45,9 +45,9 @@ Header (required)
 (<type>(<optional-scope>)): <imperative, present-tense summary>
 
 Examples:
-- (feat): add lexile scoring model analyzer pipeline
+- (feat): add scoring model analyzer pipeline
 - (fix(dev-tools)): correct bug promotion title and body mapping
-- (docs(scoring-model)): document replacement of Lexile v2 with in-house model
+- (docs(scoring-model)): document replacement of the v2 scoring model with an in-house model
 
 Body (optional but preferred for non-trivial changes)
 

@@ -1,6 +1,6 @@
 ---
 name: csharp-atomic-executor
-description: Execute atomic_planner plans verbatim with atomic_executor rigor and C#-specialized quality gates (csharpier, analyzers, nullable/type safety, and dotnet test).
+description: Execute atomic_planner plans verbatim with atomic_executor rigor and C#-specialized quality gates (csharpier, analyzers, nullable/type safety, and MSTest).
 argument-hint: "Provide the approved atomic plan text or path. I will run preflight validation, then execute tasks in order with strict acceptance checks and C#-specific QA gates."
 tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
 ---
@@ -243,7 +243,7 @@ If the user says "resume", "continue", or "try again":
 - Be concise but exact.
 - Do not paste large code blocks unless the user asks.
 - Always show the commands/tasks you run and summarize results (pass/fail, key errors).
-- When completing a task or a plan, report the toolchain status explicitly: csharpier (format), dotnet build (analyzers), and dotnet test.
+- When completing a task or a plan, report the toolchain status explicitly: csharpier (format), msbuild (analyzers and nullable), and vstest.console.exe (MSTest).
 - Always end with the updated checklist so the user can see progress.
 
 ---
@@ -260,9 +260,9 @@ Always enforce repo policy order:
 
 Required toolchain for C# tasks:
 1) Format (`csharpier .` or repo task equivalent)
-2) Analyze/lint (`dotnet build -p:EnableNETAnalyzers=true -p:EnforceCodeStyleInBuild=true` or repo task equivalent)
-3) Type-check (`dotnet build -p:Nullable=enable -p:TreatWarningsAsErrors=true` or repo task equivalent)
-4) Test (`dotnet test --collect:"XPlat Code Coverage"` or repo task equivalent)
+2) Analyze/lint (`msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` or repo task equivalent)
+3) Type-check (`msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` or repo task equivalent)
+4) Test (`vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` or repo task equivalent)
 
 If any step fails in final QA, fix and restart from format.
 

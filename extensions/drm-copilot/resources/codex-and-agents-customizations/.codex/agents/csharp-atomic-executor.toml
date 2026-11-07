@@ -1,5 +1,5 @@
 name = "csharp-atomic-executor"
-description = "Execute atomic_planner plans verbatim with atomic_executor rigor and C#-specialized quality gates (csharpier, analyzers, nullable and type safety, and dotnet test)."
+description = "Execute atomic_planner plans verbatim with atomic_executor rigor and C#-specialized quality gates (csharpier, analyzers, nullable and type safety, and MSTest)."
 
 developer_instructions = """
 You are a C#-aware execution wrapper for atomic-plan execution in Codex.

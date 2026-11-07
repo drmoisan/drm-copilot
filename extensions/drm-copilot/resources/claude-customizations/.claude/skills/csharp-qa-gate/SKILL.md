@@ -1,6 +1,6 @@
 ---
 name: csharp-qa-gate
-description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain (with architecture tests), compares static tool results and the test and coverage results of the single gate run against the Phase A baseline (the `Phase 0 baseline` of the plan), enforces zero-regression deltas, and produces the required reporting block before the agent declares the change complete.
+description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain (with architecture tests), compares static tool results and the test and coverage results of the single gate run against the Phase A baseline (the `Phase 0 baseline` of the plan), enforces zero-regression deltas, and produces the required reporting block before the agent declares the change complete.
 ---
 
 # C# QA Gate
@@ -19,7 +19,7 @@ Use this skill when:
 
 Before invoking this gate, the agent must have:
 
-- a baseline record produced in Phase A (the plan's `Phase 0 baseline`), containing analyzer findings and compiler/nullable diagnostics for the in-scope files and the xUnit pass/fail status and per-file coverage status of one test run,
+- a baseline record produced in Phase A (the plan's `Phase 0 baseline`), containing analyzer findings and compiler/nullable diagnostics for the in-scope files and the MSTest pass/fail status and per-file coverage status of one test run,
 - the exact list of touched production and test files,
 - a clean working tree (all planned edits committed to the working copy).
 
@@ -54,7 +54,7 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
 
 - **Analyzer delta**: 0 new findings across the repository.
 - **Compiler / nullable delta**: 0 new diagnostics across the repository.
-- **xUnit delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+- **MSTest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
 - **Architecture-test delta**: zero failures and 0 new failing facts in the `*.ArchitectureTests` project.
 - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
 - **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
@@ -67,7 +67,7 @@ If any delta check fails, the agent must revert or fix immediately and rerun the
 Every completion response must include the following sections:
 
 1. **Scope** — exact file list touched in this change.
-2. **Baseline** — analyzer, compiler/nullable, xUnit, and coverage status recorded in Phase A.
+2. **Baseline** — analyzer, compiler/nullable, MSTest, and coverage status recorded in Phase A.
 3. **Plan** — design and test-strategy summary, referencing the approved plan.
 4. **Diffs** — patch-style or full-file replacements for scoped files only.
 5. **QA Gate Results** — analyzer and compiler/nullable deltas, failing-tests deltas from the single gate run and the architecture tests, per-file coverage delta against the baseline and the thresholds, and overall coverage delta when applicable. If any step could not be run, mark the corresponding line **unverified** and state why.

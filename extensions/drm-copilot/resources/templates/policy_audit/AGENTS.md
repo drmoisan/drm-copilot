@@ -42,7 +42,7 @@ When performing a policy audit:
 When asked to perform a Policy Audit for a component, branch, or PR:
 
 1. **Identify scope**
-   - Determine what is being audited (e.g., "fix-all.ps1 unit tests", "Lexile scoring pipeline refactor", "new Python module X").
+   - Determine what is being audited (e.g., "fix-all.ps1 unit tests", "scoring pipeline refactor", "new Python module X").
    - Identify the relevant code files and test files.
 
 2. **Create an audit document**

@@ -12,7 +12,7 @@ This rule file summarizes the PowerShell-specific policies for this repository.
 1. **Formatting — Invoke-Formatter**: Format all PowerShell files via PoshQC. MCP command: `mcp__drm-copilot__run_poshqc_format`
 2. **Linting — PSScriptAnalyzer**: Run PoshQC analyzer with repo settings. MCP command: `mcp__drm-copilot__run_poshqc_analyze`. Optional autofix: `mcp__drm-copilot__run_poshqc_analyze_autofix`
 3. **Type checking**: Not applicable for PowerShell; skip to testing.
-4. **Testing — Pester (v5.x)**: Run tests via MCP. MCP command: `mcp__drm-copilot__run_poshqc_test`. Use repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
+4. **Testing — Pester (v6.x)**: Run tests via MCP. MCP command: `mcp__drm-copilot__run_poshqc_test`. Use repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
 
 Run the toolchain in order: format → analyze → test. Restart from step 1 if any step fails or changes files. Use the MCP server functions; do not substitute VS Code task wrappers.
 
@@ -49,7 +49,7 @@ Introduce the smallest seam that enables reliable mocking. Apply these options i
 
 ## Testing Standards
 
-- Use **Pester** (v5.x) as the test framework.
+- Use **Pester** (v6.x) as the test framework.
 - Organize tests to mirror code structure (e.g., `tests/scripts/dev-tools/ScriptName.Tests.ps1`).
 - Name test files `*.Tests.ps1`.
 - Use `Describe`/`Context`/`It` blocks; one behavior per `It`.
