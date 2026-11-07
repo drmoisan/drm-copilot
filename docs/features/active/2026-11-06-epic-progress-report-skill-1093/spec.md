@@ -214,7 +214,7 @@ Parameter surface (canonical entry): `EpicFolder` (mandatory), `StartUtc`, `Epic
 
 | Parameter | Type | Semantics |
 |---|---|---|
-| `-StartUtc` | `[datetime]`, optional | Start instant. Resolution: the passed value, else the stored value, else (with `-ResetBaseline`) now from the clock seam. With none of these the run stops with a terminating error that names `-StartUtc` and `-ResetBaseline`, raised before any git call. |
+| `-StartUtc` | `[datetime]`, optional | Start instant. Resolution: the passed value, else (with `-ResetBaseline`) now from the clock seam, else the stored value. With none of these the run stops with a terminating error that names `-StartUtc` and `-ResetBaseline`, raised before any git call. |
 | `-BaselineDone` | `[int]` | Resolution: the passed value, else (with `-ResetBaseline`) the current done count, else the stored value, else 0. |
 | `-BaselineWeeklyPct` | `[double]` | Resolution: the passed value, else the stored value, else 0. Not captured by `-ResetBaseline` (owner item 4). |
 | `-StatePath` | `[string]` | Default `<repository root>/.claude/state/epic-progress-<EpicFolder>.json`. |
