@@ -149,7 +149,7 @@
   - Acceptance: `<FEATURE>/evidence/regression-testing/pester-shuffled-order.<timestamp>.md` records each seed, its file order and its passed and failed counts; failed is 0 for every seed.
 - [x] [P6-T6] Run a fresh single-process Pester run over `tests/scripts`.
   - Acceptance: `<FEATURE>/evidence/regression-testing/pester-single-process.<timestamp>.md` records total, passed and failed counts from the JUnit file, with 0 failures in the seven touched suites and any other failure compared against the merge base and recorded as pre-existing or fixed.
-- [ ] [P6-T7] Run a concurrent-shard Pester run through `Invoke-PoshQCParallelTest` over `tests/scripts`.
+- [x] [P6-T7] Run a concurrent-shard Pester run through `Invoke-PoshQCParallelTest` over `tests/scripts`.
   - Acceptance: `<FEATURE>/evidence/regression-testing/pester-parallel-shards.<timestamp>.md` records the shard count and per-container results of the seven touched suites with 0 failures.
 - [ ] [P6-T8] Re-run the five Python contract modules of P0-T7 unchanged.
   - Acceptance: `<FEATURE>/evidence/qa-gates/python-contract-tests.<timestamp>.md` records 0 failures, including `test_every_skill_script_reference_is_bundled`, `test_every_skill_folder_file_is_carried_by_skill_packs`, `test_bundled_claude_payload_contains_all_repo_runtime_contracts`, `test_bundled_claude_files_are_listed_in_some_pack_manifest`, `test_claude_manifest_powershell_dependency_closure`, `test_every_psscriptroot_occurrence_is_recognized` and `test_scanned_source_floor`.
