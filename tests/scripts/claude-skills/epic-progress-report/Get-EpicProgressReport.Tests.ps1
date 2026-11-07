@@ -70,6 +70,16 @@ Describe 'I/O seams without side effects' {
         }
     }
 
+    It 'runs the entry point and restores the location when the run throws' {
+        # Invoked, not dot-sourced, so the entry-point block runs; the combined switches throw
+        # inside Invoke-EpicProgressReport before any I/O, and the finally block pops the location.
+        $before = (Get-Location).Path
+
+        { & $script:scriptPath -EpicFolder 'example-epic' -RepositoryRoot $PSScriptRoot -ResetBaseline -PairSamples } | Should -Throw -ExpectedMessage '*-ResetBaseline*-PairSamples*'
+
+        (Get-Location).Path | Should -Be $before
+    }
+
     It 'returns the last native exit code' {
         # Reads $LASTEXITCODE without assigning it, so no global state changes.
         Get-EpicProgressLastExitCode | Should -Be $LASTEXITCODE
