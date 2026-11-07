@@ -274,7 +274,8 @@ Paths of the #1096 landing. The six `execution-environment` copies listed above 
 - `scripts/dev_tools/atomic_executor/qc_runner.py`: canonical, with Revert Blocks
 - `scripts/dev_tools/atomic_executor/qc_toolchain.py`: canonical, with a Revert Block
 - `scripts/dev_tools/fix_all_branches.py`: canonical, with Revert Blocks
-- `scripts/dev_tools/fix_all_branches_extra.py`: canonical, with Revert Blocks
+- `scripts/dev_tools/fix_all_branches_extra.py`: canonical, with a Revert Block
+- `tests/scripts/dev_tools/atomic_executor/test_cli_part2_part2.py`: contract test, with a Revert Block
 - `tests/scripts/dev_tools/atomic_executor/test_cli_part3.py`: contract test, with Revert Blocks
 - `tests/scripts/dev_tools/atomic_executor/test_prompt_builder.py`: contract test, with a Revert Block
 - `tests/scripts/dev_tools/atomic_executor/test_qc_runner.py`: contract test, with Revert Blocks
@@ -293,7 +294,7 @@ The patch does not hold the edits of the #1096 landing. Those edits are carried 
 
 The two rules that carry the reduction each have blocks. `.claude/skills/execution-environment/SKILL.md` takes one block for the body of `## Test Isolation Checks`, because its five mirrors are byte-identical. The three `atomic-plan-contract` sources differ from one another, so each takes a block for its `Test isolation` sentence of the Pre-Mortem rule.
 
-The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionRevertBlock` reads only the first fence of each label in a block, so a file whose landing has separate hunks takes one block per hunk under the same path. A block whose `Prior` fence is empty removes test text that the landing added. The brief copies other than `.claude/skills/execution-environment/SKILL.md` take no block, because step 2 re-copies them.
+The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionRevertBlock` reads only the first fence of each label in a block, so a file whose landing has separate hunks takes one block per hunk under the same path. A block whose `Prior` fence is empty removes test text that the landing added. Each `Prior` fence holds the text of `main` after PR #1108 (issue #1106), which removed the stale package coverage flag from the same commands, so a revert restores `--cov=scripts/dev_tools` as the only coverage source. The coverage-flag hunks of `.vscode/tasks.json` and `scripts/dev_tools/fix_all_branches_extra.py` match `main` after that change and take no block. The brief copies other than `.claude/skills/execution-environment/SKILL.md` take no block, because step 2 re-copies them.
 
 ### Revert Block: .claude/skills/execution-environment/SKILL.md
 
@@ -416,27 +417,6 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
 ### Revert Block: .vscode/tasks.json
 
 ````Current
-			"args": [
-				"run",
-				"pytest",
-				"--cov=scripts/dev_tools",
-				"--cov-report=term-missing",
-				"--cov-report=lcov:artifacts/python/lcov.info"
-````
-
-````Prior
-			"args": [
-				"run",
-				"pytest",
-				"--cov=src/lexile_corpus_tuner",
-				"--cov=scripts/dev_tools",
-				"--cov-report=term-missing",
-				"--cov-report=lcov:artifacts/python/lcov.info"
-````
-
-### Revert Block: .vscode/tasks.json
-
-````Current
 		{
 			"dependsOn": [
 				"TS: 4 Jest: unit tests with coverage",
@@ -551,23 +531,6 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
         "Pytest: test with coverage" if include_coverage else "Pytest: test"
 ````
 
-### Revert Block: scripts/dev_tools/fix_all_branches_extra.py
-
-````Current
-        pytest_command.extend(
-            [
-                "--cov=scripts/dev_tools",
-                "--cov-report=term-missing",
-````
-
-````Prior
-        pytest_command.extend(
-            [
-                "--cov=src/lexile_corpus_tuner",
-                "--cov=scripts/dev_tools",
-                "--cov-report=term-missing",
-````
-
 ### Revert Block: scripts/dev_tools/atomic_executor/cli_preflight.py
 
 ````Current
@@ -584,7 +547,6 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
                     "run",
                     "pytest",
                     "--color=no",
-                    "--cov=src/lexile_corpus_tuner",
                     "--cov=scripts/dev_tools",
                     "--cov-report=term-missing",
 ````
@@ -602,7 +564,7 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
 ````Prior
                 "   - `poetry run ruff check`",
                 "   - `poetry run pyright`",
-                "   - `poetry run pytest --cov=src/lexile_corpus_tuner "
+                "   - `poetry run pytest "
                 "--cov=scripts/dev_tools --cov-report=term-missing`",
             ]
 ````
@@ -622,7 +584,7 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
   - python -m poetry run ruff check
   - python -m poetry run pyright
   - python -m poetry run pytest \\
-      --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools \\
+      --cov=scripts/dev_tools \\
       --cov-report=term-missing
 
 ````
@@ -635,6 +597,7 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
         "-n",
         "auto",
         "--color=no",
+        "--cov=scripts/dev_tools",
         "--cov-report=xml",
         "--cov-report=term-missing",
 ````
@@ -643,7 +606,7 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
         "run",
         "pytest",
         "--color=no",
-        "--cov=src/lexile_corpus_tuner",
+        "--cov=scripts/dev_tools",
         "--cov-report=xml",
         "--cov-report=term-missing",
 ````
@@ -662,7 +625,6 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
 ````Prior
                 "run",
                 "pytest",
-                "--cov=src/lexile_corpus_tuner",
                 "--cov=scripts/dev_tools",
                 "--cov-report=term-missing",
 ````
@@ -683,7 +645,6 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
         "run",
         "pytest",
         "--color=no",
-        "--cov=src/lexile_corpus_tuner",
         "--cov=scripts/dev_tools",
         "--cov-report=term-missing",
 ````
@@ -700,6 +661,32 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
 ### Revert Block: tests/scripts/dev_tools/atomic_executor/test_cli_part3.py
 
 ````Current
+_PYTEST_STEP = [
+    "poetry",
+    "run",
+    "pytest",
+    "-n",
+    "auto",
+    "--color=no",
+````
+
+````Prior
+_PYTEST_STEP = [
+    "poetry",
+    "run",
+    "pytest",
+    "--color=no",
+````
+
+### Revert Block: tests/scripts/dev_tools/atomic_executor/test_cli_part2_part2.py
+
+````Current
+        assert len(copilot_calls) == 1
+
+
+class TestPreflightParallelCommand:
+    """Tests that the preflight QC pytest step runs on pytest-xdist workers."""
+
     def test_preflight_pytest_step_runs_xdist_workers(
         self,
         mem_fs_path: Path,
@@ -728,10 +715,10 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
         start = pytest_argv.index("pytest")
         assert pytest_argv[start : start + 3] == ["pytest", "-n", "auto"]
         assert "--cov=src/lexile_corpus_tuner" not in pytest_argv
-
 ````
 
 ````Prior
+        assert len(copilot_calls) == 1
 ````
 
 ### Revert Block: tests/scripts/dev_tools/atomic_executor/test_prompt_builder.py
@@ -804,6 +791,7 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
             "-n",
             "auto",
             "--color=no",
+            "--cov=scripts/dev_tools",
             "--cov-report=xml",
             "--cov-report=term-missing",
 ````
@@ -812,7 +800,7 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
             "run",
             "pytest",
             "--color=no",
-            "--cov=src/lexile_corpus_tuner",
+            "--cov=scripts/dev_tools",
             "--cov-report=xml",
             "--cov-report=term-missing",
 ````
@@ -925,8 +913,8 @@ def test_python_branch_pytest_runs_xdist_workers_without_coverage() -> None:
 2. Re-copy mirrors and bundles: copy `.claude/skills/execution-environment/SKILL.md` to its five copies, `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md`. Copy each `atomic-plan-contract` source to its bundle copy: `extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md`.
 3. Regenerate Codex variants: run `scripts/dev_tools/generate_codex_agent_variants.py` in module form, then run it with `--check`.
 4. Restore pinned hashes: not applicable, because `parallel_orchestrator_surface_expectations.py` is outside the reduction path set.
-5. Restore contract-test literals: restore the merge-base tests `test_brief_test_isolation_requires_seeded_pester_shuffle` and `test_contract_premortem_test_isolation_requires_seeded_pester_shuffle` in place of `test_brief_test_isolation_states_parallel_gates`, `test_brief_copies_carry_no_removed_run_tokens`, and `test_contract_premortem_test_isolation_states_parallel_gates`. Remove `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, which the reduction added. For the #1096 landing, the blocks of step 1 restore `test_run_full_runs_all_tools_on_entire_codebase` in `test_qc_runner.py`, `test_build_includes_toolchain_instructions` in `test_prompt_builder.py`, and `test_build_preflight_qc_fix_prompt_includes_workspace` in `test_cli_part3.py`, and they remove the tests that landing added: `test_full_loop_full_test_runs_xdist_workers` and `test_python_toolchain_pytest_command_runs_xdist_workers` in `test_qc_runner.py`, `test_preflight_pytest_step_runs_xdist_workers` in `test_cli_part3.py`, `test_powershell_test_step_runs_invoke_poshqc_parallel_test`, `test_python_branch_pytest_runs_xdist_workers_with_coverage`, and `test_python_branch_pytest_runs_xdist_workers_without_coverage` in `test_fix_all_branches.py`, and `VT-AGGREGATES-PARALLEL-ONLY`, `VT-DEPENDS-ON-RESOLVES`, `VT-DEFAULT-TEST-TASK`, and `VT-SERIAL-TASKS-REMAIN` in `tests/scripts/workflows/VsCodeQualityTasks.Tests.ps1`. Also remove the `## Test Runtime` entry of `test_brief_passages_state_parallel_gate_facts` in `test_execution_environment_brief_contracts.py`, which asserts the `fix_all` wording of the pytest bullet that step 1 reverts.
-6. Run the contract tests: run `test_execution_environment_brief_contracts.py`, `test_single_pass_preflight_contracts.py`, `test_push_down_claude_resource_contracts.py`, and `test_push_down_codex_and_agents_resource_contracts.py`. For the #1096 landing, also run `tests/scripts/dev_tools/atomic_executor/test_qc_runner.py`, `test_prompt_builder.py`, `test_cli_part3.py`, `tests/scripts/dev_tools/test_fix_all_branches.py`, and `tests/scripts/workflows/VsCodeQualityTasks.Tests.ps1`.
+5. Restore contract-test literals: restore the merge-base tests `test_brief_test_isolation_requires_seeded_pester_shuffle` and `test_contract_premortem_test_isolation_requires_seeded_pester_shuffle` in place of `test_brief_test_isolation_states_parallel_gates`, `test_brief_copies_carry_no_removed_run_tokens`, and `test_contract_premortem_test_isolation_states_parallel_gates`. Remove `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, which the reduction added. For the #1096 landing, the blocks of step 1 restore `test_run_full_runs_all_tools_on_entire_codebase` in `test_qc_runner.py`, `test_build_includes_toolchain_instructions` in `test_prompt_builder.py`, and `test_build_preflight_qc_fix_prompt_includes_workspace` and the module constant `_PYTEST_STEP` in `test_cli_part3.py`, and they remove the tests that landing added: `test_full_loop_full_test_runs_xdist_workers` and `test_python_toolchain_pytest_command_runs_xdist_workers` in `test_qc_runner.py`, `test_preflight_pytest_step_runs_xdist_workers` with its class `TestPreflightParallelCommand` in `test_cli_part2_part2.py`, `test_powershell_test_step_runs_invoke_poshqc_parallel_test`, `test_python_branch_pytest_runs_xdist_workers_with_coverage`, and `test_python_branch_pytest_runs_xdist_workers_without_coverage` in `test_fix_all_branches.py`, and `VT-AGGREGATES-PARALLEL-ONLY`, `VT-DEPENDS-ON-RESOLVES`, `VT-DEFAULT-TEST-TASK`, and `VT-SERIAL-TASKS-REMAIN` in `tests/scripts/workflows/VsCodeQualityTasks.Tests.ps1`. Also remove the `## Test Runtime` entry of `test_brief_passages_state_parallel_gate_facts` in `test_execution_environment_brief_contracts.py`, which asserts the `fix_all` wording of the pytest bullet that step 1 reverts.
+6. Run the contract tests: run `test_execution_environment_brief_contracts.py`, `test_single_pass_preflight_contracts.py`, `test_push_down_claude_resource_contracts.py`, and `test_push_down_codex_and_agents_resource_contracts.py`. For the #1096 landing, also run `tests/scripts/dev_tools/atomic_executor/test_qc_runner.py`, `test_prompt_builder.py`, `test_cli_part3.py`, `test_cli_part2_part2.py`, `tests/scripts/dev_tools/test_fix_all_branches.py`, and `tests/scripts/workflows/VsCodeQualityTasks.Tests.ps1`.
 
 ## Revert Signals
 
