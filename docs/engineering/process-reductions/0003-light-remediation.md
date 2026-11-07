@@ -5,9 +5,9 @@
 reduction: 0003
 Date: 2026-11-07
 Issue: #1097
-Merge commit: pending (PR #1104)
+Merge commit: bad886e304990d26af56d6bcabc9d543518492e9
 
-Adds a third remediation path for small review findings. When the review finds at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`, in a review-opened cycle whose prior cycle was not light, the reviewer writes `Remediation-Path: light` and a `## Light Fix Tasks` section, and the orchestrator runs one `atomic-executor` delegation over the inputs file with no `atomic-planner` delegation and no preflight. The checkpoint records `remediation_path: "light"`, and invariant 8 replaces invariant 2 for that cycle in all three validators. Until the pull request exists, the `Merge commit:` line carries the canonical issue number as a stand-in, and the orchestrator replaces it with the pull request number right after PR creation.
+Adds a third remediation path for small review findings. When the review finds at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`, in a review-opened cycle whose prior cycle was not light, the reviewer writes `Remediation-Path: light` and a `## Light Fix Tasks` section, and the orchestrator runs one `atomic-executor` delegation over the inputs file with no `atomic-planner` delegation and no preflight. The checkpoint records `remediation_path: "light"`, and invariant 8 replaces invariant 2 for that cycle in all three validators. The `Merge commit:` line held the canonical issue number as a stand-in until the pull request existed, then the pull request number, and now holds the merge commit.
 
 ## Reason and Evidence
 
