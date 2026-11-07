@@ -5,9 +5,9 @@
 - **Depends on:** #1022 (PowerShell baseline scanner for Python and configuration surfaces) and, transitively, #1020 (contracts, including its D3/D5 amendment)
 - **Authorization:** owner decision D3 (2026-10-30), the language-native analyzer exception recorded in `docs/features/epics/documentation-estate-tooling/epic.md`
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30
-- **Status:** Draft (preparation; planning only)
-- **Version:** 0.2
+- **Last Updated:** 2026-11-07
+- **Status:** Implemented; in review (CI-dependent criteria pending)
+- **Version:** 0.3
 - **Research (primary design source):** `docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/research/research.2026-10-30T22-48.md`
 
 ## Overview
@@ -31,9 +31,9 @@ This feature delivers two parts:
    response, computes every identifier and digest with the shared 1020/1022 PowerShell functions,
    and falls back to the 1022 scanner whenever native analysis is unavailable or invalid.
 
-The 1022 specification and plan on this branch still describe a withdrawn Python design. No design
-is taken from them. Identifiers, element kinds, the digest rule and fixtures are taken from the epic
-and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the branch)`.
+The 1020 contracts and the 1022 scanner are delivered on the integration branch, and this feature
+conforms to them. Identifiers, element kinds, the digest rule and fixtures are those of the
+delivered contracts and scanner; see `## Upstream Dependencies (assumed, not yet on the branch)`.
 
 ## Behavior
 
@@ -210,7 +210,8 @@ and the 1020 contracts; see `## Upstream Dependencies (assumed, not yet on the b
   `architecture-component`.
 - Helper exit codes: 0 response written; 2 request invalid (malformed JSON, unknown key, limit
   exceeded); 3 internal error; 4 interpreter below 3.11. Every non-zero exit writes one protocol
-  error object and is treated by the adapter as `exit-nonzero`.
+  error object. The adapter maps exit 4 to `version-below-floor` and any other non-zero exit to
+  `exit-nonzero`.
 - Entry: `.claude/lib/docs/python/run_docs_python_native.py`, which calls
   `docs_python_native.protocol.main(stdin=..., stdout=...)`. Tests call `main` with `io.BytesIO`
   streams.
@@ -294,6 +295,8 @@ P = existing packaging or configuration file edited in place.
 | `.claude/lib/docs/DocsAnalyzerPythonNative.psm1` and its bundle copy | pushed-down helper/lib (adapter) | PowerShell | R1 |
 | `.claude/lib/docs/DocsPythonNativeProtocol.psm1` and its bundle copy | pushed-down helper/lib | PowerShell | R1 |
 | `.claude/lib/docs/DocsAnalyzerRegistry.psm1` (four native rows under the 1031 anchor) and its bundle copy | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/DocsInventory.psm1` and its bundle copy | pushed-down helper/lib | PowerShell | R1 |
+| `.claude/lib/docs/Invoke-DocsCommand.ps1` and its bundle copy | pushed-down helper/lib | PowerShell | R1 |
 | `extensions/drm-copilot/resources/claude-customizations/pack-manifests/python.json` (edit) | schema/config/data | JSON | D |
 | `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` (edit, adapter only) | schema/config/data | JSON | D |
 | `pyproject.toml` (edit: Pyright `include`/`extraPaths`, pytest `pythonpath`, coverage `source`) | schema/config/data | TOML | D, P |
@@ -303,7 +306,7 @@ P = existing packaging or configuration file edited in place.
 | `tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Allowlist.Helpers.ps1` and `enforcement-hooks-no-python-invocation.Tests.ps1` (edit, provisional OQ-A) | test | PowerShell (Pester) | D, OQ-A |
 | `tests/scripts/claude-lib/docs/python/conftest.py`, `test_docs_python_native_*.py` | test | Python (Pytest) | D3 (Python gates) |
 | `tests/scripts/claude-lib/docs/DocsAnalyzerPythonNative.Tests.ps1` | test | PowerShell (Pester) | D |
-| shared parity fixture (path set by 1022; native-only rows added by this feature) | test data | JSON | D |
+| shared parity fixture: `tests/scripts/claude-lib/docs/fixtures/python-surface-corpus.json` (1022, read unchanged) and `tests/scripts/claude-lib/docs/fixtures/python-native-corpus.json` (native-only rows of this feature) | test data | JSON | D |
 | `docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/**` | documentation | Markdown | D |
 
 The Codex python pack manifest is not edited: the docs lib ships in the Claude bundle only (1020
