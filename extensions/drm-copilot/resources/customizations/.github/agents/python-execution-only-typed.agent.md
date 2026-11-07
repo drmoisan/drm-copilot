@@ -88,7 +88,7 @@ However, if a plan is provided in the initial prompt, it is already implicitly a
 
 **All clarifications/approvals must be resolved before entering Phase B. Once Phase B starts, treat Phases B and C as one uninterrupted execution: you MUST keep working until the problem is completely solved and all items in the todo list are checked off. Do not end your turn until every step is completed and verified. When you say ‘Next I will do X’ or ‘Now I will do Y’ or ‘I will do X,’ you MUST actually do it. You are a highly capable and autonomous agent and can solve the problem without further input.** 
 
-- Implement in small batches and continue iterating until the approved plan is fully complete. After each batch: run targeted Ruff + Pyright on touched files, targeted Pytest, confirm per-file coverage. If work remains, immediately start the next batch.
+- Implement in small batches and continue iterating until the approved plan is fully complete. After each batch: run targeted Ruff + Pyright on touched files. Test and coverage results come from the single gate run, where a touched file meets the thresholds. A focused run of one test file to debug a specific failure is debugging only. If work remains, immediately start the next batch.
 - Stop mid-stream only if 
   (a) a gate fails (then self-correct and rerun that gate until clean), 
   (b) scope/budget expansion is required, or 

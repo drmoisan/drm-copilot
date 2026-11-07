@@ -216,8 +216,8 @@ If a plan is supplied in the initial prompt, it is implicitly approved.
 
 **All clarifications/approvals must be resolved before entering Phase C. Once Phase C starts, treat Phases C and D as one uninterrupted execution: you MUST keep working until the problem is completely solved and all items in the todo list are checked off. Do not end your turn until every step is completed and verified. When you say you will do a step, you MUST actually do it. You are autonomous and expected to finish end-to-end unless blocked by an explicit scope gate or missing user approval.**
 
-- Implement in small batches; after each batch run targeted analyzer/build checks + targeted MSTest tests.
-- Confirm coverage does not regress for touched files.
+- Implement in small batches; after each batch run targeted analyzer/build checks. A focused run of one test file to debug a specific failure is debugging only.
+- A touched file meets the coverage thresholds, read from the single gate run.
 - Continue immediately to next batch until approved plan is complete.
 - Stop mid-stream only if:
   - a quality gate fails (then self-correct and rerun),
