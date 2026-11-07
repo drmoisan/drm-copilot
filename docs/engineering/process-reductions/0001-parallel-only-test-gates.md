@@ -11,6 +11,8 @@ Removes the repeated test runs that each item performed before review. The Peste
 
 The reduction landed across this branch's commits, before the ledger rule reached the branch, so no single commit holds it. This entry's own commit carries the `reduction: 0001` token in its subject.
 
+Rebased over PR #1108 (issue #1106): after `main` merged PR #1108, which renamed the C# test framework to MSTest and the Pester version to Pester v6 and removed another project's example word from the policy-audit instructions, the stored patch sections of the sixteen paths whose reverse check that merge broke were regenerated so that they carry PR #1108's wording; their hunks are unchanged apart from that wording, and every other section is unchanged.
+
 ## Reason and Evidence
 
 The owner decided on 2026-11-06 that tests run in parallel only. The sequential run existed to detect and fix a leak that has since been fixed, and the overhead of multiple and sequential runs was judged unacceptable.
