@@ -30,7 +30,7 @@ An entry is a file named `NNNN-<short-name>.md`, where `NNNN` is the next free f
 
 Each block holds a `Current` fence, with the text as it stands after the reduction, and a `Prior` fence, with the text it replaces. The fence info string is the label. Each fence uses more backticks than any backtick run in its text, so verbatim Markdown stays inside it. `Current` must be non-empty and must occur exactly once in the target file. `Prior` may be empty, because a reduction may add text.
 
-`## Stored Patch` names `patches/NNNN-<short-name>.patch`, a file in the `patches/` folder of this ledger with the same stem as the entry. Write the path in backticks, or end a sentence with at most one period after it.
+`## Stored Patch` names `patches/NNNN-<short-name>.patch`, a file in the `patches/` folder of this ledger with the same stem as the entry. Write the path in backticks, or end a sentence with at most one period after it. The patch check, `git apply -R --check` of the patch, runs on the tree after every later entry that touches the patch's paths is reverted, as `## Revert Order` states, not on the live tree.
 
 `## Revert Steps` names these six labels, in this order:
 
@@ -50,6 +50,18 @@ Three further rules apply:
 - When wording for a reduction lands in a later commit, that commit also updates the reduction's entry, so the entry stays complete.
 - One-off waivers for a single item are not entries.
 - A revert does not depend on `git revert`. The entry alone restores the prior behavior, because the commit may be months old and the surrounding text may have moved.
+
+## Revert Order
+
+Entries are reverted newest-first: the highest-numbered entry first, then each lower number in turn. An entry may be reverted alone only when no later entry names any of its paths. To find the later entries that touch a path, search the `## Files Changed` sections of the higher-numbered entries for that path; every entry lists every path it changed. Revert those entries first, newest-first. An entry's `## Revert Steps` does not list the later entries that depend on it, because this rule derives them at revert time.
+
+A stored patch is read hunk by hunk as a revert block: a hunk's context and `+` lines are its `Current`, and its context and `-` lines are its `Prior`. After the later entries are reverted, run `git apply -R` of the patch. A hunk that does not apply is applied by hand: replace its `Current` lines with its `Prior` lines, at the occurrence nearest the hunk's recorded line.
+
+A byte-identical mirror or bundle copy, and a generated Codex variant, is derived: revert steps 2 and 3 re-create it from its source, so its patch section is not applied by hand. A bundle path under `claude-customizations/`, `codex-and-agents-customizations/`, or `customizations/` maps to the repository path below that folder, a bundle path under `feature-templates/` or `templates/` maps to the same path under `docs/features/templates/`, and a `.agents` or `.github` skill copy maps to the `.claude` skill of the same name. A copy whose text differs from its source is a source in its own right.
+
+An edit inside a recorded region, which is a block's `Current` or a hunk with its context lines, must update that entry's record in the same commit: the block, or the hunk regenerated so that it carries the edit in both images, with the entry's `reduction:` token in the commit subject. A commit that adds a rule inside a ledgered region with no entry of its own therefore breaks the chain; the chain test catches it on CI, and the fix is to rebase the affected hunk in the same change. An edit outside every region needs no record.
+
+`tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1` enforces this order: it reverts every entry newest-first in memory through `scripts/dev-tools/ProcessReductionChain.psm1` and fails when any block or hunk does not apply.
 
 ## Worked Example
 
