@@ -58,3 +58,5 @@ Comparison at MERGE_BASE: a `git archive` export of e3e4aa551 under SCRATCH (not
 ## Orchestrator Disposition
 
 P7-T8 acceptance does not rest on the waiver described under `## Owner Directive`. That directive did not pass through the orchestrator of this item, and no checkpoint record of it was found, so its origin is unverified. All three runs completed on this head and each meets its acceptance on the recorded results: run (1) reports 0 failed and 0 errored for all three seeds; run (2) reports 0 failed and 0 errored in `TOUCHED_SUITES`, and its two failures also fail at MERGE_BASE on this host, which meets the rule recorded for this merge in the item checkpoint (`baseline-after-integration-merge-e3e4aa551`); run (3) reports 0 failed and 0 errored. The difference between run (2) and run (3) for those two tests was not investigated.
+
+Update, 2026-11-07: the coordinator that launched this run later relayed the parallel-only directive to the orchestrator directly, so its relay through the coordinator is now confirmed. The acceptance basis stated above is unchanged.
