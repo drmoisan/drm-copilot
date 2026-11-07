@@ -134,7 +134,7 @@
   - Acceptance: the fixture output shows four TL;DR lines per mode and no velocity, SD, or range line; each real run is recorded with its output or as `NOT RESOLVABLE` with the failing command (the only authorized skip branch); `git status --porcelain` shows no file written by the runs.
 - [x] [P7-T9] Check off the 18 criteria in `FEATURE/spec.md` and `FEATURE/user-story.md` per `acceptance-criteria-tracking`, one at a time against the cited evidence; write `FEATURE/evidence/qa-gates/ac-checkoff.<timestamp>.md` mapping each criterion to its evidence artifact and test names.
   - Acceptance: every checked item has a mapped artifact; an unverified item stays unchecked and is listed.
-- [ ] [P7-T10] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md`, and `feature-audit.yyyy-MM-ddTHH-mm.md` against the branch diff from the merge base of `origin/main` and `HEAD`; write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
+- [x] [P7-T10] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md`, and `feature-audit.yyyy-MM-ddTHH-mm.md` against the branch diff from the merge base of `origin/main` and `HEAD`; write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
   - Acceptance: no FAIL row; a FAIL is fixed, the QA loop re-run from P7-T1, and the self-review rewritten.
 
 ## Pre-Mortem
