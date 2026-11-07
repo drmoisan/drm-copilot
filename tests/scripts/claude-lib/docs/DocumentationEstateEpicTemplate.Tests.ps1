@@ -181,6 +181,17 @@ Describe 'documentation-estate epic template positive controls' {
         @(Get-FindingCode -Finding $findings) | Should -Be @('EPIC_MANIFEST_DUPLICATE_ISSUE_NUM')
     }
 
+    It 'fails with EPIC_MANIFEST_ISSUE_NUM_INVALID for a non-integer issue_num' {
+        # Arrange
+        $text = Get-MutatedTemplateText -Old 'issue_num: 900002' -New 'issue_num: not-a-number'
+
+        # Act
+        $findings = Get-EpicManifestSchemaFinding -Manifest (ConvertFrom-EpicManifestFrontmatter -Text $text)
+
+        # Assert
+        @(Get-FindingCode -Finding $findings) | Should -Be @('EPIC_MANIFEST_ISSUE_NUM_INVALID')
+    }
+
     It 'fails with EPIC_MANIFEST_SELF_EDGE for a self-dependency' {
         # Arrange
         $text = Get-MutatedTemplateText -Old 'depends_on: []' -New 'depends_on: [900001]'

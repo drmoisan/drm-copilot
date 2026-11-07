@@ -1,7 +1,7 @@
 # Consumer Onboarding
 
 This page describes how a repository adopts the documentation-estate tooling. Examples run from a
-PowerShell 7 session at the repository root; `command-reference.md` lists every option.
+PowerShell 7.4 session at the repository root; `command-reference.md` lists every option.
 
 ## Prerequisites
 

@@ -16,9 +16,10 @@
 
 .NOTES
     Issue #1038. Requires PowerShell 7.4 or later. Findings carry the codes EPIC_MANIFEST_UNSUPPORTED,
-    EPIC_MANIFEST_KEY_MISSING, EPIC_MANIFEST_BRANCH_MISMATCH, EPIC_MANIFEST_CREATED_AT_INVALID,
-    EPIC_MANIFEST_INTENT_INVALID, EPIC_MANIFEST_DUPLICATE_ISSUE_NUM, EPIC_MANIFEST_DUPLICATE_FOLDER,
-    EPIC_MANIFEST_UNRESOLVED_DEPENDENCY, EPIC_MANIFEST_SELF_EDGE and EPIC_MANIFEST_CYCLE.
+    EPIC_MANIFEST_KEY_MISSING, EPIC_MANIFEST_ISSUE_NUM_INVALID, EPIC_MANIFEST_BRANCH_MISMATCH,
+    EPIC_MANIFEST_CREATED_AT_INVALID, EPIC_MANIFEST_INTENT_INVALID, EPIC_MANIFEST_DUPLICATE_ISSUE_NUM,
+    EPIC_MANIFEST_DUPLICATE_FOLDER, EPIC_MANIFEST_UNRESOLVED_DEPENDENCY, EPIC_MANIFEST_SELF_EDGE and
+    EPIC_MANIFEST_CYCLE.
 #>
 
 Set-StrictMode -Version Latest
@@ -193,7 +194,7 @@ function Get-EpicManifestSchemaFinding {
             if (-not $feature.Contains($key)) { $findings.Add((ConvertTo-EpicManifestFinding -Code 'EPIC_MANIFEST_KEY_MISSING' -Message "A features entry has no $key.")) }
         }
         if ($feature.Contains('issue_num')) {
-            if ($feature['issue_num'] -cnotmatch '^[1-9][0-9]*$') { $findings.Add((ConvertTo-EpicManifestFinding -Code 'EPIC_MANIFEST_KEY_MISSING' -Message "issue_num $($feature['issue_num']) is not a positive integer.")) }
+            if ($feature['issue_num'] -cnotmatch '^[1-9][0-9]*$') { $findings.Add((ConvertTo-EpicManifestFinding -Code 'EPIC_MANIFEST_ISSUE_NUM_INVALID' -Message "issue_num $($feature['issue_num']) is not a positive integer.")) }
             if (-not $issueNums.Add($feature['issue_num'])) { $findings.Add((ConvertTo-EpicManifestFinding -Code 'EPIC_MANIFEST_DUPLICATE_ISSUE_NUM' -Message "issue_num $($feature['issue_num']) is repeated.")) }
         }
         if ($feature.Contains('feature_folder') -and -not $folders.Add($feature['feature_folder'])) {
