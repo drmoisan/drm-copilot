@@ -49,7 +49,6 @@ For short-path/minor-audit reviews, the reviewer MUST verify all of the followin
 - `${feature-folder}/issue.md` contains an explicit `## Acceptance Criteria` section, and only that section is used for minor-audit acceptance validation.
 - `${feature-folder}/spec.md` does not exist.
 - `${feature-folder}/user-story.md` does not exist.
-- `phase0-instructions-read.md` exists in the canonical baseline location with the required metadata fields.
 - every baseline command-step artifact required by the approved plan exists and includes `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
 - plan checklist state matches artifact evidence on disk; do not accept blanket or inferred checkoffs.
 

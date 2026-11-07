@@ -46,8 +46,8 @@ BeforeDiscovery {
             }
         })
 
-    # Every policy-read surface outside the contract; the Copilot review prompt is held
-    # by the coordinator and is deliberately absent.
+    # Every policy-read surface outside the contract, including the Copilot review prompt,
+    # whose phase0-instructions-read.md bullet the owner ruled outside the baseline hold.
     $surfaceForbidden = @(
         'repo-policy reading', 'phase0-instructions-read', 'captures policy reads',
         'Phase 0 tasks that cover', 'Mandatory Policy & Research', 'Compliance & Context'
@@ -70,6 +70,7 @@ BeforeDiscovery {
         @{ Id = 'HARD-LOCK-CODEX'; Path = '.github/codex/execute-hard-lock.prompt.md'; Forbidden = $surfaceForbidden }
         @{ Id = 'PLAN-TEMPLATE'; Path = 'docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md'; Forbidden = $surfaceForbidden }
         @{ Id = 'ARCHITECTURE-DOC'; Path = 'docs/engineering/claude-code-architecture.md'; Forbidden = $surfaceForbidden + @('Phase 0 policy reads') }
+        @{ Id = 'REVIEW-PROMPT'; Path = '.github/prompts/review-feature.prompt.md'; Forbidden = $surfaceForbidden }
     )
 }
 

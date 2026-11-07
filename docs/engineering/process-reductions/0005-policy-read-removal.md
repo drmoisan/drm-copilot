@@ -13,7 +13,7 @@ Removes the routine Phase 0 policy-read task and its `phase0-instructions-read.m
 
 Research section 3 of `docs/features/active/reduce-feature-cycle-time-with-revertible-ledger-1097/research/research.2026-11-06.md` lists every producer and consumer of the routine policy-read task and its artifact, and records that `policy-compliance-order` governs reading, which agents keep doing, and that removing the check only widens acceptance, so a plan that keeps the task stays valid. The owner's condition is that only the routine read task and its artifact are dropped; the baseline requirements stay, and this entry changes no baseline wording. A coordinator baseline hold is in force while the owner decides how baselines and the coverage reading interact, and this entry presumes neither outcome.
 
-The removal is incomplete on one surface. `.github/prompts/review-feature.prompt.md` and its bundle `extensions/drm-copilot/resources/customizations/.github/prompts/review-feature.prompt.md` are held under the baseline hold and still expect the `phase0-instructions-read.md` artifact, so a Copilot review of a plan without the read task can report that artifact missing until the owner decides. The time saved is unknown until stage timing has data.
+The review prompt `.github/prompts/review-feature.prompt.md` and its bundle `extensions/drm-copilot/resources/customizations/.github/prompts/review-feature.prompt.md` were first held under the baseline hold. The owner ruled on 2026-11-07 that the bullet naming `phase0-instructions-read.md` in the canonical baseline location is outside that hold, so the bullet is removed from both copies and a review of a plan without the read task no longer reports that artifact missing. The time saved is unknown until stage timing has data.
 
 ## Files Changed
 
@@ -40,10 +40,10 @@ The removal is incomplete on one surface. `.github/prompts/review-feature.prompt
 - `docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md`
 - `extensions/drm-copilot/resources/feature-templates/feature/plan.yyyy-MM-ddTHH-mm.md`, a byte-identical bundle copy
 - `docs/engineering/claude-code-architecture.md`, which has no bundle
-- `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`, the `PCW-POLICY-READ-REMOVED` and `PCW-SURFACE` rows
+- `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`, the `PCW-POLICY-READ-REMOVED` and `PCW-SURFACE` rows, including `PCW-SURFACE-REVIEW-PROMPT`
+- `.github/prompts/review-feature.prompt.md`
+- `extensions/drm-copilot/resources/customizations/.github/prompts/review-feature.prompt.md`, a byte-identical bundle copy
 - `docs/engineering/process-reductions/README.md`, the index row of this entry
-
-Not changed, and held: `.github/prompts/review-feature.prompt.md` and its bundle, whose `phase0-instructions-read.md` bullet stays until the owner's decision is relayed.
 
 ## Prior Text
 
@@ -800,10 +800,27 @@ The `atomic-planner` produces a phased plan file at `docs/features/active/<featu
 
 ````
 
+### Revert Block: .github/prompts/review-feature.prompt.md
+
+````Current
+- `${feature-folder}/spec.md` does not exist.
+- `${feature-folder}/user-story.md` does not exist.
+- every baseline command-step artifact required by the approved plan exists and includes `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+
+````
+
+````Prior
+- `${feature-folder}/spec.md` does not exist.
+- `${feature-folder}/user-story.md` does not exist.
+- `phase0-instructions-read.md` exists in the canonical baseline location with the required metadata fields.
+- every baseline command-step artifact required by the approved plan exists and includes `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
+
+````
+
 ## Revert Steps
 
 1. Apply the blocks: replace each `Current` fence with its `Prior` fence in the named file, in the order of this entry. Revert this entry before `0001`: several blocks edit text inside hunks of `patches/0001-parallel-only-test-gates.patch` (the planner agents and their Codex variants, the handoff skill, the Copilot executors, both `execute-hard-lock` prompts, and the feature plan template), so that patch does not reverse-apply to those files while this entry is in place.
-2. Re-copy mirrors and bundles: copy each of these to its bundle path under `extensions/drm-copilot/resources/`: `.claude/hooks/validate-planner-output.ps1`, `.claude/skills/atomic-plan-contract/SKILL.md`, `.claude/agents/atomic-planner.md`, and `.claude/skills/remediation-handoff-atomic-planner/SKILL.md` under `claude-customizations/`; `.agents/skills/atomic-plan-contract/SKILL.md` under `codex-and-agents-customizations/`; `.github/skills/atomic-plan-contract/SKILL.md`, the twelve Copilot agents named under `## Files Changed`, `.github/prompts/execute-hard-lock.prompt.md`, and `.github/codex/execute-hard-lock.prompt.md` under `customizations/`; and `docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md` to `feature-templates/feature/plan.yyyy-MM-ddTHH-mm.md`.
+2. Re-copy mirrors and bundles: copy each of these to its bundle path under `extensions/drm-copilot/resources/`: `.claude/hooks/validate-planner-output.ps1`, `.claude/skills/atomic-plan-contract/SKILL.md`, `.claude/agents/atomic-planner.md`, and `.claude/skills/remediation-handoff-atomic-planner/SKILL.md` under `claude-customizations/`; `.agents/skills/atomic-plan-contract/SKILL.md` under `codex-and-agents-customizations/`; `.github/skills/atomic-plan-contract/SKILL.md`, the twelve Copilot agents named under `## Files Changed`, `.github/prompts/execute-hard-lock.prompt.md`, `.github/codex/execute-hard-lock.prompt.md`, and `.github/prompts/review-feature.prompt.md` under `customizations/`; and `docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md` to `feature-templates/feature/plan.yyyy-MM-ddTHH-mm.md`.
 3. Regenerate Codex variants: applicable, because the base agent `.codex/agents/atomic-planner.toml` changed. Run `scripts/dev_tools/generate_codex_agent_variants.py` in module form to rewrite the variants and their bundle copies, then run it with `--check`.
 4. Restore pinned hashes: not applicable, because no pinned surface moved.
 5. Restore contract-test literals: in `tests/scripts/claude-hooks/validate-planner-output.Tests.ps1`, rename `blocks when Phase 0 baseline tasks are missing` back to `blocks when Phase 0 baseline and policy-read tasks are missing` with its body unchanged, restore `reports an error when Phase 0 mentions baseline but no policy-read wording` in place of `accepts Phase 0 with baseline wording and no policy-read wording`, asserting a `policy-read task` error, and remove `accepts a plan that keeps the policy-read task`; in `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`, remove the `PCW-POLICY-READ-REMOVED` and `PCW-SURFACE` rows and the `PolicyReadSurface` list; and remove `tests/scripts/dev-tools/ProcessReductionLedger.Replay.Tests.ps1` when it is present, because it replays this entry's hook blocks and asserts that the live hook reports no policy-read error.
