@@ -2,7 +2,7 @@
 
 - **Issue:** #1034
 - **Branch:** `feature/docs-enforcement-and-ci-1034-r2`
-- **Status:** Authored for preflight.
+- **Status:** Revised once after preflight; this is the single permitted revision of the cycle.
 - **Inputs:** `docs/features/active/2026-10-30-docs-enforcement-and-ci-1034/remediation-inputs.2026-11-07T02-24.md`, and `### F1 remaining forms` and `### F3 results` of `code-review.2026-11-07T02-24.md` in the same folder.
 - **Scope:** F1 remaining forms, F3, N8 (P2-T5 of `remediation-plan.2026-11-07T01-25.md`), N10 (one discriminating row), and N9 (stated in the residual limits). N1 to N5 stay deferred by the relayed owner directive.
 
@@ -26,8 +26,8 @@
 - `HOOK` is `.claude/hooks/enforce-docs-complete-gate.ps1`, and `HOOK_BUNDLE` is `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate.ps1`.
 - `HELPER` is `.claude/hooks/enforce-docs-complete-gate-target.ps1`, and `HELPER_BUNDLE` is `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate-target.ps1`.
 - `CORE_MANIFEST` is `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`.
-- `HOOK_SUITE` is `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`, and `HELPER_SUITE` is `tests/scripts/claude-hooks/enforce-docs-complete-gate-target.Tests.ps1`.
-- `TOUCHED_SUITES` are `HOOK_SUITE`, `HELPER_SUITE` and `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1`.
+- `HOOK_SUITE` is `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`, `COMPOUND_SUITE` is `tests/scripts/claude-hooks/enforce-docs-complete-gate-compound.Tests.ps1`, and `HELPER_SUITE` is `tests/scripts/claude-hooks/enforce-docs-complete-gate-target.Tests.ps1`.
+- `TOUCHED_SUITES` are `HOOK_SUITE`, `COMPOUND_SUITE`, `HELPER_SUITE` and `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1`.
 - The Pester count source and the baseline-relative rule are those of `FEATURE/plan.2026-10-30T18-40.md` `## Definitions`, with the checkpoint rule that a failure outside `TOUCHED_SUITES` is pre-existing only when the same test fails at `MERGE_BASE` on this host.
 - Each step script that gates a value ends with an exit status that fails when any stated value fails, so the recorded `EXIT_CODE:` carries the acceptance.
 
@@ -48,7 +48,11 @@ Decision on placement: the detection is local to `HELPER`. The shared predicate 
   1. When the command is plain and its first word is `gh`: `Get-CommandLineStructuralWalk` over `Words` for `pr merge`. On `Match`, the command is a candidate unless `Read-DocsCompleteGateMergeOperand` reads it and reports `DisableAutoOnly`. On any other outcome, the result of `Test-EpicMergeGateCommandInScope` stands.
   2. Otherwise `Test-EpicMergeGateCommandInScope` true means candidate.
   3. Otherwise the view decides. Candidate when it holds the whole words `gh`, `pr`, `merge` in that order (case-insensitive, with the word boundaries of `Test-CommandLineWordPresent`), or the whole words `gh`, `api` in that order while `Test-EpicMergeGateApiMutationText` is true for the normalized text with its quotes intact. The second test reads quoted text because a merge endpoint or mutation name is usually quoted.
-- `Read-DocsCompleteGateMergeOperand` (moved from `HOOK`) keeps its closed flag table, drops its redirection branch (redirections never reach it now, and a quoted `'>x'` is an operand), and adds `DisableAutoOnly`: true only when `--disable-auto` was read as a flag and no flag of `$script:EpicMergeGateActionFlags` was, counting cluster letters and skipping flag values. The shared predicate reads raw tokens, so it treats `gh pr merge 12 # --disable-auto` and `gh pr merge 12 --subject --disable-auto` as `--disable-auto`-only; step 1 above closes both.
+- `Read-DocsCompleteGateMergeOperand` (moved from `HOOK`) keeps its closed flag table, drops its redirection branch (redirections never reach it now, and a quoted `'>x'` is an operand), and adds `DisableAutoOnly`. `gh` parses the value of a boolean flag and the last spelling wins, so a `--flag=value` spelling is never read as the bare flag:
+  - `DisableAutoOnly` is true only when the bare word `--disable-auto` was read as a flag, no `--disable-auto=<value>` spelling was read, and no flag of `$script:EpicMergeGateActionFlags` was read in either spelling (`--auto` or `--auto=false`), counting cluster letters and skipping flag values. `gh pr merge 12 --disable-auto=false` and `gh pr merge 12 --disable-auto --disable-auto=false` are therefore merges.
+  - `--merge=<value>` supplies a selector only when the value is not `1` or `0`. `gh` reads those two as booleans, so `gh pr merge --merge=1` merges the current branch and not pull request 1. `--merge=12` stays a selector: `gh` rejects that value and merges nothing, so the lookup cannot misbind a merge.
+  - The other spellings keep their current reading. `--<value flag>=<value>` and `-R=<value>` supply the value. `-s=false` and every other `=` after a standalone short letter are unreadable, so they deny `PR_UNRESOLVED`. `--delete-branch=<value>` and `--help=<value>` do not affect the target. `gh --help=false pr merge 12` is `Unmodeled`, because `Skip-CommandLineOption` treats only the bare `--help` as `Terminal`, so it denies.
+  - The shared predicate reads raw tokens, so it treats `gh pr merge 12 # --disable-auto`, `gh pr merge 12 --subject --disable-auto` and `gh pr merge 12 --disable-auto=false` as `--disable-auto`-only; step 1 above closes all three.
 - `Get-DocsCompleteGateMergeTarget` (moved, rewritten) returns the existing target shape. `Reason` is `$null` only when the command is plain, its first word is exactly `gh`, the walk returns `Match`, the operands are readable, and the merged repository values pass the existing shape and conflict checks. Every other case is `PR_UNRESOLVED` with no `gh` call. The message keeps the clause `does not name one pull request` and tells the caller to run one plain `gh pr merge`.
 
 Removed as unreachable: `Read-DocsCompleteGateApiTarget` and `Test-DocsCompleteGateContextChange`. A `gh api` merge is never a plain `gh pr merge`, and a directory or `GH_REPO` change is never part of a plain command, so with the gate enabled both deny `PR_UNRESOLVED`.
@@ -65,14 +69,17 @@ Residual limits, stated in the `HOOK` header `Residual limits` paragraph and in 
 - An unquoted mention denies while the gate is enabled: `echo gh pr merge 12` and `gh pr view 12 && git merge main` deny `PR_UNRESOLVED`. This false deny is accepted, and it does not occur with the gate disabled or the profile absent.
 - With the gate enabled, a merge in any form other than one plain `gh pr merge` denies `PR_UNRESOLVED` whichever pull request it names, including a `gh api` merge and a compound command on a non-integration pull request.
 - A `GET` on the merge endpoint is treated as a merge.
+- Any `=value` spelling of `--disable-auto`, including `--disable-auto=true`, is treated as a merge.
 - A push after the lookup is not observed unless `--match-head-commit` is passed.
 - A direct `git push` to `main` is outside `gh` scope.
 
 ## Row Groups
 
-`Stand-in` is `Set-TestTargetSeam` unless a row states otherwise. `Group A`, `Group B`, the enabled rows of `Group D`, the enabled rows of the unquoted forms of `Group E`, and `Group U` must fail at head. Every other row of `HOOK_SUITE` must pass at head.
+`Stand-in` is `Set-TestTargetSeam` unless a row states otherwise. `Group A`, `Group B`, the enabled rows of `Group D`, the enabled rows of the unquoted forms of `Group E`, and `Group U` must fail at head. Every other row of `HOOK_SUITE` and `COMPOUND_SUITE` must pass at head.
 
-Group A, new rows in Context `plain form allowlist (F1)`, deny `PR_UNRESOLVED` with zero `gh` calls:
+`HOOK_SUITE` takes Group A, B, C and U, and `COMPOUND_SUITE` takes Group D and E. To keep `HOOK_SUITE` below the 700-line advisory tier, a row whose assertion matches an existing `-ForEach` table joins that table instead of adding an `It`.
+
+Group A, new rows of the existing table 'denies PR_UNRESOLVED with no gh call for <Command>' in Context `merge target binding (F1)`, deny `PR_UNRESOLVED` with zero `gh` calls:
 
 - `gh pr merge 2>&1 12`
 - `gh pr merge --merge 2>&1 epic/x-integration`
@@ -91,24 +98,29 @@ Group A, new rows in Context `plain form allowlist (F1)`, deny `PR_UNRESOLVED` w
 - `read GH_REPO; gh pr merge 12`
 - `export GH_REPO; gh pr merge 12`
 
-Group B, new rows in the same Context, deny `RECEIPT_ABSENT` with exactly one lookup, the one named:
+Group B, new rows of the existing table 'looks up <Lookup> and denies RECEIPT_ABSENT for <Command>' in the same Context, except the two rows under `Set-TestIntegrationCheckoutSeam`, which go in the new Context `integration checkout (F1)`. Each denies `RECEIPT_ABSENT` with exactly one lookup, the one named:
 
 - `gh pr merge 12 #99`, lookup `pr view 12`.
 - `gh pr merge 12 # note; echo done`, lookup `pr view 12`.
 - `gh pr merge 12 # --disable-auto`, lookup `pr view 12`.
 - `gh pr merge 12 --subject --disable-auto`, lookup `pr view 12`.
-- `gh pr merge #99`, bare lookup `pr view`, under the new stand-in `Set-TestIntegrationCheckoutSeam`, where no selector returns the integration pull request and `#99` returns an unrelated one. This is the cycle 1 regression row.
+- `gh pr merge 12 --disable-auto=false`, lookup `pr view 12`.
+- `gh pr merge 12 --disable-auto=true`, lookup `pr view 12`.
+- `gh pr merge 12 --disable-auto --disable-auto=false`, lookup `pr view 12`.
+- `gh pr merge --merge=1 12`, lookup `pr view 12`.
+- `gh pr merge #99`, bare lookup `pr view`, under the new stand-in `Set-TestIntegrationCheckoutSeam`, where no selector returns the integration pull request and `#99` and `1` each return an unrelated one. This is the cycle 1 regression row.
+- `gh pr merge --merge=1`, bare lookup `pr view`, under `Set-TestIntegrationCheckoutSeam`. At head it looks up `pr view 1` and allows.
 
-Group C, new control rows in the same Context, pass at head and after the change:
+Group C, new control rows, pass at head and after the change:
 
-- `gh pr merge 12 >/dev/null 2>&1`, `gh pr merge "12"` and `gh pr merge --subject 'a; b' 12`: lookup `pr view 12`, deny `RECEIPT_ABSENT`.
-- `gh pr merge "#12"`: lookup `pr view #12`, deny `RECEIPT_ABSENT`. `$script:LookupAnswers` gains that key.
-- `gh pr merge --squash 2>&1` and `gh pr merge 12>x`: bare lookup, allow.
-- `gh pr merge --merge` under `Set-TestIntegrationCheckoutSeam`: bare lookup, deny `RECEIPT_ABSENT`.
-- `gh pr merge 12 --disable-auto # note`, `gh pr view feature/merge` and `gh --help pr merge`: allow with zero `gh` calls.
+- `gh pr merge 12 >/dev/null 2>&1`, `gh pr merge "12"`, `gh pr merge --subject 'a; b' 12` and `gh pr merge 12 --disable-auto --auto=false`: lookup `pr view 12`, deny `RECEIPT_ABSENT`, in the table of Group B.
+- `gh pr merge "#12"`: lookup `pr view #12`, deny `RECEIPT_ABSENT`, in the table of Group B. `$script:LookupAnswers` gains that key.
+- `gh pr merge --squash 2>&1` and `gh pr merge 12>x`: bare lookup, allow, in the existing table 'looks up the current branch and allows <Command>' of Context `merge target controls`.
+- `gh pr merge --merge` under `Set-TestIntegrationCheckoutSeam`: bare lookup, deny `RECEIPT_ABSENT`, in Context `integration checkout (F1)`.
+- `gh pr merge 12 --disable-auto # note`, `gh pr view feature/merge` and `gh --help pr merge`: allow with zero `gh` calls, in the existing table 'allows <Command> with no gh call' of Context `merge target controls`.
 - `gh pr merge 12 --unknown x` (N10): deny `PR_UNRESOLVED` with zero `gh` calls, in the existing `denies PR_UNRESOLVED with no gh call for <Command>` row table. Behavior at head is correct, so this row passes at head; P2-T7 proves it discriminates.
 
-Group D, new Context `compound merge scope (F3)`. Each command has an enabled row (deny `PR_UNRESOLVED`, zero `gh` calls) and a disabled row (allow, zero `gh` calls, profile disabled and profile absent):
+Group D, new Context `compound merge scope (F3)` of `COMPOUND_SUITE`. Each command has an enabled row (deny `PR_UNRESOLVED`, zero `gh` calls) and a disabled row (allow, zero `gh` calls, profile disabled and profile absent). In `COMPOUND_SUITE` the enabled stand-in is `Set-TestFileSeam` with an enabled profile and a default `Invoke-DocsOnlyGhExe` mock that exits 1, because every row asserts zero `gh` calls and needs no lookup answers:
 
 - `if gh pr checks 12; then gh pr merge 12 --merge; fi`
 - `for n in 12; do gh pr merge "$n" --merge; done`
@@ -132,7 +144,7 @@ Group D, new Context `compound merge scope (F3)`. Each command has an enabled ro
 - `! gh api graphql -f query='mutation{mergePullRequest(x)}'`
 - `gh api -X PUT repos/{owner}/{repo}/pulls/12/merge`
 
-Group E, new Context `merge mentions`:
+Group E, new Context `merge mentions` of `COMPOUND_SUITE`:
 
 - Quoted, allow with zero `gh` calls with the gate enabled and disabled (pass at head): `git commit -m 'gh pr merge 12'`, `echo "gh pr merge 12"`.
 - Unquoted, deny `PR_UNRESOLVED` with zero `gh` calls enabled (fail at head), allow with zero `gh` calls disabled (pass at head): `echo gh pr merge 12`, `gh pr view 12 && git merge main`.
@@ -173,7 +185,7 @@ Context `merge target binding (F1)`, 'denies PR_UNRESOLVED with no gh call for <
 
 Context `merge target controls`, 11 rows:
 
-- 'looks up number 12 and denies RECEIPT_ABSENT for <Command>', unchanged, 3 rows: `gh pr merge 12 --merge`; `gh pr merge --merge=12`; `gh pr merge 12 --merge 2>&1`.
+- 'looks up number 12 and denies RECEIPT_ABSENT for <Command>', unchanged, 3 rows: `gh pr merge 12 --merge`; `gh pr merge --merge=12` (`12` is not `1` or `0`, so it stays a selector); `gh pr merge 12 --merge 2>&1`.
 - Same `It`, updated, 3 rows of Group U, moved to 'denies PR_UNRESOLVED with no gh call for <Command>': `gh pr merge 12 --merge; echo done`; `gh pr view 12; gh pr merge 12 --merge`; `gh api -X PUT 'repos/{owner}/{repo}/pulls/12/merge'`. Reason: each is not one plain `gh pr merge`.
 - 'looks up the current branch and allows <Command>', unchanged, 2 rows: `gh pr merge --squash`; `gh pr merge --help`.
 - 'allows <Command> with no gh call', unchanged, 2 rows: `gh pr merge 12 --disable-auto` (step 1 of the candidate test); `gh api graphql -f query='query{viewer{login}}'` (plain, not `pr merge`, out of the shared scope).
@@ -213,15 +225,16 @@ Other suites:
 
 ### Phase 1 — Failing Rows
 
-- [ ] [P1-T1] [expect-fail] In `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`, add the rows of `## Row Groups`, move the nine Group U rows as `## Existing Asserting Tests and Dispositions` states, add `Set-TestIntegrationCheckoutSeam`, and add the `$script:LookupAnswers` keys `pr view #12` and the unrelated `pr view #99`.
+- [ ] [P1-T1] [expect-fail] In `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`, add the rows of Group A, Group B and Group C, move the nine Group U rows as `## Existing Asserting Tests and Dispositions` states, add `Set-TestIntegrationCheckoutSeam`, and add the `$script:LookupAnswers` keys `pr view #12`, the unrelated `pr view #99` and the unrelated `pr view 1`; and create `tests/scripts/claude-hooks/enforce-docs-complete-gate-compound.Tests.ps1` with the rows of Group D and Group E.
   - `Set-TestIntegrationCheckoutSeam` follows `Set-TestTargetSeam`, and the disabled rows of Group D and Group E use `Set-TestFileSeam` with a disabled and an absent profile. No row starts a process or writes a file.
-  - Acceptance: the file parses, and the row count equals 111 plus the rows added. P1-T2 records the failing rows.
-- [ ] [P1-T2] [expect-fail] Run branch-current Pester over `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1` and write `FEATURE/evidence/regression-testing/fail-before.<timestamp>.md` with `ExpectedExitCode: 1`.
+  - `COMPOUND_SUITE` dot-sources `HOOK`, and its `BeforeAll` and `AfterAll` follow the first `Describe` of `HOOK_SUITE`, with only `ConvertTo-TestEnvelope`, `Get-TestProfileText`, `Set-TestFileSeam` and the mocks of `Get-DocsCompleteGateRepositoryRoot` and `Invoke-DocsOnlyGhExe`.
+  - Acceptance: both files parse; the row count of `HOOK_SUITE` equals 111 plus the rows of Group A, Group B and Group C; `COMPOUND_SUITE` holds only the rows of Group D and Group E. P1-T2 records the failing rows.
+- [ ] [P1-T2] [expect-fail] Run branch-current Pester over `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1` and `tests/scripts/claude-hooks/enforce-docs-complete-gate-compound.Tests.ps1` and write `FEATURE/evidence/regression-testing/fail-before.<timestamp>.md` with `ExpectedExitCode: 1`.
   - Acceptance: the step script exits 1 only when every row that `## Row Groups` says must fail at head fails and every other row passes, and exits 255 otherwise. The artifact lists each failing row name. A row that passes against head when it is listed to fail is a task failure, because it proves nothing.
 - [ ] [P1-T3] [expect-fail] Run the bash-exact comparison at head under `SCRATCH/bash-exact/` and write `FEATURE/evidence/regression-testing/bash-exact-before.<timestamp>.md` with `ExpectedExitCode: 1`.
   - A stand-in `gh` on `PATH` under `SCRATCH/bash-exact/bin/` prints its arguments, one per line, into a log file under `SCRATCH/bash-exact/`, because a command under test can redirect its standard output. Real bash runs each command in a scratch working directory with standard input from `/dev/null`. A `SCRATCH` driver dot-sources the `HOOK` of a consumer copy of `.claude/hooks` and `.claude/lib` under `SCRATCH/bash-exact/consumer/` that holds an enabled profile and no receipt, because the worktree has no `docs/documentation-estate/docs-profile.json` and a gate with no profile makes no lookup. The driver replaces only `Invoke-DocsOnlyGhExe` with a recorder using the answers of `Set-TestTargetSeam`, and reports the lookup and decision. This is evidence, not a test: nothing under `tests/` uses the stand-in.
   - Command set: the rows of `### F1 remaining forms`, `gh pr merge #99`, and the controls `gh pr merge 12 --merge 2>&1`, `gh pr merge 12 >/dev/null 2>&1`, `gh pr merge --squash 2>&1`, `gh pr merge 12>x`, `gh pr merge "#12"`, `gh pr merge 12 #99`, `gh pr merge --subject 'a b' 12`, `gh --repo o/r pr merge 12`.
-  - A row agrees when the hook looks up the selector and repository that bash passed to `gh`, or denies `PR_UNRESOLVED` with no lookup.
+  - A row agrees when the hook looks up the selector and repository that bash passed to `gh`, or denies `PR_UNRESOLVED` with no lookup. The three no-merge controls of Group C, `gh pr merge 12 --disable-auto # note`, `gh pr view feature/merge` and `gh --help pr merge`, also agree when the hook allows with no lookup: none of them merges a pull request, so no selector exists for a lookup to match. This clause covers those three commands only, none of which is in the set of this task, and any other row that allows with no lookup disagrees.
   - Acceptance: the step script exits 1 only when `gh pr merge 2>&1 12`, `gh pr merge >log 2>&1 12`, `gh pr merge &>log 12`, `gh pr merge >&2 12`, `gh pr merge {12..12}` and `gh pr merge #99` disagree, and exits 255 otherwise. The artifact records, for each command, the arguments bash passed, the lookup, and the decision.
 - [ ] [P1-T4] [expect-fail] Run the F3 table in real hook processes against a consumer copy of `.claude/hooks` and `.claude/lib` under `SCRATCH/consumer/` with an enabled profile and no receipt, and write `FEATURE/evidence/regression-testing/f3-hook-process-before.<timestamp>.md` with `ExpectedExitCode: 1`.
   - Each process receives the envelope on standard input. The command set is the eleven commands of the `### F3 results` table.
@@ -235,15 +248,15 @@ Other suites:
 - [ ] [P2-T2] In `.claude/hooks/enforce-docs-complete-gate.ps1`, add the guarded dot-source of `enforce-docs-complete-gate-target.ps1`, remove the four target functions, make `Invoke-DocsCompleteGateDecision` call `Test-DocsCompleteGateMergeCandidate`, and copy the file byte for byte to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate.ps1`.
   - The dot-source follows the `hook-docs-only-diff.ps1` line, in the same single-statement `try` and `catch` form with `Add-HookDependencyFailure -Name 'enforce-docs-complete-gate-target.ps1'`, so a helper that fails to load denies through `Get-HookDependencyFailureDecision`.
   - Removed: `Read-DocsCompleteGateMergeOperand`, `Read-DocsCompleteGateApiTarget`, `Test-DocsCompleteGateContextChange` and `Get-DocsCompleteGateMergeTarget`. The header decision order (steps 2 and 4) and the `Residual limits` paragraph state the design and the list of `## Design: Fail-Closed Allowlist`, and the comment above the `enforce-epic-merge-gate-command.ps1` import names what the hook and helper still use.
-  - Acceptance: every Context of `HOOK_SUITE` reports zero failures in a branch-current Pester run, so every Group A, B, D, E and U row passes; `@(Get-Content -LiteralPath .claude/hooks/enforce-docs-complete-gate.ps1).Count` is at most 500; the SHA-256 of the two copies is equal.
+  - Acceptance: every Context of `HOOK_SUITE` and `COMPOUND_SUITE` reports zero failures in a branch-current Pester run, so every Group A, B, D, E and U row passes; `@(Get-Content -LiteralPath .claude/hooks/enforce-docs-complete-gate.ps1).Count` is at most 500; the SHA-256 of the two copies is equal.
 - [ ] [P2-T3] Create `tests/scripts/claude-hooks/enforce-docs-complete-gate-target.Tests.ps1`, which dot-sources `HOOK` and tests the helper functions directly with in-memory strings.
   - The new suite is written here and not in Phase 1 because the functions it calls do not exist at head; the decision rows of Phase 1 are the fail-first proof of the behavior.
   - `Read-DocsCompleteGatePlainCommand` rows: plain results for concatenated quoting, a single-quoted body holding `;`, `$` and `&`, a backslash-newline continuation, each redirection form, a redirection followed by a comment, and `#` inside a word; not-plain results for each of `;`, `|`, `&`, `(`, `)`, `{`, `}`, `*`, `?`, `~`, `$`, a backtick, a backslash, an unquoted newline, a double-quoted `$`, a word after a redirection, `>&log`, `<<`, a comment followed by a newline, and an unbalanced quote; the empty result for blank text.
   - `Get-DocsCompleteGateUnquotedView` rows: a quoted span and a heredoc body are blank, and an unquoted merge is present across `2>&1`.
-  - `Test-DocsCompleteGateMergeCandidate` rows: each branch of its three steps. `Read-DocsCompleteGateMergeOperand` rows: `DisableAutoOnly` for `--disable-auto`, `--disable-auto --merge`, `-s --disable-auto`, and a flag value equal to `--disable-auto`. `Get-DocsCompleteGateMergeTarget` rows: selector, repository and pin of a plain form, and `PR_UNRESOLVED` for a first word that is not exactly `gh`.
+  - `Test-DocsCompleteGateMergeCandidate` rows: each branch of its three steps. `Read-DocsCompleteGateMergeOperand` rows: `DisableAutoOnly` for `--disable-auto`, `--disable-auto --merge`, `-s --disable-auto`, a flag value equal to `--disable-auto`, `--disable-auto=false`, `--disable-auto=true`, `--disable-auto --disable-auto=false` and `--disable-auto --auto=false`; `Selector` for `--merge=1`, `--merge=0` and `--merge=12`. `Get-DocsCompleteGateMergeTarget` rows: selector, repository and pin of a plain form, and `PR_UNRESOLVED` for a first word that is not exactly `gh`.
   - `AfterAll` removes the modules that `HOOK_SUITE` removes. No row starts a process or writes a file.
   - Acceptance: the file reports zero failures in a branch-current Pester run, and it stays below 700 lines.
-- [ ] [P2-T4] Run branch-current Pester over `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`, `enforce-docs-complete-gate-target.Tests.ps1`, `hook-dependency-failure.Claude.Tests.ps1`, `hook-dependency-failure.SpecialCases.Tests.ps1`, `PreToolUsePayload.Contract.Tests.ps1`, and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`, `hook-imported-modules-no-stdout.Tests.ps1` and `enforcement-hooks-no-python-invocation.Tests.ps1`, and write `FEATURE/evidence/regression-testing/gate-rows.<timestamp>.md`.
+- [ ] [P2-T4] Run branch-current Pester over `tests/scripts/claude-hooks/enforce-docs-complete-gate.Tests.ps1`, `enforce-docs-complete-gate-compound.Tests.ps1`, `enforce-docs-complete-gate-target.Tests.ps1`, `hook-dependency-failure.Claude.Tests.ps1`, `hook-dependency-failure.SpecialCases.Tests.ps1`, `PreToolUsePayload.Contract.Tests.ps1`, and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`, `hook-imported-modules-no-stdout.Tests.ps1` and `enforcement-hooks-no-python-invocation.Tests.ps1`, and write `FEATURE/evidence/regression-testing/gate-rows.<timestamp>.md`.
   - Acceptance: zero failed and zero errored in the JUnit file; the row 'B1: PreToolUse .claude/hooks/enforce-docs-complete-gate.ps1 blocks naming enforce-docs-complete-gate-target.ps1 when that direct edge fails' is present and passes; the artifact records the passed count of each new Context.
 - [ ] [P2-T5] Re-run the P1-T3 comparison against the corrected hook under `SCRATCH/bash-exact/` and write `FEATURE/evidence/regression-testing/bash-exact-after.<timestamp>.md`.
   - The consumer copy of P1-T3 is refreshed, so it holds the corrected `HOOK` and `HELPER`.
@@ -252,7 +265,7 @@ Other suites:
 - [ ] [P2-T6] Re-run the real hook process table against a fresh consumer copy under `SCRATCH/consumer/` and write `FEATURE/evidence/regression-testing/f3-hook-process-after.<timestamp>.md`.
   - The consumer copy includes `HELPER`. The set is every command of Group D, with the profile enabled, disabled and absent, and the two quoted commands of Group E with the profile enabled.
   - Acceptance: the step script exits 0 only when every Group D command with an enabled profile prints `deny` with `PR_UNRESOLVED` and the clause `does not name one pull request`, which proves no lookup ran, at exit 0; every Group D command with a disabled or absent profile prints `allow` at exit 0; and both quoted commands print `allow` at exit 0. A second case removes `HELPER` from the consumer copy and requires `deny` for `gh pr merge 12 --merge` with text naming `enforce-docs-complete-gate-target.ps1`. Host paths are replaced by the token `SCRATCH`.
-- [ ] [P2-T7] (N10) Apply mutant A17 to a scratch copy of the hook tree and suite under `SCRATCH/mutant/`, and write `FEATURE/evidence/regression-testing/mutant-a17.<timestamp>.md`.
+- [ ] [P2-T7] (N10) Apply mutant A17 to a scratch copy of the hook tree and `HOOK_SUITE` under `SCRATCH/mutant/`, and write `FEATURE/evidence/regression-testing/mutant-a17.<timestamp>.md`.
   - The copy keeps the repository layout, so the suite resolves the copied `HOOK`. A17 removes the check in `Read-DocsCompleteGateMergeOperand` that returns unreadable for a flag outside both tables. An unmutated control run of the same copy runs first. The worktree is not modified.
   - Acceptance: the step script exits 0 only when the control run reports zero failures and the mutant run fails the row for `gh pr merge 12 --unknown x`.
 
@@ -263,20 +276,20 @@ Other suites:
   - Reason-code table: the `RECEIPT_UNREADABLE` row adds a read failure on an existing file, and the `RECEIPT_ABSENT` row is unchanged in meaning.
   - `### Registration and push-down` core-pack bullet, the `## Constraints & Risks` batch-budget and file-size bullets, and the `## Artifact Classification` hook and bundle rows name `HELPER`. The file-size bullet states that target reading moved to a helper at the 500-line limit, which supersedes the wording that cycle 1 P2-T5 proposed.
   - Acceptance: `## Acceptance Criteria` keeps its line position, and `git diff PLAN_HEAD -- FEATURE/spec.md` together with `git status --porcelain -- FEATURE/spec.md` shows no change to any line of that section.
-- [ ] [P3-T2] In `## Artifact Classification` of `FEATURE/plan.2026-10-30T18-40.md`, add rows for `.claude/hooks/enforce-docs-complete-gate-target.ps1`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate-target.ps1` and `tests/scripts/claude-hooks/enforce-docs-complete-gate-target.Tests.ps1`.
-  - The two production rows are inserted after the `Bundle copies of the seven rows above` row, so that count stays correct; class hook and hook mirror, language PowerShell, rule R1, D. The test row follows the `HOOK_SUITE` row; class test, language PowerShell (Pester), rule D.
-  - Acceptance: each of the three paths appears in that section, and no other row changes, shown by `git diff PLAN_HEAD -- FEATURE/plan.2026-10-30T18-40.md` together with `git status --porcelain -- FEATURE/plan.2026-10-30T18-40.md`.
+- [ ] [P3-T2] In `## Artifact Classification` of `FEATURE/plan.2026-10-30T18-40.md`, add rows for `.claude/hooks/enforce-docs-complete-gate-target.ps1`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-docs-complete-gate-target.ps1`, `tests/scripts/claude-hooks/enforce-docs-complete-gate-target.Tests.ps1` and `tests/scripts/claude-hooks/enforce-docs-complete-gate-compound.Tests.ps1`.
+  - The two production rows are inserted after the `Bundle copies of the seven rows above` row, so that count stays correct; class hook and hook mirror, language PowerShell, rule R1, D. The two test rows follow the `HOOK_SUITE` row; class test, language PowerShell (Pester), rule D.
+  - Acceptance: each of the four paths appears in that section, and no other row changes, shown by `git diff PLAN_HEAD -- FEATURE/plan.2026-10-30T18-40.md` together with `git status --porcelain -- FEATURE/plan.2026-10-30T18-40.md`.
 
 ### Phase 4 — Final QA Loop and Self-Review
 
 Any failing step, or any step that changes a file, restarts the loop from P4-T1. The parallel Pester and `pytest -n auto` runs are re-run only after a fix.
 
-- [ ] [P4-T1] Run the PoshQC formatter over `.claude/hooks/enforce-docs-complete-gate.ps1`, `.claude/hooks/enforce-docs-complete-gate-target.ps1`, `HOOK_SUITE` and `HELPER_SUITE`, and write `FEATURE/evidence/qa-gates/format.<timestamp>.md`.
+- [ ] [P4-T1] Run the PoshQC formatter over `.claude/hooks/enforce-docs-complete-gate.ps1`, `.claude/hooks/enforce-docs-complete-gate-target.ps1`, `HOOK_SUITE`, `COMPOUND_SUITE` and `HELPER_SUITE`, and write `FEATURE/evidence/qa-gates/format.<timestamp>.md`.
   - Acceptance: the SHA-256 of each target and the `git status --porcelain` output captured before and after the run are identical, and both comparisons are recorded.
 - [ ] [P4-T2] Run `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the P4-T1 files and write `FEATURE/evidence/qa-gates/pssa.<timestamp>.md`.
   - Acceptance: zero findings for each file, compared against P0-T3.
 - [ ] [P4-T3] Run one `Invoke-PoshQCParallelTest` from `scripts/powershell/PoshQC/PoshQC.psd1` with `-Root` at the worktree root and the default `-WorkerCount`, and write `FEATURE/evidence/regression-testing/pester-parallel.<timestamp>.md`.
-  - Acceptance: the artifact records `ExitCode`, `WorkerCount`, per-shard exit codes and the test counts of `HOOK_SUITE` and `HELPER_SUITE`; every file in `TOUCHED_SUITES` reports 0 failed and 0 errored; the baseline-relative rule holds for any other failure. A merged `artifacts/pester/pester-junit.xml` reporting zero failures is the expected result. When a shard fails and no merged file exists, counts follow the Pester count source definition.
+  - Acceptance: the artifact records `ExitCode`, `WorkerCount`, per-shard exit codes and the test counts of `HOOK_SUITE`, `COMPOUND_SUITE` and `HELPER_SUITE`; every file in `TOUCHED_SUITES` reports 0 failed and 0 errored; the baseline-relative rule holds for any other failure. A merged `artifacts/pester/pester-junit.xml` reporting zero failures is the expected result. When a shard fails and no merged file exists, counts follow the Pester count source definition.
 - [ ] [P4-T4] Read per-file line coverage from the merged `artifacts/pester/powershell-coverage.xml` of P4-T3, without a further run, and write `FEATURE/evidence/qa-gates/coverage-delta.<timestamp>.md`.
   - Acceptance: `.claude/hooks/enforce-docs-complete-gate.ps1` and `.claude/hooks/enforce-docs-complete-gate-target.ps1` each have line coverage of at least 85%, recorded numerically with covered and missed counts; the artifact records the baseline of P0-T4 and the post-change figure of `HOOK`; no line of a function in `HELPER`, and no line changed in `Invoke-DocsCompleteGateDecision`, is uncovered. The script tail of `HOOK` after the dot-source return is outside that last condition, because no in-process suite reaches it. `config/poshqc-coverage.json` shows no change against `MERGE_BASE`. No branch gate applies to Pester.
 - [ ] [P4-T5] Compute SHA-256 for the pairs `HOOK` and `HOOK_BUNDLE`, `HELPER` and `HELPER_BUNDLE`, and `.claude/hooks/enforce-epic-merge-gate-command.ps1` and `.codex/hooks/enforce-epic-merge-gate-command.ps1`, and write `FEATURE/evidence/other/mirror-hashes.<timestamp>.md`.
@@ -288,9 +301,9 @@ Any failing step, or any step that changes a file, restarts the loop from P4-T1.
 - [ ] [P4-T8] Run the Jest test of P0-T8 of `FEATURE/plan.2026-10-30T18-40.md` in `extensions/drm-copilot/` and write `FEATURE/evidence/qa-gates/jest-manifest.<timestamp>.md`.
   - Acceptance: zero failures, with the passed count recorded.
 - [ ] [P4-T9] Write `FEATURE/evidence/qa-gates/scope-check.<timestamp>.md` from `git diff --name-only MERGE_BASE HEAD` and `git diff --name-only CYCLE_BASE HEAD`, together with `git status --porcelain`.
-  - Acceptance: the paths this cycle changed outside `FEATURE/` are exactly `HOOK`, `HOOK_BUNDLE`, `HELPER`, `HELPER_BUNDLE`, `CORE_MANIFEST`, `HOOK_SUITE` and `HELPER_SUITE`; over the whole branch no path ends in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`, no path is under `.github/workflows/` or `.codex/hooks/`, and every path outside `FEATURE/` appears in `## Artifact Classification` of `FEATURE/plan.2026-10-30T18-40.md`.
+  - Acceptance: the paths this cycle changed outside `FEATURE/` are exactly `HOOK`, `HOOK_BUNDLE`, `HELPER`, `HELPER_BUNDLE`, `CORE_MANIFEST`, `HOOK_SUITE`, `COMPOUND_SUITE` and `HELPER_SUITE`; over the whole branch no path ends in `.py`, `.ts`, `.tsx`, `.js`, `.mjs` or `.cjs`, no path is under `.github/workflows/` or `.codex/hooks/`, and every path outside `FEATURE/` appears in `## Artifact Classification` of `FEATURE/plan.2026-10-30T18-40.md`.
 - [ ] [P4-T10] Scan the files changed in this cycle and write `FEATURE/evidence/qa-gates/content-checks.<timestamp>.md`.
-  - Checks: `HOOK_SUITE` and `HELPER_SUITE` contain none of `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`; `@(Get-Content -LiteralPath <path>).Count` is at most 500 for `.claude/hooks/enforce-docs-complete-gate.ps1` and `.claude/hooks/enforce-docs-complete-gate-target.ps1`, and below 700 for both suites; after collapsing whitespace, the `HOOK` header and `FEATURE/spec.md` each contain `earlier Bash call`, `quoted command word` and `unquoted mention`; neither `HOOK` nor `HELPER` defines `Read-DocsCompleteGateApiTarget` or `Test-DocsCompleteGateContextChange`; the bracket-class forbidden-token scan of P7-T10 of `FEATURE/plan.2026-10-30T18-40.md` reports no match over the cycle's files.
+  - Checks: `HOOK_SUITE`, `COMPOUND_SUITE` and `HELPER_SUITE` contain none of `New-TemporaryFile`, `TestDrive`, `GetTempPath`, `GetTempFileName` or `$env:TEMP`; `@(Get-Content -LiteralPath <path>).Count` is at most 500 for `.claude/hooks/enforce-docs-complete-gate.ps1` and `.claude/hooks/enforce-docs-complete-gate-target.ps1`, and below 700 for all three suites; after collapsing whitespace, the `HOOK` header and `FEATURE/spec.md` each contain `earlier Bash call`, `quoted command word` and `unquoted mention`; neither `HOOK` nor `HELPER` defines `Read-DocsCompleteGateApiTarget` or `Test-DocsCompleteGateContextChange`; the bracket-class forbidden-token scan of P7-T10 of `FEATURE/plan.2026-10-30T18-40.md` reports no match over the cycle's files.
   - Acceptance: the step script exits 0 only when every check passes.
 - [ ] [P4-T11] Re-evaluate the criteria at spec:516, story:65 and story:73 of `FEATURE/spec.md` and `FEATURE/user-story.md` against the evidence of this cycle, and write `FEATURE/evidence/other/criteria-reevaluation.<timestamp>.md`.
   - Acceptance: one PASS or FAIL row per criterion names its evidence file, among `fail-before`, `gate-rows`, `bash-exact-after` and `f3-hook-process-after`. Checkboxes are not edited; the next review owns them. A FAIL row returns to the owning Phase 2 task.
@@ -315,9 +328,9 @@ E1 is the first epic criterion, at spec:516 and story:65. U2 is the second story
 ## Pre-Mortem
 
 - Review checklists: P4-T12 walks all three templates against the whole branch diff, and P4-T11 re-evaluates the three criteria the audit held at PARTIAL. The self-review states that a compound or `gh api` merge of a non-integration pull request now denies with the gate enabled, so the reviewer reads story:74 and the criterion at spec:525 against plain forms.
-- Coverage: `HELPER` is new, so every line is changed. `HOOK_SUITE` and `HELPER_SUITE` drive each branch, P4-T4 requires at least 85% for `HOOK` and `HELPER` from the merged coverage XML, and it requires no uncovered line in a `HELPER` function. `HOOK` loses covered lines to the move, so its percentage can fall while staying above the threshold; P4-T4 records the figures. `config/poshqc-coverage.json` already names `.claude/hooks`, so `HELPER` is measured with no configuration change.
+- Coverage: `HELPER` is new, so every line is changed. `HOOK_SUITE`, `COMPOUND_SUITE` and `HELPER_SUITE` drive each branch, P4-T4 requires at least 85% for `HOOK` and `HELPER` from the merged coverage XML, and it requires no uncovered line in a `HELPER` function. `HOOK` loses covered lines to the move, so its percentage can fall while staying above the threshold; P4-T4 records the figures. `config/poshqc-coverage.json` already names `.claude/hooks`, so `HELPER` is measured with no configuration change.
 - Mirror parity: P2-T1 and P2-T2 copy each bundle file in the editing task, and P2-T1 adds the `CORE_MANIFEST` row in the same task, so no mid-plan suite sees a bundle gap. P4-T5 proves SHA-256 identity and that the shared command file is unchanged in both runtimes. P4-T6, P4-T7 and P4-T8 run the contract, Codex generator and Jest manifest checks. The plan changes no fact in the execution-environment brief (no CI job, required context, tool route or batch-budget rule), so no brief-update task is needed.
-- File size: `HOOK` is at the 500-line limit of spec:541. The move removes four functions, leaving an estimated 330 lines, and `HELPER` is estimated at 280. P2-T1 and P2-T2 measure each, and P4-T10 measures both and both suites. New decision rows go to `HOOK_SUITE`, and helper rows go to `HELPER_SUITE`, to keep each below 700.
-- Test isolation: the seeded shuffled Pester run and the fresh single-process run are not performed, because the relayed owner parallel-only directive bars them; P4-T3 runs concurrent shards and P4-T6 runs `pytest -n auto`. The seeded Jest run and the reversed-order Python run are not applicable because no Jest or Python test is new or changed. Rows use Pester mocks scoped to each `It`, and `HELPER_SUITE` removes imported modules in `AfterAll` as `HOOK_SUITE` does.
-- CI-only behavior: both suites run on case-sensitive `ubuntu-latest` in `poshqc / PowerShell hook suites (Linux)`, so rows use exact file-name case, no drive letter and no process. Coverage comes from `poshqc / PowerShell QC` on `windows-latest`. A new file under `tests/scripts` is assigned to a shard automatically. The real-bash and real-process runs are local evidence, not suite rows. spec:544 stays owned by the S9 CI gate.
+- File size: `HOOK` is at the 500-line limit of spec:541. The move removes four functions, leaving an estimated 330 lines, and `HELPER` is estimated at 300. P2-T1 and P2-T2 measure each, and P4-T10 measures both and all three suites. `HOOK_SUITE` is 589 lines at head. With Group D and Group E in `COMPOUND_SUITE` and the Group A, B and C rows joining existing tables, it is estimated at 660 and `COMPOUND_SUITE` at 130; new `It` blocks for those rows would have reached about 720. Helper rows go to `HELPER_SUITE`. P4-T10 keeps every suite below the 700-line advisory tier.
+- Test isolation: the seeded shuffled Pester run and the fresh single-process run are not performed, because the relayed owner parallel-only directive bars them; P4-T3 runs concurrent shards and P4-T6 runs `pytest -n auto`. The seeded Jest run and the reversed-order Python run are not applicable because no Jest or Python test is new or changed. Rows use Pester mocks scoped to each `It`, and `COMPOUND_SUITE` and `HELPER_SUITE` remove imported modules in `AfterAll` as `HOOK_SUITE` does.
+- CI-only behavior: all three suites run on case-sensitive `ubuntu-latest` in `poshqc / PowerShell hook suites (Linux)`, so rows use exact file-name case, no drive letter and no process. Coverage comes from `poshqc / PowerShell QC` on `windows-latest`. A new file under `tests/scripts` is assigned to a shard automatically. The real-bash and real-process runs are local evidence, not suite rows. spec:544 stays owned by the S9 CI gate.
 - Evidence: every artifact is under `FEATURE/evidence/<kind>/` with a write-time stamp and the four required fields. Fail-before evidence is P1-T2, P1-T3 and P1-T4, each with `ExpectedExitCode: 1`. Runs under `SCRATCH` record that token rather than a host path.
