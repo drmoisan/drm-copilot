@@ -135,7 +135,7 @@ Found by searching `tests/` for `ProcessReductionLedger`, `process-reductions`, 
 - [x] [P2-T3] Run one `poetry run pytest -n auto --cov --cov-branch --cov-report=term-missing` with `PYTHONPATH` set to this worktree's `packages/discovery-runtime/src`, and write `FEATURE/evidence/qa-gates/stage-r-python-test.<timestamp>.md`, compared with the greatest `stage-r-python-test-baseline.*.md`.
   - Output Summary: passed and failed counts, total line and branch percentages read from the same sources as [P0-T3], and the comparison.
   - Acceptance: zero failures and no total line or branch drop against the baseline.
-- [ ] [P2-T4] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the diff from the merge base of `origin/main` and `HEAD`, and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
+- [x] [P2-T4] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the diff from the merge base of `origin/main` and `HEAD`, and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
   - Rows include: each entry-editing commit carries its token, including the three [P0-T4] commits for `reduction: 0004`, `reduction: 0005`, and `reduction: 0006`; no Epic #1019 folder or admitted plan is in the diff; no skill, mirror, or brief is in the diff; `## Test Dispositions` holds.
   - Acceptance: no FAIL row; a FAIL is fixed and the loop restarts from [P2-T1].
 
