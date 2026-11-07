@@ -33,9 +33,10 @@ AfterAll {
 }
 
 Describe 'documentation skill references' {
-    It 'reads nine dispatch rows and six defined docs tools' {
+    It 'contains the nine required dispatch rows and six defined docs tools' {
         # Assert
-        $script:Rows.Count | Should -Be 9
+        foreach ($row in 'init', 'validate-profile', 'check', 'inventory', 'coverage', 'update-ledger', 'validate', 'generate-reference', 'surface-delta') { $script:Rows.Keys | Should -Contain $row }
+        $script:Rows.Count | Should -BeGreaterOrEqual 9
         foreach ($tool in $script:Set.McpTools) { $script:Defined | Should -Contain $tool }
     }
 
