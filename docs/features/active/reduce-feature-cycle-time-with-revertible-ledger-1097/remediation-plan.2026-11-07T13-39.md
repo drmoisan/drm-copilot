@@ -65,7 +65,7 @@ Premise corrections, each read against the tree:
 
 ### Phase 2 — Final QA
 
-- [ ] [P2-T1] Run format and lint over the changed files, compare the mirror, replay the ledger, and write `FEATURE/evidence/qa-gates/stage-e-review-format-lint-ledger.<timestamp>.md`.
+- [x] [P2-T1] Run format and lint over the changed files, compare the mirror, replay the ledger, and write `FEATURE/evidence/qa-gates/stage-e-review-format-lint-ledger.<timestamp>.md`.
   - PowerShell: `Invoke-PoshQCFormat` check-only with a no-op `-WriteFile`, then `Invoke-ScriptAnalyzer` directly with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, over `planning-contract-wording.Tests.ps1` and `OrchestratorStateRemediationLoop.Parity.Tests.ps1`. Acceptance: an `Already formatted: ` line and no `Formatted: ` line per file, and findings number zero.
   - Python and TypeScript: Black check, Ruff check without fixing, and Pyright on `test_orchestrator_state_remediation_loop_parity.py`; Prettier check, ESLint, and `tsc` with the test project on `orchestrator-state-remediation-loop-parity.test.ts`. Acceptance: Black reports the file unchanged and every other exit is 0.
   - Mirror: one `git hash-object` value for the prompt and its bundle.
