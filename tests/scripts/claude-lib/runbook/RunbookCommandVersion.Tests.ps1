@@ -338,3 +338,158 @@ Describe 'Get-RunbookCommandVersionFinding markers (AC 3)' {
         $finding.Count | Should -Be 0
     }
 }
+
+Describe 'Get-RunbookCountedBlock continuation joining (RI-1)' {
+    BeforeAll {
+        $script:Pinned = @{ nuitka = '4.3.4'; black = '24.1.0' }
+        $script:NuitkaMarker = 'Version check: verified against nuitka 4.3.4'
+    }
+
+    It 'passes a multi-line nuitka command joined by backslash continuations when the nuitka marker is present' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('python -m nuitka \', '  --standalone \', '  main.py') -AfterFence @($script:NuitkaMarker)
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 0
+    }
+
+    It 'reports exactly one nuitka finding for the same block without a marker and names no option or file as a tool' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('python -m nuitka \', '  --standalone \', '  main.py')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 1
+        $finding[0] | Should -BeLike '*tool nuitka *'
+        ($finding -join "`n") | Should -Not -BeLike '*-standalone*'
+        ($finding -join "`n") | Should -Not -BeLike '*main-py*'
+    }
+
+    It 'joins lines that end in <Name> the same way' -ForEach @(
+        @{ Name = 'a backtick'; Mark = '`' }
+        @{ Name = 'a caret'; Mark = '^' }
+    ) {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @("python -m nuitka $Mark", "  --standalone $Mark", '  main.py') -AfterFence @($script:NuitkaMarker)
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 0
+    }
+
+    It 'joins nothing and does not throw when the final line ends in a continuation' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('black --check . \') -AfterFence @('Version check: verified against black 24.1.0')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 0
+    }
+}
+
+Describe 'Get-RunbookCommandToolName segments (RI-2)' {
+    BeforeAll {
+        $script:Pinned = @{ nuitka = '4.3.4'; black = '24.1.0' }
+    }
+
+    It 'passes a cd-prefixed chained command when the nuitka marker is present' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('cd x && python -m nuitka --clean-cache=all') -AfterFence @('Version check: verified against nuitka 4.3.4')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 0
+    }
+
+    It 'reports the nuitka finding for the cd-prefixed chained command without a marker' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('cd x && python -m nuitka --clean-cache=all')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 1
+        $finding[0] | Should -BeLike '*tool nuitka *'
+    }
+
+    It 'skips leading assignments in <Command>' -ForEach @(
+        @{ Command = 'FOO=1 python -m nuitka main.py'; Expected = 'nuitka' }
+        @{ Command = 'A=1 B=2 black --check .'; Expected = 'black' }
+    ) {
+        # Arrange / Act
+        $tool = @(Get-RunbookCommandToolName -CommandLine $Command)
+
+        # Assert
+        $tool.Count | Should -Be 1
+        $tool[0] | Should -Be $Expected
+    }
+
+    It 'names no tool for the builtin segment <Command>' -ForEach @(
+        @{ Command = 'cd x' }
+        @{ Command = 'pushd x' }
+        @{ Command = 'popd' }
+        @{ Command = 'export A=1' }
+        @{ Command = 'set A=1' }
+        @{ Command = 'source env.sh' }
+        @{ Command = '. env.sh' }
+        @{ Command = 'echo hi' }
+        @{ Command = '$env:A = ''b''' }
+    ) {
+        # Arrange / Act
+        $tool = @(Get-RunbookCommandToolName -CommandLine $Command)
+
+        # Assert
+        $tool.Count | Should -Be 0
+    }
+
+    It 'names both tools for the separator <Separator>' -ForEach @(
+        @{ Separator = ';'; Command = 'black --check . ; nuitka x' }
+        @{ Separator = '||'; Command = 'black --check . || nuitka x' }
+        @{ Separator = '|'; Command = 'black --check . | nuitka x' }
+        @{ Separator = '&&'; Command = 'black --check . && nuitka x' }
+    ) {
+        # Arrange / Act
+        $tool = @(Get-RunbookCommandToolName -CommandLine $Command)
+
+        # Assert
+        $tool.Count | Should -Be 2
+        $tool[0] | Should -Be 'black'
+        $tool[1] | Should -Be 'nuitka'
+    }
+
+    It 'requires markers for both tools of a piped command' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('black --check . | tee out') -AfterFence @('Version check: verified against black 24.1.0')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 1
+        $finding[0] | Should -BeLike '*tool tee *'
+    }
+
+    It 'does not split on a separator inside double or single quotes' {
+        # Arrange / Act
+        $double = @(Get-RunbookCommandToolName -CommandLine 'python -c "x; y"')
+        $single = @(Get-RunbookCommandToolName -CommandLine "python -c 'x && y'")
+
+        # Assert
+        $double.Count | Should -Be 1
+        $double[0] | Should -Be 'python'
+        $single.Count | Should -Be 1
+        $single[0] | Should -Be 'python'
+    }
+}
