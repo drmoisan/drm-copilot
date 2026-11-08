@@ -74,7 +74,7 @@ Found by searching `tests/` for `PINNED_FROZEN_SURFACE_HASHES`, `0010-early-depe
     - `git grep -n -e "^<<<<<<< " -e "^>>>>>>> "` over the seven conflicted paths returns no match (tracked merge-conflict fixtures elsewhere in the tree hold such lines by design).
     - For each conflicted source file, every line that the diff from the merge base of the first parent and `origin/main` to `origin/main` adds, and every `+` line of the 0010 patch section for that path except the two stage I digest lines of the pin file (main's digest values are taken until [P2-T3]), is present in the merged file (script under `SCRATCH`, counts recorded).
     - `git log -1` shows two parents; no rebase or forced push; the push succeeds.
-- [ ] [P1-T2] Verify mirror byte-identity and write `FEATURE/evidence/other/stage-i-cycle1-mirrors.<timestamp>.md`.
+- [x] [P1-T2] Verify mirror byte-identity and write `FEATURE/evidence/other/stage-i-cycle1-mirrors.<timestamp>.md`.
   - Pairs: each source in 0010 `## Files Changed` with its bundle copy under `extensions/drm-copilot/resources/`, the two `epic-wave-barrier-early-start.ps1` twins, and each file main added or changed under `.claude/`, `.codex/`, or `.agents/` with its bundle copy (from the merge-base diff to `origin/main`).
   - Acceptance: equal SHA-256 for every pair; a mismatch is re-copied from the source and committed, and the artifact lists it.
 
