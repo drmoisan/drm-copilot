@@ -37,14 +37,34 @@ CODEX_MANIFEST = (
 CLAUDE_SURFACES = (
     ".claude/skills/epic-plan/SKILL.md",
     ".claude/skills/epic-orchestrate/SKILL.md",
+    ".claude/skills/epic-run/SKILL.md",
+    ".claude/skills/epic-progress-report/SKILL.md",
+    ".claude/skills/review-epic/SKILL.md",
     ".claude/agents/epic-orchestrator.md",
     ".claude/agents/epic-planner.md",
+    ".claude/agents/epic-review.md",
 )
 CODEX_SURFACES = (
     ".agents/skills/epic-plan/SKILL.md",
     ".agents/skills/epic-orchestrate/SKILL.md",
+    ".agents/skills/epic-run/SKILL.md",
+    ".agents/skills/review-epic/SKILL.md",
     ".codex/agents/epic-orchestrator.toml",
     ".codex/agents/epic-planner.toml",
+    ".codex/agents/epic-review.toml",
+)
+
+# Repository-relative glob patterns that enumerate every epic surface present in the
+# tree for each runtime; the surface constants above must equal their expansion.
+CLAUDE_SURFACE_GLOBS = (
+    ".claude/skills/epic-*/SKILL.md",
+    ".claude/skills/review-epic/SKILL.md",
+    ".claude/agents/epic-*.md",
+)
+CODEX_SURFACE_GLOBS = (
+    ".agents/skills/epic-*/SKILL.md",
+    ".agents/skills/review-epic/SKILL.md",
+    ".codex/agents/epic-*.toml",
 )
 
 # Cited paths that are deliberately not shipped, each with the reason that names
@@ -216,6 +236,37 @@ def test_every_epic_surface_citation_is_shipped() -> None:
     )
 
     assert unshipped == [], f"Epic surfaces cite unshipped scripts: {unshipped}"
+
+
+def _glob_surfaces(patterns: Sequence[str]) -> set[str]:
+    """Expand repository-relative glob patterns against the committed tree.
+
+    Args:
+        patterns (Sequence[str]): Repository-relative glob patterns.
+
+    Returns:
+        set[str]: Matching repository-relative POSIX paths.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Reads directory listings from the repository tree.
+    """
+
+    # Expand each pattern and keep the POSIX relative form the constants use.
+    return {
+        path.relative_to(REPO_ROOT).as_posix()
+        for pattern in patterns
+        for path in REPO_ROOT.glob(pattern)
+    }
+
+
+def test_epic_surface_sets_cover_every_epic_surface_in_tree() -> None:
+    """Fail when an epic skill or agent exists that a surface set does not scan."""
+
+    assert _glob_surfaces(CLAUDE_SURFACE_GLOBS) == set(CLAUDE_SURFACES)
+    assert _glob_surfaces(CODEX_SURFACE_GLOBS) == set(CODEX_SURFACES)
 
 
 def test_allowlist_reasons_name_the_mcp_route() -> None:
