@@ -124,7 +124,7 @@ Found by searching `tests/` for `PINNED_FROZEN_SURFACE_HASHES`, `0010-early-depe
 
 ### Phase 5 — Final QA
 
-- [ ] [P5-T1] PowerShell static: PoshQC format in check mode and the direct analyzer with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over every `.ps1`/`.psm1` in 0010 `## Files Changed` and any Phase 2 fix; write `FEATURE/evidence/qa-gates/stage-i-cycle1-powershell-static.<timestamp>.md`.
+- [x] [P5-T1] PowerShell static: PoshQC format in check mode and the direct analyzer with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over every `.ps1`/`.psm1` in 0010 `## Files Changed` and any Phase 2 fix; write `FEATURE/evidence/qa-gates/stage-i-cycle1-powershell-static.<timestamp>.md`.
   - Acceptance: `Already formatted:` for every file and no `Formatted:` line (files needing format: 0), `git status --porcelain` over those files empty afterwards, 0 analyzer findings, compared with the stage I static baseline.
 - [ ] [P5-T2] Python static: Black in check mode, Ruff, and Pyright over the Python files in 0010 `## Files Changed` and any Phase 2 fix; write `FEATURE/evidence/qa-gates/stage-i-cycle1-python-static.<timestamp>.md`.
   - Acceptance: Black reports `would be left unchanged`, Ruff and Pyright 0 findings, compared with the stage I static baseline.
