@@ -108,6 +108,9 @@ function Get-EpicProgressTldrLine {
         '#<i> is not done yet.') and no 'No feature is running.' sentence is printed. An epic
         with one feature says 'The only feature is done.' or 'The only feature is not done
         yet.'; an epic with more features counts them. A blocked count of one is singular.
+        On the Now line an in-progress step with a recorded start prints its elapsed time
+        against its median; a step without a recorded start (StartRecorded false) prints
+        '(start not recorded; median <m>)' instead of an elapsed figure.
     .PARAMETER Summary
         The record from Get-EpicProgressSummary.
     #>
@@ -147,9 +150,14 @@ function Get-EpicProgressTldrLine {
     $now = 'no step is in progress'
     if ($estimate.InProgress.Count -gt 0) {
         $now = (@($estimate.InProgress | ForEach-Object {
-                    $over = ''
-                    if ($_.OverMedian) { $over = ', over median' }
-                    "#$($_.Issue) $($_.Type) ($(Format-EpicProgressHour -Hours ($_.ElapsedSeconds / 3600.0)) of median $(Format-EpicProgressHour -Hours ($_.MedianSeconds / 3600.0))$over)"
+                    $median = Format-EpicProgressHour -Hours ($_.MedianSeconds / 3600.0)
+                    if ($_.StartRecorded -eq $false) {
+                        "#$($_.Issue) $($_.Type) (start not recorded; median $median)"
+                    } else {
+                        $over = ''
+                        if ($_.OverMedian) { $over = ', over median' }
+                        "#$($_.Issue) $($_.Type) ($(Format-EpicProgressHour -Hours ($_.ElapsedSeconds / 3600.0)) of median $median$over)"
+                    }
                 }) -join ', ')
     }
 

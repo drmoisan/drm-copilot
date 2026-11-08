@@ -35,8 +35,8 @@ function ConvertTo-EpicProgressStepType {
         'remediation' or 'remediation_cycle_2') is a composite remediation stage and maps to
         'composite'; a catalog type name maps to itself. The live stage names map through
         aliases: 'feature_review' and 'S7_feature_review' to 'review'; 'atomic_execution' and
-        'S5_atomic_execution' to 'execution'; 'S2_research' to 'research'; 'S3_spec' to
-        'spec'; 'S4_atomic_planning' to 'plan'; 'S4_preflight' to 'preflight'; 'S8_create_pr'
+        'S5_atomic_execution' to 'execution'; 'S2_research' to 'research'; 'S3_spec' and
+        'S2_feature_documents' to 'spec'; 'S4_atomic_planning' to 'plan'; 'S4_preflight' to 'preflight'; 'S8_create_pr'
         to 'pr'; and 'S9_ci_gate' and 'S9_ci_green' to 'ci'. Any other name (for example
         'promotion') maps to 'unmapped'. The comparison ignores case and surrounding blanks.
     .PARAMETER StageName
@@ -49,7 +49,7 @@ function ConvertTo-EpicProgressStepType {
     $aliases = @{
         feature_review = 'review'; s7_feature_review = 'review'; atomic_execution = 'execution'; s5_atomic_execution = 'execution'
         s2_research = 'research'; s3_spec = 'spec'; s4_atomic_planning = 'plan'; s4_preflight = 'preflight'
-        s8_create_pr = 'pr'; s9_ci_gate = 'ci'; s9_ci_green = 'ci'
+        s8_create_pr = 'pr'; s9_ci_gate = 'ci'; s9_ci_green = 'ci'; s2_feature_documents = 'spec'
     }
     $name = $StageName.Trim().ToLowerInvariant()
     if ($aliases.ContainsKey($name)) { return $aliases[$name] }
