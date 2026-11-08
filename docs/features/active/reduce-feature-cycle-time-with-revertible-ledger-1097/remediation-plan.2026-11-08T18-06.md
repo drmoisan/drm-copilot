@@ -96,7 +96,7 @@ Found by searching `tests/` for `PINNED_FROZEN_SURFACE_HASHES`, `0010-early-depe
 
 ### Phase 3 — Ledger Entry 0010
 
-- [ ] [P3-T1] Build the pre-0010 merged tree of `### Design Decision` in a scratch index and write `FEATURE/evidence/other/stage-i-cycle1-pre0010.<timestamp>.md`.
+- [x] [P3-T1] Build the pre-0010 merged tree of `### Design Decision` in a scratch index and write `FEATURE/evidence/other/stage-i-cycle1-pre0010.<timestamp>.md`.
   - Resolve each `git merge-file` conflict as `### Design Decision` states: record that the path's 0010 pre-image blob equals its merge-base blob and take its `origin/main` blob; a conflicted path whose pre-image differs from its merge-base blob is returned as a finding.
   - Acceptance: the tree id is recorded; for each path, every line `origin/main` added since the merge base of the first parent and `origin/main` is present in the pre-0010 text; the pin values equal the SHA-256 of the pre-0010 surfaces; created paths are absent.
 - [ ] [P3-T2] Regenerate `docs/engineering/process-reductions/patches/0010-early-dependent-starts.patch` as `git diff --binary --no-renames <pre-0010 tree> HEAD` over the paths of 0010 `## Files Changed` other than the ledger folder, and update `docs/engineering/process-reductions/0010-early-dependent-starts.md`, in one commit whose subject carries `reduction: 0010`.
