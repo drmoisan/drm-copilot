@@ -298,6 +298,8 @@ Spawn parameters, passed on the `Agent` call and never written into the prompt t
 `isolation: "worktree"`, `run_in_background: true`, branch base `origin/main`, and `model` equal to
 that item's model routing receipt's resolved model.
 
+A recorded `Owner directives:` block is not a kickoff element: the parallel orchestrator passes it verbatim, in a later course-correction message, to each child whose item matches an entry's scope, and never authors or edits entries (pass-through rule of the `owner-directives` skill).
+
 **Band and receipt source.** The parent reads each item's `complexity_band` and
 `model_routing_receipt` from the planner checkpoint `artifacts/orchestration/parallel-planner-state.json`.
 When the planner checkpoint is unavailable, the committed kickoff artifact's `## Item Summary`
