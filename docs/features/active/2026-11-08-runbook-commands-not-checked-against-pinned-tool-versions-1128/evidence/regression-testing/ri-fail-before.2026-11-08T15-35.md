@@ -1,6 +1,6 @@
 # RI-1 / RI-2 fail-before (P1-T2)
 
-Timestamp: 2026-11-08T15-40
+Timestamp: 2026-11-08T15-35
 Command: Invoke-Pester -Path tests/scripts/claude-lib/runbook/RunbookCommandVersion.Tests.ps1 -PassThru (debugging run, not a gate; sh launcher SCRATCH/focused.sh exits with FailedCount plus FailedContainersCount)
 EXIT_CODE: 22
 ExpectedExitCode: 22

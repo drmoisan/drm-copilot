@@ -9,8 +9,11 @@
     no siblings today, so the sentence records the convention for later additions.
 
     Counted fences are fenced code blocks whose info string is empty or one of sh, bash, shell,
-    console, powershell, pwsh, ps1, cmd, bat. Other info strings are exempt. Each non-blank,
-    non-comment line of a counted fence is a command. Immediately after the closing fence the
+    console, powershell, pwsh, ps1, cmd, bat. Other info strings are exempt. A line ending in a
+    backslash, a backtick or a caret joins the next line, and each non-blank, non-comment logical
+    line of a counted fence is a command. A command is split into segments on &&, ||, ; and | outside
+    quotes, leading NAME=value assignments are skipped, and a segment that starts with cd, pushd, popd,
+    export, set, source, '.', echo or $env: names no tool. Immediately after the closing fence the
     runbook carries one 'Version check:' line per distinct tool of the block:
         Version check: verified against <tool> <version>
         Version check: not verified against <tool> <version>
@@ -84,25 +87,66 @@ function Get-RunbookPinnedToolVersion {
     return $pinned
 }
 
-function Get-RunbookCommandToolName {
+function Split-RunbookCommandSegment {
     <#
     .SYNOPSIS
-        Derives the normalized tool name from one command line, or $null when none is found.
-    .DESCRIPTION
-        The first token names the tool, except that 'python -m X', 'python3 -m X', 'py -m X',
-        'poetry run X', 'uv run X' and 'npx X' name X. A launcher that wraps another command
-        ('poetry run python -m X') resolves the wrapped command.
+        Splits one logical command on '&&', '||', ';' and '|' that sit outside single or double quotes.
     .PARAMETER CommandLine
-        One command line from a runbook shell block.
+        One logical command from a runbook shell block.
     #>
     [CmdletBinding()]
     [OutputType([string])]
     param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $CommandLine)
 
-    $text = [regex]::Replace($CommandLine.Trim(), '^\$\s+', '')
-    if ([string]::IsNullOrWhiteSpace($text)) { return $null }
+    $segment = [System.Collections.Generic.List[string]]::new()
+    $current = [System.Text.StringBuilder]::new()
+    $quote = [char]0
+    $index = 0
+    while ($index -lt $CommandLine.Length) {
+        $char = $CommandLine[$index]
+        $isPair = $index + 1 -lt $CommandLine.Length -and $CommandLine[$index + 1] -eq $char
+        if ($quote -ne [char]0) {
+            if ($char -eq $quote) { $quote = [char]0 }
+            [void]$current.Append($char)
+        } elseif ($char -eq [char]39 -or $char -eq [char]34) {
+            $quote = $char
+            [void]$current.Append($char)
+        } elseif (($char -eq '&' -or $char -eq '|') -and $isPair) {
+            $segment.Add($current.ToString())
+            [void]$current.Clear()
+            $index++
+        } elseif ($char -eq '|' -or $char -eq ';') {
+            $segment.Add($current.ToString())
+            [void]$current.Clear()
+        } else {
+            [void]$current.Append($char)
+        }
+        $index++
+    }
+    $segment.Add($current.ToString())
+    return $segment.ToArray()
+}
+
+function Get-RunbookSegmentToolName {
+    <#
+    .SYNOPSIS
+        Derives the normalized tool name from one command segment; emits nothing when the segment names no tool.
+    .PARAMETER Segment
+        One segment of a runbook command, free of command separators.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $Segment)
+
+    $text = [regex]::Replace($Segment.Trim(), '^\$\s+', '')
+    while ($text -match '^[A-Za-z_][A-Za-z0-9_]*=\S*(\s+|$)') {
+        $text = $text.Substring($Matches[0].Length)
+    }
+    if ([string]::IsNullOrWhiteSpace($text)) { return }
     $token = @($text -split '\s+')
     $first = [regex]::Replace($token[0], '\.exe$', '', 'IgnoreCase')
+    $shellBuiltin = @('cd', 'pushd', 'popd', 'export', 'set', 'source', '.', 'echo')
+    if ($shellBuiltin -contains $first.ToLowerInvariant() -or $first.StartsWith('$env:', [System.StringComparison]::OrdinalIgnoreCase)) { return }
     # The array subexpression keeps a one-element result an array under strict mode.
     $rest = @(if ($token.Count -gt 1) { $token[1..($token.Count - 1)] })
 
@@ -110,22 +154,46 @@ function Get-RunbookCommandToolName {
         return ConvertTo-RunbookNormalizedToolName -Name $rest[1]
     }
     if (($first -eq 'poetry' -or $first -eq 'uv') -and $rest.Count -ge 2 -and $rest[0] -eq 'run') {
-        return Get-RunbookCommandToolName -CommandLine ($rest[1..($rest.Count - 1)] -join ' ')
+        return Get-RunbookSegmentToolName -Segment ($rest[1..($rest.Count - 1)] -join ' ')
     }
     if ($first -eq 'npx') {
         $operand = @($rest | Where-Object { -not $_.StartsWith('-') })
-        if ($operand.Count -eq 0) { return $null }
+        if ($operand.Count -eq 0) { return }
         $name = [regex]::Replace($operand[0], '^(@?[^@]+)@.+$', '$1')
         return ConvertTo-RunbookNormalizedToolName -Name $name
     }
     return ConvertTo-RunbookNormalizedToolName -Name $first
 }
 
+function Get-RunbookCommandToolName {
+    <#
+    .SYNOPSIS
+        Derives the normalized tool names from one logical command; emits nothing when no tool is found.
+    .DESCRIPTION
+        The command is split into segments on '&&', '||', ';' and '|' outside quotes, and each segment
+        yields at most one name. Leading NAME=value assignments are skipped. A segment whose first token is
+        cd, pushd, popd, export, set, source, '.', echo or starts with '$env:' names no tool. Otherwise the
+        first token names the tool, except that 'python -m X', 'python3 -m X', 'py -m X', 'poetry run X',
+        'uv run X' and 'npx X' name X. A launcher that wraps another command ('poetry run python -m X')
+        resolves the wrapped command. A single-segment command yields at most one name.
+    .PARAMETER CommandLine
+        One logical command from a runbook shell block.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $CommandLine)
+
+    foreach ($segment in @(Split-RunbookCommandSegment -CommandLine $CommandLine)) {
+        Get-RunbookSegmentToolName -Segment $segment
+    }
+}
+
 function Get-RunbookCountedBlock {
     <#
     .SYNOPSIS
-        Returns one object per counted fenced block: Command (its lines) and Marker (the consecutive
-        'Version check:' lines that immediately follow the closing fence).
+        Returns one object per counted fenced block: Command (its logical lines, where a physical line
+        ending in a backslash, a backtick or a caret is joined to the next line) and Marker (the
+        consecutive 'Version check:' lines that immediately follow the closing fence).
     .PARAMETER RunbookText
         The runbook text.
     #>
@@ -144,10 +212,20 @@ function Get-RunbookCountedBlock {
         $command = [System.Collections.Generic.List[string]]::new()
         $cursor = $index + 1
         $closePattern = '^\s*' + [regex]::Escape([string]$fence[0]) + '{' + $fence.Length + ',}\s*$'
+        $pending = $null
         while ($cursor -lt $line.Count -and $line[$cursor] -notmatch $closePattern) {
-            $command.Add($line[$cursor])
+            $joined = if ($null -ne $pending) { $pending + ' ' + $line[$cursor].Trim() } else { $line[$cursor] }
+            if ($null -eq $pending -and $joined.TrimStart().StartsWith('#')) {
+                $command.Add($joined)
+            } elseif ($joined -match '[\\`^]\s*$') {
+                $pending = $joined.TrimEnd().Substring(0, $joined.TrimEnd().Length - 1).TrimEnd()
+            } else {
+                $command.Add($joined)
+                $pending = $null
+            }
             $cursor++
         }
+        if ($null -ne $pending) { $command.Add($pending) }
         $marker = [System.Collections.Generic.List[string]]::new()
         $after = $cursor + 1
         while ($after -lt $line.Count -and $line[$after].TrimStart().StartsWith('Version check:')) {
@@ -166,7 +244,8 @@ function Get-RunbookCommandVersionFinding {
     .SYNOPSIS
         Reports version-marking findings for a runbook against a pinned-version map.
     .DESCRIPTION
-        Finding classes: a tool with no marker line; a marker naming a version other than the pinned
+        Every tool name that Get-RunbookCommandToolName returns for a logical command, one per
+        command segment, is a tool of the block. Finding classes: a tool with no marker line; a marker naming a version other than the pinned
         version; a 'not pinned' marker for a pinned tool; a malformed 'Version check:' line.
     .PARAMETER RunbookText
         The runbook text.
@@ -188,8 +267,9 @@ function Get-RunbookCommandVersionFinding {
         foreach ($commandLine in $block.Command) {
             $trimmed = $commandLine.Trim()
             if ($trimmed.Length -eq 0 -or $trimmed.StartsWith('#')) { continue }
-            $name = Get-RunbookCommandToolName -CommandLine $trimmed
-            if ($null -ne $name -and -not $tool.Contains($name)) { $tool.Add($name) }
+            foreach ($name in @(Get-RunbookCommandToolName -CommandLine $trimmed)) {
+                if (-not $tool.Contains($name)) { $tool.Add($name) }
+            }
         }
         $marker = @{}
         foreach ($markerLine in $block.Marker) {
