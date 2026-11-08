@@ -50,6 +50,7 @@ Describe 'enforce-epic-merge-gate epic-child CI verification (issue #1130)' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-merge-gate.ps1").Path
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
         Mock Get-ChildOrchestratorCheckpointContent { $null }
@@ -80,6 +81,8 @@ Describe 'enforce-epic-merge-gate epic-child CI verification (issue #1130)' {
             return Invoke-EpicMergeGateDecision -ToolInputRaw $envelope
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     Context 'regression: epic child with no CI record' {
         It 'CHILD-CI-NO-CI-GATE denies gh pr merge 42 --merge for an epic child with step9_status passed and no ci_gate' {
