@@ -5,50 +5,56 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-11-08T08-08
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 0.2
 
-**Fail-closed evidence rule:** Include explicit static baseline tasks, final-QA tasks, and a per-file threshold task for each in-scope language when policy requires coverage. If any required static baseline artifact, QA artifact, or per-file coverage figure is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+Terms: FEATURE is `docs/features/active/2026-11-08-runbook-commands-not-checked-against-pinned-tool-versions-1128`. The scratch directory is the session scratchpad subdirectory `issue-1128/`, recorded in artifacts as the token `SCRATCH`. Work mode is full-bug; requirements source is `FEATURE/spec.md` (`## Acceptance Criteria`, six items). Tool routes, launchers, and the batch budget are owned by the `execution-environment` skill. The executor commits and pushes after each task (no tags). Test gates are parallel only: one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run, each re-run only after a fix. No new Python; no temporary files in tests; no unqualified `poetry install` from the item worktree. The gate enforces honest version marking, not flag correctness, and the runbook's purpose is not narrowed.
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+**Fail-closed evidence rule:** If any required baseline artifact, QA artifact, or per-file coverage figure is missing, the verdict is BLOCKED or INCOMPLETE, never PASS. Every evidence-producing task names its artifact `FEATURE/evidence/<kind>/<name>.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
 
 ## Pre-Mortem
 
-<!-- One bullet per label; state how the next review or CI run could fail on that dimension and the mitigation, or "not applicable" with the reason. -->
-- Review checklists:
-- Coverage:
-- Mirror parity:
-- File size:
-- Test isolation:
-- CI-only behavior:
-- Evidence:
+- Review checklists: a reviewer fails the change for a missing mirror copy or manifest entry. P4-T4 lists every copy and both `core.json` entries; P5-T5 walks the audit templates.
+- Coverage: the module and hook enter the PowerShell coverage denominator. P2 and P3 tests cover each lockfile format, launcher form, marker form, and hook block reason; P5-T2 reads both files from `artifacts/pester/powershell-coverage.xml` (>= 85% line) and compares with the Phase 0 baseline.
+- Mirror parity: nine skill, agent, and example copies plus module and hook bundle copies must be byte-equal where contracts require. P4-T3 and P4-T4 copy by file; P5-T3 reads the push-down contract and manifest tests from the single pytest run. The change alters no fact the execution-environment brief states, so no brief-update task is needed.
+- File size: the module is expected well under 500 lines; if it nears 500, split parsing into a second module before the next task and add it to P4-T4.
+- Test isolation: tests use injected script-block seams with in-memory content, no files, globals, or environment edits; the gates are one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run; `Invoke-PoshQCLeakScan` runs in P5-T1.
+- CI-only behavior: hook tests run on `poshqc / PowerShell hook suites (Linux)` as well as the Windows shards, so fixtures use forward-slash synthetic roots, exact case, no drive letters.
+- Evidence: the hook cannot be exercised live from a branch (isolated subagents run main's hooks); acceptance relies on Pester and the live check is deferred until merge, recorded in P5-T5.
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+### Phase 0 — Baselines
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+- [ ] [P0-T1] Capture PowerShell static baselines (format check and `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`) into `FEATURE/evidence/baseline/powershell-static.<timestamp>.md`; acceptance: artifact records finding counts and `git status --porcelain` shows no tracked change.
+- [ ] [P0-T2] Run `Invoke-PoshQCParallelTest` once before any change; write `FEATURE/evidence/baseline/pester-baseline.<timestamp>.md` with pass and fail counts, repo-wide line coverage from `artifacts/pester/powershell-coverage.xml`, and per-file coverage for files under `.claude/hooks` and `.claude/lib`; acceptance: all fields numeric.
+- [ ] [P0-T3] Run `pytest -n auto` once with `--cov=scripts.dev_tools`, `--cov-branch`, and `--cov-report=term-missing`; write `FEATURE/evidence/baseline/pytest-baseline.<timestamp>.md` with pass and fail counts and the numeric total coverage; acceptance: all fields numeric.
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#1128-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the parallel test gate to confirm the new regression test fails and captures the repro
+### Phase 1 — Reproduce first
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+- [ ] [P1-T1] [expect-fail] Create `tests/scripts/claude-lib/runbook/RunbookCommandVersion.Tests.ps1` with the test `reports a finding naming nuitka and 4.3.4 for an unmarked nuitka command` (AC 1): in-memory poetry.lock text pinning nuitka 4.3.4 and runbook text with a shell fence holding `python -m nuitka --clean-cache=clcache` and no marker; asserts one finding containing `nuitka` and `4.3.4`. The module `.claude/lib/runbook/RunbookCommandVersion.psm1` does not yet exist, so the test fails at import.
+- [ ] [P1-T2] [expect-fail] Run that one test file with `Invoke-Pester -Path tests/scripts/claude-lib/runbook/RunbookCommandVersion.Tests.ps1 -PassThru` (debugging run, not a gate) and write `FEATURE/evidence/regression-testing/fail-before.<timestamp>.md`; acceptance: `EXIT_CODE` records the failure and `Output Summary:` states the module import failure and failed count of 1 or more.
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run the repro to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record the static baseline and final-QA artifact paths and the per-file threshold results for each in-scope language where coverage is required
+### Phase 2 — Pure module
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+- [ ] [P2-T1] Create `.claude/lib/runbook/RunbookCommandVersion.psm1` exporting `Get-RunbookPinnedToolVersion` (lockfile name + content -> map of PEP 503 normalized tool name to version for poetry.lock, uv.lock, package-lock.json via `ConvertFrom-Json` on the `node_modules/<name>` entries (nested paths ignored), and requirements*.txt `name==version`); add tests to `RunbookCommandVersion.Tests.ps1` for each format, normalization (`Zope_Interface` -> `zope-interface`), and an unsupported name returning an empty map (AC 2). Acceptance: those named tests pass in a focused run.
+- [ ] [P2-T2] Add `Get-RunbookCommandToolName` to the same module (first token; `python -m X`, `python3 -m X`, `py -m X`, `poetry run X`, `uv run X`, `npx X` -> X, normalized) and tests per launcher form in `RunbookCommandVersion.Tests.ps1`. Acceptance: those tests pass in a focused run.
+- [ ] [P2-T3] Add `Get-RunbookCommandVersionFinding` (runbook text + pinned map -> findings) implementing the counted-fence set, non-blank non-comment command lines, the `Version check:` line immediately after the closing fence per distinct tool, and the four finding classes of the spec; add tests in `RunbookCommandVersion.Tests.ps1` for the AC 1 repro now passing, `verified` and `not verified` with the pinned version, mismatched version, `not pinned` for a pinned tool, malformed marker, unpinned tool with the `not pinned` form, and exempt fences (`text`, `json`, `output`) (AC 3). Acceptance: the P1-T1 test and the new tests pass in a focused run.
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+### Phase 3 — SubagentStop hook
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+- [ ] [P3-T1] Create `.claude/hooks/validate-human-exception-runbook-output.ps1` modeled on `.claude/hooks/validate-task-researcher-output.ps1` and `.claude/hooks/validate-pr-author-output.ps1`: guarded single-statement dot-sources of `hook-dependency-guard.ps1`, `subagentstop-envelope.ps1`, and `subagentstop-target-worktree.ps1`, guarded `Import-Module` of `../lib/runbook/RunbookCommandVersion.psm1`, function `Get-HumanExceptionRunbookDecision` (extracts `runbook_path:` or `runbook-path:`, requires `.runbook.md` and a `runbooks/` segment, resolves the root through `Resolve-SubagentStopTargetWorktree` and `Resolve-SubagentStopArtifactLocation`, reads the runbook and top-level lockfiles through `-ReadFile` and `-TestFile` script-block seams, blocks repairably listing every finding), dependency-failure prefix `HUMAN_EXCEPTION_RUNBOOK_OUTPUT_MISSING:`, and the dot-source early return tail. Acceptance: the hook file exists and parses; tests land in P3-T2.
+- [ ] [P3-T2] Create `tests/scripts/claude-hooks/validate-human-exception-runbook-output.Tests.ps1` covering block on findings, block on missing `runbook_path:`, block on missing file, allow on a conformant runbook, and one `E3-Entry` test that spawns the hook with a malformed envelope on stdin, using in-memory seams and `ConvertTo-SubagentStopEnvelopeJson` from `SubagentStopEnvelope.Helpers.ps1` (AC 4). Acceptance: the named tests pass in a focused run.
+- [ ] [P3-T3] Create `tests/scripts/claude-hooks/validate-human-exception-runbook-output.TargetWorktree.Tests.ps1` (lockfiles and runbook read beneath the item root resolved from `-ReadTranscriptHead` and `-WorktreeListInvoker`, session-root fallback, `..` rejection) modeled on `validate-task-researcher-output.TargetWorktree.Tests.ps1`. Acceptance: the named tests pass in a focused run.
+
+### Phase 4 — Text, registration, and mirrors
+
+- [ ] [P4-T1] Edit `.claude/skills/human-exception-runbook/SKILL.md` (new `## Tool Command Version Rule` section stating counted fences, the three `Version check:` forms, placement after the closing fence, and that `verified` needs a version-bearing citation in Source and Citation; one bullet under `## Conformance`) and `.claude/skills/human-exception-runbook/example.runbook.md` (a shell block followed by a marker line). Asserting tests: none exist for this prose (searched `tests/` for the skill name, `example.runbook`, and `Source and Citation`; only the manifest-membership test `test_push_down_codex_and_agents_pack_manifest_completeness.py` names the `.agents` SKILL.md and stays unchanged because membership is unaffected). Acceptance: `Select-String`-style search of both files finds the heading `Tool Command Version Rule` once in SKILL.md and `Version check:` in the example.
+- [ ] [P4-T2] Edit `.claude/agents/human-exception-runbook.md`: add the `hooks:` frontmatter block (`SubagentStop`, matcher `human-exception-runbook`, command running `.claude/hooks/validate-human-exception-runbook-output.ps1` as `.claude/agents/pr-author.md` does), state the version rule and the return line `runbook_path: <path>` in the body. Add the hook row with prefix `HUMAN_EXCEPTION_RUNBOOK_OUTPUT_MISSING:` to `tests/scripts/claude-hooks/subagentstop-uncaught-error.Tests.ps1` and `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1` (existing rows unchanged; they list hooks literally). Acceptance: both files parse and the agent frontmatter names the hook.
+- [ ] [P4-T3] Diff the current `.claude` and `.agents` pairs, then update `.agents/skills/human-exception-runbook/SKILL.md` and `example.runbook.md` with the same rule text, keeping their own frontmatter and `.agents` path references. Acceptance: a diff of each pair shows only the pre-existing frontmatter and path differences.
+- [ ] [P4-T4] Via a `sh` copy script under `SCRATCH`, copy the new module, new hook, changed agent, skill, and example into `extensions/drm-copilot/resources/claude-customizations/.claude/`, copy the two `.agents` files into `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/human-exception-runbook/`, and add the module and hook entries to `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`. Acceptance: `git status --porcelain` lists each bundle file, and `core.json` parses as JSON with the two new entries present.
+
+### Phase 5 — Final QA and closure
+
+- [ ] [P5-T1] Run the PowerShell format, `Invoke-ScriptAnalyzer`, and `Invoke-PoshQCLeakScan` loop until a clean pass; write `FEATURE/evidence/qa-gates/powershell-static.<timestamp>.md`. Acceptance: finding count no higher than the P0-T1 artifact, leak scan exit 0, and a final format pass leaves `git status --porcelain` unchanged.
+- [ ] [P5-T2] Run `Invoke-PoshQCParallelTest` once; write `FEATURE/evidence/qa-gates/pester-final.<timestamp>.md` comparing with the P0-T2 artifact. Acceptance: zero failing tests, no new failure, no coverage drop, and `RunbookCommandVersion.psm1` and `validate-human-exception-runbook-output.ps1` each at least 85% line coverage in `artifacts/pester/powershell-coverage.xml`.
+- [ ] [P5-T3] Run `pytest -n auto` once with `--cov=scripts.dev_tools`, `--cov-branch`, `--cov-report=term-missing`; write `FEATURE/evidence/qa-gates/pytest-final.<timestamp>.md`. Acceptance: no new failure against P0-T3, no coverage drop, and the JUnit/summary shows `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py`, and `test_push_down_pack_manifest_dependency_closure.py` passing.
+- [ ] [P5-T4] Check off the six items under `## Acceptance Criteria` in `FEATURE/spec.md` per acceptance-criteria-tracking, each citing its evidence artifact. Acceptance: no unchecked criterion remains.
+- [ ] [P5-T5] Walk the templates under `docs/features/templates/policy_audit/` against the diff from the merge base of `origin/main` and `HEAD` (with `git status --porcelain` for new files) and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per item, noting the live hook check is deferred until merge; fix any FAIL and re-run P5-T1 to P5-T3 before rewriting. Acceptance: zero FAIL rows.
