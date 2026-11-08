@@ -42,7 +42,7 @@ BeforeAll {
     # Return the full fact table of a live head that descends from the reviewed head.
     function Get-DescendantFact {
         param([string] $Listing = '', [int] $Ancestry = 0, [int] $DiffExit = 0)
-        return @{ PullRequest = (Get-PullRequestFact -Head $script:Live); ArtifactCommitted = (Get-ProcessFact); Ancestry = (Get-ProcessFact -ExitCode $Ancestry); Listing = (Get-ProcessFact -ExitCode $DiffExit -Output $Listing) }
+        return @{ PullRequest = (Get-PullRequestFact -Head $script:Live); ArtifactCommitted = (Get-ProcessFact); AuditListing = (Get-ProcessFact -Output $script:Artifact); Ancestry = (Get-ProcessFact -ExitCode $Ancestry); Listing = (Get-ProcessFact -ExitCode $DiffExit -Output $Listing) }
     }
 
     # Run the Review decision for pull request 42.
@@ -101,7 +101,7 @@ Describe 'Test-ReviewVerdictFeatureFolder and Test-ReviewVerdictRecordsOnlyPath'
 Describe 'Get-ReviewVerdictReviewDecision' {
     Context 'Posting cases' {
         It 'posts when the last outcome is PASS at the live head' {
-            $decision = Invoke-ReviewDecision -Fact @{ PullRequest = (Get-PullRequestFact -Head $script:Reviewed); ArtifactCommitted = (Get-ProcessFact) }
+            $decision = Invoke-ReviewDecision -Fact @{ PullRequest = (Get-PullRequestFact -Head $script:Reviewed); ArtifactCommitted = (Get-ProcessFact); AuditListing = (Get-ProcessFact -Output $script:Artifact) }
             $decision.Eligible | Should -BeTrue
             $decision.Detail | Should -Be $script:Reviewed
             $decision.Description | Should -Be 'feature-review PASS: policy-audit.2026-01-01T00-00.md'
@@ -203,6 +203,39 @@ Describe 'Get-ReviewVerdictReviewDecision' {
         It 'refuses an artifact that is not committed in the live head' {
             $decision = Invoke-ReviewDecision -Fact @{ PullRequest = (Get-PullRequestFact -Head $script:Reviewed); ArtifactCommitted = (Get-ProcessFact -ExitCode 128) }
             $decision.Code | Should -Be 'REVIEW_VERDICT_ARTIFACT_NOT_COMMITTED'
+        }
+    }
+
+    Context 'Latest audit rule' {
+        It 'requests the audit listing after the artifact check' {
+            $decision = Invoke-ReviewDecision -Fact @{ PullRequest = (Get-PullRequestFact -Head $script:Live); ArtifactCommitted = (Get-ProcessFact) }
+            $decision.Code | Should -Be 'REVIEW_VERDICT_FACT_REQUIRED'
+            $decision.Request.Name | Should -Be 'AuditListing'
+            $decision.Request.Tool | Should -Be 'git'
+            $decision.Request.Arguments | Should -Be @('ls-tree', '--name-only', $script:Live, '--', "$($script:Folder)/")
+        }
+
+        It 'posts when the listing holds only the named audit and older audits' {
+            $older = "$($script:Folder)/policy-audit.2025-12-31T23-59.md"
+            $listing = "$older`n$($script:Folder)/spec.md`n$($script:Artifact)`n$($script:Folder)/code-review.2026-01-02T00-00.md"
+            $decision = Invoke-ReviewDecision -Fact @{ PullRequest = (Get-PullRequestFact -Head $script:Reviewed); ArtifactCommitted = (Get-ProcessFact); AuditListing = (Get-ProcessFact -Output $listing) }
+            $decision.Eligible | Should -BeTrue
+        }
+
+        It 'refuses when a newer audit exists with REVIEW_VERDICT_ARTIFACT_NOT_LATEST' {
+            $older = "$($script:Folder)/policy-audit.2025-12-31T23-59.md"
+            $newer = "$($script:Folder)/policy-audit.2026-01-02T00-00.md"
+            $decision = Invoke-ReviewDecision -Artifact $older -Fact @{ PullRequest = (Get-PullRequestFact -Head $script:Reviewed); ArtifactCommitted = (Get-ProcessFact); AuditListing = (Get-ProcessFact -Output "$older`n$newer") }
+            $decision.Eligible | Should -BeFalse
+            $decision.Code | Should -Be 'REVIEW_VERDICT_ARTIFACT_NOT_LATEST'
+            $decision.Detail | Should -BeLike "*$newer*"
+            $decision.Request | Should -BeNullOrEmpty
+        }
+
+        It 'reports a failed audit listing as REVIEW_VERDICT_GIT_FAILED' {
+            $decision = Invoke-ReviewDecision -Fact @{ PullRequest = (Get-PullRequestFact -Head $script:Reviewed); ArtifactCommitted = (Get-ProcessFact); AuditListing = (Get-ProcessFact -ExitCode 128) }
+            $decision.Eligible | Should -BeFalse
+            $decision.Code | Should -Be 'REVIEW_VERDICT_GIT_FAILED'
         }
     }
 
