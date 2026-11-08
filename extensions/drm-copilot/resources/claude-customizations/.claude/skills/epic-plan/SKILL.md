@@ -233,3 +233,13 @@ The final report to the user must include: the epic manifest path, one `plan-pat
 preflight status per feature, the integration branch name, and the kickoff artifact paths. End
 with the statement that execution has NOT started and will begin only when the user runs
 `/epic-run <epic-slug>` or replays the kickoff prompt.
+
+## Nesting Depth
+
+This chain runs three levels of subagents below the main session: the coordinator at depth 1, each per-feature `orchestrator` at depth 2, and the specialists that orchestrator delegates to at depth 3. Only the depth-2 orchestrator needs the `Agent` tool below the coordinator; specialists do not delegate.
+
+Requirement: Claude Code 2.1.219 or later, `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` unset or at least 3, and the skill invoked from the main session. A run started inside a subagent or fork adds one layer, and a lower limit withholds the `Agent` tool from the per-feature orchestrators.
+
+Outcome when the depth is insufficient: an agent that starts without the `Agent` tool records `blocked_reason: "spawn_agent_unavailable"`, does no specialist work, and returns a line beginning `AGENT_TOOL_UNAVAILABLE`; a coordinator that receives that line from a child halts with the same reason instead of doing the child's work. The `enforce-epic-invocation-origin.ps1` hook also denies a chain delegation with `NESTING_DEPTH_INSUFFICIENT:` when the configured limit is below 3.
+
+Fallback: when the depth cannot be raised, the main session itself launches each per-feature `Agent(orchestrator)` with the same delegation prompt the coordinator would have sent, including `Preparation mode: true` on the preparation path, so each orchestrator runs at depth 1 and its specialists at depth 2.
