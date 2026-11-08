@@ -106,8 +106,8 @@ Derivation per item:
   done (decision D6); a merged child has every step done.
 - Live stage names map through aliases, compared case-insensitively after trimming:
   `feature_review` and `S7_feature_review` to `review`; `atomic_execution` and
-  `S5_atomic_execution` to `execution`; `S2_research` to `research`; `S3_spec` to `spec`;
-  `S4_atomic_planning` to `plan`; `S4_preflight` to `preflight`; `S8_create_pr` to `pr`; and
+  `S5_atomic_execution` to `execution`; `S2_research` to `research`; `S3_spec` and
+  `S2_feature_documents` to `spec`; `S4_atomic_planning` to `plan`; `S4_preflight` to `preflight`; `S8_create_pr` to `pr`; and
   `S9_ci_gate` and `S9_ci_green` to `ci`.
 - Stage names `planning` and `plan` map to `plan`; names starting with `remediation` are
   composite remediation time (decision D2); any other unknown name, for example `promotion`, is
@@ -162,7 +162,8 @@ Variants:
 - A blocked count of one prints `(1 blocked step excluded)` and
   `**Blocked:** 1 step excluded from the estimate`.
 - Now line: `no step is in progress` when nothing runs; a step whose elapsed time exceeds its
-  median reads `(<elapsed> of median <m>, over median)`.
+  median reads `(<elapsed> of median <m>, over median)`; a step without a recorded start
+  reads `(start not recorded; median <m>)`.
 - `<pct>` and `<hours>` are rounded to one decimal with invariant culture and default (to-even)
   rounding; an integral value prints without a decimal. `<weekly>` is `<value>%` or `n/a`.
 - Any non-finite value prints `n/a`; no report prints `NaN` or `Infinity`.
@@ -398,7 +399,8 @@ estimate do not depend on the cadence.
 - Blank text, unparseable text, or version 3 or higher is read as empty state; a missing field
   is absent.
 - The state is written when a check-in sample is added, the duration ledger or a tick anchor
-  changes, or `-ResetBaseline` or `-PairSamples` is given.
+  changes, or `-ResetBaseline` or `-PairSamples` is given. When an item's merge step is done,
+  its `items` entry is removed; its durations stay in the ledger.
 
 ## Known Behaviors and Measured Rates
 

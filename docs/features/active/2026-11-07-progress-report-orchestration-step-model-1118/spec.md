@@ -34,7 +34,7 @@ This feature replaces the task-velocity model with a typed-step model. Every uni
 | `main-sync` | epic | sync row in the epic checkpoint with `merge_status` `merged` or `worktree_removed` |
 | `integration-pr` | epic | `epic_merge_pr.merge_commit_sha` present |
 
-Stage-name normalization: names are compared case-insensitively after trimming. The live stage names map through aliases: `feature_review` and `S7_feature_review` to `review`; `atomic_execution` and `S5_atomic_execution` to `execution`; `S2_research` to `research`; `S3_spec` to `spec`; `S4_atomic_planning` to `plan`; `S4_preflight` to `preflight`; `S8_create_pr` to `pr`; and `S9_ci_gate` and `S9_ci_green` to `ci`. A `next_step` value starting with `S2_research` or `S3b_research` names the research step. `planning` and `plan` map to `plan`. `remediation`, `remediation_cycle_<n>`, and similar names are composite remediation stages (Decision D2). Any other unrecognized stage name (for example `promotion`) maps to no type; its time is reported as unmapped stage time and never enters a median.
+Stage-name normalization: names are compared case-insensitively after trimming. The live stage names map through aliases: `feature_review` and `S7_feature_review` to `review`; `atomic_execution` and `S5_atomic_execution` to `execution`; `S2_research` to `research`; `S3_spec` and `S2_feature_documents` to `spec`; `S4_atomic_planning` to `plan`; `S4_preflight` to `preflight`; `S8_create_pr` to `pr`; and `S9_ci_gate` and `S9_ci_green` to `ci`. A `next_step` value starting with `S2_research` or `S3b_research` names the research step. `planning` and `plan` map to `plan`. `remediation`, `remediation_cycle_<n>`, and similar names are composite remediation stages (Decision D2). Any other unrecognized stage name (for example `promotion`) maps to no type; its time is reported as unmapped stage time and never enters a median.
 
 ### Step derivation per item
 
@@ -107,13 +107,13 @@ TL;DR remains four lines in both modes:
 **Estimated time remaining:** <H h MM min> by type (sum); <H h MM min> wave-parallel.
 ```
 
-In item mode the subject reads `Item #<issue>` and the wave-parallel figure equals the item sum. A blocked item reads `#<i> is blocked (<reason>).`
+In item mode the subject reads `Item #<issue>` and the wave-parallel figure equals the item sum. A blocked item reads `#<i> is blocked (<reason>).` On the Now line an in-progress step without a recorded start reads `#<i> <type> (start not recorded; median <m>)` instead of an elapsed figure.
 
 Full mode keeps the heading, the Elapsed and Progress line (in steps), the State table (with a `Blocked` row), the Wave table (`| Wave | Children | Steps | Done |`), and the weekly-quota line. It replaces the velocity, straight-line, and range lines with a per-type table (`| Type | Done | In progress | Remaining | Blocked | Median | Samples | Subtotal |` and a Total row), one line per type that uses a default (`<type>: no measured duration; default <n> min`), an unmapped and composite stage-time line, and a marker on medians that include approximate samples. The velocity, SD, and range lines are not printed.
 
 ## Data & State
 
-Version 2 state document: `version: 2`, `unit: "steps"`, `startUnixSeconds`, `baselineDone`, `baselineWeeklyPct`, `samples` (check-ins in steps), `durations` (per-type sample lists), and `items` (per-item plan tick anchors and `blockedSinceUnixSeconds`). Times are epoch seconds.
+Version 2 state document: `version: 2`, `unit: "steps"`, `startUnixSeconds`, `baselineDone`, `baselineWeeklyPct`, `samples` (check-ins in steps), `durations` (per-type sample lists), and `items` (per-item plan tick anchors and `blockedSinceUnixSeconds`). An item whose merge step is done has no `items` entry; its durations stay in the ledger. Times are epoch seconds.
 
 - Migration: a version 1 document and the legacy bare sample array are read. Their `samples` and `baselineDone` count tasks, so they are discarded; `baselineDone` resolves to the current step count; `startUnixSeconds` and `baselineWeeklyPct` are kept; `durations` and `items` start empty. Version 3 or higher, blank text, and unparseable text give empty state, as today.
 - Writing: the writer always writes version 2. The state is written when the check-in samples, the duration ledger, or the tick anchors changed, or when `-ResetBaseline` or `-PairSamples` was passed. `Write-EpicProgressState` remains the only writer.
