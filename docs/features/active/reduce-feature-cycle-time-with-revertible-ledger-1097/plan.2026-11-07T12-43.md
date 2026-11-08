@@ -142,7 +142,7 @@ On the branch: the repository template and `AGENTS.md`, their bundles under `ext
 
 ### Phase 3 — Final QA and Reduction Commit
 
-- [ ] [P3-T1] Format and analyze the two [P1-T2] files and `tests/scripts/claude-runtime/less-evidence-contract.Tests.ps1`, writing `FEATURE/evidence/qa-gates/stage-g-powershell-static.<timestamp>.md`, compared with the greatest `stage-g-powershell-static.*.md` baseline.
+- [x] [P3-T1] Format and analyze the two [P1-T2] files and `tests/scripts/claude-runtime/less-evidence-contract.Tests.ps1`, writing `FEATURE/evidence/qa-gates/stage-g-powershell-static.<timestamp>.md`, compared with the greatest `stage-g-powershell-static.*.md` baseline.
   - A clean pass is `git status --porcelain` unchanged across the formatter and zero findings; a formatter change to a [P1-T2] file is committed alone, and one to the new test stays for [P3-T4] and follows the patch rule of `## Execution Terms`.
   - Acceptance: zero findings and no formatter change in the recorded pass.
 - [ ] [P3-T2] Run one `Invoke-PoshQCParallelTest` and write `FEATURE/evidence/qa-gates/stage-g-powershell-test.<timestamp>.md`, compared with the greatest `stage-g-powershell-test-baseline.*.md`.
