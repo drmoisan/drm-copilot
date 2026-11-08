@@ -180,6 +180,11 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # dedicated sync child item, with a plain merge of `origin/main` into the
 # integration branch performed by `epic-orchestrator`. Only the skill digest
 # moved; the agent digest is unchanged and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #1136. That change added a post-fan-in allowance paragraph
+# after the integration-PR checkpoint shape paragraph of the epic skill. Only the
+# skill digest moved; the agent digest is unchanged and the pin stays live for both
+# entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -187,7 +192,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "65f34506ae2d0505f47f79bfbfcbbd9d7c7f78dccc0e9213bc6c9b8222101b76",
+        "7064366569c93f6920467e850029db0fba14e8d1e542a414d692a0d86404fe77",
     ),
 )
 
