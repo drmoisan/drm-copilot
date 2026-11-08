@@ -130,7 +130,7 @@ Not applicable; manifests are tens of nodes.
 - [x] `epic-planner.md` and `epic-orchestrator.md` list `Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)`, with bundled copies and generated Codex variants regenerated; proven by `generate_codex_agent_variants.py --check` and the push-down resource contract tests.
 - [x] The wave-layering sentences in `epic-plan` and `epic-orchestrate` SKILL.md (Claude, Codex, bundled copies) and in `.claude/agents/epic-orchestrator.md` cite the shipped CLI (Codex text cites `.codex/lib/epic-wave/`), keep the Python module only as a repository parity reference, and change nothing else; proven by the mirror contract tests and `test_frozen_epic_surface_matches_pinned_baseline_digest` after re-pinning with a `RE-BASELINED by issue #1129` note.
 - [x] `test_epic_skill_script_citations_shipped.py` passes after the fix, fails on the pre-fix tree, requires an allowlist reason naming the MCP route for `scripts/dev_tools/validate_epic_orchestrator_state.py`, and fails on a stale allowlist entry.
-- [ ] The full toolchain (format, lint, type-check, architecture, unit, contract, integration) passes in a single pass, and the PR states that destinations must refresh the push-down after an extension rebuild and reinstall.
+- [x] The full toolchain (format, lint, type-check, architecture, unit, contract, integration) passes in a single pass, and the PR states that destinations must refresh the push-down after an extension rebuild and reinstall.
 
 ## Risks & Mitigations
 - Technical or operational risks: a missed mirror copy; frozen-digest drift from concurrent edits; CRLF versus LF differences in digests.
