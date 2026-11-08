@@ -260,6 +260,19 @@ Describe 'OrchestratorStateOwnerDirectives block rules B1-B8' {
         $errors.Count | Should -Be 0 -Because ($errors -join ' | ')
     }
 
+    It 'B7 rejects the calendar-invalid ISO 8601 shape <Recorded>' -ForEach @(
+        @{ Recorded = '2026-02-30T10:00:00Z' }
+        @{ Recorded = '2026-11-08T25:00:00Z' }
+    ) {
+        $recordedValue = $Recorded
+        $text = Edit-OwnerDirectiveFixture -WithoutRecords -Edit {
+            param($root)
+            $root['owner_directives'][0]['recorded_at'] = ConvertTo-OwnerDirectiveJsonValue $recordedValue
+            $root['owner_directives'][0]['expires_at'] = ConvertTo-OwnerDirectiveJsonValue '2026-11-30T10:00:00Z'
+        }
+        Assert-OwnerDirectiveSingleError -Text $text -Expected $script:B7
+    }
+
     It 'B8 rejects entry #1 when <Case>' -ForEach @(
         @{ Case = 'scope is a string'; Path = ''; Json = '"S5"' }
         @{ Case = 'scope is removed'; Path = ''; Json = $null }
