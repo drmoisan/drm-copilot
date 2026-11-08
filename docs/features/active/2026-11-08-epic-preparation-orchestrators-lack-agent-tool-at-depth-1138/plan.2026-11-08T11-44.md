@@ -60,7 +60,7 @@
 
 ### Phase 4 — Main Sync
 
-- [ ] [P4-T1] Plain-merge `origin/main` into the branch after `git fetch origin`, resolving each conflict so both sides' content survives (expected in `.claude/skills/epic-orchestrate/SKILL.md`, `.claude/skills/orchestrate/SKILL.md`, their `BUNDLE` copies, and `parallel_orchestrator_surface_expectations.py`). After the merge, re-run the P2-T4 copy script and recompute both pinned digests; when a digest moved, update it and extend the #1138 block with one sentence naming the merge. Acceptance: `git merge-base --is-ancestor origin/main HEAD` exits 0, `git diff --check BASE..HEAD` reports no conflict marker, the 14 `cmp` pairs and the digest equality of P2-T5 hold again, and the commit rule holds.
+- [x] [P4-T1] Plain-merge `origin/main` into the branch after `git fetch origin`, resolving each conflict so both sides' content survives (expected in `.claude/skills/epic-orchestrate/SKILL.md`, `.claude/skills/orchestrate/SKILL.md`, their `BUNDLE` copies, and `parallel_orchestrator_surface_expectations.py`). After the merge, re-run the P2-T4 copy script and recompute both pinned digests; when a digest moved, update it and extend the #1138 block with one sentence naming the merge. Acceptance: `git merge-base --is-ancestor origin/main HEAD` exits 0, `git diff --check BASE..HEAD` reports no conflict marker, the 14 `cmp` pairs and the digest equality of P2-T5 hold again, and the commit rule holds.
 
 ### Phase 5 — Final QA and Review
 
