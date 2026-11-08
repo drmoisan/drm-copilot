@@ -72,6 +72,25 @@ Describe 'hook-epic-fan-in.ps1 <Surface> copy (issue #1136)' -ForEach @(
             param([string] $Command, [scriptblock] $Reader = (Get-IndexReader -Output ($script:StatusDoc + [char]0)))
             return (Get-EpicFanInAllowance -Scope (Get-FanInScope) -FilePath @('') -Command $Command -StagedIndexReader $Reader)
         }
+
+        # Issue #1141: one qualifying merged feature, child-a, with optional entry overrides and removals.
+        $script:FollowUpRoots = @('docs/features/active/child-a/', 'docs/features/completed/child-a/', 'docs/features/epics/sample-epic/epic-status.md')
+        $script:FollowUpPredicate = { param([string] $Path) Test-EpicMergedFeaturePath -RelativePath $Path -Root $script:FollowUpRoots }
+
+        function Get-RootsCheckpoint {
+            # Return an epic checkpoint whose single feature is child-a, merged with provenance unless overridden.
+            param([hashtable] $Feature = @{}, [string[]] $Remove = @(), [hashtable] $Override = @{})
+            $entry = [ordered]@{ feature_folder = 'child-a'; merge_status = 'merged'; merge_commit_sha = 'ab12' * 10; pr_number = 901 }
+            foreach ($key in $Feature.Keys) { $entry[$key] = $Feature[$key] }
+            foreach ($key in $Remove) { $entry.Remove($key) }
+            return (Get-FanInCheckpoint -Override (@{ features = @([pscustomobject]$entry) } + $Override))
+        }
+
+        function Get-FollowUpAllowance {
+            # Return the follow-up allowance for one path list or command over a scope of the given checkpoint.
+            param([object] $Checkpoint = (Get-RootsCheckpoint), [string[]] $FilePath = @(''), [string] $Command = '', [scriptblock] $Reader = (Get-IndexReader -Output ('docs/features/active/child-a/x.md' + [char]0)))
+            return (Get-EpicMergedFeatureFollowUpAllowance -Scope (Get-FanInScope -Checkpoint $Checkpoint) -FilePath $FilePath -Command $Command -StagedIndexReader $Reader)
+        }
     }
 
     Context 'Test-EpicFanInComplete' {
@@ -234,6 +253,178 @@ Describe 'hook-epic-fan-in.ps1 <Surface> copy (issue #1136)' -ForEach @(
 
         It 'refuses a call with no resolved scope' {
             (Get-EpicFanInAllowance -Scope $null -FilePath @('artifacts/pr_body_7.md') -Command '' -StagedIndexReader $null).Allowed | Should -BeFalse
+        }
+    }
+
+    Context 'Get-EpicMergedFeatureRoots' {
+        It 'returns the active and completed roots and the status doc for a <Case> feature_folder' -ForEach @(
+            @{ Case = 'bare'; Folder = 'child-a' }
+            @{ Case = 'active-prefixed'; Folder = 'docs/features/active/child-a' }
+            @{ Case = 'completed-prefixed'; Folder = 'docs/features/completed/child-a' }
+        ) {
+            $roots = @(Get-EpicMergedFeatureRoots -Checkpoint (Get-RootsCheckpoint -Feature @{ feature_folder = $Folder }))
+            $roots | Should -Be @('docs/features/active/child-a/', 'docs/features/completed/child-a/', 'docs/features/epics/sample-epic/epic-status.md')
+        }
+
+        It 'qualifies a worktree_removed feature parsed from JSON with a 64-character sha' {
+            $json = '{"route_id":"epic","epic_feature_folder":"sample-epic","features":[{"feature_folder":"child-c","merge_status":"worktree_removed","merge_commit_sha":"' + ('cd34' * 16) + '","pr_number":903}]}'
+            @(Get-EpicMergedFeatureRoots -Checkpoint ($json | ConvertFrom-Json)) | Should -Contain 'docs/features/completed/child-c/'
+        }
+
+        It 'qualifies a [long] pr_number' {
+            @(Get-EpicMergedFeatureRoots -Checkpoint (Get-RootsCheckpoint -Feature @{ pr_number = [long]901 })).Count | Should -Be 3
+        }
+
+        It 'returns no root when <Case>' -ForEach @(
+            @{ Case = 'merge_status is pr_open'; Feature = @{ merge_status = 'pr_open' }; Remove = @() }
+            @{ Case = 'merge_status differs in case'; Feature = @{ merge_status = 'MERGED' }; Remove = @() }
+            @{ Case = 'the basename has two segments'; Feature = @{ feature_folder = 'child/a' }; Remove = @() }
+            @{ Case = 'the basename is ..'; Feature = @{ feature_folder = '..' }; Remove = @() }
+            @{ Case = 'the basename is blank'; Feature = @{ feature_folder = '' }; Remove = @() }
+            @{ Case = 'the sha is uppercase hex'; Feature = @{ merge_commit_sha = 'AB12' * 10 }; Remove = @() }
+            @{ Case = 'the sha has 39 characters'; Feature = @{ merge_commit_sha = 'a' * 39 }; Remove = @() }
+            @{ Case = 'the sha has 41 characters'; Feature = @{ merge_commit_sha = 'a' * 41 }; Remove = @() }
+            @{ Case = 'the sha has 63 characters'; Feature = @{ merge_commit_sha = 'a' * 63 }; Remove = @() }
+            @{ Case = 'the sha is not a string'; Feature = @{ merge_commit_sha = 1234567 }; Remove = @() }
+            @{ Case = 'the sha is absent'; Feature = @{}; Remove = @('merge_commit_sha') }
+            @{ Case = 'pr_number is a string'; Feature = @{ pr_number = '901' }; Remove = @() }
+            @{ Case = 'pr_number is 0'; Feature = @{ pr_number = 0 }; Remove = @() }
+            @{ Case = 'pr_number is -1'; Feature = @{ pr_number = -1 }; Remove = @() }
+            @{ Case = 'pr_number is null'; Feature = @{ pr_number = $null }; Remove = @() }
+            @{ Case = 'pr_number is 7.5'; Feature = @{ pr_number = 7.5 }; Remove = @() }
+            @{ Case = 'pr_number is $true'; Feature = @{ pr_number = $true }; Remove = @() }
+            @{ Case = 'pr_number is absent'; Feature = @{}; Remove = @('pr_number') }
+        ) {
+            @(Get-EpicMergedFeatureRoots -Checkpoint (Get-RootsCheckpoint -Feature $Feature -Remove $Remove)).Count | Should -Be 0 -Because $Case
+        }
+
+        It 'returns no root for a null checkpoint, absent features, or a null feature entry' {
+            @(Get-EpicMergedFeatureRoots -Checkpoint $null).Count | Should -Be 0
+            @(Get-EpicMergedFeatureRoots -Checkpoint (Get-FanInCheckpoint -Override @{ features = $null })).Count | Should -Be 0
+            @(Get-EpicMergedFeatureRoots -Checkpoint (Get-FanInCheckpoint -Override @{ features = @($null) })).Count | Should -Be 0
+        }
+
+        It 'keeps the feature roots but omits the status doc when the epic slug is not plain' {
+            $roots = @(Get-EpicMergedFeatureRoots -Checkpoint (Get-RootsCheckpoint -Override @{ epic_feature_folder = '../sample-epic' }))
+            $roots | Should -Be @('docs/features/active/child-a/', 'docs/features/completed/child-a/')
+        }
+    }
+
+    Context 'Test-EpicMergedFeaturePath' {
+        It 'admits <Path>' -ForEach @(
+            @{ Path = 'docs/features/active/child-a/x.md' }
+            @{ Path = 'docs/features/completed/child-a/evidence/other/y.json' }
+            @{ Path = 'docs/features/epics/sample-epic/epic-status.md' }
+        ) {
+            Test-EpicMergedFeaturePath -RelativePath $Path -Root $script:FollowUpRoots | Should -BeTrue
+        }
+
+        It 'refuses <Case>' -ForEach @(
+            @{ Case = 'the status doc plus a remainder'; Path = 'docs/features/epics/sample-epic/epic-status.md/x' }
+            @{ Case = 'a sibling-prefix folder'; Path = 'docs/features/active/child-a-x/y.md' }
+            @{ Case = 'the bare root without remainder'; Path = 'docs/features/active/child-a/' }
+            @{ Case = 'the root without its trailing slash'; Path = 'docs/features/active/child-a' }
+            @{ Case = 'a .. segment'; Path = 'docs/features/active/child-a/../x.md' }
+            @{ Case = 'a . segment'; Path = 'docs/features/active/child-a/./x.md' }
+            @{ Case = 'a backslash'; Path = 'docs/features/active/child-a' + [string][char]92 + 'x.md' }
+            @{ Case = 'a * glob'; Path = 'docs/features/active/child-a/*.md' }
+            @{ Case = 'a ? glob'; Path = 'docs/features/active/child-a/x?.md' }
+            @{ Case = 'a [ glob'; Path = 'docs/features/active/child-a/[x].md' }
+            @{ Case = 'a leading slash'; Path = '/docs/features/active/child-a/x.md' }
+            @{ Case = 'a case difference'; Path = 'Docs/features/active/child-a/x.md' }
+            @{ Case = 'a blank path'; Path = '' }
+            @{ Case = 'code outside every root'; Path = 'scripts/x.ps1' }
+        ) {
+            Test-EpicMergedFeaturePath -RelativePath $Path -Root $script:FollowUpRoots | Should -BeFalse -Because $Case
+        }
+
+        It 'refuses every path when the root list is empty or blank' {
+            Test-EpicMergedFeaturePath -RelativePath 'docs/features/active/child-a/x.md' -Root @() | Should -BeFalse
+            Test-EpicMergedFeaturePath -RelativePath 'docs/features/active/child-a/x.md' -Root @('') | Should -BeFalse
+        }
+    }
+
+    Context 'generalized predicates (issue #1141)' {
+        It 'Test-EpicFanInCommitShape returns <Expected> for <Text>' -ForEach @(
+            @{ Text = 'git add docs/features/active/child-a/x.md docs/features/completed/child-a/y.md'; Expected = 'add' }
+            @{ Text = 'git commit -m m -- docs/features/active/child-a/x.md docs/features/epics/sample-epic/epic-status.md'; Expected = 'commit' }
+        ) {
+            Test-EpicFanInCommitShape -Token ($Text -split ' ') -PathPredicate $script:FollowUpPredicate | Should -BeExactly $Expected
+        }
+
+        It 'Test-EpicFanInCommitShape returns null for <Text>' -ForEach @(
+            @{ Text = 'git add -A' }
+            @{ Text = 'git add' }
+            @{ Text = 'git add docs/features/active/child-a/x.md scripts/x.ps1' }
+            @{ Text = 'git commit --all -m m' }
+            @{ Text = 'git commit --no-verify -m m -- docs/features/active/child-a/x.md' }
+            @{ Text = 'git commit -m m --' }
+        ) {
+            Test-EpicFanInCommitShape -Token ($Text -split ' ') -PathPredicate $script:FollowUpPredicate | Should -BeNullOrEmpty
+        }
+
+        It 'Test-EpicFanInStagedIndex is <Expected> when the index <Case>' -ForEach @(
+            @{ Case = 'names only allowed paths'; ExitCode = 0; Output = "docs/features/active/child-a/x.md`0docs/features/completed/child-a/y.md`0"; Expected = $true }
+            @{ Case = 'mixes an allowed and a disallowed path'; ExitCode = 0; Output = "docs/features/active/child-a/x.md`0scripts/x.ps1`0"; Expected = $false }
+            @{ Case = 'is empty'; ExitCode = 0; Output = ''; Expected = $false }
+            @{ Case = 'names one blank entry'; ExitCode = 0; Output = "`0"; Expected = $false }
+            @{ Case = 'read exits non-zero'; ExitCode = 128; Output = "docs/features/active/child-a/x.md`0"; Expected = $false }
+        ) {
+            $staged = [pscustomobject]@{ ExitCode = $ExitCode; Output = $Output }
+            Test-EpicFanInStagedIndex -Staged $staged -PathPredicate $script:FollowUpPredicate | Should -Be $Expected -Because $Case
+        }
+    }
+
+    Context 'Get-EpicMergedFeatureFollowUpAllowance' {
+        It 'allows <Case>' -ForEach @(
+            @{ Case = 'a relative path leg under the completed root'; FilePath = @('docs/features/completed/child-a/x.json'); Command = '' }
+            @{ Case = 'an absolute path leg inside the integration worktree'; FilePath = @('/synthetic-worktrees/epic-integration/docs/features/active/child-a/x.json'); Command = '' }
+            @{ Case = 'a git add of an active path'; FilePath = @(''); Command = 'git add docs/features/active/child-a/x.md' }
+            @{ Case = 'a pathless commit whose index is under child-a'; FilePath = @(''); Command = 'git commit -m m' }
+        ) {
+            $result = Get-FollowUpAllowance -FilePath $FilePath -Command $Command
+            $result.Allowed | Should -BeTrue -Because "$Case ($($result.Detail))"
+        }
+
+        It 'allows a commit with a pathspec without reading the index' {
+            (Get-FollowUpAllowance -Command 'git commit -F /scratch/msg.txt -- docs/features/completed/child-a/x.md' -Reader { throw 'the index must not be read' }).Allowed | Should -BeTrue
+        }
+
+        It 'refuses <Case>' -ForEach @(
+            @{ Case = 'a production path leg'; Override = @{}; Feature = @{}; FilePath = @('scripts/x.ps1'); Command = '' }
+            @{ Case = 'route_id parallel'; Override = @{ route_id = 'parallel' }; Feature = @{}; FilePath = @(''); Command = 'git add docs/features/active/child-a/x.md' }
+            @{ Case = 'a blank integration_branch'; Override = @{ integration_branch = '' }; Feature = @{}; FilePath = @(''); Command = 'git add docs/features/active/child-a/x.md' }
+            @{ Case = 'an integration_branch other than Scope.Branch'; Override = @{ integration_branch = 'epic/other-integration' }; Feature = @{}; FilePath = @(''); Command = 'git add docs/features/active/child-a/x.md' }
+            @{ Case = 'no qualifying feature'; Override = @{}; Feature = @{ merge_status = 'pr_open' }; FilePath = @(''); Command = 'git add docs/features/active/child-a/x.md' }
+        ) {
+            (Get-FollowUpAllowance -Checkpoint (Get-RootsCheckpoint -Feature $Feature -Override $Override) -FilePath $FilePath -Command $Command).Allowed | Should -BeFalse -Because $Case
+        }
+
+        It 'refuses a pathless commit when the reader throws' {
+            $result = Get-FollowUpAllowance -Command 'git commit -m m' -Reader { throw 'index read failed' }
+            $result.Allowed | Should -BeFalse
+            $result.Detail | Should -BeLike 'allowance error:*'
+        }
+
+        It 'refuses a null scope and a checkpoint whose route_id cannot be read as text' {
+            (Get-EpicMergedFeatureFollowUpAllowance -Scope $null -FilePath @('docs/features/active/child-a/x.md') -Command '' -StagedIndexReader $null).Allowed | Should -BeFalse
+            $unreadable = [pscustomobject]@{}
+            $unreadable | Add-Member -MemberType ScriptMethod -Name ToString -Value { throw 'route_id unreadable' } -Force
+            $result = Get-FollowUpAllowance -Checkpoint (Get-RootsCheckpoint -Override @{ route_id = $unreadable }) -FilePath @('docs/features/active/child-a/x.md')
+            $result.Allowed | Should -BeFalse
+            $result.Detail | Should -BeLike 'allowance error:*'
+        }
+
+        It 'reads no per-item checkpoint and touches no file' {
+            $text = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot "$HookDirectory/hook-epic-fan-in.ps1")
+            $ast = [System.Management.Automation.Language.Parser]::ParseInput($text, [ref]$null, [ref]$null)
+            $commands = @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true) | ForEach-Object { $_.GetCommandName() })
+            $members = @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.MemberExpressionAst] }, $true) | ForEach-Object { $_.Member.Extent.Text })
+            $text.Contains('orchestrator-state.json') | Should -BeFalse
+            $commands | Should -Not -Contain 'Get-Content'
+            $commands | Should -Not -Contain 'Test-Path'
+            $members | Should -Not -Contain 'ReadAllText'
+            $commands | Should -Contain 'Get-EpicFanInPropertyText' -Because 'the scan must see the command calls of the file'
         }
     }
 
