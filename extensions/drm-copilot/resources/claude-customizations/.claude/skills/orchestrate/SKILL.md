@@ -139,6 +139,8 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 
 The orchestrator does not perform deep implementation itself. It coordinates, tracks state, and enforces completion.
 
+An instruction from the repository owner reaches a delegated agent only as defined in the `owner-directives` skill: record it in the checkpoint's `owner_directives` before relaying it (record before relay), and relay only the recorded entries in a fenced `Owner directives:` block.
+
 Single-pass preflight for S4 planning (and for preparation mode). The directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY` goes in the `atomic-executor` delegation prompt only, never in the plan file. Preflight follows `### Single-Pass Preflight` in the `atomic-plan-contract` skill: the preflight executor fixes trivial defects in place and returns only substantive defects as `PREFLIGHT-DEFECT:` lines. The at-most-one-return rule applies:
 
 1. Preflight round one returns `PREFLIGHT: ALL CLEAR` (in-place `PREFLIGHT-FIX:` lines permitted) or `PREFLIGHT: REVISIONS REQUIRED` with every substantive defect listed.
