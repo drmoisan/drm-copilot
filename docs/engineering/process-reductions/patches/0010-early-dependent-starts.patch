@@ -1,5 +1,5 @@
 diff --git a/.agents/skills/epic-orchestrate/SKILL.md b/.agents/skills/epic-orchestrate/SKILL.md
-index e3acb490651d6f2674e9bfea701cbc6eab776e66..b94a64dbb578ab33cf4f96d4bde434593ce958d0 100644
+index ef1c7f284c09d4fc7a096fd1c113903ae3d5e0f7..acccbe2aad80da795bf1f4067e6d14edad68986a 100644
 --- a/.agents/skills/epic-orchestrate/SKILL.md
 +++ b/.agents/skills/epic-orchestrate/SKILL.md
 @@ -117,6 +117,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
@@ -420,7 +420,7 @@ index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da14720868733
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/.claude/skills/epic-orchestrate/SKILL.md b/.claude/skills/epic-orchestrate/SKILL.md
-index 82f8d475bc6009bdd9f01fcb1a808284d616912b..f8100831cec5e8745880420d8b241d28e7d8a190 100644
+index 8f36123eb66582401939ff94cc902b9326f7f798..3eb766b36e21256d15076ac36427f79c3149a29a 100644
 --- a/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/.claude/skills/epic-orchestrate/SKILL.md
 @@ -300,6 +300,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
@@ -1027,7 +1027,7 @@ index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da14720868733
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-index 82f8d475bc6009bdd9f01fcb1a808284d616912b..f8100831cec5e8745880420d8b241d28e7d8a190 100644
+index 8f36123eb66582401939ff94cc902b9326f7f798..3eb766b36e21256d15076ac36427f79c3149a29a 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
 @@ -300,6 +300,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
@@ -1152,7 +1152,7 @@ index 61534760116c9ab01040b047e8b2d9486628acb2..8271812a0bced7d111e43f9d21ba976b
      ".claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1",
      ".claude/hooks/enforce-evidence-locations.ps1",
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md
-index e3acb490651d6f2674e9bfea701cbc6eab776e66..b94a64dbb578ab33cf4f96d4bde434593ce958d0 100644
+index ef1c7f284c09d4fc7a096fd1c113903ae3d5e0f7..acccbe2aad80da795bf1f4067e6d14edad68986a 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md
 @@ -117,6 +117,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
@@ -3230,19 +3230,21 @@ index 0000000000000000000000000000000000000000..bdcde4f875b92f58c0aab776b490034e
 +    }
 +}
 diff --git a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-index 61f42dc118c4676b7eb2650ff83f93571bde54ff..750e2de2f1e81efbf55081f34040e4b738749aa8 100644
+index 79f52ca0a4afd824ef0bb7dc418dc0a447726df6..82d40ed2a7c0ab939cd1820f5906328b8c64d8cf 100644
 --- a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
 +++ b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-@@ -210,14 +210,20 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
- # skill digest is unchanged. The merge of origin/main after #1136 combined both
+@@ -219,14 +219,22 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
+ # stays live for both entries. The merge of origin/main after #1138 combined both
  # skill edits, so the skill digest below is the merged result of #1129, #1130,
- # #1136, and #1138.
+ # #1136, #1138, and #1141.
 +#
 +# RE-BASELINED by issue #1097. That change added the opt-in
 +# `## Early Dependent Starts (early_start)` section to the epic skill, and to
 +# the epic agent one closing paragraph of `## Wave Scheduling` with the Bash
 +# grant for the repository validator CLI that section names. Both digests
-+# moved, and the pin stays live for both entries.
++# moved, and the pin stays live for both entries. The merge of origin/main after #1141
++# combined both skill edits, so the skill digest below is the merged result of
++# #1129, #1130, #1136, #1138, #1141, and #1097.
  PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
      (
          ".claude/agents/epic-orchestrator.md",
@@ -3251,8 +3253,8 @@ index 61f42dc118c4676b7eb2650ff83f93571bde54ff..750e2de2f1e81efbf55081f34040e4b7
      ),
      (
          ".claude/skills/epic-orchestrate/SKILL.md",
--        "2e67dae3dd5a015693696125374e341f8c21963f36145bcf5fa8265ff8be924e",
-+        "198cfa0f80e7fa712a49031a43eb64dd0c3da08afae56b7c6c32b282f5caeee5",
+-        "e227db655edef428ef688da4c482868db0c3a7cb6de662a7bafa19f9924b0d53",
++        "25f43d48d08babbfa93101c07069aef70e5aae87277e7abbab0ea0ba5159b08d",
      ),
  )
  
