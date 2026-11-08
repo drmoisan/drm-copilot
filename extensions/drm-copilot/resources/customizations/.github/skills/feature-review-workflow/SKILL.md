@@ -93,14 +93,13 @@ Always apply:
   - Use `policy-audit-template-usage` and the MCP `template` asset to drive the artifact structure.
    - Include exact command references for the checks that were run.
    - Validate the resulting `policy-audit.<timestamp>.md` immediately after writing it.
-   - Write a `## CI Cross-check` section after `## 7. Code Quality Checks`: a table `| Check | Claimed outcome | Claimed figure | Head | Source |` with one row per CI check whose result the review relies on, that is, the format, lint, type, and test checks of each changed language and `quality-checks7 / Code Quality & Tests (3.13)` for the Python total. The outcome is `pass` or `fail` from local evidence, and the head is read from `git log` of the reviewed branch. An absent or empty section is a reviewer contract error.
 
 5. **Run required checks**
    - Prefer repo-defined, check-only commands.
    - Default order:
-     1. formatting check, read from the language's final-QC static artifact and not re-run
-     2. lint check, read from the same static artifact and not re-run
-     3. type check, read from the same static artifact and not re-run
+     1. formatting check
+     2. lint check
+     3. type check
      4. tests
    - A focused run of one test file to debug a specific failure is debugging only; a review check does not rest on it.
    - If a tool cannot run in the environment, mark the affected section unverified or partial with a concrete reason.

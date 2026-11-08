@@ -86,8 +86,6 @@ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if a
 
 The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
 
-The format, lint, and type-check results of each language go into one final-QC static artifact per language, with each step's command, exit code, and finding count; each test gate keeps its own artifact.
-
 ## Scratch Location
 
 Concurrent child runs in one session share one session scratchpad, so every scratch file a run writes lives in a directory unique to the child.

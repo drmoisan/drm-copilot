@@ -24,7 +24,7 @@
 ---
 
 **Audit Date:** [YYYY-MM-DD]  
-**Code Under Test:** merge base `[merge-base SHA]` of the base branch and reviewed head `[head SHA]`; the diff between them lists the changed files
+**Code Under Test:** [List all files modified across all languages]
 
 **Coverage Metrics by Language:**
 
@@ -52,8 +52,6 @@ Baseline coverage is read from the plan's `Phase 0 baseline` artifact, one run o
 **Fail-closed rule:** If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
 
 **Evidence rule:** Do not synthesize or backfill missing audit evidence from memory or inference. If evidence is missing, stop and list the exact missing artifact paths.
-
-**CI-proven checks:** Format, lint, and type-check results are read from the final-QC static artifact of each language and are not re-run during the review. Each CI check the review relies on is recorded in `## CI Cross-check`, which the orchestrator compares with CI at the reviewed head.
 
 ---
 
@@ -326,7 +324,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 | Requirement | Status | Evidence |
 |------------|--------|----------|
 | **Use Pytest** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe use of Pytest. Note any fixtures or plugins used.] |
-| **Coverage expectation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report coverage metrics. Confirm new code has >= 90% coverage and repo-wide >= 80%. For the Python repo-wide total, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing it; a local artifact that shows the total below a threshold is still FAIL.] |
+| **Coverage expectation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report coverage metrics. Confirm new code has >= 90% coverage and repo-wide >= 80%.] |
 
 #### 4A.2 Test Style and Structure
 
@@ -458,16 +456,6 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 
 ---
 
-## CI Cross-check
-
-[One row per CI check whose result this review relies on: the format, lint, type, and test checks of each changed language, and `quality-checks7 / Code Quality & Tests (3.13)` for the Python total. Claimed outcome is `pass` or `fail` from local evidence; Head is the reviewed head read from `git log` of the branch. An absent or empty section is a reviewer contract error.]
-
-| Check | Claimed outcome | Claimed figure | Head | Source |
-|-------|-----------------|----------------|------|--------|
-| [CI check name] | [pass/fail] | [figure or N/A] | [reviewed head] | [evidence artifact] |
-
----
-
 ## 8. Gaps and Exceptions
 
 ### Identified Gaps
@@ -495,7 +483,32 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 
 ## 9. Summary of Changes
 
-[State in one or two sentences what the change does. Do not list commits or files here: the branch log and the diff from the merge base to the reviewed head, named under **Code Under Test**, carry them.]
+### Commits in This PR/Branch
+
+[List all commits with hashes and brief descriptions]
+
+**Example:**
+1. **[hash]** - [commit message]
+2. **[hash]** - [commit message]
+3. **[hash]** - [commit message]
+
+### Files Modified
+
+[List all files that were created, modified, or deleted]
+
+**Example:**
+
+1. **[path/to/file]** (NEW/MODIFIED/DELETED)
+   - [Description of changes]
+   - [Key points]
+
+2. **[path/to/file]** (NEW/MODIFIED/DELETED)
+   - [Description of changes]
+   - [Key points]
+
+3. **[path/to/file]** (NEW/MODIFIED/DELETED)
+   - [Description of changes]
+   - [Key points]
 
 ---
 
