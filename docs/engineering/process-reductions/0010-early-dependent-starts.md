@@ -5,7 +5,7 @@
 reduction: 0010
 Date: 2026-11-08
 Issue: #1097
-Merge commit: pending (PR #1097)
+Merge commit: pending (PR #1144)
 
 Relaxes the epic wave barrier for one opted-in dependency edge. A feature whose manifest entry carries `early_start_on: <upstream issue_num>` may start before that upstream merges, once the upstream has pushed an interface-settled evidence file, and records `features[].early_start` (`dependency`, `upstream_branch`, `interface_settled_at`, `interface_evidence`, later `synced_at`) in the epic checkpoint. Layer 1 (both `enforce-epic-wave-barrier.ps1` gates, through the sibling `epic-wave-barrier-early-start.ps1`) skips only that edge while the upstream is at `worktree_created`, `pr_open`, `ci_green`, or `merge_conflict`. Layer 2 (the Python, TypeScript, and PowerShell ports of the wave-barrier ordering check) judges that edge by its own table instead of the status and timing checks, and reports `EPIC_WAVE_BARRIER_VIOLATION: <f> is at pr_open or later while early_start dependency <d> is not merged` or `EPIC_WAVE_BARRIER_VIOLATION: <f> is at pr_open or later without a string synced_at for early_start dependency <d>`. A checkpoint without a valid record takes the previous path in every runtime. Until the pull request exists, the `Merge commit:` line carries the canonical issue number as a stand-in, and the orchestrator replaces it with the pull request number right after PR creation.
 
