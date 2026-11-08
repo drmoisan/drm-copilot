@@ -194,14 +194,20 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # and a step 6 to its `## Merge-Conflict Handling (Fan-In)` section. Only the
 # skill digest moved; the skill digest below is the merged result of #1129 and
 # #1130, the agent digest is unchanged, and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #1138. That change added the Agent-tool preflight as the
+# unnumbered lead paragraph of the agent's `## Startup Protocol`, which moved the
+# agent digest, and appended a `## Nesting Depth` section to the epic skill, which
+# moved the skill digest. Both digests moved, and the pin stays live for both
+# entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "f76721ce463ba06288dbd21135f572ae28cfd9036a908587e65e1e0629b55e75",
+        "68e32052c642ff8d8717478542872ef203878a13e9755bae820e3671c56ef716",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "4a7e5ba9cc7dc7eb9e66c905fc3e866f764d3777e65c1036c8aff12481ab261f",
+        "07c02db2ded7f64062f8b066f0d9369ad15443189f5de999fa5a165aaa8649f1",
     ),
 )
 
