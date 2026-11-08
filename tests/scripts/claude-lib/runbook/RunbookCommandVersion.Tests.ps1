@@ -144,3 +144,38 @@ version = "1.1.370"
         $pinned.Count | Should -Be 0
     }
 }
+
+Describe 'Get-RunbookCommandToolName' {
+    It 'derives <Expected> from <Command>' -ForEach @(
+        @{ Command = 'python -m nuitka --clean-cache=all'; Expected = 'nuitka' }
+        @{ Command = 'python3 -m Zope_Interface'; Expected = 'zope-interface' }
+        @{ Command = 'py -m pip install x'; Expected = 'pip' }
+        @{ Command = 'poetry run pytest -n auto'; Expected = 'pytest' }
+        @{ Command = 'poetry run python -m nuitka main.py'; Expected = 'nuitka' }
+        @{ Command = 'uv run ruff check .'; Expected = 'ruff' }
+        @{ Command = 'npx prettier --check .'; Expected = 'prettier' }
+        @{ Command = 'npx -y prettier@3.3.2 --check .'; Expected = 'prettier' }
+        @{ Command = 'npx @scope/tool run'; Expected = '@scope/tool' }
+        @{ Command = '$ az login'; Expected = 'az' }
+        @{ Command = 'Black.exe --check .'; Expected = 'black' }
+        @{ Command = 'git status'; Expected = 'git' }
+    ) {
+        # Arrange / Act
+        $tool = Get-RunbookCommandToolName -CommandLine $Command
+
+        # Assert
+        $tool | Should -Be $Expected
+    }
+
+    It 'returns null for a blank line and for npx with only flags' {
+        # Arrange / Act / Assert
+        Get-RunbookCommandToolName -CommandLine '   ' | Should -BeNullOrEmpty
+        Get-RunbookCommandToolName -CommandLine 'npx --yes' | Should -BeNullOrEmpty
+    }
+
+    It 'names the launcher itself when no tool operand follows' {
+        # Arrange / Act / Assert
+        Get-RunbookCommandToolName -CommandLine 'python script.py' | Should -Be 'python'
+        Get-RunbookCommandToolName -CommandLine 'poetry install' | Should -Be 'poetry'
+    }
+}

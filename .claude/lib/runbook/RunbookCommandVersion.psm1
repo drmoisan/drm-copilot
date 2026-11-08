@@ -84,4 +84,41 @@ function Get-RunbookPinnedToolVersion {
     return $pinned
 }
 
-Export-ModuleMember -Function Get-RunbookPinnedToolVersion
+function Get-RunbookCommandToolName {
+    <#
+    .SYNOPSIS
+        Derives the normalized tool name from one command line, or $null when none is found.
+    .DESCRIPTION
+        The first token names the tool, except that 'python -m X', 'python3 -m X', 'py -m X',
+        'poetry run X', 'uv run X' and 'npx X' name X. A launcher that wraps another command
+        ('poetry run python -m X') resolves the wrapped command.
+    .PARAMETER CommandLine
+        One command line from a runbook shell block.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $CommandLine)
+
+    $text = [regex]::Replace($CommandLine.Trim(), '^\$\s+', '')
+    if ([string]::IsNullOrWhiteSpace($text)) { return $null }
+    $token = @($text -split '\s+')
+    $first = [regex]::Replace($token[0], '\.exe$', '', 'IgnoreCase')
+    # The array subexpression keeps a one-element result an array under strict mode.
+    $rest = @(if ($token.Count -gt 1) { $token[1..($token.Count - 1)] })
+
+    if (@('python', 'python3', 'py') -contains $first.ToLowerInvariant() -and $rest.Count -ge 2 -and $rest[0] -eq '-m') {
+        return ConvertTo-RunbookNormalizedToolName -Name $rest[1]
+    }
+    if (($first -eq 'poetry' -or $first -eq 'uv') -and $rest.Count -ge 2 -and $rest[0] -eq 'run') {
+        return Get-RunbookCommandToolName -CommandLine ($rest[1..($rest.Count - 1)] -join ' ')
+    }
+    if ($first -eq 'npx') {
+        $operand = @($rest | Where-Object { -not $_.StartsWith('-') })
+        if ($operand.Count -eq 0) { return $null }
+        $name = [regex]::Replace($operand[0], '^(@?[^@]+)@.+$', '$1')
+        return ConvertTo-RunbookNormalizedToolName -Name $name
+    }
+    return ConvertTo-RunbookNormalizedToolName -Name $first
+}
+
+Export-ModuleMember -Function Get-RunbookPinnedToolVersion, Get-RunbookCommandToolName
