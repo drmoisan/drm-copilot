@@ -94,6 +94,8 @@ Describe 'Codex enforce-epic-merge-gate standalone authorization (issue #670)' {
             @{ Name = 'the unchanged branch-2 epic guard'; Command = 'gh pr merge 688 --merge'; Child = 'none'; Epic = 'epic-ready'; Session = 'session-670-a1b2'; Expected = 'allow'; Token = '' }
             @{ Name = 'a squash merge of 691 with a valid 691 record'; Command = 'gh pr merge 691 --squash'; Child = 'record-691'; Epic = 'none'; Session = 'session-670-a1b2'; Expected = 'allow'; Token = '' }
         ) {
+            # The branch-1 child guard now requires a verified CI run (issue #1130); the child-CI decision is mocked to Verified.
+            Mock -CommandName Get-EpicMergeGateChildCiDecision -MockWith { [ordered]@{ Verified = $true; Reason = '' } }
             $payload = ConvertTo-CodexPayload -Command $Command -Session $Session
             $decision = Invoke-CodexEpicMergeDecision -PayloadRaw $payload -ChildCheckpointRaw $script:Fixtures[$Child] -EpicCheckpointRaw $script:Fixtures[$Epic]
 
