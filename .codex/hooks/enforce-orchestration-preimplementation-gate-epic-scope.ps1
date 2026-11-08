@@ -47,6 +47,7 @@
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-resolution.ps1')
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-targets.ps1')
 try { . (Join-Path $PSScriptRoot 'hook-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'hook-target-worktree.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-epic-fan-in.ps1') } catch { Add-HookDependencyFailure -Name 'hook-epic-fan-in.ps1' -ErrorRecord $_ }
 
 # The target-resolution reason codes (issue #1010). Their source is
 # Get-WorktreeResolutionAmbiguityReasonCode and Get-WorktreeResolutionNoTargetReasonCode
@@ -400,7 +401,9 @@ function Get-OrchestrationEpicScopeDecision {
         unchanged. In epic scope, denies an unresolvable, ambiguous, or out-of-scope target,
         and otherwise evaluates the epic command-leg readiness predicate against every
         target: the first failure denies (the session-root wording is unchanged), and no
-        failure allows.
+        failure allows. Post-fan-in allowance (issue #1136): a target whose failure is exactly
+        'merge-in-progress' passes when Test-EpicFanInComplete holds and
+        Get-EpicFanInAllowance reports Allowed over the leg paths or the leg command.
     .PARAMETER Command
         The command line of a command or apply_patch leg; empty for a path leg.
     .PARAMETER FilePath
@@ -435,7 +438,13 @@ function Get-OrchestrationEpicScopeDecision {
     $verdict = Resolve-OrchestrationEpicTargetVerdict -SessionRoot $epicScopeSessionRoot -TargetResult $targetResult -ScopeResolver $scopeResolver
     $outcome = Resolve-OrchestrationEpicTargetOutcome -Verdict $verdict -ReadinessFailure {
         param($Scope)
-        Get-EpicCommandLegReadinessFailure -Checkpoint $Scope.Checkpoint -MergeInProgress $Scope.MergeInProgress
+        $failure = Get-EpicCommandLegReadinessFailure -Checkpoint $Scope.Checkpoint -MergeInProgress $Scope.MergeInProgress
+        $reader = { param([string] $WorktreeRoot) Get-OrchestrationGateStagedIndex -WorktreeRoot $WorktreeRoot }
+        if ($failure -ceq 'merge-in-progress' -and (Test-EpicFanInComplete -Checkpoint $Scope.Checkpoint -Branch $Scope.Branch) -and
+            (Get-EpicFanInAllowance -Scope $Scope -FilePath $legPaths -Command $legCommand -StagedIndexReader $reader).Allowed) {
+            return ''
+        }
+        $failure
     }
     if ($outcome.Outcome -eq 'none') {
         return $null
