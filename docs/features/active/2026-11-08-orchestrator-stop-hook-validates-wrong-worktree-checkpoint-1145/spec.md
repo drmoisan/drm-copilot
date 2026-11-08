@@ -134,15 +134,15 @@ Seeded from issue:
 
 
 ## Acceptance Criteria
-- [ ] The orchestrator SubagentStop hook (`validate-orchestrator-output.ps1`) resolves the item worktree through `Resolve-SubagentStopTargetWorktree` (which wraps `Resolve-HookTargetWorktree`) from the delegation prompt in the subagent transcript (`branch:` label, canonical issue line) and validates that worktree's `artifacts/orchestration/orchestrator-state.json`; the routing-contract, runbook, and feature-folder checks use the same root.
-- [ ] Hook-level Pester tests fail before and pass after the fix: session root holds an invalid or different checkpoint and the item worktree a valid one -> allow; reverse (session root valid, item invalid) -> block. Fail-before evidence is recorded under `evidence/regression-testing/`.
-- [ ] With no identifiable target (no prompt identity), the hook falls back to the session worktree and says so: the fallback note appears in the block message, and on stderr when the stop is allowed.
-- [ ] When identity is present but unresolvable (NoTarget) or matches more than one worktree (Ambiguous), the hook blocks with `ORCHESTRATOR_CHECKPOINT_UNRESOLVED` and reads no checkpoint; it never validates an unrelated checkpoint.
-- [ ] Gate intent is unchanged: every existing validate-orchestrator-output test passes unchanged, and the epic and parallel artifact kinds behave as before.
-- [ ] The new logic lives in a separate dot-sourced sibling (`validate-orchestrator-output-target.ps1`) with a minimal edit to the main hook; the bundle mirror under `extensions/drm-copilot/resources` and the pack manifest are updated; the push-down contract tests pass.
-- [ ] The orchestrate skill and the execution-environment brief `## Hook Execution Context` are updated in all copies, and the six brief copies remain byte-identical.
-- [ ] No new Python is introduced (PowerShell only); line coverage of the new file is >= 90%; no per-file coverage drop versus the Phase 0 baseline; the parallel Pester gate (`Invoke-PoshQCParallelTest`) and `pytest -n auto` are green.
-- [ ] No absolute paths are encoded in committed artifacts.
+- [x] The orchestrator SubagentStop hook (`validate-orchestrator-output.ps1`) resolves the item worktree through `Resolve-SubagentStopTargetWorktree` (which wraps `Resolve-HookTargetWorktree`) from the delegation prompt in the subagent transcript (`branch:` label, canonical issue line) and validates that worktree's `artifacts/orchestration/orchestrator-state.json`; the routing-contract, runbook, and feature-folder checks use the same root.
+- [x] Hook-level Pester tests fail before and pass after the fix: session root holds an invalid or different checkpoint and the item worktree a valid one -> allow; reverse (session root valid, item invalid) -> block. Fail-before evidence is recorded under `evidence/regression-testing/`.
+- [x] With no identifiable target (no prompt identity), the hook falls back to the session worktree and says so: the fallback note appears in the block message, and on stderr when the stop is allowed.
+- [x] When identity is present but unresolvable (NoTarget) or matches more than one worktree (Ambiguous), the hook blocks with `ORCHESTRATOR_CHECKPOINT_UNRESOLVED` and reads no checkpoint; it never validates an unrelated checkpoint.
+- [x] Gate intent is unchanged: every existing validate-orchestrator-output test passes unchanged, and the epic and parallel artifact kinds behave as before.
+- [x] The new logic lives in a separate dot-sourced sibling (`validate-orchestrator-output-target.ps1`) with a minimal edit to the main hook; the bundle mirror under `extensions/drm-copilot/resources` and the pack manifest are updated; the push-down contract tests pass.
+- [x] The orchestrate skill and the execution-environment brief `## Hook Execution Context` are updated in all copies, and the six brief copies remain byte-identical.
+- [x] No new Python is introduced (PowerShell only); line coverage of the new file is >= 90%; no per-file coverage drop versus the Phase 0 baseline; the parallel Pester gate (`Invoke-PoshQCParallelTest`) and `pytest -n auto` are green.
+- [x] No absolute paths are encoded in committed artifacts.
 
 ## Risks & Mitigations
 - Technical or operational risks: merge conflict with PR #1139 on the main hook; unlisted sibling breaking mirror, manifest, or dependency-closure tests; coverage gaps in fallback and failure branches; test-state leakage across parallel shards; Linux-only CI failures from drive-letter roots.
