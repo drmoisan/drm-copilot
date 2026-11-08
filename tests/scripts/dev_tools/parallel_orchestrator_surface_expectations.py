@@ -188,6 +188,12 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # `Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)` grant
 # to the agent's `tools:` list. Both digests moved, and the pin stays live for
 # both entries.
+#
+# RE-BASELINED by issue #1130. That change added the epic-child CI verification
+# paragraph to the epic skill's `## Merge-on-Green Kickoff Parameter` section
+# and a step 6 to its `## Merge-Conflict Handling (Fan-In)` section. Only the
+# skill digest moved; the skill digest below is the merged result of #1129 and
+# #1130, the agent digest is unchanged, and the pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -195,7 +201,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "3978114ca323a4bd2fda1ced50846455ef5a37e85c4a262b4ba494d0f627c39e",
+        "4a7e5ba9cc7dc7eb9e66c905fc3e866f764d3777e65c1036c8aff12481ab261f",
     ),
 )
 

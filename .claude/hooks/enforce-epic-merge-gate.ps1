@@ -10,10 +10,10 @@
     checkpoint-only conditions holds:
 
       1. Child-feature path: artifacts/orchestration/orchestrator-state.json exists,
-         epic_mode == true, and step9_status == "passed" (the per-feature orchestrator has
-         already run S9 step 6's CI-green gate before attempting its own merge-on-green).
-         Only the JSON boolean true counts as epic mode; a string or number such as "false"
-         does not (issue #1001).
+         epic_mode == true (the JSON boolean only, issue #1001), step9_status == "passed",
+         and Get-EpicMergeGateChildCiDecision (enforce-epic-merge-gate-child-ci.ps1, issue
+         #1130) verifies a green CI run on the live PR head. Any stage failure denies with
+         EPIC_CHILD_CI_NOT_VERIFIED and never falls through to the later branches.
       2. Epic-integration path: artifacts/orchestration/epic-orchestrator-state.json exists,
          epic_merge_pr.ci_gate.conclusion == "success", and, when the command names an
          explicit PR number, that number matches epic_merge_pr.pr_number.
@@ -45,8 +45,8 @@
     enqueues the pull request; only a pure --disable-auto is out of scope. The predicate and the
     PR selector reader live in enforce-epic-merge-gate-command.ps1.
 
-    Design decision: without review_mode concurrent, branches 1-4 trust the on-disk checkpoint and
-    never call gh. Under that key the review guard (enforce-epic-merge-gate-review.ps1, issue #1097)
+    Design decision: without review_mode concurrent, branches 2-4 trust the on-disk checkpoint and
+    never call gh; branch 1 makes two bounded gh calls. Under that key the review guard (issue #1097)
     runs before branch 1 and makes one bounded gh pr view call and at most two git calls, and it
     denies a merge with no passing review at a current head. Its shape check precedes the
     out-of-scope allow and denies text that could be a merge and cannot be bound. The green-CI
@@ -106,6 +106,7 @@ try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDe
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-green-ci.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-green-ci.ps1' -ErrorRecord $_ }
 # Review guard under review_mode concurrent, byte-identical to the Codex copy (issue #1097).
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-review.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-review.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-child-ci.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-child-ci.ps1' -ErrorRecord $_ }
 
 function ConvertFrom-EpicMergeGateJson {
     <#
@@ -383,7 +384,9 @@ function Invoke-EpicMergeGateDecision {
 
     if ((Test-ChildCheckpointAllowsEpicMerge -Checkpoint $childCheckpoint) -and
         (Test-ChildCheckpointPrGateBinding -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber)) {
-        return Get-EpicMergeGateAllowDecision
+        $childCi = Get-EpicMergeGateChildCiDecision -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber -GhRoot $sessionRoot
+        if ($childCi.Verified) { return Get-EpicMergeGateAllowDecision }
+        return Get-EpicMergeGateBlockDecision -Reason $childCi.Reason
     }
 
     # A bare command targets the current branch's PR, so it reads the session worktree. An

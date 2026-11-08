@@ -25,6 +25,12 @@
     runs before every allow branch, with gh and git in the repository root, and denies a merge with
     no passing review at a current head. Its shape check precedes the out-of-scope allow and denies
     text that could be a merge and cannot be bound. Without the key it is inert and starts no process.
+
+    Epic-child CI verification (issue #1130): when Test-CodexChildMergeReady holds, the child merge is
+    allowed only when Get-EpicMergeGateChildCiDecision (enforce-epic-merge-gate-child-ci.ps1,
+    byte-identical to the Claude copy) verifies a green CI run on the live PR head, with gh in the
+    repository root. Any stage failure denies with EPIC_CHILD_CI_NOT_VERIFIED and never falls
+    through to the epic, standalone, or docs-only branches.
 #>
 [CmdletBinding()]
 param()
@@ -42,6 +48,8 @@ try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-command.ps1') } catch 
 try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDependencyFailure -Name 'hook-docs-only-diff.ps1' -ErrorRecord $_ }
 # Review guard under review_mode concurrent, byte-identical to the Claude copy (issue #1097).
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-review.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-review.ps1' -ErrorRecord $_ }
+# Epic-child CI verification, byte-identical to the Claude copy (issue #1130).
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-child-ci.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-child-ci.ps1' -ErrorRecord $_ }
 
 # Reason codes for the standalone-merge authorization branch (issue #670), spelled
 # byte-identically to the Claude helpers file. Each of the four assignments below is the only
@@ -182,7 +190,18 @@ function Invoke-CodexEpicMergeDecision {
     }
 
     if (Test-CodexChildMergeReady -Checkpoint $child) {
-        return $null
+        # Issue #1130: an epic child merges only on a verified CI run; a failure denies without fall-through.
+        $childCi = Get-EpicMergeGateChildCiDecision -Checkpoint $child -CommandPrNumber $prNumber -GhRoot $RepositoryRoot
+        if ($childCi.Verified) {
+            return $null
+        }
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = $childCi.Reason
+            }
+        }
     }
     $epic = ConvertFrom-CodexMergeJson -Raw $EpicCheckpointRaw -Name 'epic checkpoint' -Optional
     if (Test-CodexEpicMergeReady -Checkpoint $epic -CommandPrNumber $prNumber) {

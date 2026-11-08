@@ -208,6 +208,8 @@ Describe 'enforce-epic-merge-gate review paths (issue #1097)' {
             Assert-ReviewPathDeniedByReview -Result (Invoke-ReviewPathDecision -Child (Get-ReviewPathChildJson -Path PATH1 -ReviewPending))
         }
         It 'RGP-PATH1-BOTH-ALLOWED' {
+            # An allowed epic-child merge needs a verified CI run (issue #1130); the child-CI seams are mocked green by name.
+            Register-EpicMergeGateReviewChildCiSeam -HeadSha $script:Reviewed
             (Invoke-ReviewPathDecision -Child (Get-ReviewPathChildJson -Path PATH1)).Json | Should -BeExactly $script:AllowJson
         }
     }
@@ -222,6 +224,8 @@ Describe 'enforce-epic-merge-gate review paths (issue #1097)' {
             Assert-ReviewPathDeniedByReview -Result (Invoke-ReviewPathDecision -Child (Get-ReviewPathChildJson -Path PATH3 -ReviewPending))
         }
         It 'RGP-PATH3-BOTH-ALLOWED' {
+            # Issue #1130: the child-CI seams are mocked green by name so no allow row depends on a live CI lookup.
+            Register-EpicMergeGateReviewChildCiSeam -HeadSha $script:Reviewed
             Register-ReviewPathRunCheckpoint -Kind parallel -Text $script:ParallelGreen
             (Invoke-ReviewPathDecision -Child (Get-ReviewPathChildJson -Path PATH3)).Json | Should -BeExactly $script:AllowJson
         }
@@ -239,6 +243,8 @@ Describe 'enforce-epic-merge-gate review paths (issue #1097)' {
             Assert-ReviewPathDeniedByReview -Result (Invoke-ReviewPathDecision -Child (Get-ReviewPathChildJson -Path PATH3B -ReviewPending))
         }
         It 'RGP-PATH3B-BOTH-ALLOWED' {
+            # Issue #1130: the child-CI seams are mocked green by name so no allow row depends on a live CI lookup.
+            Register-EpicMergeGateReviewChildCiSeam -HeadSha $script:Reviewed
             (Invoke-ReviewPathDecision -Child (Get-ReviewPathChildJson -Path PATH3B)).Json | Should -BeExactly $script:AllowJson
             Should -Invoke Get-EpicMergeGateReviewLiveHeadSha -Times 1 -Exactly
             Should -Invoke Get-EpicMergeGateLivePrHeadSha -Times 1 -Exactly
@@ -282,6 +288,8 @@ Describe 'enforce-epic-merge-gate review paths (issue #1097)' {
 
     Context 'a checkpoint without the key' {
         It 'RGP-NOKEY-PATH1-NO-GH-NO-DENIAL-UNCHANGED' {
+            # An allowed epic-child merge needs a verified CI run (issue #1130); the seams are mocked by name, so the gh count stays 0.
+            Register-EpicMergeGateReviewChildCiSeam -HeadSha $script:Reviewed
             Assert-ReviewPathNoGuardProcess -GhCount 0 -Result (Invoke-ReviewPathDecision -Child (Get-ReviewPathChildJson -Path PATH1 -NoKey -ReviewPending))
         }
         It 'RGP-NOKEY-PATH2-NO-GH-NO-DENIAL-UNCHANGED' {

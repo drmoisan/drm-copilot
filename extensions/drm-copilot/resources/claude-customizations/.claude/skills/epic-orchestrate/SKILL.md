@@ -143,6 +143,17 @@ recording `epic_merge: { merge_commit_sha, target_branch, merged_at }`. The chil
 `origin/<integration_branch>` (S9 step 6). Standalone (non-epic)
 orchestration is unchanged: `epic_mode` absent or `false` makes S9 step 6 a no-op.
 
+Epic-child CI verification (issue #1130): the child verifies CI on its own head before S9 step 6
+merges. When no check whose `workflow` is `CI` exists on the child head, for example because the
+repository's `CI` workflow does not list `epic/**` in its `pull_request` branches, the child runs
+the S9 dispatch fallback of `.claude/skills/orchestrate/SKILL.md` and records
+`ci_gate.dispatch_run_id`. When a child reports that it is blocked at S9 because no `CI` run exists
+on its head, `epic-orchestrator` dispatches `CI` once on the child branch
+(`gh workflow run CI --ref <child branch>`) as the fallback and resumes the child at S9 to record
+the run. A child merge into the integration branch is never accepted without a green `CI` run on
+the child head SHA: `enforce-epic-merge-gate-child-ci.ps1` denies it with
+`EPIC_CHILD_CI_NOT_VERIFIED`.
+
 The run gates `enforce-orchestration-preimplementation-gate.ps1` and `enforce-epic-wave-barrier.ps1` locate the epic checkpoint by the `integration_branch:` value of this line. They select the live worktree whose `artifacts/orchestration/epic-orchestrator-state.json` records `route_id` `epic` and that integration branch, prefer the worktree that has the branch checked out when more than one records it, and deny the delegation with `TARGET_WORKTREE_NOT_DERIVABLE` or `TARGET_WORKTREE_AMBIGUOUS` when none or more than one remains. A stale copy of the epic checkpoint is moved to `artifacts/orchestration/handoff/` rather than left at a worktree root. The child run's own delegations to implementation agents carry the canonical issue-number line and `branch:` label defined in `.claude/skills/orchestrate/SKILL.md` `## Issue Number Consistency`.
 
 ## Bounded Child Return Contract
@@ -248,6 +259,8 @@ Procedure, triggered by S9 step 6's merge failure:
    `step9_status: "blocked_conflict_loop_limit"` (parallel to `blocked_ci_loop_limit`), does not
    write DONE, and halts. It reports this status to `epic-orchestrator`, which mirrors it into
    the epic checkpoint's per-feature `merge_status: "blocked_conflict_loop_limit"` field.
+6. A resolved conflict produces a new child head, so S9 runs again against it, and the fan-in
+   merge is accepted only with a green `CI` run on that new head (issue #1130).
 
 ## Wave Barrier (Two-Layer Design)
 
