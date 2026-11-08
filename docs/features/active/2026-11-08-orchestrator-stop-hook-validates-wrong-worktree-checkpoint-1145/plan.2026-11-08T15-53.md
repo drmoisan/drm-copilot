@@ -54,7 +54,7 @@
 
 ### Phase 1 — Reproduce (fail-before)
 
-- [ ] [P1-T1] [expect-fail] Create `tests/scripts/claude-hooks/validate-orchestrator-output.TargetWorktree.Tests.ps1`, modeled on `validate-human-exception-runbook-output.TargetWorktree.Tests.ps1`: session root `/synthetic-worktrees/main`, item root `/synthetic-worktrees/main/.claude/worktrees/bug-1145` on `bug/sample-1145`, porcelain list and transcript reader as closures, a path-keyed `Get-CheckpointFileContent` mock that records reads, recording `-RoutingInvoker` and `-FeatureFolderGitInvoker`. Rows, each through `Invoke-OrchestratorOutputValidation`:
+- [x] [P1-T1] [expect-fail] Create `tests/scripts/claude-hooks/validate-orchestrator-output.TargetWorktree.Tests.ps1`, modeled on `validate-human-exception-runbook-output.TargetWorktree.Tests.ps1`: session root `/synthetic-worktrees/main`, item root `/synthetic-worktrees/main/.claude/worktrees/bug-1145` on `bug/sample-1145`, porcelain list and transcript reader as closures, a path-keyed `Get-CheckpointFileContent` mock that records reads, recording `-RoutingInvoker` and `-FeatureFolderGitInvoker`. Rows, each through `Invoke-OrchestratorOutputValidation`:
   - H1 session checkpoint missing `next_step`, item valid, prompt with `branch:` and issue line: allow; only the item path is read; the routing invoker receives the item path.
   - H2 session valid, item missing `next_step`: block naming the item path; the session path is never read.
   - H3 no `agent_transcript_path`: reader not called; session invalid blocks with `ORCHESTRATOR_CHECKPOINT_FALLBACK:` in the message; session valid allows with the token in `Note` and a null `Message`.
