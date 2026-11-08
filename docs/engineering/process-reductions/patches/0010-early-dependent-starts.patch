@@ -1,8 +1,8 @@
 diff --git a/.agents/skills/epic-orchestrate/SKILL.md b/.agents/skills/epic-orchestrate/SKILL.md
-index ef1c7f284c09d4fc7a096fd1c113903ae3d5e0f7..acccbe2aad80da795bf1f4067e6d14edad68986a 100644
+index ebb8e004d19960bc5c580eeda04567ec8982cc57..c4958714b809e49834b82022d2a4d6f3e4d2f35d 100644
 --- a/.agents/skills/epic-orchestrate/SKILL.md
 +++ b/.agents/skills/epic-orchestrate/SKILL.md
-@@ -117,6 +117,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
+@@ -121,6 +121,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
  mutation hook is a per-child deterrent; the epic-state validator is the retrospective,
  authoritative backstop.
  
@@ -420,10 +420,10 @@ index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da14720868733
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/.claude/skills/epic-orchestrate/SKILL.md b/.claude/skills/epic-orchestrate/SKILL.md
-index 8f36123eb66582401939ff94cc902b9326f7f798..3eb766b36e21256d15076ac36427f79c3149a29a 100644
+index c312f554b12b9b28ac1c6685542d1aba47d69e50..3ea75b39f8c4c40b1a33e5f93f20aa2305f30800 100644
 --- a/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/.claude/skills/epic-orchestrate/SKILL.md
-@@ -300,6 +300,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
+@@ -304,6 +304,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
  `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
  on resume, not from in-memory completion notifications alone.
  
@@ -1027,10 +1027,10 @@ index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da14720868733
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-index 8f36123eb66582401939ff94cc902b9326f7f798..3eb766b36e21256d15076ac36427f79c3149a29a 100644
+index c312f554b12b9b28ac1c6685542d1aba47d69e50..3ea75b39f8c4c40b1a33e5f93f20aa2305f30800 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-@@ -300,6 +300,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
+@@ -304,6 +304,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
  `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
  on resume, not from in-memory completion notifications alone.
  
@@ -1140,7 +1140,7 @@ index 0cd1aceb6d929a9363fa81149fade5d6084bc489..f876adcf8b4c2e5bb507061cd0544111
  
  This chain runs three levels of subagents below the main session: the coordinator at depth 1, each per-feature `orchestrator` at depth 2, and the specialists that orchestrator delegates to at depth 3. Only the depth-2 orchestrator needs the `Agent` tool below the coordinator; specialists do not delegate.
 diff --git a/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json b/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json
-index 61534760116c9ab01040b047e8b2d9486628acb2..8271812a0bced7d111e43f9d21ba976b2987b5c9 100644
+index dcec79fbe7fcac3624c78729057c3726c95f5823..2be2c323b6c43215f8a621ff7e9757b89127fc4b 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json
 +++ b/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json
 @@ -51,6 +51,7 @@
@@ -1152,10 +1152,10 @@ index 61534760116c9ab01040b047e8b2d9486628acb2..8271812a0bced7d111e43f9d21ba976b
      ".claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1",
      ".claude/hooks/enforce-evidence-locations.ps1",
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md
-index ef1c7f284c09d4fc7a096fd1c113903ae3d5e0f7..acccbe2aad80da795bf1f4067e6d14edad68986a 100644
+index ebb8e004d19960bc5c580eeda04567ec8982cc57..c4958714b809e49834b82022d2a4d6f3e4d2f35d 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md
-@@ -117,6 +117,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
+@@ -121,6 +121,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
  mutation hook is a per-child deterrent; the epic-state validator is the retrospective,
  authoritative backstop.
  
@@ -1444,10 +1444,10 @@ index 0000000000000000000000000000000000000000..0ccfc28911556e22d6c5402882f87ea0
 +    return ($null -ne $status -and $status.Value -is [string] -and $usable -ccontains $status.Value)
 +}
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json b/extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json
-index 610e8c91f350ff7084234e123af32795a66812f9..f8e166f349c6c372b4f51d10ea4f869d2d4e4477 100644
+index 8c9bfe27937ec6a6df5147ed37ea27fe75634214..8a764d6c4f12cddec3d85e6fd0e77c94ae386cf8 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json
-@@ -75,6 +75,7 @@
+@@ -76,6 +76,7 @@
      ".codex/hooks/enforce-epic-planning-only.ps1",
      ".codex/hooks/enforce-epic-root-invocation.ps1",
      ".codex/hooks/enforce-epic-wave-barrier.ps1",
@@ -3230,10 +3230,10 @@ index 0000000000000000000000000000000000000000..bdcde4f875b92f58c0aab776b490034e
 +    }
 +}
 diff --git a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-index 79f52ca0a4afd824ef0bb7dc418dc0a447726df6..82d40ed2a7c0ab939cd1820f5906328b8c64d8cf 100644
+index 7124bcb667a30087272b5f7bd9a9a43cd3ca31b2..46ed72d5451848042c73c45ef6fda96782eaab30 100644
 --- a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
 +++ b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-@@ -219,14 +219,22 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
+@@ -219,14 +219,23 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
  # stays live for both entries. The merge of origin/main after #1138 combined both
  # skill edits, so the skill digest below is the merged result of #1129, #1130,
  # #1136, #1138, and #1141.
@@ -3242,9 +3242,10 @@ index 79f52ca0a4afd824ef0bb7dc418dc0a447726df6..82d40ed2a7c0ab939cd1820f5906328b
 +# `## Early Dependent Starts (early_start)` section to the epic skill, and to
 +# the epic agent one closing paragraph of `## Wave Scheduling` with the Bash
 +# grant for the repository validator CLI that section names. Both digests
-+# moved, and the pin stays live for both entries. The merge of origin/main after #1141
-+# combined both skill edits, so the skill digest below is the merged result of
-+# #1129, #1130, #1136, #1138, #1141, and #1097.
++# moved, and the pin stays live for both entries. The merges of origin/main after
++# #1141 and after #1146 (owner-directive relay sentence in the epic skill)
++# combined the skill edits, so the skill digest below is the merged result of
++# #1129, #1130, #1136, #1138, #1141, #1146, and #1097.
  PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
      (
          ".claude/agents/epic-orchestrator.md",
@@ -3253,8 +3254,8 @@ index 79f52ca0a4afd824ef0bb7dc418dc0a447726df6..82d40ed2a7c0ab939cd1820f5906328b
      ),
      (
          ".claude/skills/epic-orchestrate/SKILL.md",
--        "e227db655edef428ef688da4c482868db0c3a7cb6de662a7bafa19f9924b0d53",
-+        "25f43d48d08babbfa93101c07069aef70e5aae87277e7abbab0ea0ba5159b08d",
+-        "810801a4a734a1d5a2130092e90e685ea4dd36105615f0b92d31a8ef69a48486",
++        "119304a18373be1ee2aa7d153e93de4b2a13ce876ac8fbf6a0a541ad687374a4",
      ),
  )
  
