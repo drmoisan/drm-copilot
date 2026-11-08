@@ -1,6 +1,11 @@
+---
+name: human-exception-runbook
+description: Contract for runbooks that document permitted human exceptions recorded in orchestrator state.
+---
+
 # Human-Exception Runbook
 
-Defines the contract for a human-exception runbook: the artifact the orchestrator emits when an unautomatable requirement is resolved with the `exception` response under the autonomous-execution mandate (see `.claude/skills/orchestrate/SKILL.md`).
+Defines the contract for a human-exception runbook: the artifact the orchestrator emits when an unautomatable requirement is resolved with the `exception` response under the autonomous-execution mandate (see `.agents/skills/orchestrate/SKILL.md`).
 
 ## When to Use This Skill
 
@@ -65,4 +70,4 @@ A runbook is contract-conformant when:
 - third-party UI steps were sourced MCP-first / web-second,
 - every counted shell block carries `Version check:` marker lines per the Tool Command Version Rule.
 
-A self-contained, conformant example is provided at `.claude/skills/human-exception-runbook/example.runbook.md`.
+A self-contained, conformant example is provided at `.agents/skills/human-exception-runbook/example.runbook.md`.
