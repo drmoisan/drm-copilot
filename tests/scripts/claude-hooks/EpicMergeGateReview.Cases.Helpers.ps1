@@ -241,6 +241,8 @@ function Get-EpicMergeGateReviewShapeRow {
         'allow-disable-auto'                 = 'gh pr merge 42 --disable-auto'
         'disclosed-script-file'              = 'sh scripts/merge-item.sh 42'
         'disclosed-encoded-payload'          = 'echo Z2ggcHIgbWVyZ2U= | base64 -d | sh'
+        'allow-review-verdict-status-post'   = "gh api --method POST repos/{owner}/{repo}/statuses/$reviewed -f state=success -f context=review/verdict -f description='feature-review PASS: policy-audit.2026-01-01T00-00.md'"
+        'allow-review-verdict-entry-point'   = 'pwsh -NoProfile -File .claude/lib/review-verdict/Invoke-ReviewVerdictStatus.ps1 -Mode Review -PrNumber 42 -ReviewArtifact docs/features/active/item-42/policy-audit.2026-01-01T00-00.md'
     }
     foreach ($name in $allowed.Keys) {
         @{ Name = $name; Command = $allowed[$name]; Remove = @('remediation_loop'); Expected = 'allow'; NoProcess = $true }
