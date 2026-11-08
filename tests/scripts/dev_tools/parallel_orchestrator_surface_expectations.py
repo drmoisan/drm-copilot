@@ -211,11 +211,22 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # skill edits, so the skill digest below is the merged result of #1129, #1130,
 # #1136, and #1138.
 #
+# RE-BASELINED by issue #1141. That change added a merged-feature follow-up
+# allowance paragraph after the post-fan-in allowance paragraph of the epic skill
+# and extended its `## Worktree Cleanup` mirror sentence to state that the child's
+# `pr_number` and `merge_commit_sha` are recorded in the matching `features[]`
+# entry. Only the skill digest moved; the agent digest is unchanged and the pin
+# stays live for both entries. The merge of origin/main after #1138 combined both
+# skill edits, so the skill digest below is the merged result of #1129, #1130,
+# #1136, #1138, and #1141.
+#
 # RE-BASELINED by issue #1097. That change added the opt-in
 # `## Early Dependent Starts (early_start)` section to the epic skill, and to
 # the epic agent one closing paragraph of `## Wave Scheduling` with the Bash
 # grant for the repository validator CLI that section names. Both digests
-# moved, and the pin stays live for both entries.
+# moved, and the pin stays live for both entries. The merge of origin/main after #1141
+# combined both skill edits, so the skill digest below is the merged result of
+# #1129, #1130, #1136, #1138, #1141, and #1097.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -223,7 +234,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "198cfa0f80e7fa712a49031a43eb64dd0c3da08afae56b7c6c32b282f5caeee5",
+        "25f43d48d08babbfa93101c07069aef70e5aae87277e7abbab0ea0ba5159b08d",
     ),
 )
 
