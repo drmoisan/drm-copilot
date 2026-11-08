@@ -89,7 +89,7 @@ The tag on each criterion names the delivery stage that owes it, as defined in `
 - [x] [F] The finding message states the guideline that applied, the rule file's scope section describes the cutoff, and G13 lands as its own commit with its entry.
 - [x] [G] The evidence requirements marked Reduce in research section 4 are removed from the skills and templates, and those marked Keep remain.
 - [x] [G] The reviewer writes `## CI Cross-check`, and a mismatch at the join becomes a synthetic Blocking finding that blocks merge, as in K7.
-- [ ] [G] The less-evidence reduction lands as its own commit with its entry.
+- [x] [G] The less-evidence reduction lands as its own commit with its entry.
 - [x] [G] The less-evidence reduction does not reduce any baseline task, baseline evidence, or baseline comparison, including the Phase 0 test-suite baseline and the final-gate comparison restored at stage E2.
 - [ ] [H] The named design-check pass is in single-pass preflight, adds no delegation, and is pinned by a contract test.
 - [ ] [H] All 6 copies of the atomic-plan-contract skill describe the new rules, and contract tests pin them.
