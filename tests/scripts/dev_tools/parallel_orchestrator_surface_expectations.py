@@ -219,14 +219,23 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # stays live for both entries. The merge of origin/main after #1138 combined both
 # skill edits, so the skill digest below is the merged result of #1129, #1130,
 # #1136, #1138, and #1141.
+#
+# RE-BASELINED by issue #1097. That change added the opt-in
+# `## Early Dependent Starts (early_start)` section to the epic skill, and to
+# the epic agent one closing paragraph of `## Wave Scheduling` with the Bash
+# grant for the repository validator CLI that section names. Both digests
+# moved, and the pin stays live for both entries. The merges of origin/main after
+# #1141 and after #1146 (owner-directive relay sentence in the epic skill)
+# combined the skill edits, so the skill digest below is the merged result of
+# #1129, #1130, #1136, #1138, #1141, #1146, and #1097.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "5ff9c66f58595fa91a1f568a18a0a5aae5d1736a9dd1b13a9bbbab459df7899c",
+        "142e42d15a73fb595c2b60691d15b1808bc244a24fecd240b59c72558905a7c8",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "e227db655edef428ef688da4c482868db0c3a7cb6de662a7bafa19f9924b0d53",
+        "119304a18373be1ee2aa7d153e93de4b2a13ce876ac8fbf6a0a541ad687374a4",
     ),
 )
 

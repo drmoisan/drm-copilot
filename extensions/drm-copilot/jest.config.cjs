@@ -144,6 +144,12 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1097: the epic wave-barrier check moved out of the epic core, with
+    // the early-start exemption. Per-file entry only; the map has no `global` key.
+    "./src/lib/validate/epic-orchestrator-state-wave-barrier.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #484: gate the remediation-loop validator (R5-R11 accounting).
     "./src/lib/validate/orchestrator-state-remediation.ts": {
       lines: 85,

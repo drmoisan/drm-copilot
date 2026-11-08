@@ -34,6 +34,10 @@ import {
 } from "./epic-orchestrator-state-resolution";
 import { validateEpicChildLaunchBindings } from "./epic-orchestrator-state-launch-binding";
 import {
+  MERGED_STATUSES,
+  validateWaveBarrierOrdering,
+} from "./epic-orchestrator-state-wave-barrier";
+import {
   CODEX_MODEL_ROUTING_RECEIPTS_KEY,
   validateCodexModelRoutingGate,
   validateCodexModelRoutingReceipts,
@@ -68,13 +72,6 @@ const VALID_MERGE_STATUS: ReadonlySet<string> = new Set([
   "merged",
   "worktree_removed",
 ]);
-
-const MERGED_STATUSES: ReadonlySet<string> = new Set([
-  "merged",
-  "worktree_removed",
-]);
-
-const NOT_STARTED_MERGE_STATUS = "not_started";
 
 /** Options controlling epic-orchestrator-state validation. */
 export interface ValidateEpicOrchestratorStateOptions {
@@ -230,100 +227,6 @@ function validateMergeStatusEnum(
       errors.push(
         `Epic checkpoint feature '${String(folder)}' has invalid merge_status: ${JSON.stringify(mergeStatus)}`,
       );
-    }
-  }
-  return errors;
-}
-
-/**
- * Report whether a feature is treated as started for the wave barrier.
- *
- * Mirrors Python `feature_has_started`. Fail-closed: a feature is started when its
- * `worktree_created_at` is a string (including an empty one), or when its
- * `merge_status` is not the literal `not_started` (a missing, null, or other
- * non-string `merge_status` counts as started).
- *
- * @param feature One object-shaped `features[]` entry.
- * @returns True when the feature is treated as started.
- */
-function hasStarted(feature: Record<string, unknown>): boolean {
-  return (
-    typeof feature["worktree_created_at"] === "string" ||
-    feature["merge_status"] !== NOT_STARTED_MERGE_STATUS
-  );
-}
-
-/**
- * Validate the retrospective wave-barrier ordering invariant.
- *
- * Only a dependent feature that is treated as started (`hasStarted`) is checked.
- * Exactly one error is reported per violated dependency edge, and the status case
- * takes precedence over the timing case:
- * - `EPIC_WAVE_BARRIER_VIOLATION: <f> is treated as started while dependency <d> is not merged`
- *   when the dependency's `merge_status` is not `merged` or `worktree_removed`;
- * - `EPIC_WAVE_BARRIER_VIOLATION: <f> worktree_created_at precedes dependency <d> merge_confirmed_at`
- *   when the dependency's `merge_confirmed_at` is later than the dependent's
- *   `worktree_created_at`.
- *
- * @param features Object-shaped `features[]` entries.
- * @returns One `EPIC_WAVE_BARRIER_VIOLATION` error per violated dependency edge.
- */
-function validateWaveBarrierOrdering(
-  features: Record<string, unknown>[],
-): string[] {
-  const errors: string[] = [];
-  const byFolder = new Map<string, Record<string, unknown>>();
-  for (const feature of features) {
-    const folder = feature["feature_folder"];
-    if (typeof folder === "string") {
-      byFolder.set(folder, feature);
-    }
-  }
-  // Resolve dependencies through the union index so a barrier edge is found
-  // whether the reference is an issue_num or a folder-basename hint; on legacy
-  // folder strings the resolved key equals the reference, so lookups match.
-  const index = buildFeatureReferenceIndex(features);
-
-  for (const feature of features) {
-    const folder = feature["feature_folder"];
-    const dependsOn = feature["depends_on"];
-    if (typeof folder !== "string" || !Array.isArray(dependsOn)) {
-      continue;
-    }
-    // Start guard: a dependent that has not started cannot have violated the
-    // ordering of its dependencies, so its edges are not checked.
-    if (!hasStarted(feature)) {
-      continue;
-    }
-    const worktreeCreatedAt = feature["worktree_created_at"];
-
-    // Every dependency edge must be durably confirmed merged before this
-    // feature is considered to have safely started its own wave.
-    for (const dependency of dependsOn as unknown[]) {
-      const resolved = resolveFeatureReference(dependency, index);
-      const dependencyFeature =
-        resolved !== null ? byFolder.get(resolved) : undefined;
-      if (dependencyFeature === undefined) {
-        continue;
-      }
-      const depMergeStatus = dependencyFeature["merge_status"];
-      const depConfirmedAt = dependencyFeature["merge_confirmed_at"];
-      const statusViolation =
-        typeof depMergeStatus !== "string" ||
-        !MERGED_STATUSES.has(depMergeStatus);
-      const timingViolation =
-        typeof depConfirmedAt === "string" &&
-        typeof worktreeCreatedAt === "string" &&
-        depConfirmedAt > worktreeCreatedAt;
-      if (statusViolation) {
-        errors.push(
-          `EPIC_WAVE_BARRIER_VIOLATION: ${folder} is treated as started while dependency ${String(dependency)} is not merged`,
-        );
-      } else if (timingViolation) {
-        errors.push(
-          `EPIC_WAVE_BARRIER_VIOLATION: ${folder} worktree_created_at precedes dependency ${String(dependency)} merge_confirmed_at`,
-        );
-      }
     }
   }
   return errors;

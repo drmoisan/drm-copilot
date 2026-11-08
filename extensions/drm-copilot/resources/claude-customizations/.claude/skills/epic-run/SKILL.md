@@ -57,6 +57,10 @@ the final integration-to-`main` PR are governed entirely by the `epic-orchestrat
 merge into the integration branch requires a green `CI` run on the child head SHA; see
 `Epic-child CI verification (issue #1130)` under `## Merge-on-Green Kickoff Parameter` in that skill.
 
+An early dependent start (manifest field `early_start_on`) is governed by
+`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
+field runs exactly as described above.
+
 ## Nesting Depth
 
 This chain runs three levels of subagents below the main session: the coordinator at depth 1, each per-feature `orchestrator` at depth 2, and the specialists that orchestrator delegates to at depth 3. Only the depth-2 orchestrator needs the `Agent` tool below the coordinator; specialists do not delegate.

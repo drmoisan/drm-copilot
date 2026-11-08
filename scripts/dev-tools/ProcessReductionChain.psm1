@@ -303,7 +303,14 @@ function Test-ProcessReductionBlockText {
 function Invoke-ProcessReductionPatchStep {
     <#
     .SYNOPSIS
-        Reverts every hunk of every non-derived path of one stored patch in the chain state.
+        Reverts every hunk of every non-derived path of one stored patch in the chain state;
+        skips a derived path, except that a derived path with a create hunk is set absent.
+    .DESCRIPTION
+        A derived path (a mirror or bundle copy) is re-created from its source by revert step 2,
+        so its modify and delete hunks are skipped. A derived path whose hunks hold a create hunk
+        ends absent, because the patch also creates its source, which is absent at that step:
+        the state is set absent and the touch is recorded with an empty pre-image, with no
+        comparison against the hunk text.
     #>
     [CmdletBinding()]
     [OutputType([void])]
@@ -319,6 +326,11 @@ function Invoke-ProcessReductionPatchStep {
     foreach ($group in @($Hunk | Group-Object -Property Path -CaseSensitive)) {
         $path = $group.Name
         if ($null -ne (Get-ProcessReductionDerivedSource -Path $path -LiveText $LiveText)) {
+            if (@($group.Group | Where-Object { $_.Kind -ceq 'create' }).Count -gt 0) {
+                # The source is created by the same patch, so the copy cannot outlive the revert.
+                $State[$path] = $null
+                Add-ProcessReductionTouch -Touched $Touched -Name $Name -Path $path -PreImage ''
+            }
             continue
         }
         foreach ($item in @($group.Group | Sort-Object -Property Start -Descending)) {

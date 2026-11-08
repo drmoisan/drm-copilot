@@ -27,7 +27,10 @@
     ordering check (OrchestratorStateEpicWaveBarrier.psm1, issue #840) runs after the
     routing dispatch passes. For orchestrator-state, the adopted feature-folder probe
     (validate-orchestrator-output-feature-folder.ps1, issue #992) runs after the routing
-    dispatch passes, and only when the checkpoint waives new_active_feature_folder.
+    dispatch passes, and only when the checkpoint waives new_active_feature_folder. For every
+    type, the owner-directive check (OrchestratorStateOwnerDirectives.psm1, issue #1139) runs
+    after the routing dispatch passes and before those branches, only when the checkpoint has a
+    top-level owner_directives or owner_directive_records key.
 
 .NOTES
     Reads the SubagentStop envelope from stdin through Read-SubagentStopEnvelope
@@ -65,6 +68,7 @@ try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-rejection.ps1') }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateEpicWaveBarrier.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateOwnerDirectives.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateCompletion.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateCompletion.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
@@ -99,6 +103,30 @@ function Get-CheckpointFileContent {
 
     $content = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
     return @{ Exists = $true; Content = $content }
+}
+
+function Test-OrchestratorOutputOwnerDirectiveKey {
+    <#
+    .SYNOPSIS
+        Reports whether a checkpoint's top-level property names include an owner-directive key.
+    .DESCRIPTION
+        Returns $true only when an element equals owner_directives or owner_directive_records
+        under ordinal comparison, so a case variant such as Owner_Directives does not count
+        (issue #1139).
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $PropertyName
+    )
+
+    foreach ($candidate in $PropertyName) {
+        if ([string]::Equals($candidate, 'owner_directives', [System.StringComparison]::Ordinal) -or
+            [string]::Equals($candidate, 'owner_directive_records', [System.StringComparison]::Ordinal)) {
+            return $true
+        }
+    }
+    return $false
 }
 
 function Test-HumanInteractionShape {
@@ -357,6 +385,15 @@ function Get-OrchestratorOutputBlockDecision {
             return @{ Ok = $false; Repairable = $true; Message = "MODEL_ROUTING_BLOCKED: $($routingResult.ErrorText)" }
         }
         return @{ Ok = $false; Repairable = $true; Message = "ROUTING_CONTRACT_BLOCKED: $($routingResult.ErrorText)" }
+    }
+
+    # Issue #1139: the owner-directive rules, for every type, only when the parsed checkpoint has a
+    # top-level owner key; the module re-reads the raw text, so ISO dates stay strings.
+    if (Test-OrchestratorOutputOwnerDirectiveKey -PropertyName $checkpointProps) {
+        try { $ownerResult = Get-OrchestratorStateOwnerDirectiveError -CheckpointText $file.Content }
+        catch { return @{ Ok = $false; Repairable = $true; Message = 'OWNER_DIRECTIVE_BLOCKED: ' + $_.Exception.Message } }
+        $ownerErrors = @($ownerResult | Where-Object { $_ })
+        if ($ownerErrors.Count -gt 0) { return @{ Ok = $false; Repairable = $true; Message = 'OWNER_DIRECTIVE_BLOCKED: ' + ($ownerErrors -join '; ') } }
     }
 
     # Issue #992: a waived new_active_feature_folder must name a folder committed in HEAD of the run

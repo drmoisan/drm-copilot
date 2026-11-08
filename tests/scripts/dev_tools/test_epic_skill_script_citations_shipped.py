@@ -74,6 +74,13 @@ ALLOWLIST: Mapping[str, str] = {
         "Validated through the MCP tool validate_orchestration_artifacts, "
         "which the citing sentences already name."
     ),
+    "scripts/dev_tools/validate_orchestration_artifacts.py": (
+        "Cited in module form by the early-start procedure (issue #1097) as the "
+        "repository CLI route of decision D9, because the installed MCP tool "
+        "validate_orchestration_artifacts lags the early-start rule; the citing step "
+        "keeps the wave barrier when its route lacks the rule and when the CLI is "
+        "absent, as in a destination repository without scripts/dev_tools/."
+    ),
 }
 
 # A repository-relative path citation. The optional `./` prefix is consumed but not
@@ -272,7 +279,10 @@ def test_epic_surface_sets_cover_every_epic_surface_in_tree() -> None:
 def test_allowlist_reasons_name_the_mcp_route() -> None:
     """Require each allowlist reason to name the MCP validation route."""
 
-    assert set(ALLOWLIST) == {"scripts/dev_tools/validate_epic_orchestrator_state.py"}
+    assert set(ALLOWLIST) == {
+        "scripts/dev_tools/validate_epic_orchestrator_state.py",
+        "scripts/dev_tools/validate_orchestration_artifacts.py",
+    }
     for path, reason in ALLOWLIST.items():
         assert "validate_orchestration_artifacts" in reason, path
 

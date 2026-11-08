@@ -232,6 +232,10 @@ concrete path is resolved from the checkpoint's current state, so the dependent 
 `orchestrator`/`atomic-planner` is told exactly which upstream artifacts are relevant rather than
 being expected to rediscover prior design decisions from the diff alone.
 
+A recorded `Owner directives:` block is passed verbatim to each child whose scope matches an
+entry, as defined in the `owner-directives` skill; `epic-orchestrator` never authors or edits
+entries.
+
 ## Merge-Conflict Handling (Fan-In)
 
 The merge-conflict remediation loop runs inside the child feature's own `orchestrator` instance
@@ -299,6 +303,93 @@ Both layers are required; neither alone closes the gap. `epic-orchestrator` does
 N+1 until every wave-N feature's dependency edges are durably confirmed merged, verified against
 `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
 on resume, not from in-memory completion notifications alone.
+
+## Early Dependent Starts (early_start)
+
+This section applies only to a feature whose manifest entry carries `early_start_on`. Without
+that field this section does not apply, and every other section of this skill governs unchanged.
+Under the main-session fallback of `## Nesting Depth`, no `epic-orchestrator` runs the parent
+steps below, so the feature keeps the wave barrier and its `early_start_on` field is not acted on.
+
+**Opt-in.** A feature opts in through the manifest field `early_start_on: <upstream issue_num>`,
+which must be one of its `depends_on` values. The manifest is human-authored and the wave
+computation reads only `depends_on`, so the field moves no wave. The dependent may then start
+before its upstream merges, once the upstream has settled its interface, and it may reach
+`pr_open` only after the upstream merged and the dependent merged that result into its branch.
+
+**Key and writers.**
+
+- `features[].early_start` on the dependent holds `dependency`, `upstream_branch`,
+  `interface_settled_at`, `interface_evidence`, and later `synced_at`. `epic-orchestrator`, the
+  only writer of `features[]`, writes it from the manifest field and the evidence file.
+- `<upstream FEATURE>/evidence/other/interface-settled.<timestamp>.md` carries `Timestamp:`,
+  `Upstream-Head:`, and `Interface-Paths:` (repository-relative paths). The upstream child writes
+  it (a plan task, otherwise its `orchestrator` after S5) and pushes it to the upstream branch;
+  the upstream's kickoff prompt asks for it only when a dependent names that upstream.
+- `early_start_synced_at` is a tolerated top-level key of the dependent child's checkpoint,
+  written by the child from the clock in step 8.
+- `early_start.synced_at` on the epic feature is written by `epic-orchestrator` in the write that
+  moves the feature to `pr_open` or later, after the ancestry check of step 9.
+
+The bounded child return keeps its eight fields; the parent reads the child key from the child
+checkpoint under `worktree_path`.
+
+**Procedure.**
+
+1. Parent: while an armed dependent waits, look for the evidence file on
+   `origin/<upstream_branch>` every 30 seconds for at most 90 minutes. When none appears, keep the
+   wave barrier.
+2. Parent: write `early_start`, `merge_status: "worktree_created"`, and `worktree_created_at`,
+   then validate the epic checkpoint through the D9 route: the repository CLI
+   `scripts.dev_tools.validate_orchestration_artifacts` with its `epic-orchestrator-state`
+   subcommand, run through Poetry in module form. Installed MCP lags this rule (D9) until the
+   extension release that carries it is installed. An `EPIC_WAVE_BARRIER_VIOLATION` that names the
+   feature means the route lacks the rule (installed MCP, or an integration branch older than this
+   reduction): remove the three values and keep the barrier. The same fallback applies when the
+   sibling `epic-wave-barrier-early-start.ps1` is absent or Layer 1 denies the launch. When the
+   repository CLI is absent or does not run (a destination repository without `scripts/dev_tools/`),
+   the parent likewise removes the three values and keeps the barrier.
+3. Parent: launch with the literal `Epic mode: true` kickoff line plus
+   `Early start: true. dependency: <dep_issue_num>. upstream_branch: <branch>. interface_evidence: <path>. Run the child procedure of ## Early Dependent Starts (early_start) before S7 and S8.`
+   and, for the dependency, the line
+   `Upstream context for <issue_num>: early start on <dep_issue_num> (spec: <path>; plan: <path>; upstream_branch: <branch>; not merged).`
+4. Child: branch from `origin/<integration_branch>`, then run `git fetch origin <upstream_branch>`
+   and `git merge --no-ff origin/<upstream_branch>` before the first plan task.
+5. Child: after S6, wait for the upstream merge. Run
+   `gh pr list --head <upstream_branch> --base <integration_branch> --state merged --json number,mergeCommit`
+   every 30 seconds for at most 90 minutes, then
+   `git merge-base --is-ancestor <merge commit> origin/<integration_branch>`. When the wait ends
+   without a merge, stop with `blocked_reason: "policy_hold"`.
+6. Child: run `git diff --name-only <Upstream-Head> <merge commit> -- <Interface-Paths>`. Any listed
+   path stops the child with `blocked_reason: "premise_falsified"`, unsynced and with no PR.
+7. Child: run `git merge --no-ff origin/<integration_branch>`. The sync is a merge, not a rebase.
+   A conflict enters `## Merge-Conflict Handling (Fan-In)`.
+8. Child: re-run the local gate, commit, push, record `early_start_synced_at`, and only then
+   start S7 or S8.
+9. Parent: before the `pr_open` write, check
+   `git merge-base --is-ancestor <upstream merge_commit_sha> origin/<child branch>`. Write
+   `synced_at` only when the check passes and the child key exists; otherwise Layer 2 reports the
+   unsynced message below.
+10. Parent: after a stop in step 5 or step 6, read the diff against the child's plan. When no task
+    cites a changed symbol, or the stop was the wait bound, record fresh `interface_settled_at` and
+    `interface_evidence` and delegate once more on a branch `<child branch>-r<n>` from the pushed
+    child branch, resuming at step 5; otherwise the edge stops with `premise_falsified`.
+    `early_start` stays recorded, because removing it from a started feature would turn a truthful
+    record into a barrier violation.
+
+The sync of steps 5 to 8 finishes before S7 and S8, so the reviewed head is always a post-sync
+head; conflict cycles of an early child are never light.
+
+**Messages.** Layer 2 judges the one edge that a valid record names by its own table: a dependent
+at `not_started` or `worktree_created` reports nothing; at any later or unknown status an unmerged
+upstream reports
+`EPIC_WAVE_BARRIER_VIOLATION: <f> is at pr_open or later while early_start dependency <d> is not merged`,
+and a merged upstream without a non-empty string `synced_at` reports
+`EPIC_WAVE_BARRIER_VIOLATION: <f> is at pr_open or later without a string synced_at for early_start dependency <d>`.
+The validators compare no timestamps on this edge; the ancestry check of step 9 proves the sync.
+Layer 1 skips only the named edge while the upstream is at `worktree_created`, `pr_open`,
+`ci_green`, or `merge_conflict`, and its deny text is unchanged. Every other edge keeps the
+checks of `## Wave Barrier (Two-Layer Design)`.
 
 ## Worktree Cleanup
 
