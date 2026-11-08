@@ -143,9 +143,9 @@ One additional pwsh hook invocation per Bash call; the early exit when `poetry` 
 - [x] AC16: All six `execution-environment/SKILL.md` copies are byte-identical, and `test_execution_environment_brief_contracts.py` passes (with the new heading added to the required list if headings are pinned).
 - [x] AC17: The new regression Pester tests pass in the single `Invoke-PoshQCParallelTest` gate, with no new failures against the Phase 0 baseline of `Invoke-PoshQCParallelTest` and `pytest -n auto`.
 - [x] AC18: Line coverage of each new PowerShell file is >= 85%, read from the per-file Pester coverage report, with no coverage exclusion added for production paths.
-- [ ] AC19: If the shared command-option table is changed for Poetry, the existing `git`/`gh` parser acceptance, Issue824 regression, and TriggerScoping suites pass unchanged.
+- [x] AC19: If the shared command-option table is changed for Poetry, the existing `git`/`gh` parser acceptance, Issue824 regression, and TriggerScoping suites pass unchanged.
 - [x] AC20: Integration evidence is recorded under the feature's `evidence/` folder: `env -u VIRTUAL_ENV poetry install` in the fresh worktree leaves the main checkout's `.venv` `.pth` files and installed package list unchanged (before/after comparison).
-- [ ] AC21: Full toolchain pass completed (format, lint, type-check where applicable, test) with no gate weakened and no threshold lowered.
+- [x] AC21: Full toolchain pass completed (format, lint, type-check where applicable, test) with no gate weakened and no threshold lowered.
 - [x] AC22: Rollout notes record that destination repositories need a push-down refresh after the release carrying the hook and skill text.
 
 Note on AC9 scope: AC9's fail-open behavior applies to the Claude hook. The Codex twin follows the Codex exit-2 convention: on empty or unparseable stdin it writes a `WORKTREE_VENV_BLOCKED:` stderr line and exits 2, which every registered Codex PreToolUse handler must do.
