@@ -146,6 +146,23 @@ Describe 'Invoke-ReviewVerdictCli' {
             Should -Invoke Invoke-ReviewVerdictGhExe -Times 1 -Exactly -ParameterFilter { $GhArgs -contains "repos/{owner}/{repo}/statuses/$($script:Live)" }
         }
 
+        It 'exits 3 without a POST when a newer audit exists' {
+            $newer = "$($script:Folder)/policy-audit.2026-01-02T00-00.md"
+            $script:Git["ls-tree --name-only $($script:Reviewed) -- $($script:Folder)/"] = [pscustomobject]@{ ExitCode = 0; Output = "$($script:Artifact)`n$newer" }
+            $outcome = Invoke-Cli
+            $outcome.ExitCode | Should -Be 3
+            $outcome.Stderr | Should -BeLike 'REVIEW_VERDICT_NOT_ELIGIBLE: REVIEW_VERDICT_ARTIFACT_NOT_LATEST:*'
+            Should -Invoke Invoke-ReviewVerdictGhExe -Times 0 -Exactly -ParameterFilter { $GhArgs -contains '--method' }
+        }
+
+        It 'posts when the listing names the audit as newest' {
+            $older = "$($script:Folder)/policy-audit.2025-12-31T23-59.md"
+            $script:Git["ls-tree --name-only $($script:Reviewed) -- $($script:Folder)/"] = [pscustomobject]@{ ExitCode = 0; Output = "$older`n$($script:Artifact)" }
+            $outcome = Invoke-Cli
+            $outcome.ExitCode | Should -Be 0
+            Should -Invoke Invoke-ReviewVerdictGhExe -Times 1 -Exactly -ParameterFilter { $GhArgs -contains '--method' }
+        }
+
         It 'exits 1 when the POST fails' {
             $script:PostExit = 1
             $outcome = Invoke-Cli
