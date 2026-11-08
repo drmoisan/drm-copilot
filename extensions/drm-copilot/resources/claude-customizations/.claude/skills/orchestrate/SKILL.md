@@ -419,6 +419,26 @@ The orchestrator must not create a PR, push a branch for PR purposes, or report 
 
 This gate is non-negotiable. Each condition is independently verified before PR creation proceeds. Conditions 1-4 are unchanged from the prior contract; conditions 5-7 (receipt handoff, CI-green gate, and epic-mode merge-on-green gate, with the standalone merge of S9 step 7 for a standalone run) are additive.
 
+## Review Verdict Status (review/verdict)
+
+After a review returns PASS for the current pull-request head, the orchestrator posts the commit status context `review/verdict`, state `success`, on that head through `gh api repos/{owner}/{repo}/statuses/{sha}`, with a description that names the review artifact (decision D16, issue #1097). The orchestrator does not compose the call; it runs the entry point, which checks the rules below and issues the one POST only when they hold:
+
+```text
+pwsh -NoProfile -File .claude/lib/review-verdict/Invoke-ReviewVerdictStatus.ps1 -Mode Review -PrNumber <PR> -ReviewArtifact <feature-folder>/policy-audit.<timestamp>.md
+```
+
+`Invoke-ReviewVerdictStatus.ps1` exits 0 when it posted, 3 when the head is not eligible (no POST, and a `REVIEW_VERDICT_NOT_ELIGIBLE:` code on stderr), 1 on a read, git, or gh failure, and 2 on a usage error.
+
+1. **When to post.** Post after every PASS once the pull request exists and the review records are committed and pushed: after `## Post-Review Outcome Evaluation` advances a PASS, after R5 exits on PASS, and at the join of `## Concurrent Review and CI (review_mode)`. Every `remediation_loop.review_outcomes[]` entry records `head_sha`, the head the review ran against, in every review mode, because the entry point reads the `head_sha` of the last entry.
+2. **New push.** The status belongs to one commit, so a new push leaves the new head without the status, and review must pass again before the status is posted on that head. A merge of `origin/main` and a CI fix are new pushes.
+3. **Records before posting.** Commit and push the review records under `feature-folder`, including the policy audit, before posting; the entry point refuses with `REVIEW_VERDICT_ARTIFACT_NOT_COMMITTED` while the named policy audit is not in the live head. When records land after the review, the same command re-posts on the records-only head: it posts on a live head that descends from the reviewed head only when every path changed since the review lies under `feature-folder`, the records-only rule of the merge guard, and otherwise refuses with `REVIEW_VERDICT_HEAD_NOT_CURRENT` or `REVIEW_VERDICT_NOT_RECORDS_ONLY`. Ledger `Merge commit:` back-fills lie outside `feature-folder`, so they land before the review starts.
+4. **Before the merge.** Run the entry point against the live head immediately before the merge: before S9 steps 6 and 7, and at the join. A refusal means no merge and a new review. The merge guard is unchanged; the status is a record added beside it.
+5. **Non-feature pull requests.** `-Mode MainSync` covers a merge of `main` into an `epic/<name>-integration` branch: the head has exactly two parents, the first carries a successful `review/verdict` status, the second is on `origin/main`, and the merge changes nothing beyond `main` and the reviewed head. `-Mode RecordsPr` covers the `documentationandmemories` records pull request into `main`, whose diff holds only `docs/features/` records (not templates) and `.claude/agent-memory/` paths. `-Mode PromotionPr` covers a `feature/<name>-<number>` or `bug/<name>-<number>` promotion-record pull request into `main` whose diff adds one new `docs/features/active/<name>-<number>/` folder and otherwise touches only `docs/features/potential/` records. Each mode keys on the branch pattern and the diff, reads no checkpoint, and takes no `-ReviewArtifact`.
+6. **Absent entry point.** When `.claude/lib/review-verdict/Invoke-ReviewVerdictStatus.ps1` does not exist in the repository, post nothing; the merge conditions are unchanged.
+7. **Parallel and epic runs.** The parallel parent posts nothing: each item is an orchestrate run that posts after its own PASS, and a head the parent changes is stale and is reviewed again by the item. Epic children post as orchestrate runs. Wiring the epic orchestrator to post on the integration pull request is out of scope, because `PINNED_FROZEN_SURFACE_HASHES` freezes the epic surfaces and the context is not yet a required check (D15); `-Mode MainSync` is available for that pull request.
+8. **Not CI.** The status adds no CI run, no CI job, no workflow file, no committed verdict file, and no GitHub ruleset change. The entry point writes no file.
+9. **Limit.** Anyone with write access, including any agent with `gh`, can post the status. It records a passing review and does not prove one.
+
 ## Step 6 Delegation — Prohibited Prompt Language
 
 When delegating to the `feature-review` subagent, the orchestrator prompt MUST NOT:
