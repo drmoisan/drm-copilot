@@ -56,15 +56,28 @@ ALLOWLIST: Mapping[str, str] = {
     ),
 }
 
+# A repository-relative path citation. The optional `./` prefix is consumed but not
+# captured, so `./scripts/x.py` and `scripts/x.py` normalize to the same path. The
+# lookbehind still rejects `../` relative links and nested segments of longer paths.
 _PATH_PATTERN = re.compile(
     r"(?<![A-Za-z0-9_./-])"
+    r"(?:\./)?"
     r"((?:scripts|\.claude|\.codex|\.agents)/[A-Za-z0-9_./-]*?\.(?:py|ps1|psm1|sh))"
     r"(?![A-Za-z0-9_])"
+)
+
+# A `python -m` module citation of a repository development tool, normalized to the
+# `scripts/dev_tools/<module>.py` path it resolves to.
+_MODULE_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9_.])scripts\.dev_tools\.([A-Za-z0-9_]+)(?![A-Za-z0-9_])"
 )
 
 
 def _cited_paths(surface_texts: Mapping[str, str]) -> set[str]:
     """Return every script path cited by any surface text.
+
+    Path citations (with or without a leading `./`) and `scripts.dev_tools.<module>`
+    module citations are both reported as repository-relative script paths.
 
     Args:
         surface_texts (Mapping[str, str]): Surface path to surface text.
@@ -80,10 +93,16 @@ def _cited_paths(surface_texts: Mapping[str, str]) -> set[str]:
     """
 
     cited: set[str] = set()
-    # Collect each path token; the lookbehind keeps a nested `scripts/` segment of
-    # a `.codex/scripts/...` path from being read as a separate path.
+    # Collect each path token and each module-form citation per surface; the path
+    # lookbehind keeps a nested `scripts/` segment of a `.codex/scripts/...` path
+    # from being read as a separate path, and a module citation is normalized to
+    # the `.py` path the manifest lists.
     for text in surface_texts.values():
         cited.update(match.group(1) for match in _PATH_PATTERN.finditer(text))
+        cited.update(
+            f"scripts/dev_tools/{match.group(1)}.py"
+            for match in _MODULE_PATTERN.finditer(text)
+        )
     return cited
 
 
@@ -242,3 +261,33 @@ def test_find_stale_allowlist_entries_reports_uncited_entry() -> None:
     )
 
     assert result == ["scripts/gone.py"]
+
+
+def test_find_unshipped_citations_normalizes_module_form() -> None:
+    """Report an unlisted `python -m` module as its `.py` path, not a listed one."""
+
+    texts = {
+        "a.md": (
+            "Run `python -m scripts.dev_tools.gone_tool` then "
+            "`python -m scripts.dev_tools.kept_tool --check`."
+        )
+    }
+
+    result = find_unshipped_citations(texts, ["scripts/dev_tools/kept_tool.py"], {})
+
+    assert result == ["scripts/dev_tools/gone_tool.py"]
+
+
+def test_find_unshipped_citations_strips_dot_slash_prefix() -> None:
+    """Report `./`-prefixed citations without the prefix and honor a listed one."""
+
+    texts = {
+        "a.md": (
+            "See ./scripts/tool.py and ./.claude/lib/x/Y.psm1 and "
+            "./scripts/kept.py; ignore ../scripts/up.py."
+        )
+    }
+
+    result = find_unshipped_citations(texts, ["scripts/kept.py"], {})
+
+    assert result == [".claude/lib/x/Y.psm1", "scripts/tool.py"]
