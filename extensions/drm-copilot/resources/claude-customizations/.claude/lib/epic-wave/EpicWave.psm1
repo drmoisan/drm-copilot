@@ -20,7 +20,7 @@
     and returns an object with ExitCode, Stdout, and Stderr: 0 on success, 1 for a
     manifest error (self-loop, cycle, or unresolved reference), and 2 for a usage
     error (empty path, unreadable file, or input that is not a JSON object of string
-    arrays).
+    arrays). Manifest keys are parsed case-sensitively.
 
     The Python module scripts/dev_tools/epic_wave_computation.py is this
     repository's parity reference; both implementations are exercised by the shared
@@ -138,7 +138,8 @@ function Get-EpicWaveNumber {
     Converts a parsed JSON manifest into a feature-to-dependencies dictionary.
 
 .PARAMETER Parsed
-    The object produced by ConvertFrom-Json.
+    The dictionary produced by ConvertFrom-Json -AsHashtable. Keys are parsed
+    case-sensitively, so manifest keys that differ only by case stay distinct.
 
 .OUTPUTS
     An ordinal dictionary of feature to dependency list, or $null when the input is
@@ -151,15 +152,15 @@ function ConvertTo-EpicWaveManifest {
         [Parameter(Mandatory = $true)][AllowNull()] $Parsed
     )
 
-    if ($Parsed -isnot [pscustomobject]) { return $null }
+    if ($Parsed -isnot [System.Collections.IDictionary]) { return $null }
     $manifest = [System.Collections.Generic.Dictionary[string, string[]]]::new([StringComparer]::Ordinal)
-    foreach ($property in $Parsed.PSObject.Properties) {
-        $value = $property.Value
+    foreach ($name in $Parsed.Keys) {
+        $value = $Parsed[$name]
         if ($value -isnot [System.Array]) { return $null }
         foreach ($item in $value) {
             if ($item -isnot [string]) { return $null }
         }
-        $manifest[$property.Name] = [string[]] $value
+        $manifest[[string] $name] = [string[]] $value
     }
     return $manifest
 }
@@ -197,7 +198,9 @@ function Invoke-EpicWaveCommand {
     }
 
     try {
-        $parsed = $text | ConvertFrom-Json -ErrorAction Stop
+        # -AsHashtable yields a case-sensitive map, so keys that differ only by case
+        # stay distinct, matching the Python reference.
+        $parsed = $text | ConvertFrom-Json -AsHashtable -ErrorAction Stop
     } catch {
         return [pscustomobject] @{ ExitCode = 2; Stdout = ''; Stderr = "EPIC_WAVE_USAGE: Manifest is not valid JSON: $($_.Exception.Message)" }
     }
