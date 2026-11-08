@@ -49,7 +49,7 @@ Outcome enum: `honored | refused`. Dates parse as ISO 8601 with invariant cultur
 
 ## API / Validator Surface
 
-New pure module `.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1` exporting `Get-OrchestratorStateOwnerDirectiveError -State <psobject>`, which returns `string[]`. It reads no file, starts no process, and reads no clock. It returns an empty array when neither key is present. Entry numbers `#N` are 1-based. Errors accumulate in entry order: block rules first, then record rules.
+New pure module `.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1` exporting `Get-OrchestratorStateOwnerDirectiveError -CheckpointText <string>`, which returns `string[]`. It reads no file, starts no process, and reads no clock. It returns an empty array when neither key is present. Entry numbers `#N` are 1-based. Errors accumulate in entry order: block rules first, then record rules.
 
 Every module error string begins with `Checkpoint owner_directive`. The exact strings are:
 
