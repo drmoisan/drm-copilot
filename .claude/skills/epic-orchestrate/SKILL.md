@@ -304,6 +304,8 @@ on resume, not from in-memory completion notifications alone.
 
 This section applies only to a feature whose manifest entry carries `early_start_on`. Without
 that field this section does not apply, and every other section of this skill governs unchanged.
+Under the main-session fallback of `## Nesting Depth`, no `epic-orchestrator` runs the parent
+steps below, so the feature keeps the wave barrier and its `early_start_on` field is not acted on.
 
 **Opt-in.** A feature opts in through the manifest field `early_start_on: <upstream issue_num>`,
 which must be one of its `depends_on` values. The manifest is human-authored and the wave

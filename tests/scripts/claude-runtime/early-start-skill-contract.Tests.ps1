@@ -147,6 +147,14 @@ Describe 'early-start skill contract (issue #1097)' {
             )) | Should -BeNullOrEmpty
     }
 
+    It 'ESS-CLAUDE-FALLBACK-KEEPS-BARRIER in <Path>' -ForEach $script:ClaudeSkill {
+        # Under the main-session fallback of ## Nesting Depth (issue #1138) no epic-orchestrator owns the parent steps.
+        $section = Get-EarlyStartSection -RelativePath $Path
+        @(Get-EarlyStartMissingToken -Text $section -Token @(
+                'Under the main-session fallback of `## Nesting Depth`, no `epic-orchestrator` runs the parent steps below, so the feature keeps the wave barrier and its `early_start_on` field is not acted on.'
+            )) | Should -BeNullOrEmpty
+    }
+
     It 'ESS-CODEX-STATES-UNAVAILABLE-UNTIL-RELEASE in <Path>' -ForEach $script:CodexSkill {
         $section = Get-EarlyStartSection -RelativePath $Path
         @(Get-EarlyStartMissingToken -Text $section -Token @('The early start is therefore unavailable on Codex until that release is installed.')) | Should -BeNullOrEmpty
