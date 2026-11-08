@@ -10,6 +10,7 @@
     ".agents/skills/atomic-plan-contract/SKILL.md",
     ".agents/skills/atomic-planner/SKILL.md",
     ".agents/skills/characterize-runtime-behavior/SKILL.md",
+    ".agents/skills/ci-workflows/SKILL.md",
     ".agents/skills/codex-model-routing/SKILL.md",
     ".agents/skills/codex-model-routing/agents/openai.yaml",
     ".agents/skills/discovery-behavior-reconciliation/SKILL.md",

@@ -27,7 +27,7 @@ Finding-Scope: contained
 
 ## Light Fix Tasks
 
-- [ ] [P0-T1] `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json` and `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py` (F1): register `.agents/skills/ci-workflows/SKILL.md` in the Codex `core.json` and remove it from `PRE_EXISTING_UNRELATED_SKILL_EXCEPTIONS`, run the Python toolchain and one `pytest -n auto` run, and re-check spec AC13.
+- [x] [P0-T1] `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json` and `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py` (F1): register `.agents/skills/ci-workflows/SKILL.md` in the Codex `core.json` and remove it from `PRE_EXISTING_UNRELATED_SKILL_EXCEPTIONS`, run the Python toolchain and one `pytest -n auto` run, and re-check spec AC13.
 
 ## Non-remediation items (record only)
 
