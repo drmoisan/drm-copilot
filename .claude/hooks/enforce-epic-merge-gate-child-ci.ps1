@@ -73,7 +73,7 @@ function Get-EpicMergeGateChildCiProperty {
         System.Object
     #>
     [CmdletBinding()]
-    [OutputType([object])]
+    [OutputType([object], [object[]])]
     param([AllowNull()] $InputObject, [Parameter(Mandatory)][string] $Name)
 
     if ($InputObject -isnot [System.Management.Automation.PSCustomObject]) { return $null }

@@ -22,7 +22,7 @@ BeforeDiscovery {
     $child = '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":42},'
     $pullRun = [pscustomobject]@{ databaseId = 901; event = 'pull_request'; status = 'completed'; conclusion = 'success'; headSha = $head; workflowName = 'CI'; createdAt = $older }
 
-    $stageDenyRows = @(
+    $script:StageDenyRows = @(
         @{ Name = 'RGC-CHILD-CI-STAGE1-PR-MISMATCH'; Command = 'gh pr merge 42 --merge'; Checkpoint = '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":43},' + $green + '}'; LiveHead = $head; Runs = @($pullRun); Detail = 'stage 1 \(PR number\): the command names pull request 42 but pr_gate.pr_number records 43' }
         @{ Name = 'RGC-CHILD-CI-STAGE1-BARE-NO-PR-GATE'; Command = 'gh pr merge --merge'; Checkpoint = '{"epic_mode":true,"step9_status":"passed",' + $green + '}'; LiveHead = $head; Runs = @($pullRun); Detail = 'stage 1 \(PR number\): the command names no pull request' }
         @{ Name = 'RGC-CHILD-CI-STAGE1-NON-INTEGER-PR-GATE'; Command = 'gh pr merge 42 --merge'; Checkpoint = '{"epic_mode":true,"step9_status":"verified","pr_gate":{"pr_number":"42"},' + $green + '}'; LiveHead = $head; Runs = @($pullRun); Detail = 'stage 1 \(PR number\): pr_gate.pr_number is not a positive JSON integer' }
@@ -39,7 +39,7 @@ BeforeDiscovery {
         @{ Name = 'RGC-CHILD-CI-STAGE5-NEWEST-IN-PROGRESS'; Command = 'gh pr merge 42 --merge'; Checkpoint = $child + $green + '}'; LiveHead = $head; Runs = @($pullRun, [pscustomobject]@{ databaseId = 906; event = 'pull_request'; status = 'in_progress'; conclusion = ''; headSha = $head; workflowName = 'CI'; createdAt = $newer }); Detail = "stage 5 \(run result\): .* status 'in_progress'" }
         @{ Name = 'RGC-CHILD-CI-STAGE6-UNRECORDED-DISPATCH'; Command = 'gh pr merge 42 --merge'; Checkpoint = $child + $green + '}'; LiveHead = $head; Runs = @([pscustomobject]@{ databaseId = 907; event = 'workflow_dispatch'; status = 'completed'; conclusion = 'success'; headSha = $head; workflowName = 'CI'; createdAt = $newer }); Detail = 'stage 6 \(dispatch run\): the workflow_dispatch run 907 is not the run recorded' }
     )
-    $allowRows = @(
+    $script:AllowRows = @(
         @{ Name = 'RGC-CHILD-CI-ALLOW-PULL-REQUEST-RUN'; Command = 'gh pr merge 42 --merge'; Checkpoint = $child + $green + '}'; Runs = @($pullRun) }
         @{ Name = 'RGC-CHILD-CI-ALLOW-RECORDED-DISPATCH-RUN'; Command = 'gh pr merge 42 --squash'; Checkpoint = $child + '"ci_gate":{"conclusion":"success","head_sha":"' + $head + '","dispatch_run_id":908}}'; Runs = @([pscustomobject]@{ databaseId = 908; event = 'workflow_dispatch'; status = 'completed'; conclusion = 'success'; headSha = $head; workflowName = 'CI'; createdAt = $newer }) }
         @{ Name = 'RGC-CHILD-CI-ALLOW-BARE-COMMAND-RECORDED-PR'; Command = 'gh pr merge --merge'; Checkpoint = $child + $green + '}'; Runs = @($pullRun) }
@@ -72,7 +72,7 @@ Describe 'Codex enforce-epic-merge-gate epic-child CI verification (issue #1130)
     }
 
     Context 'gate rows: one deny per verification stage' {
-        It '<Name> denies with its stage detail and does not fall through' -ForEach $stageDenyRows {
+        It '<Name> denies with its stage detail and does not fall through' -ForEach $script:StageDenyRows {
             # Arrange
             $liveHeadValue = $LiveHead
             $runsValue = $Runs
@@ -104,7 +104,7 @@ Describe 'Codex enforce-epic-merge-gate epic-child CI verification (issue #1130)
     }
 
     Context 'gate rows: verified runs allow' {
-        It '<Name> allows' -ForEach $allowRows {
+        It '<Name> allows' -ForEach $script:AllowRows {
             # Arrange
             $runsValue = $Runs
             Mock Get-EpicMergeGateChildCiLiveHeadSha { 'abcdef0123456789abcdef0123456789abcdef01' }

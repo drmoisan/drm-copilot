@@ -23,7 +23,7 @@ BeforeDiscovery {
     $pullRun = [pscustomobject]@{ databaseId = 901; event = 'pull_request'; status = 'completed'; conclusion = 'success'; headSha = $head; workflowName = 'CI'; createdAt = $older }
 
     # One gate deny row per verification stage; Runs is $null when the run-list seam fails.
-    $stageDenyRows = @(
+    $script:StageDenyRows = @(
         @{ Name = 'CHILD-CI-STAGE1-BARE-NO-PR-GATE'; Command = 'gh pr merge --merge'; Checkpoint = '{"epic_mode":true,"step9_status":"passed",' + $green + '}'; LiveHead = $head; Runs = @($pullRun); Detail = 'stage 1 \(PR number\): the command names no pull request' }
         @{ Name = 'CHILD-CI-STAGE1-NON-INTEGER-PR-GATE'; Command = 'gh pr merge 42 --merge'; Checkpoint = '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":"42"},' + $green + '}'; LiveHead = $head; Runs = @($pullRun); Detail = 'stage 1 \(PR number\): pr_gate.pr_number is not a positive JSON integer' }
         @{ Name = 'CHILD-CI-STAGE2-CONCLUSION-FAILURE'; Command = 'gh pr merge 42 --merge'; Checkpoint = '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":42},"ci_gate":{"conclusion":"failure","head_sha":"' + $head + '"}}'; LiveHead = $head; Runs = @($pullRun); Detail = 'stage 2 \(ci_gate\): the checkpoint records no ci_gate with conclusion' }
@@ -39,7 +39,7 @@ BeforeDiscovery {
         @{ Name = 'CHILD-CI-STAGE6-UNRECORDED-DISPATCH'; Command = 'gh pr merge 42 --merge'; Checkpoint = '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":42},' + $green + '}'; LiveHead = $head; Runs = @([pscustomobject]@{ databaseId = 907; event = 'workflow_dispatch'; status = 'completed'; conclusion = 'success'; headSha = $head; workflowName = 'CI'; createdAt = $newer }); Detail = 'stage 6 \(dispatch run\): the workflow_dispatch run 907 is not the run recorded' }
         @{ Name = 'CHILD-CI-STAGE6-DIFFERENT-DISPATCH-ID'; Command = 'gh pr merge 42 --merge'; Checkpoint = '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":42},"ci_gate":{"conclusion":"success","head_sha":"' + $head + '","dispatch_run_id":999}}'; LiveHead = $head; Runs = @([pscustomobject]@{ databaseId = 907; event = 'workflow_dispatch'; status = 'completed'; conclusion = 'success'; headSha = $head; workflowName = 'CI'; createdAt = $newer }); Detail = 'stage 6 \(dispatch run\): the workflow_dispatch run 907 is not the run recorded' }
     )
-    $allowRows = @(
+    $script:AllowRows = @(
         @{ Name = 'CHILD-CI-ALLOW-PULL-REQUEST-RUN'; Command = 'gh pr merge 42 --merge'; Checkpoint = '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":42},' + $green + '}'; Runs = @($pullRun) }
         @{ Name = 'CHILD-CI-ALLOW-RECORDED-DISPATCH-RUN'; Command = 'gh pr merge 42 --merge'; Checkpoint = '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":42},"ci_gate":{"conclusion":"success","head_sha":"' + $head + '","dispatch_run_id":908}}'; Runs = @([pscustomobject]@{ databaseId = 908; event = 'workflow_dispatch'; status = 'completed'; conclusion = 'success'; headSha = $head; workflowName = 'CI'; createdAt = $newer }, $pullRun) }
         @{ Name = 'CHILD-CI-ALLOW-BARE-COMMAND-RECORDED-PR'; Command = 'gh pr merge --merge'; Checkpoint = '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":42},' + $green + '}'; Runs = @($pullRun) }
@@ -97,7 +97,7 @@ Describe 'enforce-epic-merge-gate epic-child CI verification (issue #1130)' {
     }
 
     Context 'gate rows: one deny per verification stage' {
-        It '<Name> denies with its stage detail and reaches no later branch' -ForEach $stageDenyRows {
+        It '<Name> denies with its stage detail and reaches no later branch' -ForEach $script:StageDenyRows {
             # Arrange
             $checkpointText = $Checkpoint
             $liveHeadValue = $LiveHead
@@ -137,7 +137,7 @@ Describe 'enforce-epic-merge-gate epic-child CI verification (issue #1130)' {
     }
 
     Context 'gate rows: verified runs allow' {
-        It '<Name> allows without the green-CI live-head lookup' -ForEach $allowRows {
+        It '<Name> allows without the green-CI live-head lookup' -ForEach $script:AllowRows {
             # Arrange
             $checkpointText = $Checkpoint
             $runsValue = $Runs
