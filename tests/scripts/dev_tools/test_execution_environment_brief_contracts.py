@@ -34,6 +34,7 @@ _REQUIRED_HEADINGS = (
     "## PowerShell Route and PoshQC MCP Limits",
     "## Batch Budget",
     "## Hook Execution Context",
+    "## Worktree Python Environment",
     "## MCP Surfaces Run the Installed Extension",
     "## CI Shape and Required Checks",
     "## CI-Only Failure Classes",
@@ -230,6 +231,28 @@ def test_brief_batch_budget_section_states_cap_codes_and_exemptions() -> None:
 
     # Assert
     assert missing == [], f"Batch Budget lacks {missing}"
+
+
+def test_brief_worktree_python_environment_section_states_bootstrap() -> None:
+    """The Worktree Python Environment section states the bootstrap and the guard."""
+
+    # Arrange
+    section = _section("## Worktree Python Environment")
+
+    # Act
+    missing = _missing(
+        section,
+        (
+            "env -u VIRTUAL_ENV poetry install",
+            "WORKTREE_VENV_BLOCKED:",
+            "enforce-worktree-poetry-venv.ps1",
+            "PYTHONPATH",
+            "push-down",
+        ),
+    )
+
+    # Assert
+    assert missing == [], f"Worktree Python Environment lacks {missing}"
 
 
 def test_brief_ci_section_names_jobs_and_required_contexts() -> None:
