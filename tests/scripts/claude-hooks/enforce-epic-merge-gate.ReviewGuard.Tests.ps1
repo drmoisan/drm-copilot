@@ -50,9 +50,11 @@ Describe 'enforce-epic-merge-gate review guard (issue #1097)' {
             [CmdletBinding()]
             param([Parameter(Mandatory)][hashtable] $Row)
 
-            $checkpoint = ConvertTo-EpicMergeGateReviewCheckpointJson -Override $Row.Override -Remove $Row.Remove
+            $checkpoint = ConvertTo-EpicMergeGateReviewCheckpointJson -Override $Row.Override -Remove $Row.Remove -CiHeadSha $Row.LiveHead
             Mock Get-ChildOrchestratorCheckpointContent -MockWith ({ $checkpoint }.GetNewClosure())
             Register-EpicMergeGateReviewRowSeam -Row $Row
+            # An allowed epic-child merge now needs a verified CI run (issue #1130); the child-CI seams are mocked green by name.
+            if ($Row.Expected -ceq 'allow') { Register-EpicMergeGateReviewChildCiSeam -HeadSha $Row.LiveHead }
             $envelope = @{ session_id = 'session-1097'; tool_name = 'Bash'; tool_input = @{ command = $Row.Command } } | ConvertTo-Json -Depth 5 -Compress
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $envelope
             return [pscustomobject]@{ Decision = [string]$decision.hookSpecificOutput.permissionDecision; Reason = [string]$decision.hookSpecificOutput.permissionDecisionReason }
@@ -206,6 +208,9 @@ Describe 'enforce-epic-merge-gate review guard (issue #1097)' {
         }
 
         It 'RG-SHAPE-BOUND-COMMAND-READS-NO-EXTRA-CHECKPOINT' {
+            # Arrange: the allowed epic-child merge needs a verified CI run (issue #1130).
+            Register-EpicMergeGateReviewChildCiSeam -HeadSha (Get-EpicMergeGateReviewHead -Kind Reviewed)
+
             # Act
             $result = Invoke-ShapeRead -Command 'gh pr merge 42 --merge' -SessionCheckpoint $script:NoKeyJson -ItemCheckpoint $script:NoKeyJson
 
@@ -248,6 +253,8 @@ Describe 'enforce-epic-merge-gate review guard (issue #1097)' {
         It 'RG-SHAPE-NOKEY-RESOLUTION-FAILURE-KEEPS-DECISION (in-scope candidate failure)' {
             # Arrange: the gate's own read of 42 succeeds, and only the extra read of 41 fails.
             Mock Resolve-EpicMergeGateItemTarget -ParameterFilter { $PrNumber -eq 41 } -MockWith { throw 'git worktree list failed' }
+            # The allowed epic-child merge needs a verified CI run (issue #1130).
+            Register-EpicMergeGateReviewChildCiSeam -HeadSha (Get-EpicMergeGateReviewHead -Kind Reviewed)
 
             # Act
             $result = Invoke-ShapeRead -Command 'gh pr merge 42 --merge && echo 41' -SessionCheckpoint $script:NoKeyJson -ItemCheckpoint $script:NoKeyJson

@@ -67,17 +67,20 @@ function ConvertTo-EpicMergeGateReviewCheckpointJson {
         Top-level keys to set or replace.
     .PARAMETER Remove
         Top-level keys to drop.
+    .PARAMETER CiHeadSha
+        The head_sha of the green ci_gate, which equals the row's live head (issue #1130).
     .OUTPUTS
         System.String
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param([hashtable] $Override = @{}, [string[]] $Remove = @())
+    param([hashtable] $Override = @{}, [string[]] $Remove = @(), [string] $CiHeadSha = (Get-EpicMergeGateReviewHead -Kind Reviewed))
 
     $document = [ordered]@{
         epic_mode        = $true
         step9_status     = 'passed'
         pr_gate          = [ordered]@{ pr_number = 42 }
+        ci_gate          = [ordered]@{ conclusion = 'success'; head_sha = $CiHeadSha }
         'feature-folder' = (Get-EpicMergeGateReviewFolder)
         review_mode      = 'concurrent'
         remediation_loop = [ordered]@{ review_outcomes = @([ordered]@{ verdict = 'PASS'; head_sha = (Get-EpicMergeGateReviewHead -Kind Reviewed) }) }
@@ -341,6 +344,25 @@ function Register-EpicMergeGateReviewRowSeam {
     }
     Mock Invoke-DocsOnlyGitExe -ParameterFilter { $GitArgs[0] -ceq 'merge-base' } -MockWith ({ [pscustomobject]@{ ExitCode = $ancestor; Output = '' } }.GetNewClosure())
     Mock Invoke-DocsOnlyGitExe -ParameterFilter { $GitArgs[0] -ceq 'diff' } -MockWith ({ [pscustomobject]@{ ExitCode = $diffExit; Output = $diff } }.GetNewClosure())
+}
+
+function Register-EpicMergeGateReviewChildCiSeam {
+    <#
+    .SYNOPSIS
+        Mock both child-CI seams by name to a green CI run on the given head, for the current test.
+    .DESCRIPTION
+        An epic-child merge now needs a verified CI run on its live head (issue #1130). Mocking the seams
+        by name keeps the Invoke-DocsOnlyGhExe call counts that the review rows assert unchanged.
+    .PARAMETER HeadSha
+        The live head the seams report, equal to the fixture checkpoint's ci_gate.head_sha.
+    #>
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string] $HeadSha)
+
+    $head = $HeadSha
+    $run = [pscustomobject]@{ databaseId = 1130; event = 'pull_request'; status = 'completed'; conclusion = 'success'; headSha = $head; workflowName = 'CI'; createdAt = '2026-11-08T10:00:00Z' }
+    Mock Get-EpicMergeGateChildCiLiveHeadSha -MockWith ({ $head }.GetNewClosure())
+    Mock Get-EpicMergeGateChildCiRunList -MockWith ({ , @($run) }.GetNewClosure())
 }
 
 function Assert-EpicMergeGateReviewRowProcessCount {
