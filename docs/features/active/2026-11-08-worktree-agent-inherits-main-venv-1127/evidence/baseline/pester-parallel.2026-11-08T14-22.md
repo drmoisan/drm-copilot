@@ -1,6 +1,6 @@
 # Phase 0 baseline: Pester parallel gate (P0-T3)
 
-Timestamp: 2026-11-08T14-23
+Timestamp: 2026-11-08T14-22
 Command: sh SCRATCH/issue-1127-pester.sh p0 (pwsh imports the branch-current scripts/powershell/PoshQC/PoshQC.psd1 and runs Invoke-PoshQCParallelTest -Root <item worktree>; the launcher exits with the returned ExitCode)
 EXIT_CODE: 0
 Output Summary:
