@@ -1,11 +1,6 @@
----
-name: human-exception-runbook
-description: Contract for runbooks that document permitted human exceptions recorded in orchestrator state.
----
-
 # Human-Exception Runbook
 
-Defines the contract for a human-exception runbook: the artifact the orchestrator emits when an unautomatable requirement is resolved with the `exception` response under the autonomous-execution mandate (see `.agents/skills/orchestrate/SKILL.md`).
+Defines the contract for a human-exception runbook: the artifact the orchestrator emits when an unautomatable requirement is resolved with the `exception` response under the autonomous-execution mandate (see `.claude/skills/orchestrate/SKILL.md`).
 
 ## When to Use This Skill
 
@@ -49,7 +44,7 @@ Per OD-45-5, the MCP-first / web-second ordering is mandatory for third-party UI
 
 Every tool command in a runbook is either checked against the version pinned in the repository's lockfile or marked as not verified, with the pinned version stated. The `validate-human-exception-runbook-output.ps1` SubagentStop hook enforces honest marking; it does not check that a flag is correct.
 
-- **Counted fences.** A fenced block whose info string is empty or one of `sh`, `bash`, `shell`, `console`, `powershell`, `pwsh`, `ps1`, `cmd`, `bat` is counted. Blocks with any other info string (for example `text`, `json`, `output`) are exempt. Each non-blank, non-comment line of a counted block is a command.
+- **Counted fences.** A fenced block whose info string is empty or one of `sh`, `bash`, `shell`, `console`, `powershell`, `pwsh`, `ps1`, `cmd`, `bat` is counted. Blocks with any other info string (for example `text`, `json`, `output`) are exempt. A line ending in `\`, a backtick, or `^` joins the next line into one command. Each non-blank, non-comment command of a counted block is split into segments on `&&`, `||`, `;`, and `|` outside quotes, and each segment's tool needs a marker. Leading `NAME=value` assignments are skipped, and a segment starting with `cd`, `pushd`, `popd`, `export`, `set`, `source`, `.`, `echo`, or `$env:` names no tool.
 - **Marker lines.** Immediately after the closing fence (no blank line between), write one `Version check:` line per distinct tool of the block, in one of three forms:
   - `Version check: verified against <tool> <version>`
   - `Version check: not verified against <tool> <version>`
@@ -70,4 +65,4 @@ A runbook is contract-conformant when:
 - third-party UI steps were sourced MCP-first / web-second,
 - every counted shell block carries `Version check:` marker lines per the Tool Command Version Rule.
 
-A self-contained, conformant example is provided at `.agents/skills/human-exception-runbook/example.runbook.md`.
+A self-contained, conformant example is provided at `.claude/skills/human-exception-runbook/example.runbook.md`.
