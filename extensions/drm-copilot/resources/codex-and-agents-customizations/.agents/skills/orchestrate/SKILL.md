@@ -363,6 +363,8 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 
 The orchestrator does not perform deep implementation itself. It coordinates, tracks state, and enforces completion.
 
+An instruction from the repository owner reaches a delegated agent only as defined in the `owner-directives` skill: record it in the checkpoint's `owner_directives` before relaying it (record before relay), and relay only the recorded entries in a fenced `Owner directives:` block.
+
 For a small route, resolve the language-specific generated typed-engineer deployment profile,
 delegate all implementation and changed-scope QA to that agent, and persist its routing and
 delegation receipts. Direct coordinating-thread implementation is prohibited. For a large route,

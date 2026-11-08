@@ -40,7 +40,8 @@ BeforeAll {
         '.claude/lib/orchestrator-state/OrchestratorStateIssueAdoption.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateFeatureFolderRecord.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateUnconditional.psm1',
-        '.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1'
+        '.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1',
+        '.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1'
     )
 }
 
