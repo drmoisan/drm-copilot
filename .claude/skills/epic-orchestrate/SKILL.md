@@ -77,8 +77,10 @@ wave(f) = 0                                   if depends_on(f) is empty
 wave(f) = 1 + max(wave(d) for d in depends_on(f))   otherwise
 ```
 
-`scripts/dev_tools/epic_wave_computation.py` is the canonical, tested reference implementation
-of this formula.
+`pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1 -ManifestPath <manifest>` is the shipped, tested
+implementation of this formula (exit 0 with the JSON wave map, 1 for a cycle, self-loop, or
+unresolved reference, 2 for a usage error); the Python module `epic_wave_computation` is this
+repository's parity reference.
 
 Compute this via memoized recursion with cycle detection: a `feature_folder` encountered while
 still being resolved (i.e., it appears in its own dependency chain) indicates a cycle in the

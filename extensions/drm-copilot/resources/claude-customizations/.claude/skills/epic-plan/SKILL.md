@@ -58,7 +58,9 @@ For an epic-worthy objective:
 3. Derive `depends_on` edges from real upstream/downstream contracts only; do not add ordering
    edges for stylistic reasons, because every edge reduces execution parallelism.
 4. Compute wave assignment with the longest-path layering formula from the `epic-orchestrate`
-   skill (`scripts/dev_tools/epic_wave_computation.py` is the tested reference implementation)
+   skill (`pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1 -ManifestPath <manifest>` is the shipped, tested implementation; it reads a JSON
+   object of `feature_folder` to `depends_on` and exits 1 on a cycle, self-loop, or unresolved
+   reference; the Python module `epic_wave_computation` is this repository's parity reference)
    and reject cycles or unresolved references before any preparation is delegated.
 5. Record the planned waves in the planning checkpoint and in the epic narrative.
 

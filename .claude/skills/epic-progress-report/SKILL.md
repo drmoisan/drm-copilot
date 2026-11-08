@@ -451,5 +451,5 @@ any of them.
 - The script is read-only toward git and GitHub: it runs only `git fetch`, `git show`,
   `git worktree list`, `gh pr list`, and `cswap list --json`, and the only file it writes is
   the state file.
-- In this repository, `scripts/dev-tools/Get-EpicProgressReport.ps1` forwards every argument
-  to the canonical script; the skill always invokes the canonical script.
+- In this repository, a repository-only wrapper forwards every argument to the canonical
+  script; the skill always invokes the canonical script.
