@@ -117,7 +117,7 @@ index d6627bfd5a0c49b1a066723eb7548795ddcfeb53..54e7b84be87189ac026c48a67d448675
 +`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
 +field runs exactly as described above.
 diff --git a/.claude/agents/epic-orchestrator.md b/.claude/agents/epic-orchestrator.md
-index 280aed2fcba7fad8d7a1a6686fda58682b516386..93bf7a4ff7f7ca8d1934a4dc3319f9ff1eea70ad 100644
+index 13d551fa6b321b2842fb4e31bb9f2966d41dccef..b8bfd8c52bedcc32442bd25e4ca851892423507c 100644
 --- a/.claude/agents/epic-orchestrator.md
 +++ b/.claude/agents/epic-orchestrator.md
 @@ -16,6 +16,7 @@ tools:
@@ -128,7 +128,7 @@ index 280aed2fcba7fad8d7a1a6686fda58682b516386..93bf7a4ff7f7ca8d1934a4dc3319f9ff
    - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
    - "mcp__drm-copilot__collect_pr_context"
    - "mcp__drm-copilot__validate_orchestration_artifacts"
-@@ -138,6 +139,14 @@ report it to the operator and halt. The `SubagentStop` transport and exit-code d
+@@ -140,6 +141,14 @@ report it to the operator and halt. The `SubagentStop` transport and exit-code d
  previously depended on was resolved by epic #904 and issue #928: a violation blocks the stop with
  exit 2 and a stderr reason.
  
@@ -420,10 +420,10 @@ index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da14720868733
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/.claude/skills/epic-orchestrate/SKILL.md b/.claude/skills/epic-orchestrate/SKILL.md
-index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..2d3ee748e3e5c5f10f185d44e09207c9352f688a 100644
+index 82f8d475bc6009bdd9f01fcb1a808284d616912b..f8100831cec5e8745880420d8b241d28e7d8a190 100644
 --- a/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/.claude/skills/epic-orchestrate/SKILL.md
-@@ -300,6 +300,91 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
+@@ -300,6 +300,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
  `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
  on resume, not from in-memory completion notifications alone.
  
@@ -431,6 +431,8 @@ index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..2d3ee748e3e5c5f10f185d44e09207c9
 +
 +This section applies only to a feature whose manifest entry carries `early_start_on`. Without
 +that field this section does not apply, and every other section of this skill governs unchanged.
++Under the main-session fallback of `## Nesting Depth`, no `epic-orchestrator` runs the parent
++steps below, so the feature keeps the wave barrier and its `early_start_on` field is not acted on.
 +
 +**Opt-in.** A feature opts in through the manifest field `early_start_on: <upstream issue_num>`,
 +which must be one of its `depends_on` values. The manifest is human-authored and the wave
@@ -516,17 +518,20 @@ index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..2d3ee748e3e5c5f10f185d44e09207c9
  
  After a child feature's `epic_merge.merge_commit_sha` is recorded (S9 step 6 succeeds) and
 diff --git a/.claude/skills/epic-run/SKILL.md b/.claude/skills/epic-run/SKILL.md
-index 6d081f9998b7e349764e23fac3b934dadf035085..2f620fdf9aefb08ac24a0fc3502b79410ae7c637 100644
+index 0cd1aceb6d929a9363fa81149fade5d6084bc489..f876adcf8b4c2e5bb507061cd05441113cd01f49 100644
 --- a/.claude/skills/epic-run/SKILL.md
 +++ b/.claude/skills/epic-run/SKILL.md
-@@ -56,3 +56,7 @@ the wave barrier, merge-on-green fan-in, worktree cleanup, `epic-status.md` main
- the final integration-to-`main` PR are governed entirely by the `epic-orchestrate` skill. A child
+@@ -57,6 +57,10 @@ the final integration-to-`main` PR are governed entirely by the `epic-orchestrat
  merge into the integration branch requires a green `CI` run on the child head SHA; see
  `Epic-child CI verification (issue #1130)` under `## Merge-on-Green Kickoff Parameter` in that skill.
-+
+ 
 +An early dependent start (manifest field `early_start_on`) is governed by
 +`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
 +field runs exactly as described above.
++
+ ## Nesting Depth
+ 
+ This chain runs three levels of subagents below the main session: the coordinator at depth 1, each per-feature `orchestrator` at depth 2, and the specialists that orchestrator delegates to at depth 3. Only the depth-2 orchestrator needs the `Agent` tool below the coordinator; specialists do not delegate.
 diff --git a/.codex/agents/epic-orchestrator.toml b/.codex/agents/epic-orchestrator.toml
 index 77ada2bb0abd30183d0cd61b9052de5cd77bb7e6..69f311311e3191867b8cae4ed530db2ec1ed439e 100644
 --- a/.codex/agents/epic-orchestrator.toml
@@ -719,7 +724,7 @@ index 3d8b784de6f9c6e36893c1a3ba715a170a24f10b..1e42901c63e114b5c692dc2fbed534b9
      "./src/lib/validate/orchestrator-state-remediation.ts": {
        lines: 85,
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md
-index 280aed2fcba7fad8d7a1a6686fda58682b516386..93bf7a4ff7f7ca8d1934a4dc3319f9ff1eea70ad 100644
+index 13d551fa6b321b2842fb4e31bb9f2966d41dccef..b8bfd8c52bedcc32442bd25e4ca851892423507c 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md
 @@ -16,6 +16,7 @@ tools:
@@ -730,7 +735,7 @@ index 280aed2fcba7fad8d7a1a6686fda58682b516386..93bf7a4ff7f7ca8d1934a4dc3319f9ff
    - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
    - "mcp__drm-copilot__collect_pr_context"
    - "mcp__drm-copilot__validate_orchestration_artifacts"
-@@ -138,6 +139,14 @@ report it to the operator and halt. The `SubagentStop` transport and exit-code d
+@@ -140,6 +141,14 @@ report it to the operator and halt. The `SubagentStop` transport and exit-code d
  previously depended on was resolved by epic #904 and issue #928: a violation blocks the stop with
  exit 2 and a stderr reason.
  
@@ -1022,10 +1027,10 @@ index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da14720868733
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..2d3ee748e3e5c5f10f185d44e09207c9352f688a 100644
+index 82f8d475bc6009bdd9f01fcb1a808284d616912b..f8100831cec5e8745880420d8b241d28e7d8a190 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-@@ -300,6 +300,91 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
+@@ -300,6 +300,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
  `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
  on resume, not from in-memory completion notifications alone.
  
@@ -1033,6 +1038,8 @@ index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..2d3ee748e3e5c5f10f185d44e09207c9
 +
 +This section applies only to a feature whose manifest entry carries `early_start_on`. Without
 +that field this section does not apply, and every other section of this skill governs unchanged.
++Under the main-session fallback of `## Nesting Depth`, no `epic-orchestrator` runs the parent
++steps below, so the feature keeps the wave barrier and its `early_start_on` field is not acted on.
 +
 +**Opt-in.** A feature opts in through the manifest field `early_start_on: <upstream issue_num>`,
 +which must be one of its `depends_on` values. The manifest is human-authored and the wave
@@ -1118,22 +1125,25 @@ index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..2d3ee748e3e5c5f10f185d44e09207c9
  
  After a child feature's `epic_merge.merge_commit_sha` is recorded (S9 step 6 succeeds) and
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md
-index 6d081f9998b7e349764e23fac3b934dadf035085..2f620fdf9aefb08ac24a0fc3502b79410ae7c637 100644
+index 0cd1aceb6d929a9363fa81149fade5d6084bc489..f876adcf8b4c2e5bb507061cd05441113cd01f49 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md
-@@ -56,3 +56,7 @@ the wave barrier, merge-on-green fan-in, worktree cleanup, `epic-status.md` main
- the final integration-to-`main` PR are governed entirely by the `epic-orchestrate` skill. A child
+@@ -57,6 +57,10 @@ the final integration-to-`main` PR are governed entirely by the `epic-orchestrat
  merge into the integration branch requires a green `CI` run on the child head SHA; see
  `Epic-child CI verification (issue #1130)` under `## Merge-on-Green Kickoff Parameter` in that skill.
-+
+ 
 +An early dependent start (manifest field `early_start_on`) is governed by
 +`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
 +field runs exactly as described above.
++
+ ## Nesting Depth
+ 
+ This chain runs three levels of subagents below the main session: the coordinator at depth 1, each per-feature `orchestrator` at depth 2, and the specialists that orchestrator delegates to at depth 3. Only the depth-2 orchestrator needs the `Agent` tool below the coordinator; specialists do not delegate.
 diff --git a/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json b/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json
-index 65ea4ad0c30f3f552802738fdc10cdf34b67b4c8..0ea138a067709fff3b2f9a9162c1bc48a9b8832c 100644
+index 61534760116c9ab01040b047e8b2d9486628acb2..8271812a0bced7d111e43f9d21ba976b2987b5c9 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json
 +++ b/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json
-@@ -50,6 +50,7 @@
+@@ -51,6 +51,7 @@
      ".claude/hooks/enforce-epic-merge-gate-review.ps1",
      ".claude/hooks/enforce-epic-merge-gate-child-ci.ps1",
      ".claude/hooks/enforce-epic-wave-barrier.ps1",
@@ -2917,10 +2927,10 @@ index 0000000000000000000000000000000000000000..3a82be03a0b17eef3b2a748e25c4cfa8
 +}
 diff --git a/tests/scripts/claude-runtime/early-start-skill-contract.Tests.ps1 b/tests/scripts/claude-runtime/early-start-skill-contract.Tests.ps1
 new file mode 100644
-index 0000000000000000000000000000000000000000..a302d5f47c00c8844ce0029d6d381e8a4c12b1a7
+index 0000000000000000000000000000000000000000..423478dd21f20a7178f37417da272228e381cab1
 --- /dev/null
 +++ b/tests/scripts/claude-runtime/early-start-skill-contract.Tests.ps1
-@@ -0,0 +1,181 @@
+@@ -0,0 +1,189 @@
 +#Requires -Version 7.0
 +#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 +<#
@@ -3070,6 +3080,14 @@ index 0000000000000000000000000000000000000000..a302d5f47c00c8844ce0029d6d381e8a
 +            )) | Should -BeNullOrEmpty
 +    }
 +
++    It 'ESS-CLAUDE-FALLBACK-KEEPS-BARRIER in <Path>' -ForEach $script:ClaudeSkill {
++        # Under the main-session fallback of ## Nesting Depth (issue #1138) no epic-orchestrator owns the parent steps.
++        $section = Get-EarlyStartSection -RelativePath $Path
++        @(Get-EarlyStartMissingToken -Text $section -Token @(
++                'Under the main-session fallback of `## Nesting Depth`, no `epic-orchestrator` runs the parent steps below, so the feature keeps the wave barrier and its `early_start_on` field is not acted on.'
++            )) | Should -BeNullOrEmpty
++    }
++
 +    It 'ESS-CODEX-STATES-UNAVAILABLE-UNTIL-RELEASE in <Path>' -ForEach $script:CodexSkill {
 +        $section = Get-EarlyStartSection -RelativePath $Path
 +        @(Get-EarlyStartMissingToken -Text $section -Token @('The early start is therefore unavailable on Codex until that release is installed.')) | Should -BeNullOrEmpty
@@ -3212,13 +3230,13 @@ index 0000000000000000000000000000000000000000..bdcde4f875b92f58c0aab776b490034e
 +    }
 +}
 diff --git a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-index bc810406010db5a4566fd30a63ccc68fd1eea948..02908c137ef81cc1665a388df9ba501687f86068 100644
+index 61f42dc118c4676b7eb2650ff83f93571bde54ff..750e2de2f1e81efbf55081f34040e4b738749aa8 100644
 --- a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
 +++ b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-@@ -199,14 +199,20 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
- # after the integration-PR checkpoint shape paragraph of the epic skill. Only the
- # skill digest moved; the skill digest below is the merged result of #1129, #1130,
- # and #1136, the agent digest is unchanged, and the pin stays live for both entries.
+@@ -210,14 +210,20 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
+ # skill digest is unchanged. The merge of origin/main after #1136 combined both
+ # skill edits, so the skill digest below is the merged result of #1129, #1130,
+ # #1136, and #1138.
 +#
 +# RE-BASELINED by issue #1097. That change added the opt-in
 +# `## Early Dependent Starts (early_start)` section to the epic skill, and to
@@ -3228,13 +3246,13 @@ index bc810406010db5a4566fd30a63ccc68fd1eea948..02908c137ef81cc1665a388df9ba5016
  PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
      (
          ".claude/agents/epic-orchestrator.md",
--        "f76721ce463ba06288dbd21135f572ae28cfd9036a908587e65e1e0629b55e75",
-+        "e528093388dd08788ded7b9e05c809511167e798987f906afbcb0a1e1f13624d",
+-        "5ff9c66f58595fa91a1f568a18a0a5aae5d1736a9dd1b13a9bbbab459df7899c",
++        "142e42d15a73fb595c2b60691d15b1808bc244a24fecd240b59c72558905a7c8",
      ),
      (
          ".claude/skills/epic-orchestrate/SKILL.md",
--        "73d5c859007dbfe5bb0a35ad9b5444ea85fe1bf6a43571e1941952490033ed7e",
-+        "7cf48992fc08cc031d558bbb691bf24a698a3cead17f3c05158d400883bcaafd",
+-        "2e67dae3dd5a015693696125374e341f8c21963f36145bcf5fa8265ff8be924e",
++        "198cfa0f80e7fa712a49031a43eb64dd0c3da08afae56b7c6c32b282f5caeee5",
      ),
  )
  
