@@ -24,8 +24,11 @@
     Decision procedure:
       0. An envelope this hook cannot read at all -- empty on every transport,
          unparseable, or carrying no usable tool_input -- denies (fail closed).
-      1. Resolve the target subagent_type from the nested tool_input. A non-gated
-         target allows.
+      1. Resolve the target subagent_type from the nested tool_input and the caller
+         agent_type. A chain delegation (main thread to a gated agent, or a gated
+         agent to orchestrator) denies with NESTING_DEPTH_INSUFFICIENT when the
+         configured spawn-depth limit is below 3 (epic-invocation-nesting-depth.ps1).
+         Otherwise a non-gated target allows.
       2. Resolve the calling agent_type from the payload. An absent or empty
          agent_type indicates a main-thread invocation, which allows.
       3. Deny when the calling agent_type is exactly 'orchestrator', with the
@@ -46,6 +49,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'epic-invocation-nesting-depth.ps1') } catch { Add-HookDependencyFailure -Name 'epic-invocation-nesting-depth.ps1' -ErrorRecord $_ }
 $script:GatedSubagentTypes = @('epic-planner', 'epic-orchestrator', 'parallel-planner', 'parallel-orchestrator')
 $script:ParallelSubagentTypes = @('parallel-planner', 'parallel-orchestrator')
 $script:ProhibitedCallerAgentType = 'orchestrator'
@@ -248,6 +252,12 @@ function Invoke-EpicInvocationOriginDecision {
             '. The gate fails closed on an envelope it cannot read.')
     }
 
+    # Nesting-depth preflight (issue #1138): a chain delegation is denied when the
+    # configured spawn-depth limit is below the three levels the chain needs.
+    $caller = Get-EpicInvocationOriginCallerAgentType -HookInput $hookInput
+    $depthReason = Get-EpicInvocationNestingDepthDenyReason -Target $target -Caller $caller
+    if ($null -ne $depthReason) { return Get-EpicInvocationOriginBlockDecision -Reason $depthReason }
+
     if (-not $target -or $script:GatedSubagentTypes -notcontains $target) {
         return Get-EpicInvocationOriginAllowDecision
     }
@@ -255,7 +265,6 @@ function Invoke-EpicInvocationOriginDecision {
     # An absent agent_type marks a main-thread invocation, which is the
     # intended entry point for every gated agent; only an orchestrator-context
     # invocation is prohibited.
-    $caller = Get-EpicInvocationOriginCallerAgentType -HookInput $hookInput
     if ($caller -ne $script:ProhibitedCallerAgentType) {
         return Get-EpicInvocationOriginAllowDecision
     }

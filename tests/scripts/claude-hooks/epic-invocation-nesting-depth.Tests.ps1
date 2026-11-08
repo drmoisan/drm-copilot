@@ -124,4 +124,71 @@ Describe 'epic-invocation-nesting-depth.ps1' {
             [object]::Equals($actual, $expected) | Should -BeTrue -Because "seam '$actual' and process '$expected' must agree"
         }
     }
+
+    Context 'hook integration' {
+        BeforeAll {
+            . $script:HookPath
+
+            function ConvertTo-NestingDepthEnvelope {
+                param(
+                    [Parameter(Mandatory)]
+                    [string] $Target,
+
+                    [string] $CallerAgentType
+                )
+
+                $envelope = [ordered]@{ session_id = 'nesting-1138'; tool_name = 'Agent' }
+                if ($PSBoundParameters.ContainsKey('CallerAgentType')) {
+                    $envelope.agent_type = $CallerAgentType
+                }
+                $envelope.tool_input = [ordered]@{ subagent_type = $Target; prompt = 'delegate' }
+                return ($envelope | ConvertTo-Json -Compress -Depth 5)
+            }
+        }
+
+        It 'denies a main-thread epic-planner delegation below 3' {
+            Mock Get-SubagentSpawnDepthSetting { '2' }
+            $decision = Invoke-EpicInvocationOriginDecision -HookInputRaw (ConvertTo-NestingDepthEnvelope -Target 'epic-planner')
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason.StartsWith('NESTING_DEPTH_INSUFFICIENT:', [System.StringComparison]::Ordinal) | Should -BeTrue
+        }
+
+        It 'denies an epic-planner delegation to orchestrator below 3' {
+            Mock Get-SubagentSpawnDepthSetting { '2' }
+            $decision = Invoke-EpicInvocationOriginDecision -HookInputRaw (ConvertTo-NestingDepthEnvelope -Target 'orchestrator' -CallerAgentType 'epic-planner')
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason.StartsWith('NESTING_DEPTH_INSUFFICIENT:', [System.StringComparison]::Ordinal) | Should -BeTrue
+        }
+
+        It 'keeps the origin rule for an orchestrator caller' {
+            Mock Get-SubagentSpawnDepthSetting { '2' }
+            $decision = Invoke-EpicInvocationOriginDecision -HookInputRaw (ConvertTo-NestingDepthEnvelope -Target 'epic-planner' -CallerAgentType 'orchestrator')
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason.StartsWith('EPIC_INVOCATION_ORIGIN_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue
+        }
+
+        It 'guarded import failure denies' {
+            # Arrange: fail only the helper dot-source (the B1 pattern of hook-dependency-failure.Claude.Tests.ps1).
+            Mock Get-SubagentSpawnDepthSetting { $null }
+            $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+            Mock Join-Path {
+                if ($ChildPath -eq 'epic-invocation-nesting-depth.ps1') { throw 'simulated load failure: epic-invocation-nesting-depth.ps1' }
+                & $originalJoinPath @PesterBoundParameters
+            }
+            # Act
+            try {
+                . $script:HookPath
+                $decision = Invoke-EpicInvocationOriginDecision -HookInputRaw (ConvertTo-NestingDepthEnvelope -Target 'epic-planner')
+            }
+            finally {
+                $script:HookDependencyFailures = [System.Collections.Generic.List[object]]::new()
+                $script:HookDependencyGuardLoadFailed = $false
+            }
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $reason = $decision.hookSpecificOutput.permissionDecisionReason
+            $reason.StartsWith('EPIC_INVOCATION_ORIGIN_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
+            $reason.Contains('epic-invocation-nesting-depth.ps1') | Should -BeTrue -Because $reason
+        }
+    }
 }
