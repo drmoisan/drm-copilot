@@ -139,6 +139,7 @@ run exists, `epic-orchestrator` dispatches `CI` once on the child branch
 ## Worktree Cleanup
 
 After the child merge SHA is recorded and the epic checkpoint mirrors `merge_status: "merged"`,
+with the child's `pr_number` and `merge_commit_sha` recorded in the matching `features[]` entry,
 remove its worktree. The worktree-removal hook denies removal before the matching feature is
 `merged` or `worktree_removed`. Record `worktree_removed_at` after success.
 
@@ -172,6 +173,21 @@ the preimplementation gate admits, on the integration branch only and only for t
 without `-- <status doc>` needs a staged index that is exactly the status document. Use a
 forward-slash `-F` path, and commit separately from a chained `git add`. It is a policy-level
 control, not a security control.
+
+Merged-feature follow-up allowance (issue #1141): before fan-in, a follow-up on a child that has
+already merged is made in the integration worktree on the integration branch. For the same
+`merge-in-progress` failure, the gate admits it when the matching `features[]` entry records
+`merged` or `worktree_removed`, a plain `feature_folder` basename (an optional
+`docs/features/active/` or `docs/features/completed/` prefix is stripped), a `merge_commit_sha`
+of 40 or 64 lowercase hex characters, and an integer `pr_number` above 0. Allowed roots are
+`docs/features/active/<basename>/`, `docs/features/completed/<basename>/`, and the status
+document; Write or Edit, `git add [--] <paths>`, and `git commit` (options `-m`, `--message`,
+`-F`, `--file`, `--trailer` only) with `-- <paths>` or a staged index that lies entirely under
+those roots are admitted. `-a`, `--all`, `--amend`, `-A`, other flags, globs, `..`, backslashes,
+chained non-git commands, and sibling folders keep their deny. Only the epic checkpoint entry is
+evidence; no per-item checkpoint is read. Code corrections go through a new orchestrated child,
+and agents never hand-author a readiness checkpoint. It is a policy-level control, not a
+security control.
 
 Persist `artifacts/orchestration/epic-orchestrator-state.json` with `objective`, `route_id:
 "epic"`, epic folder/manifest/status paths, integration branch, completed and next steps,
