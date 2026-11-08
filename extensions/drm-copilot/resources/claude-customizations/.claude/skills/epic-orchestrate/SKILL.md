@@ -232,6 +232,10 @@ concrete path is resolved from the checkpoint's current state, so the dependent 
 `orchestrator`/`atomic-planner` is told exactly which upstream artifacts are relevant rather than
 being expected to rediscover prior design decisions from the diff alone.
 
+A recorded `Owner directives:` block is passed verbatim to each child whose scope matches an
+entry, as defined in the `owner-directives` skill; `epic-orchestrator` never authors or edits
+entries.
+
 ## Merge-Conflict Handling (Fan-In)
 
 The merge-conflict remediation loop runs inside the child feature's own `orchestrator` instance

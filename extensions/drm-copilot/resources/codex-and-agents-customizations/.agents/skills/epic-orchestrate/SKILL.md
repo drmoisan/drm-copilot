@@ -88,6 +88,10 @@ For prepared epics, also provide the committed `plan-path` and state that the ch
 atomic execution. For each dependency, include its concrete spec, plan, PR, merge SHA, and target
 branch as upstream context.
 
+A recorded `Owner directives:` block is passed verbatim to each child whose scope matches an
+entry, as defined in the `owner-directives` skill; `epic-orchestrator` never authors or edits
+entries.
+
 Do not use native `spawn_agent` for worktree children. For each wave, write an immutable launch
 specification under `artifacts/orchestration/epic-child-launches/<wave-id>/` and invoke
 `.codex/scripts/launch-epic-child-wave.ps1` with `checkpoint_kind: "epic-orchestrator"`, the
