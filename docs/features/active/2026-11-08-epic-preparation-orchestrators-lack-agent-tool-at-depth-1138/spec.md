@@ -73,25 +73,25 @@ The `epic-plan`, `epic-run`, `epic-orchestrate`, `parallel-plan`, `parallel-run`
 - Toolchain: PoshQC format -> analyze -> Pester test, plus the repository Python contract tests unchanged.
 
 ## Acceptance Criteria
-- [ ] AC1: Each of `.claude/agents/orchestrator.md`, `epic-planner.md`, `epic-orchestrator.md`, `parallel-planner.md`, and `parallel-orchestrator.md` contains the Agent-tool preflight as its first startup step, naming `spawn_agent_unavailable` and `AGENT_TOOL_UNAVAILABLE:`; verified by `NestingDepthContract.Tests.ps1` "agent files carry the Agent-tool preflight".
-- [ ] AC2: The coordinator agents (`epic-planner`, `epic-orchestrator`, `parallel-planner`, `parallel-orchestrator`) state that an `AGENT_TOOL_UNAVAILABLE:` line from a child halts the run with the same reason; verified by `NestingDepthContract.Tests.ps1` "coordinators halt on child AGENT_TOOL_UNAVAILABLE".
-- [ ] AC3: The preflight text names both remedies (raise or unset `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`; main-session fallback); verified by `NestingDepthContract.Tests.ps1` "preflight names both remedies".
-- [ ] AC4: `.claude/hooks/epic-invocation-nesting-depth.ps1` exists, defines `Get-SubagentSpawnDepthSetting`, and is dot-sourced inside a guard by `enforce-epic-invocation-origin.ps1`; a failed import denies chain delegations; verified by `epic-invocation-nesting-depth.Tests.ps1` "guarded import failure denies".
-- [ ] AC5: Unset value and integer values of 3 or more allow; verified by `epic-invocation-nesting-depth.Tests.ps1` "allows when unset" and "allows at or above 3".
-- [ ] AC6: Integer values below 3 (including 2, 1, 0) deny with a reason beginning `NESTING_DEPTH_INSUFFICIENT:` that names both remedies; verified by `epic-invocation-nesting-depth.Tests.ps1` "denies below 3 with remedy text".
-- [ ] AC7: A set, non-integer value denies with a parse message; verified by `epic-invocation-nesting-depth.Tests.ps1` "denies non-integer value".
-- [ ] AC8: The check applies to main thread -> gated coordinator and gated coordinator -> `orchestrator`, and does not apply to `orchestrator` -> specialist or other delegations; verified by `epic-invocation-nesting-depth.Tests.ps1` "caller and target matrix".
-- [ ] AC9: The tests never set environment variables and create no temp files; verified by the `poshqc / PowerShell QC static` leak scan passing on the new test file.
-- [ ] AC10: `epic-invocation-nesting-depth.ps1` reaches at least 90% line coverage in the Pester coverage run, and no existing file's line coverage drops.
-- [ ] AC11: `tests/scripts/claude-hooks/enforce-epic-invocation-origin.Tests.ps1` and `PreToolUseSchema.Contract.Tests.ps1` pass unchanged in assertions.
-- [ ] AC12: The `epic-plan`, `epic-run`, `epic-orchestrate`, `parallel-plan`, `parallel-run`, and `parallel-orchestrate` SKILL.md files contain a `## Nesting Depth` heading that documents the main-session `Agent(orchestrator)` fallback including `Preparation mode: true`; verified by `NestingDepthContract.Tests.ps1` "coordinator skills document Nesting Depth and fallback".
-- [ ] AC13: `.claude/skills/orchestrate/SKILL.md` contains a `## Nesting Depth` heading stating the main-session path needs depth 1 and a delegated orchestrator needs Agent at its own depth; verified by `NestingDepthContract.Tests.ps1` "orchestrate documents Nesting Depth".
-- [ ] AC14: The `## Tool Routes by Agent` section carries the nesting-depth line, byte-identical in every execution-environment copy listed in FR4; verified by `test_execution_environment_brief_contracts.py` and `NestingDepthContract.Tests.ps1` "brief carries nesting-depth line".
-- [ ] AC15: Bundle mirrors under `extensions/drm-copilot/resources/claude-customizations/.claude/` match the live agent, skill, and hook files; verified by the push-down resource parity test and the bundle-copy cases in `NestingDepthContract.Tests.ps1`.
-- [ ] AC16: `pack-manifests/core.json` lists `epic-invocation-nesting-depth.ps1`; verified by the manifest completeness and dependency-closure tests.
-- [ ] AC17: `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a #1138 comment block and its test passes.
-- [ ] AC18: No new Python file is added, and no file under `.codex/` changes; verified from the branch diff.
-- [ ] AC19: Full toolchain pass (PoshQC format -> analyze -> Pester, plus repository contract tests) completes without errors.
+- [x] AC1: Each of `.claude/agents/orchestrator.md`, `epic-planner.md`, `epic-orchestrator.md`, `parallel-planner.md`, and `parallel-orchestrator.md` contains the Agent-tool preflight as its first startup step, naming `spawn_agent_unavailable` and `AGENT_TOOL_UNAVAILABLE:`; verified by `NestingDepthContract.Tests.ps1` "agent files carry the Agent-tool preflight".
+- [x] AC2: The coordinator agents (`epic-planner`, `epic-orchestrator`, `parallel-planner`, `parallel-orchestrator`) state that an `AGENT_TOOL_UNAVAILABLE:` line from a child halts the run with the same reason; verified by `NestingDepthContract.Tests.ps1` "coordinators halt on child AGENT_TOOL_UNAVAILABLE".
+- [x] AC3: The preflight text names both remedies (raise or unset `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`; main-session fallback); verified by `NestingDepthContract.Tests.ps1` "preflight names both remedies".
+- [x] AC4: `.claude/hooks/epic-invocation-nesting-depth.ps1` exists, defines `Get-SubagentSpawnDepthSetting`, and is dot-sourced inside a guard by `enforce-epic-invocation-origin.ps1`; a failed import denies chain delegations; verified by `epic-invocation-nesting-depth.Tests.ps1` "guarded import failure denies".
+- [x] AC5: Unset value and integer values of 3 or more allow; verified by `epic-invocation-nesting-depth.Tests.ps1` "allows when unset" and "allows at or above 3".
+- [x] AC6: Integer values below 3 (including 2, 1, 0) deny with a reason beginning `NESTING_DEPTH_INSUFFICIENT:` that names both remedies; verified by `epic-invocation-nesting-depth.Tests.ps1` "denies below 3 with remedy text".
+- [x] AC7: A set, non-integer value denies with a parse message; verified by `epic-invocation-nesting-depth.Tests.ps1` "denies non-integer value".
+- [x] AC8: The check applies to main thread -> gated coordinator and gated coordinator -> `orchestrator`, and does not apply to `orchestrator` -> specialist or other delegations; verified by `epic-invocation-nesting-depth.Tests.ps1` "caller and target matrix".
+- [x] AC9: The tests never set environment variables and create no temp files; verified by the `poshqc / PowerShell QC static` leak scan passing on the new test file.
+- [x] AC10: `epic-invocation-nesting-depth.ps1` reaches at least 90% line coverage in the Pester coverage run, and no existing file's line coverage drops.
+- [x] AC11: `tests/scripts/claude-hooks/enforce-epic-invocation-origin.Tests.ps1` and `PreToolUseSchema.Contract.Tests.ps1` pass unchanged in assertions.
+- [x] AC12: The `epic-plan`, `epic-run`, `epic-orchestrate`, `parallel-plan`, `parallel-run`, and `parallel-orchestrate` SKILL.md files contain a `## Nesting Depth` heading that documents the main-session `Agent(orchestrator)` fallback including `Preparation mode: true`; verified by `NestingDepthContract.Tests.ps1` "coordinator skills document Nesting Depth and fallback".
+- [x] AC13: `.claude/skills/orchestrate/SKILL.md` contains a `## Nesting Depth` heading stating the main-session path needs depth 1 and a delegated orchestrator needs Agent at its own depth; verified by `NestingDepthContract.Tests.ps1` "orchestrate documents Nesting Depth".
+- [x] AC14: The `## Tool Routes by Agent` section carries the nesting-depth line, byte-identical in every execution-environment copy listed in FR4; verified by `test_execution_environment_brief_contracts.py` and `NestingDepthContract.Tests.ps1` "brief carries nesting-depth line".
+- [x] AC15: Bundle mirrors under `extensions/drm-copilot/resources/claude-customizations/.claude/` match the live agent, skill, and hook files; verified by the push-down resource parity test and the bundle-copy cases in `NestingDepthContract.Tests.ps1`.
+- [x] AC16: `pack-manifests/core.json` lists `epic-invocation-nesting-depth.ps1`; verified by the manifest completeness and dependency-closure tests.
+- [x] AC17: `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a #1138 comment block and its test passes.
+- [x] AC18: No new Python file is added, and no file under `.codex/` changes; verified from the branch diff.
+- [x] AC19: Full toolchain pass (PoshQC format -> analyze -> Pester, plus repository contract tests) completes without errors.
 
 ## Risks & Mitigations
 - Hook env inheritance unverified: FR1 is the primary control; the assumption is stated above.
