@@ -156,7 +156,7 @@ function Get-ReviewVerdictStatusArgument {
 function Get-ReviewVerdictFactOutput {
     <#
     .SYNOPSIS
-        Return the trimmed Output of a gathered fact, or throw a code-carrying failure when the
+        Return the Output of a gathered fact untrimmed, or throw a code-carrying failure when the
         fact's process exited non-zero.
     #>
     [CmdletBinding()]
@@ -209,7 +209,8 @@ function Get-ReviewVerdictReviewDecision {
         Rules in order: the last review_outcomes entry has verdict PASS; its head_sha is an object
         id; pr_gate.pr_number equals PrNumber and the pull request is OPEN; the feature folder is
         valid; ReviewArtifact is <feature-folder>/policy-audit.<yyyy-MM-ddTHH-mm>.md and is present
-        in the live head. The live head then posts when it equals the reviewed head, or when the
+        in the live head; no policy-audit.<yyyy-MM-ddTHH-mm>.md listed in the feature folder at the
+        live head sorts after it (REVIEW_VERDICT_ARTIFACT_NOT_LATEST). The live head then posts when it equals the reviewed head, or when the
         reviewed head is its ancestor and every path changed since lies under the feature folder.
     #>
     [CmdletBinding()]
@@ -251,6 +252,17 @@ function Get-ReviewVerdictReviewDecision {
     }
     if ([int]$Fact.ArtifactCommitted.ExitCode -ne 0) {
         return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_ARTIFACT_NOT_COMMITTED' -Detail "$ReviewArtifact is not in the live head $live"
+    }
+    if (-not $Fact.ContainsKey('AuditListing')) {
+        return Get-ReviewVerdictFactRequest -Name 'AuditListing' -Tool 'git' -Arguments @('ls-tree', '--name-only', $live, '--', "$folder/")
+    }
+    if ([int]$Fact.AuditListing.ExitCode -ne 0) {
+        return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_GIT_FAILED' -Detail "git ls-tree exited $($Fact.AuditListing.ExitCode)"
+    }
+    foreach ($listed in ([string]$Fact.AuditListing.Output).Split("`n")) {
+        if ($listed -cmatch $artifactPattern -and [string]::CompareOrdinal($listed, $ReviewArtifact) -gt 0) {
+            return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_ARTIFACT_NOT_LATEST' -Detail "$listed is newer than $ReviewArtifact"
+        }
     }
     $description = "feature-review PASS: $($ReviewArtifact.Substring($ReviewArtifact.LastIndexOf('/') + 1))"
     if ($live -ceq $reviewed) { return ConvertTo-ReviewVerdictDecision -Eligible $true -Code 'REVIEW_VERDICT_ELIGIBLE' -Detail $live -Description $description }
