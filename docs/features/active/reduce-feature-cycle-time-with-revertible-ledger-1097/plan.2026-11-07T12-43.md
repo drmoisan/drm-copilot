@@ -93,7 +93,7 @@ On the branch: the repository template and `AGENTS.md`, their bundles under `ext
 - [x] [P0-T1] Capture the PowerShell static baseline of `tests/scripts/claude-hooks/EpicMergeGateReview.Cases.Helpers.ps1` and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateConcurrentReview.Tests.ps1`, writing `FEATURE/evidence/baseline/stage-g-powershell-static.<timestamp>.md`.
   - PoshQC format in check mode and a direct analyzer run with the repository settings.
   - Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the files needing format and the finding count.
-- [ ] [P0-T2] Run one `Invoke-PoshQCParallelTest` as the `Phase 0 baseline` and write `FEATURE/evidence/baseline/stage-g-powershell-test-baseline.<timestamp>.md`.
+- [x] [P0-T2] Run one `Invoke-PoshQCParallelTest` as the `Phase 0 baseline` and write `FEATURE/evidence/baseline/stage-g-powershell-test-baseline.<timestamp>.md`.
   - `EXIT_CODE:` is the returned `ExitCode`. Output Summary: total, passed, failed from `artifacts/pester/pester-junit.xml` (shard reports when non-zero, naming each failing test); the counts of the `RGC-`, `OCR-`, `PRL-`, `PRC-`, `PGW-`, and `CRS-` suites; repo-wide line percentage from `artifacts/pester/powershell-coverage.xml`, or `coverage unavailable` after a failed run.
   - Acceptance: every field and figure is present; none comes from MCP output. A failing baseline is recorded and does not stop the plan.
 - [ ] [P0-T3] Run one `poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov` from the worktree root with `PYTHONPATH` set to this worktree's `packages/discovery-runtime/src`, writing `FEATURE/evidence/baseline/stage-g-python-test-baseline.<timestamp>.md`.
