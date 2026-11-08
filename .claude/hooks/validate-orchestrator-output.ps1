@@ -41,6 +41,8 @@
     every validation, naming the file, before any read. A failed Layer 2 import
     blocks the epic leg only.
     An unhandled error during validation blocks with exit 2 and a reason (issue #928).
+    The orchestrator-state worktree comes from the delegation prompt through the sibling
+    validate-orchestrator-output-target.ps1 (issue #1145); its fallback note goes to stderr on allow.
 #>
 
 [CmdletBinding()]
@@ -56,6 +58,8 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 Set-StrictMode -Version Latest
 
 try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-resolution.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-resolution.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-target-worktree.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-target.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-target.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-routing.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-routing.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-rejection.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-rejection.ps1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
@@ -204,21 +208,31 @@ function Invoke-OrchestratorOutputValidation {
         [scriptblock] $RoutingInvoker,
 
         [Parameter(Mandatory = $false)]
-        [scriptblock] $FeatureFolderGitInvoker
+        [scriptblock] $FeatureFolderGitInvoker,
+
+        [scriptblock] $ReadTranscriptHead,
+        [scriptblock] $WorktreeListInvoker
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
+    $itemTarget = $null
     $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
     if (-not $envelope.IsValid) { $decision = @{ Ok = $false; Repairable = $false; Message = ('{0} payload anomaly - {1}' -f 'orchestrator hook:', (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)) } }
     else {
         $agentOutput = $envelope.AssistantText
-        $blockArguments = @{ AgentOutput = ([string]$agentOutput); CheckpointPath = $CheckpointPath; ArtifactType = $ArtifactType; SessionRoot = $SessionRoot }
+        # Issue #1145: the orchestrator-state worktree comes from the delegation prompt; seams are forwarded only when bound.
+        $targetArguments = @{ ArtifactType = $ArtifactType; Envelope = $envelope.Envelope; AgentOutput = ([string]$agentOutput); CheckpointPath = $CheckpointPath; SessionRoot = $SessionRoot }
+        foreach ($seam in @('ReadTranscriptHead', 'WorktreeListInvoker')) { if ($PSBoundParameters.ContainsKey($seam)) { $targetArguments[$seam] = $PSBoundParameters[$seam] } }
+        $itemTarget = Resolve-OrchestratorOutputItemTarget @targetArguments
+        $blockArguments = @{ AgentOutput = ([string]$agentOutput); CheckpointPath = $CheckpointPath; ArtifactType = $ArtifactType; SessionRoot = $SessionRoot; ItemTarget = $itemTarget }
         if ($PSBoundParameters.ContainsKey('RoutingInvoker')) { $blockArguments['RoutingInvoker'] = $RoutingInvoker }
         if ($PSBoundParameters.ContainsKey('FeatureFolderGitInvoker')) { $blockArguments['FeatureFolderGitInvoker'] = $FeatureFolderGitInvoker }
         $decision = Get-OrchestratorOutputBlockDecision @blockArguments
     }
-    if ($decision.Ok) { return @{ Ok = $true; Message = $null } }
+    $note = Get-OrchestratorOutputFallbackNote -ItemTarget $itemTarget
+    if ($decision.Ok) { return @{ Ok = $true; Message = $null; Note = $note } }
+    if ($note) { $decision.Message = $decision.Message + "`n" + $note }
     if (-not $decision.Repairable) {
         if ($envelope.StopHookActive) { return @{ Ok = $true; Message = $null } }
         if (-not $decision.Message.Contains('to the operator and halt.')) { $decision.Message = $decision.Message + "`n" + $script:SubagentStopReportAndHaltLine }
@@ -253,7 +267,9 @@ function Get-OrchestratorOutputBlockDecision {
         [scriptblock] $RoutingInvoker,
 
         [Parameter(Mandatory = $false)]
-        [scriptblock] $FeatureFolderGitInvoker
+        [scriptblock] $FeatureFolderGitInvoker,
+
+        [AllowNull()] [object] $ItemTarget
     )
 
     if ([string]::IsNullOrWhiteSpace($agentOutput)) {
@@ -263,7 +279,7 @@ function Get-OrchestratorOutputBlockDecision {
     # Resolve the run checkpoint before any read (issue #787). A failed import, or an
     # unresolved, ambiguous, or mismatched target, blocks here, so nothing is read.
     try {
-        $resolution = Resolve-OrchestratorOutputCheckpointPath -ArtifactType $ArtifactType -CheckpointPath $CheckpointPath -AgentOutput ([string]$agentOutput) -SessionRoot $SessionRoot
+        $resolution = Resolve-OrchestratorOutputCheckpointPath -ArtifactType $ArtifactType -CheckpointPath $CheckpointPath -AgentOutput ([string]$agentOutput) -SessionRoot $SessionRoot -ItemTarget $ItemTarget
     }
     catch {
         return @{ Ok = $false; Repairable = $false; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: NoTarget (RESOLVER_FAILED): {1}' -f $ArtifactType, $_.Exception.Message) }
@@ -373,4 +389,5 @@ if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecis
 try { $result = Invoke-OrchestratorOutputValidation -CheckpointPath $CheckpointPath -ArtifactType $ArtifactType }
 catch { Exit-SubagentStopBlock -Message ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + $script:SubagentStopReportAndHaltLine) }
 if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
+Write-OrchestratorOutputAllowNote -Result $result
 exit 0
