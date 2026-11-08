@@ -20,6 +20,7 @@
     PowerShell 7+. Reads no file, starts no process, and reads no clock: the caller supplies
     the checkpoint text it has already read. Mirrored byte-identically into the bundled
     extension payload.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
