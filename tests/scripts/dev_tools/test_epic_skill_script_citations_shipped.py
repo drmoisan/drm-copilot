@@ -1,0 +1,344 @@
+"""Regression tests: epic skill and agent surfaces cite only shipped scripts.
+
+Purpose:
+    Issue #1129 found that the epic skills cited a script
+    (`scripts/dev_tools/epic_wave_computation.py`) that the push-down never
+    delivers to a destination repository. These tests fail whenever an epic
+    surface cites a repository-relative script path that the owning pack
+    manifest (`core.json`) does not ship, unless the path is allowlisted with a
+    reason naming the route that replaces it.
+
+Responsibilities:
+    Provide two pure helpers (`find_unshipped_citations` and
+    `find_stale_allowlist_entries`) and assert them against in-memory inputs and
+    against the committed Claude and Codex epic surfaces.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
+CLAUDE_MANIFEST = (
+    "extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json"
+)
+CODEX_MANIFEST = (
+    "extensions/drm-copilot/resources/codex-and-agents-customizations/"
+    "pack-manifests/core.json"
+)
+
+CLAUDE_SURFACES = (
+    ".claude/skills/epic-plan/SKILL.md",
+    ".claude/skills/epic-orchestrate/SKILL.md",
+    ".claude/skills/epic-run/SKILL.md",
+    ".claude/skills/epic-progress-report/SKILL.md",
+    ".claude/skills/review-epic/SKILL.md",
+    ".claude/agents/epic-orchestrator.md",
+    ".claude/agents/epic-planner.md",
+    ".claude/agents/epic-review.md",
+)
+CODEX_SURFACES = (
+    ".agents/skills/epic-plan/SKILL.md",
+    ".agents/skills/epic-orchestrate/SKILL.md",
+    ".agents/skills/epic-run/SKILL.md",
+    ".agents/skills/review-epic/SKILL.md",
+    ".codex/agents/epic-orchestrator.toml",
+    ".codex/agents/epic-planner.toml",
+    ".codex/agents/epic-review.toml",
+)
+
+# Repository-relative glob patterns that enumerate every epic surface present in the
+# tree for each runtime; the surface constants above must equal their expansion.
+CLAUDE_SURFACE_GLOBS = (
+    ".claude/skills/epic-*/SKILL.md",
+    ".claude/skills/review-epic/SKILL.md",
+    ".claude/agents/epic-*.md",
+)
+CODEX_SURFACE_GLOBS = (
+    ".agents/skills/epic-*/SKILL.md",
+    ".agents/skills/review-epic/SKILL.md",
+    ".codex/agents/epic-*.toml",
+)
+
+# Cited paths that are deliberately not shipped, each with the reason that names
+# the route the citing sentence uses instead.
+ALLOWLIST: Mapping[str, str] = {
+    "scripts/dev_tools/validate_epic_orchestrator_state.py": (
+        "Validated through the MCP tool validate_orchestration_artifacts, "
+        "which the citing sentences already name."
+    ),
+}
+
+# A repository-relative path citation. The optional `./` prefix is consumed but not
+# captured, so `./scripts/x.py` and `scripts/x.py` normalize to the same path. The
+# lookbehind still rejects `../` relative links and nested segments of longer paths.
+_PATH_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9_./-])"
+    r"(?:\./)?"
+    r"((?:scripts|\.claude|\.codex|\.agents)/[A-Za-z0-9_./-]*?\.(?:py|ps1|psm1|sh))"
+    r"(?![A-Za-z0-9_])"
+)
+
+# A `python -m` module citation of a repository development tool, normalized to the
+# `scripts/dev_tools/<module>.py` path it resolves to.
+_MODULE_PATTERN = re.compile(
+    r"(?<![A-Za-z0-9_.])scripts\.dev_tools\.([A-Za-z0-9_]+)(?![A-Za-z0-9_])"
+)
+
+
+def _cited_paths(surface_texts: Mapping[str, str]) -> set[str]:
+    """Return every script path cited by any surface text.
+
+    Path citations (with or without a leading `./`) and `scripts.dev_tools.<module>`
+    module citations are both reported as repository-relative script paths.
+
+    Args:
+        surface_texts (Mapping[str, str]): Surface path to surface text.
+
+    Returns:
+        set[str]: Repository-relative script paths found in the texts.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    cited: set[str] = set()
+    # Collect each path token and each module-form citation per surface; the path
+    # lookbehind keeps a nested `scripts/` segment of a `.codex/scripts/...` path
+    # from being read as a separate path, and a module citation is normalized to
+    # the `.py` path the manifest lists.
+    for text in surface_texts.values():
+        cited.update(match.group(1) for match in _PATH_PATTERN.finditer(text))
+        cited.update(
+            f"scripts/dev_tools/{match.group(1)}.py"
+            for match in _MODULE_PATTERN.finditer(text)
+        )
+    return cited
+
+
+def find_unshipped_citations(
+    surface_texts: Mapping[str, str],
+    manifest_paths: Sequence[str],
+    allowlist: Mapping[str, str],
+) -> list[str]:
+    """Return cited script paths that are neither shipped nor allowlisted.
+
+    Args:
+        surface_texts (Mapping[str, str]): Surface path to surface text.
+        manifest_paths (Sequence[str]): Paths listed in the owning `core.json`.
+        allowlist (Mapping[str, str]): Allowlisted path to reason.
+
+    Returns:
+        list[str]: Sorted unshipped, unallowlisted cited paths.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    shipped = set(manifest_paths)
+    return sorted(
+        path
+        for path in _cited_paths(surface_texts)
+        if path not in shipped and path not in allowlist
+    )
+
+
+def find_stale_allowlist_entries(
+    surface_texts: Mapping[str, str],
+    allowlist: Mapping[str, str],
+) -> list[str]:
+    """Return allowlisted paths that no surface cites.
+
+    Args:
+        surface_texts (Mapping[str, str]): Surface path to surface text.
+        allowlist (Mapping[str, str]): Allowlisted path to reason.
+
+    Returns:
+        list[str]: Sorted allowlist paths cited nowhere.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    cited = _cited_paths(surface_texts)
+    return sorted(path for path in allowlist if path not in cited)
+
+
+def _read_surfaces(paths: Sequence[str]) -> dict[str, str]:
+    """Read committed surface files into a path-to-text mapping.
+
+    Args:
+        paths (Sequence[str]): Repository-relative surface paths.
+
+    Returns:
+        dict[str, str]: Path to file text.
+
+    Raises:
+        FileNotFoundError: If a surface file does not exist.
+
+    Side Effects:
+        Reads files from the repository tree.
+    """
+
+    return {
+        path: (REPO_ROOT / path).read_text(encoding="utf-8").replace("\r\n", "\n")
+        for path in paths
+    }
+
+
+def _read_manifest_paths(manifest: str) -> list[str]:
+    """Read the `paths` list of a pack manifest.
+
+    Args:
+        manifest (str): Repository-relative manifest path.
+
+    Returns:
+        list[str]: The manifest `paths` entries.
+
+    Raises:
+        FileNotFoundError: If the manifest does not exist.
+
+    Side Effects:
+        Reads a file from the repository tree.
+    """
+
+    data = json.loads((REPO_ROOT / manifest).read_text(encoding="utf-8"))
+    return [str(path) for path in data["paths"]]
+
+
+def test_every_epic_surface_citation_is_shipped() -> None:
+    """Fail when an epic surface cites a script its pack does not ship."""
+
+    unshipped = find_unshipped_citations(
+        _read_surfaces(CLAUDE_SURFACES),
+        _read_manifest_paths(CLAUDE_MANIFEST),
+        ALLOWLIST,
+    ) + find_unshipped_citations(
+        _read_surfaces(CODEX_SURFACES),
+        _read_manifest_paths(CODEX_MANIFEST),
+        ALLOWLIST,
+    )
+
+    assert unshipped == [], f"Epic surfaces cite unshipped scripts: {unshipped}"
+
+
+def _glob_surfaces(patterns: Sequence[str]) -> set[str]:
+    """Expand repository-relative glob patterns against the committed tree.
+
+    Args:
+        patterns (Sequence[str]): Repository-relative glob patterns.
+
+    Returns:
+        set[str]: Matching repository-relative POSIX paths.
+
+    Raises:
+        None.
+
+    Side Effects:
+        Reads directory listings from the repository tree.
+    """
+
+    # Expand each pattern and keep the POSIX relative form the constants use.
+    return {
+        path.relative_to(REPO_ROOT).as_posix()
+        for pattern in patterns
+        for path in REPO_ROOT.glob(pattern)
+    }
+
+
+def test_epic_surface_sets_cover_every_epic_surface_in_tree() -> None:
+    """Fail when an epic skill or agent exists that a surface set does not scan."""
+
+    assert _glob_surfaces(CLAUDE_SURFACE_GLOBS) == set(CLAUDE_SURFACES)
+    assert _glob_surfaces(CODEX_SURFACE_GLOBS) == set(CODEX_SURFACES)
+
+
+def test_allowlist_reasons_name_the_mcp_route() -> None:
+    """Require each allowlist reason to name the MCP validation route."""
+
+    assert set(ALLOWLIST) == {"scripts/dev_tools/validate_epic_orchestrator_state.py"}
+    for path, reason in ALLOWLIST.items():
+        assert "validate_orchestration_artifacts" in reason, path
+
+
+def test_allowlist_has_no_stale_entry() -> None:
+    """Fail when an allowlisted path is cited by no epic surface."""
+
+    surfaces = {**_read_surfaces(CLAUDE_SURFACES), **_read_surfaces(CODEX_SURFACES)}
+
+    assert find_stale_allowlist_entries(surfaces, ALLOWLIST) == []
+
+
+def test_find_unshipped_citations_reports_unlisted_path() -> None:
+    """Report an unlisted path and keep a nested `.codex/scripts/` path whole."""
+
+    texts = {
+        "a.md": (
+            "Run `scripts/tool.py` and .codex/scripts/launch.ps1 then "
+            "`.claude/lib/x/Y.psm1`; allowed scripts/skip.py."
+        )
+    }
+
+    result = find_unshipped_citations(
+        texts, [".codex/scripts/launch.ps1"], {"scripts/skip.py": "reason"}
+    )
+
+    assert result == [".claude/lib/x/Y.psm1", "scripts/tool.py"]
+
+
+def test_find_stale_allowlist_entries_reports_uncited_entry() -> None:
+    """Report an allowlist entry that no surface text cites."""
+
+    texts = {"a.md": "cites scripts/used.py only"}
+
+    result = find_stale_allowlist_entries(
+        texts, {"scripts/used.py": "r", "scripts/gone.py": "r"}
+    )
+
+    assert result == ["scripts/gone.py"]
+
+
+def test_find_unshipped_citations_normalizes_module_form() -> None:
+    """Report an unlisted `python -m` module as its `.py` path, not a listed one."""
+
+    texts = {
+        "a.md": (
+            "Run `python -m scripts.dev_tools.gone_tool` then "
+            "`python -m scripts.dev_tools.kept_tool --check`."
+        )
+    }
+
+    result = find_unshipped_citations(texts, ["scripts/dev_tools/kept_tool.py"], {})
+
+    assert result == ["scripts/dev_tools/gone_tool.py"]
+
+
+def test_find_unshipped_citations_strips_dot_slash_prefix() -> None:
+    """Report `./`-prefixed citations without the prefix and honor a listed one."""
+
+    texts = {
+        "a.md": (
+            "See ./scripts/tool.py and ./.claude/lib/x/Y.psm1 and "
+            "./scripts/kept.py; ignore ../scripts/up.py."
+        )
+    }
+
+    result = find_unshipped_citations(texts, ["scripts/kept.py"], {})
+
+    assert result == [".claude/lib/x/Y.psm1", "scripts/tool.py"]

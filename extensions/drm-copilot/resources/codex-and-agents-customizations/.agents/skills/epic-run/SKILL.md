@@ -37,7 +37,9 @@ Use the epic slug or path supplied in the invoking user request.
    checkpoint before constructing the first execution launch specification.
 
 Wave scheduling, fan-in, worktree cleanup, `epic-status.md`, final PR creation, CI validation,
-and completion are governed entirely by `epic-orchestrate`.
+and completion are governed entirely by `epic-orchestrate`. A child merge into the integration
+branch requires a green `CI` run on the child head SHA; see `Epic-child CI verification (issue
+#1130)` under `## Fan-In and Conflict Handling` in that skill.
 
 An early dependent start (manifest field `early_start_on`) is governed by
 `## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that

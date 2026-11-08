@@ -114,6 +114,8 @@ Describe 'Codex enforce-epic-merge-gate review guard (issue #1097)' {
         # Arrange
         $checkpoint = ConvertTo-EpicMergeGateReviewCheckpointJson -Override $Override -Remove $Remove
         Register-EpicMergeGateReviewRowSeam -Row $_
+        # An allowed epic-child merge now needs a verified CI run (issue #1130); the child-CI seams are mocked green by name.
+        if ($Expected -ceq 'allow') { Register-EpicMergeGateReviewChildCiSeam -HeadSha $script:Reviewed }
 
         # Act
         $result = Invoke-CodexReviewDecision -Child $checkpoint -Command $Command
@@ -192,6 +194,8 @@ Describe 'Codex enforce-epic-merge-gate review guard (issue #1097)' {
 
         It 'RGC-NOKEY-CHILD-NO-GH-NO-DENIAL-UNCHANGED' {
             $child = ConvertTo-EpicMergeGateReviewCheckpointJson -Remove 'review_mode', 'remediation_loop'
+            # The child merge needs a verified CI run (issue #1130); the seams are mocked by name, so the gh count stays 0.
+            Register-EpicMergeGateReviewChildCiSeam -HeadSha $script:Reviewed
             Assert-CodexNoGuardProcess -GhCount 0 -Result (Invoke-CodexReviewDecision -Child $child)
         }
         It 'RGC-NOKEY-EPIC-NO-GH-NO-DENIAL-UNCHANGED' {

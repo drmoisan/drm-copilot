@@ -77,8 +77,10 @@ wave(f) = 0                                   if depends_on(f) is empty
 wave(f) = 1 + max(wave(d) for d in depends_on(f))   otherwise
 ```
 
-`scripts/dev_tools/epic_wave_computation.py` is the canonical, tested reference implementation
-of this formula.
+`pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1 -ManifestPath <manifest>` is the shipped, tested
+implementation of this formula (exit 0 with the JSON wave map, 1 for a cycle, self-loop, or
+unresolved reference, 2 for a usage error); the Python module `epic_wave_computation` is this
+repository's parity reference.
 
 Compute this via memoized recursion with cycle detection: a `feature_folder` encountered while
 still being resolved (i.e., it appears in its own dependency chain) indicates a cycle in the
@@ -140,6 +142,17 @@ recording `epic_merge: { merge_commit_sha, target_branch, merged_at }`. The chil
 `epic_merge` only after the merge is confirmed by polling and ancestry check against
 `origin/<integration_branch>` (S9 step 6). Standalone (non-epic)
 orchestration is unchanged: `epic_mode` absent or `false` makes S9 step 6 a no-op.
+
+Epic-child CI verification (issue #1130): the child verifies CI on its own head before S9 step 6
+merges. When no check whose `workflow` is `CI` exists on the child head, for example because the
+repository's `CI` workflow does not list `epic/**` in its `pull_request` branches, the child runs
+the S9 dispatch fallback of `.claude/skills/orchestrate/SKILL.md` and records
+`ci_gate.dispatch_run_id`. When a child reports that it is blocked at S9 because no `CI` run exists
+on its head, `epic-orchestrator` dispatches `CI` once on the child branch
+(`gh workflow run CI --ref <child branch>`) as the fallback and resumes the child at S9 to record
+the run. A child merge into the integration branch is never accepted without a green `CI` run on
+the child head SHA: `enforce-epic-merge-gate-child-ci.ps1` denies it with
+`EPIC_CHILD_CI_NOT_VERIFIED`.
 
 The run gates `enforce-orchestration-preimplementation-gate.ps1` and `enforce-epic-wave-barrier.ps1` locate the epic checkpoint by the `integration_branch:` value of this line. They select the live worktree whose `artifacts/orchestration/epic-orchestrator-state.json` records `route_id` `epic` and that integration branch, prefer the worktree that has the branch checked out when more than one records it, and deny the delegation with `TARGET_WORKTREE_NOT_DERIVABLE` or `TARGET_WORKTREE_AMBIGUOUS` when none or more than one remains. A stale copy of the epic checkpoint is moved to `artifacts/orchestration/handoff/` rather than left at a worktree root. The child run's own delegations to implementation agents carry the canonical issue-number line and `branch:` label defined in `.claude/skills/orchestrate/SKILL.md` `## Issue Number Consistency`.
 
@@ -246,6 +259,8 @@ Procedure, triggered by S9 step 6's merge failure:
    `step9_status: "blocked_conflict_loop_limit"` (parallel to `blocked_ci_loop_limit`), does not
    write DONE, and halts. It reports this status to `epic-orchestrator`, which mirrors it into
    the epic checkpoint's per-feature `merge_status: "blocked_conflict_loop_limit"` field.
+6. A resolved conflict produces a new child head, so S9 runs again against it, and the fan-in
+   merge is accepted only with a green `CI` run on that new head (issue #1130).
 
 ## Wave Barrier (Two-Layer Design)
 
@@ -429,6 +444,8 @@ that same call at the completion gate. The validation is implemented in
 **Checkpoint hygiene (issue #673).** The coordinating session never holds a per-feature checkpoint at its own root. Before the first child delegation of a run it moves any `artifacts/orchestration/orchestrator-state.json` at its root to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and writes none there for the rest of the run, because each item's checkpoint lives in that item's worktree. A gated call the coordinator issues on an item's behalf is resolved by the item's issue number and branch, never by the coordinator root.
 
 **Integration-PR checkpoint shape (issue #663).** The integration-to-`main` pull request and its `Agent(pr-author)` delegation are gated against `artifacts/orchestration/epic-orchestrator-state.json`, and no per-feature checkpoint is written for them. Before `epic-orchestrator` opens that pull request, the epic checkpoint carries `route_id: "epic"`, `integration_branch`, `epic_issue_num`, and a `features[]` array in which every entry's `merge_status` is `merged` or `worktree_removed`. Before the `Agent(pr-author)` delegation, `epic-orchestrator` records the `pr-author` routing receipt in that file's `model_routing_receipts[]`. The pr-author gate, the epic base-branch check, the model-routing gate, and the preimplementation gate treat a call as epic scope when its branch signal (or, for a staging command or file edit, the worktree HEAD) equals `integration_branch`; the pull request base must then be `main`.
+
+**Post-fan-in allowance (issue #1136).** Once fan-in is complete, meaning every `features[]` entry records `merge_status` `merged` or `worktree_removed`, the preimplementation gate admits a narrow set of writes on the integration branch that its epic-scope readiness predicate would otherwise deny with `'merge-in-progress'`. The allowance applies only when the worktree HEAD equals `integration_branch` and only for that exact readiness failure. It admits a Write or Edit of `artifacts/pr_body_<N>.md` or `artifacts/pr_body_<N>.receipt.json`, and a `git add` or `git commit` of the status document `docs/features/epics/<epic_feature_folder>/epic-status.md`, where the slug is one plain path segment and agrees with `epic_status_doc_path` when that field is set. A commit may carry only `-m`, `--message`, `-F`, `--file`, and `--trailer`, followed by no pathspec or by `-- <status doc>`; a commit without a pathspec is admitted only when the staged index of the integration worktree is exactly the status document. Two limits apply: a `-F` value or any other token containing a backslash makes the command unresolvable, so use a forward-slash path or `-m`; and in a chained `git add ... && git commit ...` without a pathspec the index is read before the add runs, so issue the commit separately or name `-- <status doc>`. Every other path and command keeps its deny. The allowance (`hook-epic-fan-in.ps1`) is a policy-level control, not a security control.
 
 ## Completion Requirements
 

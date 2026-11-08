@@ -181,6 +181,25 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # integration branch performed by `epic-orchestrator`. Only the skill digest
 # moved; the agent digest is unchanged and the pin stays live for both entries.
 #
+# RE-BASELINED by issue #1129. That change replaced the wave-layering sentence in
+# the epic skill's `## Wave Assignment` section and in the agent's
+# `## Wave Scheduling` paragraph so that they cite the shipped PowerShell wave
+# CLI instead of the unshipped Python reference, and it added the matching
+# `Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)` grant
+# to the agent's `tools:` list. Both digests moved, and the pin stays live for
+# both entries.
+#
+# RE-BASELINED by issue #1130. That change added the epic-child CI verification
+# paragraph to the epic skill's `## Merge-on-Green Kickoff Parameter` section
+# and a step 6 to its `## Merge-Conflict Handling (Fan-In)` section. Only the
+# skill digest moved; the skill digest below is the merged result of #1129 and
+# #1130, the agent digest is unchanged, and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #1136. That change added a post-fan-in allowance paragraph
+# after the integration-PR checkpoint shape paragraph of the epic skill. Only the
+# skill digest moved; the skill digest below is the merged result of #1129, #1130,
+# and #1136, the agent digest is unchanged, and the pin stays live for both entries.
+#
 # RE-BASELINED by issue #1097. That change added the opt-in
 # `## Early Dependent Starts (early_start)` section to the epic skill, and to
 # the epic agent one closing paragraph of `## Wave Scheduling` with the Bash
@@ -189,11 +208,11 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "c1a704d96884d960041abc35f8f892452707737a56c882a8b932da9a3b2d1628",
+        "f76721ce463ba06288dbd21135f572ae28cfd9036a908587e65e1e0629b55e75",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "ef3114033db7854beb315a0beccacbf0ec4a98fb989c9af608109dc6d4a260fc",
+        "73d5c859007dbfe5bb0a35ad9b5444ea85fe1bf6a43571e1941952490033ed7e",
     ),
 )
 

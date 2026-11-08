@@ -1,0 +1,6 @@
+# pytest final gate, remediation (P4-T3)
+
+Timestamp: 2026-11-08T16-03
+Command: poetry run pytest -n auto --cov=scripts.dev_tools --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/pytest-cov-p4t3b.json --junitxml=SCRATCH/pytest-junit-p4t3b.xml -q -p no:cacheprovider (via sh launcher SCRATCH/run-pytest.sh; one run after the last tree change, the re-run after the .agents skill correction recorded in skill-mirror-parity)
+EXIT_CODE: 0
+Output Summary: 16537 passed, 6 skipped, 0 failed in 164.55s (Phase 0 baseline: 16537 passed, 6 skipped, 0 failed). The push-down resource, pack-manifest completeness, and dependency-closure contract tests are within the run and passed. scripts.dev_tools coverage from the JSON totals: lines 16738 of 17653 (93.58%, equal to baseline), branches 5786 of 6418 (90.15%) against baseline 5787 (90.17%). The one-branch difference is scripts/dev_tools/atomic_executor/cli_copilot_runtime.py 395->362, a file that no commit of this change touches; the earlier run of the same tree before the skill correction (16537 passed, branches 5787, 90.17%) matched the baseline exactly, so the branch is timing-dependent and unrelated to the diff. No Python file is in the diff.

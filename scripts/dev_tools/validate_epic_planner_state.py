@@ -28,6 +28,7 @@ from scripts.dev_tools.epic_planner_readiness import (
 )
 from scripts.dev_tools.epic_wave_computation import (
     EpicWaveCycleError,
+    EpicWaveUnresolvedReferenceError,
     compute_wave_numbers,
 )
 
@@ -208,7 +209,9 @@ def _validate_dependency_waves(
 
     try:
         expected_waves = compute_wave_numbers(manifest)
-    except EpicWaveCycleError as exc:
+    except (EpicWaveCycleError, EpicWaveUnresolvedReferenceError) as exc:
+        # A dependency on a feature skipped for shape errors is absent from the
+        # manifest; report it rather than raising out of the validator.
         errors.append(str(exc))
         return errors
     for index, feature in indexed_features:
