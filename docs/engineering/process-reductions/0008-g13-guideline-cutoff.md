@@ -5,7 +5,7 @@
 reduction: 0008
 Date: 2026-11-07
 Issue: #1097
-Merge commit: pending (PR #1097)
+Merge commit: pending (PR #1123)
 
 Lowers the G13 size guideline from 40 canonical tasks and 400 physical lines to 20 tasks and 250 lines in both plan validators, the rule file, the planning contract, and the planner agents. A plan file stamped before `PLAN_GUIDELINE_CUTOFF` keeps 40 and 400, and a plan validated without a path uses the new pair. The finding message states the pair that applied. Until the pull request exists, the `Merge commit:` line carries the canonical issue number as a stand-in, and the orchestrator replaces it with the pull request number right after PR creation.
 
