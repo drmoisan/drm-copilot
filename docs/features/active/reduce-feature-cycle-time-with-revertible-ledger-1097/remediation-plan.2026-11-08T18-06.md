@@ -106,7 +106,7 @@ Found by searching `tests/` for `PINNED_FROZEN_SURFACE_HASHES`, `0010-early-depe
     - `git apply -R --check` of the patch exits 0 on the live tree.
     - Excluding the pin-file digest lines (and Phase 2 fix lines, listed), the `+` and `-` line multisets of the new patch equal those of the [P0-T2] patch.
     - `git log -1 --format=%s` contains `reduction: 0010`, and the entry contains `Regenerated against the merged base`.
-- [ ] [P3-T3] Run the ledger gates (script under `SCRATCH`) and write `FEATURE/evidence/other/stage-i-cycle1-ledger-gates.<timestamp>.md`.
+- [x] [P3-T3] Run the ledger gates (script under `SCRATCH`) and write `FEATURE/evidence/other/stage-i-cycle1-ledger-gates.<timestamp>.md`.
   - Gates:
     - (a) `Test-ProcessReductionLedger` valid.
     - (b) `Invoke-ProcessReductionChain` over all 10 entries and with `-StopBefore` for each stored-patch entry: `IsValid` true, 0 errors.
