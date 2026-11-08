@@ -5,7 +5,7 @@
 reduction: 0009
 Date: 2026-11-08
 Issue: #1097
-Merge commit: pending (PR #1097)
+Merge commit: pending (PR #1131)
 
 Reduces review evidence in three places. The format, lint, and type-check results of one language are recorded in one final-QC static artifact per language instead of one artifact per step, and reviewers read that artifact instead of re-running those checks; each test gate keeps its own artifact. The reviewer records the CI result of `Enforce Python coverage thresholds` for the Python repo-wide total instead of computing it; the PowerShell and TypeScript repo-wide review rows stay. The policy-audit `Code Under Test` list and the section 9 commit and file lists are replaced by the merge base and the reviewed head, whose branch log and diff carry the same information; the heading `## 9. Summary of Changes` stays. In exchange the reviewer writes `## CI Cross-check` into the policy audit, and under `review_mode: "concurrent"` the orchestrator compares each row with CI at the join and turns a mismatch into a synthetic `autonomous` finding that the merge guard denies with `REVIEW_GATE_NOT_PASSED`. Until the pull request exists, the `Merge commit:` line carries the canonical issue number as a stand-in, and the orchestrator replaces it with the pull request number right after PR creation. After a session crash, the reduction's edits first landed in the crash checkpoint commit `c58c16243`. That partial landing was withdrawn by reversing this entry's stored patch, and the whole reduction then landed with this entry in the one commit whose subject carries `reduction: 0009`; the stored patch is generated from the reduction's pre-image, so it is the same either way.
 
