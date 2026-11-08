@@ -53,6 +53,33 @@ BeforeDiscovery {
             }
         })
 
+    # The design check of single-pass preflight: the contract copies and the executor surfaces
+    # that restate it carry the same five tokens.
+    $designToken = @(
+        'Run the design check',
+        'no new delegation',
+        'no new artifact',
+        'the task that implements it and the test that would fail if the rule were broken',
+        'is a substantive defect'
+    )
+    $script:DesignCopyRow = @(foreach ($copy in $script:ContractCopy) {
+            @{ Copy = $copy.Copy; Path = $copy.Path; Required = $designToken }
+        })
+    $script:DesignExecutorRow = @(
+        @{ Id = 'CLAUDE-EXEC'; Path = '.claude/agents/atomic-executor.md'; Required = $designToken }
+        @{ Id = 'CLAUDE-EXEC-BUNDLE'; Path = "$resources/claude-customizations/.claude/agents/atomic-executor.md"; Required = $designToken }
+        @{ Id = 'CODEX-EXEC'; Path = '.codex/agents/atomic-executor.toml'; Required = $designToken }
+        @{ Id = 'CODEX-EXEC-BUNDLE'; Path = "$resources/codex-and-agents-customizations/.codex/agents/atomic-executor.toml"; Required = $designToken }
+        @{ Id = 'COPILOT-EXEC'; Path = '.github/agents/atomic_executor.agent.md'; Required = $designToken }
+        @{ Id = 'COPILOT-CS-EXEC'; Path = '.github/agents/csharp-atomic-executor.agent.md'; Required = $designToken }
+        @{ Id = 'COPILOT-PS-EXEC'; Path = '.github/agents/powershell-atomic-executor.agent.md'; Required = $designToken }
+        @{ Id = 'COPILOT-PY-EXEC'; Path = '.github/agents/python-atomic-executor.agent.md'; Required = $designToken }
+    )
+    $script:DesignDelegationRow = @(
+        @{ Id = 'CLAUDE-EXEC'; Path = '.claude/agents/atomic-executor.md' }
+        @{ Id = 'CLAUDE-EXEC-BUNDLE'; Path = "$resources/claude-customizations/.claude/agents/atomic-executor.md" }
+    )
+
     # Every policy-read surface outside the contract, including the Copilot review prompt,
     # whose phase0-instructions-read.md bullet the owner ruled outside the baseline hold.
     $surfaceForbidden = @(
@@ -264,5 +291,39 @@ Describe 'Planning contract wording' {
 
         # Assert
         $named | Should -BeTrue -Because "$Path must name the light mode that the orchestrate skill defines"
+    }
+
+    It 'PCW-DESIGN-CHECK-<Copy> states the design check in the single-pass preflight section' -ForEach $script:DesignCopyRow {
+        # Arrange / Act
+        $sectionText = Get-PcwSectionText -RelativePath $Path -Heading 'Single-Pass Preflight' -Level 3
+        $missing = @($Required | Where-Object { -not $sectionText.Contains($_) })
+
+        # Assert
+        $sectionText | Should -Not -BeNullOrEmpty -Because "$Path must keep the single-pass preflight section"
+        $missing | Should -BeNullOrEmpty -Because "$Path must state the design check in that section"
+    }
+
+    It 'PCW-DESIGN-CHECK-EXEC-<Id> states the design check on the executor surface' -ForEach $script:DesignExecutorRow {
+        # Arrange / Act
+        $text = Get-PcwSurfaceText -RelativePath $Path
+        $missing = @($Required | Where-Object { -not $text.Contains($_) })
+
+        # Assert
+        $missing | Should -BeNullOrEmpty -Because "$Path must state the design check"
+    }
+
+    It 'PCW-DESIGN-CHECK-NO-DELEGATION-<Id> grants the Claude executor no delegation tool' -ForEach $script:DesignDelegationRow {
+        # Arrange
+        $path = Join-Path -Path $script:RepoRoot -ChildPath $Path
+        $text = [System.IO.File]::ReadAllText($path).Replace("`r`n", "`n")
+        $match = [regex]::Match($text, '(?s)\ntools:\n(?<tools>.*?)\nskills:\n')
+
+        # Act
+        $entries = if ($match.Success) { @($match.Groups['tools'].Value -split "`n" | ForEach-Object { $_.Trim().TrimStart('-').Trim().Trim('"') }) } else { @() }
+        $delegating = @($entries | Where-Object { $_ -match '^Agent' })
+
+        # Assert
+        $entries | Should -Not -BeNullOrEmpty -Because "$Path must declare a tools list before skills"
+        $delegating | Should -BeNullOrEmpty -Because "$Path must not gain a delegation tool"
     }
 }

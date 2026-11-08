@@ -14,6 +14,7 @@ tools:
   - "Edit(artifacts/orchestration/**)"
   - "Bash(git *)"
   - "Bash(gh *)"
+  - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
   - "mcp__drm-copilot__potential_to_issue"
 skills:

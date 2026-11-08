@@ -387,6 +387,10 @@ Describe 'Invoke-OrchestratorStatePreflight' {
             # the readiness gate, so a malformed delegation_receipts entry (U5) fails the
             # preflight even though the readiness gate alone would not report it. The
             # readiness seam is stubbed clean so the U-family leg is the sole cause.
+            # The default invoker imports OrchestratorStateUnconditional only when its function is absent, so
+            # the module is removed first; otherwise an earlier file in the same process that imported it
+            # decides whether the lazy-import line runs, and per-file coverage moves with shard contents.
+            Remove-Module -Name OrchestratorStateUnconditional -Force -ErrorAction SilentlyContinue
             Mock -ModuleName OrchestratorState -CommandName Test-OrchestratorStatePrCreationReadiness -MockWith { @{ ExitCode = 0; Output = '' } }
             Mock -ModuleName OrchestratorState -CommandName Get-OrchestratorStateCheckpoint -MockWith {
                 @{

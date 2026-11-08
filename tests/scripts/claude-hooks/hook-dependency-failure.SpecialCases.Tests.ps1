@@ -276,4 +276,19 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
         $reason.StartsWith('EPIC_MERGE_GATE_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
         $reason.Contains('enforce-epic-merge-gate-review.ps1') | Should -BeTrue -Because $reason
     }
+
+    It 'C11: denies through the merge gate when enforce-epic-merge-gate-child-ci.ps1 fails to load' {
+        Mock Import-Module { }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-epic-merge-gate-child-ci.ps1') { throw 'simulated load failure: enforce-epic-merge-gate-child-ci.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
+        try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-epic-merge-gate.ps1' }
+        finally { Initialize-HookDependencyState }
+        $reason = Get-DenyReason -Result $result
+        $reason.StartsWith('EPIC_MERGE_GATE_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
+        $reason.Contains('enforce-epic-merge-gate-child-ci.ps1') | Should -BeTrue -Because $reason
+    }
 }
