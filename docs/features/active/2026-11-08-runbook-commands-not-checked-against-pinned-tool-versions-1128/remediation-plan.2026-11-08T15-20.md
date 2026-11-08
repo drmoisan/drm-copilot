@@ -25,7 +25,7 @@ Design: `Get-RunbookCountedBlock` joins a physical line that ends in a continuat
 
 ### Phase 0 — Comparison point
 
-- [ ] [P0-T1] Write `FEATURE/evidence/remediation-baseline/comparison-point.<timestamp>.md` that names the newest `pester-baseline.*.md`, `pytest-baseline.*.md`, and `powershell-static.*.md` under `FEATURE/evidence/baseline/` and copies their pass and fail counts, repo-wide coverage, and the per-file coverage of `RunbookCommandVersion.psm1` as numeric values; acceptance: the artifact exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` and every figure is numeric, and no test or source file changed.
+- [x] [P0-T1] Write `FEATURE/evidence/remediation-baseline/comparison-point.<timestamp>.md` that names the newest `pester-baseline.*.md`, `pytest-baseline.*.md`, and `powershell-static.*.md` under `FEATURE/evidence/baseline/` and copies their pass and fail counts, repo-wide coverage, and the per-file coverage of `RunbookCommandVersion.psm1` as numeric values; acceptance: the artifact exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` and every figure is numeric, and no test or source file changed.
 
 ### Phase 1 — Reproduce first
 
