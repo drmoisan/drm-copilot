@@ -213,6 +213,16 @@ Describe 'OrchestratorStateOwnerDirectives record reason and date rules R8-R10' 
         Assert-OwnerDirectiveRecordError -Text $text -Expected @($script:R9)
     }
 
+    It 'R9 rejects the non-ISO decided_at <Decided>' -ForEach @(
+        @{ Decided = '11/08/2026' }
+        @{ Decided = 'Monday, 09 November 2026' }
+        @{ Decided = '8 Nov 2026 3pm' }
+    ) {
+        $decidedValue = $Decided
+        $text = Edit-OwnerDirectiveRecordFixture -Edit { param($root) $root['owner_directive_records'][0]['decided_at'] = ConvertTo-OwnerDirectiveRecordJsonValue $decidedValue }
+        Assert-OwnerDirectiveRecordError -Text $text -Expected @($script:R9)
+    }
+
     It 'R10 rejects an honored record decided after the directive expires_at' {
         $text = Edit-OwnerDirectiveRecordFixture -Edit { param($root) $root['owner_directive_records'][0]['decided_at'] = ConvertTo-OwnerDirectiveRecordJsonValue '2026-11-09T14:06:00Z' }
         Assert-OwnerDirectiveRecordError -Text $text -Expected @($script:R10)

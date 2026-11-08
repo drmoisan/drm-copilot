@@ -216,6 +216,14 @@ Describe 'OrchestratorStateOwnerDirectives block rules B1-B8' {
         @{ Recorded = '2026-11-08T10:00:00Z'; Expires = 'tomorrow' }
         @{ Recorded = '2026-11-08T09:00:00-02:00'; Expires = '2026-11-08T10:00:00Z' }
         @{ Recorded = '2026-11-08T10:00:00'; Expires = '2026-11-08T10:00:00Z' }
+        @{ Recorded = '11/08/2026'; Expires = '2026-11-30T10:00:00Z' }
+        @{ Recorded = 'Monday, 09 November 2026'; Expires = '2026-11-30T10:00:00Z' }
+        @{ Recorded = '8 Nov 2026 3pm'; Expires = '2026-11-30T10:00:00Z' }
+        @{ Recorded = '2026-11-01T10:00:00Z'; Expires = '11/08/2026' }
+        @{ Recorded = '2026-11-01T10:00:00Z'; Expires = 'Monday, 09 November 2026' }
+        @{ Recorded = '2026-11-01T10:00:00Z'; Expires = '8 Nov 2026 3pm' }
+        @{ Recorded = '2026-11-08 10:00:00Z'; Expires = '2026-11-30T10:00:00Z' }
+        @{ Recorded = '2026-11-08'; Expires = '2026-11-30T10:00:00Z' }
     ) {
         $recordedValue = $Recorded
         $expiresValue = $Expires
@@ -232,6 +240,21 @@ Describe 'OrchestratorStateOwnerDirectives block rules B1-B8' {
             param($root)
             $root['owner_directives'][0]['recorded_at'] = ConvertTo-OwnerDirectiveJsonValue '2026-11-08T12:00:00+05:00'
             $root['owner_directives'][0]['expires_at'] = ConvertTo-OwnerDirectiveJsonValue '2026-11-08T08:00:00Z'
+        }
+        $errors = Get-OrchestratorStateOwnerDirectiveError -CheckpointText $text
+        $errors.Count | Should -Be 0 -Because ($errors -join ' | ')
+    }
+
+    It 'B7 accepts the ISO 8601 shape <Recorded>' -ForEach @(
+        @{ Recorded = '2026-11-08T10:00Z' }
+        @{ Recorded = '2026-11-08T10:00:00.5Z' }
+        @{ Recorded = '2026-11-08T10:00' }
+    ) {
+        $recordedValue = $Recorded
+        $text = Edit-OwnerDirectiveFixture -WithoutRecords -Edit {
+            param($root)
+            $root['owner_directives'][0]['recorded_at'] = ConvertTo-OwnerDirectiveJsonValue $recordedValue
+            $root['owner_directives'][0]['expires_at'] = ConvertTo-OwnerDirectiveJsonValue '2026-11-30T10:00:00Z'
         }
         $errors = Get-OrchestratorStateOwnerDirectiveError -CheckpointText $text
         $errors.Count | Should -Be 0 -Because ($errors -join ' | ')
