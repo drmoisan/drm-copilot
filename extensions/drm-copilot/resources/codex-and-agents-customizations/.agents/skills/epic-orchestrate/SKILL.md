@@ -164,6 +164,15 @@ Regenerate `docs/features/epics/<epic-slug>/epic-status.md` from the checkpoint 
 merge-status transition, each wave transition, and each final-PR transition. Never treat the
 status document as the DAG source.
 
+Post-fan-in allowance (issue #1136): once every feature records `merged` or `worktree_removed`,
+the preimplementation gate admits, on the integration branch only and only for the
+`merge-in-progress` readiness failure, a Write of `artifacts/pr_body_<N>.md` or
+`artifacts/pr_body_<N>.receipt.json` and a `git add` or `git commit` (options `-m`, `--message`,
+`-F`, `--file`, `--trailer` only) of `docs/features/epics/<epic-slug>/epic-status.md`; a commit
+without `-- <status doc>` needs a staged index that is exactly the status document. Use a
+forward-slash `-F` path, and commit separately from a chained `git add`. It is a policy-level
+control, not a security control.
+
 Persist `artifacts/orchestration/epic-orchestrator-state.json` with `objective`, `route_id:
 "epic"`, epic folder/manifest/status paths, integration branch, completed and next steps,
 timestamps, bounded `max_parallel_features`, current wave, waves, features and lifecycle

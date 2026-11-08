@@ -194,6 +194,11 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # and a step 6 to its `## Merge-Conflict Handling (Fan-In)` section. Only the
 # skill digest moved; the skill digest below is the merged result of #1129 and
 # #1130, the agent digest is unchanged, and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #1136. That change added a post-fan-in allowance paragraph
+# after the integration-PR checkpoint shape paragraph of the epic skill. Only the
+# skill digest moved; the skill digest below is the merged result of #1129, #1130,
+# and #1136, the agent digest is unchanged, and the pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -201,7 +206,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "4a7e5ba9cc7dc7eb9e66c905fc3e866f764d3777e65c1036c8aff12481ab261f",
+        "73d5c859007dbfe5bb0a35ad9b5444ea85fe1bf6a43571e1941952490033ed7e",
     ),
 )
 

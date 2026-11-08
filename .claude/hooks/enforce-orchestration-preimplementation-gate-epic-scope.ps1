@@ -55,6 +55,7 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/Worktre
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'EpicScopeResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeReadiness.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'EpicScopeReadiness.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/HookTargetWorktree.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookTargetWorktree.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-epic-fan-in.ps1') } catch { Add-HookDependencyFailure -Name 'hook-epic-fan-in.ps1' -ErrorRecord $_ }
 # Per-segment target resolution for the epic-scope decision (issue #738).
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-targets.ps1')
 
@@ -346,7 +347,9 @@ function Get-OrchestrationEpicScopeDecision {
         caller's single-feature path runs unchanged. In epic scope, denies an unresolvable,
         ambiguous, or out-of-scope target, and otherwise evaluates the epic command-leg
         readiness predicate against every target: the first failure denies (the session-root
-        wording is unchanged), and no failure allows.
+        wording is unchanged), and no failure allows. Post-fan-in allowance (issue #1136): a
+        target whose failure is exactly 'merge-in-progress' passes when Test-EpicFanInComplete
+        holds and Get-EpicFanInAllowance reports Allowed.
     .PARAMETER Command
         The Bash command line; empty for a path leg.
     .PARAMETER FilePath
@@ -375,7 +378,13 @@ function Get-OrchestrationEpicScopeDecision {
     $verdict = Resolve-OrchestrationEpicTargetVerdict -SessionRoot $epicScopeSessionRoot -TargetResult $targetResult -ScopeResolver $scopeResolver
     $outcome = Resolve-OrchestrationEpicTargetOutcome -Verdict $verdict -ReadinessFailure {
         param($Scope)
-        Get-EpicCommandLegReadinessFailure -Checkpoint $Scope.Checkpoint -MergeInProgress $Scope.MergeInProgress
+        $failure = Get-EpicCommandLegReadinessFailure -Checkpoint $Scope.Checkpoint -MergeInProgress $Scope.MergeInProgress
+        $reader = { param([string] $WorktreeRoot) Get-OrchestrationGateStagedIndex -WorktreeRoot $WorktreeRoot }
+        if ($failure -ceq 'merge-in-progress' -and (Test-EpicFanInComplete -Checkpoint $Scope.Checkpoint -Branch $Scope.Branch) -and
+            (Get-EpicFanInAllowance -Scope $Scope -FilePath @($FilePath) -Command $epicScopeText -StagedIndexReader $reader).Allowed) {
+            return ''
+        }
+        $failure
     }
     if ($outcome.Outcome -eq 'none') {
         return $null
