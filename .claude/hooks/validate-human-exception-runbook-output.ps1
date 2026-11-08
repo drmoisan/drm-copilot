@@ -102,8 +102,10 @@ function Get-HumanExceptionRunbookDecision {
     try { $runbookText = [string](& $ReadFile $location.ProbePath) } catch { return @{ Ok = $false; Message = "$script:ReasonPrefix failed to read runbook path '$runbookPath': $($_.Exception.Message)" } }
 
     $pinned = @{}
-    foreach ($name in @(& $ListRootFile $target.WorktreeRoot)) {
-        $lockText = & $ReadFile (Resolve-SubagentStopArtifactPath -Path ([string]$name) -WorktreeRoot $target.WorktreeRoot -SessionRoot $root)
+    # A not-derivable or ambiguous resolution carries a null WorktreeRoot; the session root applies then.
+    $lockRoot = if ([string]::IsNullOrWhiteSpace([string]$target.WorktreeRoot)) { $root } else { [string]$target.WorktreeRoot }
+    foreach ($name in @(& $ListRootFile $lockRoot)) {
+        $lockText = & $ReadFile (($lockRoot -replace '\\', '/').TrimEnd('/') + '/' + [string]$name)
         if ($null -eq $lockText) { continue }
         foreach ($entry in (Get-RunbookPinnedToolVersion -LockfileName ([string]$name) -Content ([string]$lockText)).GetEnumerator()) {
             $pinned[$entry.Key] = $entry.Value
