@@ -110,8 +110,8 @@ function Get-EpicInvocationNestingDepthDenyReason {
 
     $remedy = 'Remedy: raise or unset CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH (unset means the default of 3), or use the main-session fallback described under ## Nesting Depth of the coordinating skill, in which the main session launches each per-feature Agent(orchestrator) itself.'
     $trimmedValue = $rawValue.Trim()
-    $parsedValue = 0
-    $isInteger = [int]::TryParse(
+    [long] $parsedValue = 0
+    $isInteger = [long]::TryParse(
         $trimmedValue,
         [System.Globalization.NumberStyles]::Integer,
         [System.Globalization.CultureInfo]::InvariantCulture,

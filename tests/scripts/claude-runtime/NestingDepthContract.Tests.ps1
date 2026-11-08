@@ -106,6 +106,13 @@ Describe 'Nesting-depth wording contract (issue #1138)' {
         }
     }
 
+    It 'coordinators halt on a NESTING_DEPTH_INSUFFICIENT deny' {
+        foreach ($file in (Get-ContractCopyPath -RelativePath $script:CoordinatorAgentFiles)) {
+            $preflight = Get-StartupPreflightText -Text (Get-ContractText -RelativePath $file)
+            Assert-ContractLiteral -Text $preflight -Literal @('NESTING_DEPTH_INSUFFICIENT:', 'halt with that reason') -File $file -Region 'Startup Protocol preflight'
+        }
+    }
+
     It 'preflight names both remedies' {
         foreach ($file in (Get-ContractCopyPath -RelativePath $script:AgentFiles)) {
             $preflight = Get-StartupPreflightText -Text (Get-ContractText -RelativePath $file)

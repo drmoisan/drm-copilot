@@ -199,11 +199,14 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # unnumbered lead paragraph of the agent's `## Startup Protocol`, which moved the
 # agent digest, and appended a `## Nesting Depth` section to the epic skill, which
 # moved the skill digest. Both digests moved, and the pin stays live for both
-# entries.
+# entries. Remediation cycle 1 of #1138 then appended to that lead paragraph the
+# instruction to halt when an `Agent(orchestrator)` call is denied with a reason
+# beginning `NESTING_DEPTH_INSUFFICIENT:`, which moved the agent digest again; the
+# skill digest is unchanged.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "68e32052c642ff8d8717478542872ef203878a13e9755bae820e3671c56ef716",
+        "5ff9c66f58595fa91a1f568a18a0a5aae5d1736a9dd1b13a9bbbab459df7899c",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",

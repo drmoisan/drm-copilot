@@ -37,7 +37,7 @@ Describe 'epic-invocation-nesting-depth.ps1' {
 
         It 'allows at or above 3' {
             Mock Get-SubagentSpawnDepthSetting { $script:DepthSetting }
-            foreach ($value in @('3', '4', '10', ' 4 ')) {
+            foreach ($value in @('3', '4', '10', ' 4 ', '99999999999')) {
                 $script:DepthSetting = $value
                 $reason = Get-EpicInvocationNestingDepthDenyReason -Target 'epic-orchestrator' -Caller $null
                 $reason | Should -BeNullOrEmpty -Because "value '$value' is at least 3"
@@ -46,7 +46,7 @@ Describe 'epic-invocation-nesting-depth.ps1' {
 
         It 'denies below 3 with remedy text' {
             Mock Get-SubagentSpawnDepthSetting { $script:DepthSetting }
-            foreach ($value in @('2', '1', '0', '-1')) {
+            foreach ($value in @('2', '1', '0', '-1', '-99999999999')) {
                 $script:DepthSetting = $value
                 $reason = Get-EpicInvocationNestingDepthDenyReason -Target 'parallel-planner' -Caller $null
                 $reason | Should -Not -BeNullOrEmpty -Because "value '$value' is below 3"
