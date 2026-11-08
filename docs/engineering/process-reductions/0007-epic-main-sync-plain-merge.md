@@ -5,7 +5,7 @@
 reduction: 0007
 Date: 2026-11-07
 Issue: #1117
-Merge commit: pending (PR #1119)
+Merge commit: dccfc06131b3e60d966a0da901fa3ccd86237df5
 
 Replaces the dedicated sync child item that step 3 of the epic integration branch lifecycle ran for every sync of `origin/main` into an epic integration branch with a plain merge performed by the running `epic-orchestrator`. The sync no longer goes through a feature record, an issue number, a test baseline, gates, review, a pull request, or CI as a child item of its own.
 

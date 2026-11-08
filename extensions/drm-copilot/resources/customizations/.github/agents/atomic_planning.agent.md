@@ -109,7 +109,7 @@ For `minor-audit`, preflight-required plan gates MUST include baseline evidence 
 
 Follow `### Single-Pass Preflight` in the `atomic-plan-contract` skill. The preflight directive belongs in the delegation prompt, never in the plan file. The preflight executor fixes trivial defects in place and returns only substantive defects as `PREFLIGHT-DEFECT:` lines. A plan returns to the planner at most once: apply every listed change in one revision of the same file; if the confirming preflight still reports a substantive defect, the orchestrator halts with `blocked_reason: "validator_failed"`.
 
-Every plan follows `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: anchors are symbols, headings, or test names (never line numbers or commit SHAs), literals appear only where they are the asserted value, tool routes are not restated, a plan above 40 tasks or 400 lines carries `## Size Justification`, every plan carries a `## Pre-Mortem` section with the seven labels, and the final phase ends with the self-review task.
+Every plan follows `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: anchors are symbols, headings, or test names (never line numbers or commit SHAs), literals appear only where they are the asserted value, tool routes are not restated, a plan above the G13 guideline of 20 tasks and 250 lines (40 and 400 for a plan file stamped before `PLAN_GUIDELINE_CUTOFF`) carries `## Size Justification`, every plan carries a `## Pre-Mortem` section with the seven labels, and the final phase ends with the self-review task.
 
 If the `atomic_executor` delegation cannot be started, resumed, or completed, you MUST stop and report blocked state. You MUST NOT self-approve or finalize the plan.
 
