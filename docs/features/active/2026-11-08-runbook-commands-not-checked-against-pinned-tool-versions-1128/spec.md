@@ -131,12 +131,12 @@ Negligible; operates on one runbook and the top-level lockfiles.
 - Manual validation steps (if required): none beyond the regression fixture.
 
 ## Acceptance Criteria
-- [ ] Reproduction: a regression fixture of a runbook with `python -m nuitka --clean-cache=clcache` in a shell block, no marker, and a poetry.lock pinning nuitka 4.3.4 produces a finding naming nuitka and 4.3.4 (fails before the fix because no check exists; passes after).
-- [ ] Lockfile resolution returns the pinned version for each supported format (poetry.lock, uv.lock, package-lock.json, requirements*.txt), with PEP 503 normalization.
-- [ ] A marker naming the pinned version passes for both the `verified` and `not verified` forms; a mismatched version, a `not pinned` claim for a pinned tool, and a malformed marker each produce a finding; an unpinned tool with the `not pinned` form passes; exempt fences produce no finding.
-- [ ] The SubagentStop hook blocks on findings, a missing `runbook_path:`, and a missing file, and allows a conformant runbook, with item-worktree resolution.
-- [ ] Skill, agent, example, and all mirrors are updated; mirror and pack-manifest contract tests pass.
-- [ ] Full toolchain passes with no new failures against the Phase 0 baseline and at least 85% line coverage on the new PowerShell files.
+- [x] Reproduction: a regression fixture of a runbook with `python -m nuitka --clean-cache=clcache` in a shell block, no marker, and a poetry.lock pinning nuitka 4.3.4 produces a finding naming nuitka and 4.3.4 (fails before the fix because no check exists; passes after).
+- [x] Lockfile resolution returns the pinned version for each supported format (poetry.lock, uv.lock, package-lock.json, requirements*.txt), with PEP 503 normalization.
+- [x] A marker naming the pinned version passes for both the `verified` and `not verified` forms; a mismatched version, a `not pinned` claim for a pinned tool, and a malformed marker each produce a finding; an unpinned tool with the `not pinned` form passes; exempt fences produce no finding.
+- [x] The SubagentStop hook blocks on findings, a missing `runbook_path:`, and a missing file, and allows a conformant runbook, with item-worktree resolution.
+- [x] Skill, agent, example, and all mirrors are updated; mirror and pack-manifest contract tests pass.
+- [x] Full toolchain passes with no new failures against the Phase 0 baseline and at least 85% line coverage on the new PowerShell files.
 
 ## Risks & Mitigations
 - Technical or operational risks: false positives on commands that are not tool invocations (for example shell builtins); agents marking `verified` without checking; lockfile formats beyond the supported ones are treated as unpinned.
