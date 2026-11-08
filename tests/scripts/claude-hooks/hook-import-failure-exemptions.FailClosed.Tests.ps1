@@ -498,4 +498,13 @@ Describe 'orchestrator output validator handler proof' {
         $result.ExitCode | Should -Be 2
         $result.Stderr.Contains('OrchestratorStateEpicWaveBarrier.psm1') | Should -BeTrue -Because $result.Stderr
     }
+
+    It 'H9 validate-orchestrator-output.ps1 exits 2 naming OrchestratorStateOwnerDirectives.psm1 when the owner-directive import fails' {
+        Mock Import-Module { }
+        Mock Import-Module { throw 'simulated load failure: OrchestratorStateOwnerDirectives.psm1' } -ParameterFilter { $Name -like '*OrchestratorStateOwnerDirectives.psm1' }
+        $result = Invoke-OrchestratorOutputHookProcess
+        $result.Thrown | Should -BeNullOrEmpty -Because "the hook must not throw ($($result.Thrown))"
+        $result.ExitCode | Should -Be 2
+        $result.Stderr.Contains('OrchestratorStateOwnerDirectives.psm1') | Should -BeTrue -Because $result.Stderr
+    }
 }
