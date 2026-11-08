@@ -65,7 +65,7 @@
 
 ### Phase 3 — Integration Evidence
 
-- [ ] [P3-T1] AC20 before/after comparison. Write `SCRATCH/issue-1127-venv-snapshot.sh` that lists the names and contents of the `*.pth` files in the main checkout's `.venv` site-packages and runs that environment's `python -m pip list` (listing only, no install), writing to a SCRATCH file named by its argument. Run it with `before`, run `env -u VIRTUAL_ENV poetry install` (the AC20 command) from the worktree root, run `env -u VIRTUAL_ENV poetry env info -p`, run the snapshot with `after`, and compare the two snapshots with `cmp`. Artifact FEATURE/evidence/regression-testing/venv-isolation.<timestamp>.md recording each command, the `poetry env info -p` result as `<item worktree>/.venv`, and the `cmp` `EXIT_CODE`. Acceptance: `cmp` exits 0 and the environment path is the item worktree's `.venv`.
+- [x] [P3-T1] AC20 before/after comparison. Write `SCRATCH/issue-1127-venv-snapshot.sh` that lists the names and contents of the `*.pth` files in the main checkout's `.venv` site-packages and runs that environment's `python -m pip list` (listing only, no install), writing to a SCRATCH file named by its argument. Run it with `before`, run `env -u VIRTUAL_ENV poetry install` (the AC20 command) from the worktree root, run `env -u VIRTUAL_ENV poetry env info -p`, run the snapshot with `after`, and compare the two snapshots with `cmp`. Artifact FEATURE/evidence/regression-testing/venv-isolation.<timestamp>.md recording each command, the `poetry env info -p` result as `<item worktree>/.venv`, and the `cmp` `EXIT_CODE`. Acceptance: `cmp` exits 0 and the environment path is the item worktree's `.venv`.
 
 ### Phase 4 — Final QA Loop
 

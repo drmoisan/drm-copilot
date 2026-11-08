@@ -144,7 +144,7 @@ One additional pwsh hook invocation per Bash call; the early exit when `poetry` 
 - [ ] AC17: The new regression Pester tests pass in the single `Invoke-PoshQCParallelTest` gate, with no new failures against the Phase 0 baseline of `Invoke-PoshQCParallelTest` and `pytest -n auto`.
 - [ ] AC18: Line coverage of each new PowerShell file is >= 85%, read from the per-file Pester coverage report, with no coverage exclusion added for production paths.
 - [ ] AC19: If the shared command-option table is changed for Poetry, the existing `git`/`gh` parser acceptance, Issue824 regression, and TriggerScoping suites pass unchanged.
-- [ ] AC20: Integration evidence is recorded under the feature's `evidence/` folder: `env -u VIRTUAL_ENV poetry install` in the fresh worktree leaves the main checkout's `.venv` `.pth` files and installed package list unchanged (before/after comparison).
+- [x] AC20: Integration evidence is recorded under the feature's `evidence/` folder: `env -u VIRTUAL_ENV poetry install` in the fresh worktree leaves the main checkout's `.venv` `.pth` files and installed package list unchanged (before/after comparison).
 - [ ] AC21: Full toolchain pass completed (format, lint, type-check where applicable, test) with no gate weakened and no threshold lowered.
 - [x] AC22: Rollout notes record that destination repositories need a push-down refresh after the release carrying the hook and skill text.
 
