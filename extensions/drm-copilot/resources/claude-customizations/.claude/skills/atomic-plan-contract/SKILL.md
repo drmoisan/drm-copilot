@@ -62,8 +62,8 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
 3) Final QC block
 - full language-appropriate QA loop (format → lint → type-check when applicable → test),
 - rerun behavior when any step changes files or fails.
-- one final-QC artifact per QC command step (no aggregate-only final-QC artifact)
-- each final-QC step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
+- one final-QC static artifact per language records the format, lint, and type-check steps of that language, and each test gate keeps its own final-QC artifact (no aggregate-only final-QC artifact across languages or gates)
+- the static artifact and each test-gate artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; the static artifact records each step's command, exit code, and finding count
 - final-QC test commands for languages with mandatory coverage policy MUST run in coverage mode and record numeric post-change coverage values from the single gate run in `Output Summary:`, compared with the `Phase 0 baseline` run of the same gate.
 - final-QC command tasks that are present in the approved plan MUST execute their stated commands; `SKIPPED` is invalid unless the task text itself explicitly authorizes a skip condition.
 
@@ -153,6 +153,8 @@ Run the full toolchain loop for each applicable language in order:
 For languages with mandatory coverage policy, step 4 must use coverage-enabled test commands and persist numeric coverage evidence.
 
 If any step fails or changes files, restart the loop from step 1 until a clean pass completes.
+
+The format, lint, and type-check results of each language are recorded in one final-QC static artifact per language, with each step's command, exit code, and finding count; reviewers read that artifact and do not re-run format, lint, or type checks.
 
 ## No-SKIPPED Rule for Planned Command Tasks
 
