@@ -26,6 +26,7 @@ Python 3.11/3.12 compatibility jobs, consumer package engines, and independent r
 - `task-researcher` has Read, Grep, Glob, WebFetch, and Write. It cannot run `git show` or `gh`; facts that need either are marked for the orchestrator to confirm.
 - `orchestrator` and the main session running the `orchestrate` skill have Bash, the PoshQC and validation MCP tools, and the `Agent` tool. Only they can delegate, so any step that needs a further agent run is orchestrator-owned.
 - PowerShell for the executor therefore runs through the `mcp__drm-copilot__run_poshqc_*` tools or through a `sh` launcher script stored under `SCRATCH` that invokes PowerShell 7 from inside the script file.
+- Nesting depth (#1138): the epic and parallel chains run the coordinator at depth 1, each per-feature `orchestrator` at depth 2, and its specialists at depth 3, so they need Claude Code 2.1.219 or later with `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` unset or at least 3, started from the main session. An agent that starts without the `Agent` tool records `blocked_reason: "spawn_agent_unavailable"` and returns a line beginning `AGENT_TOOL_UNAVAILABLE:`; `enforce-epic-invocation-origin.ps1` denies a chain delegation with `NESTING_DEPTH_INSUFFICIENT:` when the configured value is below 3, and the `## Nesting Depth` section of each coordinating skill states the main-session fallback.
 
 ## Command-Text Restrictions
 
