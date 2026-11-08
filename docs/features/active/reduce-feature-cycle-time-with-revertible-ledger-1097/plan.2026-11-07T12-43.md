@@ -90,7 +90,7 @@ On the branch: the repository template and `AGENTS.md`, their bundles under `ext
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Capture the PowerShell static baseline of `tests/scripts/claude-hooks/EpicMergeGateReview.Cases.Helpers.ps1` and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateConcurrentReview.Tests.ps1`, writing `FEATURE/evidence/baseline/stage-g-powershell-static.<timestamp>.md`.
+- [x] [P0-T1] Capture the PowerShell static baseline of `tests/scripts/claude-hooks/EpicMergeGateReview.Cases.Helpers.ps1` and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateConcurrentReview.Tests.ps1`, writing `FEATURE/evidence/baseline/stage-g-powershell-static.<timestamp>.md`.
   - PoshQC format in check mode and a direct analyzer run with the repository settings.
   - Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the files needing format and the finding count.
 - [ ] [P0-T2] Run one `Invoke-PoshQCParallelTest` as the `Phase 0 baseline` and write `FEATURE/evidence/baseline/stage-g-powershell-test-baseline.<timestamp>.md`.
