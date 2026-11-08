@@ -9,7 +9,7 @@
 
 ### Phase 0 — Fail-before reproduction
 
-- [ ] [P0-T1] [expect-fail] Run `check_quality_tiers` (module `scripts.dev_tools.check_quality_tiers`) against the unchanged `quality-tiers.yml` and record it in `FEATURE/evidence/regression-testing/qt008-fail-before.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:`. Acceptance: `EXIT_CODE: 1` and the summary names the diagnostic `QT008` for `.claude/lib/runbook`. Commit and push the artifact.
+- [x] [P0-T1] [expect-fail] Run `check_quality_tiers` (module `scripts.dev_tools.check_quality_tiers`) against the unchanged `quality-tiers.yml` and record it in `FEATURE/evidence/regression-testing/qt008-fail-before.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, and `Output Summary:`. Acceptance: `EXIT_CODE: 1` and the summary names the diagnostic `QT008` for `.claude/lib/runbook`. Commit and push the artifact.
 
 ### Phase 1 — Add the tier entry
 
