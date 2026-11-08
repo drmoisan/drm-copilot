@@ -219,11 +219,11 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "5ff9c66f58595fa91a1f568a18a0a5aae5d1736a9dd1b13a9bbbab459df7899c",
+        "142e42d15a73fb595c2b60691d15b1808bc244a24fecd240b59c72558905a7c8",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "2e67dae3dd5a015693696125374e341f8c21963f36145bcf5fa8265ff8be924e",
+        "198cfa0f80e7fa712a49031a43eb64dd0c3da08afae56b7c6c32b282f5caeee5",
     ),
 )
 
