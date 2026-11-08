@@ -112,6 +112,7 @@
     ".claude/hooks/validate-orchestrator-output-rejection.ps1",
     ".claude/hooks/validate-orchestrator-output-resolution.ps1",
     ".claude/hooks/validate-orchestrator-output-routing.ps1",
+    ".claude/hooks/validate-orchestrator-output-target.ps1",
     ".claude/hooks/validate-orchestrator-output-feature-folder.ps1",
     ".claude/hooks/validate-orchestrator-output.ps1",
     ".claude/hooks/validate-planner-output.ps1",
