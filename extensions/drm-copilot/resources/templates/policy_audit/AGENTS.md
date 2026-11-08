@@ -82,6 +82,7 @@ When asked to perform a Policy Audit for a component, branch, or PR:
      - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
      - Do not synthesize or backfill missing audit evidence from memory or inference.
      - If evidence is missing, stop and report the exact missing artifact paths.
+   - **CI cross-check:** write the `## CI Cross-check` section after `## 7. Code Quality Checks`, with one row per CI check whose result the audit relies on; read format, lint, and type-check results from the final-QC static artifact of each language rather than re-running them, and record the Python repo-wide total as the CI result of `Enforce Python coverage thresholds`.
    - **For scenario testing:**
      - Use deterministic, input→output→assertion format for all examples.
      - **Positive flows:** Show concrete valid inputs and expected outputs.
