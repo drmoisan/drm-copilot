@@ -171,13 +171,16 @@ function Get-EpicFanInShapeDetail {
         Classify the tokens of one command segment as a modelled add or commit.
     .DESCRIPTION
         Returns Shape ('add', 'commit', or $null) and Pathless (true for a commit without a
-        pathspec). Accepted: git [-C <absolute>] add [--] <status doc>, and git [-C <absolute>]
+        pathspec). Accepted: git [-C <absolute>] add [--] <p...>, and git [-C <absolute>]
         commit whose options are only -m, --message, -F, --file, or --trailer with a value,
-        followed by nothing or by -- <status doc>.
+        followed by nothing or by -- <p...>, where every operand satisfies PathPredicate
+        (default: equal to StatusDocPath, and no shape when StatusDocPath is blank).
     .PARAMETER Token
         The segment tokens.
     .PARAMETER StatusDocPath
         The status document path of the checkpoint.
+    .PARAMETER PathPredicate
+        Optional operand test called with one path (issue #1141).
     .OUTPUTS
         System.Management.Automation.PSCustomObject
     #>
@@ -185,12 +188,17 @@ function Get-EpicFanInShapeDetail {
     [OutputType([pscustomobject])]
     param(
         [AllowNull()][AllowEmptyCollection()][string[]] $Token,
-        [AllowNull()][AllowEmptyString()][string] $StatusDocPath
+        [AllowNull()][AllowEmptyString()][string] $StatusDocPath,
+        [AllowNull()][scriptblock] $PathPredicate
     )
 
     $none = [pscustomobject]@{ Shape = $null; Pathless = $false }
     $words = @($Token)
-    if ($words.Count -lt 2 -or $words[0] -cne 'git' -or [string]::IsNullOrWhiteSpace($StatusDocPath)) { return $none }
+    if ($null -eq $PathPredicate) {
+        if ([string]::IsNullOrWhiteSpace($StatusDocPath)) { return $none }
+        $PathPredicate = { param([string] $Path) $Path -ceq $StatusDocPath }
+    }
+    if ($words.Count -lt 2 -or $words[0] -cne 'git') { return $none }
     $index = 1
     if ($words[$index] -ceq '-C') {
         if ($words.Count -lt 4 -or ($words[2] -replace '\\', '/') -cnotmatch '^(/|[A-Za-z]:/)') { return $none }
@@ -200,7 +208,7 @@ function Get-EpicFanInShapeDetail {
     $rest = @(if ($words.Count -gt $index + 1) { $words[($index + 1)..($words.Count - 1)] })
     if ($verb -ceq 'add') {
         if ($rest.Count -ge 1 -and $rest[0] -ceq '--') { $rest = @($rest | Select-Object -Skip 1) }
-        if ($rest.Count -eq 1 -and $rest[0] -ceq $StatusDocPath) { return [pscustomobject]@{ Shape = 'add'; Pathless = $false } }
+        if ($rest.Count -ge 1 -and @($rest | Where-Object { -not (& $PathPredicate $_) }).Count -eq 0) { return [pscustomobject]@{ Shape = 'add'; Pathless = $false } }
         return $none
     }
     if ($verb -cne 'commit') { return $none }
@@ -208,7 +216,8 @@ function Get-EpicFanInShapeDetail {
     while ($position -lt $rest.Count) {
         $word = $rest[$position]
         if ($word -ceq '--') {
-            if ($rest.Count -eq $position + 2 -and $rest[$position + 1] -ceq $StatusDocPath) {
+            $operands = @($rest | Select-Object -Skip ($position + 1))
+            if ($operands.Count -ge 1 -and @($operands | Where-Object { -not (& $PathPredicate $_) }).Count -eq 0) {
                 return [pscustomobject]@{ Shape = 'commit'; Pathless = $false }
             }
             return $none
@@ -225,13 +234,15 @@ function Test-EpicFanInCommitShape {
         Return 'add', 'commit', or $null for the tokens of one command segment.
     .DESCRIPTION
         A thin view of Get-EpicFanInShapeDetail: 'add' for git [-C <absolute>] add [--]
-        <status doc>, 'commit' for a commit with only -m, --message, -F, --file, or --trailer
-        and either no pathspec or -- <status doc>, and $null for every other shape, including
-        --amend and -a.
+        <p...>, 'commit' for a commit with only -m, --message, -F, --file, or --trailer and
+        either no pathspec or -- <p...>, and $null for every other shape, including --amend
+        and -a. Operands satisfy PathPredicate, by default equality with StatusDocPath.
     .PARAMETER Token
         The segment tokens.
     .PARAMETER StatusDocPath
         The status document path of the checkpoint.
+    .PARAMETER PathPredicate
+        Optional operand test called with one path (issue #1141).
     .OUTPUTS
         System.String
     #>
@@ -239,36 +250,44 @@ function Test-EpicFanInCommitShape {
     [OutputType([string])]
     param(
         [AllowNull()][AllowEmptyCollection()][string[]] $Token,
-        [AllowNull()][AllowEmptyString()][string] $StatusDocPath
+        [AllowNull()][AllowEmptyString()][string] $StatusDocPath,
+        [AllowNull()][scriptblock] $PathPredicate
     )
 
-    return (Get-EpicFanInShapeDetail -Token $Token -StatusDocPath $StatusDocPath).Shape
+    return (Get-EpicFanInShapeDetail -Token $Token -StatusDocPath $StatusDocPath -PathPredicate $PathPredicate).Shape
 }
 
 function Test-EpicFanInStagedIndex {
     <#
     .SYNOPSIS
-        Report whether a staged-index read names exactly the status document.
+        Report whether every name of a staged-index read satisfies the path predicate.
     .DESCRIPTION
-        The read must carry ExitCode 0 and non-empty NUL-terminated output whose only name
-        is the status document.
+        The read must carry ExitCode 0 and non-empty NUL-terminated output naming at least
+        one path, and every name must satisfy PathPredicate (default: equal to the status
+        document, and false when StatusDocPath is blank).
     .PARAMETER Staged
         The reader result with ExitCode and Output.
     .PARAMETER StatusDocPath
         The status document path of the checkpoint.
+    .PARAMETER PathPredicate
+        Optional name test called with one path (issue #1141).
     .OUTPUTS
         System.Boolean
     #>
     [CmdletBinding()]
     [OutputType([bool])]
-    param([AllowNull()][object] $Staged, [AllowNull()][AllowEmptyString()][string] $StatusDocPath)
+    param([AllowNull()][object] $Staged, [AllowNull()][AllowEmptyString()][string] $StatusDocPath, [AllowNull()][scriptblock] $PathPredicate)
 
-    if ($null -eq $Staged -or [string]::IsNullOrWhiteSpace($StatusDocPath)) { return $false }
+    if ($null -eq $Staged) { return $false }
+    if ($null -eq $PathPredicate) {
+        if ([string]::IsNullOrWhiteSpace($StatusDocPath)) { return $false }
+        $PathPredicate = { param([string] $Path) $Path -ceq $StatusDocPath }
+    }
     if ((Get-EpicFanInPropertyText -InputObject $Staged -Name 'ExitCode') -ne '0') { return $false }
     $text = Get-EpicFanInPropertyText -InputObject $Staged -Name 'Output'
     if ([string]::IsNullOrEmpty($text) -or -not $text.EndsWith([char]0)) { return $false }
     $names = $text.Substring(0, $text.Length - 1).Split([char]0)
-    return ($names.Count -eq 1 -and $names[0] -ceq $StatusDocPath)
+    return ($names.Count -ge 1 -and @($names | Where-Object { -not (& $PathPredicate $_) }).Count -eq 0)
 }
 
 function Get-EpicFanInAllowance {
@@ -283,7 +302,9 @@ function Get-EpicFanInAllowance {
         a modelled add or commit. A pathless commit reads the staged index of
         Scope.WorktreeRoot through StagedIndexReader and needs it to name exactly the status
         document. Any error answers not allowed. Reuse seam for the follow-up findings 3 and 9
-        of issue #1136: the caller supplies an already-resolved scope object.
+        of issue #1136: the caller supplies an already-resolved scope object. Issue #1141:
+        PathPredicate replaces the path-leg allowlist and OperandPredicate replaces the
+        status-document test of command operands and staged names.
     .PARAMETER Scope
         The Resolve-EpicScopeCheckpoint result (Checkpoint, WorktreeRoot, Branch, ...).
     .PARAMETER FilePath
@@ -292,6 +313,10 @@ function Get-EpicFanInAllowance {
         The command-leg text.
     .PARAMETER StagedIndexReader
         Called with the worktree root; returns an object with ExitCode and Output.
+    .PARAMETER PathPredicate
+        Optional path-leg test; default Test-EpicFanInWriteRelativePath.
+    .PARAMETER OperandPredicate
+        Optional operand and staged-name test; default equality with the status document.
     .OUTPUTS
         System.Management.Automation.PSCustomObject with Allowed and Detail.
     #>
@@ -301,7 +326,9 @@ function Get-EpicFanInAllowance {
         [AllowNull()][object] $Scope,
         [AllowNull()][AllowEmptyCollection()][AllowEmptyString()][string[]] $FilePath,
         [AllowNull()][AllowEmptyString()][string] $Command,
-        [AllowNull()][scriptblock] $StagedIndexReader
+        [AllowNull()][scriptblock] $StagedIndexReader,
+        [AllowNull()][scriptblock] $PathPredicate,
+        [AllowNull()][scriptblock] $OperandPredicate
     )
 
     try {
@@ -313,7 +340,8 @@ function Get-EpicFanInAllowance {
             foreach ($path in $paths) {
                 $relative = $path -replace '\\', '/'
                 if ($relative -cmatch '^(/|[A-Za-z]:/)') { $relative = Get-HookTargetWorktreeRelativePath -Path $relative -WorktreeRoot $root }
-                if ($null -eq $relative -or -not (Test-EpicFanInWriteRelativePath -RelativePath $relative -Checkpoint $checkpoint)) {
+                $admitted = if ($null -eq $relative) { $false } elseif ($null -ne $PathPredicate) { [bool](& $PathPredicate $relative) } else { Test-EpicFanInWriteRelativePath -RelativePath $relative -Checkpoint $checkpoint }
+                if (-not $admitted) {
                     return [pscustomobject]@{ Allowed = $false; Detail = "path not allowlisted: $path" }
                 }
             }
@@ -329,13 +357,13 @@ function Get-EpicFanInAllowance {
         $statusDoc = Get-EpicFanInStatusDocRelativePath -Checkpoint $checkpoint
         $needsIndex = $false
         foreach ($segment in @($split.Segments)) {
-            $detail = Get-EpicFanInShapeDetail -Token @(ConvertTo-OrchestrationCommandToken -Segment $segment.Trim()) -StatusDocPath $statusDoc
+            $detail = Get-EpicFanInShapeDetail -Token @(ConvertTo-OrchestrationCommandToken -Segment $segment.Trim()) -StatusDocPath $statusDoc -PathPredicate $OperandPredicate
             if ($null -eq $detail.Shape) {
                 return [pscustomobject]@{ Allowed = $false; Detail = "segment not modelled: $($segment.Trim())" }
             }
             if ($detail.Pathless) { $needsIndex = $true }
         }
-        if ($needsIndex -and -not (Test-EpicFanInStagedIndex -Staged (& $StagedIndexReader $root) -StatusDocPath $statusDoc)) {
+        if ($needsIndex -and -not (Test-EpicFanInStagedIndex -Staged (& $StagedIndexReader $root) -StatusDocPath $statusDoc -PathPredicate $OperandPredicate)) {
             return [pscustomobject]@{ Allowed = $false; Detail = 'staged index is not exactly the status document' }
         }
         return [pscustomobject]@{ Allowed = $true; Detail = 'command leg modelled' }
