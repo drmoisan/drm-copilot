@@ -240,6 +240,13 @@ staging, commits, or implementation delegation. This gate covers edits, formatte
 If any required item is missing, implementation is blocked until the checkpoint
 and lifecycle state are corrected.
 
+Merged-feature follow-ups (issue #1141): a docs or evidence follow-up on an epic
+child that has already merged is made in the integration worktree on the
+integration branch, through the merged-feature follow-up allowance described in
+the epic-orchestrate skill. Agents never hand-author a readiness checkpoint to
+pass the gate. A standalone merged feature uses `git commit -m <msg> -- <paths>`
+for a docs follow-up, or a new orchestrated run for anything else.
+
 ## Plan-Path Resolution Gate
 
 After active feature folder creation and before any planning delegation, the

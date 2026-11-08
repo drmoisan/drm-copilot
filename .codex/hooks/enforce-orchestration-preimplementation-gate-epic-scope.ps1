@@ -404,6 +404,8 @@ function Get-OrchestrationEpicScopeDecision {
         failure allows. Post-fan-in allowance (issue #1136): a target whose failure is exactly
         'merge-in-progress' passes when Test-EpicFanInComplete holds and
         Get-EpicFanInAllowance reports Allowed over the leg paths or the leg command.
+        Merged-feature follow-up allowance (issue #1141): for that same failure, the target
+        also passes when Get-EpicMergedFeatureFollowUpAllowance reports Allowed.
     .PARAMETER Command
         The command line of a command or apply_patch leg; empty for a path leg.
     .PARAMETER FilePath
@@ -442,6 +444,10 @@ function Get-OrchestrationEpicScopeDecision {
         $reader = { param([string] $WorktreeRoot) Get-OrchestrationGateStagedIndex -WorktreeRoot $WorktreeRoot }
         if ($failure -ceq 'merge-in-progress' -and (Test-EpicFanInComplete -Checkpoint $Scope.Checkpoint -Branch $Scope.Branch) -and
             (Get-EpicFanInAllowance -Scope $Scope -FilePath $legPaths -Command $legCommand -StagedIndexReader $reader).Allowed) {
+            return ''
+        }
+        if ($failure -ceq 'merge-in-progress' -and
+            (Get-EpicMergedFeatureFollowUpAllowance -Scope $Scope -FilePath $legPaths -Command $legCommand -StagedIndexReader $reader).Allowed) {
             return ''
         }
         $failure

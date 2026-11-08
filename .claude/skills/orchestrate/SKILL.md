@@ -167,6 +167,9 @@ Content beyond those fields is discarded unread, so spend no effort on it. The p
 `epic-orchestrator` re-derives authoritative state from git and `gh` regardless, per
 `## Bounded Child Return Contract` in `.claude/skills/epic-orchestrate/SKILL.md`.
 
+Merged-feature follow-ups (issue #1141): a docs or evidence follow-up on an epic child that has already merged is made in the integration worktree on the integration branch, under `**Merged-feature follow-up allowance (issue #1141).**` in `.claude/skills/epic-orchestrate/SKILL.md`. Agents never hand-author a readiness checkpoint to pass the gate.
+A standalone merged feature uses `git commit -m <msg> -- <paths>` for a docs follow-up, or a new orchestrated run for anything else.
+
 ## Model Selection
 
 Model selection is a second axis, strictly separate from `route`. `route` (`small | large | remediation | preparation | epic`) is deterministic — file-count driven for `small`/`large`, marker-driven for `preparation` (the `Preparation mode: true` kickoff line) and `epic`; it governs `required_agents`, `required_skills`, and `required_mcp_tools` only. `route` is NOT an input to model selection anywhere. The sole feature-level input to the delegation model tier is a judgment-based `complexity_band` (`C1 | C2 | C3 | C4`). The authoritative values live in the `model_policy` block of `config/orchestration-routing.json`.
