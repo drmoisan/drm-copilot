@@ -1,8 +1,8 @@
 diff --git a/.agents/skills/epic-orchestrate/SKILL.md b/.agents/skills/epic-orchestrate/SKILL.md
-index 26dacb27d..3c691331c 100644
+index e3acb490651d6f2674e9bfea701cbc6eab776e66..b94a64dbb578ab33cf4f96d4bde434593ce958d0 100644
 --- a/.agents/skills/epic-orchestrate/SKILL.md
 +++ b/.agents/skills/epic-orchestrate/SKILL.md
-@@ -116,6 +116,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
+@@ -117,6 +117,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
  mutation hook is a per-child deterrent; the epic-state validator is the retrospective,
  authoritative backstop.
  
@@ -105,19 +105,19 @@ index 26dacb27d..3c691331c 100644
  
  Each child owns its implementation, review, PR, CI-green gate, and merge into the integration
 diff --git a/.agents/skills/epic-run/SKILL.md b/.agents/skills/epic-run/SKILL.md
-index 256315cef..732981b2e 100644
+index d6627bfd5a0c49b1a066723eb7548795ddcfeb53..54e7b84be87189ac026c48a67d448675d1c31c67 100644
 --- a/.agents/skills/epic-run/SKILL.md
 +++ b/.agents/skills/epic-run/SKILL.md
-@@ -38,3 +38,7 @@ Use the epic slug or path supplied in the invoking user request.
- 
- Wave scheduling, fan-in, worktree cleanup, `epic-status.md`, final PR creation, CI validation,
- and completion are governed entirely by `epic-orchestrate`.
+@@ -40,3 +40,7 @@ Wave scheduling, fan-in, worktree cleanup, `epic-status.md`, final PR creation,
+ and completion are governed entirely by `epic-orchestrate`. A child merge into the integration
+ branch requires a green `CI` run on the child head SHA; see `Epic-child CI verification (issue
+ #1130)` under `## Fan-In and Conflict Handling` in that skill.
 +
 +An early dependent start (manifest field `early_start_on`) is governed by
 +`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
 +field runs exactly as described above.
 diff --git a/.claude/agents/epic-orchestrator.md b/.claude/agents/epic-orchestrator.md
-index 7db699a0c..25a5d5b99 100644
+index 280aed2fcba7fad8d7a1a6686fda58682b516386..93bf7a4ff7f7ca8d1934a4dc3319f9ff1eea70ad 100644
 --- a/.claude/agents/epic-orchestrator.md
 +++ b/.claude/agents/epic-orchestrator.md
 @@ -16,6 +16,7 @@ tools:
@@ -125,10 +125,10 @@ index 7db699a0c..25a5d5b99 100644
    - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
    - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
 +  - "Bash(poetry run python -m scripts.dev_tools.validate_orchestration_artifacts *)"
+   - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
    - "mcp__drm-copilot__collect_pr_context"
    - "mcp__drm-copilot__validate_orchestration_artifacts"
- skills:
-@@ -136,6 +137,14 @@ report it to the operator and halt. The `SubagentStop` transport and exit-code d
+@@ -138,6 +139,14 @@ report it to the operator and halt. The `SubagentStop` transport and exit-code d
  previously depended on was resolved by epic #904 and issue #928: a violation blocks the stop with
  exit 2 and a stderr reason.
  
@@ -144,7 +144,7 @@ index 7db699a0c..25a5d5b99 100644
  
  Update `artifacts/orchestration/epic-orchestrator-state.json` after every completed step, per the
 diff --git a/.claude/hooks/enforce-epic-wave-barrier.ps1 b/.claude/hooks/enforce-epic-wave-barrier.ps1
-index 3638b309b..64705b3e3 100644
+index 3638b309b698230e20f553469a100b993313283a..64705b3e3bae9381379304a0a0749b7bc82b35dc 100644
 --- a/.claude/hooks/enforce-epic-wave-barrier.ps1
 +++ b/.claude/hooks/enforce-epic-wave-barrier.ps1
 @@ -25,6 +25,9 @@
@@ -186,7 +186,7 @@ index 3638b309b..64705b3e3 100644
              return $false
 diff --git a/.claude/hooks/epic-wave-barrier-early-start.ps1 b/.claude/hooks/epic-wave-barrier-early-start.ps1
 new file mode 100644
-index 000000000..0ccfc2891
+index 0000000000000000000000000000000000000000..0ccfc28911556e22d6c5402882f87ea02e1a29e0
 --- /dev/null
 +++ b/.claude/hooks/epic-wave-barrier-early-start.ps1
 @@ -0,0 +1,117 @@
@@ -308,7 +308,7 @@ index 000000000..0ccfc2891
 +    return ($null -ne $status -and $status.Value -is [string] -and $usable -ccontains $status.Value)
 +}
 diff --git a/.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1 b/.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1
-index 13bb89905..5f06dfa91 100644
+index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da147208687332adc07c0 100644
 --- a/.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1
 +++ b/.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1
 @@ -15,6 +15,16 @@
@@ -420,10 +420,10 @@ index 13bb89905..5f06dfa91 100644
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/.claude/skills/epic-orchestrate/SKILL.md b/.claude/skills/epic-orchestrate/SKILL.md
-index ce93fafae..2df410c7e 100644
+index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..7d6e7bbd465d47c61fe684cb5c9299f822faa9dd 100644
 --- a/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/.claude/skills/epic-orchestrate/SKILL.md
-@@ -285,6 +285,89 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
+@@ -300,6 +300,89 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
  `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
  on resume, not from in-memory completion notifications alone.
  
@@ -514,19 +514,19 @@ index ce93fafae..2df410c7e 100644
  
  After a child feature's `epic_merge.merge_commit_sha` is recorded (S9 step 6 succeeds) and
 diff --git a/.claude/skills/epic-run/SKILL.md b/.claude/skills/epic-run/SKILL.md
-index 34162dc9a..81d1adbae 100644
+index 6d081f9998b7e349764e23fac3b934dadf035085..2f620fdf9aefb08ac24a0fc3502b79410ae7c637 100644
 --- a/.claude/skills/epic-run/SKILL.md
 +++ b/.claude/skills/epic-run/SKILL.md
-@@ -54,3 +54,7 @@ $ARGUMENTS
- This skill adds no procedure of its own beyond kickoff-artifact resolution; wave scheduling,
- the wave barrier, merge-on-green fan-in, worktree cleanup, `epic-status.md` maintenance, and
- the final integration-to-`main` PR are governed entirely by the `epic-orchestrate` skill.
+@@ -56,3 +56,7 @@ the wave barrier, merge-on-green fan-in, worktree cleanup, `epic-status.md` main
+ the final integration-to-`main` PR are governed entirely by the `epic-orchestrate` skill. A child
+ merge into the integration branch requires a green `CI` run on the child head SHA; see
+ `Epic-child CI verification (issue #1130)` under `## Merge-on-Green Kickoff Parameter` in that skill.
 +
 +An early dependent start (manifest field `early_start_on`) is governed by
 +`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
 +field runs exactly as described above.
 diff --git a/.codex/agents/epic-orchestrator.toml b/.codex/agents/epic-orchestrator.toml
-index 77ada2bb0..69f311311 100644
+index 77ada2bb0abd30183d0cd61b9052de5cd77bb7e6..69f311311e3191867b8cae4ed530db2ec1ed439e 100644
 --- a/.codex/agents/epic-orchestrator.toml
 +++ b/.codex/agents/epic-orchestrator.toml
 @@ -63,6 +63,9 @@ begin the normal epic lifecycle without requiring planner output.
@@ -540,7 +540,7 @@ index 77ada2bb0..69f311311 100644
  - Remove a child worktree only after its merge state is safe.
  
 diff --git a/.codex/hooks/enforce-epic-wave-barrier.ps1 b/.codex/hooks/enforce-epic-wave-barrier.ps1
-index a0ade0413..ee550b2e3 100644
+index a0ade041312a3b4e51911ffa9b93e67f5278e28b..ee550b2e3cc7529af2cb93ccf71ba52a4e9ebedf 100644
 --- a/.codex/hooks/enforce-epic-wave-barrier.ps1
 +++ b/.codex/hooks/enforce-epic-wave-barrier.ps1
 @@ -7,12 +7,16 @@
@@ -578,7 +578,7 @@ index a0ade0413..ee550b2e3 100644
              $script:AllowedDependencyStatuses -notcontains [string]$record.merge_status) {
 diff --git a/.codex/hooks/epic-wave-barrier-early-start.ps1 b/.codex/hooks/epic-wave-barrier-early-start.ps1
 new file mode 100644
-index 000000000..0ccfc2891
+index 0000000000000000000000000000000000000000..0ccfc28911556e22d6c5402882f87ea02e1a29e0
 --- /dev/null
 +++ b/.codex/hooks/epic-wave-barrier-early-start.ps1
 @@ -0,0 +1,117 @@
@@ -700,7 +700,7 @@ index 000000000..0ccfc2891
 +    return ($null -ne $status -and $status.Value -is [string] -and $usable -ccontains $status.Value)
 +}
 diff --git a/extensions/drm-copilot/jest.config.cjs b/extensions/drm-copilot/jest.config.cjs
-index 3d8b784de..1e42901c6 100644
+index 3d8b784de6f9c6e36893c1a3ba715a170a24f10b..1e42901c63e114b5c692dc2fbed534b9e3ad7697 100644
 --- a/extensions/drm-copilot/jest.config.cjs
 +++ b/extensions/drm-copilot/jest.config.cjs
 @@ -144,6 +144,12 @@ module.exports = {
@@ -717,7 +717,7 @@ index 3d8b784de..1e42901c6 100644
      "./src/lib/validate/orchestrator-state-remediation.ts": {
        lines: 85,
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md
-index 7db699a0c..25a5d5b99 100644
+index 280aed2fcba7fad8d7a1a6686fda58682b516386..93bf7a4ff7f7ca8d1934a4dc3319f9ff1eea70ad 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md
 @@ -16,6 +16,7 @@ tools:
@@ -725,10 +725,10 @@ index 7db699a0c..25a5d5b99 100644
    - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
    - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
 +  - "Bash(poetry run python -m scripts.dev_tools.validate_orchestration_artifacts *)"
+   - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
    - "mcp__drm-copilot__collect_pr_context"
    - "mcp__drm-copilot__validate_orchestration_artifacts"
- skills:
-@@ -136,6 +137,14 @@ report it to the operator and halt. The `SubagentStop` transport and exit-code d
+@@ -138,6 +139,14 @@ report it to the operator and halt. The `SubagentStop` transport and exit-code d
  previously depended on was resolved by epic #904 and issue #928: a violation blocks the stop with
  exit 2 and a stderr reason.
  
@@ -744,7 +744,7 @@ index 7db699a0c..25a5d5b99 100644
  
  Update `artifacts/orchestration/epic-orchestrator-state.json` after every completed step, per the
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-wave-barrier.ps1 b/extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-wave-barrier.ps1
-index 3638b309b..64705b3e3 100644
+index 3638b309b698230e20f553469a100b993313283a..64705b3e3bae9381379304a0a0749b7bc82b35dc 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-wave-barrier.ps1
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-wave-barrier.ps1
 @@ -25,6 +25,9 @@
@@ -786,7 +786,7 @@ index 3638b309b..64705b3e3 100644
              return $false
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/hooks/epic-wave-barrier-early-start.ps1 b/extensions/drm-copilot/resources/claude-customizations/.claude/hooks/epic-wave-barrier-early-start.ps1
 new file mode 100644
-index 000000000..0ccfc2891
+index 0000000000000000000000000000000000000000..0ccfc28911556e22d6c5402882f87ea02e1a29e0
 --- /dev/null
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/hooks/epic-wave-barrier-early-start.ps1
 @@ -0,0 +1,117 @@
@@ -908,7 +908,7 @@ index 000000000..0ccfc2891
 +    return ($null -ne $status -and $status.Value -is [string] -and $usable -ccontains $status.Value)
 +}
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1 b/extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1
-index 13bb89905..5f06dfa91 100644
+index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da147208687332adc07c0 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1
 @@ -15,6 +15,16 @@
@@ -1020,10 +1020,10 @@ index 13bb89905..5f06dfa91 100644
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-index ce93fafae..2df410c7e 100644
+index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..7d6e7bbd465d47c61fe684cb5c9299f822faa9dd 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-@@ -285,6 +285,89 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
+@@ -300,6 +300,89 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
  `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
  on resume, not from in-memory completion notifications alone.
  
@@ -1114,34 +1114,34 @@ index ce93fafae..2df410c7e 100644
  
  After a child feature's `epic_merge.merge_commit_sha` is recorded (S9 step 6 succeeds) and
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md
-index 34162dc9a..81d1adbae 100644
+index 6d081f9998b7e349764e23fac3b934dadf035085..2f620fdf9aefb08ac24a0fc3502b79410ae7c637 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md
-@@ -54,3 +54,7 @@ $ARGUMENTS
- This skill adds no procedure of its own beyond kickoff-artifact resolution; wave scheduling,
- the wave barrier, merge-on-green fan-in, worktree cleanup, `epic-status.md` maintenance, and
- the final integration-to-`main` PR are governed entirely by the `epic-orchestrate` skill.
+@@ -56,3 +56,7 @@ the wave barrier, merge-on-green fan-in, worktree cleanup, `epic-status.md` main
+ the final integration-to-`main` PR are governed entirely by the `epic-orchestrate` skill. A child
+ merge into the integration branch requires a green `CI` run on the child head SHA; see
+ `Epic-child CI verification (issue #1130)` under `## Merge-on-Green Kickoff Parameter` in that skill.
 +
 +An early dependent start (manifest field `early_start_on`) is governed by
 +`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
 +field runs exactly as described above.
 diff --git a/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json b/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json
-index 9eff8d17f..df9bc1398 100644
+index 65ea4ad0c30f3f552802738fdc10cdf34b67b4c8..0ea138a067709fff3b2f9a9162c1bc48a9b8832c 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json
 +++ b/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json
-@@ -49,6 +49,7 @@
-     ".claude/hooks/enforce-docs-role-write-scope.ps1",
+@@ -50,6 +50,7 @@
      ".claude/hooks/enforce-epic-merge-gate-review.ps1",
+     ".claude/hooks/enforce-epic-merge-gate-child-ci.ps1",
      ".claude/hooks/enforce-epic-wave-barrier.ps1",
 +    ".claude/hooks/epic-wave-barrier-early-start.ps1",
      ".claude/hooks/enforce-epic-worktree-removal-gate.ps1",
      ".claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1",
      ".claude/hooks/enforce-evidence-locations.ps1",
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md
-index 26dacb27d..3c691331c 100644
+index e3acb490651d6f2674e9bfea701cbc6eab776e66..b94a64dbb578ab33cf4f96d4bde434593ce958d0 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md
-@@ -116,6 +116,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
+@@ -117,6 +117,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
  mutation hook is a per-child deterrent; the epic-state validator is the retrospective,
  authoritative backstop.
  
@@ -1244,19 +1244,19 @@ index 26dacb27d..3c691331c 100644
  
  Each child owns its implementation, review, PR, CI-green gate, and merge into the integration
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md
-index 256315cef..732981b2e 100644
+index d6627bfd5a0c49b1a066723eb7548795ddcfeb53..54e7b84be87189ac026c48a67d448675d1c31c67 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md
-@@ -38,3 +38,7 @@ Use the epic slug or path supplied in the invoking user request.
- 
- Wave scheduling, fan-in, worktree cleanup, `epic-status.md`, final PR creation, CI validation,
- and completion are governed entirely by `epic-orchestrate`.
+@@ -40,3 +40,7 @@ Wave scheduling, fan-in, worktree cleanup, `epic-status.md`, final PR creation,
+ and completion are governed entirely by `epic-orchestrate`. A child merge into the integration
+ branch requires a green `CI` run on the child head SHA; see `Epic-child CI verification (issue
+ #1130)` under `## Fan-In and Conflict Handling` in that skill.
 +
 +An early dependent start (manifest field `early_start_on`) is governed by
 +`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
 +field runs exactly as described above.
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml
-index 77ada2bb0..69f311311 100644
+index 77ada2bb0abd30183d0cd61b9052de5cd77bb7e6..69f311311e3191867b8cae4ed530db2ec1ed439e 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml
 @@ -63,6 +63,9 @@ begin the normal epic lifecycle without requiring planner output.
@@ -1270,7 +1270,7 @@ index 77ada2bb0..69f311311 100644
  - Remove a child worktree only after its merge state is safe.
  
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-wave-barrier.ps1 b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-wave-barrier.ps1
-index a0ade0413..ee550b2e3 100644
+index a0ade041312a3b4e51911ffa9b93e67f5278e28b..ee550b2e3cc7529af2cb93ccf71ba52a4e9ebedf 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-wave-barrier.ps1
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-wave-barrier.ps1
 @@ -7,12 +7,16 @@
@@ -1308,7 +1308,7 @@ index a0ade0413..ee550b2e3 100644
              $script:AllowedDependencyStatuses -notcontains [string]$record.merge_status) {
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/epic-wave-barrier-early-start.ps1 b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/epic-wave-barrier-early-start.ps1
 new file mode 100644
-index 000000000..0ccfc2891
+index 0000000000000000000000000000000000000000..0ccfc28911556e22d6c5402882f87ea02e1a29e0
 --- /dev/null
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/epic-wave-barrier-early-start.ps1
 @@ -0,0 +1,117 @@
@@ -1430,10 +1430,10 @@ index 000000000..0ccfc2891
 +    return ($null -ne $status -and $status.Value -is [string] -and $usable -ccontains $status.Value)
 +}
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json b/extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json
-index d36b46ec5..42c1b0701 100644
+index 610e8c91f350ff7084234e123af32795a66812f9..f8e166f349c6c372b4f51d10ea4f869d2d4e4477 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json
-@@ -73,6 +73,7 @@
+@@ -75,6 +75,7 @@
      ".codex/hooks/enforce-epic-planning-only.ps1",
      ".codex/hooks/enforce-epic-root-invocation.ps1",
      ".codex/hooks/enforce-epic-wave-barrier.ps1",
@@ -1442,7 +1442,7 @@ index d36b46ec5..42c1b0701 100644
      ".codex/hooks/enforce-orchestration-preimplementation-gate-cleanup.ps1",
      ".codex/hooks/hook-cleanup-context.ps1",
 diff --git a/extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-core.ts b/extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-core.ts
-index 9db2f4d41..742f6a4d6 100644
+index 9db2f4d41023ba0d43bf27565b76039904d1b00f..742f6a4d6e2e35541eba3bcc528374069ef37e6d 100644
 --- a/extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-core.ts
 +++ b/extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-core.ts
 @@ -33,6 +33,10 @@ import {
@@ -1573,7 +1573,7 @@ index 9db2f4d41..742f6a4d6 100644
   *
 diff --git a/extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-wave-barrier.ts b/extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-wave-barrier.ts
 new file mode 100644
-index 000000000..2f75a60ae
+index 0000000000000000000000000000000000000000..2f75a60ae86f0d3b6a33cec45cbcc73da4d602a0
 --- /dev/null
 +++ b/extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-wave-barrier.ts
 @@ -0,0 +1,273 @@
@@ -1852,7 +1852,7 @@ index 000000000..2f75a60ae
 +}
 diff --git a/extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-early-start.test.ts b/extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-early-start.test.ts
 new file mode 100644
-index 000000000..d223e77cd
+index 0000000000000000000000000000000000000000..d223e77cd11387118b1e3a03965094c6d737cba4
 --- /dev/null
 +++ b/extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-early-start.test.ts
 @@ -0,0 +1,249 @@
@@ -2106,7 +2106,7 @@ index 000000000..d223e77cd
 +  });
 +});
 diff --git a/scripts/dev_tools/_epic_orchestrator_state_wave_barrier.py b/scripts/dev_tools/_epic_orchestrator_state_wave_barrier.py
-index 96d8e0c84..7ed11e755 100644
+index 96d8e0c848e4c56f019e32653920196586ffc416..7ed11e755af90e3e99b3a71511fcfff0c88e9211 100644
 --- a/scripts/dev_tools/_epic_orchestrator_state_wave_barrier.py
 +++ b/scripts/dev_tools/_epic_orchestrator_state_wave_barrier.py
 @@ -3,8 +3,9 @@
@@ -2345,7 +2345,7 @@ index 96d8e0c84..7ed11e755 100644
              # The isinstance check precedes set membership so an unhashable
 diff --git a/tests/fixtures/epic_wave_barrier/early-start-edge-cases.json b/tests/fixtures/epic_wave_barrier/early-start-edge-cases.json
 new file mode 100644
-index 000000000..e4f01cd66
+index 0000000000000000000000000000000000000000..e4f01cd66687a769551b62ebec7f723ae7cdae5b
 --- /dev/null
 +++ b/tests/fixtures/epic_wave_barrier/early-start-edge-cases.json
 @@ -0,0 +1,293 @@
@@ -2644,7 +2644,7 @@ index 000000000..e4f01cd66
 +}
 diff --git a/tests/scripts/claude-hooks/EpicWaveEarlyStart.Cases.Helpers.ps1 b/tests/scripts/claude-hooks/EpicWaveEarlyStart.Cases.Helpers.ps1
 new file mode 100644
-index 000000000..758f03b3a
+index 0000000000000000000000000000000000000000..758f03b3a246d0baac24db895145eac5940a9c11
 --- /dev/null
 +++ b/tests/scripts/claude-hooks/EpicWaveEarlyStart.Cases.Helpers.ps1
 @@ -0,0 +1,127 @@
@@ -2777,7 +2777,7 @@ index 000000000..758f03b3a
 +}
 diff --git a/tests/scripts/claude-hooks/enforce-epic-wave-barrier.EarlyStart.Tests.ps1 b/tests/scripts/claude-hooks/enforce-epic-wave-barrier.EarlyStart.Tests.ps1
 new file mode 100644
-index 000000000..3a82be03a
+index 0000000000000000000000000000000000000000..3a82be03a0b17eef3b2a748e25c4cfa838401888
 --- /dev/null
 +++ b/tests/scripts/claude-hooks/enforce-epic-wave-barrier.EarlyStart.Tests.ps1
 @@ -0,0 +1,128 @@
@@ -2911,7 +2911,7 @@ index 000000000..3a82be03a
 +}
 diff --git a/tests/scripts/claude-runtime/early-start-skill-contract.Tests.ps1 b/tests/scripts/claude-runtime/early-start-skill-contract.Tests.ps1
 new file mode 100644
-index 000000000..402ea3adf
+index 0000000000000000000000000000000000000000..402ea3adfa73214e41ed39438fac8b2bdb20b2a2
 --- /dev/null
 +++ b/tests/scripts/claude-runtime/early-start-skill-contract.Tests.ps1
 @@ -0,0 +1,178 @@
@@ -3094,7 +3094,7 @@ index 000000000..402ea3adf
 +    }
 +}
 diff --git a/tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1 b/tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1
-index f1c521cc8..12aa99c70 100644
+index 3fd12897d27bbb6662a0a2a78e6053590ea20259..59a277b8541c879658d40b2535fc9116027ecf3e 100644
 --- a/tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1
 +++ b/tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1
 @@ -38,6 +38,7 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
@@ -3104,10 +3104,10 @@ index f1c521cc8..12aa99c70 100644
 +            '.codex/hooks/epic-wave-barrier-early-start.ps1',
              '.codex/hooks/enforce-epic-merge-gate.ps1',
              '.codex/hooks/enforce-epic-merge-gate-review.ps1',
-             '.codex/hooks/enforce-epic-worktree-removal-gate.ps1',
+             '.codex/hooks/enforce-epic-merge-gate-child-ci.ps1',
 diff --git a/tests/scripts/codex-hooks/enforce-epic-wave-barrier.EarlyStart.Tests.ps1 b/tests/scripts/codex-hooks/enforce-epic-wave-barrier.EarlyStart.Tests.ps1
 new file mode 100644
-index 000000000..bdcde4f87
+index 0000000000000000000000000000000000000000..bdcde4f875b92f58c0aab776b490034e6e7e3a0a
 --- /dev/null
 +++ b/tests/scripts/codex-hooks/enforce-epic-wave-barrier.EarlyStart.Tests.ps1
 @@ -0,0 +1,91 @@
@@ -3203,13 +3203,13 @@ index 000000000..bdcde4f87
 +    }
 +}
 diff --git a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-index 2a59b2752..28eed189c 100644
+index bc810406010db5a4566fd30a63ccc68fd1eea948..ce855b93ddffaffb50bdf95020ee99a930e50036 100644
 --- a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
 +++ b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-@@ -180,14 +180,20 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
- # dedicated sync child item, with a plain merge of `origin/main` into the
- # integration branch performed by `epic-orchestrator`. Only the skill digest
- # moved; the agent digest is unchanged and the pin stays live for both entries.
+@@ -199,14 +199,20 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
+ # after the integration-PR checkpoint shape paragraph of the epic skill. Only the
+ # skill digest moved; the skill digest below is the merged result of #1129, #1130,
+ # and #1136, the agent digest is unchanged, and the pin stays live for both entries.
 +#
 +# RE-BASELINED by issue #1097. That change added the opt-in
 +# `## Early Dependent Starts (early_start)` section to the epic skill, and to
@@ -3219,19 +3219,19 @@ index 2a59b2752..28eed189c 100644
  PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
      (
          ".claude/agents/epic-orchestrator.md",
--        "e0691d2a05dfd97b886694262eb900293f38d9927fc2803f7e4574af856ce740",
-+        "c1a704d96884d960041abc35f8f892452707737a56c882a8b932da9a3b2d1628",
+-        "f76721ce463ba06288dbd21135f572ae28cfd9036a908587e65e1e0629b55e75",
++        "e528093388dd08788ded7b9e05c809511167e798987f906afbcb0a1e1f13624d",
      ),
      (
          ".claude/skills/epic-orchestrate/SKILL.md",
--        "65f34506ae2d0505f47f79bfbfcbbd9d7c7f78dccc0e9213bc6c9b8222101b76",
-+        "ef3114033db7854beb315a0beccacbf0ec4a98fb989c9af608109dc6d4a260fc",
+-        "73d5c859007dbfe5bb0a35ad9b5444ea85fe1bf6a43571e1941952490033ed7e",
++        "18a5ecafff6897fb3c74822f8aac0ddb9dd54cbd301ad14893422397b2ac26fd",
      ),
  )
  
 diff --git a/tests/scripts/dev_tools/test_epic_wave_barrier_early_start.py b/tests/scripts/dev_tools/test_epic_wave_barrier_early_start.py
 new file mode 100644
-index 000000000..133a24489
+index 0000000000000000000000000000000000000000..133a244892e979924e7382c2b993a3a22c7f5ff0
 --- /dev/null
 +++ b/tests/scripts/dev_tools/test_epic_wave_barrier_early_start.py
 @@ -0,0 +1,186 @@
