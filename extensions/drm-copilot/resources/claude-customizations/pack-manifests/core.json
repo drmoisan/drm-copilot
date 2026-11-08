@@ -279,6 +279,8 @@
     ".claude/lib/project-file-merge/Resolve-MergeableConflict.ps1",
     ".claude/lib/ci-gate/Invoke-CiGateParser.ps1",
     ".claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1",
+    ".claude/lib/review-verdict/ReviewVerdictEligibility.psm1",
+    ".claude/lib/review-verdict/Invoke-ReviewVerdictStatus.ps1",
     ".claude/lib/epic-wave/EpicWave.psm1",
     ".claude/lib/epic-wave/Invoke-EpicWave.ps1",
     ".claude/lib/parallel-drift/ParallelDriftHalt.psm1",
