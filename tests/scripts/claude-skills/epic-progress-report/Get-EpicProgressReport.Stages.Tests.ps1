@@ -32,17 +32,17 @@ Describe 'Get-EpicProgressStepTypeCatalog and ConvertTo-EpicProgressStepType' {
     }
 
     It 'maps each live stage alias to its step type' {
-        # The eleven live names recorded by the orchestrator; ' Feature_Review ' checks case and blanks.
+        # The twelve live names recorded by the orchestrator; ' Feature_Review ' checks case and blanks.
         $expected = [ordered]@{
             ' Feature_Review ' = 'review'; S7_feature_review = 'review'; atomic_execution = 'execution'; S5_atomic_execution = 'execution'
             S2_research = 'research'; S3_spec = 'spec'; S4_atomic_planning = 'plan'; S4_preflight = 'preflight'
-            S8_create_pr = 'pr'; S9_ci_gate = 'ci'; S9_ci_green = 'ci'
+            S8_create_pr = 'pr'; S9_ci_gate = 'ci'; S9_ci_green = 'ci'; S2_feature_documents = 'spec'
         }
 
         $actual = @($expected.Keys | ForEach-Object { "$($_.Trim())=$(ConvertTo-EpicProgressStepType -StageName $_)" })
 
-        $expected.Count | Should -Be 11
-        ($actual -join ',') | Should -Be 'Feature_Review=review,S7_feature_review=review,atomic_execution=execution,S5_atomic_execution=execution,S2_research=research,S3_spec=spec,S4_atomic_planning=plan,S4_preflight=preflight,S8_create_pr=pr,S9_ci_gate=ci,S9_ci_green=ci'
+        $expected.Count | Should -Be 12
+        ($actual -join ',') | Should -Be 'Feature_Review=review,S7_feature_review=review,atomic_execution=execution,S5_atomic_execution=execution,S2_research=research,S3_spec=spec,S4_atomic_planning=plan,S4_preflight=preflight,S8_create_pr=pr,S9_ci_gate=ci,S9_ci_green=ci,S2_feature_documents=spec'
     }
 
     It 'keeps unknown S-prefixed and promotion names unmapped' {
