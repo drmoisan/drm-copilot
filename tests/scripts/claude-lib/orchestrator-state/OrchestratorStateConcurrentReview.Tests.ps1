@@ -120,6 +120,40 @@ Describe 'review_mode concurrent corpus (issue #1097)' {
     }
 }
 
+Describe 'review_mode concurrent CI cross-check entry (issue #1097)' {
+    BeforeAll {
+        Import-Module (Join-Path $script:LibDir 'OrchestratorStateReceipts.psm1') -Force
+        Import-Module (Join-Path $script:LibDir 'OrchestratorStateCompletionChecks.psm1') -Force
+
+        $head = 'abcdef0123456789abcdef0123456789abcdef01'
+        $script:CrossCheckLoop = [pscustomobject]@{
+            review_outcomes = @(
+                [pscustomobject]@{ verdict = 'PASS'; head_sha = $head; findings = @() }
+                [pscustomobject]@{ verdict = 'REMEDIATION_REQUIRED'; head_sha = $head; findings = @([pscustomobject]@{ remediability = 'autonomous' }) }
+            )
+        }
+    }
+
+    It 'OCR-CROSS-CHECK-SYNTHETIC-ENTRY-VALID accepts a PASS entry followed by the synthetic entry' {
+        # Act
+        $errors = @(Get-OrchestratorStateRemediationLoopError -Value $script:CrossCheckLoop)
+
+        # Assert
+        $errors | Should -BeNullOrEmpty -Because 'the synthetic entry is a well-formed review_outcomes entry'
+    }
+
+    It 'OCR-CROSS-CHECK-SYNTHETIC-ENTRY-BLOCKS-COMPLETION reports the verdict-PASS error under the key' {
+        # Arrange
+        $state = [pscustomobject]@{ review_mode = 'concurrent'; remediation_loop = $script:CrossCheckLoop }
+
+        # Act
+        $errors = @(Get-OrchestratorStateCompletionConcurrentReviewError -State $state)
+
+        # Assert
+        $errors | Should -Contain $script:ReviewError -Because 'the last entry is no longer PASS'
+    }
+}
+
 Describe 'review_mode concurrent readiness (issue #1097)' {
     BeforeAll {
         # A fresh instance, so the mocks and the readiness functions share one module scope.

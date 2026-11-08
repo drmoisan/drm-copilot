@@ -285,6 +285,7 @@ function Get-EpicMergeGateReviewCaseRow {
         @{ Name = 'no-remediation-loop'; Remove = @('remediation_loop'); Expected = 'REVIEW_GATE_NOT_PASSED'; NoProcess = $true }
         @{ Name = 'empty-outcomes'; Override = (Get-EpicMergeGateReviewOutcomeOverride -Outcome @()); Expected = 'REVIEW_GATE_NOT_PASSED'; NoProcess = $true }
         @{ Name = 'last-remediation-after-earlier-pass'; Override = (Get-EpicMergeGateReviewOutcomeOverride -Outcome @($pass, [ordered]@{ verdict = 'REMEDIATION_REQUIRED'; head_sha = $reviewed })); Expected = 'REVIEW_GATE_NOT_PASSED'; NoProcess = $true }
+        @{ Name = 'ci-cross-check-synthetic-after-pass'; Override = (Get-EpicMergeGateReviewOutcomeOverride -Outcome @($pass, [ordered]@{ verdict = 'REMEDIATION_REQUIRED'; head_sha = $reviewed; findings = @([ordered]@{ remediability = 'autonomous' }) })); Expected = 'REVIEW_GATE_NOT_PASSED'; NoProcess = $true }
         @{ Name = 'last-entry-not-object'; Override = (Get-EpicMergeGateReviewOutcomeOverride -Outcome @($pass, 'PASS')); Expected = 'REVIEW_GATE_NOT_PASSED'; NoProcess = $true }
         @{ Name = 'verdict-case-variant'; Override = (Get-EpicMergeGateReviewOutcomeOverride -Outcome @([ordered]@{ verdict = 'pass'; head_sha = $reviewed })); Expected = 'REVIEW_GATE_NOT_PASSED'; NoProcess = $true }
         @{ Name = 'head-absent'; Override = (Get-EpicMergeGateReviewOutcomeOverride -Outcome @([ordered]@{ verdict = 'PASS' })); Expected = 'REVIEW_GATE_NOT_PASSED'; NoProcess = $true }
