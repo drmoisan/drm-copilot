@@ -85,6 +85,25 @@ Describe 'enforce-epic-planning-only.ps1 planning-boundary functions' {
                 Should -BeTrue
         }
 
+        It 'allows the shipped wave CLI and the Python parity reference: <Command>' -ForEach @(
+            @{ Command = 'pwsh -NoProfile -File .codex/lib/epic-wave/Invoke-EpicWave.ps1 -ManifestPath artifacts/orchestration/wave-manifest.json' }
+            @{ Command = 'pwsh -NoProfile -File .codex/lib/epic-wave/Invoke-EpicWave.ps1' }
+            @{ Command = 'poetry run python -m scripts.dev_tools.epic_wave_computation' }
+        ) {
+            # Arrange / Act / Assert
+            Test-EpicPlanningBashAllowed -Command $Command -StagedPaths $null -CurrentBranch 'feature/planning' |
+                Should -BeTrue
+        }
+
+        It 'rejects another script under .codex/lib/epic-wave and a chained wave CLI: <Command>' -ForEach @(
+            @{ Command = 'pwsh -NoProfile -File .codex/lib/epic-wave/Other.ps1' }
+            @{ Command = 'pwsh -NoProfile -File .codex/lib/epic-wave/Invoke-EpicWave.ps1 -ManifestPath m.json; git push' }
+        ) {
+            # Arrange / Act / Assert
+            Test-EpicPlanningBashAllowed -Command $Command -StagedPaths $null -CurrentBranch 'feature/planning' |
+                Should -BeFalse
+        }
+
         It 'rejects a git add whose path list resolves to no tokens' {
             # Arrange: trailing whitespace produces a whitespace-only path capture.
             # Act / Assert
