@@ -118,6 +118,9 @@ Validation-only required output:
 
 Single-pass rules (`### Single-Pass Preflight` in the `atomic-plan-contract` skill):
   - Review the entire plan in one pass and classify every defect as trivial or substantive.
+  - Run the design check: within this same pass, with no new delegation and no new artifact, name
+    for each spec rule, parameter, and boundary the task that implements it and the test that would
+    fail if the rule were broken; a gap is a substantive defect.
   - Fix trivial defects in place, in task text only; never add, remove, or reorder tasks. Record each
     fix in `<FEATURE>/evidence/other/preflight-fixes.<timestamp>.md`. This in-place edit is the only file
     write validation-only mode permits.

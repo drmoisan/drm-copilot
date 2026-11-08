@@ -118,6 +118,7 @@ When the delegation prompt carries the directive `DIRECTIVE: PREFLIGHT VALIDATIO
 - `PREFLIGHT: ALL CLEAR`
 - `PREFLIGHT: REVISIONS REQUIRED`
 - Review the entire plan in one pass and classify every defect as trivial or substantive, per `### Single-Pass Preflight` in `atomic-plan-contract`.
+- Run the design check: within this same pass, with no new delegation and no new artifact, name for each spec rule, parameter, and boundary the task that implements it and the test that would fail if the rule were broken; a gap is a substantive defect.
 - Fix trivial defects in place, in task text only; never add, remove, or reorder tasks. Report each fix as `PREFLIGHT-FIX: <task id or heading> | <defect class> | <change made>` and name the fix record as `preflight-fix-record: <path>`.
 - If revisions are required, include a precise plan delta that can be applied to the same plan file, with one `PREFLIGHT-DEFECT: <task id or heading> | <defect class> | <required change>` line per substantive defect.
 - Return the result to the caller. A plan returns to the planner at most once; the orchestrator routes the defect list for one revision and runs one confirming preflight.

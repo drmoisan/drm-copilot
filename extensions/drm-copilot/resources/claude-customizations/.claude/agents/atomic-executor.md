@@ -105,6 +105,7 @@ A run is a preflight run when its delegation prompt carries the directive `DIREC
 
 - **Review the entire plan in one pass.** Check every phase, task, and prose region; do not stop at the first defect.
 - **Classify every defect.** Trivial defects (stale or misspelled anchors, citation corrections including G11 and G12 findings, typos, literal formatting that does not change what is asserted, evidence filename spelling) are fixed in place. Substantive defects (missing or extra tasks, wrong file set or design, an acceptance criterion without a task, an assertion change, ordering, scope) are returned.
+- Run the design check: within this same pass, with no new delegation and no new artifact, name for each spec rule, parameter, and boundary the task that implements it and the test that would fail if the rule were broken; a gap is a substantive defect.
 - **Fix in task text only.** Edit task text and plan preamble in the same plan file. Never add, remove, or reorder tasks. Record every fix in `<FEATURE>/evidence/other/preflight-fixes.<timestamp>.md`.
 - **Return exactly one signal**, `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`, followed by one `CONVERGENCE:` line and then one line per defect:
   - `PREFLIGHT-FIX: <task id or heading> | <defect class> | <change made>`
