@@ -174,7 +174,7 @@ Seeded from issue:
 - [x] The `.agents/skills` mirrors of `orchestrate`, `epic-orchestrate`, and `epic-run`, and all bundle copies under `extensions/drm-copilot/resources/`, match their sources; `.claude/agents/epic-orchestrator.md` is unchanged.
 - [x] `PINNED_FROZEN_SURFACE_HASHES` is refreshed for the epic-orchestrate skill with a `RE-BASELINED by issue #1130` comment, and `test_ci_gate_epic_child_contracts.py` passes unchanged.
 - [x] `.claude/rules/orchestrator-state.md` has an epic-child CI verification section and an updated `## Enforcement` bullet; every copy of the execution-environment brief updates `## Hook Execution Context` and `## CI Shape and Required Checks` and remain byte-identical.
-- [x] `.claude/rules/ci-workflows.md`, `.agents/skills/ci-workflows/SKILL.md`, and their bundle copies require `epic/**` in the `pull_request` branches of the `CI` workflow for repositories using epic integration branches, state that a differently named workflow is denied, and state that destinations need a push-down refresh.
+- [ ] `.claude/rules/ci-workflows.md`, `.agents/skills/ci-workflows/SKILL.md`, and their bundle copies require `epic/**` in the `pull_request` branches of the `CI` workflow for repositories using epic integration branches, state that a differently named workflow is denied, and state that destinations need a push-down refresh.
 - [x] Both `core.json` pack manifests list the new helper, and the push-down manifest-completeness, dependency-closure, and bundle-parity tests pass.
 - [x] Line coverage for the new helper file is >= 85%, and the full toolchain (format, lint, Pester parallel gate, pytest `-n auto`) passes with no regression against the Phase 0 baselines.
 
