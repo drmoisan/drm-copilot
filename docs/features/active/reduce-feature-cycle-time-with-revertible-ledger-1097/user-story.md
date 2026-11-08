@@ -95,11 +95,11 @@ The tag on each criterion names the delivery stage that owes it, as defined in `
 - [x] [H] All 6 copies of the atomic-plan-contract skill describe the new rules, and contract tests pin them.
 - [x] [I] Layer 1 and layer 2 honor `early_start` only for the named dependency; a dependent at `pr_open` or later requires the dependency merged and a string `synced_at`; and without the key both layers are unchanged.
 - [x] [I] Frozen hashes are re-baselined in the same commit, and the reduction lands as its own commit with its entry.
-- [ ] [I] The ledger holds an entry for every reduction made, including #1094; every entry carries the prior text or a patch, revert steps, and revert signals; and the reviewer confirms from the branch log that each reduction is a separate commit.
-- [ ] [I] The planning, execution, and review skills, and all mirrored copies, describe the new rules, and contract tests pin them.
-- [ ] [I] No baseline task, evidence, or comparison requirement is removed.
-- [ ] [I] Older checkpoints and plans still validate: existing fixtures pass unchanged, and no Epic #1019 feature folder or admitted plan is edited.
-- [ ] [I] Merge is still impossible without a passing review and green CI, within the limit stated in D10.
+- [x] [I] The ledger holds an entry for every reduction made, including #1094; every entry carries the prior text or a patch, revert steps, and revert signals; and the reviewer confirms from the branch log that each reduction is a separate commit.
+- [x] [I] The planning, execution, and review skills, and all mirrored copies, describe the new rules, and contract tests pin them.
+- [x] [I] No baseline task, evidence, or comparison requirement is removed.
+- [x] [I] Older checkpoints and plans still validate: existing fixtures pass unchanged, and no Epic #1019 feature folder or admitted plan is edited.
+- [x] [I] Merge is still impossible without a passing review and green CI, within the limit stated in D10.
 - [ ] [J] The `review/verdict` status, state `success`, is posted through `gh api repos/{owner}/{repo}/statuses/{sha}` only after a review returns PASS for the current PR head, with a description naming the review artifact; a test shows that no status is posted for any other verdict or for a non-current head.
 - [ ] [J] A new push leaves the new head without the `review/verdict` status, so review must pass again before the status is posted on that head.
 - [ ] [J] Records are committed before the status is posted, or a narrow tested rule re-posts the status for a records-only head after checking that the diff between the reviewed head and the new head is records-only; tests cover a records-only diff and negative cases such as a diff that includes a non-record path.
