@@ -138,7 +138,7 @@ Seeded from issue:
 - [x] `tests/scripts/claude-hooks/hook-epic-fan-in.Tests.ps1` pins the restated terminal status set equal to `$script:TerminalMergeStatuses` in `EpicScopeReadiness.psm1` and shows `Test-EpicFanInComplete` agrees with `Get-EpicPrCreationReadinessFailure` over a fixture matrix.
 - [ ] Existing suites (`EpicScope`, `CommandExemption`, `Cleanup`, `EpicScopeTargets`, `Parity`, `EpicScopeHelperParity`, `hook-dependency-guard-completeness`, and the Codex gate suites) pass unchanged, and neither main gate file nor the cleanup file grows in line count.
 - [ ] The new hook file meets the repository line-coverage threshold, PSScriptAnalyzer reports zero findings on changed files, and `Invoke-PoshQCLeakScan` is clean without new allowlist entries.
-- [ ] Documentation is updated: the epic-orchestrate skill (Claude copy, Codex variant, and bundle copies) describes the post-fan-in allowance and its limits, and every copy of the execution-environment brief carries a #1136 bullet under `## Hook Execution Context`.
+- [x] Documentation is updated: the epic-orchestrate skill (Claude copy, Codex variant, and bundle copies) describes the post-fan-in allowance and its limits, and every copy of the execution-environment brief carries a #1136 bullet under `## Hook Execution Context`.
 - [ ] `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a "RE-BASELINED by issue #1136" comment, both `pack-manifests/core.json` files list the new hook file, and the Python surface-contract, pack-manifest completeness, and dependency-closure tests pass.
 
 ## Risks & Mitigations
