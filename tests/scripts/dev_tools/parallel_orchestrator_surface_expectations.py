@@ -180,14 +180,22 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # dedicated sync child item, with a plain merge of `origin/main` into the
 # integration branch performed by `epic-orchestrator`. Only the skill digest
 # moved; the agent digest is unchanged and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #1129. That change replaced the wave-layering sentence in
+# the epic skill's `## Wave Assignment` section and in the agent's
+# `## Wave Scheduling` paragraph so that they cite the shipped PowerShell wave
+# CLI instead of the unshipped Python reference, and it added the matching
+# `Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)` grant
+# to the agent's `tools:` list. Both digests moved, and the pin stays live for
+# both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "e0691d2a05dfd97b886694262eb900293f38d9927fc2803f7e4574af856ce740",
+        "f76721ce463ba06288dbd21135f572ae28cfd9036a908587e65e1e0629b55e75",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "65f34506ae2d0505f47f79bfbfcbbd9d7c7f78dccc0e9213bc6c9b8222101b76",
+        "3978114ca323a4bd2fda1ced50846455ef5a37e85c4a262b4ba494d0f627c39e",
     ),
 )
 

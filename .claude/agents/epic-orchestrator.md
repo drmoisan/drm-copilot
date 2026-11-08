@@ -121,8 +121,9 @@ delegations belong to each child's own `orchestrator` instance.
 Compute wave assignment from the manifest's `depends_on` edges via longest-path layering
 (`wave(f) = 0` when `depends_on(f)` is empty, else `1 + max(wave(d) for d in depends_on(f))`),
 rejecting cyclic or unresolved `depends_on` references before kickoff as a synthetic Blocking
-finding. `scripts/dev_tools/epic_wave_computation.py` is the canonical, tested reference
-implementation of this formula. Within a wave, launch all features concurrently (one message, N `Agent` calls, each
+finding. `pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1 -ManifestPath <manifest>` is the shipped, tested
+implementation of this formula; the Python module `epic_wave_computation` is this repository's
+parity reference. Within a wave, launch all features concurrently (one message, N `Agent` calls, each
 `isolation: "worktree"` and `run_in_background: true`). Do not launch wave N+1 until every wave-N
 feature's dependency edges are durably confirmed `merged` or `worktree_removed`. This durable
 confirmation is enforced both by the `enforce-epic-wave-barrier.ps1` per-call deterrent and by the

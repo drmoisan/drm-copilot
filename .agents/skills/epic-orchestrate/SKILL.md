@@ -52,7 +52,8 @@ wave(f) = 0                                      when depends_on(f) is empty
 wave(f) = 1 + max(wave(d) for d in depends_on(f)) otherwise
 ```
 
-Use `scripts/dev_tools/epic_wave_computation.py` as the tested reference. Serialize features
+Run `pwsh -NoProfile -File .codex/lib/epic-wave/Invoke-EpicWave.ps1 -ManifestPath <manifest>` as the tested implementation
+(the Python module `epic_wave_computation` is this repository's parity reference). Serialize features
 within each wave lexicographically by folder, without changing wave membership.
 
 ## Entry Paths
