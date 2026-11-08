@@ -104,13 +104,14 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
   - Use `policy-audit-template-usage` and the MCP `template` asset to drive the artifact structure.
    - Include exact command references for the checks that were run.
    - Validate the resulting `policy-audit.<timestamp>.md` immediately after writing it.
+   - Write a `## CI Cross-check` section after `## 7. Code Quality Checks`: a table `| Check | Claimed outcome | Claimed figure | Head | Source |` with one row per CI check whose result the review relies on, that is, the format, lint, type, and test checks of each changed language and `quality-checks7 / Code Quality & Tests (3.13)` for the Python total. The outcome is `pass` or `fail` from local evidence, and the head is read from `git log` of the reviewed branch. An absent or empty section is a reviewer contract error.
 
 5. **Run required checks**
    - Prefer repo-defined, check-only commands.
    - Default order:
-     1. formatting check
-     2. lint check
-     3. type check
+     1. formatting check, read from the language's final-QC static artifact and not re-run
+     2. lint check, read from the same static artifact and not re-run
+     3. type check, read from the same static artifact and not re-run
      4. tests
      5. coverage (mandatory for every language that has changed files)
         - TypeScript: `npm run test:unit:coverage` → artifact: `coverage/lcov.info`
@@ -121,8 +122,9 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
           - New code files (added in this feature): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages. Flag as FAIL otherwise.
           - Modified files (changed but previously existing): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages, read from the single gate run, new behavior is tested, and no regression on changed lines relative to the `Phase 0 baseline`. Flag as FAIL otherwise.
           - Repo-wide per language: line coverage >= 85%, and branch coverage >= 75% for branch-capable languages. Flag as FAIL otherwise.
+          - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a local artifact that shows the Python total below a threshold is still FAIL.
         - If coverage artifacts already exist from the executor run, inspect them instead of re-running.
-        - If no coverage artifact exists for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
+        - If no coverage artifact exists beneath the item worktree for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
         - Tier classification findings: report a missing or incomplete `quality-tiers.yml` only when the repository has adopted tiers, that is, when `quality-tiers.yml` exists at the repository root on the resolved base branch or the repository's CI runs a tier-classification check. Otherwise record tier classification as not applicable; it is not a finding.
    - A focused run of one test file to debug a specific failure is debugging only; a review check does not rest on it.
    - If a tool cannot run in the environment, mark the affected section unverified or partial with a concrete reason.
@@ -156,7 +158,7 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
      - the code review contains blockers
      - required acceptance criteria are FAIL or PARTIAL
      - coverage below the governing thresholds defined in step 5 (repo-wide per language, modified files including any regression on changed lines against the `Phase 0 baseline`, or new files)
-     - coverage artifact absent for any language that has changed files
+     - coverage artifact absent beneath the item worktree for any language that has changed files
    - Classify each blocking finding before triggering remediation: each receives one remediability class (`autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required`; `autonomous` when no class is stated). A published MCP runtime that lags the repository contract is classified `external_dependency`.
    - Trigger the remediation handoff only when at least one blocking finding is `autonomous`. When every blocking finding is non-remediable, write the remediation inputs with the `HALT_NON_REMEDIABLE` or `AWAITING_CI` verdict and create no remediation plan target.
    - Choose the remediation path. Write one line `Remediation-Path: light` or `Remediation-Path: full` into the remediation inputs, and inside each blocking finding block one line `Finding-Scope: contained` or `Finding-Scope: design`. A missing path line reads as `full`, and a missing scope line reads as `design`. These lines never contain the substrings the orchestrator counts.
@@ -177,6 +179,7 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
   - copied from the canonical policy-audit template
   - template instruction block removed
   - includes the canonical major headings and Appendix B command reference
+  - contains `## CI Cross-check` after `## 7. Code Quality Checks`
 - `code-review.<timestamp>.md`
   - contains `## Executive Summary`
   - contains `## Findings Table`
