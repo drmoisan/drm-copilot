@@ -88,7 +88,9 @@ function Test-OwnerDirectiveNonEmptyString {
 }
 
 # Private: parse an ISO-8601 date-time with the invariant culture, reading a zone-less value as
-# UTC and adjusting an offset value to UTC. Returns $null when the text does not parse.
+# UTC and adjusting an offset value to UTC. Only the ISO 8601 extended shape is parsed
+# (yyyy-MM-ddTHH:mm, optional seconds and fraction, optional Z or +HH:mm/-HH:mm offset); any
+# other text, and text in that shape that is not a calendar date-time, returns $null.
 function ConvertFrom-OwnerDirectiveDateText {
     [CmdletBinding()]
     [OutputType([datetime])]
@@ -96,6 +98,10 @@ function ConvertFrom-OwnerDirectiveDateText {
         [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $Text
     )
 
+    $isoShape = '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2}(\.[0-9]+)?)?(Z|[+-][0-9]{2}:[0-9]{2})?\z'
+    if ($Text -cnotmatch $isoShape) {
+        return $null
+    }
     $parsed = [datetime]::MinValue
     $invariant = [System.Globalization.CultureInfo]::InvariantCulture
     $styles = [System.Globalization.DateTimeStyles]::AssumeUniversal -bor [System.Globalization.DateTimeStyles]::AdjustToUniversal
