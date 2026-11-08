@@ -49,6 +49,8 @@ You are an orchestration-only agent. You run in the main thread, and all delegat
 
 ## Startup Protocol
 
+Agent-tool preflight, before step 1: confirm that `Agent` is in the available tool list before any other work. When it is absent, record `blocked_reason: "spawn_agent_unavailable"` in the checkpoint, do no specialist work, and return a line beginning `AGENT_TOOL_UNAVAILABLE:` that names the three causes and both remedies. The causes are `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` set below 3 (the configured limit), a run started inside a subagent or fork (one extra nesting layer), and a Claude Code version older than 2.1.219. The remedies are to raise or unset `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`, or to use the main-session fallback in `## Nesting Depth` of the coordinating skill, in which the main session launches each per-feature `Agent(orchestrator)` itself.
+
 On every invocation:
 
 1. Read `CLAUDE.md` for repository tone policy and architecture context.
