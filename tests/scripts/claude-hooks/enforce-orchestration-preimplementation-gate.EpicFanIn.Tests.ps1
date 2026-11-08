@@ -1,0 +1,125 @@
+#Requires -Version 7.0
+#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
+
+<#
+.SYNOPSIS
+    Preimplementation gate post-fan-in allowance rows for the epic integration branch (issue #1136).
+
+.DESCRIPTION
+    Drives Invoke-OrchestrationPreimplementationGateDecision for the writes the epic
+    orchestrator and pr-author make on the integration branch after every child feature has
+    merged: the pr-author body and receipt under artifacts/, and the epic status document
+    commit. The epic checkpoint is fan-in complete (every merge_status merged or
+    worktree_removed) and no merge is in progress, so the readiness predicate fails with
+    'merge-in-progress'; the allowance admits only the allowlisted operations.
+
+    The fixtures follow enforce-orchestration-preimplementation-gate.EpicScope.Tests.ps1: the
+    gate is dot-sourced first, EpicScopeResolution.psm1 is imported without -Force, and the
+    resolver seams are mocked inside that module. The ascent maps the session root and any
+    path under /synthetic-worktrees/epic-coordinator to that root and returns any other
+    /synthetic-worktrees/ path unchanged. The staged index is read through the mocked
+    Get-OrchestrationGateStagedIndex seam. No row creates a file or changes the working
+    directory.
+#>
+
+BeforeAll {
+    $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude").Path
+    . (Join-Path $script:HookRoot 'hooks/enforce-orchestration-preimplementation-gate.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
+    if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Mock Get-WorktreeResolutionGitFileText { $null } }
+    Mock Get-CheckpointContent { $null }
+    Mock Get-EpicCheckpointContent { $null }
+    Mock Get-ParallelCheckpointContent { $null }
+    Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/EpicScopeResolution.psm1')
+    Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeResolution.psm1')
+
+    $script:FanInEpicJson = '{"route_id":"epic","epic_feature_folder":"sample-epic","epic_manifest_path":"docs/features/epics/sample-epic/epic.md","integration_branch":"epic/sample-epic-integration","epic_issue_num":900,"features":[{"feature_folder":"2026-09-25-child-a-901","merge_status":"merged"},{"feature_folder":"2026-09-25-child-b-902","merge_status":"worktree_removed"}]}'
+    $script:NotReadySingleFeature = '{"issue-num":"1136","route_id":"large","lifecycle_ready":false}'
+    $script:IntegrationRoot = '/synthetic-worktrees/epic-coordinator'
+    $script:StatusDoc = 'docs/features/epics/sample-epic/epic-status.md'
+
+    function ConvertTo-GateBashPayload {
+        # Return a Bash PreToolUse payload carrying one command string.
+        param([Parameter(Mandatory)] [string] $Command)
+        return (@{ tool_name = 'Bash'; tool_input = @{ command = $Command } } | ConvertTo-Json -Depth 5 -Compress)
+    }
+
+    function ConvertTo-GateFilePayload {
+        # Return a Write or Edit PreToolUse payload for one file path.
+        param([Parameter(Mandatory)] [string] $ToolName, [Parameter(Mandatory)] [string] $FilePath)
+        return (@{ tool_name = $ToolName; tool_input = @{ file_path = $FilePath } } | ConvertTo-Json -Depth 5 -Compress)
+    }
+
+    function Set-EpicScopeSeam {
+        <#
+            Mock the resolver seams inside EpicScopeResolution. The bodies close over local
+            copies because a module-scoped mock body cannot see this scope otherwise.
+        #>
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
+        param(
+            [AllowNull()] [string] $CheckpointText,
+            [string] $HeadBranch = 'epic/sample-epic-integration',
+            [bool] $MergeInProgress = $false
+        )
+        $text = $CheckpointText
+        $head = $HeadBranch
+        $merge = $MergeInProgress
+        Mock Find-WorktreeResolutionRoot -ModuleName EpicScopeResolution {
+            if ($Path -like '/synthetic-worktrees/epic-coordinator*') { return '/synthetic-worktrees/epic-coordinator' }
+            if ($Path -like '/synthetic-worktrees/*') { return $Path }
+            return '/synthetic-worktrees/epic-coordinator'
+        }
+        Mock Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution { $text }.GetNewClosure()
+        Mock Get-EpicScopeWorktreeHeadBranch -ModuleName EpicScopeResolution { $head }.GetNewClosure()
+        Mock Test-EpicScopeMergeInProgress -ModuleName EpicScopeResolution { $merge }.GetNewClosure()
+    }
+
+    function Set-StagedIndexSeam {
+        # Mock the staged-index read with one exit code and output text.
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers a Pester mock for one test only; it changes no system state.')]
+        param([int] $ExitCode = 0, [AllowEmptyString()] [string] $Output = '')
+        $code = $ExitCode
+        $text = $Output
+        Mock Get-OrchestrationGateStagedIndex { [pscustomobject]@{ ExitCode = $code; Output = $text } }.GetNewClosure()
+    }
+
+    Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
+    Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeRunResolution.psm1')
+    Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    Mock Resolve-WorktreeEpicTarget -ModuleName EpicScopeResolution { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = $SessionRoot; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
+}
+
+Describe 'preimplementation gate post-fan-in allowance (issue #1136)' {
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
+    Context 'fail-before' {
+        It 'allows a Write of artifacts/pr_body_7.receipt.json in epic scope with fan-in complete' {
+            # Arrange
+            Set-EpicScopeSeam -CheckpointText $script:FanInEpicJson
+            $payload = ConvertTo-GateFilePayload -ToolName 'Write' -FilePath 'artifacts/pr_body_7.receipt.json'
+
+            # Act
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $payload -CheckpointRaw $script:NotReadySingleFeature
+
+            # Assert
+            $reason = [string]$decision.hookSpecificOutput.permissionDecisionReason
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow' -Because "the pr-author receipt is allowlisted after fan-in (decision reason: $reason)"
+        }
+
+        It 'allows a pathless git commit -m when the staged index is exactly the status doc' {
+            # Arrange
+            Set-EpicScopeSeam -CheckpointText $script:FanInEpicJson
+            Set-StagedIndexSeam -Output ($script:StatusDoc + [char]0)
+            $payload = ConvertTo-GateBashPayload -Command 'git commit -m "docs: update epic status"'
+
+            # Act
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $payload -CheckpointRaw $script:NotReadySingleFeature
+
+            # Assert
+            $reason = [string]$decision.hookSpecificOutput.permissionDecisionReason
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow' -Because "a pathless commit of exactly the status document is allowed after fan-in (decision reason: $reason)"
+        }
+    }
+}
