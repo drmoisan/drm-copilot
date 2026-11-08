@@ -219,6 +219,36 @@ Describe 'Resolve-OrchestratorOutputItemOperandTarget' {
     }
 }
 
+Describe 'Resolve-OrchestratorOutputCheckpointPath item branch (issue #1145)' {
+    It 'keeps the session-worktree call when no item target is supplied' {
+        # Arrange
+        Mock Resolve-WorktreeOperandTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/main'; ReasonCode = $null; Detail = 'synthetic session worktree' } }
+
+        # Act
+        $resolution = Resolve-OrchestratorOutputCheckpointPath -ArtifactType 'orchestrator-state' -CheckpointPath $script:Leaf -AgentOutput 'Done.' -SessionRoot $script:SessionRoot
+
+        # Assert
+        $resolution.Resolved | Should -BeTrue
+        $resolution.CheckpointPath | Should -Be "$($script:SessionRoot)/$($script:Leaf)"
+        Should -Invoke Resolve-WorktreeOperandTarget -Times 1 -Exactly -ParameterFilter { $Path -eq '' }
+    }
+
+    It 'composes the item checkpoint from a Resolved item target without the session call' {
+        # Arrange
+        Mock Resolve-WorktreeOperandTarget { throw 'not reached' }
+        $item = [pscustomobject]@{ Status = 'Resolved'; WorktreeRoot = $script:ItemRoot; ReasonCode = $null; Detail = ''; FallbackNote = ''; FallbackApplied = $false }
+
+        # Act
+        $resolution = Resolve-OrchestratorOutputCheckpointPath -ArtifactType 'orchestrator-state' -CheckpointPath $script:Leaf -AgentOutput 'Done.' -SessionRoot $script:SessionRoot -ItemTarget $item
+
+        # Assert
+        $resolution.Resolved | Should -BeTrue
+        $resolution.CheckpointPath | Should -Be "$($script:ItemRoot)/$($script:Leaf)"
+        $resolution.WorktreeRoot | Should -Be $script:ItemRoot
+        Should -Invoke Resolve-WorktreeOperandTarget -Times 0 -Exactly
+    }
+}
+
 Describe 'Get-OrchestratorOutputFallbackNote' {
     It 'returns an empty string for <Label>' -ForEach @(
         @{ Label = 'a null target'; Applied = $null }
