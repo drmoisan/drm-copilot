@@ -811,6 +811,16 @@ request on this surface, so completion keys on the per-item terminal states abov
 else. The Run Closing run-document pull request is a bookkeeping pull request that lands the run's
 generated documents; it is not a run-level integration pull request and merges no item work.
 
+## Nesting Depth
+
+This chain runs three levels of subagents below the main session: the coordinator at depth 1, each per-item `orchestrator` at depth 2, and the specialists that orchestrator delegates to at depth 3. Only the depth-2 orchestrator needs the `Agent` tool below the coordinator; specialists do not delegate.
+
+Requirement: Claude Code 2.1.219 or later, `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` unset or at least 3, and the skill invoked from the main session. A run started inside a subagent or fork adds one layer, and a lower limit withholds the `Agent` tool from the per-item orchestrators.
+
+Outcome when the depth is insufficient: an agent that starts without the `Agent` tool records `blocked_reason: "spawn_agent_unavailable"`, does no specialist work, and returns a line beginning `AGENT_TOOL_UNAVAILABLE`; a coordinator that receives that line from a child halts with the same reason instead of doing the child's work. The `enforce-epic-invocation-origin.ps1` hook also denies a chain delegation with `NESTING_DEPTH_INSUFFICIENT:` when the configured limit is below 3.
+
+Fallback: when the depth cannot be raised, the main session itself launches each per-item `Agent(orchestrator)` with the same delegation prompt the coordinator would have sent, including `Preparation mode: true` on the preparation path, so each orchestrator runs at depth 1 and its specialists at depth 2.
+
 ## Mutation Protocol (F6)
 
 A parallel run is mutable while it executes. Three slash commands mutate it, and each one appends

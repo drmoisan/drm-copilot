@@ -1,0 +1,74 @@
+[
+  {
+    "stage": "S2_research",
+    "attempt": 1,
+    "started_at": "2026-11-08T16:46:01Z",
+    "ended_at": "2026-11-08T16:52:33Z"
+  },
+  {
+    "stage": "S4_feature_documents",
+    "attempt": 1,
+    "started_at": "2026-11-08T16:52:33Z",
+    "ended_at": "2026-11-08T16:54:28Z"
+  },
+  {
+    "stage": "S5_atomic_planning",
+    "attempt": 1,
+    "started_at": "2026-11-08T16:54:28Z",
+    "ended_at": "2026-11-08T17:03:25Z"
+  },
+  {
+    "stage": "S5_preflight",
+    "attempt": 1,
+    "started_at": "2026-11-08T17:03:25Z",
+    "ended_at": "2026-11-08T17:22:27Z"
+  },
+  {
+    "stage": "S6_atomic_execution",
+    "attempt": 1,
+    "started_at": "2026-11-08T17:22:27Z",
+    "ended_at": "2026-11-08T18:11:02Z"
+  },
+  {
+    "stage": "S7_feature_review",
+    "attempt": 1,
+    "started_at": "2026-11-08T18:11:02Z",
+    "ended_at": "2026-11-08T18:20:54Z"
+  },
+  {
+    "stage": "remediation.cycle_1.execute",
+    "attempt": 1,
+    "started_at": "2026-11-08T18:20:54Z",
+    "ended_at": "2026-11-08T18:44:16Z"
+  },
+  {
+    "stage": "remediation.cycle_1.reaudit",
+    "attempt": 1,
+    "started_at": "2026-11-08T18:44:16Z",
+    "ended_at": "2026-11-08T18:55:46Z"
+  },
+  {
+    "stage": "S7_feature_review",
+    "attempt": 1,
+    "started_at": "2026-11-08T18:55:46Z",
+    "ended_at": "2026-11-08T19:18:01Z"
+  },
+  {
+    "stage": "S8_pr_authoring",
+    "attempt": 1,
+    "started_at": "2026-11-08T19:18:01Z",
+    "ended_at": "2026-11-08T19:18:23Z"
+  },
+  {
+    "stage": "S9_ci_gate",
+    "attempt": 1,
+    "started_at": "2026-11-08T19:20:09Z",
+    "ended_at": "2026-11-08T19:41:59Z"
+  },
+  {
+    "stage": "S9_ci_gate_final",
+    "attempt": 1,
+    "started_at": "2026-11-08T19:41:59Z",
+    "ended_at": null
+  }
+]

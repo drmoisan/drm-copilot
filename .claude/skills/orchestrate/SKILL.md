@@ -499,3 +499,13 @@ The validator counts an MCP receipt as successful only when `tool` is a non-empt
 When the GitHub issue already exists before orchestration starts (transferred, filed by hand, or created by epic decomposition) and has been verified read-only (`gh issue view`, a `gh api` GET, or a GitHub MCP issue read), do not call `potential_to_issue`. Record a top-level `issue_adoption` object in the checkpoint instead of a `potential_to_issue` receipt. It may waive only `potential_to_issue`, the checkpoint's promotion-entry tool (`new_potential_entry`, or `new_potential_bug_entry` for a bug-type checkpoint), and `new_active_feature_folder` with a valid `feature_folder_record` when the feature folder was already created and committed before this run (for example by a preparation child or an earlier session); `potential_to_issue` must always be listed. For a promotion-entry waiver, `potential_record` (a markdown path under `docs/features/potential/`) is required when `origin` is `epic_decomposition`, optional when `origin` is `transferred` or `filed_before_orchestration`, and validated whenever it is present. Every other required tool still needs a successful receipt. Any adoption error waives nothing. The field rules, the closed waivable set, and the error placement are defined in `.claude/rules/orchestrator-state.md` under `## Invariants (issue_adoption object)`.
 
 These three receipt arrays, populated with the retained required names of the selected route, are what allow the routing-contract validation under `require_complete: true` to pass.
+
+## Nesting Depth
+
+Invoked from the main session, this skill runs the orchestration in the main session and delegates each specialist at depth 1, so the main-session path needs depth 1 only. A delegated orchestrator, an `Agent(orchestrator)` launched by an epic or parallel coordinator, runs at depth 2 and needs `Agent` at its own depth to delegate its specialists at depth 3.
+
+Requirement for the delegated path: Claude Code 2.1.219 or later, `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` unset or at least 3, and the coordinating skill invoked from the main session. A run started inside a subagent or fork adds one layer.
+
+Outcome when the depth is insufficient: the orchestrator's Agent-tool preflight records `blocked_reason: "spawn_agent_unavailable"`, does no specialist work, and returns a line beginning `AGENT_TOOL_UNAVAILABLE`, and the coordinator halts with the same reason.
+
+Fallback: when the depth cannot be raised, the main session itself launches each per-feature `Agent(orchestrator)` with the same delegation prompt the coordinator would have sent, including `Preparation mode: true` on the preparation path, so each orchestrator runs at depth 1 and its specialists at depth 2.

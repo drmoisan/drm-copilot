@@ -39,6 +39,7 @@
     ".claude/hooks/discovery-capability-probe.ps1",
     ".claude/hooks/docs-role-contract.ps1",
     ".claude/hooks/enforce-epic-invocation-origin.ps1",
+    ".claude/hooks/epic-invocation-nesting-depth.ps1",
     ".claude/hooks/enforce-epic-merge-gate.ps1",
     ".claude/hooks/enforce-epic-merge-gate-authorization.ps1",
     ".claude/hooks/enforce-epic-merge-gate-resolution.ps1",
