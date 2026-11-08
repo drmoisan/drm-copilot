@@ -59,7 +59,7 @@ Found by searching `tests/` for `PINNED_FROZEN_SURFACE_HASHES`, `0010-early-depe
 
 ### Phase 1 — Merge
 
-- [ ] [P1-T1] Merge `origin/main` with `git merge origin/main` and one merge commit, resolving the three conflicted files keeping both sides, and write `FEATURE/evidence/other/stage-i-cycle3-merge.<timestamp>.md`.
+- [x] [P1-T1] Merge `origin/main` with `git merge origin/main` and one merge commit, resolving the three conflicted files keeping both sides, and write `FEATURE/evidence/other/stage-i-cycle3-merge.<timestamp>.md`.
   - `.claude/skills/epic-run/SKILL.md`: keep #1142's `## Nesting Depth` section and stage I's `early_start_on` paragraph of `## Scope`, each in its own position; the Claude bundle copy under `extensions/drm-copilot/resources/claude-customizations/` is re-copied from the source, not hand-merged.
   - `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`: keep main's `RE-BASELINED` paragraphs, ending with the `RE-BASELINED by issue #1138.` paragraph, followed by the `RE-BASELINED by issue #1097.` paragraph (landing order); take main's digest values for now ([P2-T2] re-pins).
   - Acceptance:
