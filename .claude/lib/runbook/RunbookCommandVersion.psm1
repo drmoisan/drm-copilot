@@ -121,4 +121,102 @@ function Get-RunbookCommandToolName {
     return ConvertTo-RunbookNormalizedToolName -Name $first
 }
 
-Export-ModuleMember -Function Get-RunbookPinnedToolVersion, Get-RunbookCommandToolName
+function Get-RunbookCountedBlock {
+    <#
+    .SYNOPSIS
+        Returns one object per counted fenced block: Command (its lines) and Marker (the consecutive
+        'Version check:' lines that immediately follow the closing fence).
+    .PARAMETER RunbookText
+        The runbook text.
+    #>
+    [CmdletBinding()]
+    param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $RunbookText)
+
+    $countedInfo = @('', 'sh', 'bash', 'shell', 'console', 'powershell', 'pwsh', 'ps1', 'cmd', 'bat')
+    $line = @([regex]::Split($RunbookText, '\r?\n'))
+    $blocks = [System.Collections.Generic.List[object]]::new()
+    $index = 0
+    while ($index -lt $line.Count) {
+        $open = [regex]::Match($line[$index], '^\s*(`{3,}|~{3,})\s*([^\s`]*)')
+        if (-not $open.Success) { $index++; continue }
+        $fence = $open.Groups[1].Value
+        $info = $open.Groups[2].Value.ToLowerInvariant()
+        $command = [System.Collections.Generic.List[string]]::new()
+        $cursor = $index + 1
+        $closePattern = '^\s*' + [regex]::Escape([string]$fence[0]) + '{' + $fence.Length + ',}\s*$'
+        while ($cursor -lt $line.Count -and $line[$cursor] -notmatch $closePattern) {
+            $command.Add($line[$cursor])
+            $cursor++
+        }
+        $marker = [System.Collections.Generic.List[string]]::new()
+        $after = $cursor + 1
+        while ($after -lt $line.Count -and $line[$after].TrimStart().StartsWith('Version check:')) {
+            $marker.Add($line[$after].Trim())
+            $after++
+        }
+        if ($countedInfo -contains $info) {
+            $blocks.Add([pscustomobject]@{ Command = $command.ToArray(); Marker = $marker.ToArray() })
+        }
+        $index = $cursor + 1
+    }
+    return , $blocks.ToArray()
+}
+
+function Get-RunbookCommandVersionFinding {
+    <#
+    .SYNOPSIS
+        Reports version-marking findings for a runbook against a pinned-version map.
+    .DESCRIPTION
+        Finding classes: a tool with no marker line; a marker naming a version other than the pinned
+        version; a 'not pinned' marker for a pinned tool; a malformed 'Version check:' line.
+    .PARAMETER RunbookText
+        The runbook text.
+    .PARAMETER PinnedVersion
+        Hashtable of normalized tool name to pinned version, merged from the repository lockfiles.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $RunbookText,
+        [Parameter(Mandatory = $true)] [hashtable] $PinnedVersion
+    )
+
+    $finding = [System.Collections.Generic.List[string]]::new()
+    $blockNumber = 0
+    foreach ($block in (Get-RunbookCountedBlock -RunbookText $RunbookText)) {
+        $blockNumber++
+        $tool = [System.Collections.Generic.List[string]]::new()
+        foreach ($commandLine in $block.Command) {
+            $trimmed = $commandLine.Trim()
+            if ($trimmed.Length -eq 0 -or $trimmed.StartsWith('#')) { continue }
+            $name = Get-RunbookCommandToolName -CommandLine $trimmed
+            if ($null -ne $name -and -not $tool.Contains($name)) { $tool.Add($name) }
+        }
+        $marker = @{}
+        foreach ($markerLine in $block.Marker) {
+            $verified = [regex]::Match($markerLine, '^Version check:\s+(verified|not verified) against (\S+) (\S+)\s*$')
+            $unpinned = [regex]::Match($markerLine, '^Version check:\s+(\S+) not pinned in this repository\s*$')
+            if ($verified.Success) {
+                $marker[(ConvertTo-RunbookNormalizedToolName -Name $verified.Groups[2].Value)] = @{ Kind = 'version'; Version = $verified.Groups[3].Value }
+            } elseif ($unpinned.Success) {
+                $marker[(ConvertTo-RunbookNormalizedToolName -Name $unpinned.Groups[1].Value)] = @{ Kind = 'unpinned'; Version = $null }
+            } else {
+                $finding.Add("Counted block $blockNumber has a malformed marker ``$markerLine``; use 'Version check: verified against <tool> <version>', 'Version check: not verified against <tool> <version>', or 'Version check: <tool> not pinned in this repository'.")
+            }
+        }
+        foreach ($name in $tool) {
+            $isPinned = $PinnedVersion.ContainsKey($name)
+            $pinnedText = if ($isPinned) { "pinned version $($PinnedVersion[$name])" } else { 'not pinned in any lockfile' }
+            if (-not $marker.ContainsKey($name)) {
+                $finding.Add("Counted block $blockNumber runs tool $name ($pinnedText) and has no 'Version check:' line for it immediately after the closing fence.")
+            } elseif ($marker[$name].Kind -eq 'unpinned' -and $isPinned) {
+                $finding.Add("Counted block $blockNumber marks tool $name as not pinned, but it is pinned at version $($PinnedVersion[$name]).")
+            } elseif ($marker[$name].Kind -eq 'version' -and (-not $isPinned -or $marker[$name].Version -ne $PinnedVersion[$name])) {
+                $finding.Add("Counted block $blockNumber marks tool $name at version $($marker[$name].Version), which differs from the repository state ($pinnedText).")
+            }
+        }
+    }
+    return $finding.ToArray()
+}
+
+Export-ModuleMember -Function Get-RunbookPinnedToolVersion, Get-RunbookCommandToolName, Get-RunbookCommandVersionFinding

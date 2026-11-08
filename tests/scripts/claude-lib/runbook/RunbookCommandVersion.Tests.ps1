@@ -179,3 +179,162 @@ Describe 'Get-RunbookCommandToolName' {
         Get-RunbookCommandToolName -CommandLine 'poetry install' | Should -Be 'poetry'
     }
 }
+
+Describe 'Get-RunbookCommandVersionFinding markers (AC 3)' {
+    BeforeAll {
+        $script:Pinned = @{ nuitka = '4.3.4'; black = '24.1.0' }
+    }
+
+    It 'passes a <Form> marker that names the pinned version' -ForEach @(
+        @{ Form = 'verified'; Marker = 'Version check: verified against nuitka 4.3.4' }
+        @{ Form = 'not verified'; Marker = 'Version check: not verified against nuitka 4.3.4' }
+    ) {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('python -m nuitka --clean-cache=all') -AfterFence @($Marker)
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 0
+    }
+
+    It 'reports a marker that names a version other than the pinned version' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('python -m nuitka main.py') -AfterFence @('Version check: verified against nuitka 4.2.0')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 1
+        $finding[0] | Should -BeLike '*nuitka*4.2.0*4.3.4*'
+    }
+
+    It 'reports a not-pinned marker for a pinned tool' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('python -m nuitka main.py') -AfterFence @('Version check: nuitka not pinned in this repository')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 1
+        $finding[0] | Should -BeLike '*nuitka*not pinned*4.3.4*'
+    }
+
+    It 'reports a malformed marker line' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('python -m nuitka main.py') -AfterFence @('Version check: probably fine')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        ($finding -join "`n") | Should -BeLike '*malformed marker*Version check: probably fine*'
+    }
+
+    It 'passes an unpinned tool marked with the not-pinned form' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('az login') -AfterFence @('Version check: az not pinned in this repository')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 0
+    }
+
+    It 'reports a version claim for a tool that no lockfile pins' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('az login') -AfterFence @('Version check: verified against az 2.60.0')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 1
+        $finding[0] | Should -BeLike '*az*not pinned in any lockfile*'
+    }
+
+    It 'reports a missing marker for an unpinned tool without a version' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('az login')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 1
+        $finding[0] | Should -BeLike '*az*not pinned in any lockfile*'
+    }
+
+    It 'requires one marker per distinct tool of the block and reports only the missing one' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('python -m nuitka a.py', 'python -m nuitka b.py', 'black --check .') -AfterFence @('Version check: not verified against nuitka 4.3.4')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 1
+        $finding[0] | Should -BeLike '*black*24.1.0*'
+    }
+
+    It 'produces no finding for the exempt fence <Info>' -ForEach @(
+        @{ Info = 'text' }, @{ Info = 'json' }, @{ Info = 'output' }
+    ) {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Info $Info -Command @('python -m nuitka main.py')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 0
+    }
+
+    It 'counts a fence with an empty info string and a tilde fence' {
+        # Arrange
+        $backtick = [string][char]96
+        $fence = $backtick * 3
+        $runbook = "$fence`nblack --check .`n$fence`n`n~~~bash`nnuitka x`n~~~"
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 2
+    }
+
+    It 'ignores blank lines and comment lines in a counted fence' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('# python -m nuitka main.py', '', '   ')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 0
+    }
+
+    It 'does not accept a marker separated from the closing fence by a blank line' {
+        # Arrange
+        $runbook = Get-FencedRunbookText -Command @('python -m nuitka main.py') -AfterFence @('', 'Version check: verified against nuitka 4.3.4')
+
+        # Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText $runbook -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 1
+        $finding[0] | Should -BeLike '*no ''Version check:'' line*'
+    }
+
+    It 'produces no finding for text with no fenced block' {
+        # Arrange / Act
+        $finding = @(Get-RunbookCommandVersionFinding -RunbookText 'plain text only' -PinnedVersion $script:Pinned)
+
+        # Assert
+        $finding.Count | Should -Be 0
+    }
+}
