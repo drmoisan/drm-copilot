@@ -80,7 +80,7 @@ Found by searching `tests/` for `PINNED_FROZEN_SURFACE_HASHES`, `0010-early-depe
 
 ### Phase 2 — Semantic Overlap and Pins
 
-- [ ] [P2-T1] Check #1129 against stage I and write `FEATURE/evidence/other/stage-i-cycle1-overlap-1129.<timestamp>.md`.
+- [x] [P2-T1] Check #1129 against stage I and write `FEATURE/evidence/other/stage-i-cycle1-overlap-1129.<timestamp>.md`.
   - Read `tests/scripts/dev_tools/test_epic_wave_corpus_parity.py`, every #1129 test that enumerates a fixture directory, and the manifest reader under `.claude/lib/epic-wave/`.
   - Questions: (a) does any #1129 test enumerate `tests/fixtures/epic_wave_barrier/` or read `early-start-edge-cases.json`, changing its counts or results; (b) does the wave CLI read only `depends_on` and accept a manifest entry carrying `early_start_on`, as `## Early Dependent Starts (early_start)` of the epic-orchestrate skill states ("the field moves no wave").
   - Fix route: a corpus collision is fixed in the #1129 test's selection or by moving the stage I corpus, and a rejected `early_start_on` key by a tolerance in the wave lib with a new test; a fix path is added to 0010 `## Files Changed` in [P3-T2].
