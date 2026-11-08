@@ -26,6 +26,19 @@ For any such step, the `run:` block MUST do one of the following:
 
 A `pwsh` step terminates with the exit code of the last external command unless the script explicitly resets it or calls `exit`. Negative-path verification steps therefore require an explicit reset or explicit `exit 0`.
 
+## Epic Integration-Branch Trigger (Required When Epic Branches Are Used)
+
+A repository that runs epics with `epic/<slug>-integration` branches MUST list `epic/**` in the `pull_request` branches of its workflow named `CI`, so that every child pull request into an integration branch receives a CI run on its head (issue #1130):
+
+```yaml
+name: CI
+on:
+  pull_request:
+    branches: [main, "epic/**"]
+```
+
+The epic merge gates (`.claude/hooks/enforce-epic-merge-gate-child-ci.ps1` and its byte-identical `.codex/hooks/` twin) allow an epic-child merge only when the newest run of the workflow named `CI` on the live child head is a completed, successful `pull_request` run, or the `workflow_dispatch` run recorded in `ci_gate.dispatch_run_id`. A `push`-event run is not accepted, and a repository whose required workflow has a different name is denied with `EPIC_CHILD_CI_NOT_VERIFIED`. When the trigger is missing, the dispatch fallback of S9 in `.claude/skills/orchestrate/SKILL.md` (`## Step S9 — CI Green Gate`) starts the run with `gh workflow run CI --ref <child branch>`. Destination repositories receive this rule only through push-down, so a destination needs a push-down refresh before it applies.
+
 ## Rationale
 
 - GitHub Actions interprets a step's process exit code as the step result. A leaked `$LASTEXITCODE` from an intentionally-failing nested command causes a passing verification to report failure.
@@ -40,3 +53,4 @@ A `pwsh` step terminates with the exit code of the last external command unless 
 
 - This rule applies to any workflow step whose `run:` block uses `shell: pwsh` (or the repo default `pwsh`) and intentionally invokes a failing nested command.
 - It does not change required-check configuration or branch protection.
+- The epic integration-branch trigger section applies to the workflow named `CI` in a repository that uses epic integration branches.
