@@ -130,11 +130,11 @@ function Get-RunbookCountedBlock {
         The runbook text.
     #>
     [CmdletBinding()]
+    [OutputType([pscustomobject])]
     param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $RunbookText)
 
     $countedInfo = @('', 'sh', 'bash', 'shell', 'console', 'powershell', 'pwsh', 'ps1', 'cmd', 'bat')
     $line = @([regex]::Split($RunbookText, '\r?\n'))
-    $blocks = [System.Collections.Generic.List[object]]::new()
     $index = 0
     while ($index -lt $line.Count) {
         $open = [regex]::Match($line[$index], '^\s*(`{3,}|~{3,})\s*([^\s`]*)')
@@ -155,11 +155,10 @@ function Get-RunbookCountedBlock {
             $after++
         }
         if ($countedInfo -contains $info) {
-            $blocks.Add([pscustomobject]@{ Command = $command.ToArray(); Marker = $marker.ToArray() })
+            [pscustomobject]@{ Command = $command.ToArray(); Marker = $marker.ToArray() }
         }
         $index = $cursor + 1
     }
-    return , $blocks.ToArray()
 }
 
 function Get-RunbookCommandVersionFinding {
@@ -183,7 +182,7 @@ function Get-RunbookCommandVersionFinding {
 
     $finding = [System.Collections.Generic.List[string]]::new()
     $blockNumber = 0
-    foreach ($block in (Get-RunbookCountedBlock -RunbookText $RunbookText)) {
+    foreach ($block in @(Get-RunbookCountedBlock -RunbookText $RunbookText)) {
         $blockNumber++
         $tool = [System.Collections.Generic.List[string]]::new()
         foreach ($commandLine in $block.Command) {

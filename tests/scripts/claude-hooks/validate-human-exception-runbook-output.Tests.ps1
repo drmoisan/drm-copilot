@@ -41,10 +41,11 @@ BeforeAll {
     function Get-Seam {
         # Builds the in-memory ReadFile, TestFile, and ListRootFile seams over a path -> text map.
         param([hashtable] $File)
+        $fileMap = $File
         return @{
-            ReadFile     = { param($Path) if ($File.ContainsKey($Path)) { $File[$Path] } else { $null } }.GetNewClosure()
-            TestFile     = { param($Path) $File.ContainsKey($Path) }.GetNewClosure()
-            ListRootFile = { param($Root) @($File.Keys | Where-Object { $_.StartsWith("$Root/") -and -not $_.Substring($Root.Length + 1).Contains('/') } | ForEach-Object { $_.Substring($Root.Length + 1) }) }.GetNewClosure()
+            ReadFile     = { param($Path) if ($fileMap.ContainsKey($Path)) { $fileMap[$Path] } else { $null } }.GetNewClosure()
+            TestFile     = { param($Path) $fileMap.ContainsKey($Path) }.GetNewClosure()
+            ListRootFile = { param($Root) @($fileMap.Keys | Where-Object { $_.StartsWith("$Root/") -and -not $_.Substring($Root.Length + 1).Contains('/') } | ForEach-Object { $_.Substring($Root.Length + 1) }) }.GetNewClosure()
         }
     }
 
@@ -123,12 +124,10 @@ Describe 'Get-HumanExceptionRunbookDecision (AC 4)' {
     It 'merges pinned versions from several lockfile formats at the item root' {
         # Arrange
         $runbook = Get-RunbookText -Command @('npx prettier --check .', 'ruff check .') -AfterFence @('Version check: verified against prettier 3.3.2', 'Version check: not verified against ruff 0.5.1')
-        $file = @{
-            $script:ItemRunbook                      = $runbook
-            "$script:ItemRoot/package-lock.json"     = '{"packages":{"":{},"node_modules/prettier":{"version":"3.3.2"}}}'
-            "$script:ItemRoot/requirements.txt"      = "ruff==0.5.1`n"
-            "$script:ItemRoot/notes.txt"             = 'ignored'
-        }
+        $file = @{ $script:ItemRunbook = $runbook }
+        $file["$script:ItemRoot/package-lock.json"] = '{"packages":{"":{},"node_modules/prettier":{"version":"3.3.2"}}}'
+        $file["$script:ItemRoot/requirements.txt"] = "ruff==0.5.1`n"
+        $file["$script:ItemRoot/notes.txt"] = 'ignored'
 
         # Act
         $result = Invoke-Case -Message "runbook_path: $script:Relative" -File $file

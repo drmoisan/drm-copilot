@@ -39,6 +39,7 @@ BeforeAll {
     function Invoke-Case {
         # Runs the decision function with in-memory files and returns the result plus the recorded seam calls.
         param([string] $RunbookPath, [hashtable] $File, [string] $Prompt = $script:Prompt)
+        $fileMap = $File
         $read = [System.Collections.Generic.List[string]]::new()
         $listed = [System.Collections.Generic.List[string]]::new()
         $envelope = ([ordered]@{
@@ -50,9 +51,9 @@ BeforeAll {
                 last_assistant_message = "Done.`nrunbook_path: $RunbookPath"
             } | ConvertTo-Json -Compress)
         $result = Get-HumanExceptionRunbookDecision -InputText $envelope -SessionRoot $script:SessionRoot -ReadTranscriptHead (Get-TranscriptReader -Prompt $Prompt) -WorktreeListInvoker $script:ListInvoker `
-            -ReadFile { param($Path) $read.Add($Path); if ($File.ContainsKey($Path)) { $File[$Path] } else { $null } }.GetNewClosure() `
-            -TestFile { param($Path) $File.ContainsKey($Path) }.GetNewClosure() `
-            -ListRootFile { param($Root) $listed.Add($Root); @($File.Keys | Where-Object { $_.StartsWith("$Root/") -and -not $_.Substring($Root.Length + 1).Contains('/') } | ForEach-Object { $_.Substring($Root.Length + 1) }) }.GetNewClosure()
+            -ReadFile { param($Path) $read.Add($Path); if ($fileMap.ContainsKey($Path)) { $fileMap[$Path] } else { $null } }.GetNewClosure() `
+            -TestFile { param($Path) $fileMap.ContainsKey($Path) }.GetNewClosure() `
+            -ListRootFile { param($Root) $listed.Add($Root); @($fileMap.Keys | Where-Object { $_.StartsWith("$Root/") -and -not $_.Substring($Root.Length + 1).Contains('/') } | ForEach-Object { $_.Substring($Root.Length + 1) }) }.GetNewClosure()
         return [pscustomobject]@{ Result = $result; Read = @($read); Listed = @($listed) }
     }
 }
