@@ -25,6 +25,9 @@
       5. Deny with reason EPIC_WAVE_BARRIER_BLOCKED unless every dependency's merge_status
          is merged or worktree_removed. A missing/unreadable checkpoint, an unresolved
          target feature_folder, or a missing dependency record also denies (fail-closed).
+         The one edge that a valid early_start record of the target names is skipped while
+         its upstream is at worktree_created, pr_open, ci_green, or merge_conflict (issue
+         #1097, predicates in the sibling epic-wave-barrier-early-start.ps1).
 
     This is the per-call deterrent (Layer 1) of the two-layer wave-barrier design. The
     retrospective backstop (Layer 2) is the wave-barrier ordering invariant of
@@ -50,6 +53,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'epic-wave-barrier-early-start.ps1') } catch { Add-HookDependencyFailure -Name 'epic-wave-barrier-early-start.ps1' -ErrorRecord $_ }
 $script:EpicWaveBarrierResolutionImportFailure = $null
 
 # Shared feature-folder resolution (issue #565). Guarded so a failed dot-source denies
@@ -205,10 +209,17 @@ function Test-EpicWaveBarrierDependenciesMerged {
     # this wave's feature is allowed to start. Each raw entry resolves through the union
     # index, so an issue-number edge matches issue_num (issue #565).
     $features = if (@($Checkpoint.PSObject.Properties.Name) -contains 'features') { @($Checkpoint.features) } else { @() }
+    # Issue #1097: the record that a valid early_start dependency resolves to, or $null.
+    $earlyStartReference = Get-EpicWaveEarlyStartReference -Feature $FeatureRecord
+    $earlyStartRecord = if ($null -ne $earlyStartReference) { Find-FeatureFolderRecord -Records $features -Reference $earlyStartReference } else { $null }
     foreach ($dependency in $dependsOn) {
         $dependencyRecord = Find-FeatureFolderRecord -Records $features -Reference $dependency
         if ($null -eq $dependencyRecord) {
             return $false
+        }
+        # The early-start edge with a usable upstream branch is not required to be merged.
+        if (Test-EpicWaveEarlyStartEdge -ExemptRecord $earlyStartRecord -DependencyRecord $dependencyRecord) {
+            continue
         }
         $dependencyProps = @($dependencyRecord.PSObject.Properties.Name)
         if ($dependencyProps -notcontains 'merge_status') {

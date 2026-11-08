@@ -38,6 +38,7 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
             '.codex/hooks/enforce-codex-model-routing.ps1',
             '.codex/hooks/enforce-epic-child-worktree-binding.ps1',
             '.codex/hooks/enforce-epic-wave-barrier.ps1',
+            '.codex/hooks/epic-wave-barrier-early-start.ps1',
             '.codex/hooks/enforce-epic-merge-gate.ps1',
             '.codex/hooks/enforce-epic-merge-gate-review.ps1',
             '.codex/hooks/enforce-epic-merge-gate-child-ci.ps1',

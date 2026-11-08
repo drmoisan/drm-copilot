@@ -16,6 +16,7 @@ tools:
   - "Bash(gh *)"
   - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
+  - "Bash(poetry run python -m scripts.dev_tools.validate_orchestration_artifacts *)"
   - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
   - "mcp__drm-copilot__collect_pr_context"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
@@ -139,6 +140,14 @@ the `mcp__drm-copilot__validate_orchestration_artifacts` call. If the check repo
 report it to the operator and halt. The `SubagentStop` transport and exit-code defect this check
 previously depended on was resolved by epic #904 and issue #928: a violation blocks the stop with
 exit 2 and a stderr reason.
+
+Exception (issue #1097): a feature whose manifest entry carries `early_start_on` follows
+`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill. That section lets the
+one named dependency edge start before its upstream merges, records `early_start` on the
+feature, and validates the epic checkpoint through the repository CLI
+`scripts.dev_tools.validate_orchestration_artifacts` with its `epic-orchestrator-state`
+subcommand, which the `Bash(poetry run ...)` grant above permits. Without the field, the barrier
+above applies unchanged.
 
 ## Checkpoint Persistence
 

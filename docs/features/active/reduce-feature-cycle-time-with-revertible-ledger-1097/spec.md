@@ -213,8 +213,8 @@ Unsafe orderings are listed in research section 10. The guard precedes the readi
 - [x] [G] The less-evidence reduction does not reduce any baseline task, baseline evidence, or baseline comparison, including the Phase 0 test-suite baseline and the final-gate comparison restored at stage E2.
 - [x] [H] The named design-check pass is in single-pass preflight, adds no delegation, and is pinned by a contract test.
 - [x] [H] All 6 copies of the atomic-plan-contract skill describe the new rules, and contract tests pin them.
-- [ ] [I] Layer 1 and layer 2 honor `early_start` only for the named dependency; a dependent at `pr_open` or later requires the dependency merged and a string `synced_at`; and without the key both layers are unchanged.
-- [ ] [I] Frozen hashes are re-baselined in the same commit, and the reduction lands as its own commit with its entry.
+- [x] [I] Layer 1 and layer 2 honor `early_start` only for the named dependency; a dependent at `pr_open` or later requires the dependency merged and a string `synced_at`; and without the key both layers are unchanged.
+- [x] [I] Frozen hashes are re-baselined in the same commit, and the reduction lands as its own commit with its entry.
 - [ ] [I] The ledger holds an entry for every reduction made, including #1094; every entry carries the prior text or a patch, revert steps, and revert signals; and the reviewer confirms from the branch log that each reduction is a separate commit.
 - [ ] [I] The planning, execution, and review skills, and all mirrored copies, describe the new rules, and contract tests pin them.
 - [ ] [I] No baseline task, evidence, or comparison requirement is removed.

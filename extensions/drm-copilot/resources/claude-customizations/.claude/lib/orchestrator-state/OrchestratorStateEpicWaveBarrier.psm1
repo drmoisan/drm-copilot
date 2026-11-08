@@ -15,6 +15,16 @@
     an ordinal, last-definition-wins enumeration, which matches Python json semantics for a
     duplicate key.
 
+    A started feature with a valid early_start record (issue #1097: an object whose dependency
+    is a non-empty string or a number, never a boolean, and whose upstream_branch,
+    interface_settled_at, and interface_evidence are non-empty strings) exempts the one edge
+    its dependency resolves to. That edge skips the status and timing checks: a dependent at
+    not_started or worktree_created reports nothing; at any other status, absent included, an
+    unmerged upstream reports
+    'EPIC_WAVE_BARRIER_VIOLATION: <f> is at pr_open or later while early_start dependency <d> is not merged'
+    and a merged upstream without a non-empty string synced_at reports
+    'EPIC_WAVE_BARRIER_VIOLATION: <f> is at pr_open or later without a string synced_at for early_start dependency <d>'.
+
     An input this port does not evaluate fails closed with an error whose message starts
     with EPIC_WAVE_BARRIER_UNEVALUABLE:. The declared divergence classes are listed in
     tests/scripts/claude-lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.Parity.Tests.ps1.
@@ -42,6 +52,12 @@ $script:IntegerTokenPattern = '^-?(0|[1-9][0-9]*)$'
 $script:UnevaluableToken = 'EPIC_WAVE_BARRIER_UNEVALUABLE:'
 $script:StatusViolationFormat = 'EPIC_WAVE_BARRIER_VIOLATION: {0} is treated as started while dependency {1} is not merged'
 $script:TimingViolationFormat = 'EPIC_WAVE_BARRIER_VIOLATION: {0} worktree_created_at precedes dependency {1} merge_confirmed_at'
+$script:EarlyStartUnmergedFormat = 'EPIC_WAVE_BARRIER_VIOLATION: {0} is at pr_open or later while early_start dependency {1} is not merged'
+$script:EarlyStartUnsyncedFormat = 'EPIC_WAVE_BARRIER_VIOLATION: {0} is at pr_open or later without a string synced_at for early_start dependency {1}'
+
+# The early_start statuses before pr_open, and the record fields that must be non-empty strings.
+$script:EarlyStartPreReviewStatuses = @('not_started', 'worktree_created')
+$script:EarlyStartStringFields = @('upstream_branch', 'interface_settled_at', 'interface_evidence')
 
 # Private: the last property of an object element whose name equals Name (ordinal), so a
 # duplicate key resolves the way Python json does. Found is $false when there is none.
@@ -254,6 +270,59 @@ function Resolve-EpicWaveBarrierReference {
     return $map[$key]
 }
 
+# Private: the folder a valid early_start record of a feature exempts, or $null. An absent or
+# non-object record, a dependency that is not a non-empty string or a number (a boolean is
+# invalid), or an empty or non-string descriptive field gives $null, the same as no key.
+function Get-EpicWaveBarrierEarlyStartFolder {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)] [System.Text.Json.JsonElement] $Feature,
+        [Parameter(Mandatory = $true)] [System.Collections.Generic.Dictionary[string, string]] $ByHint,
+        [Parameter(Mandatory = $true)] [System.Collections.Generic.Dictionary[string, string]] $ByIssue,
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $Folder
+    )
+
+    $record = Get-EpicWaveBarrierProperty -Element $Feature -Name 'early_start'
+    if (-not $record.Found -or $record.Value.ValueKind -ne [System.Text.Json.JsonValueKind]::Object) { return $null }
+    $dependency = Get-EpicWaveBarrierProperty -Element $record.Value -Name 'dependency'
+    if (-not $dependency.Found) { return $null }
+    $kind = $dependency.Value.ValueKind
+    $isString = $kind -eq [System.Text.Json.JsonValueKind]::String -and $dependency.Value.GetString().Length -gt 0
+    if (-not $isString -and $kind -ne [System.Text.Json.JsonValueKind]::Number) { return $null }
+    foreach ($name in $script:EarlyStartStringFields) {
+        $value = Get-EpicWaveBarrierString -Element $record.Value -Name $name
+        if ($null -eq $value -or $value.Length -eq 0) { return $null }
+    }
+    return (Resolve-EpicWaveBarrierReference -Dependency $dependency.Value -ByHint $ByHint -ByIssue $ByIssue -Folder $Folder)
+}
+
+# Private: the violation line of the edge an early_start record exempts, or no output. A
+# dependent before pr_open reports nothing; otherwise the upstream must be merged, and then
+# the record must carry a non-empty string synced_at.
+function Get-EpicWaveBarrierEarlyStartViolation {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)] [System.Text.Json.JsonElement] $Feature,
+        [Parameter(Mandatory = $true)] [System.Text.Json.JsonElement] $Target,
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $Folder,
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $Reference
+    )
+
+    $status = Get-EpicWaveBarrierString -Element $Feature -Name 'merge_status'
+    if ($null -ne $status -and $script:EarlyStartPreReviewStatuses -ccontains $status) { return }
+    if (-not (Test-EpicWaveBarrierMerged -Status (Get-EpicWaveBarrierString -Element $Target -Name 'merge_status'))) {
+        $script:EarlyStartUnmergedFormat -f $Folder, $Reference
+        return
+    }
+    $record = (Get-EpicWaveBarrierProperty -Element $Feature -Name 'early_start').Value
+    $synced = Get-EpicWaveBarrierString -Element $record -Name 'synced_at'
+    if ($null -eq $synced -or $synced.Length -eq 0) {
+        $script:EarlyStartUnsyncedFormat -f $Folder, $Reference
+    }
+}
+
 # Private: the violation lines for the object entries, in feature and depends_on order.
 function Get-EpicWaveBarrierViolation {
     [CmdletBinding()]
@@ -287,11 +356,17 @@ function Get-EpicWaveBarrierViolation {
         if ($null -eq $folder -or -not $dependsOn.Found -or $dependsOn.Value.ValueKind -ne [System.Text.Json.JsonValueKind]::Array) { continue }
         if (-not (Test-EpicWaveBarrierFeatureStarted -Feature $feature)) { continue }
         $created = Get-EpicWaveBarrierString -Element $feature -Name 'worktree_created_at'
+        $exempt = Get-EpicWaveBarrierEarlyStartFolder -Feature $feature -ByHint $byHint -ByIssue $byIssue -Folder $folder
         foreach ($dependency in $dependsOn.Value.EnumerateArray()) {
             $resolved = Resolve-EpicWaveBarrierReference -Dependency $dependency -ByHint $byHint -ByIssue $byIssue -Folder $folder
             if ($null -eq $resolved -or -not $byFolder.ContainsKey($resolved)) { continue }
             $target = $byFolder[$resolved]
             $reference = Format-EpicWaveBarrierReference -Element $dependency
+            # The edge a valid early_start record names follows its own table instead.
+            if ($null -ne $exempt -and [string]::Equals($resolved, $exempt, [System.StringComparison]::Ordinal)) {
+                Get-EpicWaveBarrierEarlyStartViolation -Feature $feature -Target $target -Folder $folder -Reference $reference
+                continue
+            }
             if (-not (Test-EpicWaveBarrierMerged -Status (Get-EpicWaveBarrierString -Element $target -Name 'merge_status'))) {
                 $script:StatusViolationFormat -f $folder, $reference
                 continue
