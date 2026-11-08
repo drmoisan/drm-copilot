@@ -1,0 +1,7 @@
+{
+  "./src/docs-command-envelope.ts": { "lines": 85, "branches": 75 },
+  "./src/mcp-tool-inputs-docs.ts": { "lines": 85, "branches": 75 },
+  "./src/repo-automation-execute-docs.ts": { "lines": 85, "branches": 75 },
+  "./src/mcp-docs-tool-definitions.ts": { "lines": 85, "branches": 75 },
+  "./src/mcp-handlers/docs-handlers.ts": { "lines": 85, "branches": 75 }
+}

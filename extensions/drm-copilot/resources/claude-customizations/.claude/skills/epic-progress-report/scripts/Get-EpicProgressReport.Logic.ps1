@@ -4,18 +4,27 @@
 
 .DESCRIPTION
     The hub of the epic progress report logic. It holds the parsing and counting functions
-    and dot-sources the State (settings, state file, baseline, samples), Metrics (velocity,
-    deviation, estimates, formatting), and Render (summary and line composition) files, so a
-    consumer that dot-sources this file receives every logic function. Every function takes
-    data in and returns data: none reads a file, starts a process, calls the network, or
-    reads the clock. The main script dot-sources this file and supplies the data through its
-    I/O wrapper seams. Numeric and date text uses the invariant culture so the printed lines
-    do not depend on the host culture.
+    and dot-sources the Stages (step-type catalog, stage-name normalization, stage_timing
+    records, blockage), Steps (item, remediation-cycle, and epic-level steps), Durations
+    (median, defaults, duration samples, ledger merge), State (settings, state file,
+    baseline, samples), Metrics (per-type estimate, wave-parallel figure, formatting), Render
+    (summary and line composition), and Gather (item checkpoints, plan texts, epic rows, and
+    the step report) files, so a consumer that dot-sources this file receives every logic
+    function. Every function outside Gather takes data in and returns data: none reads a
+    file, starts a process, calls the network, or reads the clock. The Gather reading
+    functions call only the I/O wrapper seams that the main script defines; the main script
+    dot-sources this file and supplies the remaining data through those seams. Numeric and
+    date text uses the invariant culture so the printed lines do not depend on the host
+    culture.
 #>
 
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Stages.ps1')
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Steps.ps1')
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Durations.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.State.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Metrics.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Render.ps1')
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Gather.ps1')
 
 function Test-EpicProgressJsonText {
     <#

@@ -75,6 +75,7 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
 - A push-down served by the MCP tools writes the installed extension's bundled payload; a repository-side edit under `extensions/drm-copilot/resources/` changes that payload only after a rebuild and reinstall.
 - Concurrent checkpoints (#1097): until the extension release that carries the concurrent-review rule is installed, installed MCP accepts a `review_mode: "concurrent"` checkpoint that the PowerShell stop hook and the Python CLI reject, so such a checkpoint is checked with `scripts/dev_tools/validate_orchestration_artifacts.py` in its `orchestrator-state` subcommand with `--require-complete`.
 - Light remediation checkpoints (#1097): installed MCP applies invariant 8 only after the extension release that carries it is installed. Until then a Claude run validates a light checkpoint through `scripts/dev_tools/validate_orchestration_artifacts.py` in its `orchestrator-state` subcommand, and on Codex, whose orchestrator requires the installed MCP validator with no fallback, the light path is unavailable.
+- The docs tools (`run_docs_check`, `run_docs_inventory`, `run_docs_coverage`, `update_docs_ledger`, `generate_docs_reference`, `validate_docs_artifacts`) run the workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1` with `pwsh`, so a branch edit to the docs lib applies through MCP immediately, while the TypeScript wrapper is the installed extension.
 
 ## CI Shape and Required Checks
 
