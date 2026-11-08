@@ -104,7 +104,7 @@ Found by searching `tests/` for `PINNED_FROZEN_SURFACE_HASHES`, `0010-early-depe
 
 ### Phase 4 — Generated Variants
 
-- [ ] [P4-T1] Run `scripts/dev_tools/generate_codex_agent_variants.py` in module form with `--check` and write `FEATURE/evidence/other/stage-i-cycle3-codex-check.<timestamp>.md`.
+- [x] [P4-T1] Run `scripts/dev_tools/generate_codex_agent_variants.py` in module form with `--check` and write `FEATURE/evidence/other/stage-i-cycle3-codex-check.<timestamp>.md`.
   - Acceptance: exit 0 with no reported drift; on drift, run the generator without `--check`, commit the regenerated files, and re-run until exit 0.
 
 ### Phase 5 — Final QA
