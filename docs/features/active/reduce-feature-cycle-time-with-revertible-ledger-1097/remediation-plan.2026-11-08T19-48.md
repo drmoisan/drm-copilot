@@ -82,7 +82,7 @@ Found by searching `tests/` for `PINNED_FROZEN_SURFACE_HASHES`, `0010-early-depe
 
 ### Phase 3 — Ledger Entry 0010
 
-- [ ] [P3-T1] Build the pre-0010 merged tree of `### Design Decision` in a scratch index (`GIT_INDEX_FILE` under `SCRATCH`, no worktree, ref, or commit) and write `FEATURE/evidence/other/stage-i-cycle3-pre0010.<timestamp>.md`.
+- [x] [P3-T1] Build the pre-0010 merged tree of `### Design Decision` in a scratch index (`GIT_INDEX_FILE` under `SCRATCH`, no worktree, ref, or commit) and write `FEATURE/evidence/other/stage-i-cycle3-pre0010.<timestamp>.md`.
   - Acceptance: the tree id is recorded; each modify path marked `equal` in [P0-T2] holds its `origin/main` blob; each created path is absent; the two pin values in the pre-0010 pin file equal the SHA-256 of the pre-0010 `.claude/agents/epic-orchestrator.md` and `.claude/skills/epic-orchestrate/SKILL.md` and equal `origin/main`'s pinned values.
 - [ ] [P3-T2] Regenerate `docs/engineering/process-reductions/patches/0010-early-dependent-starts.patch` as `git diff --binary --full-index --no-renames <pre-0010 tree> HEAD` over the paths of 0010 `## Files Changed` other than the ledger folder, and update `docs/engineering/process-reductions/0010-early-dependent-starts.md`, in one commit whose subject carries `reduction: 0010`.
   - `## Stored Patch`: add a paragraph beginning "Regenerated in remediation cycle 3" that names PR #1142 (#1138), the three conflicted files, the derivation, and why the later-landing rule does not apply; extend the Revert Order paragraph so the revert keeps #1142's `## Nesting Depth` sections, the Agent-tool preflight, and the `RE-BASELINED by issue #1138.` paragraph.
