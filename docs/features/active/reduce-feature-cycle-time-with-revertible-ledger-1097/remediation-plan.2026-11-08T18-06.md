@@ -66,7 +66,7 @@ Found by searching `tests/` for `PINNED_FROZEN_SURFACE_HASHES`, `0010-early-depe
 
 ### Phase 1 — Merge
 
-- [ ] [P1-T1] Merge `origin/main` into the branch with `git merge origin/main` and one merge commit, resolving the seven conflicted files keeping both sides, and write `FEATURE/evidence/other/stage-i-cycle1-merge.<timestamp>.md`.
+- [x] [P1-T1] Merge `origin/main` into the branch with `git merge origin/main` and one merge commit, resolving the seven conflicted files keeping both sides, and write `FEATURE/evidence/other/stage-i-cycle1-merge.<timestamp>.md`.
   - `.claude/skills/epic-run/SKILL.md` and `.agents/skills/epic-run/SKILL.md`: keep #1130's epic-child CI text and stage I's `early_start_on` paragraph of `## Scope`, each in its own section position; bundle copies are re-copied from their sources, not hand-merged.
   - `.claude/agents/epic-orchestrator.md`: keep #1129's wave CLI grant in `tools:` and its citation, and stage I's validator CLI grant and the `Exception (issue #1097)` paragraph of `## Wave Scheduling`; the bundle copy is re-copied.
   - `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`: keep main's `RE-BASELINED` paragraphs followed by the `RE-BASELINED by issue #1097.` paragraph (landing order); take main's digest values for now ([P2-T3] re-pins).
