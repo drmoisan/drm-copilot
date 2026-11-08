@@ -14,6 +14,7 @@ This ledger records every reduction of evidence, plan tasks, gates, or review pr
 | [0006](0006-test-suite-baseline-restored.md) | Test-suite baseline restored | 2026-11-07 | #1097 | Active |
 | [0007](0007-epic-main-sync-plain-merge.md) | Epic main-sync as a plain merge | 2026-11-07 | #1117 | Active |
 | [0008](0008-g13-guideline-cutoff.md) | G13 guideline cutoff | 2026-11-07 | #1097 | Active |
+| [0009](0009-less-evidence.md) | Less evidence and the CI cross-check | 2026-11-08 | #1097 | Active |
 
 A data row's ID cell is a link such as `[0001](0001-short-name.md)`, and its label equals the number of the linked file. Every entry file has one row, and every row has one entry file.
 

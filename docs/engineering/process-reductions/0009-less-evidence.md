@@ -7,7 +7,7 @@ Date: 2026-11-08
 Issue: #1097
 Merge commit: pending (PR #1097)
 
-Reduces review evidence in three places. The format, lint, and type-check results of one language are recorded in one final-QC static artifact per language instead of one artifact per step, and reviewers read that artifact instead of re-running those checks; each test gate keeps its own artifact. The reviewer records the CI result of `Enforce Python coverage thresholds` for the Python repo-wide total instead of computing it; the PowerShell and TypeScript repo-wide review rows stay. The policy-audit `Code Under Test` list and the section 9 commit and file lists are replaced by the merge base and the reviewed head, whose branch log and diff carry the same information; the heading `## 9. Summary of Changes` stays. In exchange the reviewer writes `## CI Cross-check` into the policy audit, and under `review_mode: "concurrent"` the orchestrator compares each row with CI at the join and turns a mismatch into a synthetic `autonomous` finding that the merge guard denies with `REVIEW_GATE_NOT_PASSED`. Until the pull request exists, the `Merge commit:` line carries the canonical issue number as a stand-in, and the orchestrator replaces it with the pull request number right after PR creation.
+Reduces review evidence in three places. The format, lint, and type-check results of one language are recorded in one final-QC static artifact per language instead of one artifact per step, and reviewers read that artifact instead of re-running those checks; each test gate keeps its own artifact. The reviewer records the CI result of `Enforce Python coverage thresholds` for the Python repo-wide total instead of computing it; the PowerShell and TypeScript repo-wide review rows stay. The policy-audit `Code Under Test` list and the section 9 commit and file lists are replaced by the merge base and the reviewed head, whose branch log and diff carry the same information; the heading `## 9. Summary of Changes` stays. In exchange the reviewer writes `## CI Cross-check` into the policy audit, and under `review_mode: "concurrent"` the orchestrator compares each row with CI at the join and turns a mismatch into a synthetic `autonomous` finding that the merge guard denies with `REVIEW_GATE_NOT_PASSED`. Until the pull request exists, the `Merge commit:` line carries the canonical issue number as a stand-in, and the orchestrator replaces it with the pull request number right after PR creation. After a session crash, the reduction landed across the crash checkpoint commit `c58c16243` and the commit whose subject carries `reduction: 0009`, as entry `0001` records a similar split; the stored patch is generated from the reduction's pre-image, so it does not depend on that split.
 
 ## Reason and Evidence
 
@@ -19,7 +19,62 @@ Installed assets (decision D9): installed MCP keeps serving the old policy-audit
 
 ## Files Changed
 
-FILES_CHANGED_PLACEHOLDER
+- `.claude/skills/atomic-plan-contract/SKILL.md`: source
+- `.agents/skills/atomic-plan-contract/SKILL.md`: source
+- `.github/skills/atomic-plan-contract/SKILL.md`: source
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`: byte-identical mirror of `.claude/skills/atomic-plan-contract/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md`: byte-identical mirror of `.agents/skills/atomic-plan-contract/SKILL.md`
+- `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md`: byte-identical mirror of `.github/skills/atomic-plan-contract/SKILL.md`
+- `.claude/skills/feature-review-workflow/SKILL.md`: source
+- `.agents/skills/feature-review-workflow/SKILL.md`: source
+- `.github/skills/feature-review-workflow/SKILL.md`: source
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md`: byte-identical mirror of `.claude/skills/feature-review-workflow/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md`: byte-identical mirror of `.agents/skills/feature-review-workflow/SKILL.md`
+- `extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md`: byte-identical mirror of `.github/skills/feature-review-workflow/SKILL.md`
+- `.claude/skills/orchestrate/SKILL.md`: source
+- `.agents/skills/orchestrate/SKILL.md`: source
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md`: byte-identical mirror of `.claude/skills/orchestrate/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrate/SKILL.md`: byte-identical mirror of `.agents/skills/orchestrate/SKILL.md`
+- `.claude/agents/atomic-planner.md`: source
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-planner.md`: byte-identical mirror of `.claude/agents/atomic-planner.md`
+- `.codex/agents/atomic-planner.toml`: source
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner.toml`: byte-identical mirror of `.codex/agents/atomic-planner.toml`
+- `.claude/agents/atomic-executor.md`: source
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md`: byte-identical mirror of `.claude/agents/atomic-executor.md`
+- `.codex/agents/atomic-executor.toml`: source
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor.toml`: byte-identical mirror of `.codex/agents/atomic-executor.toml`
+- `.claude/agents/feature-review.md`: source
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md`: byte-identical mirror of `.claude/agents/feature-review.md`
+- `.codex/agents/feature-review.toml`: source
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-review.toml`: byte-identical mirror of `.codex/agents/feature-review.toml`
+- `.codex/agents/atomic-planner-c1.toml`: generated Codex variant
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c1.toml`: generated Codex variant
+- `.codex/agents/atomic-planner-c2.toml`: generated Codex variant
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c2.toml`: generated Codex variant
+- `.codex/agents/atomic-planner-c3.toml`: generated Codex variant
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c3.toml`: generated Codex variant
+- `.codex/agents/atomic-planner-c3-elevated.toml`: generated Codex variant
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c3-elevated.toml`: generated Codex variant
+- `.codex/agents/atomic-planner-c4.toml`: generated Codex variant
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c4.toml`: generated Codex variant
+- `.codex/agents/atomic-executor-c1.toml`: generated Codex variant
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c1.toml`: generated Codex variant
+- `.codex/agents/atomic-executor-c2.toml`: generated Codex variant
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c2.toml`: generated Codex variant
+- `.codex/agents/atomic-executor-c3.toml`: generated Codex variant
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3.toml`: generated Codex variant
+- `.codex/agents/atomic-executor-c3-elevated.toml`: generated Codex variant
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3-elevated.toml`: generated Codex variant
+- `.codex/agents/atomic-executor-c4.toml`: generated Codex variant
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c4.toml`: generated Codex variant
+- `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`: source
+- `extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`: byte-identical mirror of `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`
+- `docs/features/templates/policy_audit/AGENTS.md`: source
+- `extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md`: byte-identical mirror of `docs/features/templates/policy_audit/AGENTS.md`
+- `tests/scripts/claude-runtime/less-evidence-contract.Tests.ps1`: created contract test
+- `docs/engineering/process-reductions/patches/0009-less-evidence.patch`: stored patch
+- `docs/engineering/process-reductions/0009-less-evidence.md`: this entry
+- `docs/engineering/process-reductions/README.md`: index row
 
 ## Stored Patch
 
