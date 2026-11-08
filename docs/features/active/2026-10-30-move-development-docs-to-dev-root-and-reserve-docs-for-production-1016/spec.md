@@ -347,6 +347,7 @@ The orchestrator recorded these rulings on 2026-10-31 after the stage B prefligh
 - **R2 (answers that re-enter planning).** An OQ-6 answer that removes the fallback conflicts with the D-15 criterion that frozen fixtures pass through the fallback, and an OQ-9 answer that requests an extension command needs design that stage A does not contain. Either answer halts stage B at its owner-answer mapping task, and the stage B plan receives one revision for it. This halt is an accepted branch, not a plan gap.
 - **R3 (fixtures).** The stage B decision file lists `tests/fixtures/**` in `rewrite_exclusions`, so non-JSON fixtures that record past runs are frozen together with the D-15 JSON fixtures.
 - **R4 (post-apply verification).** The post-apply idempotence check runs the tool in dry-run mode, which never applies the apply-mode refusals. It uses a decision file derived mechanically in `SCRATCH` from the approved file: `decisions` empty, and `rewrite_exclusions` mapped through the mapping table and the approved rename map. It asserts zero moves, zero renames and zero rewrite candidates outside the excluded files.
+- **R6 (scope-diff base).** This child merges into the integration branch, so the no-new-Python and language-scope diffs are anchored on the merge base of `origin/epic/shared-agent-harness-layer-integration` and `HEAD`, not on `origin/main`. Commits from other children are therefore not counted against this child.
 - **R5 (execution split).** Stage B pauses for the orchestrator's checkpoint path update after the self-move. Epic execution therefore delegates stage B as two executor runs: the phases up to and including the apply and checkpoint handoff, then the remaining phases.
 
 ## Owner Questions
@@ -388,7 +389,7 @@ Recorded as questions only. None is decided by this spec.
 - [ ] `extensions/drm-copilot/jest.config.cjs` has a `coverageThreshold` entry with `lines: 85` and `branches: 75` for each new production file, and coverage evidence for the changed TypeScript code meets those thresholds, recorded under `<FEATURE>/evidence/qa-gates/`.
 - [ ] `packages/mcp-server/README.md` and `extensions/drm-copilot/README.md` document the tool inputs, the `npx` subcommand and the decision-file requirement for apply mode.
 - [ ] A dry run against this repository from a branch build writes `<FEATURE>/evidence/other/dev-docs-migration-dry-run.<UTC>.md` and `.json`, the JSON contains a `source_digest` and a `decision_skeleton`, and `git status` after the run shows no change outside `<FEATURE>/evidence/other/`.
-- [ ] The stage A change adds no Python file, no PowerShell hook and no bash script, recorded by a name-status diff against `origin/main` stored under `<FEATURE>/evidence/qa-gates/`.
+- [ ] The stage A change adds no Python file, no PowerShell hook and no bash script, recorded by a name-status diff against the merge base of the integration branch and `HEAD` (ruling R6) stored under `<FEATURE>/evidence/qa-gates/`.
 - [ ] The seven-stage toolchain passes in a single pass for the changed TypeScript, and no changed production file exceeds 800 lines.
 - [ ] A Phase 0 evidence artifact under `<FEATURE>/evidence/baseline/` records that the parallel run `bugs-1001-1002-1003-1006` and epic children 1 to 6 have merged, and that each named file, symbol and heading was re-checked against `origin/main` and the integration branch before any edit.
 
@@ -413,7 +414,7 @@ Recorded as questions only. None is decided by this spec.
 - [ ] A recorded search over production roots (`.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts`, `extensions/drm-copilot/src`) for `docs/features`, `docs/research`, `docs/engineering` and `docs/discovery` returns only child 2's resolver constants, its matcher unions and recorded Stay or exclusion entries; a link check over moved Markdown reports no link broken by the move; command, output and allowlist are stored under `<FEATURE>/evidence/other/`.
 - [ ] The orchestrator checkpoint records the post-move `<FEATURE>` path, and every stage B evidence artifact written after the move is under that path.
 - [ ] The seven-stage toolchain passes in a single pass for TypeScript, Python and PowerShell with the key at `.dev`, recorded under `<FEATURE>/evidence/qa-gates/`, and no changed production file exceeds 800 lines.
-- [ ] The stage B change adds no Python file; any Python change is an in-place edit of an existing file, recorded by a name-status diff against `origin/main` stored under `<FEATURE>/evidence/qa-gates/`.
+- [ ] The stage B change adds no Python file; any Python change is an in-place edit of an existing file, recorded by a name-status diff against the merge base of the integration branch and `HEAD` (ruling R6) stored under `<FEATURE>/evidence/qa-gates/`.
 - [ ] Each `global_decisions` answer that implies a stage B task (OQ-3, OQ-4, OQ-5, OQ-6, OQ-8, OQ-9, OQ-10, OQ-11) is either implemented with a named test or evidence artifact, or recorded as requiring no change, in the stage B completion evidence.
 
 ### Epic-level criteria owned by this child (promoted record)
