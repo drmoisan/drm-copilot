@@ -40,6 +40,21 @@ Third-party UI steps (for example Azure portal / Entra admin center, Outlook des
 
 Per OD-45-5, the MCP-first / web-second ordering is mandatory for third-party UI navigation. Non-UI CLI steps (for example `az` commands) do not require the UI ordering, but every step type — UI and CLI alike — MUST carry a current, dated citation in the Source-and-Citation section. A runbook step without a dated source is not contract-conformant.
 
+## Tool Command Version Rule
+
+Every tool command in a runbook is either checked against the version pinned in the repository's lockfile or marked as not verified, with the pinned version stated. The `validate-human-exception-runbook-output.ps1` SubagentStop hook enforces honest marking; it does not check that a flag is correct.
+
+- **Counted fences.** A fenced block whose info string is empty or one of `sh`, `bash`, `shell`, `console`, `powershell`, `pwsh`, `ps1`, `cmd`, `bat` is counted. Blocks with any other info string (for example `text`, `json`, `output`) are exempt. A line ending in `\`, a backtick, or `^` joins the next line into one command. Each non-blank, non-comment command of a counted block is split into segments on `&&`, `||`, `;`, and `|` outside quotes, and each segment's tool needs a marker. Leading `NAME=value` assignments are skipped, and a segment starting with `cd`, `pushd`, `popd`, `export`, `set`, `source`, `.`, `echo`, or `$env:` names no tool.
+- **Marker lines.** Immediately after the closing fence (no blank line between), write one `Version check:` line per distinct tool of the block, in one of three forms:
+  - `Version check: verified against <tool> <version>`
+  - `Version check: not verified against <tool> <version>`
+  - `Version check: <tool> not pinned in this repository`
+- **Version source.** The `<version>` is the version pinned in the lockfile at the top level of the item worktree (`poetry.lock`, `uv.lock`, `package-lock.json`, or `requirements*.txt`). Use the `not pinned` form only for a tool that no lockfile pins.
+- **`verified` needs a citation.** Use `verified` only when the command was checked against documentation or help for exactly the pinned version, and cite that source with the version in the Source and Citation section. Otherwise use `not verified`.
+- **Return line.** The agent ends its final message with `runbook_path: <path>` so the hook can read the written runbook.
+
+A counted block with a tool that has no marker, a marker naming a version other than the pinned version, a `not pinned` marker for a pinned tool, or a malformed `Version check:` line is a hook finding, and the hook blocks until every finding is repaired.
+
 ## Conformance
 
 A runbook is contract-conformant when:
@@ -47,6 +62,7 @@ A runbook is contract-conformant when:
 - it lives at `<FEATURE>/runbooks/<name>.runbook.md`,
 - it contains all five required sections (Cue, Prerequisites, Step-by-step Instructions, Verification, Source and Citation),
 - its Source-and-Citation section records at least one source URL and a capture date,
-- third-party UI steps were sourced MCP-first / web-second.
+- third-party UI steps were sourced MCP-first / web-second,
+- every counted shell block carries `Version check:` marker lines per the Tool Command Version Rule.
 
 A self-contained, conformant example is provided at `.claude/skills/human-exception-runbook/example.runbook.md`.
