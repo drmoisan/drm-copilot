@@ -33,7 +33,8 @@
     artifacts/orchestration/orchestrator-state.json.
 
 .PARAMETER ReviewArtifact
-    The committed policy audit of the PASS review; required by mode Review.
+    The committed policy audit of the PASS review, which must be the newest policy audit of the
+    feature folder at the live head; required by mode Review.
 #>
 [CmdletBinding(PositionalBinding = $false)]
 param(
