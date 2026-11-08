@@ -69,7 +69,7 @@
 
 ### Phase 6 — Main Sync
 
-- [ ] [P6-T1] `git fetch origin` and merge `origin/main` into the branch with a plain merge; resolve every conflict by keeping `main`'s text everywhere except this item's wave-layering sentences, tool entries, and additions (#1130 edits other parts of the same epic files); when either pinned surface differs after the merge, recompute its digest from the merged LF bytes and extend the `RE-BASELINED by issue #1129.` paragraph, keeping every note `main` added. Acceptance: `git merge-base --is-ancestor origin/main HEAD` exits 0, `git diff --name-only --diff-filter=U` lists nothing, and `git status --porcelain` is empty after the merge commit; `<FEATURE>/evidence/other/main-sync.<timestamp>.md` lists each conflicted path and its resolution, or `none`.
+- [x] [P6-T1] `git fetch origin` and merge `origin/main` into the branch with a plain merge; resolve every conflict by keeping `main`'s text everywhere except this item's wave-layering sentences, tool entries, and additions (#1130 edits other parts of the same epic files); when either pinned surface differs after the merge, recompute its digest from the merged LF bytes and extend the `RE-BASELINED by issue #1129.` paragraph, keeping every note `main` added. Acceptance: `git merge-base --is-ancestor origin/main HEAD` exits 0, `git diff --name-only --diff-filter=U` lists nothing, and `git status --porcelain` is empty after the merge commit; `<FEATURE>/evidence/other/main-sync.<timestamp>.md` lists each conflicted path and its resolution, or `none`.
 
 ### Phase 7 — Final QA
 
