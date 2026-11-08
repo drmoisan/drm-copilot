@@ -143,6 +143,48 @@ Describe 'Gather functions' {
         $report.WaveParallelSeconds | Should -Be (420 + 3600 + 300 + 2700)
     }
 
+    Context 'merged item anchors' {
+        BeforeAll {
+            function Get-TestAnchorItem {
+                # One item with a one-task unchecked plan and an empty checkpoint.
+                param([string] $Issue, [string] $MergeStatus, [string] $PrState = '')
+                $checkpoint = ConvertFrom-Json -InputObject '{}'
+                [pscustomobject]@{
+                    Issue = $Issue; Wave = 1; Band = 'small'; Checkpoint = $checkpoint; EpicRow = $null
+                    PlanText = '- [ ] [P0-T1] a.'; PlanFile = 'plan.md'; CycleText = @{}; SpecExists = $true
+                    MergeStatus = $MergeStatus; PrState = $PrState; PreparedPlan = $false; Blockage = (Get-EpicProgressBlockage -Checkpoint $checkpoint -MergeStatus $MergeStatus)
+                }
+            }
+        }
+
+        It 'drops the stored anchor of a merged item and keeps an unmerged one' {
+            # Both items hold a stored plan.md anchor with no checked task; #77 ticks nothing, so only
+            # the removal of the merged #12 entry changes the items table.
+            $items = @(
+                Get-TestAnchorItem -Issue '12' -MergeStatus 'merged' -PrState '#7 MERGED'
+                Get-TestAnchorItem -Issue '77' -MergeStatus 'pr_open'
+            )
+            $anchor = '{"plans":{"plan.md":{"checked":[],"lastTickUnixSeconds":1767610800}},"blockedSinceUnixSeconds":null}'
+            $state = ConvertFrom-EpicProgressStateText -Text ('{"version":2,"items":{"12":' + $anchor + ',"77":' + $anchor + '}}')
+
+            # 2026-01-05T12:00:00Z.
+            $report = Get-EpicProgressStepReport -Item $items -EpicIssue '42' -State $state -NowUnixSeconds 1767614400 -Default (Resolve-EpicProgressStepDefault)
+
+            $report.Items.ContainsKey('12') | Should -BeFalse
+            $report.Items.ContainsKey('77') | Should -BeTrue
+            $report.ItemsChanged | Should -BeTrue
+        }
+
+        It 'leaves ItemsChanged false for a merged item with no stored entry' {
+            $state = ConvertFrom-EpicProgressStateText -Text '{"version":2,"items":{}}'
+
+            $report = Get-EpicProgressStepReport -Item @(Get-TestAnchorItem -Issue '12' -MergeStatus 'merged' -PrState '#7 MERGED') -EpicIssue '42' -State $state -NowUnixSeconds 1767614400 -Default (Resolve-EpicProgressStepDefault) -NoEpicStep
+
+            $report.Items.Count | Should -Be 0
+            $report.ItemsChanged | Should -BeFalse
+        }
+    }
+
     Context 'in-progress execution start' {
         BeforeAll {
             function Get-TestExecutionReport {

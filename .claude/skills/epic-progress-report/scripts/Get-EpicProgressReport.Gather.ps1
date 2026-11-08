@@ -211,7 +211,9 @@ function Get-EpicProgressStepReport {
         split, an in-progress execution step of that plan file that carries a start takes the
         later of that start and the plan anchor's LastTickUnixSeconds (the anchor as updated by
         this run), so the running task is timed from the last checked task rather than from the
-        start of the whole execution stage. ResetBaseline clears every
+        start of the whole execution stage. An item whose merge step is done has no entry in
+        the returned Items table, and ItemsChanged is set for it only when the stored state held
+        an entry for it; the duration ledger keeps its samples. ResetBaseline clears every
         blocked span and keeps the ledger and the anchors (decision D10). Unless NoEpicStep is
         set, the epic-level steps and the main-sync samples are added. The ledger is merged
         once, and the estimate is computed over every step; the wave-parallel figure combines
@@ -307,7 +309,13 @@ function Get-EpicProgressStepReport {
         if ($record.Blockage.Blocked -and $null -eq $since) { $entry.BlockedSinceUnixSeconds = $NowUnixSeconds; $itemsChanged = $true }
         if (-not $record.Blockage.Blocked -and $null -ne $since) { $entry.BlockedSinceUnixSeconds = $null; $itemsChanged = $true }
         if ($null -ne $entry.BlockedSinceUnixSeconds) { $blockedSince[$issue] = $entry.BlockedSinceUnixSeconds }
-        if ($entry.Plans.Count -eq 0 -and $null -eq $entry.BlockedSinceUnixSeconds) { $items.Remove($issue) }
+        if (@($steps | Where-Object { $_.Type -eq 'merge' -and $_.Status -eq 'done' }).Count -gt 0) {
+            # A merged item keeps no state entry, so the state file does not grow with merged items.
+            if ($State.Items.ContainsKey($issue)) { $itemsChanged = $true }
+            $items.Remove($issue)
+        } elseif ($entry.Plans.Count -eq 0 -and $null -eq $entry.BlockedSinceUnixSeconds) {
+            $items.Remove($issue)
+        }
 
         $count = Get-EpicProgressStepCount -Step $steps
         $featureState = Get-EpicProgressFeatureState -MergeStatus $record.MergeStatus -PrState $record.PrState -Done (Get-EpicProgressTaskCount -PlanText ([string] $record.PlanText)).Done
