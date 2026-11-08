@@ -138,15 +138,20 @@ Describe 'Resolve-OrchestratorOutputItemTarget' {
     It 'forwards the reader and list seams only when they are supplied' {
         # Arrange
         $bound = [System.Collections.Generic.List[string]]::new()
-        Mock Resolve-SubagentStopTargetWorktree { $bound.Add((@($PesterBoundParameters.Keys) | Sort-Object) -join ','); [pscustomobject]@{ WorktreeRoot = '/synthetic-worktrees/main'; Source = 'SessionRoot'; ReasonCode = $null; Detail = 'x' } }.GetNewClosure()
+        Mock Resolve-SubagentStopTargetWorktree {
+            param($Envelope, $AdvertisedPath, $SessionRoot, $ReadTranscriptHead, $WorktreeListInvoker, $CheckpointIssueReader)
+            $null = $Envelope, $AdvertisedPath, $SessionRoot, $CheckpointIssueReader
+            $bound.Add(('{0},{1}' -f ($null -ne $ReadTranscriptHead), ($null -ne $WorktreeListInvoker)))
+            [pscustomobject]@{ WorktreeRoot = '/synthetic-worktrees/main'; Source = 'SessionRoot'; ReasonCode = $null; Detail = 'x' }
+        }.GetNewClosure()
 
         # Act
         $null = Resolve-OrchestratorOutputItemTarget -ArtifactType 'orchestrator-state' -Envelope $script:Envelope -AgentOutput 'Done.' -CheckpointPath $script:Leaf -SessionRoot $script:SessionRoot
         $null = Invoke-ItemTarget -Reader (Get-TranscriptReader -Prompt 'branch: main')
 
         # Assert
-        $bound[0] | Should -Be 'Envelope,SessionRoot'
-        $bound[1] | Should -Be 'Envelope,ReadTranscriptHead,SessionRoot,WorktreeListInvoker'
+        $bound[0] | Should -Be 'False,False'
+        $bound[1] | Should -Be 'True,True'
     }
 }
 

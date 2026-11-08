@@ -159,7 +159,7 @@ Describe 'validate-orchestrator-output orchestrator-state target worktree (issue
     It 'H7 places an issue-line-only prompt through the item checkpoint issue and reads the item path' {
         # Arrange
         $itemPath = $script:ItemPath
-        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { if ($Path -eq $itemPath) { '{"issue-num":"1145"}' } else { $null } }.GetNewClosure()
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { param([string] $Path) if ($Path -eq $itemPath) { '{"issue-num":"1145"}' } else { $null } }.GetNewClosure()
 
         # Act
         $outcome = Invoke-Case -Prompt 'Canonical issue number for this feature is 1145.' -Map @{ $script:ItemPath = $script:Valid }
@@ -228,7 +228,7 @@ Describe 'validate-orchestrator-output orchestrator-state target worktree (issue
         $interaction = '"human_interaction":{"requirements":[{"response":"exception","runbook_path":"docs/runbooks/item.runbook.md"}]}'
         $text = '{"objective":"run","completed_steps":["S1"],"next_step":"complete","last_updated":"2026-11-08T00:00:00Z","feature-folder":"' + $folder + '",' + $adoption + ',' + $interaction + '}'
         $probed = [System.Collections.Generic.List[string]]::new()
-        Mock Test-OrchestratorOutputRunbookFile { $probed.Add($Path); $true }.GetNewClosure()
+        Mock Test-OrchestratorOutputRunbookFile { param([string] $Path) $probed.Add($Path); $true }.GetNewClosure()
 
         # Act
         $outcome = Invoke-Case -Map @{ $script:ItemPath = $text }
