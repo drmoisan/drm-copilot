@@ -318,6 +318,47 @@ Describe 'Invoke-ProcessReductionChain' {
         $result.FinalText['.codex/agents/x-c1.toml'] | Should -BeExactly "new`n"
     }
 
+    It 'PRC-CHAIN-DERIVED-CREATED-COPY-ENDS-ABSENT sets a created bundle copy absent with <Case>' -ForEach @(
+        @{ Case = 'a copy hunk equal to the source text'; CopyLine = 'created' },
+        @{ Case = 'a stale copy hunk that differs from the source text'; CopyLine = 'stale' }
+    ) {
+        # Arrange: the patch creates a hook and its bundle copy; the live copy equals the source, so the copy is derived
+        $source = '.claude/hooks/x.ps1'
+        $copy = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/x.ps1'
+        $patch = @(
+            "diff --git a/$source b/$source", 'new file mode 100644', '--- /dev/null', "+++ b/$source", '@@ -0,0 +1 @@', '+created',
+            "diff --git a/$copy b/$copy", 'new file mode 100644', '--- /dev/null', "+++ b/$copy", '@@ -0,0 +1 @@', "+$CopyLine"
+        ) -join "`n"
+        $entry = Get-TestEntry -Name '0001-a.md' -Patch
+        $liveText = @{ $source = "created`n"; $copy = "created`n" }
+
+        # Act
+        $result = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{ '0001-a.patch' = $patch } -LiveText $liveText
+
+        # Assert
+        $result.IsValid | Should -BeTrue -Because ($result.Errors -join '; ')
+        $result.FinalText.ContainsKey($source) | Should -BeTrue
+        $result.FinalText.ContainsKey($copy) | Should -BeTrue
+        $result.FinalText[$source] | Should -BeNullOrEmpty
+        $result.FinalText[$copy] | Should -BeNullOrEmpty -Because 'a created copy cannot outlive the revert of its created source'
+    }
+
+    It 'PRC-CHAIN-DERIVED-MODIFIED-BUNDLE-SKIPPED leaves a bundle copy with a stale modify hunk to revert step 2' {
+        # Arrange: the copy's modify hunk is stale, so reverting it would fail
+        $source = '.claude/hooks/x.ps1'
+        $copy = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/x.ps1'
+        $patch = Get-TestPatchSection -Path $copy -Start 1 -Removed @('old') -Added @('stale')
+        $entry = Get-TestEntry -Name '0001-a.md' -Patch
+        $liveText = @{ $source = "new`n"; $copy = "new`n" }
+
+        # Act
+        $result = Invoke-ProcessReductionChain -Entry @($entry) -PatchText @{ '0001-a.patch' = $patch } -LiveText $liveText
+
+        # Assert
+        $result.IsValid | Should -BeTrue -Because ($result.Errors -join '; ')
+        $result.FinalText[$copy] | Should -BeExactly "new`n"
+    }
+
     It 'PRC-CHAIN-END-STATE-PREIMAGES reports a pre-image of the oldest entry that is missing at the end' {
         $blocks = @((Get-TestBlock -Path 'docs/a.md' -Current 'b' -Prior 'x'), (Get-TestBlock -Path 'docs/a.md' -Current 'x' -Prior 'y'))
         $entry = Get-TestEntry -Name '0001-a.md' -Block $blocks
