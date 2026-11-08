@@ -90,7 +90,7 @@ Found by searching `tests/` for `PINNED_FROZEN_SURFACE_HASHES`, `0010-early-depe
   - Question: an early-started dependent reaches `pr_open` only after its sync merge, so its CI must be verified on the post-sync live head (`ci_gate.head_sha` equal to that head). The check confirms that no early-start step allows a merge on pre-sync CI, and that the wave-barrier hooks and the merge gate share no edited function.
   - Fix route: a contradiction is fixed in the early-start section of both epic-orchestrate skills and their bundle copies (decision D7 unchanged).
   - Acceptance: the artifact records `no contradiction` or the fix, with the symbols read.
-- [ ] [P2-T3] Re-pin `PINNED_FROZEN_SURFACE_HASHES` in `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` to the SHA-256 of the merged `.claude/agents/epic-orchestrator.md` and `.claude/skills/epic-orchestrate/SKILL.md`, after Phase 2 edits.
+- [x] [P2-T3] Re-pin `PINNED_FROZEN_SURFACE_HASHES` in `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` to the SHA-256 of the merged `.claude/agents/epic-orchestrator.md` and `.claude/skills/epic-orchestrate/SKILL.md`, after Phase 2 edits.
   - Comment paragraphs stay as [P1-T1] left them; no paragraph is added.
   - Acceptance: each pinned value equals the lowercase SHA-256 of its file (script under `SCRATCH`, recorded in `FEATURE/evidence/other/stage-i-cycle1-pins.<timestamp>.md`); `test_frozen_epic_surface_matches_pinned_baseline_digest` is read from the [P5-T5] gate.
 
