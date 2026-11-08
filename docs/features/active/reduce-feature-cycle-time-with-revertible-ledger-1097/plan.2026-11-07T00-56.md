@@ -77,7 +77,7 @@ The bounded child return keeps its eight fields; the parent reads the child key 
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Capture static baselines and write `FEATURE/evidence/baseline/stage-i-powershell-static.<timestamp>.md`, `FEATURE/evidence/baseline/stage-i-python-static.<timestamp>.md`, and `FEATURE/evidence/baseline/stage-i-typescript-static.<timestamp>.md`.
+- [x] [P0-T1] Capture static baselines and write `FEATURE/evidence/baseline/stage-i-powershell-static.<timestamp>.md`, `FEATURE/evidence/baseline/stage-i-python-static.<timestamp>.md`, and `FEATURE/evidence/baseline/stage-i-typescript-static.<timestamp>.md`.
   - PowerShell: PoshQC format check-only with a no-op `-WriteFile` and a direct `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over `.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1`, both `enforce-epic-wave-barrier.ps1` gates, and `tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1`. Python: Black check, Ruff without fixing, Pyright on the edited module. TypeScript: Prettier check, ESLint without fixing, and the compiler type check in `extensions/drm-copilot/`.
   - Acceptance: each artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` with the files needing format and the finding count per tool; `git status --porcelain` is empty after the task's commit.
 - [ ] [P0-T2] Run one `Invoke-PoshQCParallelTest` as the `Phase 0 baseline` and write `FEATURE/evidence/baseline/stage-i-powershell-test.<timestamp>.md`.
