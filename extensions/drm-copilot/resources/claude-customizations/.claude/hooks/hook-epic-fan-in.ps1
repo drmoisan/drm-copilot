@@ -1,6 +1,7 @@
 <#
 .SYNOPSIS
-    Post-fan-in allowance of the preimplementation gate's epic scope (issue #1136).
+    Post-fan-in (issue #1136) and merged-feature follow-up (issue #1141) allowances of the
+    preimplementation gate's epic scope.
 
 .DESCRIPTION
     Dot-sourced by enforce-orchestration-preimplementation-gate-epic-scope.ps1 on the Claude
@@ -22,6 +23,10 @@
     - Get-EpicFanInAllowance: the decision for one call, given an already-resolved scope
       object and an injected staged-index reader. It is the reuse seam for the follow-up
       findings 3 and 9 of issue #1136.
+    - Get-EpicMergedFeatureFollowUpAllowance (issue #1141): before fan-in, admits Write/Edit,
+      git add, and git commit calls whose paths all lie under the docs folders of a merged
+      feature (Get-EpicMergedFeatureRoots, Test-EpicMergedFeaturePath) or are the status
+      document; the epic checkpoint entry is the only evidence.
 
 .NOTES
     PowerShell 7+. Pure: no disk, process, environment, or clock access; the staged index is
@@ -367,6 +372,116 @@ function Get-EpicFanInAllowance {
             return [pscustomobject]@{ Allowed = $false; Detail = 'staged index is not exactly the status document' }
         }
         return [pscustomobject]@{ Allowed = $true; Detail = 'command leg modelled' }
+    } catch {
+        return [pscustomobject]@{ Allowed = $false; Detail = "allowance error: $($_.Exception.Message)" }
+    }
+}
+
+function Get-EpicMergedFeatureRoots {
+    <#
+    .SYNOPSIS
+        Return the follow-up roots of the merged features of an epic checkpoint (issue #1141).
+    .DESCRIPTION
+        For each features entry with a terminal merge_status, a plain feature_folder basename
+        after one optional docs/features/active/ or docs/features/completed/ prefix, a
+        merge_commit_sha of 40 or 64 lowercase hex characters, and an integer pr_number above
+        0: docs/features/active/<basename>/ and docs/features/completed/<basename>/. The status
+        document is added when at least one feature qualifies.
+    .OUTPUTS
+        System.String
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Justification = 'The issue #1141 specification fixes this name; it returns a set of roots.')]
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([AllowNull()][object] $Checkpoint)
+
+    $roots = [System.Collections.Generic.List[string]]::new()
+    $property = if ($null -ne $Checkpoint) { $Checkpoint.PSObject.Properties['features'] }
+    $features = @(if ($null -ne $property -and $null -ne $property.Value) { $property.Value })
+    foreach ($feature in $features) {
+        if ($null -eq $feature) { continue }
+        $status = Get-EpicFanInPropertyText -InputObject $feature -Name 'merge_status'
+        $basename = [string](Get-EpicFanInPropertyText -InputObject $feature -Name 'feature_folder') -creplace '^docs/features/(active|completed)/', ''
+        $sha = $feature.PSObject.Properties['merge_commit_sha']
+        $pr = $feature.PSObject.Properties['pr_number']
+        if ($script:EpicFanInTerminalMergeStatuses -cnotcontains $status -or $basename -cnotmatch $script:EpicFanInSlugPattern) { continue }
+        if ($null -eq $sha -or $sha.Value -isnot [string] -or $sha.Value -cnotmatch '^([0-9a-f]{40}|[0-9a-f]{64})\z') { continue }
+        if ($null -eq $pr -or -not ($pr.Value -is [int] -or $pr.Value -is [long]) -or $pr.Value -le 0) { continue }
+        $roots.Add("docs/features/active/$basename/")
+        $roots.Add("docs/features/completed/$basename/")
+    }
+    $statusDoc = Get-EpicFanInStatusDocRelativePath -Checkpoint $Checkpoint
+    if ($roots.Count -gt 0 -and $null -ne $statusDoc) { $roots.Add($statusDoc) }
+    return $roots.ToArray()
+}
+
+function Test-EpicMergedFeaturePath {
+    <#
+    .SYNOPSIS
+        Report whether a worktree-relative path lies under a merged-feature follow-up root.
+    .DESCRIPTION
+        False for a blank path, a backslash, a glob character, a leading slash, or a . or ..
+        segment. A root ending in / admits a path that starts with it and has a non-empty
+        remainder; any other root admits only an equal path. Matching is case-sensitive.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [AllowNull()][AllowEmptyString()][string] $RelativePath,
+        [AllowNull()][AllowEmptyCollection()][string[]] $Root
+    )
+
+    if ([string]::IsNullOrWhiteSpace($RelativePath) -or $RelativePath.StartsWith('/', [StringComparison]::Ordinal)) { return $false }
+    if ($RelativePath.IndexOfAny([char[]]@([char]92, '*', '?', '[')) -ge 0) { return $false }
+    if (@($RelativePath.Split('/') | Where-Object { $_ -ceq '.' -or $_ -ceq '..' }).Count -gt 0) { return $false }
+    foreach ($candidate in @($Root)) {
+        if ([string]::IsNullOrEmpty($candidate)) { continue }
+        if (-not $candidate.EndsWith('/', [StringComparison]::Ordinal)) {
+            if ($RelativePath -ceq $candidate) { return $true }
+        } elseif ($RelativePath.Length -gt $candidate.Length -and $RelativePath.StartsWith($candidate, [StringComparison]::Ordinal)) {
+            return $true
+        }
+    }
+    return $false
+}
+
+function Get-EpicMergedFeatureFollowUpAllowance {
+    <#
+    .SYNOPSIS
+        Decide whether a call is a follow-up on a merged epic feature (issue #1141).
+    .DESCRIPTION
+        Allowed only when route_id is epic, integration_branch equals Scope.Branch, the
+        checkpoint yields merged-feature roots, and Get-EpicFanInAllowance admits the call with
+        both predicates bound to Test-EpicMergedFeaturePath over those roots. Fan-in
+        completeness is not required; only the scope object is read. Any error answers not
+        allowed.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject with Allowed and Detail.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [AllowNull()][object] $Scope,
+        [AllowNull()][AllowEmptyCollection()][AllowEmptyString()][string[]] $FilePath,
+        [AllowNull()][AllowEmptyString()][string] $Command,
+        [AllowNull()][scriptblock] $StagedIndexReader
+    )
+
+    try {
+        if ($null -eq $Scope) { return [pscustomobject]@{ Allowed = $false; Detail = 'no resolved scope' } }
+        $checkpoint = $Scope.Checkpoint
+        $integrationBranch = Get-EpicFanInPropertyText -InputObject $checkpoint -Name 'integration_branch'
+        if ((Get-EpicFanInPropertyText -InputObject $checkpoint -Name 'route_id') -cne $script:EpicFanInRouteId -or
+            [string]::IsNullOrWhiteSpace($integrationBranch) -or $integrationBranch -cne [string]$Scope.Branch) {
+            return [pscustomobject]@{ Allowed = $false; Detail = 'not the epic integration branch' }
+        }
+        # The predicate reads $mergedFeatureRoots through the caller scope chain when Get-EpicFanInAllowance invokes it.
+        $mergedFeatureRoots = @(Get-EpicMergedFeatureRoots -Checkpoint $checkpoint)
+        if ($mergedFeatureRoots.Count -eq 0) { return [pscustomobject]@{ Allowed = $false; Detail = 'no merged feature qualifies' } }
+        $predicate = { param([string] $Path) Test-EpicMergedFeaturePath -RelativePath $Path -Root $mergedFeatureRoots }
+        return (Get-EpicFanInAllowance -Scope $Scope -FilePath $FilePath -Command $Command -StagedIndexReader $StagedIndexReader -PathPredicate $predicate -OperandPredicate $predicate)
     } catch {
         return [pscustomobject]@{ Allowed = $false; Detail = "allowance error: $($_.Exception.Message)" }
     }
