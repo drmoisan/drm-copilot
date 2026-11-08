@@ -244,19 +244,20 @@ Describe 'Invoke-ReviewVerdictCli defaults and limits' {
 
 Describe 'Entry-point seams and output' {
     It 'routes the gh and git seams through the native command wrapper' {
-        Mock Invoke-ReviewVerdictNativeCommand { param([string] $Command, [string[]] $Arguments) return [pscustomobject]@{ ExitCode = 0; Output = (@($Command) + $Arguments) -join ' ' } }
-        (Invoke-ReviewVerdictGhExe -GhArgs @('pr', 'view', '42')).Output | Should -Be 'gh pr view 42'
-        (Invoke-ReviewVerdictGitExe -GitArgs @('cat-file', '-e', 'x')).Output | Should -Be 'git cat-file -e x'
+        Mock Invoke-ReviewVerdictNativeCommand { param([scriptblock] $Invocation, [string[]] $Arguments) return [pscustomobject]@{ ExitCode = 0; Output = "$($Invocation.ToString().Trim())|$($Arguments -join ' ')" } }
+        (Invoke-ReviewVerdictGhExe -GhArgs @('pr', 'view', '42')).Output | Should -Be 'param([string[]] $ToolArgs) & gh @ToolArgs|pr view 42'
+        (Invoke-ReviewVerdictGitExe -GitArgs @('cat-file', '-e', 'x')).Output | Should -Be 'param([string[]] $ToolArgs) & git @ToolArgs|cat-file -e x'
     }
 
     It 'returns stdout lines and drops error records in the native command wrapper' {
-        # A PowerShell function stands in for the executable, so no process starts.
-        function Get-ReviewVerdictFakeToolOutput {
-            "args: $($args -join ',')"
+        # An in-memory block stands in for the executable, so no process starts.
+        $fakeTool = {
+            param([string[]] $ToolArgs)
+            "args: $($ToolArgs -join ',')"
             'second'
             [System.Management.Automation.ErrorRecord]::new([System.Exception]::new('noise'), 'FakeTool', [System.Management.Automation.ErrorCategory]::NotSpecified, $null)
         }
-        $result = Invoke-ReviewVerdictNativeCommand -Command 'Get-ReviewVerdictFakeToolOutput' -Arguments @('a', 'b')
+        $result = Invoke-ReviewVerdictNativeCommand -Invocation $fakeTool -Arguments @('a', 'b')
         $result.Output | Should -Be "args: a,b`nsecond"
         $result.PSObject.Properties.Name | Should -Contain 'ExitCode'
     }

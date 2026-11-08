@@ -55,16 +55,16 @@ $script:ReviewVerdictFactLimit = 16
 function Invoke-ReviewVerdictNativeCommand {
     <#
     .SYNOPSIS
-        Run one command with arguments and return ExitCode and the stdout lines joined as Output.
+        Run one invocation block with arguments and return ExitCode and the stdout lines as Output.
     .DESCRIPTION
-        The only process start of the script. Error records on the merged stream are dropped, so
-        Output holds stdout only.
+        The only process start of the script: each seam passes a block that names its executable
+        literally. Error records on the merged stream are dropped, so Output holds stdout only.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
-    param([string] $Command, [string[]] $Arguments)
+    param([scriptblock] $Invocation, [string[]] $Arguments)
 
-    $all = @(& $Command @Arguments 2>&1)
+    $all = @(& $Invocation $Arguments 2>&1)
     return [pscustomobject]@{ ExitCode = [int](Get-Variable -Name 'LASTEXITCODE' -Scope Global -ValueOnly -ErrorAction Ignore); Output =(@($all | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] }) -join "`n") }
 }
 
@@ -77,7 +77,7 @@ function Invoke-ReviewVerdictGhExe {
     [OutputType([pscustomobject])]
     param([string[]] $GhArgs)
 
-    return Invoke-ReviewVerdictNativeCommand -Command 'gh' -Arguments $GhArgs
+    return Invoke-ReviewVerdictNativeCommand -Invocation { param([string[]] $ToolArgs) & gh @ToolArgs } -Arguments $GhArgs
 }
 
 function Invoke-ReviewVerdictGitExe {
@@ -89,7 +89,7 @@ function Invoke-ReviewVerdictGitExe {
     [OutputType([pscustomobject])]
     param([string[]] $GitArgs)
 
-    return Invoke-ReviewVerdictNativeCommand -Command 'git' -Arguments $GitArgs
+    return Invoke-ReviewVerdictNativeCommand -Invocation { param([string[]] $ToolArgs) & git @ToolArgs } -Arguments $GitArgs
 }
 
 function Read-ReviewVerdictCheckpointText {
