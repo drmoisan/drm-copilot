@@ -207,10 +207,10 @@ Unsafe orderings are listed in research section 10. The guard precedes the readi
 - [x] [F] G13 reports at the new guideline of 20 tasks and 250 physical lines in both validators, with parity, at the guideline and one above it, with and without a justification.
 - [x] [F] Parity tests run both sides of `PLAN_GUIDELINE_CUTOFF` and the no-path case, cover each stamp shape in K4, and prove that a plan with absent repository wiring keeps its stamp result.
 - [x] [F] The finding message states the guideline that applied, the rule file's scope section describes the cutoff, and G13 lands as its own commit with its entry.
-- [ ] [G] The evidence requirements marked Reduce in research section 4 are removed from the skills and templates, and those marked Keep remain.
-- [ ] [G] The reviewer writes `## CI Cross-check`, and a mismatch at the join becomes a synthetic Blocking finding that blocks merge, as in K7.
+- [x] [G] The evidence requirements marked Reduce in research section 4 are removed from the skills and templates, and those marked Keep remain.
+- [x] [G] The reviewer writes `## CI Cross-check`, and a mismatch at the join becomes a synthetic Blocking finding that blocks merge, as in K7.
 - [ ] [G] The less-evidence reduction lands as its own commit with its entry.
-- [ ] [G] The less-evidence reduction does not reduce any baseline task, baseline evidence, or baseline comparison, including the Phase 0 test-suite baseline and the final-gate comparison restored at stage E2.
+- [x] [G] The less-evidence reduction does not reduce any baseline task, baseline evidence, or baseline comparison, including the Phase 0 test-suite baseline and the final-gate comparison restored at stage E2.
 - [ ] [H] The named design-check pass is in single-pass preflight, adds no delegation, and is pinned by a contract test.
 - [ ] [H] All 6 copies of the atomic-plan-contract skill describe the new rules, and contract tests pin them.
 - [ ] [I] Layer 1 and layer 2 honor `early_start` only for the named dependency; a dependent at `pr_open` or later requires the dependency merged and a string `synced_at`; and without the key both layers are unchanged.
