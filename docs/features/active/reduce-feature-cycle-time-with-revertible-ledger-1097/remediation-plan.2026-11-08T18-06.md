@@ -130,7 +130,7 @@ Found by searching `tests/` for `PINNED_FROZEN_SURFACE_HASHES`, `0010-early-depe
   - Acceptance: Black reports `would be left unchanged`, Ruff and Pyright 0 findings, compared with the stage I static baseline.
 - [x] [P5-T3] TypeScript static: Prettier check, ESLint, and `tsc --noEmit` in `extensions/drm-copilot/`; write `FEATURE/evidence/qa-gates/stage-i-cycle1-typescript-static.<timestamp>.md`.
   - Acceptance: 0 format differences, 0 lint errors, 0 type errors, compared with the stage I static baseline.
-- [ ] [P5-T4] Run one `Invoke-PoshQCParallelTest` and write `FEATURE/evidence/qa-gates/stage-i-cycle1-powershell-test.<timestamp>.md`.
+- [x] [P5-T4] Run one `Invoke-PoshQCParallelTest` and write `FEATURE/evidence/qa-gates/stage-i-cycle1-powershell-test.<timestamp>.md`.
   - Counts from `artifacts/pester/pester-junit.xml` (shard files when `ExitCode` is non-zero), line coverage from `artifacts/pester/powershell-coverage.xml`.
   - Acceptance: `ExitCode` 0 and 0 failures; the `PRC-LEDGER-` tests, `PRL-REAL-LEDGER-AGREES`, the `EarlyStart` suites, `early-start-skill-contract.Tests.ps1`, and main's child-CI suites passed; `OrchestratorStateEpicWaveBarrier.psm1` and both `enforce-epic-wave-barrier.ps1` gates not below their baseline; both `epic-wave-barrier-early-start.ps1` siblings at least 85%; repo-wide not below 95.6% or each drop attributed per file to files only main changed.
 - [ ] [P5-T5] Run one `pytest -n auto` with coverage (command shape of the stage I baseline) and write `FEATURE/evidence/qa-gates/stage-i-cycle1-python-test.<timestamp>.md`.
