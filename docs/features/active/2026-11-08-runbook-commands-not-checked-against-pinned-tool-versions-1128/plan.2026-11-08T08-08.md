@@ -24,7 +24,7 @@ Terms: FEATURE is `docs/features/active/2026-11-08-runbook-commands-not-checked-
 ### Phase 0 — Baselines
 
 - [x] [P0-T1] Capture PowerShell static baselines (format check and `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`) into `FEATURE/evidence/baseline/powershell-static.<timestamp>.md`; acceptance: artifact records finding counts and `git status --porcelain` shows no tracked change.
-- [ ] [P0-T2] Run `Invoke-PoshQCParallelTest` once before any change; write `FEATURE/evidence/baseline/pester-baseline.<timestamp>.md` with pass and fail counts, repo-wide line coverage from `artifacts/pester/powershell-coverage.xml`, and per-file coverage for files under `.claude/hooks` and `.claude/lib`; acceptance: all fields numeric.
+- [x] [P0-T2] Run `Invoke-PoshQCParallelTest` once before any change; write `FEATURE/evidence/baseline/pester-baseline.<timestamp>.md` with pass and fail counts, repo-wide line coverage from `artifacts/pester/powershell-coverage.xml`, and per-file coverage for files under `.claude/hooks` and `.claude/lib`; acceptance: all fields numeric.
 - [ ] [P0-T3] Run `pytest -n auto` once with `--cov=scripts.dev_tools`, `--cov-branch`, and `--cov-report=term-missing`; write `FEATURE/evidence/baseline/pytest-baseline.<timestamp>.md` with pass and fail counts and the numeric total coverage; acceptance: all fields numeric.
 
 ### Phase 1 — Reproduce first
