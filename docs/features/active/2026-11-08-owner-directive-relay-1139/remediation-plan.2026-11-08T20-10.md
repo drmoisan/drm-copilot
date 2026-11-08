@@ -46,7 +46,7 @@
 
 ### Phase 2 — Final QA
 
-- [ ] [P2-T1] Run the final PowerShell static loop over the two module files and the two test files: check-only formatter comparison, `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, and `Invoke-PoshQCLeakScan -Root` of the branch-current module; on any finding or formatter difference, fix, commit, and restart the loop.
+- [x] [P2-T1] Run the final PowerShell static loop over the two module files and the two test files: check-only formatter comparison, `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, and `Invoke-PoshQCLeakScan -Root` of the branch-current module; on any finding or formatter difference, fix, commit, and restart the loop.
   - Acceptance: `FEATURE/evidence/qa-gates/powershell-static.<timestamp>.md` records per step the command, exit code, and finding count, with the formatter reporting 0 files it would change, 0 analyzer findings, and a leak scan exit code of 0.
 - [ ] [P2-T2] Run the final Pester gate: one `Invoke-PoshQCParallelTest` run of the branch-current PoshQC module; on a failure fix the cause and re-run the gate once per fix.
   - Acceptance: `FEATURE/evidence/qa-gates/pester.<timestamp>.md` records the returned `ExitCode` 0, test counts from `artifacts/pester/pester-junit.xml` with 0 failures and no failing test, repo-wide line coverage and the per-file line coverage of `OrchestratorStateOwnerDirectives.psm1` and `validate-orchestrator-output.ps1` from `artifacts/pester/powershell-coverage.xml`, and a comparison table against `pester.2026-11-08T19-51.md`: the module at or above 90%, no per-file drop for either file, no repo-wide drop, and the P1-T2 row counts present.
