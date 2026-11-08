@@ -43,6 +43,11 @@ On every invocation, the main session must:
    - In the last commit before the merge, write the whole list to `FEATURE/evidence/other/stage-timing.<timestamp>.json` as a JSON object with `issue-num` (a string of decimal digits, or an integer of 1 or more; both are read as the same issue) and `stage_timing`, stamped with the UTC write time (`yyyy-MM-ddTHH-mm`); the file sits inside the feature folder, so the commit does not stale a concurrent review, and a re-written file carries a newer stamp, which the report prefers.
    - A portable handoff archives the source checkpoint byte for byte, so the archive keeps `stage_timing`, but the destination projection copies no unknown key and starts without it; the committed evidence file is the record that spans a handoff.
    - Print the report with `scripts/dev-tools/Get-StageTimingReport.ps1`. Figures are wall-clock time and include queueing; they are not agent time. The merge stage is not captured.
+7. **Stop-hook target worktree (issue #1145).** The orchestrator SubagentStop hook (`.claude/hooks/validate-orchestrator-output.ps1`, through `.claude/hooks/validate-orchestrator-output-target.ps1`) validates the `orchestrator-state` checkpoint of the worktree the orchestrator worked in, resolved from the delegation prompt in the subagent transcript, in this order:
+   - When the prompt's `branch:` label or canonical issue line places the run in one registered worktree, that worktree's `artifacts/orchestration/orchestrator-state.json` is validated, and the routing-contract, runbook, and feature-folder checks use the same root.
+   - When the prompt carries an identity that names no registered worktree (`TARGET_WORKTREE_NOT_DERIVABLE`) or more than one (`TARGET_WORKTREE_AMBIGUOUS`), the hook blocks once with `ORCHESTRATOR_CHECKPOINT_UNRESOLVED:` and reads no checkpoint.
+   - When no identity is available (no transcript, no identity line, or a resolver failure), the checkpoint of the session worktree is validated and the note `ORCHESTRATOR_CHECKPOINT_FALLBACK:` is appended to a block message, or written to stderr when the stop is allowed.
+   - A coordinator that launches an orchestrator for an item worktree therefore puts the `branch:` label and the canonical issue line in the delegation prompt. The epic and parallel checkpoints are resolved as before.
 
 ## Prepared-State Portable Handoff Intake
 
