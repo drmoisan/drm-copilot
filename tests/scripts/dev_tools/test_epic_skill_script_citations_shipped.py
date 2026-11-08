@@ -78,7 +78,8 @@ ALLOWLIST: Mapping[str, str] = {
         "Cited in module form by the early-start procedure (issue #1097) as the "
         "repository CLI route of decision D9, because the installed MCP tool "
         "validate_orchestration_artifacts lags the early-start rule; the citing step "
-        "keeps the wave barrier when its route lacks the rule."
+        "keeps the wave barrier when its route lacks the rule and when the CLI is "
+        "absent, as in a destination repository without scripts/dev_tools/."
     ),
 }
 

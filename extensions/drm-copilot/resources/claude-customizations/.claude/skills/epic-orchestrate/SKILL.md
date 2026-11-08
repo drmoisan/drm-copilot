@@ -340,7 +340,9 @@ checkpoint under `worktree_path`.
    extension release that carries it is installed. An `EPIC_WAVE_BARRIER_VIOLATION` that names the
    feature means the route lacks the rule (installed MCP, or an integration branch older than this
    reduction): remove the three values and keep the barrier. The same fallback applies when the
-   sibling `epic-wave-barrier-early-start.ps1` is absent or Layer 1 denies the launch.
+   sibling `epic-wave-barrier-early-start.ps1` is absent or Layer 1 denies the launch. When the
+   repository CLI is absent or does not run (a destination repository without `scripts/dev_tools/`),
+   the parent likewise removes the three values and keeps the barrier.
 3. Parent: launch with the literal `Epic mode: true` kickoff line plus
    `Early start: true. dependency: <dep_issue_num>. upstream_branch: <branch>. interface_evidence: <path>. Run the child procedure of ## Early Dependent Starts (early_start) before S7 and S8.`
    and, for the dependency, the line

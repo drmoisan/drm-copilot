@@ -141,7 +141,10 @@ Describe 'early-start skill contract (issue #1097)' {
 
     It 'ESS-CLAUDE-NAMES-PYTHON-CLI-ROUTE in <Path>' -ForEach $script:ClaudeSkill {
         $section = Get-EarlyStartSection -RelativePath $Path
-        @(Get-EarlyStartMissingToken -Text $section -Token @('the repository CLI `scripts.dev_tools.validate_orchestration_artifacts` with its `epic-orchestrator-state` subcommand')) | Should -BeNullOrEmpty
+        @(Get-EarlyStartMissingToken -Text $section -Token @(
+                'the repository CLI `scripts.dev_tools.validate_orchestration_artifacts` with its `epic-orchestrator-state` subcommand'
+                'When the repository CLI is absent or does not run (a destination repository without `scripts/dev_tools/`), the parent likewise removes the three values and keeps the barrier.'
+            )) | Should -BeNullOrEmpty
     }
 
     It 'ESS-CODEX-STATES-UNAVAILABLE-UNTIL-RELEASE in <Path>' -ForEach $script:CodexSkill {

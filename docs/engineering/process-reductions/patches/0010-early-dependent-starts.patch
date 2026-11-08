@@ -420,10 +420,10 @@ index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da14720868733
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/.claude/skills/epic-orchestrate/SKILL.md b/.claude/skills/epic-orchestrate/SKILL.md
-index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..7d6e7bbd465d47c61fe684cb5c9299f822faa9dd 100644
+index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..2d3ee748e3e5c5f10f185d44e09207c9352f688a 100644
 --- a/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/.claude/skills/epic-orchestrate/SKILL.md
-@@ -300,6 +300,89 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
+@@ -300,6 +300,91 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
  `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
  on resume, not from in-memory completion notifications alone.
  
@@ -467,7 +467,9 @@ index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..7d6e7bbd465d47c61fe684cb5c9299f8
 +   extension release that carries it is installed. An `EPIC_WAVE_BARRIER_VIOLATION` that names the
 +   feature means the route lacks the rule (installed MCP, or an integration branch older than this
 +   reduction): remove the three values and keep the barrier. The same fallback applies when the
-+   sibling `epic-wave-barrier-early-start.ps1` is absent or Layer 1 denies the launch.
++   sibling `epic-wave-barrier-early-start.ps1` is absent or Layer 1 denies the launch. When the
++   repository CLI is absent or does not run (a destination repository without `scripts/dev_tools/`),
++   the parent likewise removes the three values and keeps the barrier.
 +3. Parent: launch with the literal `Epic mode: true` kickoff line plus
 +   `Early start: true. dependency: <dep_issue_num>. upstream_branch: <branch>. interface_evidence: <path>. Run the child procedure of ## Early Dependent Starts (early_start) before S7 and S8.`
 +   and, for the dependency, the line
@@ -1020,10 +1022,10 @@ index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da14720868733
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..7d6e7bbd465d47c61fe684cb5c9299f822faa9dd 100644
+index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..2d3ee748e3e5c5f10f185d44e09207c9352f688a 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-@@ -300,6 +300,89 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
+@@ -300,6 +300,91 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
  `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
  on resume, not from in-memory completion notifications alone.
  
@@ -1067,7 +1069,9 @@ index 5bed4c7303981ce82cb5e5c4fa398a812c9dc028..7d6e7bbd465d47c61fe684cb5c9299f8
 +   extension release that carries it is installed. An `EPIC_WAVE_BARRIER_VIOLATION` that names the
 +   feature means the route lacks the rule (installed MCP, or an integration branch older than this
 +   reduction): remove the three values and keep the barrier. The same fallback applies when the
-+   sibling `epic-wave-barrier-early-start.ps1` is absent or Layer 1 denies the launch.
++   sibling `epic-wave-barrier-early-start.ps1` is absent or Layer 1 denies the launch. When the
++   repository CLI is absent or does not run (a destination repository without `scripts/dev_tools/`),
++   the parent likewise removes the three values and keeps the barrier.
 +3. Parent: launch with the literal `Epic mode: true` kickoff line plus
 +   `Early start: true. dependency: <dep_issue_num>. upstream_branch: <branch>. interface_evidence: <path>. Run the child procedure of ## Early Dependent Starts (early_start) before S7 and S8.`
 +   and, for the dependency, the line
@@ -2644,10 +2648,10 @@ index 0000000000000000000000000000000000000000..e4f01cd66687a769551b62ebec7f723a
 +}
 diff --git a/tests/scripts/claude-hooks/EpicWaveEarlyStart.Cases.Helpers.ps1 b/tests/scripts/claude-hooks/EpicWaveEarlyStart.Cases.Helpers.ps1
 new file mode 100644
-index 0000000000000000000000000000000000000000..758f03b3a246d0baac24db895145eac5940a9c11
+index 0000000000000000000000000000000000000000..17e641e99f199063ede7f5138bd3adb90f564f6a
 --- /dev/null
 +++ b/tests/scripts/claude-hooks/EpicWaveEarlyStart.Cases.Helpers.ps1
-@@ -0,0 +1,127 @@
+@@ -0,0 +1,129 @@
 +<#
 +.SYNOPSIS
 +    Shared early-start rows for the Claude and Codex epic wave-barrier gate suites (issue #1097).
@@ -2771,6 +2775,8 @@ index 0000000000000000000000000000000000000000..758f03b3a246d0baac24db895145eac5
 +        @{ Name = 'empty-upstream-branch'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -Dependent @{ early_start = (Get-EpicWaveEarlyStartRecord -Override @{ upstream_branch = '' }) }) }
 +        @{ Name = 'missing-interface-evidence'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -Dependent @{ early_start = (Get-EpicWaveEarlyStartRecord -Override @{ interface_evidence = '<remove>' }) }) }
 +        @{ Name = 'missing-interface-settled-at'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -Dependent @{ early_start = (Get-EpicWaveEarlyStartRecord -Override @{ interface_settled_at = '<remove>' }) }) }
++        @{ Name = 'empty-interface-settled-at'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -Dependent @{ early_start = (Get-EpicWaveEarlyStartRecord -Override @{ interface_settled_at = '' }) }) }
++        @{ Name = 'numeric-interface-settled-at'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -Dependent @{ early_start = (Get-EpicWaveEarlyStartRecord -Override @{ interface_settled_at = 5 }) }) }
 +        @{ Name = 'case-variant-key'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -CaseVariantKey) }
 +        @{ Name = 'boolean-dependency'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -Dependent @{ early_start = (Get-EpicWaveEarlyStartRecord -Override @{ dependency = $true }) }) }
 +    )
@@ -2911,10 +2917,10 @@ index 0000000000000000000000000000000000000000..3a82be03a0b17eef3b2a748e25c4cfa8
 +}
 diff --git a/tests/scripts/claude-runtime/early-start-skill-contract.Tests.ps1 b/tests/scripts/claude-runtime/early-start-skill-contract.Tests.ps1
 new file mode 100644
-index 0000000000000000000000000000000000000000..402ea3adfa73214e41ed39438fac8b2bdb20b2a2
+index 0000000000000000000000000000000000000000..a302d5f47c00c8844ce0029d6d381e8a4c12b1a7
 --- /dev/null
 +++ b/tests/scripts/claude-runtime/early-start-skill-contract.Tests.ps1
-@@ -0,0 +1,178 @@
+@@ -0,0 +1,181 @@
 +#Requires -Version 7.0
 +#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 +<#
@@ -3058,7 +3064,10 @@ index 0000000000000000000000000000000000000000..402ea3adfa73214e41ed39438fac8b2b
 +
 +    It 'ESS-CLAUDE-NAMES-PYTHON-CLI-ROUTE in <Path>' -ForEach $script:ClaudeSkill {
 +        $section = Get-EarlyStartSection -RelativePath $Path
-+        @(Get-EarlyStartMissingToken -Text $section -Token @('the repository CLI `scripts.dev_tools.validate_orchestration_artifacts` with its `epic-orchestrator-state` subcommand')) | Should -BeNullOrEmpty
++        @(Get-EarlyStartMissingToken -Text $section -Token @(
++                'the repository CLI `scripts.dev_tools.validate_orchestration_artifacts` with its `epic-orchestrator-state` subcommand'
++                'When the repository CLI is absent or does not run (a destination repository without `scripts/dev_tools/`), the parent likewise removes the three values and keeps the barrier.'
++            )) | Should -BeNullOrEmpty
 +    }
 +
 +    It 'ESS-CODEX-STATES-UNAVAILABLE-UNTIL-RELEASE in <Path>' -ForEach $script:CodexSkill {
@@ -3203,7 +3212,7 @@ index 0000000000000000000000000000000000000000..bdcde4f875b92f58c0aab776b490034e
 +    }
 +}
 diff --git a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-index bc810406010db5a4566fd30a63ccc68fd1eea948..ce855b93ddffaffb50bdf95020ee99a930e50036 100644
+index bc810406010db5a4566fd30a63ccc68fd1eea948..02908c137ef81cc1665a388df9ba501687f86068 100644
 --- a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
 +++ b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
 @@ -199,14 +199,20 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
@@ -3225,15 +3234,15 @@ index bc810406010db5a4566fd30a63ccc68fd1eea948..ce855b93ddffaffb50bdf95020ee99a9
      (
          ".claude/skills/epic-orchestrate/SKILL.md",
 -        "73d5c859007dbfe5bb0a35ad9b5444ea85fe1bf6a43571e1941952490033ed7e",
-+        "18a5ecafff6897fb3c74822f8aac0ddb9dd54cbd301ad14893422397b2ac26fd",
++        "7cf48992fc08cc031d558bbb691bf24a698a3cead17f3c05158d400883bcaafd",
      ),
  )
  
 diff --git a/tests/scripts/dev_tools/test_epic_skill_script_citations_shipped.py b/tests/scripts/dev_tools/test_epic_skill_script_citations_shipped.py
-index 54baf6511ac711d37fd689218a8f23a41cb07e78..3d6fee39c43596722776df83a54b7f79d96585ce 100644
+index 54baf6511ac711d37fd689218a8f23a41cb07e78..ca7b39c773280de763a1ce158e38d057ba081f96 100644
 --- a/tests/scripts/dev_tools/test_epic_skill_script_citations_shipped.py
 +++ b/tests/scripts/dev_tools/test_epic_skill_script_citations_shipped.py
-@@ -74,6 +74,12 @@ ALLOWLIST: Mapping[str, str] = {
+@@ -74,6 +74,13 @@ ALLOWLIST: Mapping[str, str] = {
          "Validated through the MCP tool validate_orchestration_artifacts, "
          "which the citing sentences already name."
      ),
@@ -3241,12 +3250,13 @@ index 54baf6511ac711d37fd689218a8f23a41cb07e78..3d6fee39c43596722776df83a54b7f79
 +        "Cited in module form by the early-start procedure (issue #1097) as the "
 +        "repository CLI route of decision D9, because the installed MCP tool "
 +        "validate_orchestration_artifacts lags the early-start rule; the citing step "
-+        "keeps the wave barrier when its route lacks the rule."
++        "keeps the wave barrier when its route lacks the rule and when the CLI is "
++        "absent, as in a destination repository without scripts/dev_tools/."
 +    ),
  }
  
  # A repository-relative path citation. The optional `./` prefix is consumed but not
-@@ -272,7 +278,10 @@ def test_epic_surface_sets_cover_every_epic_surface_in_tree() -> None:
+@@ -272,7 +279,10 @@ def test_epic_surface_sets_cover_every_epic_surface_in_tree() -> None:
  def test_allowlist_reasons_name_the_mcp_route() -> None:
      """Require each allowlist reason to name the MCP validation route."""
  

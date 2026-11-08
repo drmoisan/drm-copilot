@@ -121,6 +121,8 @@ function Get-EpicWaveEarlyStartCase {
         @{ Name = 'empty-upstream-branch'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -Dependent @{ early_start = (Get-EpicWaveEarlyStartRecord -Override @{ upstream_branch = '' }) }) }
         @{ Name = 'missing-interface-evidence'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -Dependent @{ early_start = (Get-EpicWaveEarlyStartRecord -Override @{ interface_evidence = '<remove>' }) }) }
         @{ Name = 'missing-interface-settled-at'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -Dependent @{ early_start = (Get-EpicWaveEarlyStartRecord -Override @{ interface_settled_at = '<remove>' }) }) }
+        @{ Name = 'empty-interface-settled-at'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -Dependent @{ early_start = (Get-EpicWaveEarlyStartRecord -Override @{ interface_settled_at = '' }) }) }
+        @{ Name = 'numeric-interface-settled-at'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -Dependent @{ early_start = (Get-EpicWaveEarlyStartRecord -Override @{ interface_settled_at = 5 }) }) }
         @{ Name = 'case-variant-key'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -CaseVariantKey) }
         @{ Name = 'boolean-dependency'; Expected = 'deny'; Json = (ConvertTo-EpicWaveEarlyStartCheckpoint -Dependent @{ early_start = (Get-EpicWaveEarlyStartRecord -Override @{ dependency = $true }) }) }
     )
