@@ -1,0 +1,11 @@
+{
+  "issue": 1141,
+  "note": "Wall-clock times including queueing. The S2_research and S2b_spec start values and the S2_research end value were composed by the orchestrator, not read from a clock, and are ahead of real time; actual values are unknown (see the checkpoint timestamp_corrections entry). Stages from S8_create_pr onward and the merge stage are not captured in this committed copy.",
+  "stage_timing": [
+    { "stage": "S2_research", "attempt": 1, "started_at": "2026-11-08T18:40:00Z", "ended_at": "2026-11-08T19:10:00Z" },
+    { "stage": "S2b_spec", "attempt": 1, "started_at": "2026-11-08T19:12:00Z", "ended_at": "2026-11-08T18:36:26Z" },
+    { "stage": "S4_atomic_planning", "attempt": 1, "started_at": "2026-11-08T18:37:00Z", "ended_at": "2026-11-08T19:06:23Z" },
+    { "stage": "S5_atomic_execution", "attempt": 1, "started_at": "2026-11-08T19:06:23Z", "ended_at": "2026-11-08T20:09:59Z" },
+    { "stage": "S7_feature_review", "attempt": 1, "started_at": "2026-11-08T20:12:00Z", "ended_at": "2026-11-08T20:28:02Z" }
+  ]
+}
