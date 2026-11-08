@@ -34,7 +34,7 @@ FEATURE: `docs/features/active/reduce-feature-cycle-time-with-revertible-ledger-
 
 ### Phase 1 — F1: classify the library
 
-- [ ] [P1-T1] Edit `quality-tiers.yml`: add the `projects` entry `path: ".claude/lib/review-verdict"`, `tier: T3`, with a `rationale` in the form of the neighboring `.claude/lib/*` entries (runtime library shipped in the `.claude` bundle; review/verdict eligibility rules and their command entry), directly after the `.claude/lib/ci-gate` entry and before `.claude/lib/cleanup-manifest`. Acceptance: `scripts.dev_tools.check_quality_tiers` (same route as P0-T1) exits 0 with no `QT008`, recorded in `FEATURE/evidence/qa-gates/stage-j-cycle1-tiers-after.<timestamp>.md`, and a numstat diff of `quality-tiers.yml` from the merge base of `origin/main` and `HEAD` to `HEAD` shows 0 deleted lines.
+- [x] [P1-T1] Edit `quality-tiers.yml`: add the `projects` entry `path: ".claude/lib/review-verdict"`, `tier: T3`, with a `rationale` in the form of the neighboring `.claude/lib/*` entries (runtime library shipped in the `.claude` bundle; review/verdict eligibility rules and their command entry), directly after the `.claude/lib/ci-gate` entry and before `.claude/lib/cleanup-manifest`. Acceptance: `scripts.dev_tools.check_quality_tiers` (same route as P0-T1) exits 0 with no `QT008`, recorded in `FEATURE/evidence/qa-gates/stage-j-cycle1-tiers-after.<timestamp>.md`, and a numstat diff of `quality-tiers.yml` from the merge base of `origin/main` and `HEAD` to `HEAD` shows 0 deleted lines.
 
 ### Phase 2 — CR1 and CR3
 
