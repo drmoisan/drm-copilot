@@ -199,14 +199,25 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # after the integration-PR checkpoint shape paragraph of the epic skill. Only the
 # skill digest moved; the skill digest below is the merged result of #1129, #1130,
 # and #1136, the agent digest is unchanged, and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #1138. That change added the Agent-tool preflight as the
+# unnumbered lead paragraph of the agent's `## Startup Protocol`, which moved the
+# agent digest, and appended a `## Nesting Depth` section to the epic skill, which
+# moved the skill digest. Both digests moved, and the pin stays live for both
+# entries. Remediation cycle 1 of #1138 then appended to that lead paragraph the
+# instruction to halt when an `Agent(orchestrator)` call is denied with a reason
+# beginning `NESTING_DEPTH_INSUFFICIENT:`, which moved the agent digest again; the
+# skill digest is unchanged. The merge of origin/main after #1136 combined both
+# skill edits, so the skill digest below is the merged result of #1129, #1130,
+# #1136, and #1138.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "f76721ce463ba06288dbd21135f572ae28cfd9036a908587e65e1e0629b55e75",
+        "5ff9c66f58595fa91a1f568a18a0a5aae5d1736a9dd1b13a9bbbab459df7899c",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "0bcb571ab0bd895aba15a8368b98e62e412422f6593a09805e906ebd6cf1c826",
+        "facef9711c3d9bbb430a4a5491ed91c3fb8ce98113f88ed489177d0d6ba8d307",
     ),
 )
 

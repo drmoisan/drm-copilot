@@ -18,6 +18,9 @@ Describe 'enforce-epic-invocation-origin.ps1' {
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-invocation-origin.ps1").Path
         . $script:UnderTest
+        # The nesting-depth seam (issue #1138) is pinned to unset so the main-thread allow
+        # cases do not depend on the host environment.
+        Mock Get-SubagentSpawnDepthSetting { $null }
 
         function ConvertTo-OriginEnvelope {
             param(

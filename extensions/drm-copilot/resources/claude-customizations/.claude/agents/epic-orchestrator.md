@@ -52,6 +52,8 @@ maintenance. This agent frames the *who* and *when*; the skill documents the *ho
 
 ## Startup Protocol
 
+Agent-tool preflight, before step 1: confirm that `Agent` is in the available tool list before any other work. When it is absent, record `blocked_reason: "spawn_agent_unavailable"` in the epic checkpoint, do no specialist work, and return a line beginning `AGENT_TOOL_UNAVAILABLE:` that names the three causes and both remedies. The causes are `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` set below 3 (the configured limit), a run started inside a subagent or fork (one extra nesting layer), and a Claude Code version older than 2.1.219. The remedies are to raise or unset `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`, or to use the main-session fallback in `## Nesting Depth` of the `epic-orchestrate` skill, in which the main session launches each per-feature `Agent(orchestrator)` itself. When a child returns a line beginning `AGENT_TOOL_UNAVAILABLE:`, halt with the same reason and record `spawn_agent_unavailable`; do not do the child's work in its place. When an `Agent(orchestrator)` call is denied with a reason beginning `NESTING_DEPTH_INSUFFICIENT:`, halt with that reason and record `spawn_agent_unavailable` in the same way; do not do the child's work in its place.
+
 On every invocation:
 
 1. Read `artifacts/orchestration/epic-orchestrator-state.json` to check for existing epic
