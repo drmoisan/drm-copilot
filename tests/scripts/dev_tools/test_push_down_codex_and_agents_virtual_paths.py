@@ -267,3 +267,51 @@ def test_helper_directory_publishes_nothing_without_stored_resources() -> None:
         path.startswith(".codex/lib/discovery-validation/") for path in published
     )
     assert not fs.is_dir(destination_root / HELPER_DESTINATION_DIR)
+
+
+EPIC_WAVE_DESTINATION_DIR = Path(".codex/lib/epic-wave")
+EPIC_WAVE_NAMES: tuple[str, ...] = ("EpicWave.psm1", "Invoke-EpicWave.ps1")
+
+
+def test_epic_wave_directory_publishes_stored_resources() -> None:
+    """Every file stored under `lib/epic-wave` publishes at `.codex/lib/epic-wave`."""
+    # Arrange
+    module = load_module()
+    repo_root = Path("C:/repo")
+    destination_root = Path("C:/dest")
+    fs = _new_file_system(repo_root, destination_root)
+    seeded: dict[str, str] = {}
+    # Distinct bytes per file prove the directory mapping is applied per file.
+    for name in EPIC_WAVE_NAMES:
+        text = f"# epic wave {name}\n"
+        fs.files[repo_root / RESOURCES_RELATIVE / "lib" / "epic-wave" / name] = (
+            MemoryFile(text)
+        )
+        seeded[name] = text
+
+    # Act
+    summary = module.push_down_customizations(
+        repo_root=repo_root,
+        destination_root=destination_root,
+        fs=fs,
+        source_root=repo_root,
+        artifact_root=destination_root,
+    )
+
+    # Assert
+    for name, text in seeded.items():
+        assert fs.read_text(destination_root / EPIC_WAVE_DESTINATION_DIR / name) == text
+    published = {result.relative_path for result in summary.files}
+    assert {
+        (EPIC_WAVE_DESTINATION_DIR / name).as_posix() for name in EPIC_WAVE_NAMES
+    } <= published
+    assert EPIC_WAVE_DESTINATION_DIR in module.PUBLISHED_ROOT_FOLDERS
+
+
+def test_epic_wave_resources_match_claude_lib_sources() -> None:
+    """The stored epic-wave mirror is byte-identical to `.claude/lib/epic-wave`."""
+    # Arrange / Act / Assert: compare each pair byte for byte.
+    for name in EPIC_WAVE_NAMES:
+        stored = REPO_ROOT / RESOURCES_RELATIVE / "lib" / "epic-wave" / name
+        canonical = REPO_ROOT / ".claude" / "lib" / "epic-wave" / name
+        assert stored.read_bytes() == canonical.read_bytes(), name
