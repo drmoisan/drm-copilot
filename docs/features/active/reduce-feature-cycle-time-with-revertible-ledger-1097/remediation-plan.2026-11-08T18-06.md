@@ -57,7 +57,7 @@ Found by searching `tests/` for `PINNED_FROZEN_SURFACE_HASHES`, `0010-early-depe
 
 ### Phase 0 — Baseline
 
-- [ ] [P0-T1] Write `FEATURE/evidence/baseline/stage-i-cycle1-baseline-reference.<timestamp>.md`, recording the stage I Phase 0 baseline read from the greatest `stage-i-powershell-test.*.md`, `stage-i-python-test.*.md`, `stage-i-typescript-test.*.md`, `stage-i-powershell-static.*.md`, `stage-i-python-static.*.md`, `stage-i-typescript-static.*.md`, and `stage-i-ledger-state.*.md` under `FEATURE/evidence/baseline/`. No suite is run.
+- [x] [P0-T1] Write `FEATURE/evidence/baseline/stage-i-cycle1-baseline-reference.<timestamp>.md`, recording the stage I Phase 0 baseline read from the greatest `stage-i-powershell-test.*.md`, `stage-i-python-test.*.md`, `stage-i-typescript-test.*.md`, `stage-i-powershell-static.*.md`, `stage-i-python-static.*.md`, `stage-i-typescript-static.*.md`, and `stage-i-ledger-state.*.md` under `FEATURE/evidence/baseline/`. No suite is run.
   - Output Summary: per gate the pass and fail counts, repo-wide coverage, and the per-file coverage of stage I's changed production files named in those artifacts; the static finding counts; the ledger state.
   - Acceptance: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` present; every figure numeric and traced to a named artifact; `Command:` states that no suite was run.
 - [ ] [P0-T2] Record the pre-merge ledger state in `FEATURE/evidence/baseline/stage-i-cycle1-premerge-ledger.<timestamp>.md`, on the branch head before the merge.
