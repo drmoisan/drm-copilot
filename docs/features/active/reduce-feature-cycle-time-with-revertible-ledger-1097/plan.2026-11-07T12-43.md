@@ -106,7 +106,7 @@ On the branch: the repository template and `AGENTS.md`, their bundles under `ext
 
 ### Phase 1 — Spec Record and Control Cases
 
-- [ ] [P1-T1] Add clarification `K9` after `K8` under `## Clarifications` in `FEATURE/spec.md`, stating the re-derived dispositions of `## Re-derived Dispositions` (static artifact per language, Python-only repo-wide reduction, test-gate artifacts kept under D12 and D13) and that the entry is a stored patch reverted first. No acceptance criterion and no other text changes.
+- [x] [P1-T1] Add clarification `K9` after `K8` under `## Clarifications` in `FEATURE/spec.md`, stating the re-derived dispositions of `## Re-derived Dispositions` (static artifact per language, Python-only repo-wide reduction, test-gate artifacts kept under D12 and D13) and that the entry is a stored patch reverted first. No acceptance criterion and no other text changes.
   - Acceptance: `spec.md` holds one line beginning `- **K9.`; the task's commit adds that one line to `spec.md` and removes none.
 - [ ] [P1-T2] Add the synthetic cross-check cases to `tests/scripts/claude-hooks/EpicMergeGateReview.Cases.Helpers.ps1` and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateConcurrentReview.Tests.ps1` in one commit.
   - `tests/scripts/claude-hooks/EpicMergeGateReview.Cases.Helpers.ps1`: row `ci-cross-check-synthetic-after-pass` in `Get-EpicMergeGateReviewCaseRow`, outcomes `@($pass, {verdict REMEDIATION_REQUIRED, head_sha reviewed, findings one autonomous})`, expected `REVIEW_GATE_NOT_PASSED`, `NoProcess`; it runs as `RG-ci-cross-check-synthetic-after-pass` in `enforce-epic-merge-gate.ReviewGuard.Tests.ps1` and `RGC-ci-cross-check-synthetic-after-pass` in the Codex `enforce-epic-merge-gate-review.Tests.ps1`.
