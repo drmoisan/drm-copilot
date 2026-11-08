@@ -139,7 +139,7 @@ Seeded from issue:
 - [x] Existing suites (`EpicScope`, `CommandExemption`, `Cleanup`, `EpicScopeTargets`, `Parity`, `EpicScopeHelperParity`, `hook-dependency-guard-completeness`, and the Codex gate suites) pass unchanged, and neither main gate file nor the cleanup file grows in line count.
 - [x] The new hook file meets the repository line-coverage threshold, PSScriptAnalyzer reports zero findings on changed files, and `Invoke-PoshQCLeakScan` is clean without new allowlist entries.
 - [x] Documentation is updated: the epic-orchestrate skill (Claude copy, Codex variant, and bundle copies) describes the post-fan-in allowance and its limits, and every copy of the execution-environment brief carries a #1136 bullet under `## Hook Execution Context`.
-- [ ] `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a "RE-BASELINED by issue #1136" comment, both `pack-manifests/core.json` files list the new hook file, and the Python surface-contract, pack-manifest completeness, and dependency-closure tests pass.
+- [x] `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a "RE-BASELINED by issue #1136" comment, both `pack-manifests/core.json` files list the new hook file, and the Python surface-contract, pack-manifest completeness, and dependency-closure tests pass.
 
 ## Risks & Mitigations
 - Technical or operational risks: a reviewer may read the allowance as a gate weakening; mirror drift across the bundle copies; Linux-only path or case failures in CI; test-isolation leaks from module-scoped mocks.
