@@ -216,3 +216,70 @@ Describe 'Invoke-ReviewVerdictCli' {
         }
     }
 }
+
+Describe 'Invoke-ReviewVerdictCli defaults and limits' {
+    BeforeEach {
+        Mock Read-ReviewVerdictCheckpointText { param([string] $Path) $null = $Path; return (Get-CheckpointText -Verdict 'AWAITING_CI') }
+        Mock Invoke-ReviewVerdictGhExe { param([string[]] $GhArgs) $null = $GhArgs; return [pscustomobject]@{ ExitCode = 0; Output = '' } }
+        Mock Invoke-ReviewVerdictGitExe { param([string[]] $GitArgs) $null = $GitArgs; return [pscustomobject]@{ ExitCode = 0; Output = '' } }
+    }
+
+    It 'reads the default checkpoint path when -CheckpointPath is empty' {
+        $outcome = Invoke-ReviewVerdictCli -Mode 'Review' -PrNumber '42' -CheckpointPath '' -ReviewArtifact $script:Artifact
+        $outcome.ExitCode | Should -Be 3
+        Should -Invoke Read-ReviewVerdictCheckpointText -Times 1 -Exactly -ParameterFilter { $Path -ceq 'artifacts/orchestration/orchestrator-state.json' }
+    }
+
+    It 'exits 1 without a POST when a decision keeps requesting facts' {
+        Mock Get-ReviewVerdictModeDecision {
+            return [pscustomobject]@{ Eligible = $false; Code = 'REVIEW_VERDICT_FACT_REQUIRED'; Detail = 'Loop'; Description = ''; Request = [pscustomobject]@{ Name = 'Loop'; Tool = 'git'; Arguments = @('status') } }
+        }
+        $outcome = Invoke-ReviewVerdictCli -Mode 'RecordsPr' -PrNumber '8' -CheckpointPath 'state.json' -ReviewArtifact ''
+        $outcome.ExitCode | Should -Be 1
+        $outcome.Stderr | Should -BeLike 'REVIEW_VERDICT_FAILED:*more than 16 facts*'
+        Should -Invoke Invoke-ReviewVerdictGitExe -Times 16 -Exactly
+        Should -Invoke Invoke-ReviewVerdictGhExe -Times 0 -Exactly
+    }
+}
+
+Describe 'Entry-point seams and output' {
+    It 'routes the gh and git seams through the native command wrapper' {
+        Mock Invoke-ReviewVerdictNativeCommand { param([string] $Command, [string[]] $Arguments) return [pscustomobject]@{ ExitCode = 0; Output = (@($Command) + $Arguments) -join ' ' } }
+        (Invoke-ReviewVerdictGhExe -GhArgs @('pr', 'view', '42')).Output | Should -Be 'gh pr view 42'
+        (Invoke-ReviewVerdictGitExe -GitArgs @('cat-file', '-e', 'x')).Output | Should -Be 'git cat-file -e x'
+    }
+
+    It 'returns stdout lines and drops error records in the native command wrapper' {
+        # A PowerShell function stands in for the executable, so no process starts.
+        function Get-ReviewVerdictFakeToolOutput {
+            "args: $($args -join ',')"
+            'second'
+            [System.Management.Automation.ErrorRecord]::new([System.Exception]::new('noise'), 'FakeTool', [System.Management.Automation.ErrorCategory]::NotSpecified, $null)
+        }
+        $result = Invoke-ReviewVerdictNativeCommand -Command 'Get-ReviewVerdictFakeToolOutput' -Arguments @('a', 'b')
+        $result.Output | Should -Be "args: a,b`nsecond"
+        $result.PSObject.Properties.Name | Should -Contain 'ExitCode'
+    }
+
+    It 'reads a committed file as UTF-8 text through the checkpoint seam' {
+        $path = Join-Path -Path $script:RepoRoot -ChildPath 'config/poshqc-scan.json'
+        Read-ReviewVerdictCheckpointText -Path $path | Should -Be (Get-Content -LiteralPath $path -Raw)
+    }
+
+    It 'writes stdout and stderr to the given writers and returns the exit code' {
+        $out = [System.IO.StringWriter]::new()
+        $err = [System.IO.StringWriter]::new()
+        $code = Write-ReviewVerdictOutcome -Outcome ([pscustomobject]@{ ExitCode = 3; Stdout = 'posted'; Stderr = 'refused' }) -Out $out -ErrorWriter $err
+        $code | Should -Be 3
+        $out.ToString().TrimEnd() | Should -Be 'posted'
+        $err.ToString().TrimEnd() | Should -Be 'refused'
+    }
+
+    It 'writes nothing for empty stdout and stderr' {
+        $out = [System.IO.StringWriter]::new()
+        $err = [System.IO.StringWriter]::new()
+        Write-ReviewVerdictOutcome -Outcome ([pscustomobject]@{ ExitCode = 0; Stdout = ''; Stderr = '' }) -Out $out -ErrorWriter $err | Should -Be 0
+        $out.ToString() | Should -BeNullOrEmpty
+        $err.ToString() | Should -BeNullOrEmpty
+    }
+}

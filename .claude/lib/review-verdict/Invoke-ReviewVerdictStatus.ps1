@@ -52,6 +52,22 @@ $script:ReviewVerdictModes = @('Review', 'MainSync', 'RecordsPr', 'PromotionPr')
 $script:ReviewVerdictDefaultCheckpoint = 'artifacts/orchestration/orchestrator-state.json'
 $script:ReviewVerdictFactLimit = 16
 
+function Invoke-ReviewVerdictNativeCommand {
+    <#
+    .SYNOPSIS
+        Run one command with arguments and return ExitCode and the stdout lines joined as Output.
+    .DESCRIPTION
+        The only process start of the script. Error records on the merged stream are dropped, so
+        Output holds stdout only.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([string] $Command, [string[]] $Arguments)
+
+    $all = @(& $Command @Arguments 2>&1)
+    return [pscustomobject]@{ ExitCode = [int](Get-Variable -Name 'LASTEXITCODE' -Scope Global -ValueOnly -ErrorAction Ignore); Output =(@($all | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] }) -join "`n") }
+}
+
 function Invoke-ReviewVerdictGhExe {
     <#
     .SYNOPSIS
@@ -61,9 +77,7 @@ function Invoke-ReviewVerdictGhExe {
     [OutputType([pscustomobject])]
     param([string[]] $GhArgs)
 
-    $all = @(& gh @GhArgs 2>&1)
-    $stdout = @($all | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] })
-    return [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = ($stdout -join "`n") }
+    return Invoke-ReviewVerdictNativeCommand -Command 'gh' -Arguments $GhArgs
 }
 
 function Invoke-ReviewVerdictGitExe {
@@ -75,9 +89,7 @@ function Invoke-ReviewVerdictGitExe {
     [OutputType([pscustomobject])]
     param([string[]] $GitArgs)
 
-    $all = @(& git @GitArgs 2>&1)
-    $stdout = @($all | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] })
-    return [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = ($stdout -join "`n") }
+    return Invoke-ReviewVerdictNativeCommand -Command 'git' -Arguments $GitArgs
 }
 
 function Read-ReviewVerdictCheckpointText {
@@ -103,6 +115,20 @@ function ConvertTo-ReviewVerdictOutcome {
     param([int] $ExitCode, [string] $Stdout = '', [string] $Stderr = '')
 
     return [pscustomobject]@{ ExitCode = $ExitCode; Stdout = $Stdout; Stderr = $Stderr }
+}
+
+function Write-ReviewVerdictOutcome {
+    <#
+    .SYNOPSIS
+        Write the outcome's Stdout and Stderr lines to the given writers and return its ExitCode.
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param([pscustomobject] $Outcome, [System.IO.TextWriter] $Out = [Console]::Out, [System.IO.TextWriter] $ErrorWriter = [Console]::Error)
+
+    if (-not [string]::IsNullOrEmpty($Outcome.Stdout)) { $Out.WriteLine($Outcome.Stdout) }
+    if (-not [string]::IsNullOrEmpty($Outcome.Stderr)) { $ErrorWriter.WriteLine($Outcome.Stderr) }
+    return [int]$Outcome.ExitCode
 }
 
 function Get-ReviewVerdictModeDecision {
@@ -173,8 +199,5 @@ function Invoke-ReviewVerdictCli {
 
 # Dot-sourcing loads the functions for a test host; any other invocation runs the command.
 if ($MyInvocation.InvocationName -ne '.') {
-    $outcome = Invoke-ReviewVerdictCli -Mode $Mode -PrNumber $PrNumber -CheckpointPath $CheckpointPath -ReviewArtifact $ReviewArtifact
-    if (-not [string]::IsNullOrEmpty($outcome.Stdout)) { [Console]::Out.WriteLine($outcome.Stdout) }
-    if (-not [string]::IsNullOrEmpty($outcome.Stderr)) { [Console]::Error.WriteLine($outcome.Stderr) }
-    exit $outcome.ExitCode
+    exit (Write-ReviewVerdictOutcome -Outcome (Invoke-ReviewVerdictCli -Mode $Mode -PrNumber $PrNumber -CheckpointPath $CheckpointPath -ReviewArtifact $ReviewArtifact))
 }
