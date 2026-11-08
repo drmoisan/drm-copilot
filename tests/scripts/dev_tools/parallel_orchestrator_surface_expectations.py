@@ -210,6 +210,15 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # skill digest is unchanged. The merge of origin/main after #1136 combined both
 # skill edits, so the skill digest below is the merged result of #1129, #1130,
 # #1136, and #1138.
+#
+# RE-BASELINED by issue #1141. That change added a merged-feature follow-up
+# allowance paragraph after the post-fan-in allowance paragraph of the epic skill
+# and extended its `## Worktree Cleanup` mirror sentence to state that the child's
+# `pr_number` and `merge_commit_sha` are recorded in the matching `features[]`
+# entry. Only the skill digest moved; the agent digest is unchanged and the pin
+# stays live for both entries. The merge of origin/main after #1138 combined both
+# skill edits, so the skill digest below is the merged result of #1129, #1130,
+# #1136, #1138, and #1141.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -217,7 +226,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "2e67dae3dd5a015693696125374e341f8c21963f36145bcf5fa8265ff8be924e",
+        "e227db655edef428ef688da4c482868db0c3a7cb6de662a7bafa19f9924b0d53",
     ),
 )
 
