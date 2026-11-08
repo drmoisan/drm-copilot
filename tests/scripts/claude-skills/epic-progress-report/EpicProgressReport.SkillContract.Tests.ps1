@@ -1,5 +1,5 @@
 # Pester contract tests for .claude/skills/epic-progress-report/SKILL.md, its core.json entries,
-# and its bundle mirror (issue #1093). Every file is a committed repository file read through
+# and its bundle mirror (issues #1093, #1118). Every file is a committed repository file read through
 # Join-Path from $PSScriptRoot; nothing is written. Fragment checks collapse whitespace first, so a
 # fragment that wraps across lines in the Markdown still matches.
 
@@ -88,10 +88,10 @@ Describe 'epic-progress-report SKILL.md frontmatter' {
 Describe 'epic-progress-report SKILL.md structure and content' {
     It 'contains every required heading' {
         $expected = @(
-            '# Epic Progress Report', '## When to Use This Skill', '## Prerequisites', '## Inputs', '## Report Formats',
+            '# Epic Progress Report', '## When to Use This Skill', '## Prerequisites', '## Inputs', '## Step Model', '## Report Formats',
             '## Calculation Rules', '## Starting the Reports', '## Scheduling Prompts', '## Resetting the Baseline After a Pause',
             '## Changing the Cadence', '## Stopping the Reports', '## After a Restart', '## State File',
-            '## Known Behaviors and Measured Rates', '## Notes'
+            '## Known Behaviors and Measured Rates', '## Decisions', '## Notes'
         )
         $headings = [System.Collections.Generic.List[string]]::new()
         $inFence = $false
@@ -100,6 +100,7 @@ Describe 'epic-progress-report SKILL.md structure and content' {
             if (-not $inFence -and $line -match '^#{1,2} ') { $headings.Add($line.TrimEnd()) }
         }
 
+        $expected.Count | Should -Be 17
         ($headings -join "`n") | Should -Be ($expected -join "`n")
     }
 
@@ -110,18 +111,17 @@ Describe 'epic-progress-report SKILL.md structure and content' {
     It 'states the report format fragments' {
         $section = ConvertTo-TestFlatText (Get-TestSection -Heading 'Report Formats')
         $fragments = @(
-            '**TL;DR:** Epic #<issue> is at <done> of <total> tasks (<pct>%). <done-sentence> <running-sentence>'
-            'hours left on the wave-parallel estimate. **Weekly** quota is at'
-            '**Avg Velocity:** <avg> tasks / hr. **Recent Velocity:** <recent> tasks / hr since last check-in. (SD of recent velocity: <sd>, from <n> intervals)'
-            '**Estimated time remaining:** <range>'
-            'None of the <N> features is done yet.', '<K> of <N> features are done.', 'No feature is running.'
-            'is running (<d> of <t>).', 'are running.'
-            '(range needs 3 or more check-in intervals)', '<HH:MM> hrs to <HH:MM> hrs'
-            'no upper bound (average velocity minus 2.05 SD is at or below 0.5 tasks / hr)'
-            'Any non-finite value prints `n/a`'
-            "tasks per hour (one child's pace)", 'points since the epic started'
-            '- Straight line, no parallelism: about', 'per open wave for review and CI): about'
-            '| State | Features |', '| Wave | Children | Tasks | Done |', 'None yet'
+            '**TL;DR:** Epic #<issue> is at <done> of <total> steps (<pct>%). <done-sentence> <running-sentence>'
+            'hours left on the per-type estimate (<b> blocked steps excluded). **Weekly** quota is at'
+            '**Now:** #<i> <type> (<elapsed> of median <m>)[, ...]. <k> of <n> types use defaults.'
+            '**Estimated time remaining:** <H h MM min> by type (sum); <H h MM min> wave-parallel.'
+            'Item #<issue>', 'None of the <N> features is done yet.', '<K> of <N> features are done.', 'No feature is running.'
+            'is running (<d> of <t> steps).', 'are running.', 'is blocked (<reason>).', 'over median'
+            'Any non-finite value prints `n/a`', 'points since the epic started', 'None yet'
+            '| State | Features |', '| Blocked | <blocked> |', '| Wave | Children | Steps | Done |'
+            '| Type | Done | In progress | Remaining | Blocked | Median | Samples | Subtotal |'
+            'no measured duration; default <n> min', '**Unmapped and composite stage time:**', '(approx)'
+            'No velocity, standard-deviation, straight-line, or range line is printed in either mode.'
         )
 
         foreach ($fragment in $fragments) {
@@ -132,8 +132,10 @@ Describe 'epic-progress-report SKILL.md structure and content' {
     It 'states the calculation rule values' {
         $section = ConvertTo-TestFlatText (Get-TestSection -Heading 'Calculation Rules')
         $values = @(
-            '90 seconds', '(default 14)', '2 minutes', 'n-1', '3 intervals', '0.5 tasks per hour', '2.05'
-            '1.25 hours', 'epoch seconds', 'average velocity plus and minus 2.05 SD', 'cswap list --json'
+            '90 seconds', '(default 14)', 'newest 1000 samples per type', 'an even count averages the middle pair'
+            'max(0, median - elapsed in step)', '(now - last tick - blocked seconds) / (number of newly checked tasks)'
+            'stage duration divided by the task count', 'a `stage_timing` sample replaces a `tick` sample'
+            'epoch seconds', 'cswap list --json', 'sum over types'
         )
 
         foreach ($value in $values) {
@@ -179,8 +181,8 @@ Describe 'epic-progress-report SKILL.md structure and content' {
 
     It 'documents reset, cadence change, stopping and restart recovery' {
         $expected = @{
-            'Resetting the Baseline After a Pause' = @('-ResetBaseline', 'Pass `-StartUtc` and `-BaselineDone`', 'weekly-quota baseline is kept', 'The scheduled prompts are not changed', 'about two hours')
-            'Changing the Cadence'                 = @('-PairSamples', '`CronDelete`', '`CronCreate`', 'one-shot', 'mean 26.2 and SD 31.4', 'mean 27.3 and SD 23.2', 'quoted 31.5')
+            'Resetting the Baseline After a Pause' = @('-ResetBaseline', 'Pass `-StartUtc` and `-BaselineDone`', 'duration ledger and the tick anchors are kept', 'weekly-quota baseline is kept', 'The scheduled prompts are not changed')
+            'Changing the Cadence'                 = @('-PairSamples', '`CronDelete`', '`CronCreate`', 'one-shot', 'Pairing affects only the check-in samples')
             'Stopping the Reports'                 = @('`CronList`', '`CronDelete`')
             'After a Restart'                      = @('session-only', '`claude --resume` or `claude --continue`', 'expire 7 days after creation', 'recreate only the missing jobs', 'reset the baseline first')
         }
@@ -191,13 +193,14 @@ Describe 'epic-progress-report SKILL.md structure and content' {
                 $section.Contains($fragment) | Should -BeTrue -Because "the '$heading' section must state '$fragment'"
             }
         }
+        (ConvertTo-TestFlatText (Get-TestSection -Heading 'Changing the Cadence')).Contains('SD') | Should -BeFalse
     }
 
     It 'documents known behaviors, rates, delivery and quota policy' {
         $expected = @{
-            'Known Behaviors and Measured Rates' = @('bursty', 'unreliable for about two hours after a baseline', 'Task totals drift', 'Flat stretches of 20 to 60 minutes', 'adds a shorter interval', 'raises the SD', 'A negative average')
+            'Known Behaviors and Measured Rates' = @('tick split divides a batch', 'Task totals drift', 'step total grows when a remediation cycle opens', 'uses the default durations', 'not recovered')
             'Notes'                              = @('rebuilt and reinstalled', '93%', '`.claude/skills/quota-throttling/SKILL.md`', 'read-only toward git and GitHub')
-            'State File'                         = @('`-StatePath` overrides it', 'never committed', 'per checkout', '`git clean -fdX` deletes it', 'not migrated')
+            'State File'                         = @('`-StatePath` overrides it', 'never committed', 'per checkout', '`git clean -fdX` deletes it', 'not migrated', '"version": 2', 'version 3 or higher', 'progress-item-<n>.json')
         }
 
         foreach ($heading in $expected.Keys) {
@@ -206,6 +209,60 @@ Describe 'epic-progress-report SKILL.md structure and content' {
                 $section.Contains($fragment) | Should -BeTrue -Because "the '$heading' section must state '$fragment'"
             }
         }
+    }
+
+    It 'states the step model, default durations and decisions' {
+        $stepModel = ConvertTo-TestFlatText (Get-TestSection -Heading 'Step Model')
+        $decisions = ConvertTo-TestFlatText (Get-TestSection -Heading 'Decisions')
+        $inputs = ConvertTo-TestFlatText (Get-TestSection -Heading 'Inputs')
+        $defaults = @('| research | 13 min |', '| spec | 6 min |', '| plan | 11 min |', '| preflight | 10 min |', '| execution | 5 min per task |', '| review | 14 min |', '| pr | 3 min |', '| ci | 17 min |', '| merge | 5 min |', '| main-sync | 60 min |', '| integration-pr | 45 min |')
+
+        foreach ($type in @('research', 'spec', 'plan', 'preflight', 'execution', 'review', 'pr', 'ci', 'merge', 'main-sync', 'integration-pr')) {
+            $stepModel.Contains("``$type``") | Should -BeTrue -Because "the Step Model section must name the $type type"
+        }
+        foreach ($row in $defaults) {
+            $stepModel.Contains($row) | Should -BeTrue -Because "the Step Model section must state the default '$row'"
+        }
+        foreach ($fragment in @('one step per attempt', '`light`', 'awaiting_ci', 'blocked_conflict_loop_limit', 'composite remediation time', 'unmapped time')) {
+            $stepModel.Contains($fragment) | Should -BeTrue -Because "the Step Model section must state '$fragment'"
+        }
+        foreach ($number in 1..13) {
+            $decisions.Contains("D$($number):") | Should -BeTrue -Because "the Decisions section must state D$number"
+        }
+        $decisions.Contains('`-WaveOverheadHours` stays accepted and affects no figure') | Should -BeTrue
+        $inputs.Contains('| `-Issue` |') | Should -BeTrue
+        $inputs.Contains('| `-StepDefaultMinutes` |') | Should -BeTrue
+    }
+
+    It 'lists the live stage-name aliases' {
+        $flat = ConvertTo-TestFlatText $script:body
+
+        foreach ($alias in @('feature_review', 'S7_feature_review', 'atomic_execution', 'S5_atomic_execution', 'S2_research', 'S3_spec', 'S4_atomic_planning', 'S4_preflight', 'S8_create_pr', 'S9_ci_gate', 'S9_ci_green', 'S3b_research', 'S2_feature_documents')) {
+            $flat.Contains("``$alias``") | Should -BeTrue -Because "SKILL.md must name the stage alias '$alias'"
+        }
+    }
+
+    It 'states the item-mode and singular report wording' {
+        $formats = ConvertTo-TestFlatText (Get-TestSection -Heading 'Report Formats')
+
+        foreach ($fragment in @('#<i> is not done yet.', 'The only feature is not done yet.', '1 blocked step excluded', 'points since the measurement started', "not this item's cost alone", '| State | Item |')) {
+            $formats.Contains($fragment) | Should -BeTrue -Because "the Report Formats section must state '$fragment'"
+        }
+    }
+
+    It 'states the Now line form without a recorded start and the merged-item anchor removal' {
+        $formats = ConvertTo-TestFlatText (Get-TestSection -Heading 'Report Formats')
+
+        $formats.Contains('(start not recorded; median <m>)') | Should -BeTrue -Because 'the Report Formats section must state the Now line form for a step without a recorded start'
+        (ConvertTo-TestFlatText $script:body).Contains('merge step is done') | Should -BeTrue -Because 'SKILL.md must state that a merged item loses its state entry'
+    }
+
+    It 'does not state that the report wording does not change' {
+        $formats = ConvertTo-TestFlatText (Get-TestSection -Heading 'Report Formats')
+
+        $formats.Contains('do not change') | Should -BeFalse
+        $formats.Contains('does not change') | Should -BeFalse
+        (ConvertTo-TestFlatText $script:body).Contains("are the script's output and do not change") | Should -BeFalse
     }
 
     It 'names no forbidden token and no scripts/dev-tools invocation' {
@@ -232,7 +289,7 @@ Describe 'epic-progress-report delivery' {
         $manifestPaths = @((Get-Content -LiteralPath $script:manifestPath -Raw | ConvertFrom-Json).paths)
         $files = @(Get-TestSkillFile)
 
-        $files.Count | Should -Be 6
+        $files.Count | Should -Be 10
         foreach ($file in $files) {
             @($manifestPaths | Where-Object { $_ -ceq $file }).Count | Should -Be 1 -Because "$file must be listed once in core.json"
         }
@@ -241,7 +298,7 @@ Describe 'epic-progress-report delivery' {
     It 'mirrors every skill-folder file byte-identically in the bundle' {
         $files = @(Get-TestSkillFile)
 
-        $files.Count | Should -Be 6
+        $files.Count | Should -Be 10
         foreach ($file in $files) {
             $canonical = Join-Path -Path $script:repositoryRoot -ChildPath $file
             $copy = Join-Path -Path $script:bundleRoot -ChildPath $file

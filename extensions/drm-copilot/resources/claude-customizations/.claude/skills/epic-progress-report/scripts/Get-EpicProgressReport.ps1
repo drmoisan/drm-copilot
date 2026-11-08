@@ -1,40 +1,47 @@
 <#
 .SYNOPSIS
-    Print the TL;DR block and the hourly progress report of an epic.
+    Print the TL;DR block and the hourly progress report of an epic or of a standalone item.
 
 .DESCRIPTION
-    Reads the epic kickoff and the feature plans from the integration branch (or from a
-    feature worktree when one holds the plan), the epic orchestrator checkpoint, the pull
-    request state of each feature branch, and the weekly quota of the active cswap
-    account, then prints the task progress, the per-feature state, the average and
-    recent velocity, the sample standard deviation, the estimated time remaining, and the
-    weekly quota.
+    Measures progress in typed steps (issue #1118): research, spec, plan, preflight, one
+    execution step per plan task, review, pr, ci, and merge per item, the steps each opened
+    remediation cycle adds, and the main-sync and integration-pr steps of an epic. It reads
+    the epic kickoff and the feature plans from the integration branch (or from a feature
+    worktree when one holds the plan), each live item checkpoint and its stage_timing, the
+    epic orchestrator checkpoint, the pull request state of each feature branch, and the
+    weekly quota of the active cswap account. The estimate is the sum over step types of the
+    remaining steps times the median measured duration of the type, with a default duration
+    for a type that has no sample; blocked items are excluded by recorded checkpoint state.
 
-    The pure logic lives in Get-EpicProgressReport.Logic.ps1, which this script
-    dot-sources and which dot-sources the State, Metrics, and Render files. Every I/O call
-    goes through a wrapper function in this script. When gh or cswap is not installed, or
-    prints no parseable output, the report still prints: the pull-request state is empty
-    and the quota is n/a.
+    The pure logic lives in Get-EpicProgressReport.Logic.ps1, which this script dot-sources and
+    which dot-sources the Stages, Steps, Durations, State, Metrics, Render, and Gather files.
+    Every I/O call goes through a wrapper function in this script. When gh or cswap is not
+    installed, or prints no parseable output, the report still prints: the pull-request state
+    is empty and the quota is n/a.
 
-    The state file at -StatePath keeps the start instant, the baseline done count, the
-    weekly baseline, and the check-in samples (Unix time and done count). A sample is added
-    when the previous sample is at least 90 seconds old; the recent velocity and its
-    standard deviation are computed from those samples. The state file is read before the
-    first git call. The legacy sample array written by earlier versions is still read.
+    The version-2 state file at -StatePath keeps the start instant, the baseline done step
+    count, the weekly baseline, the check-in samples (Unix time and done steps), the duration
+    ledger per step type, and the per-item tick anchors and blocked spans. It is read before
+    the first git call; a version-1 file or the legacy sample array is migrated.
 
     This file is the canonical script of the /epic-progress-report skill. The entry-point
     block at the bottom is skipped when the file is dot-sourced.
 
 .PARAMETER EpicFolder
-    Mandatory. The epic folder name under docs/features/epics/. It is also the epic name
-    printed in the status heading.
+    Mandatory in the Epic parameter set (the default). The epic folder name under
+    docs/features/epics/. It is also the epic name printed in the status heading.
+
+.PARAMETER Issue
+    Mandatory in the Item parameter set. The issue number of a standalone item: the worktree
+    whose checkpoint issue-num equals it is reported, with no kickoff, epic checkpoint, or
+    epic-level step. Cannot be combined with -EpicFolder.
 
 .PARAMETER StartUtc
-    Optional. The instant from which elapsed time and average velocity are measured;
-    converted to UTC. A start after the current instant counts as zero elapsed time.
-    Resolution: the passed value, else now when -ResetBaseline is given, else the start
-    stored in the state file. With none of these the script stops with an error before any
-    git call. A passed value is persisted with the next state write.
+    Optional. The instant from which elapsed time is measured; converted to UTC. A start
+    after the current instant counts as zero elapsed time. Resolution: the passed value, else
+    now when -ResetBaseline is given, else the start stored in the state file. With none of
+    these the script stops with an error before any git call. A passed value is persisted
+    with the next state write.
 
 .PARAMETER EpicIssue
     The epic issue number printed in the report. Default: the number on the first
@@ -43,7 +50,8 @@
 
 .PARAMETER IntegrationBranch
     The branch that holds the kickoff and the plans. Default:
-    origin/epic/<EpicFolder>-integration.
+    origin/epic/<EpicFolder>-integration. In item mode it is used only for plan texts that
+    are not in the item worktree, and blank means none.
 
 .PARAMETER KickoffPath
     The repository-relative path of the kickoff file on the integration branch. Default:
@@ -60,46 +68,60 @@
     artifacts/orchestration/epic-orchestrator-state.json under the repository root.
 
 .PARAMETER StatePath
-    The state file that keeps the start, the baselines, and the check-in samples. Default:
-    .claude/state/epic-progress-<EpicFolder>.json under the repository root, a gitignored
-    location that survives a container stop with the checkout. The directory is created
-    when missing.
+    The state file. Default: .claude/state/epic-progress-<EpicFolder>.json, or
+    .claude/state/progress-item-<Issue>.json in item mode, under the repository root, a
+    gitignored location that survives a container stop with the checkout. The directory is
+    created when missing.
 
 .PARAMETER BaselineDone
-    The number of tasks already complete at the start. Resolution: the passed value, else
-    the current done count when -ResetBaseline is given, else the stored value, else 0.
+    The number of steps already complete at the start. Resolution: the passed value, else
+    the current done count when -ResetBaseline is given or the state was migrated, else the
+    stored value, else 0.
 
 .PARAMETER BaselineWeeklyPct
     The weekly quota percentage at the start. Resolution: the passed value, else the stored
     value, else 0. -ResetBaseline does not change it.
 
 .PARAMETER WaveOverheadHours
-    The review and CI hours added per open wave in the wave-parallel estimate.
-    Default: 1.25.
+    Accepted for compatibility with default 1.25; it affects no figure, because review and
+    CI are explicit steps of the step model (decision D13).
 
 .PARAMETER SampleCap
-    The maximum number of check-in samples kept in the state file. Default: 14.
+    The maximum number of check-in samples kept in the state file. Default: 14. The duration
+    ledger is not limited by it.
 
 .PARAMETER Mode
     TLDR prints the four-line TL;DR block only; Full prints the TL;DR block followed by
     the full report. Default: Full.
 
 .PARAMETER ResetBaseline
-    Discards every stored sample, sets the start to now (unless -StartUtc is passed) and the
-    baseline done count to the current done count (unless -BaselineDone is passed), adds
-    the first sample, and writes the state file. The weekly baseline is kept.
+    Discards every stored check-in sample and blocked span, sets the start to now (unless
+    -StartUtc is passed) and the baseline done count to the current done count (unless
+    -BaselineDone is passed), adds the first sample, and writes the state file. The weekly
+    baseline, the duration ledger, and the tick anchors are kept.
 
 .PARAMETER PairSamples
     After the normal sample rule, keeps the newest sample and every second older sample
     and writes the state file, so the intervals match a doubled cadence. A one-shot
     command: each run halves the samples again. Cannot be combined with -ResetBaseline.
 
+.PARAMETER StepDefaultMinutes
+    A hashtable of per-type default durations in minutes that replace the built-in defaults
+    for types with no measured sample, for example @{ ci = 25 }. An unknown type or a value
+    that is not a number above 0 stops the script before any I/O.
+
 .EXAMPLE
     pwsh -NoProfile -File .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1 -EpicFolder example-epic -StartUtc 2026-01-05T09:00:00Z -BaselineDone 40 -Mode TLDR
 
     Prints the TL;DR block for the epic in docs/features/epics/example-epic/, measuring
-    from 09:00 UTC and counting 40 tasks as complete at the start; both values are stored
+    from 09:00 UTC and counting 40 steps as complete at the start; both values are stored
     for later runs.
+
+.EXAMPLE
+    pwsh -NoProfile -File .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1 -Issue 42 -StartUtc 2026-01-05T09:00:00Z -Mode TLDR
+
+    Prints the TL;DR block for the standalone item whose worktree checkpoint carries issue-num
+    42, with its state in .claude/state/progress-item-42.json.
 
 .EXAMPLE
     pwsh -NoProfile -File .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1 -EpicFolder example-epic -EpicIssue 12
@@ -116,14 +138,18 @@
 .NOTES
     The tool is read-only toward the repository and GitHub: it runs only git fetch, git
     show, git worktree list, and gh pr list, and the only file it writes is the state file
-    at -StatePath (issues #1080 and #1093).
+    at -StatePath (issues #1080, #1093, and #1118).
 #>
 
-[CmdletBinding()]
+[CmdletBinding(DefaultParameterSetName = 'Epic')]
 param(
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $true, ParameterSetName = 'Epic')]
     [ValidateNotNullOrEmpty()]
     [string] $EpicFolder,
+
+    [Parameter(Mandatory = $true, ParameterSetName = 'Item')]
+    [ValidateRange('Positive')]
+    [int] $Issue,
 
     [datetime] $StartUtc,
 
@@ -153,7 +179,9 @@ param(
 
     [switch] $ResetBaseline,
 
-    [switch] $PairSamples
+    [switch] $PairSamples,
+
+    [hashtable] $StepDefaultMinutes = @{}
 )
 
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Logic.ps1')
@@ -294,21 +322,23 @@ function Get-EpicProgressLastExitCode {
     return $LASTEXITCODE
 }
 
+
 function Invoke-EpicProgressReport {
     <#
     .SYNOPSIS
         Gather the report inputs through the I/O seams and return the report lines.
     .DESCRIPTION
-        Wiring only. Runs git with exactly 'fetch -q origin', 'worktree list --porcelain',
-        and 'show <IntegrationBranch>:<path>'; runs 'gh pr list' only when gh is installed
-        and 'cswap list --json' only when cswap is installed; treats an unparseable
-        checkpoint or state file as empty; reads the state file and resolves the start before
-        the first git call; writes the state file only when the sample set changed or
-        ResetBaseline or PairSamples is given. When 'git fetch -q origin' exits with a non-zero code, writes a warning
-        naming the code and continues with the last fetched state of the integration branch.
-        Returns the TL;DR lines, followed by the Full lines unless Mode is TLDR.
+        Wiring only; the parameters mirror the script's (Epic and Item sets). Validates
+        -ResetBaseline with -PairSamples and -StepDefaultMinutes before any I/O, reads the state
+        before the first git call, runs git with exactly 'fetch -q origin' (epic mode, a failure
+        is a warning), 'worktree list --porcelain', and 'show', gh and cswap only when installed,
+        gathers through the Gather functions, and writes the state only when the samples, the
+        ledger, or the anchors changed, or on ResetBaseline or PairSamples. Returns the TL;DR
+        lines, followed by the Full lines unless Mode is TLDR.
     .PARAMETER EpicFolder
-        The epic folder name; also the epic name in the status heading.
+        The epic folder name (Epic set).
+    .PARAMETER Issue
+        The standalone item issue number (Item set).
     .PARAMETER StartUtc
         The start instant; when not passed, resolved by Resolve-EpicProgressBaseline.
     .PARAMETER EpicIssue
@@ -324,24 +354,27 @@ function Invoke-EpicProgressReport {
     .PARAMETER StatePath
         The state file path; blank for the default under .claude/state of the repository root.
     .PARAMETER BaselineDone
-        The tasks already complete at the start; when not passed, resolved from the reset or the state.
+        The steps already complete at the start; when not passed, resolved from the reset or the state.
     .PARAMETER BaselineWeeklyPct
         The weekly quota percentage at the start; when not passed, resolved from the state.
     .PARAMETER WaveOverheadHours
-        The hours added per open wave.
+        Accepted for compatibility; affects no figure.
     .PARAMETER SampleCap
-        The maximum number of samples kept.
+        The maximum number of check-in samples kept.
     .PARAMETER Mode
         TLDR or Full.
     .PARAMETER ResetBaseline
-        Discard the stored samples, restart the baseline now, and write the state.
+        Discard the stored samples and blocked spans, restart the baseline now, and write the state.
     .PARAMETER PairSamples
         Pair the samples after the sample rule and write the state.
+    .PARAMETER StepDefaultMinutes
+        Per-type default durations in minutes.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Epic')]
     [OutputType([string[]])]
     param(
-        [Parameter(Mandatory = $true)] [string] $EpicFolder,
+        [Parameter(Mandatory = $true, ParameterSetName = 'Epic')] [ValidateNotNullOrEmpty()] [string] $EpicFolder,
+        [Parameter(Mandatory = $true, ParameterSetName = 'Item')] [ValidateRange('Positive')] [int] $Issue,
         [datetime] $StartUtc = [datetime]::MinValue,
         [string] $EpicIssue = '',
         [string] $IntegrationBranch = '',
@@ -355,14 +388,22 @@ function Invoke-EpicProgressReport {
         [ValidateRange(1, 100000)] [int] $SampleCap = 14,
         [ValidateSet('TLDR', 'Full')] [string] $Mode = 'Full',
         [switch] $ResetBaseline,
-        [switch] $PairSamples
+        [switch] $PairSamples,
+        [hashtable] $StepDefaultMinutes = @{}
     )
 
     if ($ResetBaseline -and $PairSamples) {
         throw '-ResetBaseline and -PairSamples cannot be combined: a reset discards the samples that -PairSamples would pair. Run them separately.'
     }
-
-    $setting = Resolve-EpicProgressSetting -EpicFolder $EpicFolder -EpicIssue $EpicIssue -IntegrationBranch $IntegrationBranch -KickoffPath $KickoffPath -RepositoryRoot $RepositoryRoot -CheckpointPath $CheckpointPath -StatePath $StatePath -CurrentLocation (Get-Location).ProviderPath
+    $defaults = Resolve-EpicProgressStepDefault -StepDefaultMinutes $StepDefaultMinutes
+    Write-Verbose "-WaveOverheadHours $WaveOverheadHours is accepted for compatibility and affects no figure: review and CI are explicit steps."
+    $itemMode = $PSCmdlet.ParameterSetName -eq 'Item'
+    $location = (Get-Location).ProviderPath
+    if ($itemMode) {
+        $setting = Resolve-EpicProgressItemSetting -Issue $Issue -RepositoryRoot $RepositoryRoot -StatePath $StatePath -IntegrationBranch $IntegrationBranch -CurrentLocation $location
+    } else {
+        $setting = Resolve-EpicProgressSetting -EpicFolder $EpicFolder -EpicIssue $EpicIssue -IntegrationBranch $IntegrationBranch -KickoffPath $KickoffPath -RepositoryRoot $RepositoryRoot -CheckpointPath $CheckpointPath -StatePath $StatePath -CurrentLocation $location
+    }
     # The state file is read before the first git call.
     $stateText = ''
     if (Test-EpicProgressPath -Path $setting.StatePath) { $stateText = Read-EpicProgressFile -Path $setting.StatePath }
@@ -372,92 +413,71 @@ function Invoke-EpicProgressReport {
     # A reset discards every stored sample; the sample rule then adds the first sample (now, done).
     $priorSamples = $storedState.Samples
     if ($ResetBaseline) { $priorSamples = [object[]] @() }
-    $null = Invoke-GitExe -GitArgs @('fetch', '-q', 'origin')
-    $fetchExitCode = Get-EpicProgressLastExitCode
-    if ($fetchExitCode -ne 0) {
-        Write-Warning "git fetch -q origin failed with exit code $fetchExitCode; the report uses the last fetched state of $($setting.IntegrationBranch)."
-    }
-    $worktreeLines = @(Invoke-GitExe -GitArgs @('worktree', 'list', '--porcelain'))
-    $worktreeOf = ConvertFrom-EpicProgressWorktreeList -PorcelainLine $worktreeLines
-    $kickoffText = @(Invoke-GitExe -GitArgs @('show', "$($setting.IntegrationBranch):$($setting.KickoffPath)")) -join "`n"
-
-    $epicIssueText = $setting.EpicIssue
-    if ([string]::IsNullOrWhiteSpace($epicIssueText)) { $epicIssueText = Get-EpicProgressIssueFromKickoff -KickoffText $kickoffText }
-    if ([string]::IsNullOrWhiteSpace($epicIssueText)) {
-        throw "The epic issue number could not be resolved: pass -EpicIssue or add an 'Epic issue: #<n>' line to $($setting.KickoffPath) on $($setting.IntegrationBranch)."
-    }
-
-    $checkpointFeature = @{}
-    if (Test-EpicProgressPath -Path $setting.CheckpointPath) {
-        $checkpointText = Read-EpicProgressFile -Path $setting.CheckpointPath
-        if (Test-EpicProgressJsonText -Json $checkpointText) {
-            $checkpoint = ConvertFrom-Json -InputObject $checkpointText
-            $checkpointEntries = @($checkpoint.features)
-            foreach ($checkpointEntry in $checkpointEntries) {
-                if ($null -ne $checkpointEntry -and $null -ne $checkpointEntry.issue_num) { $checkpointFeature["$($checkpointEntry.issue_num)"] = $checkpointEntry }
-            }
+    if (-not $itemMode) {
+        $null = Invoke-GitExe -GitArgs @('fetch', '-q', 'origin')
+        $fetchExitCode = Get-EpicProgressLastExitCode
+        if ($fetchExitCode -ne 0) {
+            Write-Warning "git fetch -q origin failed with exit code $fetchExitCode; the report uses the last fetched state of $($setting.IntegrationBranch)."
         }
     }
-
+    $worktreeOf = ConvertFrom-EpicProgressWorktreeList -PorcelainLine @(Invoke-GitExe -GitArgs @('worktree', 'list', '--porcelain'))
     $ghInstalled = Test-EpicProgressCommand -Name 'gh'
-    $features = [System.Collections.Generic.List[object]]::new()
-    $rows = @(ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoffText)
-    foreach ($row in $rows) {
-        $checkpointEntry = $checkpointFeature[$row.Issue]
-        $branch = ''
-        $mergeStatus = 'not_started'
-        if ($null -ne $checkpointEntry) {
-            if ($checkpointEntry.branch_name) { $branch = [string] $checkpointEntry.branch_name }
-            if ($checkpointEntry.merge_status) { $mergeStatus = [string] $checkpointEntry.merge_status }
+    $prStateOf = {
+        param([string] $Branch)
+        if (-not $Branch -or -not $ghInstalled) { return '' }
+        ConvertFrom-EpicProgressPrList -Json (@(Invoke-GhExe -GhArgs @('pr', 'list', '--head', $Branch, '--state', 'all', '--json', 'number,state')) -join "`n")
+    }
+    $items = [System.Collections.Generic.List[object]]::new()
+    $epicRows = $null
+    if ($itemMode) {
+        $epicIssueText = [string] $Issue
+        $found = Find-EpicProgressItemWorktree -Issue $epicIssueText -WorktreeMap $worktreeOf
+        $items.Add((Get-EpicProgressItemInput -Issue $epicIssueText -PlanPath ([string] $found.Checkpoint.'plan-path') -WorktreePath $found.Path -IntegrationBranch $setting.IntegrationBranch -Checkpoint $found.Checkpoint -PrState (& $prStateOf $found.Branch)))
+    } else {
+        $kickoffText = @(Invoke-GitExe -GitArgs @('show', "$($setting.IntegrationBranch):$($setting.KickoffPath)")) -join "`n"
+        $epicIssueText = $setting.EpicIssue
+        if ([string]::IsNullOrWhiteSpace($epicIssueText)) { $epicIssueText = Get-EpicProgressIssueFromKickoff -KickoffText $kickoffText }
+        if ([string]::IsNullOrWhiteSpace($epicIssueText)) {
+            throw "The epic issue number could not be resolved: pass -EpicIssue or add an 'Epic issue: #<n>' line to $($setting.KickoffPath) on $($setting.IntegrationBranch)."
         }
-        $prState = ''
-        if ($branch -and $ghInstalled) {
-            $prJson = @(Invoke-GhExe -GhArgs @('pr', 'list', '--head', $branch, '--state', 'all', '--json', 'number,state')) -join "`n"
-            $prState = ConvertFrom-EpicProgressPrList -Json $prJson
+        $rows = @(ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoffText)
+        $epicRows = Get-EpicProgressEpicCheckpointRow -CheckpointPath $setting.CheckpointPath -KickoffIssue ([string[]] @($rows | ForEach-Object { $_.Issue }))
+        foreach ($row in $rows) {
+            $epicRow = $epicRows.Feature[$row.Issue]
+            $branch = ''
+            if ($null -ne $epicRow -and $epicRow.branch_name) { $branch = [string] $epicRow.branch_name }
+            $worktree = ''
+            if ($branch -and $worktreeOf.ContainsKey($branch)) { $worktree = $worktreeOf[$branch] }
+            $prState = & $prStateOf $branch
+            $items.Add((Get-EpicProgressItemInput -Issue $row.Issue -PlanPath $row.PlanPath -WorktreePath $worktree -IntegrationBranch $setting.IntegrationBranch -Checkpoint (Read-EpicProgressItemCheckpoint -WorktreePath $worktree) -EpicRow $epicRow -PrState $prState -Wave $row.Wave -Band $row.Band))
         }
-        $planText = $null
-        if ($branch -and $worktreeOf.ContainsKey($branch)) {
-            $livePath = Join-Path -Path $worktreeOf[$branch] -ChildPath $row.PlanPath
-            if (Test-EpicProgressPath -Path $livePath) { $planText = Read-EpicProgressFile -Path $livePath }
-        }
-        if ($null -eq $planText) { $planText = @(Invoke-GitExe -GitArgs @('show', "$($setting.IntegrationBranch):$($row.PlanPath)")) -join "`n" }
-        $count = Get-EpicProgressTaskCount -PlanText $planText
-        $features.Add([pscustomobject]@{
-                Issue = $row.Issue; Wave = $row.Wave; Band = $row.Band; Total = $count.Total; Done = $count.Done
-                State = (Get-EpicProgressFeatureState -MergeStatus $mergeStatus -PrState $prState -Done $count.Done)
-                Phase = (Get-EpicProgressCurrentPhase -PlanText $planText); Pr = $prState
-            })
     }
 
     $weeklyPct = [double]::NaN
     if (Test-EpicProgressCommand -Name 'cswap') {
-        $quotaJson = @(Invoke-CswapExe -CswapArgs @('list', '--json')) -join "`n"
-        $weeklyPct = Get-EpicProgressWeeklyQuota -Json $quotaJson
+        $weeklyPct = Get-EpicProgressWeeklyQuota -Json (@(Invoke-CswapExe -CswapArgs @('list', '--json')) -join "`n")
     }
-
     $nowUnixSeconds = [DateTimeOffset]::new($nowUtc).ToUnixTimeSeconds()
-    $done = 0
-    foreach ($record in $features) { $done += $record.Done }
+    $report = Get-EpicProgressStepReport -Item $items.ToArray() -EpicCheckpoint $epicRows.Checkpoint -SyncRow @($epicRows.Sync | Where-Object { $null -ne $_ }) -EpicIssue $epicIssueText -State $storedState -NowUnixSeconds $nowUnixSeconds -Default $defaults -NoEpicStep:$itemMode -ResetBaseline:$ResetBaseline
     $baselineDoneValue = $baseline.BaselineDone
-    if ($baseline.UseCurrentDone) { $baselineDoneValue = $done }
-    $selection = Select-EpicProgressSample -Sample $priorSamples -NowUnixSeconds $nowUnixSeconds -Done $done -SampleCap $SampleCap
+    if ($baseline.UseCurrentDone) { $baselineDoneValue = $report.Done }
+    $selection = Select-EpicProgressSample -Sample $priorSamples -NowUnixSeconds $nowUnixSeconds -Done $report.Done -SampleCap $SampleCap
     $currentSamples = $selection.Sample
     # Pairing is a one-shot rewrite applied after the sample rule (cadence change).
     if ($PairSamples) { $currentSamples = [object[]] @(Merge-EpicProgressSamplePair -Sample $currentSamples) }
-    if ($selection.Changed -or $ResetBaseline -or $PairSamples) {
+    if ($selection.Changed -or $report.LedgerChanged -or $report.ItemsChanged -or $ResetBaseline -or $PairSamples) {
         $startUnixSeconds = [DateTimeOffset]::new($baseline.StartUtc).ToUnixTimeSeconds()
-        $stateJson = ConvertTo-EpicProgressStateJson -StartUnixSeconds $startUnixSeconds -BaselineDone $baselineDoneValue -BaselineWeeklyPct $baseline.BaselineWeeklyPct -Sample $currentSamples
+        $stateJson = ConvertTo-EpicProgressStateJson -StartUnixSeconds $startUnixSeconds -BaselineDone $baselineDoneValue -BaselineWeeklyPct $baseline.BaselineWeeklyPct -Sample $currentSamples -Duration $report.Ledger -Item $report.Items
         Write-EpicProgressState -Path $setting.StatePath -Content $stateJson
     }
 
-    $summary = Get-EpicProgressSummary -Feature $features.ToArray() -BaselineDone $baselineDoneValue -StartUtc $baseline.StartUtc -NowUtc $nowUtc -Sample $currentSamples -WaveOverheadHours $WaveOverheadHours -WeeklyPct $weeklyPct -BaselineWeeklyPct $baseline.BaselineWeeklyPct -EpicIssue $epicIssueText -EpicName $EpicFolder
+    $subject = 'Epic'
+    $epicName = $EpicFolder
+    if ($itemMode) { $subject = 'Item'; $epicName = '' }
+    $summary = Get-EpicProgressSummary -Feature $report.Feature -EpicStep $report.EpicStep -Estimate $report.Estimate -WaveParallelSeconds $report.WaveParallelSeconds -Unmapped $report.Unmapped -Subject $subject -StartUtc $baseline.StartUtc -NowUtc $nowUtc -WeeklyPct $weeklyPct -BaselineWeeklyPct $baseline.BaselineWeeklyPct -EpicIssue $epicIssueText -EpicName $epicName
     $lines = [System.Collections.Generic.List[string]]::new()
-    $tldrLines = Get-EpicProgressTldrLine -Summary $summary
-    $lines.AddRange([string[]] $tldrLines)
-    if ($Mode -ne 'TLDR') {
-        $fullLines = Get-EpicProgressFullLine -Summary $summary
-        $lines.AddRange([string[]] $fullLines)
-    }
+    $lines.AddRange([string[]] @(Get-EpicProgressTldrLine -Summary $summary))
+    if ($Mode -ne 'TLDR') { $lines.AddRange([string[]] @(Get-EpicProgressFullLine -Summary $summary)) }
     return $lines.ToArray()
 }
 
