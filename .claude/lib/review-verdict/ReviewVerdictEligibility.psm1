@@ -274,3 +274,222 @@ function Get-ReviewVerdictReviewDecision {
     }
     return ConvertTo-ReviewVerdictDecision -Eligible $true -Code 'REVIEW_VERDICT_ELIGIBLE' -Detail $live -Description $description
 }
+
+function Get-ReviewVerdictBranchDecision {
+    <#
+    .SYNOPSIS
+        Gather the pull request and check its head ref and its main base; return null when both
+        match, otherwise the decision to return.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([int] $PrNumber, [hashtable] $Fact, [string] $Pattern, [string] $Expected)
+
+    if (-not $Fact.ContainsKey('PullRequest')) { return Get-ReviewVerdictPullRequestRequest -PrNumber $PrNumber }
+    $pullRequest = Get-ReviewVerdictPullRequest -Fact $Fact
+    if ($pullRequest.headRefName -cnotmatch $Pattern -or $pullRequest.baseRefName -cne $script:BaseBranch) {
+        return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_BRANCH_MISMATCH' -Detail "head '$($pullRequest.headRefName)' into '$($pullRequest.baseRefName)' is not $Expected into main"
+    }
+    return $null
+}
+
+function Get-ReviewVerdictListingFact {
+    <#
+    .SYNOPSIS
+        Return the parsed NUL listing of a gathered git fact as Entry, or a decision when git failed.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([hashtable] $Fact, [string] $Name)
+
+    try { $entry = ConvertFrom-ReviewVerdictNulList -Text (Get-ReviewVerdictFactOutput -Fact $Fact -Name $Name) }
+    catch { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_GIT_FAILED' -Detail $_.Exception.Message }
+    return [pscustomobject]@{ Entry = $entry }
+}
+
+function Get-ReviewVerdictMergeBaseFact {
+    <#
+    .SYNOPSIS
+        Return the object id of a gathered git merge-base fact as Base, or a decision when git failed.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([hashtable] $Fact, [string] $Name)
+
+    $record = $Fact[$Name]
+    $value = ([string]$record.Output).Trim()
+    if ([int]$record.ExitCode -ne 0 -or -not (Test-ReviewVerdictObjectId -Value $value)) {
+        return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_GIT_FAILED' -Detail "git merge-base for $Name exited $($record.ExitCode)"
+    }
+    return [pscustomobject]@{ Base = $value }
+}
+
+function Test-ReviewVerdictIsDecision {
+    <# .SYNOPSIS Return true when a helper result is a decision record rather than a gathered value. #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([object] $Value)
+
+    return $Value.PSObject.Properties.Name -contains 'Code'
+}
+
+function Get-ReviewVerdictMainSyncDecision {
+    <#
+    .SYNOPSIS
+        Decide mode MainSync: a merge of main into an epic integration branch.
+    .DESCRIPTION
+        The head ref matches epic/<name>-integration and the base is main. The live head has
+        exactly two parents, R then M; R carries a review/verdict status with state success; M is
+        an ancestor of origin/main. With B the merge base of R and M, diff(B,R) and diff(B,M) are
+        disjoint, diff(R,H) is a subset of diff(B,M), and diff(M,H) is a subset of diff(B,R).
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([int] $PrNumber, [hashtable] $Fact = @{})
+
+    $branch = Get-ReviewVerdictBranchDecision -PrNumber $PrNumber -Fact $Fact -Pattern $script:IntegrationBranchPattern -Expected 'epic/<name>-integration'
+    if ($null -ne $branch) { return $branch }
+    $head = (Get-ReviewVerdictPullRequest -Fact $Fact).headRefOid
+    if (-not $Fact.ContainsKey('Parents')) { return Get-ReviewVerdictFactRequest -Name 'Parents' -Tool 'git' -Arguments @('log', '-1', '--format=%P', $head) }
+    if ([int]$Fact.Parents.ExitCode -ne 0) { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_GIT_FAILED' -Detail "git log exited $($Fact.Parents.ExitCode)" }
+    $parent = @(([string]$Fact.Parents.Output).Trim().Split(' ', [System.StringSplitOptions]::RemoveEmptyEntries))
+    if ($parent.Count -ne 2) {
+        return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_NOT_MAIN_SYNC' -Detail "the head $head has $($parent.Count) parents, not 2"
+    }
+    $reviewed = $parent[0]; $main = $parent[1]
+    if (-not $Fact.ContainsKey('ParentStatus')) {
+        return Get-ReviewVerdictFactRequest -Name 'ParentStatus' -Tool 'gh' -Arguments @('api', "repos/{owner}/{repo}/commits/$reviewed/statuses")
+    }
+    $state = ''
+    if ([int]$Fact.ParentStatus.ExitCode -eq 0) {
+        $status = @(ConvertFrom-Json -InputObject ([string]$Fact.ParentStatus.Output) -AsHashtable -NoEnumerate)
+        if ($status.Count -eq 1 -and $status[0] -is [array]) { $status = @($status[0]) }
+        $newest = @($status | Where-Object { (Get-ReviewVerdictMember -Value $_ -Name 'context') -ceq $script:StatusContext })
+        if ($newest.Count -gt 0) { $state = [string](Get-ReviewVerdictMember -Value $newest[0] -Name 'state') }
+    }
+    if ($state -cne 'success') {
+        return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_PARENT_UNVERIFIED' -Detail "the first parent $reviewed has no successful review/verdict status"
+    }
+    if (-not $Fact.ContainsKey('MainAncestry')) { return Get-ReviewVerdictFactRequest -Name 'MainAncestry' -Tool 'git' -Arguments @('merge-base', '--is-ancestor', $main, $script:MainRef) }
+    $ancestry = [int]$Fact.MainAncestry.ExitCode
+    if ($ancestry -eq 1) { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_NOT_MAIN_SYNC' -Detail "the second parent $main is not an ancestor of origin/main" }
+    if ($ancestry -ne 0) { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_GIT_FAILED' -Detail "git merge-base --is-ancestor exited $ancestry" }
+    if (-not $Fact.ContainsKey('MergeBase')) { return Get-ReviewVerdictFactRequest -Name 'MergeBase' -Tool 'git' -Arguments @('merge-base', $reviewed, $main) }
+    $base = Get-ReviewVerdictMergeBaseFact -Fact $Fact -Name 'MergeBase'
+    if (Test-ReviewVerdictIsDecision -Value $base) { return $base }
+    $set = @{}
+    foreach ($pair in @(@('BranchSet', $base.Base, $reviewed), @('MainSet', $base.Base, $main), @('ReviewedToHead', $reviewed, $head), @('MainToHead', $main, $head))) {
+        if (-not $Fact.ContainsKey($pair[0])) {
+            return Get-ReviewVerdictFactRequest -Name $pair[0] -Tool 'git' -Arguments @('diff', '--name-only', '-z', '--no-renames', $pair[1], $pair[2])
+        }
+        $listing = Get-ReviewVerdictListingFact -Fact $Fact -Name $pair[0]
+        if (Test-ReviewVerdictIsDecision -Value $listing) { return $listing }
+        $set[$pair[0]] = [System.Collections.Generic.HashSet[string]]::new([string[]]$listing.Entry, [System.StringComparer]::Ordinal)
+    }
+    foreach ($path in $set.BranchSet) {
+        if ($set.MainSet.Contains($path)) { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_NOT_MAIN_SYNC' -Detail "'$path' changed on both the branch and main" }
+    }
+    foreach ($check in @(@('ReviewedToHead', 'MainSet', 'main'), @('MainToHead', 'BranchSet', 'the reviewed head'))) {
+        foreach ($path in $set[$check[0]]) {
+            if (-not $set[$check[1]].Contains($path)) {
+                return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_NOT_MAIN_SYNC' -Detail "'$path' differs from $($check[2]) in the merge"
+            }
+        }
+    }
+    return ConvertTo-ReviewVerdictDecision -Eligible $true -Code 'REVIEW_VERDICT_ELIGIBLE' -Detail $head -Description 'main sync: no change beyond main and the reviewed head'
+}
+
+function Get-ReviewVerdictBaseListing {
+    <#
+    .SYNOPSIS
+        Gather the merge base of origin/main and the head, then one listing from it; return Base
+        and Entry, or the decision to return.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([hashtable] $Fact, [string] $Head, [string] $Name, [string] $ListFlag)
+
+    if (-not $Fact.ContainsKey('MergeBase')) { return Get-ReviewVerdictFactRequest -Name 'MergeBase' -Tool 'git' -Arguments @('merge-base', $script:MainRef, $Head) }
+    $base = Get-ReviewVerdictMergeBaseFact -Fact $Fact -Name 'MergeBase'
+    if (Test-ReviewVerdictIsDecision -Value $base) { return $base }
+    if (-not $Fact.ContainsKey($Name)) { return Get-ReviewVerdictFactRequest -Name $Name -Tool 'git' -Arguments @('diff', $ListFlag, '-z', '--no-renames', $base.Base, $Head) }
+    $listing = Get-ReviewVerdictListingFact -Fact $Fact -Name $Name
+    if (Test-ReviewVerdictIsDecision -Value $listing) { return $listing }
+    return [pscustomobject]@{ Base = $base.Base; Entry = $listing.Entry }
+}
+
+function Test-ReviewVerdictRecordsPrPath {
+    <#
+    .SYNOPSIS
+        Return true for a records path: under docs/features/ except templates/ and the potential
+        template, or under .claude/agent-memory/.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([string] $Path)
+
+    $ordinal = [System.StringComparison]::Ordinal
+    if ($Path.StartsWith('.claude/agent-memory/', $ordinal)) { return $true }
+    return $Path.StartsWith($script:FeatureRoot, $ordinal) -and -not $Path.StartsWith('docs/features/templates/', $ordinal) -and $Path -cne $script:PotentialTemplate
+}
+
+function Get-ReviewVerdictRecordsPrDecision {
+    <#
+    .SYNOPSIS
+        Decide mode RecordsPr: the documentationandmemories records pull request into main.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([int] $PrNumber, [hashtable] $Fact = @{})
+
+    $branch = Get-ReviewVerdictBranchDecision -PrNumber $PrNumber -Fact $Fact -Pattern $script:RecordsBranchPattern -Expected $script:RecordsBranch
+    if ($null -ne $branch) { return $branch }
+    $head = (Get-ReviewVerdictPullRequest -Fact $Fact).headRefOid
+    $listing = Get-ReviewVerdictBaseListing -Fact $Fact -Head $head -Name 'Listing' -ListFlag '--name-only'
+    if (Test-ReviewVerdictIsDecision -Value $listing) { return $listing }
+    if ($listing.Entry.Count -eq 0) { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_NOT_RECORDS_ONLY' -Detail 'the pull request changes no path' }
+    foreach ($path in $listing.Entry) {
+        if (-not (Test-ReviewVerdictRecordsPrPath -Path $path)) {
+            return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_NOT_RECORDS_ONLY' -Detail "'$path' is not a records path"
+        }
+    }
+    return ConvertTo-ReviewVerdictDecision -Eligible $true -Code 'REVIEW_VERDICT_ELIGIBLE' -Detail $head -Description 'records-only pull request'
+}
+
+function Get-ReviewVerdictPromotionPrDecision {
+    <#
+    .SYNOPSIS
+        Decide mode PromotionPr: a promotion-record pull request into main.
+    .DESCRIPTION
+        Every name-status entry lies under docs/features/potential/ (not template.md) or is an
+        added file under exactly one folder docs/features/active/<name>-<branch number>/ that does
+        not exist at the merge base.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([int] $PrNumber, [hashtable] $Fact = @{})
+
+    $branch = Get-ReviewVerdictBranchDecision -PrNumber $PrNumber -Fact $Fact -Pattern $script:PromotionBranchPattern -Expected '<feature|bug>/<name>-<number>'
+    if ($null -ne $branch) { return $branch }
+    $pullRequest = Get-ReviewVerdictPullRequest -Fact $Fact
+    $number = ([regex]::Match($pullRequest.headRefName, $script:PromotionBranchPattern)).Groups[1].Value
+    $listing = Get-ReviewVerdictBaseListing -Fact $Fact -Head $pullRequest.headRefOid -Name 'NameStatus' -ListFlag '--name-status'
+    if (Test-ReviewVerdictIsDecision -Value $listing) { return $listing }
+    $code = 'REVIEW_VERDICT_NOT_PROMOTION_RECORD'
+    if ($listing.Entry.Count % 2 -ne 0) { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code $code -Detail 'the name-status listing is not status and path pairs' }
+    $folder = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    for ($index = 0; $index -lt $listing.Entry.Count; $index += 2) {
+        $status = $listing.Entry[$index]; $path = $listing.Entry[$index + 1]
+        if ($path.StartsWith($script:PotentialRoot, [System.StringComparison]::Ordinal) -and $path -cne $script:PotentialTemplate) { continue }
+        $match = [regex]::Match($path, $script:ActiveFolderPattern)
+        $isRecord = $status -ceq 'A' -and $match.Success -and $match.Groups[1].Value.EndsWith("-$number", [System.StringComparison]::Ordinal)
+        if (-not $isRecord) { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code $code -Detail "'$status $path' is not a potential record or an added file of the promoted folder" }
+        [void]$folder.Add("docs/features/active/$($match.Groups[1].Value)")
+    }
+    if ($folder.Count -ne 1) { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code $code -Detail "the pull request adds $($folder.Count) promoted folders, not 1" }
+    $promoted = @($folder)[0]
+    if (-not $Fact.ContainsKey('FolderTree')) { return Get-ReviewVerdictFactRequest -Name 'FolderTree' -Tool 'git' -Arguments @('ls-tree', '-d', '--name-only', $listing.Base, '--', $promoted) }
+    if ([int]$Fact.FolderTree.ExitCode -ne 0) { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code 'REVIEW_VERDICT_GIT_FAILED' -Detail "git ls-tree exited $($Fact.FolderTree.ExitCode)" }
+    if (-not [string]::IsNullOrWhiteSpace([string]$Fact.FolderTree.Output)) { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code $code -Detail "$promoted already exists at the merge base" }
+    return ConvertTo-ReviewVerdictDecision -Eligible $true -Code 'REVIEW_VERDICT_ELIGIBLE' -Detail $pullRequest.headRefOid -Description 'promotion-record pull request'
+}
