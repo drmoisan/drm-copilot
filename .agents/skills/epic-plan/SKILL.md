@@ -44,9 +44,9 @@ For an epic-worthy objective:
 2. Record goal, scope, non-goals, shared design, acceptance criteria, decomposition rationale,
    production-file estimates, and integration risks.
 3. Add `depends_on` edges only for real upstream contracts.
-4. Compute execution waves with the longest-path formula in
-   `scripts/dev_tools/epic_wave_computation.py`; unresolved references and cycles block
-   preparation.
+4. Compute execution waves with the longest-path formula by running
+   `pwsh -NoProfile -File .codex/lib/epic-wave/Invoke-EpicWave.ps1 -ManifestPath <manifest>`; unresolved references and cycles block
+   preparation (the Python module `epic_wave_computation` is this repository's parity reference).
 5. Assess each child as C1-C4 using the central policy. Record the assessed band, rationale,
    deployment agent, model, reasoning effort, and the monotonic orchestration complexity ceiling.
 6. Set `max_parallel_features` to an integer from 1 through 8. Use the routing-policy default of

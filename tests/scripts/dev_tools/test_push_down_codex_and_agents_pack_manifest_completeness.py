@@ -95,7 +95,6 @@ PRE_EXISTING_UNRELATED_SKILL_EXCEPTIONS: frozenset[str] = frozenset(
     {
         ".agents/skills/architecture-boundaries/SKILL.md",
         ".agents/skills/benchmark-baselines/SKILL.md",
-        ".agents/skills/ci-workflows/SKILL.md",
         ".agents/skills/commit-message-conventions/SKILL.md",
         ".agents/skills/commit-message/SKILL.md",
         ".agents/skills/csharp-change-budget-router/SKILL.md",

@@ -137,6 +137,8 @@ Describe 'epic merge gate run-target resolution' {
 
     It 'M4 allows a child merge whose pr_gate.pr_number equals the command PR number' {
         # Arrange
+        # Branch 1 now requires a verified CI run (issue #1130); the child-CI decision is mocked to Verified.
+        Mock -CommandName Get-EpicMergeGateChildCiDecision -MockWith { [ordered]@{ Verified = $true; Reason = '' } }
         $item = New-WorktreeResolutionFixtureTarget -Status 'OtherWorktree' -WorktreeRoot '/synthetic-worktrees/w-item'
         Mock -CommandName Resolve-EpicMergeGateItemTarget -MockWith { $item }.GetNewClosure()
         Set-MergeRunTopology -Live @('/synthetic-worktrees/w-epic')
