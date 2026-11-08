@@ -49,6 +49,7 @@
     ".claude/hooks/enforce-docs-role-write-scope.ps1",
     ".claude/hooks/enforce-epic-merge-gate-review.ps1",
     ".claude/hooks/enforce-epic-wave-barrier.ps1",
+    ".claude/hooks/epic-wave-barrier-early-start.ps1",
     ".claude/hooks/enforce-epic-worktree-removal-gate.ps1",
     ".claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1",
     ".claude/hooks/enforce-evidence-locations.ps1",

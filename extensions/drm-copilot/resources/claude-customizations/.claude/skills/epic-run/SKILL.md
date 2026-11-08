@@ -54,3 +54,7 @@ $ARGUMENTS
 This skill adds no procedure of its own beyond kickoff-artifact resolution; wave scheduling,
 the wave barrier, merge-on-green fan-in, worktree cleanup, `epic-status.md` maintenance, and
 the final integration-to-`main` PR are governed entirely by the `epic-orchestrate` skill.
+
+An early dependent start (manifest field `early_start_on`) is governed by
+`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
+field runs exactly as described above.

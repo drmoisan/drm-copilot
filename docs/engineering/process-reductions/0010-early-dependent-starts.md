@@ -1,0 +1,81 @@
+# 0010: Early dependent starts
+
+## Summary
+
+reduction: 0010
+Date: 2026-11-08
+Issue: #1097
+Merge commit: pending (PR #1097)
+
+Relaxes the epic wave barrier for one opted-in dependency edge. A feature whose manifest entry carries `early_start_on: <upstream issue_num>` may start before that upstream merges, once the upstream has pushed an interface-settled evidence file, and records `features[].early_start` (`dependency`, `upstream_branch`, `interface_settled_at`, `interface_evidence`, later `synced_at`) in the epic checkpoint. Layer 1 (both `enforce-epic-wave-barrier.ps1` gates, through the sibling `epic-wave-barrier-early-start.ps1`) skips only that edge while the upstream is at `worktree_created`, `pr_open`, `ci_green`, or `merge_conflict`. Layer 2 (the Python, TypeScript, and PowerShell ports of the wave-barrier ordering check) judges that edge by its own table instead of the status and timing checks, and reports `EPIC_WAVE_BARRIER_VIOLATION: <f> is at pr_open or later while early_start dependency <d> is not merged` or `EPIC_WAVE_BARRIER_VIOLATION: <f> is at pr_open or later without a string synced_at for early_start dependency <d>`. A checkpoint without a valid record takes the previous path in every runtime. Until the pull request exists, the `Merge commit:` line carries the canonical issue number as a stand-in, and the orchestrator replaces it with the pull request number right after PR creation.
+
+## Reason and Evidence
+
+Section `## 8. Early Dependent Starts` of `docs/features/active/reduce-feature-cycle-time-with-revertible-ledger-1097/research/research.2026-11-06.md` found that a dependent feature waits for its upstream's whole review, CI, and merge cycle although it needs only the upstream's settled interface. Decision D7 of the feature specification keeps the merge decision unchanged: the dependent merges the upstream's merge result into its branch before review (steps 5 to 8 of the skill procedure), its reviewed head is a post-sync head, and its pull request still needs a passing review and green CI. The opt-in is a human-authored manifest field, so a running epic does not adopt the behavior from the skill text alone.
+
+Back-compat proof: no checkpoint written before this reduction carries `early_start`, so every existing checkpoint takes the previous path in both layers. `tests/fixtures/epic_wave_barrier/layer2-parity-edge-cases.json`, `tests/fixtures/epic_wave_barrier/start-guard-matrix.json`, and every existing suite that reads them stay unedited, pass, and keep their Phase 0 test counts, and `test_existing_corpus_holds_no_early_start_key` fails if either fixture gains the key. The new corpus `tests/fixtures/epic_wave_barrier/early-start-edge-cases.json` pins both messages in the three runtimes. The time saved per item is unknown until stage timing has data.
+
+## Files Changed
+
+- `scripts/dev_tools/_epic_orchestrator_state_wave_barrier.py`: source
+- `tests/fixtures/epic_wave_barrier/early-start-edge-cases.json`: created corpus
+- `tests/scripts/dev_tools/test_epic_wave_barrier_early_start.py`: created test
+- `extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-wave-barrier.ts`: created source, holding the wave-barrier check moved unchanged out of the epic core plus the early-start exemption
+- `extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-core.ts`: source
+- `extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-early-start.test.ts`: created test
+- `extensions/drm-copilot/jest.config.cjs`: source, the `coverageThreshold` entry of the created source
+- `.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1`: source
+- `extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1`: byte-identical mirror of `.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1`
+- `.claude/hooks/epic-wave-barrier-early-start.ps1`: created source
+- `.codex/hooks/epic-wave-barrier-early-start.ps1`: created, byte-identical twin of `.claude/hooks/epic-wave-barrier-early-start.ps1`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/epic-wave-barrier-early-start.ps1`: created, byte-identical mirror of `.claude/hooks/epic-wave-barrier-early-start.ps1`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/epic-wave-barrier-early-start.ps1`: created, byte-identical mirror of `.codex/hooks/epic-wave-barrier-early-start.ps1`
+- `.claude/hooks/enforce-epic-wave-barrier.ps1`: source
+- `.codex/hooks/enforce-epic-wave-barrier.ps1`: source
+- `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-wave-barrier.ps1`: byte-identical mirror of `.claude/hooks/enforce-epic-wave-barrier.ps1`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-wave-barrier.ps1`: byte-identical mirror of `.codex/hooks/enforce-epic-wave-barrier.ps1`
+- `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`: source, the manifest entry of the Claude sibling
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`: source, the manifest entry of the Codex sibling
+- `tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1`: contract test, the `$script:RuntimePaths` row of the Codex sibling
+- `tests/scripts/claude-hooks/EpicWaveEarlyStart.Cases.Helpers.ps1`: created test helper
+- `tests/scripts/claude-hooks/enforce-epic-wave-barrier.EarlyStart.Tests.ps1`: created test
+- `tests/scripts/codex-hooks/enforce-epic-wave-barrier.EarlyStart.Tests.ps1`: created test
+- `.claude/skills/epic-orchestrate/SKILL.md`: source
+- `.agents/skills/epic-orchestrate/SKILL.md`: source
+- `.claude/skills/epic-run/SKILL.md`: source
+- `.agents/skills/epic-run/SKILL.md`: source
+- `.claude/agents/epic-orchestrator.md`: source
+- `.codex/agents/epic-orchestrator.toml`: source, a hand-edited base with no generated variant
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md`: byte-identical mirror of `.claude/skills/epic-orchestrate/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md`: byte-identical mirror of `.agents/skills/epic-orchestrate/SKILL.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md`: byte-identical mirror of `.claude/skills/epic-run/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md`: byte-identical mirror of `.agents/skills/epic-run/SKILL.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md`: byte-identical mirror of `.claude/agents/epic-orchestrator.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml`: byte-identical mirror of `.codex/agents/epic-orchestrator.toml`
+- `tests/scripts/claude-runtime/early-start-skill-contract.Tests.ps1`: created contract test
+- `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`: pinned hashes, both `PINNED_FROZEN_SURFACE_HASHES` digests and the `RE-BASELINED by issue #1097.` comment paragraph
+- `docs/engineering/process-reductions/patches/0010-early-dependent-starts.patch`: stored patch
+- `docs/engineering/process-reductions/0010-early-dependent-starts.md`: this entry
+- `docs/engineering/process-reductions/README.md`: index row
+
+## Stored Patch
+
+`patches/0010-early-dependent-starts.patch` holds the reduction as one diff. It is generated as `git diff --cached --binary --no-renames HEAD` over the paths of `## Files Changed` other than the ledger folder, in the run that makes the commit whose subject carries `reduction: 0010`, after the ledger check and the chain replays with this entry report no error. Its create hunks hold every created file, so the chain compares each live created file that is not a derived path with its hunk. The byte-identical bundle copies and the Codex sibling twin are in the patch. The bundle copies are derived paths; the chain skips the modify hunks of a derived path, and it sets each created bundle copy absent without a hunk comparison, because the patch also creates its source.
+
+The check of README `## Revert Order`: `0010` is the highest number, so it is reverted first, against the live tree, and its `git apply -R --check` runs there. No stored patch of an older entry has a hunk on any path this entry changes. Entry `0007` holds revert blocks on `.claude/skills/epic-orchestrate/SKILL.md` and `.agents/skills/epic-orchestrate/SKILL.md` (step 3 of `## Epic Integration Branch Lifecycle` and the main-sync paragraph of `## Integration Branch and Child Worktrees`); this entry adds a new section in other sections of both files and repeats none of that text, so each `0007` `Current` still occurs exactly once and the `0007` record is not edited. Entry `0007` also names `parallel_orchestrator_surface_expectations.py` with no block on it, so the digest hunk overlaps no recorded region. Entries `0002` and `0003` each hold a revert block on `extensions/drm-copilot/jest.config.cjs`; the new threshold entry sits after the `orchestration-artifacts.ts` entry, outside both `Current` regions, so neither record is edited.
+
+## Revert Steps
+
+1. Apply the blocks: first confirm that no running epic checkpoint carries `early_start` on any feature, because a reverted validator would then report the early-started feature as a wave-barrier violation; finish or halt such an epic first. Then run `git apply -R` of `patches/0010-early-dependent-starts.patch`, which restores every changed path and deletes every created file (the corpus, the Python and TypeScript tests, the TypeScript wave-barrier module, both sibling copies and their bundle copies, the cases helper, both `EarlyStart` suites, and `early-start-skill-contract.Tests.ps1`); then remove the `0010` row from `README.md` and delete this entry. Revert this entry before `0009` to `0001`.
+2. Re-copy mirrors and bundles: copy `.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1`, both `enforce-epic-wave-barrier.ps1` gates, both `epic-orchestrate` skills, both `epic-run` skills, `.claude/agents/epic-orchestrator.md`, and `.codex/agents/epic-orchestrator.toml` to their bundle paths under `extensions/drm-copilot/resources/`, as listed in `## Files Changed`; the patch also restores both `pack-manifests/core.json` files, which no longer list the deleted siblings.
+3. Regenerate Codex variants: not applicable, because `.codex/agents/epic-orchestrator.toml` is a hand-edited base with no generated variant; run `scripts/dev_tools/generate_codex_agent_variants.py` in module form with `--check` all the same.
+4. Restore pinned hashes: the patch hunk on `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` restores both `PINNED_FROZEN_SURFACE_HASHES` digests and removes the `RE-BASELINED by issue #1097.` paragraph.
+5. Restore contract-test literals: the patch hunk on `tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1` removes the `$script:RuntimePaths` row of the Codex sibling.
+6. Run the contract tests: run `test_parallel_orchestrator_surface_contracts.py`, `test_push_down_pack_manifest_dependency_closure.py`, `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py`, `test_epic_wave_barrier_parity_corpus.py`, `test_validate_epic_orchestrator_state_wave_barrier.py`, `ProcessReductionChain.Ledger.Tests.ps1`, `OrchestratorStateEpicWaveBarrier.Parity.Tests.ps1`, `codex-epic-runtime-contracts.Tests.ps1`, `hook-dependency-guard-completeness.Tests.ps1`, and the existing `enforce-epic-wave-barrier` suites, inside the one `Invoke-PoshQCParallelTest` run and the one `pytest -n auto` run, with Jest through its normal parallel workers.
+
+## Revert Signals
+
+- Early-started children stop with `premise_falsified` more often than they finish, showing that interfaces were not settled when the evidence file said so.
+- Sync conflicts at step 7 cost more time than the early start saved.
+- A merge is traced to a stale interface that the path check of step 6 did not catch.
+- Stage timing shows no measured saving for early-started features.

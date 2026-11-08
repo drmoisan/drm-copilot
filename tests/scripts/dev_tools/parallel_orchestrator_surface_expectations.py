@@ -180,14 +180,20 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # dedicated sync child item, with a plain merge of `origin/main` into the
 # integration branch performed by `epic-orchestrator`. Only the skill digest
 # moved; the agent digest is unchanged and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #1097. That change added the opt-in
+# `## Early Dependent Starts (early_start)` section to the epic skill, and to
+# the epic agent one closing paragraph of `## Wave Scheduling` with the Bash
+# grant for the repository validator CLI that section names. Both digests
+# moved, and the pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "e0691d2a05dfd97b886694262eb900293f38d9927fc2803f7e4574af856ce740",
+        "c1a704d96884d960041abc35f8f892452707737a56c882a8b932da9a3b2d1628",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "65f34506ae2d0505f47f79bfbfcbbd9d7c7f78dccc0e9213bc6c9b8222101b76",
+        "ef3114033db7854beb315a0beccacbf0ec4a98fb989c9af608109dc6d4a260fc",
     ),
 )
 

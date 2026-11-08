@@ -38,3 +38,7 @@ Use the epic slug or path supplied in the invoking user request.
 
 Wave scheduling, fan-in, worktree cleanup, `epic-status.md`, final PR creation, CI validation,
 and completion are governed entirely by `epic-orchestrate`.
+
+An early dependent start (manifest field `early_start_on`) is governed by
+`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
+field runs exactly as described above.
