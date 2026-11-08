@@ -42,8 +42,8 @@ AfterAll {
 }
 
 Describe 'EpicWave corpus parity' {
-    It 'loads at least the eight corpus cases' -ForEach @(@{ Count = $script:Cases.Count }) {
-        $Count | Should -BeGreaterOrEqual 8
+    It 'loads at least the nine corpus cases' -ForEach @(@{ Count = $script:Cases.Count }) {
+        $Count | Should -BeGreaterOrEqual 9
     }
 
     It 'matches the reference for <Name>' -ForEach $script:Cases {

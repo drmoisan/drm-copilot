@@ -43,6 +43,7 @@ def test_corpus_holds_every_required_case() -> None:
         "single",
         "chain",
         "diamond",
+        "case-variant-keys",
         "multiple-roots",
         "two-node-cycle",
         "self-loop",

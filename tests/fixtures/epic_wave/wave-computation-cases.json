@@ -18,6 +18,11 @@
       "manifest": { "r1": [], "r2": [], "x": ["r1", "r2"], "y": ["r2"], "z": ["x", "y"] },
       "expected_waves": { "r1": 0, "r2": 0, "x": 1, "y": 1, "z": 2 }
     },
+    {
+      "name": "case-variant-keys",
+      "manifest": { "a": [], "A": ["a"] },
+      "expected_waves": { "a": 0, "A": 1 }
+    },
     { "name": "two-node-cycle", "manifest": { "a": ["b"], "b": ["a"] }, "expected_error": "cycle" },
     { "name": "self-loop", "manifest": { "a": ["a"] }, "expected_error": "self_loop" },
     { "name": "unresolved-reference", "manifest": { "a": ["missing"] }, "expected_error": "unresolved" }

@@ -68,6 +68,14 @@ Describe 'Invoke-EpicWaveCommand' {
         $result.Stderr | Should -BeExactly ''
     }
 
+    It 'returns exit code 0 for manifest keys that differ only by case' {
+        $result = Invoke-EpicWaveCommand -ManifestPath 'm.json' -ReadManifestText { '{"a":[],"A":["a"]}' }
+
+        $result.ExitCode | Should -Be 0
+        $result.Stdout | Should -BeExactly '{"A":1,"a":0}'
+        $result.Stderr | Should -BeExactly ''
+    }
+
     It 'returns exit code 0 and an empty object for an empty manifest' {
         $result = Invoke-EpicWaveCommand -ManifestPath 'm.json' -ReadManifestText { '{}' }
 
@@ -131,6 +139,13 @@ Describe 'Invoke-EpicWave.ps1 entry script' {
 
         $LASTEXITCODE | Should -Be 0
         $output | Should -BeExactly '{"a":0,"b":1,"c":2}'
+    }
+
+    It 'exits 0 and writes both case-variant keys' {
+        $output = & $script:CliPath -ManifestPath (Join-Path $script:FixtureRoot 'cli-case-variant-manifest.json')
+
+        $LASTEXITCODE | Should -Be 0
+        $output | Should -BeExactly '{"A":1,"a":0}'
     }
 
     It 'exits 1 for a cyclic manifest' {
