@@ -183,6 +183,18 @@ Describe 'Gather functions' {
             $report.Items.Count | Should -Be 0
             $report.ItemsChanged | Should -BeFalse
         }
+
+        It 'keeps no entry for an unmerged item with no anchor and no blocked span' {
+            # #77 is open with no plan text and no stored entry, so no anchor is created for it.
+            $item = Get-TestAnchorItem -Issue '77' -MergeStatus 'pr_open'
+            $item.PlanText = ''
+            $state = ConvertFrom-EpicProgressStateText -Text '{"version":2,"items":{}}'
+
+            $report = Get-EpicProgressStepReport -Item @($item) -EpicIssue '42' -State $state -NowUnixSeconds 1767614400 -Default (Resolve-EpicProgressStepDefault) -NoEpicStep
+
+            $report.Items.Count | Should -Be 0
+            $report.ItemsChanged | Should -BeFalse
+        }
     }
 
     Context 'in-progress execution start' {
