@@ -195,6 +195,7 @@
     ".claude/skills/inventory-legacy-system/SKILL.md",
     ".claude/skills/make-skill-template/SKILL.md",
     ".claude/skills/orchestrate/SKILL.md",
+    ".claude/skills/owner-directives/SKILL.md",
     ".claude/skills/parallel-add/SKILL.md",
     ".claude/skills/parallel-close/SKILL.md",
     ".claude/skills/parallel-orchestrate/SKILL.md",
