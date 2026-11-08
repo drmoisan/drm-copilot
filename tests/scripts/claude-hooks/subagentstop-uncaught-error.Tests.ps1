@@ -18,6 +18,7 @@
 BeforeDiscovery {
     $script:ValidatorRows = @(
         @{ Hook = '.claude/hooks/validate-discovery-artifact-gate.ps1'; Parameters = @{}; Prefix = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:' }
+        @{ Hook = '.claude/hooks/validate-docs-role-output.ps1'; Parameters = @{}; Prefix = 'DOCS_ROLE_OUTPUT_BLOCKED:' }
         @{ Hook = '.claude/hooks/validate-executor-output.ps1'; Parameters = @{}; Prefix = 'validate-executor-output:' }
         @{ Hook = '.claude/hooks/validate-feature-review-coverage.ps1'; Parameters = @{}; Prefix = 'validate-feature-review-coverage:' }
         @{ Hook = '.claude/hooks/validate-orchestrator-output.ps1'; Parameters = @{}; Prefix = 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:' }

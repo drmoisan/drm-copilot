@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:docs:1.0.0:docs-evidence-pin",
+  "title": "Docs v1 evidence pins (collection form)",
+  "description": "One document per repository holds every pin, sorted by pin_id. Each pin binds a page claim to a surface element and its declaration-lines digest.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "extensions", "repository", "pins"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:docs:1.0.0:docs-evidence-pin"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact_kind": {"const": "docs-evidence-pin"},
+    "id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+    "extensions": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/extensions"},
+    "repository": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+    "pins": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/pin"}}
+  },
+  "$defs": {
+    "pin": {
+      "type": "object", "additionalProperties": false,
+      "required": ["pin_id", "element_id", "element_kind", "page_path", "symbol", "source_path", "source_sha256", "revision", "claim", "pinned_at", "pinned_by"],
+      "properties": {
+        "pin_id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+        "element_id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-id"},
+        "element_kind": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-kind"},
+        "page_path": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
+        "symbol": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"},
+        "source_path": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
+        "source_sha256": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/sha256"},
+        "revision": {"anyOf": [{"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/revision"}, {"type": "null"}]},
+        "claim": {"anyOf": [{"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"}, {"type": "null"}]},
+        "pinned_at": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/timestamp"},
+        "pinned_by": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/actor"}
+      }
+    }
+  }
+}

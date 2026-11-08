@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Docs MCP tools (issue #1036): `run_docs_check`, `run_docs_inventory`, `run_docs_coverage`,
+  `update_docs_ledger`, `generate_docs_reference`, and `validate_docs_artifacts` run the
+  workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1 -Json` with `pwsh` 7.4 or later and
+  return its envelope unchanged in the `docs` result field. Inputs are validated before launch,
+  `update_docs_ledger` is the only tool that can write (only with `write: true`), and the tools
+  carry read-only or destructive MCP annotations. Host failures return a code-prefixed `summary`
+  such as `DOCS_ENTRY_SCRIPT_MISSING` or `DOCS_PWSH_UNAVAILABLE`.
 - Claude core pack skill `/epic-progress-report` (issue #1093): the core pack now carries
   `.claude/skills/epic-progress-report/SKILL.md` and its five bundled PowerShell scripts under
   `.claude/skills/epic-progress-report/scripts/` (the report entry script and its Logic, State,

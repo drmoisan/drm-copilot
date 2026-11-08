@@ -1,0 +1,48 @@
+---
+name: docs-reconcile-behavior
+description: 'Record coverage dispositions, evidence pins and parity dimensions through update_docs_ledger, previewing each change as a dry run first. Use when coverage findings or review judgments must be written to the estate artifacts.'
+---
+
+# Docs Reconcile Behavior
+
+## When to Use This Skill
+
+[docs-reconciler](../../../.codex/agents/docs-reconciler.toml) runs this skill to
+turn coverage findings and review judgments into ledger, matrix and pin changes.
+`update_docs_ledger` is the only tool that changes those artifacts.
+
+## Prerequisites
+
+Root steps run `Invoke-DocsCommand.ps1` from the docs helper library that the Claude customization push-down delivers, under PowerShell 7.4 or later. Without that library every root step in this skill is unavailable; the docs MCP tools stay available.
+
+## Steps
+
+1. Call `run_docs_coverage` with `workspace_root` and `profile` to list the
+   uncovered elements.
+2. For each change, call `update_docs_ledger` with `workspace_root`, `profile`,
+   `operation` and the fields the operation needs:
+   - `set-disposition`: exactly one of `element` and `limit`, `disposition`
+     (`documented`, `excluded` or `deferred`), and optionally `pages`,
+     `rationale`, `owner` and `target`;
+   - `remove-entry`: exactly one of `element` and `limit`;
+   - `pin`: `element`, `pages` with exactly one page without an anchor, and
+     optionally `claim`;
+   - `unpin`: `element` and `pages` with exactly one page without an anchor;
+   - `set-dimension`: `element`, `pages` with exactly one page without an anchor,
+     `dimension` (`exists`, `accurate`, `example_present`, `owner_assigned` or
+     `diataxis_mode`), `state` (`pass`, `fail`, `not-assessed` or
+     `not-applicable`), and optionally `rationale`;
+   - `sync-refs`: no element, limit or page field.
+   Always supply `actor_kind: agent` and `actor_id: docs-reconciler`. Call first
+   without `write` (a dry run), read the planned change, then call again with
+   `write: true` only for the change that is applied.
+3. Call `validate_docs_artifacts` with `workspace_root`, `profile`, `mode`
+   (`ledger` or `matrix`) and `revision` to confirm the artifacts stay valid. The
+   tool never persists a receipt.
+4. When the MCP server is unavailable, the root session can apply the same change.
+   Root step (unavailable without the docs helper library): `Invoke-DocsCommand.ps1 -Command update-ledger -Profile docs/documentation-estate/docs-profile.json -Operation sync-refs -ActorKind human -ActorId <operator-id> -Write`
+
+## Result
+
+Report the number of applied operations, the exit code of the last
+`update_docs_ledger` call and the element ids changed.

@@ -125,6 +125,14 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `run_poshqc_suite`
 - `resolve_policy_audit_template_asset`
 - `validate_orchestration_artifacts`
+- `run_docs_check`
+- `run_docs_inventory`
+- `run_docs_coverage`
+- `update_docs_ledger`
+- `generate_docs_reference`
+- `validate_docs_artifacts`
+
+The six docs tools run the workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1` with `pwsh -NoProfile -File <script> -Command <subcommand> -Json`, with the workspace root as working directory. They require PowerShell 7.4 or later on `PATH` (there is no fallback to Windows PowerShell) and the pushed-down `.claude/lib/docs/` library in the target workspace; run `push_down_claude_customizations` first when it is missing. Only `update_docs_ledger` can change files, and only when `write` is `true`; every other docs tool is read-only.
 
 ### MCP Runtime Expectations
 
@@ -179,6 +187,12 @@ If the server is launched from a different working directory, pass `workspace_ro
 - run_poshqc_analyze_autofix: required `workspace_root`, optional `scan_folders`
 - run_poshqc_suite: required `workspace_root`, optional `scan_folders`
 - validate_orchestration_artifacts: required `workspace_root`, required `artifact_type`, required `artifact_path`, optional `require_complete`
+- `run_docs_check`: required `workspace_root`, optional `profile`, optional `paths`
+- `run_docs_inventory`: required `workspace_root`, optional `profile`, optional `analyzers`, optional `revision`
+- `run_docs_coverage`: required `workspace_root`, optional `profile`
+- `update_docs_ledger`: required `workspace_root`, required `operation`, required `actor_kind`, required `actor_id`, optional `profile`, `element` or `limit`, `disposition`, `pages`, `rationale`, `owner`, `target`, `dimension`, `state`, `claim`, and `write` (default `false`, a dry run); the fields each operation requires or permits are checked before launch
+- `generate_docs_reference`: required `workspace_root`, optional `profile`, optional `snapshot`, optional `output_directory` (always a dry run)
+- `validate_docs_artifacts`: required `workspace_root`, required `mode`, required `revision`, optional `profile` (never persists a receipt)
 
 ### MCP Result Shape
 
@@ -190,11 +204,21 @@ MCP tool calls return structured JSON with:
 - `artifacts` when the workflow has deterministic or discovered output paths
 - `summary`
 - `stderr_excerpt` when a subprocess failure surfaces stderr diagnostics
+- `docs` for the docs tools: the `Invoke-DocsCommand.ps1 -Json` envelope (`command`, `exit_code`, `findings`, `ok`, `result`) passed through unchanged; `ok` equals the envelope `ok`, `summary` is `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>`, and `stderr_excerpt` is added only for exit code 3
+
+A docs tool that fails before or instead of producing a valid envelope returns `ok: false` without `docs`, and its `summary` begins with one of these host failure codes:
+
+- `DOCS_INPUT_INVALID`: the input failed validation; no process was started.
+- `DOCS_WORKSPACE_ROOT_INVALID`: `workspace_root` is missing, not a string, or not absolute.
+- `DOCS_ENTRY_SCRIPT_MISSING`: `.claude/lib/docs/Invoke-DocsCommand.ps1` is absent; run `push_down_claude_customizations`.
+- `DOCS_PWSH_UNAVAILABLE`: `pwsh` is not on `PATH` or could not be started.
+- `DOCS_RUNTIME_UNAVAILABLE`: the host provides no docs command runtime.
+- `DOCS_ENVELOPE_EMPTY`, `DOCS_ENVELOPE_MALFORMED`, `DOCS_ENVELOPE_EXIT_MISMATCH`, `DOCS_ENVELOPE_COMMAND_MISMATCH`: stdout was empty, was not one valid envelope, or disagreed with the process exit code or the requested subcommand.
 
 ## Runtime Requirements
 
 - All commands run in-process in TypeScript; no `python` interpreter is required for any extension or MCP command.
-- PowerShell commands prefer `pwsh` and fall back to `powershell` on Windows when available.
+- PowerShell commands prefer `pwsh` and fall back to `powershell` on Windows when available. The docs tools are the exception: they require `pwsh` (PowerShell 7.4 or later) and the pushed-down `.claude/lib/docs/` library in the workspace.
 - An open workspace folder is required for workspace-targeted VS Code commands.
 - MCP clients must build the package so `out/mcp-server.js` exists before launching the server.
 

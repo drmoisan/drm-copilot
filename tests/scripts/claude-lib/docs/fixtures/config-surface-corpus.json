@@ -1,0 +1,1161 @@
+{
+  "description": "Issue 1022 config-files corpus (scanner-only): inputs under the source root config with a marker value in every value position (including JSON Schema default, enum, const, examples and pattern), the expected config-key elements and the expected diagnostics. The ENV_FILE_NOT_CAPTURED entries carry analyzer_id docs-inventory. CONFIG_KEY_LIMIT is built in test code (in-test). Golden element_id and source_sha256 values are recorded by the independent [P2-T3] helper.",
+  "expected_diagnostics": [
+    {
+      "analyzer_id": "config-files",
+      "code": "TOML_INVALID",
+      "path": "config/other/pyproject.toml"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "TOML_INLINE_TABLE_NOT_EXPANDED",
+      "path": "config/pyproject.toml"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "TOML_KEY_ESCAPE_UNSUPPORTED",
+      "path": "config/pyproject.toml"
+    },
+    {
+      "analyzer_id": "docs-inventory",
+      "code": "ENV_FILE_NOT_CAPTURED",
+      "path": "config/.env"
+    },
+    {
+      "analyzer_id": "docs-inventory",
+      "code": "ENV_FILE_NOT_CAPTURED",
+      "path": "config/.env.local"
+    },
+    {
+      "analyzer_id": "docs-inventory",
+      "code": "ENV_FILE_NOT_CAPTURED",
+      "path": "config/app.env"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "ENV_LINE_UNRECOGNIZED",
+      "path": "config/.env.example"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "ENV_KEY_DUPLICATE",
+      "path": "config/.env.example"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "ENV_INVALID",
+      "path": "config/.env.template"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "JSON_INVALID",
+      "path": "config/broken.schema.json"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "JSON_SCHEMA_REF_UNRESOLVED",
+      "path": "config/settings.schema.json"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "JSON_SCHEMA_KEYWORD_NOT_EXPANDED",
+      "path": "config/settings.schema.json"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "YAML_FLOW_COLLECTION_NOT_EXPANDED",
+      "path": "config/app.yaml"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "YAML_KEY_ESCAPE_UNSUPPORTED",
+      "path": "config/app.yaml"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "YAML_MULTI_DOCUMENT",
+      "path": "config/multi.yml"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "YAML_ANCHOR_ALIAS",
+      "path": "config/anchor.yml"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "YAML_UNSUPPORTED",
+      "path": "config/tagged.yml"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "YAML_ROOT_NOT_MAPPING",
+      "path": "config/seq.yml"
+    },
+    {
+      "analyzer_id": "config-files",
+      "code": "YAML_INVALID",
+      "path": "config/bad.yml"
+    }
+  ],
+  "expected_elements": [
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "tool.black",
+      "element_id": "config-key-905c63ac3b5d8ba4ac10a031ed55247f8636daeb6f5630ab1cc5b95c69a6041a",
+      "kind": "config-key",
+      "line_range": {
+        "end": 9,
+        "start": 7
+      },
+      "name": "black",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/pyproject.toml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "toml"
+        },
+        {
+          "name": "value_type",
+          "value": "table"
+        }
+      ],
+      "source_sha256": "206e8c4a5bfaf867b6dc50eba0a3ff262b068bad36788591764d411b17a5385d"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "tool.black.line-length",
+      "element_id": "config-key-b4b8455f5111e1f37470cabeaee9c0550928782e27d78a111a282e21297617c6",
+      "kind": "config-key",
+      "line_range": {
+        "end": 8,
+        "start": 8
+      },
+      "name": "line-length",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/pyproject.toml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "toml"
+        },
+        {
+          "name": "value_type",
+          "value": "integer"
+        }
+      ],
+      "source_sha256": "8ec03d9f52a0b74fe69be331ff9c9f5dd1021fd407a31dc8610ad1fb321be563"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "tool.black.target-version",
+      "element_id": "config-key-5ea3d515d64d68fc784f93d7034ed949baec103affca15734fb28ed771a37c5a",
+      "kind": "config-key",
+      "line_range": {
+        "end": 9,
+        "start": 9
+      },
+      "name": "target-version",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/pyproject.toml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "toml"
+        },
+        {
+          "name": "value_type",
+          "value": "array"
+        }
+      ],
+      "source_sha256": "ab0dbf4c664d0da0598bb4283964238891601ee7bc7aa030522b8e7b3234e258"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "tool.poetry",
+      "element_id": "config-key-7f46373dd4e868ce12aa0657517a59bfe64b93a6ef20dd83abf4f6f10f0da655",
+      "kind": "config-key",
+      "line_range": {
+        "end": 12,
+        "start": 11
+      },
+      "name": "poetry",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/pyproject.toml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "toml"
+        },
+        {
+          "name": "value_type",
+          "value": "table"
+        }
+      ],
+      "source_sha256": "0a98ae14882d775557510bff06981af56f1df277b1fad3638171d8a87b7eef97"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "tool.poetry.name",
+      "element_id": "config-key-d4508e88e1d22bfc7664233a98447691a210165b5641ad154cb74b00b2f5accf",
+      "kind": "config-key",
+      "line_range": {
+        "end": 12,
+        "start": 12
+      },
+      "name": "name",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/pyproject.toml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "toml"
+        },
+        {
+          "name": "value_type",
+          "value": "string"
+        }
+      ],
+      "source_sha256": "7444e2f603c63cfe8bc432cdc9a1de6deb3a6ddf2e7a44364bd98779957fbfa6"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "tool.ruff",
+      "element_id": "config-key-7e5409c9a68ca145d9dbfa68f1d1694358e265549d704b28acf7d04c4cf1238c",
+      "kind": "config-key",
+      "line_range": {
+        "end": 33,
+        "start": 29
+      },
+      "name": "ruff",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/pyproject.toml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "toml"
+        },
+        {
+          "name": "value_type",
+          "value": "table"
+        }
+      ],
+      "source_sha256": "0aa44f549e706f671b297505d872b71e0472498711723b509ce61a1cfec15863"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "tool.ruff.select",
+      "element_id": "config-key-a5b6b37e1dd775ce60c79b8fcf2d7bfee890f390e3efc3dd87f84aaca833c587",
+      "kind": "config-key",
+      "line_range": {
+        "end": 30,
+        "start": 30
+      },
+      "name": "select",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/pyproject.toml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "toml"
+        },
+        {
+          "name": "value_type",
+          "value": "array"
+        }
+      ],
+      "source_sha256": "f6bbb575b5893f36ff9c4a01bc5fbafc381722bf82d5dd0521c16fa5d0464034"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "tool.ruff.\"quoted.key\"",
+      "element_id": "config-key-fddd54a4e1932441c86e4f72cc6764fd36bc81abdc29c656f4c0c3d46cecc58a",
+      "kind": "config-key",
+      "line_range": {
+        "end": 31,
+        "start": 31
+      },
+      "name": "quoted.key",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/pyproject.toml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "toml"
+        },
+        {
+          "name": "value_type",
+          "value": "string"
+        }
+      ],
+      "source_sha256": "00b2ee5e1770147301dc11c02e3402ad888a4add703dd3b340639200332676da"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "tool.ruff.inline",
+      "element_id": "config-key-60259a050e36b1527ae24d81f69463db46298acfa353d4fcaeb887764ac315b9",
+      "kind": "config-key",
+      "line_range": {
+        "end": 32,
+        "start": 32
+      },
+      "name": "inline",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/pyproject.toml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "toml"
+        },
+        {
+          "name": "value_type",
+          "value": "table"
+        }
+      ],
+      "source_sha256": "ea5eaae5cc4961eb59786bdb4008bc456a67e830ad2f57cf699dcd2ca9fa89d1"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "tool.mypy.overrides",
+      "element_id": "config-key-82e11a14c040de466014b769857383d0e13d168c68b3db8cddccaa0dc54aa680",
+      "kind": "config-key",
+      "line_range": {
+        "end": 37,
+        "start": 35
+      },
+      "name": "overrides",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/pyproject.toml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "toml"
+        },
+        {
+          "name": "value_type",
+          "value": "array"
+        }
+      ],
+      "source_sha256": "4c3d6016f83da9dbc01e8b8325867d172ba1644193aca7254985f8684dadae35"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "tool.mypy.overrides.[].module",
+      "element_id": "config-key-5812206078cc068219cf3070bbe196872d7a4746c97f05d833c5f8e2a4868c9f",
+      "kind": "config-key",
+      "line_range": {
+        "end": 36,
+        "start": 36
+      },
+      "name": "module",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/pyproject.toml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "toml"
+        },
+        {
+          "name": "value_type",
+          "value": "string"
+        }
+      ],
+      "source_sha256": "dc847d9e80bdebd7f135016d4352161cc04ce3fb39f624e594c72019041f38bf"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "tool.mypy.overrides.[].ignore_missing_imports",
+      "element_id": "config-key-ca806fbe3780523a109f7828b9f311ab45dabb7b02443f2bb5d555b0fd3ee607",
+      "kind": "config-key",
+      "line_range": {
+        "end": 37,
+        "start": 37
+      },
+      "name": "ignore_missing_imports",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/pyproject.toml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "toml"
+        },
+        {
+          "name": "value_type",
+          "value": "boolean"
+        }
+      ],
+      "source_sha256": "00b0f5ece38ef9704d39a50c3eb2f76055634adb19b80cb3c1cb43f2e5816304"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "API_KEY",
+      "element_id": "config-key-5135293dc75560ee96ff0cf7f19df85ae07b169b11adf17197792b072a728c40",
+      "kind": "config-key",
+      "line_range": {
+        "end": 2,
+        "start": 2
+      },
+      "name": "API_KEY",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/.env.example",
+      "properties": [
+        {
+          "name": "format",
+          "value": "env"
+        }
+      ],
+      "source_sha256": "532a8b324b56f72d12726888f5b429aeb2652223a1fe0a62f3272276fd85448a"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "DEBUG",
+      "element_id": "config-key-ca095c96cdac6a480e990555e8f0929958cf769020b7e219509aeef6458903f9",
+      "kind": "config-key",
+      "line_range": {
+        "end": 3,
+        "start": 3
+      },
+      "name": "DEBUG",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/.env.example",
+      "properties": [
+        {
+          "name": "format",
+          "value": "env"
+        }
+      ],
+      "source_sha256": "feff1d271aec46166cfd040b9576914eede0cc4e0eaeaaf41bd355d11b56e554"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "MULTI",
+      "element_id": "config-key-4e36d86aa4f3d1010da136c5c6ed94fd4d579966101ea735838fb61cc435b89b",
+      "kind": "config-key",
+      "line_range": {
+        "end": 5,
+        "start": 4
+      },
+      "name": "MULTI",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/.env.example",
+      "properties": [
+        {
+          "name": "format",
+          "value": "env"
+        }
+      ],
+      "source_sha256": "9ea2c36ddad1f2e58e10e436192aab0307501057de2261d9cc1761f74721f0b6"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "EMPTY",
+      "element_id": "config-key-9a49e9f5e3f7e2f6539b1416ab888a1a608f89660043f8286c2ce23300e0e3a0",
+      "kind": "config-key",
+      "line_range": {
+        "end": 6,
+        "start": 6
+      },
+      "name": "EMPTY",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/.env.example",
+      "properties": [
+        {
+          "name": "format",
+          "value": "env"
+        }
+      ],
+      "source_sha256": "7819c04858487b8325a083235e0697f271991cb446086084807fec586dc27427"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "SAMPLE_KEY",
+      "element_id": "config-key-39a250257001d2d8f7a0ab21d0682bdc5282b8f2f09881d5825261f6c707ebbe",
+      "kind": "config-key",
+      "line_range": {
+        "end": 1,
+        "start": 1
+      },
+      "name": "SAMPLE_KEY",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/.env.sample",
+      "properties": [
+        {
+          "name": "format",
+          "value": "env"
+        }
+      ],
+      "source_sha256": "9c2f4c42c61bb441949eb48482cdf241b941f2348796c93e1397962c50d36174"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "DIST_KEY",
+      "element_id": "config-key-4ab28a0ee06eaeb888d321c85ad4c9185ddffd6ea3c88c0725edad813ae8efee",
+      "kind": "config-key",
+      "line_range": {
+        "end": 1,
+        "start": 1
+      },
+      "name": "DIST_KEY",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/.env.dist",
+      "properties": [
+        {
+          "name": "format",
+          "value": "env"
+        }
+      ],
+      "source_sha256": "cf3dd6907d124682d5fcb7f42af64584daeaf66b58998545ec676566e4678385"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "name",
+      "element_id": "config-key-357c3670e32bf2bf7e0081f5bb8f29001008f35be9a1b61cf445578c0a82a13e",
+      "kind": "config-key",
+      "line_range": {
+        "end": 5,
+        "start": 5
+      },
+      "name": "name",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/settings.schema.json",
+      "properties": [
+        {
+          "name": "format",
+          "value": "json-schema"
+        },
+        {
+          "name": "required",
+          "value": true
+        },
+        {
+          "name": "schema_type",
+          "value": "string"
+        }
+      ],
+      "source_sha256": "c43a1360ce81d4cea4208998ca022223014916ab13e0f3296466d97f60dda124"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "mode",
+      "element_id": "config-key-c8c49024ee367d5d6238cb7723287cd023a70f1e0b6b9643ee63e07a370cd419",
+      "kind": "config-key",
+      "line_range": {
+        "end": 6,
+        "start": 6
+      },
+      "name": "mode",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/settings.schema.json",
+      "properties": [
+        {
+          "name": "format",
+          "value": "json-schema"
+        },
+        {
+          "name": "required",
+          "value": false
+        }
+      ],
+      "source_sha256": "a3086d25cf5bbf7611718aaf6b995c48107c04572650fa2bbb040bee07ca4ee5"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "nested",
+      "element_id": "config-key-cc848345151f9f6e06b810bb28708aa5aa2ff1aefd2eadb0b5b99fe6755f2f9f",
+      "kind": "config-key",
+      "line_range": {
+        "end": 7,
+        "start": 7
+      },
+      "name": "nested",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/settings.schema.json",
+      "properties": [
+        {
+          "name": "format",
+          "value": "json-schema"
+        },
+        {
+          "name": "required",
+          "value": false
+        },
+        {
+          "name": "schema_type",
+          "value": "object"
+        }
+      ],
+      "source_sha256": "c3c564cd167d4dd6100a8cb1a964a7d076a1fe293dfed6816d44b58410b5d7e0"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "nested.flag",
+      "element_id": "config-key-934a1d1e0f1817b4c2684ada54496f720f1d46f4389516ebfff0d0e3a02952c5",
+      "kind": "config-key",
+      "line_range": {
+        "end": 7,
+        "start": 7
+      },
+      "name": "flag",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/settings.schema.json",
+      "properties": [
+        {
+          "name": "format",
+          "value": "json-schema"
+        },
+        {
+          "name": "required",
+          "value": false
+        },
+        {
+          "name": "schema_type",
+          "value": "boolean"
+        }
+      ],
+      "source_sha256": "c3c564cd167d4dd6100a8cb1a964a7d076a1fe293dfed6816d44b58410b5d7e0"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "list",
+      "element_id": "config-key-04e9a653491130401fc8a6f3c84c64fa5a3154bf4d61b40f0b0b5bbef8a446a2",
+      "kind": "config-key",
+      "line_range": {
+        "end": 8,
+        "start": 8
+      },
+      "name": "list",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/settings.schema.json",
+      "properties": [
+        {
+          "name": "format",
+          "value": "json-schema"
+        },
+        {
+          "name": "required",
+          "value": false
+        },
+        {
+          "name": "schema_type",
+          "value": "array"
+        }
+      ],
+      "source_sha256": "5a22924254967ec1011acc37b01ecdd30bb7295a9fbab28ac68537dc737c5a3a"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "list.[].id",
+      "element_id": "config-key-fc07f88ca9c42c24a0aef87f5e82cea08be7110b512ae89d1e34698a7f52f422",
+      "kind": "config-key",
+      "line_range": {
+        "end": 8,
+        "start": 8
+      },
+      "name": "id",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/settings.schema.json",
+      "properties": [
+        {
+          "name": "format",
+          "value": "json-schema"
+        },
+        {
+          "name": "required",
+          "value": false
+        },
+        {
+          "name": "schema_type",
+          "value": "integer"
+        }
+      ],
+      "source_sha256": "5a22924254967ec1011acc37b01ecdd30bb7295a9fbab28ac68537dc737c5a3a"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "either",
+      "element_id": "config-key-964785bd5bc30ba37b45f1b00c1bbd8494c5f0fc09bbfda0e6f6ee703b3f222c",
+      "kind": "config-key",
+      "line_range": {
+        "end": 9,
+        "start": 9
+      },
+      "name": "either",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/settings.schema.json",
+      "properties": [
+        {
+          "name": "format",
+          "value": "json-schema"
+        },
+        {
+          "name": "required",
+          "value": false
+        }
+      ],
+      "source_sha256": "1b44089fcd424f1635c38f8ea114f341587e737924d2a3de1811cb04e51a4e93"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "either.x",
+      "element_id": "config-key-896604e2fe2c7ced77a2279ee7c7f4c8333fc45c4cd065b53a3ac949648521b0",
+      "kind": "config-key",
+      "line_range": {
+        "end": 9,
+        "start": 9
+      },
+      "name": "x",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/settings.schema.json",
+      "properties": [
+        {
+          "name": "conditional",
+          "value": true
+        },
+        {
+          "name": "format",
+          "value": "json-schema"
+        },
+        {
+          "name": "required",
+          "value": false
+        }
+      ],
+      "source_sha256": "1b44089fcd424f1635c38f8ea114f341587e737924d2a3de1811cb04e51a4e93"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "ref",
+      "element_id": "config-key-b5251993edaed1022342bc09eb350cec4a62dc7cbc01757ef5456eec7c9315d2",
+      "kind": "config-key",
+      "line_range": {
+        "end": 10,
+        "start": 10
+      },
+      "name": "ref",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/settings.schema.json",
+      "properties": [
+        {
+          "name": "format",
+          "value": "json-schema"
+        },
+        {
+          "name": "required",
+          "value": false
+        }
+      ],
+      "source_sha256": "91188317d398fefaee9267ec92b0784938c4d44145b45f6c633050ec662f7375"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "ref.deep",
+      "element_id": "config-key-abce9920c12b88f86c4c233716486129bc8f5f06ca31c0ee409185adebd87d57",
+      "kind": "config-key",
+      "line_range": {
+        "end": 14,
+        "start": 14
+      },
+      "name": "deep",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/settings.schema.json",
+      "properties": [
+        {
+          "name": "format",
+          "value": "json-schema"
+        },
+        {
+          "name": "required",
+          "value": false
+        },
+        {
+          "name": "schema_type",
+          "value": "number"
+        }
+      ],
+      "source_sha256": "26185e537504ab0838a741ee0f30e9980cba9083526351cc542785a8f81e9bcf"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "broken",
+      "element_id": "config-key-dbc7c0cd8320808c1c69d958cb8f2525f8805e3fc3c3263934f8eb8c6832efac",
+      "kind": "config-key",
+      "line_range": {
+        "end": 11,
+        "start": 11
+      },
+      "name": "broken",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/settings.schema.json",
+      "properties": [
+        {
+          "name": "format",
+          "value": "json-schema"
+        },
+        {
+          "name": "required",
+          "value": false
+        }
+      ],
+      "source_sha256": "438e75f52f15db6ca8f044cc0c94a063311f42201b0032d508e854835ab403d9"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "alpha",
+      "element_id": "config-key-5472f3797dc4c74a5420ec61a96589f3940cee5b214e72cc772f0cb9a865851f",
+      "kind": "config-key",
+      "line_range": {
+        "end": 3,
+        "start": 3
+      },
+      "name": "alpha",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/other.json",
+      "properties": [
+        {
+          "name": "format",
+          "value": "json-schema"
+        },
+        {
+          "name": "required",
+          "value": false
+        },
+        {
+          "name": "schema_type",
+          "value": "string"
+        }
+      ],
+      "source_sha256": "f7db1495667689a7c84d7a36f6c6e1d3cd7056dd987c2f7f1be76660a10b4cb9"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "database",
+      "element_id": "config-key-ff923ea57b00378d31cdc6841b475baf065effd3a9b8fb0e826440cf21c606c0",
+      "kind": "config-key",
+      "line_range": {
+        "end": 3,
+        "start": 1
+      },
+      "name": "database",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/app.yaml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "yaml"
+        },
+        {
+          "name": "value_type",
+          "value": "object"
+        }
+      ],
+      "source_sha256": "0225b3e9004a838f62c95220b5ce35289a7f0aadf42816a0d6857fb77a736a22"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "database.host",
+      "element_id": "config-key-45b5f064c1fcfd010090870dddae5550fa5e3930ef27e272d48a56d8cf822283",
+      "kind": "config-key",
+      "line_range": {
+        "end": 2,
+        "start": 2
+      },
+      "name": "host",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/app.yaml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "yaml"
+        },
+        {
+          "name": "value_type",
+          "value": "string"
+        }
+      ],
+      "source_sha256": "7ab0a69b25c9ffe0040338eb8c293820f8e69aa1b796e3a41a305fb8f6a89864"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "database.port",
+      "element_id": "config-key-d03a1a9f05370b4ead6f1c37f0665cbfe57f1d10e04424793467d1e35a4ce51d",
+      "kind": "config-key",
+      "line_range": {
+        "end": 3,
+        "start": 3
+      },
+      "name": "port",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/app.yaml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "yaml"
+        },
+        {
+          "name": "value_type",
+          "value": "integer"
+        }
+      ],
+      "source_sha256": "7b24181daa1cef4f71aa2a550f52c48343348915a561f655e8ef37fbff99df7e"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "features",
+      "element_id": "config-key-f8cd3d781ec120c04b6c6286222a7ca60a336d41e8466b6849feccaed9fc0e26",
+      "kind": "config-key",
+      "line_range": {
+        "end": 7,
+        "start": 4
+      },
+      "name": "features",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/app.yaml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "yaml"
+        },
+        {
+          "name": "value_type",
+          "value": "array"
+        }
+      ],
+      "source_sha256": "9038a207426ca976fd714ddd7e9181a3e38206824d662d21a5549d88d7ddead8"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "features.[].name",
+      "element_id": "config-key-fbfed1166de4487b06e0b249ef497ef93275741c31987776e7e630da85f3e0be",
+      "kind": "config-key",
+      "line_range": {
+        "end": 6,
+        "start": 6
+      },
+      "name": "name",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/app.yaml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "yaml"
+        },
+        {
+          "name": "value_type",
+          "value": "string"
+        }
+      ],
+      "source_sha256": "99c68db317244e68407a3f47768dd03f6e0a78fb75a3f0b3e94d095373bbc70e"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "features.[].enabled",
+      "element_id": "config-key-c0c81d766c8f0859ea3a12a4d38a9985b47ea7794a8e8f520859a9005fb524fd",
+      "kind": "config-key",
+      "line_range": {
+        "end": 7,
+        "start": 7
+      },
+      "name": "enabled",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/app.yaml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "yaml"
+        },
+        {
+          "name": "value_type",
+          "value": "boolean"
+        }
+      ],
+      "source_sha256": "2eb7423d2e331462e1a7d183fc0b6edf2aa2ac51648a9b7b46efb41f92c2c4e0"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "flow",
+      "element_id": "config-key-81b2354d6bd1309b9a2d19edcadf1e3022f716887e1c89c0ff42170af0d5004b",
+      "kind": "config-key",
+      "line_range": {
+        "end": 8,
+        "start": 8
+      },
+      "name": "flow",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/app.yaml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "yaml"
+        },
+        {
+          "name": "value_type",
+          "value": "array"
+        }
+      ],
+      "source_sha256": "e7830dd00ae9171b2cedd3987ab5d012bbdfe77e6bc12609570cbacafdb17bd4"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "config-files",
+      "declaration": "note",
+      "element_id": "config-key-0c7f8cd425583a392490479ee02a3b385d329868050b16a4b67dacac45165298",
+      "kind": "config-key",
+      "line_range": {
+        "end": 11,
+        "start": 10
+      },
+      "name": "note",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "config/app.yaml",
+      "properties": [
+        {
+          "name": "format",
+          "value": "yaml"
+        },
+        {
+          "name": "value_type",
+          "value": "string"
+        }
+      ],
+      "source_sha256": "a574bb78dcbf5ab53c6bd087796e65f155ee09a3a6800058ad0ca3b2a5072af2"
+    }
+  ],
+  "inputs": {
+    "config/.env": "SECRET=MARKER_SECRET\n",
+    "config/.env.dist": "DIST_KEY='MARKER_DIST'\n",
+    "config/.env.example": "# comment\nexport API_KEY=\"MARKER_KEY\"\nDEBUG=MARKER_DEBUG\nMULTI=\"first MARKER_M1\nsecond MARKER_M2\"\nEMPTY=\nDEBUG=MARKER_DUP\nbad line without equals\n9INVALID=MARKER_NINE\n",
+    "config/.env.local": "LOCAL=MARKER_LOCAL\n",
+    "config/.env.sample": "SAMPLE_KEY=MARKER_SAMPLE\n",
+    "config/.env.template": "OPEN=\"never closed\nNEXT=MARKER_NEXT\n",
+    "config/anchor.yml": "base: &b MARKER_BASE\n",
+    "config/app.env": "APP=MARKER_APP\n",
+    "config/app.yaml": "database:\n  host: MARKER_HOST\n  port: 5432\nfeatures:\n  - MARKER_FEATURE\n  - name: MARKER_NAME\n    enabled: true\nflow: [MARKER_FLOW]\n\"quoted\\tkey\": MARKER_ESC\nnote: |\n  MARKER_BLOCK\n",
+    "config/bad.yml": "a:\n\tb: MARKER_BAD\n",
+    "config/broken.schema.json": "{\"properties\": {\n",
+    "config/multi.yml": "a: MARKER_A\n---\nb: MARKER_B\n",
+    "config/other.json": "{\n  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",\n  \"properties\": { \"alpha\": { \"type\": \"string\", \"default\": \"MARKER_ALPHA\" } }\n}\n",
+    "config/other/pyproject.toml": "[tool.x]\nkey = \n",
+    "config/plain.json": "{\"value\": \"MARKER_PLAIN\"}\n",
+    "config/pyproject.toml": "[project]\nname = \"MARKER_PROJECT\"\n\n[build-system]\nrequires = [\"MARKER_BUILD\"]\n\n[tool.black]\nline-length = 88\ntarget-version = [\"py311\", \"MARKER_TARGET\"]\n\n[tool.poetry]\nname = \"MARKER_NAME\"\n\n[tool.poetry.dependencies]\npython = \"MARKER_PY\"\n\n[tool.poetry.dev-dependencies]\npytest = \"MARKER_PYTEST\"\n\n[tool.poetry.group.test.dependencies]\nhypothesis = \"MARKER_HYPO\"\n\n[tool.poetry.extras]\ndocs = [\"MARKER_EXTRA\"]\n\n[tool.poetry.scripts]\ncli = \"MARKER_SCRIPT\"\n\n[tool.ruff]\nselect = [\"MARKER_SELECT\"]\n\"quoted.key\" = 'MARKER_LITERAL'\ninline = { nested = \"MARKER_INLINE\" }\n\"esc\\tkey\" = \"MARKER_ESC\"\n\n[[tool.mypy.overrides]]\nmodule = \"MARKER_MODULE\"\nignore_missing_imports = true\n",
+    "config/seq.yml": "- MARKER_SEQ\n",
+    "config/settings.schema.json": "{\n  \"type\": \"object\",\n  \"required\": [\"name\"],\n  \"properties\": {\n    \"name\": { \"type\": \"string\", \"default\": \"MARKER_DEFAULT\", \"pattern\": \"MARKER_PATTERN\" },\n    \"mode\": { \"enum\": [\"MARKER_ENUM\"], \"const\": \"MARKER_CONST\", \"examples\": [\"MARKER_EXAMPLE\"] },\n    \"nested\": { \"type\": \"object\", \"properties\": { \"flag\": { \"type\": \"boolean\" } } },\n    \"list\": { \"type\": \"array\", \"items\": { \"type\": \"object\", \"properties\": { \"id\": { \"type\": \"integer\" } } } },\n    \"either\": { \"anyOf\": [ { \"properties\": { \"x\": {} } } ] },\n    \"ref\": { \"$ref\": \"#/$defs/leaf\" },\n    \"broken\": { \"$ref\": \"#/$defs/missing\" }\n  },\n  \"if\": { \"properties\": { \"hidden\": {} } },\n  \"$defs\": { \"leaf\": { \"properties\": { \"deep\": { \"type\": \"number\", \"default\": \"MARKER_DEEP\" } } } }\n}\n",
+    "config/tagged.yml": "x: !!str MARKER_TAG\n"
+  },
+  "marker_prefix": "MARKER_",
+  "source_roots": [
+    "config"
+  ]
+}

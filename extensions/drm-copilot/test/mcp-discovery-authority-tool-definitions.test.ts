@@ -72,7 +72,7 @@ describe("discovery tool definitions", () => {
       REPO_AUTOMATION_TOOLS.slice(start),
     );
     expect(DISCOVERY_TOOL_DEFINITIONS).toHaveLength(19);
-    expect(REPO_AUTOMATION_TOOLS).toHaveLength(43);
+    expect(REPO_AUTOMATION_TOOLS).toHaveLength(49);
   });
 
   it.each(

@@ -116,6 +116,10 @@
           },
           {
             "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-docs-complete-gate.ps1"
+          },
+          {
+            "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/enforce-epic-worktree-removal-gate.ps1"
           },
           {
@@ -222,6 +226,15 @@
             "command": "pwsh -NoProfile -File .claude/hooks/enforce-parallel-drift-gate.ps1"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-docs-role-write-scope.ps1"
+          }
+        ]
       }
     ],
     "SubagentStart": [
@@ -314,6 +327,15 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/validate-orchestrator-output.ps1 -CheckpointPath artifacts/orchestration/parallel-orchestrator-state.json -ArtifactType parallel-orchestrator-state"
+          }
+        ]
+      },
+      {
+        "matcher": "docs-architect|docs-author|docs-reconciler|docs-coverage-reviewer",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/validate-docs-role-output.ps1"
           }
         ]
       }
