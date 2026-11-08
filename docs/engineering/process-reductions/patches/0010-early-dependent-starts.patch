@@ -3229,6 +3229,35 @@ index bc810406010db5a4566fd30a63ccc68fd1eea948..ce855b93ddffaffb50bdf95020ee99a9
      ),
  )
  
+diff --git a/tests/scripts/dev_tools/test_epic_skill_script_citations_shipped.py b/tests/scripts/dev_tools/test_epic_skill_script_citations_shipped.py
+index 54baf6511ac711d37fd689218a8f23a41cb07e78..3d6fee39c43596722776df83a54b7f79d96585ce 100644
+--- a/tests/scripts/dev_tools/test_epic_skill_script_citations_shipped.py
++++ b/tests/scripts/dev_tools/test_epic_skill_script_citations_shipped.py
+@@ -74,6 +74,12 @@ ALLOWLIST: Mapping[str, str] = {
+         "Validated through the MCP tool validate_orchestration_artifacts, "
+         "which the citing sentences already name."
+     ),
++    "scripts/dev_tools/validate_orchestration_artifacts.py": (
++        "Cited in module form by the early-start procedure (issue #1097) as the "
++        "repository CLI route of decision D9, because the installed MCP tool "
++        "validate_orchestration_artifacts lags the early-start rule; the citing step "
++        "keeps the wave barrier when its route lacks the rule."
++    ),
+ }
+ 
+ # A repository-relative path citation. The optional `./` prefix is consumed but not
+@@ -272,7 +278,10 @@ def test_epic_surface_sets_cover_every_epic_surface_in_tree() -> None:
+ def test_allowlist_reasons_name_the_mcp_route() -> None:
+     """Require each allowlist reason to name the MCP validation route."""
+ 
+-    assert set(ALLOWLIST) == {"scripts/dev_tools/validate_epic_orchestrator_state.py"}
++    assert set(ALLOWLIST) == {
++        "scripts/dev_tools/validate_epic_orchestrator_state.py",
++        "scripts/dev_tools/validate_orchestration_artifacts.py",
++    }
+     for path, reason in ALLOWLIST.items():
+         assert "validate_orchestration_artifacts" in reason, path
+ 
 diff --git a/tests/scripts/dev_tools/test_epic_wave_barrier_early_start.py b/tests/scripts/dev_tools/test_epic_wave_barrier_early_start.py
 new file mode 100644
 index 0000000000000000000000000000000000000000..133a244892e979924e7382c2b993a3a22c7f5ff0
