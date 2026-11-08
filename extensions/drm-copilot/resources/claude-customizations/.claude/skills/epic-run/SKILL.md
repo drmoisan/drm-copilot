@@ -53,4 +53,6 @@ $ARGUMENTS
 
 This skill adds no procedure of its own beyond kickoff-artifact resolution; wave scheduling,
 the wave barrier, merge-on-green fan-in, worktree cleanup, `epic-status.md` maintenance, and
-the final integration-to-`main` PR are governed entirely by the `epic-orchestrate` skill.
+the final integration-to-`main` PR are governed entirely by the `epic-orchestrate` skill. A child
+merge into the integration branch requires a green `CI` run on the child head SHA; see
+`Epic-child CI verification (issue #1130)` under `## Merge-on-Green Kickoff Parameter` in that skill.

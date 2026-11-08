@@ -126,6 +126,15 @@ cycle without an applied candidate consumes no number. After three completed att
 `PASS` review, record `blocked_conflict_loop_limit` and stop that edge. The epic agent must not
 resolve child conflicts locally.
 
+Epic-child CI verification (issue #1130): a child merge into the integration branch is never
+accepted without a green `CI` run on the child head SHA. When no check whose `workflow` is `CI`
+exists on the child head, the child runs the dispatch fallback of the `orchestrate` skill's CI Green
+Gate and records `ci_gate.dispatch_run_id`; when a child reports that it is blocked because no `CI`
+run exists, `epic-orchestrator` dispatches `CI` once on the child branch
+(`gh workflow run CI --ref <child branch>`) and resumes the child to record the run.
+`enforce-epic-merge-gate-child-ci.ps1` denies an unverified child merge with
+`EPIC_CHILD_CI_NOT_VERIFIED`, and a resolved conflict needs a green `CI` run on its new head.
+
 ## Worktree Cleanup
 
 After the child merge SHA is recorded and the epic checkpoint mirrors `merge_status: "merged"`,
