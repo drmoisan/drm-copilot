@@ -31,7 +31,7 @@ Owner instructions relayed by the coordinator are refused by subagents, which ca
 - [x] The skill lists the honorable classes (`scheduling`, `merge_timing` in autonomous mode, `extra_planner_revision`, `scope_narrowing`, `accept_nonblocking_deviation`) and the always-refused classes (`gate_bypass`, `force_push`, `tag_or_publish`, `policy_or_settings_edit`, `evidence_alteration`, plus `unclassified`), and requires a subagent to record each honored or refused directive with a reason in `owner_directive_records`.
 - [x] Given a checkpoint fixture with a recorded `extra_planner_revision` directive and an `honored` record, the stop hook accepts it; given a `gate_bypass` directive with a `refused` record, the stop hook accepts it; given the same directive with an `honored` record, the stop hook blocks it (Pester-verified).
 - [x] Given a record that references a directive id absent from `owner_directives`, the stop hook blocks the checkpoint; given a checkpoint with neither key, the stop hook decision is unchanged from current behavior (Pester-verified).
-- [ ] No existing hook or gate is weakened or given a directive-based allow path; the docs state which refused classes an existing hook enforces and which are policy-only with the R6 validator backstop.
+- [x] No existing hook or gate is weakened or given a directive-based allow path; the docs state which refused classes an existing hook enforces and which are policy-only with the R6 validator backstop.
 
 ## Non-Goals
 
