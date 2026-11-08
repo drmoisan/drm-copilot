@@ -85,6 +85,9 @@ projects:
   - path: ".claude/lib/requirements"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/runbook"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
   - path: ".claude/lib/worktree-resolution"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"

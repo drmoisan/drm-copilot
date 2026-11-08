@@ -13,7 +13,7 @@
 
 ### Phase 1 — Add the tier entry
 
-- [ ] [P1-T1] Edit `quality-tiers.yml`: insert a project entry with path `.claude/lib/runbook`, `tier: T3`, and rationale `Runtime library shipped in the `.claude` bundle` (the text the sibling `.claude/lib/*` entries carry) between the `.claude/lib/requirements` and `.claude/lib/worktree-resolution` entries, keeping the same key order and indentation as those siblings. Acceptance: `check_quality_tiers` exits 0, and `git grep -n -F ".claude/lib/runbook" -- quality-tiers.yml` returns one match. Tests asserting the file: search `tests/` for `quality-tiers.yml` and `check_quality_tiers` (including `tests/scripts/dev_tools/test_check_quality_tiers.py` if present); each reads synthetic in-memory manifests or the real file's validity only, so each is unchanged because unaffected. Commit and push.
+- [x] [P1-T1] Edit `quality-tiers.yml`: insert a project entry with path `.claude/lib/runbook`, `tier: T3`, and rationale `Runtime library shipped in the `.claude` bundle` (the text the sibling `.claude/lib/*` entries carry) between the `.claude/lib/requirements` and `.claude/lib/worktree-resolution` entries, keeping the same key order and indentation as those siblings. Acceptance: `check_quality_tiers` exits 0, and `git grep -n -F ".claude/lib/runbook" -- quality-tiers.yml` returns one match. Tests asserting the file: search `tests/` for `quality-tiers.yml` and `check_quality_tiers` (including `tests/scripts/dev_tools/test_check_quality_tiers.py` if present); each reads synthetic in-memory manifests or the real file's validity only, so each is unchanged because unaffected. Commit and push.
 
 ### Phase 2 — Final gate (every step of `.github/workflows/_quality-checks.yml`)
 
