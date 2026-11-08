@@ -252,6 +252,21 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
         $lines[2] | Should -Be '**Now:** #12 review (0 h 05 min of median 0 h 14 min), #77 ci (0 h 20 min of median 0 h 17 min, over median), #900 main-sync (0 h 30 min of median 1 h 00 min). 3 of 3 types use defaults.'
     }
 
+    It 'prints start not recorded on the Now line for a step without a start' {
+        # review of #12 started 5 min ago (median 14 min default); ci of #77 has no recorded start
+        # (median 17 min default), so it prints no elapsed figure.
+        $steps = @(
+            Get-EpicProgressStepRecord -Issue '12' -Type 'review' -Status 'in_progress' -StartedUnixSeconds ($script:nowUnix - 300)
+            Get-EpicProgressStepRecord -Issue '77' -Type 'ci' -Status 'in_progress'
+        )
+        $features = @(Get-TestFeature -Issue '12' -Wave 1 -Band 'small' -Total 1 -Done 0 -State 'Running')
+
+        $lines = @(Get-EpicProgressTldrLine -Summary (Get-TestSummary -Feature $features -Step $steps))
+
+        $lines.Count | Should -Be 4
+        $lines[2] | Should -Be '**Now:** #12 review (0 h 05 min of median 0 h 14 min), #77 ci (start not recorded; median 0 h 17 min). 2 of 2 types use defaults.'
+    }
+
     It 'prints a blocked item with its reason' {
         # Two blocked review steps of #77 (14 min each) are excluded and listed as 28 min of work.
         $features = @(

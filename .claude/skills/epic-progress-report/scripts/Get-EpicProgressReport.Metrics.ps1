@@ -81,7 +81,9 @@ function Get-EpicProgressTypeEstimate {
         of the subtotal and summed in BlockedSubtotalSeconds; a blocked step that had started
         counts its elapsed time only up to the start of the item's blocked span. Each
         in-progress step also gives an InProgress row (Issue, Type, ElapsedSeconds,
-        MedianSeconds, OverMedian). TotalSeconds is the sum of the subtotals (decision D7).
+        MedianSeconds, OverMedian, StartRecorded); StartRecorded is false when the step has no
+        recorded start, whose ElapsedSeconds is then 0. TotalSeconds is the sum of the
+        subtotals (decision D7).
     .PARAMETER Step
         The step records.
     .PARAMETER Ledger
@@ -130,7 +132,7 @@ function Get-EpicProgressTypeEstimate {
                 'remaining' { $subtotal += $median }
                 'in_progress' {
                     $subtotal += [math]::Max(0.0, $median - $elapsed)
-                    $running.Add([pscustomobject]@{ Issue = $entry.Issue; Type = $type; ElapsedSeconds = $elapsed; MedianSeconds = $median; OverMedian = ($elapsed -gt $median) })
+                    $running.Add([pscustomobject]@{ Issue = $entry.Issue; Type = $type; ElapsedSeconds = $elapsed; MedianSeconds = $median; OverMedian = ($elapsed -gt $median); StartRecorded = ($null -ne $entry.StartedUnixSeconds) })
                 }
                 'blocked' { $blockedSubtotal += [math]::Max(0.0, $median - $elapsed) }
             }

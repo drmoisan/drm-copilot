@@ -93,6 +93,22 @@ Describe 'Get-EpicProgressTypeEstimate and Get-EpicProgressWaveParallelSecond (i
         $estimate.InProgress[0].OverMedian | Should -BeTrue
     }
 
+    It 'marks an in-progress step without a start as start not recorded' {
+        # Issue #12 review has no start (0 s elapsed); issue #77 review started at 4700 (300 s elapsed).
+        $steps = @(
+            Get-TestStep -Type 'review' -Status 'in_progress'
+            Get-TestStep -Type 'review' -Status 'in_progress' -Issue '77' -Started 4700
+        )
+
+        $estimate = Get-EpicProgressTypeEstimate -Step $steps -Ledger $script:ledger -Default $script:defaults -NowUnixSeconds 5000
+
+        $estimate.InProgress.Count | Should -Be 2
+        $estimate.InProgress[0].StartRecorded | Should -BeFalse
+        $estimate.InProgress[0].ElapsedSeconds | Should -Be 0
+        $estimate.InProgress[1].StartRecorded | Should -BeTrue
+        $estimate.InProgress[1].ElapsedSeconds | Should -Be 300
+    }
+
     It 'uses the default and sets IsDefault for a type without samples' {
         # ci has no samples: default 17 min (1020 s) per remaining step.
         $estimate = Get-EpicProgressTypeEstimate -Step @(Get-TestStep -Type 'ci'; Get-TestStep -Type 'ci') -Ledger $script:ledger -Default $script:defaults -NowUnixSeconds 5000
