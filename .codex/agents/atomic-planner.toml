@@ -59,7 +59,7 @@ Generate plans using the atomic plan contract defined in the `atomic-plan-contra
 - Task IDs: `- [ ] [P#-T#] <description>`
 - Sequential task numbering within each phase
 - Phase 0: baseline capture (language-specific static tool baselines and one parallel test-suite baseline run per gate, the `Phase 0 baseline`)
-- Final phase: full QA loop for each applicable language
+- Final phase: full QA loop for each applicable language, with one final-QC static artifact per language for the format, lint, and type-check steps
 
 ## Requirements
 
