@@ -33,7 +33,7 @@
 
 ### Phase 0 — Baseline Reference
 
-- [ ] [P0-T1] Record the `Phase 0 baseline` reference without a new run: write `FEATURE/evidence/remediation-baseline/baseline-reference.<timestamp>.md` citing `FEATURE/evidence/qa-gates/pester.2026-11-08T19-51.md` as the comparison run for this cycle, and copying from it the test counts (20464 tests, 0 failures), repo-wide line coverage (95.68%), and the per-file line coverage of `.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1` (100.00%) and `.claude/hooks/validate-orchestrator-output.ps1` (99.25%); also record `MB`.
+- [x] [P0-T1] Record the `Phase 0 baseline` reference without a new run: write `FEATURE/evidence/remediation-baseline/baseline-reference.<timestamp>.md` citing `FEATURE/evidence/qa-gates/pester.2026-11-08T19-51.md` as the comparison run for this cycle, and copying from it the test counts (20464 tests, 0 failures), repo-wide line coverage (95.68%), and the per-file line coverage of `.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1` (100.00%) and `.claude/hooks/validate-orchestrator-output.ps1` (99.25%); also record `MB`.
   - Acceptance: the artifact exists with `Timestamp:`, `Command:` (the merge-base derivation), `EXIT_CODE: 0`, and an `Output Summary:` carrying the five copied values and the cited artifact path; `git status --porcelain` lists only that artifact before the commit.
 
 ### Phase 1 — Strict ISO 8601 Date Shape
