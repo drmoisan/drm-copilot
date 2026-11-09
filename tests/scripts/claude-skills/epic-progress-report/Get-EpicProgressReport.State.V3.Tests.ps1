@@ -49,6 +49,17 @@ Describe 'ConvertTo-EpicProgressStateJson version 3 (AC-41)' {
         $raw.pauses[0].endUnixSeconds | Should -Be 1767607000
     }
 
+    It 'writes the features of a sample given as an object, sorted by issue' {
+        # A features value that is an object (not a hashtable) is written property by property, sorted by name.
+        $sample = [pscustomobject]@{ ts = 5; done = 2; tasks = 7; features = [pscustomobject]@{ '77' = 3; '12' = 4 } }
+
+        $written = ConvertFrom-Json -InputObject (ConvertTo-EpicProgressStateJson -StartUnixSeconds 1 -BaselineDone 0 -BaselineWeeklyPct 0 -Sample @($sample))
+
+        @($written.samples[0].features.PSObject.Properties.Name) | Should -Be @('12', '77')
+        $written.samples[0].features.'12' | Should -Be 4
+        $written.samples[0].features.'77' | Should -Be 3
+    }
+
     It 'writes no tasks or features on a sample that carries none' {
         $json = ConvertTo-EpicProgressStateJson -StartUnixSeconds 1 -BaselineDone 0 -BaselineWeeklyPct 0 -Sample @([pscustomobject]@{ ts = 5; done = 2 })
         $raw = ConvertFrom-Json -InputObject $json
