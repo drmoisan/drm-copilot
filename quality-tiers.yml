@@ -46,6 +46,9 @@ projects:
   - path: ".claude/lib/ci-gate"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/review-verdict"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle: review/verdict eligibility rules and their command entry"
   - path: ".claude/lib/cleanup-manifest"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
