@@ -142,7 +142,7 @@ Describe 'Invoke-EpicProgressReport' {
             '**TL;DR:** Epic #42 is at 3 of 10 tasks, 19 of 35 steps (54.3%). 1 of 3 features are done. #12345 is running (6 of 13 steps).'
             '**Elapsed:** 3 h 00 min; critical path about 3 h 45 min left (#12345 -> #77 -> tail, cap 4). **Weekly** quota is at 42.5%.'
             '**Now:** no step is in progress. 10 of 10 types use defaults.'
-            '**Velocity:** sequential 12 tasks / hr per feature (default, median of 0, SD n/a); aggregate 0 tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
+            '**Velocity:** sequential 12 tasks / hr per feature (default, median of 0, SD n/a); aggregate n/a tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
             '**Estimated time remaining:** range n/a (fewer than 2 qualifying features and fewer than 3 intervals); serial sum 3 h 45 min (upper bound, no parallelism).'
         )
         $defaultLines = @(

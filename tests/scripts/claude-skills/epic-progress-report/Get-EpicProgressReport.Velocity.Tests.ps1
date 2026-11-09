@@ -155,11 +155,41 @@ Describe 'Get-EpicProgressAggregateVelocity (AC-16, AC-17, E12)' {
 
     It 'averages done tasks since the baseline over elapsed hours minus the pause span' {
         # 3 h elapsed with a 1 h pause: 10 tasks over 2 active hours = 5; without the pause 10 / 3 h.
-        $paused = Get-EpicProgressAggregateVelocity -Sample @() -PauseSpan @([pscustomobject]@{ startUnixSeconds = 3600; endUnixSeconds = 7200 }) -StartUnixSeconds 0 -NowUnixSeconds 10800 -DoneTasks 20 -BaselineDoneTasks 10
-        $plain = Get-EpicProgressAggregateVelocity -Sample @() -StartUnixSeconds 0 -NowUnixSeconds 10800 -DoneTasks 20 -BaselineDoneTasks 10
+        # The samples at 0 and 600 s form one interval that ends before the pause, so an average exists.
+        $samples = @(Get-TestTaskSample -Ts 0 -Tasks 10; Get-TestTaskSample -Ts 600 -Tasks 11)
+        $paused = Get-EpicProgressAggregateVelocity -Sample $samples -PauseSpan @([pscustomobject]@{ startUnixSeconds = 3600; endUnixSeconds = 7200 }) -StartUnixSeconds 0 -NowUnixSeconds 10800 -DoneTasks 20 -BaselineDoneTasks 10
+        $plain = Get-EpicProgressAggregateVelocity -Sample $samples -StartUnixSeconds 0 -NowUnixSeconds 10800 -DoneTasks 20 -BaselineDoneTasks 10
 
         $paused.Average | Should -Be 5
         [math]::Round($plain.Average, 4) | Should -Be 3.3333
+    }
+
+    It 'returns a non-finite average below one interval and a finite one from one interval' -ForEach @(
+        @{ Gap = 599; Finite = $false }
+        @{ Gap = 600; Finite = $true }
+        @{ Gap = 601; Finite = $true }
+    ) {
+        # 1 task since the baseline; samples at 0 and Gap s form an interval only from 600 s (CR2).
+        $samples = @(Get-TestTaskSample -Ts 0 -Tasks 0; Get-TestTaskSample -Ts $Gap -Tasks 1)
+
+        $velocity = Get-EpicProgressAggregateVelocity -Sample $samples -StartUnixSeconds 0 -NowUnixSeconds $Gap -DoneTasks 1 -BaselineDoneTasks 0
+
+        [double]::IsNaN($velocity.Average) | Should -Be (-not $Finite) -Because "the interval count is $($velocity.Count)"
+        if ($Gap -eq 600) { [math]::Round($velocity.Average, 9) | Should -Be 6 -Because '1 task over 600 s is 6 tasks per hour' }
+    }
+
+    It 'returns a non-finite average when every interval overlaps a pause span' {
+        # Samples 4000 s apart form one interval; the 1000-2000 span overlaps it, so 0 intervals remain.
+        $samples = @(Get-TestTaskSample -Ts 0 -Tasks 0; Get-TestTaskSample -Ts 4000 -Tasks 4)
+        $pause = @([pscustomobject]@{ startUnixSeconds = 1000; endUnixSeconds = 2000 })
+
+        $paused = Get-EpicProgressAggregateVelocity -Sample $samples -PauseSpan $pause -StartUnixSeconds 0 -NowUnixSeconds 4000 -DoneTasks 4 -BaselineDoneTasks 0
+        $plain = Get-EpicProgressAggregateVelocity -Sample $samples -StartUnixSeconds 0 -NowUnixSeconds 4000 -DoneTasks 4 -BaselineDoneTasks 0
+
+        $paused.Count | Should -Be 0
+        [double]::IsNaN($paused.Average) | Should -BeTrue
+        $plain.Count | Should -Be 1
+        [math]::Round($plain.Average, 4) | Should -Be 3.6
     }
 
     It 'returns a non-finite average without a task baseline' {

@@ -144,7 +144,7 @@ Describe 'Invoke-EpicProgressReport critical-path wiring (issue #1153)' {
             '**TL;DR:** Epic #42 is at 0 of 10 tasks, 12 of 43 steps (27.9%). None of the 4 features is done yet. No feature is running.'
             '**Elapsed:** 3 h 00 min; critical path about 3 h 58 min left (#102 -> #104 -> tail, cap 2). **Weekly** quota is at n/a.'
             '**Now:** no step is in progress. 10 of 10 types use defaults.'
-            '**Velocity:** sequential 12 tasks / hr per feature (default, median of 0, SD n/a); aggregate 0 tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
+            '**Velocity:** sequential 12 tasks / hr per feature (default, median of 0, SD n/a); aggregate n/a tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
             '**Estimated time remaining:** range n/a (fewer than 2 qualifying features and fewer than 3 intervals); serial sum 5 h 51 min (upper bound, no parallelism).'
             ''
             '## Epic #42 example-epic: status at 12:00 UTC, Jan 5'
@@ -327,7 +327,7 @@ Describe 'Invoke-EpicProgressReport critical-path wiring (issue #1153)' {
 
         $lines = Get-TestRun -Extra @{ Mode = 'TLDR' }
 
-        $lines[3] | Should -BeLike '*; aggregate 0 tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
+        $lines[3] | Should -BeLike '*; aggregate n/a tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
         $written = Get-TestWritten
         $written.version | Should -Be 3
         $written.baselineDoneTasks | Should -Be 1

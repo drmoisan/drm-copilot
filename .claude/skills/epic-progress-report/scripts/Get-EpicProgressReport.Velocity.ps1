@@ -242,7 +242,8 @@ function Get-EpicProgressAggregateVelocity {
         Return the aggregate (epic-wide) task velocity: Average, Recent, StandardDeviation, Count, and Interval (decision E11).
     .DESCRIPTION
         Average is (DoneTasks - BaselineDoneTasks) over the elapsed hours since the start minus
-        the pause seconds inside that time; NaN without a task baseline or without active time.
+        the pause seconds inside that time; NaN without a task baseline, without active time, or
+        while no interval exists (Count 0, including when every interval overlaps a pause span).
         Intervals are formed from the samples that carry a 'tasks' value, so samples kept by a
         version-2 migration are ignored (decision E12): starting at a sample, consecutive
         samples are combined until at least 600 seconds have elapsed, which closes one interval
@@ -274,10 +275,6 @@ function Get-EpicProgressAggregateVelocity {
         [AllowNull()] [object] $BaselineDoneTasks = $null
     )
 
-    $average = [double]::NaN
-    $active = ($NowUnixSeconds - $StartUnixSeconds) - (Get-EpicProgressExcludedSecond -PauseSpan $PauseSpan -IntervalStartUnixSeconds $StartUnixSeconds -IntervalEndUnixSeconds $NowUnixSeconds)
-    if ($null -ne $BaselineDoneTasks -and $active -gt 0) { $average = ($DoneTasks - [int] $BaselineDoneTasks) / ($active / 3600.0) }
-
     $withTasks = @($Sample | Where-Object { $null -ne $_ -and $_.PSObject.Properties.Name -contains 'tasks' -and $null -ne $_.tasks -and $null -ne $_.ts } | Sort-Object -Property { [long] $_.ts } -Stable)
     $intervals = [System.Collections.Generic.List[object]]::new()
     $first = 0
@@ -293,6 +290,11 @@ function Get-EpicProgressAggregateVelocity {
         $first = $index
     }
     [double[]] $rates = @($intervals | ForEach-Object { $_.TasksPerHour })
+    $average = [double]::NaN
+    if ($rates.Count -gt 0) {
+        $active = ($NowUnixSeconds - $StartUnixSeconds) - (Get-EpicProgressExcludedSecond -PauseSpan $PauseSpan -IntervalStartUnixSeconds $StartUnixSeconds -IntervalEndUnixSeconds $NowUnixSeconds)
+        if ($null -ne $BaselineDoneTasks -and $active -gt 0) { $average = ($DoneTasks - [int] $BaselineDoneTasks) / ($active / 3600.0) }
+    }
     $recent = [double]::NaN
     if ($rates.Count -gt 0) { $recent = $rates[$rates.Count - 1] }
     $deviation = [double]::NaN

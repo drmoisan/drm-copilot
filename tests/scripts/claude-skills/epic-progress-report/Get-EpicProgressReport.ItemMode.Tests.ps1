@@ -113,7 +113,7 @@ Describe 'Invoke-EpicProgressReport in item mode' {
             '**TL;DR:** Item #1118 is at 4 of 4 tasks, 8 of 12 steps (66.7%). #1118 is not done yet. #1118 is running (8 of 12 steps).'
             '**Elapsed:** 3 h 00 min; critical path about 0 h 29 min left (#1118). **Weekly** quota is at n/a.'
             '**Now:** #1118 review (0 h 10 min of median 0 h 14 min). 4 of 9 types use defaults.'
-            '**Velocity:** sequential 12 tasks / hr per feature (default, median of 0, SD n/a); aggregate 0 tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
+            '**Velocity:** sequential 12 tasks / hr per feature (default, median of 0, SD n/a); aggregate n/a tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
             '**Estimated time remaining:** range n/a (fewer than 2 qualifying features and fewer than 3 intervals); serial sum 0 h 29 min (upper bound, no parallelism).'
         )
         ($lines -join "`n") | Should -Be ($expected -join "`n")
@@ -178,7 +178,7 @@ Describe 'Invoke-EpicProgressReport in item mode' {
                 '**TL;DR:** Item #1118 is at 4 of 4 tasks, 8 of 12 steps (66.7%). #1118 is not done yet. #1118 is running (8 of 12 steps).'
                 '**Elapsed:** 3 h 00 min; critical path about 0 h 29 min left (#1118). **Weekly** quota is at n/a.'
                 '**Now:** #1118 review (0 h 10 min of median 0 h 14 min). 4 of 9 types use defaults.'
-                '**Velocity:** sequential 12 tasks / hr per feature (default, median of 0, SD n/a); aggregate 0 tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
+                '**Velocity:** sequential 12 tasks / hr per feature (default, median of 0, SD n/a); aggregate n/a tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
                 '**Estimated time remaining:** range n/a (fewer than 2 qualifying features and fewer than 3 intervals); serial sum 0 h 29 min (upper bound, no parallelism).'
             )
             ($lines -join "`n") | Should -Be ($expected -join "`n")
