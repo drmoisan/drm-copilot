@@ -36,7 +36,7 @@ Describe 'Format-EpicProgressHour and Format-EpicProgressNumber' {
     }
 }
 
-Describe 'Get-EpicProgressTypeEstimate and Get-EpicProgressWaveParallelSecond (issue #1118)' {
+Describe 'Get-EpicProgressTypeEstimate (issue #1118)' {
     BeforeAll {
         $script:defaults = Resolve-EpicProgressStepDefault
         # Review samples of 600, 900, and 1200 s (median 900); execution samples of 240 and 360 s (median 300).
@@ -172,19 +172,6 @@ Describe 'Get-EpicProgressTypeEstimate and Get-EpicProgressWaveParallelSecond (i
         (Get-TestRow -Estimate $estimate -Type 'main-sync').IsApproximate | Should -BeTrue
         (Get-TestRow -Estimate $estimate -Type 'main-sync').MedianSeconds | Should -Be 3000
         (Get-TestRow -Estimate $estimate -Type 'review').IsApproximate | Should -BeFalse
-    }
-
-    It 'sums the largest remaining feature per open wave plus epic steps' {
-        # Wave 1: max(600, 900) = 900; wave 2: 300; wave 3 holds only a finished feature; epic 2700.
-        $features = @(
-            [pscustomobject]@{ Wave = 1; RemainingSeconds = 600 }
-            [pscustomobject]@{ Wave = 1; RemainingSeconds = 900 }
-            [pscustomobject]@{ Wave = 2; RemainingSeconds = 300 }
-            [pscustomobject]@{ Wave = 3; RemainingSeconds = 0 }
-        )
-
-        Get-EpicProgressWaveParallelSecond -Feature $features -EpicSeconds 2700 | Should -Be 3900
-        Get-EpicProgressWaveParallelSecond -Feature @() | Should -Be 0
     }
 }
 

@@ -7,10 +7,9 @@
     process, calls the network, or reads the clock. Numeric and time text uses the invariant
     culture, and every non-finite value prints as n/a. Get-EpicProgressTypeEstimate computes
     the per-type remaining-time estimate of the step model (remaining steps times the median
-    of each type, with in-progress credit and blocked steps excluded), and
-    Get-EpicProgressWaveParallelSecond combines per-feature remaining seconds by wave. The
-    task-velocity, standard-deviation, critical-path, and range functions were removed with
-    the step model (issue #1118, decision D13). Get-EpicProgressReport.Logic.ps1 dot-sources
+    of each type, with in-progress credit and blocked steps excluded). The velocity and
+    critical-path functions live in the Velocity and Schedule files (issue #1153), and the
+    wave-parallel figure was retired (decision E10). Get-EpicProgressReport.Logic.ps1 dot-sources
     this file, so a consumer dot-sources the Logic hub, not this file.
 #>
 
@@ -171,36 +170,4 @@ function Get-EpicProgressTypeEstimate {
         BlockedCount           = @($Step | Where-Object { $_.Status -eq 'blocked' }).Count
         DefaultCount           = @($rows | Where-Object { $_.IsDefault }).Count
     }
-}
-
-function Get-EpicProgressWaveParallelSecond {
-    <#
-    .SYNOPSIS
-        Return the wave-parallel remaining seconds: the largest remaining feature of each open wave, summed, plus the epic-level seconds.
-    .DESCRIPTION
-        A wave is open when one of its features has remaining seconds above 0. The figure is
-        secondary to the per-type sum (decision D7). In item mode, with one feature and no
-        epic-level steps, it equals the item's sum.
-    .PARAMETER Feature
-        The per-feature records (Wave, RemainingSeconds).
-    .PARAMETER EpicSeconds
-        The remaining seconds of the epic-level steps.
-    #>
-    [CmdletBinding()]
-    [OutputType([double])]
-    param(
-        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $Feature,
-        [double] $EpicSeconds = 0
-    )
-
-    $largest = @{}
-    foreach ($record in $Feature) {
-        $seconds = [double] $record.RemainingSeconds
-        if ($seconds -le 0) { continue }
-        $wave = [string] $record.Wave
-        if (-not $largest.ContainsKey($wave) -or $seconds -gt $largest[$wave]) { $largest[$wave] = $seconds }
-    }
-    $sum = [double] $EpicSeconds
-    foreach ($value in $largest.Values) { $sum += $value }
-    return $sum
 }

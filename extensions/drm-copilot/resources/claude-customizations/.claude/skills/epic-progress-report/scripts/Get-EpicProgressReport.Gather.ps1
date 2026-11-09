@@ -199,6 +199,101 @@ function Get-EpicProgressEpicCheckpointRow {
     return [pscustomobject]@{ Checkpoint = $checkpoint; Feature = $feature; Sync = [object[]] $sync.ToArray(); MergePr = $mergePr }
 }
 
+function Read-EpicProgressManifestFeature {
+    <#
+    .SYNOPSIS
+        Return the epic.md frontmatter feature rows (issue_num, feature_folder, depends_on) when a kickoff feature has no checkpoint depends_on key (decision E5).
+    .DESCRIPTION
+        When every kickoff issue has an epic checkpoint row that carries a depends_on key, no
+        row is returned and no git call is made. Otherwise the manifest is read once through
+        Read-EpicProgressText on the integration branch, and the rows of the frontmatter
+        features list are returned; a row carries depends_on only when the manifest gives it
+        as an inline flow list (for example [12, 13] or []). An unreadable manifest, text
+        without frontmatter, and a block-style depends_on list each give no rows, never an
+        error, so the schedule falls back to the other sources.
+    .PARAMETER KickoffIssue
+        The issue numbers of the kickoff feature rows.
+    .PARAMETER CheckpointRow
+        The epic checkpoint features rows; empty for none.
+    .PARAMETER ManifestPath
+        The repository-relative path of epic.md.
+    .PARAMETER IntegrationBranch
+        The branch for 'git show'.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [string[]] $KickoffIssue,
+        [AllowEmptyCollection()] [object[]] $CheckpointRow = @(),
+        [Parameter(Mandatory = $true)] [string] $ManifestPath,
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $IntegrationBranch
+    )
+
+    $keyed = @($CheckpointRow | Where-Object { $null -ne $_ -and $null -ne $_.issue_num -and $_.PSObject.Properties.Name -contains 'depends_on' } | ForEach-Object { [string] $_.issue_num })
+    if (@($KickoffIssue | Where-Object { $keyed -notcontains $_ }).Count -eq 0) { return }
+    $text = Read-EpicProgressText -RelativePath $ManifestPath -IntegrationBranch $IntegrationBranch
+    $lines = @($text -split "`r?`n")
+    if ($lines.Count -lt 2 -or $lines[0].Trim() -ne '---') { return }
+    $rows = [System.Collections.Generic.List[System.Collections.Specialized.OrderedDictionary]]::new()
+    $inFeatures = $false
+    $current = $null
+    for ($index = 1; $index -lt $lines.Count; $index++) {
+        $line = $lines[$index]
+        if ($line.Trim() -eq '---') { break }
+        if ([string]::IsNullOrWhiteSpace($line) -or $line.Trim().StartsWith('#')) { continue }
+        if ($line -match '^\S') {
+            $inFeatures = $line -match '^features:\s*$'
+            $current = $null
+            continue
+        }
+        if (-not $inFeatures) { continue }
+        $pair = $null
+        if ($line -match '^\s*-\s+([A-Za-z_]+):\s*(.*)$') {
+            $current = [ordered]@{}
+            $rows.Add($current)
+            $pair = @($Matches[1], $Matches[2])
+        } elseif ($line -match '^\s*-') {
+            # A block-style list item: this reader parses inline lists only.
+            return
+        } elseif ($null -ne $current -and $line -match '^\s+([A-Za-z_]+):\s*(.*)$') {
+            $pair = @($Matches[1], $Matches[2])
+        }
+        if ($null -eq $pair) { continue }
+        $value = ([string] $pair[1]).Trim()
+        if ($pair[0] -ne 'depends_on') {
+            $current[$pair[0]] = $value.Trim('"', "'")
+            continue
+        }
+        if ($value -notmatch '^\[(.*)\]$') { return }
+        $current['depends_on'] = [string[]] @($Matches[1] -split ',' | ForEach-Object { $_.Trim().Trim('"', "'") } | Where-Object { $_ })
+    }
+    foreach ($row in $rows) { [pscustomobject] $row }
+}
+
+function Read-EpicProgressRoutingCap {
+    <#
+    .SYNOPSIS
+        Return codex_topology_policy.parallelism.default_max_parallel_features of config/orchestration-routing.json; null when the file or key is missing.
+    .DESCRIPTION
+        Reads the file through Test-EpicProgressPath and Read-EpicProgressFile; unparseable text
+        also gives null. The value is returned as parsed, and Resolve-EpicProgressParallelCap
+        validates it.
+    .PARAMETER RepositoryRoot
+        The repository root that holds config/orchestration-routing.json.
+    #>
+    [CmdletBinding()]
+    [OutputType([object])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $RepositoryRoot)
+
+    $path = Join-Path -Path $RepositoryRoot -ChildPath 'config/orchestration-routing.json'
+    if (-not (Test-EpicProgressPath -Path $path)) { return $null }
+    $text = Read-EpicProgressFile -Path $path
+    if (-not (Test-EpicProgressJsonText -Json $text)) { return $null }
+    $parallelism = (ConvertFrom-Json -InputObject $text).codex_topology_policy.parallelism
+    if ($null -eq $parallelism -or -not ($parallelism.PSObject.Properties.Name -contains 'default_max_parallel_features')) { return $null }
+    return $parallelism.default_max_parallel_features
+}
+
 function Get-EpicProgressStepReport {
     <#
     .SYNOPSIS
@@ -216,8 +311,12 @@ function Get-EpicProgressStepReport {
         an entry for it; the duration ledger keeps its samples. ResetBaseline clears every
         blocked span and keeps the ledger and the anchors (decision D10). Unless NoEpicStep is
         set, the epic-level steps and the main-sync samples are added. The ledger is merged
-        once, and the estimate is computed over every step; the wave-parallel figure combines
-        the per-feature estimates.
+        once, and the estimate is computed over every step. Each tick batch excludes the union
+        of the PauseSpan spans and the item's blocked span (Get-EpicProgressExcludedSecond), so
+        neither paused nor blocked time enters a per-task sample (decision E11). Each feature
+        record also carries its folder basename, blocked flag, steps, and plan task counts, and
+        the report returns the epic task counts, the epic checkpoint max_parallel_features
+        value, its features rows (the depends_on source), and the blocked spans (decision E5).
     .PARAMETER Item
         The item records from Get-EpicProgressItemInput.
     .PARAMETER EpicCheckpoint
@@ -236,6 +335,8 @@ function Get-EpicProgressStepReport {
         Item mode: no epic-level step is added.
     .PARAMETER ResetBaseline
         Clear the blocked spans.
+    .PARAMETER PauseSpan
+        The pause spans (startUnixSeconds, endUnixSeconds) excluded from tick batches; empty (the default) for none.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -248,7 +349,8 @@ function Get-EpicProgressStepReport {
         [Parameter(Mandatory = $true)] [long] $NowUnixSeconds,
         [Parameter(Mandatory = $true)] [hashtable] $Default,
         [switch] $NoEpicStep,
-        [switch] $ResetBaseline
+        [switch] $ResetBaseline,
+        [AllowEmptyCollection()] [object[]] $PauseSpan = @()
     )
 
     $samples = [System.Collections.Generic.List[object]]::new()
@@ -292,7 +394,7 @@ function Get-EpicProgressStepReport {
                 if ($entry.Plans.ContainsKey($planFile)) { $anchor = $entry.Plans[$planFile] }
                 $intervalStart = $NowUnixSeconds
                 if ($null -ne $anchor) { $intervalStart = [long] $anchor.LastTickUnixSeconds }
-                $blocked = Get-EpicProgressBlockedSecond -BlockedSinceUnixSeconds $since -IntervalStartUnixSeconds $intervalStart -IntervalEndUnixSeconds $NowUnixSeconds
+                $blocked = Get-EpicProgressExcludedSecond -PauseSpan $PauseSpan -BlockedSinceUnixSeconds $since -IntervalStartUnixSeconds $intervalStart -IntervalEndUnixSeconds $NowUnixSeconds
                 $stageForPlan = $null
                 if ($planFile -eq $record.PlanFile) { $stageForPlan = $execution }
                 $tick = Get-EpicProgressTickSample -Issue $issue -PlanFile $planFile -PlanText $planTexts[$planFile] -Anchor $anchor -NowUnixSeconds $NowUnixSeconds -BlockedSecond $blocked -ExecutionRecord $stageForPlan
@@ -318,12 +420,20 @@ function Get-EpicProgressStepReport {
         }
 
         $count = Get-EpicProgressStepCount -Step $steps
-        $featureState = Get-EpicProgressFeatureState -MergeStatus $record.MergeStatus -PrState $record.PrState -Done (Get-EpicProgressTaskCount -PlanText ([string] $record.PlanText)).Done
+        $tasks = Get-EpicProgressTaskCount -PlanText ([string] $record.PlanText)
+        $featureState = Get-EpicProgressFeatureState -MergeStatus $record.MergeStatus -PrState $record.PrState -Done $tasks.Done
         if ($featureState -eq 'Pending' -and $null -ne $record.Checkpoint) { $featureState = 'Running' }
         if ($featureState -ne 'Completed' -and $record.Blockage.Blocked) { $featureState = 'Blocked' }
+        # The folder basename matches a feature-folder depends_on reference (decision E5).
+        $folderValue = ''
+        if ($null -ne $record.Checkpoint -and $record.Checkpoint.'feature-folder') { $folderValue = [string] $record.Checkpoint.'feature-folder' }
+        if ($null -ne $record.EpicRow -and $record.EpicRow.feature_folder) { $folderValue = [string] $record.EpicRow.feature_folder }
+        $folderHint = ConvertTo-EpicProgressFolderHint -Value $folderValue
         $features.Add([pscustomobject]@{
                 Issue = $issue; Wave = $record.Wave; Band = $record.Band; Total = $count.Total; Done = $count.Done; State = $featureState
                 Phase = (Get-EpicProgressCurrentPhase -PlanText ([string] $record.PlanText)); Pr = $record.PrState; BlockedReason = $record.Blockage.Reason
+                Folder = $folderHint; Blocked = [bool] $record.Blockage.Blocked; Step = [object[]] $steps
+                TasksDone = $tasks.Done; TasksTotal = $tasks.Total
             })
     }
     $epicSteps = @()
@@ -336,23 +446,27 @@ function Get-EpicProgressStepReport {
     }
     $merge = Merge-EpicProgressDuration -Ledger $State.Durations -Sample $samples.ToArray()
     $estimate = Get-EpicProgressTypeEstimate -Step @(@($allSteps.ToArray()) + @($epicSteps)) -Ledger $merge.Ledger -Default $Default -NowUnixSeconds $NowUnixSeconds -BlockedSince $blockedSince
-    $perFeature = @($features | ForEach-Object {
-            $featureEstimate = Get-EpicProgressTypeEstimate -Step $featureSteps[[string] $_.Issue] -Ledger $merge.Ledger -Default $Default -NowUnixSeconds $NowUnixSeconds -BlockedSince $blockedSince
-            [pscustomobject]@{ Wave = $_.Wave; RemainingSeconds = $featureEstimate.TotalSeconds }
-        })
-    $epicSeconds = 0.0
-    if ($epicSteps.Count -gt 0) { $epicSeconds = (Get-EpicProgressTypeEstimate -Step $epicSteps -Ledger $merge.Ledger -Default $Default -NowUnixSeconds $NowUnixSeconds).TotalSeconds }
     $done = @($allSteps | Where-Object { $_.Status -eq 'done' }).Count + @($epicSteps | Where-Object { $_.Status -eq 'done' }).Count
+    $checkpointCap = $null
+    $dependencyRow = @()
+    if ($null -ne $EpicCheckpoint) {
+        if ($EpicCheckpoint.PSObject.Properties.Name -contains 'max_parallel_features') { $checkpointCap = $EpicCheckpoint.max_parallel_features }
+        $dependencyRow = @(@($EpicCheckpoint.features) | Where-Object { $null -ne $_ })
+    }
     return [pscustomobject]@{
-        Feature             = [object[]] $features.ToArray()
-        EpicStep            = [object[]] $epicSteps
-        Done                = $done
-        Ledger              = $merge.Ledger
-        LedgerChanged       = $merge.Changed
-        Items               = $items
-        ItemsChanged        = $itemsChanged
-        Estimate            = $estimate
-        WaveParallelSeconds = Get-EpicProgressWaveParallelSecond -Feature $perFeature -EpicSeconds $epicSeconds
-        Unmapped            = [object[]] $unmapped.ToArray()
+        Feature       = [object[]] $features.ToArray()
+        EpicStep      = [object[]] $epicSteps
+        Done          = $done
+        DoneTasks     = [int] (@($features | ForEach-Object { $_.TasksDone }) | Measure-Object -Sum).Sum
+        TotalTasks    = [int] (@($features | ForEach-Object { $_.TasksTotal }) | Measure-Object -Sum).Sum
+        Ledger        = $merge.Ledger
+        LedgerChanged = $merge.Changed
+        Items         = $items
+        ItemsChanged  = $itemsChanged
+        Estimate      = $estimate
+        BlockedSince  = $blockedSince
+        CheckpointCap = $checkpointCap
+        DependencyRow = [object[]] $dependencyRow
+        Unmapped      = [object[]] $unmapped.ToArray()
     }
 }
