@@ -235,4 +235,4 @@ Unsafe orderings are listed in research section 10. The guard precedes the readi
 - [x] Edge cases and error handling covered by tests
 - [x] Docs updated (README, docs/features/active/... links)
 - [x] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Toolchain pass completed (format → lint → type-check → test)
