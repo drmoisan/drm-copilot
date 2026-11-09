@@ -7,6 +7,8 @@
 # Issue #1093 added the -PairSamples write case for a run within 90 seconds of the last sample.
 # Issue #1118 replaced the task goldens with hand-derived step goldens and the stored states
 # with version-2 documents; item mode and parameter sets are in Get-EpicProgressReport.ItemMode.Tests.ps1.
+# Issue #1153 changed the goldens to the five-line TL;DR and the critical-path section and the
+# written state to version 3; its integration cases are in Get-EpicProgressReport.CriticalPath.Tests.ps1.
 
 BeforeAll {
     $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../.claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1'
@@ -125,13 +127,23 @@ Describe 'Invoke-EpicProgressReport' {
         # done, 1 of 5 tasks), and PR #8 (pr done): 6 of 13. #77 has a prepared plan: 3 of 11.
         # The integration-pr epic step remains: 19 of 35 steps (54.3%). No sample exists, so
         # every type uses its default: preflight 1 x 10 + execution 7 x 5 + review 2 x 14 +
-        # pr 1 x 3 + ci 2 x 17 + merge 2 x 5 + integration-pr 1 x 45 = 165 min (2.75 h). Wave
-        # 2 holds 56 min and wave 3 64 min, plus 45 min of epic steps: also 165 min.
+        # pr 1 x 3 + ci 2 x 17 + merge 2 x 5 + integration-pr 1 x 45 = 165 min (2.75 h).
+        # Tasks: #12 2 of 2, #12345 1 of 5, #77 0 of 3: 3 of 10 (issue #1153).
+        # Critical path (issue #1153): no feature qualifies, so every rate is the 12 tasks / hr
+        # default (5 min per task). #12345 has 56 min left (4 tasks x 5 + review 14 + ci 17 +
+        # merge 5) and #77 64 min (preflight 10 + 3 x 5 + review 14 + pr 3 + ci 17 + merge 5).
+        # No depends_on key exists in the checkpoint or epic.md, so the waves give #12345 -> #12
+        # (merged, done at 0) and #77 -> #12345; the cap is the built-in 4 (no routing config).
+        # #12345 runs 0 to 56 min and #77 56 min to 2 h 00 min. The tail is a predicted main-sync
+        # (60 min) and integration-pr (45 min): 1 h 45 min, so the headline is 3 h 45 min. The
+        # serial sum is 0 + 56 + 64 + 105 min, also 3 h 45 min. The first run's baseline task
+        # count is the current 3, so the aggregate average is 0 over 0 intervals.
         $script:expectedTldr = @(
-            '**TL;DR:** Epic #42 is at 19 of 35 steps (54.3%). 1 of 3 features are done. #12345 is running (6 of 13 steps).'
-            '**Elapsed:** 3 h 00 min, with about 2.8 hours left on the per-type estimate (0 blocked steps excluded). **Weekly** quota is at 42.5%.'
+            '**TL;DR:** Epic #42 is at 3 of 10 tasks, 19 of 35 steps (54.3%). 1 of 3 features are done. #12345 is running (6 of 13 steps).'
+            '**Elapsed:** 3 h 00 min; critical path about 3 h 45 min left (#12345 -> #77 -> tail, cap 4). **Weekly** quota is at 42.5%.'
             '**Now:** no step is in progress. 10 of 10 types use defaults.'
-            '**Estimated time remaining:** 2 h 45 min by type (sum); 2 h 45 min wave-parallel.'
+            '**Velocity:** sequential 12 tasks / hr per feature (default, median of 0, SD n/a); aggregate 0 tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
+            '**Estimated time remaining:** range n/a (fewer than 2 qualifying features and fewer than 3 intervals); serial sum 3 h 45 min (upper bound, no parallelism).'
         )
         $defaultLines = @(
             'research 13', 'spec 6', 'plan 11', 'preflight 10', 'execution 5', 'review 14', 'pr 3', 'ci 17', 'merge 5', 'integration-pr 45' | ForEach-Object {
@@ -158,6 +170,16 @@ Describe 'Invoke-EpicProgressReport' {
             '| 3 | 1 | 11 | 3 |'
             '| Epic | 0 | 1 | 0 |'
             '| **Total** | **3** | **35** | **19** |'
+            ''
+            '| Feature | State | Tasks | Rate | Source | Remaining | Start | Finish |'
+            '|---|---|---|---|---|---|---|---|'
+            '| #12 | Completed | 2 of 2 | 12 tasks / hr | default | 0 h 00 min | 0 h 00 min | 0 h 00 min |'
+            '| #12345 | Running | 1 of 5 | 12 tasks / hr | default | 0 h 56 min | 0 h 00 min | 0 h 56 min |'
+            '| #77 | Pending | 0 of 3 | 12 tasks / hr | default | 1 h 04 min | 0 h 56 min | 2 h 00 min |'
+            ''
+            '**Critical path:** #12345 -> #77 -> tail. Headline 3 h 45 min: features finish in 2 h 00 min, then the tail of 1 h 45 min (main-sync 1 h 00 min, integration-pr 0 h 45 min), main-sync predicted.'
+            '**Schedule inputs:** dependency source waves; cap 4 (built-in).'
+            '**Serial sum:** 3 h 45 min (upper bound, no parallelism). **Range:** n/a (fewer than 2 qualifying features and fewer than 3 intervals).'
             ''
             '| Type | Done | In progress | Remaining | Blocked | Median | Samples | Subtotal |'
             '|---|---|---|---|---|---|---|---|'
@@ -267,15 +289,17 @@ Describe 'Invoke-EpicProgressReport' {
         @($fetchWarnings).Count | Should -Be 0
     }
 
-    It 'prints the four TL;DR lines in TLDR mode' {
+    It 'prints the five TL;DR lines in TLDR mode' {
         $lines = Get-TestReportLine -Extra @{ Mode = 'TLDR' }
 
+        $lines.Count | Should -Be 5
         ($lines -join "`n") | Should -Be ($script:expectedTldr -join "`n")
     }
 
     It 'prints the TL;DR block followed by the Full sections in Full mode' {
         $lines = Get-TestReportLine
 
+        $lines[5] | Should -Be ''
         $lines.Count | Should -Be ($script:expectedTldr.Count + $script:expectedFull.Count)
         ($lines -join "`n") | Should -Be ((@($script:expectedTldr) + @($script:expectedFull)) -join "`n")
     }
@@ -290,7 +314,7 @@ Describe 'Invoke-EpicProgressReport' {
         $lines = Get-TestReportLine -Extra @{ EpicIssue = '900' }
 
         $lines[0] | Should -BeLike '**TL;DR:** Epic #900 is at *'
-        $lines[5] | Should -Be '## Epic #900 example-epic: status at 12:00 UTC, Jan 5'
+        $lines[6] | Should -Be '## Epic #900 example-epic: status at 12:00 UTC, Jan 5'
     }
 
     It 'throws when no epic issue can be resolved' {
@@ -351,7 +375,10 @@ Describe 'Invoke-EpicProgressReport' {
 
         ($lines -join "`n") | Should -Be ($script:expectedTldr -join "`n")
         $script:stateWrites.Count | Should -Be 1
-        @((ConvertFrom-Json -InputObject $script:stateWrites[0].Content).samples).Count | Should -Be 1
+        $written = ConvertFrom-Json -InputObject $script:stateWrites[0].Content
+        $written.version | Should -Be 3
+        @($written.samples).Count | Should -Be 1
+        @($written.pauses).Count | Should -Be 0
     }
 
     It 'passes only fetch, show and worktree list to git' {
@@ -361,6 +388,8 @@ Describe 'Invoke-EpicProgressReport' {
             'fetch -q origin'
             'worktree list --porcelain'
             "show $($script:integration):docs/features/epics/example-epic/epic-kickoff.md"
+            # The fixture checkpoint carries no depends_on key, so epic.md is read once (issue #1153).
+            "show $($script:integration):docs/features/epics/example-epic/epic.md"
             "show $($script:integration):docs/a/plan.md"
             "show $($script:integration):docs/c/plan.md"
         )
@@ -383,12 +412,15 @@ Describe 'Invoke-EpicProgressReport' {
         $script:stateWrites.Count | Should -Be 1
         $script:stateWrites[0].Path | Should -Be $script:statePath
         $written = ConvertFrom-Json -InputObject $script:stateWrites[0].Content
-        $written.version | Should -Be 2
+        $written.version | Should -Be 3
         $written.unit | Should -Be 'steps'
         @($written.samples).Count | Should -Be 1
         $written.samples[0].ts | Should -Be $script:fixedNowUnix
-        # 19 done steps (see the golden comment).
+        # 19 done steps and 3 done tasks (see the golden comment).
         $written.samples[0].done | Should -Be 19
+        $written.samples[0].tasks | Should -Be 3
+        $written.samples[0].features.'12345' | Should -Be 1
+        $written.baselineDoneTasks | Should -Be 3
         # 1767603600 is the fixture start, 2026-01-05T09:00:00Z.
         $written.startUnixSeconds | Should -Be 1767603600
         $written.baselineDone | Should -Be 0
@@ -424,6 +456,8 @@ Describe 'Invoke-EpicProgressReport' {
         $lines = @(Invoke-EpicProgressReport @arguments)
 
         ($lines -join "`n") | Should -Be ($script:expectedTldr -join "`n")
+        # The migrated version-1 state has no task baseline, so the current 3 done tasks become it.
+        (ConvertFrom-Json -InputObject $script:stateWrites[0].Content).baselineDoneTasks | Should -Be 3
     }
 
     It 'clears stored samples and writes the resolved baseline with -ResetBaseline' {
@@ -444,6 +478,11 @@ Describe 'Invoke-EpicProgressReport' {
         $written.startUnixSeconds | Should -Be $script:fixedNowUnix
         $written.baselineDone | Should -Be 19
         $written.baselineWeeklyPct | Should -Be 12.5
+        $written.baselineDoneTasks | Should -Be 3
+        # Decision E11: the reset appends the span from the newest stored sample (now - 30 s) to now.
+        @($written.pauses).Count | Should -Be 1
+        $written.pauses[0].startUnixSeconds | Should -Be ($script:fixedNowUnix - 30)
+        $written.pauses[0].endUnixSeconds | Should -Be $script:fixedNowUnix
     }
 
     It 'keeps the durations ledger and anchors with -ResetBaseline' {
@@ -526,7 +565,7 @@ Describe 'Invoke-EpicProgressReport' {
     It 'prints the Full golden for a legacy four-sample state' {
         # The legacy array (samples at now minus 10800, 7200, 3600, and 60 s with done 0 to 3)
         # counted tasks, so it is migrated: the samples are discarded, the step goldens print,
-        # and one version-2 state is written with the current step count as its baseline.
+        # and one version-3 state is written with the current step count as its baseline.
         $script:existingPaths = @($script:checkpointPath, $script:livePlanPath, $script:statePath)
         $script:fileText[$script:statePath] = "[{`"ts`":$($script:fixedNowUnix - 10800),`"done`":0},{`"ts`":$($script:fixedNowUnix - 7200),`"done`":1},{`"ts`":$($script:fixedNowUnix - 3600),`"done`":2},{`"ts`":$($script:fixedNowUnix - 60),`"done`":3}]"
 
@@ -536,7 +575,7 @@ Describe 'Invoke-EpicProgressReport' {
         ($lines -join "`n") | Should -Be ((@($script:expectedTldr) + @($script:expectedFull)) -join "`n")
         $script:stateWrites.Count | Should -Be 1
         $written = ConvertFrom-Json -InputObject $script:stateWrites[0].Content
-        $written.version | Should -Be 2
+        $written.version | Should -Be 3
         $written.baselineDone | Should -Be 19
     }
 }
