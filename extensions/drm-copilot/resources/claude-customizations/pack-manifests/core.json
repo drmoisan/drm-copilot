@@ -182,6 +182,7 @@
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Stages.ps1",
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.State.ps1",
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Steps.ps1",
+    ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Velocity.ps1",
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1",
     ".claude/skills/epic-run/SKILL.md",
     ".claude/skills/evidence-and-timestamp-conventions/SKILL.md",

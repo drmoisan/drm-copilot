@@ -543,8 +543,9 @@ Describe 'Invoke-EpicProgressReport' {
 
 Describe 'Get-EpicProgressReport.ps1 repository constraints' {
     BeforeAll {
-        # The nine canonical files, entry first (issue #1093 split the Logic file into a hub and three
-        # files; issue #1118 added the Stages, Steps, Durations, and Gather files).
+        # The canonical files, entry first (issue #1093 split the Logic file into a hub and three
+        # files; issue #1118 added the Stages, Steps, Durations, and Gather files; issue #1153 added
+        # the Velocity file).
         $canonicalFolder = Split-Path -Path $script:scriptPath -Parent
         $script:productionPaths = @(
             (Resolve-Path -LiteralPath $script:scriptPath).ProviderPath
@@ -556,10 +557,11 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
             (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.Steps.ps1')).ProviderPath
             (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.Durations.ps1')).ProviderPath
             (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.Gather.ps1')).ProviderPath
+            (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.Velocity.ps1')).ProviderPath
         )
 
         function Get-TestCommandUse {
-            # Each command invocation in the nine production files with its enclosing function name.
+            # Each command invocation in the production files with its enclosing function name.
             $uses = [System.Collections.Generic.List[object]]::new()
             foreach ($path in $script:productionPaths) {
                 $tokens = $null
@@ -585,7 +587,7 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
         $writes = @($uses | Where-Object { $writeCommands -contains $_.Name })
 
         # Set-Content writes the state file and New-Item creates its missing directory (issue #1093).
-        $script:productionPaths.Count | Should -Be 9
+        $script:productionPaths.Count | Should -Be 10
         $writes.Count | Should -Be 2
         (@($writes.Name | Sort-Object) -join ',') | Should -Be 'New-Item,Set-Content'
         foreach ($write in $writes) {
@@ -607,14 +609,14 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
 
     It 'contains no recovered hardcoded value' {
         $forbidden = @('documentation-estate-tooling', '1019', '/workspaces', '2026-11-04T13:55')
-        # The nine canonical files, the scripts/dev-tools forwarder, and the skill text (issues #1093, #1118).
+        # The canonical files, the scripts/dev-tools forwarder, and the skill text (issues #1093, #1118, #1153).
         $canonicalFolder = Split-Path -Path $script:scriptPath -Parent
         $scanPaths = @($script:productionPaths) + @(
             (Join-Path -Path $PSScriptRoot -ChildPath '../../../../scripts/dev-tools/Get-EpicProgressReport.ps1')
             (Join-Path -Path (Split-Path -Path $canonicalFolder -Parent) -ChildPath 'SKILL.md')
         )
 
-        $scanPaths.Count | Should -Be 11
+        $scanPaths.Count | Should -Be 12
         foreach ($path in $scanPaths) {
             Test-Path -LiteralPath $path -PathType Leaf | Should -BeTrue -Because "$path must exist"
             $text = Get-Content -LiteralPath $path -Raw

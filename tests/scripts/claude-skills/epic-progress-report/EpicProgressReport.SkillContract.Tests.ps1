@@ -289,7 +289,7 @@ Describe 'epic-progress-report delivery' {
         $manifestPaths = @((Get-Content -LiteralPath $script:manifestPath -Raw | ConvertFrom-Json).paths)
         $files = @(Get-TestSkillFile)
 
-        $files.Count | Should -Be 10
+        $files.Count | Should -Be 11
         foreach ($file in $files) {
             @($manifestPaths | Where-Object { $_ -ceq $file }).Count | Should -Be 1 -Because "$file must be listed once in core.json"
         }
@@ -298,7 +298,7 @@ Describe 'epic-progress-report delivery' {
     It 'mirrors every skill-folder file byte-identically in the bundle' {
         $files = @(Get-TestSkillFile)
 
-        $files.Count | Should -Be 10
+        $files.Count | Should -Be 11
         foreach ($file in $files) {
             $canonical = Join-Path -Path $script:repositoryRoot -ChildPath $file
             $copy = Join-Path -Path $script:bundleRoot -ChildPath $file
