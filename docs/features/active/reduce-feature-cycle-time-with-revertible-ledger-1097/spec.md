@@ -230,7 +230,7 @@ Unsafe orderings are listed in research section 10. The guard precedes the readi
 ## Definition of Done
 
 - [x] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
+- [x] Behavior matches acceptance criteria in all documented environments
 - [x] Tests updated/added (unit/integration as applicable)
 - [x] Edge cases and error handling covered by tests
 - [x] Docs updated (README, docs/features/active/... links)
