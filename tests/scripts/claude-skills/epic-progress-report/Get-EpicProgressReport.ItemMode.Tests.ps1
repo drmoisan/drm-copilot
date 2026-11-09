@@ -66,7 +66,7 @@ Describe 'Invoke-EpicProgressReport in item mode' {
         ($script:gitCalls -join "`n") | Should -Be 'worktree list --porcelain'
         @($script:readPaths | Where-Object { $_ -like '*epic-orchestrator-state.json' -or $_ -like '*epic-kickoff.md' }).Count | Should -Be 0
         $lines[0] | Should -BeLike '**TL;DR:** Item #1118 is at *'
-        $lines.Count | Should -Be 4
+        $lines.Count | Should -Be 5
     }
 
     It 'includes no epic-level step in item mode' {
@@ -81,7 +81,7 @@ Describe 'Invoke-EpicProgressReport in item mode' {
 
         $script:stateWrites.Count | Should -Be 1
         $script:stateWrites[0].Path | Should -Be (Join-Path -Path '/fixture-repo' -ChildPath '.claude' -AdditionalChildPath 'state', 'progress-item-1118.json')
-        (ConvertFrom-Json -InputObject $script:stateWrites[0].Content).version | Should -Be 2
+        (ConvertFrom-Json -InputObject $script:stateWrites[0].Content).version | Should -Be 3
     }
 
     It 'places -EpicFolder and -Issue in different parameter sets' {
@@ -100,18 +100,21 @@ Describe 'Invoke-EpicProgressReport in item mode' {
         Should -Invoke Invoke-GitExe -Times 0 -Exactly
     }
 
-    It 'prints the four TL;DR lines in item mode' {
+    It 'prints the five TL;DR lines in item mode' {
         # 12 steps: research, spec, plan, preflight, four tasks (all done), review (in progress),
-        # pr, ci, and merge: 8 of 12 (66.7%). Medians from the closed stages; review, pr, ci, and
-        # merge use defaults (4 of 9 types). Remaining: review 14 - 10 elapsed = 4 min, pr 3,
-        # ci 17, merge 5: 29 min (0.48 h), and the item's wave-parallel figure is the same sum.
+        # pr, ci, and merge: 8 of 12 (66.7%); 4 of 4 tasks. Medians from the closed stages; review,
+        # pr, ci, and merge use defaults (4 of 9 types). Remaining: review 14 - 10 elapsed = 4 min,
+        # pr 3, ci 17, merge 5: 29 min, which is the one-node headline and the serial sum (issue
+        # #1153). The four execution samples (3600 s) do not qualify (fewer than 5 tasks), so the
+        # rate is the 12 tasks / hr default; the first run's task baseline is the current 4.
         $lines = Get-TestItemLine -Extra @{ Mode = 'TLDR' }
 
         $expected = @(
-            '**TL;DR:** Item #1118 is at 8 of 12 steps (66.7%). #1118 is not done yet. #1118 is running (8 of 12 steps).'
-            '**Elapsed:** 3 h 00 min, with about 0.5 hours left on the per-type estimate (0 blocked steps excluded). **Weekly** quota is at n/a.'
+            '**TL;DR:** Item #1118 is at 4 of 4 tasks, 8 of 12 steps (66.7%). #1118 is not done yet. #1118 is running (8 of 12 steps).'
+            '**Elapsed:** 3 h 00 min; critical path about 0 h 29 min left (#1118). **Weekly** quota is at n/a.'
             '**Now:** #1118 review (0 h 10 min of median 0 h 14 min). 4 of 9 types use defaults.'
-            '**Estimated time remaining:** 0 h 29 min by type (sum); 0 h 29 min wave-parallel.'
+            '**Velocity:** sequential 12 tasks / hr per feature (default, median of 0, SD n/a); aggregate n/a tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
+            '**Estimated time remaining:** range n/a (fewer than 2 qualifying features and fewer than 3 intervals); serial sum 0 h 29 min (upper bound, no parallelism).'
         )
         ($lines -join "`n") | Should -Be ($expected -join "`n")
     }
@@ -145,8 +148,10 @@ Describe 'Invoke-EpicProgressReport in item mode' {
         $script:now = $script:noon.AddMinutes(5)
         $second = Get-TestItemLine -Extra @{ Mode = 'TLDR' }
 
-        $first[3] | Should -Be '**Estimated time remaining:** 0 h 29 min by type (sum); 0 h 29 min wave-parallel.'
-        $second[3] | Should -Be '**Estimated time remaining:** 0 h 25 min by type (sum); 0 h 25 min wave-parallel.'
+        $first[1] | Should -BeLike '**Elapsed:** 3 h 00 min; critical path about 0 h 29 min left (#1118). *'
+        $second[1] | Should -BeLike '**Elapsed:** 3 h 05 min; critical path about 0 h 25 min left (#1118). *'
+        $first[4] | Should -BeLike '*; serial sum 0 h 29 min (upper bound, no parallelism).'
+        $second[4] | Should -BeLike '*; serial sum 0 h 25 min (upper bound, no parallelism).'
         $second[2] | Should -BeLike '**Now:** #1118 review (0 h 15 min of median 0 h 14 min, over median).*'
     }
 
@@ -170,10 +175,11 @@ Describe 'Invoke-EpicProgressReport in item mode' {
             $lines = Get-TestItemLine -Extra @{ Mode = 'TLDR' }
 
             $expected = @(
-                '**TL;DR:** Item #1118 is at 8 of 12 steps (66.7%). #1118 is not done yet. #1118 is running (8 of 12 steps).'
-                '**Elapsed:** 3 h 00 min, with about 0.5 hours left on the per-type estimate (0 blocked steps excluded). **Weekly** quota is at n/a.'
+                '**TL;DR:** Item #1118 is at 4 of 4 tasks, 8 of 12 steps (66.7%). #1118 is not done yet. #1118 is running (8 of 12 steps).'
+                '**Elapsed:** 3 h 00 min; critical path about 0 h 29 min left (#1118). **Weekly** quota is at n/a.'
                 '**Now:** #1118 review (0 h 10 min of median 0 h 14 min). 4 of 9 types use defaults.'
-                '**Estimated time remaining:** 0 h 29 min by type (sum); 0 h 29 min wave-parallel.'
+                '**Velocity:** sequential 12 tasks / hr per feature (default, median of 0, SD n/a); aggregate n/a tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
+                '**Estimated time remaining:** range n/a (fewer than 2 qualifying features and fewer than 3 intervals); serial sum 0 h 29 min (upper bound, no parallelism).'
             )
             ($lines -join "`n") | Should -Be ($expected -join "`n")
         }
@@ -185,8 +191,8 @@ Describe 'Invoke-EpicProgressReport in item mode' {
             $second = Get-TestItemLine -Extra @{ Mode = 'TLDR' }
 
             $first[2] | Should -Be '**Now:** #1118 review (0 h 10 min of median 0 h 14 min). 4 of 9 types use defaults.'
-            $first[3] | Should -BeLike '**Estimated time remaining:** 0 h 29 min by type (sum)*'
-            $second[3] | Should -BeLike '**Estimated time remaining:** 0 h 25 min by type (sum)*'
+            $first[4] | Should -BeLike '**Estimated time remaining:** *; serial sum 0 h 29 min (upper bound, no parallelism).'
+            $second[4] | Should -BeLike '**Estimated time remaining:** *; serial sum 0 h 25 min (upper bound, no parallelism).'
         }
     }
 

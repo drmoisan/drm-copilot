@@ -9,20 +9,24 @@
     the epic kickoff and the feature plans from the integration branch (or from a feature
     worktree when one holds the plan), each live item checkpoint and its stage_timing, the
     epic orchestrator checkpoint, the pull request state of each feature branch, and the
-    weekly quota of the active cswap account. The estimate is the sum over step types of the
-    remaining steps times the median measured duration of the type, with a default duration
-    for a type that has no sample; blocked items are excluded by recorded checkpoint state.
+    weekly quota of the active cswap account, and in epic mode the epic.md depends_on lists
+    and the routing-config cap. The headline is the critical path (issue #1153): each
+    feature's remaining time at its sequential task velocity, list-scheduled over the
+    dependency graph under the parallel cap, plus the epic tail; the per-type sum is the
+    serial upper bound. Blocked items and their dependents are excluded by recorded state.
 
     The pure logic lives in Get-EpicProgressReport.Logic.ps1, which this script dot-sources and
-    which dot-sources the Stages, Steps, Durations, State, Metrics, Render, and Gather files.
+    which dot-sources the Stages, Steps, Durations, State, Metrics, Velocity, Schedule,
+    CriticalPath, Render, and Gather files.
     Every I/O call goes through a wrapper function in this script. When gh or cswap is not
     installed, or prints no parseable output, the report still prints: the pull-request state
     is empty and the quota is n/a.
 
-    The version-2 state file at -StatePath keeps the start instant, the baseline done step
-    count, the weekly baseline, the check-in samples (Unix time and done steps), the duration
-    ledger per step type, and the per-item tick anchors and blocked spans. It is read before
-    the first git call; a version-1 file or the legacy sample array is migrated.
+    The version-3 state file at -StatePath keeps the start instant, the baseline done step and
+    task counts, the weekly baseline, the check-in samples (Unix time, done steps, done tasks,
+    and per-feature done tasks), the duration ledger per step type, the per-item tick anchors
+    and blocked spans, and the pause spans. It is read before the first git call; a version-2
+    or version-1 file or the legacy sample array is migrated.
 
     This file is the canonical script of the /epic-progress-report skill. The entry-point
     block at the bottom is skipped when the file is dot-sourced.
@@ -91,7 +95,7 @@
     ledger is not limited by it.
 
 .PARAMETER Mode
-    TLDR prints the four-line TL;DR block only; Full prints the TL;DR block followed by
+    TLDR prints the five-line TL;DR block only; Full prints the TL;DR block followed by
     the full report. Default: Full.
 
 .PARAMETER ResetBaseline
@@ -332,8 +336,9 @@ function Invoke-EpicProgressReport {
         -ResetBaseline with -PairSamples and -StepDefaultMinutes before any I/O, reads the state
         before the first git call, runs git with exactly 'fetch -q origin' (epic mode, a failure
         is a warning), 'worktree list --porcelain', and 'show', gh and cswap only when installed,
-        gathers through the Gather functions, and writes the state only when the samples, the
-        ledger, or the anchors changed, or on ResetBaseline or PairSamples. Returns the TL;DR
+        gathers through the Gather functions, computes the velocity and the critical path, and
+        writes the state only when the samples, the ledger, or the anchors changed, a pause span
+        was appended, or on ResetBaseline or PairSamples. Returns the TL;DR
         lines, followed by the Full lines unless Mode is TLDR.
     .PARAMETER EpicFolder
         The epic folder name (Epic set).
@@ -409,7 +414,18 @@ function Invoke-EpicProgressReport {
     if (Test-EpicProgressPath -Path $setting.StatePath) { $stateText = Read-EpicProgressFile -Path $setting.StatePath }
     $storedState = ConvertFrom-EpicProgressStateText -Text $stateText
     $nowUtc = (Get-EpicProgressUtcNow).ToUniversalTime()
+    $nowUnixSeconds = [DateTimeOffset]::new($nowUtc).ToUnixTimeSeconds()
     $baseline = Resolve-EpicProgressBaseline -StartUtc $StartUtc -StartUtcPassed:($PSBoundParameters.ContainsKey('StartUtc')) -BaselineDone $BaselineDone -BaselineDonePassed:($PSBoundParameters.ContainsKey('BaselineDone')) -BaselineWeeklyPct $BaselineWeeklyPct -BaselineWeeklyPctPassed:($PSBoundParameters.ContainsKey('BaselineWeeklyPct')) -State $storedState -ResetBaseline:$ResetBaseline -NowUtc $nowUtc
+    # The pause span this run closes is taken from the newest stored sample before a reset discards
+    # the samples (decision E11): the reset span, else a gap above 3600 s; a stored span is never re-appended.
+    [long[]] $storedInstants = @($storedState.Samples | Where-Object { $null -ne $_ -and $null -ne $_.ts } | ForEach-Object { [long] $_.ts })
+    if ($ResetBaseline) {
+        $newPause = @(Get-EpicProgressResetPauseSpan -SampleInstant $storedInstants -ResumeUnixSeconds $nowUnixSeconds)
+    } else {
+        $newPause = @()
+        if ($storedInstants.Count -gt 0) { $newPause = @(Get-EpicProgressPauseSpan -SampleInstant @(($storedInstants | Measure-Object -Maximum).Maximum, $nowUnixSeconds)) }
+    }
+    $pauseSpans = [object[]] (@($storedState.Pauses) + $newPause)
     # A reset discards every stored sample; the sample rule then adds the first sample (now, done).
     $priorSamples = $storedState.Samples
     if ($ResetBaseline) { $priorSamples = [object[]] @() }
@@ -429,6 +445,8 @@ function Invoke-EpicProgressReport {
     }
     $items = [System.Collections.Generic.List[object]]::new()
     $epicRows = $null
+    $manifestRows = @()
+    $configCap = $null
     if ($itemMode) {
         $epicIssueText = [string] $Issue
         $found = Find-EpicProgressItemWorktree -Issue $epicIssueText -WorktreeMap $worktreeOf
@@ -441,7 +459,11 @@ function Invoke-EpicProgressReport {
             throw "The epic issue number could not be resolved: pass -EpicIssue or add an 'Epic issue: #<n>' line to $($setting.KickoffPath) on $($setting.IntegrationBranch)."
         }
         $rows = @(ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoffText)
-        $epicRows = Get-EpicProgressEpicCheckpointRow -CheckpointPath $setting.CheckpointPath -KickoffIssue ([string[]] @($rows | ForEach-Object { $_.Issue }))
+        $kickoffIssues = [string[]] @($rows | ForEach-Object { $_.Issue })
+        $epicRows = Get-EpicProgressEpicCheckpointRow -CheckpointPath $setting.CheckpointPath -KickoffIssue $kickoffIssues
+        # Dependency and cap inputs (decision E5); item mode reads neither.
+        $manifestRows = @(Read-EpicProgressManifestFeature -KickoffIssue $kickoffIssues -CheckpointRow @($epicRows.Checkpoint.features | Where-Object { $null -ne $_ }) -ManifestPath "docs/features/epics/$EpicFolder/epic.md" -IntegrationBranch $setting.IntegrationBranch)
+        $configCap = Read-EpicProgressRoutingCap -RepositoryRoot $setting.RepositoryRoot
         foreach ($row in $rows) {
             $epicRow = $epicRows.Feature[$row.Issue]
             $branch = ''
@@ -457,24 +479,37 @@ function Invoke-EpicProgressReport {
     if (Test-EpicProgressCommand -Name 'cswap') {
         $weeklyPct = Get-EpicProgressWeeklyQuota -Json (@(Invoke-CswapExe -CswapArgs @('list', '--json')) -join "`n")
     }
-    $nowUnixSeconds = [DateTimeOffset]::new($nowUtc).ToUnixTimeSeconds()
-    $report = Get-EpicProgressStepReport -Item $items.ToArray() -EpicCheckpoint $epicRows.Checkpoint -SyncRow @($epicRows.Sync | Where-Object { $null -ne $_ }) -EpicIssue $epicIssueText -State $storedState -NowUnixSeconds $nowUnixSeconds -Default $defaults -NoEpicStep:$itemMode -ResetBaseline:$ResetBaseline
+    # The stored spans plus the span this run closes are excluded from this run's tick batches.
+    $report = Get-EpicProgressStepReport -Item $items.ToArray() -EpicCheckpoint $epicRows.Checkpoint -SyncRow @($epicRows.Sync | Where-Object { $null -ne $_ }) -EpicIssue $epicIssueText -State $storedState -NowUnixSeconds $nowUnixSeconds -Default $defaults -NoEpicStep:$itemMode -ResetBaseline:$ResetBaseline -PauseSpan $pauseSpans
     $baselineDoneValue = $baseline.BaselineDone
     if ($baseline.UseCurrentDone) { $baselineDoneValue = $report.Done }
+    $baselineDoneTasksValue = $baseline.BaselineDoneTasks
+    if ($baseline.UseCurrentDoneTasks) { $baselineDoneTasksValue = $report.DoneTasks }
     $selection = Select-EpicProgressSample -Sample $priorSamples -NowUnixSeconds $nowUnixSeconds -Done $report.Done -SampleCap $SampleCap
     $currentSamples = $selection.Sample
+    if ($selection.Changed) {
+        # The sample added for this run carries the epic and per-feature done task counts (decision E12).
+        $taskCounts = @{}
+        foreach ($record in $report.Feature) { $taskCounts[[string] $record.Issue] = [int] $record.TasksDone }
+        $added = $currentSamples[$currentSamples.Count - 1]
+        $added | Add-Member -NotePropertyName 'tasks' -NotePropertyValue $report.DoneTasks -Force
+        $added | Add-Member -NotePropertyName 'features' -NotePropertyValue $taskCounts -Force
+    }
     # Pairing is a one-shot rewrite applied after the sample rule (cadence change).
     if ($PairSamples) { $currentSamples = [object[]] @(Merge-EpicProgressSamplePair -Sample $currentSamples) }
-    if ($selection.Changed -or $report.LedgerChanged -or $report.ItemsChanged -or $ResetBaseline -or $PairSamples) {
-        $startUnixSeconds = [DateTimeOffset]::new($baseline.StartUtc).ToUnixTimeSeconds()
-        $stateJson = ConvertTo-EpicProgressStateJson -StartUnixSeconds $startUnixSeconds -BaselineDone $baselineDoneValue -BaselineWeeklyPct $baseline.BaselineWeeklyPct -Sample $currentSamples -Duration $report.Ledger -Item $report.Items
+    $startUnixSeconds = [DateTimeOffset]::new($baseline.StartUtc).ToUnixTimeSeconds()
+    # Migrated version-2 samples carry no 'tasks' value and are passed unchanged, so they form no interval.
+    $aggregate = Get-EpicProgressAggregateVelocity -Sample $currentSamples -PauseSpan $pauseSpans -StartUnixSeconds $startUnixSeconds -NowUnixSeconds $nowUnixSeconds -DoneTasks $report.DoneTasks -BaselineDoneTasks $baselineDoneTasksValue
+    $criticalPath = Get-EpicProgressCriticalPathReport -Feature $report.Feature -EpicStep $report.EpicStep -Ledger $report.Ledger -Default $defaults -NowUnixSeconds $nowUnixSeconds -BlockedSince $report.BlockedSince -CheckpointRow $report.DependencyRow -ManifestRow $manifestRows -CheckpointCap $report.CheckpointCap -ConfigCap $configCap -Aggregate $aggregate -ItemMode:$itemMode
+    if ($selection.Changed -or $report.LedgerChanged -or $report.ItemsChanged -or $ResetBaseline -or $PairSamples -or $newPause.Count -gt 0) {
+        $stateJson = ConvertTo-EpicProgressStateJson -StartUnixSeconds $startUnixSeconds -BaselineDone $baselineDoneValue -BaselineWeeklyPct $baseline.BaselineWeeklyPct -Sample $currentSamples -Duration $report.Ledger -Item $report.Items -BaselineDoneTasks $baselineDoneTasksValue -PauseSpan $pauseSpans
         Write-EpicProgressState -Path $setting.StatePath -Content $stateJson
     }
 
     $subject = 'Epic'
     $epicName = $EpicFolder
     if ($itemMode) { $subject = 'Item'; $epicName = '' }
-    $summary = Get-EpicProgressSummary -Feature $report.Feature -EpicStep $report.EpicStep -Estimate $report.Estimate -WaveParallelSeconds $report.WaveParallelSeconds -Unmapped $report.Unmapped -Subject $subject -StartUtc $baseline.StartUtc -NowUtc $nowUtc -WeeklyPct $weeklyPct -BaselineWeeklyPct $baseline.BaselineWeeklyPct -EpicIssue $epicIssueText -EpicName $epicName
+    $summary = Get-EpicProgressSummary -Feature $report.Feature -EpicStep $report.EpicStep -Estimate $report.Estimate -CriticalPath $criticalPath -Aggregate $aggregate -Unmapped $report.Unmapped -Subject $subject -StartUtc $baseline.StartUtc -NowUtc $nowUtc -WeeklyPct $weeklyPct -BaselineWeeklyPct $baseline.BaselineWeeklyPct -EpicIssue $epicIssueText -EpicName $epicName
     $lines = [System.Collections.Generic.List[string]]::new()
     $lines.AddRange([string[]] @(Get-EpicProgressTldrLine -Summary $summary))
     if ($Mode -ne 'TLDR') { $lines.AddRange([string[]] @(Get-EpicProgressFullLine -Summary $summary)) }

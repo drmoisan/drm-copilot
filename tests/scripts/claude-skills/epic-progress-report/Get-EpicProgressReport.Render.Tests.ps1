@@ -17,9 +17,30 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
         $script:defaults = Resolve-EpicProgressStepDefault
 
         function Get-TestFeature {
-            param([string] $Issue, [int] $Wave, [string] $Band, [int] $Total, [int] $Done, [string] $State, [string] $Phase = '', [string] $Pr = '', [string] $BlockedReason = '')
-            [pscustomobject]@{ Issue = $Issue; Wave = $Wave; Band = $Band; Total = $Total; Done = $Done; State = $State; Phase = $Phase; Pr = $Pr; BlockedReason = $BlockedReason }
+            param([string] $Issue, [int] $Wave, [string] $Band, [int] $Total, [int] $Done, [string] $State, [string] $Phase = '', [string] $Pr = '', [string] $BlockedReason = '', [int] $TasksDone = 0, [int] $TasksTotal = 0)
+            [pscustomobject]@{ Issue = $Issue; Wave = $Wave; Band = $Band; Total = $Total; Done = $Done; State = $State; Phase = $Phase; Pr = $Pr; BlockedReason = $BlockedReason; TasksDone = $TasksDone; TasksTotal = $TasksTotal }
         }
+
+        function Get-TestCriticalPath {
+            # A critical-path record (issue #1153) with no qualifying feature (default rate 12) and an n/a range.
+            param([double] $HeadlineSeconds, [string] $Chain = '#12345 -> tail', [object[]] $Excluded = @(), [object[]] $FeatureRow = @(), [object] $Tail = $null, [double] $FinishSeconds = $HeadlineSeconds, [double] $SerialSumSeconds = $HeadlineSeconds)
+            if ($null -eq $Tail) { $Tail = [pscustomobject]@{ TailSeconds = 0.0; PredictedSync = $false; Step = @() } }
+            [pscustomobject]@{
+                Feature = $FeatureRow; Excluded = $Excluded; DefaultRate = 12.0
+                Pooled = [pscustomobject]@{ Median = [double]::NaN; StandardDeviation = [double]::NaN; Count = 0; Rate = @() }
+                Cap = 4; CapSource = 'built-in'; DependencySource = 'waves'; GraphMessage = ''; Tail = $Tail
+                FinishSeconds = $FinishSeconds; HeadlineSeconds = $HeadlineSeconds; Chain = $Chain; SerialSumSeconds = $SerialSumSeconds
+                Range  = [pscustomobject]@{ FastSeconds = [double]::NaN; SlowSeconds = [double]::NaN; NoUpperBound = $false; StandardDeviation = [double]::NaN; SdSource = 'n/a'; Reason = 'fewer than 2 qualifying features and fewer than 3 intervals' }
+            }
+        }
+
+        function Get-TestFeatureRow {
+            param([string] $Issue, [string] $State, [int] $TasksDone, [int] $TasksTotal, [double] $RemainingSeconds, [double] $StartSeconds, [double] $FinishSeconds)
+            [pscustomobject]@{ Issue = $Issue; State = $State; TasksDone = $TasksDone; TasksTotal = $TasksTotal; Rate = 12.0; RateSource = 'default'; RemainingSeconds = $RemainingSeconds; StartSeconds = $StartSeconds; FinishSeconds = $FinishSeconds; Excluded = $false }
+        }
+
+        $script:naRange = 'range n/a (fewer than 2 qualifying features and fewer than 3 intervals)'
+        $script:defaultVelocity = '**Velocity:** sequential 12 tasks / hr per feature (default, median of 0, SD n/a); aggregate n/a tasks / hr average, n/a recent, SD n/a over 0 intervals (aggregate, informational).'
 
         function Get-TestStepSet {
             # Steps from 'type:done/remaining' pairs, for example 'review:1/2'.
@@ -33,37 +54,51 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
         }
 
         function Get-TestSummary {
-            param([object[]] $Feature, [object[]] $Step, [object[]] $EpicStep = @(), [hashtable] $Ledger = @{}, [double] $WeeklyPct = 42.5, [datetime] $StartUtc = $script:startUtc, [double] $WaveSeconds = -1, [object[]] $Unmapped = @(), [string] $Subject = 'Epic', [hashtable] $BlockedSince = @{})
+            param([object[]] $Feature, [object[]] $Step, [object[]] $EpicStep = @(), [hashtable] $Ledger = @{}, [double] $WeeklyPct = 42.5, [datetime] $StartUtc = $script:startUtc, [object] $CriticalPath = $null, [string] $Chain = '#12345 -> tail', [object[]] $Excluded = @(), [object[]] $Unmapped = @(), [string] $Subject = 'Epic', [hashtable] $BlockedSince = @{})
             $estimate = Get-EpicProgressTypeEstimate -Step @(@($Step) + @($EpicStep)) -Ledger $Ledger -Default $script:defaults -NowUnixSeconds $script:nowUnix -BlockedSince $BlockedSince
-            if ($WaveSeconds -lt 0) { $WaveSeconds = $estimate.TotalSeconds }
+            # Without an explicit record the headline and the serial sum equal the per-type sum.
+            if ($null -eq $CriticalPath) { $CriticalPath = Get-TestCriticalPath -HeadlineSeconds $estimate.TotalSeconds -Chain $Chain -Excluded $Excluded }
             $name = 'example-epic'
             if ($Subject -eq 'Item') { $name = '' }
-            Get-EpicProgressSummary -Feature $Feature -EpicStep $EpicStep -Estimate $estimate -WaveParallelSeconds $WaveSeconds -Unmapped $Unmapped -Subject $Subject -StartUtc $StartUtc -NowUtc $script:nowUtc -WeeklyPct $WeeklyPct -BaselineWeeklyPct 0 -EpicIssue '42' -EpicName $name
+            Get-EpicProgressSummary -Feature $Feature -EpicStep $EpicStep -Estimate $estimate -CriticalPath $CriticalPath -Unmapped $Unmapped -Subject $Subject -StartUtc $StartUtc -NowUtc $script:nowUtc -WeeklyPct $WeeklyPct -BaselineWeeklyPct 0 -EpicIssue '42' -EpicName $name
         }
 
-        # Three features: #12 Completed (wave 1, 10 of 10 steps), #12345 Running (wave 2, 6 of 13),
-        # #77 Pending (wave 3, 3 of 11), plus one remaining integration-pr step: 19 of 35 steps.
+        # Three features: #12 Completed (wave 1, 10 of 10 steps, 5 of 5 tasks), #12345 Running
+        # (wave 2, 6 of 13, 3 of 10 tasks), #77 Pending (wave 3, 3 of 11, 0 of 7 tasks), plus one
+        # remaining integration-pr step: 19 of 35 steps and 8 of 22 tasks.
         $script:threeFeatures = @(
-            Get-TestFeature -Issue '12' -Wave 1 -Band 'small' -Total 10 -Done 10 -State 'Completed' -Pr '#7 MERGED'
-            Get-TestFeature -Issue '12345' -Wave 2 -Band 'large' -Total 13 -Done 6 -State 'Running' -Phase 'Phase 1 - Build' -Pr '#8 OPEN'
-            Get-TestFeature -Issue '77' -Wave 3 -Band 'medium' -Total 11 -Done 3 -State 'Pending'
+            Get-TestFeature -Issue '12' -Wave 1 -Band 'small' -Total 10 -Done 10 -State 'Completed' -Pr '#7 MERGED' -TasksDone 5 -TasksTotal 5
+            Get-TestFeature -Issue '12345' -Wave 2 -Band 'large' -Total 13 -Done 6 -State 'Running' -Phase 'Phase 1 - Build' -Pr '#8 OPEN' -TasksDone 3 -TasksTotal 10
+            Get-TestFeature -Issue '77' -Wave 3 -Band 'medium' -Total 11 -Done 3 -State 'Pending' -TasksDone 0 -TasksTotal 7
         )
         $script:threeSteps = @(Get-TestStepSet -Spec 'research:3/0,spec:3/0,plan:3/0,preflight:2/1,execution:3/7,review:1/2,pr:2/1,ci:1/2,merge:1/2')
         $script:epicSteps = @(Get-EpicProgressStepRecord -Issue '42' -Type 'integration-pr')
         # Remaining with defaults: preflight 1 x 10 + execution 7 x 5 + review 2 x 14 + pr 1 x 3
-        # + ci 2 x 17 + merge 2 x 5 + integration-pr 1 x 45 = 165 min (2 h 45 min, 2.75 h).
-        $script:threeSummary = Get-TestSummary -Feature $script:threeFeatures -Step $script:threeSteps -EpicStep $script:epicSteps -WaveSeconds 9900
+        # + ci 2 x 17 + merge 2 x 5 + integration-pr 1 x 45 = 165 min (2 h 45 min) by type.
+        # Schedule: #12 done at 0; #12345 runs 0 to 1 h; #77 (after #12345) runs 1 h to 2 h 05 min;
+        # the tail is a predicted main-sync (60 min) and integration-pr (45 min): 1 h 45 min, so the
+        # headline is 2 h 05 min + 1 h 45 min = 3 h 50 min (13800 s), equal to the serial sum here.
+        $threeTail = [pscustomobject]@{ TailSeconds = 6300.0; PredictedSync = $true; Step = @([pscustomobject]@{ Type = 'main-sync'; Seconds = 3600.0 }, [pscustomobject]@{ Type = 'integration-pr'; Seconds = 2700.0 }) }
+        $threeRows = @(
+            Get-TestFeatureRow -Issue '12' -State 'Completed' -TasksDone 5 -TasksTotal 5 -RemainingSeconds 0 -StartSeconds 0 -FinishSeconds 0
+            Get-TestFeatureRow -Issue '12345' -State 'Running' -TasksDone 3 -TasksTotal 10 -RemainingSeconds 3600 -StartSeconds 0 -FinishSeconds 3600
+            Get-TestFeatureRow -Issue '77' -State 'Pending' -TasksDone 0 -TasksTotal 7 -RemainingSeconds 3900 -StartSeconds 3600 -FinishSeconds 7500
+        )
+        $threePath = Get-TestCriticalPath -HeadlineSeconds 13800 -FinishSeconds 7500 -Chain '#12345 -> #77 -> tail' -FeatureRow $threeRows -Tail $threeTail
+        $script:threeSummary = Get-TestSummary -Feature $script:threeFeatures -Step $script:threeSteps -EpicStep $script:epicSteps -CriticalPath $threePath
     }
 
-    It 'composes the four TL;DR lines' {
+    It 'composes the five TL;DR lines' {
         $lines = @(Get-EpicProgressTldrLine -Summary $script:threeSummary)
 
         $expected = @(
-            '**TL;DR:** Epic #42 is at 19 of 35 steps (54.3%). 1 of 3 features are done. #12345 is running (6 of 13 steps).'
-            '**Elapsed:** 3 h 00 min, with about 2.8 hours left on the per-type estimate (0 blocked steps excluded). **Weekly** quota is at 42.5%.'
+            '**TL;DR:** Epic #42 is at 8 of 22 tasks, 19 of 35 steps (54.3%). 1 of 3 features are done. #12345 is running (6 of 13 steps).'
+            '**Elapsed:** 3 h 00 min; critical path about 3 h 50 min left (#12345 -> #77 -> tail, cap 4). **Weekly** quota is at 42.5%.'
             '**Now:** no step is in progress. 10 of 10 types use defaults.'
-            '**Estimated time remaining:** 2 h 45 min by type (sum); 2 h 45 min wave-parallel.'
+            $script:defaultVelocity
+            "**Estimated time remaining:** $($script:naRange); serial sum 3 h 50 min (upper bound, no parallelism)."
         )
+        $lines.Count | Should -Be 5
         ($lines -join "`n") | Should -Be ($expected -join "`n")
     }
 
@@ -90,6 +125,16 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
             '| 3 | 1 | 11 | 3 |'
             '| Epic | 0 | 1 | 0 |'
             '| **Total** | **3** | **35** | **19** |'
+            ''
+            '| Feature | State | Tasks | Rate | Source | Remaining | Start | Finish |'
+            '|---|---|---|---|---|---|---|---|'
+            '| #12 | Completed | 5 of 5 | 12 tasks / hr | default | 0 h 00 min | 0 h 00 min | 0 h 00 min |'
+            '| #12345 | Running | 3 of 10 | 12 tasks / hr | default | 1 h 00 min | 0 h 00 min | 1 h 00 min |'
+            '| #77 | Pending | 0 of 7 | 12 tasks / hr | default | 1 h 05 min | 1 h 00 min | 2 h 05 min |'
+            ''
+            '**Critical path:** #12345 -> #77 -> tail. Headline 3 h 50 min: features finish in 2 h 05 min, then the tail of 1 h 45 min (main-sync 1 h 00 min, integration-pr 0 h 45 min), main-sync predicted.'
+            '**Schedule inputs:** dependency source waves; cap 4 (built-in).'
+            '**Serial sum:** 3 h 50 min (upper bound, no parallelism). **Range:** n/a (fewer than 2 qualifying features and fewer than 3 intervals).'
             ''
             '| Type | Done | In progress | Remaining | Blocked | Median | Samples | Subtotal |'
             '|---|---|---|---|---|---|---|---|'
@@ -124,47 +169,47 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
 
     It 'states that no feature is running' {
         $features = @(
-            Get-TestFeature -Issue '12' -Wave 1 -Band 'small' -Total 10 -Done 10 -State 'Completed'
-            Get-TestFeature -Issue '77' -Wave 2 -Band 'medium' -Total 11 -Done 0 -State 'Pending'
+            Get-TestFeature -Issue '12' -Wave 1 -Band 'small' -Total 10 -Done 10 -State 'Completed' -TasksDone 4 -TasksTotal 4
+            Get-TestFeature -Issue '77' -Wave 2 -Band 'medium' -Total 11 -Done 0 -State 'Pending' -TasksDone 0 -TasksTotal 6
         )
 
         $lines = @(Get-EpicProgressTldrLine -Summary (Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:1/1')))
 
-        # 10 + 0 done of 10 + 11 steps: 47.6%.
-        $lines[0] | Should -Be '**TL;DR:** Epic #42 is at 10 of 21 steps (47.6%). 1 of 2 features are done. No feature is running.'
+        # 10 + 0 done of 10 + 11 steps: 47.6%; 4 + 0 of 4 + 6 tasks.
+        $lines[0] | Should -Be '**TL;DR:** Epic #42 is at 4 of 10 tasks, 10 of 21 steps (47.6%). 1 of 2 features are done. No feature is running.'
     }
 
     It 'names a single running feature' {
-        $features = @(Get-TestFeature -Issue '12345' -Wave 1 -Band 'large' -Total 12 -Done 9 -State 'Running')
+        $features = @(Get-TestFeature -Issue '12345' -Wave 1 -Band 'large' -Total 12 -Done 9 -State 'Running' -TasksDone 5 -TasksTotal 8)
 
         $lines = @(Get-EpicProgressTldrLine -Summary (Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:0/1')))
 
-        $lines[0] | Should -Be '**TL;DR:** Epic #42 is at 9 of 12 steps (75%). The only feature is not done yet. #12345 is running (9 of 12 steps).'
+        $lines[0] | Should -Be '**TL;DR:** Epic #42 is at 5 of 8 tasks, 9 of 12 steps (75%). The only feature is not done yet. #12345 is running (9 of 12 steps).'
     }
 
     It 'lists several running features' {
         $features = @(
-            Get-TestFeature -Issue '12345' -Wave 1 -Band 'large' -Total 15 -Done 3 -State 'Running'
-            Get-TestFeature -Issue '600' -Wave 1 -Band 'small' -Total 12 -Done 6 -State 'Running'
+            Get-TestFeature -Issue '12345' -Wave 1 -Band 'large' -Total 15 -Done 3 -State 'Running' -TasksDone 1 -TasksTotal 9
+            Get-TestFeature -Issue '600' -Wave 1 -Band 'small' -Total 12 -Done 6 -State 'Running' -TasksDone 2 -TasksTotal 4
         )
 
         $lines = @(Get-EpicProgressTldrLine -Summary (Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:0/1')))
 
-        # 9 of 27 steps: 33.3%.
-        $lines[0] | Should -Be '**TL;DR:** Epic #42 is at 9 of 27 steps (33.3%). None of the 2 features is done yet. #12345 (3 of 15), #600 (6 of 12) are running.'
+        # 9 of 27 steps: 33.3%; 3 of 13 tasks.
+        $lines[0] | Should -Be '**TL;DR:** Epic #42 is at 3 of 13 tasks, 9 of 27 steps (33.3%). None of the 2 features is done yet. #12345 (3 of 15), #600 (6 of 12) are running.'
     }
 
     It 'states that no feature is done yet' {
         $features = @(
-            Get-TestFeature -Issue '12' -Wave 1 -Band 'small' -Total 10 -Done 5 -State 'Running'
-            Get-TestFeature -Issue '77' -Wave 2 -Band 'medium' -Total 10 -Done 0 -State 'Pending'
+            Get-TestFeature -Issue '12' -Wave 1 -Band 'small' -Total 10 -Done 5 -State 'Running' -TasksDone 2 -TasksTotal 6
+            Get-TestFeature -Issue '77' -Wave 2 -Band 'medium' -Total 10 -Done 0 -State 'Pending' -TasksDone 0 -TasksTotal 6
         )
         $summary = Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:0/1')
 
         $tldr = @(Get-EpicProgressTldrLine -Summary $summary)
         $full = @(Get-EpicProgressFullLine -Summary $summary)
 
-        $tldr[0] | Should -Be '**TL;DR:** Epic #42 is at 5 of 20 steps (25%). None of the 2 features is done yet. #12 is running (5 of 10 steps).'
+        $tldr[0] | Should -Be '**TL;DR:** Epic #42 is at 2 of 12 tasks, 5 of 20 steps (25%). None of the 2 features is done yet. #12 is running (5 of 10 steps).'
         $full | Should -Contain '| Completed | None yet |'
         $full | Should -Contain '| Running | #12 (wave 1, small): 5 of 10 steps (50%). |'
     }
@@ -181,7 +226,7 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
                 param([datetime] $StartUtc = $script:startUtc)
                 $row = [pscustomobject]@{ Type = 'review'; Done = 0; InProgress = 0; Remaining = 1; Blocked = 0; MedianSeconds = [double]::NaN; Samples = 1; IsDefault = $false; IsApproximate = $false; SubtotalSeconds = [double]::NaN; BlockedSubtotalSeconds = 0.0 }
                 $estimate = [pscustomobject]@{ Type = @($row); InProgress = @(); TotalSeconds = [double]::NaN; BlockedSubtotalSeconds = 0.0; BlockedCount = 0; DefaultCount = 0 }
-                Get-EpicProgressSummary -Feature @(Get-TestFeature -Issue '12345' -Wave 1 -Band 'large' -Total 4 -Done 2 -State 'Running') -Estimate $estimate -WaveParallelSeconds ([double]::NaN) -StartUtc $StartUtc -NowUtc $script:nowUtc -WeeklyPct 42.5 -BaselineWeeklyPct 0 -EpicIssue '42' -EpicName 'example-epic'
+                Get-EpicProgressSummary -Feature @(Get-TestFeature -Issue '12345' -Wave 1 -Band 'large' -Total 4 -Done 2 -State 'Running') -Estimate $estimate -CriticalPath (Get-TestCriticalPath -HeadlineSeconds ([double]::NaN)) -StartUtc $StartUtc -NowUtc $script:nowUtc -WeeklyPct 42.5 -BaselineWeeklyPct 0 -EpicIssue '42' -EpicName 'example-epic'
             }
         }
 
@@ -194,8 +239,8 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
         It 'prints n/a for the hours-left figure' {
             $tldr = @(Get-EpicProgressTldrLine -Summary (Get-TestNanSummary))
 
-            $tldr[1] | Should -BeLike '*, with about n/a hours left on the per-type estimate (0 blocked steps excluded). *'
-            $tldr[3] | Should -Be '**Estimated time remaining:** n/a by type (sum); n/a wave-parallel.'
+            $tldr[1] | Should -BeLike '*; critical path about n/a left (#12345 -> tail, cap 4). *'
+            $tldr[4] | Should -Be "**Estimated time remaining:** $($script:naRange); serial sum n/a (upper bound, no parallelism)."
         }
 
         It 'prints n/a for the weekly quota and its delta' {
@@ -206,7 +251,7 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
         It 'prints n/a estimates at zero elapsed time' {
             $tldr = @(Get-EpicProgressTldrLine -Summary (Get-TestNanSummary -StartUtc $script:nowUtc))
 
-            $tldr[1] | Should -Be '**Elapsed:** 0 h 00 min, with about n/a hours left on the per-type estimate (0 blocked steps excluded). **Weekly** quota is at 42.5%.'
+            $tldr[1] | Should -Be '**Elapsed:** 0 h 00 min; critical path about n/a left (#12345 -> tail, cap 4). **Weekly** quota is at 42.5%.'
         }
 
         It 'clamps elapsed time at zero when the start is after now' {
@@ -216,7 +261,7 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
             $tldr = @(Get-EpicProgressTldrLine -Summary $summary)
 
             $summary.ElapsedHours | Should -Be 0
-            $tldr[1] | Should -BeLike '**Elapsed:** 0 h 00 min, with about *'
+            $tldr[1] | Should -BeLike '**Elapsed:** 0 h 00 min; critical path about *'
         }
     }
 
@@ -233,8 +278,8 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
         # research 2 x 13 + execution 5 x 5 = 51 min (0.85 h).
         $summary.ElapsedHours | Should -BeGreaterThan 0
         ($lines -join "`n") | Should -Not -Match 'NaN|Infinity'
-        $lines[1] | Should -Be '**Elapsed:** 3 h 00 min, with about 0.8 hours left on the per-type estimate (0 blocked steps excluded). **Weekly** quota is at 42.5%.'
-        $lines[3] | Should -Be '**Estimated time remaining:** 0 h 51 min by type (sum); 0 h 51 min wave-parallel.'
+        $lines[1] | Should -Be '**Elapsed:** 3 h 00 min; critical path about 0 h 51 min left (#12345 -> tail, cap 4). **Weekly** quota is at 42.5%.'
+        $lines[4] | Should -Be "**Estimated time remaining:** $($script:naRange); serial sum 0 h 51 min (upper bound, no parallelism)."
     }
 
     It 'prints the Now line with elapsed against median for review, ci and main-sync' {
@@ -263,27 +308,28 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
 
         $lines = @(Get-EpicProgressTldrLine -Summary (Get-TestSummary -Feature $features -Step $steps))
 
-        $lines.Count | Should -Be 4
+        $lines.Count | Should -Be 5
         $lines[2] | Should -Be '**Now:** #12 review (0 h 05 min of median 0 h 14 min), #77 ci (start not recorded; median 0 h 17 min). 2 of 2 types use defaults.'
     }
 
     It 'prints a blocked item with its reason' {
         # Two blocked review steps of #77 (14 min each) are excluded and listed as 28 min of work.
         $features = @(
-            Get-TestFeature -Issue '12' -Wave 1 -Band 'small' -Total 4 -Done 2 -State 'Running'
-            Get-TestFeature -Issue '77' -Wave 1 -Band 'medium' -Total 3 -Done 1 -State 'Blocked' -BlockedReason 'policy_hold'
+            Get-TestFeature -Issue '12' -Wave 1 -Band 'small' -Total 4 -Done 2 -State 'Running' -TasksDone 1 -TasksTotal 2
+            Get-TestFeature -Issue '77' -Wave 1 -Band 'medium' -Total 3 -Done 1 -State 'Blocked' -BlockedReason 'policy_hold' -TasksDone 0 -TasksTotal 1
         )
         $steps = @(
             Get-TestStepSet -Spec 'review:0/1' -Issue '12'
             1..2 | ForEach-Object { Get-EpicProgressStepRecord -Issue '77' -Type 'review' -Ordinal $_ -Status 'blocked' }
         )
 
-        $summary = Get-TestSummary -Feature $features -Step $steps
+        $summary = Get-TestSummary -Feature $features -Step $steps -Chain '#12 -> tail' -Excluded @([pscustomobject]@{ Issue = '77'; RemainingSeconds = 1680.0 })
         $tldr = @(Get-EpicProgressTldrLine -Summary $summary)
         $full = @(Get-EpicProgressFullLine -Summary $summary)
 
-        $tldr[0] | Should -Be '**TL;DR:** Epic #42 is at 3 of 7 steps (42.9%). None of the 2 features is done yet. #12 is running (2 of 4 steps). #77 is blocked (policy_hold).'
-        $tldr[1] | Should -BeLike '*, with about 0.2 hours left on the per-type estimate (2 blocked steps excluded). *'
+        $tldr[0] | Should -Be '**TL;DR:** Epic #42 is at 1 of 3 tasks, 3 of 7 steps (42.9%). None of the 2 features is done yet. #12 is running (2 of 4 steps). #77 is blocked (policy_hold).'
+        # The remaining review of #12 (14 min) is the headline; #77 is excluded.
+        $tldr[1] | Should -BeLike '*; critical path about 0 h 14 min left (#12 -> tail, cap 4; excludes 1 blocked: #77). *'
         $full | Should -Contain '| Blocked | #77 (policy_hold) |'
         $full | Should -Contain '**Blocked:** 2 steps excluded from the estimate, about 0 h 28 min of work.'
     }
@@ -346,16 +392,17 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
         $full | Should -Contain '| merge | 0 | 0 | 1 | 0 | 0 h 07 min (approx) | 1 | 0 h 07 min |'
     }
 
-    It 'prints Item as the subject in item mode with wave-parallel equal to the sum' {
-        # One item: review 1 x 14 + ci 1 x 17 = 31 min, and the wave-parallel figure is the same sum.
-        $features = @(Get-TestFeature -Issue '42' -Wave 1 -Band '' -Total 4 -Done 2 -State 'Running')
+    It 'prints Item as the subject in item mode with the headline equal to the sum' {
+        # One item: review 1 x 14 + ci 1 x 17 = 31 min; the one-node headline is the same sum and the chain names the item alone.
+        $features = @(Get-TestFeature -Issue '42' -Wave 1 -Band '' -Total 4 -Done 2 -State 'Running' -TasksDone 1 -TasksTotal 2)
 
-        $summary = Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:1/1,ci:1/1' -Issue '42') -Subject 'Item'
+        $summary = Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:1/1,ci:1/1' -Issue '42') -Subject 'Item' -Chain '#42'
         $tldr = @(Get-EpicProgressTldrLine -Summary $summary)
         $full = @(Get-EpicProgressFullLine -Summary $summary)
 
-        $tldr[0] | Should -Be '**TL;DR:** Item #42 is at 2 of 4 steps (50%). #42 is not done yet. #42 is running (2 of 4 steps).'
-        $tldr[3] | Should -Be '**Estimated time remaining:** 0 h 31 min by type (sum); 0 h 31 min wave-parallel.'
+        $tldr[0] | Should -Be '**TL;DR:** Item #42 is at 1 of 2 tasks, 2 of 4 steps (50%). #42 is not done yet. #42 is running (2 of 4 steps).'
+        $tldr[1] | Should -Be '**Elapsed:** 3 h 00 min; critical path about 0 h 31 min left (#42). **Weekly** quota is at 42.5%.'
+        $tldr[4] | Should -Be "**Estimated time remaining:** $($script:naRange); serial sum 0 h 31 min (upper bound, no parallelism)."
         $full[1] | Should -Be '## Item #42: status at 12:00 UTC, Jan 5'
         # Item mode prints no wave or band label on the Running row.
         $full | Should -Contain '| Running | #42: 2 of 4 steps (50%). |'
@@ -364,26 +411,31 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
     It 'prints the one-feature epic golden with one blocked step' {
         # Feature #12 is blocked with one done review and one blocked review (14-min default):
         # 1 of 2 steps, nothing remaining, and 14 min of blocked work excluded.
-        $features = @(Get-TestFeature -Issue '12' -Wave 1 -Band 'small' -Total 2 -Done 1 -State 'Blocked' -BlockedReason 'policy_hold')
+        # The schedule holds no feature, so the chain is the tail alone and the headline is 0.
+        $features = @(Get-TestFeature -Issue '12' -Wave 1 -Band 'small' -Total 2 -Done 1 -State 'Blocked' -BlockedReason 'policy_hold' -TasksDone 1 -TasksTotal 1)
         $steps = @(
             Get-EpicProgressStepRecord -Issue '12' -Type 'review' -Ordinal 1 -Status 'done'
             Get-EpicProgressStepRecord -Issue '12' -Type 'review' -Ordinal 2 -Status 'blocked'
         )
 
-        $summary = Get-TestSummary -Feature $features -Step $steps
+        $summary = Get-TestSummary -Feature $features -Step $steps -Chain 'tail' -Excluded @([pscustomobject]@{ Issue = '12'; RemainingSeconds = 840.0 })
         $tldr = @(Get-EpicProgressTldrLine -Summary $summary)
         $full = @(Get-EpicProgressFullLine -Summary $summary)
 
-        $tldr.Count | Should -Be 4
-        $tldr[0] | Should -Be '**TL;DR:** Epic #42 is at 1 of 2 steps (50%). The only feature is not done yet. #12 is blocked (policy_hold).'
-        $tldr[1] | Should -BeLike '*on the per-type estimate (1 blocked step excluded). *'
+        $tldr.Count | Should -Be 5
+        $tldr[0] | Should -Be '**TL;DR:** Epic #42 is at 1 of 1 tasks, 1 of 2 steps (50%). The only feature is not done yet. #12 is blocked (policy_hold).'
+        $tldr[1] | Should -BeLike '*; critical path about 0 h 00 min left (tail, cap 4; excludes 1 blocked: #12). *'
+        $full | Should -Contain '**Excluded (blocked):** #12 (0 h 14 min).'
         $full | Should -Contain '**Blocked:** 1 step excluded from the estimate, about 0 h 14 min of work.'
     }
 
     It 'prints the item-mode Full golden' {
         # One running item: review 1 done and 1 remaining (14 min), ci 1 done and 1 remaining (17 min): 31 min.
-        $features = @(Get-TestFeature -Issue '42' -Wave 1 -Band '' -Total 4 -Done 2 -State 'Running')
-        $summary = Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:1/1,ci:1/1' -Issue '42') -Subject 'Item'
+        # The item runs from 0 to 31 min at the default rate: the headline and the serial sum are 31 min.
+        $features = @(Get-TestFeature -Issue '42' -Wave 1 -Band '' -Total 4 -Done 2 -State 'Running' -TasksDone 1 -TasksTotal 2)
+        $itemRow = Get-TestFeatureRow -Issue '42' -State 'Running' -TasksDone 1 -TasksTotal 2 -RemainingSeconds 1860 -StartSeconds 0 -FinishSeconds 1860
+        $path = Get-TestCriticalPath -HeadlineSeconds 1860 -Chain '#42' -FeatureRow @($itemRow)
+        $summary = Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:1/1,ci:1/1' -Issue '42') -Subject 'Item' -CriticalPath $path
 
         $full = @(Get-EpicProgressFullLine -Summary $summary)
 
@@ -404,6 +456,13 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
             '| 1 | 1 | 4 | 2 |'
             '| **Total** | **1** | **4** | **2** |'
             ''
+            '| Feature | State | Tasks | Rate | Source | Remaining | Start | Finish |'
+            '|---|---|---|---|---|---|---|---|'
+            '| #42 | Running | 1 of 2 | 12 tasks / hr | default | 0 h 31 min | 0 h 00 min | 0 h 31 min |'
+            ''
+            '**Critical path:** #42. Headline 0 h 31 min: the item finishes in 0 h 31 min; no dependency, cap, or tail.'
+            '**Serial sum:** 0 h 31 min (upper bound, no parallelism). **Range:** n/a (fewer than 2 qualifying features and fewer than 3 intervals).'
+            ''
             '| Type | Done | In progress | Remaining | Blocked | Median | Samples | Subtotal |'
             '|---|---|---|---|---|---|---|---|'
             '| review | 1 | 0 | 1 | 0 | 0 h 14 min (default) | 0 | 0 h 14 min |'
@@ -420,25 +479,28 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
     }
 
     It 'prints the done sentence about a completed item' {
-        $features = @(Get-TestFeature -Issue '42' -Wave 1 -Band '' -Total 2 -Done 2 -State 'Completed')
-        $summary = Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:2/0' -Issue '42') -Subject 'Item'
+        $features = @(Get-TestFeature -Issue '42' -Wave 1 -Band '' -Total 2 -Done 2 -State 'Completed' -TasksDone 3 -TasksTotal 3)
+        $summary = Get-TestSummary -Feature $features -Step @(Get-TestStepSet -Spec 'review:2/0' -Issue '42') -Subject 'Item' -Chain '#42'
 
         $tldr = @(Get-EpicProgressTldrLine -Summary $summary)
 
-        $tldr[0] | Should -Be '**TL;DR:** Item #42 is at 2 of 2 steps (100%). #42 is done.'
+        $tldr[0] | Should -Be '**TL;DR:** Item #42 is at 3 of 3 tasks, 2 of 2 steps (100%). #42 is done.'
         ($tldr -join "`n") | Should -Not -Match 'No feature is running'
-        $tldr.Count | Should -Be 4
+        $tldr.Count | Should -Be 5
     }
 
-    It 'prints no velocity, SD or range line in either mode' {
-        $epicLines = @(Get-EpicProgressTldrLine -Summary $script:threeSummary) + @(Get-EpicProgressFullLine -Summary $script:threeSummary)
-        $itemSummary = Get-TestSummary -Feature @(Get-TestFeature -Issue '42' -Wave 1 -Band '' -Total 2 -Done 1 -State 'Running') -Step @(Get-TestStepSet -Spec 'review:1/1' -Issue '42') -Subject 'Item'
-        $itemLines = @(Get-EpicProgressTldrLine -Summary $itemSummary) + @(Get-EpicProgressFullLine -Summary $itemSummary)
+    It 'prints the velocity and range lines in both modes' {
+        # Issue #1153 (E1) replaces the #1118 rule that no velocity, SD, or range line is printed.
+        $epicTldr = @(Get-EpicProgressTldrLine -Summary $script:threeSummary)
+        $itemSummary = Get-TestSummary -Feature @(Get-TestFeature -Issue '42' -Wave 1 -Band '' -Total 2 -Done 1 -State 'Running') -Step @(Get-TestStepSet -Spec 'review:1/1' -Issue '42') -Subject 'Item' -Chain '#42'
+        $itemTldr = @(Get-EpicProgressTldrLine -Summary $itemSummary)
+        $allLines = @($epicTldr + $itemTldr + @(Get-EpicProgressFullLine -Summary $script:threeSummary) + @(Get-EpicProgressFullLine -Summary $itemSummary))
 
-        foreach ($line in @($epicLines + $itemLines)) {
-            $line | Should -Not -Match 'Velocity|SD of|Straight line|range needs|no upper bound|tasks / hr'
+        foreach ($tldr in @(@{ Lines = $epicTldr }, @{ Lines = $itemTldr })) {
+            $tldr.Lines.Count | Should -Be 5
+            $tldr.Lines[3] | Should -Be $script:defaultVelocity
+            $tldr.Lines[4] | Should -BeLike "**Estimated time remaining:** $($script:naRange); serial sum * (upper bound, no parallelism)."
         }
-        $epicLines.Count | Should -BeGreaterThan 4
-        $itemLines.Count | Should -BeGreaterThan 4
+        @($allLines | Where-Object { $_ -like '*wave-parallel*' }).Count | Should -Be 0
     }
 }

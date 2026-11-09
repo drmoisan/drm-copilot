@@ -140,7 +140,151 @@ Describe 'Gather functions' {
         # ci in progress 600 s of its 17-min default (credit 420); execution 1 x 3600; merge 5 min; integration-pr 45 min.
         $report.Estimate.InProgress[0].Type | Should -Be 'ci'
         $report.Estimate.TotalSeconds | Should -Be (420 + 3600 + 300 + 2700)
-        $report.WaveParallelSeconds | Should -Be (420 + 3600 + 300 + 2700)
+        # Issue #1153: the plan task counts, steps, and dependency inputs replace the wave-parallel figure.
+        $report.PSObject.Properties.Name | Should -Not -Contain 'WaveParallelSeconds'
+        "$($report.Feature[0].TasksDone) of $($report.Feature[0].TasksTotal)" | Should -Be '1 of 2'
+        "$($report.DoneTasks) of $($report.TotalTasks)" | Should -Be '1 of 2'
+        $report.Feature[0].Step.Count | Should -Be 10
+        $report.Feature[0].Blocked | Should -BeFalse
+        $report.Feature[0].Folder | Should -Be ''
+        $report.CheckpointCap | Should -BeNullOrEmpty
+        $report.DependencyRow.Count | Should -Be 0
+        $report.BlockedSince.Count | Should -Be 0
+    }
+
+    It 'returns the checkpoint cap, depends_on rows and folder basename of the epic checkpoint' {
+        $checkpoint = ConvertFrom-Json -InputObject '{"feature-folder":"docs/features/active/2026-01-01-alpha-12"}'
+        $epicRow = ConvertFrom-Json -InputObject '{"issue_num":12,"feature_folder":"docs/features/completed/2026-01-01-alpha-12","depends_on":[]}'
+        $epic = ConvertFrom-Json -InputObject '{"max_parallel_features":3,"features":[{"issue_num":12,"depends_on":[]},{"issue_num":900}]}'
+        $item = [pscustomobject]@{
+            Issue = '12'; Wave = 1; Band = 'small'; Checkpoint = $checkpoint; EpicRow = $epicRow
+            PlanText = '- [ ] [P0-T1] a.'; PlanFile = 'plan.md'; CycleText = @{}; SpecExists = $true
+            MergeStatus = 'worktree_created'; PrState = ''; PreparedPlan = $false; Blockage = (Get-EpicProgressBlockage -Checkpoint $checkpoint)
+        }
+
+        $report = Get-EpicProgressStepReport -Item @($item) -EpicCheckpoint $epic -EpicIssue '42' -State (ConvertFrom-EpicProgressStateText -Text '') -NowUnixSeconds 1767614400 -Default (Resolve-EpicProgressStepDefault)
+
+        $report.CheckpointCap | Should -Be 3
+        ($report.DependencyRow.issue_num -join ',') | Should -Be '12,900'
+        # The epic row's folder wins over the item checkpoint's; both reduce to the basename.
+        $report.Feature[0].Folder | Should -Be '2026-01-01-alpha-12'
+    }
+
+    Context 'tick batches exclude pause and blocked spans (issue #1153, AC-20)' {
+        BeforeAll {
+            function Get-TestTickReport {
+                # One item whose stored anchor at 11:00 (1767610800) has no checked task; P0-T1 is
+                # checked at the 12:00 run (1767614400), so one execution sample covers 3600 s less
+                # the excluded seconds.
+                param([object[]] $PauseSpan = @(), [string] $BlockedSince = 'null')
+                $checkpoint = ConvertFrom-Json -InputObject '{}'
+                $item = [pscustomobject]@{
+                    Issue = '12'; Wave = 1; Band = 'small'; Checkpoint = $checkpoint; EpicRow = $null
+                    PlanText = "- [x] [P0-T1] a.`n- [ ] [P0-T2] b."; PlanFile = 'plan.md'; CycleText = @{}; SpecExists = $true
+                    MergeStatus = 'worktree_created'; PrState = ''; PreparedPlan = $false; Blockage = (Get-EpicProgressBlockage -Checkpoint $checkpoint)
+                }
+                $state = ConvertFrom-EpicProgressStateText -Text ('{"version":3,"items":{"12":{"plans":{"plan.md":{"checked":[],"lastTickUnixSeconds":1767610800}},"blockedSinceUnixSeconds":' + $BlockedSince + '}}}')
+                Get-EpicProgressStepReport -Item @($item) -EpicIssue '42' -State $state -NowUnixSeconds 1767614400 -Default (Resolve-EpicProgressStepDefault) -NoEpicStep -PauseSpan $PauseSpan
+            }
+        }
+
+        It 'yields the full interval with no span' {
+            (Get-TestTickReport).Ledger['execution'][0].seconds | Should -Be 3600
+        }
+
+        It 'yields per-task seconds without a pause span inside the batch' {
+            # Pause 11:10 to 11:40 (1767611400 to 1767613200): 1800 s excluded.
+            $span = [pscustomobject]@{ startUnixSeconds = 1767611400; endUnixSeconds = 1767613200 }
+
+            (Get-TestTickReport -PauseSpan @($span)).Ledger['execution'][0].seconds | Should -Be 1800
+        }
+
+        It 'yields per-task seconds without a blocked span inside the batch' {
+            # Blocked since 11:30 (1767612600) until the run: 1800 s excluded.
+            (Get-TestTickReport -BlockedSince '1767612600').Ledger['execution'][0].seconds | Should -Be 1800
+        }
+
+        It 'counts overlapping pause and blocked time once' {
+            # Pause 11:10 to 11:40 and blocked from 11:30: the union 11:10 to 12:00 is 3000 s, leaving 600 s.
+            $span = [pscustomobject]@{ startUnixSeconds = 1767611400; endUnixSeconds = 1767613200 }
+
+            (Get-TestTickReport -PauseSpan @($span) -BlockedSince '1767612600').Ledger['execution'][0].seconds | Should -Be 600
+        }
+    }
+
+    Context 'manifest and routing-config reads (issue #1153, E5)' {
+        BeforeAll {
+            $script:manifestPath = 'docs/features/epics/example-epic/epic.md'
+            $script:manifestKey = "$($script:integration):$($script:manifestPath)"
+            $script:inlineManifest = @(
+                '---', 'epic: example-epic', '# Manifest DAG.', 'features:',
+                '  - issue_num: 12', '    feature_folder: 2026-01-01-alpha-12', '    depends_on: []',
+                '  - issue_num: 13', '    feature_folder: "2026-01-01-beta-13"', '    depends_on: [12, ''2026-01-01-alpha-12'']',
+                '  - issue_num: 14', '    feature_folder: 2026-01-01-gamma-14',
+                'intent:', '  epic_type: enabler', '---', '# Body', 'features:', '  - issue_num: 99') -join "`n"
+            $script:routingPath = Join-Path -Path '/fixture-repo' -ChildPath 'config/orchestration-routing.json'
+        }
+
+        It 'reads the inline depends_on lists with one epic.md show when a kickoff feature has no checkpoint key' {
+            $script:gitShow[$script:manifestKey] = $script:inlineManifest
+            $rows = @((ConvertFrom-Json -InputObject '{"issue_num":12,"depends_on":[]}'), (ConvertFrom-Json -InputObject '{"issue_num":13}'))
+
+            $manifest = @(Read-EpicProgressManifestFeature -KickoffIssue @('12', '13') -CheckpointRow $rows -ManifestPath $script:manifestPath -IntegrationBranch $script:integration)
+
+            ($script:gitCalls -join "`n") | Should -Be "show $($script:manifestKey)"
+            ($manifest.issue_num -join ',') | Should -Be '12,13,14'
+            @($manifest[0].depends_on).Count | Should -Be 0
+            ($manifest[1].depends_on -join ',') | Should -Be '12,2026-01-01-alpha-12'
+            $manifest[1].feature_folder | Should -Be '2026-01-01-beta-13'
+            $manifest[2].PSObject.Properties.Name | Should -Not -Contain 'depends_on'
+        }
+
+        It 'makes no git call when every kickoff feature carries a checkpoint depends_on key' {
+            # An explicit empty list counts as a key.
+            $rows = @((ConvertFrom-Json -InputObject '{"issue_num":12,"depends_on":[]}'), (ConvertFrom-Json -InputObject '{"issue_num":13,"depends_on":[12]}'))
+
+            $manifest = @(Read-EpicProgressManifestFeature -KickoffIssue @('12', '13') -CheckpointRow $rows -ManifestPath $script:manifestPath -IntegrationBranch $script:integration)
+
+            $manifest.Count | Should -Be 0
+            Should -Invoke Invoke-GitExe -Times 0 -Exactly
+        }
+
+        It 'returns no rows when the manifest cannot be read or has no frontmatter' {
+            $unread = @(Read-EpicProgressManifestFeature -KickoffIssue @('12') -ManifestPath $script:manifestPath -IntegrationBranch $script:integration)
+            $script:gitShow[$script:manifestKey] = "# epic`nfeatures:`n  - issue_num: 12`n    depends_on: []"
+            $plain = @(Read-EpicProgressManifestFeature -KickoffIssue @('12') -ManifestPath $script:manifestPath -IntegrationBranch $script:integration)
+
+            $unread.Count | Should -Be 0
+            $plain.Count | Should -Be 0
+        }
+
+        It 'returns no rows and does not throw for a block-style depends_on list' {
+            $script:gitShow[$script:manifestKey] = "---`nfeatures:`n  - issue_num: 12`n    depends_on:`n      - 11`n---"
+            $blockStyle = @(Read-EpicProgressManifestFeature -KickoffIssue @('12') -ManifestPath $script:manifestPath -IntegrationBranch $script:integration)
+            $script:gitShow[$script:manifestKey] = "---`nfeatures:`n  - issue_num: 12`n    depends_on: [11]`n---"
+            $inline = @(Read-EpicProgressManifestFeature -KickoffIssue @('12') -ManifestPath $script:manifestPath -IntegrationBranch $script:integration)
+
+            $blockStyle.Count | Should -Be 0
+            ($inline[0].depends_on -join ',') | Should -Be '11'
+        }
+
+        It 'reads the routing-config cap at codex_topology_policy.parallelism' {
+            $script:files[$script:routingPath] = '{"codex_topology_policy":{"parallelism":{"default_max_parallel_features":6}},"parallelism":{"default_max_parallel_features":2}}'
+
+            Read-EpicProgressRoutingCap -RepositoryRoot '/fixture-repo' | Should -Be 6
+        }
+
+        It 'returns no routing-config cap for a missing file, a missing key, or unparseable text' {
+            $missingFile = Read-EpicProgressRoutingCap -RepositoryRoot '/fixture-repo'
+            $script:files[$script:routingPath] = '{"codex_topology_policy":{"parallelism":{}}}'
+            $missingKey = Read-EpicProgressRoutingCap -RepositoryRoot '/fixture-repo'
+            $script:files[$script:routingPath] = 'not json {'
+            $unparseable = Read-EpicProgressRoutingCap -RepositoryRoot '/fixture-repo'
+
+            $missingFile | Should -BeNullOrEmpty
+            $missingKey | Should -BeNullOrEmpty
+            $unparseable | Should -BeNullOrEmpty
+        }
     }
 
     Context 'merged item anchors' {

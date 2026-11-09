@@ -7,7 +7,10 @@
     and dot-sources the Stages (step-type catalog, stage-name normalization, stage_timing
     records, blockage), Steps (item, remediation-cycle, and epic-level steps), Durations
     (median, defaults, duration samples, ledger merge), State (settings, state file,
-    baseline, samples), Metrics (per-type estimate, wave-parallel figure, formatting), Render
+    baseline, samples), Metrics (per-type estimate and formatting), Velocity
+    (default rate, sequential, pooled, and aggregate task velocity, pause spans), Schedule
+    (dependency graph, parallel cap, blocked closure, and list schedule), CriticalPath
+    (critical chain, tail, remaining time, range, and the report composition), Render
     (summary and line composition), and Gather (item checkpoints, plan texts, epic rows, and
     the step report) files, so a consumer that dot-sources this file receives every logic
     function. Every function outside Gather takes data in and returns data: none reads a
@@ -23,6 +26,9 @@
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Durations.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.State.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Metrics.ps1')
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Velocity.ps1')
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Schedule.ps1')
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.CriticalPath.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Render.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Gather.ps1')
 
