@@ -1,4 +1,4 @@
-# Pester tests for .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.State.ps1 (issues #1080, #1093, #1118).
+# Pester tests for .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.State.ps1 (issues #1080, #1093, #1118, #1153).
 # The Logic hub is dot-sourced, which dot-sources this file; every function under test is pure,
 # so each test supplies fixed in-memory input and asserts the returned data.
 
@@ -107,11 +107,11 @@ Describe 'Resolve-EpicProgressSetting' {
 Describe 'ConvertFrom-EpicProgressStateText and ConvertTo-EpicProgressStateJson' {
     It 'reads a legacy sample array' {
         # The issue #1080 tool wrote a bare JSON array of task-count samples with no baseline;
-        # issue #1118 discards those samples and marks the state migrated.
+        # issue #1118 discards those samples and marks the state migrated (from 'legacy', issue #1153).
         $state = ConvertFrom-EpicProgressStateText -Text '[{"ts":1000,"done":3},{"ts":1600,"done":5}]'
 
         $state.Samples.Count | Should -Be 0
-        $state.Migrated | Should -BeTrue
+        $state.MigratedFrom | Should -Be 'legacy'
         $state.StartUnixSeconds | Should -BeNullOrEmpty
         $state.BaselineDone | Should -BeNullOrEmpty
         $state.BaselineWeeklyPct | Should -BeNullOrEmpty
@@ -127,7 +127,7 @@ Describe 'ConvertFrom-EpicProgressStateText and ConvertTo-EpicProgressStateJson'
         $state.BaselineWeeklyPct | Should -Be 12.5
         $state.BaselineDone | Should -BeNullOrEmpty
         $state.Samples.Count | Should -Be 0
-        $state.Migrated | Should -BeTrue
+        $state.MigratedFrom | Should -Be '1'
     }
 
     It 'treats blank text as empty state' {
@@ -150,7 +150,8 @@ Describe 'ConvertFrom-EpicProgressStateText and ConvertTo-EpicProgressStateJson'
     }
 
     It 'treats an unknown version as empty state' {
-        $state = ConvertFrom-EpicProgressStateText -Text '{"version":3,"startUnixSeconds":1767603600,"baselineDone":7,"samples":[{"ts":1000,"done":1}]}'
+        # Version 4 is the first unknown version once version 3 is written (issue #1153, E12).
+        $state = ConvertFrom-EpicProgressStateText -Text '{"version":4,"startUnixSeconds":1767603600,"baselineDone":7,"samples":[{"ts":1000,"done":1}]}'
 
         $state.Samples.Count | Should -Be 0
         $state.StartUnixSeconds | Should -BeNullOrEmpty
@@ -174,7 +175,7 @@ Describe 'ConvertFrom-EpicProgressStateText and ConvertTo-EpicProgressStateJson'
         $state = ConvertFrom-EpicProgressStateText -Text $json
         $raw = ConvertFrom-Json -InputObject $json
 
-        $raw.version | Should -Be 2
+        $raw.version | Should -Be 3
         $raw.unit | Should -Be 'steps'
         $raw.startUnixSeconds | Should -BeOfType [long]
         $raw.samples[0].ts | Should -BeOfType [long]
@@ -182,7 +183,7 @@ Describe 'ConvertFrom-EpicProgressStateText and ConvertTo-EpicProgressStateJson'
         $state.StartUnixSeconds | Should -Be 1767603600
         $state.BaselineDone | Should -Be 1
         $state.BaselineWeeklyPct | Should -Be 0
-        $state.Migrated | Should -BeFalse
+        $state.MigratedFrom | Should -BeNullOrEmpty
         ($state.Samples.ts -join ',') | Should -Be '1767610800,1767614400'
         ($state.Samples.done -join ',') | Should -Be '2,3'
     }
@@ -203,9 +204,16 @@ Describe 'ConvertFrom-EpicProgressStateText and ConvertTo-EpicProgressStateJson'
 
         $state = ConvertFrom-EpicProgressStateText -Text $text
 
-        $state.Migrated | Should -BeFalse
+        # A version-2 document migrates to version 3 (issue #1153, E12): baselines, samples,
+        # durations, and items are kept, no task baseline is stored, and pauses start empty.
+        $state.MigratedFrom | Should -Be '2'
+        $state.StartUnixSeconds | Should -Be 1767603600
+        $state.BaselineWeeklyPct | Should -Be 10
+        $state.BaselineDoneTasks | Should -BeNullOrEmpty
+        $state.Pauses.Count | Should -Be 0
         $state.BaselineDone | Should -Be 4
         $state.Samples[0].done | Should -Be 12
+        $state.Samples[0].PSObject.Properties.Name | Should -Not -Contain 'tasks'
         $state.Durations['review'].Count | Should -Be 1
         $state.Durations['review'][0].seconds | Should -Be 780
         ($state.Items['12'].Plans['plan.md'].Checked -join ',') | Should -Be 'P0-T1,P1-T2'
@@ -216,7 +224,7 @@ Describe 'ConvertFrom-EpicProgressStateText and ConvertTo-EpicProgressStateJson'
     }
 
     It 'migrates a version-1 document to the current step count' {
-        # The migrated state resolves its baseline to the current done count, and the next write is version 2.
+        # The migrated state resolves its baseline to the current done count, and the next write is version 3.
         $state = ConvertFrom-EpicProgressStateText -Text '{"version":1,"startUnixSeconds":1767603600,"baselineDone":7,"baselineWeeklyPct":12.5,"samples":[{"ts":1767614400,"done":9}]}'
         $baseline = Resolve-EpicProgressBaseline -State $state -NowUtc ([datetime]::new(2026, 1, 5, 12, 0, 0, [System.DateTimeKind]::Utc))
 
@@ -227,7 +235,7 @@ Describe 'ConvertFrom-EpicProgressStateText and ConvertTo-EpicProgressStateJson'
         $baseline.BaselineWeeklyPct | Should -Be 12.5
         $state.Durations.Count | Should -Be 0
         $state.Items.Count | Should -Be 0
-        $raw.version | Should -Be 2
+        $raw.version | Should -Be 3
         $raw.unit | Should -Be 'steps'
         $raw.startUnixSeconds | Should -Be 1767603600
         $raw.baselineDone | Should -Be 21
@@ -237,29 +245,32 @@ Describe 'ConvertFrom-EpicProgressStateText and ConvertTo-EpicProgressStateJson'
         $state = ConvertFrom-EpicProgressStateText -Text '[{"ts":1000,"done":3}]'
         $baseline = Resolve-EpicProgressBaseline -StartUtc ([datetime]::new(2026, 1, 5, 9, 0, 0, [System.DateTimeKind]::Utc)) -StartUtcPassed -State $state -NowUtc ([datetime]::new(2026, 1, 5, 12, 0, 0, [System.DateTimeKind]::Utc))
 
-        $state.Migrated | Should -BeTrue
+        $state.MigratedFrom | Should -Be 'legacy'
         $state.Samples.Count | Should -Be 0
         $state.Durations.Count | Should -Be 0
         $baseline.UseCurrentDone | Should -BeTrue
     }
 
-    It 'treats version 3 as empty state' {
-        $state = ConvertFrom-EpicProgressStateText -Text '{"version":3,"durations":{"review":[{"key":"k","seconds":1}]},"items":{"12":{}}}'
+    It 'treats version 4 as empty state' {
+        $state = ConvertFrom-EpicProgressStateText -Text '{"version":4,"durations":{"review":[{"key":"k","seconds":1}]},"items":{"12":{}}}'
 
-        $state.Migrated | Should -BeFalse
+        $state.MigratedFrom | Should -BeNullOrEmpty
         $state.Durations.Count | Should -Be 0
         $state.Items.Count | Should -Be 0
         $state.Samples.Count | Should -Be 0
     }
 
-    It 'writes version 2 with unit steps' {
+    It 'writes version 3 with unit steps' {
         $item = @{ '12' = [pscustomobject]@{ Plans = @{ 'plan.md' = [pscustomobject]@{ Checked = [string[]] @('P0-T1'); LastTickUnixSeconds = 1767614400 } }; BlockedSinceUnixSeconds = $null } }
 
         $json = ConvertTo-EpicProgressStateJson -StartUnixSeconds 1767603600 -BaselineDone 0 -BaselineWeeklyPct 0 -Sample @() -Duration @{} -Item $item
         $raw = ConvertFrom-Json -InputObject $json
 
-        $raw.version | Should -Be 2
+        $raw.version | Should -Be 3
         $raw.unit | Should -Be 'steps'
+        $raw.PSObject.Properties.Name | Should -Contain 'baselineDoneTasks'
+        $raw.baselineDoneTasks | Should -BeNullOrEmpty
+        $json | Should -Match '"pauses":\s*\[\s*\]'
         $json | Should -Match '"checked":\s*\[\s*"P0-T1"\s*\]'
         $raw.items.'12'.plans.'plan.md'.lastTickUnixSeconds | Should -Be 1767614400
         $raw.items.'12'.blockedSinceUnixSeconds | Should -BeNullOrEmpty
@@ -294,7 +305,7 @@ Describe 'Resolve-EpicProgressItemSetting' {
 Describe 'Resolve-EpicProgressBaseline after migration' {
     It 'resolves the baseline to the current done count after migration' {
         $now = [datetime]::new(2026, 1, 5, 12, 0, 0, [System.DateTimeKind]::Utc)
-        $migrated = [pscustomobject]@{ StartUnixSeconds = [long] 1767600000; BaselineDone = $null; BaselineWeeklyPct = 5.0; Samples = [object[]] @(); Migrated = $true }
+        $migrated = [pscustomobject]@{ StartUnixSeconds = [long] 1767600000; BaselineDone = $null; BaselineWeeklyPct = 5.0; Samples = [object[]] @(); MigratedFrom = '1' }
 
         $resolved = Resolve-EpicProgressBaseline -State $migrated -NowUtc $now
         $passed = Resolve-EpicProgressBaseline -BaselineDone 3 -BaselineDonePassed -State $migrated -NowUtc $now

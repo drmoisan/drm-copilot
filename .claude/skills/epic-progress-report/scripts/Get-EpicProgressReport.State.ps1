@@ -149,21 +149,60 @@ function Resolve-EpicProgressItemSetting {
     return [pscustomobject]@{ Issue = [string] $Issue; RepositoryRoot = $root; StatePath = $state; IntegrationBranch = $IntegrationBranch }
 }
 
+function ConvertFrom-EpicProgressStateSample {
+    <#
+    .SYNOPSIS
+        Return one stored check-in sample as ts and done, plus tasks and a features hashtable when a version-3 sample carries them.
+    .DESCRIPTION
+        A version-2 sample keeps only ts and done, so it never feeds task velocity (decision
+        E12). A version-3 sample keeps a non-null 'tasks' value and converts 'features' into a
+        hashtable from issue to done task count.
+    .PARAMETER Entry
+        The parsed sample object.
+    .PARAMETER Version
+        The document version ('2' or '3').
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)] [object] $Entry,
+        [Parameter(Mandatory = $true)] [string] $Version
+    )
+
+    $names = @($Entry.PSObject.Properties.Name)
+    $sample = [ordered]@{}
+    if ($names -contains 'ts') { $sample['ts'] = $Entry.ts }
+    if ($names -contains 'done') { $sample['done'] = $Entry.done }
+    if ($Version -eq '3' -and $names -contains 'tasks' -and $null -ne $Entry.tasks) { $sample['tasks'] = $Entry.tasks -as [int] }
+    if ($Version -eq '3' -and $Entry.features -is [System.Management.Automation.PSCustomObject]) {
+        $features = @{}
+        foreach ($feature in $Entry.features.PSObject.Properties) { $features[$feature.Name] = $feature.Value -as [int] }
+        $sample['features'] = $features
+    }
+    return [pscustomobject] $sample
+}
+
 function ConvertFrom-EpicProgressStateText {
     <#
     .SYNOPSIS
-        Parse the state file text into StartUnixSeconds, BaselineDone, BaselineWeeklyPct, Samples, Durations, Items, Unit, and Migrated.
+        Parse the state file text into StartUnixSeconds, BaselineDone, BaselineDoneTasks, BaselineWeeklyPct, Samples, Durations, Items, Pauses, Unit, and MigratedFrom.
     .DESCRIPTION
-        Reads the version-2 object written by ConvertTo-EpicProgressStateJson: the check-in
-        samples count steps, Durations maps each step type to its sample list, and Items maps
-        each issue to its plan tick anchors (Plans: file name to Checked and
-        LastTickUnixSeconds) and BlockedSinceUnixSeconds. A version-1 object and the legacy JSON
-        array of samples (issues #1080 and #1093) counted tasks, so they are migrated: their
-        samples and baseline done count are discarded, the start and the weekly baseline of a
-        version-1 object are kept, and Migrated is $true. Blank text, unparseable text, any
-        other JSON value, and an object of any other version give the empty state. A field that
-        is missing, null, or not a number is absent: its value is $null. Samples is always an
-        array; Durations and Items are always hashtables.
+        Reads the version-3 object written by ConvertTo-EpicProgressStateJson (issue #1153,
+        decision E12): the check-in samples count steps ('done') and carry the epic done task
+        count ('tasks') and the per-feature done task counts ('features'), BaselineDoneTasks is
+        the done task count at the baseline, Pauses lists the pause spans (startUnixSeconds,
+        endUnixSeconds), Durations maps each step type to its sample list, and Items maps each
+        issue to its plan tick anchors (Plans: file name to Checked and LastTickUnixSeconds) and
+        BlockedSinceUnixSeconds. A version-2 object is migrated with its start, weekly baseline,
+        baseline done count, samples, durations, and items kept, BaselineDoneTasks absent, and
+        Pauses empty; its samples carry no 'tasks' value, and MigratedFrom is '2'. A version-1
+        object and the legacy JSON array of samples (issues #1080 and #1093) counted tasks, so
+        their samples and baseline done count are discarded, the start and the weekly baseline
+        of a version-1 object are kept, and MigratedFrom is '1' or 'legacy'. MigratedFrom is
+        $null for a version-3 document and for the empty state. Blank text, unparseable text,
+        any other JSON value, and an object of any other version (4 or above) give the empty
+        state. A field that is missing, null, or not a number is absent: its value is $null.
+        Samples and Pauses are always arrays; Durations and Items are always hashtables.
     .PARAMETER Text
         The raw state file text; blank or null for no state file.
     #>
@@ -171,27 +210,34 @@ function ConvertFrom-EpicProgressStateText {
     [OutputType([pscustomobject])]
     param([Parameter(Mandatory = $true)] [AllowEmptyString()] [AllowNull()] [string] $Text)
 
-    $state = [pscustomobject]@{ StartUnixSeconds = $null; BaselineDone = $null; BaselineWeeklyPct = $null; Samples = [object[]] @(); Durations = @{}; Items = @{}; Unit = 'steps'; Migrated = $false }
+    $state = [pscustomobject]@{ StartUnixSeconds = $null; BaselineDone = $null; BaselineDoneTasks = $null; BaselineWeeklyPct = $null; Samples = [object[]] @(); Durations = @{}; Items = @{}; Pauses = [object[]] @(); Unit = 'steps'; MigratedFrom = $null }
     if (-not (Test-EpicProgressJsonText -Json $Text)) { return $state }
     $parsed = ConvertFrom-Json -InputObject $Text -NoEnumerate
     if ($parsed -is [array]) {
-        $state.Migrated = $true
+        $state.MigratedFrom = 'legacy'
         return $state
     }
     if ($parsed -isnot [System.Management.Automation.PSCustomObject]) { return $state }
     $names = $parsed.PSObject.Properties.Name
     $version = ''
     if ($names -contains 'version') { $version = [string] $parsed.version }
-    if ($version -ne '1' -and $version -ne '2') { return $state }
+    if ($version -notin @('1', '2', '3')) { return $state }
     if ($names -contains 'startUnixSeconds' -and $null -ne $parsed.startUnixSeconds) { $state.StartUnixSeconds = $parsed.startUnixSeconds -as [long] }
     if ($names -contains 'baselineWeeklyPct' -and $null -ne $parsed.baselineWeeklyPct) { $state.BaselineWeeklyPct = $parsed.baselineWeeklyPct -as [double] }
     if ($version -eq '1') {
-        $state.Migrated = $true
+        $state.MigratedFrom = '1'
         return $state
     }
+    if ($version -eq '2') { $state.MigratedFrom = '2' }
     if ($names -contains 'baselineDone' -and $null -ne $parsed.baselineDone) { $state.BaselineDone = $parsed.baselineDone -as [int] }
+    if ($version -eq '3' -and $names -contains 'baselineDoneTasks' -and $null -ne $parsed.baselineDoneTasks) { $state.BaselineDoneTasks = $parsed.baselineDoneTasks -as [int] }
     if ($names -contains 'samples' -and $null -ne $parsed.samples) {
-        $state.Samples = [object[]] @($parsed.samples | Where-Object { $null -ne $_ })
+        $state.Samples = [object[]] @($parsed.samples | Where-Object { $null -ne $_ } | ForEach-Object { ConvertFrom-EpicProgressStateSample -Entry $_ -Version $version })
+    }
+    if ($version -eq '3' -and $names -contains 'pauses' -and $null -ne $parsed.pauses) {
+        $state.Pauses = [object[]] @($parsed.pauses | Where-Object { $null -ne $_ -and $null -ne $_.startUnixSeconds -and $null -ne $_.endUnixSeconds } | ForEach-Object {
+                [pscustomobject]@{ startUnixSeconds = $_.startUnixSeconds -as [long]; endUnixSeconds = $_.endUnixSeconds -as [long] }
+            })
     }
     if ($parsed.durations -is [System.Management.Automation.PSCustomObject]) {
         foreach ($property in $parsed.durations.PSObject.Properties) { $state.Durations[$property.Name] = [object[]] @($property.Value | Where-Object { $null -ne $_ }) }
@@ -215,14 +261,17 @@ function ConvertFrom-EpicProgressStateText {
 function ConvertTo-EpicProgressStateJson {
     <#
     .SYNOPSIS
-        Return the version-2 state document as JSON text.
+        Return the version-3 state document as JSON text.
     .DESCRIPTION
-        The document holds version 2, unit 'steps', startUnixSeconds, baselineDone,
-        baselineWeeklyPct, samples (each with an integer 'ts' in Unix epoch seconds and a 'done'
-        step count; a sample without 'ts' is not written), durations (each step type with its
-        samples: key, type, seconds, source, approx, recorded), and items (each issue with its
-        plan tick anchors and blockedSinceUnixSeconds). Epoch seconds are used because
-        ConvertFrom-Json converts ISO date strings into local-time DateTime values.
+        The document holds version 3, unit 'steps', startUnixSeconds, baselineDone,
+        baselineDoneTasks (null when none is stored), baselineWeeklyPct, samples (each with an
+        integer 'ts' in Unix epoch seconds, a 'done' step count, and, when the sample carries
+        them, the epic done task count 'tasks' and the per-feature done task counts 'features';
+        a sample without 'ts' is not written), durations (each step type with its samples: key,
+        type, seconds, source, approx, recorded), items (each issue with its plan tick anchors
+        and blockedSinceUnixSeconds), and pauses (startUnixSeconds, endUnixSeconds) (issue
+        #1153, decision E12). Epoch seconds are used because ConvertFrom-Json converts ISO date
+        strings into local-time DateTime values.
     .PARAMETER StartUnixSeconds
         The start instant in Unix epoch seconds.
     .PARAMETER BaselineDone
@@ -230,11 +279,15 @@ function ConvertTo-EpicProgressStateJson {
     .PARAMETER BaselineWeeklyPct
         The weekly quota percentage at the start instant.
     .PARAMETER Sample
-        The retained check-in samples (ts, done).
+        The retained check-in samples (ts, done, and optionally tasks and features).
     .PARAMETER Duration
         The duration ledger: a hashtable from step type to its samples.
     .PARAMETER Item
         The per-item state: a hashtable from issue to Plans and BlockedSinceUnixSeconds.
+    .PARAMETER BaselineDoneTasks
+        The done task count at the start instant; null (the default) when none is stored.
+    .PARAMETER PauseSpan
+        The pause spans (startUnixSeconds, endUnixSeconds); empty by default.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -244,14 +297,32 @@ function ConvertTo-EpicProgressStateJson {
         [Parameter(Mandatory = $true)] [double] $BaselineWeeklyPct,
         [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $Sample,
         [hashtable] $Duration = @{},
-        [hashtable] $Item = @{}
+        [hashtable] $Item = @{},
+        [AllowNull()] [object] $BaselineDoneTasks = $null,
+        [AllowEmptyCollection()] [object[]] $PauseSpan = @()
     )
 
     $written = [System.Collections.Generic.List[object]]::new()
     foreach ($entry in $Sample) {
         if ($null -eq $entry -or -not ($entry.PSObject.Properties.Name -contains 'ts')) { continue }
-        $written.Add([ordered]@{ ts = [long] $entry.ts; done = [int] $entry.done })
+        $record = [ordered]@{ ts = [long] $entry.ts; done = [int] $entry.done }
+        $names = @($entry.PSObject.Properties.Name)
+        if ($names -contains 'tasks' -and $null -ne $entry.tasks) { $record['tasks'] = [int] $entry.tasks }
+        if ($names -contains 'features' -and $null -ne $entry.features) {
+            $source = $entry.features
+            $features = [ordered]@{}
+            if ($source -is [System.Collections.IDictionary]) {
+                foreach ($key in @($source.Keys | Sort-Object)) { $features[[string] $key] = [int] $source[$key] }
+            } else {
+                foreach ($property in @($source.PSObject.Properties | Sort-Object -Property Name)) { $features[$property.Name] = [int] $property.Value }
+            }
+            $record['features'] = $features
+        }
+        $written.Add($record)
     }
+    $pauses = [object[]] @($PauseSpan | Where-Object { $null -ne $_ } | ForEach-Object { [ordered]@{ startUnixSeconds = [long] $_.startUnixSeconds; endUnixSeconds = [long] $_.endUnixSeconds } })
+    $tasksBaseline = $null
+    if ($null -ne $BaselineDoneTasks) { $tasksBaseline = [int] $BaselineDoneTasks }
     $durations = [ordered]@{}
     foreach ($type in @($Duration.Keys | Sort-Object)) {
         $durations[[string] $type] = [object[]] @($Duration[$type] | Where-Object { $null -ne $_ } | ForEach-Object {
@@ -268,14 +339,16 @@ function ConvertTo-EpicProgressStateJson {
         $items[[string] $issue] = [ordered]@{ plans = $plans; blockedSinceUnixSeconds = $record.BlockedSinceUnixSeconds }
     }
     $document = [ordered]@{
-        version           = 2
+        version           = 3
         unit              = 'steps'
         startUnixSeconds  = $StartUnixSeconds
         baselineDone      = $BaselineDone
+        baselineDoneTasks = $tasksBaseline
         baselineWeeklyPct = $BaselineWeeklyPct
         samples           = [object[]] $written.ToArray()
         durations         = $durations
         items             = $items
+        pauses            = $pauses
     }
     return ConvertTo-Json -InputObject $document -Depth 8
 }
@@ -289,10 +362,15 @@ function Resolve-EpicProgressBaseline {
         none of these a terminating error names -StartUtc and -ResetBaseline. Baseline done:
         the passed value, else (with ResetBaseline) the current done count, else (for a state
         migrated from version 1 or the legacy array, whose counts were tasks) the current done
-        count, else the stored value, else 0. The Migrated property is read only when the
-        state carries it. Weekly baseline: the passed value, else the stored value, else 0; a
-        reset does not capture it. The current done count is not known before the git calls,
-        so UseCurrentDone is $true when the caller must substitute it for BaselineDone.
+        count, else the stored value, else 0. A state migrated from version 2 counted steps,
+        so its stored baseline is kept. The MigratedFrom property is read only when the state
+        carries it. Weekly baseline: the passed value, else the stored value, else 0; a reset
+        does not capture it. The current done count is not known before the git calls, so
+        UseCurrentDone is $true when the caller must substitute it for BaselineDone. Task
+        baseline (issue #1153, decision E12): with ResetBaseline, or when the state stores no
+        BaselineDoneTasks (a version-2 migration or no state), UseCurrentDoneTasks is $true and
+        the caller substitutes the current done task count; otherwise BaselineDoneTasks is the
+        stored value.
     .PARAMETER StartUtc
         The passed start instant; read only when StartUtcPassed is set.
     .PARAMETER StartUtcPassed
@@ -342,7 +420,7 @@ function Resolve-EpicProgressBaseline {
         $done = $BaselineDone
     } elseif ($ResetBaseline) {
         $useCurrentDone = $true
-    } elseif ($State.PSObject.Properties.Name -contains 'Migrated' -and $State.Migrated) {
+    } elseif ($State.PSObject.Properties.Name -contains 'MigratedFrom' -and $State.MigratedFrom -in @('1', 'legacy')) {
         # A migrated version-1 or legacy state counted tasks, so the baseline restarts at the current step count.
         $useCurrentDone = $true
     } elseif ($null -ne $State.BaselineDone) {
@@ -356,7 +434,14 @@ function Resolve-EpicProgressBaseline {
         $weekly = [double] $State.BaselineWeeklyPct
     }
 
-    return [pscustomobject]@{ StartUtc = $start; BaselineDone = $done; BaselineWeeklyPct = $weekly; UseCurrentDone = $useCurrentDone }
+    $useCurrentDoneTasks = $true
+    $doneTasks = $null
+    if (-not $ResetBaseline -and $State.PSObject.Properties.Name -contains 'BaselineDoneTasks' -and $null -ne $State.BaselineDoneTasks) {
+        $useCurrentDoneTasks = $false
+        $doneTasks = [int] $State.BaselineDoneTasks
+    }
+
+    return [pscustomobject]@{ StartUtc = $start; BaselineDone = $done; BaselineWeeklyPct = $weekly; UseCurrentDone = $useCurrentDone; BaselineDoneTasks = $doneTasks; UseCurrentDoneTasks = $useCurrentDoneTasks }
 }
 
 function Merge-EpicProgressSamplePair {
@@ -364,6 +449,7 @@ function Merge-EpicProgressSamplePair {
     .SYNOPSIS
         Keep the newest sample and every second older sample (indices n-1, n-3, ...), in chronological order.
     .DESCRIPTION
+        Each kept sample is returned unchanged, so its 'tasks' and 'features' values are kept.
         With k intervals the result has floor(k/2) intervals, each spanning two original
         intervals; when k is odd the oldest interval is discarded. 14 samples become 7, 13
         become 7, 2 become 1, and 1 or 0 samples are returned unchanged. Each application
