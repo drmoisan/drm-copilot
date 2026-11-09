@@ -83,7 +83,9 @@ function Get-EpicProgressTypeEstimate {
         in-progress step also gives an InProgress row (Issue, Type, ElapsedSeconds,
         MedianSeconds, OverMedian, StartRecorded); StartRecorded is false when the step has no
         recorded start, whose ElapsedSeconds is then 0. TotalSeconds is the sum of the
-        subtotals (decision D7).
+        subtotals (decision D7). A type named in MedianOverride uses the override in place of
+        its ledger median or default, for remaining steps and for in-progress credit alike, and
+        is not counted as a default (issue #1153, decision E4).
     .PARAMETER Step
         The step records.
     .PARAMETER Ledger
@@ -94,6 +96,9 @@ function Get-EpicProgressTypeEstimate {
         The current epoch second.
     .PARAMETER BlockedSince
         The start of each blocked item's span, keyed by issue; empty for none.
+    .PARAMETER MedianOverride
+        Seconds per step that replace the median of the named types, keyed by step type; empty
+        (the default) for none.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -102,7 +107,8 @@ function Get-EpicProgressTypeEstimate {
         [Parameter(Mandatory = $true)] [AllowNull()] [hashtable] $Ledger,
         [Parameter(Mandatory = $true)] [hashtable] $Default,
         [Parameter(Mandatory = $true)] [long] $NowUnixSeconds,
-        [hashtable] $BlockedSince = @{}
+        [hashtable] $BlockedSince = @{},
+        [hashtable] $MedianOverride = @{}
     )
 
     $rows = [System.Collections.Generic.List[object]]::new()
@@ -117,6 +123,10 @@ function Get-EpicProgressTypeEstimate {
         $isDefault = $samples.Count -eq 0
         $median = [double] $Default[$type]
         if (-not $isDefault) { $median = Get-EpicProgressMedian -Value ([double[]] @($samples | ForEach-Object { [double] $_.seconds })) }
+        if ($null -ne $MedianOverride -and $MedianOverride.ContainsKey($type)) {
+            $median = [double] $MedianOverride[$type]
+            $isDefault = $false
+        }
         $subtotal = 0.0
         $blockedSubtotal = 0.0
         foreach ($entry in $typeSteps) {

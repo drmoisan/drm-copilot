@@ -187,3 +187,52 @@ Describe 'Get-EpicProgressTypeEstimate and Get-EpicProgressWaveParallelSecond (i
         Get-EpicProgressWaveParallelSecond -Feature @() | Should -Be 0
     }
 }
+
+Describe 'Get-EpicProgressTypeEstimate -MedianOverride (issue #1153, AC-21, AC-22, E4)' {
+    BeforeAll {
+        $script:defaults = Resolve-EpicProgressStepDefault
+        # Execution samples of 600 s (median 600) so the ledger median differs from the 300 s override.
+        $script:execLedger = @{ execution = @(Get-EpicProgressDurationSample -Key 'e1' -Type 'execution' -Seconds 600 -Source 'tick') }
+
+        function Get-TestOverrideStep {
+            # One step record with the given type, status, and start for issue 12.
+            param([string] $Type, [string] $Status = 'remaining', [object] $Started = $null)
+            [pscustomobject]@{ Issue = '12'; Type = $Type; Cycle = 0; Ordinal = 1; Status = $Status; Key = "12|$Type"; StartedUnixSeconds = $Started }
+        }
+    }
+
+    It 'prices remaining execution tasks at the override and other steps at their median' {
+        # 6 tasks x 300 s (12 tasks per hour) = 1800 s; one review at the 14-minute default = 840 s; 2640 s = 44 min.
+        $steps = @(1..6 | ForEach-Object { Get-TestOverrideStep -Type 'execution' }) + @(Get-TestOverrideStep -Type 'review')
+
+        $estimate = Get-EpicProgressTypeEstimate -Step $steps -Ledger @{} -Default $script:defaults -NowUnixSeconds 5000 -MedianOverride @{ execution = 300.0 }
+
+        $estimate.TotalSeconds | Should -Be 2640
+        $estimate.TotalSeconds / 60 | Should -Be 44
+        @($estimate.Type | Where-Object { $_.Type -eq 'execution' })[0].IsDefault | Should -BeFalse
+    }
+
+    It 'credits max(0, override - elapsed) at the in-progress boundaries' -ForEach @(
+        @{ Elapsed = 299; Expected = 1 }
+        @{ Elapsed = 300; Expected = 0 }
+        @{ Elapsed = 301; Expected = 0 }
+    ) {
+        $step = Get-TestOverrideStep -Type 'execution' -Status 'in_progress' -Started (5000 - $Elapsed)
+
+        $estimate = Get-EpicProgressTypeEstimate -Step @($step) -Ledger $script:execLedger -Default $script:defaults -NowUnixSeconds 5000 -MedianOverride @{ execution = 300.0 }
+
+        $estimate.TotalSeconds | Should -Be $Expected
+    }
+
+    It 'credits an in-progress execution step with the override and with the ledger median without it' {
+        # 100 s elapsed: 300 - 100 = 200 s with the override; 600 - 100 = 500 s at the ledger median.
+        $step = Get-TestOverrideStep -Type 'execution' -Status 'in_progress' -Started 4900
+
+        $withOverride = Get-EpicProgressTypeEstimate -Step @($step) -Ledger $script:execLedger -Default $script:defaults -NowUnixSeconds 5000 -MedianOverride @{ execution = 300.0 }
+        $without = Get-EpicProgressTypeEstimate -Step @($step) -Ledger $script:execLedger -Default $script:defaults -NowUnixSeconds 5000
+
+        $withOverride.TotalSeconds | Should -Be 200
+        $withOverride.InProgress[0].MedianSeconds | Should -Be 300
+        $without.TotalSeconds | Should -Be 500
+    }
+}
