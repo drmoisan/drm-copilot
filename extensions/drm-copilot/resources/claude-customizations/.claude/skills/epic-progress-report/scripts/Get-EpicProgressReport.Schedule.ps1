@@ -281,3 +281,236 @@ function Find-EpicProgressDependencyCycle {
     }
     return ''
 }
+
+function Get-EpicProgressBlockedClosure {
+    <#
+    .SYNOPSIS
+        Return the blocked features and every feature that depends on one of them, directly or transitively, in ascending issue order (decision E7).
+    .PARAMETER Blocked
+        The issue numbers of the blocked features.
+    .PARAMETER DependsOn
+        The dependencies: a hashtable from issue to its dependency issues.
+    #>
+    [CmdletBinding()]
+    [OutputType([object[]])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [string[]] $Blocked,
+        [Parameter(Mandatory = $true)] [hashtable] $DependsOn
+    )
+
+    $closed = [System.Collections.Generic.HashSet[string]]::new([string[]] $Blocked)
+    $grown = $true
+    while ($grown) {
+        $grown = $false
+        foreach ($issue in @($DependsOn.Keys)) {
+            if ($closed.Contains([string] $issue)) { continue }
+            if (@($DependsOn[$issue] | Where-Object { $closed.Contains([string] $_) }).Count -gt 0) {
+                $null = $closed.Add([string] $issue)
+                $grown = $true
+            }
+        }
+    }
+    $sorted = Get-EpicProgressSortedIssue -Issue ([string[]] @($closed))
+    return $sorted
+}
+
+function Get-EpicProgressLongestPath {
+    <#
+    .SYNOPSIS
+        Return the longest remaining path to a sink of each node: its duration plus the largest path of the nodes that depend on it.
+    .PARAMETER Node
+        The schedule nodes (Issue, DurationSeconds, DependsOn).
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $Node)
+
+    $paths = @{}
+    $pending = @($Node)
+    $rounds = 0
+    while ($pending.Count -gt 0 -and $rounds -le $Node.Count) {
+        $rounds++
+        $left = [System.Collections.Generic.List[object]]::new()
+        foreach ($entry in $pending) {
+            $dependents = @($Node | Where-Object { @($_.DependsOn) -contains [string] $entry.Issue })
+            if (@($dependents | Where-Object { -not $paths.ContainsKey([string] $_.Issue) }).Count -gt 0) {
+                $left.Add($entry)
+                continue
+            }
+            $longest = 0.0
+            foreach ($dependent in $dependents) { $longest = [math]::Max($longest, $paths[[string] $dependent.Issue]) }
+            $paths[[string] $entry.Issue] = [double] $entry.DurationSeconds + $longest
+        }
+        $pending = @($left)
+    }
+    return $paths
+}
+
+function Get-EpicProgressPriorityOrder {
+    <#
+    .SYNOPSIS
+        Return issues ordered by descending longest remaining path, ties by ascending issue number.
+    .PARAMETER Issue
+        The issue numbers.
+    .PARAMETER Path
+        The longest remaining path of each issue.
+    #>
+    [CmdletBinding()]
+    [OutputType([object[]])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [string[]] $Issue,
+        [Parameter(Mandatory = $true)] [hashtable] $Path
+    )
+
+    $length = @{}
+    foreach ($entry in $Issue) { $length[$entry] = [double] $Path[$entry] }
+    $list = [System.Collections.Generic.List[string]]::new([string[]] $Issue)
+    $list.Sort([System.Comparison[string]] {
+            param($left, $right)
+            $byPath = $length[$right].CompareTo($length[$left])
+            if ($byPath -ne 0) { return $byPath }
+            return Compare-EpicProgressIssue -Left $left -Right $right
+        })
+    return , [string[]] $list.ToArray()
+}
+
+function Invoke-EpicProgressListSchedule {
+    <#
+    .SYNOPSIS
+        Simulate list scheduling of the feature nodes under a parallel cap; return Feature rows, FinishSeconds, HeadlineSeconds, and LastIssue (decision E6).
+    .DESCRIPTION
+        From t = 0: done nodes finish at 0 and hold no slot; running nodes start at 0 and hold
+        slots even when their count exceeds the cap; at each event, ready nodes (every
+        dependency finished; a dependency that is not a node is satisfied) start while fewer
+        than Cap nodes run, by descending longest remaining path to a sink, ties by ascending
+        issue number. Each row holds Issue, StartSeconds, FinishSeconds, and Predecessor: the
+        dependency that finished last, or, when the start waited for a slot, the node whose
+        finish freed it (ties among nodes finishing at the same instant by ascending issue
+        number); null for a start at 0 without a dependency. FinishSeconds is the latest finish,
+        LastIssue the node that reaches it (ties by ascending issue number), and
+        HeadlineSeconds is FinishSeconds plus TailSeconds. A node that can never start, which
+        only a cycle causes, has a NaN finish.
+    .PARAMETER Node
+        The nodes (Issue, State 'done', 'running', or 'pending', DurationSeconds, DependsOn).
+    .PARAMETER Cap
+        The parallel cap; 0 for no cap.
+    .PARAMETER TailSeconds
+        The epic tail added after the latest finish; 0 for none.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $Node,
+        [ValidateRange(0, 1000)] [int] $Cap = 0,
+        [double] $TailSeconds = 0
+    )
+
+    $issues = [string[]] @($Node | ForEach-Object { [string] $_.Issue })
+    $byIssue = @{}
+    foreach ($entry in $Node) { $byIssue[[string] $entry.Issue] = $entry }
+    $paths = Get-EpicProgressLongestPath -Node $Node
+    $start = @{}
+    $finish = @{}
+    $predecessor = @{}
+    $running = [System.Collections.Generic.List[string]]::new()
+    $pending = [System.Collections.Generic.List[string]]::new()
+    foreach ($issue in (Get-EpicProgressSortedIssue -Issue $issues)) {
+        $entry = $byIssue[$issue]
+        $predecessor[$issue] = $null
+        if ($entry.State -eq 'done') {
+            $start[$issue] = 0.0
+            $finish[$issue] = 0.0
+        } elseif ($entry.State -eq 'running') {
+            $start[$issue] = 0.0
+            $finish[$issue] = [double] $entry.DurationSeconds
+            $running.Add($issue)
+        } else {
+            $pending.Add($issue)
+        }
+    }
+    $now = 0.0
+    $freedBy = $null
+    while ($pending.Count -gt 0) {
+        foreach ($issue in @($running)) { if ($finish[$issue] -le $now) { $null = $running.Remove($issue) } }
+        [string[]] $ready = @($pending | Where-Object {
+                $dependencies = @($byIssue[$_].DependsOn | Where-Object { $byIssue.ContainsKey([string] $_) })
+                @($dependencies | Where-Object { -not $finish.ContainsKey([string] $_) -or $finish[[string] $_] -gt $now }).Count -eq 0
+            })
+        $started = $false
+        foreach ($issue in (Get-EpicProgressPriorityOrder -Issue $ready -Path $paths)) {
+            if ($Cap -gt 0 -and $running.Count -ge $Cap) { break }
+            [string[]] $dependencies = @($byIssue[$issue].DependsOn | Where-Object { $byIssue.ContainsKey([string] $_) } | ForEach-Object { [string] $_ })
+            $readyAt = 0.0
+            $lastDependency = $null
+            foreach ($dependency in (Get-EpicProgressSortedIssue -Issue $dependencies)) {
+                if ($null -eq $lastDependency -or $finish[$dependency] -gt $readyAt) {
+                    $readyAt = [math]::Max($readyAt, $finish[$dependency])
+                    $lastDependency = $dependency
+                }
+            }
+            $predecessor[$issue] = $lastDependency
+            if ($readyAt -lt $now -and $null -ne $freedBy) { $predecessor[$issue] = $freedBy }
+            $start[$issue] = $now
+            $finish[$issue] = $now + [double] $byIssue[$issue].DurationSeconds
+            $running.Add($issue)
+            $null = $pending.Remove($issue)
+            $started = $true
+        }
+        if ($pending.Count -eq 0) { break }
+        $later = @($running | Where-Object { $finish[$_] -gt $now } | ForEach-Object { $finish[$_] })
+        if ($later.Count -eq 0) {
+            if ($started) { continue }
+            break
+        }
+        $now = ($later | Measure-Object -Minimum).Minimum
+        $freedBy = (Get-EpicProgressSortedIssue -Issue ([string[]] @($running | Where-Object { $finish[$_] -eq $now })))[0]
+    }
+    foreach ($issue in $pending) {
+        $start[$issue] = [double]::NaN
+        $finish[$issue] = [double]::NaN
+    }
+    $rows = @(foreach ($issue in (Get-EpicProgressSortedIssue -Issue $issues)) {
+            [pscustomobject]@{ Issue = $issue; StartSeconds = $start[$issue]; FinishSeconds = $finish[$issue]; Predecessor = $predecessor[$issue] }
+        })
+    $latest = 0.0
+    $lastIssue = $null
+    foreach ($row in $rows) {
+        if ([double]::IsNaN($row.FinishSeconds)) {
+            $latest = [double]::NaN
+            break
+        }
+        if ($null -eq $lastIssue -or $row.FinishSeconds -gt $latest) {
+            $latest = $row.FinishSeconds
+            $lastIssue = $row.Issue
+        }
+    }
+    return [pscustomobject]@{ Feature = [object[]] $rows; FinishSeconds = $latest; HeadlineSeconds = $latest + $TailSeconds; LastIssue = $lastIssue }
+}
+
+function Get-EpicProgressCriticalChain {
+    <#
+    .SYNOPSIS
+        Return the critical chain text '#a -> #b -> tail', walking back from the latest-finishing node through each start's delaying predecessor (decision E6).
+    .PARAMETER Schedule
+        The result of Invoke-EpicProgressListSchedule.
+    .PARAMETER NoTail
+        Omit the trailing 'tail' (item mode).
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)] [pscustomobject] $Schedule,
+        [switch] $NoTail
+    )
+
+    $byIssue = @{}
+    foreach ($row in $Schedule.Feature) { $byIssue[[string] $row.Issue] = $row }
+    $chain = [System.Collections.Generic.List[string]]::new()
+    $current = $Schedule.LastIssue
+    while ($null -ne $current -and $byIssue.ContainsKey([string] $current) -and $chain.Count -lt $byIssue.Count) {
+        $chain.Insert(0, "#$current")
+        $current = $byIssue[[string] $current].Predecessor
+    }
+    if (-not $NoTail) { $chain.Add('tail') }
+    return ($chain -join ' -> ')
+}
