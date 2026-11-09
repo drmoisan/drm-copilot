@@ -70,4 +70,4 @@ Every PreToolUse tool call starts one `pwsh -NoProfile -File` process per matchi
 - Consolidating SessionStart, SubagentStart, SubagentStop, UserPromptSubmit or Codex non-PreToolUse hooks.
 - A bash front filter or any second implementation of a hook's scope test.
 - Reducing hook-internal child processes such as `git` and `gh`.
-- Starting execution before #1157, #1158, #1160 and #1163 have merged.
+- Ordering this item's execution or merge behind any other open item; the item is merge-order independent and integrates PreToolUse changes that reach `origin/main` in one pre-merge pass (spec D15).

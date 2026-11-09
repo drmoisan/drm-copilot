@@ -5,7 +5,7 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-11-09T21-47
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 - **Work Mode:** full-feature
 - **Requirements source:** `docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159/issue.md` (authoritative scope; not reduced here)
 - **Research:** `docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159/research/research.2026-11-09T21-47.md`
@@ -19,12 +19,13 @@ This feature replaces the per-hook process fan-out with one in-process PowerShel
 - Target users/personas and primary use cases: repository operators running several concurrent Claude Code or Codex agents; maintainers of the enforcement hook layer; destination repositories that receive the push-down payload.
 - Success metrics or expected impact: the PreToolUse hook process count per tool call becomes one dispatcher process for every tool name, against the per-call count derived from the registrations at execution time; summed CPU seconds per call fall accordingly; decisions and deny codes are unchanged.
 
-Context (observed on 2026-11-09, research section 2; not an acceptance target): a main-session Claude `Bash` call started 12 hook processes and a `Write` or `Edit` call 13; a Codex `Bash` call started 12 and an `apply_patch` call 15. These figures will change when the sibling issues listed under Sibling Ordering Constraint merge, which is why no acceptance criterion asserts them.
+Context (observed on 2026-11-09, research section 2; not an acceptance target): a main-session Claude `Bash` call started 12 hook processes and a `Write` or `Edit` call 13; a Codex `Bash` call started 12 and an `apply_patch` call 15. These figures change whenever other items add or change PreToolUse hooks on `main`, which is why no acceptance criterion asserts them.
 
-## Sibling Ordering Constraint
+## Merge-Order Independence
 
-- Execution begins only after #1157, #1158, #1160 and #1163 have merged into `main`.
+- This item runs concurrently with every other open item and does not wait for, or assume, the merge state of any of them (D15).
 - The first execution step merges `origin/main` into the feature branch and re-derives the PreToolUse hook inventory from the registrations in `.claude/settings.json` and `.codex/config.toml` as they exist at that point. The dispatcher registries are generated from that inventory (D10).
+- Before the final QA gates, an integration pass merges `origin/main` again, re-derives the inventory, and moves every PreToolUse hook added, removed, reordered or changed in the meantime into the registries by the same rule, restoring the single dispatcher registration per runtime (D15). The pass is correct whether zero or many changes arrived.
 - The registries, the measurement tool and the parity suite enumerate hooks from settings and config data (and from the registries derived from them) at run or test time. No hook list, hook count or hook name set is frozen in this spec, in the plan, or in any test.
 - Any count named in this spec as "observed on 2026-11-09" is context only.
 
@@ -35,7 +36,7 @@ Context (observed on 2026-11-09, research section 2; not an acceptance target): 
 1. The runtime fires PreToolUse for a tool call. The single dispatcher registration matches every tool name that any registry group matcher admits.
 2. The dispatcher reads the payload once: the Claude dispatcher through `Read-ClaudeHookRawPayload` (stdin, then the existing environment fallback); the Codex dispatcher through `[Console]::In.ReadToEnd()` with no fallback. It writes no environment variable (D3).
 3. It reads its runtime's registry, evaluates each group matcher against `tool_name` using that runtime's matcher semantics (Claude: exact string or exact list, otherwise unanchored JavaScript-style regex; Codex: regex as written, including the `apply_patch` to `Edit`/`Write` alias), and collects the selected hooks in registry order.
-4. For each selected hook it replays the payload with `[Console]::SetIn`, records and later restores the current location, sets `$LASTEXITCODE` to a sentinel, invokes the script with `&` in its own script scope, and captures stdout (success, warning and information streams), stderr and the exit code (D2).
+4. For each selected hook it replays the payload with `[Console]::SetIn`, records and later restores the current location, sets `$LASTEXITCODE` to a sentinel, redirects `[Console]::SetError` and `[Console]::SetOut` to per-hook writers, invokes the script with `&` in its own script scope, and captures stdout (the per-hook `[Console]::Out` writer text, which carries decisions written with `[Console]::Out.WriteLine`, followed by the success, warning and information streams), stderr (the per-hook error writer) and the exit code (D2). A hook that ends without `exit` leaves the sentinel unchanged and maps to exit code 0.
 5. It never stops at the first deny; every selected hook runs (D5).
 6. It normalizes each per-hook result (exit 2 is a deny with the stderr reason or the JSON blocking reason; exit 0 with a JSON `permissionDecision` is that decision; exit 0 with empty stdout is no decision; any other exit code or invalid JSON is a non-blocking error and no decision) and combines them by precedence `deny` > `defer` > `ask` > `allow` > none (D4).
 7. It emits one combined JSON decision at exit 0, with every deny reason in registry order separated by a line feed and every `additionalContext` value concatenated in registry order. When the strongest decision is `allow`, it emits `allow`.
@@ -52,7 +53,7 @@ Context (observed on 2026-11-09, research section 2; not an acceptance target): 
 
 - A terminating error inside one hook is caught and treated as that hook's non-blocking error, which preserves today's per-hook fail-open outcome.
 - A failure of the dispatcher itself (registry missing, unreadable or schema-invalid; a registry hook path that does not resolve; a bootstrap failure) is fail-closed: a deny whose reason starts with `HOOK_DISPATCH_BLOCKED:`. If the dispatcher cannot load `hook-dependency-guard.ps1`, it writes the reason to stderr and exits 2, following the existing guard bootstrap pattern (D8).
-- Process-global state changed per hook (`[Console]::SetIn`, error writer, location) is restored in `finally` blocks.
+- Process-global state changed per hook (`[Console]::SetIn`, error writer, output writer, location) is restored in `finally` blocks.
 - Revert path: setting `isolation` to `per-process` (or removing the field) in a registry restores per-process hook isolation with one data edit and no code change.
 
 ## Inputs / Outputs
@@ -77,7 +78,7 @@ Context (observed on 2026-11-09, research section 2; not an acceptance target): 
 
 ## Data & State
 
-- Registry generation: group order and hook order are copied verbatim from the merged `origin/main` PreToolUse blocks at execution time (D10).
+- Registry generation: group order and hook order are copied verbatim from the merged `origin/main` PreToolUse blocks at execution start and again at the pre-merge integration pass (D10, D15).
 - Invariants: the dispatcher's process exit code is 0 whenever it emits a decision; deny reasons keep registry order; no hook is skipped; no environment variable is written.
 - Side effects preserved: hooks that record state on every call (the batch-budget hooks write their `.claude/state` budget files) still run when another hook denies.
 - Module loading: guarded `Import-Module` statements in the dispatched Claude hooks lose `-Force` so a shared module loads once per call, except where a module audit finds mutable module-scope state (D6).
@@ -88,7 +89,7 @@ Context (observed on 2026-11-09, research section 2; not an acceptance target): 
 Adopted by the orchestrator from research section 10.
 
 - **D1. One dispatcher per runtime, registered once with the union matcher.** Claude: `Bash|Write|Edit|MultiEdit|NotebookEdit|Agent|Task|WebFetch|WebSearch|mcp__.*` (or the union of the groups derived at execution time). Codex: the anchored union of its group matchers. Rationale: one pwsh process per PreToolUse call regardless of how many groups match; per-group dispatchers would still start several processes per `Bash` call.
-- **D2. Run each selected hook script unchanged with `& <script>` in its own script scope**, after `[Console]::SetIn` replay, capturing streams and `$LASTEXITCODE`. Rationale: no re-implementation of the differing hook tails, isolated script scope (no function-name collisions, no shared `$script:HookDependencyFailures`, no leaked strict mode), and parity by construction.
+- **D2. Run each selected hook script unchanged with `& <script>` in its own script scope**, after `[Console]::SetIn` replay, capturing streams, the `[Console]::Out` and `[Console]::Error` writers (redirected per hook with `[Console]::SetOut` and `[Console]::SetError`) and `$LASTEXITCODE`. Rationale: no re-implementation of the differing hook tails, isolated script scope (no function-name collisions, no shared `$script:HookDependencyFailures`, no leaked strict mode), and parity by construction.
 - **D3. Read the payload once.** Claude reads through `Read-ClaudeHookRawPayload`; Codex reads `[Console]::In.ReadToEnd()`. No environment variable is written. Rationale: preserves each runtime's transport and satisfies `tests/scripts/claude-hooks/PreToolUsePayload.Contract.Tests.ps1`.
 - **D4. Combine by documented precedence** `deny` > `defer` > `ask` > `allow` > none. Join every deny reason in registry order separated by a line feed so every deny code token remains visible; concatenate `additionalContext` values; emit `allow` when it is the strongest decision; map exit 2 to deny with the stderr reason and other exit codes or invalid JSON to no decision. Codex uses the same rule with JSON deny output. Rationale: reproduces Claude's documented combination and today's per-hook fail-open.
 - **D5. Never short-circuit; run every selected hook.** Rationale: the batch-budget hooks record state on calls that another hook denies.
@@ -96,11 +97,12 @@ Adopted by the orchestrator from research section 10.
 - **D7. Timeouts.** The Claude dispatcher keeps the runtime default (no `timeout` key). The Codex dispatcher sets `timeout` to the sum of its members' timeouts. Rationale: avoids a fail-open caused by a combined budget shorter than today's per-hook budgets.
 - **D8. Dispatcher self-failure is fail-closed** (`HOOK_DISPATCH_BLOCKED:` deny; exit 2 with stderr if its own guard cannot load). A per-hook failure keeps today's per-hook outcome. The dispatcher follows the `hook-dependency-guard.ps1` bootstrap pattern so the dependency-guard completeness rules apply to it. Rationale: a broken dispatcher must not silently disable every gate.
 - **D9. Narrow carve-out (c) in `tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1` — adopted.** The carve-out is not an allowlist entry. It admits only the dispatcher runner's single `&` call whose target is resolved through the registry to a hooks-folder `.ps1` sibling (file name `^[a-z0-9][a-z0-9.-]*\.ps1$`, existence verified). Fixtures keep every other dynamic `&` call reported as `DynamicInvocation`. Fallback (a') — a uniform `Invoke-HookScriptMain` function per hook loaded without a dynamic `&` call — is recorded as not selected. Rationale: the carve-out is the smallest policy-oracle change that permits D2; (a') would move every hook tail and its bundle mirror and collide with the tail-shape rules of `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`.
-- **D10. Generate the registry at execution time** from the PreToolUse blocks of the merged `origin/main` settings and config (after #1157, #1158, #1160 and #1163 merge), preserving group order and hook order. The registry schema reuses the settings shape `{matcher, hooks: [{type, command}]}`. Rationale: sibling issues add or change hooks; a frozen list would drop or misorder them.
+- **D10. Generate the registry at execution time** from the PreToolUse blocks of the `origin/main` settings and config merged at execution start, and regenerate it by the same rule at the pre-merge integration pass (D15), preserving group order and hook order. The registry schema reuses the settings shape `{matcher, hooks: [{type, command}]}`. Rationale: other items add or change hooks at any time; a frozen list would drop or misorder them.
 - **D11. Agent-frontmatter PreToolUse hooks (`pr-author`) stay separate registrations.** Rationale: folding them into the global dispatcher would change their lifetime scoping.
 - **D12. SessionStart, SubagentStart, SubagentStop, UserPromptSubmit and Codex non-PreToolUse events are out of scope.** Rationale: they fire per session, prompt or subagent, orders of magnitude less often than PreToolUse, and are outside the issue's problem statement.
 - **D13. Family (D) tails (`exit (Invoke-...EntryPoint)`) are reproduced as-is by D2.** The Phase 0 baseline records their real process output. If they emit no JSON (suspected fail-open), the finding is reported to the orchestrator under the related-findings rule and fixed only as a separate, explicitly stated change with its own before/after evidence, not as part of the parity claim. Rationale: the parity claim must compare like with like.
 - **D14. Isolation knob.** A registry field `isolation` with values `in-process` and `per-process`. An absent field means `per-process`: each hook runs as its own `pwsh -NoProfile -File` child with the payload on stdin, matching today's isolation. The shipped registries set `in-process` explicitly. Rationale: a destination registry without the field keeps today's isolation, the operator can revert with one data edit, and the shipped setting meets issue AC 2.
+- **D15. Merge-order independence and the pre-merge integration pass (owner directive OD-2026-11-09-max-parallel) — adopted.** The item executes concurrently with every other open item; no step waits for, or assumes, any other item's merge state. Execution starts by merging `origin/main` (D10). In the final phase, before the QA gates, one integration pass merges `origin/main` again, re-derives the PreToolUse inventory from `.claude/settings.json` and `.codex/config.toml`, moves every hook added, removed, reordered or changed in the meantime (including a PreToolUse registration the merge placed beside the dispatcher registration) into the registries by the D10 rule, restores the single dispatcher registration per runtime, applies the D6 and D13 audits to every arrived hook and to every dispatched hook, dot-sourced helper or imported module whose content the merge changed, keeps the bundle mirrors, pack manifests and the Codex timeout sum consistent, gives each arrived registry hook parity envelopes to the corpus standard or records why none is possible, and records the result in the feature's `evidence/other/` folder. Acceptance: every hook registered on the merged origin/main is dispatched and passes parity, proven by the parity suite in the final gate and an inventory showing zero PreToolUse registrations outside the dispatcher (agent-frontmatter hooks excluded per D11). The owner accepts at most one such pass. Rationale: maximum parallelism, at the cost of one integration pass and of the registration rule for later items stated under Risks.
 
 Rejected alternatives (research section 5): a bash front filter and a filter-plus-dispatcher hybrid (a second implementation of each hook's scope test that would drift, contrary to the one-implementation rule for enforcement hooks); dot-sourcing every hook into one shared scope; passing the payload through `CLAUDE_HOOK_INPUT`; per-group dispatchers.
 
@@ -128,6 +130,7 @@ Rejected alternatives (research section 5): a bash front filter and a filter-plu
 - Linux CI: case-exact paths, `Join-Path`, no drive letters, LF fixtures, no reads of gitignored `artifacts/` state; bounded parity corpus.
 - Hook execution context: isolated subagents run `main`'s hooks, so live sessions use the dispatcher only after merge; branch proof is the Pester suites plus the measurement script, which launches branch files directly.
 - `TotalProcessorTime` readability after exit on Linux is unconfirmed; Windows is the measured host.
+- Later items (owner-accepted under D15): an item that merges after this one and adds or changes a PreToolUse hook must register it in `.claude/hooks/pretooluse-dispatch.json` or `.codex/hooks/pretooluse-dispatch.json`, not beside the dispatcher in `.claude/settings.json` or `.codex/config.toml`. Mitigation: the single-registration tests and the parity suite fail on a registration placed beside the dispatcher, and the execution-environment brief states where new PreToolUse hooks are registered.
 
 ## Implementation Strategy
 
@@ -156,7 +159,7 @@ Rejected alternatives (research section 5): a bash front filter and a filter-plu
 - Dependency changes: none.
 - Logging/telemetry: the `-PerHookTrace` switch (test use) and the cost report.
 - Rollout: lands on `main`; live sessions adopt it after merge. Fallback: registry `isolation` set to `per-process` or removed.
-- Phasing: Phase 0 (after merging `origin/main`) re-derives the inventory and runs `Measure-HookProcessCost.ps1 -Source Registration` before any registration edit; the final phase runs `-Source Dispatcher` with identical payloads.
+- Phasing: Phase 0 (after merging `origin/main`) re-derives the inventory and runs `Measure-HookProcessCost.ps1 -Source Registration` before any registration edit; the final phase starts with the D15 integration pass, then runs the QA gates and `-Source Dispatcher` with identical payloads.
 
 ## Acceptance Criteria
 
