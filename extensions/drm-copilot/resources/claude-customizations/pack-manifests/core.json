@@ -174,6 +174,7 @@
     ".claude/skills/epic-orchestrate/SKILL.md",
     ".claude/skills/epic-plan/SKILL.md",
     ".claude/skills/epic-progress-report/SKILL.md",
+    ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.CriticalPath.ps1",
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Durations.ps1",
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Gather.ps1",
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Logic.ps1",

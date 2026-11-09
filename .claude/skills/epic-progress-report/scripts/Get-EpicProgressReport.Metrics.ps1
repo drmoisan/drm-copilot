@@ -8,9 +8,10 @@
     culture, and every non-finite value prints as n/a. Get-EpicProgressTypeEstimate computes
     the per-type remaining-time estimate of the step model (remaining steps times the median
     of each type, with in-progress credit and blocked steps excluded). The velocity and
-    critical-path functions live in the Velocity and Schedule files (issue #1153), and the
-    wave-parallel figure was retired (decision E10). Get-EpicProgressReport.Logic.ps1 dot-sources
-    this file, so a consumer dot-sources the Logic hub, not this file.
+    critical-path functions live in the Velocity, Schedule, and CriticalPath files
+    (issue #1153), and the wave-parallel figure was retired (decision E10).
+    Get-EpicProgressReport.Logic.ps1 dot-sources this file, so a consumer dot-sources the Logic
+    hub, not this file.
 #>
 
 function Format-EpicProgressHour {

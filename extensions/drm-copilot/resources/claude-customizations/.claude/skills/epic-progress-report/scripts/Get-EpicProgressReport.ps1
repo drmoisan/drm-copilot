@@ -16,8 +16,8 @@
     serial upper bound. Blocked items and their dependents are excluded by recorded state.
 
     The pure logic lives in Get-EpicProgressReport.Logic.ps1, which this script dot-sources and
-    which dot-sources the Stages, Steps, Durations, State, Metrics, Velocity, Schedule, Render,
-    and Gather files.
+    which dot-sources the Stages, Steps, Durations, State, Metrics, Velocity, Schedule,
+    CriticalPath, Render, and Gather files.
     Every I/O call goes through a wrapper function in this script. When gh or cswap is not
     installed, or prints no parseable output, the report still prints: the pull-request state
     is empty and the quota is n/a.

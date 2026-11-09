@@ -1,6 +1,6 @@
 # Pester tests for the epic tail, range, and report composition of
-# .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Schedule.ps1 (issue #1153, decisions E4, E8, E9).
-# The Logic hub is dot-sourced, which dot-sources the Schedule file; every function under test is
+# .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.CriticalPath.ps1 (issue #1153, decisions E4, E8, E9).
+# The Logic hub is dot-sourced, which dot-sources the CriticalPath file; every function under test is
 # pure, so each test supplies fixed in-memory steps and ledgers and asserts the returned data.
 # Golden values are derived by hand in the comments (seconds; 60 per minute, 3600 per hour).
 

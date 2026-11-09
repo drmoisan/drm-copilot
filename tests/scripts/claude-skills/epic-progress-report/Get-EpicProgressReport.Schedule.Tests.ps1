@@ -1,5 +1,6 @@
-# Pester tests for .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Schedule.ps1 (issue #1153).
-# The Logic hub is dot-sourced, which dot-sources the Schedule file; every function under test is
+# Pester tests for .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Schedule.ps1 and the
+# critical chain of Get-EpicProgressReport.CriticalPath.ps1 (issue #1153).
+# The Logic hub is dot-sourced, which dot-sources both files; every function under test is
 # pure, so each test supplies fixed in-memory input and asserts the returned data. Durations are in
 # seconds (3600 per hour), and golden values are derived by hand in the comments.
 
@@ -200,7 +201,7 @@ Describe 'Get-EpicProgressDependencyGraph invalid graphs (AC-33)' {
 Describe 'Velocity and Schedule purity (AC-50, E6, E14)' {
     It 'calls no I/O seam and reads no clock in the Velocity and Schedule files' {
         $forbidden = @('Get-EpicProgressUtcNow', 'Read-EpicProgressFile', 'Test-EpicProgressPath', 'Write-EpicProgressState', 'Invoke-GitExe', 'Invoke-GhExe', 'Invoke-CswapExe', 'Get-Date', 'Import-Module')
-        foreach ($name in @('Get-EpicProgressReport.Velocity.ps1', 'Get-EpicProgressReport.Schedule.ps1')) {
+        foreach ($name in @('Get-EpicProgressReport.Velocity.ps1', 'Get-EpicProgressReport.Schedule.ps1', 'Get-EpicProgressReport.CriticalPath.ps1')) {
             $path = Join-Path -Path $script:scriptFolder -ChildPath $name
             $tokens = $null
             $parseErrors = $null
