@@ -7,7 +7,7 @@
     and dot-sources the Stages (step-type catalog, stage-name normalization, stage_timing
     records, blockage), Steps (item, remediation-cycle, and epic-level steps), Durations
     (median, defaults, duration samples, ledger merge), State (settings, state file,
-    baseline, samples), Metrics (per-type estimate, wave-parallel figure, formatting), Velocity
+    baseline, samples), Metrics (per-type estimate and formatting), Velocity
     (default rate, sequential, pooled, and aggregate task velocity, pause spans), Schedule
     (dependency graph, parallel cap, blocked closure, and list schedule), CriticalPath
     (critical chain, tail, remaining time, range, and the report composition), Render
