@@ -50,6 +50,10 @@ $script:MemberName = @('tolerance_percent', 'weights', 'band_durations', 'defaul
 $script:WeightName = @('same_file', 'possible_overlap', 'append_only', 'module', 'contract')
 $script:BandName = @('C1', 'C2', 'C3', 'C4')
 
+# The one optional weight (issue #1164): the merge time of a path both items
+# declare separable. It joins the exact weight-name set only when present.
+$script:SeparableWeightName = 'separable'
+
 # The one optional member (issue #1013): the issue-combination threshold, read
 # as this default when absent. Pinned to COMBINATION_THRESHOLD_DEFAULT in the
 # Python reference by a Pester parity row.
@@ -115,7 +119,9 @@ function Assert-ExactMemberName {
     }
 }
 
-# Read a nested map with exactly Names, each an integer >= 1.
+# Read a nested map with exactly Names, each an integer >= 1. An OptionalName
+# joins the exact name set only when the map carries it, so every other unknown
+# name is still rejected and an absent optional name leaves no key.
 function Get-RequiredIntegerMap {
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -126,14 +132,16 @@ function Get-RequiredIntegerMap {
         [Parameter(Mandatory = $true)]
         [string[]] $Name,
         [Parameter(Mandatory = $true)]
-        [string] $Member
+        [string] $Member,
+        [string[]] $OptionalName = @()
     )
 
     $label = "$script:ToleranceLabel[""$Member""]"
     $mapping = Get-RequiredMapping -Value $Value -FieldName $label
-    Assert-ExactMemberName -Mapping $mapping -Name $Name -FieldName $label
+    $present = @($Name) + @($OptionalName | Where-Object { $mapping.ContainsKey($_) })
+    Assert-ExactMemberName -Mapping $mapping -Name $present -FieldName $label
     $result = @{}
-    foreach ($entry in $Name) {
+    foreach ($entry in $present) {
         $result[$entry] = Get-RequiredInteger -Value $mapping[$entry] -FieldName "$label[""$entry""]" -Minimum 1
     }
     return $result
@@ -149,7 +157,9 @@ function Get-ConfigConflictTolerance {
         strict semantics: tolerance 0, every weight 1, every band duration 1,
         default_band C1, no append-only paths, and the default combination
         threshold. combination_threshold_percent is optional: when present it
-        must be an integer of at least 0, and when absent it reads as 400.
+        must be an integer of at least 0, and when absent it reads as 400. The
+        weight separable (issue #1164) is optional: when present it must be an
+        integer of at least 1, and when absent weights carries no separable key.
 
     .PARAMETER Config
         Parsed config/blast-radius.json.
@@ -196,7 +206,7 @@ function Get-ConfigConflictTolerance {
 
     return @{
         tolerance_percent             = Get-RequiredInteger -Value $member['tolerance_percent'] -FieldName "$script:ToleranceLabel[""tolerance_percent""]" -Minimum 0
-        weights                       = Get-RequiredIntegerMap -Value $member['weights'] -Name $script:WeightName -Member 'weights'
+        weights                       = Get-RequiredIntegerMap -Value $member['weights'] -Name $script:WeightName -Member 'weights' -OptionalName $script:SeparableWeightName
         band_durations                = Get-RequiredIntegerMap -Value $member['band_durations'] -Name $script:BandName -Member 'band_durations'
         default_band                  = [string]$defaultBand
         append_only_paths             = [string[]]@(Get-RequiredStringList -Value $member['append_only_paths'] -FieldName "$script:ToleranceLabel[""append_only_paths""]")

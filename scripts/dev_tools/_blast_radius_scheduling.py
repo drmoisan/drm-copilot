@@ -87,6 +87,10 @@ WEIGHT_NAMES: tuple[str, ...] = tuple(
 )
 BAND_NAMES: tuple[str, ...] = ("C1", "C2", "C3", "C4")
 
+# The one optional weight (issue #1164): the merge time of a path both items
+# declare separable. It joins the exact weight-name set only when present.
+SEPARABLE_WEIGHT = "separable"
+
 # The one optional member (issue #1013): the issue-combination threshold, a
 # percentage of the pair benefit, read as this default when absent.
 _COMBINATION_THRESHOLD = "combination_threshold_percent"
@@ -110,7 +114,8 @@ class ConflictTolerance:
     Attributes:
         tolerance_percent (int): Percentage of the benefit a cost may reach
             before the pair becomes an edge; 0 is zero tolerance.
-        weights (Mapping[str, int]): Cost weight per name in ``WEIGHT_NAMES``.
+        weights (Mapping[str, int]): Cost weight per name in ``WEIGHT_NAMES``,
+            plus ``separable`` when the configuration carries it.
         band_durations (Mapping[str, int]): Duration per band in ``BAND_NAMES``.
         default_band (str): Band used for an item that records none.
         append_only_paths (tuple[str, ...]): Append-only file patterns, matched
@@ -260,7 +265,9 @@ def config_conflict_tolerance(config: Mapping[str, object]) -> ConflictTolerance
         tolerance_percent=_require_int(
             member["tolerance_percent"], f'{_LABEL}["tolerance_percent"]', minimum=0
         ),
-        weights=_read_int_map(member["weights"], WEIGHT_NAMES, "weights"),
+        weights=_read_int_map(
+            member["weights"], WEIGHT_NAMES, "weights", optional=(SEPARABLE_WEIGHT,)
+        ),
         band_durations=_read_int_map(
             member["band_durations"], BAND_NAMES, "band_durations"
         ),
@@ -550,12 +557,25 @@ def _require_int(value: object, label: str, *, minimum: int) -> int:
     return value
 
 
-def _read_int_map(value: object, names: tuple[str, ...], member: str) -> dict[str, int]:
-    """Read a nested map with exactly ``names``, each an integer >= 1."""
+def _read_int_map(
+    value: object,
+    names: tuple[str, ...],
+    member: str,
+    *,
+    optional: tuple[str, ...] = (),
+) -> dict[str, int]:
+    """Read a nested map with exactly ``names``, each an integer >= 1.
+
+    An ``optional`` name joins the exact name set only when the map carries it,
+    so every other unknown name is still rejected and an absent optional name
+    leaves the result without that key.
+    """
     label = f'{_LABEL}["{member}"]'
-    mapping = _require_names(require_mapping(value, label), names, label)
+    raw = require_mapping(value, label)
+    present = names + tuple(name for name in optional if name in raw)
+    mapping = _require_names(raw, present, label)
     # Validate each named value in the fixed name order.
     return {
         name: _require_int(mapping[name], f'{label}["{name}"]', minimum=1)
-        for name in names
+        for name in present
     }
