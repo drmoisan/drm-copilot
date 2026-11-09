@@ -179,6 +179,7 @@
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Logic.ps1",
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Metrics.ps1",
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Render.ps1",
+    ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Schedule.ps1",
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Stages.ps1",
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.State.ps1",
     ".claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.Steps.ps1",

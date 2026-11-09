@@ -545,7 +545,7 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
     BeforeAll {
         # The canonical files, entry first (issue #1093 split the Logic file into a hub and three
         # files; issue #1118 added the Stages, Steps, Durations, and Gather files; issue #1153 added
-        # the Velocity file).
+        # the Velocity and Schedule files).
         $canonicalFolder = Split-Path -Path $script:scriptPath -Parent
         $script:productionPaths = @(
             (Resolve-Path -LiteralPath $script:scriptPath).ProviderPath
@@ -558,6 +558,7 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
             (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.Durations.ps1')).ProviderPath
             (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.Gather.ps1')).ProviderPath
             (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.Velocity.ps1')).ProviderPath
+            (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.Schedule.ps1')).ProviderPath
         )
 
         function Get-TestCommandUse {
@@ -587,7 +588,7 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
         $writes = @($uses | Where-Object { $writeCommands -contains $_.Name })
 
         # Set-Content writes the state file and New-Item creates its missing directory (issue #1093).
-        $script:productionPaths.Count | Should -Be 10
+        $script:productionPaths.Count | Should -Be 11
         $writes.Count | Should -Be 2
         (@($writes.Name | Sort-Object) -join ',') | Should -Be 'New-Item,Set-Content'
         foreach ($write in $writes) {
@@ -616,7 +617,7 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
             (Join-Path -Path (Split-Path -Path $canonicalFolder -Parent) -ChildPath 'SKILL.md')
         )
 
-        $scanPaths.Count | Should -Be 12
+        $scanPaths.Count | Should -Be 13
         foreach ($path in $scanPaths) {
             Test-Path -LiteralPath $path -PathType Leaf | Should -BeTrue -Because "$path must exist"
             $text = Get-Content -LiteralPath $path -Raw
