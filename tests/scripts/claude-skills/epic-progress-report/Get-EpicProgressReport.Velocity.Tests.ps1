@@ -143,3 +143,150 @@ Describe 'Get-EpicProgressDefaultRate (AC-15)' {
         Get-EpicProgressDefaultRate -Default (Resolve-EpicProgressStepDefault -StepDefaultMinutes @{ execution = 6 }) | Should -Be 10
     }
 }
+
+Describe 'Get-EpicProgressAggregateVelocity (AC-16, AC-17, E12)' {
+    BeforeAll {
+        function Get-TestTaskSample {
+            # One version-3 check-in sample at Ts seconds holding Tasks done tasks.
+            param([long] $Ts, [int] $Tasks)
+            [pscustomobject]@{ ts = $Ts; done = 0; tasks = $Tasks; features = @{} }
+        }
+    }
+
+    It 'averages done tasks since the baseline over elapsed hours minus the pause span' {
+        # 3 h elapsed with a 1 h pause: 10 tasks over 2 active hours = 5; without the pause 10 / 3 h.
+        $paused = Get-EpicProgressAggregateVelocity -Sample @() -PauseSpan @([pscustomobject]@{ startUnixSeconds = 3600; endUnixSeconds = 7200 }) -StartUnixSeconds 0 -NowUnixSeconds 10800 -DoneTasks 20 -BaselineDoneTasks 10
+        $plain = Get-EpicProgressAggregateVelocity -Sample @() -StartUnixSeconds 0 -NowUnixSeconds 10800 -DoneTasks 20 -BaselineDoneTasks 10
+
+        $paused.Average | Should -Be 5
+        [math]::Round($plain.Average, 4) | Should -Be 3.3333
+    }
+
+    It 'returns a non-finite average without a task baseline' {
+        $velocity = Get-EpicProgressAggregateVelocity -Sample @() -StartUnixSeconds 0 -NowUnixSeconds 3600 -DoneTasks 4
+
+        [double]::IsNaN($velocity.Average) | Should -BeTrue
+        [double]::IsNaN($velocity.Recent) | Should -BeTrue
+        $velocity.Count | Should -Be 0
+    }
+
+    It 'prints n/a for the SD of 2 intervals and a finite SD for 3' {
+        # Rates: 0-1200 gives 2 tasks in 1/3 h = 6; 1200-2400 gives 4 in 1/3 h = 12; 2400-3600 gives 3 = 9.
+        # Three rates 6, 12, 9: mean 9, squared deviations 9 + 9 + 0 = 18, 18 / 2 = 9, SD 3.
+        $two = @(Get-TestTaskSample -Ts 0 -Tasks 0; Get-TestTaskSample -Ts 1200 -Tasks 2; Get-TestTaskSample -Ts 2400 -Tasks 6)
+        $three = $two + @(Get-TestTaskSample -Ts 3600 -Tasks 9)
+
+        $velocityTwo = Get-EpicProgressAggregateVelocity -Sample $two -StartUnixSeconds 0 -NowUnixSeconds 2400 -DoneTasks 6 -BaselineDoneTasks 0
+        $velocityThree = Get-EpicProgressAggregateVelocity -Sample $three -StartUnixSeconds 0 -NowUnixSeconds 3600 -DoneTasks 9 -BaselineDoneTasks 0
+
+        $velocityTwo.Count | Should -Be 2
+        $velocityTwo.Recent | Should -Be 12
+        Format-EpicProgressNumber -Value $velocityTwo.StandardDeviation -Digits 1 | Should -Be 'n/a'
+        $velocityThree.Count | Should -Be 3
+        $velocityThree.Recent | Should -Be 9
+        $velocityThree.StandardDeviation | Should -Be 3
+    }
+
+    It 'combines consecutive samples until 600 seconds have elapsed' -ForEach @(
+        @{ Gap = 599; Expected = 0 }
+        @{ Gap = 600; Expected = 1 }
+        @{ Gap = 601; Expected = 1 }
+    ) {
+        $samples = @(Get-TestTaskSample -Ts 0 -Tasks 0; Get-TestTaskSample -Ts $Gap -Tasks 1)
+
+        (Get-EpicProgressAggregateVelocity -Sample $samples -StartUnixSeconds 0 -NowUnixSeconds $Gap -DoneTasks 1 -BaselineDoneTasks 0).Count | Should -Be $Expected
+    }
+
+    It 'forms exactly 0-20 and 20-40 from samples at 0, 7, 20, 27 and 40 minutes' {
+        $samples = @(0, 7, 20, 27, 40 | ForEach-Object { Get-TestTaskSample -Ts ($_ * 60) -Tasks $_ })
+
+        $velocity = Get-EpicProgressAggregateVelocity -Sample $samples -StartUnixSeconds 0 -NowUnixSeconds 2400 -DoneTasks 40 -BaselineDoneTasks 0
+
+        @($velocity.Interval | ForEach-Object { "$($_.StartUnixSeconds)-$($_.EndUnixSeconds)" }) | Should -Be @('0-1200', '1200-2400')
+    }
+
+    It 'skips a trailing remainder under 600 seconds' {
+        $samples = @(Get-TestTaskSample -Ts 0 -Tasks 0; Get-TestTaskSample -Ts 1200 -Tasks 4; Get-TestTaskSample -Ts 1500 -Tasks 5)
+
+        $velocity = Get-EpicProgressAggregateVelocity -Sample $samples -StartUnixSeconds 0 -NowUnixSeconds 1500 -DoneTasks 5 -BaselineDoneTasks 0
+
+        @($velocity.Interval | ForEach-Object { "$($_.StartUnixSeconds)-$($_.EndUnixSeconds)" }) | Should -Be @('0-1200')
+    }
+
+    It 'drops an interval overlapping a pause span and keeps one ending where it starts' {
+        # The 1200-5000 gap is the pause span; 0-1200 ends at its start and 5000-6200 starts at its end.
+        $samples = @(Get-TestTaskSample -Ts 0 -Tasks 0; Get-TestTaskSample -Ts 1200 -Tasks 2; Get-TestTaskSample -Ts 5000 -Tasks 3; Get-TestTaskSample -Ts 6200 -Tasks 5)
+        $pause = @([pscustomobject]@{ startUnixSeconds = 1200; endUnixSeconds = 5000 })
+
+        $velocity = Get-EpicProgressAggregateVelocity -Sample $samples -PauseSpan $pause -StartUnixSeconds 0 -NowUnixSeconds 6200 -DoneTasks 5 -BaselineDoneTasks 0
+
+        @($velocity.Interval | ForEach-Object { "$($_.StartUnixSeconds)-$($_.EndUnixSeconds)" }) | Should -Be @('0-1200', '5000-6200')
+    }
+
+    It 'ignores migrated version-2 samples without a tasks value when forming intervals' {
+        # v2 samples at 0 and 20 min carry no tasks; v3 samples at 40, 60 and 80 min give 40-60 and 60-80.
+        $v2 = @([pscustomobject]@{ ts = 0; done = 1 }; [pscustomobject]@{ ts = 1200; done = 2 })
+        $v3 = @(Get-TestTaskSample -Ts 2400 -Tasks 3; Get-TestTaskSample -Ts 3600 -Tasks 5; Get-TestTaskSample -Ts 4800 -Tasks 8)
+        $allTasks = @(Get-TestTaskSample -Ts 0 -Tasks 1; Get-TestTaskSample -Ts 1200 -Tasks 2) + $v3
+
+        $migrated = Get-EpicProgressAggregateVelocity -Sample ($v2 + $v3) -StartUnixSeconds 0 -NowUnixSeconds 4800 -DoneTasks 8 -BaselineDoneTasks 0
+        $full = Get-EpicProgressAggregateVelocity -Sample $allTasks -StartUnixSeconds 0 -NowUnixSeconds 4800 -DoneTasks 8 -BaselineDoneTasks 0
+
+        @($migrated.Interval | ForEach-Object { "$($_.StartUnixSeconds)-$($_.EndUnixSeconds)" }) | Should -Be @('2400-3600', '3600-4800')
+        @($full.Interval | ForEach-Object { "$($_.StartUnixSeconds)-$($_.EndUnixSeconds)" }) | Should -Be @('0-1200', '1200-2400', '2400-3600', '3600-4800')
+    }
+}
+
+Describe 'Get-EpicProgressPauseSpan and Get-EpicProgressResetPauseSpan (AC-18, AC-19)' {
+    It 'records a span only for a gap strictly longer than 3600 seconds' -ForEach @(
+        @{ Gap = 3599; Expected = 0 }
+        @{ Gap = 3600; Expected = 0 }
+        @{ Gap = 3601; Expected = 1 }
+    ) {
+        @(Get-EpicProgressPauseSpan -SampleInstant @(1000, (1000 + $Gap))).Count | Should -Be $Expected
+    }
+
+    It 'records the span from the earlier to the later sample of a 3601-second gap' {
+        $spans = @(Get-EpicProgressPauseSpan -SampleInstant @(500, 1000, 4601, 5000))
+
+        $spans.Count | Should -Be 1
+        $spans[0].startUnixSeconds | Should -Be 1000
+        $spans[0].endUnixSeconds | Should -Be 4601
+    }
+
+    It 'returns the reset span from the newest stored sample to the resume instant' {
+        $span = Get-EpicProgressResetPauseSpan -SampleInstant @(100, 500, 300) -ResumeUnixSeconds 9000
+
+        $span.startUnixSeconds | Should -Be 500
+        $span.endUnixSeconds | Should -Be 9000
+    }
+
+    It 'returns no reset span without a stored sample' {
+        Get-EpicProgressResetPauseSpan -SampleInstant @() -ResumeUnixSeconds 9000 | Should -BeNullOrEmpty
+    }
+}
+
+Describe 'Get-EpicProgressExcludedSecond (E11)' {
+    It 'counts a pause span alone inside the interval' {
+        # Pause 100-300 inside 0-1000: 200 s.
+        Get-EpicProgressExcludedSecond -PauseSpan @([pscustomobject]@{ startUnixSeconds = 100; endUnixSeconds = 300 }) -IntervalStartUnixSeconds 0 -IntervalEndUnixSeconds 1000 | Should -Be 200
+    }
+
+    It 'counts an open blocked span alone up to the interval end' {
+        # Blocked since 600 with no end: 600-1000 = 400 s.
+        Get-EpicProgressExcludedSecond -BlockedSinceUnixSeconds 600 -IntervalStartUnixSeconds 0 -IntervalEndUnixSeconds 1000 | Should -Be 400
+    }
+
+    It 'counts overlapping pause and blocked spans once' {
+        # Pause 100-500 and blocked 300-700 merge to 100-700 = 600 s, not 400 + 400.
+        Get-EpicProgressExcludedSecond -PauseSpan @([pscustomobject]@{ startUnixSeconds = 100; endUnixSeconds = 500 }) -BlockedSinceUnixSeconds 300 -BlockedUntilUnixSeconds 700 -IntervalStartUnixSeconds 0 -IntervalEndUnixSeconds 1000 | Should -Be 600
+    }
+
+    It 'sums disjoint pause and blocked spans and clips them to the interval' {
+        # Pause 100-200 (100 s) plus blocked 800 to beyond the end, clipped at 1000 (200 s); a span before the interval adds nothing.
+        $pauses = @([pscustomobject]@{ startUnixSeconds = 100; endUnixSeconds = 200 }; [pscustomobject]@{ startUnixSeconds = -500; endUnixSeconds = -100 })
+
+        Get-EpicProgressExcludedSecond -PauseSpan $pauses -BlockedSinceUnixSeconds 800 -BlockedUntilUnixSeconds 5000 -IntervalStartUnixSeconds 0 -IntervalEndUnixSeconds 1000 | Should -Be 300
+        Get-EpicProgressExcludedSecond -IntervalStartUnixSeconds 0 -IntervalEndUnixSeconds 1000 | Should -Be 0
+    }
+}
