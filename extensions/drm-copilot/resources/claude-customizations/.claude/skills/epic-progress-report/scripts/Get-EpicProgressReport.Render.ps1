@@ -87,31 +87,31 @@ function Get-EpicProgressSummary {
         if ($entry.Approx) { $approximate += [double] $entry.Seconds }
     }
     return [pscustomobject]@{
-        Subject           = $Subject
-        EpicIssue         = $EpicIssue
-        EpicName          = $EpicName
-        Feature           = $Feature
-        EpicStep          = $EpicStep
-        Completed         = [object[]] @($Feature | Where-Object { $_.State -eq 'Completed' })
-        Running           = [object[]] @($Feature | Where-Object { $_.State -eq 'Running' })
-        Blocked           = [object[]] @($Feature | Where-Object { $_.State -eq 'Blocked' })
-        Pending           = [object[]] @($Feature | Where-Object { $_.State -eq 'Pending' })
-        Total             = $total
-        Done              = $done
-        TasksTotal        = $tasksTotal
-        TasksDone         = $tasksDone
+        Subject          = $Subject
+        EpicIssue        = $EpicIssue
+        EpicName         = $EpicName
+        Feature          = $Feature
+        EpicStep         = $EpicStep
+        Completed        = [object[]] @($Feature | Where-Object { $_.State -eq 'Completed' })
+        Running          = [object[]] @($Feature | Where-Object { $_.State -eq 'Running' })
+        Blocked          = [object[]] @($Feature | Where-Object { $_.State -eq 'Blocked' })
+        Pending          = [object[]] @($Feature | Where-Object { $_.State -eq 'Pending' })
+        Total            = $total
+        Done             = $done
+        TasksTotal       = $tasksTotal
+        TasksDone        = $tasksDone
         Percent          = 100.0 * $done / [math]::Max(1, $total)
-        StartUtc          = $StartUtc
-        NowUtc            = $NowUtc
-        ElapsedHours      = [math]::Max(0.0, ($NowUtc - $StartUtc).TotalHours)
-        Estimate          = $Estimate
-        CriticalPath      = $CriticalPath
-        Aggregate         = $Aggregate
-        CompositeSeconds  = $composite
-        UnmappedSeconds   = $unmappedSeconds
-        ApproxSeconds     = $approximate
-        WeeklyPct         = $WeeklyPct
-        WeeklyDelta       = $WeeklyPct - $BaselineWeeklyPct
+        StartUtc         = $StartUtc
+        NowUtc           = $NowUtc
+        ElapsedHours     = [math]::Max(0.0, ($NowUtc - $StartUtc).TotalHours)
+        Estimate         = $Estimate
+        CriticalPath     = $CriticalPath
+        Aggregate        = $Aggregate
+        CompositeSeconds = $composite
+        UnmappedSeconds  = $unmappedSeconds
+        ApproxSeconds    = $approximate
+        WeeklyPct        = $WeeklyPct
+        WeeklyDelta      = $WeeklyPct - $BaselineWeeklyPct
     }
 }
 

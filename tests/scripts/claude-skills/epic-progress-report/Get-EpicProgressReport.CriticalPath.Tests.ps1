@@ -360,11 +360,11 @@ Describe 'Invoke-EpicProgressReport critical-path wiring (issue #1153)' {
 
     Context 'scripts/dev-tools forwarder (AC-54)' {
         BeforeEach {
-            $savedExitCode = $global:LASTEXITCODE
+            $script:savedExitCode = $global:LASTEXITCODE
         }
 
         AfterEach {
-            $global:LASTEXITCODE = $savedExitCode
+            $global:LASTEXITCODE = $script:savedExitCode
         }
 
         It 'prints the five TL;DR lines and the Full report through the forwarder' {

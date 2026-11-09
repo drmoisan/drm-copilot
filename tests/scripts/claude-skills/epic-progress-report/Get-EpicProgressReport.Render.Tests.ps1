@@ -30,7 +30,7 @@ Describe 'Get-EpicProgressSummary, Get-EpicProgressTldrLine, and Get-EpicProgres
                 Pooled = [pscustomobject]@{ Median = [double]::NaN; StandardDeviation = [double]::NaN; Count = 0; Rate = @() }
                 Cap = 4; CapSource = 'built-in'; DependencySource = 'waves'; GraphMessage = ''; Tail = $Tail
                 FinishSeconds = $FinishSeconds; HeadlineSeconds = $HeadlineSeconds; Chain = $Chain; SerialSumSeconds = $SerialSumSeconds
-                Range = [pscustomobject]@{ FastSeconds = [double]::NaN; SlowSeconds = [double]::NaN; NoUpperBound = $false; StandardDeviation = [double]::NaN; SdSource = 'n/a'; Reason = 'fewer than 2 qualifying features and fewer than 3 intervals' }
+                Range  = [pscustomobject]@{ FastSeconds = [double]::NaN; SlowSeconds = [double]::NaN; NoUpperBound = $false; StandardDeviation = [double]::NaN; SdSource = 'n/a'; Reason = 'fewer than 2 qualifying features and fewer than 3 intervals' }
             }
         }
 
