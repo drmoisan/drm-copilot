@@ -149,6 +149,8 @@ Describe 'epic-progress-report SKILL.md structure and content' {
             'at least 5 tasks and 15 active minutes', 'rate + 2.05 x SD and rate - 2.05 x SD', 'at or below 0.5 tasks per hour'
             'longer than 3600 s', 'at least 600 s', '3600 / the execution default', 'nearest lower wave', 'max_parallel_features'
             'ties by ascending issue number', 'predicted `main-sync`', 'equal to the cap-1 schedule'
+            # Remediation cycle 1 (CR2): no average before the first interval.
+            'average is `n/a` while no interval exists'
         )
 
         foreach ($value in $values) {
@@ -220,7 +222,7 @@ Describe 'epic-progress-report SKILL.md structure and content' {
         $expected = @{
             'Known Behaviors and Measured Rates' = @('tick split divides a batch', 'Task totals drift', 'step total grows when a remediation cycle opens', 'uses the default durations', 'not recovered')
             'Notes'                              = @('rebuilt and reinstalled', '93%', '`.claude/skills/quota-throttling/SKILL.md`', 'read-only toward git and GitHub')
-            'State File'                         = @('`-StatePath` overrides it', 'never committed', 'per checkout', '`git clean -fdX` deletes it', 'not migrated', '"version": 3', 'version 4 or higher', 'progress-item-<n>.json', '"baselineDoneTasks"', '"pauses"', 'a version-2 document keeps')
+            'State File'                         = @('`-StatePath` overrides it', 'never committed', 'per checkout', '`git clean -fdX` deletes it', 'not migrated', '"version": 3', 'version 4 or higher', 'progress-item-<n>.json', '"baselineDoneTasks"', '"pauses"', 'a version-2 document keeps', 'is dropped when the state is written')
         }
 
         foreach ($heading in $expected.Keys) {

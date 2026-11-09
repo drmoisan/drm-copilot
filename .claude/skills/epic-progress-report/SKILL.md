@@ -301,7 +301,8 @@ Full report contents:
 - Aggregate velocity (E11): the average is (done tasks - `baselineDoneTasks`) over active hours. Intervals
   combine consecutive samples until at least 600 s have passed; a trailing remainder under 600 s is skipped,
   and an interval overlapping a pause span is dropped. Recent is the last interval; the interval SD (n-1) is
-  `n/a` below 3 intervals. Samples without a task count, kept from version 2, form no interval.
+  `n/a` below 3 intervals. Samples without a task count, kept from version 2, form no interval. The average
+  is `n/a` while no interval exists.
 - Check-ins: a check-in sample (Unix epoch seconds, done steps, done tasks) is added when there is no previous
   sample or the previous one is at least 90 seconds old. Epoch seconds are used because `ConvertFrom-Json`
   converts ISO date strings into local-time values.
@@ -367,8 +368,8 @@ pwsh -NoProfile -File .claude/skills/epic-progress-report/scripts/Get-EpicProgre
   count becomes the current done step count. Pass `-StartUtc` and `-BaselineDone` with `-ResetBaseline` when
   the resume instant is in the past.
 - The duration ledger and the tick anchors are kept (decision D10), so the medians survive a reset; the stored
-  pause spans are kept, and a span from the newest stored sample to the resume instant is appended (decision
-  E11), so the pause enters no velocity.
+  pause spans are kept except as the pruning rule under `## State File` states, and a span from the newest
+  stored sample to the resume instant is appended (decision E11), so the pause enters no velocity.
 - The weekly-quota baseline is kept, so the Full report's points since the epic started stay accurate. The
   scheduled prompts are not changed.
 - The first report after a reset shows `0 h 00 min` elapsed; the estimate still uses the retained medians.
@@ -431,7 +432,8 @@ Pairing affects only the check-in samples; the duration ledger and the estimate 
 - Blank text, unparseable text, or version 4 or higher is read as empty state; a missing field is absent.
 - The state is written when a check-in sample is added, the duration ledger or a tick anchor changes, a pause
   span is appended, or `-ResetBaseline` or `-PairSamples` is given. When an item's merge step is done, its
-  `items` entry is removed; its durations stay in the ledger.
+  `items` entry is removed; its durations stay in the ledger. A pause span that ends before the earliest
+  stored instant (the start, the oldest sample, or the oldest tick anchor) is dropped when the state is written.
 
 ## Known Behaviors and Measured Rates
 
@@ -482,8 +484,8 @@ Issue #1153 decisions (the rules are stated under Calculation Rules):
   excluded and listed. E8: the tail is a predicted main sync and the integration PR.
 - E9: the range at rate +/- 2.05 SD, unbounded at or below 0.5 tasks per hour. E10: the wave-parallel figure
   is retired. E11: pause spans above 3600 s and on reset are excluded; intervals combine to 600 s.
-- E12: state version 3 with a version-2 migration. E13: TL;DR cron `*/20 * * * *`, hourly `7 * * * *`.
-  E14: pure logic in the Velocity and Schedule files, reads in Gather, wiring in the entry. E15: this record.
+- E12: state version 3 with a version-2 migration. E13: TL;DR cron `*/20 * * * *`, hourly `7 * * * *`. E14:
+  pure logic in the Velocity, Schedule, and CriticalPath files, reads in Gather, wiring in the entry. E15: this record.
 
 ## Notes
 
