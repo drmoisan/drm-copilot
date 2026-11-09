@@ -139,6 +139,9 @@ function ConvertTo-EpicProgressFolderHint {
     <#
     .SYNOPSIS
         Return the basename of a feature-folder reference: the last path segment, with a docs/features/active/ or completed/ prefix ignored.
+    .DESCRIPTION
+        Unlike _epic_orchestrator_state_resolution.py, which strips only the four lifecycle prefixes and reads every string as a
+        folder hint, any path gives its last segment here and a digits-only string is an issue number (in the graph builder).
     .PARAMETER Value
         The feature_folder value or depends_on reference.
     #>
@@ -165,7 +168,10 @@ function Get-EpicProgressDependencyGraph {
         in either source, the waves fallback applies: each feature depends on every feature of
         the nearest lower kickoff wave, and Source is 'waves'. A self-loop, an unresolved
         reference, and a cycle each give a distinct Message, and the graph then falls back to
-        the waves; Message is empty for a valid graph.
+        the waves; Message is empty for a valid graph. Unlike _epic_orchestrator_state_resolution.py, a digits-only
+        string (after an optional '#') is an issue number and a folder hint is the last segment of any path, not only
+        of the four lifecycle prefixes; both affect only references the epic checkpoint validator rejects or
+        folders named only by digits (see ConvertTo-EpicProgressFolderHint).
     .PARAMETER Feature
         The kickoff features (Issue, Wave, Folder, Merged).
     .PARAMETER CheckpointRow
