@@ -243,7 +243,7 @@ This change supersedes the following parts of #1118 (`docs/features/active/2026-
 - [x] AC-55: Integration golden: the entry test renders the Full report from fixture checkpoints carrying `max_parallel_features` and `depends_on` and from a fixture `epic.md`, and matches a golden whose values are hand-derived in test comments.
 - [x] AC-56: Each test listed in research section 2 with an "Update" or "Replace" disposition is updated with an assertion of the new behavior; `prints no velocity, SD or range line in either mode` is replaced by a test asserting that the velocity and range lines are present, not deleted.
 - [x] AC-57: The PowerShell toolchain passes in a single pass (Invoke-Formatter, PSScriptAnalyzer, one `Invoke-PoshQCParallelTest` run), each new and changed script has line coverage of at least 85% read from `artifacts/pester/powershell-coverage.xml`, and no new Python file is added.
-- [ ] AC-58 (CI-dependent): CI on the pull request head completes with `success`, including the Linux and Windows Pester shards and the push-down contract tests.
+- [x] AC-58 (CI-dependent): CI on the pull request head completes with `success`, including the Linux and Windows Pester shards and the push-down contract tests.
 
 ## Definition of Done
 
