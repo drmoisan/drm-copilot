@@ -29,20 +29,20 @@
 
 ### Phase 0 — Baselines
 
-- [ ] [P0-T1] Capture the PowerShell static baseline, after reading the policy files above, for `.claude/lib/blast-radius/BlastRadiusScheduling.psm1`, `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1`, `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1`, and `.claude/lib/parallel-drift/ParallelDrift.psm1`.
+- [x] [P0-T1] Capture the PowerShell static baseline, after reading the policy files above, for `.claude/lib/blast-radius/BlastRadiusScheduling.psm1`, `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1`, `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1`, and `.claude/lib/parallel-drift/ParallelDrift.psm1`.
   - Steps: PoshQC format check in check-only mode and PSScriptAnalyzer with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
   - Acceptance: `<FEATURE>/evidence/baseline/powershell-static.<timestamp>.md` carries `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` and each step's finding count per file.
-- [ ] [P0-T2] Capture the Python static baseline (Black check mode, Ruff, Pyright) for `scripts/dev_tools/_blast_radius_scheduling.py`, `scripts/dev_tools/_parallel_drift_scheduling.py`, `scripts/dev_tools/parallel_drift_detection.py`, `scripts/dev_tools/_parallel_state_records.py`, `scripts/dev_tools/parallel_manifest_contract.py`, `scripts/dev_tools/validate_parallel_planner_state.py`, `scripts/dev_tools/validate_parallel_orchestrator_state.py`.
+- [x] [P0-T2] Capture the Python static baseline (Black check mode, Ruff, Pyright) for `scripts/dev_tools/_blast_radius_scheduling.py`, `scripts/dev_tools/_parallel_drift_scheduling.py`, `scripts/dev_tools/parallel_drift_detection.py`, `scripts/dev_tools/_parallel_state_records.py`, `scripts/dev_tools/parallel_manifest_contract.py`, `scripts/dev_tools/validate_parallel_planner_state.py`, `scripts/dev_tools/validate_parallel_orchestrator_state.py`.
   - Acceptance: `<FEATURE>/evidence/baseline/python-static.<timestamp>.md` carries the four fields and each step's finding count.
-- [ ] [P0-T3] Capture the TypeScript static baseline in `extensions/drm-copilot/` (Prettier check on `src/lib/validate/parallel-state-records.ts`, `src/lib/validate/parallel-planner-state-core.ts`, `src/lib/validate/parallel-orchestrator-state-core.ts`; `npm run lint`; `npm run typecheck`).
+- [x] [P0-T3] Capture the TypeScript static baseline in `extensions/drm-copilot/` (Prettier check on `src/lib/validate/parallel-state-records.ts`, `src/lib/validate/parallel-planner-state-core.ts`, `src/lib/validate/parallel-orchestrator-state-core.ts`; `npm run lint`; `npm run typecheck`).
   - Acceptance: `<FEATURE>/evidence/baseline/typescript-static.<timestamp>.md` carries the four fields and each step's finding count.
-- [ ] [P0-T4] Run the Pester `Phase 0 baseline`: one `Invoke-PoshQCParallelTest` run importing the branch `scripts/powershell/PoshQC/PoshQC.psd1`.
+- [x] [P0-T4] Run the Pester `Phase 0 baseline`: one `Invoke-PoshQCParallelTest` run importing the branch `scripts/powershell/PoshQC/PoshQC.psd1`.
   - Acceptance: `<FEATURE>/evidence/baseline/pester-gate.<timestamp>.md` records `EXIT_CODE:` equal to the returned `ExitCode`; pass and fail counts from `artifacts/pester/pester-junit.xml`, or from the shard files under `artifacts/pester/parallel/` when the run is not green; repo-wide line coverage; and per-file line coverage from `artifacts/pester/powershell-coverage.xml` for the four P0-T1 files. Every failing test is classified with the Execution Terms.
-- [ ] [P0-T5] Run the pytest `Phase 0 baseline`: one `pytest -n auto` run over `tests/` with `--cov-branch`, `--cov-report=term-missing`, `--cov-report=json:SCRATCH/issue-1164-cov-baseline.json`, and a bare `--cov` as the last argument.
+- [x] [P0-T5] Run the pytest `Phase 0 baseline`: one `pytest -n auto` run over `tests/` with `--cov-branch`, `--cov-report=term-missing`, `--cov-report=json:SCRATCH/issue-1164-cov-baseline.json`, and a bare `--cov` as the last argument.
   - Acceptance: `<FEATURE>/evidence/baseline/pytest-gate.<timestamp>.md` records pass and fail counts, repo-wide line and branch coverage, and per-file line and branch coverage from the JSON report for the seven P0-T2 files.
-- [ ] [P0-T6] Run the Jest `Phase 0 baseline` in `extensions/drm-copilot/`: one `node run-jest.cjs --coverage` run.
+- [x] [P0-T6] Run the Jest `Phase 0 baseline` in `extensions/drm-copilot/`: one `node run-jest.cjs --coverage` run.
   - Acceptance: `<FEATURE>/evidence/baseline/jest-gate.<timestamp>.md` records pass and fail counts and per-file line and branch coverage of the three P0-T3 files from the coverage report the run writes.
-- [ ] [P0-T7] Record the bash baseline for `.claude/lib/bash/parallel-manifest-validate.sh` from the `shell-coverage / Shell Coverage (Bats + kcov)` job of the newest `ci.yml` run on `main` whose `CI full run` job succeeded.
+- [x] [P0-T7] Record the bash baseline for `.claude/lib/bash/parallel-manifest-validate.sh` from the `shell-coverage / Shell Coverage (Bats + kcov)` job of the newest `ci.yml` run on `main` whose `CI full run` job succeeded.
   - Acceptance: `<FEATURE>/evidence/baseline/shell-ci.<timestamp>.md` records the run id, the shell-qc check result, the bats pass and fail counts, and the kcov line coverage of that file from the `shell-coverage` artifact.
 
 ### Phase 1 — Configuration, readers, and recalibration
