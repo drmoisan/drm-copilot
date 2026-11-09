@@ -179,6 +179,55 @@ function Get-EpicProgressResetPauseSpan {
     return [pscustomobject]@{ startUnixSeconds = [long] $newest; endUnixSeconds = $ResumeUnixSeconds }
 }
 
+function Select-EpicProgressRetainedPauseSpan {
+    <#
+    .SYNOPSIS
+        Return, in order, the pause spans that end at or after the earliest stored instant; every span when no instant is stored.
+    .DESCRIPTION
+        The cutoff is the minimum of the start instant, the oldest sample 'ts', and the oldest
+        plan tick anchor (LastTickUnixSeconds). No later calculation reads time before it: the
+        aggregate elapsed time starts at the start instant, every interval starts at a sample,
+        and every tick batch starts at an anchor. A span whose endUnixSeconds is before the
+        cutoff is dropped; a span ending at the cutoff or later, or without an end, is kept.
+    .PARAMETER PauseSpan
+        The pause spans (startUnixSeconds, endUnixSeconds); empty for none.
+    .PARAMETER StartUnixSeconds
+        The stored start instant; null when none is stored.
+    .PARAMETER Sample
+        The stored check-in samples (ts, ...); a sample without 'ts' is ignored.
+    .PARAMETER Item
+        The per-item state: a hashtable from issue to a record whose Plans hashtable maps each
+        plan file to its Checked list and LastTickUnixSeconds.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [AllowEmptyCollection()] [object[]] $PauseSpan = @(),
+        [AllowNull()] [object] $StartUnixSeconds = $null,
+        [AllowEmptyCollection()] [object[]] $Sample = @(),
+        [hashtable] $Item = @{}
+    )
+
+    $instants = [System.Collections.Generic.List[long]]::new()
+    if ($null -ne $StartUnixSeconds) { $instants.Add([long] $StartUnixSeconds) }
+    foreach ($entry in $Sample) {
+        if ($null -ne $entry -and $entry.PSObject.Properties.Name -contains 'ts' -and $null -ne $entry.ts) { $instants.Add([long] $entry.ts) }
+    }
+    foreach ($issue in @($Item.Keys)) {
+        $plans = $Item[$issue].Plans
+        if ($null -eq $plans) { continue }
+        foreach ($file in @($plans.Keys)) {
+            $tick = $plans[$file].LastTickUnixSeconds
+            if ($null -ne $tick) { $instants.Add([long] $tick) }
+        }
+    }
+    $cutoff = [long]::MinValue
+    if ($instants.Count -gt 0) { $cutoff = [long] ($instants | Measure-Object -Minimum).Minimum }
+    foreach ($span in @($PauseSpan | Where-Object { $null -ne $_ })) {
+        if ($null -eq $span.endUnixSeconds -or [long] $span.endUnixSeconds -ge $cutoff) { $span }
+    }
+}
+
 function Get-EpicProgressExcludedSecond {
     <#
     .SYNOPSIS

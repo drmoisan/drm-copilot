@@ -60,6 +60,17 @@ Describe 'ConvertTo-EpicProgressStateJson version 3 (AC-41)' {
         $written.samples[0].features.'77' | Should -Be 3
     }
 
+    It 'drops a pause span ending one second before the earliest stored instant and writes one ending at it (CR4)' {
+        # Start 1000, oldest sample 1200, anchor 1500: the cutoff is the start, 1000.
+        $item = @{ '12' = [pscustomobject]@{ Plans = @{ 'plan.md' = [pscustomobject]@{ Checked = [string[]] @('P1-T1'); LastTickUnixSeconds = 1500 } }; BlockedSinceUnixSeconds = $null } }
+        $pauses = @([pscustomobject]@{ startUnixSeconds = 900; endUnixSeconds = 999 }; [pscustomobject]@{ startUnixSeconds = 950; endUnixSeconds = 1000 })
+
+        $raw = ConvertFrom-Json -InputObject (ConvertTo-EpicProgressStateJson -StartUnixSeconds 1000 -BaselineDone 0 -BaselineWeeklyPct 0 -Sample @([pscustomobject]@{ ts = 1200; done = 1 }) -Item $item -PauseSpan $pauses)
+
+        @($raw.pauses).Count | Should -Be 1
+        $raw.pauses[0].endUnixSeconds | Should -Be 1000
+    }
+
     It 'writes no tasks or features on a sample that carries none' {
         $json = ConvertTo-EpicProgressStateJson -StartUnixSeconds 1 -BaselineDone 0 -BaselineWeeklyPct 0 -Sample @([pscustomobject]@{ ts = 5; done = 2 })
         $raw = ConvertFrom-Json -InputObject $json

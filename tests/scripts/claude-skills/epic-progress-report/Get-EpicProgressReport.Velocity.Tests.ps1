@@ -296,6 +296,77 @@ Describe 'Get-EpicProgressPauseSpan and Get-EpicProgressResetPauseSpan (AC-18, A
     }
 }
 
+Describe 'Select-EpicProgressRetainedPauseSpan (CR4)' {
+    BeforeAll {
+        function Get-TestSpan {
+            # One pause span ending at End seconds; it starts 50 s earlier unless Start is given.
+            param([long] $End, [long] $Start = ($End - 50))
+            [pscustomobject]@{ startUnixSeconds = $Start; endUnixSeconds = $End }
+        }
+
+        function Get-TestAnchorItem {
+            # One item whose single plan carries a tick anchor at Tick seconds.
+            param([long] $Tick)
+            @{ '101' = [pscustomobject]@{ Plans = @{ 'docs/p1/plan.md' = [pscustomobject]@{ Checked = @('P0-T1'); LastTickUnixSeconds = $Tick } }; BlockedSinceUnixSeconds = $null } }
+        }
+
+        function ConvertTo-TestEndText {
+            # The kept spans' end instants joined by ',' in returned order.
+            param([object[]] $Span)
+            (@($Span | ForEach-Object { $_.endUnixSeconds }) -join ',')
+        }
+    }
+
+    It 'keeps spans ending at or after a stored start of 1000 and drops one ending at 999' {
+        $spans = @(Get-TestSpan -End 999; Get-TestSpan -End 1000; Get-TestSpan -End 1001)
+
+        $kept = @(Select-EpicProgressRetainedPauseSpan -PauseSpan $spans -StartUnixSeconds 1000)
+
+        ConvertTo-TestEndText -Span $kept | Should -Be '1000,1001'
+    }
+
+    It 'uses a tick anchor at 500 below the start of 1000 as the cutoff' {
+        $spans = @(Get-TestSpan -End 499; Get-TestSpan -End 600)
+
+        $kept = @(Select-EpicProgressRetainedPauseSpan -PauseSpan $spans -StartUnixSeconds 1000 -Item (Get-TestAnchorItem -Tick 500))
+
+        ConvertTo-TestEndText -Span $kept | Should -Be '600'
+    }
+
+    It 'uses a sample at 300 below the anchor and the start as the cutoff' {
+        $spans = @(Get-TestSpan -End 299; Get-TestSpan -End 400)
+        $samples = @([pscustomobject]@{ ts = 300; done = 0; tasks = 0 }; [pscustomobject]@{ ts = 2000; done = 1; tasks = 1 })
+
+        $kept = @(Select-EpicProgressRetainedPauseSpan -PauseSpan $spans -StartUnixSeconds 1000 -Sample $samples -Item (Get-TestAnchorItem -Tick 500))
+
+        ConvertTo-TestEndText -Span $kept | Should -Be '400'
+    }
+
+    It 'keeps a span ending after the start and before the anchor when the start is the minimum' {
+        $spans = @(Get-TestSpan -Start 2000 -End 3000)
+
+        $kept = @(Select-EpicProgressRetainedPauseSpan -PauseSpan $spans -StartUnixSeconds 1000 -Item (Get-TestAnchorItem -Tick 5000))
+
+        ConvertTo-TestEndText -Span $kept | Should -Be '3000'
+    }
+
+    It 'keeps every span when no start, sample, or anchor is stored' {
+        $spans = @(Get-TestSpan -End 10; Get-TestSpan -End 20)
+
+        $kept = @(Select-EpicProgressRetainedPauseSpan -PauseSpan $spans -Sample @([pscustomobject]@{ done = 1 }))
+
+        ConvertTo-TestEndText -Span $kept | Should -Be '10,20'
+    }
+
+    It 'preserves the order of the kept spans' {
+        $spans = @(Get-TestSpan -End 3000; Get-TestSpan -End 500; Get-TestSpan -End 1500; Get-TestSpan -End 2000)
+
+        $kept = @(Select-EpicProgressRetainedPauseSpan -PauseSpan $spans -StartUnixSeconds 1000)
+
+        ConvertTo-TestEndText -Span $kept | Should -Be '3000,1500,2000'
+    }
+}
+
 Describe 'Get-EpicProgressExcludedSecond (E11)' {
     It 'counts a pause span alone inside the interval' {
         # Pause 100-300 inside 0-1000: 200 s.

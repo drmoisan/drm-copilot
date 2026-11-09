@@ -271,7 +271,9 @@ function ConvertTo-EpicProgressStateJson {
         type, seconds, source, approx, recorded), items (each issue with its plan tick anchors
         and blockedSinceUnixSeconds), and pauses (startUnixSeconds, endUnixSeconds) (issue
         #1153, decision E12). Epoch seconds are used because ConvertFrom-Json converts ISO date
-        strings into local-time DateTime values.
+        strings into local-time DateTime values. A pause span that ends before the earliest
+        stored instant (StartUnixSeconds, the oldest sample, or the oldest tick anchor in Item)
+        is not written (Select-EpicProgressRetainedPauseSpan).
     .PARAMETER StartUnixSeconds
         The start instant in Unix epoch seconds.
     .PARAMETER BaselineDone
@@ -320,7 +322,8 @@ function ConvertTo-EpicProgressStateJson {
         }
         $written.Add($record)
     }
-    $pauses = [object[]] @($PauseSpan | Where-Object { $null -ne $_ } | ForEach-Object { [ordered]@{ startUnixSeconds = [long] $_.startUnixSeconds; endUnixSeconds = [long] $_.endUnixSeconds } })
+    $retained = @(Select-EpicProgressRetainedPauseSpan -PauseSpan $PauseSpan -StartUnixSeconds $StartUnixSeconds -Sample $Sample -Item $Item)
+    $pauses = [object[]] @($retained | Where-Object { $null -ne $_ } | ForEach-Object { [ordered]@{ startUnixSeconds = [long] $_.startUnixSeconds; endUnixSeconds = [long] $_.endUnixSeconds } })
     $tasksBaseline = $null
     if ($null -ne $BaselineDoneTasks) { $tasksBaseline = [int] $BaselineDoneTasks }
     $durations = [ordered]@{}

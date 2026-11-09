@@ -300,6 +300,24 @@ Describe 'Invoke-EpicProgressReport critical-path wiring (issue #1153)' {
 
             Get-TestExecutionSecond | Should -Be @(2000)
         }
+
+        It 'drops a stored span ending before the start, the samples, and the anchor and prints the same velocity line (CR4)' {
+            # Start 09:00 (1767603600); the samples at now - 2400 and now - 1200 form one 1200 s
+            # interval, the anchor is at now - 2400, and the span 1767590000-1767600000 ends before all of them.
+            $fixture.Plans['docs/p1/plan.md'] = "### Phase 0 - Setup`n- [x] [P0-T1] a.`n- [ ] [P0-T2] b."
+            $samples = '{"ts":' + ($script:nowUnix - 2400) + ',"done":12,"tasks":1,"features":{}},{"ts":' + ($script:nowUnix - 1200) + ',"done":12,"tasks":1,"features":{}}'
+            $items = Get-TestAnchor -Checked '"P0-T1"' -LastTick ($script:nowUnix - 2400)
+            $fixture.Files[$script:statePath] = Get-TestStateText -Samples $samples -Items $items -Pauses '[{"startUnixSeconds":1767590000,"endUnixSeconds":1767600000}]'
+            $withSpan = Get-TestRun -Extra @{ Mode = 'TLDR' }
+            $writtenWithSpan = Get-TestWritten
+            $fixture.Files[$script:statePath] = Get-TestStateText -Samples $samples -Items $items
+            $withoutSpan = Get-TestRun -Extra @{ Mode = 'TLDR' }
+
+            @($writtenWithSpan.pauses).Count | Should -Be 0
+            $withSpan[3] | Should -BeLike '**Velocity:** *'
+            $withSpan[3] | Should -Not -BeLike '*aggregate n/a tasks / hr average*' -Because 'the stored samples form an interval, so the compared average is finite'
+            $withSpan[3] | Should -Be $withoutSpan[3]
+        }
     }
 
     It 'reads the per-feature rate from the ledger merged this run (E3)' {
