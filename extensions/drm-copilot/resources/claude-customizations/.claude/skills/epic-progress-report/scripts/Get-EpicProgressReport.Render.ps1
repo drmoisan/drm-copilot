@@ -5,10 +5,14 @@
 .DESCRIPTION
     Pure functions: Get-EpicProgressSummary collects every value the report prints, and
     Get-EpicProgressTldrLine and Get-EpicProgressFullLine compose the TL;DR and Full lines from
-    that summary in the step model of issue #1118: progress in steps, the per-type estimate,
-    the wave-parallel figure, the in-progress steps against their medians, blocked steps, and
-    unmapped and composite stage time. No velocity, standard-deviation, straight-line, or range
-    line is printed. None reads a file, starts a process, calls the network, or reads the clock.
+    that summary: progress in tasks and steps, the critical-path headline with its chain and
+    cap, the sequential and aggregate velocity, the range and the serial sum (issue #1153,
+    decision E1), the in-progress steps against their medians, the per-feature table, the
+    critical-path section, the per-type table, blocked steps, and unmapped and composite stage
+    time. Get-EpicProgressPushText derives the push-notification text from the first TL;DR
+    line. Every figure passes through Format-EpicProgressHour or Format-EpicProgressNumber, so
+    a non-finite value prints n/a. None reads a file, starts a process, calls the network, or
+    reads the clock.
     Get-EpicProgressReport.Logic.ps1 dot-sources this file, so a consumer dot-sources the Logic
     hub, not this file.
 #>
@@ -18,14 +22,17 @@ function Get-EpicProgressSummary {
     .SYNOPSIS
         Return one record with every value the progress report prints.
     .PARAMETER Feature
-        The feature records (Issue, Wave, Band, Total, Done, State, Phase, Pr, BlockedReason);
-        Total and Done count steps, and State is Completed, Running, Blocked, or Pending.
+        The feature records (Issue, Wave, Band, Total, Done, State, Phase, Pr, BlockedReason,
+        TasksDone, TasksTotal); Total and Done count steps, TasksDone and TasksTotal count plan
+        tasks, and State is Completed, Running, Blocked, or Pending.
     .PARAMETER EpicStep
         The epic-level step records (main-sync and integration-pr); empty in item mode.
     .PARAMETER Estimate
         The record from Get-EpicProgressTypeEstimate over every step.
-    .PARAMETER WaveParallelSeconds
-        The wave-parallel remaining seconds from Get-EpicProgressWaveParallelSecond.
+    .PARAMETER CriticalPath
+        The record from Get-EpicProgressCriticalPathReport.
+    .PARAMETER Aggregate
+        The record from Get-EpicProgressAggregateVelocity; null for none.
     .PARAMETER Unmapped
         The unmapped and composite stage-time records (Kind, Seconds, Approx).
     .PARAMETER Subject
@@ -49,7 +56,8 @@ function Get-EpicProgressSummary {
         [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $Feature,
         [AllowEmptyCollection()] [object[]] $EpicStep = @(),
         [Parameter(Mandatory = $true)] [pscustomobject] $Estimate,
-        [Parameter(Mandatory = $true)] [double] $WaveParallelSeconds,
+        [Parameter(Mandatory = $true)] [pscustomobject] $CriticalPath,
+        [AllowNull()] [object] $Aggregate = $null,
         [AllowEmptyCollection()] [object[]] $Unmapped = @(),
         [ValidateSet('Epic', 'Item')] [string] $Subject = 'Epic',
         [Parameter(Mandatory = $true)] [datetime] $StartUtc,
@@ -62,10 +70,15 @@ function Get-EpicProgressSummary {
 
     $total = $EpicStep.Count
     $done = @($EpicStep | Where-Object { $_.Status -eq 'done' }).Count
+    $tasksTotal = 0
+    $tasksDone = 0
     foreach ($record in $Feature) {
         $total += [int] $record.Total
         $done += [int] $record.Done
+        $tasksTotal += [int] $record.TasksTotal
+        $tasksDone += [int] $record.TasksDone
     }
+    if ($null -eq $Aggregate) { $Aggregate = [pscustomobject]@{ Average = [double]::NaN; Recent = [double]::NaN; StandardDeviation = [double]::NaN; Count = 0 } }
     $composite = 0.0
     $unmappedSeconds = 0.0
     $approximate = 0.0
@@ -85,12 +98,15 @@ function Get-EpicProgressSummary {
         Pending           = [object[]] @($Feature | Where-Object { $_.State -eq 'Pending' })
         Total             = $total
         Done              = $done
-        Percent           = 100.0 * $done / [math]::Max(1, $total)
+        TasksTotal        = $tasksTotal
+        TasksDone         = $tasksDone
+        Percent          = 100.0 * $done / [math]::Max(1, $total)
         StartUtc          = $StartUtc
         NowUtc            = $NowUtc
         ElapsedHours      = [math]::Max(0.0, ($NowUtc - $StartUtc).TotalHours)
         Estimate          = $Estimate
-        WaveParallelHours = $WaveParallelSeconds / 3600.0
+        CriticalPath      = $CriticalPath
+        Aggregate         = $Aggregate
         CompositeSeconds  = $composite
         UnmappedSeconds   = $unmappedSeconds
         ApproxSeconds     = $approximate
@@ -99,23 +115,20 @@ function Get-EpicProgressSummary {
     }
 }
 
-function Get-EpicProgressTldrLine {
+function Get-EpicProgressTldrHead {
     <#
     .SYNOPSIS
-        Return the four TL;DR lines (TL;DR, Elapsed, Now, estimated time remaining).
+        Return the parts of the first TL;DR line: Head (progress), DoneSentence, and Running (the running and blocked sentences).
     .DESCRIPTION
         In item mode (Subject 'Item') the done sentence is about the item ('#<i> is done.' or
         '#<i> is not done yet.') and no 'No feature is running.' sentence is printed. An epic
         with one feature says 'The only feature is done.' or 'The only feature is not done
-        yet.'; an epic with more features counts them. A blocked count of one is singular.
-        On the Now line an in-progress step with a recorded start prints its elapsed time
-        against its median; a step without a recorded start (StartRecorded false) prints
-        '(start not recorded; median <m>)' instead of an elapsed figure.
+        yet.'; an epic with more features counts them.
     .PARAMETER Summary
         The record from Get-EpicProgressSummary.
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([pscustomobject])]
     param([Parameter(Mandatory = $true)] [pscustomobject] $Summary)
 
     $featureCount = $Summary.Feature.Count
@@ -140,13 +153,90 @@ function Get-EpicProgressTldrLine {
         $doneSentence = "None of the $featureCount features is done yet."
         if ($isDone) { $doneSentence = "$($Summary.Completed.Count) of $featureCount features are done." }
     }
-    $sentences.Insert(0, $doneSentence)
-    $blockedText = "$($Summary.Estimate.BlockedCount) blocked steps excluded"
-    if ($Summary.Estimate.BlockedCount -eq 1) { $blockedText = '1 blocked step excluded' }
     $percent = Format-EpicProgressNumber -Value $Summary.Percent -Digits 1
+    return [pscustomobject]@{
+        Head         = "**TL;DR:** $($Summary.Subject) #$($Summary.EpicIssue) is at $($Summary.TasksDone) of $($Summary.TasksTotal) tasks, $($Summary.Done) of $($Summary.Total) steps ($percent%)."
+        DoneSentence = $doneSentence
+        Running      = ($sentences -join ' ')
+    }
+}
+
+function Get-EpicProgressSequentialText {
+    <#
+    .SYNOPSIS
+        Return the sequential-rate text 'v tasks / hr per feature (source, median of n, SD sd)' of a critical-path report.
+    .DESCRIPTION
+        One feature prints its own rate and source; otherwise the pooled median prints with
+        source 'pooled' when a feature qualifies, else the default rate with source 'default'.
+    .PARAMETER CriticalPath
+        The record from Get-EpicProgressCriticalPathReport.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [pscustomobject] $CriticalPath)
+
+    $pooled = $CriticalPath.Pooled
+    $rate = [double] $CriticalPath.DefaultRate
+    $source = 'default'
+    $rates = @($pooled.Rate)
+    if ($rates.Count -eq 1) {
+        $rate = [double] $rates[0].TasksPerHour
+        $source = [string] $rates[0].Source
+    } elseif ($pooled.Count -gt 0) {
+        $rate = [double] $pooled.Median
+        $source = 'pooled'
+    }
+    return "$(Format-EpicProgressNumber -Value $rate -Digits 1) tasks / hr per feature ($source, median of $($pooled.Count), SD $(Format-EpicProgressNumber -Value ([double] $pooled.StandardDeviation) -Digits 1))"
+}
+
+function Get-EpicProgressRangeText {
+    <#
+    .SYNOPSIS
+        Return the range text 'fast to slow (velocity +/- 2.05 SD, source)', 'fast to no upper bound (...)', or 'n/a (reason)'.
+    .PARAMETER Range
+        The record from Get-EpicProgressScheduleRange.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [pscustomobject] $Range)
+
+    if ($Range.SdSource -eq 'n/a') { return "n/a ($($Range.Reason))" }
+    $slow = Format-EpicProgressHour -Hours ([double] $Range.SlowSeconds / 3600.0)
+    if ($Range.NoUpperBound) { $slow = 'no upper bound' }
+    return "$(Format-EpicProgressHour -Hours ([double] $Range.FastSeconds / 3600.0)) to $slow (velocity +/- 2.05 SD, $($Range.SdSource))"
+}
+
+function Get-EpicProgressTldrLine {
+    <#
+    .SYNOPSIS
+        Return the five TL;DR lines (TL;DR, Elapsed, Now, Velocity, estimated time remaining; decision E1).
+    .DESCRIPTION
+        Line 1 states tasks and steps with the step percentage (decision D8) and the done and
+        running sentences of Get-EpicProgressTldrHead. Line 2 states the elapsed time, the
+        critical-path headline with its chain and cap, the blocked exclusion, and the weekly
+        quota last; item mode prints the chain with no cap text. On the Now line an in-progress
+        step with a recorded start prints its elapsed time against its median; a step without a
+        recorded start prints '(start not recorded; median <m>)'. Line 4 prints the sequential
+        and aggregate velocity, and line 5 the range and the serial sum.
+    .PARAMETER Summary
+        The record from Get-EpicProgressSummary.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param([Parameter(Mandatory = $true)] [pscustomobject] $Summary)
+
+    $head = Get-EpicProgressTldrHead -Summary $Summary
+    $path = $Summary.CriticalPath
+    $parts = [System.Collections.Generic.List[string]]::new()
+    if ($path.Chain) { $parts.Add([string] $path.Chain) }
+    if ($Summary.Subject -ne 'Item') { $parts.Add("cap $($path.Cap)") }
+    $inner = $parts -join ', '
+    $excluded = @($path.Excluded)
+    if ($excluded.Count -gt 0) {
+        $exclusion = "excludes $($excluded.Count) blocked: $((@($excluded | ForEach-Object { "#$($_.Issue)" })) -join ', ')"
+        $inner = (@(@($inner, $exclusion) | Where-Object { $_ })) -join '; '
+    }
     $estimate = $Summary.Estimate
-    $hoursLeft = Format-EpicProgressNumber -Value ($estimate.TotalSeconds / 3600.0) -Digits 1
-    $weekly = Get-EpicProgressWeeklyText -Value $Summary.WeeklyPct
     $now = 'no step is in progress'
     if ($estimate.InProgress.Count -gt 0) {
         $now = (@($estimate.InProgress | ForEach-Object {
@@ -161,12 +251,87 @@ function Get-EpicProgressTldrLine {
                 }) -join ', ')
     }
 
+    $aggregate = $Summary.Aggregate
+    $aggregateText = "aggregate $(Format-EpicProgressNumber -Value ([double] $aggregate.Average) -Digits 1) tasks / hr average, $(Format-EpicProgressNumber -Value ([double] $aggregate.Recent) -Digits 1) recent, SD $(Format-EpicProgressNumber -Value ([double] $aggregate.StandardDeviation) -Digits 1) over $($aggregate.Count) intervals (aggregate, informational)"
+    $headline = Format-EpicProgressHour -Hours ([double] $path.HeadlineSeconds / 3600.0)
     return [string[]] @(
-        "**TL;DR:** $($Summary.Subject) #$($Summary.EpicIssue) is at $($Summary.Done) of $($Summary.Total) steps ($percent%). $($sentences -join ' ')"
-        "**Elapsed:** $(Format-EpicProgressHour -Hours $Summary.ElapsedHours), with about $hoursLeft hours left on the per-type estimate ($blockedText). **Weekly** quota is at $weekly."
+        (@($head.Head, $head.DoneSentence, $head.Running) | Where-Object { $_ }) -join ' '
+        "**Elapsed:** $(Format-EpicProgressHour -Hours $Summary.ElapsedHours); critical path about $headline left ($inner). **Weekly** quota is at $(Get-EpicProgressWeeklyText -Value $Summary.WeeklyPct)."
         "**Now:** $now. $($estimate.DefaultCount) of $($estimate.Type.Count) types use defaults."
-        "**Estimated time remaining:** $(Format-EpicProgressHour -Hours ($estimate.TotalSeconds / 3600.0)) by type (sum); $(Format-EpicProgressHour -Hours $Summary.WaveParallelHours) wave-parallel."
+        "**Velocity:** sequential $(Get-EpicProgressSequentialText -CriticalPath $path); $aggregateText."
+        "**Estimated time remaining:** range $(Get-EpicProgressRangeText -Range $path.Range); serial sum $(Format-EpicProgressHour -Hours ([double] $path.SerialSumSeconds / 3600.0)) (upper bound, no parallelism)."
     )
+}
+
+function Get-EpicProgressPushText {
+    <#
+    .SYNOPSIS
+        Return the push-notification text: the first TL;DR line with every '**' removed, without the running sentence when it is 200 characters or longer.
+    .PARAMETER Summary
+        The record from Get-EpicProgressSummary.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [pscustomobject] $Summary)
+
+    $head = Get-EpicProgressTldrHead -Summary $Summary
+    $text = ((@($head.Head, $head.DoneSentence, $head.Running) | Where-Object { $_ }) -join ' ').Replace('**', '')
+    if ($text.Length -lt 200) { return $text }
+    return ("$($head.Head) $($head.DoneSentence)").Replace('**', '')
+}
+
+function Get-EpicProgressCriticalPathLine {
+    <#
+    .SYNOPSIS
+        Return the Full-mode per-feature table and critical-path section lines (decision E1).
+    .DESCRIPTION
+        The table has one row per feature: issue, state, tasks done of total, rate, rate
+        source, remaining time, and the scheduled start and finish from now; an excluded
+        (blocked or blocked-dependent) feature prints 'excluded' for both. The section names
+        the chain, the headline, the feature finish, the tail steps, the dependency source,
+        the cap and its source (item mode: none), the graph message when one exists, the
+        serial sum, the range with its SD source, and the excluded features with their
+        remaining time.
+    .PARAMETER Summary
+        The record from Get-EpicProgressSummary.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param([Parameter(Mandatory = $true)] [pscustomobject] $Summary)
+
+    $path = $Summary.CriticalPath
+    $hourText = { param([double] $Seconds) Format-EpicProgressHour -Hours ($Seconds / 3600.0) }
+    $lines = [System.Collections.Generic.List[string]]::new()
+    $lines.Add('| Feature | State | Tasks | Rate | Source | Remaining | Start | Finish |')
+    $lines.Add('|---|---|---|---|---|---|---|---|')
+    foreach ($row in @($path.Feature)) {
+        $startText = & $hourText $row.StartSeconds
+        $finishText = & $hourText $row.FinishSeconds
+        if ($row.Excluded) {
+            $startText = 'excluded'
+            $finishText = 'excluded'
+        }
+        $lines.Add("| #$($row.Issue) | $($row.State) | $($row.TasksDone) of $($row.TasksTotal) | $(Format-EpicProgressNumber -Value ([double] $row.Rate) -Digits 1) tasks / hr | $($row.RateSource) | $(& $hourText $row.RemainingSeconds) | $startText | $finishText |")
+    }
+    $lines.Add('')
+    $headline = & $hourText $path.HeadlineSeconds
+    if ($Summary.Subject -eq 'Item') {
+        $lines.Add("**Critical path:** $($path.Chain). Headline $($headline): the item finishes in $(& $hourText $path.FinishSeconds); no dependency, cap, or tail.")
+    } else {
+        $tailSteps = @($path.Tail.Step | ForEach-Object { "$($_.Type) $(& $hourText $_.Seconds)" })
+        $tailText = & $hourText $path.Tail.TailSeconds
+        if ($tailSteps.Count -gt 0) { $tailText = "$tailText ($($tailSteps -join ', '))" }
+        if ($path.Tail.PredictedSync) { $tailText = "$tailText, main-sync predicted" }
+        $lines.Add("**Critical path:** $($path.Chain). Headline $($headline): features finish in $(& $hourText $path.FinishSeconds), then the tail of $tailText.")
+        $lines.Add("**Schedule inputs:** dependency source $($path.DependencySource); cap $($path.Cap) ($($path.CapSource)).")
+    }
+    if ($path.GraphMessage) { $lines.Add("**Dependency graph:** $($path.GraphMessage).") }
+    $lines.Add("**Serial sum:** $(& $hourText $path.SerialSumSeconds) (upper bound, no parallelism). **Range:** $(Get-EpicProgressRangeText -Range $path.Range).")
+    $excluded = @($path.Excluded)
+    if ($excluded.Count -gt 0) {
+        $lines.Add("**Excluded (blocked):** $((@($excluded | ForEach-Object { "#$($_.Issue) ($(& $hourText $_.RemainingSeconds))" })) -join ', ').")
+    }
+    return $lines.ToArray()
 }
 
 function Get-EpicProgressFullLine {
@@ -176,6 +341,7 @@ function Get-EpicProgressFullLine {
     .DESCRIPTION
         The status heading, the Elapsed and Progress line in steps, the State table with a
         Blocked row, the Wave table with an Epic row for epic-level steps and its Total row,
+        the per-feature table and critical-path section (Get-EpicProgressCriticalPathLine),
         the per-type table with its Total row, one line per type that uses a default duration,
         the blocked-work line when a step is blocked, the unmapped and composite stage-time
         line, and the weekly-quota line, with invariant-culture times. A median that includes
@@ -243,6 +409,8 @@ function Get-EpicProgressFullLine {
         $lines.Add("| Epic | 0 | $($Summary.EpicStep.Count) | $(@($Summary.EpicStep | Where-Object { $_.Status -eq 'done' }).Count) |")
     }
     $lines.Add("| **Total** | **$($Summary.Feature.Count)** | **$($Summary.Total)** | **$($Summary.Done)** |")
+    $lines.Add('')
+    $lines.AddRange([string[]] @(Get-EpicProgressCriticalPathLine -Summary $Summary))
     $lines.Add('')
     $lines.Add('| Type | Done | In progress | Remaining | Blocked | Median | Samples | Subtotal |')
     $lines.Add('|---|---|---|---|---|---|---|---|')
