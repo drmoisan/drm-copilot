@@ -62,6 +62,7 @@ __all__ = [
     "STRICT_CONFLICT_TOLERANCE",
     "ConflictEdge",
     "ConflictTolerance",
+    "ItemAccess",
     "PairDecision",
     "SchedulingItem",
     "SchedulingResult",
@@ -168,12 +169,36 @@ STRICT_CONFLICT_TOLERANCE = ConflictTolerance(
 
 
 @dataclass(frozen=True)
+class ItemAccess:
+    """An item's optional access declarations (issue #1164, spec section B5).
+
+    Both lists name members of the item's ``blast_radius.paths``; neither removes
+    a path from the radius. They only lower the weight of an overlapping path
+    pair: a path one side only reads costs 0, and a path both sides declare
+    separable costs the configured ``separable`` weight.
+
+    Attributes:
+        read_paths (tuple[str, ...]): Radius paths the item only reads.
+        separable_paths (tuple[str, ...]): Radius paths whose edits are
+            section-separable.
+    """
+
+    read_paths: tuple[str, ...] = ()
+    separable_paths: tuple[str, ...] = ()
+
+
+# The access of an item that declares neither list: every weight is unchanged.
+NO_ACCESS = ItemAccess()
+
+
+@dataclass(frozen=True)
 class SchedulingItem:
-    """One work item: its ``issue_num`` key, declared radius, and optional band."""
+    """One work item: its ``issue_num`` key, declared radius, optional band, and access."""
 
     key: int
     radius: BlastRadius
     band: str | None = None
+    access: ItemAccess = NO_ACCESS
 
 
 @dataclass(frozen=True)
@@ -292,6 +317,9 @@ def pair_cost(
     radius_b: BlastRadius,
     config: Mapping[str, object],
     tolerance: ConflictTolerance,
+    *,
+    access_a: ItemAccess = NO_ACCESS,
+    access_b: ItemAccess = NO_ACCESS,
 ) -> int:
     """Compute the integer integration cost of running two items concurrently.
 
@@ -301,6 +329,8 @@ def pair_cost(
         config (Mapping[str, object]): Parsed truth table; only
             ``mergeable_paths`` is read, for the exclusion the relation uses.
         tolerance (ConflictTolerance): Weights and append-only patterns.
+        access_a (ItemAccess): First item's access declarations.
+        access_b (ItemAccess): Second item's access declarations.
 
     Returns:
         int: Summed path-pair weights, plus the module weight times the number
@@ -316,7 +346,7 @@ def pair_cost(
     # Enumerate the overlapping pairs with the relation's own primitive, so the
     # cost covers exactly the pairs the relation could report.
     cost = sum(
-        _path_pair_weight(entry_a, entry_b, tolerance)
+        _path_pair_weight(entry_a, entry_b, tolerance, access_a, access_b)
         for entry_a in paths_a
         for entry_b in paths_b
         if _entries_overlap(entry_a, entry_b)
@@ -357,6 +387,8 @@ def decide_pair(
     band_a: str | None = None,
     band_b: str | None = None,
     relation: ConflictRelation = conflicts,
+    access_a: ItemAccess = NO_ACCESS,
+    access_b: ItemAccess = NO_ACCESS,
 ) -> PairDecision:
     """Decide whether one pair is an edge, a tolerated overlap, or neither.
 
@@ -369,6 +401,9 @@ def decide_pair(
         relation (ConflictRelation): Callable with the ``conflicts`` signature,
             called exactly once; injectable so drift detection can pass its own
             patchable reference.
+        access_a (ItemAccess): First item's access declarations, used only to
+            price the pair; detection is unchanged.
+        access_b (ItemAccess): Second item's access declarations.
 
     Returns:
         PairDecision: The verdict; without a conflict every other field is empty.
@@ -385,7 +420,9 @@ def decide_pair(
     # Project the reason records to their kinds, which keep canonical order.
     reasons = tuple(reason.kind for reason in result.reasons)
     hard = any(kind in HARD_REASON_KINDS for kind in reasons)
-    cost = pair_cost(radius_a, radius_b, config, tolerance)
+    cost = pair_cost(
+        radius_a, radius_b, config, tolerance, access_a=access_a, access_b=access_b
+    )
     benefit = pair_benefit(band_a, band_b, tolerance)
 
     # Tolerance 0 is stated explicitly rather than left to the inequality, so
@@ -431,6 +468,8 @@ def schedule_conflict_edges(
                 config,
                 band_a=first.band,
                 band_b=second.band,
+                access_a=first.access,
+                access_b=second.access,
             )
             # An edge is recorded as an edge; a conflict within tolerance is
             # recorded as a tolerated overlap; a non-conflicting pair is dropped.
@@ -491,19 +530,40 @@ def _apply_aggregate_cap(
     )
 
 
-def _path_pair_weight(entry_a: str, entry_b: str, tolerance: ConflictTolerance) -> int:
-    """Weigh one overlapping path pair.
+def _path_pair_weight(
+    entry_a: str,
+    entry_b: str,
+    tolerance: ConflictTolerance,
+    access_a: ItemAccess = NO_ACCESS,
+    access_b: ItemAccess = NO_ACCESS,
+) -> int:
+    """Weigh one overlapping path pair (spec section B2; first matching row wins).
 
     Returns:
-        int: append_only when a concrete entry of the pair is append-only
-        (checked first, so a registry named by both items stays cheap), else
-        same_file for two equal concrete entries, else possible_overlap.
+        int: 0 when ``entry_a`` is in A's read_paths or ``entry_b`` is in B's
+        read_paths; else append_only when a concrete entry of the pair is
+        append-only (so a registry named by both items stays cheap); else the
+        separable weight when both entries are declared separable on their own
+        side and the weight is configured; else same_file for two equal
+        concrete entries; else possible_overlap. Without access lists the
+        result equals the weight before issue #1164 for every input.
     """
-    # Only a concrete entry can name an append-only file; the order of the two
-    # tests below is the append-only precedence the spec requires.
+    # A path one side only reads costs nothing to integrate.
+    if entry_a in access_a.read_paths or entry_b in access_b.read_paths:
+        return 0
+    # Only a concrete entry can name an append-only file; append-only precedes
+    # every write class, as the spec requires.
     concrete = tuple(entry for entry in (entry_a, entry_b) if not is_glob_entry(entry))
     if any(matches_mergeable_path(e, tolerance.append_only_paths) for e in concrete):
         return tolerance.weights["append_only"]
+    # Separable pricing needs the declaration on both sides and a configured
+    # weight; otherwise the pair falls through to the write classes below.
+    if (
+        SEPARABLE_WEIGHT in tolerance.weights
+        and entry_a in access_a.separable_paths
+        and entry_b in access_b.separable_paths
+    ):
+        return tolerance.weights[SEPARABLE_WEIGHT]
     if len(concrete) == 2 and entry_a == entry_b:
         return tolerance.weights["same_file"]
     return tolerance.weights["possible_overlap"]

@@ -39,6 +39,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConfig.psm1'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConflict.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusValidation.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusAggregate.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusAccess.psm1') -Force -ErrorAction Stop
 
 # Truth-table key and the label every reader error carries.
 $script:ToleranceKey = 'conflict_tolerance'
@@ -214,35 +215,6 @@ function Get-ConfigConflictTolerance {
     }
 }
 
-# Weigh one overlapping path pair: append_only when a concrete entry of the pair
-# is append-only (checked first, so a registry named by both items stays cheap),
-# else same_file for two equal concrete entries, else possible_overlap.
-function Get-PathPairWeight {
-    [CmdletBinding()]
-    [OutputType([long])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string] $EntryA,
-        [Parameter(Mandatory = $true)]
-        [string] $EntryB,
-        [Parameter(Mandatory = $true)]
-        [hashtable] $Tolerance
-    )
-
-    # Only a concrete entry can name an append-only file.
-    $concrete = @(@($EntryA, $EntryB) | Where-Object { -not (Test-GlobEntry -Entry $_) })
-    $appendOnly = [string[]]@($Tolerance['append_only_paths'])
-    foreach ($entry in $concrete) {
-        if (Test-MergeablePath -Entry $entry -MergeablePath $appendOnly) {
-            return [long]$Tolerance['weights']['append_only']
-        }
-    }
-    if ($concrete.Count -eq 2 -and [string]::Equals($EntryA, $EntryB, [System.StringComparison]::Ordinal)) {
-        return [long]$Tolerance['weights']['same_file']
-    }
-    return [long]$Tolerance['weights']['possible_overlap']
-}
-
 function Get-BlastRadiusPairCost {
     <#
     .SYNOPSIS
@@ -254,7 +226,9 @@ function Get-BlastRadiusPairCost {
         number of shared modules and the contract weight times the number of
         distinct shared contract identifiers (the ordinal intersection the
         relation reads for contract_dependency, each identifier counted once).
-        Mergeable paths therefore contribute 0.
+        Mergeable paths therefore contribute 0. Each path pair is weighed by
+        Get-BlastRadiusAccessPathPairWeight with the items' optional access
+        lists (issue #1164); without them every weight is unchanged.
 
     .PARAMETER RadiusA
         First radius record.
@@ -268,6 +242,12 @@ function Get-BlastRadiusPairCost {
 
     .PARAMETER Tolerance
         A value returned by Get-ConfigConflictTolerance.
+
+    .PARAMETER AccessA
+        Optional access lists of the first item (read_paths, separable_paths).
+
+    .PARAMETER AccessB
+        Optional access lists of the second item (read_paths, separable_paths).
 
     .OUTPUTS
         System.Int64. The cost.
@@ -285,7 +265,11 @@ function Get-BlastRadiusPairCost {
         [AllowNull()]
         [object] $Config,
         [Parameter(Mandatory = $true)]
-        [hashtable] $Tolerance
+        [hashtable] $Tolerance,
+        [AllowNull()]
+        [System.Collections.IDictionary] $AccessA,
+        [AllowNull()]
+        [System.Collections.IDictionary] $AccessB
     )
 
     $left = ConvertTo-NormalizedBlastRadius -Radius $RadiusA
@@ -299,7 +283,7 @@ function Get-BlastRadiusPairCost {
     # pairs the relation could report.
     [long]$cost = 0
     foreach ($pair in @(Get-OverlappingPathPair -PathA $pathsA -PathB $pathsB)) {
-        $cost += Get-PathPairWeight -EntryA $pair['EntryA'] -EntryB $pair['EntryB'] -Tolerance $Tolerance
+        $cost += Get-BlastRadiusAccessPathPairWeight -EntryA $pair['EntryA'] -EntryB $pair['EntryB'] -Tolerance $Tolerance -AccessA $AccessA -AccessB $AccessB
     }
     $sharedModule = @(@($left['modules']) | Where-Object { @($right['modules']) -ccontains $_ })
     # Distinct shared contract identifiers, compared ordinally like the relation.
@@ -378,6 +362,12 @@ function Get-BlastRadiusPairDecision {
     .PARAMETER Relation
         The detection relation; pass ${function:Test-BlastRadiusConflict}.
 
+    .PARAMETER AccessA
+        Optional access lists of the first item (read_paths, separable_paths).
+
+    .PARAMETER AccessB
+        Optional access lists of the second item (read_paths, separable_paths).
+
     .OUTPUTS
         System.Collections.Hashtable. Keys conflict, edge, hard, cost, benefit,
         reason, and reasons. Without a conflict, edge and hard are false, cost
@@ -399,7 +389,11 @@ function Get-BlastRadiusPairDecision {
         [object] $BandA,
         [AllowNull()]
         [object] $BandB,
-        [scriptblock] $Relation
+        [scriptblock] $Relation,
+        [AllowNull()]
+        [System.Collections.IDictionary] $AccessA,
+        [AllowNull()]
+        [System.Collections.IDictionary] $AccessB
     )
 
     if ($null -eq $Relation) { throw $script:RelationRequired }
@@ -412,7 +406,7 @@ function Get-BlastRadiusPairDecision {
     # Project the reason records to their kinds, which keep canonical order.
     $reasons = [string[]]@($result['reasons'] | ForEach-Object { $_['kind'] })
     $hard = @($reasons | Where-Object { $script:HardReasonKind -ccontains $_ }).Count -gt 0
-    $cost = Get-BlastRadiusPairCost -RadiusA $RadiusA -RadiusB $RadiusB -Config $Config -Tolerance $tolerance
+    $cost = Get-BlastRadiusPairCost -RadiusA $RadiusA -RadiusB $RadiusB -Config $Config -Tolerance $tolerance -AccessA $AccessA -AccessB $AccessB
     $benefit = Get-BlastRadiusPairBenefit -BandA $BandA -BandB $BandB -Tolerance $tolerance
 
     # Tolerance 0 is stated explicitly rather than left to the inequality, so
@@ -423,7 +417,8 @@ function Get-BlastRadiusPairDecision {
 }
 
 # Validate item keys (integers, booleans rejected, distinct) and return the
-# items as records sorted by key.
+# items as records sorted by key. Each record keeps the item's optional
+# read_paths and separable_paths as its access hashtable (issue #1164).
 function Get-OrderedSchedulingItem {
     [CmdletBinding()]
     [OutputType([System.Object[]])]
@@ -445,7 +440,11 @@ function Get-OrderedSchedulingItem {
             throw "scheduling item keys must be distinct: $key."
         }
         $band = if ($mapping.ContainsKey('band')) { $mapping['band'] } else { $null }
-        @{ key = [long]$key; radius = $mapping['radius']; band = $band }
+        $access = @{}
+        foreach ($name in @('read_paths', 'separable_paths')) {
+            if ($mapping.ContainsKey($name) -and $null -ne $mapping[$name]) { $access[$name] = [string[]]@($mapping[$name]) }
+        }
+        @{ key = [long]$key; radius = $mapping['radius']; band = $band; access = $access }
     }
     return @(@($record) | Where-Object { $null -ne $_ } | Sort-Object -Property { $_['key'] })
 }
@@ -465,7 +464,9 @@ function Get-BlastRadiusConflictEdge {
 
     .PARAMETER Item
         The run's items: records carrying key (an integer issue number), radius,
-        and an optional band.
+        an optional band, and the optional access lists read_paths and
+        separable_paths (issue #1164), which price a path pair lower without
+        narrowing the radius.
 
     .PARAMETER Config
         Parsed truth table.
@@ -501,7 +502,8 @@ function Get-BlastRadiusConflictEdge {
         for ($second = $first + 1; $second -lt $ordered.Count; $second++) {
             $a = $ordered[$first]
             $b = $ordered[$second]
-            $decision = Get-BlastRadiusPairDecision -RadiusA $a['radius'] -RadiusB $b['radius'] -Config $Config -BandA $a['band'] -BandB $b['band'] -Relation $Relation
+            $decision = Get-BlastRadiusPairDecision -RadiusA $a['radius'] -RadiusB $b['radius'] -Config $Config -BandA $a['band'] -BandB $b['band'] -Relation $Relation `
+                -AccessA $a['access'] -AccessB $b['access']
             if ($decision['edge']) {
                 $edge.Add([ordered]@{ a = $a['key']; b = $b['key']; reason = $decision['reason']; hard = $decision['hard']; cost = $decision['cost']; benefit = $decision['benefit'] })
             } elseif ($decision['conflict']) {

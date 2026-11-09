@@ -14,7 +14,10 @@ import copy
 import pytest
 
 from scripts.dev_tools._blast_radius_scheduling import (
+    NO_ACCESS,
     ConflictTolerance,
+    ItemAccess,
+    _path_pair_weight,  # pyright: ignore[reportPrivateUsage]
     config_conflict_tolerance,
 )
 
@@ -101,3 +104,89 @@ def test_unknown_weight_name_still_rejected() -> None:
     """Another unknown weight name still fails the exact name check."""
     with pytest.raises(ValueError, match=r"unknown \['shared'\]"):
         read(make_config(separable=15, shared=4))
+
+
+# ------------------------------------------------- access-aware weight (B2)
+
+SEPARABLE_TOLERANCE = config_conflict_tolerance(make_config(separable=15))
+PLAIN_TOLERANCE = config_conflict_tolerance(make_config())
+
+
+def weigh(
+    entry_a: str,
+    entry_b: str,
+    *,
+    access_a: ItemAccess = NO_ACCESS,
+    access_b: ItemAccess = NO_ACCESS,
+    tolerance: ConflictTolerance = SEPARABLE_TOLERANCE,
+) -> int:
+    """Weigh one overlapping path pair through the scheduling module."""
+    return _path_pair_weight(entry_a, entry_b, tolerance, access_a, access_b)
+
+
+def test_read_only_either_side_weighs_zero() -> None:
+    """A path read on side A or on side B costs 0."""
+    reader = ItemAccess(read_paths=("src/app.py",))
+
+    assert weigh("src/app.py", "src/app.py", access_a=reader) == 0
+    assert weigh("src/**", "src/app.py", access_b=reader) == 0
+
+
+def test_append_only_precedes_separable() -> None:
+    """An append-only file stays at the append-only weight when both sides declare it separable."""
+    both = ItemAccess(separable_paths=("CHANGELOG.md",))
+
+    assert weigh("CHANGELOG.md", "CHANGELOG.md", access_a=both, access_b=both) == 10
+
+
+def test_both_side_separable_weighs_separable() -> None:
+    """A path both sides declare separable costs the separable weight."""
+    both = ItemAccess(separable_paths=("src/app.py",))
+
+    assert weigh("src/app.py", "src/app.py", access_a=both, access_b=both) == 15
+
+
+def test_one_side_separable_falls_through() -> None:
+    """A separable declaration on one side only falls through to same_file."""
+    one = ItemAccess(separable_paths=("src/app.py",))
+
+    assert weigh("src/app.py", "src/app.py", access_a=one) == 90
+
+
+def test_absent_separable_weight_falls_through() -> None:
+    """Without a configured separable weight, both-side separable reads as same_file."""
+    both = ItemAccess(separable_paths=("src/app.py",))
+
+    assert (
+        weigh(
+            "src/app.py",
+            "src/app.py",
+            access_a=both,
+            access_b=both,
+            tolerance=PLAIN_TOLERANCE,
+        )
+        == 90
+    )
+
+
+def test_glob_overlap_weighs_possible_overlap() -> None:
+    """A glob overlap without access declarations costs possible_overlap."""
+    assert weigh("src/**", "src/app.py") == 20
+
+
+@pytest.mark.parametrize(
+    ("entry_a", "entry_b", "expected"),
+    [
+        ("CHANGELOG.md", "CHANGELOG.md", 10),
+        ("docs", "docs/CHANGELOG.md", 10),
+        ("src/app.py", "src/app.py", 90),
+        ("scripts/dev_tools", "scripts/dev_tools/x.py", 20),
+        ("src/**", "src/app.py", 20),
+    ],
+)
+def test_no_access_lists_match_legacy_weight(
+    entry_a: str, entry_b: str, expected: int
+) -> None:
+    """Without access lists every pair keeps the append-only, same-file, or overlap weight."""
+    assert weigh(entry_a, entry_b) == expected
+    assert _path_pair_weight(entry_a, entry_b, SEPARABLE_TOLERANCE) == expected

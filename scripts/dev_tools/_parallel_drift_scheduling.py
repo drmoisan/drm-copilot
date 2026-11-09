@@ -32,7 +32,12 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING, cast
 
 from scripts.dev_tools._blast_radius_conflicts import conflicts
-from scripts.dev_tools._blast_radius_scheduling import BAND_NAMES, decide_pair
+from scripts.dev_tools._blast_radius_scheduling import (
+    BAND_NAMES,
+    NO_ACCESS,
+    ItemAccess,
+    decide_pair,
+)
 from scripts.dev_tools._parallel_drift_shape import as_item_key, canonical_pair
 from scripts.dev_tools.compute_blast_radius import BlastRadius
 
@@ -41,10 +46,47 @@ if TYPE_CHECKING:
 
     from scripts.dev_tools._blast_radius_scheduling import ConflictRelation
 
-__all__ = ["existing_edge_pairs", "item_band", "observed_pair_is_edge"]
+__all__ = ["existing_edge_pairs", "item_access", "item_band", "observed_pair_is_edge"]
 
 # The item field that carries a complexity band, as the planner records it.
 ITEM_BAND_FIELD = "complexity_band"
+
+# The optional item access lists of issue #1164, recorded beside blast_radius.
+ACCESS_FIELDS: tuple[str, str] = ("read_paths", "separable_paths")
+
+
+def _access_list(value: object) -> tuple[str, ...]:
+    """Return a list of non-empty strings as a tuple, or empty when malformed."""
+    if not isinstance(value, list):
+        return ()
+    entries = cast("list[object]", value)
+    if not all(isinstance(entry, str) and entry for entry in entries):
+        return ()
+    return tuple(cast("list[str]", entries))
+
+
+def item_access(items: Sequence[Mapping[str, object]], item_key: int) -> ItemAccess:
+    """Read an item's declared ``read_paths`` and ``separable_paths``.
+
+    Args:
+        items (Sequence[Mapping[str, object]]): The checkpoint's ``items[]``.
+        item_key (int): The ``issue_num`` of the item whose lists are read.
+
+    Returns:
+        ItemAccess: Both lists when the item records them; an empty list for a
+        list that is absent or malformed (not a list of non-empty strings), and
+        ``NO_ACCESS`` when the item is absent. The validators report malformed
+        lists; here a malformed list prices like an absent one, which is the
+        fail-closed direction because it removes a cost reduction.
+    """
+    # Return the first matching item's lists; issue numbers are unique.
+    for record in items:
+        if record.get("issue_num") == item_key:
+            read_paths, separable_paths = (
+                _access_list(record.get(field)) for field in ACCESS_FIELDS
+            )
+            return ItemAccess(read_paths=read_paths, separable_paths=separable_paths)
+    return NO_ACCESS
 
 
 def existing_edge_pairs(
@@ -103,6 +145,7 @@ def observed_pair_is_edge(
     observed_band: str | None = None,
     peer_band: str | None = None,
     relation: ConflictRelation = conflicts,
+    peer_access: ItemAccess = NO_ACCESS,
 ) -> bool:
     """Decide whether a drifting item's observed radius makes a peer pair an edge.
 
@@ -114,6 +157,9 @@ def observed_pair_is_edge(
         peer_band (str | None): The peer's band, or ``None``.
         relation (ConflictRelation): The contention relation, forwarded to the
             pair decision with the observed radius as the first argument.
+        peer_access (ItemAccess): The peer's declared access lists (issue
+            #1164, spec B5.6), so a path the peer only reads still costs 0. The
+            observed side carries none: every observed path is a write.
 
     Returns:
         bool: ``True`` when the peer radius cannot be evaluated (the relation is
@@ -139,5 +185,6 @@ def observed_pair_is_edge(
         band_a=observed_band,
         band_b=peer_band,
         relation=relation,
+        access_b=peer_access,
     )
     return decision.edge
