@@ -40,7 +40,7 @@ The worktree-removal gates authorize removal only from epic-orchestrator, parall
 
 Epic-planner operator story:
 
-- [ ] The epic-planner checkpoint accepts a `planner_worktrees` list whose entries carry `branch`, optional repository-relative `path`, `purpose`, `preparation_status`, `feature_folder`, and optional `recorded_at`, and both the Python and TypeScript validators accept a well-formed list and reject malformed entries with the byte-identical strings defined in `spec.md`.
+- [x] The epic-planner checkpoint accepts a `planner_worktrees` list whose entries carry `branch`, optional repository-relative `path`, `purpose`, `preparation_status`, `feature_folder`, and optional `recorded_at`, and both the Python and TypeScript validators accept a well-formed list and reject malformed entries with the byte-identical strings defined in `spec.md`.
 - [ ] `.claude/skills/epic-plan/SKILL.md` and `.agents/skills/epic-plan/SKILL.md` instruct the planner to record each preparation worktree by branch, update its status through `prepared`, `fanned_in`, and `removed`, remove it with a plain `git worktree remove` without `--force`, and never detach HEAD to free a branch.
 - [ ] `.claude/agents/epic-planner.md` and `.codex/agents/epic-planner.toml` list `planner_worktrees` in their checkpoint key lists.
 - [ ] A recorded, eligible (`prepared` or `fanned_in`), clean, pushed, not-in-use preparation worktree is allowed by each of the three removal gates.
