@@ -26,6 +26,32 @@ BeforeAll {
     $script:Planning = '/synthetic-worktrees/planning'
     $script:Relative = '.claude/worktrees/agent-x'
     $script:Target = '/synthetic-worktrees/main/.claude/worktrees/agent-x'
+
+    # Issue #1163 (D9) argument builder: -RecordedBranch, -LiveWorktreeRoot, and -BranchWorktreeResolver
+    # are passed only when Get-Command reports that the matcher declares them, so the M12 to M16 rows
+    # run unchanged against the unmodified module (fail-before) and the changed module.
+    function Get-RecordPathFallbackArgument {
+        param([string] $RecordedPath, [string] $TargetPath, [string] $Branch, [string[]] $Live, [scriptblock] $Resolver)
+        $arguments = @{ RecordedPath = $RecordedPath; TargetPath = $TargetPath }
+        $parameters = (Get-Command -Name Test-WorktreeRunRecordedPathMatchesTarget).Parameters
+        if ($parameters.ContainsKey('RecordedBranch')) { $arguments['RecordedBranch'] = $Branch }
+        if ($parameters.ContainsKey('LiveWorktreeRoot')) { $arguments['LiveWorktreeRoot'] = $Live }
+        if ($parameters.ContainsKey('BranchWorktreeResolver')) { $arguments['BranchWorktreeResolver'] = $Resolver }
+        return $arguments
+    }
+
+    # The D9 resolver seam: a mapped branch gives its root and no reason code, an unmapped branch gives
+    # a null root and ReasonCode, and every invocation is appended to the row's Calls list.
+    function New-BranchResolverSeam {
+        param([hashtable] $Map = @{}, [string] $ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE', [System.Collections.Generic.List[string]] $Calls)
+        $branchMap = $Map; $code = $ReasonCode; $callList = $Calls
+        return {
+            param($Branch)
+            $callList.Add([string] $Branch)
+            if ($branchMap.ContainsKey([string] $Branch)) { return [pscustomobject]@{ WorktreeRoot = $branchMap[[string] $Branch]; ReasonCode = $null } }
+            return [pscustomobject]@{ WorktreeRoot = $null; ReasonCode = $code }
+        }.GetNewClosure()
+    }
 }
 
 Describe 'Test-WorktreeRunRecordedPathMatchesTarget' {
@@ -137,6 +163,85 @@ Describe 'Test-WorktreeRunRecordedPathMatchesTarget' {
 
         # Assert
         $result | Should -BeFalse
+    }
+
+    Context 'recorded branch fallback (issue #1163)' {
+        BeforeAll {
+            $script:FallbackTarget = '/repo/.claude/worktrees/item'
+            $script:FallbackLive = @('/repo', '/repo/.claude/worktrees/item', '/sibling/item-b')
+        }
+
+        It 'M12 matches a rooted record that names no live root through a branch that resolves to the target' {
+            # Arrange (fails before: a host-moved absolute record never matches)
+            $calls = [System.Collections.Generic.List[string]]::new()
+            $resolver = New-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = $script:FallbackTarget } -Calls $calls
+            $arguments = Get-RecordPathFallbackArgument -RecordedPath '/host-a/repo/.claude/worktrees/item' -TargetPath $script:FallbackTarget -Branch 'feature/issue-1163-item' -Live $script:FallbackLive -Resolver $resolver
+
+            # Act
+            $result = Test-WorktreeRunRecordedPathMatchesTarget @arguments
+
+            # Assert
+            $result | Should -BeTrue
+            $calls.Count | Should -Be 1
+        }
+
+        It 'M13 does not match when the branch resolves to <ReasonCode>' -ForEach @(
+            @{ ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE' }
+            @{ ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS' }
+        ) {
+            # Arrange
+            $calls = [System.Collections.Generic.List[string]]::new()
+            $resolver = New-BranchResolverSeam -ReasonCode $ReasonCode -Calls $calls
+            $arguments = Get-RecordPathFallbackArgument -RecordedPath '/host-a/repo/.claude/worktrees/item' -TargetPath $script:FallbackTarget -Branch 'feature/issue-1163-item' -Live $script:FallbackLive -Resolver $resolver
+
+            # Act
+            $result = Test-WorktreeRunRecordedPathMatchesTarget @arguments
+
+            # Assert
+            $result | Should -BeFalse
+        }
+
+        It 'M14 does not match when the branch resolves to a different worktree' {
+            # Arrange
+            $calls = [System.Collections.Generic.List[string]]::new()
+            $resolver = New-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = '/sibling/item-b' } -Calls $calls
+            $arguments = Get-RecordPathFallbackArgument -RecordedPath '/host-a/repo/.claude/worktrees/item' -TargetPath $script:FallbackTarget -Branch 'feature/issue-1163-item' -Live $script:FallbackLive -Resolver $resolver
+
+            # Act
+            $result = Test-WorktreeRunRecordedPathMatchesTarget @arguments
+
+            # Assert
+            $result | Should -BeFalse
+        }
+
+        It "M15 returns today's result without calling the resolver for a rooted record that names a live root" {
+            # Arrange
+            $calls = [System.Collections.Generic.List[string]]::new()
+            $resolver = New-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = $script:FallbackTarget } -Calls $calls
+            $arguments = Get-RecordPathFallbackArgument -RecordedPath '/sibling/item-b' -TargetPath $script:FallbackTarget -Branch 'feature/issue-1163-item' -Live $script:FallbackLive -Resolver $resolver
+
+            # Act
+            $result = Test-WorktreeRunRecordedPathMatchesTarget @arguments
+
+            # Assert
+            $result | Should -BeFalse
+            $calls.Count | Should -Be 0
+        }
+
+        It "M16 returns today's result for a relative record with a branch" {
+            # Arrange
+            $calls = [System.Collections.Generic.List[string]]::new()
+            $resolver = New-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = $script:FallbackTarget } -Calls $calls
+            $arguments = Get-RecordPathFallbackArgument -RecordedPath '.claude/worktrees/other' -TargetPath $script:FallbackTarget -Branch 'feature/issue-1163-item' -Live $script:FallbackLive -Resolver $resolver
+            $arguments['BaseRoot'] = @('/repo')
+
+            # Act
+            $result = Test-WorktreeRunRecordedPathMatchesTarget @arguments
+
+            # Assert
+            $result | Should -BeFalse
+            $calls.Count | Should -Be 0
+        }
     }
 }
 
