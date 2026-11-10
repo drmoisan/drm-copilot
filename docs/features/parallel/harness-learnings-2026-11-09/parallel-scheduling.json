@@ -1,0 +1,283 @@
+{
+  "edges": [
+    {
+      "a": 1156,
+      "b": 1159,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1157,
+      "b": 1158,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1157,
+      "b": 1159,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1157,
+      "b": 1161,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1157,
+      "b": 1162,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1157,
+      "b": 1163,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1158,
+      "b": 1159,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1158,
+      "b": 1161,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1158,
+      "b": 1162,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1158,
+      "b": 1163,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1159,
+      "b": 1161,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1159,
+      "b": 1162,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1159,
+      "b": 1163,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1161,
+      "b": 1162,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1161,
+      "b": 1163,
+      "reason": "path_overlap"
+    },
+    {
+      "a": 1162,
+      "b": 1163,
+      "reason": "path_overlap"
+    }
+  ],
+  "items": [
+    {
+      "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+      "branch_name": "feature/regenerate-after-integration-merge-1156",
+      "complexity_band": "C3",
+      "issue_num": 1156,
+      "plan_hash": "46dddd7d448ca703ba018f76217b5356d724d5f8",
+      "plan_path": "docs/features/active/regenerate-after-integration-merge-1156/plan.2026-11-09T16-31.md",
+      "preparation_status": "cleared"
+    },
+    {
+      "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+      "branch_name": "feature/owner-directive-pass-down-1157",
+      "complexity_band": "C3",
+      "issue_num": 1157,
+      "plan_hash": "3d3d5834920cc1f077bd48e2fb8a49aa42b09ff3",
+      "plan_path": "docs/features/active/owner-directive-pass-down-1157/plan.2026-11-09T16-32.md",
+      "preparation_status": "cleared"
+    },
+    {
+      "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+      "branch_name": "feature/test-execution-policy-machine-lock-1158",
+      "complexity_band": "C3",
+      "issue_num": 1158,
+      "plan_hash": "75c96cbef40da404dd0535d98884dd34060ba65f",
+      "plan_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/plan.2026-11-09T16-31.md",
+      "preparation_status": "cleared"
+    },
+    {
+      "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+      "branch_name": "feature/hook-dispatcher-process-cost-1159",
+      "complexity_band": "C3",
+      "issue_num": 1159,
+      "plan_hash": "b27d8347091f2405d953b226d136c0e5f4cf2319",
+      "plan_path": "docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159/plan.2026-11-09T16-31.md",
+      "preparation_status": "cleared"
+    },
+    {
+      "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+      "branch_name": "bug/preimplementation-gate-false-positives-1160",
+      "complexity_band": "C3",
+      "issue_num": 1160,
+      "plan_hash": "67c60ee34c491ed4220b8e0620700669ef85d749",
+      "plan_path": "docs/features/active/2026-11-09-preimplementation-gate-false-positives-1160/plan.2026-11-09T16-36.md",
+      "preparation_status": "cleared"
+    },
+    {
+      "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+      "branch_name": "feature/planner-worktree-removal-authorization-1161",
+      "complexity_band": "C3",
+      "issue_num": 1161,
+      "plan_hash": "9128f972a2f7b927f271e716013971f608997a71",
+      "plan_path": "docs/features/active/2026-11-09-planner-worktree-removal-authorization-1161/plan.2026-11-09T16-33.md",
+      "preparation_status": "cleared"
+    },
+    {
+      "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+      "branch_name": "feature/cross-epic-dependencies-1162",
+      "complexity_band": "C3",
+      "issue_num": 1162,
+      "plan_hash": "92c7743114cc2a1524ba8e4902cc7e412ad3eac9",
+      "plan_path": "docs/features/active/2026-11-09-cross-epic-dependencies-1162/plan.2026-11-09T16-32.md",
+      "preparation_status": "cleared"
+    },
+    {
+      "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+      "branch_name": "bug/hook-session-root-resolution-1163",
+      "complexity_band": "C3",
+      "issue_num": 1163,
+      "plan_hash": "8bbc206395381eed6cf26cabdffbfbb06fac645e",
+      "plan_path": "docs/features/active/2026-11-09-hook-session-root-resolution-1163/plan.2026-11-09T16-33.md",
+      "preparation_status": "cleared"
+    }
+  ],
+  "parallel_slug": "harness-learnings-2026-11-09",
+  "precedence": [],
+  "schema_version": 1,
+  "tolerated_overlaps": [
+    {
+      "a": 1156,
+      "b": 1157,
+      "benefit": 4,
+      "cost": 213,
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    },
+    {
+      "a": 1156,
+      "b": 1158,
+      "benefit": 4,
+      "cost": 78,
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    },
+    {
+      "a": 1156,
+      "b": 1160,
+      "benefit": 4,
+      "cost": 127,
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    },
+    {
+      "a": 1156,
+      "b": 1161,
+      "benefit": 4,
+      "cost": 213,
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    },
+    {
+      "a": 1156,
+      "b": 1162,
+      "benefit": 4,
+      "cost": 45,
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    },
+    {
+      "a": 1156,
+      "b": 1163,
+      "benefit": 4,
+      "cost": 189,
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    },
+    {
+      "a": 1157,
+      "b": 1160,
+      "benefit": 4,
+      "cost": 93,
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    },
+    {
+      "a": 1158,
+      "b": 1160,
+      "benefit": 4,
+      "cost": 54,
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    },
+    {
+      "a": 1159,
+      "b": 1160,
+      "benefit": 4,
+      "cost": 111,
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    },
+    {
+      "a": 1160,
+      "b": 1161,
+      "benefit": 4,
+      "cost": 133,
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    },
+    {
+      "a": 1160,
+      "b": 1162,
+      "benefit": 4,
+      "cost": 21,
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    },
+    {
+      "a": 1160,
+      "b": 1163,
+      "benefit": 4,
+      "cost": 133,
+      "reasons": [
+        "path_overlap",
+        "module_overlap"
+      ]
+    }
+  ]
+}

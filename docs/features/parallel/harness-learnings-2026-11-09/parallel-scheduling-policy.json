@@ -1,0 +1,337 @@
+{
+  "schema_version": 1,
+  "parallel_slug": "harness-learnings-2026-11-09",
+  "recorded_at": "2026-11-10T03:00:38Z",
+  "owner_directive": "OD-1 (maximum parallelization; edge only when merge cost exceeds gain)",
+  "run_conflict_tolerance": {
+    "tolerance_percent": 21625,
+    "source": "owner directive OD-1 (run-level operator-directed setting)",
+    "committed_value": 100,
+    "committed_config_unchanged": true,
+    "derivation": "Every non-hard detected pair has verdict parallel, so the value must tolerate all 12 soft pairs and satisfy the aggregate cap for every item: pairwise needs ceil(213*100/4) = 5325; the cap needs ceil(max item total 865 (item 1156) * 100 / 4) = 21625. Hard edges are unaffected by tolerance.",
+    "residual_risk": "Drift detection and any re-seed during execution read the committed truth table (tolerance_percent 100), not this value; a tolerated pair re-evaluated there would be reported as exceeding tolerance. The parallel orchestrator must reuse the recorded edges (parallel-scheduling.json) rather than recompute them."
+  },
+  "duration_estimates": {
+    "method": "Expected start-to-merge hours = 1.0 h fixed (review, PR, CI about 0.5 h) + 0.1 h per canonical plan task; calibrated against measured items #1009 (about 1 h) and #1010 (about 3 h) of run bugs-1001-1002-1003-1006.",
+    "hours": {
+      "1156": 4.5,
+      "1157": 4.2,
+      "1158": 5.3,
+      "1159": 5.1,
+      "1160": 2.9,
+      "1161": 3.4,
+      "1162": 4.4,
+      "1163": 4.5
+    },
+    "plan_tasks": {
+      "1156": 35,
+      "1157": 32,
+      "1158": 43,
+      "1159": 41,
+      "1160": 19,
+      "1161": 24,
+      "1162": 34,
+      "1163": 35
+    }
+  },
+  "pair_verdicts": [
+    {
+      "a": 1156,
+      "b": 1157,
+      "gain_hours": 4.2,
+      "merge_cost_hours": 0.5,
+      "verdict": "parallel",
+      "hard_class": false,
+      "implemented_as": "tolerated",
+      "rationale": "Different sections of .claude/rules/orchestrator-state.md and the epic-orchestrate skill; the later item recomputes the frozen-surface digest; shared brief copies are separate sections."
+    },
+    {
+      "a": 1156,
+      "b": 1158,
+      "gain_hours": 4.5,
+      "merge_cost_hours": 0.25,
+      "verdict": "parallel",
+      "hard_class": false,
+      "implemented_as": "tolerated",
+      "rationale": "Shared files are the execution-environment brief copies and pack manifests: separate sections and appended entries."
+    },
+    {
+      "a": 1156,
+      "b": 1159,
+      "gain_hours": 4.5,
+      "merge_cost_hours": 0.5,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "Hard only through the shared contract token command (a generic JSON key, not a shared API). 1156 adds new hook helper files; if 1159 merges first, 1156 keeps its entry points and the dispatcher runs them unchanged; if 1156 merges first, 1159 P7-T1 audits the changed hook files."
+    },
+    {
+      "a": 1156,
+      "b": 1160,
+      "gain_hours": 2.9,
+      "merge_cost_hours": 0.5,
+      "verdict": "parallel",
+      "hard_class": false,
+      "implemented_as": "tolerated",
+      "rationale": "1156 edits enforce-orchestration-preimplementation-gate-epic-scope.ps1; 1160 edits functions of the main gate file. Different files; shared tests and brief sections."
+    },
+    {
+      "a": 1156,
+      "b": 1161,
+      "gain_hours": 3.4,
+      "merge_cost_hours": 0.5,
+      "verdict": "parallel",
+      "hard_class": false,
+      "implemented_as": "tolerated",
+      "rationale": "Different sections of the epic and parallel orchestrate skills and agents; shared push-down contract tests."
+    },
+    {
+      "a": 1156,
+      "b": 1162,
+      "gain_hours": 4.4,
+      "merge_cost_hours": 0.5,
+      "verdict": "parallel",
+      "hard_class": false,
+      "implemented_as": "tolerated",
+      "rationale": "Each adds its own section to the epic-orchestrate skill; 1162 does not edit the merge gates 1156 wires."
+    },
+    {
+      "a": 1156,
+      "b": 1163,
+      "gain_hours": 4.5,
+      "merge_cost_hours": 0.5,
+      "verdict": "parallel",
+      "hard_class": false,
+      "implemented_as": "tolerated",
+      "rationale": "Different sections of .claude/rules/orchestrator-state.md and shared brief copies."
+    },
+    {
+      "a": 1157,
+      "b": 1158,
+      "gain_hours": 4.2,
+      "merge_cost_hours": 0.25,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "Both append one PreToolUse registration to .claude/settings.json and its bundle copy: append-style."
+    },
+    {
+      "a": 1157,
+      "b": 1159,
+      "gain_hours": 4.2,
+      "merge_cost_hours": 0.75,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "1159 replaces the PreToolUse array with the dispatcher; the later item registers 1157 hook in the dispatcher registry (1159 P7-T1 if 1159 merges second). One integration pass, per the owner estimate."
+    },
+    {
+      "a": 1157,
+      "b": 1160,
+      "gain_hours": 2.9,
+      "merge_cost_hours": 0.25,
+      "verdict": "parallel",
+      "hard_class": false,
+      "implemented_as": "tolerated",
+      "rationale": "1157 only reads Test-ImplementationPath in a test; shared brief and pack-manifest entries."
+    },
+    {
+      "a": 1157,
+      "b": 1161,
+      "gain_hours": 3.4,
+      "merge_cost_hours": 0.25,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "1161 only asserts .claude/settings.json unchanged (read-only side: 0); remaining shared files are separate skill and agent sections."
+    },
+    {
+      "a": 1157,
+      "b": 1162,
+      "gain_hours": 4.2,
+      "merge_cost_hours": 0.5,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "1162 reads .claude/settings.json only; epic-orchestrate skill and epic-orchestrator agent separate sections plus a digest recompute."
+    },
+    {
+      "a": 1157,
+      "b": 1163,
+      "gain_hours": 4.2,
+      "merge_cost_hours": 0.5,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "1163 reads .claude/settings.json only; both edit validate-orchestrator-output.ps1 (different functions) and different sections of orchestrator-state.md."
+    },
+    {
+      "a": 1158,
+      "b": 1159,
+      "gain_hours": 5.1,
+      "merge_cost_hours": 0.75,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "Same shape as 1157-1159: 1158 registers a hook (branch A direct, branch B through the registry when 1159 merged first); one integration pass."
+    },
+    {
+      "a": 1158,
+      "b": 1160,
+      "gain_hours": 2.9,
+      "merge_cost_hours": 0.25,
+      "verdict": "parallel",
+      "hard_class": false,
+      "implemented_as": "tolerated",
+      "rationale": "Shared brief sections and pack-manifest entries."
+    },
+    {
+      "a": 1158,
+      "b": 1161,
+      "gain_hours": 3.4,
+      "merge_cost_hours": 0.25,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "1161 reads .claude/settings.json only; shared brief and manifests."
+    },
+    {
+      "a": 1158,
+      "b": 1162,
+      "gain_hours": 4.4,
+      "merge_cost_hours": 0.25,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "1162 reads .claude/settings.json only; few shared files."
+    },
+    {
+      "a": 1158,
+      "b": 1163,
+      "gain_hours": 4.5,
+      "merge_cost_hours": 0.25,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "1163 reads .claude/settings.json only; shared brief and hook-dependency tests (added rows)."
+    },
+    {
+      "a": 1159,
+      "b": 1160,
+      "gain_hours": 2.9,
+      "merge_cost_hours": 0.5,
+      "verdict": "parallel",
+      "hard_class": false,
+      "implemented_as": "tolerated",
+      "rationale": "1160 changes gate internals and keeps its entry point; the dispatcher runs it unchanged; 1159 P7-T1 audits changed hook content."
+    },
+    {
+      "a": 1159,
+      "b": 1161,
+      "gain_hours": 3.4,
+      "merge_cost_hours": 0.5,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "1161 does not touch registrations; it edits removal-gate hook bodies that 1159 P7-T1 re-audits after the merge."
+    },
+    {
+      "a": 1159,
+      "b": 1162,
+      "gain_hours": 4.4,
+      "merge_cost_hours": 0.5,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "1162 does not touch registrations; P7-T1 audit of any changed hook content."
+    },
+    {
+      "a": 1159,
+      "b": 1163,
+      "gain_hours": 4.5,
+      "merge_cost_hours": 0.75,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "1163 changes the shared worktree-resolution libraries the hooks import; 1159 P7-T1 re-runs the -Force import and hook-tail checks on every changed hook and module."
+    },
+    {
+      "a": 1160,
+      "b": 1161,
+      "gain_hours": 2.9,
+      "merge_cost_hours": 0.25,
+      "verdict": "parallel",
+      "hard_class": false,
+      "implemented_as": "tolerated",
+      "rationale": "Shared brief, pack manifests, and push-down contract tests: separate entries."
+    },
+    {
+      "a": 1160,
+      "b": 1162,
+      "gain_hours": 2.9,
+      "merge_cost_hours": 0.25,
+      "verdict": "parallel",
+      "hard_class": false,
+      "implemented_as": "tolerated",
+      "rationale": "Three shared files, all append-style."
+    },
+    {
+      "a": 1160,
+      "b": 1163,
+      "gain_hours": 2.9,
+      "merge_cost_hours": 0.5,
+      "verdict": "parallel",
+      "hard_class": false,
+      "implemented_as": "tolerated",
+      "rationale": "Shared brief, push-down tests, and gate-suite discovery tests: separate rows and sections."
+    },
+    {
+      "a": 1161,
+      "b": 1162,
+      "gain_hours": 3.4,
+      "merge_cost_hours": 1.5,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "Both edit validate_epic_planner_state.py, epic-planner-state-core.ts, the epic-plan skill, and the epic-planner agent, possibly the same validator functions: one remediation pass."
+    },
+    {
+      "a": 1161,
+      "b": 1163,
+      "gain_hours": 3.4,
+      "merge_cost_hours": 1.5,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "Both edit the same removal-gate functions (Find-EpicWorktreeFeatureRecord, Test-ParallelCheckpointAllowsWorktreeRemoval, Find-ParallelWorktreeItemRecord): one remediation pass."
+    },
+    {
+      "a": 1162,
+      "b": 1163,
+      "gain_hours": 4.4,
+      "merge_cost_hours": 0.25,
+      "verdict": "parallel",
+      "hard_class": true,
+      "implemented_as": "edge_kept_hard_class_owner_review",
+      "rationale": "Both only read .claude/settings.json and .codex/config.toml; shared generator and manifest entries."
+    }
+  ],
+  "hard_edges_for_owner_review": [
+    "1156-1159",
+    "1157-1158",
+    "1157-1159",
+    "1157-1161",
+    "1157-1162",
+    "1157-1163",
+    "1158-1159",
+    "1158-1161",
+    "1158-1162",
+    "1158-1163",
+    "1159-1161",
+    "1159-1162",
+    "1159-1163",
+    "1161-1162",
+    "1161-1163",
+    "1162-1163"
+  ]
+}
