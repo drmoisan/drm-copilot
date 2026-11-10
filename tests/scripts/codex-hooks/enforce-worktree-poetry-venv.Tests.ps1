@@ -79,6 +79,14 @@ Describe 'Codex enforce-worktree-poetry-venv (issue #1127)' {
         $equal | Should -BeTrue
     }
 
+    It 'names the poetry -C form in the deny reason for an agent outside the worktree root (issue #1165)' {
+        # Act
+        $reason = Get-WorktreePoetryVenvBlockedReason
+
+        # Assert
+        $reason.Contains('poetry -C <worktree root>', [System.StringComparison]::Ordinal) | Should -BeTrue
+    }
+
     It 'reads VIRTUAL_ENV through the process seam when no value is injected' {
         # Arrange
         Mock Get-WorktreePoetryVenvProcessValue { 'C:\repo\.venv' }
