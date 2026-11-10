@@ -40,10 +40,16 @@ SKILLS_DIR = CLAUDE_ROOT / "skills"
 # loads unconditionally exactly as an unscoped rule does.
 UNCONDITIONAL_GLOBS = frozenset({"**", "**/*", "*"})
 
-# The four repository-wide policies whose applicability is genuinely not
-# conditioned on file type. Every other rule file must be scoped.
+# Rule files that carry no `paths:` key so the runtime loads them at launch,
+# before an agent's first tool call (issue #1165). A `paths:` list, even one that
+# matches every file, defers loading until the first Read, Write, or Edit.
+LAUNCH_LOADED_RULES = frozenset({"bash-command-shape.md"})
+
+# The repository-wide policies whose applicability is genuinely not conditioned
+# on file type, plus the launch-loaded rules. Every other rule file must be scoped.
 DELIBERATE_UNCONDITIONAL_RULES = frozenset(
     {
+        "bash-command-shape.md",
         "general-code-change.md",
         "general-unit-test.md",
         "quality-tiers.md",
@@ -353,7 +359,9 @@ def test_every_claude_rule_carries_parseable_paths_and_description() -> None:
 
     The runtime reads ``paths:`` to decide when to inject a rule and
     ``description:`` to describe it. A file missing either declares no scope, so
-    it is injected on every turn regardless of relevance.
+    it is injected on every turn regardless of relevance. The launch-loaded rules
+    are exempt from the ``paths:`` requirement only; they still need a
+    description.
     """
 
     defects: list[str] = []
@@ -365,7 +373,10 @@ def test_every_claude_rule_carries_parseable_paths_and_description() -> None:
             defects.append(f"{rule_file.name}: no parseable YAML frontmatter block")
             continue
         declared = string_sequence(mapping.get("paths"))
-        if not declared or any(not glob.strip() for glob in declared):
+        launch_loaded = rule_file.name in LAUNCH_LOADED_RULES
+        if not launch_loaded and (
+            not declared or any(not glob.strip() for glob in declared)
+        ):
             defects.append(f"{rule_file.name}: no non-empty `paths:` list")
         description = mapping.get("description")
         if not isinstance(description, str) or not description.strip():
@@ -374,12 +385,42 @@ def test_every_claude_rule_carries_parseable_paths_and_description() -> None:
     assert not defects, "Rule files missing frontmatter contract: " + "; ".join(defects)
 
 
-def test_unconditional_rule_set_is_exactly_the_four_deliberate_files() -> None:
-    """Require exactly four rule files to load unconditionally.
+def test_launch_loaded_rules_carry_description_and_no_paths_key() -> None:
+    """Require each launch-loaded rule to exist with a description and no scope.
 
-    A file carrying no frontmatter block counts as unconditional because it
-    declares no scope and is therefore injected on every turn. Only the four
-    repository-wide policies may load that way.
+    A launch-loaded rule is loaded before an agent's first tool call only while
+    its frontmatter carries no ``paths:`` key; adding one, even a match-everything
+    glob, defers it to the first Read, Write, or Edit of a matching file.
+    """
+
+    defects: list[str] = []
+    # Check every member of the launch-loaded set, accumulating each defect so one
+    # run names every offending file.
+    for rule_file_name in sorted(LAUNCH_LOADED_RULES):
+        rule_file = RULES_DIR / rule_file_name
+        if not rule_file.is_file():
+            defects.append(f"{rule_file_name}: file does not exist")
+            continue
+        mapping = parse_frontmatter(read_text(rule_file))
+        if mapping is None:
+            defects.append(f"{rule_file_name}: no parseable YAML frontmatter block")
+            continue
+        if "paths" in mapping:
+            defects.append(f"{rule_file_name}: carries a `paths:` key")
+        description = mapping.get("description")
+        if not isinstance(description, str) or not description.strip():
+            defects.append(f"{rule_file_name}: no non-empty `description:` scalar")
+
+    assert not defects, "Launch-loaded rule defects: " + "; ".join(defects)
+
+
+def test_unconditional_rule_set_is_exactly_the_deliberate_files() -> None:
+    """Require exactly the deliberate rule files to load unconditionally.
+
+    A file carrying no frontmatter block, or no ``paths:`` list, counts as
+    unconditional because it declares no scope and is therefore injected on
+    every turn. Only the repository-wide policies and the launch-loaded rules
+    may load that way.
     """
 
     # Select the rule files that carry no scope, treating an absent frontmatter

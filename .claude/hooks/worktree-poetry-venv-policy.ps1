@@ -23,7 +23,7 @@ $script:WorktreePoetryMutatingSubcommand = @('install', 'sync', 'add', 'remove',
 # Poetry global options that take a directory value as the following token.
 $script:WorktreePoetryDirectoryOption = @('-C', '--directory', '-P', '--project')
 
-$script:WorktreePoetryVenvBlockedReason = "WORKTREE_VENV_BLOCKED: a mutating Poetry command would write into the virtual environment named by VIRTUAL_ENV, which lies outside the target project. From the worktree root run env -u VIRTUAL_ENV poetry install to create the worktree's own in-project .venv; never repoint the main checkout's environment."
+$script:WorktreePoetryVenvBlockedReason = "WORKTREE_VENV_BLOCKED: a mutating Poetry command would write into the virtual environment named by VIRTUAL_ENV, which lies outside the target project. From the worktree root run env -u VIRTUAL_ENV poetry install to create the worktree's own in-project .venv; never repoint the main checkout's environment. An agent whose Bash working directory is not the worktree root runs env -u VIRTUAL_ENV poetry -C <worktree root> install instead of changing directory first."
 
 function Get-WorktreePoetryVenvBlockedReason {
     <#
