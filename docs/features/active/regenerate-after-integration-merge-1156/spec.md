@@ -5,7 +5,7 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-11-09T21-35
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3 (D15 and D16 recorded during the single plan revision)
 - **Research:** `docs/features/active/regenerate-after-integration-merge-1156/research/research.2026-11-09T21-35.md`
 
 ## Overview
@@ -33,7 +33,7 @@ Any classifier decision other than `regenerate`, and any failure in the preparat
 
 ### Epic integration-tip flow
 
-1. After the epic orchestrator records a child's `merge_status: "merged"`, and when the integration worktree contains a valid `config/orchestration-regeneration.json`, it fetches and fast-forwards the integration worktree, then invokes the entry point with `-Mode Tip`.
+1. After the epic orchestrator records a child's `merge_status: "merged"`, and when the integration worktree contains a valid `config/orchestration-regeneration.json` (the entry point in `Validate` mode exits 0 there, D15), it fetches and fast-forwards the integration worktree, then invokes the entry point with `-Mode Tip`.
 2. In `Tip` mode the entry point runs the command twice with confinement and idempotency checks, without staging and without committing, and reports the changed paths.
 3. When the changed-path list is non-empty and the result is applied, the epic orchestrator runs `git add -- <changed paths>` and `git commit -F <message file>`, admitted by the new preimplementation allowance, and pushes.
 4. Whether or not a regeneration commit was made, the epic orchestrator dispatches CI on the integration branch with `gh workflow run CI --ref <integration branch>`, locates the run with `gh run list --commit <tip> --workflow CI`, polls every 30 seconds for at most 90 minutes, and appends an `integration_regenerations[]` entry.
@@ -46,7 +46,7 @@ During `## Epic Integration Branch Lifecycle` step 3, when the merge of `origin/
 
 ### Child-side verification before sync
 
-In epic mode, when the child's feature worktree holds a valid config, a child about to merge the integration branch (fan-in conflict handling or early-start step 7) first confirms with `gh run list --commit <integration tip> --workflow CI` that the tip has a completed run with conclusion `success`, polling every 30 seconds for at most 90 minutes. On timeout the child follows the existing wait branch with `blocked_reason: "awaiting_ci"`. Without a valid config the child does not wait.
+In epic mode, when the child's feature worktree holds a valid config (the entry point in `Validate` mode exits 0 there, D15), a child about to merge the integration branch (fan-in conflict handling or early-start step 7) first confirms with `gh run list --commit <integration tip> --workflow CI` that the tip has a completed run with conclusion `success`, polling every 30 seconds for at most 90 minutes. On timeout the child follows the existing wait branch with `blocked_reason: "awaiting_ci"`. Without a valid config the child does not wait.
 
 ### Error handling and recovery
 
@@ -87,14 +87,16 @@ Default-off: file absent, `regeneration` key absent, or `regeneration: null` mea
 
 `pwsh -NoProfile -File .claude/lib/regeneration/Invoke-RegenerationPath.ps1` with parameters:
 
-- `-Mode` (required): `Merge` or `Tip`.
-- `-MergeRef` (required for `Merge`, rejected for `Tip`): the remote-tracking ref to merge.
-- `-Trigger` (required for `Merge`): `integration_sync` or `main_sync`.
-- `-ConfigPath` (optional): relative path of the config file; default `config/orchestration-regeneration.json`.
+- `-Mode` (required): `Merge`, `Tip`, or `Validate` (D15).
+- `-MergeRef` (required for `Merge`, rejected for `Tip` and `Validate`): the remote-tracking ref to merge.
+- `-Trigger` (required for `Merge`, rejected for `Tip` and `Validate`, D16): `integration_sync` or `main_sync`.
+- `-ConfigPath` (optional): relative path of the config file; default `config/orchestration-regeneration.json`. An absolute value (leading slash or drive letter) or a value with a `..` segment is a usage error (D16).
 
-Output: exactly one JSON object on stdout with keys `mode`, `trigger`, `decision`, `reason`, `unmatched_paths`, `config_errors`, `feature_head_sha`, `merge_head_sha`, `merge_base_sha`, `command_exit_code`, `confined`, `idempotent`, `unit_gate`, `delta_check`, `changed_paths`, `outcome`, `at`, `event`, `review_outcome`, and `evidence_text`. In `Tip` mode `merge_head_sha`, `merge_base_sha`, `review_outcome`, and `delta_check` are `null` or `not_run` as applicable.
+Output: exactly one JSON object on stdout with keys `mode`, `trigger`, `decision`, `reason`, `unmatched_paths`, `config_errors`, `feature_head_sha`, `merge_head_sha`, `merge_base_sha`, `command_exit_code`, `confined`, `idempotent`, `unit_gate`, `delta_check`, `changed_paths`, `outcome`, `at`, `event`, `review_outcome`, and `evidence_text`. In `Tip` mode `merge_head_sha`, `merge_base_sha`, `review_outcome`, and `delta_check` are `null` or `not_run` as applicable. Per-mode values of `outcome`, `decision`, `event`, and `evidence_text` are fixed by D16.
 
-Exit codes: `0` regenerate path prepared (`Merge`) or result applied (`Tip`); `3` fall back or not applied (worktree restored); `1` git or process failure (worktree restored); `2` usage error (no git call made).
+Exit codes: `0` regenerate path prepared (`Merge`), result applied (`Tip`), or config valid (`Validate`); `3` fall back, not applied, or config not valid (worktree restored); `1` git or process failure (worktree restored); `2` usage error (no git call made).
+
+Config stage (D16): in every mode the config is read and validated before any git call. When the reason is `no_config` or `config_invalid`, the entry point makes no git call and no process call and exits 3, with `config_errors` holding the validator errors for `config_invalid` and empty otherwise.
 
 ### Checkpoint and evidence outputs
 
@@ -251,6 +253,8 @@ New:
 - `tests/scripts/claude-lib/regeneration/RegenerationClassifier.Tests.ps1`
 - `tests/scripts/claude-lib/regeneration/RegenerationDelta.Tests.ps1`
 - `tests/scripts/claude-lib/regeneration/Invoke-RegenerationPath.Tests.ps1`
+- `tests/scripts/claude-lib/regeneration/Invoke-RegenerationPath.Merge.Tests.ps1`
+- `tests/scripts/claude-lib/regeneration/Invoke-RegenerationPath.Tip.Tests.ps1`
 - `tests/scripts/claude-hooks/enforce-epic-merge-gate.Regeneration.Tests.ps1`
 - `tests/scripts/claude-hooks/hook-epic-regeneration.Tests.ps1`
 - `tests/scripts/codex-hooks/enforce-epic-merge-gate-regeneration.Tests.ps1`
@@ -285,6 +289,9 @@ Edited:
 - `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`
 - `tests/scripts/claude-hooks/enforce-epic-merge-gate.ReviewGuard.Tests.ps1`
 - `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.EpicFanIn.Tests.ps1`
+- `tests/scripts/dev_tools/test_validate_epic_orchestrator_state.py`
+- `tests/scripts/dev_tools/test_orchestration_handoff_taskmaster_469.py`
+- `extensions/drm-copilot/test/lib/validate/epic-orchestrator-state-core.test.ts`
 - `.claude/skills/execution-environment/SKILL.md`
 - `.agents/skills/execution-environment/SKILL.md`
 - `.github/skills/execution-environment/SKILL.md`
@@ -308,6 +315,17 @@ Edited:
 - **D12 — Entry-point invocation.** Decision: `pwsh -NoProfile -File .claude/lib/regeneration/Invoke-RegenerationPath.ps1`, granted to `epic-orchestrator` as one prefix grant. Rationale: follows the existing `Invoke-CiGateParser.ps1` precedent in the same tool list. Rejected: a generic command route or an `sh` launcher.
 - **D13 — Merge-gate entry-file line budget.** Decision: `.claude/hooks/enforce-epic-merge-gate.ps1` stays at or under the 500-line bound pinned by `tests/scripts/claude-hooks/session-root-reads-850.Constraints.Tests.ps1`; its one added dot-source and one added call are offset by collapsing three existing single-statement brace blocks to the one-line form, and the bound is not raised. Rationale: the file is at the bound today, and the collapse changes no statement. Rejected: raising the pinned bound.
 - **D14 — Evidence path function.** Decision: `RegenerationDelta.psm1` also exports pure `Get-RegenerationEvidencePath`, which returns the `evidence/qa-gates/regeneration-delta.<timestamp>.md` path under a feature folder for the delta outcome's `evidence_path`. Rationale: the file-name rule needs a tested implementation. Rejected: leaving the name to skill prose only.
+- **D15 — Deterministic "valid config" check (`Validate` mode).** Ambiguity resolved: the spec required a valid config before the epic integration-tip flow and before the child-side CI wait, but named no mechanism that decides validity without running the declared command. Decision: the entry point gains `-Mode Validate`, which reads and validates the config only, makes no git call and no process call, and exits 0 when the config is valid or 3 with reason `no_config` or `config_invalid`. "Valid config" in the epic skill means that `Validate` mode exits 0 in the named worktree. The research recommendation (D7: the flow applies only "when the integration worktree holds a valid regeneration config"; without a declaration "the child does not wait") is kept, and this mode is its mechanical test. Rejected: judging validity by file presence, which would add a 90-minute wait for an invalid config; and having the orchestrator judge the JSON by reading it, which is not deterministic.
+- **D16 — Result values, parameter boundaries, and exit-code assignment.** Ambiguities resolved, following the research exit-code scheme (0 regenerated, 3 fall back, 1 git or process failure, 2 usage):
+  - Config stage first in every mode, as stated under `### Entry point`.
+  - `outcome`: `prepared` (Merge exit 0), `fell_back` (Merge exit 3 or 1), `applied` (Tip exit 0), `not_applied` (Tip exit 3 or 1), `valid` (Validate exit 0), `not_valid` (Validate exit 3), `usage_error` (exit 2).
+  - `decision` is the classifier decision in `Merge` mode (`remediation_loop` for a config-stage exit) and `null` in `Tip` and `Validate` mode; `reason` is the classifier reason in `Merge`, `no_config` or `config_invalid` for a config-stage exit in any mode, and `null` otherwise.
+  - `event` and `evidence_text` are built only in `Merge` mode (and are `null` for a usage error); in `Tip` and `Validate` mode both are `null`, because the epic records `integration_regenerations[]` instead. `unit_gate` is `not_run` in `Tip` and `Validate` mode, which run no unit gate.
+  - `-Trigger` is rejected in `Tip` and `Validate` mode, as `-MergeRef` is, because the `Tip` trigger is recorded by the epic orchestrator in `integration_regenerations[]`.
+  - `-Mode` is not a mandatory PowerShell parameter, so an omitted or unknown value reaches the usage check (exit 2) instead of an interactive prompt.
+  - A declared command, `idempotency_check`, or unit-gate argv that runs and exits non-zero is a check failure: exit 3, with the exit code in `command_exit_code`. Exit 1 is reserved for a git call that returns non-zero where success is required and for a process that cannot be started.
+  - `git merge --no-commit --no-ff` exits non-zero for a conflicting merge, which is expected. After the call the adapter verifies `MERGE_HEAD`; when it is absent (merge refused or nothing to merge) the adapter exits 1 with no `git merge --abort` call, because no merge is in progress.
+  - With `idempotency_check` undeclared, no check process runs; with `unit_gate` undeclared, no unit-gate process runs.
 
 ## Acceptance Criteria
 
@@ -318,6 +336,8 @@ Edited:
 - [ ] [AC1] For a present but invalid config, the entry point returns reason `config_invalid` with the validator errors in `config_errors`, makes no `git merge` call, runs no declared command, and exits 3.
 - [ ] [AC1] The orchestrate skill's `## Merge-Conflict Remediation` section and the rules-file section `## Regeneration-Path Scope and Backward Compatibility` document `version`, `command`, `paths`, `idempotency_check`, and `unit_gate` with their validation rules and the default-off rule, pinned by `tests/scripts/claude-runtime/regeneration-path-skill-contract.Tests.ps1`.
 - [ ] [AC1] Neither `config/orchestration-regeneration.json` nor `extensions/drm-copilot/resources/config/orchestration-regeneration.json` exists in the repository after this item, asserted by the skill-contract test (D11).
+- [ ] [AC1] In `Tip` mode, a config that is absent, lacks the `regeneration` key, or sets it to `null` yields reason `no_config`, and a present but invalid config yields `config_invalid` with the errors in `config_errors`; each makes no git call and no process call, exits 3, and returns the twenty-key result (D16).
+- [ ] [AC1] `Validate` mode exits 0 for a valid config and 3 for each of the four other config states, with no git call and no process call, and rejects `-MergeRef` and `-Trigger` with exit 2 (D15).
 
 ### Classifier (issue AC2)
 
@@ -334,6 +354,7 @@ Edited:
 - [ ] [AC3] `Tip` mode applies the blob-id snapshot idempotency rule, makes no `git add` and no `git commit` call, and on a not-applied result restores tracked paths with `git checkout --` and removes created untracked paths with `git clean -f -q --`; a test fails if any of these calls is missing or extra.
 - [ ] [AC3] The `regeneration_events[]` builder, delta review outcome builder, and evidence-text builder produce the exact shapes in `## Data & State`, the evidence text contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` lines, uses the injected clock value, and contains no drive letter or leading-slash absolute path.
 - [ ] [AC3] The orchestrate skill states that after a successful `Merge` result the orchestrator runs the standard parallel unit gates when `unit_gate` is `not_run`, writes a new evidence file (never editing an existing one), commits with `git commit -F`, pushes, appends the event and the delta outcome with `head_sha` equal to the pushed head, and re-runs S9; and that a failure after the entry point exits runs `git merge --abort` and falls back. Pinned by the skill-contract test.
+- [ ] [AC3] The D16 boundaries hold and each has a failing test: the per-mode `outcome`, `decision`, `event`, and `evidence_text` values; a non-zero command, check, or unit-gate exit giving exit 3; a git failure giving exit 1 in each mode with the worktree restored; a conflicting `git merge` exit treated as expected when `MERGE_HEAD` exists and as exit 1 with no abort when it does not; no check or unit-gate process for an undeclared key; omitted `-Mode`, `-Trigger` in `Tip`, and an absolute or `..` `-ConfigPath` giving exit 2; and the script body printing one JSON object that keeps `null` values.
 
 ### Attempt accounting (issue AC4)
 
@@ -348,6 +369,7 @@ Edited:
 - [ ] [AC5] `Get-EpicRegenerationAllowance` tests admit `git add -- <path>` and `git commit -F <file>` on the integration branch for paths matching the config patterns, and deny each of: a path outside the patterns, a path with a backslash, asterisk, question mark, square bracket, `.` or `..` segment, or leading slash; `git commit -a`, `--all`, `--amend`, `--no-verify`; a chained command; Write and Edit; a HEAD other than the integration branch; an absent or invalid config; and a readiness failure other than `'merge-in-progress'`.
 - [ ] [AC5] `.claude/agents/epic-orchestrator.md` contains the Bash grant for the `Invoke-RegenerationPath.ps1` prefix in the same form as the `Invoke-CiGateParser.ps1` grant and no other new grant, asserted by the skill-contract test.
 - [ ] [AC5] The epic main-sync flow (lifecycle step 3) states that a conflicting merge with a valid config runs `Merge` mode with trigger `main_sync`, commits during the in-progress merge, and dispatches and verifies CI before the wave launches, and that a fallback runs today's step unchanged; pinned by the skill-contract test.
+- [ ] [AC5] The epic-orchestrate skill states the default-off boundary in both places: the integration-tip flow and the main-sync regenerate path each run only when the integration worktree holds a valid config, and a valid config is one for which `Validate` mode exits 0; pinned section- and item-scoped by the skill-contract test.
 
 ### Documentation, schema, and gates (issue AC6)
 
@@ -358,6 +380,8 @@ Edited:
 - [ ] [AC6] Every new or edited `.claude/` file listed in `### Concrete write paths` has a byte-identical bundle copy, the new lib and hook files appear in both `pack-manifests/core.json` files, and the existing push-down contract, pack-manifest completeness, and dependency-closure tests pass.
 - [ ] [AC6] The `PINNED_FROZEN_SURFACE_HASHES` entries for `.claude/agents/epic-orchestrator.md` and `.claude/skills/epic-orchestrate/SKILL.md` in `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` are re-baselined in place with a dated comment, and the test that reads them passes.
 - [ ] [AC6] The execution-environment brief is updated identically in `.claude/skills/execution-environment/SKILL.md`, `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md` (new epic regeneration allowance, regeneration merge-gate check, integration-tip CI dispatch), so that the listed copies remain byte-identical to one another and every existing test that compares them passes.
+- [ ] [AC6] The portable handoff projection holds none of `regeneration_events`, `integration_regenerations`, and `review_kind`, shown by a test appended to `tests/scripts/dev_tools/test_orchestration_handoff_taskmaster_469.py`, and the rules section discloses that the review/verdict status names the last full review's audit file.
+- [ ] [AC6] Codex scope: `.agents/skills/orchestrate/SKILL.md` and `.agents/skills/epic-orchestrate/SKILL.md` contain no reference to `Invoke-RegenerationPath`, asserted by the skill-contract test.
 
 ### Regression (issue AC7)
 
