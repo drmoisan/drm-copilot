@@ -9,6 +9,7 @@
     ".agents/skills/atomic-executor/SKILL.md",
     ".agents/skills/atomic-plan-contract/SKILL.md",
     ".agents/skills/atomic-planner/SKILL.md",
+    ".agents/skills/bash-command-shape/SKILL.md",
     ".agents/skills/characterize-runtime-behavior/SKILL.md",
     ".agents/skills/ci-workflows/SKILL.md",
     ".agents/skills/codex-model-routing/SKILL.md",
