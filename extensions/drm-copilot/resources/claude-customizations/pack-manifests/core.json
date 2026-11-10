@@ -294,6 +294,7 @@
     ".claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1",
     ".claude/lib/parallel-admission/ParallelAdmission.psm1",
     ".claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1",
+    ".claude/lib/parallel-admission/ParallelAdmissionPrecedenceGate.psm1",
     ".claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1",
     ".claude/lib/parallel-admission/ParallelAdmissionJson.psm1",
     ".claude/rules/parallel-orchestration.md",

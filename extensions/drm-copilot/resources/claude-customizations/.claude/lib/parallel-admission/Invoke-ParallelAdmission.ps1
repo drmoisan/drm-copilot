@@ -6,9 +6,13 @@
     Entry point the parallel-planner and parallel-orchestrator forks call as
     `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 <subcommand> ...`
     with the subcommands guard-run, assess, order-cohorts, test-cohorts, record,
-    and reuse-edges (feature spec `## API / CLI Surface`). The decisions are the
-    pure functions of ParallelAdmission.psm1 and ParallelAdmissionPrecedence.psm1,
-    and ParallelAdmissionJson.psm1 reads and writes the JSON; this script owns the
+    reuse-edges, test-precedence, and access-paths (feature spec `## API / CLI
+    Surface`; the last two from issue #1164). test-precedence rejects an ordering
+    that fails the parallel scheduling rule; access-paths derives each item's
+    read_paths from its plan text. The decisions are the pure functions of
+    ParallelAdmission.psm1, ParallelAdmissionPrecedence.psm1,
+    ParallelAdmissionPrecedenceGate.psm1, and the blast-radius modules, and
+    ParallelAdmissionJson.psm1 reads and writes the JSON; this script owns the
     I/O through three seams: Invoke-ParallelAdmissionGit (every git call),
     Read-ParallelAdmissionJsonText (every file read), and
     Get-ParallelAdmissionUtcNow (the clock).
@@ -21,7 +25,8 @@
 
     Exit codes: 0 prints one JSON object; 1 is a rule rejection with one stderr
     line "PARALLEL_ADMISSION_REJECTED: <code>: <detail>" (run_closed,
-    precedence_cycle, precedence_unknown_item, precedence_violated) or an
+    precedence_cycle, precedence_unknown_item, precedence_violated,
+    precedence_not_justified) or an
     unreadable input with one stderr line prefixed "parallel admission failed: ";
     2 is a usage error prefixed "parallel admission usage error: ".
 #>
@@ -41,21 +46,29 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ParallelAdmission.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ParallelAdmissionPrecedence.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ParallelAdmissionJson.psm1') -Force -ErrorAction Stop
+# The gate re-imports the scheduling module with -Force, so the scheduling and
+# access modules this script calls directly are imported after it.
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ParallelAdmissionPrecedenceGate.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../blast-radius/BlastRadiusScheduling.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../blast-radius/BlastRadiusAccess.psm1') -Force -ErrorAction Stop
 
 $script:AdmissionUsagePrefix = 'parallel admission usage error: '
 $script:AdmissionFailurePrefix = 'parallel admission failed: '
 $script:AdmissionRejectionPrefix = 'PARALLEL_ADMISSION_REJECTED: '
-$script:AdmissionRejectionCode = @('run_closed', 'precedence_cycle', 'precedence_unknown_item', 'precedence_violated')
+$script:AdmissionRejectionCode = @('run_closed', 'precedence_cycle', 'precedence_unknown_item', 'precedence_violated', 'precedence_not_justified')
+$script:AdmissionConfigPath = 'config/blast-radius.json'
 $script:AdmissionDefaultMain = 'origin/main'
 $script:AdmissionTimestampFormat = 'yyyy-MM-ddTHH-mm'
 $script:AdmissionBandName = @('C1', 'C2', 'C3', 'C4')
 $script:AdmissionRequiredOption = @{
-    'guard-run'     = @('CheckpointPath', 'ManifestMode')
-    'assess'        = @('Branch', 'FeatureFolder')
-    'order-cohorts' = @('Cohorts')
-    'test-cohorts'  = @('CheckpointPath')
-    'record'        = @('RunFolder', 'Entry')
-    'reuse-edges'   = @('Slug', 'IssueNum', 'PlanHash')
+    'guard-run'       = @('CheckpointPath', 'ManifestMode')
+    'assess'          = @('Branch', 'FeatureFolder')
+    'order-cohorts'   = @('Cohorts')
+    'test-cohorts'    = @('CheckpointPath')
+    'record'          = @('RunFolder', 'Entry')
+    'reuse-edges'     = @('Slug', 'IssueNum', 'PlanHash')
+    'test-precedence' = @('Entry')
+    'access-paths'    = @('Entry')
 }
 $script:AdmissionSpecTemplatePath = 'docs/features/templates/feature/spec.md'
 $script:AdmissionPlanTemplatePath = 'docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md'
@@ -157,7 +170,7 @@ function ConvertTo-ParallelAdmissionRejection {
 function Test-ParallelAdmissionRejectionMessage {
     <#
     .SYNOPSIS
-        Report whether an exception message starts with one of the four rejection codes.
+        Report whether an exception message starts with one of the rejection codes.
     #>
     [CmdletBinding()]
     [OutputType([bool])]
@@ -572,6 +585,43 @@ function Invoke-ParallelAdmissionEdgeReuse {
     return ConvertTo-ParallelAdmissionCliOutcome -ExitCode 0 -Stdout (ConvertTo-ParallelAdmissionJson -Value $result)
 }
 
+function Invoke-ParallelAdmissionPrecedenceTest {
+    <#
+    .SYNOPSIS
+        test-precedence: reject a precedence entry that fails the parallel scheduling rule (issue #1164).
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([hashtable] $Option)
+
+    $entry = ConvertFrom-ParallelAdmissionJson -Text $Option.Entry
+    if ($entry -isnot [System.Collections.IDictionary]) { throw '-Entry must be a JSON object.' }
+    $config = ConvertFrom-ParallelAdmissionJson -Text (Read-ParallelAdmissionJsonText -Path (Resolve-ParallelAdmissionPath -Path $script:AdmissionConfigPath))
+    $checked = Test-ParallelPrecedenceJustified -Entry $entry -Tolerance (Get-ConfigConflictTolerance -Config $config)
+    $result = [ordered]@{ checked = [long]$checked; result = 'justified' }
+    return ConvertTo-ParallelAdmissionCliOutcome -ExitCode 0 -Stdout (ConvertTo-ParallelAdmissionJson -Value $result)
+}
+
+function Invoke-ParallelAdmissionAccessPath {
+    <#
+    .SYNOPSIS
+        access-paths: derive each entry item's read_paths from its plan text (issue #1164).
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([hashtable] $Option)
+
+    $entry = ConvertFrom-ParallelAdmissionJson -Text $Option.Entry
+    if ($entry -isnot [System.Collections.IDictionary]) { throw '-Entry must be a JSON object.' }
+    $readPaths = [ordered]@{}
+    foreach ($item in @(Get-ParallelAdmissionMapValue -Map $entry -Key 'items') | Sort-Object -Property { [long]$_['issue_num'] }) {
+        $planText = Read-ParallelAdmissionJsonText -Path (Resolve-ParallelAdmissionPath -Path ([string]$item['plan_path']))
+        $radius = [string[]]@(Get-ParallelAdmissionMapValue -Map (Get-ParallelAdmissionMapValue -Map $item -Key 'blast_radius') -Key 'paths')
+        $readPaths[[string]$item['issue_num']] = [object[]]@(Get-BlastRadiusReadOnlyPath -PlanText $planText -RadiusPath $radius)
+    }
+    return ConvertTo-ParallelAdmissionCliOutcome -ExitCode 0 -Stdout (ConvertTo-ParallelAdmissionJson -Value ([ordered]@{ read_paths = $readPaths }))
+}
+
 function Invoke-ParallelAdmissionCli {
     <#
     .SYNOPSIS
@@ -604,6 +654,8 @@ function Invoke-ParallelAdmissionCli {
             'test-cohorts' { return Invoke-ParallelAdmissionCohortTest -Option $option }
             'record' { return Invoke-ParallelAdmissionRecord -Option $option }
             'reuse-edges' { return Invoke-ParallelAdmissionEdgeReuse -Option $option }
+            'test-precedence' { return Invoke-ParallelAdmissionPrecedenceTest -Option $option }
+            'access-paths' { return Invoke-ParallelAdmissionAccessPath -Option $option }
         }
     } catch {
         $message = $_.Exception.Message
