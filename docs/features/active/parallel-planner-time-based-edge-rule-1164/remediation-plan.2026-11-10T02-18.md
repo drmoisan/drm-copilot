@@ -88,7 +88,7 @@
   - Acceptance: one PASS, FAIL, or N/A row per checklist item, plus the mechanical rows of main-plan P6-T11 (no new Python file, no new TypeScript production file, byte-equal mirrors, unchanged agent `tools:` lines, no `.github/`, `.agents/`, or `.codex/` parallel planning surface); policy-audit 2.4 "Docs/docstrings", 2.4 "Comment why, not what", 8 "Gaps and exceptions", and code-review "Python implementation audit: Typing and API notes" cite the P2-T4 artifact; the artifact contains no FAIL row. A FAIL row is fixed and the loop restarts at P2-T1 before another self-review file is written.
 - [x] [P2-T10] Check off `[P6-T11]` in `docs/features/active/parallel-planner-time-based-edge-rule-1164/plan.2026-11-09T16-56.md` and the completed tasks of this plan.
   - Acceptance: the newest `self-review.*.md` has no FAIL row; `git diff HEAD -- docs/features/active/parallel-planner-time-based-edge-rule-1164/plan.2026-11-09T16-56.md` shows exactly one changed checkbox line, the `[P6-T11]` line.
-- [ ] [P2-T11] Commit the self-review, the plan check-offs, and remaining evidence with `git commit -F SCRATCH/issue-1164-commit-self-review.txt` and push with a plain `git push`.
+- [x] [P2-T11] Commit the self-review, the plan check-offs, and remaining evidence with `git commit -F SCRATCH/issue-1164-commit-self-review.txt` and push with a plain `git push`.
   - Acceptance: `git status --porcelain` lists no change under `<FEATURE>/`, `scripts/`, `.claude/lib/`, or `extensions/drm-copilot/`; `git rev-parse HEAD` equals `git rev-parse @{u}`. The `[P2-T11]` check-off itself is made after this acceptance holds and is committed and pushed in one follow-up commit with a plain `git push`, after which the acceptance is read again.
 
 ## Pre-Mortem
