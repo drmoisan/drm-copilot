@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "stage": "plan",
+  "research_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/research/research.2026-11-09T21-35.md",
+  "spec_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/spec.md",
+  "spec_version": "0.8",
+  "plan_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/plan.2026-11-09T16-31.md",
+  "plan_hash": "75c96cbef40da404dd0535d98884dd34060ba65f",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "ALL CLEAR",
+  "preflight_convergence": "NO FURTHER ROUNDS EXPECTED",
+  "preflight_rounds_this_run": [
+    {
+      "round": 1,
+      "status": "REVISIONS REQUIRED",
+      "closed_prior_defects": ["pester suite argument reach (P1-T1, P3-T1, P7-T4)", "expectations=None classification cases (P5-T3)"],
+      "substantive_defects": [
+        "process-reduction ledger handling (P6-T3 to P6-T7, Pre-Mortem)",
+        "registration branch B concrete registry paths and Codex dispatcher timeout (Execution Constraints, P4-T3, P6-T8)",
+        ".codex/hooks-only helper cases and TEST_EXECUTION_QUEUE_TIMEOUT: prefix assertion (P3-T1, P2-T2)",
+        "lock and holder file-name assertions (P1-T3)"
+      ],
+      "preflight_fix_record": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/evidence/other/preflight-fixes.2026-11-10T01-43.md"
+    },
+    {
+      "round": 2,
+      "status": "ALL CLEAR",
+      "closed_prior_defects": ["process-reduction ledger", "registration branch B", ".codex/hooks-only cases and queue-timeout prefix", "lock file names"],
+      "substantive_defects": [],
+      "preflight_fix_record": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/evidence/other/preflight-fixes.2026-11-10T02-17.md"
+    }
+  ],
+  "plan_task_count": 43,
+  "validators": {
+    "python_cli_plan": "exit 0",
+    "mcp_validate_orchestration_artifacts_plan": "ok true"
+  },
+  "non_blocking_observations": [
+    "Launcher matched by path suffix, so a copied tree under SCRATCH counts as the real launcher; no disclosure states this limit.",
+    "Branch B direct-group fallback for a name the #1159 registry does not dispatch would conflict with #1159 one-registration tests; unreachable today because both dispatchers admit mcp__.*.",
+    "P5-T1 and P5-T3 pass -n auto twice to pytest, which pytest accepts."
+  ],
+  "recorded_at": "2026-11-10T02:20:11Z"
+}
