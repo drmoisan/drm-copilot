@@ -331,7 +331,7 @@ def test_rule_documents_the_contract_weight() -> None:
         text,
         (
             "module, and contract, each an integer of at least 1",
-            "its committed value is 8",
+            "its committed value is 90",
             "`combination_threshold_percent` (integer, at least 0; default 400",
             "the contract weight times the number of distinct shared contract "
             "identifiers",
