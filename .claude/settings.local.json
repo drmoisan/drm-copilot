@@ -10,5 +10,6 @@
   },
   "enabledMcpjsonServers": [
     "drm-copilot"
-  ]
+  ],
+  "outputStyle": "Explanatory"
 }
