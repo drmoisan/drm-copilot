@@ -85,6 +85,14 @@ Describe 'worktree-poetry-venv-policy helper functions (issue #1127)' {
         $reason | Should -BeLike '*env -u VIRTUAL_ENV poetry install*'
         $reason | Should -BeLike "*never repoint the main checkout's environment*"
     }
+
+    It 'names the poetry -C form for an agent outside the worktree root (issue #1165)' {
+        # Act
+        $reason = Get-WorktreePoetryVenvBlockedReason
+
+        # Assert
+        $reason.Contains('poetry -C <worktree root>', [System.StringComparison]::Ordinal) | Should -BeTrue
+    }
 }
 
 Describe 'enforce-worktree-poetry-venv decision (issue #1127)' {
