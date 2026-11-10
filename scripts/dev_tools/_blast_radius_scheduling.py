@@ -539,6 +539,13 @@ def _path_pair_weight(
 ) -> int:
     """Weigh one overlapping path pair (spec section B2; first matching row wins).
 
+    Args:
+        entry_a (str): Item A's blast-radius entry of the overlapping pair.
+        entry_b (str): Item B's blast-radius entry of the overlapping pair.
+        tolerance (ConflictTolerance): The configured weights.
+        access_a (ItemAccess): Item A's access lists; empty by default.
+        access_b (ItemAccess): Item B's access lists; empty by default.
+
     Returns:
         int: 0 when ``entry_a`` is in A's read_paths or ``entry_b`` is in B's
         read_paths; else append_only when a concrete entry of the pair is
@@ -629,9 +636,24 @@ def _read_int_map(
     An ``optional`` name joins the exact name set only when the map carries it,
     so every other unknown name is still rejected and an absent optional name
     leaves the result without that key.
+
+    Args:
+        value (object): The deserialized nested map.
+        names (tuple[str, ...]): The required names, in result order.
+        member (str): The config member name used in error labels.
+        optional (tuple[str, ...]): Names accepted only when present.
+
+    Returns:
+        dict[str, int]: Each present name mapped to its integer value.
+
+    Raises:
+        TypeError: If the value is not a mapping or a named value is not an
+        integer.
+        ValueError: If a name is missing or unknown, or a value is below 1.
     """
     label = f'{_LABEL}["{member}"]'
     raw = require_mapping(value, label)
+    # Accept an optional name only when the map carries it, after the required names.
     present = names + tuple(name for name in optional if name in raw)
     mapping = _require_names(raw, present, label)
     # Validate each named value in the fixed name order.

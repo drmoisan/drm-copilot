@@ -365,7 +365,13 @@ const VALID_PRECEDENCE_KINDS: readonly string[] = ["cost", "correctness"];
 /** The optional item access lists of issue #1164, recorded beside `blast_radius`. */
 const ACCESS_LIST_FIELDS: readonly string[] = ["read_paths", "separable_paths"];
 
-/** A canonical `(a, b)` pair rendered as one key for set membership. */
+/**
+ * A canonical `(a, b)` pair rendered as one key for set membership.
+ *
+ * @param first The lower issue number of the pair.
+ * @param second The higher issue number of the pair.
+ * @returns The key `first,second`.
+ */
 function pairKey(first: number, second: number): string {
   return `${String(first)},${String(second)}`;
 }
@@ -381,6 +387,7 @@ function estimateErrors(
   entry: Record<string, unknown>,
   entryContext: string,
 ): string[] {
+  // Check each estimate field the entry carries; an absent field is not an error.
   return ["cost", "benefit"]
     .filter((field) => field in entry && !isNonNegativeInteger(entry[field]))
     .map(
@@ -404,6 +411,7 @@ function overlapPair(
 ): { errors: string[]; pair: [number, number] | null } {
   const errors: string[] = [];
   const endpoints: number[] = [];
+  // Resolve both endpoints so a bad `a` does not hide a bad `b`.
   for (const field of ["a", "b"]) {
     const value = entry[field];
     if (resolves(value, issueNums)) {
@@ -447,11 +455,14 @@ function overlapPair(
 function reasonErrors(reasons: unknown, entryContext: string): string[] {
   const entries: unknown[] = Array.isArray(reasons) ? reasons : [];
   let rule: string;
+  // Shape and enum membership are checked first: an unknown reason is reported
+  // as such even when a hard reason is also present.
   if (
     entries.length === 0 ||
     entries.some((entry) => !isEnumMember(VALID_EDGE_REASONS, entry))
   ) {
     rule = `must be a non-empty list drawn from ${VALID_EDGE_REASONS.join(", ")}`;
+    // A hard reason is always an edge, so it can never be tolerated (issue #722).
   } else if (entries.some((entry) => isEnumMember(HARD_EDGE_REASONS, entry))) {
     rule = "must not contain a hard reason";
   } else {
@@ -541,6 +552,7 @@ function edgeErrors(
 function accessListErrors(items: unknown, context: string): string[] {
   const errors: string[] = [];
   const entries: unknown[] = Array.isArray(items) ? items : [];
+  // Check every item; a non-object item reads as an item with no access lists.
   entries.forEach((entry: unknown, index: number) => {
     const record = isObject(entry) ? entry : {};
     const radius = isObject(record["blast_radius"])
@@ -548,6 +560,7 @@ function accessListErrors(items: unknown, context: string): string[] {
       : {};
     const paths = radius["paths"];
     const declared: unknown[] = Array.isArray(paths) ? paths : [];
+    // Visit only the access-list fields the item declares, in canonical order.
     for (const field of ACCESS_LIST_FIELDS.filter((name) => name in record)) {
       const prefix = `${itemContext(context, index)} ${field}`;
       const value = record[field];
@@ -578,6 +591,7 @@ function accessListErrors(items: unknown, context: string): string[] {
 function precedenceErrors(precedence: unknown, context: string): string[] {
   const errors: string[] = [];
   const entries: unknown[] = Array.isArray(precedence) ? precedence : [];
+  // Only entries that carry `kind` are checked, so legacy entries stay valid.
   entries.forEach((entry: unknown, position: number) => {
     if (!isObject(entry) || !("kind" in entry)) {
       return;
@@ -632,6 +646,7 @@ export function validateSchedulingDecisions(
     .filter((key) => overlapPairs.has(key))
     .map((key) => key.split(",").map(Number) as [number, number])
     .sort((left, right) => left[0] - right[0] || left[1] - right[1]);
+  // Report each shared pair once, in ascending pair order.
   for (const [first, second] of shared) {
     errors.push(
       `${context} pair (${String(first)}, ${String(second)}) is in both conflict_edges and tolerated_overlaps.`,

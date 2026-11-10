@@ -56,10 +56,19 @@ ACCESS_FIELDS: tuple[str, str] = ("read_paths", "separable_paths")
 
 
 def _access_list(value: object) -> tuple[str, ...]:
-    """Return a list of non-empty strings as a tuple, or empty when malformed."""
+    """Return a list of non-empty strings as a tuple, or empty when malformed.
+
+    Args:
+        value (object): The deserialized access-list value.
+
+    Returns:
+        tuple[str, ...]: The entries in order, or an empty tuple when the value
+        is not a list of non-empty strings.
+    """
     if not isinstance(value, list):
         return ()
     entries = cast("list[object]", value)
+    # One malformed entry rejects the whole list, so it prices like an absent one.
     if not all(isinstance(entry, str) and entry for entry in entries):
         return ()
     return tuple(cast("list[str]", entries))
@@ -82,6 +91,7 @@ def item_access(items: Sequence[Mapping[str, object]], item_key: int) -> ItemAcc
     # Return the first matching item's lists; issue numbers are unique.
     for record in items:
         if record.get("issue_num") == item_key:
+            # Read both lists in ACCESS_FIELDS order: read_paths, separable_paths.
             read_paths, separable_paths = (
                 _access_list(record.get(field)) for field in ACCESS_FIELDS
             )

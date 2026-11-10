@@ -44,8 +44,17 @@ $script:WriteTitleVerb = @(
 # A task line of an atomic plan: a checkbox, the task id, then the title.
 $script:TaskLinePattern = '^\s*-\s*\[[ xX]\]\s*\[P\d+-T\d+\]\s*(?<title>.*)$'
 
-# Return the string entries of one access list, or an empty array when absent.
 function Get-AccessListEntry {
+    <#
+    .SYNOPSIS
+        Return the string entries of one access list, or an empty array when absent.
+    .PARAMETER Access
+        The item's access lists (read_paths, separable_paths), or null.
+    .PARAMETER Name
+        The access-list name to read.
+    .OUTPUTS
+        System.String[]. The entries in order; empty when the list is absent or null.
+    #>
     [CmdletBinding()]
     [OutputType([string[]])]
     param(
@@ -56,6 +65,7 @@ function Get-AccessListEntry {
     )
 
     if ($null -eq $Access -or -not $Access.Contains($Name) -or $null -eq $Access[$Name]) { return [string[]]@() }
+    # Cast every entry to a string so ordinal membership tests compare strings only.
     return [string[]]@($Access[$Name] | ForEach-Object { [string]$_ })
 }
 
@@ -114,6 +124,7 @@ function Get-BlastRadiusAccessPathPairWeight {
     # Row 2: only a concrete entry can name an append-only file.
     $concrete = @(@($EntryA, $EntryB) | Where-Object { -not (Test-GlobEntry -Entry $_) })
     $appendOnly = [string[]]@($Tolerance['append_only_paths'])
+    # The first concrete entry that matches an append-only path decides the row.
     foreach ($entry in $concrete) {
         if (Test-MergeablePath -Entry $entry -MergeablePath $appendOnly) {
             return [long]$Tolerance['weights']['append_only']
@@ -135,8 +146,15 @@ function Get-BlastRadiusAccessPathPairWeight {
     return [long]$weights['possible_overlap']
 }
 
-# Return the task windows of a plan: each holds the title and the window text.
 function Get-PlanTaskWindow {
+    <#
+    .SYNOPSIS
+        Return the task windows of a plan: each holds the title and the window text.
+    .PARAMETER PlanText
+        The approved plan text, passed in memory.
+    .OUTPUTS
+        System.Object[]. One hashtable per task line, with keys title and text.
+    #>
     [CmdletBinding()]
     [OutputType([System.Object[]])]
     param(
@@ -146,6 +164,7 @@ function Get-PlanTaskWindow {
 
     $window = [System.Collections.Generic.List[object]]::new()
     $current = $null
+    # Walk the plan once: a task line opens a window and later lines join it.
     foreach ($line in ($PlanText -split "\r?\n")) {
         $match = [regex]::Match($line, $script:TaskLinePattern)
         if ($match.Success) {
@@ -158,11 +177,19 @@ function Get-PlanTaskWindow {
         if ($line -match '^\s*#') { $current = $null; continue }
         if ($null -ne $current) { $current['lines'].Add($line) }
     }
+    # Join each window's lines into one text so path naming is a substring test.
     return @($window | ForEach-Object { @{ title = $_['title']; text = ($_['lines'] -join "`n") } })
 }
 
-# Split a title into its alphabetic words; backticks and punctuation separate words.
 function Get-TitleWord {
+    <#
+    .SYNOPSIS
+        Split a title into its alphabetic words; backticks and punctuation separate words.
+    .PARAMETER Title
+        The task title.
+    .OUTPUTS
+        System.String[]. The words in title order.
+    #>
     [CmdletBinding()]
     [OutputType([string[]])]
     param(
@@ -170,11 +197,19 @@ function Get-TitleWord {
         [string] $Title
     )
 
+    # Drop the empty pieces that leading, trailing, or repeated separators produce.
     return [string[]]@($Title -split '[^A-Za-z]+' | Where-Object { $_ })
 }
 
-# Report whether every window naming a path is a read task (no write verb, no Create).
 function Test-ReadOnlyWindowSet {
+    <#
+    .SYNOPSIS
+        Report whether every window naming a path is a read task (no write verb, no Create).
+    .PARAMETER Window
+        The task windows that name the path.
+    .OUTPUTS
+        System.Boolean. True when every window is a read task.
+    #>
     [CmdletBinding()]
     [OutputType([bool])]
     param(
@@ -183,9 +218,11 @@ function Test-ReadOnlyWindowSet {
         [object[]] $Window
     )
 
+    # One write-like window makes the path a write path, so the first such window decides.
     foreach ($entry in $Window) {
         $words = @(Get-TitleWord -Title $entry['title'])
         $first = if ($words.Count -gt 0) { $words[0] } else { '' }
+        # A write verb anywhere in the title outweighs a read verb in first position.
         $hasWriteVerb = @($words | Where-Object { $script:WriteTitleVerb -contains $_ }).Count -gt 0
         if ($first -ceq 'Create' -or $script:ReadTitleVerb -cnotcontains $first -or $hasWriteVerb) { return $false }
     }
@@ -229,8 +266,10 @@ function Get-BlastRadiusReadOnlyPath {
 
     $windows = @(Get-PlanTaskWindow -PlanText ([string]$PlanText))
     $result = [System.Collections.Generic.List[string]]::new()
+    # Test each radius path once, in RadiusPath order, against the windows that name it.
     foreach ($path in @($RadiusPath)) {
         if ([string]::IsNullOrEmpty($path) -or $result.Contains($path)) { continue }
+        # A window names the path when its text contains the path ordinally.
         $naming = @($windows | Where-Object { $_['text'].Contains($path, [System.StringComparison]::Ordinal) })
         if ($naming.Count -gt 0 -and (Test-ReadOnlyWindowSet -Window $naming)) { $result.Add($path) }
     }

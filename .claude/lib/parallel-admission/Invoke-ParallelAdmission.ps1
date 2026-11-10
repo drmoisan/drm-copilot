@@ -589,6 +589,10 @@ function Invoke-ParallelAdmissionPrecedenceTest {
     <#
     .SYNOPSIS
         test-precedence: reject a precedence entry that fails the parallel scheduling rule (issue #1164).
+    .PARAMETER Option
+        The CLI options; Entry holds the scheduling result as JSON text.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject. The CLI outcome: exit 0 and the checked count.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -606,6 +610,10 @@ function Invoke-ParallelAdmissionAccessPath {
     <#
     .SYNOPSIS
         access-paths: derive each entry item's read_paths from its plan text (issue #1164).
+    .PARAMETER Option
+        The CLI options; Entry holds the items, with plan_path and blast_radius, as JSON text.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject. The CLI outcome: exit 0 and read_paths by issue_num.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -614,6 +622,7 @@ function Invoke-ParallelAdmissionAccessPath {
     $entry = ConvertFrom-ParallelAdmissionJson -Text $Option.Entry
     if ($entry -isnot [System.Collections.IDictionary]) { throw '-Entry must be a JSON object.' }
     $readPaths = [ordered]@{}
+    # Derive each item's list in ascending issue_num order so the output is deterministic.
     foreach ($item in @(Get-ParallelAdmissionMapValue -Map $entry -Key 'items') | Sort-Object -Property { [long]$_['issue_num'] }) {
         $planText = Read-ParallelAdmissionJsonText -Path (Resolve-ParallelAdmissionPath -Path ([string]$item['plan_path']))
         $radius = [string[]]@(Get-ParallelAdmissionMapValue -Map (Get-ParallelAdmissionMapValue -Map $item -Key 'blast_radius') -Key 'paths')

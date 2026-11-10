@@ -333,7 +333,17 @@ def validate_drift_events(
 
 
 def _estimate_errors(record: dict[str, object], entry_context: str) -> list[str]:
-    """Reject a present ``cost`` or ``benefit`` that is not a non-negative integer."""
+    """Reject a present ``cost`` or ``benefit`` that is not a non-negative integer.
+
+    Args:
+        record (dict[str, object]): One edge or tolerated-overlap entry.
+        entry_context (str): The error prefix naming the entry.
+
+    Returns:
+        list[str]: One error per present, invalid estimate, ``cost`` first; an
+        empty list when both are absent or valid.
+    """
+    # Check each estimate field the entry carries; an absent field is not an error.
     return [
         f"{entry_context} {field} must be a non-negative integer; "
         f"found: {record[field]!r}."
@@ -345,9 +355,21 @@ def _estimate_errors(record: dict[str, object], entry_context: str) -> list[str]
 def _overlap_pair(
     record: dict[str, object], entry_context: str, issue_nums: set[int]
 ) -> tuple[list[str], tuple[int, int] | None]:
-    """Return a tolerated overlap's endpoint errors and its canonical pair, or None."""
+    """Return a tolerated overlap's endpoint errors and its canonical pair, or None.
+
+    Args:
+        record (dict[str, object]): One ``tolerated_overlaps[]`` entry.
+        entry_context (str): The error prefix naming the entry.
+        issue_nums (set[int]): The declared ``items[].issue_num`` values.
+
+    Returns:
+        tuple[list[str], tuple[int, int] | None]: The endpoint errors and the
+        ``(a, b)`` pair; the pair is None when an endpoint does not resolve,
+        the endpoints are equal, or ``a > b``.
+    """
     errors: list[str] = []
     endpoints: list[int] = []
+    # Resolve both endpoints so a bad ``a`` does not hide a bad ``b``.
     for field in ("a", "b"):
         value = record.get(field)
         if _resolves(value, issue_nums):
@@ -371,10 +393,21 @@ def _overlap_pair(
 
 
 def _reason_errors(reasons: object, entry_context: str) -> list[str]:
-    """Check a tolerated overlap's ``reasons``: non-empty, in the enum, never hard."""
+    """Check a tolerated overlap's ``reasons``: non-empty, in the enum, never hard.
+
+    Args:
+        reasons (object): The deserialized ``reasons`` value.
+        entry_context (str): The error prefix naming the entry.
+
+    Returns:
+        list[str]: One error naming the first broken rule, or an empty list.
+    """
     entries = cast("list[object]", reasons) if isinstance(reasons, list) else []
+    # Shape and enum membership are checked first: an unknown reason is reported
+    # as such even when a hard reason is also present.
     if not entries or any(entry not in VALID_EDGE_REASONS for entry in entries):
         rule = f"must be a non-empty list drawn from {', '.join(VALID_EDGE_REASONS)}"
+    # A hard reason is always an edge, so it can never be tolerated (issue #722).
     elif any(entry in HARD_EDGE_REASONS for entry in entries):
         rule = "must not contain a hard reason"
     else:
@@ -385,7 +418,17 @@ def _reason_errors(reasons: object, entry_context: str) -> list[str]:
 def _validate_tolerated_overlaps(
     overlaps: object, issue_nums: set[int], context: str
 ) -> tuple[list[str], set[tuple[int, int]]]:
-    """Validate ``tolerated_overlaps[]`` and collect its canonical pairs."""
+    """Validate ``tolerated_overlaps[]`` and collect its canonical pairs.
+
+    Args:
+        overlaps (object): The deserialized ``tolerated_overlaps`` value.
+        issue_nums (set[int]): The declared ``items[].issue_num`` values.
+        context (str): The checkpoint error prefix.
+
+    Returns:
+        tuple[list[str], set[tuple[int, int]]]: The errors in entry order and
+        the ``(a, b)`` pairs of entries whose endpoints are valid.
+    """
     if not isinstance(overlaps, list):
         return [f"{context} tolerated_overlaps must be a list."], set()
     errors: list[str] = []
@@ -407,7 +450,16 @@ def _validate_tolerated_overlaps(
 
 
 def _edge_errors(edges: object, context: str) -> tuple[list[str], set[tuple[int, int]]]:
-    """Check the optional edge estimates and collect each edge's unordered pair."""
+    """Check the optional edge estimates and collect each edge's unordered pair.
+
+    Args:
+        edges (object): The deserialized ``conflict_edges`` value.
+        context (str): The checkpoint error prefix.
+
+    Returns:
+        tuple[list[str], set[tuple[int, int]]]: The ``hard`` and estimate
+        errors, and the ascending ``(low, high)`` pair of each usable edge.
+    """
     errors: list[str] = []
     pairs: set[tuple[int, int]] = set()
     entries = cast("list[object]", edges) if isinstance(edges, list) else []
@@ -428,15 +480,26 @@ def _edge_errors(edges: object, context: str) -> tuple[list[str], set[tuple[int,
 
 
 def _access_list_errors(items: object, context: str) -> list[str]:
-    """Check each item's optional access lists against its ``blast_radius.paths``."""
+    """Check each item's optional access lists against its ``blast_radius.paths``.
+
+    Args:
+        items (object): The deserialized ``items`` value.
+        context (str): The checkpoint error prefix.
+
+    Returns:
+        list[str]: One error per malformed list and per entry outside the
+        item's declared paths, in item and field order.
+    """
     errors: list[str] = []
     entries = cast("list[object]", items) if isinstance(items, list) else []
+    # Check every item; a non-object item reads as an item with no access lists.
     for index, entry in enumerate(entries):
         record = cast("dict[str, object]", entry) if isinstance(entry, dict) else {}
         raw = record.get("blast_radius")
         radius = cast("dict[str, object]", raw) if isinstance(raw, dict) else {}
         paths = radius.get("paths")
         declared = cast("list[object]", paths) if isinstance(paths, list) else []
+        # Visit only the access-list fields the item declares, in canonical order.
         for field in (name for name in ACCESS_LIST_FIELDS if name in record):
             prefix = f"{item_context(context, index)} {field}"
             if not is_string_list(record[field]):
@@ -452,9 +515,19 @@ def _access_list_errors(items: object, context: str) -> list[str]:
 
 
 def _precedence_errors(precedence: object, context: str) -> list[str]:
-    """Check each precedence entry's optional ``kind`` and its ``reason`` rule."""
+    """Check each precedence entry's optional ``kind`` and its ``reason`` rule.
+
+    Args:
+        precedence (object): The deserialized ``precedence`` value.
+        context (str): The checkpoint error prefix.
+
+    Returns:
+        list[str]: One error per entry whose ``kind`` is outside the enum or
+        whose ``correctness`` kind lacks a reason; legacy entries yield none.
+    """
     errors: list[str] = []
     entries = cast("list[object]", precedence) if isinstance(precedence, list) else []
+    # Only entries that carry ``kind`` are checked, so legacy entries stay valid.
     for position, entry in enumerate(entries):
         if not isinstance(entry, dict) or "kind" not in entry:
             continue
@@ -481,6 +554,14 @@ def validate_scheduling_decisions(
     error (B10.2). Returns edge estimate errors, tolerated-overlap errors, one
     both-lists error per shared unordered pair in ascending order, item
     access-list errors, then precedence ``kind`` and ``reason`` errors.
+
+    Args:
+        state (dict[str, object]): The parsed checkpoint mapping.
+        issue_nums (set[int]): The declared ``items[].issue_num`` values.
+        context (str): The checkpoint error prefix.
+
+    Returns:
+        list[str]: The errors in the order above; an empty list when valid.
     """
     errors, edge_pairs = _edge_errors(state.get("conflict_edges"), context)
     overlap_pairs: set[tuple[int, int]] = set()

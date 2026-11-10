@@ -432,8 +432,18 @@ def _validate_expected_conflict_components(mapping: dict[str, object]) -> list[s
 def _pair_endpoint_errors(
     entry: dict[str, object], position: str, declared: set[int]
 ) -> tuple[list[str], tuple[int, int] | None]:
-    """Resolve one pair decision's endpoints (M9); return errors and the pair."""
+    """Resolve one pair decision's endpoints (M9); return errors and the pair.
+
+    Args:
+        entry (dict[str, object]): One ``pair_decisions`` entry.
+        position (str): The error prefix naming the entry.
+        declared (set[int]): The declared ``items[].issue_num`` values.
+
+    Returns:
+        tuple[list[str], tuple[int, int] | None]: Errors, and ``(a, b)`` or None.
+    """
     errors: list[str] = []
+    # Resolve both endpoints so a bad ``a`` does not hide a bad ``b``.
     for field in ("a", "b"):
         value = entry.get(field)
         if not (is_integer(value) and cast("int", value) in declared):
@@ -452,10 +462,19 @@ def _pair_endpoint_errors(
 
 
 def _pair_field_errors(entry: dict[str, object], position: str) -> list[str]:
-    """Check one pair decision's reasons, hard flag, estimates, and verdict (M9)."""
+    """Check one pair decision's reasons, hard flag, estimates, and verdict (M9).
+
+    Args:
+        entry (dict[str, object]): One ``pair_decisions`` entry.
+        position (str): The error prefix naming the entry.
+
+    Returns:
+        list[str]: One error per broken field rule, in field order.
+    """
     errors: list[str] = []
     reasons = entry.get("reasons")
     entries = cast("list[object]", reasons) if isinstance(reasons, list) else []
+    # Every reason must be an enum member; one unknown reason fails the list.
     if not entries or any(reason not in VALID_EDGE_REASONS for reason in entries):
         errors.append(
             f"{position} reasons must be a non-empty list drawn from "
@@ -464,6 +483,7 @@ def _pair_field_errors(entry: dict[str, object], position: str) -> list[str]:
     hard = entry.get("hard")
     if not isinstance(hard, bool):
         errors.append(f"{position} hard must be a boolean.")
+    # Both integer-minute estimates are required on every pair decision.
     for field in ("cost", "benefit"):
         if not is_non_negative_integer(entry.get(field)):
             errors.append(

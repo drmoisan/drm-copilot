@@ -37,6 +37,7 @@ function Get-ParallelDriftAccessList {
     param([AllowNull()][object] $Item)
 
     $access = @{}
+    # Read both lists independently; a malformed list leaves the other unaffected.
     foreach ($name in $script:AccessListName) {
         $access[$name] = [string[]]@()
         if ($Item -isnot [System.Collections.IDictionary] -or -not $Item.Contains($name)) { continue }
@@ -44,6 +45,7 @@ function Get-ParallelDriftAccessList {
         # A string is IEnumerable but is not a list; it is malformed like any other scalar.
         if ($value -is [string] -or $value -isnot [System.Collections.IList]) { continue }
         $entries = @($value)
+        # Accept the list only when every entry is a non-empty string.
         $valid = @($entries | Where-Object { $_ -is [string] -and $_.Length -gt 0 }).Count -eq $entries.Count
         if ($valid) { $access[$name] = [string[]]$entries }
     }

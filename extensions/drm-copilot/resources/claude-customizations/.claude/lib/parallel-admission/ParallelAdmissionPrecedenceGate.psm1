@@ -27,8 +27,17 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../blast-radius/BlastRa
 # The rejection code; it is listed in $script:AdmissionRejectionCode of Invoke-ParallelAdmission.ps1.
 $script:PrecedenceNotJustified = 'precedence_not_justified'
 
-# Return a dictionary value, or null when the map is not a dictionary or lacks the key.
 function Get-PrecedenceGateValue {
+    <#
+    .SYNOPSIS
+        Return a dictionary value, or null when the map is not a dictionary or lacks the key.
+    .PARAMETER Map
+        The candidate dictionary, as deserialized.
+    .PARAMETER Key
+        The key to read.
+    .OUTPUTS
+        System.Object. The value, or null.
+    #>
     [CmdletBinding()]
     [OutputType([object])]
     param([AllowNull()][object] $Map, [string] $Key)
@@ -37,12 +46,24 @@ function Get-PrecedenceGateValue {
     return $Map[$Key]
 }
 
-# Find the record of a list whose unordered {a, b} pair equals the given pair, or null.
 function Find-PrecedenceGatePairRecord {
+    <#
+    .SYNOPSIS
+        Find the record of a list whose unordered {a, b} pair equals the given pair, or null.
+    .PARAMETER Record
+        The edge or tolerated-overlap records to search.
+    .PARAMETER First
+        One issue_num of the pair.
+    .PARAMETER Second
+        The other issue_num of the pair.
+    .OUTPUTS
+        System.Object. The first matching record, or null.
+    #>
     [CmdletBinding()]
     [OutputType([object])]
     param([AllowNull()][AllowEmptyCollection()][object[]] $Record = @(), [long] $First, [long] $Second)
 
+    # Return the first record whose endpoints match in either order; skip incomplete records.
     foreach ($entry in @($Record)) {
         $a = Get-PrecedenceGateValue -Map $entry -Key 'a'
         $b = Get-PrecedenceGateValue -Map $entry -Key 'b'
@@ -52,12 +73,22 @@ function Find-PrecedenceGatePairRecord {
     return $null
 }
 
-# Read the complexity band of one item key from the entry's items, or null.
 function Get-PrecedenceGateItemBand {
+    <#
+    .SYNOPSIS
+        Read the complexity band of one item key from the entry's items, or null.
+    .PARAMETER Item
+        The entry's items (issue_num and complexity_band).
+    .PARAMETER IssueNum
+        The item key whose band is read.
+    .OUTPUTS
+        System.Object. The complexity_band value, or null when the item is absent.
+    #>
     [CmdletBinding()]
     [OutputType([object])]
     param([AllowNull()][AllowEmptyCollection()][object[]] $Item = @(), [long] $IssueNum)
 
+    # Return the band of the first item with the key; issue numbers are unique.
     foreach ($entry in @($Item)) {
         $key = Get-PrecedenceGateValue -Map $entry -Key 'issue_num'
         if ($null -ne $key -and [long]$key -eq $IssueNum) { return Get-PrecedenceGateValue -Map $entry -Key 'complexity_band' }
@@ -97,6 +128,7 @@ function Test-ParallelPrecedenceJustified {
     $tolerated = @(Get-PrecedenceGateValue -Map $Entry -Key 'tolerated_overlaps')
     $items = @(Get-PrecedenceGateValue -Map $Entry -Key 'items')
     $checked = 0
+    # Test the entries in recorded order; the first rejection is thrown.
     foreach ($precedence in @(Get-PrecedenceGateValue -Map $Entry -Key 'precedence')) {
         $kind = Get-PrecedenceGateValue -Map $precedence -Key 'kind'
         if ($null -eq $kind) { continue }

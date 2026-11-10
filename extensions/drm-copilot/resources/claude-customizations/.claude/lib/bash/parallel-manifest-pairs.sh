@@ -26,9 +26,11 @@ pm_pair_endpoints() {
 	# Args: $1 = node path of the entry, $2 = entry context prefix,
 	# $3 = space-separated declared issue_num values. Appends one error per
 	# unresolved endpoint, or one normalization error when a >= b.
+	# Returns: 0 always; PM_PAIR_KEY is "a:b" when both endpoints are usable.
 	local path="$1" ctx="$2" declared="$3"
 	local field type value failed=0
 	PM_PAIR_KEY=""
+	# Resolve both endpoints so a bad a does not hide a bad b.
 	for field in a b; do
 		type=$(yp_type_of "${path}.${field}")
 		value=$(yp_value_of "${path}.${field}")
@@ -52,10 +54,12 @@ pm_pair_reasons_valid() {
 	# Return 0 when a reasons node is a non-empty sequence of enum members.
 	#
 	# Args: $1 = node path of the reasons list.
+	# Returns: 0 when valid, 1 otherwise; prints nothing.
 	local path="$1" count index type value
 	[[ $(yp_type_of "$path") == seq ]] || return 1
 	count=$(yp_count_of "$path")
 	((count > 0)) || return 1
+	# Every reason must be a string enum member; the first other entry fails the list.
 	for ((index = 0; index < count; index++)); do
 		type=$(yp_type_of "${path}[${index}]")
 		value=$(yp_value_of "${path}[${index}]")
@@ -69,6 +73,7 @@ pm_pair_fields() {
 	# Check one pair decision's reasons, hard flag, estimates, and verdict.
 	#
 	# Args: $1 = node path of the entry, $2 = entry context prefix.
+	# Returns: 0 unless pc_error_add fails; errors are appended through pc_error_add.
 	local path="$1" ctx="$2" field hard_type hard_value type value
 	if ! pm_pair_reasons_valid "${path}.reasons"; then
 		pc_error_add "$ctx reasons must be a non-empty list drawn from $PM_VALID_EDGE_REASONS."
@@ -78,6 +83,7 @@ pm_pair_fields() {
 	if [[ $hard_type != bool ]]; then
 		pc_error_add "$ctx hard must be a boolean."
 	fi
+	# Both integer-minute estimates are required on every pair decision.
 	for field in cost benefit; do
 		type=$(yp_type_of "${path}.${field}")
 		value=$(yp_value_of "${path}.${field}")
@@ -101,6 +107,9 @@ pm_validate_pair_decisions() {
 	# Key gated, like M8: absence is the shape of every earlier manifest, so a
 	# manifest without the key gains no error. Entries are validated in
 	# document order: endpoint errors, then a repeated pair, then the fields.
+	#
+	# Args: none
+	# Returns: 0 unless pc_error_add fails; errors are appended through pc_error_add.
 	local root="pair_decisions"
 	yp_has "$root" || return 0
 	if [[ $(yp_type_of "$root") != seq ]]; then
@@ -111,6 +120,7 @@ pm_validate_pair_decisions() {
 	local declared total index path ctx seen=""
 	declared=$(pm_declared_issue_nums)
 	total=$(yp_count_of "$root")
+	# Validate every entry in document order and track the pairs already seen.
 	for ((index = 0; index < total; index++)); do
 		path="${root}[${index}]"
 		ctx="$PM_CONTEXT ${root}[${index}]"
