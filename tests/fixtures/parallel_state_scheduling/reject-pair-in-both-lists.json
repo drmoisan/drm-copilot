@@ -1,0 +1,136 @@
+{
+  "name": "reject-pair-in-both-lists",
+  "artifact_type": "parallel-planner-state",
+  "checkpoint": {
+    "objective": "prepare parallel run wave-one",
+    "parallel_slug": "wave-one",
+    "parallel_manifest_path": "docs/features/parallel/wave-one/parallel.md",
+    "mode": "closed",
+    "max_concurrency": 4,
+    "items": [
+      {
+        "issue_num": 444,
+        "feature_folder": "2026-08-07-parallel-schema-validators-444",
+        "kind": "feature",
+        "state": "prepared",
+        "blast_radius": {
+          "paths": [
+            "scripts/dev_tools/**"
+          ],
+          "modules": [
+            "scripts"
+          ],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-07T10-00"
+        },
+        "preparation_status": "prepared",
+        "research_path": "docs/features/active/parallel-schema-validators/research.md",
+        "plan_path": "docs/features/active/parallel-schema-validators/plan.md",
+        "preflight_status": "PREFLIGHT: ALL CLEAR",
+        "complexity_band": "C3",
+        "complexity_assessment": {
+          "band": "C3",
+          "floor": "C3",
+          "signals_present": [
+            "cross_module_contract_change"
+          ],
+          "rationale": "Changes a validator contract shared across modules.",
+          "assessed_at": "2026-08-07T10-00"
+        },
+        "model_routing_receipt": {
+          "agent": "orchestrator",
+          "phase": "execution",
+          "complexity_band": "C3",
+          "fable_policy": "available",
+          "table_model": "opus",
+          "clamped_from": null,
+          "model": "opus"
+        }
+      },
+      {
+        "issue_num": 445,
+        "feature_folder": "2026-08-07-parallel-cohort-scheduler-445",
+        "kind": "feature",
+        "state": "prepared",
+        "blast_radius": {
+          "paths": [
+            "scripts/dev_tools/**"
+          ],
+          "modules": [
+            "scripts"
+          ],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-08-07T10-00"
+        },
+        "preparation_status": "prepared",
+        "research_path": "docs/features/active/parallel-cohort-scheduler/research.md",
+        "plan_path": "docs/features/active/parallel-cohort-scheduler/plan.md",
+        "preflight_status": "PREFLIGHT: ALL CLEAR",
+        "complexity_band": "C3",
+        "complexity_assessment": {
+          "band": "C3",
+          "floor": "C3",
+          "signals_present": [
+            "cross_module_contract_change"
+          ],
+          "rationale": "Changes a validator contract shared across modules.",
+          "assessed_at": "2026-08-07T10-00"
+        },
+        "model_routing_receipt": {
+          "agent": "orchestrator",
+          "phase": "execution",
+          "complexity_band": "C3",
+          "fable_policy": "available",
+          "table_model": "opus",
+          "clamped_from": null,
+          "model": "opus"
+        }
+      }
+    ],
+    "cohorts": [
+      {
+        "index": 0,
+        "generation": 0,
+        "item_keys": [
+          444,
+          445
+        ]
+      }
+    ],
+    "conflict_edges": [
+      {
+        "a": 444,
+        "b": 445,
+        "reason": "path_overlap",
+        "hard": false,
+        "cost": 90,
+        "benefit": 45
+      }
+    ],
+    "recolor_generation": 0,
+    "completed_steps": [
+      "manifest_parsed"
+    ],
+    "next_step": "PARALLEL_EXECUTION_READY",
+    "last_updated": "2026-08-07T10-00",
+    "kickoff_prompt_path": "artifacts/orchestration/parallel-kickoff-wave-one.md",
+    "tolerated_overlaps": [
+      {
+        "a": 444,
+        "b": 445,
+        "reasons": [
+          "path_overlap"
+        ],
+        "cost": 10,
+        "benefit": 45
+      }
+    ]
+  },
+  "expected_errors": [
+    "Parallel planner checkpoint pair (444, 445) is in both conflict_edges and tolerated_overlaps."
+  ]
+}

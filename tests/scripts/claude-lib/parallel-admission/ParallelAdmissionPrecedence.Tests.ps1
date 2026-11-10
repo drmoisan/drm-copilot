@@ -347,6 +347,31 @@ Describe 'Scheduling record' {
         @($record['precedence'][0].Keys) | Should -Be @('after', 'before', 'recorded_at', 'source')
     }
 
+    It 'emits edge estimates only when present' {
+        $record = New-ParallelSchedulingRecord @script:RecordArguments
+
+        # The second edge carries hard and cost but no benefit; the first carries neither.
+        @($record['edges'][1].Keys) | Should -Be @('a', 'b', 'cost', 'hard', 'reason')
+        $record['edges'][1]['hard'] | Should -BeFalse
+        $record['edges'][1]['cost'] | Should -Be 2
+        @($record['edges'][0].Keys) | Should -Be @('a', 'b', 'reason')
+    }
+
+    It 'emits precedence kind and reason only when present' {
+        $withKind = $script:RecordArguments.Clone()
+        $withKind.Precedence = @(
+            @{ before = 1101; after = 1102; source = 'operator'; recorded_at = '2026-11-03T10-00'; kind = 'correctness'; reason = '1102 consumes the schema 1101 adds' },
+            @{ before = 1101; after = 1103; source = 'planner'; recorded_at = '2026-11-03T10-01'; kind = 'cost' }
+        )
+
+        $record = New-ParallelSchedulingRecord @withKind
+
+        @($record['precedence'][0].Keys) | Should -Be @('after', 'before', 'kind', 'reason', 'recorded_at', 'source')
+        $record['precedence'][0]['reason'] | Should -Be '1102 consumes the schema 1101 adds'
+        @($record['precedence'][1].Keys) | Should -Be @('after', 'before', 'kind', 'recorded_at', 'source')
+        $record['precedence'][1]['kind'] | Should -Be 'cost'
+    }
+
     It 'yields the same record whatever the input order' {
         $reversed = $script:RecordArguments.Clone()
         $reversed.Item = @($script:RecordArguments.Item[1], $script:RecordArguments.Item[0])

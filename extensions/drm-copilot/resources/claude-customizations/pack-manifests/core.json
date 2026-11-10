@@ -307,6 +307,7 @@
     ".claude/lib/bash/parallel-items-validate.sh",
     ".claude/lib/bash/parallel-lane-assertion.sh",
     ".claude/lib/bash/parallel-manifest-validate.sh",
+    ".claude/lib/bash/parallel-manifest-pairs.sh",
     ".claude/lib/bash/parallel-mutation-cli.sh",
     ".claude/lib/bash/parallel-mutation-ops.sh",
     ".claude/lib/bash/parallel-mutation.sh",

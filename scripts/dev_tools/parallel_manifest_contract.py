@@ -3,7 +3,7 @@
 Purpose:
     Enforce the repository contract for the frontmatter of
     ``docs/features/parallel/<slug>/parallel.md`` -- spec invariants M1 through
-    M8 -- and expose the two default-resolving accessors that every consumer of
+    M9 -- and expose the two default-resolving accessors that every consumer of
     the manifest uses instead of reading ``mode`` and ``max_concurrency``
     directly.
 
@@ -38,14 +38,20 @@ from typing import cast
 import yaml
 
 from scripts.dev_tools._parallel_state_common import (
+    VALID_EDGE_REASONS,
     VALID_MODES,
     enum_error,
     in_bounded_range,
     is_integer,
     is_non_empty_string,
+    is_non_negative_integer,
     scan_prohibited_keys,
     validate_items,
 )
+
+# The two pair verdicts of invariant M9 (issue #1164): list membership in the
+# checkpoints, an explicit field in the manifest.
+VALID_PAIR_VERDICTS: tuple[str, ...] = ("edge", "tolerated")
 
 # Literal context prefix for every error this module and its helpers emit.
 CONTEXT = "Parallel manifest"
@@ -423,8 +429,110 @@ def _validate_expected_conflict_components(mapping: dict[str, object]) -> list[s
     return errors
 
 
+def _pair_endpoint_errors(
+    entry: dict[str, object], position: str, declared: set[int]
+) -> tuple[list[str], tuple[int, int] | None]:
+    """Resolve one pair decision's endpoints (M9); return errors and the pair."""
+    errors: list[str] = []
+    for field in ("a", "b"):
+        value = entry.get(field)
+        if not (is_integer(value) and cast("int", value) in declared):
+            errors.append(
+                f"{position} {field} does not resolve to an items[] issue_num; "
+                f"found: {value!r}."
+            )
+    if errors:
+        return errors, None
+    first, second = cast("int", entry["a"]), cast("int", entry["b"])
+    if first >= second:
+        return [
+            f"{position} must be normalized with a < b; found: ({first}, {second})."
+        ], None
+    return [], (first, second)
+
+
+def _pair_field_errors(entry: dict[str, object], position: str) -> list[str]:
+    """Check one pair decision's reasons, hard flag, estimates, and verdict (M9)."""
+    errors: list[str] = []
+    reasons = entry.get("reasons")
+    entries = cast("list[object]", reasons) if isinstance(reasons, list) else []
+    if not entries or any(reason not in VALID_EDGE_REASONS for reason in entries):
+        errors.append(
+            f"{position} reasons must be a non-empty list drawn from "
+            f"{', '.join(VALID_EDGE_REASONS)}."
+        )
+    hard = entry.get("hard")
+    if not isinstance(hard, bool):
+        errors.append(f"{position} hard must be a boolean.")
+    for field in ("cost", "benefit"):
+        if not is_non_negative_integer(entry.get(field)):
+            errors.append(
+                f"{position} {field} must be a non-negative integer; "
+                f"found: {entry.get(field)!r}."
+            )
+    verdict = entry.get("verdict")
+    if verdict not in VALID_PAIR_VERDICTS:
+        errors.append(enum_error(position, "verdict", VALID_PAIR_VERDICTS, verdict))
+    elif hard is True and verdict != "edge":
+        # A hard class is an edge at every tolerance (issue #722).
+        errors.append(f"{position} verdict must be edge when hard is true.")
+    return errors
+
+
+def _validate_pair_decisions(mapping: dict[str, object]) -> list[str]:
+    """Validate the optional ``pair_decisions`` key (invariant M9, issue #1164).
+
+    Purpose:
+        Check the per-pair scheduling record the planner writes at seeding:
+        one ``{a, b, reasons, hard, cost, benefit, verdict}`` entry per detected
+        pair, with integer-minute estimates and an ``edge`` or ``tolerated``
+        verdict.
+
+    Args:
+        mapping (dict[str, object]): A parsed manifest frontmatter mapping.
+
+    Returns:
+        list[str]: One error per violated condition, in document order. An
+        EMPTY list when the key is absent, so a manifest without the key
+        validates byte-identically to before M9 existed.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    # Key-gated, like M8: absence is the shape of every earlier manifest.
+    if "pair_decisions" not in mapping:
+        return []
+    decisions = mapping["pair_decisions"]
+    if not isinstance(decisions, list):
+        return [f"{CONTEXT} pair_decisions must be a list."]
+
+    errors: list[str] = []
+    declared = _declared_issue_nums(mapping.get("items"))
+    seen: set[tuple[int, int]] = set()
+    # Validate each entry in document order; endpoint errors come first, then a
+    # repeated pair, then the remaining fields in authoring order.
+    for index, decision in enumerate(cast("list[object]", decisions)):
+        position = f"{CONTEXT} pair_decisions[{index}]"
+        if not isinstance(decision, dict):
+            errors.append(f"{position} must be an object.")
+            continue
+        entry = cast("dict[str, object]", decision)
+        endpoint_errors, pair = _pair_endpoint_errors(entry, position, declared)
+        errors.extend(endpoint_errors)
+        if pair is not None and pair in seen:
+            errors.append(f"{position} repeats pair ({pair[0]}, {pair[1]}).")
+        if pair is not None:
+            seen.add(pair)
+        errors.extend(_pair_field_errors(entry, position))
+    return errors
+
+
 def validate_parallel_manifest_text(text: str) -> list[str]:
-    """Validate a parallel-run manifest document against invariants M1 to M8.
+    """Validate a parallel-run manifest document against invariants M1 to M9.
 
     Args:
         text (str): Raw manifest document text, authored with LF, CRLF, or CR
@@ -434,9 +542,10 @@ def validate_parallel_manifest_text(text: str) -> list[str]:
         list[str]: Validation errors for a malformed manifest; an empty list
         when the manifest is valid. A frontmatter failure returns a
         single-element list. An empty ``items`` list is valid: a manifest may
-        be authored before any item is admitted (schema S1). Invariant M8 is
-        key-gated, so a manifest without ``expected_conflict_components``
-        produces exactly the list it produced before M8 existed.
+        be authored before any item is admitted (schema S1). Invariants M8
+        and M9 are key-gated, so a manifest without
+        ``expected_conflict_components`` or ``pair_decisions`` produces exactly
+        the list it produced before those invariants existed.
 
     Raises:
         None.
@@ -463,7 +572,9 @@ def validate_parallel_manifest_text(text: str) -> list[str]:
     # The manifest carries `kind` on every item, unlike the orchestrator
     # checkpoint, so the shared item validator is asked to require it (S1).
     errors.extend(validate_items(mapping.get("items"), CONTEXT, require_kind=True))
-    # M8 runs last because its membership check resolves against the same
-    # `items` collection the previous call validated.
+    # M8 runs after the items check because its membership check resolves
+    # against the same `items` collection the previous call validated.
     errors.extend(_validate_expected_conflict_components(mapping))
+    # M9 runs after M8 and resolves its endpoints against the same items.
+    errors.extend(_validate_pair_decisions(mapping))
     return errors

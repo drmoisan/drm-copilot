@@ -5,7 +5,9 @@
  *     TypeScript port of `scripts/dev_tools/_parallel_state_records.py`. Enforces
  *     spec invariants 16, 17, and 18 -- the full `mutations[]` shape (schema S5)
  *     including the in-flight-removal disposition rule, and the full
- *     `drift_events[]` shape (schema S6).
+ *     `drift_events[]` shape (schema S6) -- and, presence-gated, the recorded
+ *     scheduling estimates, verdicts, access lists, and precedence kinds
+ *     (issue #1164).
  *
  * Responsibilities:
  *     Validate shape, enum membership, op-specific null rules, and item-key
@@ -28,6 +30,7 @@
 import {
   VALID_DISPOSITIONS,
   VALID_DRIFT_ACTIONS,
+  VALID_EDGE_REASONS,
   VALID_ITEM_STATES,
   VALID_MUTATION_OPS,
   enumError,
@@ -36,6 +39,7 @@ import {
   isNonNegativeInteger,
   isObject,
   isStringList,
+  itemContext,
   pythonRepr,
 } from "./parallel-state-shared";
 
@@ -343,5 +347,297 @@ export function validateDriftEvents(
       );
     }
   });
+  return errors;
+}
+
+/**
+ * Reason kinds that make a pair an edge at every tolerance (issue #722), so a
+ * tolerated overlap never carries one (issue #1164).
+ */
+const HARD_EDGE_REASONS: readonly string[] = [
+  "shared_surface_overlap",
+  "contract_dependency",
+];
+
+/** The precedence kinds of issue #1164: a re-tested cost ordering, or a correctness ordering. */
+const VALID_PRECEDENCE_KINDS: readonly string[] = ["cost", "correctness"];
+
+/** The optional item access lists of issue #1164, recorded beside `blast_radius`. */
+const ACCESS_LIST_FIELDS: readonly string[] = ["read_paths", "separable_paths"];
+
+/** A canonical `(a, b)` pair rendered as one key for set membership. */
+function pairKey(first: number, second: number): string {
+  return `${String(first)},${String(second)}`;
+}
+
+/**
+ * Reject a present `cost` or `benefit` that is not a non-negative integer.
+ *
+ * @param entry One object-shaped pair record.
+ * @param entryContext Context prefix naming this entry.
+ * @returns One error per malformed estimate; an absent estimate is valid.
+ */
+function estimateErrors(
+  entry: Record<string, unknown>,
+  entryContext: string,
+): string[] {
+  return ["cost", "benefit"]
+    .filter((field) => field in entry && !isNonNegativeInteger(entry[field]))
+    .map(
+      (field) =>
+        `${entryContext} ${field} must be a non-negative integer; found: ${pythonRepr(entry[field])}.`,
+    );
+}
+
+/**
+ * Return a tolerated overlap's endpoint errors and its canonical pair.
+ *
+ * @param entry One object-shaped tolerated overlap.
+ * @param entryContext Context prefix naming this entry.
+ * @param issueNums Resolvable primary keys.
+ * @returns The errors and the pair, or `null` when the endpoints are unusable.
+ */
+function overlapPair(
+  entry: Record<string, unknown>,
+  entryContext: string,
+  issueNums: ReadonlySet<number>,
+): { errors: string[]; pair: [number, number] | null } {
+  const errors: string[] = [];
+  const endpoints: number[] = [];
+  for (const field of ["a", "b"]) {
+    const value = entry[field];
+    if (resolves(value, issueNums)) {
+      endpoints.push(value as number);
+    } else {
+      errors.push(
+        `${entryContext} ${field} ${pythonRepr(value)} does not resolve to an items[].issue_num.`,
+      );
+    }
+  }
+  const [first, second] = endpoints;
+  if (first === undefined || second === undefined) {
+    return { errors, pair: null };
+  }
+  if (first === second) {
+    return {
+      errors: [
+        `${entryContext} endpoints must be distinct; found: ${String(first)}.`,
+      ],
+      pair: null,
+    };
+  }
+  if (first > second) {
+    return {
+      errors: [
+        `${entryContext} must be normalized with a < b; found: (${String(first)}, ${String(second)}).`,
+      ],
+      pair: null,
+    };
+  }
+  return { errors, pair: [first, second] };
+}
+
+/**
+ * Check a tolerated overlap's `reasons`: non-empty, in the enum, never hard.
+ *
+ * @param reasons The candidate `reasons` value.
+ * @param entryContext Context prefix naming this entry.
+ * @returns At most one error.
+ */
+function reasonErrors(reasons: unknown, entryContext: string): string[] {
+  const entries: unknown[] = Array.isArray(reasons) ? reasons : [];
+  let rule: string;
+  if (
+    entries.length === 0 ||
+    entries.some((entry) => !isEnumMember(VALID_EDGE_REASONS, entry))
+  ) {
+    rule = `must be a non-empty list drawn from ${VALID_EDGE_REASONS.join(", ")}`;
+  } else if (entries.some((entry) => isEnumMember(HARD_EDGE_REASONS, entry))) {
+    rule = "must not contain a hard reason";
+  } else {
+    return [];
+  }
+  return [`${entryContext} reasons ${rule}; found: ${pythonRepr(reasons)}.`];
+}
+
+/**
+ * Validate `tolerated_overlaps[]` and collect its canonical pairs.
+ *
+ * @param overlaps The candidate `tolerated_overlaps` value.
+ * @param issueNums Resolvable primary keys.
+ * @param context Surface prefix.
+ * @returns The errors in entry and field order, and the canonical pair keys.
+ */
+function validateToleratedOverlaps(
+  overlaps: unknown,
+  issueNums: ReadonlySet<number>,
+  context: string,
+): { errors: string[]; pairs: Set<string> } {
+  const pairs = new Set<string>();
+  if (!Array.isArray(overlaps)) {
+    return { errors: [`${context} tolerated_overlaps must be a list.`], pairs };
+  }
+  const errors: string[] = [];
+  // Validate every entry in field order so one malformed entry hides no other.
+  overlaps.forEach((entry: unknown, position: number) => {
+    const entryContext = `${context} tolerated_overlaps[${String(position)}]`;
+    if (!isObject(entry)) {
+      errors.push(`${entryContext} must be an object.`);
+      return;
+    }
+    const endpoint = overlapPair(entry, entryContext, issueNums);
+    errors.push(...endpoint.errors);
+    errors.push(...reasonErrors(entry["reasons"], entryContext));
+    errors.push(...estimateErrors(entry, entryContext));
+    if (endpoint.pair !== null) {
+      pairs.add(pairKey(endpoint.pair[0], endpoint.pair[1]));
+    }
+  });
+  return { errors, pairs };
+}
+
+/**
+ * Check the optional edge estimates and collect each edge's unordered pair.
+ *
+ * @param edges The candidate `conflict_edges` value; its shape is checked elsewhere.
+ * @param context Surface prefix.
+ * @returns The estimate errors and the unordered pair keys.
+ */
+function edgeErrors(
+  edges: unknown,
+  context: string,
+): { errors: string[]; pairs: Set<string> } {
+  const errors: string[] = [];
+  const pairs = new Set<string>();
+  const entries: unknown[] = Array.isArray(edges) ? edges : [];
+  // validateConflictEdges owns the edge shape; only object entries are read.
+  entries.forEach((entry: unknown, position: number) => {
+    if (!isObject(entry)) {
+      return;
+    }
+    const entryContext = `${context} conflict_edges[${String(position)}]`;
+    if ("hard" in entry && typeof entry["hard"] !== "boolean") {
+      errors.push(`${entryContext} hard must be a boolean.`);
+    }
+    errors.push(...estimateErrors(entry, entryContext));
+    const a = entry["a"];
+    const b = entry["b"];
+    if (isNonNegativeInteger(a) && isNonNegativeInteger(b) && a !== b) {
+      const low = Math.min(a as number, b as number);
+      const high = Math.max(a as number, b as number);
+      pairs.add(pairKey(low, high));
+    }
+  });
+  return { errors, pairs };
+}
+
+/**
+ * Check each item's optional access lists against its `blast_radius.paths`.
+ *
+ * @param items The candidate `items` value.
+ * @param context Surface prefix.
+ * @returns One error per malformed list or out-of-radius entry.
+ */
+function accessListErrors(items: unknown, context: string): string[] {
+  const errors: string[] = [];
+  const entries: unknown[] = Array.isArray(items) ? items : [];
+  entries.forEach((entry: unknown, index: number) => {
+    const record = isObject(entry) ? entry : {};
+    const radius = isObject(record["blast_radius"])
+      ? record["blast_radius"]
+      : {};
+    const paths = radius["paths"];
+    const declared: unknown[] = Array.isArray(paths) ? paths : [];
+    for (const field of ACCESS_LIST_FIELDS.filter((name) => name in record)) {
+      const prefix = `${itemContext(context, index)} ${field}`;
+      const value = record[field];
+      if (!isStringList(value) || !Array.isArray(value)) {
+        errors.push(`${prefix} must be a list of non-empty strings.`);
+        continue;
+      }
+      // A declaration never narrows a radius (spec B5.1, B5.4).
+      for (const path of value) {
+        if (!declared.includes(path)) {
+          errors.push(
+            `${prefix} entry ${pythonRepr(path)} is not in blast_radius.paths.`,
+          );
+        }
+      }
+    }
+  });
+  return errors;
+}
+
+/**
+ * Check each precedence entry's optional `kind` and its `reason` rule.
+ *
+ * @param precedence The candidate `precedence` value.
+ * @param context Surface prefix.
+ * @returns One error per malformed entry.
+ */
+function precedenceErrors(precedence: unknown, context: string): string[] {
+  const errors: string[] = [];
+  const entries: unknown[] = Array.isArray(precedence) ? precedence : [];
+  entries.forEach((entry: unknown, position: number) => {
+    if (!isObject(entry) || !("kind" in entry)) {
+      return;
+    }
+    const entryContext = `${context} precedence[${String(position)}]`;
+    const kind = entry["kind"];
+    if (!isEnumMember(VALID_PRECEDENCE_KINDS, kind)) {
+      errors.push(
+        enumError(entryContext, "kind", VALID_PRECEDENCE_KINDS, kind),
+      );
+    } else if (kind === "correctness" && !isNonEmptyString(entry["reason"])) {
+      errors.push(
+        `${entryContext} reason must be a non-empty string when kind is 'correctness'.`,
+      );
+    }
+  });
+  return errors;
+}
+
+/**
+ * Validate the recorded scheduling estimates and verdicts (issue #1164, spec
+ * B10.1). Port of `validate_scheduling_decisions` with byte-identical errors.
+ * Every check is presence-gated, so a checkpoint without the fields yields no
+ * error (B10.2).
+ *
+ * @param state The parsed checkpoint object.
+ * @param issueNums Resolvable primary keys.
+ * @param context Surface prefix, for example `Parallel checkpoint`.
+ * @returns Edge estimate errors, tolerated-overlap errors, one both-lists error
+ * per shared unordered pair in ascending order, item access-list errors, then
+ * precedence `kind` and `reason` errors.
+ */
+export function validateSchedulingDecisions(
+  state: Record<string, unknown>,
+  issueNums: ReadonlySet<number>,
+  context: string,
+): string[] {
+  const edges = edgeErrors(state["conflict_edges"], context);
+  const errors = [...edges.errors];
+  let overlapPairs = new Set<string>();
+  if ("tolerated_overlaps" in state) {
+    const overlaps = validateToleratedOverlaps(
+      state["tolerated_overlaps"],
+      issueNums,
+      context,
+    );
+    errors.push(...overlaps.errors);
+    overlapPairs = overlaps.pairs;
+  }
+  // A pair is either an edge or tolerated, never both (spec Data & State).
+  const shared = [...edges.pairs]
+    .filter((key) => overlapPairs.has(key))
+    .map((key) => key.split(",").map(Number) as [number, number])
+    .sort((left, right) => left[0] - right[0] || left[1] - right[1]);
+  for (const [first, second] of shared) {
+    errors.push(
+      `${context} pair (${String(first)}, ${String(second)}) is in both conflict_edges and tolerated_overlaps.`,
+    );
+  }
+  errors.push(...accessListErrors(state["items"], context));
+  errors.push(...precedenceErrors(state["precedence"], context));
   return errors;
 }
