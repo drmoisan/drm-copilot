@@ -559,9 +559,9 @@ the escalation path.
   every entry added from each side and every version choice, then runs the three commands
   `dotnet tool restore --tool-manifest <worktree_path>/.config/dotnet-tools.json`,
   `dotnet csharpier check <worktree_path>`, and
-  `dotnet build <worktree_path>/<solution>`, each with path arguments rather than `cd`.
+  `dotnet build <worktree_path>/<solution>`, each with path arguments rather than `cd` (forms: the Command-Text Restrictions table of the `execution-environment` brief).
   A failing check reverts with
-  `git -C <worktree_path> reset --hard HEAD~1`
+  `git -C <worktree_path> reset --keep HEAD~1`
   and escalates with the tool output as the finding.
 - (d) On success the parent pushes the item branch, records `mergeable_conflicts_resolved` on the
   item, sets `merge_status: pr_open`, regenerates `parallel-status.md`, and re-enters
