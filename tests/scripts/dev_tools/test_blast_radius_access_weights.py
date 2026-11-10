@@ -10,6 +10,7 @@ its configuration in memory; no file is read or created.
 from __future__ import annotations
 
 import copy
+from typing import cast
 
 import pytest
 
@@ -47,8 +48,7 @@ def make_config(**weight_overrides: object) -> dict[str, object]:
         dict[str, object]: A fresh truth table; callers may mutate it freely.
     """
     tolerance = copy.deepcopy(BASE_TOLERANCE)
-    weights = tolerance["weights"]
-    assert isinstance(weights, dict)
+    weights = cast("dict[str, object]", tolerance["weights"])
     weights.update(weight_overrides)
     return {"version": 1, "mergeable_paths": [], "conflict_tolerance": tolerance}
 
@@ -133,7 +133,7 @@ def test_read_only_either_side_weighs_zero() -> None:
 
 
 def test_append_only_precedes_separable() -> None:
-    """An append-only file stays at the append-only weight when both sides declare it separable."""
+    """An append-only file keeps its weight when both sides declare it separable."""
     both = ItemAccess(separable_paths=("CHANGELOG.md",))
 
     assert weigh("CHANGELOG.md", "CHANGELOG.md", access_a=both, access_b=both) == 10
@@ -187,6 +187,6 @@ def test_glob_overlap_weighs_possible_overlap() -> None:
 def test_no_access_lists_match_legacy_weight(
     entry_a: str, entry_b: str, expected: int
 ) -> None:
-    """Without access lists every pair keeps the append-only, same-file, or overlap weight."""
+    """Without access lists each pair keeps its pre-issue-1164 path weight."""
     assert weigh(entry_a, entry_b) == expected
     assert _path_pair_weight(entry_a, entry_b, SEPARABLE_TOLERANCE) == expected

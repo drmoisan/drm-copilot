@@ -32,7 +32,7 @@ BeforeAll {
 
     # A scheduling result for items 1 (C2), 2 (C2), 3 (C3), 4 (C3), and 5 (C4)
     # with one precedence entry; Override replaces any member.
-    function New-GateEntry {
+    function Get-GateEntry {
         param([hashtable] $Precedence, [hashtable] $Override = @{})
         $entry = @{
             edges              = @(
@@ -54,19 +54,19 @@ BeforeAll {
 
 Describe 'Test-ParallelPrecedenceJustified' {
     It 'accepts a cost entry on a cost edge' {
-        $entry = New-GateEntry -Precedence @{ before = 1; after = 2; source = 'operator'; kind = 'cost' }
+        $entry = Get-GateEntry -Precedence @{ before = 1; after = 2; source = 'operator'; kind = 'cost' }
 
         Test-ParallelPrecedenceJustified -Entry $entry -Tolerance $script:Tolerance | Should -Be 1
     }
 
     It 'accepts a cost entry on a hard edge' {
-        $entry = New-GateEntry -Precedence @{ before = 5; after = 2; source = 'planner'; kind = 'cost' }
+        $entry = Get-GateEntry -Precedence @{ before = 5; after = 2; source = 'planner'; kind = 'cost' }
 
         Test-ParallelPrecedenceJustified -Entry $entry -Tolerance $script:Tolerance | Should -Be 1
     }
 
     It 'rejects a cost entry on a tolerated overlap with its estimates' {
-        $entry = New-GateEntry -Precedence @{ before = 3; after = 4; source = 'operator'; kind = 'cost' } -Override @{
+        $entry = Get-GateEntry -Precedence @{ before = 3; after = 4; source = 'operator'; kind = 'cost' } -Override @{
             tolerated_overlaps = @(@{ a = 3; b = 4; reasons = @('path_overlap'); cost = 10; benefit = 90 })
         }
 
@@ -75,14 +75,14 @@ Describe 'Test-ParallelPrecedenceJustified' {
     }
 
     It 'rejects a tie at 90 against 90' {
-        $entry = New-GateEntry -Precedence @{ before = 3; after = 4; source = 'operator'; kind = 'cost' }
+        $entry = Get-GateEntry -Precedence @{ before = 3; after = 4; source = 'operator'; kind = 'cost' }
 
         { Test-ParallelPrecedenceJustified -Entry $entry -Tolerance $script:Tolerance } |
             Should -Throw -ExpectedMessage '*--after 4:3 fails the parallel scheduling rule (merge time 90 min does not exceed parallel gain 90 min)*'
     }
 
     It 'rejects a cost entry on a non-conflicting pair with merge time 0 and the gain' {
-        $entry = New-GateEntry -Precedence @{ before = 1; after = 3; source = 'operator'; kind = 'cost' }
+        $entry = Get-GateEntry -Precedence @{ before = 1; after = 3; source = 'operator'; kind = 'cost' }
 
         # Items 1 (C2) and 3 (C3) do not conflict: merge time 0, gain min(45, 90) = 45.
         { Test-ParallelPrecedenceJustified -Entry $entry -Tolerance $script:Tolerance } |
@@ -90,27 +90,27 @@ Describe 'Test-ParallelPrecedenceJustified' {
     }
 
     It 'accepts a correctness entry with a reason' {
-        $entry = New-GateEntry -Precedence @{ before = 3; after = 4; source = 'operator'; kind = 'correctness'; reason = 'item 4 consumes the schema item 3 adds' }
+        $entry = Get-GateEntry -Precedence @{ before = 3; after = 4; source = 'operator'; kind = 'correctness'; reason = 'item 4 consumes the schema item 3 adds' }
 
         Test-ParallelPrecedenceJustified -Entry $entry -Tolerance $script:Tolerance | Should -Be 0
     }
 
     It 'rejects a correctness entry with an empty reason' {
-        $entry = New-GateEntry -Precedence @{ before = 3; after = 4; source = 'operator'; kind = 'correctness'; reason = '' }
+        $entry = Get-GateEntry -Precedence @{ before = 3; after = 4; source = 'operator'; kind = 'correctness'; reason = '' }
 
         { Test-ParallelPrecedenceJustified -Entry $entry -Tolerance $script:Tolerance } |
             Should -Throw -ExpectedMessage 'precedence_not_justified: --after 4:3 is marked as a correctness ordering with an empty reason'
     }
 
     It 'rejects a correctness entry with a whitespace reason' {
-        $entry = New-GateEntry -Precedence @{ before = 3; after = 4; source = 'operator'; kind = 'correctness'; reason = "  `t" }
+        $entry = Get-GateEntry -Precedence @{ before = 3; after = 4; source = 'operator'; kind = 'correctness'; reason = "  `t" }
 
         { Test-ParallelPrecedenceJustified -Entry $entry -Tolerance $script:Tolerance } |
             Should -Throw -ExpectedMessage '*is marked as a correctness ordering with an empty reason'
     }
 
     It 'skips a legacy entry without kind' {
-        $entry = New-GateEntry -Precedence @{ before = 1; after = 3; source = 'operator'; recorded_at = '2026-11-03T10-00' }
+        $entry = Get-GateEntry -Precedence @{ before = 1; after = 3; source = 'operator'; recorded_at = '2026-11-03T10-00' }
 
         Test-ParallelPrecedenceJustified -Entry $entry -Tolerance $script:Tolerance | Should -Be 0
     }

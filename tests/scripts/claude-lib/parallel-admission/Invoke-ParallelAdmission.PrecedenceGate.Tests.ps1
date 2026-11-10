@@ -30,7 +30,7 @@ BeforeAll {
     } | ConvertTo-Json -Depth 6
 
     # A scheduling result: edge 1:2 (C2 and C2), tolerated overlap 3:4 (C3 and C3, a tie).
-    function New-PrecedenceEntryText {
+    function Get-PrecedenceEntryText {
         param([hashtable] $Precedence)
         return @{
             edges              = @(@{ a = 1; b = 2; reason = 'path_overlap'; hard = $false; cost = 90; benefit = 45 })
@@ -51,7 +51,7 @@ Describe 'Invoke-ParallelAdmission precedence gate subcommands' {
     }
 
     It 'test-precedence exits 0 for a justified cost entry' {
-        $entry = New-PrecedenceEntryText -Precedence @{ before = 1; after = 2; source = 'operator'; recorded_at = '2026-11-09T10-00'; kind = 'cost' }
+        $entry = Get-PrecedenceEntryText -Precedence @{ before = 1; after = 2; source = 'operator'; recorded_at = '2026-11-09T10-00'; kind = 'cost' }
 
         $outcome = Invoke-ParallelAdmissionCli -Subcommand 'test-precedence' -Entry $entry
 
@@ -61,7 +61,7 @@ Describe 'Invoke-ParallelAdmission precedence gate subcommands' {
     }
 
     It 'test-precedence exits 1 with the exact precedence_not_justified line' {
-        $entry = New-PrecedenceEntryText -Precedence @{ before = 3; after = 4; source = 'operator'; recorded_at = '2026-11-09T10-00'; kind = 'cost' }
+        $entry = Get-PrecedenceEntryText -Precedence @{ before = 3; after = 4; source = 'operator'; recorded_at = '2026-11-09T10-00'; kind = 'cost' }
 
         $outcome = Invoke-ParallelAdmissionCli -Subcommand 'test-precedence' -Entry $entry
 
@@ -70,7 +70,7 @@ Describe 'Invoke-ParallelAdmission precedence gate subcommands' {
     }
 
     It 'test-precedence exits 1 for an empty correctness reason' {
-        $entry = New-PrecedenceEntryText -Precedence @{ before = 3; after = 4; source = 'operator'; recorded_at = '2026-11-09T10-00'; kind = 'correctness'; reason = ' ' }
+        $entry = Get-PrecedenceEntryText -Precedence @{ before = 3; after = 4; source = 'operator'; recorded_at = '2026-11-09T10-00'; kind = 'correctness'; reason = ' ' }
 
         $outcome = Invoke-ParallelAdmissionCli -Subcommand 'test-precedence' -Entry $entry
 

@@ -152,19 +152,19 @@
 
 ### Phase 6 — Final QA loop and self-review
 
-- [ ] [P6-T1] Merge `origin/main` into the branch with a plain merge (never a rebase), resolve conflicts in the files of this plan only, and record `<FEATURE>/evidence/other/main-merge.<timestamp>.md`.
+- [x] [P6-T1] Merge `origin/main` into the branch with a plain merge (never a rebase), resolve conflicts in the files of this plan only, and record `<FEATURE>/evidence/other/main-merge.<timestamp>.md`.
   - Acceptance: the artifact records the merged `origin/main` ref name, the conflicted files and their resolution, and that `docs/features/parallel/harness-learnings-2026-11-09/` is absent from the merge-base diff of `origin/main` and `HEAD`.
-- [ ] [P6-T2] Run the PowerShell final static loop over every changed or new `.ps1`, `.psm1`, and test file under `.claude/lib/` and `tests/scripts/` (PoshQC format, PSScriptAnalyzer, `Invoke-PoshQCLeakScan -Root`).
+- [x] [P6-T2] Run the PowerShell final static loop over every changed or new `.ps1`, `.psm1`, and test file under `.claude/lib/` and `tests/scripts/` (PoshQC format, PSScriptAnalyzer, `Invoke-PoshQCLeakScan -Root`).
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-static.<timestamp>.md` records each step's command, exit code, and finding count; the formatter step shows no file changed (a before-and-after `git status --porcelain` listing), and every count is 0.
-- [ ] [P6-T3] Run the Python final static loop (Black check mode, Ruff, Pyright) over the seven P0-T2 files and the new tests under `tests/scripts/dev_tools/`.
+- [x] [P6-T3] Run the Python final static loop (Black check mode, Ruff, Pyright) over the seven P0-T2 files and the new tests under `tests/scripts/dev_tools/`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/python-static.<timestamp>.md` records each step with exit code 0 and finding count 0.
-- [ ] [P6-T4] Run the TypeScript final static loop in `extensions/drm-copilot/` (Prettier check on the changed files, `npm run lint`, `npm run typecheck`).
+- [x] [P6-T4] Run the TypeScript final static loop in `extensions/drm-copilot/` (Prettier check on the changed files, `npm run lint`, `npm run typecheck`).
   - Acceptance: `<FEATURE>/evidence/qa-gates/typescript-static.<timestamp>.md` records each step with exit code 0 and finding count 0.
-- [ ] [P6-T5] Run the final Pester gate: one `Invoke-PoshQCParallelTest` run importing the branch `scripts/powershell/PoshQC/PoshQC.psd1`.
+- [x] [P6-T5] Run the final Pester gate: one `Invoke-PoshQCParallelTest` run importing the branch `scripts/powershell/PoshQC/PoshQC.psd1`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/pester-gate.<timestamp>.md` records `EXIT_CODE: 0` from the returned `ExitCode`, zero failures, the pass count, repo-wide line coverage of at least 85%, and per-file line coverage from `artifacts/pester/powershell-coverage.xml` for every changed or new PowerShell file; each test case named in Phases 1-5 appears as passed in the JUnit output; `FileSizePolicy.RepoGate.Tests.ps1` passes.
-- [ ] [P6-T6] Run the final pytest gate: one `pytest -n auto` run over `tests/` with `--cov-branch`, `--cov-report=term-missing`, `--cov-report=json:SCRATCH/issue-1164-cov-final.json`, and a bare `--cov` as the last argument.
+- [x] [P6-T6] Run the final pytest gate: one `pytest -n auto` run over `tests/` with `--cov-branch`, `--cov-report=term-missing`, `--cov-report=json:SCRATCH/issue-1164-cov-final.json`, and a bare `--cov` as the last argument.
   - Acceptance: `<FEATURE>/evidence/qa-gates/pytest-gate.<timestamp>.md` records exit code 0, zero failures, repo-wide line and branch coverage, and per-file line and branch coverage for the seven P0-T2 files; the named Python tests of Phases 1-5 and the contract tests `test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, `test_blast_radius_config_parity.py`, `test_claude_rules_frontmatter.py`, `test_parallel_planner_surface_contracts.py`, `test_parallel_orchestrator_surface_contracts.py`, and `test_parallel_issue_combination_contracts.py` pass.
-- [ ] [P6-T7] Run the final Jest gate in `extensions/drm-copilot/`: one `node run-jest.cjs --coverage` run.
+- [x] [P6-T7] Run the final Jest gate in `extensions/drm-copilot/`: one `node run-jest.cjs --coverage` run.
   - Acceptance: `<FEATURE>/evidence/qa-gates/jest-gate.<timestamp>.md` records exit code 0, zero failures, and per-file line and branch coverage for the three P0-T3 files; `parallel-state-scheduling-parity.test.ts` and `claude-blast-radius-overlay-parity.test.ts` pass.
 - [ ] [P6-T8] Push the branch, dispatch `ci.yml` on it, and record `<FEATURE>/evidence/qa-gates/shell-ci.<timestamp>.md` from that run.
   - Acceptance: the artifact records the run id and head ref, `shell-coverage / Shell Coverage (Bats + kcov)` success, the `Run shell-qc check (shfmt diff + shellcheck)` step result with its finding count as the bash final static record, the bats pass and fail counts with `tests/shell/parallel_manifest_parity.bats` passing, and kcov line coverage of `.claude/lib/bash/parallel-manifest-validate.sh` and `.claude/lib/bash/parallel-manifest-pairs.sh`; `CI Required Gate` success.

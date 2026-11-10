@@ -140,6 +140,12 @@
         "recorded_at": "2026-11-09T10-01",
         "kind": "correctness",
         "reason": "445 consumes the schema 444 adds"
+      },
+      {
+        "before": 444,
+        "after": 445,
+        "source": "operator",
+        "recorded_at": "2026-11-03T10-00"
       }
     ]
   },

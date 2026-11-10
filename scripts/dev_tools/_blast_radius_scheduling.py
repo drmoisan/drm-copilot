@@ -193,7 +193,7 @@ NO_ACCESS = ItemAccess()
 
 @dataclass(frozen=True)
 class SchedulingItem:
-    """One work item: its ``issue_num`` key, declared radius, optional band, and access."""
+    """One work item: its ``issue_num`` key, radius, optional band, and access."""
 
     key: int
     radius: BlastRadius

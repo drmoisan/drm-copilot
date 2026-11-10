@@ -136,8 +136,8 @@ input declared in `## Prepared-Item Admission (issue #1047)` of
 the constraint, and a `blocked` predecessor holds its dependent. Layer 1 enforces this rule through
 `Test-ParallelCohortBarrierClear` in `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`,
 which denies a target whose predecessor is not released and fails closed on a missing predecessor
-record. Before an ordering is recorded, `/parallel-add` runs the helper's `test-precedence`
-subcommand and rejects an unjustified flag with `precedence_not_justified` (issue #1164): a
+record. The `/parallel-add` skill runs the helper's `test-precedence` subcommand for each new
+ordering and rejects an unjustified flag with `precedence_not_justified` (issue #1164): a
 `kind: "cost"` entry must name a returned edge, and a `kind: "correctness"` entry needs a
 non-empty `reason`. A legacy entry without kind is held the same way: it is honoured unchanged by
 this rule and is not re-tested. A tolerated pair, whose merge time does not exceed its gain, runs

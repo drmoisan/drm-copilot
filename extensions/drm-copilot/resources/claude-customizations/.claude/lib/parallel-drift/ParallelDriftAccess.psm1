@@ -13,6 +13,7 @@
     empty: the validators report the malformed value, and an empty list removes
     a cost reduction, which is the fail-closed direction. The function is pure:
     no filesystem, subprocess, network, or clock access, and no input is mutated.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
