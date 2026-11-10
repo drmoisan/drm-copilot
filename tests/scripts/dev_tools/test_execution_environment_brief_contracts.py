@@ -255,6 +255,42 @@ def test_brief_worktree_python_environment_section_states_bootstrap() -> None:
     assert missing == [], f"Worktree Python Environment lacks {missing}"
 
 
+def test_brief_command_text_restrictions_states_preferred_forms() -> None:
+    """The brief states the preferred-forms table and the corrected Codex attribution.
+
+    Issue #1165: the table maps each intent to its form for an agent-isolated
+    worktree and for a sibling worktree, the Codex hook is stated to have no
+    cd-chained leg, and the Worktree Python Environment section names the
+    directory-option form of the bootstrap.
+    """
+
+    # Arrange
+    restrictions = _section("## Command-Text Restrictions")
+    python_environment = _section("## Worktree Python Environment")
+
+    # Act
+    missing = _missing(
+        restrictions,
+        (
+            "| Intent | Agent-isolated worktree | Sibling worktree |",
+            "git -C <abs>",
+            "poetry -C <abs>",
+            "npm --prefix <abs>",
+            "Read or Grep tool",
+            "absolute-path read",
+            "sh <SCRATCH>/<file>.sh",
+            ".claude/rules/bash-command-shape.md",
+            "has no cd-chained leg",
+        ),
+    ) + _missing(python_environment, ("poetry -C <worktree root>",))
+
+    # Assert
+    assert missing == [], f"brief lacks preferred-form tokens {missing}"
+    assert (
+        "`.codex/hooks/validate-bash.ps1` for Codex; functions" not in restrictions
+    ), "the brief still attributes the cd-chained functions to the Codex hook"
+
+
 def test_brief_ci_section_names_jobs_and_required_contexts() -> None:
     """The CI section names every job, the change scope, and each required context."""
 
