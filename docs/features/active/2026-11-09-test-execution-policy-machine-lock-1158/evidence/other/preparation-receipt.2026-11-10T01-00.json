@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "stage": "plan",
+  "research_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/research/research.2026-11-09T21-35.md",
+  "spec_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/spec.md",
+  "plan_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/plan.2026-11-09T16-31.md",
+  "plan_hash": "3b0f9c5d6a488380ba75d0735427d8e8c8a672ce",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "REVISIONS REQUIRED",
+  "preflight_convergence": "NO FURTHER ROUNDS EXPECTED",
+  "preflight_closed_defects": [
+    "exit-code collision (P5-T1, P5-T2, P5-T3)",
+    "runner-detection command-form bypass (P1-T5, P4-T1, P7-T5)",
+    "suites.workingDirectory reach (P3-T1)"
+  ],
+  "preflight_open_defects": [
+    "P1-T1 / P3-T1 / P7-T4 | wrong design (pester suite argument reach) | The pester suite runs Invoke-PoshQCParallelTest through a pwsh -Command string, so appended lane exclusions are read as command text and never bind. Required change: add launcher-sibling Invoke-PesterSuite.ps1 run through pwsh -NoProfile -NonInteractive -File, which imports scripts/powershell/PoshQC/PoshQC.psd1, calls Invoke-PoshQCParallelTest -Root . splatting $args as named parameters, and exits with the result ExitCode; P1-T1 test asserts -File with no -Command word; P3-T1 argument-reach case asserts the mock receives -ExcludeTag Integration,Golden and -ExcludeTestFileSuffix with every configured suffix including -integration.test.ts, no -WorkerCount, and exit code equal to the mocked ExitCode (0 and 1); P3-T2 and P6-T2 copy the script; P7-T4 records that none of the four integration-named Pester files of P0-T4 appears in artifacts/pester/pester-junit.xml and adds the script to its coverage list; spec D26 and Scope add the script and its .agents and bundle copies.",
+    "P5-T3 | design-check gap (rule with no failing test) | Add expectations=None cases to test_cli_preflight.py: pytest step returning 75 gives success false, failed_step pytest, launcher_outcome QUEUE_TIMEOUT; test-unit step returning 2 with a first output line starting TEST_EXECUTION_POLICY_BLOCKED: gives launcher_outcome POLICY_REFUSAL; pytest step returning 2 with pytest session output gives launcher_outcome None (each fails against a classification placed after the existing expectations-is-None early return)."
+  ],
+  "preflight_fix_record": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/evidence/other/preflight-fixes.2026-11-10T00-58.md",
+  "recorded_at": "2026-11-10T01:00:05Z"
+}
