@@ -208,7 +208,51 @@ function Get-RegenerationTipScenarioAlternative {
     [OutputType([object[]])]
     param([Parameter(Mandatory = $true)] [string] $Name)
 
-    throw "Unknown Tip scenario '$Name'"
+    $nul = [string] [char] 0
+    $unstaged = 'diff --name-only -z'
+    $untracked = 'ls-files --others --exclude-standard -z'
+    $alt = { param($Steps, $Git = @{}, $Process = @{}, $Config = 'valid') @{ Steps = [string[]] $Steps; Git = $Git; Process = $Process; Config = $Config } }
+    $head = @('T1', 'T2', 'P1', 'T3', 'T4', 'H:gen/a.json', 'H:gen/new.json')
+    $restore = @('RL1', 'RL2', 'RC:gen/a.json', 'RK:gen/new.json')
+    $tracked = @('T1', 'T2', 'P1', 'T3', 'T4', 'H:gen/a.json', 'H:gen/new.json', 'H:src/x.ps1', 'RL1', 'RL2', 'RC:gen/a.json src/x.ps1', 'RK:gen/new.json')
+    $trackedGit = @{ $unstaged = @("gen/a.json${nul}src/x.ps1$nul") }
+    $scenario = @{
+        'tip-applied'                 = @(& $alt ($head + @('P2', 'T6', 'T7', 'H:gen/a.json', 'H:gen/new.json')))
+        'tip-applied-empty'           = @(& $alt @('T1', 'T2', 'P1', 'T3', 'T4', 'P2', 'T6', 'T7') @{ $unstaged = @(''); $untracked = @('') })
+        'tip-merge-in-progress'       = @(& $alt @('T1') @{ 'rev-parse -q --verify MERGE_HEAD' = @('merge-head-sha') })
+        'tip-status-dirty'            = @(& $alt @('T1', 'T2') @{ 'status --porcelain -z' = @(" M gen/a.json$nul") })
+        'tip-status-fails'            = @(& $alt @('T1', 'T2') @{ 'status --porcelain -z' = @(128) })
+        'tip-run1-cannot-start'       = @(& $alt @('T1', 'T2', 'P1', 'RL1', 'RL2') @{ $unstaged = @(''); $untracked = @('') } @{ 'gen-tool --write' = @('THROW') })
+        'tip-run1-nonzero'            = @(& $alt (@('T1', 'T2', 'P1') + $restore) @{} @{ 'gen-tool --write' = @(4) })
+        'tip-c1-listing-fails'        = @(
+            (& $alt (@('T1', 'T2', 'P1', 'T3') + $restore) @{ $unstaged = @(128, "gen/a.json$nul") }),
+            (& $alt (@('T1', 'T2', 'P1', 'T3', 'T4') + $restore) @{ $untracked = @(128, "gen/new.json$nul") }),
+            (& $alt (@('T1', 'T2', 'P1', 'T3', 'T4', 'H:gen/a.json') + $restore) @{ 'hash-object -- gen/a.json' = @(128) }))
+        'tip-not-confined'            = @(
+            (& $alt $tracked $trackedGit),
+            (& $alt @('T1', 'T2', 'P1', 'T3', 'T4', 'H:gen/a.json', 'H:gen/new.json', 'H:stray.txt', 'RL1', 'RL2', 'RC:gen/a.json', 'RK:gen/new.json stray.txt') @{ $untracked = @("gen/new.json${nul}stray.txt$nul") }))
+        'tip-run2-nonzero'            = @(& $alt ($head + @('P2') + $restore) @{} @{ 'gen-tool --write' = @(0, 5) })
+        'tip-check-nonzero'           = @(& $alt ($head + @('P2', 'P3') + $restore) @{} @{ 'check-tool' = @(6) } 'check')
+        'tip-snapshot-differs'        = @(
+            (& $alt ($head + @('P2', 'T6', 'T7', 'H:gen/a.json', 'H:gen/extra.json', 'H:gen/new.json', 'RL1', 'RL2', 'RC:gen/a.json', 'RK:gen/extra.json gen/new.json')) @{ $untracked = @("gen/new.json$nul", "gen/extra.json${nul}gen/new.json$nul") }),
+            (& $alt ($head + @('P2', 'T6', 'T7', 'H:gen/a.json', 'H:gen/new.json') + $restore) @{ 'hash-object -- gen/a.json' = @('blob-a', 'blob-a2') }))
+        'tip-run2-cannot-start'       = @(
+            (& $alt ($head + @('P2') + $restore) @{} @{ 'gen-tool --write' = @(0, 'THROW') }),
+            (& $alt ($head + @('P2', 'P3') + $restore) @{} @{ 'check-tool' = @('THROW') } 'check'))
+        'tip-post-run2-listing-fails' = @(
+            (& $alt ($head + @('P2', 'T6') + $restore) @{ $unstaged = @("gen/a.json$nul", 128, "gen/a.json$nul") }),
+            (& $alt ($head + @('P2', 'T6', 'T7', 'H:gen/a.json') + $restore) @{ 'hash-object -- gen/a.json' = @('blob-a', 128) }))
+        'tip-restore-fails'           = @(
+            (& $alt $tracked ($trackedGit + @{ 'checkout -- gen/a.json src/x.ps1' = @(128) })),
+            (& $alt $tracked ($trackedGit + @{ 'clean -f -q -- gen/new.json' = @(128) })))
+    }
+    if (-not $scenario.ContainsKey($Name)) { throw "Unknown Tip scenario '$Name'" }
+    $arguments = Get-RegenerationScenarioFlowArgument -Flow 'tip'
+    return , @($scenario[$Name] | ForEach-Object {
+            $alternative = New-RegenerationScenarioAlternative -Arguments $arguments -Config $_.Config -Git $_.Git -Process $_.Process
+            $alternative.Steps = $_.Steps
+            $alternative
+        })
 }
 
 function Get-RegenerationMergeScenarioAlternative {
@@ -292,7 +336,10 @@ function Get-RegenerationScenarioCallList {
 
     $definition = Get-RegenerationScenarioDefinition -Name $Row.Scenario
     $selected = $definition.Alternatives[$Alternative]
-    if ($definition.Flow -ceq 'Tip') { return , [string[]] @(Get-RegenerationTipScenarioCallList -Selected $selected) }
+    if ($definition.Flow -ceq 'Tip') {
+        $tipCalls = Get-RegenerationTipScenarioCallList -Selected $selected
+        return , $tipCalls
+    }
     if ($definition.Flow -cne 'Merge') { throw "Row $($Row.Id) has no call list" }
     $listing = @('git diff --name-only -z', 'git ls-files --others --exclude-standard -z')
     $sequence = [System.Collections.Generic.List[object]]::new()
@@ -345,7 +392,18 @@ function Get-RegenerationTipScenarioCallList {
     [OutputType([string[]])]
     param([Parameter(Mandatory = $true)] [hashtable] $Selected)
 
-    throw 'Tip call lists are not transcribed'
+    $fixed = @{
+        T1 = 'git rev-parse -q --verify MERGE_HEAD'; T2 = 'git status --porcelain -z'
+        P1 = 'process gen-tool --write'; P2 = 'process gen-tool --write'; P3 = 'process check-tool'
+        T3 = 'git diff --name-only -z'; T6 = 'git diff --name-only -z'; RL1 = 'git diff --name-only -z'
+        T4 = 'git ls-files --others --exclude-standard -z'; T7 = 'git ls-files --others --exclude-standard -z'
+        RL2 = 'git ls-files --others --exclude-standard -z'
+    }
+    $prefix = @{ H = 'git hash-object -- '; RC = 'git checkout -- '; RK = 'git clean -f -q -- ' }
+    return , [string[]] @($Selected.Steps | ForEach-Object {
+            $parts = $_.Split(':', 2)
+            if ($parts.Count -eq 2) { $prefix[$parts[0]] + $parts[1] } else { $fixed[$_] }
+        })
 }
 
 function Get-RegenerationScenarioAlternativeCount {

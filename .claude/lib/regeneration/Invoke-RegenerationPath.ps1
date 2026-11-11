@@ -281,7 +281,110 @@ function Invoke-RegenerationTipMode {
         $result = New-RegenerationResult -Mode 'Tip' -Reason $stage.Reason -ConfigErrors $stage.Errors -Outcome 'not_applied' -At $Context.At
         return [pscustomobject]@{ ExitCode = 3; Result = $result }
     }
-    throw 'Tip flow is not implemented'
+    $state = New-RegenerationMergeState
+    $state.restore = $false
+    $exitCode = Invoke-RegenerationTipFlow -Config $stage.Config -State $state
+    if ($state.restore -and -not (Invoke-RegenerationTipRestore)) { $exitCode = 1 }
+    $outcome = if ($exitCode -eq 0) { 'applied' } else { 'not_applied' }
+    $result = New-RegenerationResult -Mode 'Tip' -CommandExitCode $state.command_exit_code -Confined $state.confined `
+        -Idempotent $state.idempotent -ChangedPaths $state.changed_paths -Outcome $outcome -At $Context.At
+    return [pscustomobject]@{ ExitCode = $exitCode; Result = $result }
+}
+
+function Get-RegenerationTipSnapshot {
+    <#
+    .SYNOPSIS
+        List the worktree changes and the blob id of each changed path, or ExitCode 1.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param()
+
+    $change = Get-RegenerationWorktreeChange
+    if ($change.ExitCode -ne 0) { return [pscustomobject]@{ ExitCode = 1; Path = [string[]] @(); Blob = @{} } }
+    $blob = [ordered]@{}
+    foreach ($path in $change.Path) {
+        $step = Invoke-RegenerationGitStep -GitArgs @('hash-object', '--', $path)
+        if ($step.ExitCode -ne 0) { return [pscustomobject]@{ ExitCode = 1; Path = $change.Path; Blob = $blob } }
+        $blob[$path] = $step.Output.Trim()
+    }
+    return [pscustomobject]@{ ExitCode = 0; Path = $change.Path; Blob = $blob }
+}
+
+function Invoke-RegenerationTipFlow {
+    <#
+    .SYNOPSIS
+        Run the Tip-mode sequence after the config stage and return its exit code.
+
+    .DESCRIPTION
+        Fills the result cells in State and sets State.restore once run 1 was
+        attempted. Nothing is staged, committed, or reset, and no unit gate runs.
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $Config,
+        [Parameter(Mandatory = $true)] [hashtable] $State
+    )
+
+    if ((Invoke-RegenerationGitStep -GitArgs @('rev-parse', '-q', '--verify', 'MERGE_HEAD')).ExitCode -eq 0) { return 3 }
+    $status = Invoke-RegenerationGitStep -GitArgs @('status', '--porcelain', '-z')
+    if ($status.ExitCode -ne 0) { return 1 }
+    if ($status.Output.Length -gt 0) { return 3 }
+
+    $State.restore = $true
+    $run = Invoke-RegenerationProcessStep -Argv @($Config['command'])
+    if (-not $run.Started) { return 1 }
+    $State.command_exit_code = $run.ExitCode
+    if ($run.ExitCode -ne 0) { return 3 }
+    $first = Get-RegenerationTipSnapshot
+    if ($first.ExitCode -ne 0) { return 1 }
+    $State.confined = Get-RegenerationConfinementDecision -ChangedPath $first.Path -Pattern ([string[]] @($Config['paths']))
+    if (-not $State.confined) { return 3 }
+
+    $run = Invoke-RegenerationProcessStep -Argv @($Config['command'])
+    $State.command_exit_code = $run.ExitCode
+    if (-not $run.Started) { return 1 }
+    if ($run.ExitCode -ne 0) { return 3 }
+    $checkExitCode = $null
+    if ($Config.Contains('idempotency_check')) {
+        $run = Invoke-RegenerationProcessStep -Argv @($Config['idempotency_check'])
+        $State.command_exit_code = $run.ExitCode
+        if (-not $run.Started) { return 1 }
+        $checkExitCode = $run.ExitCode
+    }
+    if ($null -ne $checkExitCode -and $checkExitCode -ne 0) {
+        $State.idempotent = $false
+        return 3
+    }
+    $second = Get-RegenerationTipSnapshot
+    if ($second.ExitCode -ne 0) { return 1 }
+    $State.idempotent = Get-RegenerationIdempotencyDecision -FirstSnapshot $first.Blob -SecondSnapshot $second.Blob -CheckExitCode $checkExitCode
+    if (-not $State.idempotent) { return 3 }
+    $State.restore = $false
+    $State.changed_paths = [object[]] @($first.Path)
+    return 0
+}
+
+function Invoke-RegenerationTipRestore {
+    <#
+    .SYNOPSIS
+        Restore tracked and remove untracked worktree changes; return $true when every call succeeds.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param()
+
+    $ok = $true
+    $tracked = [string[]] @()
+    $untracked = [string[]] @()
+    $step = Invoke-RegenerationGitStep -GitArgs @('diff', '--name-only', '-z')
+    if ($step.ExitCode -ne 0) { $ok = $false } else { $tracked = Get-RegenerationSortedPath -Listing @($step.Output) }
+    $step = Invoke-RegenerationGitStep -GitArgs @('ls-files', '--others', '--exclude-standard', '-z')
+    if ($step.ExitCode -ne 0) { $ok = $false } else { $untracked = Get-RegenerationSortedPath -Listing @($step.Output) }
+    if ($tracked.Count -gt 0 -and (Invoke-RegenerationGitStep -GitArgs ([string[]] (@('checkout', '--') + $tracked))).ExitCode -ne 0) { $ok = $false }
+    if ($untracked.Count -gt 0 -and (Invoke-RegenerationGitStep -GitArgs ([string[]] (@('clean', '-f', '-q', '--') + $untracked))).ExitCode -ne 0) { $ok = $false }
+    return $ok
 }
 
 function Invoke-RegenerationMergeMode {
