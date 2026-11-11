@@ -62,6 +62,7 @@ Describe 'test-execution-lock-decision helper <Copy> (issue #1158)' -ForEach $sc
             @{ Case = 'a matching start time'; Text = 'holder'; Start = 'match'; CurrentPid = 1; Expected = 'suite pytest (pid 4242, worktree /repo/wt)' }
             @{ Case = 'a missing process'; Text = 'holder'; Start = 'missing'; CurrentPid = 1; Expected = 'an unidentified process (stale record for pid 4242)' }
             @{ Case = 'a differing start time'; Text = 'holder'; Start = 'differs'; CurrentPid = 1; Expected = 'an unidentified process (stale record for pid 4242)' }
+            @{ Case = 'a start time read 10 ms apart'; Text = 'holder'; Start = 'near'; CurrentPid = 1; Expected = 'suite pytest (pid 4242, worktree /repo/wt)' }
             @{ Case = 'an absent record'; Text = 'absent'; Start = 'match'; CurrentPid = 1; Expected = 'an unidentified process' }
             @{ Case = 'an unparseable record'; Text = 'bad'; Start = 'match'; CurrentPid = 1; Expected = 'an unidentified process' }
             @{ Case = 'a record without a numeric pid'; Text = 'nopid'; Start = 'match'; CurrentPid = 1; Expected = 'an unidentified process' }
@@ -69,7 +70,7 @@ Describe 'test-execution-lock-decision helper <Copy> (issue #1158)' -ForEach $sc
         ) {
             # Arrange
             $text = switch ($Text) { 'holder' { $script:HolderText } 'bad' { '[1,' } 'nopid' { '{"pid":"x"}' } default { $null } }
-            $observed = switch ($Start) { 'match' { $script:HolderStart } 'differs' { $script:HolderStart.AddSeconds(1) } default { $null } }
+            $observed = switch ($Start) { 'match' { $script:HolderStart } 'differs' { $script:HolderStart.AddSeconds(1) } 'near' { $script:HolderStart.AddMilliseconds(-10) } default { $null } }
 
             # Act
             $description = Get-TestExecutionLockHolderDescription -HolderRecord (ConvertFrom-TestExecutionHolderText -Text $text) -ProcessStartUtc $observed -CurrentProcessId $CurrentPid

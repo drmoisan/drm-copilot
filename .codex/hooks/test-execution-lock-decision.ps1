@@ -58,8 +58,8 @@ function Get-TestExecutionLockHolderDescription {
     .SYNOPSIS
         Describe the lock holder for a busy-lock message.
     .DESCRIPTION
-        Named holder (suite, pid, worktree) when ProcessStartUtc equals the recorded
-        processStartUtc; "an unidentified process (stale record for pid N)" when the process
+        Named holder (suite, pid, worktree) when ProcessStartUtc is less than one second from the
+        recorded processStartUtc; "an unidentified process (stale record for pid N)" when the process
         is missing, its start time differs, or the record names the current process; and
         "an unidentified process" when no record is readable.
     #>
@@ -78,7 +78,9 @@ function Get-TestExecutionLockHolderDescription {
     if ($holderPid -eq $CurrentProcessId) { return $stale }
     $recorded = ConvertTo-TestExecutionUtcTick $record['processStartUtc']
     $observed = ConvertTo-TestExecutionUtcTick $ProcessStartUtc
-    if ($null -eq $recorded -or $null -eq $observed -or $recorded -ne $observed) { return $stale }
+    # The start time is read again by another process; Linux derives it from boot time and clock ticks, so two
+    # reads of one process can differ by milliseconds. Times less than one second apart identify the same process.
+    if ($null -eq $recorded -or $null -eq $observed -or [math]::Abs($recorded - $observed) -ge [timespan]::TicksPerSecond) { return $stale }
     return "suite $($record['suite']) (pid $holderPid, worktree $($record['worktreeRoot']))"
 }
 
