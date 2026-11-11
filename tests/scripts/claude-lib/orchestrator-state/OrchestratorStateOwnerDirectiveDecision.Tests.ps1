@@ -18,17 +18,17 @@ BeforeAll {
     $script:Now = [datetime]::new(2026, 11, 10, 12, 0, 0, [System.DateTimeKind]::Utc)
     $script:Reason = 'The owner asked for parallel execution of the items.'
 
-    function New-DecisionTestDirective {
+    function Get-DecisionTestDirective {
         param([string] $Class = 'scheduling', [bool] $Refused = $false, [string] $Expires = '2026-11-11T12:00:00Z')
         return [pscustomobject]@{ Id = 'OD-1'; Class = $Class; IsRefusedClass = $Refused; ExpiresAt = $Expires }
     }
 
     function Get-DecisionTestError {
-        param([string] $Line, [object] $Directive = (New-DecisionTestDirective))
+        param([string] $Line, [object] $Directive = (Get-DecisionTestDirective))
         return @(Test-OwnerDirectiveDecision -Decision (ConvertFrom-OwnerDirectiveDecisionLine -Line $Line) -Directive $Directive -Now $script:Now)
     }
 
-    function New-DecisionTestLedgerLine {
+    function Get-DecisionTestLedgerLine {
         param([string] $Id = 'OD-1', [string] $Text = 'Run the items in parallel.')
         $digest = [System.Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData([System.Text.UTF8Encoding]::new($false).GetBytes($Text))).ToLowerInvariant()
         return ([ordered]@{
@@ -80,14 +80,14 @@ Describe 'Test-OwnerDirectiveDecision (AC-17)' {
         @{ Class = 'gate_bypass' }, @{ Class = 'force_push' }, @{ Class = 'tag_or_publish' }
         @{ Class = 'policy_or_settings_edit' }, @{ Class = 'evidence_alteration' }, @{ Class = 'unclassified' }
     ) {
-        $directive = New-DecisionTestDirective -Class $Class -Refused $true
+        $directive = Get-DecisionTestDirective -Class $Class -Refused $true
         $errors = Get-DecisionTestError -Directive $directive -Line ("OWNER-DIRECTIVE-DECISION: OD-1 | $Class | honored | - | " + $script:Reason)
         $errors | Should -Be @("R6: directive OD-1 of refused class $Class accepts only refused.")
         Get-DecisionTestError -Directive $directive -Line ("OWNER-DIRECTIVE-DECISION: OD-1 | $Class | refused | - | " + $script:Reason) | Should -BeNullOrEmpty
     }
 
     It 'rejects an honored decision later than expires_at (R10)' {
-        $errors = Get-DecisionTestError -Directive (New-DecisionTestDirective -Expires '2026-11-10T10:00:00Z') -Line ('OWNER-DIRECTIVE-DECISION: OD-1 | scheduling | honored | 2026-11-10T11:00:00Z | ' + $script:Reason)
+        $errors = Get-DecisionTestError -Directive (Get-DecisionTestDirective -Expires '2026-11-10T10:00:00Z') -Line ('OWNER-DIRECTIVE-DECISION: OD-1 | scheduling | honored | 2026-11-10T11:00:00Z | ' + $script:Reason)
         $errors | Should -Be @('R10: an honored decision at 2026-11-10T11:00:00Z is later than expires_at 2026-11-10T10:00:00Z of directive OD-1.')
     }
 
@@ -136,30 +136,30 @@ Describe 'Decision path, pending set, and agent id' {
 
 Describe 'Test-OwnerDirectiveLedgerAppend (pure part of AC-27)' {
     It 'accepts a first write and an append that keeps the existing lines as a prefix' {
-        $first = New-DecisionTestLedgerLine
+        $first = Get-DecisionTestLedgerLine
         Test-OwnerDirectiveLedgerAppend -ExistingText $null -NewText ($first + "`n") | Should -BeNullOrEmpty
-        Test-OwnerDirectiveLedgerAppend -ExistingText ($first + "`r`n") -NewText ($first + "`n" + (New-DecisionTestLedgerLine -Id 'OD-2') + "`n") | Should -BeNullOrEmpty
+        Test-OwnerDirectiveLedgerAppend -ExistingText ($first + "`r`n") -NewText ($first + "`n" + (Get-DecisionTestLedgerLine -Id 'OD-2') + "`n") | Should -BeNullOrEmpty
     }
 
     It 'rejects a write that changes an existing line' {
-        $errors = Test-OwnerDirectiveLedgerAppend -ExistingText (New-DecisionTestLedgerLine) -NewText (New-DecisionTestLedgerLine -Text 'Changed text.')
+        $errors = Test-OwnerDirectiveLedgerAppend -ExistingText (Get-DecisionTestLedgerLine) -NewText (Get-DecisionTestLedgerLine -Text 'Changed text.')
         $errors | Should -Be @('the write changes existing ledger line #1.')
     }
 
     It 'rejects a write that removes an existing line' {
-        $existing = (New-DecisionTestLedgerLine) + "`n" + (New-DecisionTestLedgerLine -Id 'OD-2')
-        $errors = Test-OwnerDirectiveLedgerAppend -ExistingText $existing -NewText (New-DecisionTestLedgerLine)
+        $existing = (Get-DecisionTestLedgerLine) + "`n" + (Get-DecisionTestLedgerLine -Id 'OD-2')
+        $errors = Test-OwnerDirectiveLedgerAppend -ExistingText $existing -NewText (Get-DecisionTestLedgerLine)
         $errors | Should -Be @('the write removes existing ledger lines: 1 lines remain of 2.')
     }
 
     It 'rejects an appended line that fails a B rule and ignores errors of existing lines' {
         $existing = '{broken'
-        $errors = Test-OwnerDirectiveLedgerAppend -ExistingText $existing -NewText ($existing + "`n" + (New-DecisionTestLedgerLine -Id 'OD-x'))
+        $errors = Test-OwnerDirectiveLedgerAppend -ExistingText $existing -NewText ($existing + "`n" + (Get-DecisionTestLedgerLine -Id 'OD-x'))
         $errors | Should -Be @('Ledger line #2 id must match OD-<positive integer>.')
     }
 
     It 'rejects an appended line that duplicates an existing id' {
-        $first = New-DecisionTestLedgerLine
+        $first = Get-DecisionTestLedgerLine
         $errors = Test-OwnerDirectiveLedgerAppend -ExistingText $first -NewText ($first + "`n" + $first)
         $errors | Should -Be @('Ledger line #2 id OD-1 is duplicated.')
     }

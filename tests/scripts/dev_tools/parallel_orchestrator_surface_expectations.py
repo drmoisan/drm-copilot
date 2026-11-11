@@ -228,6 +228,15 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # #1141 and after #1146 (owner-directive relay sentence in the epic skill)
 # combined the skill edits, so the skill digest below is the merged result of
 # #1129, #1130, #1136, #1138, #1141, #1146, and #1097.
+#
+# RE-BASELINED by issue #1157. That change extended the owner-directive paragraph
+# of the epic skill's `## Context Handoff to Dependent Features` section with
+# hook-level pass-down through the coordinator ledger, epic fan-out scope, and
+# the running-child check. Only the skill digest moved; the agent digest is
+# unchanged and the pin stays live for both entries. The digest was recomputed
+# after the merge of origin/main that brought in #1165, which did not edit the
+# epic skill, so the skill digest below is the merged result of #1129, #1130,
+# #1136, #1138, #1141, #1146, #1097, and #1157.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -235,7 +244,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "119304a18373be1ee2aa7d153e93de4b2a13ce876ac8fbf6a0a541ad687374a4",
+        "ef59580f8306d5ae8f313d80cb7d25e3718828fcb2a1c116a8491d7b04921517",
     ),
 )
 

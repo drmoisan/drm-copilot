@@ -11,6 +11,9 @@
     a clock.
 #>
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Injected seam stubs mirror the production script-block signatures and ignore some parameters.')]
+param()
+
 BeforeAll {
     $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
     $hooks = Join-Path $script:RepoRoot '.claude/hooks'
@@ -31,7 +34,7 @@ BeforeAll {
     ) -join "`n"
     $script:List = { param($SessionRoot) $porcelain }.GetNewClosure()
 
-    function New-TargetTestReader {
+    function Get-TargetTestReader {
         param([hashtable] $Files)
         $map = @{}
         foreach ($key in $Files.Keys) { $map[$key.Replace('\', '/')] = $Files[$key] }
@@ -66,14 +69,14 @@ Describe 'Get-OwnerDirectiveSubagentTranscriptPath' {
 
 Describe 'Resolve-OwnerDirectiveItemRoot (AC-23)' {
     It 'resolves the cwd worktree when it holds the item checkpoint' {
-        $reader = New-TargetTestReader -Files @{ $script:ItemCheckpointPath = '{"issue-num":"1157"}' }
+        $reader = Get-TargetTestReader -Files @{ $script:ItemCheckpointPath = '{"issue-num":"1157"}' }
         $result = Resolve-OwnerDirectiveItemRoot -Cwd "$script:Item/src" -SessionRoot $script:Session -ReadText $reader -WorktreeListInvoker $script:List
         $result.Root | Should -BeExactly $script:Item
         $result.Source | Should -BeExactly 'Cwd'
     }
 
     It 'falls back to the delegation prompt of the subagent transcript when the cwd worktree holds no checkpoint' {
-        $reader = New-TargetTestReader -Files @{}
+        $reader = Get-TargetTestReader -Files @{}
         $prompt = 'Task. branch: feature/owner-directive-pass-down-1157'
         $head = { param($Path) if ($Path -eq '/synthetic-home/session/subagents/agent-a1.jsonl') { @(([ordered]@{ type = 'user'; message = @{ content = $prompt } } | ConvertTo-Json -Compress -Depth 4)) } }.GetNewClosure()
         $result = Resolve-OwnerDirectiveItemRoot -Cwd "$script:Session" -TranscriptPath '/synthetic-home/session.jsonl' -AgentId 'a1' -SessionRoot $script:Session -ReadText $reader -ReadTranscriptHead $head -WorktreeListInvoker $script:List
@@ -82,7 +85,7 @@ Describe 'Resolve-OwnerDirectiveItemRoot (AC-23)' {
     }
 
     It 'places an issue-only prompt through the worktree checkpoints' {
-        $reader = New-TargetTestReader -Files @{ $script:ItemCheckpointPath = '{"issue-num":"1157"}' }
+        $reader = Get-TargetTestReader -Files @{ $script:ItemCheckpointPath = '{"issue-num":"1157"}' }
         $prompt = 'Canonical issue number for this feature is 1157.'
         $head = { param($Path) @(([ordered]@{ type = 'user'; message = @{ content = $prompt } } | ConvertTo-Json -Compress -Depth 4)) }.GetNewClosure()
         $result = Resolve-OwnerDirectiveItemRoot -TranscriptPath '/synthetic-home/session/subagents/agent-a1.jsonl' -AgentId 'a1' -SessionRoot $script:Session -ReadText $reader -ReadTranscriptHead $head -WorktreeListInvoker $script:List
@@ -96,7 +99,7 @@ Describe 'Resolve-OwnerDirectiveItemRoot (AC-23)' {
         @{ Case = 'the prompt carries no identity'; Transcript = '/synthetic-home/session.jsonl'; Head = { param($Path) @('{"type":"user","message":{"content":"no identity here"}}') } }
         @{ Case = 'the prompt names an unregistered branch'; Transcript = '/synthetic-home/session.jsonl'; Head = { param($Path) @('{"type":"user","message":{"content":"branch: feature/unknown"}}') } }
     ) {
-        $arguments = @{ TranscriptPath = $Transcript; AgentId = 'a1'; SessionRoot = $script:Session; ReadText = (New-TargetTestReader -Files @{}); WorktreeListInvoker = $script:List }
+        $arguments = @{ TranscriptPath = $Transcript; AgentId = 'a1'; SessionRoot = $script:Session; ReadText = (Get-TargetTestReader -Files @{}); WorktreeListInvoker = $script:List }
         if ($null -ne $Head) { $arguments['ReadTranscriptHead'] = $Head }
         Resolve-OwnerDirectiveItemRoot @arguments | Should -BeNullOrEmpty
     }
@@ -147,10 +150,10 @@ Describe 'Get-OwnerDirectiveItemBranch (AC-1 item-branch input)' {
 Describe 'Get-OwnerDirectiveSourceSet and Get-OwnerDirectiveItemContext' {
     It 'reads the item checkpoint block, the item ledger, and both parent sources of an epic parent' {
         $epicRoot = '/synthetic-worktrees/epic'
-        $reader = New-TargetTestReader -Files @{
-            (Get-TargetTestPath -Root $script:Item -Relative 'artifacts/orchestration/owner-directives.jsonl')       = '{"id":"OD-2"}'
-            (Get-TargetTestPath -Root $epicRoot -Relative 'artifacts/orchestration/epic-orchestrator-state.json')    = '{"epic_issue_num":900,"owner_directives":[{"id":"OD-3"}]}'
-            (Get-TargetTestPath -Root $epicRoot -Relative 'artifacts/orchestration/owner-directives.jsonl')          = '{"id":"OD-4"}'
+        $reader = Get-TargetTestReader -Files @{
+            (Get-TargetTestPath -Root $script:Item -Relative 'artifacts/orchestration/owner-directives.jsonl')    = '{"id":"OD-2"}'
+            (Get-TargetTestPath -Root $epicRoot -Relative 'artifacts/orchestration/epic-orchestrator-state.json') = '{"epic_issue_num":900,"owner_directives":[{"id":"OD-3"}]}'
+            (Get-TargetTestPath -Root $epicRoot -Relative 'artifacts/orchestration/owner-directives.jsonl')       = '{"id":"OD-4"}'
         }
         $parent = [pscustomobject]@{ Kind = 'epic'; Root = $epicRoot; IntegrationBranch = 'epic/x'; ParallelSlug = '' }
         $sources = Get-OwnerDirectiveSourceSet -ItemRoot $script:Item -ItemCheckpointText '{"owner_directives":[{"id":"OD-1"}]}' -Parent $parent -ReadText $reader
@@ -164,14 +167,14 @@ Describe 'Get-OwnerDirectiveSourceSet and Get-OwnerDirectiveItemContext' {
     }
 
     It 'leaves an absent ledger as $null text and reads no parent source without a parent' {
-        $sources = Get-OwnerDirectiveSourceSet -ItemRoot $script:Item -ItemCheckpointText '{}' -Parent $null -ReadText (New-TargetTestReader -Files @{})
+        $sources = Get-OwnerDirectiveSourceSet -ItemRoot $script:Item -ItemCheckpointText '{}' -Parent $null -ReadText (Get-TargetTestReader -Files @{})
         $sources.Count | Should -Be 2
         $sources[1].Text | Should -BeNullOrEmpty
         Get-OwnerDirectiveParentIssue -Parent $null | Should -BeNullOrEmpty
     }
 
     It 'builds the item context from the checkpoint issue, step, and branch' {
-        $reader = New-TargetTestReader -Files @{ $script:ItemCheckpointPath = '{"issue-num":"1157","next_step":"S5_atomic_execution"}' }
+        $reader = Get-TargetTestReader -Files @{ $script:ItemCheckpointPath = '{"issue-num":"1157","next_step":"S5_atomic_execution"}' }
         $context = Get-OwnerDirectiveItemContext -ItemRoot $script:Item -SessionRoot $script:Session -ReadText $reader -WorktreeListInvoker $script:List
         $context.Issue | Should -Be 1157
         $context.Step | Should -BeExactly 'S5_atomic_execution'
@@ -180,7 +183,7 @@ Describe 'Get-OwnerDirectiveSourceSet and Get-OwnerDirectiveItemContext' {
     }
 
     It 'uses the fallback issue when the checkpoint records none, and returns $null without either' {
-        $reader = New-TargetTestReader -Files @{}
+        $reader = Get-TargetTestReader -Files @{}
         (Get-OwnerDirectiveItemContext -ItemRoot $script:Item -SessionRoot $script:Session -FallbackIssue '1157' -ReadText $reader -WorktreeListInvoker $script:List).Issue | Should -Be 1157
         Get-OwnerDirectiveItemContext -ItemRoot $script:Item -SessionRoot $script:Session -ReadText $reader -WorktreeListInvoker $script:List | Should -BeNullOrEmpty
     }

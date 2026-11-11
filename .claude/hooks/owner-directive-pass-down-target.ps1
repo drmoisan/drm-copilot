@@ -318,7 +318,7 @@ function Get-OwnerDirectiveParentIssue {
         { param($Path) <text or $null> }.
     #>
     [CmdletBinding()]
-    [OutputType([object])]
+    [OutputType([long])]
     param(
         [AllowNull()] [object] $Parent,
         [scriptblock] $ReadText = { param($Path) Read-OwnerDirectiveFileText -Path $Path }

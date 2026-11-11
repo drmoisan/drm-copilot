@@ -25,7 +25,7 @@ BeforeAll {
     $script:Epic = '/synthetic-worktrees/epic'
     $script:Parallel = '/synthetic-worktrees/parallel'
 
-    function New-PassDownStopEntry {
+    function Get-PassDownStopEntry {
         param([string] $Id = 'OD-1', [long] $Issue = 1157, [string] $Branch = 'feature/owner-directive-pass-down-1157', [string] $Expires = '2026-11-11T00:00:00Z', [string] $Text = 'Run the features in parallel where the merge cost is lower.')
         $digest = [System.Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData([System.Text.UTF8Encoding]::new($false).GetBytes($Text))).ToLowerInvariant()
         return ([ordered]@{
@@ -34,7 +34,7 @@ BeforeAll {
             } | ConvertTo-Json -Compress -Depth 4)
     }
 
-    function New-PassDownStopParent {
+    function Get-PassDownStopParent {
         param([ValidateSet('epic', 'parallel')] [string] $Kind, [string] $Status = 'pr_open', [string[]] $Directive = @())
         $child = '{"issue_num":1157,"branch_name":"feature/owner-directive-pass-down-1157","merge_status":"' + $Status + '"}'
         $text = if ($Kind -eq 'epic') { '{"route_id":"epic","integration_branch":"epic/pass-down-integration","epic_issue_num":900,"features":[' + $child + ']' }
@@ -43,7 +43,7 @@ BeforeAll {
         return $text + '}'
     }
 
-    function New-PassDownStopItem {
+    function Get-PassDownStopItem {
         param([string[]] $Directive = @(), [ValidateSet('', 'epic', 'parallel')] [string] $Link = '')
         $text = '{"issue-num":"1157","next_step":"S5","route_id":"large"'
         if ($Link -eq 'epic') { $text += ',"epic_context":{"integration_branch":"epic/pass-down-integration"}' }
@@ -53,7 +53,7 @@ BeforeAll {
     }
 
     # Register the seam mocks over a file map; returns nothing. The parent result defaults to the epic worktree.
-    function Set-PassDownStopSeam {
+    function Register-PassDownStopSeam {
         param([hashtable] $Files, [object] $Parent, [object] $Child)
         $script:Map = @{}
         foreach ($key in $Files.Keys) { $script:Map[$key] = $Files[$key] }
@@ -82,8 +82,8 @@ Describe 'epic parent running-child check (AC-30)' {
     It 'reports a child with merge_status <Status> that lacks the entry and does not link back' -ForEach @(
         @{ Status = 'worktree_created' }, @{ Status = 'pr_open' }, @{ Status = 'ci_green' }, @{ Status = 'merge_conflict' }
     ) {
-        Set-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (New-PassDownStopItem) }
-        $decision = Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (New-PassDownStopParent -Kind epic -Status $Status -Directive @(New-PassDownStopEntry))
+        Register-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (Get-PassDownStopItem) }
+        $decision = Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (Get-PassDownStopParent -Kind epic -Status $Status -Directive @(Get-PassDownStopEntry))
         $decision.Ok | Should -BeFalse
         $decision.Repairable | Should -BeTrue
         $decision.Message | Should -BeLike 'OWNER_DIRECTIVE_BLOCKED: OWNER_DIRECTIVE_RELAY_MISSING: *child #1157*OD-1*'
@@ -92,16 +92,16 @@ Describe 'epic parent running-child check (AC-30)' {
     It 'does not check a child with merge_status <Status>' -ForEach @(
         @{ Status = 'not_started' }, @{ Status = 'blocked_conflict_loop_limit' }, @{ Status = 'merged' }, @{ Status = 'worktree_removed' }
     ) {
-        Set-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (New-PassDownStopItem) }
-        Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (New-PassDownStopParent -Kind epic -Status $Status -Directive @(New-PassDownStopEntry)) | Should -BeNullOrEmpty
+        Register-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (Get-PassDownStopItem) }
+        Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (Get-PassDownStopParent -Kind epic -Status $Status -Directive @(Get-PassDownStopEntry)) | Should -BeNullOrEmpty
         Should -Invoke Resolve-OrchestratorOutputOwnerPassDownChild -Times 0 -Exactly
     }
 }
 
 Describe 'parallel parent running-child check (AC-31)' {
     It 'reports a child with merge_status <Status> that lacks the entry' -ForEach @(@{ Status = 'worktree_created' }, @{ Status = 'pr_open' }, @{ Status = 'ci_green' }) {
-        Set-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (New-PassDownStopItem) }
-        $decision = Invoke-PassDownStop -ArtifactType 'parallel-orchestrator-state' -Root $script:Parallel -CheckpointText (New-PassDownStopParent -Kind parallel -Status $Status -Directive @(New-PassDownStopEntry))
+        Register-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (Get-PassDownStopItem) }
+        $decision = Invoke-PassDownStop -ArtifactType 'parallel-orchestrator-state' -Root $script:Parallel -CheckpointText (Get-PassDownStopParent -Kind parallel -Status $Status -Directive @(Get-PassDownStopEntry))
         $decision.Message | Should -BeLike 'OWNER_DIRECTIVE_BLOCKED: OWNER_DIRECTIVE_RELAY_MISSING: *'
         $decision.Repairable | Should -BeTrue
     }
@@ -109,20 +109,20 @@ Describe 'parallel parent running-child check (AC-31)' {
     It 'does not check a child with merge_status <Status>' -ForEach @(
         @{ Status = 'not_started' }, @{ Status = 'merged' }, @{ Status = 'worktree_removed' }, @{ Status = 'blocked_drift' }, @{ Status = 'blocked_ci_loop_limit' }
     ) {
-        Set-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (New-PassDownStopItem) }
-        Invoke-PassDownStop -ArtifactType 'parallel-orchestrator-state' -Root $script:Parallel -CheckpointText (New-PassDownStopParent -Kind parallel -Status $Status -Directive @(New-PassDownStopEntry)) | Should -BeNullOrEmpty
+        Register-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (Get-PassDownStopItem) }
+        Invoke-PassDownStop -ArtifactType 'parallel-orchestrator-state' -Root $script:Parallel -CheckpointText (Get-PassDownStopParent -Kind parallel -Status $Status -Directive @(Get-PassDownStopEntry)) | Should -BeNullOrEmpty
     }
 }
 
 Describe 'running-child compliance (AC-32)' {
     It 'allows a child whose checkpoint holds the same id and text_sha256' {
-        Set-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (New-PassDownStopItem -Directive @(New-PassDownStopEntry)) }
-        Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (New-PassDownStopParent -Kind epic -Directive @(New-PassDownStopEntry)) | Should -BeNullOrEmpty
+        Register-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (Get-PassDownStopItem -Directive @(Get-PassDownStopEntry)) }
+        Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (Get-PassDownStopParent -Kind epic -Directive @(Get-PassDownStopEntry)) | Should -BeNullOrEmpty
     }
 
     It 'allows a resolved <Kind> child whose checkpoint links back' -ForEach @(@{ Kind = 'epic'; Type = 'epic-orchestrator-state' }, @{ Kind = 'parallel'; Type = 'parallel-orchestrator-state' }) {
-        Set-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (New-PassDownStopItem -Link $Kind) }
-        Invoke-PassDownStop -ArtifactType $Type -Root $script:Epic -CheckpointText (New-PassDownStopParent -Kind $Kind -Directive @(New-PassDownStopEntry)) | Should -BeNullOrEmpty
+        Register-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (Get-PassDownStopItem -Link $Kind) }
+        Invoke-PassDownStop -ArtifactType $Type -Root $script:Epic -CheckpointText (Get-PassDownStopParent -Kind $Kind -Directive @(Get-PassDownStopEntry)) | Should -BeNullOrEmpty
     }
 
     It 'reports <Case>' -ForEach @(
@@ -130,25 +130,25 @@ Describe 'running-child compliance (AC-32)' {
         @{ Case = 'an unreadable child checkpoint'; Child = $null; Files = @{}; Expected = '*Unreadable*' }
         @{ Case = 'a child that does not link back'; Child = $null; Files = @{ '/synthetic-worktrees/item-1157/artifacts/orchestration/orchestrator-state.json' = '{"issue-num":"1157","parallel_slug":"other"}' }; Expected = '*Resolved*does not link back*' }
     ) {
-        Set-PassDownStopSeam -Files $Files -Child $Child
-        $decision = Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (New-PassDownStopParent -Kind epic -Directive @(New-PassDownStopEntry))
+        Register-PassDownStopSeam -Files $Files -Child $Child
+        $decision = Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (Get-PassDownStopParent -Kind epic -Directive @(Get-PassDownStopEntry))
         $decision.Message | Should -BeLike "OWNER_DIRECTIVE_BLOCKED: OWNER_DIRECTIVE_RELAY_MISSING: $Expected"
     }
 
     It 'reports an id conflict between parent and child even when the child links back' {
-        Set-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (New-PassDownStopItem -Link epic -Directive @(New-PassDownStopEntry -Text 'The child text of the same id.')) }
-        $decision = Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (New-PassDownStopParent -Kind epic -Directive @(New-PassDownStopEntry))
+        Register-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (Get-PassDownStopItem -Link epic -Directive @(Get-PassDownStopEntry -Text 'The child text of the same id.')) }
+        $decision = Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (Get-PassDownStopParent -Kind epic -Directive @(Get-PassDownStopEntry))
         $decision.Message | Should -BeLike '*OWNER_DIRECTIVE_RELAY_MISSING:*different text_sha256*'
     }
 
     It 'does not require an expired parent entry' {
-        Set-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (New-PassDownStopItem) }
-        Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (New-PassDownStopParent -Kind epic -Directive @(New-PassDownStopEntry -Expires '2026-11-10T12:00:00Z')) | Should -BeNullOrEmpty
+        Register-PassDownStopSeam -Files @{ $script:ItemCheckpointPath = (Get-PassDownStopItem) }
+        Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (Get-PassDownStopParent -Kind epic -Directive @(Get-PassDownStopEntry -Expires '2026-11-10T12:00:00Z')) | Should -BeNullOrEmpty
     }
 
     It 'reports an invalid parent ledger line as OWNER_DIRECTIVE_LEDGER_INVALID' {
-        Set-PassDownStopSeam -Files @{ "$script:Epic/artifacts/orchestration/owner-directives.jsonl" = '{"id":"OD-1"}' }
-        $decision = Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (New-PassDownStopParent -Kind epic)
+        Register-PassDownStopSeam -Files @{ "$script:Epic/artifacts/orchestration/owner-directives.jsonl" = '{"id":"OD-1"}' }
+        $decision = Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText (Get-PassDownStopParent -Kind epic)
         $decision.Message | Should -BeLike 'OWNER_DIRECTIVE_BLOCKED: OWNER_DIRECTIVE_LEDGER_INVALID: parent-ledger: Ledger line #1 *'
     }
 }
@@ -159,42 +159,42 @@ Describe 'item stop (AC-33)' {
         @{ Source = 'the parent checkpoint'; Key = '/synthetic-worktrees/epic/artifacts/orchestration/epic-orchestrator-state.json'; Value = 'checkpoint'; Link = 'epic' }
         @{ Source = 'the parent ledger'; Key = '/synthetic-worktrees/epic/artifacts/orchestration/owner-directives.jsonl'; Value = 'ledger'; Link = 'epic' }
     ) {
-        $value = if ($Value -eq 'ledger') { New-PassDownStopEntry } else { New-PassDownStopParent -Kind epic -Directive @(New-PassDownStopEntry) }
-        Set-PassDownStopSeam -Files @{ $Key = $value } -Parent $script:EpicParent
-        $decision = Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (New-PassDownStopItem -Link $Link)
+        $value = if ($Value -eq 'ledger') { Get-PassDownStopEntry } else { Get-PassDownStopParent -Kind epic -Directive @(Get-PassDownStopEntry) }
+        Register-PassDownStopSeam -Files @{ $Key = $value } -Parent $script:EpicParent
+        $decision = Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (Get-PassDownStopItem -Link $Link)
         $decision.Message | Should -BeLike 'OWNER_DIRECTIVE_BLOCKED: OWNER_DIRECTIVE_RELAY_MISSING: *lacks OD-1*'
         $decision.Repairable | Should -BeTrue
     }
 
     It 'allows an item checkpoint that holds every selected entry' {
-        Set-PassDownStopSeam -Files @{ "$script:Item/artifacts/orchestration/owner-directives.jsonl" = (New-PassDownStopEntry) }
-        Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (New-PassDownStopItem -Directive @(New-PassDownStopEntry)) | Should -BeNullOrEmpty
+        Register-PassDownStopSeam -Files @{ "$script:Item/artifacts/orchestration/owner-directives.jsonl" = (Get-PassDownStopEntry) }
+        Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (Get-PassDownStopItem -Directive @(Get-PassDownStopEntry)) | Should -BeNullOrEmpty
     }
 
     It 'reports an invalid item ledger line as OWNER_DIRECTIVE_LEDGER_INVALID' {
-        Set-PassDownStopSeam -Files @{ "$script:Item/artifacts/orchestration/owner-directives.jsonl" = 'not json' }
-        $decision = Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (New-PassDownStopItem)
+        Register-PassDownStopSeam -Files @{ "$script:Item/artifacts/orchestration/owner-directives.jsonl" = 'not json' }
+        $decision = Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (Get-PassDownStopItem)
         $decision.Message | Should -BeExactly 'OWNER_DIRECTIVE_BLOCKED: OWNER_DIRECTIVE_LEDGER_INVALID: item-ledger: Ledger line #1 is not a JSON object.'
     }
 
     It 'reports a conflict between the item checkpoint and the parent ledger' {
-        Set-PassDownStopSeam -Files @{ "$script:Epic/artifacts/orchestration/owner-directives.jsonl" = (New-PassDownStopEntry -Text 'The parent text of the same id.') } -Parent $script:EpicParent
-        $decision = Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (New-PassDownStopItem -Link epic -Directive @(New-PassDownStopEntry))
+        Register-PassDownStopSeam -Files @{ "$script:Epic/artifacts/orchestration/owner-directives.jsonl" = (Get-PassDownStopEntry -Text 'The parent text of the same id.') } -Parent $script:EpicParent
+        $decision = Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (Get-PassDownStopItem -Link epic -Directive @(Get-PassDownStopEntry))
         $decision.Message | Should -BeLike '*OD-1 in parent-ledger has a different text_sha256 than in item-checkpoint*'
     }
 }
 
 Describe 'key gate and clock (AC-34, AC-25 stop part)' {
     It 'keeps today''s decision for an unlinked item without owner_directives or ledger, with no parent call and no clock read' {
-        Set-PassDownStopSeam -Files @{}
-        Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (New-PassDownStopItem) | Should -BeNullOrEmpty
+        Register-PassDownStopSeam -Files @{}
+        Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (Get-PassDownStopItem) | Should -BeNullOrEmpty
         Should -Invoke Resolve-OrchestratorOutputOwnerPassDownParent -Times 0 -Exactly
         Should -Invoke Get-OrchestratorOutputOwnerPassDownClock -Times 0 -Exactly
     }
 
     It 'keeps today''s decision for a linked item whose parent has no source, with one parent call and no clock read' {
-        Set-PassDownStopSeam -Files @{ "$script:Epic/artifacts/orchestration/epic-orchestrator-state.json" = (New-PassDownStopParent -Kind epic) } -Parent $script:EpicParent
-        Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (New-PassDownStopItem -Link epic) | Should -BeNullOrEmpty
+        Register-PassDownStopSeam -Files @{ "$script:Epic/artifacts/orchestration/epic-orchestrator-state.json" = (Get-PassDownStopParent -Kind epic) } -Parent $script:EpicParent
+        Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (Get-PassDownStopItem -Link epic) | Should -BeNullOrEmpty
         Should -Invoke Resolve-OrchestratorOutputOwnerPassDownParent -Times 1 -Exactly
         Should -Invoke Get-OrchestratorOutputOwnerPassDownClock -Times 0 -Exactly
     }
@@ -203,9 +203,9 @@ Describe 'key gate and clock (AC-34, AC-25 stop part)' {
         @{ Where = 'checkpoint'; Key = '/synthetic-worktrees/epic/artifacts/orchestration/epic-orchestrator-state.json' }
         @{ Where = 'ledger'; Key = '/synthetic-worktrees/epic/artifacts/orchestration/owner-directives.jsonl' }
     ) {
-        $value = if ($Where -eq 'ledger') { New-PassDownStopEntry } else { New-PassDownStopParent -Kind epic -Directive @(New-PassDownStopEntry) }
-        Set-PassDownStopSeam -Files @{ $Key = $value } -Parent $script:EpicParent
-        (Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (New-PassDownStopItem -Link epic)).Message | Should -BeLike '*OWNER_DIRECTIVE_RELAY_MISSING:*'
+        $value = if ($Where -eq 'ledger') { Get-PassDownStopEntry } else { Get-PassDownStopParent -Kind epic -Directive @(Get-PassDownStopEntry) }
+        Register-PassDownStopSeam -Files @{ $Key = $value } -Parent $script:EpicParent
+        (Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (Get-PassDownStopItem -Link epic)).Message | Should -BeLike '*OWNER_DIRECTIVE_RELAY_MISSING:*'
         Should -Invoke Resolve-OrchestratorOutputOwnerPassDownParent -Times 1 -Exactly
         Should -Invoke Get-OrchestratorOutputOwnerPassDownClock -Times 1 -Exactly
     }
@@ -215,21 +215,21 @@ Describe 'key gate and clock (AC-34, AC-25 stop part)' {
         @{ Case = 'returns Ambiguous'; Parent = [pscustomobject]@{ Kind = 'epic'; Status = 'Ambiguous'; WorktreeRoot = $null; IntegrationBranch = 'epic/pass-down-integration' } }
         @{ Case = 'throws'; Parent = { throw 'listing failed' } }
     ) {
-        Set-PassDownStopSeam -Files @{ "$script:Epic/artifacts/orchestration/owner-directives.jsonl" = (New-PassDownStopEntry) } -Parent $Parent
-        Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (New-PassDownStopItem -Link epic) | Should -BeNullOrEmpty
+        Register-PassDownStopSeam -Files @{ "$script:Epic/artifacts/orchestration/owner-directives.jsonl" = (Get-PassDownStopEntry) } -Parent $Parent
+        Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (Get-PassDownStopItem -Link epic) | Should -BeNullOrEmpty
         Should -Invoke Get-OrchestratorOutputOwnerPassDownClock -Times 0 -Exactly
     }
 
     It 'keeps today''s decision for <Type> without owner_directives or ledger, with no clock read' -ForEach @(
         @{ Type = 'epic-orchestrator-state'; Kind = 'epic' }, @{ Type = 'parallel-orchestrator-state'; Kind = 'parallel' }
     ) {
-        Set-PassDownStopSeam -Files @{}
-        Invoke-PassDownStop -ArtifactType $Type -Root $script:Epic -CheckpointText (New-PassDownStopParent -Kind $Kind) | Should -BeNullOrEmpty
+        Register-PassDownStopSeam -Files @{}
+        Invoke-PassDownStop -ArtifactType $Type -Root $script:Epic -CheckpointText (Get-PassDownStopParent -Kind $Kind) | Should -BeNullOrEmpty
         Should -Invoke Get-OrchestratorOutputOwnerPassDownClock -Times 0 -Exactly
     }
 
     It 'keeps today''s decision for unparseable checkpoint text and for an item without an issue number' {
-        Set-PassDownStopSeam -Files @{ "$script:Item/artifacts/orchestration/owner-directives.jsonl" = (New-PassDownStopEntry) }
+        Register-PassDownStopSeam -Files @{ "$script:Item/artifacts/orchestration/owner-directives.jsonl" = (Get-PassDownStopEntry) }
         Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText 'not json' | Should -BeNullOrEmpty
         Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText '{"next_step":"S5"}' | Should -BeNullOrEmpty
     }
