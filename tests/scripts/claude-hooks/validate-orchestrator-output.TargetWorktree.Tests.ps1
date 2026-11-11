@@ -171,7 +171,8 @@ Describe 'validate-orchestrator-output orchestrator-state target worktree (issue
 
     It 'H8 validates the session worktree with the failure detail when the resolver throws' {
         # Arrange
-        Mock Resolve-HookTargetWorktree { throw 'synthetic resolver failure' }
+        # Issue #1163: the helper resolves through Resolve-AgentTargetWorktree, so the failing collaborator is mocked there; the asserted fallback is unchanged.
+        Mock Resolve-AgentTargetWorktree { throw 'synthetic resolver failure' }
 
         # Act
         $outcome = Invoke-Case -Map @{ $script:SessionPath = $script:Valid; $script:ItemPath = $script:Invalid }

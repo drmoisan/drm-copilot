@@ -227,7 +227,8 @@ Describe 'Resolve-SubagentStopTargetWorktree (issue #1105)' {
 
     It 'reports the session root with a failure detail when resolution throws' {
         # Arrange
-        Mock Resolve-HookTargetWorktree { throw 'resolver unavailable' }
+        # Issue #1163: the helper resolves through Resolve-AgentTargetWorktree, so the failing collaborator is mocked there; the asserted fallback is unchanged.
+        Mock Resolve-AgentTargetWorktree { throw 'resolver unavailable' }
 
         # Act
         $result = Resolve-SubagentStopTargetWorktree -Envelope $null -AdvertisedPath @("$script:ItemRoot/plan.md") -SessionRoot $script:SessionRoot -WorktreeListInvoker $script:ListInvoker
