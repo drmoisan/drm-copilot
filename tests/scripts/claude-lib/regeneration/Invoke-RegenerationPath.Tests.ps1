@@ -23,6 +23,7 @@ BeforeAll {
     $script:ScriptPath = Join-Path $script:LibRoot 'Invoke-RegenerationPath.ps1'
     Import-Module (Join-Path $script:LibRoot 'RegenerationConfig.psm1') -Force -ErrorAction Stop
     Import-Module (Join-Path $script:LibRoot 'RegenerationDelta.psm1') -Force -ErrorAction Stop
+    Import-Module (Join-Path $script:LibRoot 'RegenerationClassifier.psm1') -ErrorAction Stop
     . $script:ScriptPath
     . (Join-Path $PSScriptRoot 'RegenerationResultScenario.ps1')
     $script:Rows = @((Import-PowerShellDataFile -LiteralPath (Join-Path $PSScriptRoot 'RegenerationResultTable.psd1')).Rows)

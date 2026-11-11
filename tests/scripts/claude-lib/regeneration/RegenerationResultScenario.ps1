@@ -220,7 +220,132 @@ function Get-RegenerationMergeScenarioAlternative {
     [OutputType([object[]])]
     param([Parameter(Mandatory = $true)] [string] $Name)
 
-    throw "Unknown Merge scenario '$Name'"
+    $nul = [string] [char] 0
+    $unstaged = 'diff --name-only -z'
+    $untracked = 'ls-files --others --exclude-standard -z'
+    $ours = 'diff --name-only -z --no-renames base-sha HEAD'
+    $theirs = 'diff --name-only -z --no-renames base-sha MERGE_HEAD'
+    $cachedHead = 'diff --cached --name-only -z --no-renames HEAD'
+    $cachedMerge = 'diff --cached --name-only -z --no-renames MERGE_HEAD'
+    $alt = { param($End, $Abort, $Git = @{}, $Process = @{}, $Config = 'valid') @{ End = $End; Abort = $Abort; Git = $Git; Process = $Process; Config = $Config } }
+    $scenario = @{
+        'merge-head-absent'            = @(& $alt 'M2' $false @{ 'rev-parse -q --verify MERGE_HEAD' = @(1) })
+        'merge-rev-parse-fails'        = @(& $alt 'M3' $true @{ 'rev-parse HEAD' = @(128) })
+        'merge-base-fails'             = @(& $alt 'M4' $true @{ 'merge-base --all HEAD MERGE_HEAD' = @(128) })
+        'merge-listing-fails'          = @((& $alt 'M5' $true @{ $ours = @(128) }), (& $alt 'M6' $true @{ $theirs = @(128) }))
+        'merge-base-count-0'           = @(& $alt 'M4' $true @{ 'merge-base --all HEAD MERGE_HEAD' = @('') })
+        'merge-base-count-2'           = @(& $alt 'M4' $true @{ 'merge-base --all HEAD MERGE_HEAD' = @("base-sha`nbase-two-sha") })
+        'merge-empty-set'              = @(& $alt 'M6' $true @{ $theirs = @("src/main.ps1$nul") })
+        'merge-unmatched-path'         = @(& $alt 'M6' $true @{ $ours = @("gen/a.json${nul}src/shared.ps1$nul"); $theirs = @("gen/a.json${nul}src/shared.ps1$nul") })
+        'merge-conflict-call-fails'    = @(
+            (& $alt 'M7' $true @{ 'diff --name-only -z --diff-filter=U' = @(128) }),
+            (& $alt 'M8' $true @{ 'checkout --ours -- gen/a.json' = @(128) }),
+            (& $alt 'M9' $true @{ 'add -- gen/a.json' = @(128) }),
+            (& $alt 'M10' $true @{ $unstaged = @(128) }),
+            (& $alt 'M11' $true @{ $untracked = @(128) }))
+        'merge-dirty-after-resolution' = @((& $alt 'M11' $true @{ $unstaged = @("gen/a.json$nul") }), (& $alt 'M11' $true @{ $untracked = @("gen/new.json$nul") }))
+        'merge-run1-cannot-start'      = @(& $alt 'P1' $true @{} @{ 'gen-tool --write' = @('THROW') })
+        'merge-run1-nonzero'           = @(& $alt 'P1' $true @{} @{ 'gen-tool --write' = @(4) })
+        'merge-c1-listing-fails'       = @((& $alt 'M12' $true @{ $unstaged = @('', 128) }), (& $alt 'M13' $true @{ $untracked = @('', 128) }))
+        'merge-not-confined'           = @(& $alt 'M13' $true @{ $untracked = @('', "gen/new.json${nul}stray.txt$nul", '') })
+        'merge-stage-fails'            = @(& $alt 'M14' $true @{ 'add -A -- gen/a.json gen/new.json' = @(128) })
+        'merge-run2-nonzero'           = @(& $alt 'P2' $true @{} @{ 'gen-tool --write' = @(0, 5) })
+        'merge-run2-cannot-start'      = @((& $alt 'P2' $true @{} @{ 'gen-tool --write' = @(0, 'THROW') }), (& $alt 'P3' $true @{} @{ 'check-tool' = @('THROW') } 'check'))
+        'merge-check-nonzero'          = @(& $alt 'P3' $true @{} @{ 'check-tool' = @(6) } 'check')
+        'merge-c2-listing-fails'       = @((& $alt 'M15' $true @{ $unstaged = @('', "gen/a.json$nul", 128) }), (& $alt 'M16' $true @{ $untracked = @('', "gen/new.json$nul", 128) }))
+        'merge-c2-non-empty'           = @(& $alt 'M16' $true @{ $unstaged = @('', "gen/a.json$nul", "gen/a.json$nul") })
+        'merge-cached-listing-fails'   = @((& $alt 'M17' $true @{ $cachedHead = @(128) }), (& $alt 'M18' $true @{ $cachedMerge = @(128) }))
+        'merge-delta-feature'          = @(& $alt 'M18' $true @{ $cachedHead = @("gen/a.json${nul}gen/new.json${nul}src/main.ps1${nul}src/rogue.ps1$nul") })
+        'merge-delta-incoming'         = @(& $alt 'M18' $true @{ $cachedMerge = @("gen/a.json${nul}gen/new.json${nul}src/feature.ps1${nul}src/rogue.ps1$nul") })
+        'merge-unit-cannot-start'      = @(& $alt 'P4' $true @{} @{ 'ut-a' = @('THROW') } 'unit')
+        'merge-unit-nonzero'           = @(& $alt 'P5' $true @{} @{ 'ut-b' = @(7) } 'unit')
+        'merge-prepared-unit'          = @(& $alt 'P5' $false @{ 'merge --no-commit --no-ff origin/epic/x' = @(1) } @{} 'unit')
+        'merge-prepared'               = @(& $alt 'M18' $false)
+        'merge-abort-fails'            = @(& $alt 'P1' $true @{ 'merge --abort' = @(128) } @{ 'gen-tool --write' = @(4) })
+    }
+    if (-not $scenario.ContainsKey($Name)) { throw "Unknown Merge scenario '$Name'" }
+    $arguments = Get-RegenerationScenarioFlowArgument -Flow 'merge'
+    return , @($scenario[$Name] | ForEach-Object {
+            $alternative = New-RegenerationScenarioAlternative -Arguments $arguments -Config $_.Config -Git $_.Git -Process $_.Process
+            $alternative.End = $_.End
+            $alternative.Abort = $_.Abort
+            $alternative
+        })
+}
+
+function Get-RegenerationScenarioCallList {
+    <#
+    .SYNOPSIS
+        Return the exact ordered git and process call list of a Merge or Tip row alternative.
+
+    .DESCRIPTION
+        Transcribes the per-row call lists of plan tasks P2-T2 and P2-T3: the flow's
+        full call sequence for the alternative's config, cut after the row's
+        deciding call, followed by the restore calls of the row.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $true)] [hashtable] $Row,
+        [int] $Alternative = 0
+    )
+
+    $definition = Get-RegenerationScenarioDefinition -Name $Row.Scenario
+    $selected = $definition.Alternatives[$Alternative]
+    if ($definition.Flow -ceq 'Tip') { return , [string[]] @(Get-RegenerationTipScenarioCallList -Selected $selected) }
+    if ($definition.Flow -cne 'Merge') { throw "Row $($Row.Id) has no call list" }
+    $listing = @('git diff --name-only -z', 'git ls-files --others --exclude-standard -z')
+    $sequence = [System.Collections.Generic.List[object]]::new()
+    $add = { param($Label, $Call) $sequence.Add(@($Label, $Call)) }
+    & $add 'M1' 'git merge --no-commit --no-ff origin/epic/x'
+    & $add 'M2' 'git rev-parse -q --verify MERGE_HEAD'
+    & $add 'M3' 'git rev-parse HEAD'
+    & $add 'M4' 'git merge-base --all HEAD MERGE_HEAD'
+    & $add 'M5' 'git diff --name-only -z --no-renames base-sha HEAD'
+    & $add 'M6' 'git diff --name-only -z --no-renames base-sha MERGE_HEAD'
+    & $add 'M7' 'git diff --name-only -z --diff-filter=U'
+    & $add 'M8' 'git checkout --ours -- gen/a.json'
+    & $add 'M9' 'git add -- gen/a.json'
+    & $add 'M10' $listing[0]
+    & $add 'M11' $listing[1]
+    & $add 'P1' 'process gen-tool --write'
+    & $add 'M12' $listing[0]
+    & $add 'M13' $listing[1]
+    & $add 'M14' 'git add -A -- gen/a.json gen/new.json'
+    & $add 'P2' 'process gen-tool --write'
+    if ($selected.Config -ceq 'check') { & $add 'P3' 'process check-tool' }
+    & $add 'M15' $listing[0]
+    & $add 'M16' $listing[1]
+    & $add 'M17' 'git diff --cached --name-only -z --no-renames HEAD'
+    & $add 'M18' 'git diff --cached --name-only -z --no-renames MERGE_HEAD'
+    if ($selected.Config -ceq 'unit') {
+        & $add 'P4' 'process ut-a'
+        & $add 'P5' 'process ut-b'
+    }
+    $calls = [System.Collections.Generic.List[string]]::new()
+    $found = $false
+    foreach ($entry in $sequence) {
+        $calls.Add($entry[1])
+        if ($entry[0] -ceq $selected.End) {
+            $found = $true
+            break
+        }
+    }
+    if (-not $found) { throw "Row $($Row.Id) ends at unknown call '$($selected.End)'" }
+    if ($selected.Abort) { $calls.Add('git merge --abort') }
+    return , [string[]] @($calls)
+}
+
+function Get-RegenerationTipScenarioCallList {
+    <#
+    .SYNOPSIS
+        Return the exact ordered call list of one Tip scenario alternative.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param([Parameter(Mandatory = $true)] [hashtable] $Selected)
+
+    throw 'Tip call lists are not transcribed'
 }
 
 function Get-RegenerationScenarioAlternativeCount {
