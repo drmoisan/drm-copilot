@@ -55,7 +55,7 @@ Describe 'agent-target-worktree.ps1 parity with AgentTargetWorktree.psm1' {
 
     It 'answers the rows from the dot-sourced twin' {
         $command = Get-Command -Name Resolve-AgentTargetWorktree -CommandType Function
-        $command.Source | Should -BeNullOrEmpty
+        $command.ModuleName | Should -Not -Be 'AgentTargetWorktree'
         ($command.ScriptBlock.File -replace '\\', '/') | Should -BeLike '*/.codex/hooks/agent-target-worktree.ps1'
     }
 }

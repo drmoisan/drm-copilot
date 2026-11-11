@@ -450,8 +450,7 @@ function Invoke-CompletionConsistencyDecision {
         if ($null -ne $WorktreeListInvoker) { $resolverArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
         $resolvedRoot = (([string](Resolve-AgentTargetWorktree @resolverArguments).WorktreeRoot) -replace '\\', '/').TrimEnd('/')
         if ($resolvedRoot -and -not [string]::Equals($resolvedRoot, (($SessionRoot -replace '\\', '/').TrimEnd('/')), [System.StringComparison]::OrdinalIgnoreCase)) {
-            $innerCheck = $FolderExistsCheck
-            $folderCheck = { param($p) & $innerCheck "$resolvedRoot/$p" }.GetNewClosure()
+            $folderCheck = { param($p) & $FolderExistsCheck "$resolvedRoot/$p" }.GetNewClosure()
         }
     }
     $missingArgs = @{ Payload = $payload; FolderExistsCheck = $folderCheck }

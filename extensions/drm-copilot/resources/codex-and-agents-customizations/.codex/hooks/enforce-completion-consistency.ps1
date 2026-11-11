@@ -383,9 +383,7 @@ function Invoke-CompletionConsistencyDecision {
 
         [Parameter(Mandatory = $false)]
         [scriptblock] $RoutingMatrixReader,
-
         [string] $SessionRoot = (Get-Location).Path,
-
         [scriptblock] $WorktreeListInvoker
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'COMPLETION_CONSISTENCY_BLOCKED:'
@@ -446,18 +444,12 @@ function Invoke-CompletionConsistencyDecision {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    # Issue #1163 (D6): an absolute checkpoint path probes the feature folder beneath the worktree
-    # that encloses it; a relative path, an unregistered path, or a listing failure keeps the probe.
+    # Issue #1163 (D6): an absolute checkpoint path probes the feature folder beneath its enclosing worktree.
     $folderCheck = $FolderExistsCheck
-    if ($normalized -match '^(/|[A-Za-z]:/)') {
-        $resolverArguments = @{ SessionRoot = $SessionRoot; FilePath = @([string]$filePath); Policy = 'SessionFallback' }
-        if ($null -ne $WorktreeListInvoker) { $resolverArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
-        $resolvedRoot = (([string](Resolve-AgentTargetWorktree @resolverArguments).WorktreeRoot) -replace '\\', '/').TrimEnd('/')
-        if ($resolvedRoot -and -not [string]::Equals($resolvedRoot, (($SessionRoot -replace '\\', '/').TrimEnd('/')), [System.StringComparison]::OrdinalIgnoreCase)) {
-            $innerCheck = $FolderExistsCheck
-            $folderCheck = { param($p) & $innerCheck "$resolvedRoot/$p" }.GetNewClosure()
-        }
-    }
+    $resolverArguments = @{ SessionRoot = $SessionRoot; FilePath = @([string]$filePath); Policy = 'SessionFallback' }
+    if ($null -ne $WorktreeListInvoker) { $resolverArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+    $resolvedRoot = if ($normalized -match '^(/|[A-Za-z]:/)') { (([string](Resolve-AgentTargetWorktree @resolverArguments).WorktreeRoot) -replace '\\', '/').TrimEnd('/') } else { '' }
+    if ($resolvedRoot -and -not [string]::Equals($resolvedRoot, (($SessionRoot -replace '\\', '/').TrimEnd('/')), [System.StringComparison]::OrdinalIgnoreCase)) { $folderCheck = { param($p) & $FolderExistsCheck "$resolvedRoot/$p" }.GetNewClosure() }
     $missingArgs = @{ Payload = $payload; FolderExistsCheck = $folderCheck }
     if ($PSBoundParameters.ContainsKey('RoutingMatrixReader') -and $null -ne $RoutingMatrixReader) {
         $missingArgs['RoutingMatrixReader'] = $RoutingMatrixReader

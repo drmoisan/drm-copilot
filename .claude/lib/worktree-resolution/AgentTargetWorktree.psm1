@@ -120,10 +120,9 @@ function Resolve-AgentTargetWorktree {
     # is captured as a script block, so the closure needs no command lookup of its own.
     $dropped = [System.Collections.Generic.List[object]]::new()
     $filter = ${function:ConvertTo-AgentTargetLiveWorktreeListText}
-    $userInvoker = $WorktreeListInvoker
     $liveInvoker = {
-        param($Root)
-        $live = & $filter -Text (@(& $userInvoker $Root) -join "`n")
+        param($Root, [scriptblock] $ListFilter = $filter)
+        $live = & $ListFilter -Text (@(& $WorktreeListInvoker $Root) -join "`n")
         foreach ($record in @($live.Dropped)) { $dropped.Add($record) }
         return $live.Text
     }.GetNewClosure()
@@ -144,7 +143,9 @@ function Resolve-AgentTargetWorktree {
         } elseif (-not [string]::Equals($directory, $session, $ignoreCase)) {
             $roots = @()
             try {
-                $roots = @(ConvertFrom-HookTargetWorktreePorcelain -Text (& $liveInvoker $SessionRoot) | ForEach-Object { $_.Root })
+                $live = ConvertTo-AgentTargetLiveWorktreeListText -Text (@(& $WorktreeListInvoker $SessionRoot) -join "`n")
+                foreach ($record in @($live.Dropped)) { $dropped.Add($record) }
+                $roots = @(ConvertFrom-HookTargetWorktreePorcelain -Text $live.Text | ForEach-Object { $_.Root })
             } catch {
                 $roots = @()
             }

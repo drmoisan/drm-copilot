@@ -311,11 +311,11 @@ function Invoke-EpicWorktreeRemovalGateDecision {
 
         [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
-    if ($null -eq $BranchWorktreeResolver) { $BranchWorktreeResolver = { param($Branch) Resolve-AgentTargetWorktree -SessionRoot (Get-Location).Path -CommandBranch $Branch -Policy FailClosedOnIdentity } }
 
     # A failed worktree-resolution import denies before any other logic (issue #690).
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WORKTREE_REMOVAL_BLOCKED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
+    if ($null -eq $BranchWorktreeResolver) { $BranchWorktreeResolver = { param($Branch) Resolve-AgentTargetWorktree -SessionRoot (Get-Location).Path -CommandBranch $Branch -Policy FailClosedOnIdentity } }
 
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $payload.IsValid) {
