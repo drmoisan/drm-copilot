@@ -7,6 +7,8 @@ Describe "claude-settings" {
         $script:PrdFeatureCommand = 'pwsh -NoProfile -File .claude/hooks/validate-prd-feature-output.ps1'
         # Issue #897: the fifteen-agent SubagentStop group keeps this exact matcher after the inline command is removed.
         $script:BroadSubagentStopMatcher = 'atomic-planner|atomic-executor|feature-review|task-researcher|prd-feature|staged-review|epic-review|status-updater|python-typed-engineer|powershell-typed-engineer|csharp-typed-engineer|typescript-engineer|orchestrator|epic-orchestrator|epic-planner'
+        # Issue #1159: the PreToolUse hook groups live in the dispatcher registry, read at test time.
+        $script:ClaudeRegistry = Get-Content -Path (Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'hooks', 'pretooluse-dispatch.json') -Raw | ConvertFrom-Json
         $script:SettingsCopies = @(
             @{ Name = 'canonical'; Settings = (Get-Content -Path (Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'settings.json') -Raw | ConvertFrom-Json) },
             @{ Name = 'bundled'; Settings = (Get-Content -Path (Join-Path -Path $script:RepoRoot -ChildPath 'extensions' -AdditionalChildPath 'drm-copilot', 'resources', 'claude-customizations', '.claude', 'settings.json') -Raw | ConvertFrom-Json) }
@@ -111,13 +113,13 @@ Describe "claude-settings" {
         $start.Count | Should -Be 1
         foreach ($role in $roles) { $role | Should -Match $start[0].matcher }
 
-        $tool = @($settings.hooks.PreToolUse | Where-Object { ($_.hooks | ForEach-Object { $_.command }) -match 'enforce-discovery-artifact-gate\.ps1' })
+        $tool = @($script:ClaudeRegistry.hooks.PreToolUse | Where-Object { ($_.hooks | ForEach-Object { $_.command }) -match 'enforce-discovery-artifact-gate\.ps1' })
         $tool.Count | Should -Be 1
         foreach ($name in @('Bash', 'Write', 'Edit', 'Agent', 'mcp__drm-copilot__run_discovery_repo_inventory', 'mcp__drm-copilot__discovery_capability_sentinel')) { $name | Should -Match $tool[0].matcher }
         # The sentinel agent is not a discovery role: no SubagentStart or SubagentStop matcher names it.
         foreach ($entry in @($settings.hooks.SubagentStart) + @($settings.hooks.SubagentStop)) { 'discovery-capability-sentinel' | Should -Not -Match "^($($entry.matcher))$" }
 
-        $planning = @($settings.hooks.PreToolUse | Where-Object { $_.matcher -ceq 'Agent' })
+        $planning = @($script:ClaudeRegistry.hooks.PreToolUse | Where-Object { $_.matcher -ceq 'Agent' })
         @($planning[0].hooks.command) | Should -Contain 'pwsh -NoProfile -File .claude/hooks/enforce-discovery-planning-gate.ps1'
 
         $broadStop = @($settings.hooks.SubagentStop | Where-Object { $_.matcher -like 'atomic-planner|atomic-executor|*' })
@@ -133,13 +135,33 @@ Describe "claude-settings" {
         $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json
 
         $bashHookCoverage = @(
-            $settings.hooks.PreToolUse |
+            $script:ClaudeRegistry.hooks.PreToolUse |
                 Where-Object { $_.matcher -eq 'Bash' } |
                     ConvertTo-Json -Depth 10 -Compress
         ) -join "`n"
 
         $bashHookCoverage | Should -Match ([regex]::Escape('.claude/hooks/validate-bash.ps1'))
         $bashHookCoverage | Should -Match ([regex]::Escape('.claude/hooks/enforce-promotion-mcp-only.ps1'))
+    }
+
+    It "registers a single PreToolUse dispatcher entry without a timeout key" {
+        $settingsPath = Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'settings.json'
+        $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json
+
+        $entries = @($settings.hooks.PreToolUse)
+        $entries.Count | Should -Be 1
+        $hooks = @($entries[0].hooks)
+        $hooks.Count | Should -Be 1
+        $hooks[0].command | Should -BeLike '*.claude/hooks/invoke-pretooluse-dispatch.ps1*'
+        # Spec D7: the Claude dispatcher keeps the runtime default timeout.
+        $entries[0].PSObject.Properties['timeout'] | Should -BeNullOrEmpty
+        $hooks[0].PSObject.Properties['timeout'] | Should -BeNullOrEmpty
+
+        # Every tool name a registry group admits is admitted by the dispatcher matcher (a regex, as it holds '.*').
+        $dispatcherMatcher = [string]$entries[0].matcher
+        $names = @($script:ClaudeRegistry.hooks.PreToolUse | ForEach-Object { [string]$_.matcher -split '\|' } | ForEach-Object { $_.Trim().Replace('.*', 'sample') } | Where-Object { $_ } | Sort-Object -Unique)
+        $names.Count | Should -BeGreaterThan 0
+        foreach ($name in $names) { [regex]::IsMatch($name, $dispatcherMatcher) | Should -BeTrue -Because "the dispatcher matcher must admit $name" }
     }
 
     It "requires one dedicated prd-feature stop-hook registration in byte-identical settings files" {
