@@ -39,7 +39,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'HookProcessCost.psm1') -Force
 
-function Start-HookCostProcessSet {
+function Invoke-HookCostProcessSet {
     <#
     .SYNOPSIS
         Starts every hook of one scenario concurrently and returns process count, CPU and wall ticks.
@@ -96,11 +96,13 @@ function Invoke-MeasureHookProcessCost {
         [Parameter(Mandatory)] [string] $RepositoryRoot,
         [AllowEmptyString()] [string] $OutputPath,
         [scriptblock] $ReadText = { param([string] $Path) $full = Join-Path -Path $RepositoryRoot -ChildPath $Path; if (Test-Path -LiteralPath $full -PathType Leaf) { Get-Content -LiteralPath $full -Raw } else { $null } },
-        [scriptblock] $StartHookProcess = { param($Scenario) Start-HookCostProcessSet -Scenario $Scenario -RepositoryRoot $RepositoryRoot },
+        [scriptblock] $StartHookProcess = { param($Scenario) Invoke-HookCostProcessSet -Scenario $Scenario -RepositoryRoot $RepositoryRoot },
         [scriptblock] $GetTimestamp = { [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH-mm') },
         [scriptblock] $WriteReport = { param([string] $Path, [string[]] $Lines) Set-Content -LiteralPath $Path -Value $Lines -Encoding utf8 }
     )
 
+    # The default seams above resolve hook and registration paths against this root.
+    Write-Verbose -Message "Measuring hook process cost under the repository root '$RepositoryRoot'."
     $scenarios = @(Get-HookCostScenario -Source $Source -ReadText $ReadText)
     $samples = [System.Collections.Generic.List[object]]::new()
     foreach ($scenario in $scenarios) {

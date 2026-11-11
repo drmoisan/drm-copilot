@@ -110,7 +110,7 @@ function ConvertFrom-HookCostJsonGroup {
     # Normalizes the PreToolUse groups of a settings.json or registry JSON document.
     [CmdletBinding()]
     [OutputType([pscustomobject])]
-    param([Parameter(Mandatory)] [AllowEmptyString()] [string] $Text, [switch] $Registry)
+    param([Parameter(Mandatory)] [AllowEmptyString()] [string] $Text)
 
     $document = $Text | ConvertFrom-Json
     if (@($document.PSObject.Properties | ForEach-Object Name) -notcontains 'hooks') { return }
@@ -200,7 +200,7 @@ function Get-HookCostScenario {
         if ($Source -eq 'Dispatcher') {
             $registryText = & $ReadText $entry.Registry
             if ($null -eq $registryText) { throw "Registry file not readable: $($entry.Registry)" }
-            $registryGroups = @(ConvertFrom-HookCostJsonGroup -Text $registryText -Registry)
+            $registryGroups = @(ConvertFrom-HookCostJsonGroup -Text $registryText)
         }
         foreach ($payload in @(Get-HookCostScenarioPayload -Runtime $runtime)) {
             $hooks = [System.Collections.Generic.List[string]]::new()
@@ -372,7 +372,10 @@ function Format-HookCostReport {
 }
 
 function Resolve-HookCostPayload {
-    # Replaces the repository-root token in a payload template with a JSON-escaped root path.
+    <#
+    .SYNOPSIS
+        Replaces the repository-root token in a payload template with a JSON-escaped root path.
+    #>
     [CmdletBinding()]
     [OutputType([string])]
     param([Parameter(Mandatory)] [string] $PayloadTemplate, [Parameter(Mandatory)] [string] $RepositoryRoot)

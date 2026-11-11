@@ -1,7 +1,7 @@
 # Pester tests for scripts/dev-tools/Measure-HookProcessCost.ps1 (issue #1159).
 # The script is dot-sourced, which defines its functions and runs nothing. Invoke-MeasureHookProcessCost
 # is driven through stub reader, process-starter, clock and writer seams with in-memory data. One
-# integration case runs Start-HookCostProcessSet against the committed fixture hook
+# integration case runs Invoke-HookCostProcessSet against the committed fixture hook
 # tests/fixtures/dev-tools/hook-process-cost/stdin-exit-hook.ps1; no test writes a file.
 
 BeforeAll {
@@ -65,14 +65,14 @@ Describe 'Invoke-MeasureHookProcessCost' {
     }
 }
 
-Describe 'Start-HookCostProcessSet' -Tag 'Integration' {
+Describe 'Invoke-HookCostProcessSet' -Tag 'Integration' {
     It 'starts every hook concurrently with the payload on stdin and reports count, CPU, wall and max exit code' {
         $hook = 'tests/fixtures/dev-tools/hook-process-cost/stdin-exit-hook.ps1'
         $allow = [pscustomobject]@{ Hooks = @($hook, $hook); PayloadTemplate = '{"cwd":"{{REPOSITORY_ROOT}}","note":"ok"}' }
         $deny = [pscustomobject]@{ Hooks = @($hook); PayloadTemplate = '{"note":"deny"}' }
 
-        $allowResult = Start-HookCostProcessSet -Scenario $allow -RepositoryRoot $script:RepositoryRoot
-        $denyResult = Start-HookCostProcessSet -Scenario $deny -RepositoryRoot $script:RepositoryRoot
+        $allowResult = Invoke-HookCostProcessSet -Scenario $allow -RepositoryRoot $script:RepositoryRoot
+        $denyResult = Invoke-HookCostProcessSet -Scenario $deny -RepositoryRoot $script:RepositoryRoot
 
         $allowResult.ProcessCount | Should -Be 2
         $allowResult.ExitCode | Should -Be 0
@@ -83,7 +83,7 @@ Describe 'Start-HookCostProcessSet' -Tag 'Integration' {
     }
 
     It 'returns zero processes for a scenario without hooks' {
-        $result = Start-HookCostProcessSet -Scenario ([pscustomobject]@{ Hooks = @(); PayloadTemplate = '{}' }) -RepositoryRoot $script:RepositoryRoot
+        $result = Invoke-HookCostProcessSet -Scenario ([pscustomobject]@{ Hooks = @(); PayloadTemplate = '{}' }) -RepositoryRoot $script:RepositoryRoot
 
         $result.ProcessCount | Should -Be 0
         $result.CpuSeconds | Should -Be 0
