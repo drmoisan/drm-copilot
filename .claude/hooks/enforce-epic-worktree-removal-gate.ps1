@@ -71,10 +71,10 @@ param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Sanctioned-removal manifest reader (issue #635), consumed by the manifest branch in
 # Invoke-EpicWorktreeRemovalGateDecision.
-try { Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'CleanupWorktreeManifest.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'CleanupWorktreeManifest.psm1' -ErrorRecord $_ }
 # Shared command-line parser (issue #545), consumed by the scope filter in
 # Invoke-EpicWorktreeRemovalGateDecision and by Resolve-CommandLineInvocationTarget.
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }

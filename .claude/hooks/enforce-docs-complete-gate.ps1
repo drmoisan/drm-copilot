@@ -86,9 +86,9 @@
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
-try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Pure gate predicates: profile switch, receipt path, integration target, receipt check.
-try { Import-Module (Join-Path $PSScriptRoot '../lib/docs/DocsCompleteGate.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DocsCompleteGate.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/docs/DocsCompleteGate.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DocsCompleteGate.psm1' -ErrorRecord $_ }
 # Shared command-line parser and structural invocation matcher (issues #545 and #952).
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }

@@ -33,8 +33,8 @@
 #>
 
 # Shared recorded-path matcher and main-checkout-root seam (issue #995).
-try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunRecordPath.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunRecordPath.psm1' -ErrorRecord $_ }
-try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunRecordPath.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunRecordPath.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 
 function Get-EpicWorktreeGateCheckpointContent {
     <#

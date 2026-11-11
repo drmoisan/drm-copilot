@@ -35,10 +35,10 @@ param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Sanctioned-removal manifest reader (issue #635), consumed by the manifest branch in
 # Invoke-ParallelWorktreeRemovalGateDecision. Same module the epic gate imports.
-try { Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'CleanupWorktreeManifest.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'CleanupWorktreeManifest.psm1' -ErrorRecord $_ }
 # Shared command-line parser (issue #545), consumed by the scope filter in
 # Invoke-ParallelWorktreeRemovalGateDecision and by Resolve-CommandLineInvocationTarget.
 # Both call sites are byte-for-byte the calls the epic gate makes, so the duplicated
@@ -47,8 +47,8 @@ try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookD
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 
 # Shared recorded-path matcher and main-checkout-root seam (issue #995).
-try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunRecordPath.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunRecordPath.psm1' -ErrorRecord $_ }
-try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunRecordPath.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunRecordPath.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
 # Sanctioned-removal manifest location. Recorded here so every hook-read document this
