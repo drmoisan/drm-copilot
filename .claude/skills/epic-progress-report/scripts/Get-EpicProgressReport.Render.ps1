@@ -326,6 +326,12 @@ function Get-EpicProgressCriticalPathLine {
         $lines.Add("**Schedule inputs:** dependency source $($path.DependencySource); cap $($path.Cap) ($($path.CapSource)).")
     }
     if ($path.GraphMessage) { $lines.Add("**Dependency graph:** $($path.GraphMessage).") }
+    # Issue #1162: one line for the cross-epic edges, only when an edge exists.
+    $crossEpic = @()
+    if ($path.PSObject.Properties.Name -contains 'CrossEpic') { $crossEpic = @($path.CrossEpic) }
+    if ($crossEpic.Count -gt 0) {
+        $lines.Add("**Cross-epic:** $((@($crossEpic | ForEach-Object { "#$($_.Issue) depends on $($_.Node) ($($_.State), $($_.Label))" })) -join ', ').")
+    }
     $lines.Add("**Serial sum:** $(& $hourText $path.SerialSumSeconds) (upper bound, no parallelism). **Range:** $(Get-EpicProgressRangeText -Range $path.Range).")
     $excluded = @($path.Excluded)
     if ($excluded.Count -gt 0) {

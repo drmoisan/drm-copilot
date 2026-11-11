@@ -4,11 +4,8 @@
 # command, absent path, a read of the script itself, a -WhatIf write) or mocked with a
 # matching parameter signature; no test starts git, gh, or cswap, writes a file, or reads
 # the clock.
-# Issue #1093 added the -PairSamples write case for a run within 90 seconds of the last sample.
-# Issue #1118 replaced the task goldens with hand-derived step goldens and the stored states
-# with version-2 documents; item mode and parameter sets are in Get-EpicProgressReport.ItemMode.Tests.ps1.
-# Issue #1153 changed the goldens to the five-line TL;DR and the critical-path section and the
-# written state to version 3; its integration cases are in Get-EpicProgressReport.CriticalPath.Tests.ps1.
+# History: #1093 the -PairSamples case; #1118 step goldens and version-2 states (item mode: Get-EpicProgressReport.ItemMode.Tests.ps1);
+# #1153 the five-line TL;DR, the critical-path section, and version-3 states (integration cases: Get-EpicProgressReport.CriticalPath.Tests.ps1).
 
 BeforeAll {
     $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../.claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1'
@@ -121,23 +118,19 @@ Describe 'Invoke-EpicProgressReport' {
         $script:livePlan = "### Phase 0 - Setup`n- [x] [P0-T1] Read.`n### Phase 1 - Build`n- [ ] [P1-T1] a.`n- [ ] [P1-T2] b.`n- [ ] [P1-T3] c.`n- [ ] [P1-T4] d."
         $script:checkpointJson = '{"features":[{"issue_num":12,"branch_name":"feature/alpha","merge_status":"merged"},{"issue_num":12345,"branch_name":"feature/beta","merge_status":"in_progress"}]}'
 
-        # Hand-derived step goldens. No item has a checkpoint, so stage_timing is absent:
-        # #12 is merged, so all 10 item steps (8 non-execution types plus 2 tasks) are done.
-        # #12345 has a prepared plan (research, spec, plan done), a checked task (preflight
-        # done, 1 of 5 tasks), and PR #8 (pr done): 6 of 13. #77 has a prepared plan: 3 of 11.
-        # The integration-pr epic step remains: 19 of 35 steps (54.3%). No sample exists, so
-        # every type uses its default: preflight 1 x 10 + execution 7 x 5 + review 2 x 14 +
-        # pr 1 x 3 + ci 2 x 17 + merge 2 x 5 + integration-pr 1 x 45 = 165 min (2.75 h).
-        # Tasks: #12 2 of 2, #12345 1 of 5, #77 0 of 3: 3 of 10 (issue #1153).
-        # Critical path (issue #1153): no feature qualifies, so every rate is the 12 tasks / hr
-        # default (5 min per task). #12345 has 56 min left (4 tasks x 5 + review 14 + ci 17 +
-        # merge 5) and #77 64 min (preflight 10 + 3 x 5 + review 14 + pr 3 + ci 17 + merge 5).
-        # No depends_on key exists in the checkpoint or epic.md, so the waves give #12345 -> #12
-        # (merged, done at 0) and #77 -> #12345; the cap is the built-in 4 (no routing config).
-        # #12345 runs 0 to 56 min and #77 56 min to 2 h 00 min. The tail is a predicted main-sync
-        # (60 min) and integration-pr (45 min): 1 h 45 min, so the headline is 3 h 45 min. The
-        # serial sum is 0 + 56 + 64 + 105 min, also 3 h 45 min. The first run's baseline task
-        # count is the current 3, so the aggregate average is 0 over 0 intervals.
+        # Hand-derived step goldens. No item has a checkpoint, so stage_timing is absent: #12 is merged, so all 10 item steps
+        # (8 non-execution types plus 2 tasks) are done. #12345 has a prepared plan (research, spec, plan done), a checked
+        # task (preflight done, 1 of 5 tasks), and PR #8 (pr done): 6 of 13. #77 has a prepared plan: 3 of 11. The
+        # integration-pr epic step remains: 19 of 35 steps (54.3%). No sample exists, so every type uses its default:
+        # preflight 1 x 10 + execution 7 x 5 + review 2 x 14 + pr 1 x 3 + ci 2 x 17 + merge 2 x 5 + integration-pr 1 x 45 =
+        # 165 min (2.75 h). Tasks: #12 2 of 2, #12345 1 of 5, #77 0 of 3: 3 of 10 (issue #1153). Critical path (issue #1153):
+        # no feature qualifies, so every rate is the 12 tasks / hr default (5 min per task). #12345 has 56 min left (4 tasks
+        # x 5 + review 14 + ci 17 + merge 5) and #77 64 min (preflight 10 + 3 x 5 + review 14 + pr 3 + ci 17 + merge 5). No
+        # depends_on key exists in the checkpoint or epic.md, so the waves give #12345 -> #12 (merged, done at 0) and #77 ->
+        # #12345; the cap is the built-in 4 (no routing config). #12345 runs 0 to 56 min and #77 56 min to 2 h 00 min. The
+        # tail is a predicted main-sync (60 min) and integration-pr (45 min): 1 h 45 min, so the headline is 3 h 45 min. The
+        # serial sum is 0 + 56 + 64 + 105 min, also 3 h 45 min. The first run's baseline task count is the current 3, so the
+        # aggregate average is 0 over 0 intervals.
         $script:expectedTldr = @(
             '**TL;DR:** Epic #42 is at 3 of 10 tasks, 19 of 35 steps (54.3%). 1 of 3 features are done. #12345 is running (6 of 13 steps).'
             '**Elapsed:** 3 h 00 min; critical path about 3 h 45 min left (#12345 -> #77 -> tail, cap 4). **Weekly** quota is at 42.5%.'
@@ -266,6 +259,12 @@ Describe 'Invoke-EpicProgressReport' {
         # The fetch exit code comes from the fixture, never from the ambient $LASTEXITCODE.
         $script:fetchExitCode = 0
         Mock Get-EpicProgressLastExitCode { return $script:fetchExitCode }
+    }
+
+    It 'prints the same TL;DR first line with a pending cross-epic edge, so external nodes add no steps (issue #1162)' {
+        $before = (Get-TestReportLine -Extra @{ Mode = 'TLDR' })[0]
+        $script:fileText[$script:checkpointPath] = $script:checkpointJson.Replace('"merge_status":"in_progress"}', '"merge_status":"in_progress","cross_epic_depends_on":[{"epic":"provider-epic","integration_branch":"epic/provider-epic-integration","issue_num":1188,"status":"held"}]}')
+        (Get-TestReportLine -Extra @{ Mode = 'TLDR' })[0] | Should -BeExactly $before
     }
 
     It 'warns when git fetch fails' {
@@ -599,6 +598,7 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
             (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.Velocity.ps1')).ProviderPath
             (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.Schedule.ps1')).ProviderPath
             (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.CriticalPath.ps1')).ProviderPath
+            (Resolve-Path -LiteralPath (Join-Path -Path $canonicalFolder -ChildPath 'Get-EpicProgressReport.CrossEpic.ps1')).ProviderPath
         )
 
         function Get-TestCommandUse {
@@ -628,7 +628,7 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
         $writes = @($uses | Where-Object { $writeCommands -contains $_.Name })
 
         # Set-Content writes the state file and New-Item creates its missing directory (issue #1093).
-        $script:productionPaths.Count | Should -Be 12
+        $script:productionPaths.Count | Should -Be 13
         $writes.Count | Should -Be 2
         (@($writes.Name | Sort-Object) -join ',') | Should -Be 'New-Item,Set-Content'
         foreach ($write in $writes) {
@@ -657,7 +657,7 @@ Describe 'Get-EpicProgressReport.ps1 repository constraints' {
             (Join-Path -Path (Split-Path -Path $canonicalFolder -Parent) -ChildPath 'SKILL.md')
         )
 
-        $scanPaths.Count | Should -Be 14
+        $scanPaths.Count | Should -Be 15
         foreach ($path in $scanPaths) {
             Test-Path -LiteralPath $path -PathType Leaf | Should -BeTrue -Because "$path must exist"
             $text = Get-Content -LiteralPath $path -Raw

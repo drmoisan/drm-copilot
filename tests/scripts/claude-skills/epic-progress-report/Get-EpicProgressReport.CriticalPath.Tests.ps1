@@ -401,3 +401,49 @@ Describe 'Invoke-EpicProgressReport critical-path wiring (issue #1153)' {
         }
     }
 }
+
+Describe 'Cross-epic external nodes on the critical path (issue #1162)' {
+    BeforeAll {
+        $script:crossDefaults = Resolve-EpicProgressStepDefault
+        $script:crossNow = 1767614400
+    }
+
+    It 'lengthens the chain of a dependent by a pending external prerequisite' {
+        $nodes = @(
+            [pscustomobject]@{ Issue = 'provider-epic#1188'; State = 'pending'; DurationSeconds = 7200; DependsOn = [string[]] @(); External = $true }
+            [pscustomobject]@{ Issue = '1201'; State = 'pending'; DurationSeconds = 3600; DependsOn = [string[]] @('provider-epic#1188') }
+        )
+
+        $schedule = Invoke-EpicProgressListSchedule -Node $nodes -Cap 1 -TailSeconds 600
+
+        $schedule.HeadlineSeconds | Should -Be (7200 + 3600 + 600)
+        Get-EpicProgressCriticalChain -Schedule $schedule | Should -BeExactly 'provider-epic#1188 -> #1201 -> tail'
+    }
+
+    It 're-prices an external node at the side rates like an equal local node' {
+        # The local twin has 3 remaining execution tasks and a merge step whose default (300 s)
+        # equals the external node's OtherSeconds, so both price identically at every rate.
+        $external = [pscustomobject]@{ Issue = 'p#7'; NodeState = 'pending'; Step = @(); Rate = 8.0; DependsOn = [string[]] @(); External = $true; ExecutionTasks = 3; OtherSeconds = 300.0 }
+        $steps = @(1..3 | ForEach-Object { Get-EpicProgressStepRecord -Issue '7' -Type 'execution' -Ordinal $_ }) + @(Get-EpicProgressStepRecord -Issue '7' -Type 'merge')
+        $local = [pscustomobject]@{ Issue = '7'; NodeState = 'pending'; Step = $steps; Rate = 8.0; DependsOn = [string[]] @() }
+        $pooled = [pscustomobject]@{ Count = 2; StandardDeviation = 1.0 }
+
+        $externalRange = Get-EpicProgressScheduleRange -Feature @($external) -Pooled $pooled -Ledger @{} -Default $script:crossDefaults -NowUnixSeconds $script:crossNow
+        $localRange = Get-EpicProgressScheduleRange -Feature @($local) -Pooled $pooled -Ledger @{} -Default $script:crossDefaults -NowUnixSeconds $script:crossNow
+
+        "$($externalRange.FastSeconds)|$($externalRange.SlowSeconds)" | Should -BeExactly "$($localRange.FastSeconds)|$($localRange.SlowSeconds)"
+    }
+
+    It 'adds external nodes to the report schedule without a feature row or a step' {
+        $feature = [pscustomobject]@{ Issue = '1201'; Wave = 1; Folder = 'f'; State = 'Pending'; Blocked = $false; Step = @(Get-EpicProgressStepRecord -Issue '1201' -Type 'merge'); TasksDone = 0; TasksTotal = 0 }
+        $edge = [pscustomobject]@{ Issue = '1201'; Epic = 'p'; IntegrationBranch = 'epic/p-integration'; IssueNum = '7'; Status = 'held'; Node = 'p#7' }
+        $node = New-EpicProgressExternalNode -Edge $edge -Default $script:crossDefaults -NowUnixSeconds $script:crossNow
+
+        $path = Get-EpicProgressCriticalPathReport -Feature @($feature) -Ledger @{} -Default $script:crossDefaults -NowUnixSeconds $script:crossNow -ExternalNode @($node) -CrossEdge @($edge)
+
+        @($path.Feature).Count | Should -Be 1
+        $path.Chain | Should -BeExactly 'p#7 -> #1201 -> tail'
+        "$($path.CrossEpic[0].Issue)|$($path.CrossEpic[0].Node)|$($path.CrossEpic[0].State)|$($path.CrossEpic[0].Label)" | Should -BeExactly '1201|p#7|pending|external (default)'
+        $path.SerialSumSeconds | Should -BeLessThan $path.HeadlineSeconds
+    }
+}

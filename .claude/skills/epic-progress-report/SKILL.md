@@ -205,6 +205,7 @@ Full mode prints the TL;DR lines, then these lines:
 **Critical path:** <chain>. Headline <H h MM min>: features finish in <H h MM min>, then the tail of <H h MM min> (<type> <H h MM min>, ...)[, main-sync predicted].
 **Schedule inputs:** dependency source <dependency-source>; cap <k> (<cap-source>).
 **Dependency graph:** <message>.
+**Cross-epic:** #<i> depends on <epic>#<n> (<state>, <label>)[, ...].
 **Serial sum:** <H h MM min> (upper bound, no parallelism). **Range:** <range>.
 **Excluded (blocked):** #<x> (<H h MM min>), #<y> (<H h MM min>).
 
@@ -245,69 +246,67 @@ Full report contents:
 ## Calculation Rules
 
 - Steps: derived per the step model above; the completion percentage is done steps over total steps (decision D8).
-- Feature state: Completed when merged; Blocked when blocked by recorded state; Running when a task is done, a
-  checkpoint exists, the epic row is past `not_started`, or a PR exists; otherwise Pending.
-- Median: over all retained samples of a type; an odd count takes the middle value and an even count averages
-  the middle pair.
+- Feature state: Completed when merged; Blocked when blocked by recorded state; Running when a task is done, a checkpoint
+  exists, the epic row is past `not_started`, or a PR exists; otherwise Pending.
+- Median: over all retained samples of a type; an odd count takes the middle value and an even count averages the middle pair.
 - Samples: one per closed `stage_timing` attempt (key `<issue>|<stage>|<attempt>`), one per execution task (key
-  `<issue>|exec|<plan file>|<task>`), and approximate main-sync and merge samples from epic rows (decision D3).
-  One sample per key is kept across runs; a `stage_timing` sample replaces a `tick` sample of the same key.
-- Retention: the duration ledger keeps the newest 1000 samples per type and is not limited by `-SampleCap`; the
-  check-in samples keep `-SampleCap` (default 14).
-- Tick split: tasks newly checked between two runs each receive (now - last tick - excluded seconds) / (number
-  of newly checked tasks); the excluded seconds are the union of the pause spans and the item's blocked span
-  in the interval, counted once (E11). The first observation of a plan seeds the anchor from the execution stage
-  start when one is recorded, otherwise from now with no sample. When the execution stage closes, each task's
-  sample becomes the stage duration divided by the task count.
-- Estimate per type: remaining steps x median, plus, for each in-progress step, max(0, median - elapsed in
-  step). Blocked steps are excluded and their would-be subtotal is listed; elapsed time does not accrue while
-  an item is blocked. The step-type table shows this sum over types; it is no longer the headline.
-- Sequential velocity (E3): a feature's rate is its execution samples in the ledger (keys `<issue>|exec|...`)
-  over their summed hours. A feature qualifies with at least 5 tasks and 15 active minutes (900 s). The pooled
-  rate is the median over qualifying features, with the across-feature SD (n-1, `n/a` below 2 features). Each
-  feature uses its own rate when it qualifies, else the pooled rate, else the default rate.
-- Default rate (E2): 3600 / the execution default in seconds: 12 tasks per hour with the built-in 5 minutes,
-  10 with `-StepDefaultMinutes @{ execution = 6 }`.
-- Remaining per feature (E4): remaining execution tasks x 3600 / rate, plus each remaining non-execution step
-  at its per-type median, plus in-progress credit; an in-progress task's median is 3600 / rate.
-- Dependencies (E5): the epic checkpoint `features[].depends_on` of a row that carries the key, else the
-  `epic.md` inline list (one `git show`, only when a kickoff feature has no checkpoint key; a block-style list
-  is not parsed). `[]` means none; a reference resolves by issue number or feature-folder basename; a merged
-  feature is satisfied. Waves apply only when no feature has the key in either source, each feature then
-  depending on every feature of the nearest lower wave. A self-loop, an unresolved reference, or a cycle
-  prints its message and falls back to waves.
+  `<issue>|exec|<plan file>|<task>`), and approximate main-sync and merge samples from epic rows (decision D3). One sample per
+  key is kept across runs; a `stage_timing` sample replaces a `tick` sample of the same key.
+- Retention: the duration ledger keeps the newest 1000 samples per type and is not limited by `-SampleCap`; the check-in samples
+  keep `-SampleCap` (default 14).
+- Tick split: tasks newly checked between two runs each receive (now - last tick - excluded seconds) / (number of newly checked
+  tasks); the excluded seconds are the union of the pause spans and the item's blocked span in the interval, counted once (E11).
+  The first observation of a plan seeds the anchor from the execution stage start when one is recorded, otherwise from now with
+  no sample. When the execution stage closes, each task's sample becomes the stage duration divided by the task count.
+- Estimate per type: remaining steps x median, plus, for each in-progress step, max(0, median - elapsed in step). Blocked steps
+  are excluded and their would-be subtotal is listed; elapsed time does not accrue while an item is blocked. The step-type table
+  shows this sum over types; it is no longer the headline.
+- Sequential velocity (E3): a feature's rate is its execution samples in the ledger (keys `<issue>|exec|...`) over their summed
+  hours. A feature qualifies with at least 5 tasks and 15 active minutes (900 s). The pooled rate is the median over qualifying
+  features, with the across-feature SD (n-1, `n/a` below 2 features). Each feature uses its own rate when it qualifies, else the
+  pooled rate, else the default rate.
+- Default rate (E2): 3600 / the execution default in seconds: 12 tasks per hour with the built-in 5 minutes, 10 with
+  `-StepDefaultMinutes @{ execution = 6 }`.
+- Remaining per feature (E4): remaining execution tasks x 3600 / rate, plus each remaining non-execution step at its per-type
+  median, plus in-progress credit; an in-progress task's median is 3600 / rate.
+- Dependencies (E5): the epic checkpoint `features[].depends_on` of a row that carries the key, else the `epic.md` inline list
+  (one `git show`, only when a kickoff feature has no checkpoint key; a block-style list is not parsed). `[]` means none; a
+  reference resolves by issue number or feature-folder basename; a merged feature is satisfied. Waves apply only when no feature
+  has the key in either source, each feature then depending on every feature of the nearest lower wave. A self-loop, an
+  unresolved reference, or a cycle prints its message and falls back to waves.
 - Cap (E5): the checkpoint `max_parallel_features` when it is an integer from 1 to 8, else
-  `codex_topology_policy.parallelism.default_max_parallel_features` in `config/orchestration-routing.json`,
-  else 4. Item mode has one node and no cap.
-- List schedule (E6): done features finish at 0 and hold no slot; running features start at 0 even beyond the
-  cap; ready features start while fewer than the cap run, by descending longest remaining path, ties by
-  ascending issue number. The headline is the latest finish plus the tail; the chain follows each start's
-  delaying predecessor (the dependency that finished last, or the feature whose finish freed the slot).
-- Blocked features (E7): a blocked feature and its transitive dependents leave the schedule and the serial
-  sum and are listed with their remaining time.
-- Tail (E8): one predicted `main-sync` and one `integration-pr`, at their ledger medians or 60 and 45 minutes,
-  with in-progress credit. The predicted sync is omitted when a sync row that is not done exists or
-  `integration-pr` is in progress or done; a done `integration-pr` gives a tail of 0. The predicted sync
-  enters the time figures only, not the step counts.
-- Serial sum: the per-feature remaining times plus the tail, equal to the cap-1 schedule; the headline never
-  exceeds it.
-- Range (E9): the schedule re-run at rate + 2.05 x SD and rate - 2.05 x SD. SD is the across-feature SD with at
-  least 2 qualifying features, else the aggregate interval SD with at least 3 intervals, else the range is
-  `n/a` with its reason. The slow end is `no upper bound` when a feature with remaining tasks has a slow rate at
-  or below 0.5 tasks per hour.
-- Pauses (E11): a gap longer than 3600 s between consecutive check-in samples (3 x the 20-minute cadence; a
-  constant, not a parameter) is a pause span, and `-ResetBaseline` appends the span from the newest stored
-  sample to the resume instant. Spans are excluded from tick batches and from the aggregate elapsed time.
-- Aggregate velocity (E11): the average is (done tasks - `baselineDoneTasks`) over active hours. Intervals
-  combine consecutive samples until at least 600 s have passed; a trailing remainder under 600 s is skipped,
-  and an interval overlapping a pause span is dropped. Recent is the last interval; the interval SD (n-1) is
-  `n/a` below 3 intervals. Samples without a task count, kept from version 2, form no interval. The average
-  is `n/a` while no interval exists.
-- Check-ins: a check-in sample (Unix epoch seconds, done steps, done tasks) is added when there is no previous
-  sample or the previous one is at least 90 seconds old. Epoch seconds are used because `ConvertFrom-Json`
-  converts ISO date strings into local-time values.
-- Weekly quota: the seven-day percentage of the active account in `cswap list --json`; `n/a` when `cswap` is
-  missing or prints nothing parseable.
+  `codex_topology_policy.parallelism.default_max_parallel_features` in `config/orchestration-routing.json`, else 4. Item mode
+  has one node and no cap.
+- List schedule (E6): done features finish at 0 and hold no slot; running features start at 0 even beyond the cap; ready
+  features start while fewer than the cap run, by descending longest remaining path, ties by ascending issue number. The
+  headline is the latest finish plus the tail; the chain follows each start's delaying predecessor (the dependency that finished
+  last, or the feature whose finish freed the slot).
+- Blocked features (E7): a blocked feature and its transitive dependents leave the schedule and the serial sum and are listed
+  with their remaining time.
+- Cross-epic edges (issue #1162, D9): each `cross_epic_depends_on` prerequisite is an external node `<epic>#<n>` (no leading
+  `#`): done when its checkpoint hold record shows `integrated` or `in_main`, else pending, never blocked; priced from the other
+  epic's prepared plan (pooled rate, step medians), else per-type defaults with zero tasks, labeled `external (default)`.
+  External nodes skip the cap, add no steps, and enter the time figures only; the `**Cross-epic:**` line appears only when an
+  edge exists.
+- Tail (E8): one predicted `main-sync` and one `integration-pr`, at their ledger medians or 60 and 45 minutes, with in-progress
+  credit. The predicted sync is omitted when a sync row that is not done exists or `integration-pr` is in progress or done; a
+  done `integration-pr` gives a tail of 0. The predicted sync enters the time figures only, not the step counts.
+- Serial sum: the per-feature remaining times plus the tail, equal to the cap-1 schedule; the headline never exceeds it.
+- Range (E9): the schedule re-run at rate + 2.05 x SD and rate - 2.05 x SD. SD is the across-feature SD with at least 2
+  qualifying features, else the aggregate interval SD with at least 3 intervals, else the range is `n/a` with its reason. The
+  slow end is `no upper bound` when a feature with remaining tasks has a slow rate at or below 0.5 tasks per hour.
+- Pauses (E11): a gap longer than 3600 s between consecutive check-in samples (3 x the 20-minute cadence; a constant, not a
+  parameter) is a pause span, and `-ResetBaseline` appends the span from the newest stored sample to the resume instant. Spans
+  are excluded from tick batches and from the aggregate elapsed time.
+- Aggregate velocity (E11): the average is (done tasks - `baselineDoneTasks`) over active hours. Intervals combine consecutive
+  samples until at least 600 s have passed; a trailing remainder under 600 s is skipped, and an interval overlapping a pause
+  span is dropped. Recent is the last interval; the interval SD (n-1) is `n/a` below 3 intervals. Samples without a task count,
+  kept from version 2, form no interval. The average is `n/a` while no interval exists.
+- Check-ins: a check-in sample (Unix epoch seconds, done steps, done tasks) is added when there is no previous sample or the
+  previous one is at least 90 seconds old. Epoch seconds are used because `ConvertFrom-Json` converts ISO date strings into
+  local-time values.
+- Weekly quota: the seven-day percentage of the active account in `cswap list --json`; `n/a` when `cswap` is missing or prints
+  nothing parseable.
 - `n/a`: every printed number passes through a formatter that returns `n/a` for NaN or infinity.
 
 ## Starting the Reports

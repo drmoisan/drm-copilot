@@ -28,6 +28,7 @@
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Metrics.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Velocity.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Schedule.ps1')
+. (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.CrossEpic.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.CriticalPath.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Render.ps1')
 . (Join-Path -Path $PSScriptRoot -ChildPath 'Get-EpicProgressReport.Gather.ps1')
