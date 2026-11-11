@@ -34,6 +34,7 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-c
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-commands.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-commands.ps1' -ErrorRecord $_ }
 
 # Every orchestration checkpoint a planner or orchestrator surface writes. Writing one
 # of these is orchestration bookkeeping, not implementation, so the gate must not
@@ -166,9 +167,10 @@ function Test-ImplementationCommand {
     $isStaging = @('add', 'commit').Where({ Test-CommandLineInvocation -CommandText $normalizedCommand -CommandWord 'git' -SubcommandPath @($_) }).Count -gt 0
 
     for ($index = 0; $index -lt $implementationCommandPatterns.Count; $index++) {
-        if (-not (($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }) -or ($index -eq 0 -and $isStaging))) {
-            continue
-        }
+        $structural = ($index -eq 0 -and $isStaging)
+        if (-not ($structural -or ($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }))) { continue }
+        # Stage 2 (issue #1160): a regex-only hit is dropped when every governed word is a mention-host operand.
+        if (-not $structural -and -not (Test-OrchestrationGateInvocationConfirmed -CommandText $normalizedCommand -PatternIndex $index)) { continue }
         # Allow-side only (issue #539). Index 0 is the git staging trigger, whose pattern
         # text is unchanged. It is the sole leg the orchestration-bookkeeping exemption may
         # clear, and only when no other implementation pattern matches the same line: the
