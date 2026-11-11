@@ -24,6 +24,8 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
         $script:Head = '0123456789abcdef0123456789abcdef01234567'
         $script:OtherHead = 'fedcba9876543210fedcba9876543210fedcba98'
         Mock Get-DocsCompleteGateRepositoryRoot { 'repo-root' }
+        # Issue #1163: the receipt root seam keeps these rows' receipt path and starts no process.
+        Mock Get-DocsCompleteGateReceiptRoot { 'repo-root' }
         Mock Invoke-DocsOnlyGhExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
 
         function ConvertTo-TestEnvelope {

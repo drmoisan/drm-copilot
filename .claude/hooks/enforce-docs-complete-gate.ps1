@@ -89,6 +89,8 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Pure gate predicates: profile switch, receipt path, integration target, receipt check.
 try { Import-Module (Join-Path $PSScriptRoot '../lib/docs/DocsCompleteGate.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DocsCompleteGate.psm1' -ErrorRecord $_ }
+# The receipt root is the live worktree that has the pull request head branch checked out (issue #1163).
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/AgentTargetWorktree.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'AgentTargetWorktree.psm1' -ErrorRecord $_ }
 # Shared command-line parser and structural invocation matcher (issues #545 and #952).
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
@@ -238,6 +240,40 @@ function Get-DocsCompleteGatePullRequest {
     return @{ Reason = $null; Message = $null; BaseRefName = [string] $pr.baseRefName; HeadRefName = [string] $pr.headRefName; HeadRefOid = $head }
 }
 
+function Get-DocsCompleteGateReceiptRoot {
+    <#
+    .SYNOPSIS
+        Returns the root the validation receipt is read beneath (issue #1163).
+    .DESCRIPTION
+        The worktree that Resolve-AgentTargetWorktree -CommandBranch resolves for the pull request
+        head branch when exactly one live (non-prunable) registration has it checked out; the
+        repository root when no registration, several registrations, or only a prunable one has
+        it, when the branch is blank, or when resolution throws.
+    .PARAMETER HeadRefName
+        The pull request head branch from gh pr view.
+    .PARAMETER RepositoryRoot
+        The root the profile is read beneath; the fallback.
+    .PARAMETER WorktreeListInvoker
+        Optional worktree-list seam; the resolver's default runs git worktree list --porcelain.
+    .OUTPUTS
+        System.String
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [AllowNull()] [AllowEmptyString()] [string] $HeadRefName,
+        [Parameter(Mandatory)] [string] $RepositoryRoot,
+        [scriptblock] $WorktreeListInvoker
+    )
+
+    if ([string]::IsNullOrWhiteSpace($HeadRefName)) { return $RepositoryRoot }
+    $resolverArguments = @{ SessionRoot = $RepositoryRoot; CommandBranch = $HeadRefName; Policy = 'FailClosedOnIdentity' }
+    if ($null -ne $WorktreeListInvoker) { $resolverArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+    try { $resolved = Resolve-AgentTargetWorktree @resolverArguments } catch { return $RepositoryRoot }
+    if ($null -ne $resolved.ReasonCode -or [string]::IsNullOrWhiteSpace([string] $resolved.WorktreeRoot)) { return $RepositoryRoot }
+    return [string] $resolved.WorktreeRoot
+}
+
 function Invoke-DocsCompleteGateDecision {
     <#
     .SYNOPSIS
@@ -248,6 +284,8 @@ function Invoke-DocsCompleteGateDecision {
         for the full decision order.
     .PARAMETER ToolInputRaw
         The raw JSON hook payload acquired by Read-ClaudeHookRawPayload.
+    .PARAMETER WorktreeListInvoker
+        Optional worktree-list seam forwarded to Get-DocsCompleteGateReceiptRoot (issue #1163).
     .OUTPUTS
         System.Collections.Specialized.OrderedDictionary
     #>
@@ -256,7 +294,9 @@ function Invoke-DocsCompleteGateDecision {
     param(
         [AllowNull()]
         [AllowEmptyString()]
-        [string] $ToolInputRaw
+        [string] $ToolInputRaw,
+
+        [scriptblock] $WorktreeListInvoker = $null
     )
 
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'DOCS_COMPLETE_GATE_BLOCKED:'
@@ -289,8 +329,11 @@ function Invoke-DocsCompleteGateDecision {
 
     $receiptPath = Get-DocsCompleteGateReceiptPath -ProfileText $profileText
     if ($null -ne $receiptPath.Reason) { return Get-DocsCompleteGateBlockDecision -Code $receiptPath.Reason -Message $receiptPath.Message }
+    $receiptRootArguments = @{ HeadRefName = $pr.HeadRefName; RepositoryRoot = $root }
+    if ($PSBoundParameters.ContainsKey('WorktreeListInvoker')) { $receiptRootArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+    $receiptRoot = Get-DocsCompleteGateReceiptRoot @receiptRootArguments
     try {
-        $receiptText = Get-DocsCompleteGateFileText -Path (Join-Path -Path $root -ChildPath $receiptPath.Path)
+        $receiptText = Get-DocsCompleteGateFileText -Path (Join-Path -Path $receiptRoot -ChildPath $receiptPath.Path)
     } catch {
         return Get-DocsCompleteGateBlockDecision -Code 'RECEIPT_UNREADABLE' -Message "The validation receipt exists but could not be read ($($_.Exception.GetBaseException().GetType().Name)); the gate fails closed. Make the file readable and retry."
     }
