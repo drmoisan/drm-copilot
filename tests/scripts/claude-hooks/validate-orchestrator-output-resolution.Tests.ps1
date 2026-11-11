@@ -25,6 +25,7 @@ BeforeAll {
     Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
     Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
     Mock Get-CheckpointFileContent { $null }
+    Mock Read-OrchestratorOutputOwnerPassDownText { $null }
     Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
     Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
     Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }

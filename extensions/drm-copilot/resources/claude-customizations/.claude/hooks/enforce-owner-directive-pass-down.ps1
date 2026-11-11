@@ -112,7 +112,7 @@ function Get-OwnerDirectivePassDownSelection {
     return (Select-OwnerDirectivePassDown -Source $Context.Sources -ItemIssue $Context.Issue -ItemBranch $Context.Branch -ItemStep $Context.Step -ParentIssue $Context.ParentIssue -ParentBranch $parentBranch -Now $Now)
 }
 
-function Get-OwnerDirectivePassDownAckDecision {
+function Resolve-OwnerDirectivePassDownAck {
     <#
     .SYNOPSIS
         The acknowledgement-mode decision for a call by an agent of the acknowledgement set.
@@ -244,7 +244,7 @@ function Get-OwnerDirectivePassDownDecisionWrite {
     return $null
 }
 
-function Get-OwnerDirectivePassDownCoordinatorDecision {
+function Resolve-OwnerDirectivePassDownCoordinator {
     <#
     .SYNOPSIS
         The prompt-only relay decision for a child orchestrator launch by an epic or parallel coordinator.
@@ -294,7 +294,7 @@ function Get-OwnerDirectivePassDownCoordinatorDecision {
     return [pscustomobject]@{ Decision = (New-OwnerDirectivePassDownDeny -Code 'OWNER_DIRECTIVE_RELAY_REQUIRED' -Detail $detail) }
 }
 
-function Get-OwnerDirectivePassDownRelayDecision {
+function Resolve-OwnerDirectivePassDownRelay {
     <#
     .SYNOPSIS
         The relay-mode decision for a delegation to a relay target.
@@ -321,7 +321,7 @@ function Get-OwnerDirectivePassDownRelayDecision {
     $callerRoot = $null
     if (-not [string]::IsNullOrWhiteSpace($cwd)) { $callerRoot = (Resolve-HookTargetWorktree -SessionRoot $Seam.SessionRoot -FilePath @($cwd) -WorktreeListInvoker $Seam.WorktreeListInvoker).WorktreeRoot }
     if ($SubagentType -ceq 'orchestrator' -and -not [string]::IsNullOrWhiteSpace($callerRoot)) {
-        $coordinator = Get-OwnerDirectivePassDownCoordinatorDecision -CallerRoot $callerRoot -Prompt $Prompt -Seam $Seam
+        $coordinator = Resolve-OwnerDirectivePassDownCoordinator -CallerRoot $callerRoot -Prompt $Prompt -Seam $Seam
         if ($null -ne $coordinator) { return $coordinator.Decision }
     }
     $itemRoot = $null
@@ -428,11 +428,11 @@ function Get-OwnerDirectivePassDownDecision {
         }
     }
     if (Test-OwnerDirectivePassDownMember -Value $agentType -Set $roles.Acknowledgement) {
-        return (Get-OwnerDirectivePassDownAckDecision -Payload $payload -ToolName $toolName -ToolInput $toolInput -Seam $seam)
+        return (Resolve-OwnerDirectivePassDownAck -Payload $payload -ToolName $toolName -ToolInput $toolInput -Seam $seam)
     }
     $subagentType = [string] (Get-ClaudeHookEnvelopeValue -Envelope $toolInput -Name 'subagent_type')
     if ((Test-OwnerDirectivePassDownMember -Value $toolName -Set $roles.DelegationTool) -and (Test-OwnerDirectivePassDownMember -Value $subagentType -Set $roles.Relay)) {
-        return (Get-OwnerDirectivePassDownRelayDecision -Payload $payload -SubagentType $subagentType -Prompt ([string] (Get-ClaudeHookEnvelopeValue -Envelope $toolInput -Name 'prompt')) -Seam $seam)
+        return (Resolve-OwnerDirectivePassDownRelay -Payload $payload -SubagentType $subagentType -Prompt ([string] (Get-ClaudeHookEnvelopeValue -Envelope $toolInput -Name 'prompt')) -Seam $seam)
     }
     return $null
 }

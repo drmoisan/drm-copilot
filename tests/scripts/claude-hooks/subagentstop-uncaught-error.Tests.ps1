@@ -46,6 +46,7 @@ Describe 'SubagentStop validator unhandled-error block (issue #928)' {
         if (Get-Command Get-ArtifactFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ArtifactFileContent' -Surface 'Codex' }
         if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChangedLanguageSet' -Surface 'Codex' }
         if (Get-Command Get-CheckpointFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex' }
+        if (Get-Command Read-OrchestratorOutputOwnerPassDownText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Read-OrchestratorOutputOwnerPassDownText' -Surface 'Codex' }
         if (Get-Command Get-JacocoRepoCoverage -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-JacocoRepoCoverage' -Surface 'Codex' }
         if (Get-Command Get-LcovRepoCoverage -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-LcovRepoCoverage' -Surface 'Codex' }
         $script:EnvelopeJson = '{"session_id":"u-928","hook_event_name":"SubagentStop"}'

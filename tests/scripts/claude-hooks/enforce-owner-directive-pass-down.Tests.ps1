@@ -17,6 +17,9 @@ param()
 BeforeAll {
     $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
     . (Join-Path $script:RepoRoot '.claude/hooks/enforce-owner-directive-pass-down.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+    Mock Read-OwnerDirectiveFileText { $null }
 
     $script:Session = '/synthetic-worktrees/main'
     $script:Item = '/synthetic-worktrees/item-1157'
@@ -108,6 +111,8 @@ BeforeAll {
 }
 
 Describe 'relay mode (AC-10, AC-13)' {
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     It 'denies a delegation to <Target> when the entry is missing from the item checkpoint' -ForEach @(
         @{ Target = 'atomic-executor' }, @{ Target = 'atomic-planner' }, @{ Target = 'feature-review' }, @{ Target = 'task-researcher' }, @{ Target = 'prd-feature' }
         @{ Target = 'python-typed-engineer' }, @{ Target = 'powershell-typed-engineer' }, @{ Target = 'csharp-typed-engineer' }, @{ Target = 'typescript-engineer' }, @{ Target = 'orchestrator' }

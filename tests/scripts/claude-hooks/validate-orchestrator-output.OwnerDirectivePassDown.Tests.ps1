@@ -20,6 +20,7 @@ BeforeAll {
     Import-Module (Join-Path $script:RepoRoot '.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1') -Force -ErrorAction Stop
     Import-Module (Join-Path $script:RepoRoot '.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectiveSelection.psm1') -Force -ErrorAction Stop
     . (Join-Path $script:RepoRoot '.claude/hooks/validate-orchestrator-output-owner-pass-down.ps1')
+    Mock Read-OrchestratorOutputOwnerPassDownText { $null }
 
     $script:Item = '/synthetic-worktrees/item-1157'
     $script:Epic = '/synthetic-worktrees/epic'
