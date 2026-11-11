@@ -146,4 +146,12 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('DISCOVE
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'DISCOVERY_PLANNING_GATE_BLOCKED:'
 if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
-exit (Invoke-DiscoveryPlanningGateEntryPoint -PayloadRaw ([Console]::In.ReadToEnd()))
+# The entry point returns its [int] exit code as the last pipeline element and the
+# decision JSON before it. `exit (<call>)` would capture BOTH into the exit
+# expression and emit nothing, so the decision is written explicitly here first.
+$entryPointResult = @(Invoke-DiscoveryPlanningGateEntryPoint -PayloadRaw ([Console]::In.ReadToEnd()))
+if ($entryPointResult.Count -gt 1) {
+    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
+}
+
+exit ([int]$entryPointResult[-1])

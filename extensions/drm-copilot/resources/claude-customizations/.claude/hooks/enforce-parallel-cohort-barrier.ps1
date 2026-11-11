@@ -343,4 +343,12 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('PARALLE
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PARALLEL_COHORT_BARRIER_BLOCKED:'
 if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
-exit (Invoke-ParallelCohortBarrierEntryPoint)
+# The entry point returns its [int] exit code as the last pipeline element and the
+# decision JSON before it. `exit (<call>)` would capture BOTH into the exit
+# expression and emit nothing, so the decision is written explicitly here first.
+$entryPointResult = @(Invoke-ParallelCohortBarrierEntryPoint)
+if ($entryPointResult.Count -gt 1) {
+    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
+}
+
+exit ([int]$entryPointResult[-1])
