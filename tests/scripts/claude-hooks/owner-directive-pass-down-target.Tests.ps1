@@ -200,3 +200,60 @@ Describe 'Get-OwnerDirectiveSourceSet and Get-OwnerDirectiveItemContext' {
         (Get-OwnerDirectiveClock).Kind | Should -Be ([System.DateTimeKind]::Utc)
     }
 }
+
+Describe 'default seam parameters delegate to the named readers and resolvers' {
+    It 'Get-OwnerDirectiveSourceSet reads the item ledger through Read-OwnerDirectiveFileText by default' {
+        # Arrange: the default reader is the named function, mocked over an in-memory ledger.
+        Mock Read-OwnerDirectiveFileText { if (([string] $Path).Replace('\', '/').EndsWith('/owner-directives.jsonl')) { '{"id":"OD-7"}' } else { $null } }
+
+        # Act
+        $sources = Get-OwnerDirectiveSourceSet -ItemRoot $script:Item -ItemCheckpointText '{}' -Parent $null
+
+        # Assert
+        $sources[1].Text | Should -BeExactly '{"id":"OD-7"}'
+    }
+
+    It 'Get-OwnerDirectiveParentIssue reads the epic checkpoint through Read-OwnerDirectiveFileText by default' {
+        # Arrange
+        Mock Read-OwnerDirectiveFileText { '{"epic_issue_num":901}' }
+        $parent = [pscustomobject]@{ Kind = 'epic'; Root = '/synthetic-worktrees/epic'; IntegrationBranch = 'epic/x'; ParallelSlug = '' }
+
+        # Act and assert
+        Get-OwnerDirectiveParentIssue -Parent $parent | Should -Be 901
+    }
+
+    It 'Get-OwnerDirectiveExistingDecisionId tests decision files through Test-OwnerDirectiveFileExist by default' {
+        # Arrange
+        Mock Test-OwnerDirectiveFileExist { ([string] $Path).Replace('\', '/').EndsWith('/a2/OD-3.md') }
+        $selected = @([pscustomobject]@{ Id = 'OD-3' }, [pscustomobject]@{ Id = 'OD-4' })
+
+        # Act and assert
+        Get-OwnerDirectiveExistingDecisionId -ItemRoot $script:Item -AgentId 'a2' -Selected $selected | Should -Be @('OD-3')
+    }
+
+    It 'Resolve-OwnerDirectiveParentRoot resolves an epic parent through Resolve-WorktreeEpicTarget by default' {
+        # Arrange
+        Mock Resolve-WorktreeEpicTarget { [pscustomobject]@{ Status = 'OtherWorktree'; WorktreeRoot = '/synthetic-worktrees/epic' } }
+        $checkpoint = '{"epic_context":{"integration_branch":"epic/pass-down-integration"}}' | ConvertFrom-Json
+
+        # Act
+        $result = Resolve-OwnerDirectiveParentRoot -Checkpoint $checkpoint -SessionRoot $script:Session
+
+        # Assert
+        $result.Kind | Should -BeExactly 'epic'
+        Should -Invoke Resolve-WorktreeEpicTarget -Times 1 -Exactly
+    }
+
+    It 'Resolve-OwnerDirectiveParentRoot resolves a parallel parent through Resolve-WorktreeParallelTarget by default' {
+        # Arrange
+        Mock Resolve-WorktreeParallelTarget { [pscustomobject]@{ Status = 'OtherWorktree'; WorktreeRoot = '/synthetic-worktrees/parallel' } }
+        $checkpoint = '{"parallel_slug":"harness-learnings"}' | ConvertFrom-Json
+
+        # Act
+        $result = Resolve-OwnerDirectiveParentRoot -Checkpoint $checkpoint -SessionRoot $script:Session
+
+        # Assert
+        $result.Kind | Should -BeExactly 'parallel'
+        Should -Invoke Resolve-WorktreeParallelTarget -Times 1 -Exactly
+    }
+}

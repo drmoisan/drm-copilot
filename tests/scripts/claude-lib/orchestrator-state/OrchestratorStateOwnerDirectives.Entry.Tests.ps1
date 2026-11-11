@@ -70,6 +70,14 @@ Describe 'Get-OrchestratorStateOwnerDirectiveValidEntry input forms' {
         $result.InvalidNumber | Should -Be @(3)
     }
 
+    It 'reports a ledger line that parses as JSON but is not an object' {
+        $text = $script:Valid + "`n[1, 2]`n"
+        $result = Get-OrchestratorStateOwnerDirectiveValidEntry -Text $text
+        @($result.Entries | ForEach-Object Id) | Should -Be @('OD-1')
+        $result.Errors | Should -Be @('Ledger line #2 is not a JSON object.')
+        $result.InvalidNumber | Should -Be @(2)
+    }
+
     It 'reports a JSON array that is not a non-empty list of objects with the B1 string' {
         $result = Get-OrchestratorStateOwnerDirectiveValidEntry -Text '[]'
         $result.Entries.Count | Should -Be 0
