@@ -18,9 +18,13 @@
         and must be unclassified after the stage-2 confirmation.
       - NonGoal: the D2 declared non-goals and the two D15 rows (spec AC-3). Each row is
         unclassified today and must stay unclassified; classification is never widened.
+      - BookkeepingLeg and D5D14: the decision-level bookkeeping-leg rows (research section
+        6.4; spec AC-6, AC-8, AC-13) and the decision D5 rows as amended by D14 (spec AC-7),
+        run by enforce-orchestration-preimplementation-gate.BookkeepingLeg.Tests.ps1 and
+        tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-bookkeeping-leg.Tests.ps1.
 
-    Every row carries a stable identifier (Id), the command text (Command), and the
-    expected Test-ImplementationCommand result (Expected).
+    Every row carries a stable identifier (Id), the command text (Command), and Expected: the
+    Test-ImplementationCommand result in the first three tables, the decision in the last two.
 #>
 
 $script:ClassificationExistingDenialCase = @(
@@ -98,4 +102,53 @@ $script:ClassificationNonGoalCase = @(
     @{ Id = 'NG-07'; Command = 'sh artifacts/launcher.sh'; Expected = $false }
     @{ Id = 'NG-08'; Command = 'pwsh -c "Invoke-Expression ''pytest''"'; Expected = $false }
     @{ Id = 'NG-09'; Command = 'pwsh -c "[Diagnostics.Process]::Start(''pytest'')"'; Expected = $false }
+)
+
+# Bookkeeping-leg rows (research section 6.4; spec AC-6, AC-8, AC-13). Driven through the
+# decision with the default configuration. Root $true: the checkpoint read is mocked to a
+# synthetic worktree; Root $false: a NOT-ready checkpoint text is injected, so there is no
+# root. IndexExitCode and IndexOutput are the mocked staged-index read. Expected is the
+# decision; every deny carries the generic deny text with no suffix.
+$script:ClassificationBookkeepingLegCase = @(
+    @{ Id = 'BL-01'; Command = 'git add .claude/agent-memory/r/notes.md'; Expected = 'allow'; Root = $false; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-02'; Command = 'git add -- .claude/agent-memory/r/notes.md'; Expected = 'allow'; Root = $false; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-03'; Command = 'git commit -m m -- .claude/agent-memory/r/a.md'; Expected = 'allow'; Root = $false; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-04'; Command = 'git commit -F msg.txt -- .claude/agent-memory/r/a.md'; Expected = 'allow'; Root = $false; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-05'; Command = 'git commit -m m'; Expected = 'allow'; Root = $true; IndexExitCode = 0; IndexOutput = ".claude/agent-memory/r/a.md`0" }
+    @{ Id = 'BL-06'; Command = 'git commit -m m'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-07'; Command = 'git commit -m m'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = ".claude/agent-memory/r/a.md`0src/app.ps1`0" }
+    @{ Id = 'BL-08'; Command = 'git commit -m m'; Expected = 'deny'; Root = $true; IndexExitCode = 128; IndexOutput = '' }
+    @{ Id = 'BL-09'; Command = 'git commit -m m'; Expected = 'deny'; Root = $false; IndexExitCode = 0; IndexOutput = ".claude/agent-memory/r/a.md`0" }
+    @{ Id = 'BL-10'; Command = 'git commit -am m'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = ".claude/agent-memory/r/a.md`0" }
+    @{ Id = 'BL-11'; Command = 'git commit -a -m m'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = ".claude/agent-memory/r/a.md`0" }
+    @{ Id = 'BL-12'; Command = 'git commit --amend -m m'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = ".claude/agent-memory/r/a.md`0" }
+    @{ Id = 'BL-13'; Command = 'git add .'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-14'; Command = 'git add -A'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-15'; Command = 'git add -u'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-16'; Command = 'git add :/'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-17'; Command = 'git add .claude/agent-memory/r/*.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-18'; Command = 'git add .claude/agent-memory/'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-19'; Command = 'git add .claude/agent-memory/../src/x.ps1'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-20'; Command = 'git add .claude\agent-memory\x.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-21'; Command = 'git add .claude/agent-memory/r/a.md src/x.ps1'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-22'; Command = 'git commit -i -m m -- .claude/agent-memory/r/a.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-23'; Command = 'git commit -o -m m -- .claude/agent-memory/r/a.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-24'; Command = 'git commit --pathspec-from-file=list.txt -m m'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = ".claude/agent-memory/r/a.md`0" }
+    @{ Id = 'BL-25'; Command = 'git commit --message=m -- .claude/agent-memory/r/a.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-26'; Command = 'git add .claude/agent-memory/r/a.md && pytest'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-27'; Command = 'git add .claude/agent-memory/r/a.md && git push'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-28'; Command = 'git commit -m "$x" -- .claude/agent-memory/r/a.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'BL-29'; Command = 'git add ".claude/agent-memory/r/a.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+)
+
+# Decision D5 rows as amended by D14 (spec AC-7). The two allow rows mix a declared-root path
+# with an issue #539 tree path; the deny rows carry no declared-root path or a rejected -C
+# selector, and keep the generic deny text with no suffix.
+$script:ClassificationD5D14Case = @(
+    @{ Id = 'DW-01'; Command = 'git add -- .claude/agent-memory/r/a.md docs/features/active/x/plan.md'; Expected = 'allow'; Root = $false; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'DW-02'; Command = 'git commit -m m'; Expected = 'allow'; Root = $true; IndexExitCode = 0; IndexOutput = ".claude/agent-memory/r/a.md`0docs/features/active/x/plan.md`0" }
+    @{ Id = 'DW-03'; Command = 'git commit -m m'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = "docs/features/active/x/plan.md`0docs/features/epics/e/epic.md`0" }
+    @{ Id = 'DW-04'; Command = 'git commit -F msg.txt -- docs/features/active/x/plan.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'DW-05'; Command = 'git commit --file msg.txt -- docs/features/active/x/plan.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'DW-06'; Command = 'git -C //server/share/wt add -- .claude/agent-memory/r/a.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
 )
