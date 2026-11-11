@@ -94,6 +94,7 @@ BeforeAll {
         'enforce-parallel-drift-gate.ps1'        = 'gates parallel delegations; the workflow is not a parallel run'
         'enforce-docs-role-write-scope.ps1'      = 'acts only for the four documentation roles; the workflow runs in the main session, which carries no agent_type'
         'enforce-worktree-poetry-venv.ps1'       = 'denies mutating Poetry commands aimed at an outside VIRTUAL_ENV; the workflow runs no Poetry command'
+        'enforce-test-execution-policy.ps1'      = 'denies test-suite runs outside the test-execution launcher; the workflow starts no test suite'
     }
 
     function ConvertTo-WorkflowPayload {

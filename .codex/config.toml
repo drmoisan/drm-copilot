@@ -155,6 +155,21 @@ command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/
 command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-worktree-poetry-venv.ps1"'
 timeout = 30
 
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-test-execution-policy.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-test-execution-policy.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse]]
+matcher = "^(mcp__drm-copilot__run_poshqc_test|mcp__drm-copilot__run_poshqc_suite)$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-test-execution-policy.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-test-execution-policy.ps1"'
+timeout = 30
+
 [[hooks.PreToolUse]]
 matcher = "^(Bash|shell_command|apply_patch|Edit|Write|mcp__.*)$"
 

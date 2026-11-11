@@ -85,6 +85,7 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
             '.codex/hooks/enforce-promotion-mcp-only.ps1'                   = 'PROMOTION_MCP_ONLY_BLOCKED:'
             '.codex/hooks/enforce-python-batch-budget.ps1'                  = 'PYTHON_LARGE_PATH_REQUIRED:'
             '.codex/hooks/enforce-worktree-poetry-venv.ps1'                 = 'WORKTREE_VENV_BLOCKED:'
+            '.codex/hooks/enforce-test-execution-policy.ps1'                = 'TEST_EXECUTION_POLICY_BLOCKED:'
             '.codex/hooks/validate-bash.ps1'                                = 'HOOK_DEPENDENCY_LOAD_FAILED:'
             '.codex/hooks/validate-codex-subagent-routing.ps1'              = 'MODEL_ROUTING_ATTESTATION_BLOCKED:'
             '.codex/hooks/validate-discovery-agent-output.ps1'              = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'

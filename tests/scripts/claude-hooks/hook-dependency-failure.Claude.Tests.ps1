@@ -98,6 +98,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
             '.claude/hooks/enforce-promotion-mcp-only.ps1'                   = 'PROMOTION_MCP_ONLY_BLOCKED:'
             '.claude/hooks/enforce-python-batch-budget.ps1'                  = 'PYTHON_LARGE_PATH_REQUIRED:'
             '.claude/hooks/enforce-worktree-poetry-venv.ps1'                 = 'WORKTREE_VENV_BLOCKED:'
+            '.claude/hooks/enforce-test-execution-policy.ps1'                = 'TEST_EXECUTION_POLICY_BLOCKED:'
             '.claude/hooks/validate-bash.ps1'                                = 'HOOK_DEPENDENCY_LOAD_FAILED:'
             '.claude/hooks/validate-discovery-artifact-gate.ps1'             = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
             '.claude/hooks/validate-docs-role-output.ps1'                    = 'DOCS_ROLE_OUTPUT_BLOCKED:'
