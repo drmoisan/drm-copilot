@@ -177,10 +177,11 @@ function Get-OwnerDirectiveEntryError {
     param(
         [Parameter(Mandatory = $true)] [System.Text.Json.JsonElement] $Entry,
         [Parameter(Mandatory = $true)] [int] $Number,
-        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [System.Collections.Generic.HashSet[string]] $SeenIds
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [System.Collections.Generic.HashSet[string]] $SeenIds,
+        [string] $MessagePrefix
     )
 
-    $prefix = 'Checkpoint owner_directives entry #{0}' -f $Number
+    $prefix = if ([string]::IsNullOrEmpty($MessagePrefix)) { 'Checkpoint owner_directives entry #{0}' -f $Number } else { $MessagePrefix }
     foreach ($field in $script:DirectiveFields) {
         if (-not (Test-OwnerDirectiveNonEmptyString -Element $Entry -Name $field)) {
             '{0} field {1} must be a non-empty string.' -f $prefix, $field
@@ -375,4 +376,115 @@ function Get-OrchestratorStateOwnerDirectiveError {
     }
 }
 
-Export-ModuleMember -Function Get-OrchestratorStateOwnerDirectiveError
+# Private: one B2-B8-valid entry element as a plain object, with its expiry parsed and its JSON
+# text on one line in its recorded field order (JSON strings hold no raw line break, so every
+# line break of the raw text lies between tokens).
+function ConvertTo-OwnerDirectiveValidEntry {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)] [System.Text.Json.JsonElement] $Entry
+    )
+
+    $scope = (Get-OwnerDirectiveProperty -Element $Entry -Name 'scope').Value
+    $expiresText = Get-OwnerDirectiveString -Element $Entry -Name 'expires_at'
+    return [pscustomobject]@{
+        Id              = Get-OwnerDirectiveString -Element $Entry -Name 'id'
+        Text            = Get-OwnerDirectiveString -Element $Entry -Name 'text'
+        TextSha256      = Get-OwnerDirectiveString -Element $Entry -Name 'text_sha256'
+        Class           = Get-OwnerDirectiveString -Element $Entry -Name 'class'
+        RecordedAt      = Get-OwnerDirectiveString -Element $Entry -Name 'recorded_at'
+        ExpiresAt       = $expiresText
+        ExpiresAtUtc    = ConvertFrom-OwnerDirectiveDateText -Text $expiresText
+        ScopeIssue      = [long]::Parse((Get-OwnerDirectiveProperty -Element $scope -Name 'issue').Value.GetRawText(), [System.Globalization.CultureInfo]::InvariantCulture)
+        ScopeBranch     = Get-OwnerDirectiveString -Element $scope -Name 'branch'
+        ScopeStep       = Get-OwnerDirectiveString -Element $scope -Name 'step'
+        IssuedBySession = Get-OwnerDirectiveString -Element $Entry -Name 'issued_by_session'
+        Json            = ($Entry.GetRawText() -replace '\s*\r?\n\s*', ' ')
+    }
+}
+
+function Get-OrchestratorStateOwnerDirectiveValidEntry {
+    <#
+    .SYNOPSIS
+        Return the B2-B8-valid owner-directive entries of JSON array text or ledger text (issue #1157).
+    .DESCRIPTION
+        Text whose first non-whitespace character is '[' is read as an owner_directives array:
+        a value that is not a non-empty list of objects yields the B1 string, and unparseable text
+        yields one error starting with OWNER_DIRECTIVE_UNEVALUABLE:. Any other text is ledger text:
+        one directive object per line, blank lines ignored, a line that is not a JSON object
+        reported as 'Ledger line #N is not a JSON object.', and rule errors prefixed with
+        'Ledger line #N' instead of 'Checkpoint owner_directives entry #N'. Rules B2-B8 come from
+        the same private checks as Get-OrchestratorStateOwnerDirectiveError, and B4 is judged across
+        the whole text, so a later entry with a seen id is invalid and the first stays valid.
+        Returns Entries (Id, Text, TextSha256, Class, RecordedAt, ExpiresAt as recorded,
+        ExpiresAtUtc, ScopeIssue, ScopeBranch, ScopeStep, IssuedBySession, Json), Errors,
+        ErrorNumber (the entry or line number of each error), and InvalidNumber (the distinct
+        numbers of the invalid entries or lines). Never throws for malformed text.
+    .PARAMETER Text
+        The JSON array text or ledger text.
+    .OUTPUTS
+        System.Management.Automation.PSCustomObject
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowNull()] [AllowEmptyString()] [string] $Text
+    )
+
+    $entries = [System.Collections.Generic.List[object]]::new()
+    $errors = [System.Collections.Generic.List[string]]::new()
+    $errorNumbers = [System.Collections.Generic.List[int]]::new()
+    $invalid = [System.Collections.Generic.List[int]]::new()
+    $seenIds = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    $options = [System.Text.Json.JsonDocumentOptions]::new()
+    $options.CommentHandling = [System.Text.Json.JsonCommentHandling]::Skip
+    $options.AllowTrailingCommas = $true
+    $isArray = -not [string]::IsNullOrWhiteSpace($Text) -and $Text.TrimStart().StartsWith('[')
+    $units = if ($isArray) { @(, $Text) } elseif ([string]::IsNullOrWhiteSpace($Text)) { @() } else { @($Text -split '\r?\n') }
+    $lineNumber = 0
+    foreach ($unit in $units) {
+        $lineNumber++
+        if (-not $isArray -and [string]::IsNullOrWhiteSpace($unit)) { continue }
+        $document = $null
+        try { $document = [System.Text.Json.JsonDocument]::Parse($unit, $options) }
+        catch {
+            $message = if ($isArray) { '{0} the owner_directives text is not parseable by System.Text.Json: {1}' -f $script:UnevaluableToken, $_.Exception.Message } else { 'Ledger line #{0} is not a JSON object.' -f $lineNumber }
+            $errors.Add($message); $errorNumbers.Add($lineNumber); $invalid.Add($lineNumber)
+            continue
+        }
+        try {
+            $root = $document.RootElement
+            $elements = @()
+            if ($isArray) {
+                if (-not (Test-OwnerDirectiveObjectList -Element $root) -or $root.GetArrayLength() -eq 0) {
+                    $errors.Add('Checkpoint owner_directives must be a non-empty list of objects when present.'); $errorNumbers.Add(0)
+                    continue
+                }
+                $elements = @($root.EnumerateArray())
+            }
+            elseif ($root.ValueKind -ne [System.Text.Json.JsonValueKind]::Object) {
+                $errors.Add(('Ledger line #{0} is not a JSON object.' -f $lineNumber)); $errorNumbers.Add($lineNumber); $invalid.Add($lineNumber)
+                continue
+            }
+            else { $elements = @($root) }
+            $number = if ($isArray) { 0 } else { $lineNumber - 1 }
+            foreach ($element in $elements) {
+                $number++
+                $errorArguments = @{ Entry = $element; Number = $number; SeenIds = $seenIds }
+                if (-not $isArray) { $errorArguments['MessagePrefix'] = 'Ledger line #{0}' -f $number }
+                $messages = @(Get-OwnerDirectiveEntryError @errorArguments)
+                if ($messages.Count -gt 0) {
+                    foreach ($message in $messages) { $errors.Add($message); $errorNumbers.Add($number) }
+                    $invalid.Add($number)
+                    continue
+                }
+                $entries.Add((ConvertTo-OwnerDirectiveValidEntry -Entry $element))
+            }
+        }
+        finally { $document.Dispose() }
+    }
+    return [pscustomobject]@{ Entries = $entries.ToArray(); Errors = $errors.ToArray(); ErrorNumber = $errorNumbers.ToArray(); InvalidNumber = $invalid.ToArray() }
+}
+
+Export-ModuleMember -Function Get-OrchestratorStateOwnerDirectiveError, Get-OrchestratorStateOwnerDirectiveValidEntry
