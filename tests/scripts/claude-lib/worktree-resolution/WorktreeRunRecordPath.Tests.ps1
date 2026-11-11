@@ -42,7 +42,7 @@ BeforeAll {
 
     # The D9 resolver seam: a mapped branch gives its root and no reason code, an unmapped branch gives
     # a null root and ReasonCode, and every invocation is appended to the row's Calls list.
-    function New-BranchResolverSeam {
+    function Get-BranchResolverSeam {
         param([hashtable] $Map = @{}, [string] $ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE', [System.Collections.Generic.List[string]] $Calls)
         $branchMap = $Map; $code = $ReasonCode; $callList = $Calls
         return {
@@ -174,7 +174,7 @@ Describe 'Test-WorktreeRunRecordedPathMatchesTarget' {
         It 'M12 matches a rooted record that names no live root through a branch that resolves to the target' {
             # Arrange (fails before: a host-moved absolute record never matches)
             $calls = [System.Collections.Generic.List[string]]::new()
-            $resolver = New-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = $script:FallbackTarget } -Calls $calls
+            $resolver = Get-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = $script:FallbackTarget } -Calls $calls
             $arguments = Get-RecordPathFallbackArgument -RecordedPath '/host-a/repo/.claude/worktrees/item' -TargetPath $script:FallbackTarget -Branch 'feature/issue-1163-item' -Live $script:FallbackLive -Resolver $resolver
 
             # Act
@@ -191,7 +191,7 @@ Describe 'Test-WorktreeRunRecordedPathMatchesTarget' {
         ) {
             # Arrange
             $calls = [System.Collections.Generic.List[string]]::new()
-            $resolver = New-BranchResolverSeam -ReasonCode $ReasonCode -Calls $calls
+            $resolver = Get-BranchResolverSeam -ReasonCode $ReasonCode -Calls $calls
             $arguments = Get-RecordPathFallbackArgument -RecordedPath '/host-a/repo/.claude/worktrees/item' -TargetPath $script:FallbackTarget -Branch 'feature/issue-1163-item' -Live $script:FallbackLive -Resolver $resolver
 
             # Act
@@ -204,7 +204,7 @@ Describe 'Test-WorktreeRunRecordedPathMatchesTarget' {
         It 'M14 does not match when the branch resolves to a different worktree' {
             # Arrange
             $calls = [System.Collections.Generic.List[string]]::new()
-            $resolver = New-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = '/sibling/item-b' } -Calls $calls
+            $resolver = Get-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = '/sibling/item-b' } -Calls $calls
             $arguments = Get-RecordPathFallbackArgument -RecordedPath '/host-a/repo/.claude/worktrees/item' -TargetPath $script:FallbackTarget -Branch 'feature/issue-1163-item' -Live $script:FallbackLive -Resolver $resolver
 
             # Act
@@ -217,7 +217,7 @@ Describe 'Test-WorktreeRunRecordedPathMatchesTarget' {
         It "M15 returns today's result without calling the resolver for a rooted record that names a live root" {
             # Arrange
             $calls = [System.Collections.Generic.List[string]]::new()
-            $resolver = New-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = $script:FallbackTarget } -Calls $calls
+            $resolver = Get-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = $script:FallbackTarget } -Calls $calls
             $arguments = Get-RecordPathFallbackArgument -RecordedPath '/sibling/item-b' -TargetPath $script:FallbackTarget -Branch 'feature/issue-1163-item' -Live $script:FallbackLive -Resolver $resolver
 
             # Act
@@ -231,7 +231,7 @@ Describe 'Test-WorktreeRunRecordedPathMatchesTarget' {
         It "M16 returns today's result for a relative record with a branch" {
             # Arrange
             $calls = [System.Collections.Generic.List[string]]::new()
-            $resolver = New-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = $script:FallbackTarget } -Calls $calls
+            $resolver = Get-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = $script:FallbackTarget } -Calls $calls
             $arguments = Get-RecordPathFallbackArgument -RecordedPath '.claude/worktrees/other' -TargetPath $script:FallbackTarget -Branch 'feature/issue-1163-item' -Live $script:FallbackLive -Resolver $resolver
             $arguments['BaseRoot'] = @('/repo')
 

@@ -681,7 +681,7 @@ Describe 'enforce-docs-complete-gate receipt root (issue #1163)' {
         $profileKey = Join-Path -Path '/repo' -ChildPath 'docs/documentation-estate/docs-profile.json'
         $script:ProfileKey = $profileKey
         $files = @{
-            $profileKey = ([ordered]@{ artifact_paths = [ordered]@{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json' }; completion_gates = [ordered]@{ integration_pr_gate = [ordered]@{ enabled = $true } } } | ConvertTo-Json -Depth 5 -Compress)
+            $profileKey                                                                                                          = ([ordered]@{ artifact_paths = [ordered]@{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json' }; completion_gates = [ordered]@{ integration_pr_gate = [ordered]@{ enabled = $true } } } | ConvertTo-Json -Depth 5 -Compress)
             (Join-Path -Path '/repo/.claude/worktrees/item' -ChildPath 'docs/documentation-estate/docs-validation-receipt.json') = ([ordered]@{ artifact_kind = 'docs-validation-receipt'; mode = 'docs-complete'; revision = $script:ReceiptHead; validation_result = 'pass' } | ConvertTo-Json -Compress)
         }
         Mock Get-DocsCompleteGateRepositoryRoot { '/repo' }

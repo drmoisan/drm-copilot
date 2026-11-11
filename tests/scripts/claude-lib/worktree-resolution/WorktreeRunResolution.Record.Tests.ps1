@@ -33,7 +33,7 @@ BeforeAll {
     # Issue #1163: imported only when present, so this suite also loads before the module exists.
     if (Test-Path -LiteralPath (Join-Path $script:LibRoot 'AgentTargetWorktree.psm1')) { Import-Module (Join-Path $script:LibRoot 'AgentTargetWorktree.psm1') }
     # D9 resolver seam: a mapped branch gives its root and no reason code; any other branch gives ReasonCode.
-    function New-BranchResolverSeam {
+    function Get-BranchResolverSeam {
         param([hashtable] $Map = @{}, [string] $ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE')
         $branchMap = $Map; $code = $ReasonCode
         return { param($Branch) if ($branchMap.ContainsKey([string] $Branch)) { [pscustomobject]@{ WorktreeRoot = $branchMap[[string] $Branch]; ReasonCode = $null } } else { [pscustomobject]@{ WorktreeRoot = $null; ReasonCode = $code } } }.GetNewClosure()
@@ -281,7 +281,7 @@ Describe 'Resolve-WorktreeRunTargetByRecord' {
 
     It 'B15 resolves the live worktree whose <Kind> checkpoint records a stale absolute worktree_path through its branch_name' -ForEach @(@{ Kind = 'epic' }, @{ Kind = 'parallel' }) {
         # Arrange (fails before: the host-moved record matches no live path and resolves NoTarget)
-        $arguments = Get-StaleRecordArgument -Kind $Kind -Resolver (New-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = '/synthetic-worktrees/item-new' })
+        $arguments = Get-StaleRecordArgument -Kind $Kind -Resolver (Get-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = '/synthetic-worktrees/item-new' })
 
         # Act
         $target = Resolve-WorktreeRunTargetByRecord @arguments
@@ -296,7 +296,7 @@ Describe 'Resolve-WorktreeRunTargetByRecord' {
         @{ Kind = 'parallel'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE' }, @{ Kind = 'parallel'; ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS' }
     ) {
         # Arrange
-        $arguments = Get-StaleRecordArgument -Kind $Kind -Resolver (New-BranchResolverSeam -ReasonCode $ReasonCode)
+        $arguments = Get-StaleRecordArgument -Kind $Kind -Resolver (Get-BranchResolverSeam -ReasonCode $ReasonCode)
 
         # Act
         $target = Resolve-WorktreeRunTargetByRecord @arguments
