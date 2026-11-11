@@ -298,7 +298,7 @@ Spawn parameters, passed on the `Agent` call and never written into the prompt t
 `isolation: "worktree"`, `run_in_background: true`, branch base `origin/main`, and `model` equal to
 that item's model routing receipt's resolved model.
 
-A recorded `Owner directives:` block is not a kickoff element: the parallel orchestrator passes it verbatim, in a later course-correction message, to each child whose item matches an entry's scope, and never authors or edits entries (pass-through rule of the `owner-directives` skill).
+A recorded `Owner directives:` block is not a kickoff element. The coordinator records a directive for an item in the ledger `artifacts/orchestration/owner-directives.jsonl` of that item's worktree, or of the parallel worktree, with the item's issue and branch as its scope; there is no run-wide fan-out, so each entry applies only to the item it names. Pass-down is hook-level: on Claude Code the PreToolUse hook `enforce-owner-directive-pass-down.ps1` reads the item's checkpoint and ledger and the parallel checkpoint and ledger for every worker of that item, so the directive reaches a running child without the parallel orchestrator acting. The parallel orchestrator never authors or edits entries (pass-through rule of the `owner-directives` skill).
 
 **Band and receipt source.** The parent reads each item's `complexity_band` and
 `model_routing_receipt` from the planner checkpoint `artifacts/orchestration/parallel-planner-state.json`.
