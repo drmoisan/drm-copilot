@@ -1069,7 +1069,10 @@ denies with a reason prefixed `PARALLEL_WORKTREE_REMOVAL_BLOCKED`. Commands that
 `git worktree remove` always allow. This is the mechanical counterpart to `## Worktree Cleanup`.
 `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` fires on the same command and now carries a
 matching parallel allow-branch keyed on the same checkpoint, so both gates must allow for a removal
-to proceed.
+to proceed. Both gates also carry a planner allow branch (issue #1161), evaluated before the
+manifest branch, that allows removing an epic-planner preparation worktree recorded by branch in
+`planner_worktrees` of `artifacts/orchestration/epic-planner-state.json` when it is eligible, not
+in use, clean, and pushed; it reads no parallel-planner checkpoint.
 
 **Invocation-origin extension.** `.claude/hooks/enforce-epic-invocation-origin.ps1` was extended
 additively so `$script:GatedSubagentTypes` lists `epic-planner`, `epic-orchestrator`,
