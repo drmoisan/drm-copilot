@@ -455,3 +455,25 @@ def test_validate_accepts_epic_issue_num_and_model_routing_receipts() -> None:
     state["epic_issue_num"] = 663
     state["model_routing_receipts"] = [{"agent": "pr-author", "phase": "pr"}]
     assert validate_epic_orchestrator_state_text(json.dumps(state)) == []
+
+
+def test_validate_tolerates_integration_regenerations_list() -> None:
+    """Accept a valid epic checkpoint carrying an integration_regenerations list (issue #1156)."""
+
+    state = build_valid_epic_state()
+    state["integration_regenerations"] = [
+        {
+            "trigger": "post_feature_merge",
+            "after_feature_issue_num": 1156,
+            "merge_commit_sha": "1111111111111111111111111111111111111111",
+            "regeneration_commit_sha": None,
+            "command_exit_code": 0,
+            "confined": True,
+            "idempotent": True,
+            "outcome": "not_applied",
+            "ci_run_id": 9001,
+            "ci_conclusion": "success",
+            "verified_at": "2026-11-09T23:00:00Z",
+        }
+    ]
+    assert validate_epic_orchestrator_state_text(json.dumps(state)) == []

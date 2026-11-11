@@ -106,6 +106,10 @@ function of the DAG.
    rebase, no force-push), pushes the integration branch, re-runs step 2, and launches the wave.
    Commits that reach `origin/main` afterwards are picked up by the next wave's check or by the
    final integration PR in step 6.
+   When that merge conflicts, the main-sync regenerate path runs only when the integration worktree holds a valid config/orchestration-regeneration.json (issue #1156).
+   In that case `epic-orchestrator` aborts the conflicted merge and runs `pwsh -NoProfile -File .claude/lib/regeneration/Invoke-RegenerationPath.ps1 -Mode Merge -MergeRef origin/main -Trigger main_sync` in the integration worktree.
+   On exit 0 it commits during the in-progress merge with `git commit -F <message file>`, pushes the integration branch, dispatches and verifies CI before the wave launches as `## Integration-Tip Regeneration` states, and appends an integration_regenerations[] entry with trigger main_sync.
+   On any other exit the fallback runs this step unchanged: a fresh merge of `origin/main` with the conflict resolved as above.
 4. Each child feature's worktree/branch (created via
    `Agent(orchestrator, isolation: "worktree", run_in_background: true)`) is branched from
    `origin/<integration_branch>`, not `origin/main`. The child's own `orchestrator` instance
@@ -243,6 +247,8 @@ The merge-conflict remediation loop runs inside the child feature's own `orchest
 (`.claude/skills/orchestrate/SKILL.md` "Remediation Loop (R1–R5)") unmodified — no new loop is
 owned by `epic-orchestrator`.
 
+When the child's feature worktree holds a valid config, the child-side check and the regenerate path run first: the child confirms CI on the integration tip as `## Integration-Tip Regeneration` states, then applies the regenerate path of `## Merge-Conflict Remediation` in `.claude/skills/orchestrate/SKILL.md`, and only its fallback starts the procedure below (issue #1156).
+
 Procedure, triggered by S9 step 6's merge failure:
 
 1. The child's `atomic-executor` runs `git fetch origin <integration_branch>`,
@@ -364,6 +370,7 @@ checkpoint under `worktree_path`.
    path stops the child with `blocked_reason: "premise_falsified"`, unsynced and with no PR.
 7. Child: run `git merge --no-ff origin/<integration_branch>`. The sync is a merge, not a rebase.
    A conflict enters `## Merge-Conflict Handling (Fan-In)`.
+   When the child's feature worktree holds a valid config, the child-side check and the regenerate path run first, as `## Merge-Conflict Remediation` in `.claude/skills/orchestrate/SKILL.md` states.
 8. Child: re-run the local gate, commit, push, record `early_start_synced_at`, and only then
    start S7 or S8.
 9. Parent: before the `pr_open` write, check
@@ -402,6 +409,23 @@ child worktree) issues `git worktree remove <worktree_path>`, gated by
 `EPIC_WORKTREE_REMOVAL_BLOCKED` unless the epic checkpoint's matching `features[]` record has
 `merge_status` in `{merged, worktree_removed}`. On success, `epic-orchestrator` sets
 `merge_status: "worktree_removed"` and `worktree_removed_at`.
+
+## Integration-Tip Regeneration
+
+This section applies only to a repository that declares the regenerate path of `## Merge-Conflict Remediation` in `.claude/skills/orchestrate/SKILL.md` (issue #1156). It keeps generated files on the integration branch current after each child merge, so later child syncs do not conflict on them.
+
+- **Default-off.** In this skill, the integration-tip flow runs only when the integration worktree holds a valid config/orchestration-regeneration.json.
+  `epic-orchestrator` checks this with `pwsh -NoProfile -File .claude/lib/regeneration/Invoke-RegenerationPath.ps1 -Mode Validate` in the integration worktree; a valid config is one for which Validate mode exits 0, and the term has that meaning throughout this skill.
+  Without a valid config, `epic-orchestrator` runs no Tip mode, dispatches no CI, waits for nothing, and appends no entry, so the epic proceeds exactly as before.
+- **Post-merge flow.** After it records a child's `merge_status: "merged"`, the epic orchestrator fetches and fast-forwards the integration worktree, then runs `pwsh -NoProfile -File .claude/lib/regeneration/Invoke-RegenerationPath.ps1 -Mode Tip` there.
+  When the result is applied and lists changed paths, it stages them with `git add -- <changed paths>`, commits with `git commit -F <message file>` (admitted by the preimplementation allowance `Get-EpicRegenerationAllowance`), and pushes the regeneration commit.
+  It then dispatches `CI` on the integration branch with `gh workflow run CI --ref <integration branch>`, even when no regeneration commit was made, and locates the run with `gh run list --commit <integration tip> --workflow CI`; the epic orchestrator polls every 30 seconds for at most 90 minutes.
+  It appends an integration_regenerations[] entry with trigger post_feature_merge, the merged child's issue number, the merge and regeneration commits, the command exit code, confined, idempotent, outcome, the CI run id and conclusion, and the verification time.
+  The epic orchestrator does not merge another child and does not launch another wave until the integration tip has a successful completed CI run.
+- **Not applied.** When the Tip result is not applied, the entry point has restored every path it changed, no regeneration commit is made, the CI dispatch and wait still run, and the entry records outcome not_applied. Later child syncs then reach the feature-side classifier as usual.
+- **Child verification.** In epic mode, the child-side check applies: the child runs Validate mode in its feature worktree before merging the integration branch, in fan-in conflict handling and in early-start step 7.
+  With a valid config it confirms that the integration tip has a successful completed CI run through `gh run list --commit <integration tip> --workflow CI`; the child polls every 30 seconds for at most 90 minutes, and on timeout it follows the existing wait branch with `blocked_reason: "awaiting_ci"`.
+  Without a valid config the child does not wait.
 
 ## Documentation Maintenance Boundaries
 

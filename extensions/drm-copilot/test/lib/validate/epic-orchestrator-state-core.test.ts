@@ -473,3 +473,27 @@ describe("validateEpicOrchestratorStateText presence-gated intent block", () => 
     );
   });
 });
+
+describe("validateEpicOrchestratorStateText integration_regenerations tolerance", () => {
+  it("accepts a valid epic checkpoint carrying integration_regenerations (issue #1156)", () => {
+    const state = buildValidEpicState();
+    state.integration_regenerations = [
+      {
+        trigger: "post_feature_merge",
+        after_feature_issue_num: 1156,
+        merge_commit_sha: "1111111111111111111111111111111111111111",
+        regeneration_commit_sha: null,
+        command_exit_code: 0,
+        confined: true,
+        idempotent: true,
+        outcome: "not_applied",
+        ci_run_id: 9001,
+        ci_conclusion: "success",
+        verified_at: "2026-11-09T23:00:00Z",
+      },
+    ];
+    expect(validateEpicOrchestratorStateText(JSON.stringify(state))).toEqual(
+      [],
+    );
+  });
+});
