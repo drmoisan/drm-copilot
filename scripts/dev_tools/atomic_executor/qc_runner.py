@@ -12,6 +12,9 @@ import shutil
 from typing import TYPE_CHECKING
 
 from scripts.dev_tools.atomic_executor.qc_runner_expectations import (
+    TEST_SUITE_LAUNCHER_ARGV,
+    classify_launcher_exit,
+    launcher_refusal_message,
     run_jest_with_expectations,
     run_pytest_with_expectations,
 )
@@ -78,9 +81,9 @@ class QCRunner(QCRunnerProcessMixin):
     FULL_FMT = ["poetry", "run", "black", "--check", "."]
     FULL_LINT = ["poetry", "run", "ruff", "check"]
     FULL_TYPE = ["poetry", "run", "pyright"]
+    # Full test suites run through the test-execution launcher (issue #1158, spec D16).
     FULL_TEST = [
-        "poetry",
-        "run",
+        *TEST_SUITE_LAUNCHER_ARGV,
         "pytest",
         "-n",
         "auto",
@@ -94,7 +97,7 @@ class QCRunner(QCRunnerProcessMixin):
     FULL_TS_FMT = TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["format"]
     FULL_TS_LINT = TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["lint"]
     FULL_TS_TYPE = TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["typecheck"]
-    FULL_TS_TEST = TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["test-unit"]
+    FULL_TS_TEST = [*TEST_SUITE_LAUNCHER_ARGV, "jest"]
 
     AUTO_QC_STEP_ORDER = ["black", "ruff", "pyright", "pytest"]
     EXECUTOR_LOCK_BYPASS_ENV = "ATOMIC_EXECUTOR_SKIP_LOCK"
@@ -326,7 +329,8 @@ class QCRunner(QCRunnerProcessMixin):
             QCLoopResult: Success flag and failure details if applicable.
 
         Raises:
-            RuntimeError: If loop iteration exceeds max_loops.
+            RuntimeError: If loop iteration exceeds max_loops, or when the test
+                step exits as a launcher queue timeout or policy refusal.
 
         Side Effects:
             Runs subprocess commands and writes output files under artifacts/.
@@ -358,7 +362,7 @@ class QCRunner(QCRunnerProcessMixin):
                 env=env,
             )
 
-        return run_full_loop_with_artifacts(
+        result = run_full_loop_with_artifacts(
             workspace=self.workspace,
             resolve_executable=self.resolve_executable,
             run_checked=self._run,
@@ -369,8 +373,7 @@ class QCRunner(QCRunnerProcessMixin):
             full_lint=["poetry", "run", "ruff", "check"],
             full_type=["poetry", "run", "pyright"],
             full_test=[
-                "poetry",
-                "run",
+                *TEST_SUITE_LAUNCHER_ARGV,
                 "pytest",
                 "-n",
                 "auto",
@@ -386,6 +389,12 @@ class QCRunner(QCRunnerProcessMixin):
             max_loops=max_loops,
             toolchain=toolchain,
         )
+        failure = result.failure
+        if failure is not None and failure.step in ("pytest", "test-unit"):
+            outcome = classify_launcher_exit(failure.returncode, failure.output)
+            if outcome is not None:
+                raise RuntimeError(launcher_refusal_message(outcome))
+        return result
 
     def changed_files(self) -> list[str]:
         """

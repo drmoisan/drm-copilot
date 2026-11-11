@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+from enum import Enum
 from typing import TYPE_CHECKING
 
 from scripts.dev_tools.atomic_executor.pytest_expectations import (
@@ -15,6 +16,98 @@ from scripts.dev_tools.atomic_executor.pytest_expectations import (
 if TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
+
+# The test-execution launcher (issue #1158, spec D12, D16): the suite name follows these words.
+TEST_SUITE_LAUNCHER_ARGV: list[str] = [
+    "pwsh",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    ".claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1",
+]
+
+_QUEUE_TIMEOUT_EXIT_CODE = 75
+_POLICY_REFUSAL_EXIT_CODE = 2
+_QUEUE_TIMEOUT_PREFIX = "TEST_EXECUTION_QUEUE_TIMEOUT:"
+_POLICY_REFUSAL_PREFIX = "TEST_EXECUTION_POLICY_BLOCKED:"
+
+
+class LauncherOutcome(Enum):
+    """A launcher exit that is not a test result (spec D12)."""
+
+    QUEUE_TIMEOUT = "queue-timeout"
+    POLICY_REFUSAL = "policy-refusal"
+
+
+def _first_nonblank_line(output: str) -> str:
+    """Return the first line of output that is not blank, or an empty string."""
+    for line in output.splitlines():
+        if line.strip():
+            return line.strip()
+    return ""
+
+
+def classify_launcher_exit(returncode: int, output: str | None) -> LauncherOutcome | None:
+    """Classify a launcher exit as a queue timeout, a policy refusal, or neither.
+
+    Exit 75, or a non-zero exit whose first non-blank output line starts with the queue
+    prefix, is a queue timeout. Exit 2 is a policy refusal only when the first non-blank
+    output line starts with the refusal prefix, because pytest also exits 2 on an
+    interrupted run or a collection error. ``None`` output means it was not captured, so
+    only exit 75 classifies.
+    """
+    if returncode == _QUEUE_TIMEOUT_EXIT_CODE:
+        return LauncherOutcome.QUEUE_TIMEOUT
+    if output is None or returncode == 0:
+        return None
+    first_line = _first_nonblank_line(output)
+    if first_line.startswith(_QUEUE_TIMEOUT_PREFIX):
+        return LauncherOutcome.QUEUE_TIMEOUT
+    if returncode == _POLICY_REFUSAL_EXIT_CODE and first_line.startswith(
+        _POLICY_REFUSAL_PREFIX
+    ):
+        return LauncherOutcome.POLICY_REFUSAL
+    return None
+
+
+def launcher_refusal_message(outcome: LauncherOutcome) -> str:
+    """Return the one-line report for a launcher outcome, starting with its prefix."""
+    if outcome is LauncherOutcome.QUEUE_TIMEOUT:
+        return (
+            f"{_QUEUE_TIMEOUT_PREFIX} the machine test-suite lock was busy; re-run the "
+            "gate after the holder finishes and record it as a queue timeout, not a "
+            "failure (test-execution policy)."
+        )
+    return (
+        f"{_POLICY_REFUSAL_PREFIX} the test-execution launcher refused the suite "
+        "command; correct the command and re-run (test-execution policy)."
+    )
+
+
+class LauncherRefusedError(subprocess.CalledProcessError):
+    """A launcher exit classified as a queue timeout or a policy refusal."""
+
+    def __init__(
+        self,
+        outcome: LauncherOutcome,
+        returncode: int,
+        cmd: list[str],
+        output: str | None = None,
+    ) -> None:
+        super().__init__(returncode, cmd, output=output)
+        self.outcome = outcome
+
+    def __str__(self) -> str:
+        return launcher_refusal_message(self.outcome)
+
+
+def _raise_if_launcher_refused(
+    returncode: int, cmd: list[str], output: str | None
+) -> None:
+    """Raise LauncherRefusedError when the exit classifies as a launcher outcome."""
+    outcome = classify_launcher_exit(returncode, output)
+    if outcome is not None:
+        raise LauncherRefusedError(outcome, returncode, cmd, output=output)
 
 
 def matches_expected_ref(nodeid: str, expected_refs: set[str]) -> bool:
@@ -54,15 +147,19 @@ def run_pytest_with_expectations(
     """Run pytest and tolerate failures only when they match expected-fail refs."""
     if expectations is None:
         resolved_cmd = resolve_executable(cmd)
-        subprocess.run(  # noqa: S603 - argv constructed from trusted constants
-            resolved_cmd,
-            cwd=workspace,
-            check=True,
-            capture_output=False,
-            text=True,
-            errors="replace",
-            env=env,
-        )
+        try:
+            subprocess.run(  # noqa: S603 - argv constructed from trusted constants
+                resolved_cmd,
+                cwd=workspace,
+                check=True,
+                capture_output=False,
+                text=True,
+                errors="replace",
+                env=env,
+            )
+        except subprocess.CalledProcessError as error:
+            _raise_if_launcher_refused(error.returncode, cmd, None)
+            raise
         return
 
     if expectations.missing_test_refs:
@@ -84,6 +181,7 @@ def run_pytest_with_expectations(
     combined = (result.stdout or "") + (result.stderr or "")
     if result.returncode == 0:
         return
+    _raise_if_launcher_refused(result.returncode, cmd, combined)
 
     summary = parse_pytest_failure_output(combined)
     if summary.has_collection_error:
@@ -115,14 +213,18 @@ def run_jest_with_expectations(
     """Run Jest and tolerate failures only when they match expected-fail refs."""
     if expectations is None:
         resolved_cmd = resolve_executable(cmd)
-        subprocess.run(  # noqa: S603 - argv constructed from trusted constants
-            resolved_cmd,
-            cwd=workspace,
-            check=True,
-            capture_output=False,
-            text=True,
-            errors="replace",
-        )
+        try:
+            subprocess.run(  # noqa: S603 - argv constructed from trusted constants
+                resolved_cmd,
+                cwd=workspace,
+                check=True,
+                capture_output=False,
+                text=True,
+                errors="replace",
+            )
+        except subprocess.CalledProcessError as error:
+            _raise_if_launcher_refused(error.returncode, cmd, None)
+            raise
         return
 
     if expectations.missing_test_refs:
@@ -143,6 +245,7 @@ def run_jest_with_expectations(
     combined = (result.stdout or "") + (result.stderr or "")
     if result.returncode == 0:
         return
+    _raise_if_launcher_refused(result.returncode, cmd, combined)
 
     summary = parse_jest_failure_output(combined)
     if summary.has_runtime_error:
