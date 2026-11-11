@@ -247,6 +247,20 @@ the epic-orchestrate skill. Agents never hand-author a readiness checkpoint to
 pass the gate. A standalone merged feature uses `git commit -m <msg> -- <paths>`
 for a docs follow-up, or a new orchestrated run for anything else.
 
+Runner mentions and bookkeeping staging (issue #1160): the gate classifies a
+test-runner, formatter, linter, or staging word only when it is invoked, so a
+word that is only an operand of a search, process, lookup, or output command
+(for example `ps aux | grep pytest` or `git log --grep pytest`) is not
+classified. Without a ready checkpoint, the gate allows a `git add` or
+`git commit` whose paths all lie under the issue #539 bookkeeping trees or the
+declared `bookkeeping_roots`, when at least one path lies under a declared
+root. The default declared root is `.claude/agent-memory/`; a repository opts
+out by committing `config/preimplementation-gate.json` with
+`{"schema_version": 1, "bookkeeping_roots": []}`, and an invalid file adds
+`BOOKKEEPING_CONFIG_INVALID` to the deny text. Commit agent memory with
+`git commit -m <msg> -- <paths>`, or with a pathless commit when the staged
+index holds only bookkeeping paths.
+
 ## Plan-Path Resolution Gate
 
 After active feature folder creation and before any planning delegation, the
