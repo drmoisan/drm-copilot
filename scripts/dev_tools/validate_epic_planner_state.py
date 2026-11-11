@@ -11,6 +11,7 @@ from scripts.dev_tools._epic_orchestrator_state_launch_binding import (
 from scripts.dev_tools._epic_orchestrator_state_resolution import (
     build_feature_reference_index,
     resolve_feature_reference,
+    validate_cross_epic_dependency_shape,
 )
 from scripts.dev_tools._orchestrator_state_codex_model_routing import (
     validate_codex_model_routing_receipts,
@@ -344,6 +345,8 @@ def validate_epic_planner_state_text(
         cast("list[object]", raw_features) if isinstance(raw_features, list) else []
     )
     errors.extend(_validate_dependency_waves(indexed_features))
+    # Key-gated issue #1162 shape check of the planner copy of the manifest key.
+    errors.extend(validate_cross_epic_dependency_shape(state))
     max_parallel = state.get("max_parallel_features")
     if (
         not isinstance(max_parallel, int)

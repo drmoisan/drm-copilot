@@ -33,6 +33,20 @@ module.exports = {
   coverageThreshold: {
     ...discoveryCoverageThresholds,
     ...docsCoverageThresholds,
+    // Issue #1162: the three epic validator modules extended with the key-gated
+    // cross-epic dependency invariants.
+    "./src/lib/validate/epic-orchestrator-state-resolution.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/epic-orchestrator-state-core.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/epic-planner-state-core.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #574: the three pr-context modules changed by the collect-pr-context
     // path-identity and freshness fix. The map carried no entry for any
     // src/lib/pr-context/ file before this change.

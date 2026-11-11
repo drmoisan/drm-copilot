@@ -30,6 +30,8 @@ import {
   buildFeatureReferenceIndex,
   detectDependencyCycle,
   resolveFeatureReference,
+  validateCrossEpicDependencyShape,
+  validateCrossEpicMainGate,
   validateIntentBlock,
 } from "./epic-orchestrator-state-resolution";
 import { validateEpicChildLaunchBindings } from "./epic-orchestrator-state-launch-binding";
@@ -318,6 +320,8 @@ function validateCompletion(
       "Epic checkpoint completion validation failed: epic_merge_pr.merge_commit_sha is missing or empty.",
     );
   }
+  // Key-gated issue #1162 backstop: no cross-epic edge adds no completion error.
+  errors.push(...validateCrossEpicMainGate(features, state));
   return errors;
 }
 
@@ -368,6 +372,8 @@ export function validateEpicOrchestratorStateText(
   // Presence-gated: only runs when the checkpoint carries a top-level intent
   // object, so an intent-free checkpoint stays byte-identical.
   errors.push(...validateIntentBlock(stateMap));
+  // Key-gated issue #1162 shape check of features[].cross_epic_depends_on.
+  errors.push(...validateCrossEpicDependencyShape(stateMap));
   errors.push(...validateEpicChildLaunchBindings(stateMap, options));
   if (CODEX_MODEL_ROUTING_RECEIPTS_KEY in stateMap) {
     errors.push(
