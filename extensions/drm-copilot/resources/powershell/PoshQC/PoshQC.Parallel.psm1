@@ -215,6 +215,11 @@ One-based shard index.
 Number of shards.
 .PARAMETER ShardDirectory
 Directory that receives the shard's JUnit, coverage, and manifest files.
+.PARAMETER ExcludeTag
+Pester tags passed to the shard's Invoke-PoshQCTest (issue #1158). Appended to the command text only when non-empty,
+as an @(...) array literal of single-quoted values.
+.PARAMETER ExcludeTestFileSuffix
+Test file-name suffixes passed to the shard's Invoke-PoshQCTest (issue #1158), appended the same way as ExcludeTag.
 #>
 function Get-PoshQCParallelShardArgument {
     [CmdletBinding()]
@@ -224,7 +229,9 @@ function Get-PoshQCParallelShardArgument {
         [Parameter(Mandatory)][string] $Root,
         [Parameter(Mandatory)][int] $ShardIndex,
         [Parameter(Mandatory)][int] $ShardCount,
-        [Parameter(Mandatory)][string] $ShardDirectory
+        [Parameter(Mandatory)][string] $ShardDirectory,
+        [string[]] $ExcludeTag = @(),
+        [string[]] $ExcludeTestFileSuffix = @()
     )
 
     $quote = { param([string] $Text) "'" + $Text.Replace("'", "''") + "'" }
@@ -238,6 +245,10 @@ function Get-PoshQCParallelShardArgument {
         (& $quote (Join-Path $ShardDirectory 'powershell-coverage.xml'))
     )
     $command = 'Import-Module {0}; Invoke-PoshQCTest -Root {1} -ShardIndex {2} -ShardCount {3} -ShardFileListPath {4} -TestResultPath {5} -CoverageOutputPath {6} -DisableKoverageCopy' -f $values
+    # Issue #1158 (spec D27): each lane value is one single-quoted element, so a value such as '-integration.test.ts'
+    # binds as a value and not as a parameter name.
+    if (@($ExcludeTag).Count -gt 0) { $command += ' -ExcludeTag @(' + (@($ExcludeTag | ForEach-Object { & $quote $_ }) -join ', ') + ')' }
+    if (@($ExcludeTestFileSuffix).Count -gt 0) { $command += ' -ExcludeTestFileSuffix @(' + (@($ExcludeTestFileSuffix | ForEach-Object { & $quote $_ }) -join ', ') + ')' }
     [string[]] @('-NoLogo', '-NoProfile', '-NonInteractive', '-Command', $command)
 }
 
@@ -361,6 +372,10 @@ Returns an object with ExitCode (0 only on full success), WorkerCount, WallClock
 Workspace root. Defaults to the current location.
 .PARAMETER WorkerCount
 Number of shard processes. Defaults to Get-PoshQCParallelWorkerCount over [Environment]::ProcessorCount.
+.PARAMETER ExcludeTag
+Pester tags excluded in every shard (issue #1158). Empty keeps today's shard command text.
+.PARAMETER ExcludeTestFileSuffix
+Test file-name suffixes excluded in every shard (issue #1158). Empty keeps today's shard command text.
 .PARAMETER ResetShardDirectory
 Seam that empties or creates one shard directory.
 .PARAMETER StartShardProcess
@@ -381,6 +396,8 @@ function Invoke-PoshQCParallelTest {
     param(
         [string] $Root,
         [ValidateRange(1, [int]::MaxValue)][int] $WorkerCount,
+        [string[]] $ExcludeTag = @(),
+        [string[]] $ExcludeTestFileSuffix = @(),
         [scriptblock] $ResetShardDirectory = {
             param([string] $Path)
             if (Test-Path -LiteralPath $Path) { Remove-Item -LiteralPath $Path -Recurse -Force }
@@ -423,7 +440,7 @@ function Invoke-PoshQCParallelTest {
             $directory = Join-Path $parallelDirectory "shard-$index"
             & $ResetShardDirectory $directory
             $logPath = Join-Path $directory 'shard.log'
-            $arguments = Get-PoshQCParallelShardArgument -ModuleManifestPath $manifestPath -Root $Root -ShardIndex $index -ShardCount $WorkerCount -ShardDirectory $directory
+            $arguments = Get-PoshQCParallelShardArgument -ModuleManifestPath $manifestPath -Root $Root -ShardIndex $index -ShardCount $WorkerCount -ShardDirectory $directory -ExcludeTag $ExcludeTag -ExcludeTestFileSuffix $ExcludeTestFileSuffix
             [pscustomobject]@{
                 ShardIndex = $index
                 Directory  = $directory
