@@ -124,6 +124,19 @@ Describe 'Codex enforce-file-size-limit.ps1 paths in other worktrees (issue #116
         $result | Should -BeNullOrEmpty
     }
 
+    It 'keeps the allow for an 801-line agent-worktree Write when the resolver throws' {
+        # Arrange (D7: a resolver exception is caught and today's relative path applies)
+        Mock Resolve-AgentTargetWorktree { throw 'synthetic resolver failure' }
+        $arguments = Get-CodexFileSizeTargetArgument -FilePath '/repo/.claude/worktrees/item/scripts/new.ps1' -LineCount 801 -Invoker $script:ListInvoker
+
+        # Act
+        $result = Invoke-CodexFileSizeLimitDecision @arguments
+
+        # Assert
+        $result | Should -BeNullOrEmpty
+        Should -Invoke Resolve-AgentTargetWorktree -Times 1 -Exactly
+    }
+
     It 'forwards the worktree-list seam from the entry point to the decision' {
         # Arrange (fails before: the unmodified entry point allows the uncovered agent-worktree path)
         $entryArguments = @{ PayloadRaw = (Get-CodexFileSizeTargetPayloadText -FilePath '/repo/.claude/worktrees/item/scripts/new.ps1' -LineCount 801); RepositoryRoot = $script:Root; ReadFileContent = $script:AbsentReader }

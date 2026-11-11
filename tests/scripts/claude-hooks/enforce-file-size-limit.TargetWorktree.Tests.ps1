@@ -118,4 +118,17 @@ Describe 'enforce-file-size-limit.ps1 paths in other worktrees (issue #1163)' {
         # Assert
         $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
     }
+
+    It 'keeps the allow for an 801-line agent-worktree Write when the resolver throws' {
+        # Arrange (D7: a resolver exception is caught and today's relative path applies)
+        Mock Resolve-AgentTargetWorktree { throw 'synthetic resolver failure' }
+        $arguments = Get-FileSizeTargetArgument -FilePath '/repo/.claude/worktrees/item/scripts/new.ps1' -LineCount 801 -Invoker $script:ListInvoker
+
+        # Act
+        $result = Invoke-FileSizeLimitDecision @arguments
+
+        # Assert
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        Should -Invoke Resolve-AgentTargetWorktree -Times 1 -Exactly
+    }
 }
