@@ -24,6 +24,18 @@
     records the removal target under worktree_path. An ambiguous target denies before any
     allow; when neither kind resolves, the deny names TARGET_WORKTREE_NOT_DERIVABLE.
 
+    Issue #1161: after the parallel and epic allows and before the manifest branch, a
+    planner branch (enforce-worktree-removal-gate-planner.ps1) allows the removal of a
+    preparation worktree that an epic-planner-state.json planner_worktrees record names by
+    branch, when the record is eligible, the worktree is not in use, is clean, and its HEAD
+    is on a remote-tracking ref. This gate consumes the epic-planner branch only and reads no
+    parallel-planner checkpoint. A refusal does not stop the cascade; when the final deny is
+    reached it appends one sentence with a code: PLANNER_WORKTREE_NOT_ELIGIBLE,
+    PLANNER_WORKTREE_DIRTY, PLANNER_WORKTREE_NOT_PUSHED, PLANNER_WORKTREE_IN_USE,
+    PLANNER_WORKTREE_AMBIGUOUS, or PLANNER_WORKTREE_GIT_FAILED. The branch is a
+    policy-level control, not a security control: any same-session writer can author a
+    record, and the git checks bound what a record can authorize.
+
 .NOTES
     Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 (issue #690),
     imported inside a guard: a failed import is recorded and the decision denies naming
@@ -49,6 +61,7 @@ try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-Ho
 # Shared recorded-path matcher and main-checkout-root seam (issue #995).
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunRecordPath.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunRecordPath.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-worktree-removal-gate-planner.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-worktree-removal-gate-planner.ps1' -ErrorRecord $_ }
 
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
 # Sanctioned-removal manifest location. Recorded here so every hook-read document this
@@ -386,6 +399,9 @@ function Get-ParallelWorktreeRemovalTargetDenial {
     if (Test-ParallelWorktreeRemovalAllowed -ItemRecord $featureRecord) {
         return $null
     }
+    # Planner branch (issue #1161); a refusal falls through and closes the final deny.
+    $planner = Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $worktreePath -SessionRoot (Get-Location).Path
+    if ($planner.Outcome -eq 'Allow') { return $null }
 
     # Sanctioned-removal manifest branch (issue #635). It runs last, so a
     # checkpoint-authorized removal still allows at the same decision point it does
@@ -407,7 +423,7 @@ function Get-ParallelWorktreeRemovalTargetDenial {
     if ($parallelRead.Target.Status -eq 'NoTarget' -and $epicRead.Target.Status -eq 'NoTarget') {
         $prefix = "$($parallelRead.Target.ReasonCode): $($parallelRead.Target.Detail). "
     }
-    return Get-ParallelWorktreeGateBlockDecision -Reason ('PARALLEL_WORKTREE_REMOVAL_BLOCKED: ' + $prefix + "git worktree remove for '$worktreePath' requires a matching parallel checkpoint items[] record with merge_status in {merged, worktree_removed}. The checkpoint was unreadable, no matching record was found, or merge_status was not yet safe for removal.")
+    return Get-ParallelWorktreeGateBlockDecision -Reason ('PARALLEL_WORKTREE_REMOVAL_BLOCKED: ' + $prefix + "git worktree remove for '$worktreePath' requires a matching parallel checkpoint items[] record with merge_status in {merged, worktree_removed}. The checkpoint was unreadable, no matching record was found, or merge_status was not yet safe for removal." + $planner.Suffix)
 }
 
 function Invoke-ParallelWorktreeRemovalGateEntryPoint {

@@ -39,8 +39,10 @@ function Get-PlannerWorktreeCheckpointText {
     [OutputType([pscustomobject])]
     param([Parameter(Mandatory)][AllowEmptyString()][string] $SessionRoot, [Parameter(Mandatory)][string] $RelativePath)
 
+    # The live-root seam returns its roots as one array object; the assignment unwraps it.
+    $roots = Get-WorktreeItemLiveRoot -SessionRoot $SessionRoot
     # Read the file beneath each live root; a root without the file contributes nothing.
-    foreach ($root in @(Get-WorktreeItemLiveRoot -SessionRoot $SessionRoot)) {
+    foreach ($root in @($roots)) {
         if ([string]::IsNullOrWhiteSpace($root)) { continue }
         $text = Get-WorktreeRunCheckpointText -Path ((($root -replace '\\', '/').TrimEnd('/')) + '/' + $RelativePath)
         if ($null -ne $text) { [pscustomobject]@{ Root = $root; Text = $text } }
@@ -128,7 +130,7 @@ function Get-PlannerWorktreeRemovalTargetDecision {
             if (Test-WorktreeRunPathEqual -Left $read.Root -Right $WorktreePath) { $facts.U4 = Test-PlannerWorktreeTargetCheckpointInUse -Text $read.Text }
         }
         foreach ($read in @(Get-PlannerWorktreeCheckpointText -SessionRoot $SessionRoot -RelativePath 'artifacts/orchestration/epic-orchestrator-state.json')) {
-            $epic = Get-PlannerWorktreeEpicRecordFact -Text $read.Text -Branch $facts.Branch
+            $epic = Get-PlannerWorktreeEpicRecordFact -Checkpoint (ConvertFrom-PlannerWorktreeJson -Text $read.Text) -Branch $facts.Branch
             $baseRoot = @(@($mainRoot, $read.Root) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
             if ($epic.BranchNamed -or @($epic.WorktreePath | Where-Object { Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath $_ -TargetPath $WorktreePath -BaseRoot $baseRoot }).Count -gt 0) { $facts.U5 = $true }
         }
@@ -156,18 +158,4 @@ function Invoke-PlannerWorktreeTargetGitCheck {
         $result = Invoke-PlannerWorktreeGitExe -GitArgs (Get-PlannerWorktreeGitFactArgument -Pending $decision.Pending -WorktreePath $WorktreePath -Facts $Facts)
         Add-PlannerWorktreeGitFact -Pending $decision.Pending -Result $result -Facts $Facts
     }
-}
-
-function Complete-PlannerWorktreeDecision {
-    <#
-    .SYNOPSIS
-        Add the deny Suffix to a settled planner decision.
-    .PARAMETER Decision
-        The settled decision.
-    #>
-    [CmdletBinding()]
-    [OutputType([pscustomobject])]
-    param([Parameter(Mandatory)] $Decision)
-
-    return [pscustomobject]@{ Outcome = $Decision.Outcome; Code = $Decision.Code; Detail = $Decision.Detail; Suffix = (Get-PlannerWorktreeDenySuffix -Decision $Decision) }
 }

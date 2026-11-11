@@ -124,33 +124,20 @@ function Test-PlannerWorktreeRecordPathMatch {
     return (Test-PlannerWorktreePathEqual -Left ($base + '/' + $Record.path) -Right $TargetPath)
 }
 
-function Test-PlannerWorktreeRecordedPathMatch {
+function ConvertFrom-PlannerWorktreeJson {
     <#
     .SYNOPSIS
-        Report whether a recorded worktree_path names the target.
-    .DESCRIPTION
-        A rooted record (drive letter or leading slash) is compared directly. A relative
-        record matches when it is safe and its join to one of the base roots equals the target.
-    .PARAMETER RecordedPath
-        The recorded worktree_path.
-    .PARAMETER TargetPath
-        The removal target.
-    .PARAMETER BaseRoot
-        The roots a relative record is joined to.
+        Parse checkpoint text tolerantly, returning $null for blank or invalid text.
+    .PARAMETER Text
+        The checkpoint text, or $null.
     #>
     [CmdletBinding()]
-    [OutputType([bool])]
-    param([AllowNull()][AllowEmptyString()][string] $RecordedPath, [AllowNull()][AllowEmptyString()][string] $TargetPath, [AllowNull()][AllowEmptyCollection()][string[]] $BaseRoot = @())
+    [OutputType([object])]
+    param([AllowNull()] $Text)
 
-    $recorded = ConvertTo-PlannerWorktreeNormalizedPath -Path $RecordedPath
-    if ($recorded -match '^([A-Za-z]:(/|$)|/)') { return (Test-PlannerWorktreePathEqual -Left $recorded -Right $TargetPath) }
-    if (-not (Test-PlannerWorktreeRelativePathSafe -Path $recorded)) { return $false }
-    # Try the join to each base root; any equal join names the target.
-    foreach ($root in @($BaseRoot)) {
-        $base = ConvertTo-PlannerWorktreeNormalizedPath -Path $root
-        if ($base -ne '' -and (Test-PlannerWorktreePathEqual -Left ($base + '/' + $recorded) -Right $TargetPath)) { return $true }
-    }
-    return $false
+    if ($Text -isnot [string] -or [string]::IsNullOrWhiteSpace($Text)) { return $null }
+    # -NoEnumerate plus the unary comma keep a JSON array root an array, so it never reads as a checkpoint object.
+    try { return , (ConvertFrom-Json -InputObject $Text -NoEnumerate -ErrorAction Stop) } catch { return $null }
 }
 
 function Test-PlannerWorktreeTargetCheckpointInUse {
@@ -162,10 +149,10 @@ function Test-PlannerWorktreeTargetCheckpointInUse {
     #>
     [CmdletBinding()]
     [OutputType([bool])]
-    param([AllowNull()][AllowEmptyString()][string] $Text)
+    param([AllowNull()] $Text)
 
     if ($null -eq $Text) { return $false }
-    try { $state = ConvertFrom-Json -InputObject $Text -NoEnumerate -ErrorAction Stop } catch { return $true }
+    $state = ConvertFrom-PlannerWorktreeJson -Text ([string] $Text)
     if ($state -isnot [pscustomobject] -or @($state.PSObject.Properties.Name) -cnotcontains 'next_step') { return $true }
     return -not ($state.next_step -is [string] -and $state.next_step -ceq 'S5_atomic_execution')
 }
@@ -178,18 +165,17 @@ function Get-PlannerWorktreeEpicRecordFact {
         Only a checkpoint whose route_id is exactly epic counts. Returns BranchNamed (a
         features[].branch_name equals the branch, ordinally) and WorktreePath (every
         string features[].worktree_path), which the adapter compares with the target.
-    .PARAMETER Text
-        The epic checkpoint text, or $null.
+    .PARAMETER Checkpoint
+        The parsed epic checkpoint, or $null.
     .PARAMETER Branch
         The matched record's branch.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
-    param([AllowNull()][AllowEmptyString()][string] $Text, [AllowNull()][AllowEmptyString()][string] $Branch)
+    param([AllowNull()] $Checkpoint, [AllowNull()][AllowEmptyString()][string] $Branch)
 
     $fact = [pscustomobject]@{ BranchNamed = $false; WorktreePath = [string[]] @() }
-    if ([string]::IsNullOrWhiteSpace($Text)) { return $fact }
-    try { $state = ConvertFrom-Json -InputObject $Text -NoEnumerate -ErrorAction Stop } catch { return $fact }
+    $state = $Checkpoint
     if ($state -isnot [pscustomobject]) { return $fact }
     $names = @($state.PSObject.Properties.Name)
     if ($names -cnotcontains 'route_id' -or $state.route_id -isnot [string] -or $state.route_id -cne 'epic' -or $names -cnotcontains 'features') { return $fact }
@@ -222,8 +208,7 @@ function Get-PlannerWorktreeCandidateRecord {
     [OutputType([pscustomobject])]
     param([AllowNull()][AllowEmptyString()][string] $Text)
 
-    if ([string]::IsNullOrWhiteSpace($Text)) { return }
-    try { $state = ConvertFrom-Json -InputObject $Text -NoEnumerate -ErrorAction Stop } catch { return }
+    $state = ConvertFrom-PlannerWorktreeJson -Text $Text
     if ($state -isnot [pscustomobject] -or @($state.PSObject.Properties.Name) -cnotcontains 'planner_worktrees') { return }
     $records = $state.planner_worktrees
     if ($records -isnot [array]) { return }
@@ -431,6 +416,22 @@ function Get-PlannerWorktreeDenySuffix {
 
     if ($null -eq $Decision -or $Decision.Outcome -ne 'Refuse') { return '' }
     return ' ' + (Format-PlannerWorktreeRefusalSentence -Code $Decision.Code -Detail $Decision.Detail)
+}
+
+function Complete-PlannerWorktreeDecision {
+    <#
+    .SYNOPSIS
+        Add the deny Suffix to a settled planner decision.
+    .PARAMETER Decision
+        The settled decision.
+    .OUTPUTS
+        PSCustomObject with Outcome, Code, Detail, and Suffix ('' unless refused).
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param([Parameter(Mandatory)] $Decision)
+
+    return [pscustomobject]@{ Outcome = $Decision.Outcome; Code = $Decision.Code; Detail = $Decision.Detail; Suffix = (Get-PlannerWorktreeDenySuffix -Decision $Decision) }
 }
 
 function Get-PlannerWorktreeGitFactArgument {

@@ -49,6 +49,8 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        # Issue #1161: the entry point reads the gitignored planner checkpoint; its git seam fails without a process.
+        Mock Invoke-CodexPlannerWorktreeGitExe { [pscustomobject]@{ ExitCode = 1; Output = [string[]] @() } }
 
         # Synthetic rooted prefixes chosen per host OS. [System.IO.Path]::IsPathRooted treats a
         # drive-letter path (a letter, a colon, and a slash) as rooted only on Windows; on Linux

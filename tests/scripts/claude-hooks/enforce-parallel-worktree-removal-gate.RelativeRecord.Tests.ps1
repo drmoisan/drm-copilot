@@ -26,6 +26,7 @@
 
 BeforeAll {
     . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-worktree-removal-gate.ps1").Path
+    Mock Get-PlannerWorktreeCheckpointText { @() }
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
     # The shipped epic read seam, captured before the baseline mock below replaces it by name.
     $script:ShippedCheckpointReader = ${function:Get-ParallelWorktreeRemovalGateEpicCheckpointContent}
