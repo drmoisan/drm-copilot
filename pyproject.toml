@@ -131,6 +131,10 @@ addopts = "-ra --cov-report=lcov:artifacts/python/lcov.info --strict-markers --s
 testpaths = ["tests"]
 xfail_strict = true
 pythonpath = [".claude/lib/docs/python"]
+markers = [
+    "integration: integration-lane test; CI-only evidence, excluded from local gates by the test-execution launcher",
+    "golden: golden-lane test; CI-only evidence, excluded from local gates by the test-execution launcher",
+]
 
 [tool.coverage.run]
 source = ["src", "scripts/dev_tools", "packages/discovery-runtime/src", ".claude/lib/docs/python"]
