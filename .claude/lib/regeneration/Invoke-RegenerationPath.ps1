@@ -502,26 +502,26 @@ function Invoke-RegenerationMergeClassification {
         [Parameter(Mandatory = $true)] [hashtable] $State
     )
 
-    $stop = { param($Code) [pscustomobject]@{ ExitCode = $Code; Ours = ''; Theirs = '' } }
+    $failed = [pscustomobject]@{ ExitCode = 1; Ours = ''; Theirs = '' }
     $null = Invoke-RegenerationGitStep -GitArgs @('merge', '--no-commit', '--no-ff', $MergeRef)
     $step = Invoke-RegenerationGitStep -GitArgs @('rev-parse', '-q', '--verify', 'MERGE_HEAD')
-    if ($step.ExitCode -ne 0) { return (& $stop 1) }
+    if ($step.ExitCode -ne 0) { return $failed }
     $State.merge_head_sha = $step.Output.Trim()
     $step = Invoke-RegenerationGitStep -GitArgs @('rev-parse', 'HEAD')
-    if ($step.ExitCode -ne 0) { return (& $stop 1) }
+    if ($step.ExitCode -ne 0) { return $failed }
     $State.feature_head_sha = $step.Output.Trim()
     $step = Invoke-RegenerationGitStep -GitArgs @('merge-base', '--all', 'HEAD', 'MERGE_HEAD')
-    if ($step.ExitCode -ne 0) { return (& $stop 1) }
+    if ($step.ExitCode -ne 0) { return $failed }
     $bases = @($step.Output.Split("`n") | ForEach-Object { $_.Trim() } | Where-Object { $_.Length -gt 0 })
     $ours = ''
     $theirs = ''
     if ($bases.Count -eq 1) {
         $State.merge_base_sha = $bases[0]
         $step = Invoke-RegenerationGitStep -GitArgs @('diff', '--name-only', '-z', '--no-renames', $bases[0], 'HEAD')
-        if ($step.ExitCode -ne 0) { return (& $stop 1) }
+        if ($step.ExitCode -ne 0) { return $failed }
         $ours = $step.Output
         $step = Invoke-RegenerationGitStep -GitArgs @('diff', '--name-only', '-z', '--no-renames', $bases[0], 'MERGE_HEAD')
-        if ($step.ExitCode -ne 0) { return (& $stop 1) }
+        if ($step.ExitCode -ne 0) { return $failed }
         $theirs = $step.Output
     }
     $changed = Get-RegenerationChangedPath -OursListing $ours -TheirsListing $theirs
@@ -529,7 +529,7 @@ function Invoke-RegenerationMergeClassification {
     $State.decision = $decision.Decision
     $State.reason = $decision.Reason
     $State.unmatched_paths = [object[]] @($decision.UnmatchedPath)
-    if ($decision.Decision -cne 'regenerate') { return (& $stop 3) }
+    if ($decision.Decision -cne 'regenerate') { return [pscustomobject]@{ ExitCode = 3; Ours = ''; Theirs = '' } }
     return [pscustomobject]@{ ExitCode = 0; Ours = $ours; Theirs = $theirs }
 }
 

@@ -50,6 +50,7 @@ try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDe
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-review.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-review.ps1' -ErrorRecord $_ }
 # Epic-child CI verification, byte-identical to the Claude copy (issue #1130).
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-child-ci.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-child-ci.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-regeneration.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-regeneration.ps1' -ErrorRecord $_ }
 
 # Reason codes for the standalone-merge authorization branch (issue #670), spelled
 # byte-identically to the Claude helpers file. Each of the four assignments below is the only
@@ -178,6 +179,7 @@ function Invoke-CodexEpicMergeDecision {
             return $null
         }
         $reviewDecision = Get-EpicMergeGateReviewDecision -Checkpoint $child -CommandPrNumber $prNumber -GhRoot $RepositoryRoot -GitRoot $RepositoryRoot
+        if (-not $reviewDecision.Denied) { $reviewDecision = Get-EpicMergeGateRegenerationDecision -Checkpoint $child }
     }
     if ($reviewDecision.Denied) {
         return [ordered]@{
