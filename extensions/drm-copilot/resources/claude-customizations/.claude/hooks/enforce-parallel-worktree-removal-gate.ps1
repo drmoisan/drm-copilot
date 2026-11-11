@@ -47,6 +47,8 @@ try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookD
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 
 # Shared recorded-path matcher and main-checkout-root seam (issue #995).
+# Branch resolver for a host-moved worktree_path record (issue #1163).
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/AgentTargetWorktree.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'AgentTargetWorktree.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunRecordPath.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunRecordPath.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 
@@ -116,10 +118,13 @@ function Resolve-ParallelWorktreeGateRunTarget {
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)][ValidateSet('epic', 'parallel')][string] $Kind,
-        [AllowNull()][AllowEmptyString()][string] $WorktreePath
+        [AllowNull()][AllowEmptyString()][string] $WorktreePath,
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
 
-    return Resolve-WorktreeRunTargetByRecord -Kind $Kind -RecordField worktree_path -Value $WorktreePath -SessionRoot (Get-Location).Path
+    $arguments = @{ Kind = $Kind; RecordField = 'worktree_path'; Value = $WorktreePath; SessionRoot = (Get-Location).Path }
+    if ($null -ne $BranchWorktreeResolver) { $arguments['BranchWorktreeResolver'] = $BranchWorktreeResolver }
+    return Resolve-WorktreeRunTargetByRecord @arguments
 }
 
 function Read-ParallelWorktreeGateRunCheckpoint {
@@ -138,10 +143,11 @@ function Read-ParallelWorktreeGateRunCheckpoint {
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)][ValidateSet('epic', 'parallel')][string] $Kind,
-        [AllowNull()][AllowEmptyString()][string] $WorktreePath
+        [AllowNull()][AllowEmptyString()][string] $WorktreePath,
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
 
-    $target = Resolve-ParallelWorktreeGateRunTarget -Kind $Kind -WorktreePath $WorktreePath
+    $target = Resolve-ParallelWorktreeGateRunTarget -Kind $Kind -WorktreePath $WorktreePath -BranchWorktreeResolver $BranchWorktreeResolver
     $checkpoint = $null
     if ($target.Status -eq 'SessionRoot' -or $target.Status -eq 'OtherWorktree') {
         $path = Get-WorktreeRunCheckpointPath -Kind $Kind -WorktreeRoot $target.WorktreeRoot
@@ -192,7 +198,11 @@ function Find-ParallelWorktreeItemRecord {
 
         [AllowNull()]
         [AllowEmptyCollection()]
-        [string[]] $BaseRoot = @()
+        [string[]] $BaseRoot = @(),
+
+        [AllowNull()][AllowEmptyCollection()][string[]] $LiveWorktreeRoot = @(),
+
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
 
     if ($null -eq $Checkpoint -or [string]::IsNullOrWhiteSpace($WorktreePath)) {
@@ -210,7 +220,8 @@ function Find-ParallelWorktreeItemRecord {
         if ($itemProps -notcontains 'worktree_path') {
             continue
         }
-        if (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$item.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot) {
+        $branch = if ($itemProps -contains 'branch_name') { [string]$item.branch_name } else { '' }
+        if (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$item.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot -RecordedBranch $branch -LiveWorktreeRoot $LiveWorktreeRoot -BranchWorktreeResolver $BranchWorktreeResolver) {
             return $item
         }
     }
@@ -280,14 +291,20 @@ function Invoke-ParallelWorktreeRemovalGateDecision {
         Parses the PreToolUse envelope and returns an allow-or-block decision.
     .PARAMETER ToolInputRaw
         The raw JSON tool payload supplied by Claude Code.
+    .PARAMETER BranchWorktreeResolver
+        Optional branch resolver for a host-moved worktree_path record (issue #1163); defaults
+        to Resolve-AgentTargetWorktree -CommandBranch with Policy FailClosedOnIdentity.
     .OUTPUTS
         System.Collections.Specialized.OrderedDictionary
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
-        [string] $ToolInputRaw
+        [string] $ToolInputRaw,
+
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
+    if ($null -eq $BranchWorktreeResolver) { $BranchWorktreeResolver = { param($Branch) Resolve-AgentTargetWorktree -SessionRoot (Get-Location).Path -CommandBranch $Branch -Policy FailClosedOnIdentity } }
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'PARALLEL_WORKTREE_REMOVAL_BLOCKED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
@@ -322,7 +339,7 @@ function Invoke-ParallelWorktreeRemovalGateDecision {
         return Get-ParallelWorktreeGateBlockDecision -Reason 'PARALLEL_WORKTREE_REMOVAL_BLOCKED: TARGET_WORKTREE_NOT_DERIVABLE: the git worktree remove target cannot be derived from the command text. No checkpoint can authorize this removal.'
     }
     foreach ($target in @($resolution.Targets)) {
-        $denial = Get-ParallelWorktreeRemovalTargetDenial -WorktreePath $target
+        $denial = Get-ParallelWorktreeRemovalTargetDenial -WorktreePath $target -BranchWorktreeResolver $BranchWorktreeResolver
         if ($null -ne $denial) {
             return $denial
         }
@@ -346,13 +363,17 @@ function Get-ParallelWorktreeRemovalTargetDenial {
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [Parameter(Mandatory)]
-        [string] $WorktreePath
+        [string] $WorktreePath,
+
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
 
     # Each run checkpoint is read beneath the worktree that records this path (issue #690),
     # parallel kind first; an ambiguous target denies before any allow or manifest check.
-    $parallelRead = Read-ParallelWorktreeGateRunCheckpoint -Kind parallel -WorktreePath $worktreePath
-    $epicRead = Read-ParallelWorktreeGateRunCheckpoint -Kind epic -WorktreePath $worktreePath
+    $parallelRead = Read-ParallelWorktreeGateRunCheckpoint -Kind parallel -WorktreePath $worktreePath -BranchWorktreeResolver $BranchWorktreeResolver
+    $epicRead = Read-ParallelWorktreeGateRunCheckpoint -Kind epic -WorktreePath $worktreePath -BranchWorktreeResolver $BranchWorktreeResolver
+    $parallelLive = [string[]] @($parallelRead.Target.PSObject.Properties | Where-Object { $_.Name -eq 'LiveRoot' } | ForEach-Object { $_.Value })
+    $epicLive = [string[]] @($epicRead.Target.PSObject.Properties | Where-Object { $_.Name -eq 'LiveRoot' } | ForEach-Object { $_.Value })
     foreach ($read in @($parallelRead, $epicRead)) {
         if ($read.Target.Status -eq 'Ambiguous') {
             return Get-ParallelWorktreeGateBlockDecision -Reason "PARALLEL_WORKTREE_REMOVAL_BLOCKED: $($read.Target.ReasonCode): $($read.Target.Detail)"
@@ -365,7 +386,7 @@ function Get-ParallelWorktreeRemovalTargetDenial {
     $parallelBaseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $mainRoot -Read $parallelRead
     $epicBaseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $mainRoot -Read $epicRead
 
-    $itemRecord = Find-ParallelWorktreeItemRecord -Checkpoint $checkpoint -WorktreePath $worktreePath -BaseRoot $parallelBaseRoot
+    $itemRecord = Find-ParallelWorktreeItemRecord -Checkpoint $checkpoint -WorktreePath $worktreePath -BaseRoot $parallelBaseRoot -LiveWorktreeRoot $parallelLive -BranchWorktreeResolver $BranchWorktreeResolver
     if (Test-ParallelWorktreeRemovalAllowed -ItemRecord $itemRecord) {
         return $null
     }
@@ -382,7 +403,7 @@ function Get-ParallelWorktreeRemovalTargetDenial {
     # $null, which yields no record, which is not allowed.
     $epicCheckpoint = $epicRead.Checkpoint
 
-    $featureRecord = Find-ParallelWorktreeItemRecord -Checkpoint $epicCheckpoint -WorktreePath $worktreePath -RecordArrayName 'features' -BaseRoot $epicBaseRoot
+    $featureRecord = Find-ParallelWorktreeItemRecord -Checkpoint $epicCheckpoint -WorktreePath $worktreePath -RecordArrayName 'features' -BaseRoot $epicBaseRoot -LiveWorktreeRoot $epicLive -BranchWorktreeResolver $BranchWorktreeResolver
     if (Test-ParallelWorktreeRemovalAllowed -ItemRecord $featureRecord) {
         return $null
     }

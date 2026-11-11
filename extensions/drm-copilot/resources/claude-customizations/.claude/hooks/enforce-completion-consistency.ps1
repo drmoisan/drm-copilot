@@ -50,6 +50,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/AgentTargetWorktree.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'AgentTargetWorktree.psm1' -ErrorRecord $_ }
 # Dot-source the shared validation helpers (handler H9, issue #984). A failed load is recorded in
 # $script:CompletionHelpersImportFailure and denies only checkpoint writes; other paths are allowed.
 $script:CompletionHelpersImportFailure = $null; try { . (Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1') } catch { $script:CompletionHelpersImportFailure = 'enforce-completion-helpers.ps1' }
@@ -374,7 +375,11 @@ function Invoke-CompletionConsistencyDecision {
         [scriptblock] $CheckpointReader = { param($Path) Get-CheckpointFileContent -Path $Path },
 
         [Parameter(Mandatory = $false)]
-        [scriptblock] $RoutingMatrixReader
+        [scriptblock] $RoutingMatrixReader,
+
+        [string] $SessionRoot = (Get-Location).Path,
+
+        [scriptblock] $WorktreeListInvoker
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'COMPLETION_CONSISTENCY_BLOCKED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
@@ -437,7 +442,19 @@ function Invoke-CompletionConsistencyDecision {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    $missingArgs = @{ Payload = $payload; FolderExistsCheck = $FolderExistsCheck }
+    # Issue #1163 (D6): an absolute checkpoint path probes the feature folder beneath the worktree
+    # that encloses it; a relative path, an unregistered path, or a listing failure keeps the probe.
+    $folderCheck = $FolderExistsCheck
+    if ($normalized -match '^(/|[A-Za-z]:/)') {
+        $resolverArguments = @{ SessionRoot = $SessionRoot; FilePath = @($filePath); Policy = 'SessionFallback' }
+        if ($null -ne $WorktreeListInvoker) { $resolverArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+        $resolvedRoot = (([string](Resolve-AgentTargetWorktree @resolverArguments).WorktreeRoot) -replace '\\', '/').TrimEnd('/')
+        if ($resolvedRoot -and -not [string]::Equals($resolvedRoot, (($SessionRoot -replace '\\', '/').TrimEnd('/')), [System.StringComparison]::OrdinalIgnoreCase)) {
+            $innerCheck = $FolderExistsCheck
+            $folderCheck = { param($p) & $innerCheck "$resolvedRoot/$p" }.GetNewClosure()
+        }
+    }
+    $missingArgs = @{ Payload = $payload; FolderExistsCheck = $folderCheck }
     if ($PSBoundParameters.ContainsKey('RoutingMatrixReader') -and $null -ne $RoutingMatrixReader) {
         $missingArgs['RoutingMatrixReader'] = $RoutingMatrixReader
     }
