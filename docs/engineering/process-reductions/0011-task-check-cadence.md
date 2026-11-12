@@ -5,7 +5,7 @@
 reduction: 0011
 Date: 2026-11-12
 Issue: #1167
-Merge commit: pending (PR #1167)
+Merge commit: pending (PR #1168)
 
 Replaces the per-task full toolchain run with a task check during atomic plan execution. A new section `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill defines the cadence once: after each task, a task check runs format, lint, and type check scoped to the changed files and then the task's test selection (mirrored and importing tests, and the contract tests that read a changed Markdown or configuration path), with no coverage and no gate status; the last task of every phase between Phase 0 and the final QA phase is a `[phase-gate]` task that runs stages 1 to 6 of the toolchain loop with one run of each parallel gate; the final QA loop, the `Phase 0 baseline` comparison, and the no-SKIPPED rule are unchanged. Stage 7 (integration tests) of the general code-change loop, and golden suites, run in CI for phase gates and the final QA loop. The policy texts, the orchestrate skill, the executor and planner surfaces, the hard-lock prompts, the language rules and skills, the QA-gate skills, the plan templates, and the execution-environment brief reference the section instead of restating a per-task full run. Until the pull request exists, the `Merge commit:` line carries the canonical issue number as a stand-in, as entry `0005` did.
 
