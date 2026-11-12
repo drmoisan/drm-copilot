@@ -14,7 +14,7 @@ This rule file summarizes the PowerShell-specific policies for this repository.
 3. **Type checking**: Not applicable for PowerShell; skip to testing.
 4. **Testing — Pester (v6.x)**: Run tests via MCP. MCP command: `mcp__drm-copilot__run_poshqc_test`. Use repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
 
-Run the toolchain in order: format → analyze → test. Restart from step 1 if any step fails or changes files. Use the MCP server functions; do not substitute VS Code task wrappers.
+Run the toolchain in order: format → analyze → test. Restart from step 1 if any step fails or changes files. Use the MCP server functions; do not substitute VS Code task wrappers. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
 ## Compatibility
 

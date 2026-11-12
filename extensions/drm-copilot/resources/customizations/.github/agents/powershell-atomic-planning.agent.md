@@ -67,6 +67,7 @@ The plan must be executable by the `powershell_atomic_executor` agent without re
 
 - If the plan changes code or tests, it MUST include baseline tool results capture tasks in **Phase 0**: static baselines and one `Phase 0 baseline` run of each test gate.
 - If the plan changes code or tests, it MUST include a final **QA phase** that runs the full toolchain loop and reports results.
+- If the plan changes code or tests, every phase between Phase 0 and the final QA phase MUST end with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop. A phase that ends with `[expect-fail]` tests keeps its `[phase-gate]` task, whose unit stage accepts only those named expected failures; a no-change phase, one that changes no tracked file, needs no gate task.
 
 ### 2.1 Phase structure
 
@@ -629,6 +630,7 @@ Before sending any response that includes a plan, you must quickly self-check:
 * If the plan changes code or tests:
   * Did Phase 0 include baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in §2.3)?
   * Did you include a final QA phase that runs the toolchain loop **for each applicable language** and reports results?
+  * Does every phase between Phase 0 and the final QA phase end with a `[phase-gate]` task (an `[expect-fail]` phase keeps its gate; a no-change phase needs none)?
 * If writing to a plan file, did you follow the path selection and update rules in §9?
 * Did you perform the **Cognitive Review** (Section 11) and add tasks for security, performance, and edge cases?
 

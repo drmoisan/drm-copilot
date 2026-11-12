@@ -38,7 +38,7 @@ rather than this bugfix sequence.
 
 3. **Verify locally before review**
    - Re-run the original repro and the new regression test.
-   - Run the full toolchain in order (format → lint → type-check → test) using the repo-standard commands or tasks; rerun from the start if any step changes files or fails.
+   - Run the full toolchain in order (format → lint → type-check → test) using the repo-standard commands or tasks; rerun from the start if any step changes files or fails. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
 ---
 
@@ -232,7 +232,7 @@ You **must** run the full toolchain in this exact order and repeat it until ever
 3. **Type checking**
 4. **Testing**
 
-Treat these four steps as one **toolchain pass**.
+Treat these four steps as one **toolchain pass**. The toolchain pass is the phase-gate and final-QA requirement; integration tests run in CI for phase gates and the final QA loop. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
 1. Run the formatter on the relevant files (e.g. Black).
 
