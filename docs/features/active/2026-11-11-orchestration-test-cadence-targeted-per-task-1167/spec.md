@@ -211,7 +211,7 @@ Existing tests that must keep passing: `test_push_down_claude_resource_contracts
 - [x] AC11: The existing contract and parity tests pass: push-down Claude and Codex-and-agents resource contracts, `planning-contract-wording.Tests.ps1`, `parallel-gate-wording.Tests.ps1`, the execution-environment brief contracts, the single-pass preflight contracts, `test_typescript_toolchain_instruction_contracts.py`, and `test_plan_templates_carry_premortem_skeleton`.
 - [x] AC12: `docs/engineering/process-reductions/0011-<short-name>.md` and its `README.md` index row are added in the same commit with revert blocks for every non-identical source, and the process-reduction ledger chain tests pass.
 - [x] AC13: Line and branch coverage do not regress against the `Phase 0 baseline`; no file under `scripts/dev_tools/atomic_executor/`, the Python or TypeScript plan validators, or `.claude/hooks/validate-planner-output.ps1` is modified; no new Python file is added.
-- [ ] AC14 (CI-dependent): CI is green on the PR head.
+- [x] AC14 (CI-dependent): CI is green on the PR head.
 
 ## Risks & Mitigations
 - Technical or operational risks:
