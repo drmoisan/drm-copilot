@@ -89,6 +89,14 @@ Describe 'Test-ParallelPrecedenceJustified' {
             Should -Throw -ExpectedMessage '*--after 3:1 fails the parallel scheduling rule (merge time 0 min does not exceed parallel gain 45 min)*'
     }
 
+    It 'rejects a cost entry naming an item absent from items with the default-band gain' {
+        $entry = Get-GateEntry -Precedence @{ before = 5; after = 9; source = 'operator'; kind = 'cost' }
+
+        # Item 9 is absent from items, so its band is the default C1: gain min(180, 30) = 30.
+        { Test-ParallelPrecedenceJustified -Entry $entry -Tolerance $script:Tolerance } |
+            Should -Throw -ExpectedMessage '*--after 9:5 fails the parallel scheduling rule (merge time 0 min does not exceed parallel gain 30 min)*'
+    }
+
     It 'accepts a correctness entry with a reason' {
         $entry = Get-GateEntry -Precedence @{ before = 3; after = 4; source = 'operator'; kind = 'correctness'; reason = 'item 4 consumes the schema item 3 adds' }
 

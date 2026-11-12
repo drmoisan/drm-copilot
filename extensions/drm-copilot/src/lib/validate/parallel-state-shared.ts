@@ -105,9 +105,11 @@ export function isObject(value: unknown): value is Record<string, unknown> {
  * Format a value the way Python `repr` does, for byte-identical error strings.
  *
  * @param value Value to format.
- * @returns `None` for null/undefined, `True`/`False` for booleans, single-quoted
- * escaped text for strings, bracketed/braced forms for arrays and objects, and
- * the plain string form for everything else.
+ * @returns `None` for null/undefined, `True`/`False` for booleans, quoted text
+ * for strings with Python's quote selection (double quotes when the text holds a
+ * single quote and no double quote, otherwise single quotes with backslashes and
+ * single quotes escaped), bracketed/braced forms for arrays and objects, and the
+ * plain string form for everything else.
  */
 export function pythonRepr(value: unknown): string {
   if (value === null || value === undefined) {
@@ -117,7 +119,12 @@ export function pythonRepr(value: unknown): string {
     return value ? "True" : "False";
   }
   if (typeof value === "string") {
-    return `'${value.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`;
+    const escaped = value.replace(/\\/g, "\\\\");
+    // Python's repr switches to double quotes for a single quote without a double quote.
+    if (value.includes("'") && !value.includes('"')) {
+      return `"${escaped}"`;
+    }
+    return `'${escaped.replace(/'/g, "\\'")}'`;
   }
   if (Array.isArray(value)) {
     return `[${value.map(pythonRepr).join(", ")}]`;

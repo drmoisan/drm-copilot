@@ -161,6 +161,22 @@ Describe 'Read-only path derivation' {
         @(Get-BlastRadiusReadOnlyPath -PlanText $plan -RadiusPath @('src/app.ps1')).Count | Should -Be 0
     }
 
+    It 'rejects a path whose read title carries the write form <Form>' -ForEach @(
+        @{ Form = 'writes' }, @{ Form = 'updates' }, @{ Form = 'adds' }, @{ Form = 'fixes' }, @{ Form = 'copies' },
+        @{ Form = 'added' }, @{ Form = 'fixed' }, @{ Form = 'copied' }, @{ Form = 'updated' }, @{ Form = 'adding' },
+        @{ Form = 'updating' }, @{ Form = 'Regenerate' }, @{ Form = 'regenerates' }, @{ Form = 'Overwrite' }, @{ Form = 'overwriting' }
+    ) {
+        $plan = "- [ ] [P2-T1] Run the generator that $Form ``docs/out.json``."
+
+        @(Get-BlastRadiusReadOnlyPath -PlanText $plan -RadiusPath @('docs/out.json')).Count | Should -Be 0 -Because "'$Form' marks a write"
+    }
+
+    It 'keeps a read path whose title word only begins like a write verb' {
+        $plan = '- [ ] [P0-T1] Review the address table in `docs/rule.md`.'
+
+        Get-BlastRadiusReadOnlyPath -PlanText $plan -RadiusPath @('docs/rule.md') | Should -Be @('docs/rule.md')
+    }
+
     It 'never derives a created path' {
         $plan = @(
             '- [ ] [P1-T1] Create `src/new.ps1` with the helper.',

@@ -18,8 +18,9 @@
 
     Get-BlastRadiusReadOnlyPath derives read_paths from approved plan text
     passed in memory: a radius path is read-only when every task naming it has
-    a read verb as its first title word, no naming title carries a write verb,
-    and no task whose title begins with Create names it.
+    a read verb as its first title word, no naming title carries a write verb
+    or one of its inflections (writes, updated, copying), and no task whose
+    title begins with Create names it.
 
     Every function is pure: no filesystem, subprocess, network, or clock access,
     and no input is mutated.
@@ -38,8 +39,25 @@ $script:ReadTitleVerb = @('Read', 'Verify', 'Confirm', 'Inspect', 'Review', 'Bas
 # Title words that mark a task as writing the paths it names.
 $script:WriteTitleVerb = @(
     'Add', 'Append', 'Change', 'Copy', 'Create', 'Delete', 'Edit', 'Extend', 'Fix', 'Generate', 'Implement',
-    'Insert', 'Modify', 'Move', 'Port', 'Refactor', 'Remove', 'Rename', 'Replace', 'Rewrite', 'Update', 'Wire', 'Write'
+    'Insert', 'Modify', 'Move', 'Overwrite', 'Port', 'Refactor', 'Regenerate', 'Remove', 'Rename', 'Replace', 'Rewrite', 'Update',
+    'Wire', 'Write'
 )
+
+# Every write verb with its inflections (s, es, ed, ing; d and e-dropping ing for
+# a final e; ies and ied for a final consonant and y), compared case-insensitively.
+$script:WriteTitleWordSet = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+foreach ($writeVerb in $script:WriteTitleVerb) {
+    foreach ($suffix in @('', 's', 'es', 'ed', 'ing')) { [void]$script:WriteTitleWordSet.Add($writeVerb + $suffix) }
+    $stem = $writeVerb.Substring(0, $writeVerb.Length - 1)
+    if ($writeVerb.EndsWith('e')) {
+        [void]$script:WriteTitleWordSet.Add($writeVerb + 'd')
+        [void]$script:WriteTitleWordSet.Add($stem + 'ing')
+    }
+    if ($writeVerb -match '[^aeiou]y$') {
+        [void]$script:WriteTitleWordSet.Add($stem + 'ies')
+        [void]$script:WriteTitleWordSet.Add($stem + 'ied')
+    }
+}
 
 # A task line of an atomic plan: a checkbox, the task id, then the title.
 $script:TaskLinePattern = '^\s*-\s*\[[ xX]\]\s*\[P\d+-T\d+\]\s*(?<title>.*)$'
@@ -201,6 +219,26 @@ function Get-TitleWord {
     return [string[]]@($Title -split '[^A-Za-z]+' | Where-Object { $_ })
 }
 
+function Test-WriteTitleWord {
+    <#
+    .SYNOPSIS
+        Report whether a title word is a write verb or one of its inflections.
+    .PARAMETER Word
+        One title word.
+    .OUTPUTS
+        System.Boolean. True when the word is in the write-word set, compared case-insensitively.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string] $Word
+    )
+
+    return $script:WriteTitleWordSet.Contains($Word)
+}
+
 function Test-ReadOnlyWindowSet {
     <#
     .SYNOPSIS
@@ -223,7 +261,7 @@ function Test-ReadOnlyWindowSet {
         $words = @(Get-TitleWord -Title $entry['title'])
         $first = if ($words.Count -gt 0) { $words[0] } else { '' }
         # A write verb anywhere in the title outweighs a read verb in first position.
-        $hasWriteVerb = @($words | Where-Object { $script:WriteTitleVerb -contains $_ }).Count -gt 0
+        $hasWriteVerb = @($words | Where-Object { Test-WriteTitleWord -Word $_ }).Count -gt 0
         if ($first -ceq 'Create' -or $script:ReadTitleVerb -cnotcontains $first -or $hasWriteVerb) { return $false }
     }
     return $true
@@ -238,7 +276,8 @@ function Get-BlastRadiusReadOnlyPath {
         A radius path is read-only when at least one task window names it, the
         first title word of every naming window is one of Read, Verify, Confirm,
         Inspect, Review, Baseline, Run, or Execute, no naming title contains a
-        write verb, and no task whose title begins with Create names it. A task
+        write verb or one of its inflections (for example writes, updated, or
+        copying), and no task whose title begins with Create names it. A task
         window is a checkbox task line with its id and every following line up to
         the next task line or heading; a window names a path when its text
         contains the path ordinally. A path the plan creates is therefore never

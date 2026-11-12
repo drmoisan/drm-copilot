@@ -3,8 +3,10 @@
 Covers two additions to ``scripts/dev_tools/_blast_radius_scheduling.py``: the
 optional ``weights.separable`` name of the ``conflict_tolerance`` reader, and
 the access-aware path-pair weight that reads each item's optional
-``read_paths`` and ``separable_paths`` (spec section B2). Every test builds
-its configuration in memory; no file is read or created.
+``read_paths`` and ``separable_paths`` (spec section B2). The access-aware
+rows are priced through the public ``pair_cost`` over two single-path
+radii, so each cost equals the one path-pair weight. Every test builds its
+configuration in memory; no file is read or created.
 """
 
 from __future__ import annotations
@@ -18,9 +20,10 @@ from scripts.dev_tools._blast_radius_scheduling import (
     NO_ACCESS,
     ConflictTolerance,
     ItemAccess,
-    _path_pair_weight,  # pyright: ignore[reportPrivateUsage]
     config_conflict_tolerance,
+    pair_cost,
 )
+from scripts.dev_tools.compute_blast_radius import BlastRadius
 
 # A conflict_tolerance member carrying the recalibrated committed minutes.
 BASE_TOLERANCE: dict[str, object] = {
@@ -112,6 +115,18 @@ SEPARABLE_TOLERANCE = config_conflict_tolerance(make_config(separable=15))
 PLAIN_TOLERANCE = config_conflict_tolerance(make_config())
 
 
+def single_path_radius(entry: str) -> BlastRadius:
+    """Build a declared radius holding one path and no modules or contracts."""
+    return BlastRadius(
+        paths=(entry,),
+        modules=(),
+        shared_surfaces=(),
+        contracts=(),
+        source="declared",
+        computed_at="2026-11-11T00-00",
+    )
+
+
 def weigh(
     entry_a: str,
     entry_b: str,
@@ -120,8 +135,19 @@ def weigh(
     access_b: ItemAccess = NO_ACCESS,
     tolerance: ConflictTolerance = SEPARABLE_TOLERANCE,
 ) -> int:
-    """Weigh one overlapping path pair through the scheduling module."""
-    return _path_pair_weight(entry_a, entry_b, tolerance, access_a, access_b)
+    """Price one overlapping path pair through the public pair_cost.
+
+    Both radii hold one path and nothing else, so the cost equals that pair's
+    path-pair weight.
+    """
+    return pair_cost(
+        single_path_radius(entry_a),
+        single_path_radius(entry_b),
+        make_config(),
+        tolerance,
+        access_a=access_a,
+        access_b=access_b,
+    )
 
 
 def test_read_only_either_side_weighs_zero() -> None:
@@ -189,4 +215,6 @@ def test_no_access_lists_match_legacy_weight(
 ) -> None:
     """Without access lists each pair keeps its pre-issue-1164 path weight."""
     assert weigh(entry_a, entry_b) == expected
-    assert _path_pair_weight(entry_a, entry_b, SEPARABLE_TOLERANCE) == expected
+    radius_a = single_path_radius(entry_a)
+    radius_b = single_path_radius(entry_b)
+    assert pair_cost(radius_a, radius_b, make_config(), SEPARABLE_TOLERANCE) == expected
