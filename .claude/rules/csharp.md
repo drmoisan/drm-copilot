@@ -16,7 +16,7 @@ This rule file summarizes the C#-specific policies for this repository. It targe
 3. **Type Checking — Nullable Analysis**: Nullable reference types are enabled solution-wide via `Directory.Build.props` (`Nullable=enable`, `TreatWarningsAsErrors=true`). Command: `dotnet build` enforces nullable warnings as errors.
 4. **Testing — MSTest + NSubstitute + FluentAssertions**: Run tests with: `dotnet test --collect:"XPlat Code Coverage"`.
 
-Run the toolchain in order: format → lint → type-check → architecture → test. Restart from step 1 if any step fails or changes files.
+Run the toolchain in order: format → lint → type-check → architecture → test. Restart from step 1 if any step fails or changes files. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
 ## Coding Standards
 

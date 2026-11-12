@@ -30,6 +30,7 @@ Evidence accounting rule: record the expected artifact path or location in each 
 - [ ] Apply moves/renames to reach the target layout
 - [ ] Update imports/tooling/entry points
 - [ ] Remove or redirect legacy paths
+- [ ] [phase-gate] Run the full toolchain loop (stages 1 to 6) per `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill and record `<FEATURE>/evidence/qa-gates/phase-gate.P2.<timestamp>.md`
 
 ### Phase 3: Verification & Cleanup [0%]
 - [ ] Run tests/type checks; fix fallout
