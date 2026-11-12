@@ -7,7 +7,7 @@ Date: 2026-11-12
 Issue: #1167
 Merge commit: pending (PR #1168)
 
-Replaces the per-task full toolchain run with a task check during atomic plan execution. A new section `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill defines the cadence once: after each task, a task check runs format, lint, and type check scoped to the changed files and then the task's test selection (mirrored and importing tests, and the contract tests that read a changed Markdown or configuration path), with no coverage and no gate status; the last task of every phase between Phase 0 and the final QA phase is a `[phase-gate]` task that runs stages 1 to 6 of the toolchain loop with one run of each parallel gate; the final QA loop, the `Phase 0 baseline` comparison, and the no-SKIPPED rule are unchanged. Stage 7 (integration tests) of the general code-change loop, and golden suites, run in CI for phase gates and the final QA loop. The policy texts, the orchestrate skill, the executor and planner surfaces, the hard-lock prompts, the language rules and skills, the QA-gate skills, the plan templates, and the execution-environment brief reference the section instead of restating a per-task full run. Until the pull request exists, the `Merge commit:` line carries the canonical issue number as a stand-in, as entry `0005` did.
+Replaces the per-task full toolchain run with a task check during atomic plan execution. A new section `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill defines the cadence once: after each task, a task check runs format, lint, and type check scoped to the changed files and then the task's test selection (mirrored and importing tests, and the contract tests that read a changed Markdown or configuration path), with no coverage and no gate status; the last task of every phase between Phase 0 and the final QA phase is a `[phase-gate]` task that runs stages 1 to 6 of the toolchain loop with one run of each parallel gate; the final QA loop, the `Phase 0 baseline` comparison, and the no-SKIPPED rule are unchanged. Stage 7 (integration tests) of the general code-change loop, and golden suites, run in CI for phase gates and the final QA loop. The policy texts, the orchestrate skill, the executor and planner surfaces, the hard-lock prompts, the language rules and skills, the QA-gate skills, the plan templates, and the execution-environment brief reference the section instead of restating a per-task full run. A phase that ends with `[expect-fail]` tests keeps its `[phase-gate]` task, whose unit stage accepts only those named expected failures, and a no-change phase, one that changes no tracked file, needs no gate task. The `Merge commit:` line names pull request #1168 until it merges.
 
 ## Reason and Evidence
 
@@ -177,6 +177,8 @@ This section defines when the toolchain runs during plan execution. Other plan-e
 
 - **Task check (after each task).** After each task, the executor runs a task check: format, lint, and type check scoped to the files the task changed, then the task's test selection. The task's test selection is the mirrored test files under `tests/` of each changed production file, plus every test file that imports, dot-sources, or names a changed module or file; for a changed Markdown or configuration path, it is the contract tests that read that path. Integration and golden suites are never part of the task's test selection. A task check is not a gate: it measures no coverage and does not replace the phase gate. Its evidence is a new append-only file per task, `<FEATURE>/evidence/other/task-check.P<N>-T<M>.<timestamp>.md`, which records the changed files, the selection and the rule that produced it, and each command with its exit code.
 - **Phase gate (after each phase).** The last task of every phase between Phase 0 and the final QA phase carries the `[phase-gate]` tag, placed after the task ID as `[expect-fail]` is. That task runs stages 1 to 6 of the toolchain loop across the repository: format, lint, type check, architecture-boundary tests, the full unit suite, and contract checks. The unit stage is one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers. On a failure or an auto-fix, fix the cause and restart from step 1; the phase closes only after one clean pass. Its evidence is `<FEATURE>/evidence/qa-gates/phase-gate.P<N>.<timestamp>.md`. Phase 0 needs no gate task, and the loop of the final QA phase is its own gate.
+- **Expect-fail phase.** A phase may end with tests tagged `[expect-fail]` that fail by design until a later phase. Its `[phase-gate]` task still runs the full loop: the unit stage passes when its only failures are the plan's named `[expect-fail]` tests that a later phase makes pass, each confirmed failing, and every other test passes. The gate evidence lists those expected failures by name.
+- **No-change phase.** A phase that changes no tracked file, such as an investigation or reproduction phase that only writes evidence, is a no-change phase and needs no `[phase-gate]` task; the next gate covers it.
 - **Final QA loop (unchanged).** The final QA loop in the next section remains a full run with coverage compared with the `Phase 0 baseline`, and the no-SKIPPED rule is unchanged.
 - **CI-only suites.** Integration and golden suites run in CI only.
 
@@ -206,7 +208,7 @@ Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract`
 
 ````Current
 
-In every plan, every phase between Phase 0 and the final QA phase ends with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+In every plan, every phase between Phase 0 and the final QA phase ends with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop. A phase that ends with `[expect-fail]` tests keeps its `[phase-gate]` task, whose unit stage accepts only those named expected failures; a no-change phase, one that changes no tracked file, needs no gate task.
 
 In a workspace with an active discovery activation, the planner launch itself is admitted
 ````
@@ -247,6 +249,7 @@ Run the toolchain in order: format → lint → type-check → test. Restart fro
 ### Revert Block: .agents/skills/general-code-change/SKILL.md
 
 ````Current
+**Restart from step 1** if any stage fails or auto-fixes any files. Do not stop the loop until every stage it runs completes without errors in a single pass; at phase gates and in the final QA loop, stage 7 runs in CI.
 
 This loop is the phase-gate and final-QA requirement; integration tests (stage 7) run in CI for phase gates and the final QA loop. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
@@ -254,6 +257,7 @@ Mutation testing and golden tests run in pre-merge or nightly pipelines, not the
 ````
 
 ````Prior
+**Restart from step 1** if any stage fails or auto-fixes any files. Do not stop the loop until all seven stages complete without errors in a single pass.
 
 Mutation testing and golden tests run in pre-merge or nightly pipelines, not the per-commit loop.
 ````
@@ -388,7 +392,7 @@ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if a
 
 ````Current
 - Phase 0: baseline capture (language-specific static tool baselines and one parallel test-suite baseline run per gate, the `Phase 0 baseline`)
-- Phase gates: every phase between Phase 0 and the final QA phase ends with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+- Phase gates: every phase between Phase 0 and the final QA phase ends with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop. A phase that ends with `[expect-fail]` tests keeps its `[phase-gate]` task, whose unit stage accepts only those named expected failures; a no-change phase, one that changes no tracked file, needs no gate task.
 - Final phase: full QA loop for each applicable language, with one final-QC static artifact per language for the format, lint, and type-check steps, ending with the self-review task that writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`
 ````
 
@@ -414,6 +418,7 @@ Run the toolchain in order: format → lint → type-check → architecture → 
 ### Revert Block: .claude/rules/general-code-change.md
 
 ````Current
+**Restart from step 1** if any stage fails or auto-fixes any files. Do not stop the loop until every stage it runs completes without errors in a single pass; at phase gates and in the final QA loop, stage 7 runs in CI.
 
 This loop is the phase-gate and final-QA requirement; integration tests (stage 7) run in CI for phase gates and the final QA loop. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
@@ -421,6 +426,7 @@ Mutation testing and golden tests run in pre-merge or nightly pipelines, not the
 ````
 
 ````Prior
+**Restart from step 1** if any stage fails or auto-fixes any files. Do not stop the loop until all seven stages complete without errors in a single pass.
 
 Mutation testing and golden tests run in pre-merge or nightly pipelines, not the per-commit loop.
 ````
@@ -505,6 +511,8 @@ This section defines when the toolchain runs during plan execution. Other plan-e
 
 - **Task check (after each task).** After each task, the executor runs a task check: format, lint, and type check scoped to the files the task changed, then the task's test selection. The task's test selection is the mirrored test files under `tests/` of each changed production file, plus every test file that imports, dot-sources, or names a changed module or file; for a changed Markdown or configuration path, it is the contract tests that read that path. Integration and golden suites are never part of the task's test selection. A task check is not a gate: it measures no coverage and does not replace the phase gate. Its evidence is a new append-only file per task, `<FEATURE>/evidence/other/task-check.P<N>-T<M>.<timestamp>.md`, which records the changed files, the selection and the rule that produced it, and each command with its exit code.
 - **Phase gate (after each phase).** The last task of every phase between Phase 0 and the final QA phase carries the `[phase-gate]` tag, placed after the task ID as `[expect-fail]` is. That task runs stages 1 to 6 of the toolchain loop across the repository: format, lint, type check, architecture-boundary tests, the full unit suite, and contract checks. The unit stage is one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers. On a failure or an auto-fix, fix the cause and restart from step 1; the phase closes only after one clean pass. Its evidence is `<FEATURE>/evidence/qa-gates/phase-gate.P<N>.<timestamp>.md`. Phase 0 needs no gate task, and the loop of the final QA phase is its own gate.
+- **Expect-fail phase.** A phase may end with tests tagged `[expect-fail]` that fail by design until a later phase. Its `[phase-gate]` task still runs the full loop: the unit stage passes when its only failures are the plan's named `[expect-fail]` tests that a later phase makes pass, each confirmed failing, and every other test passes. The gate evidence lists those expected failures by name.
+- **No-change phase.** A phase that changes no tracked file, such as an investigation or reproduction phase that only writes evidence, is a no-change phase and needs no `[phase-gate]` task; the next gate covers it.
 - **Final QA loop (unchanged).** The final QA loop in the next section remains a full run with coverage compared with the `Phase 0 baseline`, and the no-SKIPPED rule is unchanged.
 - **CI-only suites.** Integration and golden suites run in CI only.
 
@@ -685,7 +693,7 @@ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if a
 
 ````Current
 5. Do not execute implementation; produce the plan only.
-6. In every plan, every phase between Phase 0 and the final QA phase ends with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+6. In every plan, every phase between Phase 0 and the final QA phase ends with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop. A phase that ends with `[expect-fail]` tests keeps its `[phase-gate]` task, whose unit stage accepts only those named expected failures; a no-change phase, one that changes no tracked file, needs no gate task.
 
 ````
 
@@ -726,7 +734,7 @@ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if a
 
 ````Current
 - If the plan changes code or tests, it MUST include a final **QA phase** that runs the full toolchain loop and reports results.
-- If the plan changes code or tests, every phase between Phase 0 and the final QA phase MUST end with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+- If the plan changes code or tests, every phase between Phase 0 and the final QA phase MUST end with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop. A phase that ends with `[expect-fail]` tests keeps its `[phase-gate]` task, whose unit stage accepts only those named expected failures; a no-change phase, one that changes no tracked file, needs no gate task.
 
 ````
 
@@ -739,7 +747,7 @@ Run toolchain in order: format, lint, type-check, test. Restart from step 1 if a
 
 ````Current
    * Did you include a final QA phase that runs the toolchain loop **for each applicable language** and reports results?
-   * Does every phase between Phase 0 and the final QA phase end with a `[phase-gate]` task?
+   * Does every phase between Phase 0 and the final QA phase end with a `[phase-gate]` task (an `[expect-fail]` phase keeps its gate; a no-change phase needs none)?
 * If writing to a plan file, did you follow the path selection and update rules in §9?
 ````
 
@@ -794,7 +802,7 @@ Required toolchain for C# tasks:
 
 ````Current
 - If the plan changes code or tests, it MUST include a final **QA phase** that runs the full toolchain loop and reports results.
-- If the plan changes code or tests, every phase between Phase 0 and the final QA phase MUST end with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+- If the plan changes code or tests, every phase between Phase 0 and the final QA phase MUST end with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop. A phase that ends with `[expect-fail]` tests keeps its `[phase-gate]` task, whose unit stage accepts only those named expected failures; a no-change phase, one that changes no tracked file, needs no gate task.
 
 ````
 
@@ -807,7 +815,7 @@ Required toolchain for C# tasks:
 
 ````Current
 - final QA loop for affected toolchains,
-- a `[phase-gate]` task ending every phase between Phase 0 and the final QA phase,
+- a `[phase-gate]` task ending every phase between Phase 0 and the final QA phase (an `[expect-fail]` phase keeps its gate; a no-change phase needs none),
 - REQ-ID closure when applicable.
 ````
 
@@ -862,7 +870,7 @@ Required toolchain for PowerShell tasks:
 
 ````Current
 - If the plan changes code or tests, it MUST include a final **QA phase** that runs the full toolchain loop and reports results.
-- If the plan changes code or tests, every phase between Phase 0 and the final QA phase MUST end with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+- If the plan changes code or tests, every phase between Phase 0 and the final QA phase MUST end with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop. A phase that ends with `[expect-fail]` tests keeps its `[phase-gate]` task, whose unit stage accepts only those named expected failures; a no-change phase, one that changes no tracked file, needs no gate task.
 
 ````
 
@@ -875,7 +883,7 @@ Required toolchain for PowerShell tasks:
 
 ````Current
   * Did you include a final QA phase that runs the toolchain loop **for each applicable language** and reports results?
-  * Does every phase between Phase 0 and the final QA phase end with a `[phase-gate]` task?
+  * Does every phase between Phase 0 and the final QA phase end with a `[phase-gate]` task (an `[expect-fail]` phase keeps its gate; a no-change phase needs none)?
 * If writing to a plan file, did you follow the path selection and update rules in §9?
 ````
 
@@ -930,7 +938,7 @@ Required toolchain for Python tasks:
 
 ````Current
 - If the plan changes code or tests, it MUST include a final **QA phase** that runs the full toolchain loop and reports results.
-- If the plan changes code or tests, every phase between Phase 0 and the final QA phase MUST end with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+- If the plan changes code or tests, every phase between Phase 0 and the final QA phase MUST end with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop. A phase that ends with `[expect-fail]` tests keeps its `[phase-gate]` task, whose unit stage accepts only those named expected failures; a no-change phase, one that changes no tracked file, needs no gate task.
 
 ````
 
@@ -943,7 +951,7 @@ Required toolchain for Python tasks:
 
 ````Current
 - final QA loop for affected toolchains,
-- a `[phase-gate]` task ending every phase between Phase 0 and the final QA phase,
+- a `[phase-gate]` task ending every phase between Phase 0 and the final QA phase (an `[expect-fail]` phase keeps its gate; a no-change phase needs none),
 - REQ-ID closure when applicable.
 ````
 
@@ -1046,6 +1054,8 @@ This section defines when the toolchain runs during plan execution. Other plan-e
 
 - **Task check (after each task).** After each task, the executor runs a task check: format, lint, and type check scoped to the files the task changed, then the task's test selection. The task's test selection is the mirrored test files under `tests/` of each changed production file, plus every test file that imports, dot-sources, or names a changed module or file; for a changed Markdown or configuration path, it is the contract tests that read that path. Integration and golden suites are never part of the task's test selection. A task check is not a gate: it measures no coverage and does not replace the phase gate. Its evidence is a new append-only file per task, `<FEATURE>/evidence/other/task-check.P<N>-T<M>.<timestamp>.md`, which records the changed files, the selection and the rule that produced it, and each command with its exit code.
 - **Phase gate (after each phase).** The last task of every phase between Phase 0 and the final QA phase carries the `[phase-gate]` tag, placed after the task ID as `[expect-fail]` is. That task runs stages 1 to 6 of the toolchain loop across the repository: format, lint, type check, architecture-boundary tests, the full unit suite, and contract checks. The unit stage is one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers. On a failure or an auto-fix, fix the cause and restart from step 1; the phase closes only after one clean pass. Its evidence is `<FEATURE>/evidence/qa-gates/phase-gate.P<N>.<timestamp>.md`. Phase 0 needs no gate task, and the loop of the final QA phase is its own gate.
+- **Expect-fail phase.** A phase may end with tests tagged `[expect-fail]` that fail by design until a later phase. Its `[phase-gate]` task still runs the full loop: the unit stage passes when its only failures are the plan's named `[expect-fail]` tests that a later phase makes pass, each confirmed failing, and every other test passes. The gate evidence lists those expected failures by name.
+- **No-change phase.** A phase that changes no tracked file, such as an investigation or reproduction phase that only writes evidence, is a no-change phase and needs no `[phase-gate]` task; the next gate covers it.
 - **Final QA loop (unchanged).** The final QA loop in the next section remains a full run with coverage compared with the `Phase 0 baseline`, and the no-SKIPPED rule is unchanged.
 - **CI-only suites.** Integration and golden suites run in CI only.
 
@@ -1088,12 +1098,30 @@ This loop is the phase-gate and final-QA requirement; integration tests run in C
 ### Revert Block: docs/features/templates/bug/plan.yyyy-MM-ddTHH-mm.md
 
 ````Current
+**Phase 1 — Preparation** (no-change phase: it changes no tracked file, so it has no `[phase-gate]` task; the next gate covers it)
+- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
+- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+
+**Phase 2 — Regression Test (must fail first)**
+- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/<issue>-<desc>.py` only if no clear home exists)
+- [ ] [P2-T2] [phase-gate] Run the full toolchain loop (stages 1 to 6) per `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill; the unit stage passes when its only failures are the expected failures of [P2-T1], each confirmed failing, and `<FEATURE>/evidence/qa-gates/phase-gate.P2.<timestamp>.md` lists them by name
+
+**Phase 3 — Minimal Fix**
 - [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
 - [ ] [P3-T2] [phase-gate] Run the full toolchain loop (stages 1 to 6) per `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill and record `<FEATURE>/evidence/qa-gates/phase-gate.P3.<timestamp>.md`
 
 ````
 
 ````Prior
+**Phase 1 — Preparation**
+- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
+- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+
+**Phase 2 — Regression Test (must fail first)**
+- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/<issue>-<desc>.py` only if no clear home exists)
+- [ ] [P2-T2] [expect-fail] Run the parallel test gate to confirm the new regression test fails and captures the repro
+
+**Phase 3 — Minimal Fix**
 - [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
 
 ````

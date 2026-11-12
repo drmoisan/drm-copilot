@@ -107,10 +107,14 @@ BeforeDiscovery {
         'one `Invoke-PoshQCParallelTest` run', 'one `pytest -n auto` run', 'Jest through its normal parallel workers',
         'task-check.P<N>-T<M>.<timestamp>.md', 'phase-gate.P<N>.<timestamp>.md'
     )
+    # Decision D15: the expect-fail phase and the no-change phase provisions.
+    $script:CanonicalD15Token = @(
+        'expected failures', 'confirmed failing', 'every other test passes',
+        'no-change phase', 'changes no tracked file', 'the next gate covers it'
+    )
+    $script:CanonicalCheck = Get-TcwCheck -Heading $anchor -Required ($canonicalRequired + $script:CanonicalD15Token) -Forbidden ($runClassForbidden + $script:PerTaskSweepToken) -NextHeading '## Final QA Loop (Required for Code/Test Changes)'
     $script:WordingRow = @(
-        Get-TcwRow -Group 'CANONICAL' -Base $contractBase -Check @(
-            Get-TcwCheck -Heading $anchor -Required $canonicalRequired -Forbidden ($runClassForbidden + $script:PerTaskSweepToken) -NextHeading '## Final QA Loop (Required for Code/Test Changes)'
-        )
+        Get-TcwRow -Group 'CANONICAL' -Base $contractBase -Check @($script:CanonicalCheck)
         Get-TcwRow -Group 'CANONICAL-REF' -Base $contractBase -Check @(
             Get-TcwCheck -Heading '## Final QA Loop (Required for Code/Test Changes)' -Required @($anchor)
             Get-TcwCheck -Heading '## Short-Path Minimal Plan Contract' -Required @($anchor)
@@ -118,9 +122,11 @@ BeforeDiscovery {
     )
 
     $policyRequired = @($anchor, 'phase-gate and final-QA requirement', 'run in CI', 'from step 1')
+    # Finding CR2: the stop condition names the stages the loop runs, not all seven.
+    $stopCheck = Get-TcwCheck -Heading '## Mandatory Toolchain Loop' -Required @('every stage it runs') -Forbidden @('all seven stages')
     $script:WordingRow += Get-TcwRow -Group 'POLICY' -Base @(
-        @{ Id = 'CLAUDE-RULE'; Path = '.claude/rules/general-code-change.md' }
-        @{ Id = 'AGENTS-SKILL'; Path = '.agents/skills/general-code-change/SKILL.md' }
+        @{ Id = 'CLAUDE-RULE'; Path = '.claude/rules/general-code-change.md'; Extra = @($stopCheck) }
+        @{ Id = 'AGENTS-SKILL'; Path = '.agents/skills/general-code-change/SKILL.md'; Extra = @($stopCheck) }
         @{ Id = 'AGENTS-MD'; Path = 'AGENTS.md' }
     ) -Check @((Get-TcwCheck -Heading '## Mandatory Toolchain Loop' -Required $policyRequired), $fileForbidden)
     $script:WordingRow += Get-TcwRow -Group 'POLICY' -Base @(
@@ -171,7 +177,7 @@ BeforeDiscovery {
         @{ Id = 'COPILOT-CS'; Path = '.github/agents/csharp-atomic-executor.agent.md'; Extra = @(Get-TcwCheck -Heading '### 7.1 C# policy and toolchain gates' -Required @('Phase-gate and final-QA toolchain')) }
     ) -Check $copilotExecutorCheck
 
-    $plannerRequired = @($anchor, '[phase-gate]', 'between Phase 0 and the final QA phase')
+    $plannerRequired = @($anchor, '[phase-gate]', 'between Phase 0 and the final QA phase', 'expected failures', 'no-change phase')
     $script:WordingRow += Get-TcwRow -Group 'PLANNER' -Base @(
         @{ Id = 'CLAUDE'; Path = '.claude/agents/atomic-planner.md' }
     ) -Check @((Get-TcwCheck -Heading '## Plan Structure' -Required $plannerRequired), $fileForbidden)
@@ -227,10 +233,19 @@ BeforeDiscovery {
         (Get-TcwCheck -Heading '## PowerShell Route and PoshQC MCP Limits' -Required @('Run.Path', 'New-PesterConfiguration'))
     )
 
+    # Gate layout per template under decision D15: the bug template gates its expect-fail
+    # Phase 2 and its fix Phase 3, and its Phase 1 is a no-change phase without a gate.
+    $templateLayout = @{
+        bug      = @{ GateCount = 2; ExpectFailGate = 1; NoChangePhase = '**Phase 1' }
+        feature  = @{ GateCount = 1; ExpectFailGate = 0; NoChangePhase = $null }
+        refactor = @{ GateCount = 1; ExpectFailGate = 0; NoChangePhase = $null }
+    }
     $script:TemplateRow = @(foreach ($name in 'bug', 'feature', 'refactor') {
             $path = "docs/features/templates/$name/plan.yyyy-MM-ddTHH-mm.md"
-            @{ Id = $name.ToUpperInvariant(); Path = $path }
-            @{ Id = "$($name.ToUpperInvariant())-BUNDLE"; Path = (Get-TcwBundlePath -Path $path) }
+            $layout = $templateLayout[$name]
+            foreach ($pair in @(@($name.ToUpperInvariant(), $path), @("$($name.ToUpperInvariant())-BUNDLE", (Get-TcwBundlePath -Path $path)))) {
+                @{ Id = $pair[0]; Path = $pair[1]; GateCount = $layout.GateCount; ExpectFailGate = $layout.ExpectFailGate; NoChangePhase = $layout.NoChangePhase }
+            }
         })
 
     $script:BundleRow = @(foreach ($entry in @(
@@ -399,27 +414,54 @@ Describe 'Test cadence wording' {
         $problem | Should -BeNullOrEmpty -Because "$Path must reference the test cadence in the narrowest scope"
     }
 
-    It 'TCW-TEMPLATE-<Id> shows a phase gate as the last task of an intermediate phase' -ForEach $script:TemplateRow {
+    It 'TCW-CANONICAL-DISCRIMINATES reports each D15 token missing once the D15 bullets are removed' -ForEach @(@{ Check = $script:CanonicalCheck; Token = $script:CanonicalD15Token }) {
+        # Arrange: drop the expect-fail and no-change bullets from in-memory lines only.
+        $fileLine = @(Get-TcwFileLine -RelativePath '.claude/skills/atomic-plan-contract/SKILL.md' | Where-Object { -not ($_.Contains('no-change phase') -or $_.Contains('expected failures')) })
+
+        # Act
+        $problem = @(Get-TcwCheckProblem -Line $fileLine -Check $Check)
+        $unreported = @($Token | Where-Object { $problem -notcontains "missing '$_' in $($Check.Heading)" })
+
+        # Assert
+        $Token.Count | Should -Be 6 -Because 'decision D15 adds six canonical tokens'
+        $unreported | Should -BeNullOrEmpty -Because 'the canonical row must fail when the D15 wording is removed'
+    }
+
+    It 'TCW-TEMPLATE-<Id> ends each gated phase with its phase gate' -ForEach $script:TemplateRow {
         # Arrange
         $fileLine = Get-TcwFileLine -RelativePath $Path
         $checkbox = @(for ($index = 0; $index -lt $fileLine.Count; $index++) { if ($fileLine[$index] -match '^\s*- \[[ xX]\] ') { $index } })
+        $phaseHead = @(for ($index = 0; $index -lt $fileLine.Count; $index++) { if ($fileLine[$index] -match '^(### Phase|\*\*Phase)') { $index } })
 
         # Act
         $gate = @($checkbox | Where-Object { $fileLine[$_].Contains('[phase-gate]') })
-        $gateIndex = if ($gate.Count -eq 1) { $gate[0] } else { -1 }
-        $nextCheckbox = @($checkbox | Where-Object { $_ -gt $gateIndex })
-        $phaseBetween = @(if ($gateIndex -ge 0 -and $nextCheckbox.Count -gt 0) {
-                for ($index = $gateIndex + 1; $index -lt $nextCheckbox[0]; $index++) {
-                    if ($fileLine[$index] -match '^(### Phase|\*\*Phase)') { $index }
-                }
-            })
+        $problem = [System.Collections.Generic.List[string]]::new()
+        $expectFailGateCount = 0
+        foreach ($gateIndex in $gate) {
+            $text = $fileLine[$gateIndex]
+            $start = @($phaseHead | Where-Object { $_ -lt $gateIndex })
+            $start = if ($start.Count -gt 0) { $start[-1] } else { -1 }
+            $stop = @($phaseHead | Where-Object { $_ -gt $gateIndex })
+            $stop = if ($stop.Count -gt 0) { $stop[0] } else { $fileLine.Count }
+            if (-not $text.Contains('phase-gate.P')) { $problem.Add("gate line $gateIndex names no phase-gate evidence") }
+            if (-not $text.Contains('## Test Cadence (Mandatory)')) { $problem.Add("gate line $gateIndex names no cadence section") }
+            if (@($checkbox | Where-Object { $_ -gt $gateIndex -and $_ -lt $stop }).Count -gt 0) { $problem.Add("gate line $gateIndex is not the last task of its phase") }
+            if (@($checkbox | Where-Object { $_ -gt $gateIndex }).Count -eq 0) { $problem.Add("gate line $gateIndex has no later task") }
+            if (@($checkbox | Where-Object { $_ -gt $start -and $_ -lt $gateIndex -and $fileLine[$_].Contains('[expect-fail]') }).Count -gt 0) {
+                $expectFailGateCount++
+                if (-not $text.Contains('expected failures')) { $problem.Add("gate line $gateIndex of an expect-fail phase names no expected failures") }
+            }
+        }
+        $noChangeLine = @(if ($NoChangePhase) { $fileLine | Where-Object { $_.StartsWith($NoChangePhase, [System.StringComparison]::Ordinal) } })
 
         # Assert
-        $gate.Count | Should -Be 1 -Because "$Path must hold exactly one [phase-gate] checkbox line"
-        $fileLine[$gateIndex] | Should -BeLike '*phase-gate.P*' -Because 'the gate task must name its phase-gate evidence'
-        $fileLine[$gateIndex].Contains('## Test Cadence (Mandatory)') | Should -BeTrue -Because 'the gate task must name the cadence section'
-        $nextCheckbox.Count | Should -BeGreaterThan 0 -Because 'a later phase must follow the gate task'
-        $phaseBetween.Count | Should -BeGreaterThan 0 -Because 'the gate task must be the last task of its phase'
+        $gate.Count | Should -Be $GateCount -Because "$Path must hold $GateCount [phase-gate] checkbox lines"
+        $problem | Should -BeNullOrEmpty -Because 'each gate must be the last task of its phase and name its evidence'
+        $expectFailGateCount | Should -Be $ExpectFailGate -Because 'each gate of an expect-fail phase accepts only the expected failures'
+        if ($NoChangePhase) {
+            $noChangeLine.Count | Should -Be 1 -Because "$Path must hold one '$NoChangePhase' heading"
+            $noChangeLine[0].Contains('no-change phase') | Should -BeTrue -Because 'the ungated preparation phase must be marked as a no-change phase'
+        }
     }
 
     It 'TCW-BUNDLE-<Id> is byte-identical to its bundle copy' -ForEach $script:BundleRow {
@@ -439,7 +481,7 @@ Describe 'Test cadence wording' {
             $resourceRoot = 'extensions/drm-copilot/resources'
             $script:SweepRoot = @(
                 '.claude/skills', '.claude/agents', '.agents/skills', '.github/agents', '.github/skills', '.github/prompts',
-                '.github/codex', '.codex/agents', 'docs/features/templates', '.claude/rules', '.github/instructions', 'AGENTS.md',
+                '.github/codex', '.codex/agents', 'docs/features/templates', '.claude/rules', '.github/instructions', 'AGENTS.md', 'CLAUDE.md', '.github/copilot-instructions.md',
                 "$resourceRoot/claude-customizations", "$resourceRoot/codex-and-agents-customizations", "$resourceRoot/customizations",
                 "$resourceRoot/templates/policy_audit", "$resourceRoot/feature-templates"
             )
