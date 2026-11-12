@@ -38,7 +38,7 @@ Describe 'Codex planner worktree branch (issue #1161)' {
         $script:Planner = '{"integration_branch":"epic/alpha","planner_worktrees":[{"branch":"feature/alpha-1","purpose":"preparation","preparation_status":"prepared","feature_folder":"f"}]}'
         $script:DefaultListing = @('worktree /synthetic-worktrees/session', 'branch refs/heads/main', '', "worktree $($script:Target)", 'branch refs/heads/feature/alpha-1', '')
 
-        function Set-CodexPlannerScenario {
+        function Use-CodexPlannerScenario {
             # Install the git results of one row; each key overrides a default.
             param([string[]] $Listing = $script:DefaultListing, [hashtable] $Git = @{})
             $script:GitResult = @{
@@ -66,7 +66,7 @@ Describe 'Codex planner worktree branch (issue #1161)' {
 
     Context 'adapter and gate rows' {
         BeforeEach {
-            Set-CodexPlannerScenario
+            Use-CodexPlannerScenario
             Mock Invoke-CodexPlannerWorktreeGitExe {
                 param([string[]] $GitArgs)
                 $script:GitCalls.Add($GitArgs -join ' ')
@@ -77,7 +77,7 @@ Describe 'Codex planner worktree branch (issue #1161)' {
         }
 
         It 'adapter: allows and runs exactly the listing and target checks in order' {
-            Set-CodexPlannerScenario -Git @{ integration = @{ ExitCode = 1; Output = @() }; branch = @{ ExitCode = 0; Output = @() } }
+            Use-CodexPlannerScenario -Git @{ integration = @{ ExitCode = 1; Output = @() }; branch = @{ ExitCode = 0; Output = @() } }
             (Invoke-CodexPlannerAdapter).Outcome | Should -Be 'Allow'
             $expected = @(
                 '-C /synthetic-worktrees/session worktree list --porcelain'
@@ -104,7 +104,7 @@ Describe 'Codex planner worktree branch (issue #1161)' {
             $script:GitCalls.ToArray() | Should -Be @('-C /synthetic-worktrees/session worktree list --porcelain')
         }
         It 'adapter: never matches a detached target stanza (AC-21)' {
-            Set-CodexPlannerScenario -Listing @('worktree /synthetic-worktrees/session', 'branch refs/heads/main', '', "worktree $($script:Target)", 'HEAD abc1234', 'detached', '')
+            Use-CodexPlannerScenario -Listing @('worktree /synthetic-worktrees/session', 'branch refs/heads/main', '', "worktree $($script:Target)", 'HEAD abc1234', 'detached', '')
             (Invoke-CodexPlannerAdapter).Outcome | Should -Be 'NoRecord'
         }
         It 'adapter: does not name the target when the record path does not match it (AC-21)' {
@@ -114,7 +114,7 @@ Describe 'Codex planner worktree branch (issue #1161)' {
             (Invoke-CodexPlannerAdapter -Text '{"integration_branch":"epic/alpha","planner_worktrees":[{"branch":"feature/alpha-1","path":".claude/worktrees/agent-alpha","purpose":"preparation","preparation_status":"prepared"}]}').Outcome | Should -Be 'Allow'
         }
         It 'adapter: refuses GIT_FAILED when the listing fails while a candidate exists' {
-            Set-CodexPlannerScenario -Git @{ worktree = @{ ExitCode = 128; Output = @() } }
+            Use-CodexPlannerScenario -Git @{ worktree = @{ ExitCode = 128; Output = @() } }
             (Invoke-CodexPlannerAdapter).Code | Should -BeExactly 'GIT_FAILED'
             $script:GitCalls.Count | Should -Be 1
         }
@@ -126,11 +126,11 @@ Describe 'Codex planner worktree branch (issue #1161)' {
             (Invoke-CodexPlannerAdapter -WorkingDirectory $WorkingDirectory -RepositoryRoot $RepositoryRoot).Detail | Should -BeLike 'U1 *'
         }
         It 'adapter: refuses U2 when the target is the main checkout' {
-            Set-CodexPlannerScenario -Listing @('worktree /synthetic-worktrees/main', 'branch refs/heads/feature/alpha-1', '')
+            Use-CodexPlannerScenario -Listing @('worktree /synthetic-worktrees/main', 'branch refs/heads/feature/alpha-1', '')
             (Invoke-CodexPlannerAdapter -Target '/synthetic-worktrees/main').Detail | Should -BeLike 'U2 *'
         }
         It 'adapter: refuses U3 for a locked target without reading its checkpoint' {
-            Set-CodexPlannerScenario -Listing @('worktree /synthetic-worktrees/session', 'branch refs/heads/main', '', "worktree $($script:Target)", 'branch refs/heads/feature/alpha-1', 'locked claude agent agent-alpha (pid 4242)', '')
+            Use-CodexPlannerScenario -Listing @('worktree /synthetic-worktrees/session', 'branch refs/heads/main', '', "worktree $($script:Target)", 'branch refs/heads/feature/alpha-1', 'locked claude agent agent-alpha (pid 4242)', '')
             (Invoke-CodexPlannerAdapter -Reader { throw 'reader must not run' }).Detail | Should -BeLike 'U3 *'
         }
         It 'adapter: reads the target orchestrator checkpoint path and refuses U4 when <Name>' -ForEach @(
@@ -159,7 +159,7 @@ Describe 'Codex planner worktree branch (issue #1161)' {
             $decision | Should -BeNullOrEmpty
         }
         It 'gate: denies a dirty recorded target even with --force (AC-9)' {
-            Set-CodexPlannerScenario -Git @{ status = @{ ExitCode = 0; Output = @(' M file.txt') } }
+            Use-CodexPlannerScenario -Git @{ status = @{ ExitCode = 0; Output = @(' M file.txt') } }
             $decision = Invoke-CodexWorktreeRemovalDecision -PayloadRaw (Get-CodexPlannerPayload -Command "git worktree remove --force $($script:Target)") -EpicCheckpointRaw '' -PlannerCheckpointRaw $script:Planner -TargetCheckpointReader { $null }
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly ("EPIC_WORKTREE_REMOVAL_BLOCKED: '$($script:Target)' requires a matching epic feature with merge_status merged or worktree_removed. Planner worktree: PLANNER_WORKTREE_DIRTY: branch 'feature/alpha-1' has uncommitted or untracked changes.")
         }
@@ -178,7 +178,7 @@ Describe 'Codex planner worktree branch (issue #1161)' {
             @{ Name = 'the branch is checked out twice'; Code = 'AMBIGUOUS'; Detail = "branch 'feature/alpha-1'*"; Cwd = $null; Listing = @('worktree /synthetic-worktrees/session', '', 'worktree /synthetic-worktrees/session/.claude/worktrees/agent-alpha', 'branch refs/heads/feature/alpha-1', '', 'worktree /synthetic-worktrees/copy', 'branch refs/heads/feature/alpha-1', ''); Git = @{}; Planner = $null; Epic = ''; Reader = { $null } }
             @{ Name = 'rev-parse fails'; Code = 'GIT_FAILED'; Detail = "branch 'feature/alpha-1'*"; Cwd = $null; Listing = $null; Git = @{ 'rev-parse' = @{ ExitCode = 128; Output = @() } }; Planner = $null; Epic = ''; Reader = { $null } }
         ) {
-            if ($null -ne $Listing) { Set-CodexPlannerScenario -Listing $Listing -Git $Git } else { Set-CodexPlannerScenario -Git $Git }
+            if ($null -ne $Listing) { Use-CodexPlannerScenario -Listing $Listing -Git $Git } else { Use-CodexPlannerScenario -Git $Git }
             $cwd = if ($Cwd) { $Cwd } else { $script:Session }
             $payload = [ordered]@{ tool_name = 'Bash'; tool_input = @{ command = "git worktree remove $($script:Target)" }; cwd = $cwd } | ConvertTo-Json -Compress -Depth 5
             $plannerText = if ($Planner) { $Planner } else { $script:Planner }

@@ -35,7 +35,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1 planner branch' {
         $script:Diagnostics = " Diagnostics: epic run SessionRoot (checkpoint '/synthetic-worktrees/default-session/artifacts/orchestration/epic-orchestrator-state.json'), no matching features[] record; parallel run SessionRoot (checkpoint '/synthetic-worktrees/default-session/artifacts/orchestration/parallel-orchestrator-state.json'), no matching items[] record."
         $script:DenySource = $source.Replace('""', '"')
 
-        function Set-GatePlannerScenario {
+        function Use-GatePlannerScenario {
             # Install the planner text, porcelain listing, and git results of one row.
             param([string] $Planner = $script:Planner, [string[]] $Listing = $script:Unlocked, [hashtable] $Git = @{})
             $script:PlannerText = $Planner
@@ -69,7 +69,7 @@ Describe 'enforce-epic-worktree-removal-gate.ps1 planner branch' {
 
     Context 'planner rows' {
         BeforeEach {
-            Set-GatePlannerScenario
+            Use-GatePlannerScenario
             Mock Get-EpicWorktreeGateCheckpointContent { '{"features":[]}' }
             Mock Get-EpicWorktreeGateParallelCheckpointContent { '{"route_id":"parallel","items":[]}' }
             Mock Get-PlannerWorktreeCheckpointText {
@@ -89,11 +89,11 @@ Describe 'enforce-epic-worktree-removal-gate.ps1 planner branch' {
             @{ Status = 'prepared'; Ref = 'branch'; Git = @{ integration = @{ ExitCode = 1; Output = @() }; branch = @{ ExitCode = 0; Output = @() } } }
             @{ Status = 'fanned_in'; Ref = 'branch'; Git = @{ integration = @{ ExitCode = 1; Output = @() }; branch = @{ ExitCode = 0; Output = @() } } }
         ) {
-            Set-GatePlannerScenario -Planner $script:Planner.Replace('"prepared"', """$Status""") -Git $Git
+            Use-GatePlannerScenario -Planner $script:Planner.Replace('"prepared"', """$Status""") -Git $Git
             (Invoke-EpicPlannerRow).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
         It 'denies a dirty target <Name> (AC-9)' -ForEach @(@{ Name = 'without --force'; Flag = '' }, @{ Name = 'with --force'; Flag = '--force ' }) {
-            Set-GatePlannerScenario -Git @{ status = @{ ExitCode = 0; Output = @('?? scratch.txt') } }
+            Use-GatePlannerScenario -Git @{ status = @{ ExitCode = 0; Output = @('?? scratch.txt') } }
             $reason = (Invoke-EpicPlannerRow -Command "git worktree remove $Flag$($script:Target)").hookSpecificOutput.permissionDecisionReason
             $reason | Should -BeLike "* Planner worktree: PLANNER_WORKTREE_DIRTY: branch 'feature/alpha-1' has uncommitted or untracked changes."
         }
@@ -112,18 +112,18 @@ Describe 'enforce-epic-worktree-removal-gate.ps1 planner branch' {
         ) {
             $listing = switch ($Listing) { 'locked' { $script:Locked } 'twice' { $script:Unlocked + @('worktree /synthetic-worktrees/copy', 'branch refs/heads/feature/alpha-1', '') } default { $script:Unlocked } }
             $planner = if ($Planner) { $Planner } else { $script:Planner }
-            Set-GatePlannerScenario -Planner $planner -Listing $listing -Git $Git
+            Use-GatePlannerScenario -Planner $planner -Listing $listing -Git $Git
             $reason = (Invoke-EpicPlannerRow).hookSpecificOutput.permissionDecisionReason
             $reason | Should -BeLike ([WildcardPattern]::Escape($script:DenySource.Replace('$worktreePath', $script:Target) + $script:Diagnostics) + " Planner worktree: PLANNER_WORKTREE_$($Code): *.")
             ([regex]::Matches($reason, 'EPIC_WORKTREE_REMOVAL_BLOCKED')).Count | Should -Be 1
         }
         It 'denies a locked target as U3 <Name> (AC-13)' -ForEach @(@{ Name = 'without --force'; Flag = '' }, @{ Name = 'with --force'; Flag = '--force ' }) {
-            Set-GatePlannerScenario -Listing $script:Locked
+            Use-GatePlannerScenario -Listing $script:Locked
             $reason = (Invoke-EpicPlannerRow -Command "git worktree remove $Flag$($script:Target)").hookSpecificOutput.permissionDecisionReason
             $reason | Should -BeLike '* Planner worktree: PLANNER_WORKTREE_IN_USE: U3 *'
         }
         It 'still allows through the manifest branch after a planner refusal (AC-20)' {
-            Set-GatePlannerScenario -Git @{ status = @{ ExitCode = 0; Output = @(' M a.txt') } }
+            Use-GatePlannerScenario -Git @{ status = @{ ExitCode = 0; Output = @(' M a.txt') } }
             Mock Test-CleanupWorktreeManifestAuthorizesRemoval { $true }
             (Invoke-EpicPlannerRow).hookSpecificOutput.permissionDecision | Should -Be 'allow'
             Should -Invoke Invoke-PlannerWorktreeGitExe -Times 2 -Exactly

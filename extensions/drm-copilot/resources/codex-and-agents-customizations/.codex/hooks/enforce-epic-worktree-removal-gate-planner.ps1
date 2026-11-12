@@ -111,7 +111,7 @@ function Get-CodexPlannerWorktreeRemovalDecision {
     $facts.BranchRootCount = $match.RootCount
     $facts.Record = $match.Candidate.Record
     $facts.IntegrationBranch = $match.Candidate.IntegrationBranch
-    $facts.U1 = (Test-PlannerWorktreePathEncloses -Outer $targetPath -Inner $workingRoot) -or (Test-PlannerWorktreePathEqual -Left $targetPath -Right (Get-NormalizedCodexWorktreePath -Path $RepositoryRoot -WorkingDirectory $WorkingDirectory))
+    $facts.U1 = (Test-PlannerWorktreePathEnclosure -Outer $targetPath -Inner $workingRoot) -or (Test-PlannerWorktreePathEqual -Left $targetPath -Right (Get-NormalizedCodexWorktreePath -Path $RepositoryRoot -WorkingDirectory $WorkingDirectory))
     $facts.U2 = Test-PlannerWorktreePathEqual -Left $targetPath -Right $mainRoot
     $facts.U3 = [bool] $match.Stanza.Locked
     $facts.U4 = $false

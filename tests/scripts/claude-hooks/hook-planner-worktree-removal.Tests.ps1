@@ -137,7 +137,7 @@ Describe 'hook-planner-worktree-removal.ps1 (<HelperPath>)' -ForEach @(
             @{ Outer = '/synthetic-worktrees/session/sub'; Inner = '/synthetic-worktrees/session'; Expected = $false }
             @{ Outer = ''; Inner = '/synthetic-worktrees/session'; Expected = $false }
         ) {
-            Test-PlannerWorktreePathEncloses -Outer $Outer -Inner $Inner | Should -Be $Expected
+            Test-PlannerWorktreePathEnclosure -Outer $Outer -Inner $Inner | Should -Be $Expected
         }
         It 'accepts a safe relative path <Path>: <Expected>' -ForEach @(
             @{ Path = '.claude/worktrees/agent-alpha'; Expected = $true }

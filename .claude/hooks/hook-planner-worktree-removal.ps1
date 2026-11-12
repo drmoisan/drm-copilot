@@ -57,7 +57,7 @@ function Test-PlannerWorktreePathEqual {
     return [string]::Equals($a, $b, $comparison)
 }
 
-function Test-PlannerWorktreePathEncloses {
+function Test-PlannerWorktreePathEnclosure {
     <#
     .SYNOPSIS
         Report whether Outer equals Inner or is an ancestor directory of it.
@@ -132,7 +132,7 @@ function ConvertFrom-PlannerWorktreeJson {
         The checkpoint text, or $null.
     #>
     [CmdletBinding()]
-    [OutputType([object])]
+    [OutputType([pscustomobject], [object[]])]
     param([AllowNull()] $Text)
 
     if ($Text -isnot [string] -or [string]::IsNullOrWhiteSpace($Text)) { return $null }
@@ -446,7 +446,7 @@ function Get-PlannerWorktreeGitFactArgument {
         The facts collected so far (Head, IntegrationBranch, Branch).
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [object[]])]
     param([Parameter(Mandatory)][ValidateSet('Status', 'Head', 'IntegrationAncestor', 'BranchAncestor')][string] $Pending, [Parameter(Mandatory)][string] $WorktreePath, [Parameter(Mandatory)][hashtable] $Facts)
 
     switch ($Pending) {

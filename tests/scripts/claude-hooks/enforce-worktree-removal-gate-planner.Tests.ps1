@@ -28,7 +28,7 @@ Describe 'enforce-worktree-removal-gate-planner.ps1' {
         $script:OrchestratorPath = 'artifacts/orchestration/orchestrator-state.json'
         $script:EpicPath = 'artifacts/orchestration/epic-orchestrator-state.json'
 
-        function Set-PlannerScenario {
+        function Use-PlannerScenario {
             # Install the in-memory reads and git results of one row; each argument overrides a default.
             param(
                 [object[]] $PlannerRead = @([pscustomobject]@{ Root = '/synthetic-worktrees/session'; Text = '{"integration_branch":"epic/alpha","planner_worktrees":[{"branch":"feature/alpha-1","purpose":"preparation","preparation_status":"prepared","feature_folder":"f"}]}' }),
@@ -66,7 +66,7 @@ Describe 'enforce-worktree-removal-gate-planner.ps1' {
 
     Context 'decision rows' {
         BeforeEach {
-            Set-PlannerScenario
+            Use-PlannerScenario
             Mock Get-PlannerWorktreeCheckpointText { @($script:Reads[$RelativePath]) }
             Mock Invoke-PlannerWorktreeGitExe {
                 param([string[]] $GitArgs)
@@ -83,7 +83,7 @@ Describe 'enforce-worktree-removal-gate-planner.ps1' {
             $decision.Suffix | Should -BeExactly ''
         }
         It 'runs exactly the listing and the target checks, in order, and allows through the branch ref' {
-            Set-PlannerScenario -Git @{ integration = @{ ExitCode = 1; Output = @() }; branch = @{ ExitCode = 0; Output = @() } }
+            Use-PlannerScenario -Git @{ integration = @{ ExitCode = 1; Output = @() }; branch = @{ ExitCode = 0; Output = @() } }
             $decision = Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session
             $decision.Outcome | Should -Be 'Allow'
             $expected = @(
@@ -97,15 +97,15 @@ Describe 'enforce-worktree-removal-gate-planner.ps1' {
             @($script:GitCalls | Where-Object { $_ -match '\b(fetch|pull|ls-remote)\b' }).Count | Should -Be 0
         }
         It 'allows a fanned_in record' {
-            Set-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = '{"integration_branch":"epic/alpha","planner_worktrees":[{"branch":"feature/alpha-1","purpose":"preparation","preparation_status":"fanned_in"}]}' })
+            Use-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = '{"integration_branch":"epic/alpha","planner_worktrees":[{"branch":"feature/alpha-1","purpose":"preparation","preparation_status":"fanned_in"}]}' })
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Outcome | Should -Be 'Allow'
         }
         It 'allows a record whose repository-relative path names the target' {
-            Set-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = '{"integration_branch":"epic/alpha","planner_worktrees":[{"branch":"feature/alpha-1","path":".claude/worktrees/agent-alpha","purpose":"preparation","preparation_status":"prepared"}]}' })
+            Use-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = '{"integration_branch":"epic/alpha","planner_worktrees":[{"branch":"feature/alpha-1","path":".claude/worktrees/agent-alpha","purpose":"preparation","preparation_status":"prepared"}]}' })
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Outcome | Should -Be 'Allow'
         }
         It 'returns NoRecord with zero git calls and one planner read when no planner checkpoint exists' {
-            Set-PlannerScenario -PlannerRead @()
+            Use-PlannerScenario -PlannerRead @()
             $decision = Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session
             $decision.Outcome | Should -Be 'NoRecord'
             $decision.Suffix | Should -BeExactly ''
@@ -114,18 +114,18 @@ Describe 'enforce-worktree-removal-gate-planner.ps1' {
             Should -Invoke Get-PlannerWorktreeCheckpointText -Times 1 -Exactly -ParameterFilter { $RelativePath -ceq 'artifacts/orchestration/epic-planner-state.json' -and $SessionRoot -ceq '/synthetic-worktrees/session' }
         }
         It 'returns NoRecord with zero git calls when the checkpoint holds no candidate' {
-            Set-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = '{"planner_worktrees":[{"branch":""}]}' })
+            Use-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = '{"planner_worktrees":[{"branch":""}]}' })
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Outcome | Should -Be 'NoRecord'
             $script:GitCalls.Count | Should -Be 0
         }
         It 'returns NoRecord after only the listing when the candidates name another branch' {
-            Set-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = '{"planner_worktrees":[{"branch":"feature/beta-2","purpose":"preparation","preparation_status":"prepared"}]}' })
+            Use-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = '{"planner_worktrees":[{"branch":"feature/beta-2","purpose":"preparation","preparation_status":"prepared"}]}' })
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Outcome | Should -Be 'NoRecord'
             $script:GitCalls.ToArray() | Should -Be @('-C /synthetic-worktrees/session worktree list --porcelain')
             Should -Invoke Get-PlannerWorktreeCheckpointText -Times 1 -Exactly
         }
         It 'never matches a detached target (AC-21)' {
-            Set-PlannerScenario -Listing @('worktree /synthetic-worktrees/session', 'branch refs/heads/main', '', "worktree $($script:Target)", 'HEAD abc1234', 'detached', '')
+            Use-PlannerScenario -Listing @('worktree /synthetic-worktrees/session', 'branch refs/heads/main', '', "worktree $($script:Target)", 'HEAD abc1234', 'detached', '')
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Outcome | Should -Be 'NoRecord'
         }
         It 'does not name the target when the record path <Name> (AC-21)' -ForEach @(
@@ -134,11 +134,11 @@ Describe 'enforce-worktree-removal-gate-planner.ps1' {
             @{ Name = 'has a dot segment'; Path = '.claude/worktrees/../worktrees/agent-alpha' }
         ) {
             $text = '{"planner_worktrees":[{"branch":"feature/alpha-1","path":"' + $Path + '","purpose":"preparation","preparation_status":"prepared"}]}'
-            Set-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = $text })
+            Use-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = $text })
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Outcome | Should -Be 'NoRecord'
         }
         It 'refuses GIT_FAILED when the listing fails while a candidate exists' {
-            Set-PlannerScenario -Git @{ worktree = @{ ExitCode = 128; Output = @() } }
+            Use-PlannerScenario -Git @{ worktree = @{ ExitCode = 128; Output = @() } }
             $decision = Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session
             $decision.Code | Should -BeExactly 'GIT_FAILED'
             $decision.Suffix | Should -BeLike " Planner worktree: PLANNER_WORKTREE_GIT_FAILED: branch 'feature/alpha-1': git worktree list exited 128."
@@ -151,17 +151,17 @@ Describe 'enforce-worktree-removal-gate-planner.ps1' {
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot "$($script:Target)/src").Detail | Should -BeLike 'U1 *'
         }
         It 'refuses IN_USE U1 when the target holds the matching planner checkpoint' {
-            Set-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Target; Text = '{"planner_worktrees":[{"branch":"feature/alpha-1","purpose":"preparation","preparation_status":"prepared"}]}' })
+            Use-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Target; Text = '{"planner_worktrees":[{"branch":"feature/alpha-1","purpose":"preparation","preparation_status":"prepared"}]}' })
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Detail | Should -BeLike 'U1 *'
         }
         It 'refuses IN_USE U2 when the target is the main checkout' {
-            Set-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = '/synthetic-worktrees/other'; Text = '{"planner_worktrees":[{"branch":"feature/alpha-1","purpose":"preparation","preparation_status":"prepared"}]}' }) -Listing @('worktree /synthetic-worktrees/main', 'branch refs/heads/feature/alpha-1', '')
+            Use-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = '/synthetic-worktrees/other'; Text = '{"planner_worktrees":[{"branch":"feature/alpha-1","purpose":"preparation","preparation_status":"prepared"}]}' }) -Listing @('worktree /synthetic-worktrees/main', 'branch refs/heads/feature/alpha-1', '')
             $decision = Get-PlannerWorktreeRemovalTargetDecision -WorktreePath '/synthetic-worktrees/main' -SessionRoot '/synthetic-worktrees/other'
             $decision.Code | Should -BeExactly 'IN_USE'
             $decision.Detail | Should -BeLike 'U2 *'
         }
         It 'refuses IN_USE U3 when the target stanza carries a locked line' {
-            Set-PlannerScenario -Listing @('worktree /synthetic-worktrees/session', 'branch refs/heads/main', '', "worktree $($script:Target)", 'branch refs/heads/feature/alpha-1', 'locked claude agent agent-alpha (pid 4242)', '')
+            Use-PlannerScenario -Listing @('worktree /synthetic-worktrees/session', 'branch refs/heads/main', '', "worktree $($script:Target)", 'branch refs/heads/feature/alpha-1', 'locked claude agent agent-alpha (pid 4242)', '')
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Detail | Should -BeLike 'U3 *'
             Should -Invoke Get-PlannerWorktreeCheckpointText -Times 1 -Exactly
         }
@@ -169,11 +169,11 @@ Describe 'enforce-worktree-removal-gate-planner.ps1' {
             @{ Name = 'unparseable'; Text = '{broken' }
             @{ Name = 'not at S5_atomic_execution'; Text = '{"next_step":"S7_pr_authoring"}' }
         ) {
-            Set-PlannerScenario -OrchestratorRead @([pscustomobject]@{ Root = $script:Target; Text = $Text })
+            Use-PlannerScenario -OrchestratorRead @([pscustomobject]@{ Root = $script:Target; Text = $Text })
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Detail | Should -BeLike 'U4 *'
         }
         It 'does not apply U4 to an absent target checkpoint or one held by another root' {
-            Set-PlannerScenario -OrchestratorRead @([pscustomobject]@{ Root = $script:Session; Text = '{"next_step":"S7_pr_authoring"}' }, [pscustomobject]@{ Root = $script:Target; Text = '{"next_step":"S5_atomic_execution"}' })
+            Use-PlannerScenario -OrchestratorRead @([pscustomobject]@{ Root = $script:Session; Text = '{"next_step":"S7_pr_authoring"}' }, [pscustomobject]@{ Root = $script:Target; Text = '{"next_step":"S5_atomic_execution"}' })
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Outcome | Should -Be 'Allow'
         }
         It 'refuses IN_USE U5 when a live epic checkpoint records the target through <Name>' -ForEach @(
@@ -181,21 +181,21 @@ Describe 'enforce-worktree-removal-gate-planner.ps1' {
             @{ Name = 'an absolute worktree_path'; Text = '{"route_id":"epic","features":[{"worktree_path":"/synthetic-worktrees/session/.claude/worktrees/agent-alpha"}]}' }
             @{ Name = 'branch_name'; Text = '{"route_id":"epic","features":[{"branch_name":"feature/alpha-1","worktree_path":"elsewhere"}]}' }
         ) {
-            Set-PlannerScenario -EpicRead @([pscustomobject]@{ Root = '/synthetic-worktrees/epic-root'; Text = $Text })
+            Use-PlannerScenario -EpicRead @([pscustomobject]@{ Root = '/synthetic-worktrees/epic-root'; Text = $Text })
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Detail | Should -BeLike 'U5 *'
         }
         It 'does not apply U5 to an epic checkpoint of another route or one recording another worktree' {
-            Set-PlannerScenario -EpicRead @([pscustomobject]@{ Root = $script:Session; Text = '{"route_id":"parallel","features":[{"branch_name":"feature/alpha-1"}]}' }, [pscustomobject]@{ Root = $script:Session; Text = '{"route_id":"epic","features":[{"worktree_path":".claude/worktrees/agent-beta"}]}' })
+            Use-PlannerScenario -EpicRead @([pscustomobject]@{ Root = $script:Session; Text = '{"route_id":"parallel","features":[{"branch_name":"feature/alpha-1"}]}' }, [pscustomobject]@{ Root = $script:Session; Text = '{"route_id":"epic","features":[{"worktree_path":".claude/worktrees/agent-beta"}]}' })
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Outcome | Should -Be 'Allow'
         }
         It 'refuses DIRTY when git status prints a change' {
-            Set-PlannerScenario -Git @{ status = @{ ExitCode = 0; Output = @('?? scratch.txt') } }
+            Use-PlannerScenario -Git @{ status = @{ ExitCode = 0; Output = @('?? scratch.txt') } }
             $decision = Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session
             $decision.Code | Should -BeExactly 'DIRTY'
             $decision.Suffix | Should -BeExactly " Planner worktree: PLANNER_WORKTREE_DIRTY: branch 'feature/alpha-1' has uncommitted or untracked changes."
         }
         It 'refuses NOT_PUSHED when neither remote-tracking ref holds the HEAD' {
-            Set-PlannerScenario -Git @{ integration = @{ ExitCode = 1; Output = @() }; branch = @{ ExitCode = 1; Output = @() } }
+            Use-PlannerScenario -Git @{ integration = @{ ExitCode = 1; Output = @() }; branch = @{ ExitCode = 1; Output = @() } }
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Code | Should -BeExactly 'NOT_PUSHED'
         }
         It 'refuses NOT_ELIGIBLE for <Name>' -ForEach @(
@@ -204,18 +204,18 @@ Describe 'enforce-worktree-removal-gate-planner.ps1' {
             @{ Name = 'an abandoned record'; Record = '"purpose":"preparation","preparation_status":"abandoned"' }
             @{ Name = 'another purpose'; Record = '"purpose":"review","preparation_status":"prepared"' }
         ) {
-            Set-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = '{"planner_worktrees":[{"branch":"feature/alpha-1",' + $Record + '}]}' })
+            Use-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = '{"planner_worktrees":[{"branch":"feature/alpha-1",' + $Record + '}]}' })
             $decision = Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session
             $decision.Code | Should -BeExactly 'NOT_ELIGIBLE'
             $script:GitCalls.Count | Should -Be 1
         }
         It 'refuses AMBIGUOUS when records in two planner checkpoints name the target' {
             $text = '{"planner_worktrees":[{"branch":"feature/alpha-1","purpose":"preparation","preparation_status":"prepared"}]}'
-            Set-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = $text }, [pscustomobject]@{ Root = '/synthetic-worktrees/session/.claude/worktrees/agent-beta'; Text = $text })
+            Use-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = $text }, [pscustomobject]@{ Root = '/synthetic-worktrees/session/.claude/worktrees/agent-beta'; Text = $text })
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Code | Should -BeExactly 'AMBIGUOUS'
         }
         It 'refuses AMBIGUOUS when the branch is checked out in two live roots' {
-            Set-PlannerScenario -Listing @('worktree /synthetic-worktrees/session', 'branch refs/heads/main', '', "worktree $($script:Target)", 'branch refs/heads/feature/alpha-1', '', 'worktree /synthetic-worktrees/copy', 'branch refs/heads/feature/alpha-1', '')
+            Use-PlannerScenario -Listing @('worktree /synthetic-worktrees/session', 'branch refs/heads/main', '', "worktree $($script:Target)", 'branch refs/heads/feature/alpha-1', '', 'worktree /synthetic-worktrees/copy', 'branch refs/heads/feature/alpha-1', '')
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Code | Should -BeExactly 'AMBIGUOUS'
         }
         It 'refuses GIT_FAILED when <Name>' -ForEach @(
@@ -224,11 +224,11 @@ Describe 'enforce-worktree-removal-gate-planner.ps1' {
             @{ Name = 'the integration check exits 128'; Git = @{ integration = @{ ExitCode = 128; Output = @() } } }
             @{ Name = 'the branch check exits 128'; Git = @{ integration = @{ ExitCode = 1; Output = @() }; branch = @{ ExitCode = 128; Output = @() } } }
         ) {
-            Set-PlannerScenario -Git $Git
+            Use-PlannerScenario -Git $Git
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Code | Should -BeExactly 'GIT_FAILED'
         }
         It 'tests only the branch ref when the planner checkpoint records no integration branch' {
-            Set-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = '{"planner_worktrees":[{"branch":"feature/alpha-1","purpose":"preparation","preparation_status":"prepared"}]}' }) -Git @{ branch = @{ ExitCode = 0; Output = @() } }
+            Use-PlannerScenario -PlannerRead @([pscustomobject]@{ Root = $script:Session; Text = '{"planner_worktrees":[{"branch":"feature/alpha-1","purpose":"preparation","preparation_status":"prepared"}]}' }) -Git @{ branch = @{ ExitCode = 0; Output = @() } }
             (Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $script:Target -SessionRoot $script:Session).Outcome | Should -Be 'Allow'
             @($script:GitCalls | Where-Object { $_ -like '*merge-base*' }) | Should -Be @("-C $($script:Target) merge-base --is-ancestor abc1234 refs/remotes/origin/feature/alpha-1")
         }

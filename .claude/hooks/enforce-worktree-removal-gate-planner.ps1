@@ -119,7 +119,7 @@ function Get-PlannerWorktreeRemovalTargetDecision {
     $facts.BranchRootCount = $match.RootCount
     $facts.Record = $match.Entry.Candidate.Record
     $facts.IntegrationBranch = $match.Entry.Candidate.IntegrationBranch
-    $facts.U1 = (Test-PlannerWorktreePathEncloses -Outer $WorktreePath -Inner $SessionRoot) -or (Test-WorktreeRunPathEqual -Left $WorktreePath -Right $match.Entry.Root)
+    $facts.U1 = (Test-PlannerWorktreePathEnclosure -Outer $WorktreePath -Inner $SessionRoot) -or (Test-WorktreeRunPathEqual -Left $WorktreePath -Right $match.Entry.Root)
     $facts.U2 = Test-WorktreeRunPathEqual -Left $WorktreePath -Right $mainRoot
     $facts.U3 = [bool] $match.Stanza.Locked
     $facts.U4 = $false
