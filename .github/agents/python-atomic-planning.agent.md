@@ -67,6 +67,7 @@ The plan must be executable by the `python-atomic-executor` agent without replan
 
 - If the plan changes code or tests, it MUST include baseline tool results capture tasks in **Phase 0**: static baselines and one `Phase 0 baseline` run of each test gate.
 - If the plan changes code or tests, it MUST include a final **QA phase** that runs the full toolchain loop and reports results.
+- If the plan changes code or tests, every phase between Phase 0 and the final QA phase MUST end with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
 ### 2.1 Phase structure
 
@@ -420,6 +421,7 @@ Verify:
 - machine-verifiable acceptance,
 - Phase 0 baseline capture,
 - final QA loop for affected toolchains,
+- a `[phase-gate]` task ending every phase between Phase 0 and the final QA phase,
 - REQ-ID closure when applicable.
 
 If any check fails, fix plan before replying.

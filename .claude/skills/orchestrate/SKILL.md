@@ -138,7 +138,7 @@ The mandate is enforced mechanically, so DONE cannot be written while a human-in
 After reading `artifacts/orchestration/orchestrator-state.json`, the main session delegates work exclusively through configured workers:
 
 - `atomic-planner` — generates phased implementation plans
-- `atomic-executor` — executes approved plans task-by-task
+- `atomic-executor` — executes approved plans task-by-task. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 - `feature-review` — produces policy, code, and feature audit artifacts
 - `task-researcher` — performs deep research and writes findings to the research path the orchestrator resolves before delegating: `docs/features/<feature>/research/` when an active `feature-folder` is in scope in `orchestrator-state.json`, otherwise `docs/research/` for one-off research. The orchestrator passes the resolved path in the delegation prompt.
 
@@ -292,7 +292,7 @@ Remediation mode. Before R1, or before R3 for a light cycle, the orchestrator wr
 
 - **R1 — Remediation planning:** Delegate to `atomic-planner` with `remediation-inputs.<timestamp>.md` path as primary context. Receive `remediation-plan.<timestamp>.md` in the active feature folder.
 - **R2 — Preflight clearance:** Delegate to `atomic-executor` for precondition validation only (no implementation), with the preflight directive in the delegation prompt. Trivial defects are fixed in place. If the executor returns `PREFLIGHT: REVISIONS REQUIRED`, return to R1 once and re-delegate to `atomic-planner` with the full `PREFLIGHT-DEFECT:` list; if the following preflight still reports a substantive defect, record `final_status: "blocked_preflight_iteration_limit"` on the cycle and halt per `.claude/skills/remediation-handoff-atomic-planner/SKILL.md`. Only after `PREFLIGHT: ALL CLEAR` may the orchestrator advance to R3.
-- **R3 — Remediation execution:** Delegate to `atomic-executor` with full execution authorization. Each task's toolchain loop (format → lint → type-check → test) is mandatory; no skipping.
+- **R3 — Remediation execution:** Delegate to `atomic-executor` with full execution authorization. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 - **Pre-R4 commit:** Stage all changes (`git add -A`), delegate to `Agent(commit-message)` to generate a commit message from the staged diff (the agent returns message text only and does not commit), then commit with the generated message. The `git commit` action remains on the orchestrator. Advance to R4 only after a successful commit.
 - **R4 — Re-audit:** Delegate to `feature-review` with the same inputs as the original review (resolved base branch, feature folder, refreshed PR context artifacts, acceptance-criteria source). No scope narrowing. The canonical issue number line must be included.
 - **R5 — Loop-exit decision:** Evaluate the re-audit per Post-Review Outcome Evaluation. If it produces zero blocking findings, exit the loop and advance to the PR creation gate. If its verdict is `HALT_NON_REMEDIABLE` or `AWAITING_CI`, follow the halt or wait branch instead of opening the next cycle. Otherwise, record the cycle's `candidate_applied` value and the resulting `completed_attempts` in the checkpoint and return to R1.

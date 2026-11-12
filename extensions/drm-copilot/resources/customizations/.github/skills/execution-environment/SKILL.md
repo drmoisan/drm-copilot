@@ -55,6 +55,7 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
 - The MCP test tool reads the installed extension's settings. Branch-current Pester runs import `scripts/powershell/PoshQC/PoshQC.psd1` and call `Invoke-PoshQCParallelTest` from a `sh`-launched PowerShell 7. The coverage population is derived by `Invoke-PoshQCTest`, which each shard runs, from `config/poshqc-coverage.json`; there is no hand-maintained coverage path list.
 - `Invoke-PoshQCParallelTest` returns an object whose `ExitCode` is read first, and the launcher exits with that value. Merged JUnit and coverage exist only after a fully green run, and a failed run can leave older merged files in place. Failure detail is under `artifacts/pester/parallel/shard-<i>/`.
 - `Invoke-Pester` without `-EnableExit` (or `Run.Exit`) exits 0 when tests fail; read the JUnit file rather than the exit code of such a run.
+- A task check runs Pester on the selected test files through `New-PesterConfiguration` with `Run.Path` set to those files and `Run.Exit` set to `$true`, so its exit status reflects failures; it is not a gate.
 - No MCP tool exposes `Invoke-PoshQCLeakScan`. The executor reaches it through the `sh` launcher route, importing the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and calling `Invoke-PoshQCLeakScan -Root`; the scan throws on any failure, so the launcher exits non-zero.
 
 ## Batch Budget
@@ -144,6 +145,7 @@ Run these after editing any mirrored or bundled file; each is under `tests/scrip
 - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
 - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`: the concurrent-review text of issue #1097 in the orchestrate and parallel-orchestrate skills, the orchestrator-state rule, the orchestrator agent, and their mirrors.
 - `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`: the light-remediation text of issue #1097 in the review and orchestration surfaces and their mirrors.
+- `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`: the test-cadence wording of issue #1167 in the six `atomic-plan-contract` copies and the referring surfaces, the sweep for per-task full-suite wording, and the byte identity of the edited Copilot files and their bundles.
 
 ## Preflight Defect Classes the Validator Cannot See
 
@@ -184,7 +186,7 @@ These pass every validator rule and are found only by reading the plan against t
 - Fix repeated production work first. An immutable structure, such as a schema registry that is rebuilt and re-verified on every call, is built once per owning instance. This speeds up the runtime as well as the tests.
 - Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
 - Parallel workers reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
-- pytest: pass `-n auto` (pytest-xdist) on the command line of the CI step `Run tests with Pytest`, of the parallel VS Code tasks, of the `fix_all` pytest step, and of the full-suite pytest commands of the atomic executor tool (its preflight QC, its full QC loop, and the commands its prompts state), never in `addopts`, because the VS Code Test Explorer keys results to the wrong file when `addopts` carries it. `-n auto` counts physical cores, so a runner can start fewer workers than it has vCPUs; measure it against an explicit count such as `-n 4` before keeping it. pytest-cov combines the worker coverage into one report.
+- pytest: pass `-n auto` (pytest-xdist) on the command line of the CI step `Run tests with Pytest`, of the parallel VS Code tasks, of the `fix_all` pytest step, and of the full-suite pytest commands of the atomic executor tool (its preflight QC, its phase-gate QC loop, and the commands its prompts state), never in `addopts`, because the VS Code Test Explorer keys results to the wrong file when `addopts` carries it. `-n auto` counts physical cores, so a runner can start fewer workers than it has vCPUs; measure it against an explicit count such as `-n 4` before keeping it. pytest-cov combines the worker coverage into one report.
 - Pester: parallel validation uses separate Pester 6 processes: `Invoke-PoshQCTest -ShardIndex -ShardCount` on the CI runners and `Invoke-PoshQCParallelTest` locally. Read the per-file `time` of the JUnit `testsuite` elements before changing the shard count or the weights in `config/poshqc-shard-weights.json`.
 - A candidate fix can be measured before the tree is edited by loading a pytest plugin module from `SCRATCH` with `-p <module>` and `PYTHONPATH`.
 
@@ -197,6 +199,7 @@ These pass every validator rule and are found only by reading the plan against t
   - Jest runs through its normal parallel workers.
 - Each gate reaches zero failures and is re-run only after a fix.
 - A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence.
+- A task check under `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill runs the task's test selection; its selection and results are recorded as task-check evidence, never as a gate result or coverage evidence.
 - Serial tasks remain for debugging one failure and are not gates.
 - A leak found by a gate is fixed on both sides: the suite that leaves state behind (globals, functions, environment variables, mocks, imported modules, script-scope state) and the suite that assumes prior state.
 - The parallel gates govern where a policy file names a toolchain test command.

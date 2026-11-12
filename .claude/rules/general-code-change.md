@@ -42,6 +42,8 @@ Run the full seven-stage toolchain in this exact order and repeat until all stag
 
 **Restart from step 1** if any stage fails or auto-fixes any files. Do not stop the loop until all seven stages complete without errors in a single pass.
 
+This loop is the phase-gate and final-QA requirement; integration tests (stage 7) run in CI for phase gates and the final QA loop. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+
 Mutation testing and golden tests run in pre-merge or nightly pipelines, not the per-commit loop.
 
 ## File Size Limit

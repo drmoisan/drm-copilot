@@ -37,6 +37,7 @@
 
 **Phase 3 — Minimal Fix**
 - [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+- [ ] [P3-T2] [phase-gate] Run the full toolchain loop (stages 1 to 6) per `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill and record `<FEATURE>/evidence/qa-gates/phase-gate.P3.<timestamp>.md`
 
 **Phase 4 — Verification Loop**
 - [ ] [P4-T1] Re-run the repro to confirm expected behavior
