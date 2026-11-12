@@ -56,7 +56,7 @@ For EACH task:
 2) Verify stated preconditions
 3) Perform ONLY work required by the task (bounded micro-actions allowed)
 4) Verify acceptance criteria
-5) Run required toolchains as specified or implied
+5) Run the task check; a `[phase-gate]` task runs the full toolchain loop instead. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 6) Check off the task ONLY when verification passes
 
 [expect-fail] tasks:
