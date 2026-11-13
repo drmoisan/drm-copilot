@@ -62,7 +62,7 @@ The scheduler's rule (`cost * 100 > benefit * tolerance_percent`) has the right 
 - [x] US-AC10 (issue AC4; spec B6.4, B6.6): Legacy precedence entries without `kind` are honoured unchanged and not re-tested, `precedence_not_justified` is listed in `$script:AdmissionRejectionCode`, the helper description, and the rule's admission output signal paragraph, and no agent `tools:` frontmatter changes.
 - [x] US-AC11 (issue AC5; spec B9): A push-down overlay test with `config/blast-radius.local.json` overriding `weights.same_file` composes the overridden value over the recalibrated base, and the base-only `weights.separable` passes through.
 - [x] US-AC12 (issue AC5; spec Implementation Strategy, rollout): Every changed or new file under `.claude/` has a byte-equal bundled copy under `extensions/drm-copilot/resources/claude-customizations/.claude/`, every new file has a `core.json` pack-manifest entry, and the push-down resource, pack-manifest completeness, dependency-closure, and config-parity contract tests pass.
-- [ ] US-AC13 (issue AC6; spec B3, B10.4, rollout): The PR body states that the default scheduling behaviour changes as directed by the owner (OD-1164-1), and that the new validator rules apply through MCP only after the next extension release.
+- [x] US-AC13 (issue AC6; spec B3, B10.4, rollout): The PR body states that the default scheduling behaviour changes as directed by the owner (OD-1164-1), and that the new validator rules apply through MCP only after the next extension release.
 
 ## Non-Goals
 
