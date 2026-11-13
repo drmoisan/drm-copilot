@@ -40,9 +40,9 @@
   - Acceptance: `<FEATURE>/evidence/remediation-baseline/pester-gate.<timestamp>.md` records `EXIT_CODE:` equal to the returned `ExitCode`; pass and fail counts from `artifacts/pester/pester-junit.xml`, or from the shard files under `artifacts/pester/parallel/` when the run is not green; repo-wide line coverage; and per-file line coverage of `BlastRadiusAccess.psm1` from `artifacts/pester/powershell-coverage.xml`. Every failing test is classified with the Execution Terms.
 - [x] [P0-T4] Run the pytest `Phase 0 baseline`: one `pytest -n auto` run over `tests/` with `--cov-branch`, `--cov-report=term-missing`, `--cov-report=json:SCRATCH/issue-1164-cov-r2-baseline.json`, and a bare `--cov` as the last argument.
   - Acceptance: `<FEATURE>/evidence/remediation-baseline/pytest-gate.<timestamp>.md` records pass and fail counts, repo-wide line and branch coverage, and per-file line and branch coverage of `scripts/dev_tools/_parallel_state_records.py` from the JSON report.
-- [ ] [P0-T5] Run the extension Jest `Phase 0 baseline` in `extensions/drm-copilot/`: one `node run-jest.cjs --coverage` run.
+- [x] [P0-T5] Run the extension Jest `Phase 0 baseline` in `extensions/drm-copilot/`: one `node run-jest.cjs --coverage` run.
   - Acceptance: `<FEATURE>/evidence/remediation-baseline/jest-gate.<timestamp>.md` records pass and fail counts and per-file line and branch coverage of `src/lib/validate/parallel-state-shared.ts` from the coverage report the run writes.
-- [ ] [P0-T6] Run the root Jest `Phase 0 baseline` at the worktree root under `jest.config.cjs`: one `node run-jest.cjs --coverage` run, writing `coverage/lcov.info`.
+- [x] [P0-T6] Run the root Jest `Phase 0 baseline` at the worktree root under `jest.config.cjs`: one `node run-jest.cjs --coverage` run, writing `coverage/lcov.info`.
   - Acceptance: `<FEATURE>/evidence/remediation-baseline/jest-root-gate.<timestamp>.md` records pass and fail counts and the repo-wide line and branch coverage of the root configuration, read from the run's coverage summary.
 
 ### Phase 1 — Corrections
