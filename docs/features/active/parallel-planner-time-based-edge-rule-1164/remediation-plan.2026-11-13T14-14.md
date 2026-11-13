@@ -73,7 +73,7 @@
   - Existing tests: `tests/scripts/claude-runtime/parallel-scheduling-rule-wording.Tests.ps1` is unchanged, because no token it requires lies in `## Enforcement` and the new text carries none of its `FormerStatement` tokens. `test_push_down_claude_resource_contracts.py` pins the mirror.
   - Task check selection: `parallel-scheduling-rule-wording.Tests.ps1` and `test_push_down_claude_resource_contracts.py`.
   - Acceptance: both rule copies are byte-equal. `git grep -c -F -e str.isprintable -- .claude/rules/parallel-orchestration.md extensions/drm-copilot/resources/claude-customizations/.claude/rules/parallel-orchestration.md` reports a count of 1 for each file. The same command with the pattern `Unicode database` also reports 1 for each file. Neither token occurs in either copy before this task.
-- [ ] [P1-T5] [phase-gate] Run stages 1 to 6 of the toolchain loop across the repository, as `## Test Cadence (Mandatory)` defines. The unit stage is one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal workers in `extensions/drm-copilot/` and at the worktree root.
+- [x] [P1-T5] [phase-gate] Run stages 1 to 6 of the toolchain loop across the repository, as `## Test Cadence (Mandatory)` defines. The unit stage is one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal workers in `extensions/drm-copilot/` and at the worktree root.
   - Acceptance: `<FEATURE>/evidence/qa-gates/phase-gate.P1.<timestamp>.md` records each stage's command and exit code. One clean pass completes with zero failing tests and no auto-fixed file. A failure or auto-fix is fixed and the loop restarts at stage 1.
 
 ### Phase 2 — Final QA loop and self-review
