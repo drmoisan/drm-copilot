@@ -300,5 +300,5 @@ Dependencies: none added. Logging: deny reasons and stop-hook block reasons are 
 - [x] Every acceptance criterion above is mapped to a named test or contract assertion in the plan.
 - [ ] Toolchain loop passes in a single pass (format, lint, type check where applicable, architecture, one parallel unit-test run, contract checks, integration).
 - [x] Mirror and bundle parity verified by the push-down contract tests.
-- [ ] Evidence recorded append-only under `docs/features/active/owner-directive-pass-down-1157/evidence/`.
+- [x] Evidence recorded append-only under `docs/features/active/owner-directive-pass-down-1157/evidence/`.
 - [ ] CI green on the PR head after the final `origin/main` merge and digest recompute.
