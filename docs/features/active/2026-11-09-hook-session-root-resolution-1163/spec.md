@@ -238,7 +238,7 @@ Bundle mirrors live at the same relative path under `extensions/drm-copilot/reso
 - [x] AC-31: No Python file is added or modified by this item, and no changed hook invokes Python.
 - [x] AC-32: All new and changed tests use in-memory POSIX-style roots, create no temporary files, and contain no sleep, wall-clock wait, or retry; `Invoke-PoshQCLeakScan` reports no leak.
 - [x] AC-33: A single `Invoke-PoshQCParallelTest` run passes with every new and changed suite included, and line coverage in `artifacts/pester/powershell-coverage.xml` is at least 85% for each new or changed production PowerShell file named in this spec; evidence is written append-only under `docs/features/active/2026-11-09-hook-session-root-resolution-1163/evidence/` and contains no absolute path or host name.
-- [ ] AC-34 (CI-dependent): CI on the PR head is fully green, including the Linux hook-suite job. This criterion is verified after the PR exists and is checked off at S9 by the item's own orchestrator run.
+- [x] AC-34 (CI-dependent): CI on the PR head is fully green, including the Linux hook-suite job. This criterion is verified after the PR exists and is checked off at S9 by the item's own orchestrator run.
 
 ## Risks and Mitigations
 
