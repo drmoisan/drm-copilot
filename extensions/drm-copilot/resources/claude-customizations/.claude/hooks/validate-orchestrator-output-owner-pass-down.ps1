@@ -24,8 +24,9 @@
     repairable. The clock is read once, after at least one candidate entry exists.
 
 .NOTES
-    PowerShell 7+. The file read, the clock, the parent resolver, the child resolver, and the
-    item-branch reader are functions that tests mock. Mirrored byte-identically under
+    PowerShell 7+. File reads go through Get-CheckpointFileContent, the stop hook's file seam,
+    which the stop-hook suites already mock. The clock, the parent resolver, the child resolver,
+    and the item-branch reader are functions that tests mock. Mirrored byte-identically under
     extensions/drm-copilot/resources/claude-customizations/.
 #>
 
@@ -41,19 +42,29 @@ function Get-OrchestratorOutputOwnerPassDownClock {
     return [DateTime]::UtcNow
 }
 
-function Read-OrchestratorOutputOwnerPassDownText {
+function Get-OrchestratorOutputOwnerPassDownSourceText {
     <#
     .SYNOPSIS
-        File seam: the text of a file, or $null when it does not exist or cannot be read.
+        The text of a ledger, parent checkpoint, or child checkpoint, or $null when the source is absent.
+    .DESCRIPTION
+        Reads through Get-CheckpointFileContent, the stop hook's file seam. A thrown read, a $null
+        result, Exists false, and blank content are absent. Content ordinally equal to the
+        checkpoint under validation is also absent: a source file is never the checkpoint itself.
     .PARAMETER Path
         The absolute path.
+    .PARAMETER CheckpointText
+        The text of the checkpoint under validation.
     #>
     [CmdletBinding()]
     [OutputType([string])]
-    param([Parameter(Mandatory = $true)] [string] $Path)
+    param([Parameter(Mandatory = $true)] [string] $Path, [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $CheckpointText)
 
-    if (-not [System.IO.File]::Exists($Path)) { return $null }
-    try { return [System.IO.File]::ReadAllText($Path) } catch { return $null }
+    try { $file = Get-CheckpointFileContent -Path $Path } catch { return $null }
+    if ($null -eq $file -or -not $file.Exists) { return $null }
+    $content = [string] $file.Content
+    if ([string]::IsNullOrWhiteSpace($content)) { return $null }
+    if ([string]::Equals($content, $CheckpointText, [System.StringComparison]::Ordinal)) { return $null }
+    return $content
 }
 
 function Get-OrchestratorOutputOwnerPassDownValue {
@@ -268,7 +279,7 @@ function Get-OrchestratorOutputOwnerPassDownParentDecision {
             $probe.Resolution = if ($null -eq $resolved) { 'NoTarget' } else { [string] $resolved.Status }
         }
         else {
-            $childText = Read-OrchestratorOutputOwnerPassDownText -Path (Join-Path ([string] $resolved.WorktreeRoot) 'artifacts/orchestration/orchestrator-state.json')
+            $childText = Get-OrchestratorOutputOwnerPassDownSourceText -Path (Join-Path ([string] $resolved.WorktreeRoot) 'artifacts/orchestration/orchestrator-state.json') -CheckpointText $CheckpointText
             $childCheckpoint = ConvertFrom-OrchestratorOutputOwnerPassDownJson -Text $childText
             if ($null -eq $childCheckpoint) { $probe.Resolution = 'Unreadable' }
             else {
@@ -322,8 +333,8 @@ function Get-OrchestratorOutputOwnerPassDownItemDecision {
         if ($null -ne $resolved -and [string] $resolved.Status -in @('SessionRoot', 'OtherWorktree') -and -not [string]::IsNullOrWhiteSpace([string] $resolved.WorktreeRoot)) {
             $parent = $resolved
             $relative = if ($parent.Kind -eq 'epic') { 'artifacts/orchestration/epic-orchestrator-state.json' } else { 'artifacts/orchestration/parallel-orchestrator-state.json' }
-            $parentCheckpointText = Read-OrchestratorOutputOwnerPassDownText -Path (Join-Path ([string] $parent.WorktreeRoot) $relative)
-            $parentLedgerText = Read-OrchestratorOutputOwnerPassDownText -Path (Join-Path ([string] $parent.WorktreeRoot) 'artifacts/orchestration/owner-directives.jsonl')
+            $parentCheckpointText = Get-OrchestratorOutputOwnerPassDownSourceText -Path (Join-Path ([string] $parent.WorktreeRoot) $relative) -CheckpointText $CheckpointText
+            $parentLedgerText = Get-OrchestratorOutputOwnerPassDownSourceText -Path (Join-Path ([string] $parent.WorktreeRoot) 'artifacts/orchestration/owner-directives.jsonl') -CheckpointText $CheckpointText
             if (Test-OrchestratorOutputOwnerPassDownSource -CheckpointText $parentCheckpointText -LedgerText $parentLedgerText) { $active = $true }
         }
     }
@@ -390,7 +401,7 @@ function Get-OrchestratorOutputOwnerPassDownDecision {
         'parallel-orchestrator-state' { 'parallel' }
         default { if ($routeId -ceq 'epic' -or $routeId -ceq 'parallel') { $routeId } else { 'item' } }
     }
-    $ledgerText = Read-OrchestratorOutputOwnerPassDownText -Path (Join-Path $WorktreeRoot 'artifacts/orchestration/owner-directives.jsonl')
+    $ledgerText = Get-OrchestratorOutputOwnerPassDownSourceText -Path (Join-Path $WorktreeRoot 'artifacts/orchestration/owner-directives.jsonl') -CheckpointText $CheckpointText
     if ($kind -eq 'item') {
         return (Get-OrchestratorOutputOwnerPassDownItemDecision -Checkpoint $checkpoint -CheckpointText $CheckpointText -LedgerText $ledgerText -WorktreeRoot $WorktreeRoot -SessionRoot $SessionRoot)
     }

@@ -20,7 +20,9 @@ BeforeAll {
     Import-Module (Join-Path $script:RepoRoot '.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1') -Force -ErrorAction Stop
     Import-Module (Join-Path $script:RepoRoot '.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectiveSelection.psm1') -Force -ErrorAction Stop
     . (Join-Path $script:RepoRoot '.claude/hooks/validate-orchestrator-output-owner-pass-down.ps1')
-    Mock Read-OrchestratorOutputOwnerPassDownText { $null }
+    # The file seam lives in validate-orchestrator-output.ps1, which this suite does not load; the stub gives the mock parameter parity.
+    function Get-CheckpointFileContent { param([string] $Path) $null = $Path }
+    Mock Get-CheckpointFileContent { $null }
 
     $script:Item = '/synthetic-worktrees/item-1157'
     $script:Epic = '/synthetic-worktrees/epic'
@@ -60,7 +62,11 @@ BeforeAll {
         foreach ($key in $Files.Keys) { $script:Map[$key] = $Files[$key] }
         $script:ParentResult = $Parent
         $script:ChildResult = if ($null -ne $Child) { $Child } else { [pscustomobject]@{ Status = 'Resolved'; WorktreeRoot = '/synthetic-worktrees/item-1157' } }
-        Mock Read-OrchestratorOutputOwnerPassDownText { $script:Map[([string] $Path).Replace('\', '/')] }
+        Mock Get-CheckpointFileContent {
+            $key = ([string] $Path).Replace('\', '/')
+            if ($script:Map.ContainsKey($key)) { return @{ Exists = $true; Content = $script:Map[$key] } }
+            return @{ Exists = $false; Content = $null }
+        }
         Mock Get-OrchestratorOutputOwnerPassDownClock { [datetime]::new(2026, 11, 10, 12, 0, 0, [System.DateTimeKind]::Utc) }
         Mock Resolve-OrchestratorOutputOwnerPassDownChild { $script:ChildResult }
         Mock Get-OrchestratorOutputOwnerPassDownItemBranch { 'feature/owner-directive-pass-down-1157' }
@@ -237,8 +243,7 @@ Describe 'key gate and clock (AC-34, AC-25 stop part)' {
 }
 
 Describe 'default seams' {
-    It 'reads nothing for an absent path and returns a UTC clock value' {
-        Read-OrchestratorOutputOwnerPassDownText -Path '/synthetic-worktrees/absent/file.json' | Should -BeNullOrEmpty
+    It 'returns a UTC clock value' {
         (Get-OrchestratorOutputOwnerPassDownClock).Kind | Should -Be ([System.DateTimeKind]::Utc)
     }
 
@@ -258,5 +263,50 @@ Describe 'default seams' {
         (Resolve-OrchestratorOutputOwnerPassDownChild -Issue '1157' -SessionRoot '/synthetic-worktrees/main').Status | Should -BeExactly 'Resolved'
         Mock Resolve-HookTargetWorktree { [pscustomobject]@{ WorktreeRoot = $null; ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS' } }
         (Resolve-OrchestratorOutputOwnerPassDownChild -Issue '1157' -SessionRoot '/synthetic-worktrees/main').Status | Should -BeExactly 'TARGET_WORKTREE_AMBIGUOUS'
+    }
+}
+
+Describe 'source read seam (F1)' {
+    It 'treats <Case> as an absent source' -ForEach @(
+        @{ Case = 'a thrown read'; Read = { throw 'synthetic read failure' } }
+        @{ Case = 'a $null result'; Read = { $null } }
+        @{ Case = 'an Exists false result'; Read = { @{ Exists = $false; Content = '{"id":"OD-1"}' } } }
+        @{ Case = 'blank content'; Read = { @{ Exists = $true; Content = "  `n" } } }
+        @{ Case = 'content equal to the checkpoint text'; Read = { @{ Exists = $true; Content = '{"route_id":"epic"}' } } }
+    ) {
+        # Arrange
+        Mock Get-CheckpointFileContent $Read
+
+        # Act
+        $text = Get-OrchestratorOutputOwnerPassDownSourceText -Path '/synthetic-worktrees/epic/artifacts/orchestration/owner-directives.jsonl' -CheckpointText '{"route_id":"epic"}'
+
+        # Assert
+        $text | Should -BeNullOrEmpty
+        Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq '/synthetic-worktrees/epic/artifacts/orchestration/owner-directives.jsonl' }
+    }
+
+    It 'returns content distinct from the checkpoint text' {
+        # Arrange
+        Mock Get-CheckpointFileContent { @{ Exists = $true; Content = '{"id":"OD-1"}' } }
+
+        # Act
+        $text = Get-OrchestratorOutputOwnerPassDownSourceText -Path '/synthetic-worktrees/epic/artifacts/orchestration/owner-directives.jsonl' -CheckpointText '{"route_id":"epic"}'
+
+        # Assert
+        $text | Should -BeExactly '{"id":"OD-1"}'
+    }
+
+    It 'treats a parent ledger read that returns the checkpoint text as absent' {
+        # Arrange: an epic checkpoint with one valid directive and no running child; every read returns the checkpoint text.
+        Register-PassDownStopSeam -Files @{}
+        $checkpointText = Get-PassDownStopParent -Kind epic -Status 'merged' -Directive @(Get-PassDownStopEntry)
+        Mock Get-CheckpointFileContent { @{ Exists = $true; Content = $checkpointText } }.GetNewClosure()
+
+        # Act
+        $decision = Invoke-PassDownStop -ArtifactType 'epic-orchestrator-state' -Root $script:Epic -CheckpointText $checkpointText
+
+        # Assert
+        $decision | Should -BeNullOrEmpty
+        Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly
     }
 }
