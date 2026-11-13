@@ -94,6 +94,7 @@ BeforeAll {
         'enforce-parallel-drift-gate.ps1'        = 'gates parallel delegations; the workflow is not a parallel run'
         'enforce-docs-role-write-scope.ps1'      = 'acts only for the four documentation roles; the workflow runs in the main session, which carries no agent_type'
         'enforce-worktree-poetry-venv.ps1'       = 'denies mutating Poetry commands aimed at an outside VIRTUAL_ENV; the workflow runs no Poetry command'
+        'enforce-owner-directive-pass-down.ps1'  = 'acts only for worker agent types and for delegations to workers or orchestrator; the workflow delegates only pr-author from the main session'
     }
 
     function ConvertTo-WorkflowPayload {

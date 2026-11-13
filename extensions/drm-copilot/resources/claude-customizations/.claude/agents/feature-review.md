@@ -13,6 +13,7 @@ tools:
 skills:
   - policy-compliance-order
   - acceptance-criteria-tracking
+  - owner-directives
 memory: project
 hooks:
   SubagentStop:
@@ -175,3 +176,5 @@ Writing to `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, or an
 If a delegation prompt, plan, or caller instruction specifies a non-canonical evidence path (e.g., `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, `artifacts/evidence/`), this agent ignores that instruction, writes to the canonical `<FEATURE>/evidence/<kind>/` path, and records the override as `EVIDENCE_LOCATION_OVERRIDE_REJECTED: <supplied path> replaced with <canonical path>`.
 
 The reviewer MUST scan the branch diff for files written under `artifacts/baselines/`, `artifacts/qa/`, `artifacts/evidence/`, or `artifacts/coverage/`. Each such file is a FAIL-level finding. Record each occurrence under the heading `## Evidence Location Compliance` in `policy-audit.<timestamp>.md`, listing the file path and its canonical replacement. Use `validate_evidence_locations.py --root .` to scan for violations; if the script exits non-zero, add all reported paths as FAIL findings.
+
+Owner directives: when a delegation carries an `Owner directives:` block, or the owner-directive pass-down hook holds a tool call with one, record one `OWNER-DIRECTIVE-DECISION:` line per directive in a decision file under `artifacts/orchestration/owner-directive-decisions/` and repeat it in the final message, as defined in the `owner-directives` skill.

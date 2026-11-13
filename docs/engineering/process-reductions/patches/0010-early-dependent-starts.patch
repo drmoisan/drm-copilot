@@ -3230,10 +3230,10 @@ index 0000000000000000000000000000000000000000..bdcde4f875b92f58c0aab776b490034e
 +    }
 +}
 diff --git a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-index 7124bcb667a30087272b5f7bd9a9a43cd3ca31b2..46ed72d5451848042c73c45ef6fda96782eaab30 100644
+index 790b42488ec4a6b9ed0262a5bfc82c0d4329ec1a..968f49c566474da9679b401ee1ce9b5d1ba691e1 100644
 --- a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
 +++ b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-@@ -219,14 +219,23 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
+@@ -219,23 +219,32 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
  # stays live for both entries. The merge of origin/main after #1138 combined both
  # skill edits, so the skill digest below is the merged result of #1129, #1130,
  # #1136, #1138, and #1141.
@@ -3246,6 +3246,15 @@ index 7124bcb667a30087272b5f7bd9a9a43cd3ca31b2..46ed72d5451848042c73c45ef6fda967
 +# #1141 and after #1146 (owner-directive relay sentence in the epic skill)
 +# combined the skill edits, so the skill digest below is the merged result of
 +# #1129, #1130, #1136, #1138, #1141, #1146, and #1097.
+ #
+ # RE-BASELINED by issue #1157. That change extended the owner-directive paragraph
+ # of the epic skill's `## Context Handoff to Dependent Features` section with
+ # hook-level pass-down through the coordinator ledger, epic fan-out scope, and
+ # the running-child check. Only the skill digest moved; the agent digest is
+ # unchanged and the pin stays live for both entries. The digest was recomputed
+ # after the merge of origin/main that brought in #1165, which did not edit the
+ # epic skill, so the skill digest below is the merged result of #1129, #1130,
+ # #1136, #1138, #1141, #1146, #1097, and #1157.
  PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
      (
          ".claude/agents/epic-orchestrator.md",
@@ -3254,8 +3263,8 @@ index 7124bcb667a30087272b5f7bd9a9a43cd3ca31b2..46ed72d5451848042c73c45ef6fda967
      ),
      (
          ".claude/skills/epic-orchestrate/SKILL.md",
--        "810801a4a734a1d5a2130092e90e685ea4dd36105615f0b92d31a8ef69a48486",
-+        "119304a18373be1ee2aa7d153e93de4b2a13ce876ac8fbf6a0a541ad687374a4",
+-        "30b1500bec4840bec1e0f1a9765883c681c8d4e5d606a016126e2480473675c4",
++        "ef59580f8306d5ae8f313d80cb7d25e3718828fcb2a1c116a8491d7b04921517",
      ),
  )
  
