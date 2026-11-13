@@ -65,7 +65,9 @@ BeforeAll {
             -ArtifactType $ArtifactType -CheckpointPath $CheckpointPath -ReadTranscriptHead $reader -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; $listText }.GetNewClosure() `
             -RoutingInvoker { param($Path, $Type) $null = $Type; $routed.Add($Path); [pscustomobject]@{ ExitCode = 0; Output = '' } }.GetNewClosure() `
             -FeatureFolderGitInvoker { $git.Add([string[]]@($args)); $global:LASTEXITCODE = 0; 'tree' }.GetNewClosure()
-        return [pscustomobject]@{ Result = $result; Read = @($read); Routed = @($routed); ReaderCalls = $readerCalls.Count; Git = @($git) }
+        # CheckpointRead keeps the checkpoint reads only, in order and unaltered; the owner-directive sibling also reads its ledger.
+        $checkpointRead = @($read | Where-Object { ([string] $_).Replace('\', '/').EndsWith('/orchestrator-state.json', [System.StringComparison]::Ordinal) })
+        return [pscustomobject]@{ Result = $result; Read = @($read); CheckpointRead = $checkpointRead; Routed = @($routed); ReaderCalls = $readerCalls.Count; Git = @($git) }
     }
 }
 
@@ -87,7 +89,7 @@ Describe 'validate-orchestrator-output orchestrator-state target worktree (issue
 
         # Assert
         $outcome.Result.Ok | Should -BeTrue -Because $outcome.Result.Message
-        $outcome.Read | Should -Be @($script:ItemPath)
+        $outcome.CheckpointRead | Should -Be @($script:ItemPath)
         $outcome.Routed | Should -Be @($script:ItemPath)
     }
 
@@ -113,7 +115,7 @@ Describe 'validate-orchestrator-output orchestrator-state target worktree (issue
         $allowed.Result.Ok | Should -BeTrue
         $allowed.Result.Message | Should -BeNullOrEmpty
         $allowed.Result.Note | Should -BeLike "$($script:Token)*"
-        $allowed.Read | Should -Be @($script:SessionPath)
+        $allowed.CheckpointRead | Should -Be @($script:SessionPath)
     }
 
     It 'H4 reads the transcript once and falls back with the note when the prompt carries no identity' {
@@ -166,7 +168,7 @@ Describe 'validate-orchestrator-output orchestrator-state target worktree (issue
 
         # Assert
         $outcome.Result.Ok | Should -BeTrue -Because $outcome.Result.Message
-        $outcome.Read | Should -Be @($script:ItemPath)
+        $outcome.CheckpointRead | Should -Be @($script:ItemPath)
     }
 
     It 'H8 validates the session worktree with the failure detail when the resolver throws' {
@@ -178,7 +180,7 @@ Describe 'validate-orchestrator-output orchestrator-state target worktree (issue
 
         # Assert
         $outcome.Result.Ok | Should -BeTrue
-        $outcome.Read | Should -Be @($script:SessionPath)
+        $outcome.CheckpointRead | Should -Be @($script:SessionPath)
         $outcome.Result.Note | Should -BeLike '*target worktree resolution failed*'
     }
 
@@ -217,7 +219,7 @@ Describe 'validate-orchestrator-output orchestrator-state target worktree (issue
 
         # Assert
         $outcome.Result.Ok | Should -BeTrue
-        $outcome.Read | Should -Be @($script:SessionPath)
+        $outcome.CheckpointRead | Should -Be @($script:SessionPath)
         $outcome.Result.Note | Should -BeNullOrEmpty
     }
 
@@ -237,6 +239,20 @@ Describe 'validate-orchestrator-output orchestrator-state target worktree (issue
         $outcome.Result.Ok | Should -BeTrue -Because $outcome.Result.Message
         ($outcome.Git[0] -join '|') | Should -BeExactly ('-C|' + $script:ItemRoot + '|cat-file|-t|HEAD:' + $folder)
         $probed | Should -Be @("$($script:ItemRoot)/docs/runbooks/item.runbook.md")
+    }
+
+    It 'H14 reads the owner-directive ledger beneath the item root through Get-CheckpointFileContent' {
+        # Arrange
+        $ledgerLeaf = 'artifacts/orchestration/owner-directives.jsonl'
+
+        # Act
+        $outcome = Invoke-Case -Map @{ $script:SessionPath = $script:Invalid; $script:ItemPath = $script:Valid }
+        $normalized = @($outcome.Read | ForEach-Object { ([string] $_).Replace('\', '/') })
+
+        # Assert
+        $outcome.Result.Ok | Should -BeTrue -Because $outcome.Result.Message
+        $normalized | Should -Contain "$($script:ItemRoot)/$ledgerLeaf"
+        $normalized | Should -Not -Contain "$($script:SessionRoot)/$ledgerLeaf"
     }
 }
 
