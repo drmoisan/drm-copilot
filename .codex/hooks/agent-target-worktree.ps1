@@ -175,12 +175,13 @@ function Resolve-AgentTargetWorktree {
     # A branch registered only at a prunable root names that root and the repair remedy.
     $detailText = [string] $result.Detail
     if ($result.ReasonCode -eq $notDerivableCode) {
-        $branches = if (-not [string]::IsNullOrWhiteSpace($CommandBranch)) { @($CommandBranch.Trim()) } else {
-            @([regex]::Matches([string] $DelegationPrompt, $branchPattern) | ForEach-Object { $_.Groups['name'].Value.TrimEnd('.', '/') })
-        }
-        $stale = @($dropped | Where-Object { $record = $_; $null -ne $record.Branch -and @($branches | Where-Object { [string]::Equals($_, $record.Branch, $ignoreCase) }).Count -gt 0 } | ForEach-Object { $_.Root })
+        # @() around the whole if keeps a single branch an array rather than unrolling it to a string.
+        $branches = @(if (-not [string]::IsNullOrWhiteSpace($CommandBranch)) { $CommandBranch.Trim() } else {
+                [regex]::Matches([string] $DelegationPrompt, $branchPattern) | ForEach-Object { $_.Groups['name'].Value.TrimEnd('.', '/') }
+            })
+        $stale = @($dropped | Where-Object { $record = $_; $null -ne $record.Branch -and @($branches | Where-Object { [string]::Equals($_, $record.Branch, $ignoreCase) }).Count -gt 0 })
         if ($stale.Count -gt 0) {
-            $detailText = "branch '$($branches[0])' is registered only at the stale root '$($stale[0])'; run git worktree repair to register the worktree at its current path"
+            $detailText = "branch '$($stale[0].Branch)' is registered only at the stale root '$($stale[0].Root)'; run git worktree repair to register the worktree at its current path"
         }
     }
 
