@@ -16,6 +16,7 @@ BeforeDiscovery {
     $roots = Get-DocsAuthoringSkillRoot
     $script:SkillCopyRows = @(foreach ($key in $roots.Keys) { foreach ($skill in $set.Skills) { @{ Copy = $key; Path = "$($roots[$key])/$skill/SKILL.md" } } })
     $script:HostCopyRows = @($script:SkillCopyRows | Where-Object { $_.Copy -notlike 'Claude*' })
+    $script:DocsInitCopyRows = @($script:SkillCopyRows | Where-Object { $_.Path -like '*/docs-init/SKILL.md' })
 }
 
 BeforeAll {
@@ -89,6 +90,15 @@ Describe 'documentation skill references' {
         $section.Groups['body'].Value | Should -Match 'docs helper library'
         $section.Groups['body'].Value | Should -Match 'push-down'
         $section.Groups['body'].Value | Should -Match 'PowerShell 7\.4'
+    }
+
+    It 'states the linter locations, the --config usage, and the workflow-path policy note in <Path> (issue #1169)' -ForEach $script:DocsInitCopyRows {
+        # Arrange
+        $text = (Read-DocsAuthoringText -RelativePath $Path) -replace '\s+', ' '
+        $tokens = @('--config docs/documentation-estate/.vale.ini', 'VALE_CONFIG_PATH', 'docs/documentation-estate/.markdownlint.json', 'No workflow step runs Vale or markdownlint', 'policy-level control')
+
+        # Assert
+        foreach ($token in $tokens) { $text.Contains($token, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "docs-init states '$token'" }
     }
 
     It 'lists the seven skills in dispatch order in documentation-workflow' {

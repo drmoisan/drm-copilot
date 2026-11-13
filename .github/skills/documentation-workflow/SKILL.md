@@ -37,3 +37,55 @@ runs in the root session.
 - Every write of a profile artifact goes through a root step or through
   `update_docs_ledger`; no role writes the profile, the ledger, the matrix, the
   pins or a receipt directly.
+
+## Commit, Receipt and Pull Request
+
+The root session runs this stage itself after the dispatch order. It is not a dispatch row and
+writes no orchestration checkpoint; the repository hooks admit it through their docs-estate legs.
+
+1. Commit: after `docs-init`, and again after `docs-complete` validation passes, stage the changed
+   paths with `git add -- <paths>` and commit with `git commit -F <file>`. Give the commit no
+   pathspec.
+2. Receipt: write the receipt with the command below, which defaults the revision to the snapshot
+   revision of the inventory, then stage and commit it with the same command shape.
+
+   ```powershell
+   Invoke-DocsCommand.ps1 -Command validate -Mode docs-complete -WriteReceipt
+   ```
+
+3. Push: run `git push origin <branch>`.
+4. Delegate: delegate `Agent(pr-author)` with a prompt that carries each of these lines exactly once:
+   - `branch: <branch>`
+   - `base: <base>`
+   - `Canonical issue number for this feature is <N>.`
+   - `Author-asserted autoclose issues: #<N>`
+
+   and that asks for the pull request with this command form:
+
+   ```text
+   gh pr create --head <branch> --base <base>
+   ```
+
+Rules:
+
+- A docs run that opens a pull request requires a tracking issue, so `<N>` in
+  `artifacts/pr_body_<N>.md` and in its receipt is defined before the pull request exists.
+- A session root that holds another item's checkpoint makes every docs leg decline. This is
+  intended fail-closed behavior: decline to run the stage there, and run it from a root that holds
+  no checkpoint.
+- Only docs path set changes may be on the branch: paths under the profile's documentation roots
+  and artifact directories, and the docs-init workflow file. Any other path is denied at commit,
+  PR creation, and merge.
+
+## Refresh After Rebase or Source Change
+
+After a rebase, or after a source path under `surface_selection.source_roots` changes, the receipt
+revision rule denies the existing receipt. Run these steps in order before the stage above:
+
+1. Re-inventory at the new revision.
+2. Regenerate the reference pages.
+3. Update the `surface_refs` of hand-written pages for added and removed elements.
+4. Re-review the changed elements.
+5. Rebuild the ledger.
+6. Re-validate.
+7. Write a new receipt.

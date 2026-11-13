@@ -200,7 +200,7 @@ Each criterion names the Pester suite intended to prove it. Suite names under `t
 - [x] E7 allows a docs-only PR whose diff is `docs/` paths plus the workflow path, and denies with `DOCS_ONLY_EXEMPTION_NON_DOCS_PATH` when one extra non-docs path is present. Suite: `claude-hooks/enforce-pr-author-skill.DocsOnly.Exemption.Tests.ps1`.
 - [x] M9 allows the same docs-plus-workflow diff and denies the same diff with one extra non-docs path, on both runtimes. Suites: `claude-hooks/enforce-epic-merge-gate.DocsOnly.Tests.ps1` and `codex-hooks/enforce-epic-merge-gate-docs-only.Tests.ps1`.
 - [x] `$script:DocsOnlyInitWorkflowPath` equals the workflow destination row returned by `Get-DocsInitTemplate`. Suite: `claude-hooks/hook-docs-only-diff.InitWorkflowParity.Tests.ps1`.
-- [ ] `docs-init/SKILL.md` (all copies) and `consumer-onboarding.md` state the new configuration locations and the `--config` usage for Vale and markdownlint, and they state that no workflow step runs the linters. Suite: a skill-text assertion in `claude-runtime/docs-authoring-roles.Skills.Tests.ps1` (extended).
+- [x] `docs-init/SKILL.md` (all copies) and `consumer-onboarding.md` state the new configuration locations and the `--config` usage for Vale and markdownlint, and they state that no workflow step runs the linters. Suite: a skill-text assertion in `claude-runtime/docs-authoring-roles.Skills.Tests.ps1` (extended).
 
 ### A4
 
@@ -215,9 +215,9 @@ Each criterion names the Pester suite intended to prove it. Suite names under `t
 
 ### A5
 
-- [ ] Every copy of `documentation-workflow/SKILL.md` contains `## Commit, Receipt and Pull Request`, with the commit, receipt, push, and delegation steps in that order, the delegation-prompt contract (`branch:`, `base:`, the canonical issue line, `Author-asserted autoclose issues:`, `gh pr create --head <branch> --base <base>`), and the tracking-issue rule. Every copy also contains `## Refresh After Rebase or Source Change`, with the refresh steps in the order stated in `## Behavior`. The existing dispatch-order and option-reference assertions still pass. Suite: `claude-runtime/documentation-workflow.CommitStage.Tests.ps1`.
-- [ ] Every copy of `pr-author/SKILL.md` documents the checkpoint-free docs-estate delegation-prompt contract after `## Coordinator-Session Topology (issue #1011)`. Suite: `claude-runtime/pr-author-docs-estate-delegation-contract.Tests.ps1`. The existing pr-author contract suites pass.
-- [ ] The execution-environment brief copies remain byte-identical and contain a docs-estate legs bullet in `## Hook Execution Context`, and `cleanup-merged-worktrees.SkillText.Tests.ps1` still passes. Suites: `dev_tools/test_execution_environment_brief_contracts.py` (existing contract test, run unchanged) and the existing cleanup skill-text suite.
+- [x] Every copy of `documentation-workflow/SKILL.md` contains `## Commit, Receipt and Pull Request`, with the commit, receipt, push, and delegation steps in that order, the delegation-prompt contract (`branch:`, `base:`, the canonical issue line, `Author-asserted autoclose issues:`, `gh pr create --head <branch> --base <base>`), and the tracking-issue rule. Every copy also contains `## Refresh After Rebase or Source Change`, with the refresh steps in the order stated in `## Behavior`. The existing dispatch-order and option-reference assertions still pass. Suite: `claude-runtime/documentation-workflow.CommitStage.Tests.ps1`.
+- [x] Every copy of `pr-author/SKILL.md` documents the checkpoint-free docs-estate delegation-prompt contract after `## Coordinator-Session Topology (issue #1011)`. Suite: `claude-runtime/pr-author-docs-estate-delegation-contract.Tests.ps1`. The existing pr-author contract suites pass.
+- [x] The execution-environment brief copies remain byte-identical and contain a docs-estate legs bullet in `## Hook Execution Context`, and `cleanup-merged-worktrees.SkillText.Tests.ps1` still passes. Suites: `dev_tools/test_execution_environment_brief_contracts.py` (existing contract test, run unchanged) and the existing cleanup skill-text suite.
 
 ### End-to-end and cross-cutting
 
