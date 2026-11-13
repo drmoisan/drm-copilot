@@ -68,7 +68,7 @@
 
 ### Phase 2 — Final QA
 
-- [ ] [P2-T1] Run the PowerShell final-QC static steps over every PowerShell file in the branch diff from the merge base: formatter drift check, `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, and `Invoke-PoshQCLeakScan -Root`.
+- [x] [P2-T1] Run the PowerShell final-QC static steps over every PowerShell file in the branch diff from the merge base: formatter drift check, `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, and `Invoke-PoshQCLeakScan -Root`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-static.<timestamp>.md` records each step's command, exit code, and count: drift 0, analyzer findings 0, leak-scan failures 0; a check-only formatter run records equal before-and-after file hashes.
 - [ ] [P2-T2] Run the Python final-QC static steps over `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, the one Python file in the branch diff: Black in check mode, Ruff, and Pyright.
   - Acceptance: `<FEATURE>/evidence/qa-gates/python-static.<timestamp>.md` records each command, exit code 0, and the success-case summary each tool prints (Black `would be left unchanged`, Ruff `All checks passed!`, Pyright `0 errors`).
