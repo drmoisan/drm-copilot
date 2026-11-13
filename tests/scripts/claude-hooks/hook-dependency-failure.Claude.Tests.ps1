@@ -43,6 +43,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
         if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChangedLanguageSet' -Surface 'Codex' }
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-CheckpointFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex' }
+        if (Get-Command Read-OwnerDirectiveFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Read-OwnerDirectiveFileText' -Surface 'Codex' }
         if (Get-Command Get-ChildOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChildOrchestratorCheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-EpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicCheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-EpicOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicOrchestratorCheckpointContent' -Surface 'Codex' }
@@ -88,6 +89,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
             '.claude/hooks/enforce-mermaid-validation.ps1'                   = 'MERMAID_VALIDATION_BLOCKED:'
             '.claude/hooks/enforce-model-routing-receipt.ps1'                = 'MODEL_ROUTING_RECEIPT_BLOCKED:'
             '.claude/hooks/enforce-orchestration-preimplementation-gate.ps1' = 'PREIMPLEMENTATION_GATE_BLOCKED:'
+            '.claude/hooks/enforce-owner-directive-pass-down.ps1'            = 'OWNER_DIRECTIVE_PASS_DOWN_BLOCKED:'
             '.claude/hooks/enforce-parallel-abandon-gate.ps1'                = 'enforce-parallel-abandon-gate:'
             '.claude/hooks/enforce-parallel-cohort-barrier.ps1'              = 'PARALLEL_COHORT_BARRIER_BLOCKED:'
             '.claude/hooks/enforce-parallel-drift-gate.ps1'                  = 'PARALLEL_DRIFT_GATE_BLOCKED:'

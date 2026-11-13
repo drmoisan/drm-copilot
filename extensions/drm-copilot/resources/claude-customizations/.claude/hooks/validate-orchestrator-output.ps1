@@ -30,7 +30,9 @@
     dispatch passes, and only when the checkpoint waives new_active_feature_folder. For every
     type, the owner-directive check (OrchestratorStateOwnerDirectives.psm1, issue #1139) runs
     after the routing dispatch passes and before those branches, only when the checkpoint has a
-    top-level owner_directives or owner_directive_records key.
+    top-level owner_directives or owner_directive_records key. The owner-directive relay check
+    (validate-orchestrator-output-owner-pass-down.ps1, issue #1157) follows it and is active only
+    when the checkpoint, its ledger, or a linked parent holds a directive source.
 
 .NOTES
     Reads the SubagentStop envelope from stdin through Read-SubagentStopEnvelope
@@ -69,6 +71,9 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/Worktre
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateEpicWaveBarrier.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateOwnerDirectives.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateOwnerDirectiveSelection.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateOwnerDirectiveSelection.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateOwnerDirectiveDecision.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateOwnerDirectiveDecision.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-owner-pass-down.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-owner-pass-down.ps1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateCompletion.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateCompletion.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
@@ -394,6 +399,11 @@ function Get-OrchestratorOutputBlockDecision {
         catch { return @{ Ok = $false; Repairable = $true; Message = 'OWNER_DIRECTIVE_BLOCKED: ' + $_.Exception.Message } }
         $ownerErrors = @($ownerResult | Where-Object { $_ })
         if ($ownerErrors.Count -gt 0) { return @{ Ok = $false; Repairable = $true; Message = 'OWNER_DIRECTIVE_BLOCKED: ' + ($ownerErrors -join '; ') } }
+    }
+    # Issue #1157: the owner-directive relay check; key-gated inside the sibling, so a checkpoint without a source is unaffected.
+    if (-not [string]::IsNullOrWhiteSpace([string]$resolution.WorktreeRoot)) {
+        $passDown = Get-OrchestratorOutputOwnerPassDownDecision -ArtifactType $ArtifactType -CheckpointText $file.Content -WorktreeRoot ([string]$resolution.WorktreeRoot) -SessionRoot $SessionRoot
+        if ($null -ne $passDown) { return $passDown }
     }
 
     # Issue #992: a waived new_active_feature_folder must name a folder committed in HEAD of the run
