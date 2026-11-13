@@ -28,7 +28,7 @@ Finding-Scope: contained
 
 ## Light Fix Tasks
 
-- [ ] [P0-T1] `.claude/lib/worktree-resolution/AgentTargetWorktree.psm1`, `.codex/hooks/agent-target-worktree.ps1`, both bundle mirrors, and `tests/scripts/claude-lib/worktree-resolution/AgentTargetWorktree.Rows.Helpers.ps1` (F1): tighten the two AC-7 `DetailPattern` values to require the full branch name and record that they fail before the fix; keep `$branches` an array and name the matching dropped record's branch in the detail; copy the function text to the Codex twin and both mirrors; run the final QA loop and record each result append-only under `evidence/`.
+- [x] [P0-T1] `.claude/lib/worktree-resolution/AgentTargetWorktree.psm1`, `.codex/hooks/agent-target-worktree.ps1`, both bundle mirrors, and `tests/scripts/claude-lib/worktree-resolution/AgentTargetWorktree.Rows.Helpers.ps1` (F1): tighten the two AC-7 `DetailPattern` values to require the full branch name and record that they fail before the fix; keep `$branches` an array and name the matching dropped record's branch in the detail; copy the function text to the Codex twin and both mirrors; run the final QA loop and record each result append-only under `evidence/`.
 
 ## Non-remediation items (record only)
 
