@@ -18,9 +18,10 @@ Describe 'enforce-worktree-removal-gate-planner.ps1' {
         Import-Module (Join-Path $script:RepoRoot '.claude/lib/worktree-resolution/WorktreeRunRecordPath.psm1') -ErrorAction Stop
         Import-Module (Join-Path $script:RepoRoot '.claude/lib/worktree-resolution/WorktreeRunResolution.psm1') -ErrorAction Stop
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
-        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
-        # Loaded after the baseline registration, so the seam under test keeps its real body here.
         . $script:AdapterFile
+        # The run seam is mocked directly: naming it in the helper would also mock the adapter seam under test (R1).
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution -MockWith { $null }
 
         $script:Session = '/synthetic-worktrees/session'
         $script:Target = '/synthetic-worktrees/session/.claude/worktrees/agent-alpha'
