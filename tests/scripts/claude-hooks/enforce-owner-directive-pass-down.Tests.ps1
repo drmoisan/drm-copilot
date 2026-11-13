@@ -316,9 +316,10 @@ Describe 'ledger guard (AC-27)' {
         (Get-PassDownReason (Invoke-PassDownTest -Payload $call -Files @{})) | Should -BeLike '*OWNER_DIRECTIVE_LEDGER_WRITE_DENIED:*'
     }
 
-    It 'denies a subagent Write to the case-variant ledger path <Variant>' -ForEach @(
-        @{ Variant = 'Artifacts/Orchestration/Owner-Directives.jsonl' }
-        @{ Variant = 'ARTIFACTS/ORCHESTRATION/OWNER-DIRECTIVES.JSONL' }
+    # Each row carries a Label because the two paths differ only in letter case, and test names must stay unique when case-folded.
+    It 'denies a subagent Write to the case-variant ledger path <Variant> (<Label>)' -ForEach @(
+        @{ Variant = 'Artifacts/Orchestration/Owner-Directives.jsonl'; Label = 'title case' }
+        @{ Variant = 'ARTIFACTS/ORCHESTRATION/OWNER-DIRECTIVES.JSONL'; Label = 'upper case' }
     ) {
         # Arrange: the ledger path differs from the canonical leaf only in letter case (finding F3).
         $call = @{ tool_name = 'Write'; cwd = $script:Session; agent_type = 'orchestrator'; agent_id = 'a1'; tool_input = @{ file_path = "$script:Item/$Variant"; content = $script:Entry + "`n" } }
