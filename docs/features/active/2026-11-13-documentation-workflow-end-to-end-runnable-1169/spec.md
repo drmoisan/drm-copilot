@@ -3,214 +3,239 @@
 - **Issue:** #1169
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-11-13T12-10
-- **Status:** Draft
-- **Version:** 0.1
+- **Last Updated:** 2026-11-13
+- **Status:** Approved for planning
+- **Version:** 1.0
+- **Research:** `docs/features/active/2026-11-13-documentation-workflow-end-to-end-runnable-1169/research/research.2026-11-13T18-22.md`
 
 ## Overview
 
-Make the documentation workflow end-to-end runnable (commit, push, PR) and fix defects found in a first consumer run.
+A documentation run (`/documentation-workflow`) writes no orchestration checkpoint by design. Today such a run cannot commit, cannot delegate `Agent(pr-author)`, and its first pull request cannot pass the docs-only exemptions. Its docs-complete receipt also cannot satisfy the integration docs-complete gate. This feature gives a docs run a checkpoint-free path that is fail-closed and modelled on the issue #1026 cleanup-worktrees legs. The readiness evidence is the docs profile plus a passing docs-complete receipt.
 
-A first full run of `/documentation-workflow` (docs-init → inventory → IA plan → author → reconcile → review → validate) was completed in a consumer repository: a Python package of 3,061 surface elements (2,610 public symbols, 386 architecture components, 65 config keys), 22 pages, docs-complete passing. The run exposed (A) gaps that prevent a docs run from committing, opening a PR, or merging without an orchestration checkpoint, and (B) defects in the docs tooling, hooks, templates and skills. Fix all items below. Each item states the observed behavior, the evidence and the required change. Follow the repository's toolchain, test, file-size and tonality rules; add a regression test per item.
+## Scope
 
-Design principle for part A: a docs run writes no orchestration checkpoint by design. Give it a checkpoint-free path modelled on the cleanup-worktrees context (issue #1026: session-root manifest + consolidation branch + path restriction), using the docs profile and a passing docs-complete receipt as the readiness evidence.
+In scope: Part A of `issue.md`, items A1 to A5.
 
+- A1: a docs-estate leg in the preimplementation gate for `git add`, `git commit`, and the pr-author receipt Write.
+- A2: a docs-estate delegation leg in the model-routing gate for a checkpoint-free `Agent(pr-author)`.
+- A3: docs-init writes its linter configuration under `docs/documentation-estate/`. The E7 and M9 docs-only classifiers admit exactly one non-`docs/` path, the docs-init workflow file.
+- A4: one receipt revision rule, shared by `validate` and the integration docs-complete gate.
+- A5: a root-owned commit, receipt, and pull-request stage and a refresh procedure in the documentation-workflow skill, plus the delegation-prompt contract in the pr-author skill.
+
+## Non-Goals
+
+- Part B of `issue.md` (B1 to B13) is out of scope. It is tracked in issue #1173 (owner decision 2026-11-13). The early-draft criteria for bulk `update-ledger` performance (reconciling an estate of about 3,000 elements in minutes) and for B regression tests moved to #1173.
+- No change to `New-DocsStarterProfile` (`.claude/lib/docs/DocsProfile.psm1`) or its `documentation_roots` default. B6 and B7 in #1173 own that function.
+- No Vale or markdownlint step is added to `_docs-quality.yml` (see A3).
+- No change to the Codex model-routing gate (`.codex/hooks/enforce-codex-model-routing.ps1`). It checks a profile attestation and does not read a checkpoint receipt, so it does not block a checkpoint-free pr-author delegation.
+- No change to the PR-create gate's E1 to E6 logic. The research found that once A3 makes E7 pass, a checkpoint-free docs PR already passes E1 to E7.
+- No change to the existing cleanup legs (issue #1026) or their contract text.
+- No live end-to-end run before merge is required (see `## Verification Model`).
+
+## Definitions
+
+- **Resolved root (R):** the single worktree root that the existing target resolution returns for the command, Write path, or delegation prompt. When resolution returns no root or more than one root, the call is denied before any docs leg runs, as it is today.
+- **Docs profile:** `docs/documentation-estate/docs-profile.json` beneath R.
+- **Structurally valid profile:** a JSON object with `artifact_kind` equal to `docs-profile`, a non-empty `documentation_roots` array whose `path` values are plain repository-relative paths, and an `artifact_paths` object whose values are strings. The hooks validate the structure only, because the Codex hooks cannot import `.claude/lib`.
+- **Docs path set:** a repository-relative path is in the set when it passes the character-class and `..` rules of `Test-CleanupConsolidationRelativePath` and at least one of the following holds:
+  1. It lies under the directory of an `artifact_paths` value.
+  2. It equals the shared docs-init workflow constant (A3).
+  3. It lies under a `documentation_roots[].path`. When that root is not under `docs/`, the path must also end in `.md`.
+  All comparisons are ordinal and segment-anchored.
+- **Docs-init workflow constant:** the literal `.github/workflows/_docs-quality.yml`, held once as `$script:DocsOnlyInitWorkflowPath` in `.claude/hooks/hook-docs-only-diff.ps1`.
 
 ## Behavior
 
-### Part A — Let the documentation workflow commit, push and open PRs
+### A1. Docs-estate leg in the preimplementation gate
 
-**A1. Preimplementation gate blocks every docs commit**
-- Observed: `git add -- docs/... && git commit -F <file>` from the root session is denied with `PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json ...`.
-- Evidence: `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1:137` (`git (add|commit)` pattern) and `:144` (`$isStaging`); the only checkpoint-free allow legs are the #539 bookkeeping exemption and the #1026 cleanup leg (`:415`).
-- Change: add a docs-estate leg (new sibling, e.g. `enforce-orchestration-preimplementation-gate-docs.ps1`, mirroring `-cleanup.ps1`) that allows `git add -- <paths>` and `git commit -F <file>` (no pathspec on the commit) only when all of the following hold:
-  1. `docs/documentation-estate/docs-profile.json` exists and validates.
-  2. Every pathspec and every staged path is under a profile `documentation_roots[].path`, under the directory of the profile's `artifact_paths`, or in the docs-init output set (see A3).
-  3. No other implementation pattern matches the same command line. Keep the existing loop semantics, so a chained `pytest`/`ruff` segment still denies.
+A new sibling hook, `enforce-orchestration-preimplementation-gate-docs.ps1`, exposes `Get-OrchestrationDocsEstateContextResult`. Its result has the same shape as `Get-OrchestrationCleanupContextResult` (`Allowed`, `DenySuffix`), and it never throws. The Claude and Codex main gates (`enforce-orchestration-preimplementation-gate.ps1`) call it once, only where the gate would otherwise deny and only after the cleanup leg has declined. Its suffix is appended after the cleanup suffix. Pure profile and path predicates live in a new hook file, `hook-docs-estate-context.ps1`.
 
-  Fail closed. Add a deny suffix that names the failed condition, as the cleanup leg does.
+Prefilters (pure, evaluated before any I/O):
 
-**A2. PR-author delegation is denied without a checkpoint**
-- Observed: a docs run cannot delegate `Agent(pr-author)`. `enforce-model-routing-receipt.ps1:376` requires a `model_routing_receipts` entry in a checkpoint; only the cleanup delegation is exempt (`:368`).
-- Change: add a docs-estate delegation leg beside the cleanup leg. It admits `Agent(pr-author)` with no checkpoint when all of these hold:
-  - the prompt carries exactly one `branch: <name>` label line;
-  - the branch diff against the explicit base is limited to the A1 path set;
-  - a passing docs-complete receipt exists at the profile's `artifact_paths.validation_receipt` (see A4 for the revision rule).
+- Command form: every segment of `Split-OrchestrationCommandLine` is either `git add -- <operand>...` or `git commit` with only `-m`, `--message`, `-F`, `--file`, or `--trailer` and no pathspec, each optionally written as `git -C <absolute root>`.
+- Write form: the target path is `artifacts/pr_body_<digits>.receipt.json`, given as a relative or absolute path.
+- Any other shape declines with `Allowed $false` and an empty suffix. A chained `pytest`, `ruff`, `black`, `pyright`, `npm`, `npx`, or `Invoke-Pester` segment therefore still denies with the unchanged deny text.
 
-  Document the delegation-prompt contract in `.claude/skills/pr-author/SKILL.md` and in the documentation-workflow skill (A5).
+Conditions, evaluated in order (the first failure declines):
 
-**A3. Docs-only exemptions reject the files docs-init itself creates**
-- Observed: `docs-init -Write` creates these files:
-  - `.markdownlint.json`
-  - `.vale.ini`
-  - `.vale/styles/DocsBase/HeadingPunctuation.yml`
-  - `.vale/styles/DocsBase/Placeholders.yml`
-  - `.vale/styles/config/vocabularies/Project/accept.txt`
-  - `.github/workflows/_docs-quality.yml`
+- D1, target and checkpoint: R resolves, and no orchestration checkpoint exists at R. A present checkpoint, ready or not, governs the call, and the docs leg does not apply.
+- D2, profile: the docs profile beneath R exists and is structurally valid.
+- D3, add: every `git add` operand is in the docs path set.
+- D4, commit: the staged index beneath R, read through `Get-OrchestrationGateStagedIndex`, is readable, NUL-terminated, non-empty, and entirely in the docs path set.
+- Receipt Write: D1 and D2 hold.
 
-  A docs branch therefore always contains non-`docs/` paths. The create-side exemption (E7 `DOCS_ONLY_EXEMPTION_NON_DOCS_PATH`, `.claude/hooks/enforce-pr-author-skill.docs-only.ps1`) and the merge-side exemption (M9, `.claude/hooks/hook-docs-only-diff.ps1`) can never pass for a docs estate's first PR.
-- Change (choose one and document it):
-  - Preferred: have docs-init place the Vale and markdownlint configuration under `docs/documentation-estate/`, and pass `--config` paths in `_docs-quality.yml`. Then treat exactly the docs-init workflow file path as an allowed non-`docs/` path in E7/M9, sourced from one shared constant used by init (not a glob).
-  - Alternative: extend E7/M9 to accept exactly the docs-init output paths from that single shared constant.
+Deny suffix: `' Docs-estate leg not applied: <SUB_CODE>: <detail>'`, with sub-codes `DOCS_LEG_PROFILE_INVALID`, `DOCS_LEG_PATH_NOT_ALLOWED`, `DOCS_LEG_STAGED_INDEX_UNREADABLE`, `DOCS_LEG_STAGED_INDEX_EMPTY`, and `DOCS_LEG_STAGED_PATH_NOT_ALLOWED`. The suffix is set only after the leg has resolved R and found a profile file. When no profile file exists, the suffix is empty, so repositories without a docs estate see byte-identical deny text.
 
-  Keep the exemptions fail-closed and ordinal. Add tests for a branch containing only docs paths plus the init outputs (allow), and for one with one extra non-docs path (deny).
+The new sibling and `hook-docs-estate-context.ps1` are byte-identical in `.claude/hooks/`, `.codex/hooks/`, and both push-down bundles.
 
-**A4. Receipt revision rule makes the integration docs-complete gate unsatisfiable**
-- Observed: `validate -Mode docs-complete -Revision <rev>` fails with `DOCS_REVISION_MISMATCH` unless `<rev>` equals the snapshot's `revision`. The snapshot is committed inside the PR, so the commit containing it can never be the snapshot's revision. A receipt is therefore only writable for the source revision, an ancestor of the PR head. But `.claude/hooks/enforce-docs-complete-gate.ps1:297` checks the receipt against the PR `headRefOid`. With `completion_gates.integration_pr_gate.enabled: true` the gate appears impossible to satisfy. This was inferred from the call site and the validate behavior; verify it in `Test-DocsCompleteGateReceipt`.
-- Additional observation: after the docs branch was rebased onto a newer main, the snapshot revision was no longer in branch history at all, and the source had drifted (+52 / −40 / 13 changed elements).
-- Change: define one revision rule used by both `validate` and the gate. For example:
-  - the receipt revision equals the snapshot revision, which must be an ancestor of the head;
-  - `git diff --name-only <receipt-rev> <head>` must contain no path under the profile's `surface_selection.source_roots`; otherwise deny, with a remediation that names the refresh steps.
+### A2. Docs-estate delegation leg in the model-routing gate
 
-  Make `validate -WriteReceipt` default `-Revision` to the snapshot revision, and say so in its help.
+In `Invoke-ModelRoutingReceiptDecision` (`.claude/hooks/enforce-model-routing-receipt.ps1`), a docs-estate leg sits after the cleanup exemption under the same `$subagent -eq 'pr-author' -and $null -eq $checkpoint` conjunct. The planner may place the leg's logic in a new sibling file to keep the main hook small. Conditions, evaluated in order (the first failure denies with the existing final reason plus a docs suffix):
 
-**A5. The documentation-workflow skill has no commit / PR stage**
-- Observed: `.claude/skills/documentation-workflow/SKILL.md` ends at docs-validate. Nothing says when to commit, how the receipt relates to commits, or what to do after a rebase.
-- Change: add a final, root-owned stage:
-  1. Commit after docs-init and after docs-complete.
-  2. Write the receipt per A4.
-  3. Push.
-  4. Delegate `Agent(pr-author)` per A2.
+1. Labels: the prompt carries exactly one line-anchored `branch: <name>` line (the shape of `Test-CleanupConsolidationBranchLabel`) and exactly one line-anchored `base: <branch>` line. Both values use a conservative branch spelling with no `..`. The base is explicit and is not fixed to `main`, because a docs PR may target an epic integration branch.
+2. Profile: the docs profile beneath R is structurally valid.
+3. Diff: in R, `refs/remotes/origin/<base>` and `HEAD` resolve, and the `<base>...HEAD` diff (`--name-only -z --no-renames --no-relative`) is readable, NUL-terminated, non-empty, and entirely in the docs path set.
+4. Receipt: the receipt at `artifact_paths.validation_receipt` beneath R has `artifact_kind` `docs-validation-receipt`, `mode` `docs-complete`, and `validation_result` `pass`, and it passes the A4 rule against the `HEAD` of R.
 
-  Add a "refresh after rebase or source change" procedure:
-  1. Re-inventory at the new revision.
-  2. Regenerate reference pages.
-  3. Update `surface_refs` of hand-written pages for added and removed elements.
-  4. Re-review changed elements.
-  5. Rebuild the ledger.
-  6. Re-validate.
-  7. Write a new receipt.
+Every git call goes through `Invoke-DocsOnlyGitExe` (bounded, never throws). A timeout or a non-zero exit is a denial, not an allowance. Deny suffix: `' Docs-estate delegation leg not applied: <SUB_CODE>: <detail>'`, with sub-codes `DOCS_DELEGATION_LABEL_INVALID`, `DOCS_DELEGATION_PROFILE_INVALID`, `DOCS_DELEGATION_DIFF_UNREADABLE`, `DOCS_DELEGATION_DIFF_EMPTY`, `DOCS_DELEGATION_PATH_NOT_ALLOWED`, `DOCS_DELEGATION_RECEIPT_INVALID`, and the A4 reason codes. When no profile file exists beneath R, the suffix is empty and the existing deny text is unchanged. The cleanup exemption keeps its behavior.
 
-### Part B — Defects found in the run
+### A3. Docs-init outputs and the docs-only exemptions
 
-**B1. docs-architect cannot finish a first inventory run (stop-hook loop)**
-- Observed: `validate-docs-role-output.ps1` rejects every docs-architect report with `DOCS_ROLE_OUTPUT_BLOCKED: ... docs-snapshot path 'docs/documentation-estate/surface-inventory-snapshot.json' does not exist`. The role cannot create the snapshot: `run_docs_inventory` returns `written: false`, and persistence is a root step (`docs-inventory-surface/SKILL.md` step 3). On a first run the agent repeated its report until the run ended, with no real fault (inventory exit 0, 0 findings). The cost was about 93 minutes, 361 tool uses and about 652k tokens.
-- Evidence: `.claude/hooks/docs-role-contract.ps1:173-175` passes `docs-snapshot` to `Get-DocsRolePathFinding`, whose `:153` requires existence for every `docs-result` value.
-- Change: use one or more of these:
-  - do not require `docs-snapshot` to exist; check only that it is repository-relative;
-  - exempt `BLOCKED`/`FAIL`;
-  - accept a `docs-snapshot-persisted: false` token;
-  - have the workflow run the root `inventory -Write` before delegating step 2.
+Selected option: the preferred option of the issue, recorded here as the documented choice.
 
-  Add a first-run test (profile present, snapshot absent).
+- `Get-DocsInitTemplate` (`.claude/lib/docs/DocsProfileCommands.psm1`) writes the markdownlint and Vale configuration under `docs/documentation-estate/`: `docs/documentation-estate/.markdownlint.json`, `docs/documentation-estate/.vale.ini`, and the Vale styles and vocabulary under `docs/documentation-estate/.vale/styles/`. `StylesPath = .vale/styles` stays valid, because Vale resolves it relative to the `.vale.ini` that sets it.
+- `.github/workflows/_docs-quality.yml` is still written by docs-init, and it is the one non-`docs/` path the exemptions admit.
+- `Get-DocsOnlyPathViolation` (`hook-docs-only-diff.ps1`) admits a path that equals `$script:DocsOnlyInitWorkflowPath`, by one ordinal equality and not by a glob. Because E7 (`Get-PrAuthorDocsOnlyExemption`) and M9 (`Get-DocsOnlyMergeExemption`, both runtimes' `enforce-epic-merge-gate.ps1`) share this classifier, the one change covers both on both runtimes. The A1 and A2 legs read the same constant.
+- Parity: a Pester test pins `$script:DocsOnlyInitWorkflowPath` equal to the workflow destination row of `Get-DocsInitTemplate`. It follows the precedent of `hook-cleanup-context.Parity.Tests.ps1`, because a hook cannot import the docs library.
+- `--config` choice: `_docs-quality.yml` runs no Vale or markdownlint step, so no `--config` argument is added to it. Instead, `docs-init/SKILL.md` and `docs/engineering/documentation-estate/consumer-onboarding.md` (`## Linting`) state that a consumer passes `--config docs/documentation-estate/.vale.ini` (or sets `VALE_CONFIG_PATH`) to Vale, and passes the markdownlint configuration path explicitly. The documentation records this as the documented choice the issue requires.
+- Policy note: admitting the workflow path applies to every pull request, not only to docs-estate runs. A PR that edits only that workflow passes the docs-only exemptions. CI still runs in full for it, because the path is outside `config/ci-docs-only-paths.json`, and the required CI gate still applies. The skill and engineering documentation state this as a policy-level control.
 
-**B2. update-ledger: no bulk operation, ~39 s per call, and quadratic in-process cost**
-- Observed: one `update-ledger` CLI call takes about 39 s, almost all of it loading and re-validating the estate. A 3,061-element estate needs about 15,300 single-element calls (set-disposition, exists, owner_assigned, accurate, and pins): about 130 hours through the CLI or MCP.
-- Applying the operations in one process is still quadratic: every merge copies, scans and re-sorts the whole collection. The first 500 operations took about 40 s and the last 500 about 12 min; 12,244 operations took about 2 h 40 min.
-- Evidence:
-  - `DocsLedger.psm1:471-474` (`Merge-DocsLedgerEntry`: `Copy-DocsLedgerValue`, `Where-Object` over all entries, `Get-DocsLedgerSortedEntry`);
-  - `DocsParity.psm1:451-453` (`Merge-DocsParityDimension`);
-  - `DocsEvidencePins.psm1:249-252` (`Merge-DocsEvidencePin`);
-  - `DocsLedgerCommands.psm1:569` (another full scan per operation).
-- Verified workaround:
-  1. Run each element's operations through `Invoke-DocsLedgerOperation` against the empty documents, and collect the entries, rows and pins.
-  2. Sort each collection once.
-  3. Run the unchanged introduced-error check and one `Invoke-DocsArtifactWrite`.
+### A4. One receipt revision rule
 
-  The output was byte-identical to sequential application on a 120-element / 560-operation sample, and the full 15,305 operations took about 3 min.
-- Change:
-  - Add a batch operation to `update-ledger` (CLI `-Operations <json path>`, plus the MCP `update_docs_ledger` equivalent). It loads once, applies N operations with keyed (dictionary) indexes instead of copy-scan-sort per operation, runs the introduced-error comparison once, and writes once.
-  - Add a bulk "bind page refs" operation that sets `documented` plus page bindings for every element listed in pages' `surface_refs`. Today `sync-refs` only refreshes snapshot and ledger pins and plans no writes on an empty ledger, which is easy to mistake for that operation.
-  - Update `docs-reconcile-behavior/SKILL.md` and the docs-reconciler agent accordingly.
+A new pure module, `.claude/lib/docs/DocsReceiptRevision.psm1`, exports `Get-DocsReceiptRevisionDecision -ReceiptRevision -SnapshotRevision -HeadRevision -IsAncestor -ChangedPath -SourceRoot`, which returns `Allow`, `Reason`, and `Message`. It does no git I/O; each caller supplies `IsAncestor` and `ChangedPath`.
 
-**B3. `accurate = pass` requires an evidence pin, but the skill doesn't say so**
-- Observed: 2,675 `set-dimension accurate pass` operations without a preceding `pin` introduced `DOCS_MATRIX_ACCURACY_UNPINNED` errors, and the write was refused. `set-dimension` attaches only pins that already exist.
-- Change: document in `docs-reconcile-behavior/SKILL.md` that `pin` must precede `set-dimension accurate pass` for the same element and page. Consider having the batch operation (B2) accept a pin claim on the accurate dimension.
+- Allow when the receipt revision equals the snapshot revision, the receipt revision is an ancestor of the head, and no changed path between the receipt revision and the head lies under any `surface_selection.source_roots` entry (ordinal, segment-anchored).
+- A head equal to the receipt revision allows without needing ancestry or diff input, which keeps the CI template's inventory-at-head flow passing.
+- Deny reasons:
+  - `RECEIPT_REVISION_SNAPSHOT_MISMATCH`: the receipt revision differs from the snapshot revision.
+  - `RECEIPT_REVISION_NOT_ANCESTOR`: the receipt revision is not an ancestor of the head, as after a rebase.
+  - `RECEIPT_SOURCE_DRIFT`: the message names a bounded list of drifted paths.
+  - `RECEIPT_REVISION_UNRESOLVED`: a git failure, a timeout, or a head not present locally. The message includes a fetch remediation.
+- Every deny message names the refresh procedure of the documentation-workflow skill (A5).
 
-**B4. Page templates write `audience` as a string; the checker requires a list**
-- Observed: every page from `.claude/skills/docs-author-page/templates/*.md` failed `run_docs_check` with `DOCS_PAGE_AUDIENCE_INVALID` until `audience` was changed to `["<id>"]`.
-- Change: fix all templates to `audience: ["<audience-id>"]`. Add a test that renders each template's front matter through the page checker.
+Callers:
 
-**B5. generate-reference writes one API page per output directory and exceeds the 1 MiB page bound**
-- Observed: for 2,610 public symbols, `generate-reference -Write` produced one `api-reference.md` of about 1.4 MB / 28,720 lines, which `check` rejects with `DOCS_PAGE_TOO_LARGE` (1 MiB scan bound). The IA plan's per-module grouping cannot be expressed.
-- The workaround was four runs with `-Snapshot` filtered copies and distinct `-OutputDirectory` values. Filtered snapshots must be repository-relative (`DOCS_CLI_ARGUMENTS ... is not a repository-relative path`), which forces scratch files into the repository.
-- Change:
-  - Split generated reference pages automatically below the bound (for example per source package, or by size), or support a grouping key (path prefix → page) in `diataxis_policy` or as a generate-reference option, with an index page.
-  - Allow `-Snapshot` outside the repository, or add an element filter option so no filtered snapshot copy is needed.
+- `Test-DocsCompleteGateReceipt` (`DocsCompleteGate.psm1`) delegates its revision step to the new function in place of the head-equality comparison. `enforce-docs-complete-gate.ps1` supplies ancestry and the changed paths through `Invoke-DocsOnlyGitExe`.
+- The A2 leg uses the same function.
+- `validate`: `Test-DocsValidateArgument` and `Invoke-DocsValidateCommand` first move unchanged from `DocsLedgerCommands.psm1` (785 lines) to a new module, `DocsValidateCommands.psm1`, and the `validate` dispatch row in `Invoke-DocsCommand.ps1` is updated. Only then do they change:
+  - With `-WriteReceipt` and no `-Revision`, the revision defaults to the snapshot `revision`. When the snapshot revision is null or absent, a usage error names `inventory -Revision`.
+  - `-Help` and `docs/engineering/documentation-estate/command-reference.md` state the default.
+  - In `docs-complete` mode, `validate` applies the rule against the repository `HEAD` through new bounded command-context members in `Invoke-DocsCommand.ps1`. A denial is reported as an error finding, so a drifted estate cannot be written as a pass receipt.
+  - Without `-WriteReceipt`, `-Revision` remains required. The MCP `validate_docs_artifacts` path, which passes `-Revision` and never persists a receipt, keeps its behavior.
+- The unused `Get-DocsReceiptGateDecision` (`DocsReceipt.psm1`) either delegates to the new function or is left unchanged with its tests. The planner records the choice.
 
-**B6. docs-init defaults `source_roots` to `src` without checking it exists**
-- Observed: the generated profile had `surface_selection.source_roots: ["src"]`. The repository has no `src/`: its package is at the root, declared in `pyproject.toml`. Both `init` and `validate-profile` passed without a finding.
-- Change: detect the package root (pyproject `[tool.poetry].packages` or `[project]` name, `package.json`, `.csproj`), or at minimum emit a `validate-profile` error for a source root that does not exist.
+### A5. Skill stages and contracts
 
-**B7. A documentation root of `docs` makes `check` crash on non-documentation trees**
-- Observed: with the default root `docs`, `check` scanned about 6,000 planning and evidence files under `docs/features/`. It failed with exit 3: `DOCS_CONTEXT_PATH_INVALID: 'docs/features/active/.../evidence/other/xlsx|xlsm|xls|csv' is not a repository-relative path` (a link target containing `|`).
-- Change:
-  1. A malformed link target must produce a page finding, not a runtime crash.
-  2. docs-init should not default to a documentation root that contains `docs/features/`. Default to dedicated roots, or add a root-level exclusion list to the profile schema.
+`.claude/skills/documentation-workflow/SKILL.md` and its mirrors gain a final root-owned section, `## Commit, Receipt and Pull Request`, placed after `## Dispatch Order`. It is not a dispatch row, so the existing dispatch-order test is unchanged. Steps:
 
-**B8. Inventory reads `__pycache__` and emits hundreds of warnings**
-- Observed: 310 `DOCS_INPUT_NOT_UTF8` warnings from `supply_planning/**/__pycache__/*.pyc` until an exclusion was added manually.
-- Change: exclude VCS-ignored files and bytecode caches by default (honor `.gitignore`, or use a built-in default exclusion list).
+1. Commit after docs-init and again after docs-complete, using `git add -- <paths>` and `git commit -F <file>` with no pathspec on the commit.
+2. Write the receipt with `validate -Mode docs-complete -WriteReceipt`, using the default revision, and commit it with the same command shape.
+3. Push.
+4. Delegate `Agent(pr-author)` with the delegation-prompt contract: one `branch: <name>` line, one `base: <branch>` line, the `Canonical issue number for this feature is <N>.` line, `Author-asserted autoclose issues: #<N>`, and `gh pr create --head <branch> --base <base>`.
 
-**B9. Python CLI analyzer captures no commands for subcommand registration across modules**
-- Observed: zero `cli-command` and `cli-option` elements for an argparse CLI. Its subcommands are registered in `cli.py`, `cli_daily.py`, `cli_segments.py` and `cli_compare.py`, with help in `cli_help/`. The analyzer emitted `CLI_UNBOUND_REGISTRATION` (20, 16, 13, 6 and 2 occurrences). The CLI reference had to be hand-written with `surface_refs: []`, so nothing tracks its accuracy.
-- Change: resolve registration functions that receive a subparsers object as a parameter (cross-module `add_parser` calls). Add a fixture with that layout.
+Rules stated in the stage:
 
-**B10. Diagnostic counts differ between the MCP tool and the CLI**
-- Observed (not investigated): the role summarized 509 snapshot diagnostics from the `run_docs_inventory` MCP result, while CLI `inventory -Write` on the same revision reported 819. The difference equals the 310 `DOCS_INPUT_NOT_UTF8` warnings. Either the MCP result omits that code, or the role left it out of its summary.
-- Change: confirm that the two return identical diagnostics; add a parity test.
+- A docs run that opens a PR requires a tracking issue, so `<N>` in `artifacts/pr_body_<N>.md` and its receipt is defined before the PR exists.
+- A session root that holds another item's checkpoint makes every docs leg decline. This is intended fail-closed behavior; run the docs stage from a root without a checkpoint.
+- Only docs path set changes may be on the branch. Any other path is denied at commit, PR creation, and merge.
 
-**B11. Estate hashes are not protected against line-ending conversion**
-- Observed: committing the estate printed "LF will be replaced by CRLF" for every file (`core.autocrlf=true`, no `.gitattributes` rule). The ledger, pins and receipt store SHA-256 hashes of snapshot and ledger content, so a CRLF checkout probably invalidates them. Whether the library normalizes line endings before hashing has not been verified.
-- Change: either docs-init writes `.gitattributes` rules (`docs/documentation-estate/*.json text eol=lf` and `<documentation_root>/** text eol=lf`), or the hashing normalizes line endings. Add a test either way.
+A `## Refresh After Rebase or Source Change` section lists, in order: re-inventory at the new revision; regenerate reference pages; update `surface_refs` of hand-written pages for added and removed elements; re-review changed elements; rebuild the ledger; re-validate; write a new receipt.
 
-**B12. A subagent harness guard blocked a planned page name**
-- Observed: docs-author could not write `docs/developer/architecture/reporting-storage-normalization.md`. It was refused with "Subagents should return findings as text, not write report files", apparently because the name contains "report". The page had to be written by the root.
-- Change: identify the guard. Exempt `.md` writes inside the profile's documentation roots for docs-author, or document the naming restriction in `docs-plan-ia` and `docs-author-page`.
-
-**B13. docs-init adds a CI workflow without saying so in the skill**
-- Observed: `docs-init -Write` creates `.github/workflows/_docs-quality.yml`. The dry-run preview lists it, but `docs-init/SKILL.md` does not mention that init adds a CI workflow.
-- Change: state it in the skill's Steps and Result sections, and report it as a distinct line in the init output.
-
+`.claude/skills/pr-author/SKILL.md` and its mirrors gain a section after `## Coordinator-Session Topology (issue #1011)` that documents the checkpoint-free docs-estate delegation-prompt contract and its preconditions (profile, docs-only diff against the explicit base, passing receipt). The `.claude/skills/execution-environment/SKILL.md` brief and all its byte-identical copies gain a docs-estate legs bullet in `## Hook Execution Context`, beside the cleanup-legs bullet. The bullet covers the A1 leg, the receipt Write, the A2 leg, and the A3 constant. The brief's `## Contract Tests That Pin Mirrored Files` lists the new suites. Non-Claude skill copies contain no `.claude/` text and reference only dispatch-table options.
 
 ## Inputs / Outputs
 
-- Inputs (CLI flags, files, env vars)
-- Outputs (artifacts, logs, telemetry)
-- Config keys and defaults:
-- Versioning or backward-compatibility constraints:
+- Inputs: `docs/documentation-estate/docs-profile.json`; the receipt at `artifact_paths.validation_receipt`; the surface snapshot `revision`; the delegation prompt's `branch:` and `base:` lines; the staged index; git ancestry and diff output through bounded seams.
+- Outputs: allow or deny hook decisions with named sub-codes; docs-init writes at the new destinations; receipts whose revision is the snapshot revision; skill text.
+- Config keys: `surface_selection.source_roots`, `documentation_roots[].path`, and `artifact_paths.*` (read only; the schema is unchanged).
+- Compatibility: repositories without a docs profile see unchanged deny text on every gate. Existing estates that already hold root-level `.vale.ini` or `.markdownlint.json` are not migrated. The consumer-onboarding documentation states the new locations.
 
 ## API / CLI Surface
 
-List commands, flags, request/response shapes, and examples.
-- Example invocations with expected outputs (concise):
-- Contracts and validation rules:
+- `Invoke-DocsCommand.ps1 -Command validate -Mode docs-complete -WriteReceipt`: `-Revision` is optional and defaults to the snapshot revision.
+- `Invoke-DocsCommand.ps1 -Command validate` without `-WriteReceipt`: `-Revision` remains required.
+- `Get-DocsReceiptRevisionDecision` (new, pure) and `Get-OrchestrationDocsEstateContextResult` (new, never throws).
+- Delegation-prompt contract for a checkpoint-free `Agent(pr-author)`: `branch: <name>` and `base: <branch>`, each exactly once.
 
 ## Data & State
 
-Data flow, storage, or state changes introduced by this feature.
-- Data transformations and invariants:
-- Caching or persistence details:
-- Migration or backfill requirements (if any):
+- No orchestration checkpoint is written by a docs run.
+- Receipt `revision` equals the snapshot `revision`. Its validity against a later head is decided by the A4 rule, not by equality with the head.
+- Linter configuration moves under `docs/documentation-estate/` for new inits only. No migration is performed.
 
 ## Constraints & Risks
 
-- Every new allow leg (A1, A2, A3) is fail-closed and ordinal, modelled on the #1026 cleanup legs. A non-docs path must still be denied at commit, PR-create and merge.
-- A docs run writes no orchestration checkpoint by design; readiness evidence is the docs profile plus a passing docs-complete receipt.
-- Follow the repository's toolchain, test, file-size and tonality rules. Hook changes stay PowerShell or bash (no Python in enforcement hooks). Mirrors and push-down bundles stay in parity.
-- B10 and B11 are unverified observations; confirm each before changing behavior.
-- Scope is large (5 Part A items and 13 Part B items across hooks, docs library, MCP tool, skills, templates and analyzers). Planning should assess whether it is epic-scale.
+- Every new allow leg is fail-closed and ordinal. Prefilters run before any I/O. Every git call is bounded, and a timeout or error denies.
+- New code and tests are PowerShell. Enforcement hooks invoke no Python.
+- Mirrors stay in parity: `.claude/`, `.codex/`, `.agents/`, `.github/`, and the push-down bundles under `extensions/drm-copilot/resources/`. The Claude `core.json` pack manifest lists the new files, and the Codex manifest is regenerated through `scripts/dev_tools/generate_codex_agent_variants.py`.
+- File size: `DocsLedgerCommands.psm1` is at 785 lines, so the validate command is extracted before any change. `hook-docs-only-diff.ps1` and the Codex main gate cross the 500-line guidance tier only.
+- Issue #1160 concurrently edits the Claude main preimplementation gate. The A1 edit to it is limited to the guarded dot-source and the call site.
+- Tests run in parallel only. No test may depend on order. Suites dot-sourcing hook files remove their functions in `AfterAll`, set no environment variables, and use no temporary files. Fixtures use forward-slash relative paths and `/`-rooted synthetic roots, so the Linux CI job passes.
+- Evidence is append-only. Every timestamp is read from the clock. No artifact encodes an absolute path.
+- A2 adds bounded git calls to every checkpoint-free pr-author delegation in a repository with a docs profile.
 
+## Verification Model
+
+Isolated subagents run `main`'s hooks, so a live run on this branch cannot exercise the new legs. Before merge, behavior is proven by Pester suites for each leg and by a composed end-to-end Pester scenario that drives the A1, A2, A3 (E7 and M9), and A4 decision functions in sequence for one synthetic docs branch through injected seams. No acceptance criterion requires a live post-merge run.
+
+## Acceptance Criteria
+
+Each criterion names the Pester suite intended to prove it. Suite names under `tests/scripts/` are the planned names; the planner may adjust a name but must keep one named suite per criterion.
+
+### A1
+
+- [ ] With no checkpoint at R, a structurally valid profile, and every operand in the docs path set, `git add -- <paths>` is allowed by the Claude and Codex preimplementation gates. Suites: `claude-hooks/enforce-orchestration-preimplementation-gate.DocsEstate.Tests.ps1` and `codex-hooks/enforce-orchestration-preimplementation-gate-docs.Tests.ps1`.
+- [ ] With the same preconditions and a readable, non-empty staged index entirely in the docs path set, `git commit -F <file>` with no pathspec is allowed by both gates. Same suites.
+- [ ] Each of the following denies, and the deny reason ends with the docs-estate suffix naming the listed sub-code: an invalid profile (`DOCS_LEG_PROFILE_INVALID`); an add operand outside the docs path set (`DOCS_LEG_PATH_NOT_ALLOWED`); an unreadable or non-NUL-terminated staged index (`DOCS_LEG_STAGED_INDEX_UNREADABLE`); an empty staged index (`DOCS_LEG_STAGED_INDEX_EMPTY`); a staged path outside the docs path set (`DOCS_LEG_STAGED_PATH_NOT_ALLOWED`). Same suites.
+- [ ] A path under a documentation root outside `docs/` is allowed only when it ends in `.md`, and a non-`.md` path under that root denies with `DOCS_LEG_PATH_NOT_ALLOWED`. Suites: the same gate suites and `claude-hooks/hook-docs-estate-context.Tests.ps1`.
+- [ ] A docs-path `git add` chained with a `pytest`, `ruff`, or `Invoke-Pester` segment, a commit that carries a pathspec, and a commit with any option other than `-m`, `--message`, `-F`, `--file`, or `--trailer` each deny with the existing deny text and an empty docs suffix. Same gate suites.
+- [ ] With a checkpoint present at R, ready or not, the docs leg does not allow, and the gate's existing checkpoint-governed behavior is unchanged. Same gate suites.
+- [ ] Without a profile file at R, every gate deny reason is byte-identical to the reason produced before this change. Same gate suites.
+- [ ] A Write to `artifacts/pr_body_<N>.receipt.json` with no checkpoint and a valid profile at R is allowed. The same Write denies with no profile, with an invalid profile, or with a checkpoint present, and a Write to any other `.json` path is not admitted by the docs leg. Same gate suites.
+- [ ] The existing cleanup-leg suites (`claude-hooks/enforce-orchestration-preimplementation-gate.Cleanup.Tests.ps1`, `codex-hooks/enforce-orchestration-preimplementation-gate-cleanup.Tests.ps1`) pass unchanged.
+- [ ] `hook-docs-estate-context.ps1` and `enforce-orchestration-preimplementation-gate-docs.ps1` are byte-identical across `.claude/hooks/`, `.codex/hooks/`, and both push-down bundles. Suite: `claude-hooks/hook-docs-estate-context.Parity.Tests.ps1`, together with the existing push-down contract tests.
+
+### A2
+
+- [ ] A checkpoint-free `Agent(pr-author)` whose prompt carries exactly one `branch:` line and exactly one `base:` line is allowed when the profile is valid, the `<base>...HEAD` diff is non-empty and entirely in the docs path set, and the receipt passes with the A4 rule. Suite: `claude-hooks/enforce-model-routing-receipt.DocsEstate.Tests.ps1`.
+- [ ] A base other than `main` (for example an epic integration branch) is accepted when the other conditions hold. Same suite.
+- [ ] Each of the following denies with the named sub-code: a missing or duplicated `branch:` line, a missing or duplicated `base:` line, or a value containing `..` (`DOCS_DELEGATION_LABEL_INVALID`); an invalid profile (`DOCS_DELEGATION_PROFILE_INVALID`); an unresolvable `origin/<base>` or `HEAD`, a git timeout, or a non-NUL-terminated diff (`DOCS_DELEGATION_DIFF_UNREADABLE`); an empty diff (`DOCS_DELEGATION_DIFF_EMPTY`); a diff path outside the docs path set (`DOCS_DELEGATION_PATH_NOT_ALLOWED`); a receipt that is absent, unreadable, of the wrong kind or mode, or not `pass` (`DOCS_DELEGATION_RECEIPT_INVALID`); a receipt that fails the A4 rule (the A4 reason code). Same suite.
+- [ ] With a checkpoint present, the docs leg does not apply and the existing receipt check governs. Without a profile file, the deny text is byte-identical to the text produced before this change. Same suite.
+- [ ] The cleanup delegation exemption keeps its behavior. Suite: the existing `claude-hooks/enforce-model-routing-receipt.Cleanup.Tests.ps1` passes unchanged.
+
+### A3
+
+- [ ] `docs-init -Write` plans and writes the markdownlint and Vale files under `docs/documentation-estate/` and writes `.github/workflows/_docs-quality.yml`. It writes no `.markdownlint.json`, `.vale.ini`, or `.vale/` at the repository root. Suites: `claude-lib/docs/DocsPageTemplates.Tests.ps1`, `claude-lib/docs/DocsInitTemplate.DocsWorkflow.Tests.ps1`, and `claude-lib/docs/DocsProfileCommands.Tests.ps1` (updated).
+- [ ] `Get-DocsOnlyPathViolation` reports no violation for a path list of `docs/` paths plus `.github/workflows/_docs-quality.yml`. It reports a violation when one further non-`docs/` path is added, and when a path differs from the constant only by case, by a prefix, or by a suffix. Suites: `claude-hooks/hook-docs-only-diff.Tests.ps1` and `codex-hooks/hook-docs-only-diff.Tests.ps1`.
+- [ ] E7 allows a docs-only PR whose diff is `docs/` paths plus the workflow path, and denies with `DOCS_ONLY_EXEMPTION_NON_DOCS_PATH` when one extra non-docs path is present. Suite: `claude-hooks/enforce-pr-author-skill.DocsOnly.Exemption.Tests.ps1`.
+- [ ] M9 allows the same docs-plus-workflow diff and denies the same diff with one extra non-docs path, on both runtimes. Suites: `claude-hooks/enforce-epic-merge-gate.DocsOnly.Tests.ps1` and `codex-hooks/enforce-epic-merge-gate-docs-only.Tests.ps1`.
+- [ ] `$script:DocsOnlyInitWorkflowPath` equals the workflow destination row returned by `Get-DocsInitTemplate`. Suite: `claude-hooks/hook-docs-only-diff.InitWorkflowParity.Tests.ps1`.
+- [ ] `docs-init/SKILL.md` (all copies) and `consumer-onboarding.md` state the new configuration locations and the `--config` usage for Vale and markdownlint, and they state that no workflow step runs the linters. Suite: a skill-text assertion in `claude-runtime/docs-authoring-roles.Skills.Tests.ps1` (extended).
+
+### A4
+
+- [ ] `Get-DocsReceiptRevisionDecision` allows when the receipt revision equals the snapshot revision, is an ancestor of the head, and no changed path lies under a source root. It also allows when the head equals the receipt revision. Suite: `claude-lib/docs/DocsReceiptRevision.Tests.ps1`.
+- [ ] The function denies with `RECEIPT_REVISION_SNAPSHOT_MISMATCH`, `RECEIPT_REVISION_NOT_ANCESTOR`, `RECEIPT_SOURCE_DRIFT` (listing drifted paths, including a path under a source root reached through a segment-anchored match only), and `RECEIPT_REVISION_UNRESOLVED` (null ancestry input). Each message names the refresh procedure. Same suite.
+- [ ] A property test over generated revisions, ancestry values, changed-path sets, and source roots shows that the function allows exactly when equality, ancestry, and the absence of drift all hold. Suite: `claude-lib/docs/DocsReceiptRevision.Properties.Tests.ps1`.
+- [ ] `Test-DocsCompleteGateReceipt` accepts a pass receipt whose revision is an ancestor of the PR head with no source drift, and it denies a receipt whose source drifted and a receipt whose revision is not an ancestor. Suites: `claude-lib/docs/DocsCompleteGate.Tests.ps1` and `claude-hooks/enforce-docs-complete-gate.Tests.ps1` (updated; the earlier head-equality cases are revised to the new rule).
+- [ ] `Test-DocsValidateArgument` and `Invoke-DocsValidateCommand` reside in `DocsValidateCommands.psm1`, the `validate` dispatch row resolves to that module, and `DocsLedgerCommands.psm1` no longer defines them. Suite: `claude-lib/docs/DocsValidateCommands.Tests.ps1`, with the existing `DocsLedgerCommands.Validate.Tests.ps1` cases moved or retargeted.
+- [ ] `validate -Mode docs-complete -WriteReceipt` without `-Revision` writes a receipt whose `revision` equals the snapshot revision. It returns a usage error naming `inventory -Revision` when the snapshot revision is null or absent. `validate` without `-WriteReceipt` still requires `-Revision`. Suites: `claude-lib/docs/DocsValidateCommands.Tests.ps1` and `claude-lib/docs/DocsLedgerCommands.Properties.Tests.ps1` (the docs-complete plus `-WriteReceipt` row is given its deliberate disposition).
+- [ ] In docs-complete mode, `validate` reports an error finding and writes no pass receipt when the snapshot revision is not an ancestor of the repository `HEAD` or when source paths drifted. Suite: `claude-lib/docs/DocsValidateCommands.Tests.ps1`.
+- [ ] `validate -Help` output states that `-Revision` defaults to the snapshot revision under `-WriteReceipt`. Same suite.
+
+### A5
+
+- [ ] Every copy of `documentation-workflow/SKILL.md` contains `## Commit, Receipt and Pull Request`, with the commit, receipt, push, and delegation steps in that order, the delegation-prompt contract (`branch:`, `base:`, the canonical issue line, `Author-asserted autoclose issues:`, `gh pr create --head <branch> --base <base>`), and the tracking-issue rule. Every copy also contains `## Refresh After Rebase or Source Change`, with the refresh steps in the order stated in `## Behavior`. The existing dispatch-order and option-reference assertions still pass. Suite: `claude-runtime/documentation-workflow.CommitStage.Tests.ps1`.
+- [ ] Every copy of `pr-author/SKILL.md` documents the checkpoint-free docs-estate delegation-prompt contract after `## Coordinator-Session Topology (issue #1011)`. Suite: `claude-runtime/pr-author-docs-estate-delegation-contract.Tests.ps1`. The existing pr-author contract suites pass.
+- [ ] The execution-environment brief copies remain byte-identical and contain a docs-estate legs bullet in `## Hook Execution Context`, and `cleanup-merged-worktrees.SkillText.Tests.ps1` still passes. Suites: `dev_tools/test_execution_environment_brief_contracts.py` (existing contract test, run unchanged) and the existing cleanup skill-text suite.
+
+### End-to-end and cross-cutting
+
+- [ ] A composed scenario for one synthetic docs branch, with no checkpoint, a valid profile, `docs/` pages, estate artifacts, and the docs-init workflow, runs through the following sequence with injected seams: the A1 gate allows `git add` and `git commit` of the init outputs and of the docs-complete estate; the A1 gate allows the pr-author receipt Write; the A2 leg allows `Agent(pr-author)`; E7 allows `gh pr create`; and M9 and the A4-based docs-complete gate allow the merge. The same scenario with one added non-docs path denies at commit, at delegation, at PR creation, and at merge. Suite: `claude-hooks/docs-estate-workflow.EndToEnd.Tests.ps1`.
+- [ ] No new or changed hook invokes Python. Suite: the existing `claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`. Each new hook uses the guarded dot-source pattern. Suite: the existing `claude-runtime/hook-dependency-guard-completeness.Tests.ps1`.
+- [ ] The push-down resource and pack-manifest contract tests pass with the new Claude and Codex files, and the Codex generator `--check` reports no drift.
+- [ ] The full toolchain loop passes in a single pass, with parallel test execution only. Every new or changed PowerShell production file has line coverage at or above 85%, measured from the Pester coverage report, and coverage does not regress on changed lines.
 
 ## Implementation Strategy
 
-- Implementation scope (what changes, not sequencing):
-- New classes/functions/commands to add or update:
-- Dependency changes (new/removed packages) and rationale:
-- Logging/telemetry additions and locations:
-- Rollout plan (feature flags, staged deploys, fallback path):
+- New files: `enforce-orchestration-preimplementation-gate-docs.ps1` and `hook-docs-estate-context.ps1` (each in four copies); `DocsReceiptRevision.psm1` and `DocsValidateCommands.psm1` (each with a Claude bundle copy); optionally an `enforce-model-routing-receipt` docs sibling.
+- Changed files: both main preimplementation gates (guarded dot-source and call site only), `hook-docs-only-diff.ps1` (four copies), `enforce-model-routing-receipt.ps1`, `enforce-docs-complete-gate.ps1`, `DocsCompleteGate.psm1`, `DocsLedgerCommands.psm1` (extraction), `Invoke-DocsCommand.ps1`, `DocsProfileCommands.psm1`, the skill copies named above, the engineering documentation pages (`consumer-onboarding.md`, `command-reference.md`, `workflow.md`), and the pack manifests.
+- No dependency changes. Rollout is by merge. No feature flag is needed, because every leg is inert without a docs profile.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (README, docs/features/active/... links)
-- [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
-
-## Seeded Test Conditions (from potential)
-- [ ] Unit coverage areas: the A1/A2 allow legs (allow and each deny condition), the E7/M9 exemption with the init outputs (allow) plus one extra non-docs path (deny), the A4 revision rule (ancestor, drift deny), B1 first-run role output, B2 batch equivalence against sequential application, B4 template front matter through the page checker, B5 page splitting, B6 missing source root, B7 malformed link target as a finding, B8 default exclusions, B9 cross-module subparser registration fixture, B10 MCP/CLI diagnostic parity, B11 line-ending stability of hashes.
-- [ ] Integration scenarios: a first-time end-to-end `/documentation-workflow` run with no orchestration checkpoint, through commit, push and PR creation.
-- [ ] CLI/API examples: `update-ledger -Operations <json path>` and its MCP equivalent; `validate -WriteReceipt` with the default revision.
+- [ ] All acceptance criteria above are checked off with evidence.
+- [ ] Mirrors and push-down bundles are in parity.
+- [ ] The full toolchain loop passes.
+- [ ] The engineering documentation and skills are updated.
+- [ ] Part B items remain tracked in #1173 and none is implemented here.
