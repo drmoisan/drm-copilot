@@ -39,6 +39,9 @@ BeforeDiscovery {
         @{ Token = 'validate-bash.ps1'; Ac = 'U7' }
         @{ Token = 'Codex enforcement gap'; Ac = 'S11' }
         @{ Token = 'Python and TypeScript parity gap'; Ac = 'S11' }
+        @{ Token = 'owner-directives.jsonl'; Ac = 'AC-40' }
+        @{ Token = 'OWNER-DIRECTIVE-DECISION:'; Ac = 'AC-40' }
+        @{ Token = 'enforce-owner-directive-pass-down.ps1'; Ac = 'AC-40' }
     )
     $script:ClassName = @(
         @{ Class = 'scheduling' }
@@ -60,6 +63,15 @@ BeforeDiscovery {
         @{ Pointer = '.claude/skills/parallel-orchestrate/SKILL.md' }
         @{ Pointer = '.claude/skills/epic-orchestrate/SKILL.md' }
         @{ Pointer = '.agents/skills/epic-orchestrate/SKILL.md' }
+        @{ Pointer = '.claude/agents/atomic-executor.md' }
+        @{ Pointer = '.claude/agents/atomic-planner.md' }
+        @{ Pointer = '.claude/agents/feature-review.md' }
+        @{ Pointer = '.claude/agents/task-researcher.md' }
+        @{ Pointer = '.claude/agents/prd-feature.md' }
+        @{ Pointer = '.claude/agents/python-typed-engineer.md' }
+        @{ Pointer = '.claude/agents/powershell-typed-engineer.md' }
+        @{ Pointer = '.claude/agents/csharp-typed-engineer.md' }
+        @{ Pointer = '.claude/agents/typescript-engineer.md' }
     )
     $script:RuleId = @(
         @{ Rule = 'B1' }, @{ Rule = 'B2' }, @{ Rule = 'B3' }, @{ Rule = 'B4' }, @{ Rule = 'B5' },
@@ -165,6 +177,42 @@ Describe 'owner-directives pointers' {
         $found | Should -BeTrue -Because "$Pointer must carry the owner-directives pointer sentence"
     }
 
+    It 'AC-22 states the write-on-return token <Token> in the orchestrate skill' -ForEach @(
+        @{ Token = 'decision_source' }
+        @{ Token = 'decided_by' }
+    ) {
+        # Arrange
+        $text = Get-OwnerDirectiveRepoText -RelativePath '.claude/skills/orchestrate/SKILL.md'
+
+        # Act
+        $found = $text.Contains($Token)
+
+        # Assert
+        $found | Should -BeTrue -Because "the orchestrate skill must state the write-on-return token $Token"
+    }
+
+    It 'AC-26 states hook-level pass-down in the epic-orchestrate skill' {
+        # Arrange
+        $text = Get-OwnerDirectiveRepoText -RelativePath '.claude/skills/epic-orchestrate/SKILL.md'
+
+        # Act
+        $found = $text.Contains('enforce-owner-directive-pass-down.ps1')
+
+        # Assert
+        $found | Should -BeTrue -Because 'the epic-orchestrate skill must name the pass-down hook'
+    }
+
+    It 'AC-26 adds no keep-the-turn-open rule to the epic-orchestrate skill' {
+        # Arrange
+        $text = Get-OwnerDirectiveRepoText -RelativePath '.claude/skills/epic-orchestrate/SKILL.md'
+
+        # Act
+        $found = $text.Contains('does not end its turn')
+
+        # Assert
+        $found | Should -BeFalse -Because 'relay is hook-level, so the epic orchestrator is never told to keep its turn open'
+    }
+
     It 'S12 leaves the frozen epic-orchestrator agent without a pointer' {
         # Arrange
         $text = Get-OwnerDirectiveRepoText -RelativePath '.claude/agents/epic-orchestrator.md'
@@ -200,6 +248,17 @@ Describe 'orchestrator-state rule owner-directive section' {
 
         # Assert
         $found | Should -BeTrue -Because "the rule table must carry a row for $Rule"
+    }
+
+    It 'AC-44 names the OWNER_DIRECTIVE_RELAY_MISSING check' {
+        # Arrange
+        $text = Get-OwnerDirectiveRepoText -RelativePath $script:RulePath
+
+        # Act
+        $found = $text.Contains('OWNER_DIRECTIVE_RELAY_MISSING')
+
+        # Assert
+        $found | Should -BeTrue -Because 'the rule must name the pass-down coverage block reason'
     }
 
     It 'S13 states the parity and Codex limitations and the key-gated status' {

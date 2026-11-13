@@ -514,4 +514,30 @@ Describe 'orchestrator output validator handler proof' {
         $result.ExitCode | Should -Be 2
         $result.Stderr.Contains('OrchestratorStateOwnerDirectives.psm1') | Should -BeTrue -Because $result.Stderr
     }
+
+    It 'H10 validate-orchestrator-output.ps1 exits 2 naming <Dependency> when the pass-down module import fails' -ForEach @(
+        @{ Dependency = 'OrchestratorStateOwnerDirectiveSelection.psm1' }, @{ Dependency = 'OrchestratorStateOwnerDirectiveDecision.psm1' }
+    ) {
+        Mock Import-Module { }
+        $failedDependency = $Dependency
+        Mock Import-Module { throw "simulated load failure: $failedDependency" } -ParameterFilter { $Name -like "*$failedDependency" }
+        $result = Invoke-OrchestratorOutputHookProcess
+        $result.Thrown | Should -BeNullOrEmpty -Because "the hook must not throw ($($result.Thrown))"
+        $result.ExitCode | Should -Be 2
+        $result.Stderr.Contains($Dependency) | Should -BeTrue -Because $result.Stderr
+    }
+
+    It 'H10 validate-orchestrator-output.ps1 exits 2 naming validate-orchestrator-output-owner-pass-down.ps1 when the sibling fails to load' {
+        Mock Import-Module { }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'validate-orchestrator-output-owner-pass-down.ps1') { throw 'simulated load failure: validate-orchestrator-output-owner-pass-down.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
+        $result = Invoke-OrchestratorOutputHookProcess
+        $result.Thrown | Should -BeNullOrEmpty -Because "the hook must not throw ($($result.Thrown))"
+        $result.ExitCode | Should -Be 2
+        $result.Stderr.Contains('validate-orchestrator-output-owner-pass-down.ps1') | Should -BeTrue -Because $result.Stderr
+    }
 }

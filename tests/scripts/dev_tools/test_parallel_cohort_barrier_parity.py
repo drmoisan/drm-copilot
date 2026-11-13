@@ -28,9 +28,10 @@ must emit, empty when the barrier holds).
 Parity claim scope. Only barrier messages are compared: both suites filter
 validator output to the strings beginning with the literal violation token
 before asserting. Corpus documents are restricted to JSON-representable values
-that round-trip through both runtimes' native types, so the three divergence
-classes recorded in ``.claude/rules/parallel-orchestration.md`` are avoided
-rather than fixed.
+that round-trip through both runtimes' native types. Of the divergence classes
+recorded in ``.claude/rules/parallel-orchestration.md``, class (1),
+``pythonRepr`` quote selection, is resolved for these validators by issue #1164,
+and classes (2) and (3) are avoided rather than fixed.
 
 The corpus files are committed and read-only here. No temporary file is created,
 no external process is started, and no other runtime is invoked: parity is

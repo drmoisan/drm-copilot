@@ -1,0 +1,116 @@
+[
+  {
+    "stage": "promotion",
+    "attempt": 1,
+    "started_at": "2026-11-09T21:32:52Z",
+    "ended_at": "2026-11-09T21:33:48Z"
+  },
+  {
+    "stage": "research",
+    "attempt": 1,
+    "started_at": "2026-11-09T21:33:48Z",
+    "ended_at": "2026-11-09T21:51:14Z"
+  },
+  {
+    "stage": "feature_documents",
+    "attempt": 1,
+    "started_at": "2026-11-09T21:51:14Z",
+    "ended_at": "2026-11-09T21:59:30Z"
+  },
+  {
+    "stage": "atomic_planning",
+    "attempt": 1,
+    "started_at": "2026-11-09T21:59:30Z",
+    "ended_at": "2026-11-09T22:13:18Z"
+  },
+  {
+    "stage": "preflight",
+    "attempt": 1,
+    "started_at": "2026-11-09T22:13:18Z",
+    "ended_at": "2026-11-09T22:25:28Z"
+  },
+  {
+    "stage": "atomic_planning",
+    "attempt": 2,
+    "started_at": "2026-11-09T22:25:28Z",
+    "ended_at": "2026-11-09T22:34:32Z"
+  },
+  {
+    "stage": "preflight",
+    "attempt": 2,
+    "started_at": "2026-11-09T22:34:32Z",
+    "ended_at": "2026-11-09T22:43:45Z"
+  },
+  {
+    "stage": "atomic_execution",
+    "attempt": 1,
+    "started_at": "2026-11-10T03:08:35Z",
+    "ended_at": "2026-11-10T04:39:13Z"
+  },
+  {
+    "stage": "atomic_execution",
+    "attempt": 2,
+    "started_at": "2026-11-11T03:54:15Z",
+    "ended_at": "2026-11-11T06:59:00Z"
+  },
+  {
+    "stage": "atomic_execution",
+    "attempt": 3,
+    "started_at": "2026-11-12T12:31:14Z",
+    "ended_at": "2026-11-12T13:09:03Z"
+  },
+  {
+    "stage": "atomic_execution",
+    "attempt": 4,
+    "started_at": "2026-11-13T13:43:26Z",
+    "ended_at": "2026-11-13T13:55:34Z"
+  },
+  {
+    "stage": "feature_review",
+    "attempt": 1,
+    "started_at": "2026-11-13T13:55:34Z",
+    "ended_at": "2026-11-13T14:12:33Z"
+  },
+  {
+    "stage": "remediation_cycle_1",
+    "attempt": 1,
+    "started_at": "2026-11-13T14:12:33Z",
+    "ended_at": "2026-11-13T16:02:54Z"
+  },
+  {
+    "stage": "feature_review",
+    "attempt": 2,
+    "started_at": "2026-11-13T16:02:54Z",
+    "ended_at": "2026-11-13T16:11:33Z"
+  },
+  {
+    "stage": "pr_authoring",
+    "attempt": 1,
+    "started_at": "2026-11-13T16:11:33Z",
+    "ended_at": "2026-11-13T16:15:13Z"
+  },
+  {
+    "stage": "ci_gate",
+    "attempt": 1,
+    "started_at": "2026-11-13T16:15:13Z",
+    "ended_at": "2026-11-13T16:31:18Z"
+  },
+  {
+    "stage": "remediation_cycle_2",
+    "attempt": 1,
+    "started_at": "2026-11-13T16:31:18Z",
+    "ended_at": "2026-11-13T17:44:10Z"
+  },
+  {
+    "stage": "feature_review",
+    "attempt": 3,
+    "started_at": "2026-11-13T17:44:10Z",
+    "ended_at": "2026-11-13T17:51:46Z"
+  },
+  {
+    "stage": "ci_gate",
+    "attempt": 2,
+    "started_at": "2026-11-13T17:51:46Z",
+    "ended_at": "2026-11-13T18:32:44Z"
+  }
+]

@@ -146,6 +146,14 @@ The orchestrator does not perform deep implementation itself. It coordinates, tr
 
 An instruction from the repository owner reaches a delegated agent only as defined in the `owner-directives` skill: record it in the checkpoint's `owner_directives` before relaying it (record before relay), and relay only the recorded entries in a fenced `Owner directives:` block.
 
+### Owner-Directive Write on Return
+
+When a worker returns, the orchestrator writes the worker's owner-directive decisions into the checkpoint before its next delegation:
+
+1. Copy into `owner_directives` every entry selected for the item (from the item ledger or the parent checkpoint and ledger) that the checkpoint lacks, before writing any record for it.
+2. Read the worker's decision files under `artifacts/orchestration/owner-directive-decisions/<agent_id>/` and the `OWNER-DIRECTIVE-DECISION:` lines of its final message. A decision file takes precedence over a return line for the same `id`.
+3. Append one `owner_directive_records` entry per decision, with `decided_by` set to the worker's agent type and `decided_at` set to the recorded value, or to the orchestrator's own clock reading when the recorded value is `-`. The optional fields `agent_id` and `decision_source` (`decision_file` or `return_line`) may be added.
+
 Single-pass preflight for S4 planning (and for preparation mode). The directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY` goes in the `atomic-executor` delegation prompt only, never in the plan file. Preflight follows `### Single-Pass Preflight` in the `atomic-plan-contract` skill: the preflight executor fixes trivial defects in place and returns only substantive defects as `PREFLIGHT-DEFECT:` lines. The at-most-one-return rule applies:
 
 1. Preflight round one returns `PREFLIGHT: ALL CLEAR` (in-place `PREFLIGHT-FIX:` lines permitted) or `PREFLIGHT: REVISIONS REQUIRED` with every substantive defect listed.
