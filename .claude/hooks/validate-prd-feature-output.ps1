@@ -140,13 +140,13 @@ function Invoke-PrdFeatureOutputValidation {
     if ($null -ne $ReadTranscriptHead) { $targetArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
     if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
     $target = Resolve-SubagentStopTargetWorktree @targetArguments
-    $specLocation = if ([string]::IsNullOrWhiteSpace($specPath)) { $null } else { Resolve-SubagentStopArtifactLocation -Path $specPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root }
+    $specLocation = if ([string]::IsNullOrWhiteSpace($specPath)) { $null } else { Resolve-SubagentStopArtifactLocation -Path $specPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root -Target $target }
     if ($null -ne $specLocation -and $specLocation.Rejected) { return @{ Ok = $false; Message = "prd-feature hook: spec-path '$specPath' is rejected: $($specLocation.RejectionDetail)." } }
     $specProbe = if ($null -eq $specLocation) { $null } else { $specLocation.ProbePath }
     if ($null -eq $specProbe -or -not (Test-PrdFeatureArtifactFile -Path $specProbe)) { return @{ Ok = $false; Message = "prd-feature hook: spec-path is required and must exist.$(Get-SubagentStopTargetNote -Target $target -ProbePath $specProbe -SessionRoot $root)" } }
     try { $specContent = Get-PrdFeatureArtifactContent -Path $specProbe } catch { return @{ Ok = $false; Message = "prd-feature hook: failed to read spec-path '$specPath': $($_.Exception.Message)" } }
     if (-not (Test-SpecNumericCriterion -SpecContent $specContent)) { return @{ Ok = $true; Message = $null } }
-    $researchLocation = if ([string]::IsNullOrWhiteSpace($researchPath)) { $null } else { Resolve-SubagentStopArtifactLocation -Path $researchPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root }
+    $researchLocation = if ([string]::IsNullOrWhiteSpace($researchPath)) { $null } else { Resolve-SubagentStopArtifactLocation -Path $researchPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root -Target $target }
     if ($null -ne $researchLocation -and $researchLocation.Rejected) { return @{ Ok = $false; Message = "prd-feature hook: research-path '$researchPath' is rejected: $($researchLocation.RejectionDetail)." } }
     $researchProbe = if ($null -eq $researchLocation) { $null } else { $researchLocation.ProbePath }
     if ($null -eq $researchProbe -or -not (Test-PrdFeatureArtifactFile -Path $researchProbe)) { return @{ Ok = $false; Message = "prd-feature hook: numeric acceptance criterion requires an existing research-path.$(Get-SubagentStopTargetNote -Target $target -ProbePath $researchProbe -SessionRoot $root)" } }

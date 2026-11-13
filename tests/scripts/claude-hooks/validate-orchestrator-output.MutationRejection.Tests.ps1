@@ -199,7 +199,9 @@ Describe 'validate-orchestrator-output parallel mutation rejection' {
 
             # Assert
             $result.Ok | Should -BeTrue -Because $result.Message
-            Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $path }
+            # A distinct name: inside the filter, $path resolves to the mock parameter $Path.
+            $expectedPath = $path
+            Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $expectedPath }
             $routingCalls.Count | Should -Be 1
             $routingCalls[0] | Should -BeExactly $path
         }
@@ -217,7 +219,9 @@ Describe 'validate-orchestrator-output parallel mutation rejection' {
             # Assert
             $result.Ok | Should -BeFalse
             $result.Message.Contains('missing required field') | Should -BeTrue -Because $result.Message
-            Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $path }
+            # A distinct name: inside the filter, $path resolves to the mock parameter $Path.
+            $expectedPath = $path
+            Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $expectedPath }
         }
     }
 

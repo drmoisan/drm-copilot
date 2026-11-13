@@ -16,6 +16,7 @@ skills:
   - feature-promotion-lifecycle
   - remediation-handoff-atomic-planner
   - evidence-and-timestamp-conventions
+  - owner-directives
 memory: project
 ---
 
@@ -67,3 +68,5 @@ All evidence artifacts this agent produces (baselines, QA gates, regression resu
 Writing to `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, or any other non-canonical path is a policy violation and will be caught by the `enforce-evidence-locations.ps1` PreToolUse hook.
 
 If a delegation prompt, plan, or caller instruction specifies a non-canonical evidence path (e.g., `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, `artifacts/evidence/`), this agent ignores that instruction, writes to the canonical `<FEATURE>/evidence/<kind>/` path, and records the override as `EVIDENCE_LOCATION_OVERRIDE_REJECTED: <supplied path> replaced with <canonical path>`.
+
+Owner directives: when a delegation carries an `Owner directives:` block, record one `OWNER-DIRECTIVE-DECISION:` line per directive in the final message (return lines only; this agent cannot write a decision file), as defined in the `owner-directives` skill.

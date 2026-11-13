@@ -392,16 +392,19 @@ function ConvertTo-ParallelSchedulingProjection {
     <#
     .SYNOPSIS
         Project each dictionary onto the named keys in ordinal key order; a missing key becomes null.
+    .DESCRIPTION
+        An OptionalKey is projected only for an entry that carries it (issue
+        #1164), so an input without the optional keys yields the same rows as before.
     #>
     [CmdletBinding()]
     [OutputType([System.Object[]])]
-    param([AllowNull()][AllowEmptyCollection()][object[]] $Value = @(), [string[]] $Key)
+    param([AllowNull()][AllowEmptyCollection()][object[]] $Value = @(), [string[]] $Key, [string[]] $OptionalKey = @())
 
-    $sortedKey = [string[]]@($Key)
-    [Array]::Sort($sortedKey, [System.StringComparer]::Ordinal)
     $projection = [System.Collections.Generic.List[object]]::new()
     foreach ($entry in @($Value)) {
         if ($entry -isnot [System.Collections.IDictionary]) { continue }
+        $sortedKey = [string[]](@($Key) + @($OptionalKey | Where-Object { $entry.Contains($_) }))
+        [Array]::Sort($sortedKey, [System.StringComparer]::Ordinal)
         $row = [ordered]@{}
         foreach ($name in $sortedKey) { $row[$name] = Get-ParallelPrecedenceMapValue -Map $entry -Key $name }
         $projection.Add($row)
@@ -418,9 +421,10 @@ function New-ParallelSchedulingRecord {
 
     .DESCRIPTION
         The record carries exactly schema_version, parallel_slug, edges,
-        tolerated_overlaps, precedence, and items. Edges keep a, b, and reason;
-        tolerated overlaps keep a, b, reasons, cost, and benefit; precedence
-        entries keep before, after, source, and recorded_at; items keep
+        tolerated_overlaps, precedence, and items. Edges keep a, b, and reason,
+        plus hard, cost, and benefit when present; tolerated overlaps keep a, b,
+        reasons, cost, and benefit; precedence entries keep before, after,
+        source, and recorded_at, plus kind and reason when present; items keep
         issue_num, branch_name, plan_path, plan_hash, base_commit,
         preparation_status, and complexity_band. Keys are in ordinal order at
         every level and lists are sorted by their keys, so the same input always
@@ -444,9 +448,10 @@ function New-ParallelSchedulingRecord {
     if ([string]::IsNullOrWhiteSpace($Slug)) { throw 'New-ParallelSchedulingRecord requires -Slug.' }
     $byPair = @(@{ Expression = { [long]$_['a'] } }, @{ Expression = { [long]$_['b'] } })
     # Each projection is parenthesized so the pipeline enumerates its rows rather than passing the array as one object.
-    $edges = @((ConvertTo-ParallelSchedulingProjection -Value $Edge -Key @('a', 'b', 'reason')) | Sort-Object -Property $byPair)
+    # Edge estimates and precedence kind and reason are emitted only when present (issue #1164).
+    $edges = @((ConvertTo-ParallelSchedulingProjection -Value $Edge -Key @('a', 'b', 'reason') -OptionalKey @('hard', 'cost', 'benefit')) | Sort-Object -Property $byPair)
     $tolerated = @((ConvertTo-ParallelSchedulingProjection -Value $ToleratedOverlap -Key @('a', 'b', 'reasons', 'cost', 'benefit')) | Sort-Object -Property $byPair)
-    $precedence = @((ConvertTo-ParallelSchedulingProjection -Value $Precedence -Key @('before', 'after', 'source', 'recorded_at')) |
+    $precedence = @((ConvertTo-ParallelSchedulingProjection -Value $Precedence -Key @('before', 'after', 'source', 'recorded_at') -OptionalKey @('kind', 'reason')) |
             Sort-Object -Property @{ Expression = { [long]$_['before'] } }, @{ Expression = { [long]$_['after'] } })
     $items = @((ConvertTo-ParallelSchedulingProjection -Value $Item -Key $script:RecordItemKey) | Sort-Object -Property @{ Expression = { [long]$_['issue_num'] } })
     $record = [ordered]@{}

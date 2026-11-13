@@ -334,9 +334,19 @@ def test_main_dispatches_the_cli_inputs_into_the_pure_detection_function(
     monkeypatch.setattr(LOAD_SEAM, _load_seam(state, CONFIG))
     captured: list[tuple[tuple[str, ...], tuple[str, ...]]] = []
 
-    def _record(changed: Sequence[str], declared: Sequence[str]) -> tuple[str, ...]:
-        """Record the arguments the command line passed and report no escape."""
+    def _record(
+        changed: Sequence[str],
+        declared: Sequence[str],
+        *,
+        read_paths: Sequence[str] = (),
+    ) -> tuple[str, ...]:
+        """Record the arguments the command line passed and report no escape.
+
+        The keyword-only ``read_paths`` matches ``detect_escaped_paths`` since
+        issue #1164; the item here declares none, so it arrives empty.
+        """
         captured.append((tuple(changed), tuple(declared)))
+        assert tuple(read_paths) == ()
         return ()
 
     monkeypatch.setattr(ESCAPE_SEAM, _record)

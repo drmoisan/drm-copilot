@@ -45,10 +45,11 @@ import { validateArtifact } from "../../../src/lib/validate/orchestration-artifa
  *     Only barrier messages are compared: both suites filter validator output to
  *     the strings beginning with the literal violation token before asserting.
  *     Corpus documents are restricted to JSON-representable values that
- *     round-trip through both runtimes' native types, so the three divergence
- *     classes recorded in `.claude/rules/parallel-orchestration.md` —
- *     `pythonRepr` quote selection, integral floats erased by `JSON.parse`, and
- *     boolean/integer equality — are avoided rather than fixed.
+ *     round-trip through both runtimes' native types. Of the divergence classes
+ *     recorded in `.claude/rules/parallel-orchestration.md`, class (1),
+ *     `pythonRepr` quote selection, is resolved for these validators by issue #1164;
+ *     classes (2) and (3), integral floats erased by `JSON.parse` and
+ *     boolean/integer equality, are avoided rather than fixed.
  */
 
 /**

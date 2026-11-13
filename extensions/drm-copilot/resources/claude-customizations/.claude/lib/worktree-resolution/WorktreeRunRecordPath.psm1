@@ -100,19 +100,38 @@ function Test-WorktreeRunRecordedPathMatchesTarget {
     .PARAMETER BaseRoot
         Optional. The roots a relative record is joined to: the main checkout root and the
         root that holds the checkpoint. With none, a relative record matches nothing.
+    .PARAMETER RecordedBranch
+        Optional. The record's branch_name (issue #1163).
+    .PARAMETER LiveWorktreeRoot
+        Optional. The live registered worktree roots.
+    .PARAMETER BranchWorktreeResolver
+        Optional { param($Branch) <result with WorktreeRoot and ReasonCode> }. Only when a rooted
+        record names no live root, RecordedBranch is non-blank, and a resolver is supplied, the
+        record matches when the resolver returns no reason code and a root equal to the target,
+        so a record left behind by a host move is found through its portable branch.
     #>
     [CmdletBinding()]
     [OutputType([bool])]
     param(
         [Parameter(Mandatory = $true)] [AllowNull()] [AllowEmptyString()] [string] $RecordedPath,
         [Parameter(Mandatory = $true)] [AllowNull()] [AllowEmptyString()] [string] $TargetPath,
-        [AllowNull()] [AllowEmptyCollection()] [string[]] $BaseRoot = @()
+        [AllowNull()] [AllowEmptyCollection()] [string[]] $BaseRoot = @(),
+        [AllowNull()] [AllowEmptyString()] [string] $RecordedBranch = $null,
+        [AllowNull()] [AllowEmptyCollection()] [string[]] $LiveWorktreeRoot = @(),
+        [AllowNull()] [scriptblock] $BranchWorktreeResolver = $null
     )
 
     if ([string]::IsNullOrWhiteSpace($RecordedPath) -or [string]::IsNullOrWhiteSpace($TargetPath)) { return $false }
     $recorded = $RecordedPath.Trim() -replace '\\', '/'
     if ($recorded -match $script:AbsolutePathPattern) {
-        return (Test-WorktreeRunPathEqual -Left $recorded -Right $TargetPath)
+        if (Test-WorktreeRunPathEqual -Left $recorded -Right $TargetPath) { return $true }
+        if ([string]::IsNullOrWhiteSpace($RecordedBranch) -or $null -eq $BranchWorktreeResolver) { return $false }
+        foreach ($live in @($LiveWorktreeRoot)) {
+            if (Test-WorktreeRunPathEqual -Left $recorded -Right $live) { return $false }
+        }
+        $resolved = & $BranchWorktreeResolver $RecordedBranch
+        if ($null -eq $resolved -or -not [string]::IsNullOrWhiteSpace([string] $resolved.ReasonCode)) { return $false }
+        return (Test-WorktreeRunPathEqual -Left ([string] $resolved.WorktreeRoot) -Right $TargetPath)
     }
     if (-not (Test-WorktreeRunRelativeRecordSafe -Path $recorded)) { return $false }
     foreach ($root in @($BaseRoot)) {
