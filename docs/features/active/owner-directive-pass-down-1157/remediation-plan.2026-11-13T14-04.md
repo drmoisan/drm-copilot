@@ -1,64 +1,101 @@
-# <feature-name> - Plan
+# Owner-Directive Pass-Down - Remediation Plan, Cycle 1
 
-- **Issue:** <issue>
-- **Parent (optional):** <parent-id>
-- **Owner:** <name>
-- **Last Updated:** <yyyy-MM-ddTHH-mm>
-- **Status:** <template>
-- **Version:** <version_number>
+- **Issue:** 1157
+- **Branch:** feature/owner-directive-pass-down-1157
+- **Requirements source:** `docs/features/active/owner-directive-pass-down-1157/remediation-inputs.2026-11-13T14-04.md` (findings F1, F2, F3; `Remediation-Mode: proportionate`)
+- **Context:** `spec.md`, `user-story.md`, the approved plan `plan.2026-11-09T16-32.md`, and `policy-audit`, `code-review`, `feature-audit` `.2026-11-13T14-04.md` in the same folder
+- **Status:** ready for preflight
 
 ## Required References
 
-- General Coding Standards: [`.github/instructions/general-code-change.instructions.md`](../../../../.github/instructions/general-code-change.instructions.md)
-- General Unit Test Policy: [`.github/instructions/general-unit-test.instructions.md`](../../../../.github/instructions/general-unit-test.instructions.md)
-- (Add language-specific policies as needed, e.g. `python-code-change.instructions.md`)
+- Policy reading order: the `policy-compliance-order` skill; PowerShell rules in `.claude/rules/powershell.md`.
+- Tool routes, launchers, PoshQC MCP limits, the batch budget, and CI shape: the `execution-environment` skill. This plan does not restate them.
+- Test cadence: `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill. After every task the executor writes `<FEATURE>/evidence/other/task-check.P<N>-T<M>.<timestamp>.md`; task checks are not gates.
+- `<FEATURE>` is `docs/features/active/owner-directive-pass-down-1157`. SCRATCH means `<session scratchpad>/issue-1157/`; artifacts record the token `SCRATCH`, never a host path.
+- The merge base is the output of `git merge-base origin/main HEAD` in the item worktree, derived at run time.
 
-**All work must comply with these policies; do not duplicate their content here.**
+## Premise Corrections
+
+- **F1 seam transparency.** The inputs state that `validate-orchestrator-output.OwnerDirectives.Tests.ps1` null-mocks `Get-CheckpointFileContent`. Its outermost `BeforeAll` does, but its rows replace that mock through `Set-OwnerDirectiveCheckpointRead` with a path-agnostic mock that returns the checkpoint text for every path. A plain switch of the sibling's reads to `Get-CheckpointFileContent` would hand that checkpoint text to the sibling as the ledger, parent, and child text, so rows such as `S8 allows a refused gate_bypass record for <Type>` and `U5 allows an honored extra_planner_revision record` would block with `OWNER_DIRECTIVE_LEDGER_INVALID`. The design therefore adds a self-read guard (P1-T6): a sibling source read whose content is ordinally equal to the checkpoint text under validation is treated as absent. In production the ledger, parent checkpoint, and child checkpoint are different files from the checkpoint under validation, so the guard changes no production decision except that a ledger file byte-identical to the checkpoint is treated as absent instead of reported invalid. Under every path-agnostic mock that returns the checkpoint text, the guard gives the same decision the former `Read-OrchestratorOutputOwnerPassDownText { $null }` mock gave.
+- **F1 mock removal is required, not optional.** Removing `Read-OrchestratorOutputOwnerPassDownText` makes every unguarded `Mock` or `Register-EpicStateBaselineMock` of it throw (Pester cannot mock an absent command), so the 13 `validate-orchestrator-output*` suites other than the AC-29 suite and the sibling suite lose the line in this cycle (P1-T4). The four `Get-Command`-guarded lines become dead code and are removed (P1-T5).
+- **Ordering.** The mock lines are removed (P1-T3 to P1-T5) while the function still exists, so each of those task checks runs passing suites; P1-T6 then removes the function. Between P1-T3 and P1-T6 the read seam is unmocked in those suites; the window closes before the P1-T7 gate, whose `enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1` rows confirm compliance.
+
+## Changed Behavior and Asserting Tests
+
+| Change | Asserting tests | Disposition |
+|---|---|---|
+| F3: ledger-path suffix comparison becomes case-insensitive in `Get-OwnerDirectivePassDownDecision` | `enforce-owner-directive-pass-down.Tests.ps1` `Describe 'ledger guard (AC-27)'` rows | unchanged (lower-case paths keep the same decision); one row added (P1-T1) |
+| F1: sibling reads go through `Get-CheckpointFileContent`; `Read-OrchestratorOutputOwnerPassDownText` removed | `validate-orchestrator-output.OwnerDirectivePassDown.Tests.ps1` (`Register-PassDownStopSeam`, BeforeAll mock, `reads nothing for an absent path and returns a UTC clock value`) | updated: seam mocks move to `Get-CheckpointFileContent`; the absent-path row keeps only its clock assertion; helper rows added (P1-T6) |
+| same | `validate-orchestrator-output.OwnerDirectives.Tests.ps1` (AC-29) | updated: the added mock line is reverted, file equals the merge base (P1-T3) |
+| same | `validate-orchestrator-output.Tests.ps1`, `.Envelope`, `.FeatureFolder`, `.MutationRejection`, `.Reentry`, `.WaveBarrier`, `.WorktreeResolution`, `.artifact-type-dispatch`, `.human-interaction`, `.model-routing`, `validate-orchestrator-output-resolution.Tests.ps1` (direct `Mock`), `validate-orchestrator-output.TargetWorktree.Tests.ps1`, `validate-orchestrator-output-target.Tests.ps1` (`Register-EpicStateBaselineMock`) | updated: the mock line is removed (P1-T4); assertions unchanged |
+| same | `hook-dependency-failure.Claude.Tests.ps1`, `hook-dependency-failure.SpecialCases.Tests.ps1`, `subagentstop-uncaught-error.Tests.ps1`, `hook-import-failure-exemptions.FailClosed.Tests.ps1` (`Get-Command`-guarded lines) | updated: dead guarded lines removed (P1-T5); the AC-35 import case stays |
+| same | `enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1` (`AC-4 <Path> complies with the baseline isolation form for every closure seam`) | unchanged; it passes because the sibling no longer defines a read seam (the helper body holds no `Get-Content`, `ReadAllText`, or `ReadAllLines` primitive) and `Get-CheckpointFileContent` is already baseline-mocked in every suite that loads the main hook |
+| same | `OrchestratorStateOwnerDirectives.Tests.ps1`, `OrchestratorStateOwnerDirectives.Records.Tests.ps1` | unchanged; they load no hook |
 
 ## Implementation Plan (Atomic Tasks)
 
-> **Instructions for this section:**
-> - Break work into **Phases** (broad buckets) and **Atomic Tasks** (binary, 5-30 min units).
-> - Use `- [ ] [P#-T#]` for every task.
-> - Start every task with a **strong verb** (Implement, Create, Update, Verify).
-> - No "bucket" tasks like "Refactor module" or "Write tests"; split them into specific, verifiable steps.
-> - **Self-Validating Phases:** Include necessary test creation/update tasks *within* the phase that implements the code. Do not defer verification to a final "Testing" phase.
-> - Include explicit baseline artifact tasks (static baselines and one `Phase 0 baseline` run of each test gate), final-QA artifact tasks, and coverage-comparison tasks for every language in scope when policy requires coverage.
-> - Name the expected artifact path or location in each evidence-producing task's acceptance criteria.
-> - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+### Phase 0 — Remediation Baseline
 
-### Phase 0: Context & Inputs
-- [ ] [P0-T1] <Atomic task>
+- [ ] [P0-T1] Record the PowerShell static remediation baseline over `.claude/hooks/validate-orchestrator-output-owner-pass-down.ps1`, `.claude/hooks/enforce-owner-directive-pass-down.ps1`, `tests/scripts/claude-hooks/validate-orchestrator-output.OwnerDirectivePassDown.Tests.ps1`, and `tests/scripts/claude-hooks/enforce-owner-directive-pass-down.Tests.ps1`: formatter drift in check-only mode and `Invoke-ScriptAnalyzer` findings with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, before any edit.
+  - Acceptance: `<FEATURE>/evidence/remediation-baseline/powershell-static.<timestamp>.md` exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` giving a numeric drift count and a numeric finding count per file; a check-only formatter run that changes no file records the before-and-after file hashes as equal.
+- [ ] [P0-T2] Record the remediation baseline reference, with no test run: the Phase 0 Pester baseline `<FEATURE>/evidence/baseline/pester-baseline.2026-11-10T04-02.md` (repo-wide 95.80%, `OrchestratorStateOwnerDirectives.psm1` 100.00%, `validate-orchestrator-output.ps1` 99.30%), the new-file figures of `<FEATURE>/evidence/qa-gates/coverage-comparison.2026-11-12T13-05.md`, the Phase 0 pytest baseline `<FEATURE>/evidence/baseline/pytest-baseline.2026-11-10T04-08.md` (16590 passed, 0 failed), and the merge-base CI pytest TOTAL from the inputs (35355 statements, 1035 missed; 13424 branches, 554 partial; CI run 43170341553); plus the count of files under `.claude`, `extensions`, and `tests` that name `Read-OrchestratorOutputOwnerPassDownText` from `git grep -l Read-OrchestratorOutputOwnerPassDownText -- .claude extensions tests`.
+  - Acceptance: `<FEATURE>/evidence/remediation-baseline/baseline-reference.<timestamp>.md` exists with the four fields, every figure above copied numerically, and a file count of 21 (two hook copies and 19 suites); a different count is recorded as observed and P1-T3 to P1-T6 cover every listed file.
 
-### Phase 1: <Phase Name>
-- [ ] [P1-T1] <Atomic task with strong verb>
-- [ ] [P1-T2] <Atomic task>
-  - Preconditions: <optional>
-  - Acceptance: <optional>
-- [ ] [P1-T3] [phase-gate] Run the full toolchain loop (stages 1 to 6) per `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill and record `<FEATURE>/evidence/qa-gates/phase-gate.P1.<timestamp>.md`
+### Phase 1 — Ledger Path Case and Sibling Read Seam
 
-### Phase 2: <Phase Name>
-- [ ] [P2-T1] <Atomic task>
-- [ ] [P2-T2] <Atomic task>
+- [ ] [P1-T1] [expect-fail] Add the row `It 'denies a subagent Write to the case-variant ledger path <Variant>'` to `Describe 'ledger guard (AC-27)'` in `tests/scripts/claude-hooks/enforce-owner-directive-pass-down.Tests.ps1`, with `-ForEach` variants `Artifacts/Orchestration/Owner-Directives.jsonl` and `ARTIFACTS/ORCHESTRATION/OWNER-DIRECTIVES.JSONL`, each joined under `$script:Item` with `/`; the call is a `Write` with `agent_type` `orchestrator` and `agent_id` `a1`, and the reason must match `OWNER_DIRECTIVE_PASS_DOWN_BLOCKED: OWNER_DIRECTIVE_LEDGER_WRITE_DENIED: *`.
+  - Acceptance: the task check runs the suite and both new cases fail against the current ordinal suffix comparison while every other row passes; `<FEATURE>/evidence/regression-testing/fail-before.F3.<timestamp>.md` records `Timestamp:`, `Command:`, `EXIT_CODE:` (non-zero), `ExpectedExitCode: 1`, and `Output Summary:` naming the two failing cases and stating that no other case failed.
+- [ ] [P1-T2] Change the ledger branch of `Get-OwnerDirectivePassDownDecision` in `.claude/hooks/enforce-owner-directive-pass-down.ps1` so the relative-path equality uses `[string]::Equals` and the suffix test uses `EndsWith`, both with `[System.StringComparison]::OrdinalIgnoreCase`; byte-copy the file to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-owner-directive-pass-down.ps1`.
+  - Acceptance: the task check of `enforce-owner-directive-pass-down.Tests.ps1` passes with zero failures, including both P1-T1 cases and every existing `ledger guard (AC-27)` row; the SHA-256 of the two copies is equal and recorded in the task-check artifact.
+- [ ] [P1-T3] Remove the line `Mock Read-OrchestratorOutputOwnerPassDownText { $null }` from the outermost `BeforeAll` of `tests/scripts/claude-hooks/validate-orchestrator-output.OwnerDirectives.Tests.ps1` (AC-29).
+  - Acceptance: `git diff $(git merge-base origin/main HEAD) -- tests/scripts/claude-hooks/validate-orchestrator-output.OwnerDirectives.Tests.ps1` prints nothing; the task check runs the suite with 22 passed and 0 failed.
+- [ ] [P1-T4] Remove the `Read-OrchestratorOutputOwnerPassDownText` mock line (direct `Mock` or `Register-EpicStateBaselineMock -Seam`) from each of the 13 suites listed in the `## Changed Behavior and Asserting Tests` row whose disposition is "the mock line is removed (P1-T4)", all under `tests/scripts/claude-hooks/`, leaving every other line unchanged.
+  - Acceptance: `git grep -l Read-OrchestratorOutputOwnerPassDownText -- tests/scripts/claude-hooks` lists none of the 13 files; before the commit, `git diff --numstat HEAD -- tests/scripts/claude-hooks` lists exactly the 13 files, each with 0 insertions and 1 deletion; the task check runs the 13 suites with 0 failures.
+- [ ] [P1-T5] Remove each `Get-Command Read-OrchestratorOutputOwnerPassDownText` guarded line from `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1`, `tests/scripts/claude-hooks/hook-dependency-failure.SpecialCases.Tests.ps1`, `tests/scripts/claude-hooks/subagentstop-uncaught-error.Tests.ps1`, and the seven in `tests/scripts/claude-hooks/hook-import-failure-exemptions.FailClosed.Tests.ps1`, keeping the AC-35 import-failure case for `validate-orchestrator-output-owner-pass-down.ps1`.
+  - Acceptance: `git grep -c Read-OrchestratorOutputOwnerPassDownText -- tests/scripts/claude-hooks` reports only `validate-orchestrator-output.OwnerDirectivePassDown.Tests.ps1`; the task check runs the four suites with 0 failures.
+- [ ] [P1-T6] In `.claude/hooks/validate-orchestrator-output-owner-pass-down.ps1`, add `Get-OrchestratorOutputOwnerPassDownSourceText` (parameters `Path` and `CheckpointText`) that calls `Get-CheckpointFileContent -Path` inside `try` and returns `$null` for a thrown read, a `$null` result, `Exists` false, a blank `Content`, or a `Content` ordinally equal to `CheckpointText`, and otherwise returns `Content`; route the ledger read in `Get-OrchestratorOutputOwnerPassDownDecision`, the parent checkpoint and parent ledger reads in `Get-OrchestratorOutputOwnerPassDownItemDecision`, and the child checkpoint read in `Get-OrchestratorOutputOwnerPassDownParentDecision` through it; delete `Read-OrchestratorOutputOwnerPassDownText`; update `.NOTES` to name `Get-CheckpointFileContent` as the file seam; write no `Get-Content`, `ReadAllText`, or `ReadAllLines` token anywhere in the file; byte-copy the file to its bundle path under `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`. In `tests/scripts/claude-hooks/validate-orchestrator-output.OwnerDirectivePassDown.Tests.ps1`, declare a parameter-parity stub `function Get-CheckpointFileContent { param([string] $Path) }` before the baseline `Mock Get-CheckpointFileContent { $null }`; make `Register-PassDownStopSeam` mock `Get-CheckpointFileContent` to return `@{ Exists = $true; Content = <map text> }` for a mapped path and `@{ Exists = $false; Content = $null }` otherwise; reduce `reads nothing for an absent path and returns a UTC clock value` to its clock assertion under the name `returns a UTC clock value`; add a `Describe 'source read seam (F1)'` with one row per helper outcome (thrown read, `$null` result, `Exists` false, content equal to the checkpoint text, distinct content returned) and the row `It 'treats a parent ledger read that returns the checkpoint text as absent'` asserting `$null` from `Get-OrchestratorOutputOwnerPassDownDecision` for an epic checkpoint holding one valid directive and no running child.
+  - Acceptance: `git grep -c Read-OrchestratorOutputOwnerPassDownText -- .claude extensions tests` finds no match; the two hook copies have equal SHA-256, recorded in the task-check artifact; the task check runs the sibling suite, `validate-orchestrator-output.OwnerDirectives.Tests.ps1`, and `hook-import-failure-exemptions.FailClosed.Tests.ps1` with 0 failures, including the key-gate counting rows that assert `Should -Invoke Get-OrchestratorOutputOwnerPassDownClock`.
+- [ ] [P1-T7] [phase-gate] Run stages 1 to 6 of the toolchain loop across the repository per `## Test Cadence (Mandatory)`, writing `docs/features/active/owner-directive-pass-down-1157/evidence/qa-gates/phase-gate.P1.<timestamp>.md`: PowerShell format check and analyzer, Python format check, lint, and type check, one `Invoke-PoshQCParallelTest` run, and one `pytest -n auto` run; restart from stage 1 after any failure or auto-fix.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/phase-gate.P1.<timestamp>.md` records each stage's command, exit code, and finding or failure count from one clean pass; the Pester `ExitCode` is 0 and the pytest run reports 0 failed; it names `enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1` as passed; no `[expect-fail]` case remains failing.
+
+### Phase 2 — Final QA
+
+- [ ] [P2-T1] Run the PowerShell final-QC static steps over every PowerShell file in the branch diff from the merge base: formatter drift check, `Invoke-ScriptAnalyzer` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, and `Invoke-PoshQCLeakScan -Root`.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-static.<timestamp>.md` records each step's command, exit code, and count: drift 0, analyzer findings 0, leak-scan failures 0; a check-only formatter run records equal before-and-after file hashes.
+- [ ] [P2-T2] Run the Python final-QC static steps over `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, the one Python file in the branch diff: Black in check mode, Ruff, and Pyright.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/python-static.<timestamp>.md` records each command, exit code 0, and the success-case summary each tool prints (Black `would be left unchanged`, Ruff `All checks passed!`, Pyright `0 errors`).
+- [ ] [P2-T3] Run the final Pester gate: one `Invoke-PoshQCParallelTest` run from a `sh`-launched PowerShell 7 over the branch-current module, reading counts from `artifacts/pester/pester-junit.xml` and per-file line coverage from `artifacts/pester/powershell-coverage.xml`.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/pester-final.<timestamp>.md` records `ExitCode` 0, the test-case, passed, failed (0), and skipped counts, repo-wide line coverage, and the coverage of the five new files and the two modified files named in spec AC-47.
+- [ ] [P2-T4] Compare the P2-T3 coverage with the Phase 0 baseline: each of `.claude/hooks/enforce-owner-directive-pass-down.ps1`, `.claude/hooks/owner-directive-pass-down-target.ps1`, `.claude/hooks/validate-orchestrator-output-owner-pass-down.ps1`, `.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectiveSelection.psm1`, and `.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectiveDecision.psm1` at or above 90%; `.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1` and `.claude/hooks/validate-orchestrator-output.ps1` at or above 85% and not below the `pester-baseline.2026-11-10T04-02.md` figures; repo-wide at or above 85%; new behavior (the helper and the case-insensitive comparison) covered by the P1-T1 and P1-T6 rows.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/coverage-comparison.<timestamp>.md` records baseline, post-change, and threshold for each of the seven files and the repo total as numbers, and a PASS outcome only when every comparison holds; otherwise the outcome is remediation-required.
+- [ ] [P2-T5] Run the final pytest gate (F2): one `pytest -n auto --cov-branch --cov-report=term-missing --cov` run in the item worktree, reading `artifacts/python/lcov.info` and writing `docs/features/active/owner-directive-pass-down-1157/evidence/qa-gates/pytest-final.<timestamp>.md`.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/pytest-final.<timestamp>.md` records exit code 0, passed and failed (0) counts, and the repo-wide statements, missed, branches, and partial figures read from `artifacts/python/lcov.info` and the terminal TOTAL row, compared with the merge-base CI TOTAL recorded in P0-T2; equal figures, or a difference explained by a file outside this branch, are recorded; the file states that no production Python file changed.
+- [ ] [P2-T6] Verify bundle byte parity for every `.claude` file in the branch diff from the merge base that has a copy under `extensions/drm-copilot/resources/claude-customizations/`, and record the P2-T5 results of `test_push_down_claude_resource_contracts.py` and `test_push_down_pack_manifest_dependency_closure.py`.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/bundle-parity.<timestamp>.md` lists each pair with equal SHA-256 and zero unequal pairs, and both contract test files with 0 failed.
+- [ ] [P2-T7] Record the scope check: `git diff --name-status $(git merge-base origin/main HEAD)` plus `git status --porcelain`; no added `.py` file; no change to `.claude/agents/epic-orchestrator.md`, `.claude/agents/orchestrator.md`, `.claude/agents/parallel-orchestrator.md`, any `.codex/hooks/` or Copilot hook file, or the Python or TypeScript validators; the three AC-29 suites `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateOwnerDirectives.Tests.ps1`, `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateOwnerDirectives.Records.Tests.ps1`, and `tests/scripts/claude-hooks/validate-orchestrator-output.OwnerDirectives.Tests.ps1` with an empty diff against the merge base.
+  - Acceptance: `<FEATURE>/evidence/other/scope-check.<timestamp>.md` records both listings and each check as PASS with its command and exit code.
+- [ ] [P2-T8] Check off AC-29 in `docs/features/active/owner-directive-pass-down-1157/spec.md` by changing its checkbox from `[ ]` to `[x]` without changing the criterion text, citing the P2-T3 and P2-T7 artifacts in the task-check artifact.
+  - Acceptance: `git diff $(git merge-base origin/main HEAD) -- docs/features/active/owner-directive-pass-down-1157/spec.md` shows, for the AC-29 criterion, only the checkbox character changed; the spec holds no unchecked `AC-` criterion.
+- [ ] [P2-T9] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base, including findings F1 to F3 and items CR1 to CR3 of the inputs, and write a new self-review file; fix any FAIL row and re-run P2-T1 to P2-T7 before rewriting a new self-review file.
+  - Acceptance: `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` exists, is newer than `self-review.2026-11-13T13-52.md`, which is not edited, and carries one PASS, FAIL, or N/A row per checklist item with zero FAIL rows.
 
 ## Pre-Mortem
 
-<!-- One bullet per label; state how the next review or CI run could fail on that dimension and the mitigation, or "not applicable" with the reason. -->
-- Review checklists:
-- Coverage:
-- Mirror parity:
-- File size:
-- Test isolation:
-- CI-only behavior:
-- Evidence:
+- Review checklists: P2-T9 walks all three templates against the merge-base diff, including F1 to F3 and the non-blocking CR1 to CR3, and the plan cannot complete with a FAIL row; the AC-29 check-off (P2-T8) cites gate and scope evidence rather than a claim.
+- Coverage: the sibling loses the removed function's lines and gains the helper, whose five outcomes each have a P1-T6 row, so the sibling stays at or above 90%; the enforce-hook change is a one-expression edit exercised by the P1-T1 rows and the existing ledger rows; P2-T4 compares every figure with `pester-baseline.2026-11-10T04-02.md` and the thresholds, and P2-T5 supplies the missing Python figures (F2).
+- Mirror parity: two `.claude` files change and each is byte-copied to its bundle path in the same task (P1-T2, P1-T6), checked by hash in the task and again in P2-T6; byte copies are not `Write` calls, so they consume no batch-budget slot; the plan changes no fact the execution-environment brief states (it names neither the removed function nor the ledger comparison), so no brief-update task is needed.
+- File size: `enforce-owner-directive-pass-down.ps1` (450 lines) changes by one expression; its suite (379) gains one row; the sibling (400) loses one function and gains one of similar size; the sibling suite (262) gains about 30 lines; every file stays below the 500-line guidance tier.
+- Test isolation: gates are one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run each (P1-T7, P2-T3, P2-T5), re-run only after a fix; no Jest, because no TypeScript changes. No test creates a file; the new rows use `/synthetic-worktrees/` roots and in-memory maps; the self-read guard keeps every path-agnostic `Get-CheckpointFileContent` mock equivalent to the former null read mock, and the discovery guard confirms seam compliance at P1-T7.
+- CI-only behavior: the changed suites run in `poshqc / PowerShell hook suites (Linux)` on a case-sensitive file system; the F3 rows assert a decision computed from string comparison only, with forward-slash synthetic paths and no drive letter, so they behave the same on Linux and Windows; coverage is measured on the Windows shards of `poshqc / PowerShell QC`.
+- Evidence: every artifact is a new file under `<FEATURE>/evidence/<kind>/` named with a clock-read UTC stamp; no existing evidence, including `self-review.2026-11-13T13-52.md` and `task-check.P6-T9.2026-11-13T13-50.md`, is edited, back-dated, or deleted; artifacts record `SCRATCH` and no absolute path.
 
 ## Test Plan
 
-- Unit: ...
-- Integration: ...
-- Manual/CLI: ...
-- Coverage evidence: list baseline artifact paths (static and `Phase 0 baseline`), post-change artifact paths, and comparison artifact paths, with the per-file threshold results from the single gate run, for each in-scope language
+- Unit: P1-T1 rows (F3), P1-T6 helper and decision rows (F1), the unchanged AC-29 suites, and the discovery guard, all in the P1-T7 and P2-T3 parallel Pester runs.
+- Integration: none local; CI runs integration and golden suites.
+- Coverage evidence: baseline `evidence/baseline/pester-baseline.2026-11-10T04-02.md`, `evidence/baseline/pytest-baseline.2026-11-10T04-08.md`, and `evidence/remediation-baseline/baseline-reference.<timestamp>.md`; post-change `evidence/qa-gates/pester-final.<timestamp>.md` and `evidence/qa-gates/pytest-final.<timestamp>.md`; comparison `evidence/qa-gates/coverage-comparison.<timestamp>.md`.
 
 ## Open Questions / Notes
 
-- ...
+- Proportionate mode holds: no spec acceptance criterion or public interface changes; AC-29 is satisfied, not amended.
+- The rest of the spec was implemented under `plan.2026-11-09T16-32.md`; this cycle covers F1 to F3 and the criteria they touch (AC-27, AC-29, AC-38, AC-47).
