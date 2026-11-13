@@ -78,7 +78,7 @@
 
 ### Phase 2 — Final QA loop and self-review
 
-- [ ] [P2-T1] Run the PowerShell final static loop (PoshQC format in check-only mode, PSScriptAnalyzer with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, `Invoke-PoshQCLeakScan -Root`) over the P0-T1 files.
+- [x] [P2-T1] Run the PowerShell final static loop (PoshQC format in check-only mode, PSScriptAnalyzer with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, `Invoke-PoshQCLeakScan -Root`) over the P0-T1 files.
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-static.<timestamp>.md` records each step's command, exit code, and finding count, every count 0. A before-and-after `git status --porcelain` listing shows the format step changed no file.
 - [ ] [P2-T2] Run the TypeScript final static loop in `extensions/drm-copilot/` (Prettier check on `src/lib/validate/parallel-state-shared.ts`, `npm run lint`, `npm run typecheck`).
   - Acceptance: `<FEATURE>/evidence/qa-gates/typescript-static.<timestamp>.md` records each step with exit code 0 and finding count 0, the Prettier step prints "All matched files use Prettier code style!", and the artifact records the logical line count of `parallel-state-shared.ts`.
