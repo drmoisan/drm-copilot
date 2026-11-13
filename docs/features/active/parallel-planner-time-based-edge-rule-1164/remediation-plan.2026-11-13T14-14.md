@@ -80,7 +80,7 @@
 
 - [x] [P2-T1] Run the PowerShell final static loop (PoshQC format in check-only mode, PSScriptAnalyzer with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, `Invoke-PoshQCLeakScan -Root`) over the P0-T1 files.
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-static.<timestamp>.md` records each step's command, exit code, and finding count, every count 0. A before-and-after `git status --porcelain` listing shows the format step changed no file.
-- [ ] [P2-T2] Run the TypeScript final static loop in `extensions/drm-copilot/` (Prettier check on `src/lib/validate/parallel-state-shared.ts`, `npm run lint`, `npm run typecheck`).
+- [x] [P2-T2] Run the TypeScript final static loop in `extensions/drm-copilot/` (Prettier check on `src/lib/validate/parallel-state-shared.ts`, `npm run lint`, `npm run typecheck`).
   - Acceptance: `<FEATURE>/evidence/qa-gates/typescript-static.<timestamp>.md` records each step with exit code 0 and finding count 0, the Prettier step prints "All matched files use Prettier code style!", and the artifact records the logical line count of `parallel-state-shared.ts`.
 - [ ] [P2-T3] Run the Pester gate: one `Invoke-PoshQCParallelTest` run importing the branch `scripts/powershell/PoshQC/PoshQC.psd1`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/pester-gate.<timestamp>.md` records `EXIT_CODE: 0` from the returned `ExitCode`, zero failures, and the pass count from `artifacts/pester/pester-junit.xml` against P0-T3. It also records repo-wide line coverage and per-file line coverage of `BlastRadiusAccess.psm1` from `artifacts/pester/powershell-coverage.xml`, at least 85% with no drop against P0-T3. The P1-T1 rows, `parallel-scheduling-rule-wording.Tests.ps1`, and `FileSizePolicy.RepoGate.Tests.ps1` pass.
