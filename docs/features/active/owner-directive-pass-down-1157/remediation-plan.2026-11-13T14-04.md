@@ -84,7 +84,7 @@
   - Acceptance: `<FEATURE>/evidence/other/scope-check.<timestamp>.md` records both listings and each check as PASS with its command and exit code.
 - [x] [P2-T8] Check off AC-29 in `docs/features/active/owner-directive-pass-down-1157/spec.md` by changing its checkbox from `[ ]` to `[x]` without changing the criterion text, citing the P2-T3 and P2-T7 artifacts in the task-check artifact.
   - Acceptance: `git diff $(git merge-base origin/main HEAD) -- docs/features/active/owner-directive-pass-down-1157/spec.md` shows, for the AC-29 criterion, only the checkbox character changed; the spec holds no unchecked `AC-` criterion.
-- [ ] [P2-T9] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base, including findings F1 to F3 and items CR1 to CR3 of the inputs, and write a new self-review file; fix any FAIL row and re-run P2-T1 to P2-T7 before rewriting a new self-review file.
+- [x] [P2-T9] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base, including findings F1 to F3 and items CR1 to CR3 of the inputs, and write a new self-review file; fix any FAIL row and re-run P2-T1 to P2-T7 before rewriting a new self-review file.
   - Acceptance: `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` exists, is newer than `self-review.2026-11-13T13-52.md`, which is not edited, and carries one PASS, FAIL, or N/A row per checklist item with zero FAIL rows.
 
 ## Pre-Mortem
