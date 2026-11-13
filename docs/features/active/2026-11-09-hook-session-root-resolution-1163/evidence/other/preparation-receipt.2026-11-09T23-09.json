@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "stage": "plan",
+  "issue_num": 1163,
+  "research_path": "docs/features/active/2026-11-09-hook-session-root-resolution-1163/research/2026-11-09-hook-session-root-resolution-research.md",
+  "spec_path": "docs/features/active/2026-11-09-hook-session-root-resolution-1163/spec.md",
+  "plan_path": "docs/features/active/2026-11-09-hook-session-root-resolution-1163/plan.2026-11-09T16-33.md",
+  "plan_hash": "8bbc206395381eed6cf26cabdffbfbb06fac645e",
+  "plan_hash_kind": "git blob object id of the plan file as committed",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "base_commit_derivation": "merge base of origin/main and HEAD",
+  "preflight_status": "PREFLIGHT: ALL CLEAR",
+  "preflight_fix_record": "docs/features/active/2026-11-09-hook-session-root-resolution-1163/evidence/other/preflight-fixes.2026-11-09T23-08.md",
+  "recorded_at": "2026-11-09T23:09:00Z"
+}

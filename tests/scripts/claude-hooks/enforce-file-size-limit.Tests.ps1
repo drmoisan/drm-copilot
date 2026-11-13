@@ -238,7 +238,7 @@ Describe 'enforce-file-size-limit.ps1' {
         ) {
             $envelope = ConvertTo-FileSizeEnvelope -ToolName $Tool -ToolInput @{ file_path = $Path; content = (Get-FileSizeTestText -LineCount 5000); old_string = 'a'; new_string = 'b' }
 
-            $result = Invoke-FileSizeLimitDecision -ToolInputRaw $envelope -RepositoryRoot $script:Root -ReadFileContent $script:ThrowingReader
+            $result = Invoke-FileSizeLimitDecision -ToolInputRaw $envelope -RepositoryRoot $script:Root -ReadFileContent $script:ThrowingReader -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
             $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }

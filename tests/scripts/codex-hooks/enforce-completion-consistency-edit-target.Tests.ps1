@@ -61,7 +61,7 @@ Describe 'enforce-completion-consistency.ps1 Codex Edit target path (issue #736)
         $json = ConvertTo-MappedEditJson -FilePath $script:AbsoluteTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
 
         # Act
-        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null }
+        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: the patched content lacks completion evidence, so the Edit is denied.
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -78,7 +78,7 @@ Describe 'enforce-completion-consistency.ps1 Codex Edit target path (issue #736)
         $json = ConvertTo-MappedEditJson -FilePath $script:AbsoluteTarget -OldString $script:PatchOldString -NewString $script:PatchNotCompletion
 
         # Act
-        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null }
+        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: the decision follows the targeted content, which still asserts completion.
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -95,7 +95,7 @@ Describe 'enforce-completion-consistency.ps1 Codex Edit target path (issue #736)
         $json = ConvertTo-MappedEditJson -FilePath $script:AbsoluteTarget -OldString $script:PatchOldString -NewString $script:PatchNotCompletion
 
         # Act
-        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null }
+        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: the decision follows the targeted content, which does not assert completion.
         $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
@@ -108,7 +108,7 @@ Describe 'enforce-completion-consistency.ps1 Codex Edit target path (issue #736)
         $json = ConvertTo-MappedEditJson -FilePath $script:AbsoluteTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
 
         # Act
-        $null = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null }
+        $null = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: exactly one read, at the supplied file_path.
         $captured.Count | Should -Be 1
@@ -122,7 +122,7 @@ Describe 'enforce-completion-consistency.ps1 Codex Edit target path (issue #736)
         $json = ConvertTo-MappedEditJson -FilePath $script:RelativeTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
 
         # Act
-        $null = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null }
+        $null = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: exactly one read, at the supplied file_path.
         $captured.Count | Should -Be 1
@@ -136,7 +136,7 @@ Describe 'enforce-completion-consistency.ps1 Codex Edit target path (issue #736)
         $json = ConvertTo-MappedEditJson -FilePath $script:BackslashTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
 
         # Act
-        $null = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null }
+        $null = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: exactly one read, at the raw (not separator-normalized) file_path.
         $captured.Count | Should -Be 1

@@ -175,7 +175,7 @@ function Get-PreflightRunBlockDecision {
         $recordPath = if ($record.Success) { ($record.Groups['Path'].Value -replace '\\', '/') -replace '^\./', '' } else { '' }
         $root = if ([string]::IsNullOrWhiteSpace($SessionRoot)) { (Get-Location).Path } else { $SessionRoot }
         $targetRoot = if ($null -eq $Target) { $null } else { [string]$Target.WorktreeRoot }
-        $location = Resolve-SubagentStopArtifactLocation -Path $recordPath -WorktreeRoot $targetRoot -SessionRoot $root
+        $location = Resolve-SubagentStopArtifactLocation -Path $recordPath -WorktreeRoot $targetRoot -SessionRoot $root -Target $Target
         if ($location.Rejected) {
             return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: preflight-fix-record '$recordPath' is rejected: $($location.RejectionDetail)." }
         }
@@ -335,7 +335,7 @@ function Get-ExecutorOutputBlockDecision {
     if ($null -ne $headReader) { $targetArguments['ReadTranscriptHead'] = $headReader }
     if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
     $target = Resolve-SubagentStopTargetWorktree @targetArguments
-    $location = Resolve-SubagentStopArtifactLocation -Path $planPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root
+    $location = Resolve-SubagentStopArtifactLocation -Path $planPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root -Target $target
     if ($location.Rejected) {
         return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: executor advertised plan-path '$planPath', which is rejected: $($location.RejectionDetail)." }
     }
