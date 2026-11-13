@@ -11,7 +11,8 @@
     function, and no I/O.
 
     Tables:
-      - ExistingDenial: research section 6.2 and spec AC-2 (as amended by decision D15).
+      - ExistingDenial: research section 6.2 and spec AC-2 (as amended by decisions D15 and
+        D16; rows ED-43 to ED-50 are the D16 pipeline-consumer and sort rows).
         Each row is classified as implementation today and must stay classified, with the
         generic final deny text unchanged.
       - FalsePositive: research section 6.3 and spec AC-1. Each row is classified today
@@ -70,6 +71,14 @@ $script:ClassificationExistingDenialCase = @(
     @{ Id = 'ED-40'; Command = 'git grep -O vim pytest'; Expected = $true }
     @{ Id = 'ED-41'; Command = 'command -v pytest'; Expected = $true }
     @{ Id = 'ED-42'; Command = 'echo "pytest'; Expected = $true }
+    @{ Id = 'ED-43'; Command = 'pwsh -NoProfile -Command "Get-ChildItem tests/scripts/run.ps1 | ForEach-Object { & $_.FullName }"'; Expected = $true }
+    @{ Id = 'ED-44'; Command = 'pwsh -NoProfile -Command "Get-ChildItem tests/scripts/ -Filter *.Tests.ps1 | ForEach-Object { & $_ }"'; Expected = $true }
+    @{ Id = 'ED-45'; Command = 'pwsh -NoProfile -Command "Get-ChildItem tests/scripts/run.ps1 | % { & $_ }"'; Expected = $true }
+    @{ Id = 'ED-46'; Command = 'pwsh -NoProfile -Command "Get-Command pytest | ForEach-Object { & $_ }"'; Expected = $true }
+    @{ Id = 'ED-47'; Command = 'pwsh -NoProfile -Command "Get-Command pytest | ForEach-Object { & $_.Source -q }"'; Expected = $true }
+    @{ Id = 'ED-48'; Command = 'pwsh -NoProfile -Command "Get-Command Invoke-Pester | ForEach-Object { & $_ }"'; Expected = $true }
+    @{ Id = 'ED-49'; Command = 'echo pytest | xargs env'; Expected = $true }
+    @{ Id = 'ED-50'; Command = 'sort --compress-program pytest big.txt'; Expected = $true }
 )
 
 $script:ClassificationFalsePositiveCase = @(
