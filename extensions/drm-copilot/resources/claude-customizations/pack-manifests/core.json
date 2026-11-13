@@ -99,6 +99,7 @@
     ".claude/hooks/hook-docs-only-diff.ps1",
     ".claude/hooks/hook-docs-estate-context.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate-docs.ps1",
+    ".claude/hooks/enforce-model-routing-receipt-docs.ps1",
     ".claude/hooks/persist-session-id.ps1",
     ".claude/hooks/premortem-section.ps1",
     ".claude/hooks/record-discovery-agent-start.ps1",
