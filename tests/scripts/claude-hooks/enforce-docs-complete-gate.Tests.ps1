@@ -735,4 +735,16 @@ Describe 'enforce-docs-complete-gate receipt root (issue #1163)' {
         # Assert
         $root | Should -BeExactly $Expected
     }
+
+    It 'Get-DocsCompleteGateReceiptRoot returns the repository root and reports the failure when the resolver throws' {
+        # Arrange
+        Mock Resolve-AgentTargetWorktree { throw 'synthetic resolver failure' }
+
+        # Act
+        $records = @(Get-DocsCompleteGateReceiptRoot -HeadRefName 'epic/x-integration' -RepositoryRoot '/repo' -Verbose 4>&1)
+
+        # Assert
+        @($records | Where-Object { $_ -is [string] }) | Should -BeExactly @('/repo')
+        @($records | Where-Object { $_ -is [System.Management.Automation.VerboseRecord] } | ForEach-Object { $_.Message }) -join "`n" | Should -Match 'synthetic resolver failure'
+    }
 }

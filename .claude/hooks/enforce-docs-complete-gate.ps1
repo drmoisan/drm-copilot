@@ -269,7 +269,7 @@ function Get-DocsCompleteGateReceiptRoot {
     if ([string]::IsNullOrWhiteSpace($HeadRefName)) { return $RepositoryRoot }
     $resolverArguments = @{ SessionRoot = $RepositoryRoot; CommandBranch = $HeadRefName; Policy = 'FailClosedOnIdentity' }
     if ($null -ne $WorktreeListInvoker) { $resolverArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
-    try { $resolved = Resolve-AgentTargetWorktree @resolverArguments } catch { return $RepositoryRoot }
+    try { $resolved = Resolve-AgentTargetWorktree @resolverArguments } catch { Write-Verbose "receipt root resolution failed; the repository root applies: $($_.Exception.Message)"; return $RepositoryRoot }
     if ($null -ne $resolved.ReasonCode -or [string]::IsNullOrWhiteSpace([string] $resolved.WorktreeRoot)) { return $RepositoryRoot }
     return [string] $resolved.WorktreeRoot
 }

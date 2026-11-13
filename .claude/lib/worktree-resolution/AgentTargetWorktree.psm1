@@ -142,15 +142,20 @@ function Resolve-AgentTargetWorktree {
             $detail = "the agent working directory '$directory' is relative, so the session root applies"
         } elseif (-not [string]::Equals($directory, $session, $ignoreCase)) {
             $roots = @()
+            $listFailure = $null
             try {
                 $live = ConvertTo-AgentTargetLiveWorktreeListText -Text (@(& $WorktreeListInvoker $SessionRoot) -join "`n")
                 foreach ($record in @($live.Dropped)) { $dropped.Add($record) }
                 $roots = @(ConvertFrom-HookTargetWorktreePorcelain -Text $live.Text | ForEach-Object { $_.Root })
             } catch {
+                # The session root applies, as in Resolve-HookTargetWorktree; the failure is kept for the detail.
                 $roots = @()
+                $listFailure = $_.Exception.Message
             }
             $enclosing = Get-HookTargetWorktreeEnclosingRoot -Path $directory -Roots $roots
-            if ($null -eq $enclosing) {
+            if ($null -ne $listFailure) {
+                $detail = "the worktree list failed: $listFailure, so the session root applies"
+            } elseif ($null -eq $enclosing) {
                 $detail = "the agent working directory '$directory' is inside no live registered worktree, so the session root applies"
             } elseif (-not [string]::Equals($enclosing, $session, $ignoreCase)) {
                 $root = $enclosing
