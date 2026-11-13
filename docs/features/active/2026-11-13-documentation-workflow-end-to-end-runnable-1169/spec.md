@@ -222,9 +222,9 @@ Each criterion names the Pester suite intended to prove it. Suite names under `t
 ### End-to-end and cross-cutting
 
 - [x] A composed scenario for one synthetic docs branch, with no checkpoint, a valid profile, `docs/` pages, estate artifacts, and the docs-init workflow, runs through the following sequence with injected seams: the A1 gate allows `git add` and `git commit` of the init outputs and of the docs-complete estate; the A1 gate allows the pr-author receipt Write; the A2 leg allows `Agent(pr-author)`; E7 allows `gh pr create`; and M9 and the A4-based docs-complete gate allow the merge. The same scenario with one added non-docs path denies at commit, at delegation, at PR creation, and at merge. Suite: `claude-hooks/docs-estate-workflow.EndToEnd.Tests.ps1`.
-- [ ] No new or changed hook invokes Python. Suite: the existing `claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`. Each new hook uses the guarded dot-source pattern. Suite: the existing `claude-runtime/hook-dependency-guard-completeness.Tests.ps1`.
-- [ ] The push-down resource and pack-manifest contract tests pass with the new Claude and Codex files, and the Codex generator `--check` reports no drift.
-- [ ] The full toolchain loop passes in a single pass, with parallel test execution only. Every new or changed PowerShell production file has line coverage at or above 85%, measured from the Pester coverage report, and coverage does not regress on changed lines.
+- [x] No new or changed hook invokes Python. Suite: the existing `claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1`. Each new hook uses the guarded dot-source pattern. Suite: the existing `claude-runtime/hook-dependency-guard-completeness.Tests.ps1`.
+- [x] The push-down resource and pack-manifest contract tests pass with the new Claude and Codex files, and the Codex generator `--check` reports no drift.
+- [x] The full toolchain loop passes in a single pass, with parallel test execution only. Every new or changed PowerShell production file has line coverage at or above 85%, measured from the Pester coverage report, and coverage does not regress on changed lines.
 
 ## Implementation Strategy
 

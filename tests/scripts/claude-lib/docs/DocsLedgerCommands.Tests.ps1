@@ -520,3 +520,34 @@ Describe 'coverage' {
         $pass.Outcome.Stdout.Contains('{', [System.StringComparison]::Ordinal) | Should -BeFalse
     }
 }
+
+Describe 'shared ledger-command helpers exported for DocsValidateCommands.psm1 (issue #1169)' {
+    It 'Get-DocsLedgerCommandMember returns the member, or $null for <Case>' -ForEach @(
+        @{ Case = 'an absent key'; Table = @{ present = 1 } }
+        @{ Case = 'a $null table'; Table = $null }
+        @{ Case = 'a table that is not a dictionary'; Table = 'text' }
+    ) {
+        # Act
+        $present = Get-DocsLedgerCommandMember -Table @{ name = 'value' } -Name 'name'
+        $absent = Get-DocsLedgerCommandMember -Table $Table -Name 'name'
+
+        # Assert
+        $present | Should -BeExactly 'value'
+        $null -eq $absent | Should -BeTrue
+    }
+
+    It 'Read-DocsLedgerInputSet reports an artifact as absent when TestFile finds it but ReadBytes reports item-not-found' {
+        # Arrange
+        $profileDocument = @{ artifact_paths = @{ coverage_ledger = 'estate/docs-coverage-ledger.json' } }
+        $testFile = { param($RelativePath) $null -ne $RelativePath }
+        $readBytes = { param($RelativePath) throw [System.Management.Automation.ItemNotFoundException]::new("Cannot find path '$RelativePath' because it does not exist.") }
+        $listFile = { param($RelativeRoot) $null = $RelativeRoot; , [string[]]@() }
+
+        # Act
+        $result = Read-DocsLedgerInputSet -Profile $profileDocument -Need @('docs-coverage-ledger') -ReadBytes $readBytes -TestFile $testFile -ListFile $listFile
+
+        # Assert
+        $result.Artifact.Contains('docs-coverage-ledger') | Should -BeTrue
+        $null -eq $result.Artifact['docs-coverage-ledger'] | Should -BeTrue -Because 'a file that disappears between TestFile and ReadBytes is absent, not a read failure'
+    }
+}

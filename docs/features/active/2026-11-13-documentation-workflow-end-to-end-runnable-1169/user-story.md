@@ -49,7 +49,7 @@ A first consumer run of `/documentation-workflow` reached docs-complete and then
 - [x] The integration docs-complete gate accepts a receipt produced by the documented workflow, and it denies a receipt whose source drifted or whose revision is not an ancestor of the head. `validate -WriteReceipt` defaults `-Revision` to the snapshot revision and says so in its help. Proven by `DocsReceiptRevision.Tests.ps1`, `DocsReceiptRevision.Properties.Tests.ps1`, `DocsCompleteGate.Tests.ps1`, `enforce-docs-complete-gate.Tests.ps1`, and `DocsValidateCommands.Tests.ps1`.
 - [x] The documentation-workflow skill copies contain the commit, receipt, and pull-request stage, the tracking-issue rule, and the refresh procedure. The pr-author skill copies contain the delegation-prompt contract, and the execution-environment brief copies contain the docs-estate legs bullet and remain byte-identical. Proven by `documentation-workflow.CommitStage.Tests.ps1`, `pr-author-docs-estate-delegation-contract.Tests.ps1`, and the existing brief contract tests.
 - [x] A composed end-to-end Pester scenario shows a synthetic checkpoint-free docs branch allowed at commit, receipt Write, delegation, PR creation, and merge. It also shows the same branch with one non-docs path denied at commit, delegation, PR creation, and merge. Proven by `docs-estate-workflow.EndToEnd.Tests.ps1`.
-- [ ] The full toolchain loop passes with parallel-only test execution, mirrors and push-down bundles are in parity, and no new or changed hook invokes Python.
+- [x] The full toolchain loop passes with parallel-only test execution, mirrors and push-down bundles are in parity, and no new or changed hook invokes Python.
 
 ## Non-Goals
 
