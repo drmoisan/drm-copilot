@@ -125,7 +125,7 @@ Describe 'hook-planner-worktree-removal.ps1 (<HelperPath>)' -ForEach @(
         It 'compares <Left> and <Right> as equal: <Expected>' -ForEach @(
             @{ Left = '/synthetic-worktrees/a/'; Right = '/synthetic-worktrees/a'; Expected = $true }
             @{ Left = '/synthetic-worktrees/A'; Right = '/synthetic-worktrees/a'; Expected = $false }
-            @{ Left = 'Z:\synthetic\A'; Right = 'z:/synthetic/a'; Expected = $true }
+            @{ Left = '\\synthetic-host\share\A'; Right = '//synthetic-host/share/a'; Expected = $true }
             @{ Left = ''; Right = '/synthetic-worktrees/a'; Expected = $false }
         ) {
             Test-PlannerWorktreePathEqual -Left $Left -Right $Right | Should -Be $Expected
