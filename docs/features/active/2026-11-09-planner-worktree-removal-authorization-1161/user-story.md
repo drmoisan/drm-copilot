@@ -56,8 +56,8 @@ Gate maintainer story:
 - [x] The `.DESCRIPTION` block of each removal gate documents the planner branch, its cascade position, the refusal codes, and the honest disclosure that the branch is a policy-level control.
 - [x] Every existing gate suite passes unchanged, both Claude gates and `.claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1` stay at or below 500 lines, and `Invoke-PoshQCLeakScan` passes.
 - [x] Bundle mirrors are byte-identical, both pack manifests list the new hook files, the push-down contract tests and `scripts/dev_tools/generate_codex_agent_variants.py --check` pass, and `.claude/skills/epic-orchestrate/SKILL.md` and `.claude/agents/epic-orchestrator.md` are unchanged.
-- [ ] New PowerShell files reach at least 85% line coverage; the new TypeScript module reaches at least 85% line and 75% branch coverage with its own `coverageThreshold` entry; changed Python lines reach at least 85% line and 75% branch coverage.
-- [ ] Gate, Python, and TypeScript test evidence comes from parallel runs only, and new tests use no temporary files, no wall-clock waits, and no live git process.
+- [x] New PowerShell files reach at least 85% line coverage; the new TypeScript module reaches at least 85% line and 75% branch coverage with its own `coverageThreshold` entry; changed Python lines reach at least 85% line and 75% branch coverage.
+- [x] Gate, Python, and TypeScript test evidence comes from parallel runs only, and new tests use no temporary files, no wall-clock waits, and no live git process.
 
 ## Non-Goals
 
