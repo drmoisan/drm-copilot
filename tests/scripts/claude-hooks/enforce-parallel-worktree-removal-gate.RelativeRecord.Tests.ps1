@@ -22,6 +22,13 @@
     the /synthetic-worktrees/<name> form and Join-Path, because this folder also runs in
     the Linux hook-suite job. No row reads, creates, or writes a file, reads a wall clock,
     starts a process, or touches the network.
+
+    The issue #1163 rows (RP7 to RP11) drive a host-moved record: its absolute worktree_path
+    names no live root and its branch_name is mapped to the target by a suite-local resolver
+    seam that records each invocation. A suite argument builder passes -BranchWorktreeResolver
+    and -LiveWorktreeRoot only when Get-Command reports that the command under test declares
+    them, so the identical rows run against the unmodified gate (fail-before) and the changed
+    gate (pass-after).
 #>
 
 BeforeAll {
@@ -72,11 +79,14 @@ BeforeAll {
     # main checkout root. The same text feeds the gate's own read seam.
     function Set-RelativeTopology {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
-        param([hashtable] $Parallel = @{}, [string[]] $Live = @('/synthetic-worktrees/main', '/synthetic-worktrees/planning'))
+        param([hashtable] $Parallel = @{}, [string[]] $Live = @('/synthetic-worktrees/main', '/synthetic-worktrees/planning'), [hashtable] $Epic = @{})
         $liveSet = $Live
         $mainRoot = $script:Main
         $textMap = @{}
         foreach ($root in $Parallel.Keys) { $textMap["$root/artifacts/orchestration/parallel-orchestrator-state.json"] = $Parallel[$root] }
+        # Issue #1163: the optional epic map feeds the epic checkpoint path of both read seams;
+        # rows that pass no -Epic keep a null epic read.
+        foreach ($root in $Epic.Keys) { $textMap["$root/artifacts/orchestration/epic-orchestrator-state.json"] = $Epic[$root] }
         Mock -CommandName Get-WorktreeItemLiveRoot -ModuleName WorktreeRunResolution -MockWith { , [string[]] $liveSet }.GetNewClosure()
         Mock -CommandName Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution -MockWith {
             param([string] $Path)
@@ -94,7 +104,68 @@ BeforeAll {
             if ($textMap.ContainsKey($Path)) { return $textMap[$Path] }
             return $null
         }.GetNewClosure()
-        Mock -CommandName Get-ParallelWorktreeRemovalGateEpicCheckpointContent -MockWith { $null }
+        Mock -CommandName Get-ParallelWorktreeRemovalGateEpicCheckpointContent -MockWith {
+            param([string] $Path)
+            if ($textMap.ContainsKey($Path)) { return $textMap[$Path] }
+            return $null
+        }.GetNewClosure()
+    }
+
+    # Issue #1163 (D9) fixture: a host-moved record names a worktree_path that is no live root,
+    # and its branch_name is mapped to the target by the resolver seam.
+    $script:HostMoved = '/host-a/repo/.claude/worktrees/agent-x'
+    $script:Sibling = '/synthetic-worktrees/main/.claude/worktrees/agent-y'
+    $script:Branch = 'feature/issue-1163-agent-x'
+    $script:MovedLive = @($script:Main, $script:Planning, $script:Sibling, $script:Target)
+
+    # One run checkpoint of one kind. Without -WithLiveSibling it holds the host-moved record;
+    # with it, record A names the live sibling (same branch_name, merged) and record B names
+    # the target directly with the given merge_status.
+    function Get-HostMovedCheckpointText {
+        param([ValidateSet('epic', 'parallel')] [string] $Kind, [string] $MergeStatus, [switch] $WithLiveSibling)
+        $records = if ($WithLiveSibling) {
+            @([ordered]@{ worktree_path = $script:Sibling; branch_name = $script:Branch; merge_status = 'merged' }, [ordered]@{ worktree_path = $script:Target; merge_status = $MergeStatus })
+        }
+        else { @([ordered]@{ worktree_path = $script:HostMoved; branch_name = $script:Branch; merge_status = $MergeStatus }) }
+        foreach ($record in $records) { if ($Kind -eq 'parallel') { $record.issue_num = 101 } else { $record.feature_folder = 'child-a' } }
+        $document = if ($Kind -eq 'parallel') { [ordered]@{ route_id = 'parallel'; items = $records } } else { [ordered]@{ route_id = 'epic'; features = $records } }
+        return ($document | ConvertTo-Json -Compress -Depth 5)
+    }
+
+    # Places one checkpoint of the given kind in the planning root over the host-moved live set.
+    function Set-HostMovedTopology {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
+        param([string] $Kind, [string] $Text)
+        if ($Kind -eq 'parallel') { Set-RelativeTopology -Parallel @{ $script:Planning = $Text } -Live $script:MovedLive }
+        else { Set-RelativeTopology -Epic @{ $script:Planning = $Text } -Live $script:MovedLive }
+    }
+
+    # The D9 resolver seam: the fixture branch gives Root, any other branch or a ReasonCode gives a
+    # null root and that code, and every invocation is appended to the row's Calls list.
+    function Get-BranchResolverSeam {
+        param([AllowNull()] [string] $Root, [AllowNull()] [string] $ReasonCode, [System.Collections.Generic.List[string]] $Calls)
+        $mapped = $Root; $code = $ReasonCode; $callList = $Calls; $known = $script:Branch
+        return {
+            param($Branch)
+            $callList.Add([string] $Branch)
+            if ([string]::IsNullOrEmpty($code) -and [string] $Branch -ceq $known) { return [pscustomobject]@{ WorktreeRoot = $mapped; ReasonCode = $null } }
+            return [pscustomobject]@{ WorktreeRoot = $null; ReasonCode = $(if ($code) { $code } else { 'TARGET_WORKTREE_NOT_DERIVABLE' }) }
+        }.GetNewClosure()
+    }
+
+    # Issue #1163 argument builder: each optional argument is passed only when Get-Command reports
+    # that the command declares it, so the RP7 to RP11 rows run unchanged against the unmodified
+    # gate (fail-before) and the changed gate.
+    function Get-DeclaredArgument {
+        param([string] $CommandName, [hashtable] $Arguments, [hashtable] $Optional = @{})
+        $declared = (Get-Command -Name $CommandName).Parameters
+        foreach ($key in $Optional.Keys) { if ($declared.ContainsKey($key)) { $Arguments[$key] = $Optional[$key] } }
+        return $Arguments
+    }
+
+    function Get-RemovalDecisionArgument {
+        param([scriptblock] $Resolver)
+        return (Get-DeclaredArgument -CommandName Invoke-ParallelWorktreeRemovalGateDecision -Arguments @{ ToolInputRaw = (ConvertTo-RemovalPayload -Command "git worktree remove $($script:Target)") } -Optional @{ BranchWorktreeResolver = $Resolver })
     }
 }
 
@@ -182,5 +253,85 @@ Describe 'parallel worktree-removal gate with a relative worktree_path record' {
 
         # Assert
         $text | Should -Be '{"route_id":"epic"}'
+    }
+}
+
+Describe 'parallel worktree-removal gate with a host-moved worktree_path record (issue #1163)' {
+    It 'RP7 allows removal of a host-moved <Kind> record through its branch_name' -ForEach @(@{ Kind = 'parallel' }, @{ Kind = 'epic' }) {
+        # Arrange (fails before: the host-moved record names no live root and matches nothing)
+        $calls = [System.Collections.Generic.List[string]]::new()
+        Set-HostMovedTopology -Kind $Kind -Text (Get-HostMovedCheckpointText -Kind $Kind -MergeStatus 'merged')
+        $arguments = Get-RemovalDecisionArgument -Resolver (Get-BranchResolverSeam -Root $script:Target -Calls $calls)
+
+        # Act
+        $decision = Invoke-ParallelWorktreeRemovalGateDecision @arguments
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+    }
+
+    It 'RP8 finds a host-moved epic features[] record through Find-ParallelWorktreeItemRecord' {
+        # Arrange (fails before: the matcher cannot see the host-moved record)
+        $calls = [System.Collections.Generic.List[string]]::new()
+        $checkpoint = (Get-HostMovedCheckpointText -Kind epic -MergeStatus 'merged') | ConvertFrom-Json
+        $resolver = Get-BranchResolverSeam -Root $script:Target -Calls $calls
+        $arguments = Get-DeclaredArgument -CommandName Find-ParallelWorktreeItemRecord -Arguments @{ Checkpoint = $checkpoint; WorktreePath = $script:Target; RecordArrayName = 'features'; BaseRoot = @($script:Main, $script:Planning) } -Optional @{ LiveWorktreeRoot = $script:MovedLive; BranchWorktreeResolver = $resolver }
+
+        # Act
+        $record = Find-ParallelWorktreeItemRecord @arguments
+
+        # Assert
+        $record | Should -Not -BeNullOrEmpty
+        $record.feature_folder | Should -Be 'child-a'
+    }
+
+    It 'RP9 denies a host-moved <Kind> record whose branch resolves to <ReasonCode>' -ForEach @(
+        @{ Kind = 'parallel'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE' }
+        @{ Kind = 'parallel'; ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS' }
+        @{ Kind = 'epic'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE' }
+        @{ Kind = 'epic'; ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS' }
+    ) {
+        # Arrange (unchanged deny)
+        $calls = [System.Collections.Generic.List[string]]::new()
+        Set-HostMovedTopology -Kind $Kind -Text (Get-HostMovedCheckpointText -Kind $Kind -MergeStatus 'merged')
+        $arguments = Get-RemovalDecisionArgument -Resolver (Get-BranchResolverSeam -ReasonCode $ReasonCode -Calls $calls)
+
+        # Act
+        $decision = Invoke-ParallelWorktreeRemovalGateDecision @arguments
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $decision.hookSpecificOutput.permissionDecisionReason.StartsWith('PARALLEL_WORKTREE_REMOVAL_BLOCKED') | Should -BeTrue
+    }
+
+    It 'RP10 keeps the deny without calling the resolver when a <Kind> record names another live worktree' -ForEach @(@{ Kind = 'parallel' }, @{ Kind = 'epic' }) {
+        # Arrange (unchanged decision): record A names the live sibling, record B names the target
+        $calls = [System.Collections.Generic.List[string]]::new()
+        Set-HostMovedTopology -Kind $Kind -Text (Get-HostMovedCheckpointText -Kind $Kind -MergeStatus 'pr_open' -WithLiveSibling)
+        $arguments = Get-RemovalDecisionArgument -Resolver (Get-BranchResolverSeam -Root $script:Target -Calls $calls)
+
+        # Act
+        $decision = Invoke-ParallelWorktreeRemovalGateDecision @arguments
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $calls.Count | Should -Be 0
+    }
+
+    It 'RP11 applies the default resolver to a host-moved <Kind> record' -ForEach @(@{ Kind = 'parallel' }, @{ Kind = 'epic' }) {
+        # Arrange (fails before: the unmodified gate has no default resolver)
+        Set-HostMovedTopology -Kind $Kind -Text (Get-HostMovedCheckpointText -Kind $Kind -MergeStatus 'merged')
+        $target = $script:Target
+        if (Get-Command -Name Resolve-AgentTargetWorktree -ErrorAction SilentlyContinue) {
+            Mock -CommandName Resolve-AgentTargetWorktree -MockWith { [pscustomobject]@{ WorktreeRoot = $target; ReasonCode = $null } }.GetNewClosure()
+        }
+
+        # Act
+        $decision = Invoke-ParallelWorktreeRemovalGateDecision -ToolInputRaw (ConvertTo-RemovalPayload -Command "git worktree remove $($script:Target)")
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        $branch = $script:Branch
+        Should -Invoke Resolve-AgentTargetWorktree -ParameterFilter { $CommandBranch -eq $branch -and $Policy -eq 'FailClosedOnIdentity' }
     }
 }

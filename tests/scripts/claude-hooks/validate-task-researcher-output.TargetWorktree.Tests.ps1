@@ -148,29 +148,42 @@ Describe 'validate-task-researcher-output research-path target worktree (issue #
         Should -Invoke Test-ResearchFile -Times 0 -Exactly
     }
 
-    It 'falls back to the session root with TARGET_WORKTREE_NOT_DERIVABLE in the block message' {
-        # Arrange
-        Mock Test-ResearchFile { $false }
+    It 'blocks without a probe naming TARGET_WORKTREE_NOT_DERIVABLE when the prompt branch names no worktree' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
+        Mock Test-ResearchFile { throw 'the research probe must not be called for an unresolved identity' }
 
         # Act
         $result = Invoke-ResearcherCase -ResearchPath $script:Relative -Prompt 'branch: bug/unknown-branch'
 
         # Assert
         $result.Ok | Should -BeFalse
-        $result.Message | Should -BeLike '*TARGET_WORKTREE_NOT_DERIVABLE*the session root was probed.'
-        Should -Invoke Test-ResearchFile -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Relative }
+        $result.Message | Should -BeLike '*is rejected:*TARGET_WORKTREE_NOT_DERIVABLE*'
+        Should -Invoke Test-ResearchFile -Times 0 -Exactly
     }
 
-    It 'falls back to the session root with TARGET_WORKTREE_AMBIGUOUS in the block message' {
-        # Arrange
-        Mock Test-ResearchFile { $false }
+    It 'blocks without a probe naming TARGET_WORKTREE_AMBIGUOUS when the prompt names two issue numbers' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
+        Mock Test-ResearchFile { throw 'the research probe must not be called for an unresolved identity' }
 
         # Act
         $result = Invoke-ResearcherCase -ResearchPath $script:Relative -Prompt "Canonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Assert
         $result.Ok | Should -BeFalse
-        $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*the session root was probed.'
+        $result.Message | Should -BeLike '*is rejected:*TARGET_WORKTREE_AMBIGUOUS*'
+        Should -Invoke Test-ResearchFile -Times 0 -Exactly
+    }
+
+    It 'keeps the session-root probe when the prompt carries no branch label and no canonical issue line' {
+        # Arrange (D5: no identity keeps the session-root fallback)
+        Mock Test-ResearchFile { param([string] $Path) $Path -eq $script:Relative }
+        Mock Get-ResearchFileContent { 'main research body' }
+
+        # Act
+        $result = Invoke-ResearcherCase -ResearchPath $script:Relative -Prompt 'Research the topic.'
+
+        # Assert
+        $result.Ok | Should -BeTrue
         Should -Invoke Test-ResearchFile -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Relative }
     }
 }

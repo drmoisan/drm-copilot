@@ -66,7 +66,7 @@ Describe 'enforce-completion-consistency.ps1 Codex default reader against commit
                 [Parameter(Mandatory)]
                 [string] $Json
             )
-            return Invoke-CompletionConsistencyDecision -ToolInputRaw $Json -FolderExistsCheck { param($p) $true } -RoutingMatrixReader { $null }
+            return Invoke-CompletionConsistencyDecision -ToolInputRaw $Json -FolderExistsCheck { param($p) $true } -RoutingMatrixReader { $null } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
         }
     }
 

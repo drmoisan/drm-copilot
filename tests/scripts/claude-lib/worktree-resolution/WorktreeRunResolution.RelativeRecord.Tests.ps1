@@ -48,6 +48,31 @@ BeforeAll {
         Mock -CommandName Get-WorktreeRunMainCheckoutRoot -ModuleName WorktreeRunResolution -MockWith { $mainRootValue }.GetNewClosure()
     }
 
+    # Issue #1163 (D9) argument builder: -BranchWorktreeResolver is passed only when
+    # Resolve-WorktreeRunTargetByRecord declares it, so RR8 to RR10 run unchanged against the
+    # unmodified module (fail-before) and the changed module.
+    function Get-StaleRecordArgument {
+        param([string] $Kind, [scriptblock] $Resolver)
+        $arguments = @{ Kind = $Kind; RecordField = 'worktree_path'; Value = $script:Target; SessionRoot = $script:Session }
+        if ($null -ne $Resolver -and (Get-Command -Name Resolve-WorktreeRunTargetByRecord).Parameters.ContainsKey('BranchWorktreeResolver')) { $arguments['BranchWorktreeResolver'] = $Resolver }
+        return $arguments
+    }
+
+    # The run checkpoint text of one kind holding a single record with worktree_path and branch_name.
+    function Get-BranchRecordText {
+        param([string] $Kind, [string] $WorktreePath)
+        $record = @{ worktree_path = $WorktreePath; branch_name = 'feature/issue-1163-agent-x'; merge_status = 'merged' }
+        if ($Kind -eq 'epic') { return (@{ route_id = 'epic'; features = @($record) } | ConvertTo-Json -Compress -Depth 5) }
+        return (@{ route_id = 'parallel'; items = @($record) } | ConvertTo-Json -Compress -Depth 5)
+    }
+
+    # True when the module-scope session state of a loaded module resolves the command.
+    function Test-ModuleScopeCommand {
+        param([string] $ModuleName, [string] $CommandName)
+        $module = Get-Module -Name $ModuleName | Select-Object -First 1
+        if ($null -eq $module) { return $false }
+        return [bool] (& $module { param($Name) Get-Command -Name $Name -ErrorAction SilentlyContinue } $CommandName)
+    }
     function Get-ParallelRecordText {
         param([AllowEmptyString()] [string] $WorktreePath)
         return (@{ route_id = 'parallel'; items = @(@{ issue_num = 101; worktree_path = $WorktreePath; merge_status = 'merged'; pr_number = 812 }) } | ConvertTo-Json -Compress -Depth 5)
@@ -143,5 +168,56 @@ Describe 'Resolve-WorktreeRunTargetByRecord with a relative worktree_path record
         # Assert
         $target.Status | Should -Be 'OtherWorktree'
         Should -Invoke Get-WorktreeRunMainCheckoutRoot -ModuleName WorktreeRunResolution -Times 0 -Exactly
+    }
+
+    It 'RR8 calls no resolver when the stale <Kind> record names another live worktree' -ForEach @(@{ Kind = 'epic' }, @{ Kind = 'parallel' }) {
+        # Arrange
+        $calls = [System.Collections.Generic.List[string]]::new()
+        $target = $script:Target
+        $resolver = { param($Branch) $calls.Add([string] $Branch); [pscustomobject]@{ WorktreeRoot = $target; ReasonCode = $null } }.GetNewClosure()
+        $text = Get-BranchRecordText -Kind $Kind -WorktreePath '/synthetic-worktrees/item-old'
+        if ($Kind -eq 'epic') { Set-RecordTopology -Live @($script:Main, $script:Planning, '/synthetic-worktrees/item-old', $script:Target) -Epic @{ $script:Planning = $text } -MainRoot $script:Main }
+        else { Set-RecordTopology -Live @($script:Main, $script:Planning, '/synthetic-worktrees/item-old', $script:Target) -Parallel @{ $script:Planning = $text } -MainRoot $script:Main }
+        $arguments = Get-StaleRecordArgument -Kind $Kind -Resolver $resolver
+
+        # Act
+        $result = Resolve-WorktreeRunTargetByRecord @arguments
+
+        # Assert
+        $result.Status | Should -Be 'NoTarget'
+        $calls.Count | Should -Be 0
+    }
+
+    It 'RR9 carries the enumerated live roots in LiveRoot for a worktree_path lookup' {
+        # Arrange (fails before: the result carries no LiveRoot)
+        Set-RecordTopology -Live @($script:Main, $script:Planning) -Parallel @{ $script:Planning = (Get-ParallelRecordText -WorktreePath '.claude/worktrees/agent-x') } -MainRoot $script:Main
+
+        # Act
+        $result = Resolve-WorktreeRunTargetByRecord -Kind parallel -RecordField worktree_path -Value $script:Target -SessionRoot $script:Session
+
+        # Assert
+        $result.Status | Should -Be 'OtherWorktree'
+        @($result.PSObject.Properties.Name) | Should -Contain 'LiveRoot'
+        @($result.LiveRoot) | Should -Be @($script:Main, $script:Planning)
+    }
+
+    It 'RR10 calls Resolve-AgentTargetWorktree with the record branch, FailClosedOnIdentity, and the call SessionRoot when no resolver is supplied for <Kind>' -ForEach @(@{ Kind = 'epic' }, @{ Kind = 'parallel' }) {
+        # Arrange (fails before: the unmodified module has no default resolver and resolves NoTarget)
+        $text = Get-BranchRecordText -Kind $Kind -WorktreePath '/host-a/repo/.claude/worktrees/agent-x'
+        if ($Kind -eq 'epic') { Set-RecordTopology -Live @($script:Main, $script:Planning, $script:Target) -Epic @{ $script:Planning = $text } -MainRoot $script:Main }
+        else { Set-RecordTopology -Live @($script:Main, $script:Planning, $script:Target) -Parallel @{ $script:Planning = $text } -MainRoot $script:Main }
+        $target = $script:Target
+        $registered = Test-ModuleScopeCommand -ModuleName WorktreeRunResolution -CommandName Resolve-AgentTargetWorktree
+        if ($registered) { Mock -CommandName Resolve-AgentTargetWorktree -ModuleName WorktreeRunResolution -MockWith { [pscustomobject]@{ WorktreeRoot = $target; ReasonCode = $null } }.GetNewClosure() }
+        $arguments = Get-StaleRecordArgument -Kind $Kind -Resolver $null
+
+        # Act
+        $result = Resolve-WorktreeRunTargetByRecord @arguments
+
+        # Assert
+        $result.Status | Should -Be 'OtherWorktree'
+        $result.WorktreeRoot | Should -Be $script:Planning
+        $session = $script:Session
+        Should -Invoke Resolve-AgentTargetWorktree -ModuleName WorktreeRunResolution -Times 1 -Exactly -ParameterFilter { $CommandBranch -eq 'feature/issue-1163-agent-x' -and $Policy -eq 'FailClosedOnIdentity' -and $SessionRoot -eq $session }
     }
 }
