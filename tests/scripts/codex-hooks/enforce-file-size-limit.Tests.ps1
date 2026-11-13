@@ -61,7 +61,7 @@ BeforeAll {
         try {
             [Console]::SetOut($out)
             [Console]::SetError($err)
-            $exitCode = Invoke-CodexFileSizeLimitEntryPoint -PayloadRaw $PayloadRaw -RepositoryRoot $script:Root -ReadFileContent $Reader
+            $exitCode = Invoke-CodexFileSizeLimitEntryPoint -PayloadRaw $PayloadRaw -RepositoryRoot $script:Root -ReadFileContent $Reader -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
         } finally {
             [Console]::SetOut($originalOut)
             [Console]::SetError($originalError)
