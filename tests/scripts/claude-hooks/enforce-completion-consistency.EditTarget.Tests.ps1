@@ -59,7 +59,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $json = ConvertTo-EditToolInputJson -FilePath $script:AbsoluteTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
 
         # Act
-        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
+        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: the patched content lacks completion evidence, so the Edit is denied.
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -76,7 +76,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $json = ConvertTo-EditToolInputJson -FilePath $script:AbsoluteTarget -OldString $script:PatchOldString -NewString $script:PatchNotCompletion
 
         # Act
-        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
+        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: the decision follows the targeted content, which still asserts completion.
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -92,7 +92,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $json = ConvertTo-EditToolInputJson -FilePath $script:AbsoluteTarget -OldString $script:PatchOldString -NewString $script:PatchNotCompletion
 
         # Act
-        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
+        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: the decision follows the targeted content, which does not assert completion.
         $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
@@ -105,7 +105,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $json = ConvertTo-EditToolInputJson -FilePath $script:AbsoluteTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
 
         # Act
-        $null = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
+        $null = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: exactly one read, at the supplied file_path.
         $captured.Count | Should -Be 1
@@ -119,7 +119,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $json = ConvertTo-EditToolInputJson -FilePath $script:RelativeTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
 
         # Act
-        $null = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
+        $null = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: exactly one read, at the supplied file_path.
         $captured.Count | Should -Be 1
@@ -133,7 +133,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $json = ConvertTo-EditToolInputJson -FilePath $script:BackslashTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
 
         # Act
-        $null = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
+        $null = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: exactly one read, at the raw (not separator-normalized) file_path.
         $captured.Count | Should -Be 1
@@ -146,7 +146,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $json = ConvertTo-EditToolInputJson -FilePath $script:AbsoluteTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
 
         # Act
-        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
+        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: an unresolvable patch is denied with the checkpoint-missing cause.
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -160,7 +160,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $json = ConvertTo-EditToolInputJson -FilePath $script:RelativeTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
 
         # Act
-        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
+        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: relative-path decisions are unchanged.
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -176,7 +176,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $json = ConvertTo-EditToolInputJson -FilePath $script:AbsoluteTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
 
         # Act
-        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
+        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: a patch that does not apply to the targeted content is denied with the old_string-not-found cause.
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -193,7 +193,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $json = ConvertTo-EditToolInputJson -FilePath $script:AbsoluteTarget -NewString $script:PatchToCompletion
 
         # Act
-        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
+        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: an Edit without old_string cannot be resolved and is denied with the no-old_string cause.
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -210,7 +210,7 @@ Describe 'enforce-completion-consistency.ps1 Edit target path (issue #708)' {
         $json = ConvertTo-EditToolInputJson -FilePath $script:AbsoluteTarget -OldString $script:PatchOldString -NewString $script:PatchToCompletion
 
         # Act
-        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false }
+        $result = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
 
         # Assert: empty targeted content cannot be patched, so the Edit is denied with the checkpoint-empty cause.
         $result.hookSpecificOutput.permissionDecision | Should -Be 'deny'

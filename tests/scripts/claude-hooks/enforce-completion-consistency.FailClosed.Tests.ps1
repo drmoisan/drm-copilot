@@ -69,7 +69,7 @@ Describe 'enforce-completion-consistency.ps1 fail-closed checkpoint handling (is
                 [Parameter(Mandatory)]
                 [scriptblock] $Reader
             )
-            return Invoke-CompletionConsistencyDecision -ToolInputRaw $Json -CheckpointReader $Reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null }
+            return Invoke-CompletionConsistencyDecision -ToolInputRaw $Json -CheckpointReader $Reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
         }
     }
 

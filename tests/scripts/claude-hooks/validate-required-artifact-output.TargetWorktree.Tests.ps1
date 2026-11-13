@@ -124,27 +124,41 @@ Describe 'validate-required-artifact-output prd-feature spec-path target worktre
         Should -Invoke Test-ArtifactFile -Times 0 -Exactly
     }
 
-    It 'falls back to the session root with TARGET_WORKTREE_NOT_DERIVABLE in the block message' {
-        # Arrange
-        Mock Test-ArtifactFile { $false }
+    It 'blocks without a probe naming TARGET_WORKTREE_NOT_DERIVABLE when the prompt branch names no worktree' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
+        Mock Test-ArtifactFile { throw 'the spec probe must not be called for an unresolved identity' }
 
         # Act
         $result = Get-RequiredArtifactCase -SpecPath $script:Relative -Prompt 'branch: bug/unknown-branch'
 
         # Assert
-        $result.Message | Should -BeLike '*TARGET_WORKTREE_NOT_DERIVABLE*the session root was probed'
-        Should -Invoke Test-ArtifactFile -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Relative }
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike "*spec-path '$script:Relative' is rejected:*TARGET_WORKTREE_NOT_DERIVABLE*"
+        Should -Invoke Test-ArtifactFile -Times 0 -Exactly
     }
 
-    It 'falls back to the session root with TARGET_WORKTREE_AMBIGUOUS in the block message' {
-        # Arrange
-        Mock Test-ArtifactFile { $false }
+    It 'blocks without a probe naming TARGET_WORKTREE_AMBIGUOUS when the prompt names two issue numbers' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
+        Mock Test-ArtifactFile { throw 'the spec probe must not be called for an unresolved identity' }
 
         # Act
         $result = Get-RequiredArtifactCase -SpecPath $script:Relative -Prompt "Canonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Assert
-        $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*the session root was probed'
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike "*spec-path '$script:Relative' is rejected:*TARGET_WORKTREE_AMBIGUOUS*"
+        Should -Invoke Test-ArtifactFile -Times 0 -Exactly
+    }
+
+    It 'keeps the session-root probe when the prompt carries no branch label and no canonical issue line' {
+        # Arrange (D5: no identity keeps the session-root fallback)
+        Mock Test-ArtifactFile { param([string] $Path) $Path -eq $script:Relative }
+
+        # Act
+        $result = Get-RequiredArtifactCase -SpecPath $script:Relative -Prompt 'Write the spec.'
+
+        # Assert
+        $result.Ok | Should -BeTrue
         Should -Invoke Test-ArtifactFile -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Relative }
     }
 

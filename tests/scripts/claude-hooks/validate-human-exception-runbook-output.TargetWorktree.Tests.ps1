@@ -38,10 +38,13 @@ BeforeAll {
 
     function Invoke-Case {
         # Runs the decision function with in-memory files and returns the result plus the recorded seam calls.
-        param([string] $RunbookPath, [hashtable] $File, [string] $Prompt = $script:Prompt)
+        # FailIfProbed makes the TestFile probe seam throw, so a row can prove the probe is never invoked.
+        param([string] $RunbookPath, [hashtable] $File, [string] $Prompt = $script:Prompt, [switch] $FailIfProbed)
         $fileMap = $File
+        $failProbe = [bool] $FailIfProbed
         $read = [System.Collections.Generic.List[string]]::new()
         $listed = [System.Collections.Generic.List[string]]::new()
+        $tested = [System.Collections.Generic.List[string]]::new()
         $envelope = ([ordered]@{
                 session_id             = 'tw-1128'
                 hook_event_name        = 'SubagentStop'
@@ -52,9 +55,9 @@ BeforeAll {
             } | ConvertTo-Json -Compress)
         $result = Get-HumanExceptionRunbookDecision -InputText $envelope -SessionRoot $script:SessionRoot -ReadTranscriptHead (Get-TranscriptReader -Prompt $Prompt) -WorktreeListInvoker $script:ListInvoker `
             -ReadFile { param($Path) $read.Add($Path); if ($fileMap.ContainsKey($Path)) { $fileMap[$Path] } else { $null } }.GetNewClosure() `
-            -TestFile { param($Path) $fileMap.ContainsKey($Path) }.GetNewClosure() `
+            -TestFile { param($Path) $tested.Add($Path); if ($failProbe) { throw 'the runbook probe must not be called for an unresolved identity' }; $fileMap.ContainsKey($Path) }.GetNewClosure() `
             -ListRootFile { param($Root) $listed.Add($Root); @($fileMap.Keys | Where-Object { $_.StartsWith("$Root/") -and -not $_.Substring($Root.Length + 1).Contains('/') } | ForEach-Object { $_.Substring($Root.Length + 1) }) }.GetNewClosure()
-        return [pscustomobject]@{ Result = $result; Read = @($read); Listed = @($listed) }
+        return [pscustomobject]@{ Result = $result; Read = @($read); Listed = @($listed); Tested = @($tested) }
     }
 }
 
@@ -126,27 +129,56 @@ Describe 'validate-human-exception-runbook-output runbook_path target worktree (
         $outcome.Read.Count | Should -Be 0
     }
 
-    It 'falls back to the session root with TARGET_WORKTREE_NOT_DERIVABLE in the block message' {
-        # Arrange
+    It 'blocks without a probe naming TARGET_WORKTREE_NOT_DERIVABLE when the prompt branch names no worktree' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
         $file = @{}
 
         # Act
-        $outcome = Invoke-Case -RunbookPath $script:Relative -File $file -Prompt 'branch: bug/unknown-branch'
+        $outcome = Invoke-Case -RunbookPath $script:Relative -File $file -Prompt 'branch: bug/unknown-branch' -FailIfProbed
 
         # Assert
         $outcome.Result.Ok | Should -BeFalse
-        $outcome.Result.Message | Should -BeLike '*TARGET_WORKTREE_NOT_DERIVABLE*the session root was probed.'
+        $outcome.Result.Message | Should -BeLike "*runbook path '$script:Relative' is rejected:*TARGET_WORKTREE_NOT_DERIVABLE*"
+        $outcome.Tested.Count | Should -Be 0
     }
 
-    It 'lists the session root and reads its lockfile when the target falls back to the session root' {
-        # Arrange
+    It 'blocks without a probe naming TARGET_WORKTREE_AMBIGUOUS when the prompt names two issue numbers' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
+        $file = @{}
+
+        # Act
+        $outcome = Invoke-Case -RunbookPath $script:Relative -File $file -Prompt "Canonical issue number for this feature is 1128.`nCanonical issue number for this feature is 1129." -FailIfProbed
+
+        # Assert
+        $outcome.Result.Ok | Should -BeFalse
+        $outcome.Result.Message | Should -BeLike "*runbook path '$script:Relative' is rejected:*TARGET_WORKTREE_AMBIGUOUS*"
+        $outcome.Tested.Count | Should -Be 0
+    }
+
+    It 'lists no root and reads no file when the prompt branch names no worktree' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
         $file = @{ $script:Relative = $script:Runbook; "$script:SessionRoot/poetry.lock" = "[[package]]`nname = `"nuitka`"`nversion = `"4.3.4`"`n" }
 
         # Act
         $outcome = Invoke-Case -RunbookPath $script:Relative -File $file -Prompt 'branch: bug/unknown-branch'
 
         # Assert
-        $outcome.Result.Message | Should -BeLike '*nuitka*4.3.4*'
+        $outcome.Result.Ok | Should -BeFalse
+        $outcome.Result.Message | Should -Not -BeLike '*nuitka*'
+        $outcome.Listed.Count | Should -Be 0
+        $outcome.Read.Count | Should -Be 0
+    }
+
+    It 'keeps the session-root probe and lockfile root when the prompt carries no branch label and no canonical issue line' {
+        # Arrange (D5: no identity keeps the session-root fallback)
+        $file = @{ $script:Relative = (@('# Runbook', 'No commands.') -join "`n") }
+
+        # Act
+        $outcome = Invoke-Case -RunbookPath $script:Relative -File $file -Prompt 'Write the runbook.'
+
+        # Assert
+        $outcome.Result.Ok | Should -BeTrue
+        $outcome.Tested | Should -Be @($script:Relative)
         $outcome.Listed | Should -Be @($script:SessionRoot)
     }
 }
