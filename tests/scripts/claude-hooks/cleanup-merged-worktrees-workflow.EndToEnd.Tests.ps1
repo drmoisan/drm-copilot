@@ -152,6 +152,11 @@ BeforeAll {
     }
 }
 
+AfterAll {
+    # The gates replace the run module; discard only the stale fixture-owned scope binding.
+    Reset-EpicStateProbeModuleBinding
+}
+
 Describe 'cleanup-merged-worktrees workflow end to end with no checkpoint (issue #1026)' {
     BeforeEach {
         Set-WorkflowScenario
