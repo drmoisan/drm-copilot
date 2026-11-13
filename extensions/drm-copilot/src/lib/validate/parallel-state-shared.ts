@@ -102,14 +102,60 @@ export function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 /**
+ * Code points that CPython's `str.isprintable` rejects: Unicode categories C
+ * (Cc, Cf, Cs, Co, Cn) and Z (Zs, Zl, Zp). The space is kept before this test.
+ */
+const NON_PRINTABLE_CODE_POINT = /^[\p{C}\p{Z}]$/u;
+
+/** The named escapes Python's `repr` uses for the backslash and three controls. */
+const NAMED_REPR_ESCAPES: ReadonlyMap<string, string> = new Map([
+  ["\\", "\\\\"],
+  ["\t", "\\t"],
+  ["\n", "\\n"],
+  ["\r", "\\r"],
+]);
+
+/**
+ * Escape one code point the way CPython's `repr` does inside a string literal.
+ *
+ * @param char One code point (one or two UTF-16 code units).
+ * @param quote The active delimiter, `'` or `"`.
+ * @returns The escaped delimiter, a named escape, the code point itself when it
+ * is printable, or a `\x`, `\u`, or `\U` hex escape.
+ */
+function escapeReprCodePoint(char: string, quote: string): string {
+  if (char === quote) {
+    return `\\${char}`;
+  }
+  const named = NAMED_REPR_ESCAPES.get(char);
+  if (named !== undefined) {
+    return named;
+  }
+  if (char === " " || !NON_PRINTABLE_CODE_POINT.test(char)) {
+    return char;
+  }
+  // CPython picks the shortest of the 2-, 4-, and 8-digit lowercase hex forms.
+  const code = Number(char.codePointAt(0));
+  const hex = code.toString(16);
+  if (code <= 0xff) {
+    return `\\x${hex.padStart(2, "0")}`;
+  }
+  if (code <= 0xffff) {
+    return `\\u${hex.padStart(4, "0")}`;
+  }
+  return `\\U${hex.padStart(8, "0")}`;
+}
+
+/**
  * Format a value the way Python `repr` does, for byte-identical error strings.
  *
  * @param value Value to format.
  * @returns `None` for null/undefined, `True`/`False` for booleans, quoted text
  * for strings with Python's quote selection (double quotes when the text holds a
- * single quote and no double quote, otherwise single quotes with backslashes and
- * single quotes escaped), bracketed/braced forms for arrays and objects, and the
- * plain string form for everything else.
+ * single quote and no double quote, otherwise single quotes) and Python's string
+ * escaping (the active quote, the backslash, `\t`, `\n`, and `\r`, and a hex
+ * escape for every code point that `str.isprintable` rejects), bracketed/braced
+ * forms for arrays and objects, and the plain string form for everything else.
  */
 export function pythonRepr(value: unknown): string {
   if (value === null || value === undefined) {
@@ -119,12 +165,11 @@ export function pythonRepr(value: unknown): string {
     return value ? "True" : "False";
   }
   if (typeof value === "string") {
-    const escaped = value.replace(/\\/g, "\\\\");
     // Python's repr switches to double quotes for a single quote without a double quote.
-    if (value.includes("'") && !value.includes('"')) {
-      return `"${escaped}"`;
-    }
-    return `'${escaped.replace(/'/g, "\\'")}'`;
+    const quote = value.includes("'") && !value.includes('"') ? '"' : "'";
+    // Array.from walks code points, so a supplementary character is one unit.
+    const body = Array.from(value, (char) => escapeReprCodePoint(char, quote));
+    return `${quote}${body.join("")}${quote}`;
   }
   if (Array.isArray(value)) {
     return `[${value.map(pythonRepr).join(", ")}]`;
