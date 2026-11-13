@@ -132,7 +132,7 @@ Describe 'codex enforce-orchestration-preimplementation-gate.ps1 absolute-path c
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/enforce-orchestration-preimplementation-gate.ps1").Path
         . $script:UnderTest
         . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
-        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText', 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
         Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
         # Issue #707 (D10): the epic-scope read is mocked so local epic state cannot change a decision.
         Mock Get-EpicScopeCheckpointText { $null }
