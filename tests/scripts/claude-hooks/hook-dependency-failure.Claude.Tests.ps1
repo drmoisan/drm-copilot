@@ -43,7 +43,6 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
         if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChangedLanguageSet' -Surface 'Codex' }
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-CheckpointFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex' }
-        if (Get-Command Read-OrchestratorOutputOwnerPassDownText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Read-OrchestratorOutputOwnerPassDownText' -Surface 'Codex' }
         if (Get-Command Read-OwnerDirectiveFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Read-OwnerDirectiveFileText' -Surface 'Codex' }
         if (Get-Command Get-ChildOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChildOrchestratorCheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-EpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicCheckpointContent' -Surface 'Codex' }
