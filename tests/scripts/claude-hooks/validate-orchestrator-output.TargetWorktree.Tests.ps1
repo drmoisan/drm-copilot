@@ -19,7 +19,6 @@ BeforeAll {
     . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-orchestrator-output.ps1')
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
     Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-CheckpointFileContent' -Surface 'Claude'
-    Register-EpicStateBaselineMock -Seam 'Read-OrchestratorOutputOwnerPassDownText' -Surface 'Codex'
 
     $script:SessionRoot = '/synthetic-worktrees/main'
     $script:ItemRoot = '/synthetic-worktrees/main/.claude/worktrees/bug-1145'
