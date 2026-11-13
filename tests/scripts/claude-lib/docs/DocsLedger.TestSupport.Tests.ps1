@@ -50,7 +50,40 @@ Describe 'New-DocsLedgerTestContext' {
         $test.CallLog[4].Mode | Should -BeExactly 'create'
         $listed | Should -Be @('docs/one.md')
         (& $test.Context.UtcNow).Kind | Should -Be ([System.DateTimeKind]::Utc)
-        @($test.Context.PSObject.Properties | ForEach-Object { $_.Name }) | Should -Be @('RepositoryRoot', 'ReadText', 'ReadBytes', 'TestFile', 'ListFile', 'WriteText', 'UtcNow', 'InvokeProcess')
+        # Issue #1169: the factory carries the twelve members of New-DocsCommandContext.
+        @($test.Context.PSObject.Properties | ForEach-Object { $_.Name }) | Should -Be @('RepositoryRoot', 'ReadText', 'ReadBytes', 'TestFile', 'ListFile', 'WriteText', 'UtcNow', 'InvokeProcess', 'ResolveRevision', 'ReadRevisionText', 'TestAncestor', 'ListChangedPath')
+    }
+
+    It 'answers the revision members from the in-memory maps and $null for an unmapped key (issue #1169)' {
+        # Arrange
+        $one = '1111111111111111111111111111111111111111'
+        $two = '2222222222222222222222222222222222222222'
+        $test = New-DocsLedgerTestContext -RevisionMap @{ HEAD = $two } -AncestorMap @{ "$one..$two" = $true } -ChangedPathMap @{ "$one..$two" = @('docs/a.md'); "$two..$two" = @() }
+
+        # Act
+        $head = & $test.Context.ResolveRevision 'HEAD'
+        $missingRef = & $test.Context.ResolveRevision 'main'
+        $ancestor = & $test.Context.TestAncestor $one $two
+        $unmappedAncestor = & $test.Context.TestAncestor $two $one
+        $changed = & $test.Context.ListChangedPath $one $two
+        $empty = & $test.Context.ListChangedPath $two $two
+        $unmappedChanged = & $test.Context.ListChangedPath $two $one
+        $text = & $test.Context.ReadRevisionText $one 'docs/a.md'
+        $test.Revisions['HEAD'] = $one
+        $moved = & $test.Context.ResolveRevision 'HEAD'
+
+        # Assert
+        $head | Should -BeExactly $two
+        $missingRef | Should -BeNullOrEmpty
+        $ancestor | Should -BeTrue
+        $null -eq $unmappedAncestor | Should -BeTrue
+        @($changed) | Should -Be @('docs/a.md')
+        $null -eq $empty | Should -BeFalse -Because 'an empty mapped entry is an empty array, not $null'
+        @($empty).Count | Should -Be 0
+        $null -eq $unmappedChanged | Should -BeTrue
+        $text | Should -BeNullOrEmpty
+        $moved | Should -BeExactly $one -Because 'Revisions is the table ResolveRevision reads'
+        $test.CallLog.Count | Should -Be 0 -Because 'the revision members record no file access'
     }
 
     It 'returns written text on a later ReadBytes' {

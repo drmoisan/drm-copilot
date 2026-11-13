@@ -368,6 +368,7 @@
     ".claude/lib/docs/DocsParity.psm1",
     ".claude/lib/docs/DocsReceipt.psm1",
     ".claude/lib/docs/DocsReceiptRevision.psm1",
+    ".claude/lib/docs/DocsValidateCommands.psm1",
     ".claude/lib/docs/DocsLedgerMutation.psm1",
     ".claude/lib/docs/DocsValidation.psm1",
     ".claude/lib/docs/DocsCoverageReport.psm1",

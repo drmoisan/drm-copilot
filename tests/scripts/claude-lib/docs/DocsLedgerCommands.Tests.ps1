@@ -7,8 +7,8 @@
     the dispatch rows and the coverage subcommand (the DocsLedgerCommands suite family).
 
 .DESCRIPTION
-    Covers Test-DocsUpdateLedgerArgument and Test-DocsValidateArgument over every operation and
-    value grammar, Read-DocsLedgerInputSet over the recording in-memory context of
+    Covers Test-DocsUpdateLedgerArgument over every operation and value grammar (the
+    Test-DocsValidateArgument cases live in DocsValidateCommands.Tests.ps1, issue #1169), Read-DocsLedgerInputSet over the recording in-memory context of
     DocsLedger.TestSupport.psm1, the 1023 dispatch rows of Invoke-DocsCommand.ps1 and the
     coverage subcommand through Invoke-DocsCommandCli. Assertions use codes, exit codes,
     pointers and identifiers, never Test-Json message text. No file is written.
@@ -204,20 +204,6 @@ Describe 'Test-DocsUpdateLedgerArgument' {
         Assert-TestUsageFinding -Finding (Test-DocsUpdateLedgerArgument -Argument (New-TestArgument -Operation 'set-dimension' -Extra @{ Dimension = 'tone' })) -Fragment 'tone'
         Assert-TestUsageFinding -Finding (Test-DocsUpdateLedgerArgument -Argument (New-TestArgument -Operation 'set-dimension' -Extra @{ State = 'maybe' })) -Fragment 'maybe'
         Assert-TestUsageFinding -Finding (Test-DocsUpdateLedgerArgument -Argument (New-TestArgument -Operation 'set-disposition' -Extra @{ Rationale = '   ' })) -Fragment '-Rationale'
-        Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Mode = 'ledger'; Revision = $script:Revision.ToUpperInvariant() }) -Fragment 'Revision'
-        Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Mode = 'ledger'; Revision = 'abc' }) -Fragment 'Revision'
-        Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Mode = 'ledger'; Revision = $script:Revision; Profile = '/abs.json' }) -Fragment 'repository-relative'
-    }
-
-    It 'rejects WriteReceipt outside docs-complete' {
-        foreach ($mode in 'profile', 'ledger', 'matrix') {
-            Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Mode = $mode; Revision = $script:Revision; WriteReceipt = $true }) -Fragment '-WriteReceipt'
-        }
-        $null -eq (Test-DocsValidateArgument -Argument @{ Mode = 'docs-complete'; Revision = $script:Revision; WriteReceipt = $true }) | Should -BeTrue
-        $null -eq (Test-DocsValidateArgument -Argument @{ Mode = 'matrix'; Revision = $script:Revision; WriteReceipt = $false }) | Should -BeTrue
-        Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Revision = $script:Revision }) -Fragment '-Mode'
-        Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Mode = 'all'; Revision = $script:Revision }) -Fragment 'all'
-        Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Mode = 'ledger' }) -Fragment '-Revision'
     }
 
     It 'returns null for valid arguments' {
@@ -228,12 +214,11 @@ Describe 'Test-DocsUpdateLedgerArgument' {
         $null -eq (Test-DocsUpdateLedgerArgument -Argument (New-TestArgument -Operation 'set-disposition' -Extra @{ Page = [string[]]@('docs/a.md#intro', 'docs/b.md') })) | Should -BeTrue
         $null -eq (Test-DocsUpdateLedgerArgument -Argument (New-TestArgument -Operation 'pin' -Extra @{ Claim = 'Describes the command.' })) | Should -BeTrue
         $null -eq (Test-DocsUpdateLedgerArgument -Argument (New-TestArgument -Operation 'set-dimension' -Extra @{ State = 'fail'; Rationale = 'Missing.' })) | Should -BeTrue
-        $null -eq (Test-DocsValidateArgument -Argument @{ Mode = 'profile'; Revision = 'f' * 64; Profile = 'p.json' }) | Should -BeTrue
     }
 }
 
 Describe 'Dispatch rows' {
-    It 'Get-DocsCommandTable carries the coverage, update-ledger and validate rows bound to DocsLedgerCommands.psm1' {
+    It 'Get-DocsCommandTable carries the coverage and update-ledger rows bound to DocsLedgerCommands.psm1 and the validate row bound to DocsValidateCommands.psm1' {
         # Act
         $table = Get-DocsCommandTable
         $rows = @{}
@@ -242,7 +227,8 @@ Describe 'Dispatch rows' {
         # Assert (membership; no row-count assertion)
         foreach ($name in 'coverage', 'update-ledger', 'validate') {
             $rows[$name].Count | Should -Be 1 -Because "one row is named $name"
-            [System.IO.Path]::GetFileName([string] $rows[$name][0].Module) | Should -BeExactly 'DocsLedgerCommands.psm1'
+            $expectedModule = if ($name -ceq 'validate') { 'DocsValidateCommands.psm1' } else { 'DocsLedgerCommands.psm1' }
+            [System.IO.Path]::GetFileName([string] $rows[$name][0].Module) | Should -BeExactly $expectedModule
             Test-Path -LiteralPath $rows[$name][0].Module | Should -BeTrue
         }
         $rows['coverage'][0].Function | Should -BeExactly 'Invoke-DocsCoverageCommand'
