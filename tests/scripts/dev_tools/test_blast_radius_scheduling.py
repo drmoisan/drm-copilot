@@ -27,6 +27,7 @@ import pytest
 from scripts.dev_tools._blast_radius_scheduling import (
     STRICT_CONFLICT_TOLERANCE,
     ConflictTolerance,
+    ItemAccess,
     SchedulingItem,
     config_conflict_tolerance,
     decide_pair,
@@ -50,6 +51,8 @@ SCHEDULING_STEMS: tuple[str, ...] = (
     "scheduling-452-negative-controls",
     "scheduling-soft-pair-tolerated",
     "scheduling-absent-key-strict",
+    "scheduling-1164-committed-minutes",
+    "scheduling-1164-separable-fallthrough",
 )
 FIXTURE_452_STEMS: tuple[str, ...] = SCHEDULING_STEMS[:3]
 
@@ -122,12 +125,19 @@ def records(value: object) -> list[Mapping[str, object]]:
 
 def fixture_items(fixture: Mapping[str, object]) -> list[SchedulingItem]:
     """Build scheduling items from a scheduling fixture's embedded radii."""
-    # One scheduling item per fixture item, keeping the fixture's key and band.
+    # One scheduling item per fixture item, keeping the fixture's key, band, and
+    # optional access lists (issue #1164).
     return [
         SchedulingItem(
             key=cast("int", item["key"]),
             radius=BlastRadius.from_dict(cast("Mapping[str, object]", item["radius"])),
             band=cast("str | None", item["band"]),
+            access=ItemAccess(
+                read_paths=tuple(cast("list[str]", item.get("read_paths", []))),
+                separable_paths=tuple(
+                    cast("list[str]", item.get("separable_paths", []))
+                ),
+            ),
         )
         for item in records(fixture["items"])
     ]

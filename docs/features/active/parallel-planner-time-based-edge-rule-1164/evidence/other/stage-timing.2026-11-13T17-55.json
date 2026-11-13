@@ -1,0 +1,67 @@
+{
+  "issue": 1164,
+  "recorded_at": "2026-11-13T17:55:43Z",
+  "note": "Wall-clock figures including queueing; the merge stage is not captured.",
+  "stage_timing": [
+    {
+      "stage": "S4_research",
+      "attempt": 1,
+      "started_at": "2026-11-09T21:56:41Z",
+      "ended_at": "2026-11-09T22:14:58Z"
+    },
+    {
+      "stage": "S4_spec",
+      "attempt": 1,
+      "started_at": "2026-11-09T22:14:58Z",
+      "ended_at": "2026-11-09T22:21:07Z"
+    },
+    {
+      "stage": "S4_atomic_planning",
+      "attempt": 1,
+      "started_at": "2026-11-09T22:21:07Z",
+      "ended_at": "2026-11-09T23:20:01Z"
+    },
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 1,
+      "started_at": "2026-11-09T23:20:01Z",
+      "ended_at": "2026-11-10T04:36:46Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 1,
+      "started_at": "2026-11-10T04:36:46Z",
+      "ended_at": "2026-11-11T04:44:13Z"
+    },
+    {
+      "stage": "remediation_cycle_1",
+      "attempt": 1,
+      "started_at": "2026-11-11T04:49:16Z",
+      "ended_at": "2026-11-13T14:15:20Z"
+    },
+    {
+      "stage": "remediation_cycle_2",
+      "attempt": 1,
+      "started_at": "2026-11-13T14:15:20Z",
+      "ended_at": "2026-11-13T16:48:00Z"
+    },
+    {
+      "stage": "S8_create_pr",
+      "attempt": 1,
+      "started_at": "2026-11-13T16:48:00Z",
+      "ended_at": "2026-11-13T16:51:02Z"
+    },
+    {
+      "stage": "S9_ci_green",
+      "attempt": 1,
+      "started_at": "2026-11-13T16:51:02Z",
+      "ended_at": "2026-11-13T17:55:43Z"
+    },
+    {
+      "stage": "S9_ci_green",
+      "attempt": 2,
+      "started_at": "2026-11-13T17:55:43Z",
+      "ended_at": null
+    }
+  ]
+}

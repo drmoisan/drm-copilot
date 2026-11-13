@@ -1,0 +1,8 @@
+{
+  "name": "manifest_m9_valid_pair_decisions",
+  "notes": "M9: one edge and one tolerated pair, each with integer-minute estimates, validate cleanly.",
+  "manifest_text": "---\nparallel: alpha-run\nmode: closed\nmax_concurrency: 4\ncreated_at: \"2026-08-10T00:00:00Z\"\nitems:\n  - issue_num: 101\n    feature_folder: docs/features/active/alpha-101\n    kind: feature\n    state: proposed\n    blast_radius:\n      paths:\n        - src/alpha.ts\n      modules: []\n      shared_surfaces: []\n      contracts: []\n      source: derived\n      computed_at: \"2026-08-10T00:00:00Z\"\n  - issue_num: 102\n    feature_folder: docs/features/active/alpha-102\n    kind: feature\n    state: proposed\n    blast_radius:\n      paths:\n        - src/alpha.ts\n      modules: []\n      shared_surfaces: []\n      contracts: []\n      source: derived\n      computed_at: \"2026-08-10T00:00:00Z\"\n  - issue_num: 103\n    feature_folder: docs/features/active/alpha-103\n    kind: feature\n    state: proposed\n    blast_radius:\n      paths:\n        - src/alpha.ts\n      modules: []\n      shared_surfaces: []\n      contracts: []\n      source: derived\n      computed_at: \"2026-08-10T00:00:00Z\"\npair_decisions:\n  - a: 101\n    b: 102\n    reasons:\n      - path_overlap\n    hard: false\n    cost: 90\n    benefit: 45\n    verdict: edge\n  - a: 102\n    b: 103\n    reasons:\n      - path_overlap\n    hard: false\n    cost: 10\n    benefit: 45\n    verdict: tolerated\n  - a: 101\n    b: 103\n    reasons:\n      - contract_dependency\n    hard: true\n    cost: 90\n    benefit: 45\n    verdict: edge\n---\n\n# Parallel Run\n",
+  "expected_errors": [],
+  "expected_mode": "closed",
+  "expected_max_concurrency": 4
+}
