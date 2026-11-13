@@ -15,7 +15,13 @@
         DepthLimit, an opaque NoPayload shell wrapper, an evaluator command word, rg --pre,
         git -O and --open-files-in-pager, ForEach-Object, find, and a PowerShell expression
         with '::' or '.Invoke';
-      - mention cases that clear the hit, and the remaining rule branches.
+      - mention cases that clear the hit, and the remaining rule branches;
+      - decision D16: a named case for each pipeline-consumer probe (ED-43 to ED-49), the
+        sort --compress-program option, and each D16 boundary (pipe chain, nested-depth skip,
+        expression consumers, NotHost precedence, an executing option on a consumer), plus
+        guard cases that must stay unclassified (all-host pipeline, ';' boundary, wrapper
+        payload nesting, PowerShell payload end, accepted expression consumer). The two
+        NotHost cases mock Get-OrchestrationGateMentionHostTable inside their own It.
 
     Two further Context blocks run each gate and pin spec AC-3: the stage-2 function is
     invoked only after a stage-1 hit. The outermost BeforeAll loads the Codex gate in the
@@ -57,7 +63,7 @@ Describe 'enforce-orchestration-preimplementation-gate-commands.ps1 (issue #1160
                 $table.Output | Should -Be @('echo', 'printf', 'Write-Output', 'Write-Host', 'Write-Verbose')
                 $table.ReadAndFilter | Should -Be @('cat', 'Get-Content', 'head', 'tail', 'less', 'more', 'wc', 'sort', 'uniq', 'Where-Object', 'Select-Object', 'Sort-Object', 'Measure-Object', 'Format-Table', 'Format-List', 'Out-String', 'Get-ChildItem', 'Test-Path')
                 $table.Lookup | Should -Be @('which', 'where', 'where.exe', 'type', 'Get-Command', 'gcm')
-                $table.NotHost | Should -Be @('ForEach-Object', 'find')
+                $table.NotHost | Should -Be @('ForEach-Object', '%', 'foreach', 'find')
             }
 
             It 'returns exactly the decision D2 subcommand sets' {
@@ -74,9 +80,10 @@ Describe 'enforce-orchestration-preimplementation-gate-commands.ps1 (issue #1160
             It 'returns exactly the decision D2 executing-option exclusions' {
                 $table = Get-OrchestrationGateMentionHostTable
 
-                @($table.ExecutingOption.Keys) | Should -Be @('rg', 'git')
+                @($table.ExecutingOption.Keys) | Should -Be @('rg', 'git', 'sort')
                 $table.ExecutingOption.rg | Should -Be @('--pre')
                 $table.ExecutingOption.git | Should -Be @('-O', '--open-files-in-pager')
+                $table.ExecutingOption.sort | Should -Be @('--compress-program')
             }
 
             It 'returns a new table on every call' {
@@ -200,6 +207,104 @@ Describe 'enforce-orchestration-preimplementation-gate-commands.ps1 (issue #1160
 
             It 'rejects a pattern index outside the five stage-1 patterns' {
                 { Test-OrchestrationGateInvocationConfirmed -CommandText 'pytest' -PatternIndex 5 } | Should -Throw
+            }
+        }
+
+        Context 'pipeline consumers confirm the hit (decision D16)' {
+            It 'confirms probe ED-43, a ForEach-Object consumer of Get-ChildItem tests/scripts/' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'pwsh -NoProfile -Command "Get-ChildItem tests/scripts/run.ps1 | ForEach-Object { & $_.FullName }"' -PatternIndex 4 | Should -BeTrue
+            }
+
+            It 'confirms probe ED-44, a ForEach-Object consumer of a filtered Get-ChildItem' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'pwsh -NoProfile -Command "Get-ChildItem tests/scripts/ -Filter *.Tests.ps1 | ForEach-Object { & $_ }"' -PatternIndex 4 | Should -BeTrue
+            }
+
+            It 'confirms probe ED-45, a % consumer' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'pwsh -NoProfile -Command "Get-ChildItem tests/scripts/run.ps1 | % { & $_ }"' -PatternIndex 4 | Should -BeTrue
+            }
+
+            It 'confirms probe ED-46, a ForEach-Object consumer of Get-Command pytest' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'pwsh -NoProfile -Command "Get-Command pytest | ForEach-Object { & $_ }"' -PatternIndex 1 | Should -BeTrue
+            }
+
+            It 'confirms probe ED-47, a ForEach-Object consumer calling the Source property' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'pwsh -NoProfile -Command "Get-Command pytest | ForEach-Object { & $_.Source -q }"' -PatternIndex 1 | Should -BeTrue
+            }
+
+            It 'confirms probe ED-48, a ForEach-Object consumer of Get-Command Invoke-Pester' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'pwsh -NoProfile -Command "Get-Command Invoke-Pester | ForEach-Object { & $_ }"' -PatternIndex 4 | Should -BeTrue
+            }
+
+            It 'confirms probe ED-49, an xargs env consumer of echo' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'echo pytest | xargs env' -PatternIndex 1 | Should -BeTrue
+            }
+
+            It 'confirms sort with --compress-program' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'sort --compress-program pytest big.txt' -PatternIndex 1 | Should -BeTrue
+            }
+
+            It 'confirms a non-host stage after an intervening host stage' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'echo pytest | sort | xargs env' -PatternIndex 1 | Should -BeTrue
+            }
+
+            It 'reads NotHost before the host groups' {
+                Mock Get-OrchestrationGateMentionHostTable {
+                    [ordered]@{
+                        Search = @('grep'); Process = @('ps'); Output = @(); ReadAndFilter = @(); Lookup = @()
+                        Subcommand = [ordered]@{}; ExecutingOption = [ordered]@{}; NotHost = @('grep')
+                    }
+                }
+
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'ps aux | grep pytest' -PatternIndex 1 | Should -BeTrue
+            }
+
+            It 'confirms a PowerShell expression consumer containing ::' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'pwsh -c "Get-Command pytest; [Diagnostics.Process]::Start(''x'')"' -PatternIndex 1 | Should -BeTrue
+            }
+
+            It 'confirms a PowerShell expression consumer containing .Invoke' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'pwsh -c "Get-Command pytest; { 1 }.Invoke()"' -PatternIndex 1 | Should -BeTrue
+            }
+
+            It 'skips nested payload records when following the pipeline' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'echo pytest | grep "$(cat x)" | xargs env' -PatternIndex 1 | Should -BeTrue
+            }
+
+            It 'reads NotHost before the host groups in the consumer check' {
+                Mock Get-OrchestrationGateMentionHostTable {
+                    [ordered]@{
+                        Search = @(); Process = @(); Output = @('echo'); ReadAndFilter = @('sort'); Lookup = @()
+                        Subcommand = [ordered]@{}; ExecutingOption = [ordered]@{}; NotHost = @('sort')
+                    }
+                }
+
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'echo pytest | sort' -PatternIndex 1 | Should -BeTrue
+            }
+
+            It 'confirms a consumer with an executing option' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'echo pytest | sort --compress-program gzip' -PatternIndex 1 | Should -BeTrue
+            }
+        }
+
+        Context 'pipeline guards keep a mention unclassified (decision D16)' {
+            It 'clears a pipeline whose later stages are all hosts' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'Get-Command pytest | Select-Object -ExpandProperty Source' -PatternIndex 1 | Should -BeFalse
+            }
+
+            It 'does not treat a record after ; as a consumer' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'echo pytest; make build' -PatternIndex 1 | Should -BeFalse
+            }
+
+            It 'does not treat records nested in a wrapper payload as consumers of the wrapper' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'sh -c "make build; grep pytest x" | sort' -PatternIndex 1 | Should -BeFalse
+            }
+
+            It 'stops a PowerShell consumer search at the end of its payload' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'pwsh -c "Get-Command pytest"; make build' -PatternIndex 1 | Should -BeFalse
+            }
+
+            It 'accepts a PowerShell expression consumer without :: or .Invoke' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'pwsh -c "Get-Command pytest; $null"' -PatternIndex 1 | Should -BeFalse
             }
         }
     }
