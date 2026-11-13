@@ -1,0 +1,157 @@
+# 2026-11-09-preimplementation-gate-false-positives (Remediation Plan, cycle 3)
+
+- **Issue:** #1160
+- **Branch:** bug/preimplementation-gate-false-positives-1160 (PR #1174)
+- **Remediation cycle:** 3, R1; Remediation-Mode: design; path: full
+- **Inputs:** `remediation-inputs.2026-11-13T19-53.md` in this folder (F2, N1 to N4, `## Constraints`), with `policy-audit.2026-11-13T19-53.md`, `code-review.2026-11-13T19-53.md`, and `feature-audit.2026-11-13T19-53.md`
+- **Work Mode:** full-bug (AC source: `spec.md` in this folder; AC text is not changed)
+- **Scope:** F2 (the D16 consumer walk is cut at group and process-substitution boundaries and never looks before the carrying record), closed by decision D17, a closed fail-safe rule, instead of support for further constructs one by one; N1 is recorded in D17. N2 to N4 need no change.
+
+**Fail-closed evidence rule:** every baseline, gate, and comparison task names its artifact. A missing or incomplete artifact makes the audit verdict BLOCKED or INCOMPLETE, never PASS.
+
+**Evidence accounting rule:** `<FEATURE>` is `docs/features/active/2026-11-09-preimplementation-gate-false-positives-1160`. Evidence is append-only: no evidence file or receipt is back-dated, rewritten, or deleted, and a later loop pass writes a new file. Every filename stamp and `Timestamp:` value is UTC read from the clock at write time. A consumer reads the lexicographically greatest file of the named artifact.
+
+## Execution Constraints (owner rules, binding)
+
+- Tool routes, launchers, command-text restrictions, PoshQC MCP limits, the batch budget, hook context, and CI shape are owned by the `execution-environment` skill and are not restated here. Counts come from JUnit files and line coverage from `artifacts/pester/powershell-coverage.xml`, never from an MCP result string.
+- SCRATCH resolves to `<session scratchpad>/issue-1160/`; every launcher and scratch file lives there, and evidence records the token `SCRATCH`. No artifact records an absolute path, a host name, or a scratchpad path.
+- Parallel-only gates: one `Invoke-PoshQCParallelTest` run per gate and one `pytest -n auto` run for the contract tests, each re-run only after a fix. No serial, single-process, shuffled, or reversed run is a gate or evidence. Integration and golden suites run in CI only.
+- No new Python: this item adds no `.py` file, and no enforcement hook invokes Python. Hook logic stays PowerShell.
+- Never bypass a hook. A denied call is reported, not routed around.
+- git `-C` and `-F` operands are written literally in each command, never through a shell variable.
+- Existing gate suites stay unmodified (AC-9, AC-17), and `$script:SharedGateFunction` in `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Parity.Cases.ps1` stays unchanged (AC-14). Neither gate file is edited; the commands sibling is the only production PowerShell file that changes.
+- Files not to modify: every file under spec heading `#### Files not to modify` (including every `hook-command-` matcher file), both gate files, the bookkeeping sibling, both `core.json` pack manifests, `.agents/skills/orchestrate/SKILL.md` and its bundle copy, and the existing commands suite `enforce-orchestration-preimplementation-gate-commands.Tests.ps1`.
+- Batch budget: the four sibling copies are production files; the item worktree's checkpoint selects a non-terminal orchestrated route, which the brief's `## Batch Budget` section exempts.
+- Scope comparisons anchor on the merge base of `origin/main` and `HEAD`, or on the remediation start ref that [P0-T2] records.
+
+## Design: decision D17 (closed modelled-command rule)
+
+Cause (F2): `Read-CommandLineSegment` drops whitespace-only segments, so the `|` after a group closer, and every brace, is never recorded; the D16 walk runs forward only and stops at the first same-depth delimiter other than `|`. Each round has found another construct stage 2 mis-models, so D17 inverts the default: stage 2 drops a hit only for commands built entirely from constructs it positively models.
+
+**Rule.** Where rules 1 to 5 (D2, D16) would drop a stage-1 hit, D17 drops it only when all three conditions hold; otherwise the hit is confirmed:
+1. *Modelled.* The normalized command text, every modelled Posix payload, and every PowerShell payload consist only of the allowlisted constructs below.
+2. *Operand.* Every record carrying a governed word is a mention-host record (rule 3 lookup), a modelled payload wrapper whose payload carries the word, or a PowerShell expression record inside the scriptblock argument of a mention-host command.
+3. *Pipeline mates.* Every non-carrying record of the same pipeline as a carrying record, before or after it, is an accepted consumer (D16 definition). Posix: the maximal run of same-depth records joined by `|`, skipping deeper payload records and ended by a lower-depth record. PowerShell: every record of the same payload (fail-closed, as in D16).
+
+**Posix allowlist** (quote-aware scan, as `Read-CommandLineSegment` scans, of text after `ConvertTo-CommandLineNormalizedText`): words that are unquoted, `'...'`, or `"..."` without `$(` or a backtick inside, backslash escapes, unquoted `$name` operands, and the standalone `{}` word that normalization quotes; the separators `|`, `;`, `&&`, `||`, and newline; the transparent wrappers `env`, `timeout`, `time`, `command`, `nohup` of `Skip-CommandLineTransparentWrapper`; payload wrappers re-derived through `Get-CommandLineWrapperPayload` from the words `Add-CommandLineWrapperExpansion` received (`Split-CommandLinePosixWord` of the record text for Posix records, `Tokens` for PowerShell and `ArgumentInjector` records): `sh`, `bash`, `zsh`, `dash`, `ksh` with a `-c` flag whose payload is the last word, `pwsh` or `powershell` with `-c` or a `-Command` prefix, or with `-CommandWithArgs`, `-cwa`, or an `-EncodedCommand` form whose payload is the last word, and `xargs` with its injected command; the mention hosts of the unchanged table with their operands. **Unmodelled** (keeps the hit): any unquoted `(`, `)`, `{`, `}`, `<`, `>`, backtick, `#`, or `&` outside `&&`; `$(` or a backtick inside double quotes; a record whose first token or command word is a reserved word (`if`, `then`, `else`, `elif`, `fi`, `case`, `esac`, `for`, `select`, `while`, `until`, `do`, `done`, `function`, `!`, `[[`, `]]`, `coproc`), `eval`, `source`, `.`, or a shell-state builtin (`alias`, `unalias`, `hash`, `enable`, `builtin`, `exec`, `trap`, `set`, `shopt`, `export`, `declare`, `typeset`, `readonly`, `local`, `unset`); an assignment word `NAME=value` anywhere, including after `env`; a wrapper word after its payload; every Opaque or Unbalanced record.
+
+**PowerShell allowlist** (AST from `[System.Management.Automation.Language.Parser]::ParseInput`, which never executes): `ScriptBlockAst` with only an unnamed end block (no param, begin, process, or dynamicparam block, no using statement), `NamedBlockAst`, `PipelineAst` statements, `CommandAst` with a constant name, no `&` or `.` operator, and no redirection, `CommandParameterAst`, `StringConstantExpressionAst`, `ConstantExpressionAst`, `ExpandableStringExpressionAst`, `VariableExpressionAst`, non-static `MemberExpressionAst` with a constant member, `UnaryExpressionAst`, `BinaryExpressionAst`, `CommandExpressionAst`, and `ScriptBlockExpressionAst` only as an element of a mention-host `CommandAst` (its body judged by the same list). A `CommandExpressionAst` outside such a scriptblock must not carry a governed word. Every other node type is unmodelled.
+
+**Placement.** Four new functions in `enforce-orchestration-preimplementation-gate-commands.ps1`: `Test-OrchestrationGatePosixTextModelled`, `Test-OrchestrationGatePowerShellPayloadModelled`, `Test-OrchestrationGateCommandModelled` (record-level conditions 1 and 2), and `Test-OrchestrationGateAcceptedConsumer`, shared by the forward D16 walk and a new backward walk. `Test-OrchestrationGateInvocationConfirmed` evaluates D17 only where it would otherwise return `$false`, so rules 1 to 5 keep their order and their coverage. `Get-OrchestrationGateMentionHostTable` is unchanged.
+
+**Bound, cost, N1.** Stage 1 is unchanged and D17 only adds confirmations, so the classified set lies between the head set and the merge-base set (AC-3); every row on which head and merge base agree keeps its value. Cost: a mention with a redirection (`2>&1`), comment, background job, assignment word, compound command, or PowerShell assignment or method call stays classified, as at the merge base. N1: a redirection hand-off (`echo pytest > f; xargs env < f`) is now classified; a hand-off through a host's own file option across statements (`grep -o pytest x | sort -o f; xargs -a f env`), or through state left by an earlier call, stays outside the model. **FP rows:** none contains an unmodelled construct; the stages before the carrier in FP-01 and FP-02 are `ps`, in FP-16 `Get-Process`, and FP-16's scriptblock is the argument of the host `Where-Object` and holds only a variable, a member access, a constant, and `-match`; all 17 stay unclassified. **AC reading:** AC-2's table includes ED-51 to ED-85; AC-4's fallbacks include the D17 classes. No AC text changes.
+
+### Adversarial self-check (construct, example, D17 verdict)
+
+| POSIX construct | Example | D17 |
+|---|---|---|
+| Simple command, host operand; `\|`, `;`, `&&`, `\|\|`, newline | FP-01, `grep -q pytest x && echo y` | modelled |
+| Quoted text, backslash escape, standalone `{}` | `grep "(pytest)" 'a<b>' x\(y`; `xargs -I {} grep pytest {}` | modelled |
+| `env`/`timeout`/`time`/`command`/`nohup` prefix | `timeout 9 grep pytest x` | modelled |
+| `sh -c`, `pwsh -c` payload as last word; `xargs` command | `sh -c "ps aux \| grep pytest"` | modelled, payload judged |
+| Word after the payload | ED-77 | classified |
+| Subshell, brace group, `${...}` | ED-51 to ED-53 | classified |
+| Process substitution `<(...)`, `>(...)` | ED-54 to ED-66 | classified |
+| Command substitution `$(...)`, backtick, `"$(...)"`, `$((...))` | ED-69, ED-70 | classified |
+| Here-document, here-string | ED-68, ED-67 | classified |
+| Redirection `<`, `>`, `>>`, `2>&1`, `&>`, `<>` | ED-75 | classified |
+| Background `&`, `\|&` | ED-76 | classified |
+| Comment | ED-80 | classified |
+| Reserved words, compound commands | ED-81, ED-62 | classified |
+| Function definition; array assignment | ED-78; ED-79 | classified |
+| Assignment word; shell-state builtin | ED-84; ED-85 | classified |
+| `eval`; `source`, `.` | ED-71; `confirms a POSIX evaluator command word` | classified |
+| Unbalanced text; opaque wrapper | ED-42; ED-30, ED-31, ED-34 | classified (rule 1) |
+| Non-host stage before or after the carrier | ED-83; ED-49 | classified |
+| Cross-statement file-option hand-off (N1) | `... \| sort -o f; xargs -a f env` | outside the model |
+
+| PowerShell construct | Example | D17 |
+|---|---|---|
+| Pipelines of constant-name commands; `;`, newline | FP-17, `Get-Command pytest; $null` | modelled |
+| Parameters, constants, variables, property access, operators | FP-16 | modelled |
+| Scriptblock argument of a mention host | FP-16 | modelled, body judged |
+| Expression carrying the word outside such a scriptblock | `pwsh -c "'pytest'"` | classified |
+| Scriptblock elsewhere; `&`, `.` operators | ED-43 to ED-48, ED-35 | classified |
+| Method call, static member, type literal, cast | ED-82, ED-33 | classified |
+| `$(...)`, `@(...)`, array literal, hashtable, index, parentheses | ED-73 | classified |
+| Assignment; function, filter, class, enum | `$c = 'x'`; ED-72 | classified |
+| Control flow, `try`, `trap`, `throw`, `return`, `exit`, `data` | `if ($x) { }` | classified |
+| Redirection; param, begin, process blocks, `using` | ED-74 | classified |
+| Evaluator; non-host command anywhere in the payload | ED-32; ED-43 | classified |
+| `-CommandWithArgs` or `-EncodedCommand` with words after the payload | commands-suite case | classified |
+| Parse error | `pwsh -c "Get-Command ("` | classified (rule 1) |
+
+### Rows and cases
+
+Rows ED-51 to ED-66 are the sixteen F2 probe commands of the inputs file (`Observed:`), in their order. Class rows ED-67 to ED-85, each verified by trace to be unclassified at head and classified at the merge base (in both tables `\|` stands for a single `|` in the command text, and the Cases file doubles each `'` inside its single-quoted strings):
+
+| Id | Class | Command |
+|---|---|---|
+| ED-67 | here-string | `xargs env <<< $(grep -o pytest x)` |
+| ED-68 | here-document | `grep pytest x <<'EOF'`, a line `hello`, a line `EOF` (newline-joined) |
+| ED-69 | command substitution | `env $(grep -o pytest x)` |
+| ED-70 | backtick substitution | ``env `grep -o pytest x` `` |
+| ED-71 | eval | `eval grep pytest x` |
+| ED-72 | PowerShell function | `pwsh -c "function Select-String { & $args[0] }; Select-String pytest"` |
+| ED-73 | PowerShell array | `pwsh -c "@('pytest') \| Select-String pytest"` |
+| ED-74 | PowerShell redirection | `pwsh -c "Get-Command pytest > out.txt"` |
+| ED-75 | redirection | `grep pytest x > out.txt` |
+| ED-76 | background job | `grep pytest x & xargs env` |
+| ED-77 | word after payload | `sh -c 'grep pytest x; "$0"' pytest` |
+| ED-78 | function definition | `f() { grep pytest x; }` |
+| ED-79 | array assignment | `a=(x) && grep pytest x` |
+| ED-80 | comment | `grep pytest x # note` |
+| ED-81 | compound command | `grep pytest x; if true; then echo y; fi` |
+| ED-82 | PowerShell method call | `pwsh -c "(Get-Command pytest).ToString()"` |
+| ED-83 | stage before carrier | `make test \| grep pytest` |
+| ED-84 | assignment word | `PATH=./bin grep pytest x` |
+| ED-85 | shell-state builtin | `alias grep=xargs; grep pytest x` |
+
+## Pre-Mortem
+
+- Review checklists: F2 came from a rule recorded only as code; D17 is recorded in `spec.md` first ([P1-T1]) with an explicit allowlist, every probe and class has a row and a named case ([P1-T2], [P1-T3]), the adversarial table above is part of the design, and [P3-T7] walks the three templates against the branch diff.
+- Coverage: the `.claude/hooks` and `.codex/hooks` commands copies stay at or above 90% (98.96% at head) and repo-wide coverage stays at or above the `Phase 0 baseline` 95.80% (`evidence/baseline/pester-gate.2026-11-10T04-19.md`); the 29 class and shape cases and the three guards execute every new function on both surfaces; [P3-T4] names any uncovered new line with its reason.
+- Mirror parity: four byte-identical commands copies ([P2-T1], pinned by `enforce-orchestration-preimplementation-gate-commands.Parity.Tests.ps1`), and the execution-environment brief, whose #1160 bullet of `## Hook Execution Context` states the D16 drop condition that D17 changes; [P2-T2] updates all six byte-identical copies. The `## Pre-Implementation Gate` paragraph of `.agents/skills/orchestrate/SKILL.md` names only examples that stay unclassified, so it is unchanged. [P3-T5] runs the push-down contract tests and the Codex generator check.
+- File size: the commands sibling grows from about 263 to at most about 460 logical lines, below its 500 bound (AC-15); new cases go into a new suite file (about 220 lines) so the existing commands suite (361 lines) is untouched; the Cases file grows to about 200 lines. [P0-T1] records counts and [P2-T1] and [P3-T6] re-measure.
+- Test isolation: gates are one `Invoke-PoshQCParallelTest` run ([P1-T4], [P2-T3], [P3-T2]) and one `pytest -n auto` run ([P2-T3], [P3-T5]); Jest is not applicable. The new suite uses pure string inputs and no mocks; `Invoke-PoshQCLeakScan` runs in [P3-T3].
+- CI-only behavior: `poshqc / PowerShell hook suites (Linux)` runs both classification runners and the new suite on `ubuntu-latest`; rows carry no drive letter, path separator, or file access, and the PowerShell parser behaves the same there. Coverage is read from the Windows shards of `poshqc / PowerShell QC`.
+- Evidence: remediation baselines under `<FEATURE>/evidence/remediation-baseline/`, fail-before under `<FEATURE>/evidence/regression-testing/`, gates, coverage, parity, and self-review under `<FEATURE>/evidence/qa-gates/`, task checks under `<FEATURE>/evidence/other/`; each command artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. The branch hook is proven by Pester, never by an isolated subagent.
+
+## Existing Tests Asserting Changed Behavior (searched by symbol, file name, and asserted output)
+
+The changed behavior is the return value of `Test-OrchestrationGateInvocationConfirmed` (more `$true` results), reached directly only by `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-commands.Tests.ps1` and through `Test-ImplementationCommand` by both classification runners.
+
+- `enforce-orchestration-preimplementation-gate-commands.Tests.ps1`: unchanged. Its `$true` cases stay true (D17 only adds confirmations). Its `$false` cases (`clears a governed word that only a search host carries`, `clears a staging mention carried by an output host`, `clears a subcommand-scoped host`, `clears a PowerShell expression without :: or .Invoke`, `clears a wrapper whose payload carries the word only under a host`, `clears a Windows executable host name through its leaf`, and the five D16 guard cases) contain no unmodelled construct, their earlier pipeline stages are hosts, and `$null` is a non-carrying expression, so each stays false. Its table pins are unaffected.
+- `enforce-orchestration-preimplementation-gate.Classification.Tests.ps1` and `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-classification.Tests.ps1`: runner files unchanged; ED-01 to ED-50 stay classified, FP-01 to FP-17 stay unclassified (FP analysis above), NG-01 to NG-09 miss stage 1.
+- `enforce-orchestration-preimplementation-gate-commands.Parity.Tests.ps1`: unchanged; passes once the four copies are equal and below 500 lines.
+- Bookkeeping-leg, bookkeeping unit, and bookkeeping parity suites: unchanged; their rows are structural staging, which never reaches stage 2.
+- Every AC-9 and AC-17 suite and `enforce-orchestration-preimplementation-gate.Parity.Tests.ps1`: unchanged; each passes at head and merge base, and D17's classified set lies between the two.
+- Suites that read the brief (`tests/scripts/dev_tools/test_execution_environment_brief_contracts.py`, `test_discovery_documentation_contracts.py`, `test_bash_command_shape_surfaces.py`, `test_single_pass_preflight_contracts.py`, `test-cadence-wording.Tests.ps1`, `parallel-gate-wording.Tests.ps1`, `planning-contract-wording.Tests.ps1`, `NestingDepthContract.Tests.ps1`, `cleanup-merged-worktrees.SkillText.Tests.ps1`, `ProcessReductionChain.Ledger.Tests.ps1`): unchanged; none asserts the #1160 bullet, and byte identity holds once the six copies are equal.
+
+### Phase 0 — Remediation Baseline
+
+- [ ] [P0-T1] Capture the static baseline: `Invoke-Formatter` check (the formatted text is compared with the file; no rewrite) and PSScriptAnalyzer with `scripts/powershell/PoshQC/settings/pssa.settings.psd1` over the four copies of `enforce-orchestration-preimplementation-gate-commands.ps1` (`.claude/hooks`, `.codex/hooks`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks`) and `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Classification.Cases.ps1`, with each file's logical line count. Acceptance: `<FEATURE>/evidence/remediation-baseline/powershell-static.<timestamp>.md` records per file the formatter difference count, the analyzer finding count, and the line count.
+- [ ] [P0-T2] Record the baseline reference: the remediation start ref (`git rev-parse HEAD` and the merge base of `origin/main` and `HEAD`), the `Phase 0 baseline` figures from `<FEATURE>/evidence/baseline/pester-gate.2026-11-10T04-19.md` (repo-wide 95.80%), the head figures from `<FEATURE>/evidence/qa-gates/pester-gate.2026-11-13T19-43.md` (both commands copies 98.96%), and the SHA256 of the four sibling copies and the six execution-environment `SKILL.md` copies. Acceptance: `<FEATURE>/evidence/remediation-baseline/baseline-reference.<timestamp>.md` carries every value, with four equal sibling digests and six equal brief digests.
+
+### Phase 1 — Decision D17 and Failing Rows
+
+- [ ] [P1-T1] Record decision D17 in `docs/features/active/2026-11-09-preimplementation-gate-false-positives-1160/spec.md` under `## Decisions`, after D16, in the D16 form ("recorded <UTC date from the clock> at remediation, amends the D2 stage-2 rule and decision D16"), stating the rule, both allowlists, the unmodelled list, placement, bound, cost, N1, the FP analysis, and the AC reading of `## Design: decision D17` above. D2, D16, and every AC line stay byte-unchanged. Acceptance: the `- **D17.` entry exists once and follows the `- **D16.` entry, contains `here-string`, `ED-85`, and `N1`, and the anchored diff of `spec.md` against the remediation start ref adds lines only.
+- [ ] [P1-T2] [expect-fail] Append rows ED-51 to ED-85 of `### Rows and cases` to `$script:ClassificationExistingDenialCase` in `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Classification.Cases.ps1`, each with `Expected = $true` (ED-51 to ED-66 equal the inputs file's text; ED-68 joins its three parts with a newline), and update the `ExistingDenial` line of the header comment to name D17. Acceptance: the file defines 85 existing-denial rows with unique identifiers, and the task check shows exactly the 35 new rows failing in both runners (fail-before is recorded by [P1-T4]).
+- [ ] [P1-T3] [expect-fail] Create `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-commands.Modelled.Tests.ps1` with the `-ForEach` surface Context setup of the existing commands suite (loading each surface's `hook-command-scanner.ps1`, `hook-command-invocation.ps1`, and commands sibling) and a header comment. `Context 'unmodelled constructs keep the hit classified (decision D17)'` holds 29 cases asserting `$true` at pattern index 1: one per class row ED-67 to ED-85 with the row's command; one per shape ED-51 (subshell), ED-52 (brace group), ED-56 (input process substitution), ED-61 (preceding consumer), and ED-63 (output process substitution); `keeps a mention-host consumer through a process substitution classified` (`ps aux > >(grep pytest)`); `keeps a group inside a wrapper payload classified` (`sh -c "(echo pytest) | xargs env"`); `keeps a PowerShell expression carrying the word outside a host scriptblock classified` (`pwsh -c "'pytest'"`); `keeps a PowerShell stage before the carrying record classified` (`pwsh -c "Invoke-Build | Select-String pytest"`); and `keeps PowerShell -CommandWithArgs arguments after the payload classified` (`pwsh -CommandWithArgs "Get-Command pytest" pytest`). `Context 'modelled constructs keep a mention unclassified (decision D17)'` holds three guards asserting `$false`: `keeps quoted and escaped structural characters modelled` (`grep "(pytest)" 'a<b>' x\(y`), `keeps an xargs placeholder modelled` (`xargs -I {} grep pytest {}`), and `keeps &&, ||, and newline separators modelled` (`grep -q pytest x && echo y || echo z`, a newline, `ps aux`). Acceptance: the task check shows the 29 classified cases failing and the three guards passing on each surface.
+- [ ] [P1-T4] [expect-fail] [phase-gate] Run the Phase 1 gate on the unfixed sibling: formatter and analyzer over the two changed test files, then one `Invoke-PoshQCParallelTest` run; the contract stage has no selection, because no mirrored or bundled file changed. Acceptance: the run's only failures are the 198 expected tests of [P1-T2] and [P1-T3] (35 rows x 2 tests x 2 runners, and 29 cases x 2 surfaces), read by name from the shard JUnit files; every other test passes, including ED-01 to ED-50, FP-01 to FP-17, NG-01 to NG-09, and the three guards on both surfaces; the static stage reports no finding. A new row or case that passes here is reported as a plan defect, not relabelled. The failures are listed in `<FEATURE>/evidence/regression-testing/fail-before-modelled-command.<timestamp>.md` (with `ExpectedExitCode: 1`) and `<FEATURE>/evidence/qa-gates/phase-gate.P1.<timestamp>.md`.
+
+### Phase 2 — Rule Change and Brief
+
+- [ ] [P2-T1] Implement D17 in `.claude/hooks/enforce-orchestration-preimplementation-gate-commands.ps1` and copy it byte-identically to `.codex/hooks/`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/`: add `Test-OrchestrationGatePosixTextModelled`, `Test-OrchestrationGatePowerShellPayloadModelled`, `Test-OrchestrationGateCommandModelled`, and `Test-OrchestrationGateAcceptedConsumer` as `## Design: decision D17` states, add the backward consumer walk, call the D17 check in `Test-OrchestrationGateInvocationConfirmed` only where it would otherwise return `$false`, and update the file header rule list, the call-time dependency list, and the help of each changed function. Pure string and AST logic: no process, file, clock, or environment access, no new dependency file, no gate-file edit, and `Get-OrchestrationGateMentionHostTable` unchanged. Acceptance: the four copies have one SHA256 and each is below 500 logical lines; in the task check, the new suite (32 cases), `enforce-orchestration-preimplementation-gate-commands.Tests.ps1`, both classification runners (ED-01 to ED-85, FP-01 to FP-17, NG-01 to NG-09), and `enforce-orchestration-preimplementation-gate-commands.Parity.Tests.ps1` pass with zero failures on both surfaces.
+- [ ] [P2-T2] Update the #1160 bullet of `## Hook Execution Context` in `.claude/skills/execution-environment/SKILL.md` and copy the file byte-identically to `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, and the bundle copies under `extensions/drm-copilot/resources/` (`claude-customizations/.claude`, `codex-and-agents-customizations/.agents`, `customizations/.github`). The bullet states that stage 2 drops a hit only when the whole command consists of modelled constructs (simple commands joined by `|`, `;`, `&&`, `||`, or newline, the transparent and payload wrappers, and mention hosts), that every other construct (groups, substitutions, here-documents, here-strings, redirections, `eval`, functions, arrays) keeps the hit, and that a non-host stage of the same pipeline, before or after, confirms it (decision D17). Acceptance: the six copies have one SHA256, each contains `decision D17` once, and the diff against the remediation start ref touches only that bullet.
+- [ ] [P2-T3] [phase-gate] Run the Phase 2 gate: formatter and analyzer over the changed PowerShell files, one `Invoke-PoshQCParallelTest` run, and the contract stage of [P3-T5] (one `pytest -n auto` run and the generator `--check`). Acceptance: zero test failures, zero analyzer findings, no formatter difference, contract stage exit 0, recorded in `<FEATURE>/evidence/qa-gates/phase-gate.P2.<timestamp>.md`; on a failure or rewrite the cause is fixed and the gate restarts from formatting.
+
+### Phase 3 — Final QA
+
+- [ ] [P3-T1] Run the final PowerShell static loop over the six files of [P0-T1] plus the new suite: `Invoke-Formatter` check, then PSScriptAnalyzer with the repository settings; type checking does not apply. Acceptance: `<FEATURE>/evidence/qa-gates/powershell-static.<timestamp>.md` records each step's command, exit code, and finding count, with no formatter difference and zero findings; a rewrite or finding restarts the loop.
+- [ ] [P3-T2] Run the final Pester gate as one `Invoke-PoshQCParallelTest` run with coverage. Acceptance: `<FEATURE>/evidence/qa-gates/pester-gate.<timestamp>.md` records the pass and fail counts from `artifacts/pester/pester-junit.xml` with zero failures, and confirms that ED-01 to ED-85, FP-01 to FP-17, and NG-01 to NG-09 pass in both runners and that the 32 cases of the new suite pass on both surfaces.
+- [ ] [P3-T3] Run `Invoke-PoshQCLeakScan` over the repository root on the branch-current PoshQC module. Acceptance: `<FEATURE>/evidence/qa-gates/leak-scan.<timestamp>.md` records exit code 0 and no finding for either changed test file, and `config/poshqc-leak-allowlist.json` is unchanged.
+- [ ] [P3-T4] Compare coverage from the [P3-T2] run with the `Phase 0 baseline` and the [P0-T2] head figures. Acceptance: `<FEATURE>/evidence/qa-gates/coverage-comparison.<timestamp>.md` shows repo-wide line coverage at or above 95.80%, the `.claude/hooks` and `.codex/hooks` copies of both siblings each at or above 90%, and every new D17 line covered or named with its reason; a figure below threshold returns the plan to [P1-T3] for a case.
+- [ ] [P3-T5] Run the contract tests in one `pytest -n auto` run: `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, `test_push_down_issue_824_follow_ups.py`, and `test_execution_environment_brief_contracts.py`, then `scripts/dev_tools/generate_codex_agent_variants.py` in module form with `--check`. Acceptance: `<FEATURE>/evidence/qa-gates/contract-tests.<timestamp>.md` records zero failed tests from the one run and generator exit 0.
+- [ ] [P3-T6] Verify parity and scope against the remediation start ref and the merge base. Acceptance: `<FEATURE>/evidence/qa-gates/parity-and-scope.<timestamp>.md` records one SHA256 for the four sibling copies and one for the six brief copies; the remediation file set (the union of the name-only diff from the start ref to `HEAD`, the name-only diff from the start ref to the working tree, and the untracked entries of `git status --porcelain`) lists only `spec.md`, the Cases file, the new suite, the four sibling copies, the six brief copies, `<FEATURE>` evidence and plan files, and any `.claude/agent-memory/` file (excluded from the comparison); no gate file, `enforce-orchestration-preimplementation-gate.Parity.Cases.ps1`, existing commands suite, `hook-command-` file, or AC-9 or AC-17 suite appears; the merge-base diff adds no `.py` file; a search of the four sibling copies finds no `python` token; each changed PowerShell file is below 500 logical lines.
+- [ ] [P3-T7] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md`, and `feature-audit.yyyy-MM-ddTHH-mm.md` against the branch diff from the merge base of `origin/main` and `HEAD`, with F2 and N1 each traced to the D17 text, change, and tests that close them. Acceptance: `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` has one PASS, FAIL, or N/A row per checklist item and no FAIL row; a FAIL is fixed, the QA loop re-runs from [P3-T1], and a new self-review file is written.
