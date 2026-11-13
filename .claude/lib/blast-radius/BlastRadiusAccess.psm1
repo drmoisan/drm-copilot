@@ -19,7 +19,7 @@
     Get-BlastRadiusReadOnlyPath derives read_paths from approved plan text
     passed in memory: a radius path is read-only when every task naming it has
     a read verb as its first title word, no naming title carries a write verb
-    or one of its inflections (writes, updated, copying), and no task whose
+    or one of its inflections (writes, updated, copying, written), and no task whose
     title begins with Create names it.
 
     Every function is pure: no filesystem, subprocess, network, or clock access,
@@ -58,6 +58,12 @@ foreach ($writeVerb in $script:WriteTitleVerb) {
         [void]$script:WriteTitleWordSet.Add($stem + 'ied')
     }
 }
+
+# The irregular past and past-participle forms of Write, Rewrite, and Overwrite;
+# every other write verb inflects regularly. Adding them only grows the set, so a
+# path classified as written stays written.
+$script:WriteTitleIrregularForm = @('Wrote', 'Written', 'Rewrote', 'Rewritten', 'Overwrote', 'Overwritten')
+foreach ($irregularForm in $script:WriteTitleIrregularForm) { [void]$script:WriteTitleWordSet.Add($irregularForm) }
 
 # A task line of an atomic plan: a checkbox, the task id, then the title.
 $script:TaskLinePattern = '^\s*-\s*\[[ xX]\]\s*\[P\d+-T\d+\]\s*(?<title>.*)$'
@@ -276,8 +282,8 @@ function Get-BlastRadiusReadOnlyPath {
         A radius path is read-only when at least one task window names it, the
         first title word of every naming window is one of Read, Verify, Confirm,
         Inspect, Review, Baseline, Run, or Execute, no naming title contains a
-        write verb or one of its inflections (for example writes, updated, or
-        copying), and no task whose title begins with Create names it. A task
+        write verb or one of its inflections (for example writes, updated,
+        copying, or written), and no task whose title begins with Create names it. A task
         window is a checkbox task line with its id and every following line up to
         the next task line or heading; a window names a path when its text
         contains the path ordinally. A path the plan creates is therefore never

@@ -164,7 +164,9 @@ Describe 'Read-only path derivation' {
     It 'rejects a path whose read title carries the write form <Form>' -ForEach @(
         @{ Form = 'writes' }, @{ Form = 'updates' }, @{ Form = 'adds' }, @{ Form = 'fixes' }, @{ Form = 'copies' },
         @{ Form = 'added' }, @{ Form = 'fixed' }, @{ Form = 'copied' }, @{ Form = 'updated' }, @{ Form = 'adding' },
-        @{ Form = 'updating' }, @{ Form = 'Regenerate' }, @{ Form = 'regenerates' }, @{ Form = 'Overwrite' }, @{ Form = 'overwriting' }
+        @{ Form = 'updating' }, @{ Form = 'Regenerate' }, @{ Form = 'regenerates' }, @{ Form = 'Overwrite' }, @{ Form = 'overwriting' },
+        @{ Form = 'wrote' }, @{ Form = 'written' }, @{ Form = 'rewrote' }, @{ Form = 'rewritten' }, @{ Form = 'overwrote' },
+        @{ Form = 'overwritten' }
     ) {
         $plan = "- [ ] [P2-T1] Run the generator that $Form ``docs/out.json``."
 
