@@ -423,7 +423,7 @@ function Get-OwnerDirectivePassDownDecision {
 
     if (Test-OwnerDirectivePassDownMember -Value $toolName -Set $roles.FileTool) {
         $path = ([string] (Get-ClaudeHookEnvelopeValue -Envelope $toolInput -Name 'file_path') + [string] (Get-ClaudeHookEnvelopeValue -Envelope $toolInput -Name 'notebook_path')).Replace('\', '/')
-        if ($path -eq 'artifacts/orchestration/owner-directives.jsonl' -or $path.EndsWith('/artifacts/orchestration/owner-directives.jsonl', [System.StringComparison]::Ordinal)) {
+        if ([string]::Equals($path, 'artifacts/orchestration/owner-directives.jsonl', [System.StringComparison]::OrdinalIgnoreCase) -or $path.EndsWith('/artifacts/orchestration/owner-directives.jsonl', [System.StringComparison]::OrdinalIgnoreCase)) {
             return (Get-OwnerDirectivePassDownLedgerDecision -ToolName $toolName -AgentType $agentType -Path $path -Content ([string] (Get-ClaudeHookEnvelopeValue -Envelope $toolInput -Name 'content')) -ReadText $ReadText)
         }
     }
