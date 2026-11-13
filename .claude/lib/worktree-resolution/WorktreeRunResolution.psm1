@@ -32,6 +32,7 @@ Import-Module (Join-Path $PSScriptRoot 'WorktreeResolution.psm1') -ErrorAction S
 Import-Module (Join-Path $PSScriptRoot 'WorktreeTargetResolution.psm1') -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot 'WorktreeItemResolution.psm1') -ErrorAction Stop
 Import-Module (Join-Path $PSScriptRoot 'WorktreeRunRecordPath.psm1') -ErrorAction Stop
+Import-Module (Join-Path $PSScriptRoot 'AgentTargetWorktree.psm1') -ErrorAction Stop
 
 # The run checkpoint locations relative to a worktree root.
 $script:EpicCheckpointRelativePath = 'artifacts/orchestration/epic-orchestrator-state.json'
@@ -366,24 +367,27 @@ function Test-WorktreeRunCheckpointRecord {
         [Parameter(Mandatory = $true)] [ValidateSet('epic', 'parallel')] [string] $Kind,
         [Parameter(Mandatory = $true)] [ValidateSet('pr_number', 'worktree_path')] [string] $RecordField,
         [Parameter(Mandatory = $true)] [string] $Value,
-        [AllowNull()] [AllowEmptyCollection()] [string[]] $BaseRoot = @()
+        [AllowNull()] [AllowEmptyCollection()] [string[]] $BaseRoot = @(),
+        [AllowNull()] [AllowEmptyCollection()] [string[]] $LiveWorktreeRoot = @(),
+        [AllowNull()] [scriptblock] $BranchWorktreeResolver = $null
     )
 
+    # Each entry pairs the recorded value with the record's branch_name (issue #1163).
     $values = [System.Collections.Generic.List[object]]::new()
     $arrayName = if ($Kind -eq 'epic') { 'features' } else { 'items' }
     foreach ($record in @(Get-WorktreeRunPropertyValue -InputObject $Checkpoint -Name $arrayName)) {
-        $values.Add((Get-WorktreeRunPropertyValue -InputObject $record -Name $RecordField))
+        $values.Add(@((Get-WorktreeRunPropertyValue -InputObject $record -Name $RecordField), [string] (Get-WorktreeRunPropertyValue -InputObject $record -Name 'branch_name')))
     }
     if ($Kind -eq 'epic' -and $RecordField -eq 'pr_number') {
         $mergePr = Get-WorktreeRunPropertyValue -InputObject $Checkpoint -Name 'epic_merge_pr'
-        $values.Add((Get-WorktreeRunPropertyValue -InputObject $mergePr -Name 'pr_number'))
+        $values.Add(@((Get-WorktreeRunPropertyValue -InputObject $mergePr -Name 'pr_number'), ''))
     }
 
-    foreach ($recorded in $values) {
+    foreach ($pair in $values) {
         if ($RecordField -eq 'pr_number') {
-            if (Test-WorktreeRunPrNumberEqual -Recorded $recorded -Expected ([long] $Value)) { return $true }
+            if (Test-WorktreeRunPrNumberEqual -Recorded $pair[0] -Expected ([long] $Value)) { return $true }
         }
-        elseif (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string] $recorded) -TargetPath $Value -BaseRoot $BaseRoot) { return $true }
+        elseif (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string] $pair[0]) -TargetPath $Value -BaseRoot $BaseRoot -RecordedBranch $pair[1] -LiveWorktreeRoot $LiveWorktreeRoot -BranchWorktreeResolver $BranchWorktreeResolver) { return $true }
     }
     return $false
 }
@@ -412,9 +416,13 @@ function Resolve-WorktreeRunTargetByRecord {
         [Parameter(Mandatory = $true)] [ValidateSet('epic', 'parallel')] [string] $Kind,
         [Parameter(Mandatory = $true)] [ValidateSet('pr_number', 'worktree_path')] [string] $RecordField,
         [AllowNull()] [AllowEmptyString()] [string] $Value,
-        [Parameter(Mandatory = $true)] [string] $SessionRoot
+        [Parameter(Mandatory = $true)] [string] $SessionRoot,
+        [AllowNull()] [scriptblock] $BranchWorktreeResolver = $null
     )
 
+    # Issue #1163 (D9): a host-moved worktree_path record falls back to its branch_name; the default
+    # resolver is a module-bound literal, so it resolves the module's imported command and this call's SessionRoot.
+    if ($null -eq $BranchWorktreeResolver) { $BranchWorktreeResolver = { param($Branch) Resolve-AgentTargetWorktree -SessionRoot $SessionRoot -CommandBranch $Branch -Policy FailClosedOnIdentity } }
     $description = "{0} '{1}' in the {2} checkpoint" -f $RecordField, $Value, $Kind
     $isBlank = [string]::IsNullOrWhiteSpace($Value)
     $parsedNumber = [long] 0
@@ -428,13 +436,16 @@ function Resolve-WorktreeRunTargetByRecord {
     # holding the checkpoint (issue #995); the main root is derived once, and only for paths.
     $mainRoot = if ($RecordField -eq 'worktree_path') { Get-WorktreeRunMainCheckoutRoot -SessionRoot $SessionRoot } else { $null }
     $matched = [System.Collections.Generic.List[string]]::new()
-    foreach ($root in (Get-WorktreeRunLiveRoot -SessionRoot $SessionRoot)) {
+    $liveRoots = Get-WorktreeRunLiveRoot -SessionRoot $SessionRoot
+    foreach ($root in $liveRoots) {
         $checkpoint = Get-WorktreeRunCheckpoint -Kind $Kind -WorktreeRoot $root
         if ($null -eq $checkpoint) { continue }
         $baseRoot = [string[]] @(@($mainRoot, $root) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-        if (Test-WorktreeRunCheckpointRecord -Checkpoint $checkpoint -Kind $Kind -RecordField $RecordField -Value $needle -BaseRoot $baseRoot) { $matched.Add($root) }
+        if (Test-WorktreeRunCheckpointRecord -Checkpoint $checkpoint -Kind $Kind -RecordField $RecordField -Value $needle -BaseRoot $baseRoot -LiveWorktreeRoot $liveRoots -BranchWorktreeResolver $BranchWorktreeResolver) { $matched.Add($root) }
     }
-    return (Resolve-WorktreeRunMatch -Matched $matched.ToArray() -SessionRoot $SessionRoot -Description $description)
+    $result = Resolve-WorktreeRunMatch -Matched $matched.ToArray() -SessionRoot $SessionRoot -Description $description
+    if ($RecordField -eq 'worktree_path') { $result.PSObject.Properties.Add([psnoteproperty]::new('LiveRoot', [string[]] $liveRoots)) }
+    return $result
 }
 
 function Resolve-WorktreeOperandTarget {

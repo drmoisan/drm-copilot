@@ -110,27 +110,42 @@ Describe 'validate-executor-output plan-path target worktree (issue #1105)' {
         Should -Invoke Get-PlanFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq "/elsewhere/$script:PlanRelative" }
     }
 
-    It 'falls back to the session root with TARGET_WORKTREE_NOT_DERIVABLE in the plan block message' {
-        # Arrange
-        Mock Get-PlanFileContent { @{ Exists = $false; Lines = @() } }
+    It 'blocks without a probe naming TARGET_WORKTREE_NOT_DERIVABLE in the plan block message when the prompt branch names no worktree' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
+        Mock Get-PlanFileContent { throw 'the plan probe must not be called for an unresolved identity' }
 
         # Act
         $result = Get-ExecutorCase -Output "plan-path: $script:PlanRelative" -Prompt 'branch: bug/unknown-branch'
 
         # Assert
-        $result.Message | Should -BeLike '*TARGET_WORKTREE_NOT_DERIVABLE*the session root was probed.'
-        Should -Invoke Get-PlanFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:PlanRelative }
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike "*plan-path '$script:PlanRelative', which is rejected:*TARGET_WORKTREE_NOT_DERIVABLE*"
+        Should -Invoke Get-PlanFileContent -Times 0 -Exactly
     }
 
-    It 'falls back to the session root with TARGET_WORKTREE_AMBIGUOUS in the plan block message' {
-        # Arrange
-        Mock Get-PlanFileContent { @{ Exists = $false; Lines = @() } }
+    It 'blocks without a probe naming TARGET_WORKTREE_AMBIGUOUS in the plan block message when the prompt names two issue numbers' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
+        Mock Get-PlanFileContent { throw 'the plan probe must not be called for an unresolved identity' }
 
         # Act
         $result = Get-ExecutorCase -Output "plan-path: $script:PlanRelative" -Prompt "Canonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Assert
-        $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*the session root was probed.'
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike "*plan-path '$script:PlanRelative', which is rejected:*TARGET_WORKTREE_AMBIGUOUS*"
+        Should -Invoke Get-PlanFileContent -Times 0 -Exactly
+    }
+
+    It 'keeps the session-root plan probe when the prompt carries no branch label and no canonical issue line' {
+        # Arrange (D5: no identity keeps the session-root fallback)
+        Mock Get-PlanFileContent { param([string] $Path) @{ Exists = ($Path -eq $script:PlanRelative); Lines = $script:CheckedPlan } }
+
+        # Act
+        $result = Get-ExecutorCase -Output "plan-path: $script:PlanRelative`n$script:CompleteOutput" -Prompt 'Execute the plan.'
+
+        # Assert
+        $result.Ok | Should -BeTrue
+        Should -Invoke Get-PlanFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:PlanRelative }
     }
 
     It 'reads the transcript head once and still classifies the run from the delegation prompt' {
@@ -238,28 +253,34 @@ Describe 'validate-executor-output preflight-fix-record target worktree (issue #
         Should -Invoke Test-PreflightFixRecord -Times 0 -Exactly
     }
 
-    It 'probes the session-root fix record and names TARGET_WORKTREE_NOT_DERIVABLE when the branch names no worktree' {
-        # Arrange
-        Mock Test-PreflightFixRecord { $false }
+    It 'blocks without probing the fix record or the plan and names TARGET_WORKTREE_NOT_DERIVABLE when the branch names no worktree' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
+        Mock Get-PlanFileContent { throw 'the plan probe must not be called for an unresolved identity' }
+        Mock Test-PreflightFixRecord { throw 'the fix-record probe must not be called for an unresolved identity' }
 
         # Act
         $result = Get-ExecutorCase -Output $script:PreflightOutput -Prompt "DIRECTIVE: PREFLIGHT VALIDATION ONLY`nbranch: bug/unknown-branch"
 
         # Assert
-        $result.Message | Should -BeLike '*TARGET_WORKTREE_NOT_DERIVABLE*the session root was probed.'
-        Should -Invoke Test-PreflightFixRecord -Times 1 -Exactly -ParameterFilter { $Path -eq $script:RecordRelative }
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike '*is rejected:*TARGET_WORKTREE_NOT_DERIVABLE*'
+        Should -Invoke Test-PreflightFixRecord -Times 0 -Exactly
+        Should -Invoke Get-PlanFileContent -Times 0 -Exactly
     }
 
-    It 'probes the session-root fix record and names TARGET_WORKTREE_AMBIGUOUS when the prompt names two issue numbers' {
-        # Arrange
-        Mock Test-PreflightFixRecord { $false }
+    It 'blocks without probing the fix record or the plan and names TARGET_WORKTREE_AMBIGUOUS when the prompt names two issue numbers' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
+        Mock Get-PlanFileContent { throw 'the plan probe must not be called for an unresolved identity' }
+        Mock Test-PreflightFixRecord { throw 'the fix-record probe must not be called for an unresolved identity' }
 
         # Act
         $result = Get-ExecutorCase -Output $script:PreflightOutput -Prompt "DIRECTIVE: PREFLIGHT VALIDATION ONLY`nCanonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Assert
-        $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*the session root was probed.'
-        Should -Invoke Test-PreflightFixRecord -Times 1 -Exactly -ParameterFilter { $Path -eq $script:RecordRelative }
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike '*is rejected:*TARGET_WORKTREE_AMBIGUOUS*'
+        Should -Invoke Test-PreflightFixRecord -Times 0 -Exactly
+        Should -Invoke Get-PlanFileContent -Times 0 -Exactly
     }
 
     It 'blocks repairably on a fix-record value with a parent segment beneath the item root without probing it' {

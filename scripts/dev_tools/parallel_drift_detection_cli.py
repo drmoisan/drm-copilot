@@ -102,6 +102,7 @@ from scripts.dev_tools._parallel_drift_cli_io import (
     item_by_key,
     load_mapping,
 )
+from scripts.dev_tools._parallel_drift_scheduling import item_access
 from scripts.dev_tools.parallel_drift_detection import (
     DRIFT_ACTION_HALTED_LATER_STARTED_ITEM,
     DRIFT_ACTION_RAISED_BLOCKING_FINDING,
@@ -266,7 +267,10 @@ def evaluate_drift(
     """
     items = checkpoint_items(state)
     declared = declared_paths(item_by_key(items, item_key))
-    escaped = detect_escaped_paths(changed_paths, declared)
+    # A write to a path the item declared read-only escapes (issue #1164).
+    escaped = detect_escaped_paths(
+        changed_paths, declared, read_paths=item_access(items, item_key).read_paths
+    )
 
     pairs: tuple[tuple[int, int], ...] = ()
     halted: tuple[int, ...] = ()

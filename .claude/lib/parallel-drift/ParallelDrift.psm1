@@ -30,6 +30,7 @@ $ErrorActionPreference = 'Stop'
 # The halt module is imported first, then the blast-radius facade, then the two
 # blast-radius modules whose functions the facade does not re-export.
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ParallelDriftHalt.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ParallelDriftAccess.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../blast-radius/BlastRadius.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../blast-radius/BlastRadiusGlob.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../blast-radius/BlastRadiusValidation.psm1') -Force -ErrorAction Stop
@@ -178,12 +179,16 @@ function Get-ParallelDriftEscapedPath {
         Observed repository-relative paths; may be empty.
     .PARAMETER DeclaredPath
         The declared blast_radius.paths; may be empty, which covers nothing.
+    .PARAMETER ReadPath
+        The item's declared read_paths (issue #1164); a changed path they cover is
+        an observed write to a read-declared path and escapes like an undeclared one.
     #>
     [CmdletBinding()]
     [OutputType([string[]], [System.Object[]])]
     param(
         [Parameter(Mandatory = $true)][AllowNull()][AllowEmptyCollection()][object] $ChangedPath,
-        [Parameter(Mandatory = $true)][AllowNull()][AllowEmptyCollection()][object] $DeclaredPath
+        [Parameter(Mandatory = $true)][AllowNull()][AllowEmptyCollection()][object] $DeclaredPath,
+        [AllowEmptyCollection()][string[]] $ReadPath = @()
     )
 
     $changed = Assert-ParallelDriftPathList -Value $ChangedPath -FieldName 'changed' -AllowEmpty
@@ -191,7 +196,8 @@ function Get-ParallelDriftEscapedPath {
     $escaped = [System.Collections.Generic.List[string]]::new()
     # Test each changed path independently against the whole declared collection.
     foreach ($path in $changed) {
-        if (-not (Test-PathSubsumed -Path $path -CoveringPath $declared)) { $escaped.Add($path) }
+        $isReadDeclared = $ReadPath.Count -gt 0 -and (Test-PathSubsumed -Path $path -CoveringPath $ReadPath)
+        if ($isReadDeclared -or -not (Test-PathSubsumed -Path $path -CoveringPath $declared)) { $escaped.Add($path) }
     }
     return , [string[]]$escaped.ToArray()
 }
@@ -300,7 +306,8 @@ function Test-ParallelDriftObservedPairEdge {
         [Parameter(Mandatory = $true)][AllowNull()][object] $PeerRadius,
         [Parameter(Mandatory = $true)][AllowNull()][object] $Config,
         [AllowNull()][object] $ObservedBand,
-        [AllowNull()][object] $PeerBand
+        [AllowNull()][object] $PeerBand,
+        [AllowNull()][System.Collections.IDictionary] $PeerAccess
     )
 
     if ($PeerRadius -isnot [System.Collections.IDictionary]) { return $true }
@@ -312,7 +319,7 @@ function Test-ParallelDriftObservedPairEdge {
         return $true
     }
     $decision = Get-BlastRadiusPairDecision -RadiusA $ObservedRadius -RadiusB $peer -Config $Config `
-        -BandA $ObservedBand -BandB $PeerBand -Relation ${function:Test-BlastRadiusConflict}
+        -BandA $ObservedBand -BandB $PeerBand -Relation ${function:Test-BlastRadiusConflict} -AccessB $PeerAccess
     return [bool]$decision['edge']
 }
 
@@ -381,7 +388,7 @@ function Get-ParallelDriftNewConflictPair {
         if ($existing.Contains("$($pair[0]),$($pair[1])")) { continue }
         $peerBand = Get-ParallelDriftItemBand -Item $Item -ItemKey $itemKey
         if (Test-ParallelDriftObservedPairEdge -ObservedRadius $observed -PeerRadius $record['blast_radius'] -Config $Config `
-                -ObservedBand $observedBand -PeerBand $peerBand) {
+                -ObservedBand $observedBand -PeerBand $peerBand -PeerAccess (Get-ParallelDriftAccessList -Item $record)) {
             $found.Add($pair)
         }
     }
@@ -415,8 +422,10 @@ function Get-ParallelDriftResult {
     )
 
     $items = Get-ParallelDriftCheckpointItem -State $State
-    $declared = Get-ParallelDriftDeclaredPath -Item (Get-ParallelDriftItemRecord -Item $items -ItemKey $ItemKey)
-    $escaped = Get-ParallelDriftEscapedPath -ChangedPath $ChangedPath -DeclaredPath $declared
+    $itemRecord = Get-ParallelDriftItemRecord -Item $items -ItemKey $ItemKey
+    $declared = Get-ParallelDriftDeclaredPath -Item $itemRecord
+    $readPath = (Get-ParallelDriftAccessList -Item $itemRecord)['read_paths']
+    $escaped = Get-ParallelDriftEscapedPath -ChangedPath $ChangedPath -DeclaredPath $declared -ReadPath $readPath
 
     $pairs = @()
     $halted = [long[]]@()

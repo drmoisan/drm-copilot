@@ -1,7 +1,7 @@
 ---
 name: parallel-add
 description: Admit one new item into a running parallel run — preparation via a preparation-mode child orchestrator run, conflict-edge computation against all items including in-flight ones, and the admission decision that either places the item in the current cohort or defers it and recolors the unstarted subgraph. Appends exactly one mutations[] entry. In-flight items are never moved.
-argument-hint: "[issue|potential-entry] [--after <earlier>] [--band <Cn>]"
+argument-hint: "[issue|potential-entry] [--after <earlier>] [--reason <text>] [--band <Cn>]"
 context: fork
 agent: parallel-orchestrator
 ---
@@ -123,7 +123,9 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    that committed folder instead of calling `new_active_feature_folder` again, per
    `/parallel-orchestrate` kickoff element 4.
 
-3. **Compute conflict edges over ALL items, including in-flight ones.** Invoke the scheduling
+3. **Compute conflict edges over ALL items, including in-flight ones.** Two items run sequentially if and only if the expected merge time exceeds the expected time gained by running them in parallel.
+   Both estimates are integer minutes: merge time is the summed overlap-class weights, and a path that one side only reads costs 0; gain is the shorter of the two band durations. Hard classes are always edges. At `tolerance_percent` 100 the rule is exactly merge time greater than gain, and a tie runs in parallel. `--after` flags and planner-proposed orderings pass the same test and are rejected with `precedence_not_justified` unless marked as a correctness ordering with `--reason`.
+   Invoke the scheduling
    entry point Get-BlastRadiusConflictEdge from the destination-runtime PowerShell port
    `.claude/lib/blast-radius/BlastRadius.psm1`, which is published by push-down and needs no Python
    interpreter (the default PowerShell 5.1 execution policy blocks `Import-Module` of a `.psm1`
@@ -131,7 +133,8 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    (Join-Path $repoRoot '.claude/lib/blast-radius/BlastRadius.psm1') -Force -ErrorAction Stop`).
    Call it once, as `Get-BlastRadiusConflictEdge -Item <items> -Config <config> -Relation ${function:Test-BlastRadiusConflict}`, where each item
    record carries `key` (the `items[].issue_num` value), `radius` (the item's radius hashtable, not
-   a string), and the optional complexity `band`, and `-Config` is the required parsed
+   a string), the optional complexity `band`, and the item's optional `read_paths` and
+   `separable_paths` lists (issue #1164), and `-Config` is the required parsed
    `config/blast-radius.json` mapping, which push-down publishes into the destination workspace.
    The -Relation argument is required and carries the facade's detection relation; an omitted
    relation fails fast. The entry point applies the contention relation `Test-BlastRadiusConflict` to every unordered
@@ -162,9 +165,22 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    `qualifies for combination; not combined (combination applies at planning time only)`. This
    step never combines items: it adds no checkpoint field and makes no `mutations[]` change for a
    qualifying pair.
-   Record each `--after <earlier>` flag as one top-level `precedence[]` entry
-   `{before, after, source, recorded_at}` with `before` the earlier item, `after` the candidate,
-   `source` `operator`, and `recorded_at` the current UTC minute. Each precedence pair is a
+   Record each `--after <earlier> [--reason <text>]` flag as one top-level `precedence[]` entry
+   `{before, after, source, recorded_at, kind[, reason]}` with `before` the earlier item, `after`
+   the candidate, `source: "operator"`, and `recorded_at` the current UTC minute. A `--reason`
+   binds to the immediately preceding `--after`. Without `--reason` the entry records
+   `kind: "cost"` and no `reason`; with `--reason` the entry records `kind: "correctness"` and the
+   supplied text as `reason`. Run `test-precedence` after the scheduling entry point returns:
+   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 test-precedence -Entry <json carrying precedence, edges, tolerated_overlaps, and items>`.
+   It exits 0 when every `kind: "cost"` entry names a returned edge and every `kind: "correctness"`
+   entry has a non-empty reason, and otherwise exits 1 with one
+   `PARALLEL_ADMISSION_REJECTED: precedence_not_justified: ...` line; a rejected flag stops the
+   scheduling step, and the operator removes the flag or re-issues it with `--reason`. A legacy
+   entry without `kind` is honoured and not re-tested. Record each returned edge in
+   `conflict_edges[]` with `hard`, `cost`, and `benefit`, and each tolerated overlap with its
+   `cost` and `benefit`, in the orchestrator checkpoint and in `parallel-scheduling.json`;
+   admissions after seeding are not written to `pair_decisions` (manifest invariant M9), because
+   the orchestrator keeps the manifest read-only. Each precedence pair is a
    separating input, never a dependency key: add it to the edges passed to steps 4 and 5 as one
    more `<a>:<b>` edge with `a < b`, so the coloring always separates the pair.
 
@@ -285,8 +301,10 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
   fields added to `items[]` are the four tolerated fields `preparation_status`, `plan_hash`,
   `base_commit`, and `band_source` declared in `## Prepared-Item Admission (issue #1047)` of
   `.claude/rules/parallel-orchestration.md`, which also declares the top-level `precedence[]` list
-  this skill records. A `conflict_edges[]` entry may carry only the three tolerated extra fields `hard`, `cost`,
-  and `benefit` (tolerated-not-validated, returned by the scheduling entry point), and no reason
+  this skill records. A `conflict_edges[]` entry may carry only the three fields `hard`, `cost`,
+  and `benefit` returned by the scheduling entry point. These fields, the tolerated overlaps, and
+  precedence `kind` and `reason` are checked when present by the validators named in
+  `## Enum Ownership (F6/F7/F8 consume, never extend)` of the rule, and no reason
   member is added: the four `conflict_edges[].reason` members are unchanged. The nine parallel
   enums are owned by `.claude/rules/parallel-orchestration.md` and are consumed, never extended.
   The `complexity_band` recorded in step 2 is not a new field: it is an existing scheduling field

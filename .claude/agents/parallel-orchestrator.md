@@ -223,6 +223,13 @@ back into separate pull requests, and it is merged, blocked, or removed as a who
 
 ## Cohort Scheduling
 
+Two items run sequentially if and only if the expected merge time exceeds the expected time gained by running them in parallel.
+
+Both estimates are integer minutes: merge time is the summed overlap-class weights, and a path that one side only reads costs 0; gain is the shorter of the two band durations. Hard classes are always edges. At `tolerance_percent` 100 the rule is exactly merge time greater than gain, and a tie runs in parallel. `--after` flags and planner-proposed orderings pass the same test and are rejected with `precedence_not_justified` unless marked as a correctness ordering with `--reason`.
+
+The planner applies this rule at seeding, and `/parallel-add` applies it to each admission, so the
+cohort table and the recorded edges already reflect it.
+
 You consume the `cohorts[]` table that `parallel-planner` seeded. You never compute a cohort
 partition and never recolor one: cohort computation belongs to the cohort-scheduler library that
 the planner calls, and recoloring after a membership change or a drift event belongs to F6 and F8.

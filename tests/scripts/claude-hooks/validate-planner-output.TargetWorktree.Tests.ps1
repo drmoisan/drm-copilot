@@ -118,27 +118,42 @@ Describe 'validate-planner-output plan-path target worktree (issue #1105)' {
         Should -Invoke Get-PlanFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq "/elsewhere/$script:Relative" }
     }
 
-    It 'falls back to the session root with TARGET_WORKTREE_NOT_DERIVABLE in the block message' {
-        # Arrange
-        Mock Get-PlanFileContent { @{ Exists = $false; Lines = @() } }
+    It 'blocks without a probe naming TARGET_WORKTREE_NOT_DERIVABLE when the prompt branch names no worktree' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
+        Mock Get-PlanFileContent { throw 'the plan probe must not be called for an unresolved identity' }
 
         # Act
         $result = Get-PlannerCase -PlanPath $script:Relative -Prompt 'branch: bug/unknown-branch'
 
         # Assert
-        $result.Message | Should -BeLike '*TARGET_WORKTREE_NOT_DERIVABLE*the session root was probed.'
-        Should -Invoke Get-PlanFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Relative }
+        $result.Ok | Should -BeFalse
+        $result.Repairable | Should -BeTrue
+        $result.Message | Should -BeLike "*plan-path '$script:Relative', which is rejected:*TARGET_WORKTREE_NOT_DERIVABLE*"
+        Should -Invoke Get-PlanFileContent -Times 0 -Exactly
     }
 
-    It 'falls back to the session root with TARGET_WORKTREE_AMBIGUOUS in the block message' {
-        # Arrange
-        Mock Get-PlanFileContent { @{ Exists = $false; Lines = @() } }
+    It 'blocks without a probe naming TARGET_WORKTREE_AMBIGUOUS when the prompt names two issue numbers' {
+        # Arrange (D4: an unresolved present identity never probes the session root)
+        Mock Get-PlanFileContent { throw 'the plan probe must not be called for an unresolved identity' }
 
         # Act
         $result = Get-PlannerCase -PlanPath $script:Relative -Prompt "Canonical issue number for this feature is 1105.`nCanonical issue number for this feature is 1106."
 
         # Assert
-        $result.Message | Should -BeLike '*TARGET_WORKTREE_AMBIGUOUS*the session root was probed.'
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -BeLike "*plan-path '$script:Relative', which is rejected:*TARGET_WORKTREE_AMBIGUOUS*"
+        Should -Invoke Get-PlanFileContent -Times 0 -Exactly
+    }
+
+    It 'keeps the session-root probe when the prompt carries no branch label and no canonical issue line' {
+        # Arrange (D5: no identity keeps the session-root fallback)
+        Mock Get-PlanFileContent { param([string] $Path) if ($Path -eq $script:Relative) { @{ Exists = $true; Lines = $script:ItemLines } } else { @{ Exists = $false; Lines = @() } } }
+
+        # Act
+        $result = Get-PlannerCase -PlanPath $script:Relative -Prompt 'Write the plan.'
+
+        # Assert
+        $result.Ok | Should -BeTrue
         Should -Invoke Get-PlanFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Relative }
     }
 
