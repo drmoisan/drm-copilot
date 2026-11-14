@@ -14,7 +14,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 - `max_concurrency`: 8
 - `current_cohort`: 0
 - `recolor_generation`: 6
-- `last_updated`: 2026-11-14T03-51
+- `last_updated`: 2026-11-14T09-48
 
 **Items**
 
@@ -23,8 +23,8 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 1156 | docs/features/active/regenerate-after-integration-merge-1156 | - | withdrawn | not_started |  |  |  |  |  |
 | 1157 | docs/features/active/owner-directive-pass-down-1157 | - | withdrawn | not_started |  |  |  |  |  |
 | 1158 | docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158 | - | withdrawn | not_started |  |  |  |  |  |
-| 1159 | docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159 | 0 | in_flight | worktree_created |  |  | 2026-11-10T03-12 |  |  |
-| 1160 | docs/features/active/2026-11-09-preimplementation-gate-false-positives-1160 | 0 | merged | merged | https://github.com/drmoisan/drm-copilot/pull/1174 | 063504dc4b2ea08a2c5bd39b57d70ce5963815ed | 2026-11-10T03-12 | 2026-11-14T03-50 |  |
+| 1159 | docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159 | 0 | merged | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/1177 | af38efaee09c09526eeb1f7429febcc74abf402b | 2026-11-10T03-12 | 2026-11-14T09-46 | 2026-11-14T09-48 |
+| 1160 | docs/features/active/2026-11-09-preimplementation-gate-false-positives-1160 | 0 | merged | worktree_removed | https://github.com/drmoisan/drm-copilot/pull/1174 | 063504dc4b2ea08a2c5bd39b57d70ce5963815ed | 2026-11-10T03-12 | 2026-11-14T03-50 | 2026-11-14T09-48 |
 | 1161 | docs/features/active/2026-11-09-planner-worktree-removal-authorization-1161 | - | withdrawn | not_started |  |  |  |  |  |
 | 1162 | docs/features/active/2026-11-09-cross-epic-dependencies-1162 | - | withdrawn | not_started |  |  |  |  |  |
 | 1163 | docs/features/active/2026-11-09-hook-session-root-resolution-1163 | - | withdrawn | not_started |  |  |  |  |  |
@@ -114,7 +114,7 @@ This document is regenerated from the parallel-orchestrator checkpoint and must 
 | 1156 | 1163 | path_overlap, module_overlap | 189 | 4 |  |  |  |
 | 1157 | 1160 | path_overlap, module_overlap | 93 | 4 |  |  |  |
 | 1158 | 1160 | path_overlap, module_overlap | 54 | 4 |  |  |  |
-| 1159 | 1160 | path_overlap, module_overlap | 111 | 4 |  |  |  |
+| 1159 | 1160 | path_overlap, module_overlap | 111 | 4 | 1159 | false | 0 |
 | 1160 | 1161 | path_overlap, module_overlap | 133 | 4 |  |  |  |
 | 1160 | 1162 | path_overlap, module_overlap | 21 | 4 |  |  |  |
 | 1160 | 1163 | path_overlap, module_overlap | 133 | 4 |  |  |  |
