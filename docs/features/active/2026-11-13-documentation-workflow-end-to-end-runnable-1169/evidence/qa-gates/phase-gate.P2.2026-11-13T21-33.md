@@ -1,0 +1,15 @@
+# Phase Gate P2
+
+Timestamp: 2026-11-13T21-16
+Command: stages 1 to 6 of the toolchain loop over the worktree root: sh SCRATCH/issue-1169-static.sh p2b (check-only Invoke-PoshQCFormat with a no-op WriteFile seam, then Invoke-ScriptAnalyzer with scripts/powershell/PoshQC/settings/pssa.settings.psd1 on every PoshQC file, one retry per file on an analyzer exception); sh SCRATCH/issue-1169-pytest.sh p2b (env -u VIRTUAL_ENV poetry run pytest -n auto --cov --cov-branch --cov-report=json:artifacts/python/coverage.json --cov-report=term-missing); sh SCRATCH/issue-1169-pester.sh p2b (one Invoke-PoshQCParallelTest); sh SCRATCH/issue-1169-leak.sh (Invoke-PoshQCLeakScan -Root)
+EXIT_CODE: 0
+Output Summary:
+- First pass (started 2026-11-13T20-57): the static stage hit the intermittent PSScriptAnalyzer 1.25 NullReferenceException (the launcher then gained a one-retry rule and the stage was re-run clean); pytest passed (16598 passed); the Pester stage failed with 7 failures in DocsValidateCommands.Tests.ps1 (6) and DocsCompleteIntegration.Tests.ps1 (1): 'Get-DocsArtifactWritePlan' was not recognized inside DocsValidateCommands.psm1. Cause: the new module did not import DocsLedgerMutation.psm1 and the other siblings the moved function calls; the task checks passed only because those suites imported the siblings into the global scope, and in a shard process an earlier suite's Remove-Module removed them. Fix: DocsValidateCommands.psm1 imports the full sibling set of DocsLedgerCommands.psm1; a fresh-process probe (SCRATCH/issue-1169-resolve.ps1) resolves all 36 commands the module calls with only the module imported (the pre-fix copy left Get-DocsArtifactWritePlan and Invoke-DocsArtifactWrite unresolved). The loop restarted from step 1.
+- Clean pass (started 2026-11-13T21-16):
+  - Stage 1 format (PowerShell, 1554 files, check-only): 0 files would change; exit 0.
+  - Stage 2 lint (PSScriptAnalyzer 1.25.0, 1554 files): 0 findings, 0 retries; exit 0.
+  - Stage 3 type check: not applicable to PowerShell; no Python or TypeScript file changed.
+  - Stages 4 and 6: architecture and contract checks run inside the pytest gate (push-down resource, pack-manifest, dependency-closure, and brief contract tests) and the Pester gate (claude-runtime contract suites); all passed.
+  - Stage 5 Pester: one Invoke-PoshQCParallelTest run, 8 shards all exit 0, wall-clock 667.74 s; 21760 tests, 21750 passed, 0 failed, 10 skipped; repo-wide line coverage 95.84% (37963/39611). Per-file: .claude/lib/docs/DocsValidateCommands.psm1 100.00% (102/102), .claude/lib/docs/DocsLedgerCommands.psm1 99.01% (300/303), .claude/lib/docs/Invoke-DocsCommand.ps1 90.82% (188/207), .claude/lib/docs/DocsCompleteGate.psm1 100.00% (39/39), .claude/hooks/enforce-docs-complete-gate.ps1 95.00% (114/120), .claude/lib/docs/DocsReceiptRevision.psm1 100.00% (40/40).
+  - Stage 5 pytest: one pytest -n auto run; 16598 passed, 0 failed, 6 skipped; line 97.11% (34334/35355), branch 94.37% (12668/13424).
+  - Leak scan: 754 files, 75 findings, 73 exempt, 2 allowlisted, 0 failures; exit 0.

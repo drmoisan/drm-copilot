@@ -28,10 +28,10 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-h
 # normative contract and which lacks headroom; leaving that file byte-untouched is the
 # proof the issue #539 exemption is behaviourally unchanged.
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-modes.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-modes.ps1' -ErrorRecord $_ }
-# Epic-scope command and path legs (issue #707, porting issue #663 decision D2), plus the
-# two per-mode read seams relocated from this file to keep it inside the 500-line cap.
+# Epic-scope legs (issue #707, porting #663 D2) plus two per-mode read seams moved out for the 500-line cap.
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-epic-scope.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-cleanup.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-cleanup.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-docs.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-docs.ps1' -ErrorRecord $_ }
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
@@ -456,7 +456,8 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     }
     if (($cleanup = Get-OrchestrationCleanupContextResult -FilePath $filePath -Content (Get-StringProperty -Value $toolInput -Name 'content') -Command $command -AllowPatchManifest).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Cleanup-context legs (issue #1026).
     if (($bookkeeping = Get-OrchestrationBookkeepingStagingResult -Command $command -CheckpointPath $checkpointPath).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Bookkeeping staging leg (issue #1160).
-    return Get-OrchestrationPreimplementationGateBlockDecision -Reason ('PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.' + $cleanup.DenySuffix + $bookkeeping.DenySuffix)
+    if (($docs = Get-OrchestrationDocsEstateContextResult -FilePath $filePath -Command $command).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Docs-estate leg (issue #1169).
+    return Get-OrchestrationPreimplementationGateBlockDecision -Reason ('PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.' + $cleanup.DenySuffix + $bookkeeping.DenySuffix + $docs.DenySuffix)
 }
 
 if ($MyInvocation.InvocationName -eq '.') {
