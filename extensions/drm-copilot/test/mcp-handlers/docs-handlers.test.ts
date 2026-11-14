@@ -190,6 +190,51 @@ describe("handleDocsTool", () => {
     expect(result.docs).toBe(outcome);
   });
 
+  it("returns inventory snapshot diagnostics, including DOCS_INPUT_NOT_UTF8, with an unchanged count (issue #1173 B10)", async () => {
+    // Arrange
+    const diagnostics = [
+      {
+        id: "docs-capture-1",
+        code: "DOCS_INPUT_NOT_UTF8",
+        severity: "warning",
+        blocking: false,
+        path: "src/legacy/latin1.py",
+        analyzer_id: "docs-capture",
+      },
+      {
+        id: "docs-inventory-1",
+        code: "ENV_FILE_NOT_CAPTURED",
+        severity: "warning",
+        blocking: false,
+        path: "config/.env",
+        analyzer_id: "docs-inventory",
+      },
+    ];
+    const outcome = envelope("inventory", 0, {
+      snapshot: { inputs: [], elements: [], diagnostics },
+      snapshot_path:
+        "docs/documentation-estate/surface-inventory-snapshot.json",
+      written: false,
+    });
+    const service = serviceReturning(outcome);
+
+    // Act
+    const result = await handleDocsTool(
+      "run_docs_inventory",
+      CHECK_INPUT,
+      service,
+    );
+    const returned = (
+      result.docs?.result as { snapshot: { diagnostics: { code: string }[] } }
+    ).snapshot.diagnostics;
+
+    // Assert
+    expect(result.ok).toBe(true);
+    expect(returned).toHaveLength(diagnostics.length);
+    expect(returned.map((item) => item.code)).toContain("DOCS_INPUT_NOT_UTF8");
+    expect(returned).toEqual(diagnostics);
+  });
+
   it("pins the generate_docs_reference result key set of the 1024 contract", async () => {
     // Arrange
     const outcome = envelope("generate-reference", 0, {

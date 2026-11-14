@@ -132,7 +132,10 @@ function New-DocsTestExtensionManifest {
         document before it is serialized; MutateManifest runs on the manifest before
         manifest_sha256 is computed; MutateManifestAfterDigest runs after the digest is computed,
         so a digest mismatch can be produced. ManifestExtension seeds the manifest's extensions
-        map (for example the docs.analysis-method key).
+        map (for example the docs.analysis-method key). SourceLineEnding (LF or CRLF) sets the line
+        endings of the captured source and result inputs. Every digest the manifest and the result
+        document declare is the raw-byte raw_sha256 of the captured input (issue #1173), as discovery
+        extension manifests declare raw-byte digests.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory fixture factory in a test support module; it changes no system state.')]
     [CmdletBinding()]
@@ -152,13 +155,14 @@ function New-DocsTestExtensionManifest {
         [AllowNull()] [scriptblock] $MutateResult,
         [AllowNull()] [scriptblock] $MutateManifest,
         [AllowNull()] [scriptblock] $MutateManifestAfterDigest,
-        [AllowNull()] [System.Collections.IDictionary] $ManifestExtension
+        [AllowNull()] [System.Collections.IDictionary] $ManifestExtension,
+        [ValidateSet('LF', 'CRLF')] [string] $SourceLineEnding = 'LF'
     )
 
-    $sourceInput = New-DocsTestCapturedInput -Path $SourcePath -Text $SourceText
+    $sourceInput = New-DocsTestCapturedInput -Path $SourcePath -Text $SourceText -LineEnding $SourceLineEnding
     # The array wrapper sits outside the if-expression so that a single finding stays a JSON array.
     [object[]] $findings = @(if ($null -eq $Finding) {
-            New-DocsTestFinding -FindingId 'finding-handle' -Kind 'public-symbol' -RepositoryId $RepositoryId -Revision $Revision -Path $SourcePath -Sha256 $sourceInput['sha256'] -AdapterId $AdapterId -AdapterVersion $AdapterVersion -Symbol 'Service.handle' -LineRange @(2, 2) -Property ([ordered]@{ name = 'handle' })
+            New-DocsTestFinding -FindingId 'finding-handle' -Kind 'public-symbol' -RepositoryId $RepositoryId -Revision $Revision -Path $SourcePath -Sha256 $sourceInput['raw_sha256'] -AdapterId $AdapterId -AdapterVersion $AdapterVersion -Symbol 'Service.handle' -LineRange @(2, 2) -Property ([ordered]@{ name = 'handle' })
         } else {
             & $Finding $sourceInput
         })
@@ -172,7 +176,7 @@ function New-DocsTestExtensionManifest {
         tool                      = [ordered]@{ id = $AdapterId; version = $AdapterVersion }
         analyzers                 = @([ordered]@{ id = $AdapterId; version = $AdapterVersion })
         scan_configuration_sha256 = ('b' * 64)
-        files                     = @([ordered]@{ path = $SourcePath; status = 'captured'; sha256 = $sourceInput['sha256']; size = [long] $sourceInput['size']; rationale = $null; diagnostic_ids = @() })
+        files                     = @([ordered]@{ path = $SourcePath; status = 'captured'; sha256 = $sourceInput['raw_sha256']; size = [long] $sourceInput['size']; rationale = $null; diagnostic_ids = @() })
         components                = @()
         findings                  = $findings
         relationships             = @()
@@ -183,7 +187,7 @@ function New-DocsTestExtensionManifest {
     }
     if ($null -ne $MutateResult) { & $MutateResult $result }
     $resultText = ConvertTo-DocsJsonText -Value $result -Indented
-    $resultInput = New-DocsTestCapturedInput -Path $ResultPath -Text $resultText
+    $resultInput = New-DocsTestCapturedInput -Path $ResultPath -Text $resultText -LineEnding $SourceLineEnding
 
     $extensions = [ordered]@{}
     if ($null -ne $ManifestExtension) { foreach ($name in @($ManifestExtension.Keys)) { $extensions[[string] $name] = $ManifestExtension[$name] } }
@@ -195,8 +199,8 @@ function New-DocsTestExtensionManifest {
         adapter               = [ordered]@{ id = $AdapterId; version = $AdapterVersion }
         repository            = [ordered]@{ id = $RepositoryId; revision = $Revision }
         input_manifest_sha256 = ('c' * 64)
-        source_inputs         = @([ordered]@{ path = $SourcePath; sha256 = $sourceInput['sha256']; size = [long] $sourceInput['size'] })
-        result_files          = @([ordered]@{ artifact_kind = 'inventory-snapshot'; id = $ResultId; schema_version = '2.0.0'; path = $ResultPath; sha256 = $resultInput['sha256']; size = [long] $resultInput['size'] })
+        source_inputs         = @([ordered]@{ path = $SourcePath; sha256 = $sourceInput['raw_sha256']; size = [long] $sourceInput['size'] })
+        result_files          = @([ordered]@{ artifact_kind = 'inventory-snapshot'; id = $ResultId; schema_version = '2.0.0'; path = $ResultPath; sha256 = $resultInput['raw_sha256']; size = [long] $resultInput['size'] })
         manifest_sha256       = $null
         generated_at          = '2026-01-01T00:00:00Z'
         generated_by          = [ordered]@{ kind = 'tool'; id = $AdapterId }

@@ -9,6 +9,8 @@
     excess depth as findings instead of exceptions. Serializes values with ordinal key order,
     relaxed escaping, LF line endings and one trailing LF. Canonical JSON and SHA-256 delegate
     to DiscoveryEncoding.psm1, so docs digests agree byte for byte with the discovery runtime.
+    Get-DocsTextSha256Hex hashes bytes after mapping CRLF and lone CR to LF (issue #1173), for
+    estate artifact references and write conflict checks that must not depend on line endings.
     ConvertFrom-Json is never used for artifacts, because it converts timestamp-shaped strings
     to DateTime and loses the integer and boolean distinctions.
 
@@ -295,6 +297,41 @@ function Get-DocsBytesSha256Hex {
     return Get-DiscoveryBytesSha256Hex -Bytes $Bytes
 }
 
+function Get-DocsTextSha256Hex {
+    <#
+    .SYNOPSIS
+        Returns the lowercase hex SHA-256 of Bytes after mapping CRLF and lone CR to LF (issue #1173).
+    .DESCRIPTION
+        The mapping is done at byte level: each CR (0x0D) followed by LF (0x0A) is dropped, and
+        each other CR becomes LF. A leading BOM and every other byte are kept, so for LF-only
+        content the value equals Get-DocsBytesSha256Hex. Estate artifact references and write
+        conflict checks use this hash, so a CRLF checkout of LF-written text keeps its hash.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [byte[]] $Bytes)
+
+    $carriageReturn = [System.Array]::IndexOf($Bytes, [byte] 0x0D)
+    if ($carriageReturn -lt 0) { return Get-DiscoveryBytesSha256Hex -Bytes $Bytes }
+    # Copy the runs between CR bytes in bulk, so the loop runs once per CR rather than once per byte.
+    $normalized = [byte[]]::new($Bytes.Length)
+    $length = 0
+    $start = 0
+    while ($carriageReturn -ge 0) {
+        [System.Array]::Copy($Bytes, $start, $normalized, $length, $carriageReturn - $start)
+        $length += $carriageReturn - $start
+        $nextIsLineFeed = ($carriageReturn + 1 -lt $Bytes.Length) -and ($Bytes[$carriageReturn + 1] -eq 0x0A)
+        if (-not $nextIsLineFeed) { $normalized[$length] = 0x0A; $length++ }
+        $start = $carriageReturn + 1
+        $carriageReturn = if ($start -lt $Bytes.Length) { [System.Array]::IndexOf($Bytes, [byte] 0x0D, $start) } else { -1 }
+    }
+    [System.Array]::Copy($Bytes, $start, $normalized, $length, $Bytes.Length - $start)
+    $length += $Bytes.Length - $start
+    $trimmed = [byte[]]::new($length)
+    [System.Array]::Copy($normalized, $trimmed, $length)
+    return Get-DiscoveryBytesSha256Hex -Bytes $trimmed
+}
+
 function ConvertFrom-DocsUtf8Bytes {
     <#
     .SYNOPSIS
@@ -320,4 +357,5 @@ Export-ModuleMember -Function `
     ConvertTo-DocsCanonicalJson, `
     Get-DocsSha256Hex, `
     Get-DocsBytesSha256Hex, `
+    Get-DocsTextSha256Hex, `
     ConvertFrom-DocsUtf8Bytes

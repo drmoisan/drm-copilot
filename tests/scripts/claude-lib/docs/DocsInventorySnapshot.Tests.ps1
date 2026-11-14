@@ -163,13 +163,14 @@ Describe 'New-DocsInventorySnapshot over both corpora' {
         Test-TestOrdinalOrder -Value @($script:Snapshot['diagnostics'] | ForEach-Object { [string] $_['id'] }) | Should -BeTrue -Because 'diagnostics are sorted by id'
     }
 
-    It 'records inputs[].sha256 equal to the SHA-256 of the fixture bytes with size equal to their length, sorted by path, and no withheld path' {
+    It 'records inputs[].sha256 equal to the line-ending-normalized SHA-256 of the fixture bytes with size equal to their raw length, sorted by path, and no withheld path (issue #1173)' {
         $script:Snapshot['inputs'].Count | Should -Be $script:Captured.Count
         [string[]] $paths = @($script:Snapshot['inputs'] | ForEach-Object { [string] $_['path'] })
         Test-TestOrdinalOrder -Value $paths | Should -BeTrue -Because 'inputs are sorted by path'
         foreach ($entry in $script:Snapshot['inputs']) {
             $bytes = [System.Text.UTF8Encoding]::new($false).GetBytes([string] $script:Inputs[[string] $entry['path']])
-            $entry['sha256'] | Should -BeExactly (Get-DocsBytesSha256Hex -Bytes $bytes) -Because $entry['path']
+            # The corpus holds CRLF inputs, so the normalized hash differs from the raw-byte hash for those inputs.
+            $entry['sha256'] | Should -BeExactly (Get-DocsTextSha256Hex -Bytes $bytes) -Because $entry['path']
             $entry['size'] | Should -Be $bytes.Length -Because $entry['path']
         }
         foreach ($path in $script:Selection.Withheld) { $paths | Should -Not -Contain $path }

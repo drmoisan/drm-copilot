@@ -140,7 +140,8 @@ function Get-DocsReferenceGeneration {
         Computes every planned page change in memory; returns @{ Page; Unrendered; Finding }.
     .DESCRIPTION
         ExistingPage maps each candidate page path to $null (absent) or @{ Text; Sha256 }, Sha256
-        being the digest of the raw page bytes. Each page record, ordinal by Path, carries Path,
+        being Get-DocsTextSha256Hex of the page bytes (line endings normalized, issue #1173), so an
+        existing CRLF page equal in LF form to the computed text gives action none. Each page record, ordinal by Path, carries Path,
         Action (create, update, none or blocked), the ordinal-sorted Added, Updated, Unchanged and
         Removed identifier lists, the computed Text, Sha256Before, Sha256After and the dry-run Diff
         ($null for none and blocked). A page-scoped error finding blocks only its page. Existing
@@ -196,8 +197,8 @@ function Invoke-DocsReferencePageWrite {
         Performs one guarded page write; returns @{ Status; Message } (private helper).
     .DESCRIPTION
         create: TestFile immediately before writing; an existing target is a conflict, otherwise
-        WriteText with mode create. update: ReadBytes immediately before writing; a digest other
-        than Sha256Before is a conflict, otherwise WriteText with mode overwrite. Status is
+        WriteText with mode create. update: ReadBytes immediately before writing; a
+        Get-DocsTextSha256Hex digest other than Sha256Before is a conflict, otherwise WriteText with mode overwrite. Status is
         created, updated, conflict, or failed when WriteText throws (Message holds the error).
     #>
     [CmdletBinding()]
@@ -216,7 +217,7 @@ function Invoke-DocsReferencePageWrite {
         $status = 'created'
     } else {
         $bytes = [byte[]] (& $ReadBytes $path)
-        if ((Get-DocsBytesSha256Hex -Bytes $bytes) -cne [string] $Change['Sha256Before']) { return @{ Status = 'conflict'; Message = "the page $path changed after planning." } }
+        if ((Get-DocsTextSha256Hex -Bytes $bytes) -cne [string] $Change['Sha256Before']) { return @{ Status = 'conflict'; Message = "the page $path changed after planning." } }
         $mode = 'overwrite'
         $status = 'updated'
     }
@@ -342,7 +343,7 @@ function Invoke-DocsGenerateReferenceCommand {
         if (-not [bool] (Invoke-DocsReferenceContextMember -Member $Context.TestFile -ArgumentList @($path))) { continue }
         $text = [string] (Invoke-DocsReferenceContextMember -Member $Context.ReadText -ArgumentList @($path))
         $bytes = [byte[]] (Invoke-DocsReferenceContextMember -Member $Context.ReadBytes -ArgumentList @($path))
-        $existing[$path] = @{ Text = $text; Sha256 = (Get-DocsBytesSha256Hex -Bytes $bytes) }
+        $existing[$path] = @{ Text = $text; Sha256 = (Get-DocsTextSha256Hex -Bytes $bytes) }
     }
     $generation = Get-DocsReferenceGeneration -Profile $docsProfile -Snapshot $snapshot.Snapshot -Element $element -ExistingPage $existing -OutputDirectory $directory.OutputDirectory -ProfilePath $profilePath -ComposedSchemaSet $schemas
     $findings.AddRange([object[]] @($generation.Finding))

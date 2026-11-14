@@ -338,7 +338,7 @@ function Read-DocsLedgerCommandProfile {
 function ConvertFrom-DocsLedgerCommandArtifact {
     <#
     .SYNOPSIS
-        Decodes, schema-checks and parses one present artifact entry @{ Path; Bytes }; returns @{ Path; Bytes; Sha256; Value; Findings } (private helper).
+        Decodes, schema-checks and parses one present artifact entry @{ Path; Bytes }; returns @{ Path; Bytes; Sha256; Value; Findings }, Sha256 from Get-DocsTextSha256Hex (private helper).
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -354,7 +354,7 @@ function ConvertFrom-DocsLedgerCommandArtifact {
     $findings = Test-DocsArtifactText -ArtifactKind $ArtifactKind -JsonText $text -ComposedSchemaSet $ComposedSchemaSet -ArtifactPath $path
     $value = $null
     if (@($findings).Count -eq 0) { $value = (ConvertFrom-DocsJsonText -Text $text -ArtifactPath $path).Value }
-    return @{ Path = $path; Bytes = $bytes; Sha256 = (Get-DocsBytesSha256Hex -Bytes $bytes); Value = $value; Findings = [object[]]@($findings) }
+    return @{ Path = $path; Bytes = $bytes; Sha256 = (Get-DocsTextSha256Hex -Bytes $bytes); Value = $value; Findings = [object[]]@($findings) }
 }
 
 function Read-DocsLedgerCommandDocumentSet {

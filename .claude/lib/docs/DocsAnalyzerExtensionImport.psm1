@@ -10,7 +10,9 @@
     result-file digests and documents, finding sources) and returns
     @{ Ok; Diagnostics; Manifest; ResultDocument }. The first failing check yields exactly one
     blocking diagnostic at the manifest path. A selection without repository_id or revision
-    yields the non-blocking unverified diagnostics and the check continues.
+    yields the non-blocking unverified diagnostics and the check continues. Source-input and
+    result-file digests are compared with the raw-byte raw_sha256 of the captured input, because
+    manifests declare raw-byte digests (issue #1173).
     Invoke-DocsAnalyzerExtensionImport selects the captured *.json inputs whose parsed root is
     an extension-result manifest, validates each, and merges every mappable finding (step 8)
     as data: nothing from a manifest is executed or imported, element identifiers and digests
@@ -81,7 +83,10 @@ function Find-DocsExtensionCapturedInput {
 function Test-DocsExtensionCapturedDigest {
     <#
     .SYNOPSIS
-        Returns $true when a captured input has the sha256 and size of a manifest payload entry (private helper).
+        Returns $true when a captured input's raw_sha256 and size equal the sha256 and size of a manifest payload entry (private helper).
+    .DESCRIPTION
+        Discovery extension manifests declare raw-byte digests, so the raw-byte raw_sha256 of the
+        captured input is compared, not its line-ending-normalized sha256 (issue #1173).
     #>
     [CmdletBinding()]
     [OutputType([bool])]
@@ -90,7 +95,7 @@ function Test-DocsExtensionCapturedDigest {
         [Parameter(Mandatory = $true)] [object] $Entry
     )
 
-    $sameDigest = [string] (Get-DocsExtensionValue -Record $Captured -Name 'sha256') -ceq [string] (Get-DocsExtensionValue -Record $Entry -Name 'sha256')
+    $sameDigest = [string] (Get-DocsExtensionValue -Record $Captured -Name 'raw_sha256') -ceq [string] (Get-DocsExtensionValue -Record $Entry -Name 'sha256')
     $sameSize = [long] (Get-DocsExtensionValue -Record $Captured -Name 'size') -eq [long] (Get-DocsExtensionValue -Record $Entry -Name 'size')
     return $sameDigest -and $sameSize
 }
