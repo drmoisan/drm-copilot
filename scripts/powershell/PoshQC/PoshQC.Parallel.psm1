@@ -220,6 +220,9 @@ Pester tags passed to the shard's Invoke-PoshQCTest (issue #1158). Appended to t
 as an @(...) array literal of single-quoted values.
 .PARAMETER ExcludeTestFileSuffix
 Test file-name suffixes passed to the shard's Invoke-PoshQCTest (issue #1158), appended the same way as ExcludeTag.
+.PARAMETER TestPath
+Test files and folders passed to the shard's Invoke-PoshQCTest as -ScanFolders (issue #1158), so the shard enumerates
+only those paths. Appended the same way as ExcludeTag; empty keeps the command text unchanged.
 #>
 function Get-PoshQCParallelShardArgument {
     [CmdletBinding()]
@@ -231,7 +234,8 @@ function Get-PoshQCParallelShardArgument {
         [Parameter(Mandatory)][int] $ShardCount,
         [Parameter(Mandatory)][string] $ShardDirectory,
         [string[]] $ExcludeTag = @(),
-        [string[]] $ExcludeTestFileSuffix = @()
+        [string[]] $ExcludeTestFileSuffix = @(),
+        [string[]] $TestPath = @()
     )
 
     $quote = { param([string] $Text) "'" + $Text.Replace("'", "''") + "'" }
@@ -249,7 +253,51 @@ function Get-PoshQCParallelShardArgument {
     # binds as a value and not as a parameter name.
     if (@($ExcludeTag).Count -gt 0) { $command += ' -ExcludeTag @(' + (@($ExcludeTag | ForEach-Object { & $quote $_ }) -join ', ') + ')' }
     if (@($ExcludeTestFileSuffix).Count -gt 0) { $command += ' -ExcludeTestFileSuffix @(' + (@($ExcludeTestFileSuffix | ForEach-Object { & $quote $_ }) -join ', ') + ')' }
+    if (@($TestPath).Count -gt 0) { $command += ' -ScanFolders @(' + (@($TestPath | ForEach-Object { & $quote $_ }) -join ', ') + ')' }
     [string[]] @('-NoLogo', '-NoProfile', '-NonInteractive', '-Command', $command)
+}
+
+<#
+.SYNOPSIS
+Resolves the test paths of a scoped concurrent run into one sorted list of test files (issue #1158).
+.DESCRIPTION
+Each path is resolved against Root. A *.Tests.ps1 file counts as itself, a folder yields its *.Tests.ps1 files
+recursively, and any other or absent path yields none. Files whose name ends with an ExcludeTestFileSuffix value are
+dropped by Select-PoshQCLaneTestFile. Returns root-relative forward-slash paths, sorted ordinally and unique, so a
+folder and a file inside it yield that file once.
+.PARAMETER Root
+Workspace root.
+.PARAMETER TestPath
+Test files and folders, relative to Root or absolute.
+.PARAMETER ExcludeTestFileSuffix
+Lane file-name suffixes to drop.
+#>
+function Resolve-PoshQCParallelTestFile {
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory)][string] $Root,
+        [Parameter(Mandatory)][AllowEmptyCollection()][string[]] $TestPath,
+        [AllowEmptyCollection()][string[]] $ExcludeTestFileSuffix = @()
+    )
+
+    $rootPath = [IO.Path]::GetFullPath($Root)
+    $isTestFile = { param([string] $Path) $Path.EndsWith('.Tests.ps1', [StringComparison]::OrdinalIgnoreCase) }
+    [string[]] $found = @(foreach ($path in $TestPath) {
+            if ([string]::IsNullOrWhiteSpace($path)) { continue }
+            $fullPath = [IO.Path]::GetFullPath([IO.Path]::Combine($rootPath, $path))
+            if (Test-Path -LiteralPath $fullPath -PathType Container) {
+                Get-ChildItem -LiteralPath $fullPath -Recurse -File -Filter '*.Tests.ps1' | ForEach-Object { [string] $_.FullName } | Where-Object { & $isTestFile $_ }
+            } elseif ((Test-Path -LiteralPath $fullPath -PathType Leaf) -and (& $isTestFile $fullPath)) {
+                $fullPath
+            }
+        })
+    $kept = @(Select-PoshQCLaneTestFile -TestFile $found -ExcludeTestFileSuffix @($ExcludeTestFileSuffix))
+    $unique = New-Object 'System.Collections.Generic.SortedSet[string]' ([System.StringComparer]::Ordinal)
+    foreach ($file in $kept) {
+        [void] $unique.Add([IO.Path]::GetRelativePath($rootPath, [string] $file).Replace([IO.Path]::DirectorySeparatorChar, '/'))
+    }
+    [string[]] @($unique)
 }
 
 <#
@@ -376,6 +424,14 @@ Number of shard processes. Defaults to Get-PoshQCParallelWorkerCount over [Envir
 Pester tags excluded in every shard (issue #1158). Empty keeps today's shard command text.
 .PARAMETER ExcludeTestFileSuffix
 Test file-name suffixes excluded in every shard (issue #1158). Empty keeps today's shard command text.
+.PARAMETER TestPath
+Test files and folders of a scoped run (issue #1158). When non-empty, ResolveTestFile is called once: no resolved file
+logs the given paths and returns ExitCode 1 without starting a shard; otherwise the worker count is the lesser of the
+effective WorkerCount and the file count, and every shard receives the resolved file list as -ScanFolders. The merged
+files then cover the selection only. Empty keeps today's behavior and never calls ResolveTestFile.
+.PARAMETER ResolveTestFile
+Seam that takes the root, the test paths, and the lane suffixes and returns the sorted, unique, root-relative test
+files. Defaults to Resolve-PoshQCParallelTestFile.
 .PARAMETER ResetShardDirectory
 Seam that empties or creates one shard directory.
 .PARAMETER StartShardProcess
@@ -398,6 +454,11 @@ function Invoke-PoshQCParallelTest {
         [ValidateRange(1, [int]::MaxValue)][int] $WorkerCount,
         [string[]] $ExcludeTag = @(),
         [string[]] $ExcludeTestFileSuffix = @(),
+        [string[]] $TestPath = @(),
+        [scriptblock] $ResolveTestFile = {
+            param([string] $RootPath, [string[]] $Paths, [string[]] $Suffixes)
+            Resolve-PoshQCParallelTestFile -Root $RootPath -TestPath $Paths -ExcludeTestFileSuffix $Suffixes
+        },
         [scriptblock] $ResetShardDirectory = {
             param([string] $Path)
             if (Test-Path -LiteralPath $Path) { Remove-Item -LiteralPath $Path -Recurse -Force }
@@ -431,6 +492,19 @@ function Invoke-PoshQCParallelTest {
         $WorkerCount = Get-PoshQCParallelWorkerCount -LogicalProcessorCount ([Environment]::ProcessorCount)
     }
 
+    # Issue #1158 (C1): a scoped run hands every shard the resolved file list, never the raw paths, because a folder
+    # plus a file inside it would make each shard enumerate that file twice and fail the completeness check.
+    [string[]] $scopedFile = @()
+    if (@($TestPath).Count -gt 0) {
+        $scopedFile = @(& $ResolveTestFile $Root ([string[]] $TestPath) ([string[]] $ExcludeTestFileSuffix))
+        if ($scopedFile.Count -eq 0) {
+            & $Logger ('Invoke-PoshQCParallelTest: no Pester test file was found under the test paths {0}; no shard was started.' -f (@($TestPath) -join ', '))
+            return [pscustomobject]@{ ExitCode = 1; WorkerCount = 0; WallClockSeconds = 0; Shards = @() }
+        }
+        # Select-PoshQCShardTestFile throws on an empty shard, so no shard may outnumber the files.
+        $WorkerCount = [math]::Min($WorkerCount, $scopedFile.Count)
+    }
+
     $started = & $Clock
     $manifestPath = Join-Path $script:ModuleRoot 'PoshQC.psd1'
     $parallelDirectory = Join-Path $Root 'artifacts/pester/parallel'
@@ -440,7 +514,7 @@ function Invoke-PoshQCParallelTest {
             $directory = Join-Path $parallelDirectory "shard-$index"
             & $ResetShardDirectory $directory
             $logPath = Join-Path $directory 'shard.log'
-            $arguments = Get-PoshQCParallelShardArgument -ModuleManifestPath $manifestPath -Root $Root -ShardIndex $index -ShardCount $WorkerCount -ShardDirectory $directory -ExcludeTag $ExcludeTag -ExcludeTestFileSuffix $ExcludeTestFileSuffix
+            $arguments = Get-PoshQCParallelShardArgument -ModuleManifestPath $manifestPath -Root $Root -ShardIndex $index -ShardCount $WorkerCount -ShardDirectory $directory -ExcludeTag $ExcludeTag -ExcludeTestFileSuffix $ExcludeTestFileSuffix -TestPath $scopedFile
             [pscustomobject]@{
                 ShardIndex = $index
                 Directory  = $directory
