@@ -162,6 +162,8 @@ Run the full toolchain loop for each applicable language in order:
 3) Type checking (if applicable)
 4) Testing
 
+A launcher exit 75 means the machine test-suite lock was busy: the gate is re-run after the holder finishes and is recorded as a queue timeout, not a failure (see the `test-execution-policy` skill).
+
 For languages with mandatory coverage policy, step 4 must use coverage-enabled test commands and persist numeric coverage evidence.
 
 If any step fails or changes files, restart the loop from step 1 until a clean pass completes.
