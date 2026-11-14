@@ -270,6 +270,54 @@ after children 8 to 10, and no cited path changed, so child 7 is not revised.
 - Before each wave the epic orchestrator syncs `origin/main` into the integration branch per the
   epic-orchestrate skill.
 
+## Planning Refresh 2026-11-14
+
+Planning paused on 2026-10-31 and resumed on 2026-11-14 (UTC) under owner directive OD-1
+(autonomous mode). `origin/main` was merged into the integration branch at that time (2,493
+commits; merge commit `Merge origin/main into epic/shared-agent-harness-layer-integration`; no
+conflicts, because the integration branch changes only `docs/features/`). Each child's
+authoritative branch then merged the integration branch, so every child branch contains current
+`origin/main`.
+
+### Authoritative child branches
+
+| Issue | Branch | Worktree note |
+| --- | --- | --- |
+| 1025 | `feature/harness-survey-gold-standard-contracts-parity-matrix-1025` | fast-forwarded from the plan-B decision head, then merged the integration branch |
+| 1035 | `feature/dev-docs-root-resolver-phase1-1035` | new branch at the integration head; it is the branch label the re-keyed plan already names. The pre-re-key branch `feature/dev-docs-root-resolver-phase1-1016` is superseded and not used |
+| 1028 | `feature/shared-source-generators-skills-rules-mcp-agents-1028` | fast-forwarded to the H3 decision head |
+| 1029 | `feature/push-down-consolidation-and-ecosystem-packs-1029` | fast-forwarded |
+| 1030 | `feature/hook-parity-across-claude-codex-copilot-1030` | local diverged line (preserved on `wip/preserve-feature-hook-parity-across-claude-codex-copilot-1030-2026-11-10`) replaced by the origin head |
+| 1032 | `feature/retire-github-skills-and-thin-copilot-layer-1032` | fast-forwarded to the H3 fix head |
+| 1016 | `feature/dev-docs-root-migration-phases-2-3-1016` | local WIP commit (preserved on `wip/1016-local-preflight-round2`) replaced by the origin head |
+| 1049 | `feature/pushed-down-vendored-code-coverage-carve-out-1049` | unchanged head plus the integration merge |
+| 1050, 1051 | created by their preparation runs | not yet prepared |
+
+The `-r2`, `-r3`, `-resume`, `-h3`, `prep-*`, `issue-1030-prep*` and `feature-1032-h3*` branches
+hold no commit that the integration branch lacks and are not used.
+
+### Superseded-work check (coordinator pass)
+
+Method: merged pull requests on `main` since 2026-10-31, `git diff` of each child's surfaces
+between the old merge base and `origin/main`, and searches of the current tree for each child's
+primary deliverable. Each preparation run repeats the check at citation level and the result is
+recorded below at fan-in.
+
+| Issue | Primary deliverable on main? | Main changes that touch the child's scope | Result |
+| --- | --- | --- | --- |
+| 1025 | No: no `references/standard.md` under `.agents/skills`; no harness parity matrix (the parity-matrix files on main belong to the discovery and docs-estate tooling) | new skills under `.agents/skills`, `.github/skills`, `.claude/skills` (survey inventory grew) | kept; plan refresh required |
+| 1035 | No: no `development_docs_root` key anywhere | docs-estate tooling (#1125) adds `documentation_roots` in docs profiles; `enforce-feature-folder-order.ps1` changed | kept; plan refresh required |
+| 1028 | No: no skill, rule, MCP or agent generator with `--check` | hook registration moved to one PreToolUse dispatcher per runtime (#1159, `pretooluse-dispatch.json`, `.codex/config.toml` hook table reduced); regeneration framework after integration merges (#1156, `.claude/lib/regeneration/`); `generate_codex_agent_variants.py` changed | kept; plan refresh required |
+| 1029 | No: three push-downs remain separate | push-down scripts and tests changed (#1134 epic-wave push-down, bundle tests) | kept; plan refresh required |
+| 1030 | No: function parity not delivered | #1159 replaced per-hook registrations with a dispatcher in both runtimes; 77 Claude hook files and 35 Codex hook files changed | kept; scope to be narrowed by the preparation run where the dispatcher already provides registration parity |
+| 1032 | No: `.github/skills` and `.github/agents` still present and grew | `.vscode/settings.json` is now tracked (2026-10-31) | kept; plan refresh required |
+| 1016 | No: no `.dev` root | docs-estate tooling treats `docs` as a documentation root | kept; plan refresh required |
+| 1049 | No: no vendored-code exception in coverage rules | none found | kept; preparation resumes at preflight |
+| 1050 | No: no per-pack CI templates | CI now exposes one required context `CI Required Gate` (#1077); the required-check data becomes smaller | kept; scope to be confirmed by its preparation run |
+| 1051 | No: no `integration-needed` file or detect/validate tools | none found | kept |
+
+No child is fully superseded at the coordinator pass.
+
 ## Complexity Assessment
 
 - Child 1: research-heavy, novel, with owner-run experiments and bulk approvals; band C4 by
