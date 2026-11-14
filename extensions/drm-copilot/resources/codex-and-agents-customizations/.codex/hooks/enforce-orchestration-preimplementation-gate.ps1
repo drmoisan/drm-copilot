@@ -8,6 +8,7 @@
     shell-divergent command shape denies (research/research.2026-10-08T14-00.md in the issue
     #732 feature folder). The payload carries no workdir either, so the session root is the
     default target of a segment without an explicit -C (issue #738, decision D4).
+    Issue #1160: stage-2 mention-host confirmation (-commands sibling) and bookkeeping leg (-bookkeeping sibling).
 #>
 [CmdletBinding()]
 param()
@@ -34,6 +35,8 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-c
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-commands.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-commands.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-bookkeeping.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-bookkeeping.ps1' -ErrorRecord $_ }
 
 # Every orchestration checkpoint a planner or orchestrator surface writes. Writing one
 # of these is orchestration bookkeeping, not implementation, so the gate must not
@@ -166,9 +169,10 @@ function Test-ImplementationCommand {
     $isStaging = @('add', 'commit').Where({ Test-CommandLineInvocation -CommandText $normalizedCommand -CommandWord 'git' -SubcommandPath @($_) }).Count -gt 0
 
     for ($index = 0; $index -lt $implementationCommandPatterns.Count; $index++) {
-        if (-not (($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }) -or ($index -eq 0 -and $isStaging))) {
-            continue
-        }
+        $structural = ($index -eq 0 -and $isStaging)
+        if (-not ($structural -or ($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }))) { continue }
+        # Stage 2 (issue #1160): a regex-only hit is dropped when every governed word is a mention-host operand.
+        if (-not $structural -and -not (Test-OrchestrationGateInvocationConfirmed -CommandText $normalizedCommand -PatternIndex $index)) { continue }
         # Allow-side only (issue #539). Index 0 is the git staging trigger, whose pattern
         # text is unchanged. It is the sole leg the orchestration-bookkeeping exemption may
         # clear, and only when no other implementation pattern matches the same line: the
@@ -435,10 +439,11 @@ function Invoke-OrchestrationPreimplementationGateDecision {
 
     # Truthiness fall-through is kept: an empty -CheckpointRaw resolves like an unbound one.
     # The checkpoint is read beneath the worktree the call targets (issue #1010).
+    $checkpointPath = ''
     if (-not $CheckpointRaw) {
         $read = Read-OrchestrationGateCheckpoint -Mode 'single-feature' -FilePath $filePath -Command $command
         if (-not $read.Resolved) { return Get-OrchestrationPreimplementationGateBlockDecision -Reason $read.DenyReason }
-        $CheckpointRaw = $read.Raw
+        $CheckpointRaw = $read.Raw; $checkpointPath = [string]$read.Path
     }
     try {
         $checkpoint = ConvertFrom-CheckpointJson -Json $CheckpointRaw
@@ -450,7 +455,8 @@ function Invoke-OrchestrationPreimplementationGateDecision {
         return Get-OrchestrationPreimplementationGateAllowDecision
     }
     if (($cleanup = Get-OrchestrationCleanupContextResult -FilePath $filePath -Content (Get-StringProperty -Value $toolInput -Name 'content') -Command $command -AllowPatchManifest).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Cleanup-context legs (issue #1026).
-    return Get-OrchestrationPreimplementationGateBlockDecision -Reason ('PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.' + $cleanup.DenySuffix)
+    if (($bookkeeping = Get-OrchestrationBookkeepingStagingResult -Command $command -CheckpointPath $checkpointPath).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Bookkeeping staging leg (issue #1160).
+    return Get-OrchestrationPreimplementationGateBlockDecision -Reason ('PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.' + $cleanup.DenySuffix + $bookkeeping.DenySuffix)
 }
 
 if ($MyInvocation.InvocationName -eq '.') {
