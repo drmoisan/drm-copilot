@@ -21,12 +21,12 @@ An epic manifest lists only edges inside the epic and assumes earlier epics have
 
 ## Acceptance Criteria
 
-- [ ] The epic manifest schema accepts cross-epic depends-on edges (feature + other epic + its integration branch); validated and documented; manifests without them behave as today.
-- [ ] Pure readiness logic decides hold/release from prerequisite merge state, with unit tests; the gh and ancestry checks are thin adapters.
-- [ ] On release the orchestrator merges the other epic's integration branch into its own (direct merge commit) before starting the feature.
-- [ ] The epic-progress-report critical path includes cross-epic edges.
-- [ ] The integration-to-main PR is held until the prerequisite epic's integration-to-main PR has merged.
-- [ ] epic-plan, epic-orchestrate, epic-progress-report skills and agents updated.
+- [x] The epic manifest schema accepts cross-epic depends-on edges (feature + other epic + its integration branch); validated and documented; manifests without them behave as today.
+- [x] Pure readiness logic decides hold/release from prerequisite merge state, with unit tests; the gh and ancestry checks are thin adapters.
+- [x] On release the orchestrator merges the other epic's integration branch into its own (direct merge commit) before starting the feature.
+- [x] The epic-progress-report critical path includes cross-epic edges.
+- [x] The integration-to-main PR is held until the prerequisite epic's integration-to-main PR has merged.
+- [x] epic-plan, epic-orchestrate, epic-progress-report skills and agents updated.
 
 ## Constraints & Risks
 

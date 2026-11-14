@@ -50,14 +50,14 @@ An epic manifest lists only edges inside the epic and assumes earlier epics have
 
 ## Acceptance Criteria
 
-- [ ] An epic manifest accepts a `cross_epic_depends_on` edge naming another epic's feature and that epic's integration branch; malformed edges are rejected at kickoff with documented `EPIC_CROSS_DEPENDENCY_` codes; the syntax is documented in the epic-orchestrate skills and both epic templates. (Issue AC1)
-- [ ] A manifest or checkpoint without `cross_epic_depends_on` behaves and validates exactly as before this change, including unchanged wave numbers and an unchanged progress report. (Issue AC1)
-- [ ] Hold, merge-required, and release decisions for a feature and for the integration-to-main PR come from pure functions covered by unit tests for every row of both decision tables, and the `gh` and `git` checks run only through thin, mocked adapters that fail closed. (Issue AC2)
-- [ ] A main-sync chore PR into the other integration branch is never accepted as the prerequisite's merged PR, as shown by a dedicated unit test. (Issue AC2)
-- [ ] A held feature receives no worktree; on release the orchestrator merges the other epic's integration branch into its own with a direct merge commit, pushes, and records it before starting the feature, and the validators flag a feature started while its cross-epic dependency is not integrated. (Issue AC3)
-- [ ] The epic progress report's critical path includes each cross-epic prerequisite as an external node that delays its dependent while pending and does not consume this epic's parallel cap. (Issue AC4)
-- [ ] The integration-to-main PR is not opened or merged until the prerequisite epic's integration-to-main PR has merged, and a completed checkpoint for an epic with cross-epic edges fails validation unless the main gate is recorded as released. (Issue AC5)
-- [ ] The epic-plan, epic-orchestrate, epic-run, and epic-progress-report skills, the epic-planner and epic-orchestrator agents, their Codex variants, bundle copies, and pack manifests are updated, and every mirror and frozen-surface contract test passes. (Issue AC6)
+- [x] An epic manifest accepts a `cross_epic_depends_on` edge naming another epic's feature and that epic's integration branch; malformed edges are rejected at kickoff with documented `EPIC_CROSS_DEPENDENCY_` codes; the syntax is documented in the epic-orchestrate skills and both epic templates. (Issue AC1)
+- [x] A manifest or checkpoint without `cross_epic_depends_on` behaves and validates exactly as before this change, including unchanged wave numbers and an unchanged progress report. (Issue AC1)
+- [x] Hold, merge-required, and release decisions for a feature and for the integration-to-main PR come from pure functions covered by unit tests for every row of both decision tables, and the `gh` and `git` checks run only through thin, mocked adapters that fail closed. (Issue AC2)
+- [x] A main-sync chore PR into the other integration branch is never accepted as the prerequisite's merged PR, as shown by a dedicated unit test. (Issue AC2)
+- [x] A held feature receives no worktree; on release the orchestrator merges the other epic's integration branch into its own with a direct merge commit, pushes, and records it before starting the feature, and the validators flag a feature started while its cross-epic dependency is not integrated. (Issue AC3)
+- [x] The epic progress report's critical path includes each cross-epic prerequisite as an external node that delays its dependent while pending and does not consume this epic's parallel cap. (Issue AC4)
+- [x] The integration-to-main PR is not opened or merged until the prerequisite epic's integration-to-main PR has merged, and a completed checkpoint for an epic with cross-epic edges fails validation unless the main gate is recorded as released. (Issue AC5)
+- [x] The epic-plan, epic-orchestrate, epic-run, and epic-progress-report skills, the epic-planner and epic-orchestrator agents, their Codex variants, bundle copies, and pack manifests are updated, and every mirror and frozen-surface contract test passes. (Issue AC6)
 
 ## Non-Goals
 

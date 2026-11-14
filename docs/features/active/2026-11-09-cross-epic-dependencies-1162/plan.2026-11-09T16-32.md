@@ -148,15 +148,15 @@
   - Acceptance: every step exits 0 with zero findings.
 - [x] [P5-T6] Run the Pester gate: one `Invoke-PoshQCParallelTest`. Write `FEATURE/evidence/qa-gates/pester.<timestamp>.md` with the P0-T5 fields plus the four new PowerShell files.
   - Acceptance: zero failures, and each new or changed PowerShell file has at least 85% line coverage.
-- [ ] [P5-T7] Run the pytest gate: one `pytest -n auto` with the P0-T6 coverage arguments. Write `FEATURE/evidence/qa-gates/pytest.<timestamp>.md`.
+- [x] [P5-T7] Run the pytest gate: one `pytest -n auto` with the P0-T6 coverage arguments. Write `FEATURE/evidence/qa-gates/pytest.<timestamp>.md`.
   - Acceptance: zero failures, and each of the four Python files has at least 85% line and 75% branch coverage from the JSON report.
-- [ ] [P5-T8] Run the Jest gate: one coverage run. Write `FEATURE/evidence/qa-gates/jest.<timestamp>.md`.
+- [x] [P5-T8] Run the Jest gate: one coverage run. Write `FEATURE/evidence/qa-gates/jest.<timestamp>.md`.
   - Acceptance: zero failures, and each of the four TypeScript files has at least 85% line and 75% branch coverage.
-- [ ] [P5-T9] Write `FEATURE/evidence/qa-gates/coverage-comparison.<timestamp>.md`. For each in-scope file it gives the `Phase 0 baseline` figure, the post-change figure, and the new-code figure, with a threshold verdict.
+- [x] [P5-T9] Write `FEATURE/evidence/qa-gates/coverage-comparison.<timestamp>.md`. For each in-scope file it gives the `Phase 0 baseline` figure, the post-change figure, and the new-code figure, with a threshold verdict.
   - Acceptance: no new failing test, no repository-wide or per-file drop against the baseline, and new files judged against the thresholds. A missing value makes the result remediation-required.
-- [ ] [P5-T10] List `git diff --name-status` from the merge base of `origin/main` and `HEAD` for `.claude/hooks/`, `.codex/hooks/`, `.claude/settings.json`, `.codex/config.toml`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`, `extensions/drm-copilot/resources/claude-customizations/.claude/settings.json`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml`, together with `git status --porcelain`, into `FEATURE/evidence/other/no-hook-change.<timestamp>.md`. Then check off the AC in `FEATURE/spec.md`, `FEATURE/user-story.md`, and `FEATURE/issue.md` whose evidence exists.
+- [x] [P5-T10] List `git diff --name-status` from the merge base of `origin/main` and `HEAD` for `.claude/hooks/`, `.codex/hooks/`, `.claude/settings.json`, `.codex/config.toml`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/`, `extensions/drm-copilot/resources/claude-customizations/.claude/settings.json`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml`, together with `git status --porcelain`, into `FEATURE/evidence/other/no-hook-change.<timestamp>.md`. Then check off the AC in `FEATURE/spec.md`, `FEATURE/user-story.md`, and `FEATURE/issue.md` whose evidence exists.
   - Acceptance: both listings are empty for those paths.
-- [ ] [P5-T11] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base. Write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
+- [x] [P5-T11] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base. Write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
   - Acceptance: no FAIL row. A FAIL row is fixed, the QA loop re-runs, and a new self-review file is written.
 
 ## AC Traceability
