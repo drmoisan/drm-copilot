@@ -322,18 +322,18 @@ Exit codes follow the existing contract: 0 success, 1 findings, 2 argument or in
 - [x] B11: `Get-DocsTextSha256Hex` returns equal values for LF, CRLF and lone-CR forms of a text and the raw-byte value for LF content, every listed artifact-reference and conflict-check site uses it, and `update-ledger` over CRLF-encoded estate bytes reports no reference drift.
 - [x] B12: every M-SKILL copy of `docs-plan-ia` and `docs-author-page` and every M-AGENT copy of `docs-author` document the runtime naming restriction and the root fallback; a skill-text test asserts it.
 - [x] B13: `init` emits a distinct `ci-workflow <path>` line and a `ci_workflow` result field in dry-run and write modes, and every M-SKILL copy of `docs-init` states in Steps and Result that init adds the CI workflow; tests cover the line, the field, the `null` case and the skill text.
-- [ ] Every new `.claude/lib/docs` module is listed in `core.json` and bundled byte-identically, and the mirror, push-down contract, pack-manifest and Codex generator parity checks pass.
-- [ ] Every item B1-B13 has at least one regression test that fails before the change and passes after it (for B10, the parity tests that prove the verdict).
-- [ ] Each changed PowerShell file has at least 85% line coverage and each changed TypeScript or Python file has at least 85% line and 75% branch coverage, with no regression on changed lines.
+- [x] Every new `.claude/lib/docs` module is listed in `core.json` and bundled byte-identically, and the mirror, push-down contract, pack-manifest and Codex generator parity checks pass.
+- [x] Every item B1-B13 has at least one regression test that fails before the change and passes after it (for B10, the parity tests that prove the verdict).
+- [x] Each changed PowerShell file has at least 85% line coverage and each changed TypeScript or Python file has at least 85% line and 75% branch coverage, with no regression on changed lines.
 - [ ] The full seven-stage toolchain loop passes in a single pass with parallel-only test runs and no test-order dependence.
 - [ ] CI is green on the final pull request head.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
+- [x] Acceptance criteria documented and mapped to tests or demos
 - [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (skills, agents, brief, and their mirrors)
-- [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Tests updated/added (unit/integration as applicable)
+- [x] Edge cases and error handling covered by tests
+- [x] Docs updated (skills, agents, brief, and their mirrors)
+- [x] Telemetry/logging added or updated (if applicable)
+- [x] Toolchain pass completed (format → lint → type-check → test)
