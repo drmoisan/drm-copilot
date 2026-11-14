@@ -3,9 +3,9 @@
 - **Issue:** #1029
 - **Parent (optional):** epic #1018 (`docs/features/epics/shared-agent-harness-layer/epic.md`), child 4
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30
+- **Last Updated:** 2026-11-14
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 - **Work Mode:** full-feature (AC sources: this file and `user-story.md`)
 - **Primary research input:** `docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/research/research.2026-10-30T23-07.md` (cited below as "the research")
 
@@ -38,7 +38,6 @@ Out of scope:
 - Pushing generators down to destinations (O-9).
 - Any destination-side hook or skill helper that checks local edits (none is planned; see `## Language Classification`).
 - Changes to enforcement hooks.
-- Edits to files or branches of the in-flight parallel run `bugs-1001-1002-1003-1006` before it merges.
 
 ## Behavior
 
@@ -202,32 +201,21 @@ Owner decision E3 applies: this child is planned before its upstream outputs exi
 
 ## Execution Preconditions
 
-- Execution starts only after the parallel run `bugs-1001-1002-1003-1006` has merged to `main`. Item 1009 appears merged; the merge state of items 1001, 1002, 1003, 1006, 1010, 1011, 1012 and 1013 is verified by the orchestrator at the gate.
-- Files that overlap the parallel run's blast radius (research section 8) and must not be edited before it merges:
-  - `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`
-  - `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`
-  - `extensions/drm-copilot/jest.config.cjs`
-  - `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`
-  - `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`
-  - `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`
-  - `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py`
-  - `tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py`
-  - `tests/scripts/dev_tools/test_push_down_claude_customizations.py`
-  - `tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py`
-  - `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`
-  - `tests/scripts/dev_tools/test_push_down_claude_overlay_parity.py`
-  - `tests/scripts/dev_tools/test_push_down_claude_blast_radius_overlay.py`
-  - `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-overlay.ts` (item 1006 also adds `claude-blast-radius-overlay-demote.ts`)
-  - `extensions/drm-copilot/test/lib/push-down/config-carriage.test-helpers.ts`
-  - `extensions/drm-copilot/test/lib/push-down/claude-blast-radius-overlay-parity.test.ts`
-  - `.claude/skills/execution-environment/SKILL.md`
-  - `.agents/` and `.github/` trees and the bundled `execution-environment/SKILL.md` copies
-  - `.codex/config.toml` (only if a new MCP tool is added)
-  - `extensions/drm-copilot/package.json`, `extensions/drm-copilot/README.md`, `extensions/drm-copilot/CHANGELOG.md`
-  - `extensions/drm-copilot/test/extension.workflow-commands.test.ts`
-  - `tests/scripts/claude-lib/worktree-resolution/WorktreeResolution.Manifest.Tests.ps1` and `tests/scripts/claude-lib/blast-radius/BlastRadius.Manifest.Tests.ps1` (only if manifest shape changes)
-  - `scripts/dev_tools/generate_codex_agent_variants.py` (run, not edited)
-- An execution-time gate re-checks every file, symbol and heading that the plan edits or pins (including `DESTINATION_WRITE_DECORATORS`, which item 1006 changes, and the TypeScript declarations pinned by the static parity tests) against current `origin/main`, and stops for re-planning if any has moved, been renamed or changed shape.
+- The parallel run `bugs-1001-1002-1003-1006` and issue #1013 merged before the 2026-11-14 planning refresh, and issues #1001, #1002, #1003, #1006, #1009, #1010, #1011, #1012 and #1013 are closed (read-only `gh issue view`, 2026-11-14). There is no execution-time wait on that run, and the plan carries no gate for it.
+- Hook registration is one PreToolUse dispatcher per runtime (#1159): `.claude/hooks/invoke-pretooluse-dispatch.ps1` with its registry `.claude/hooks/pretooluse-dispatch.json` and the Codex counterparts. A Claude or Codex pack that installs hooks installs the dispatcher and its registry with them; `test_push_down_pack_manifest_dependency_closure.py` already reads the hooks the registry names, and this child keeps it green without editing a hook.
+- An execution-time gate re-checks every file, symbol and heading that the plan edits or pins (including `DESTINATION_WRITE_DECORATORS`, `VIRTUAL_RESOURCE_DIRECTORIES`, and the TypeScript declarations pinned by the static parity tests) against the merge base of `origin/main` and `HEAD`, and stops for re-planning if any has moved, been renamed or changed shape.
+
+## Planning Refresh Decisions (2026-11-14)
+
+Recorded by the preparation-mode orchestrator under the coordinator's autonomous-mode relay; each is task direction within the existing scope and changes no owner default above.
+
+- R-1 Superseded-work check: partial. `main` already removed `.agents/skills/ci-workflows/SKILL.md` from the Codex completeness test's skill exception set; the O-12 work closes only the exceptions still present. No other cited behavior is delivered by `main`: none of the planned pipeline modules exists under `extensions/drm-copilot/src/lib/push-down/`.
+- R-2 The execution wait on the parallel run `bugs-1001-1002-1003-1006` is removed, because the run merged and its issues are closed.
+- R-3 The seeded shuffled Jest run is removed from the non-functional requirements, because the repository's test policy now forbids shuffled, reversed and serial runs as gates or evidence; test-order independence is still required.
+- R-4 Hook registration through the PreToolUse dispatcher (#1159) is recorded under `## Execution Preconditions`; this child edits no hook and keeps the dependency-closure test green.
+- R-5 `VIRTUAL_RESOURCE_DIRECTORIES` in `codex-agents-customizations.ts` gained the `.codex/lib/epic-wave` pair (#1134). It stays a pinned declaration that the Codex layer reuses unchanged.
+- R-6 #1025 and #1028 are still open on 2026-11-14, so the Phase 0 upstream gate (owner decision E3) is kept unchanged.
+- R-7 The destination manifest location (`.push-down-manifest.json` at the destination root), its field names, and the pack names (`core`, `python`, `powershell`, `typescript`, `csharp-modern`, `csharp-legacy`, Copilot `csharp`, and `shared`) are unchanged, because the prepared plans of #1049, #1050 and #1051 cite them.
 
 ## Open Owner Questions
 
@@ -274,7 +262,7 @@ Rule: execution proceeds on the recommended defaults below unless the owner answ
 ## Constraints & Risks
 
 - Depends on child 3 (generators) and on child 1 (parity-matrix dispositions, contract format), neither of which exists on `main` at planning time (owner decision E3); see `## Upstream Dependencies and Phase 0 Gate`.
-- Execution starts after the parallel run `bugs-1001-1002-1003-1006` merges; see `## Execution Preconditions`.
+- The parallel run `bugs-1001-1002-1003-1006` has merged; no execution wait remains (see `## Execution Preconditions`).
 - Language rule: see `## Language Classification`.
 - Risk: existing tests that assert `overwritten` change meaning under O-4; mitigated by naming each affected test with its disposition in the plan and a wrapper-compatibility test for old inputs.
 - Risk: new manifests or moved `.agents/skills` entries break resource-contract, completeness or closure tests; mitigated by running the contract tests in `## Non-Functional Requirements` after each manifest change.
@@ -284,7 +272,7 @@ Rule: execution proceeds on the recommended defaults below unless the owner answ
 
 - File size: every new or changed file stays at or below 800 lines. New logic goes into new modules; `claude-customizations.ts` (near 500 lines) receives no new logic, and each edited file is re-measured before commit.
 - Coverage: changed TypeScript meets line >= 85% and branch >= 75%. Each new production file gets its own `coverageThreshold` entry (lines 85, branches 75) in `extensions/drm-copilot/jest.config.cjs`.
-- Tests create no temporary files and touch no real file system; destinations are in-memory `PushDownFileSystem` fakes, and the payload is read through the existing real-bundle reader helper. Each test builds a fresh fake; the pipeline holds no module-level mutable state. A seeded shuffled Jest run is recorded under `<FEATURE>/evidence/regression-testing/`.
+- Tests create no temporary files and touch no real file system; destinations are in-memory `PushDownFileSystem` fakes, and the payload is read through the existing real-bundle reader helper. Each test builds a fresh fake; the pipeline holds no module-level mutable state. Test gates are parallel only: Jest runs through its normal parallel workers, pytest as one `pytest -n auto` run, and Pester as one `Invoke-PoshQCParallelTest` run; no serial, single-process, shuffled or reversed run is a gate or evidence, and test-order dependence is a defect.
 - Bundle mirrors and the contract tests named in `.claude/skills/execution-environment/SKILL.md` (`## Contract Tests That Pin Mirrored Files`) stay green, plus `test_push_down_pack_manifest_dependency_closure.py`, `test_codex_core_manifest_closure.py`, `test_push_down_issue_824_follow_ups.py`, `test_push_down_tier_rule_adoption_gate.py`, the static parity tests, the Pester `*.Manifest.Tests.ps1` suites and the Codex generator `--check`. If the brief's contract-test list or push-down facts change, all byte-identical copies of the brief are updated in the same change.
 - Enforcement hooks under `.claude/hooks`, `.codex/hooks` and `.github/hooks` are unchanged.
 - `extensions/drm-copilot` remains tier T3 in `quality-tiers.yml`; no new project entry is required because no PowerShell module is added.
@@ -318,7 +306,7 @@ Rule: execution proceeds on the recommended defaults below unless the owner answ
 - [ ] Manifest entries without a payload counterpart are reported as `orphaned` and no destination file is deleted.
 - [ ] An omitted `packs` reuses the selection recorded for that ecosystem in `.push-down-manifest.json`, and publishes the full ecosystem tree when no selection is recorded (O-5 default).
 - [ ] The pack manifests list every generated file that child 3 produces, as recorded by the Phase 0 gate, and a Jest full-bundle completeness test passes: every file under a published root of each bundle is listed by a layer manifest or by a documented exception with a stated reason.
-- [ ] The Phase 0 gate and the execution-precondition gate ran before any edit and their records are under `<FEATURE>/evidence/qa-gates/`, including confirmation that the parallel run `bugs-1001-1002-1003-1006`, child 1 (#1025) and child 3 (#1028) have merged.
+- [ ] The Phase 0 gate and the execution-precondition gate ran before any edit and their records are under `<FEATURE>/evidence/qa-gates/`, including confirmation that child 1 (#1025) and child 3 (#1028) have merged.
 - [ ] The language classification holds: the branch diff against `origin/main` adds no `.py` file, adds no TypeScript or Python file under a pushed-down root or its bundle copy, and adds or changes no `scripts/dev_tools/push_down_*.py` file.
 - [ ] Existing MCP tool names are unchanged, existing input properties keep their types, enums and defaults, and for calls without the new properties the result keeps `ok`, `tool`, `workspace_root`, `summary`, a one-element `artifacts` and `warnings` only when non-empty, with `push_down_report` as the only added field; verified by a wrapper-compatibility Jest test.
 - [ ] The static parity tests (`test_push_down_claude_parity.py`, `test_push_down_claude_overlay_parity.py`, `test_push_down_claude_exclusion_parity.py`, `test_push_down_claude_gitignore_parity.py`, `test_skill_bundle_contract_repo.py`) pass without modification (O-6 default).
