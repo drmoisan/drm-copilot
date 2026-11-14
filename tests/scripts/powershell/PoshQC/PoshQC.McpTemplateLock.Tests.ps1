@@ -174,6 +174,23 @@ Describe 'MCP template lock branch (<Script>)' -ForEach $script:Templates {
         $built.Scenario.Errors[0] | Should -BeLike 'TEST_EXECUTION_QUEUE_TIMEOUT:*waited 90000 ms*'
     }
 
+    It 'names the live holder from its record and start time when the lock stays busy' {
+        # Arrange: a holder record whose process start time matches the GetProcessStartUtc seam.
+        $built = & $script:NewScenario 'both' $null $true
+        Set-Variable -Name scenario -Value $built.Scenario
+        $arguments = $built.Arguments
+        $holder = '{"pid":4242,"processStartUtc":"2026-01-01T00:00:00.0000000Z","suite":"pytest","commandLine":[],"worktreeRoot":"/other","acquiredAtUtc":"2026-01-01T00:00:00.0000000Z","policyVersion":1}'
+        $arguments.LockSeams.ReadHolderText = { param([string] $Path) [void] $Path; $holder }.GetNewClosure()
+
+        # Act
+        & $script:TemplatePath @arguments
+
+        # Assert
+        $LASTEXITCODE | Should -Be 75
+        $built.Scenario.Calls.Count | Should -Be 0
+        $built.Scenario.Errors[0] | Should -BeLike 'TEST_EXECUTION_QUEUE_TIMEOUT:*pytest*4242*'
+    }
+
     It 'runs the command with neither lane parameter when the helper is absent' {
         # Arrange
         $built = & $script:NewScenario 'none' $null $false
