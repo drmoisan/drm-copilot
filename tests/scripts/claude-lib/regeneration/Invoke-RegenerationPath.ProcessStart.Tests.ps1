@@ -60,10 +60,37 @@ Describe 'Get-RegenerationProcessStartSpec' {
     It 'throws for a batch argument holding <Label>' -ForEach @(
         @{ Label = 'a space'; Argument = 'a b' },
         @{ Label = 'a double quote'; Argument = 'say"hi' },
-        @{ Label = 'an ampersand'; Argument = 'a&b' }
+        @{ Label = 'an ampersand'; Argument = 'a&b' },
+        @{ Label = 'a percent sign'; Argument = '%PATH%' },
+        @{ Label = 'a caret'; Argument = 'a^b' },
+        @{ Label = 'an opening parenthesis'; Argument = 'a(b' },
+        @{ Label = 'a closing parenthesis'; Argument = 'a)b' },
+        @{ Label = 'a less-than sign'; Argument = 'a<b' },
+        @{ Label = 'a greater-than sign'; Argument = 'a>b' },
+        @{ Label = 'a pipe'; Argument = 'a|b' },
+        @{ Label = 'a tab'; Argument = "a`tb" }
     ) {
         { Get-RegenerationProcessStartSpec -ResolvedPath '/opt/node/npm.cmd' -ArgumentList @('ok', $Argument) -ComSpec $script:ComSpecPath } |
             Should -Throw -ExpectedMessage '*cmd.exe metacharacter*'
+    }
+
+    It 'throws for a batch path holding <Label>' -ForEach @(
+        @{ Label = 'a double quote'; Path = '/opt/a"b/npm.cmd' },
+        @{ Label = 'an ampersand'; Path = '/opt/a&b/npm.cmd' },
+        @{ Label = 'a pipe'; Path = '/opt/a|b/npm.cmd' },
+        @{ Label = 'a less-than sign'; Path = '/opt/a<b/npm.cmd' },
+        @{ Label = 'a greater-than sign'; Path = '/opt/a>b/npm.cmd' },
+        @{ Label = 'a caret'; Path = '/opt/a^b/npm.cmd' },
+        @{ Label = 'a percent sign'; Path = '/opt/pct%OS%/npm.cmd' }
+    ) {
+        { Get-RegenerationProcessStartSpec -ResolvedPath $Path -ArgumentList @('run', 'gen') -ComSpec $script:ComSpecPath } |
+            Should -Throw -ExpectedMessage '*batch file path*'
+    }
+
+    It 'keeps a batch path containing parentheses as one item' {
+        $spec = Get-RegenerationProcessStartSpec -ResolvedPath '/opt/p (x86)/npm.cmd' -ArgumentList @('--version') -ComSpec $script:ComSpecPath
+        $spec.FileName | Should -BeExactly $script:ComSpecPath
+        $spec.ArgumentList -join '|' | Should -BeExactly '/d|/c|/opt/p (x86)/npm.cmd|--version'
     }
 }
 

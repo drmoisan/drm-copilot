@@ -126,6 +126,7 @@ function Get-RegenerationProcessStartSpec {
         batch argument holding whitespace, a double quote, or one of the characters
         & | < > ^ % ( ) throws, because it would not reach the batch file
         unchanged. Every other path starts directly with the arguments unchanged.
+        A batch path holding a double quote or one of & | < > ^ % throws as well.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -144,6 +145,9 @@ function Get-RegenerationProcessStartSpec {
 
     if ([string]::IsNullOrEmpty($ComSpec)) {
         throw "ComSpec is not set; batch file $ResolvedPath cannot be started"
+    }
+    if ($ResolvedPath -match '["&|<>^%]') {
+        throw "batch file path '$ResolvedPath' holds a quote or a cmd.exe metacharacter"
     }
     foreach ($argument in $ArgumentList) {
         if ($argument -match '[\s"&|<>^%()]') {
