@@ -8,7 +8,8 @@
     the UTF-8 text and the status planned, or skipped when the digest equals the digest read at
     load time. Invoke-DocsArtifactWrite commits plans in ascending path order: it creates an
     absent document only after TestFile returns false and overwrites an existing document only
-    when the re-read digest equals BeforeSha256; a present-when-absent document or a digest
+    when the re-read digest (Get-DocsTextSha256Hex, line endings normalized, issue #1173) equals
+    BeforeSha256; a present-when-absent document or a digest
     mismatch is a conflict that stops the sequence, and a throwing WriteText is reported as a
     failed plan with its status unchanged. Earlier writes are not rolled back. With -DryRun no
     scriptblock is invoked. This is the only function of the library that invokes a write
@@ -107,7 +108,8 @@ function Invoke-DocsArtifactWrite {
         With -DryRun no scriptblock is invoked and every plan keeps its status. Otherwise a
         skipped plan is left alone; a plan whose BeforeSha256 is $null is created after TestFile
         returns false (status created), and a plan with a BeforeSha256 is overwritten after the
-        re-read digest equals it (status updated). A present-when-absent document or a digest
+        re-read digest equals it (status updated); the re-read digest is Get-DocsTextSha256Hex, so a
+        CRLF form of the read text is not a conflict. A present-when-absent document or a digest
         mismatch gives status conflict and stops the sequence; a throwing WriteText stops the
         sequence with the status unchanged. Failed is $null or the failing plan copy with a
         Message member. Earlier writes are not rolled back; WrittenPath lists them in order.
@@ -140,7 +142,7 @@ function Invoke-DocsArtifactWrite {
             if ([bool] (& $TestFile $path)) { $message = "The document $path exists but was absent when it was read." }
             $mode = 'create'
         } else {
-            $current = Get-DocsBytesSha256Hex -Bytes ([byte[]] (& $ReadBytes $path))
+            $current = Get-DocsTextSha256Hex -Bytes ([byte[]] (& $ReadBytes $path))
             if ($current -cne [string] $before) { $message = "The document $path changed after it was read (digest $current, expected $before)." }
         }
         if ($null -ne $message) {

@@ -1,0 +1,13 @@
+# Task Check P4-T1
+
+Timestamp: 2026-11-14T10-48
+Command: sh SCRATCH/issue-1173-p0t1.sh issue-1173-static-p4t1.txt (Invoke-Formatter check and PSScriptAnalyzer with pssa.settings.psd1); sh SCRATCH/issue-1173-taskcheck.sh issue-1173-sel-p4t1.txt p4t1-before / p4t1-after / p4t1-after2 (New-PesterConfiguration, Run.Path = selection, Run.Exit = $true)
+EXIT_CODE: 0
+Output Summary:
+- Changed files: .claude/lib/docs/Invoke-DocsCommand.ps1 (update-ledger row gains Operations = 'value', so -Help lists [-Operations <value>]; New-DocsCommandContext gains ReadStdin = { [Console]::In.ReadToEnd() }, placed after InvokeProcess and before ResolveRevision; help updated; 624 physical lines, ceiling 640), its bundle copy (cmp: byte-identical), tests/scripts/claude-lib/docs/Docs.TestSupport.psm1 (New-DocsTestContext gains an in-memory -Stdin parameter and the ReadStdin member in the same position; help updated), new tests/scripts/claude-lib/docs/Invoke-DocsCommand.Stdin.Tests.ps1, tests/scripts/claude-lib/docs/DocsLedgerCommands.Tests.ps1.
+- Updated: Get-DocsCommandTable carries the coverage and update-ledger rows bound to DocsLedgerCommands.psm1 and the validate row bound to DocsValidateCommands.psm1 (its ordinal-sorted update-ledger option list gains Operations after Operation; Claim stays on the row for pin).
+- Unchanged and passing: Invoke-DocsCommand.Tests.ps1; exposes TestAncestor and ListChangedPath after ReadRevisionText with their leading parameters (ReadStdin sits before ResolveRevision, so the last three members stay); New-DocsLedgerTestContext and its twelve-member assertion in DocsLedger.TestSupport.Tests.ps1. Additional hit of the re-search: exposes the same member names as the in-memory context, the four InvokeProcess parameters and the Operation seam (Invoke-DocsCommand.Tests.ps1) compares the real and in-memory member lists; it failed while only the test support had ReadStdin and passes once both have it (disposition: unchanged).
+- Selection rule: every test file under tests/ that names Docs.TestSupport, Get-DocsCommandTable, New-DocsCommandContext or Invoke-DocsCommand.ps1.
+- Static (4 files): the first run found one PSReviewUnusedParameter warning: the scripted edit's anchor also matched the parameter block of New-DocsTestRevisionPairMember and added a stray -Stdin there; it was removed (and a space the removal dropped was restored); recorded pass: format drift 0, PSScriptAnalyzer findings 0, exit 0.
+- Fail-before (new tests, test support and the option-list update written first, production unchanged): exit 5; 5 failed: the three new Stdin-file cases, the table option-list case and the member-list parity case.
+- Pass-after (after the support fix): exit 0; 1017 passed, 0 failed, 0 skipped.

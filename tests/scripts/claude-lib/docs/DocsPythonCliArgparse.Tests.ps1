@@ -151,6 +151,47 @@ Describe 'Get-DocsArgparseCommandSite' {
         @($result['Site'] | ForEach-Object { $_['Name'] }) | Should -Be @('p', '--kept')
     }
 
+    It 'seeds a parameter that receives add_parser as a provisional subparsers role with no diagnostic (issue #1173 B9)' {
+        # Act
+        $result = Get-TestSite -Text "def register(subparsers):`n    daily = subparsers.add_parser('daily', help='Daily')`n    daily.add_argument('--date')`n"
+
+        # Assert
+        $result['Diagnostics'].Count | Should -Be 0
+        @($result['Provisional'] | ForEach-Object { "$($_['Id'])|$($_['Function'])|$($_['Parameter'])|$($_['Position'])" }) | Should -Be @('#param-register-subparsers|register|subparsers|0')
+        @($result['Site'] | ForEach-Object { "$($_['Name'])|$($_['ParentId'])" }) | Should -Be @('daily|#param-register-subparsers', '--date|daily')
+    }
+
+    It 'counts every preceding parameter in the provisional position and seeds only add_parser receivers that are parameters' {
+        # Act
+        $method = Get-TestSite -Text "class K:`n    def register(self, subs):`n        subs.add_parser('x')`n"
+        $other = Get-TestSite -Text "def f(arg):`n    other.add_parser('x')`n    arg.add_argument('--y')`nother2.add_parser('z')`n"
+
+        # Assert
+        @($method['Provisional'] | ForEach-Object { "$($_['Id'])|$($_['Position'])" }) | Should -Be @('#param-register-subs|1')
+        $other['Provisional'].Count | Should -Be 0
+        @($other['Diagnostics'] | ForEach-Object { $_['Code'] }) | Should -Be @('CLI_UNBOUND_REGISTRATION', 'CLI_UNBOUND_REGISTRATION', 'CLI_UNBOUND_REGISTRATION')
+    }
+
+    It 'gives a keyword-only parameter position -1 and treats a self-referencing receiver as unbound' {
+        # Act
+        $keywordOnly = Get-TestSite -Text "def register(*, subs):`n    subs.add_parser('x')`n"
+        $selfReference = Get-TestSite -Text "p = p.add_subparsers()`np.add_parser('x')`n"
+
+        # Assert
+        @($keywordOnly['Provisional'] | ForEach-Object { "$($_['Id'])|$($_['Position'])" }) | Should -Be @('#param-register-subs|-1')
+        $selfReference['Site'].Count | Should -Be 0
+        @($selfReference['Diagnostics'] | ForEach-Object { $_['Code'] }) | Should -Be @('CLI_UNBOUND_REGISTRATION', 'CLI_UNBOUND_REGISTRATION')
+    }
+
+    It 'records a handoff for each positional or keyword argument that holds a subparsers receiver' {
+        # Act
+        $result = Get-TestSite -Text "import argparse`nimport cli_daily`nfrom pkg import tools`ndef build():`n    parser = argparse.ArgumentParser(prog='tool')`n    subparsers = parser.add_subparsers()`n    cli_daily.register(subparsers)`n    tools.attach(1, target=subparsers)`n    make().register(subparsers)`n    print(parser)`n    return parser`n"
+
+        # Assert
+        @($result['Handoff'] | ForEach-Object { "$($_['Callee'])|$($_['Position'])|$($_['Keyword'])|$($_['ParserId'])" }) | Should -Be @('cli_daily.register|0||parser', 'pkg.tools.attach||target|parser')
+        $result['Diagnostics'].Count | Should -Be 0
+    }
+
     It 'reports CLI_PARENTS_UNRESOLVED on ArgumentParser and add_parser while classifying the parser itself' {
         $result = Get-TestSite -Text "import argparse`nbase = argparse.ArgumentParser(add_help=False)`nchild = argparse.ArgumentParser(prog='child', parents=[base])`nchild.add_argument('--own')`nsub = child.add_subparsers()`nleaf = sub.add_parser('leaf', parents=[base])`n"
         @($result['Diagnostics'] | ForEach-Object { $_['Code'] }) | Should -Be @('CLI_PARENTS_UNRESOLVED', 'CLI_PARENTS_UNRESOLVED')

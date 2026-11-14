@@ -10,6 +10,9 @@ never part of the distributable payload:
 `.claude/settings.local.json` is a single local-override file rather than a
 subtree, so it is listed as an explicit file entry instead of a subdirectory.
 
+`__pycache__` directories (gitignored bytecode written by any run that imports
+the docs native recognizer) are excluded at any depth (issue #1173).
+
 Matching is performed on `Path.parts` and never on substrings, so lookalike names
 such as `.claude/statement.md` or `.claude/hooks/state/x.ps1` are retained.
 
@@ -30,10 +33,25 @@ LOCAL_ONLY_CLAUDE_SUBDIRS: frozenset[str] = frozenset(
 LOCAL_ONLY_CLAUDE_FILES: frozenset[Path] = frozenset(
     {Path(".claude/settings.local.json")}
 )
+LOCAL_ONLY_CLAUDE_SEGMENTS: frozenset[str] = frozenset({"__pycache__"})
 
 
 def is_local_runtime_path(relative_path: Path) -> bool:
-    """Return True when the repo-relative path is gitignored local runtime state."""
+    """Return True when the repo-relative path is gitignored local runtime state.
+
+    Args:
+        relative_path: A repository-relative path that starts with `.claude`.
+
+    Returns:
+        True for a path under a local-only `.claude` subdirectory, for the
+        explicit local-only file, and for any path with a gitignored
+        bytecode-cache segment (`__pycache__`, issue #1173) at any depth;
+        False otherwise.
+    """
+    # A bytecode-cache segment at any depth is written by test runs that import
+    # the docs native recognizer, so it is never part of the payload.
+    if any(part in LOCAL_ONLY_CLAUDE_SEGMENTS for part in relative_path.parts):
+        return True
     parts = relative_path.parts[:2]
     if (
         len(parts) == 2

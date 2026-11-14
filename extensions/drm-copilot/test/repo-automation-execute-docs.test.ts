@@ -223,6 +223,29 @@ describe("invokeDocsCommand", () => {
     }
   });
 
+  it("forwards the request stdin to the launcher (issue #1173 B2.5)", async () => {
+    // Arrange
+    const { deps, calls } = harness();
+    const resolved = resolveDocsToolInput("update_docs_ledger", {
+      workspace_root: VIRTUAL_WORKSPACE_ROOT,
+      operations: [{ operation: "bind-page-refs" }],
+      actor_kind: "agent",
+      actor_id: "docs-reconciler",
+    });
+
+    // Act
+    await invokeDocsCommand(resolved, deps);
+
+    // Assert
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.args).toEqual(
+      expect.arrayContaining(["-Operations", "-"]),
+    );
+    expect(JSON.parse(calls[0]?.stdin ?? "")).toEqual({
+      operations: [{ operation: "bind-page-refs" }],
+    });
+  });
+
   it("fails with DOCS_WORKSPACE_ROOT_INVALID before any other check for a relative workspace root", async () => {
     // Arrange
     const { deps, calls, order } = harness();

@@ -237,7 +237,7 @@ Describe 'Dispatch rows' {
         @($rows['coverage'][0].Option.Keys) | Should -Be @('Profile')
         [string[]] $updateOptions = @($rows['update-ledger'][0].Option.Keys)
         [Array]::Sort($updateOptions, [System.StringComparer]::Ordinal)
-        $updateOptions | Should -Be @('ActorId', 'ActorKind', 'Claim', 'Dimension', 'Disposition', 'Element', 'Limit', 'Operation', 'Owner', 'Page', 'Profile', 'Rationale', 'State', 'Target', 'Write')
+        $updateOptions | Should -Be @('ActorId', 'ActorKind', 'Claim', 'Dimension', 'Disposition', 'Element', 'Limit', 'Operation', 'Operations', 'Owner', 'Page', 'Profile', 'Rationale', 'State', 'Target', 'Write')
         $rows['update-ledger'][0].Option['Page'] | Should -BeExactly 'multi'
         $rows['update-ledger'][0].Option['Write'] | Should -BeExactly 'switch'
         [string[]] $validateOptions = @($rows['validate'][0].Option.Keys)

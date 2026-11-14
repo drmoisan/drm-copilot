@@ -124,6 +124,12 @@ Describe 'Invoke-DocsAnalyzerPythonCli' {
         @($output['Diagnostics'] | ForEach-Object { $_['code'] + '|' + $_['analyzer_id'] }) | Should -Be @('DUPLICATE_DECLARATION|docs-inventory')
     }
 
+    It 'reports an unbound provisional registration once and keeps the sites of the same file that are not beneath it (issue #1173 B9)' {
+        $output = Invoke-DocsAnalyzerPythonCli -CapturedInput (ConvertTo-TestCaptured -Source ([ordered]@{ 'src/tool/solo.py' = "import argparse`nparser = argparse.ArgumentParser(prog='solo')`ndef register(subparsers):`n    subparsers.add_parser('lost')`n" })) -Selection @{ source_roots = @('src') }
+        @($output['Elements'] | ForEach-Object { $_['declaration'] }) | Should -Be @('solo')
+        @($output['Diagnostics'] | ForEach-Object { $_['code'] + '|' + $_['path'] }) | Should -Be @('CLI_UNBOUND_REGISTRATION|src/tool/solo.py')
+    }
+
     It 'ignores captured inputs whose text is null and non-Python paths' {
         $captured = @((New-DocsCapturedInput -Path 'big.py' -Bytes ([System.Text.Encoding]::UTF8.GetBytes('x = 1')) -MaxBytes 2), (New-DocsCapturedInput -Path 'notes.txt' -Bytes ([System.Text.Encoding]::UTF8.GetBytes('import click'))))
         $output = Invoke-DocsAnalyzerPythonCli -CapturedInput $captured -Selection $null

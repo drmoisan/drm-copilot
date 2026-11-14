@@ -7,7 +7,8 @@
     docs-profile schema through Test-DocsArtifactText, and then applies the semantic checks of
     Test-DocsProfileSemantic, each of which names the offending field by JSON pointer.
     New-DocsStarterProfile returns a neutral profile that passes those checks with the committed
-    analyzer registry, whatever rows it holds.
+    analyzer registry, whatever rows it holds; its source roots default to src and its one
+    documentation root defaults to docs/guide (id guide), each overridable by a parameter.
 
     Every function is pure apart from the built-in Test-Json call made by Test-DocsArtifactText.
 
@@ -180,11 +181,19 @@ function New-DocsStarterProfile {
         The profile omits surface_selection.analyzers and sets
         completion_gates.integration_pr_gate.enabled to false, so it passes
         ConvertFrom-DocsProfileText with the committed registry whatever rows it holds.
+        SourceRoot (default @('src')) becomes surface_selection.source_roots; init passes the
+        root detected by Get-DocsProfileSourceRootDefault. DocumentationRoot (default
+        'docs/guide', issue #1173) becomes the path of the one documentation root, whose id is
+        'guide', so a starter profile never selects planning trees such as docs/features/.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory factory that changes no system state; the exported name is fixed by the issue #1020 contract.')]
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param([string] $RepositoryId = 'repository')
+    param(
+        [string] $RepositoryId = 'repository',
+        [ValidateNotNullOrEmpty()] [string[]] $SourceRoot = @('src'),
+        [ValidateNotNullOrEmpty()] [string] $DocumentationRoot = 'docs/guide'
+    )
 
     $estate = 'docs/documentation-estate'
     return [ordered]@{
@@ -195,10 +204,10 @@ function New-DocsStarterProfile {
         extensions          = [ordered]@{}
         repository          = [ordered]@{ id = $RepositoryId }
         audiences           = @([ordered]@{ id = 'maintainers'; description = 'People who change and release this repository.' })
-        documentation_roots = @([ordered]@{ id = 'docs-root'; path = 'docs'; audience_ids = @('maintainers') })
+        documentation_roots = @([ordered]@{ id = 'guide'; path = $DocumentationRoot; audience_ids = @('maintainers') })
         surface_selection   = [ordered]@{
             element_kinds = @('cli-command', 'cli-option', 'http-route', 'config-key', 'public-symbol', 'architecture-component')
-            source_roots  = @('src')
+            source_roots  = [string[]] @($SourceRoot)
             exclusions    = @()
         }
         page_owners         = @()

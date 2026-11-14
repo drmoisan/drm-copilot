@@ -15,6 +15,8 @@
     analyzer function and validates its output: kinds within the registration, analyzer_id and
     analysis_method equal to the row, recomputed element identifiers, and source_sha256 equal to
     the declaration-lines digest of the captured input. Output that fails a check is rejected.
+    New-DocsCapturedInput records sha256 over line-ending-normalized bytes and raw_sha256 over
+    the raw bytes (issue #1173).
 
     Row form, one row per line:
     [pscustomobject]@{ Id = '<identifier>'; Version = '1.0.0'; AnalysisMethod = '<scanner|native>'; ElementKinds = @('<kind>'); Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzer<Name>.psm1'); Function = 'Invoke-DocsAnalyzer<Name>' }
@@ -238,10 +240,14 @@ function Select-DocsAnalyzerRegistration {
 function New-DocsCapturedInput {
     <#
     .SYNOPSIS
-        Returns one captured analyzer input: @{ path; sha256; size; text; diagnostic }.
+        Returns one captured analyzer input: @{ path; sha256; raw_sha256; size; text; diagnostic }.
     .DESCRIPTION
         Decodes strictly as UTF-8. An input above MaxBytes or with invalid UTF-8 carries a
         warning diagnostic and text $null. A non-relative Path throws DOCS_IDENTITY_INPUT_INVALID.
+        sha256 is Get-DocsTextSha256Hex of the bytes (CRLF and lone CR mapped to LF, issue #1173),
+        so snapshot input hashes do not depend on the checkout's line endings; raw_sha256 is
+        Get-DocsBytesSha256Hex of the raw bytes, which extension manifests declare; size is the
+        raw byte count.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory factory that changes no system state; the exported name is fixed by the issue #1020 contract.')]
     [CmdletBinding()]
@@ -264,7 +270,7 @@ function New-DocsCapturedInput {
             $diagnostic = New-DocsDiagnostic -Code 'DOCS_INPUT_NOT_UTF8' -Path $Path -Severity 'warning' -AnalyzerId 'docs-capture' -Message 'The input is not valid UTF-8.'
         }
     }
-    return @{ path = $Path; sha256 = (Get-DocsBytesSha256Hex -Bytes $Bytes); size = [long] $Bytes.Length; text = $text; diagnostic = $diagnostic }
+    return @{ path = $Path; sha256 = (Get-DocsTextSha256Hex -Bytes $Bytes); raw_sha256 = (Get-DocsBytesSha256Hex -Bytes $Bytes); size = [long] $Bytes.Length; text = $text; diagnostic = $diagnostic }
 }
 
 function Get-DocsAnalyzerOutputFinding {

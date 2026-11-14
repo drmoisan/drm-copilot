@@ -122,3 +122,142 @@ class TestAttachment:
         assert [(d.code, d.line) for d in output.diagnostics["src/x.py"]] == [
             ("CLI_UNBOUND_REGISTRATION", 3)
         ]
+
+
+CALLER = (
+    "import argparse\n"
+    "from pkg import cli_daily\n"
+    "def build():\n"
+    "    parser = argparse.ArgumentParser(prog='tool')\n"
+    "    subparsers = parser.add_subparsers()\n"
+    "    cli_daily.register(subparsers)\n"
+    "    return parser\n"
+)
+REGISTER = (
+    "def register(subparsers):\n"
+    "    daily = subparsers.add_parser('daily', help='Daily')\n"
+    "    daily.add_argument('--date')\n"
+)
+
+
+class TestCrossModuleRegistration:
+    """Scenarios for the cross-module subparsers bind of issue 1173 B9."""
+
+    def test_registration_through_a_parameter_binds_to_the_caller_parser(
+        self,
+    ) -> None:
+        """Scenario: commands and options attach under the caller's command."""
+        # Arrange
+        files = [
+            _file("src/pkg/cli.py", CALLER),
+            _file("src/pkg/cli_daily.py", REGISTER),
+        ]
+
+        # Act
+        output = analyze_cli(files, ROOTS, [])
+        facts = {f.declaration: f for fs in output.facts.values() for f in fs}
+        paths = {f.declaration: p for p, fs in output.facts.items() for f in fs}
+
+        # Assert
+        daily = facts["tool daily"]
+        assert (paths["tool daily"], daily.kind, daily.name) == (
+            "src/pkg/cli_daily.py",
+            "cli-command",
+            "daily",
+        )
+        assert daily.parent == ("cli-command", "tool", "src/pkg/cli.py")
+        assert dict(daily.properties) == {"framework": "argparse", "help": "Daily"}
+        date = facts["tool daily --date"]
+        assert date.parent == ("cli-command", "tool daily", "src/pkg/cli_daily.py")
+        assert (date.line_start, date.line_end) == (3, 3)
+        assert all(not codes for codes in output.diagnostics.values())
+
+    def test_a_console_script_root_carries_into_the_bound_registration(
+        self,
+    ) -> None:
+        """Scenario: an attached root names the commands of the other module."""
+        # Arrange
+        files = [
+            _file("src/pkg/cli.py", CALLER),
+            _file("src/pkg/cli_daily.py", REGISTER),
+        ]
+        scripts = [
+            ConsoleScript(
+                "daily-tool", "project.scripts", "pyproject.toml", "pkg.cli:build"
+            )
+        ]
+
+        # Act
+        facts = _facts(files, scripts)
+
+        # Assert
+        assert facts["daily-tool daily"].parent == (
+            "cli-command",
+            "daily-tool",
+            "pyproject.toml",
+        )
+
+    def test_registration_without_a_resolvable_caller_is_unbound(self) -> None:
+        """Scenario: no caller keeps CLI_UNBOUND_REGISTRATION for each registration."""
+        # Arrange
+        other = CALLER.replace("cli_daily.register", "cli_other.register").replace(
+            "from pkg import cli_daily", "from pkg import cli_other"
+        )
+        files = [
+            _file("src/pkg/cli.py", other),
+            _file("src/pkg/cli_daily.py", REGISTER),
+        ]
+
+        # Act
+        output = analyze_cli(files, ROOTS, [])
+
+        # Assert
+        assert [
+            (d.code, d.line) for d in output.diagnostics["src/pkg/cli_daily.py"]
+        ] == [
+            ("CLI_UNBOUND_REGISTRATION", 2),
+            ("CLI_UNBOUND_REGISTRATION", 3),
+        ]
+        declarations = {f.declaration for fs in output.facts.values() for f in fs}
+        assert declarations == {"tool"}
+
+    def test_unbound_role_keeps_the_sites_that_are_not_beneath_it(self) -> None:
+        """Scenario: only registrations under the unbound parameter are reported."""
+        # Arrange
+        text = (
+            "import argparse\n"
+            "parser = argparse.ArgumentParser(prog='solo')\n"
+            "def register(subparsers):\n"
+            "    subparsers.add_parser('lost')\n"
+        )
+
+        # Act
+        output = analyze_cli([_file("src/tool/solo.py", text)], ROOTS, [])
+
+        # Assert
+        declarations = {f.declaration for fs in output.facts.values() for f in fs}
+        assert declarations == {"solo"}
+        assert [(d.code, d.line) for d in output.diagnostics["src/tool/solo.py"]] == [
+            ("CLI_UNBOUND_REGISTRATION", 4)
+        ]
+
+    def test_keyword_handoff_binds_a_keyword_only_parameter(self) -> None:
+        """Scenario: subparsers passed by keyword bind a keyword-only parameter."""
+        # Arrange
+        caller = CALLER.replace(
+            "cli_daily.register(subparsers)",
+            "cli_daily.register(subparsers=subparsers)",
+        )
+        register = REGISTER.replace(
+            "def register(subparsers)", "def register(*, subparsers)"
+        )
+        files = [
+            _file("src/pkg/cli.py", caller),
+            _file("src/pkg/cli_daily.py", register),
+        ]
+
+        # Act
+        facts = _facts(files, [])
+
+        # Assert
+        assert facts["tool daily"].parent == ("cli-command", "tool", "src/pkg/cli.py")

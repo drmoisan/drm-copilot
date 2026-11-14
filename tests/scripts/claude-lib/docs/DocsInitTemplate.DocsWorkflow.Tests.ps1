@@ -30,6 +30,8 @@ BeforeAll {
     $script:SourceFiles = @{}
     $rows = Get-DocsInitTemplate
     foreach ($row in $rows) { $script:SourceFiles[[string] $row.Source] = [System.IO.File]::ReadAllText((Join-Path -Path $script:RepositoryRoot -ChildPath $row.Source)) }
+    # Issue #1173 B6: init exits 0 only when the starter source root lists a file.
+    $script:SourceFiles['src/app.py'] = "value = 1`n"
 
     function Get-TestRunStepBlock {
         # Returns the text of each step list item of the template that carries a run: key.
@@ -116,6 +118,41 @@ Describe 'init with the docs workflow template' {
         $result.Findings[0].artifact_path | Should -BeExactly $script:TemplateDestination
         $entry[0].action | Should -BeExactly 'exists'
         $test.WriteLog.Count | Should -Be 0
+    }
+
+    It 'emits the ci-workflow line after the action lines and the ci_workflow field in <Mode> mode (issue #1173 B13)' -ForEach @(
+        @{ Mode = 'dry-run'; Write = $false }
+        @{ Mode = 'write'; Write = $true }
+    ) {
+        # Arrange
+        $test = New-DocsTestContext -File $script:SourceFiles
+
+        # Act
+        $result = Invoke-DocsInitCommand -Argument @{ Write = $Write } -Context $test.Context
+        [string[]] $lines = @($result.Line)
+
+        # Assert
+        $result.ExitCode | Should -Be 0
+        $result.Result['ci_workflow'] | Should -BeExactly $script:TemplateDestination
+        $lines[-1] | Should -BeExactly "ci-workflow $script:TemplateDestination"
+        @($lines | Where-Object { $_ -ceq "create $script:TemplateDestination" }).Count | Should -Be 1 -Because 'the ordinary action line stays'
+        @($lines | Where-Object { $_.StartsWith('ci-workflow ', [System.StringComparison]::Ordinal) }).Count | Should -Be 1
+        $lines.Count | Should -Be (@($result.Result.planned_writes).Count + 1)
+    }
+
+    It 'sets ci_workflow to null and emits no ci-workflow line when no template row targets .github/workflows/ (issue #1173 B13)' {
+        # Arrange
+        $row = [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale.ini'; Destination = 'docs/documentation-estate/.vale.ini' }
+        $test = New-DocsTestContext -File $script:SourceFiles
+
+        # Act
+        $result = Invoke-DocsInitCommand -Argument @{} -Context $test.Context -TemplateRow @($row)
+
+        # Assert
+        $result.ExitCode | Should -Be 0
+        $result.Result.Contains('ci_workflow') | Should -BeTrue
+        $result.Result['ci_workflow'] | Should -BeNullOrEmpty
+        @($result.Line | Where-Object { ([string] $_).StartsWith('ci-workflow ', [System.StringComparison]::Ordinal) }).Count | Should -Be 0
     }
 }
 
