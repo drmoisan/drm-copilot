@@ -5,7 +5,7 @@
 reduction: 0012
 Date: 2026-11-14
 Issue: #1158
-Merge commit: pending (PR #1158)
+Merge commit: pending (PR #1184)
 
 Local test gates stop running the integration and golden lanes; CI keeps running them. The test-execution launcher and the PoshQC lane parameters exclude the lanes named by `localLanes.exclude` in `config/test-execution-policy.json` (default `integration` and `golden`), and the planning, QA-gate, review, and agent surfaces state the lane statement below once per file. The machine test-suite lock and the launcher requirement remove no gate and no evidence and are not recorded here.
 
