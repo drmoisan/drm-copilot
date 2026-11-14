@@ -111,7 +111,8 @@ BeforeAll {
         param([Parameter(Mandatory = $true)] [ValidateSet('Baseline', 'Defects', 'Fixed', 'Unpinned')] [string] $Through)
         $files = Get-DocumentationEstateFixtureFile
         foreach ($path in $script:SchemaFile.Keys) { $files[$path] = $script:SchemaFile[$path] }
-        $test = New-DocumentationEstateFixtureContext -Files $files
+        # Issue #1169: validate checks the receipt revision against HEAD, which starts at R1.
+        $test = New-DocumentationEstateFixtureContext -Files $files -RevisionMap @{ HEAD = $DocumentationEstateRevision1 }
         $runs = @{}
         $capture = @{}
 
@@ -137,6 +138,7 @@ BeforeAll {
         # Defects at R2: A's help line changes inside its line range and B is added.
         $edit = Get-DocumentationEstateRevision2Edit
         $test.Files[$edit.Path] = $edit.Text
+        $test.Revisions['HEAD'] = $DocumentationEstateRevision2
         $null = Invoke-EstateCommand -Test $test -Command 'inventory' -Argument @('-Revision', $DocumentationEstateRevision2, '-AnalysisMethod', 'scanner', '-Write') -ExpectedExitCode 0
         $null = Invoke-EstateCommand -Test $test -Command 'update-ledger' -Argument (@('-Operation', 'sync-refs', '-Write') + $script:Actor) -ExpectedExitCode 0
         $runs['Defects'] = Invoke-EstateCommand -Test $test -Command 'validate' -Argument @('-Mode', 'docs-complete', '-Revision', $DocumentationEstateRevision2)

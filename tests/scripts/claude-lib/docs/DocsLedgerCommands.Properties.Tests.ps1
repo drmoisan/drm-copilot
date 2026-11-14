@@ -14,7 +14,7 @@
 
 BeforeAll {
     $script:LibraryRoot = Join-Path -Path $PSScriptRoot -ChildPath '../../../../.claude/lib'
-    foreach ($name in 'DocsJson', 'DocsFinding', 'DocsSurface', 'DocsSchema', 'DocsProfile', 'DocsLedger', 'DocsLedgerRules', 'DocsParity', 'DocsEvidencePins', 'DocsStaleness', 'DocsReceipt', 'DocsValidation', 'DocsLedgerMutation', 'DocsLedgerCommands') {
+    foreach ($name in 'DocsJson', 'DocsFinding', 'DocsSurface', 'DocsSchema', 'DocsProfile', 'DocsLedger', 'DocsLedgerRules', 'DocsParity', 'DocsEvidencePins', 'DocsStaleness', 'DocsReceipt', 'DocsValidation', 'DocsLedgerMutation', 'DocsLedgerCommands', 'DocsValidateCommands') {
         Import-Module -Name (Join-Path -Path $script:LibraryRoot -ChildPath "docs/$name.psm1") -Force -ErrorAction Stop
     }
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedger.TestSupport.psm1') -Force -ErrorAction Stop
@@ -78,7 +78,7 @@ Describe 'DocsLedgerCommands argument properties' {
         $checked | Should -Be 72
     }
 
-    It 'property Test-DocsValidateArgument: accepts exactly the four modes with a full revision; WriteReceipt only with docs-complete' {
+    It 'property Test-DocsValidateArgument: accepts exactly the four modes with a full revision, or no revision under docs-complete WriteReceipt; WriteReceipt only with docs-complete' {
         $modes = @('profile', 'ledger', 'matrix', 'docs-complete', 'all', '')
         $revisions = @($script:Revision, ('f' * 64), ('F' * 40), 'abc', '')
         $checked = 0
@@ -92,7 +92,10 @@ Describe 'DocsLedgerCommands argument properties' {
                     if ($write) { $argument['WriteReceipt'] = $true }
                     $validMode = (Get-DocsValidationMode) -ccontains $mode
                     $validRevision = Test-DocsFullRevision -Revision $revision
-                    $expectNull = $validMode -and $validRevision -and (-not $write -or $mode -ceq 'docs-complete')
+                    # Issue #1169: the docs-complete plus WriteReceipt row with an empty revision is valid,
+                    # because the command defaults -Revision to the inventory snapshot revision.
+                    $defaultedRevision = $revision.Length -eq 0 -and $write -and $mode -ceq 'docs-complete'
+                    $expectNull = $validMode -and ($validRevision -or $defaultedRevision) -and (-not $write -or $mode -ceq 'docs-complete')
 
                     # Act
                     $finding = Test-DocsValidateArgument -Argument $argument
