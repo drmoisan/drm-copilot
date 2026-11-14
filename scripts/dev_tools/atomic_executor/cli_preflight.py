@@ -14,6 +14,12 @@ from scripts.dev_tools.atomic_executor.pytest_expectations import (
     resolve_checked_test_expectations,
     split_jest_expected_ref,
 )
+from scripts.dev_tools.atomic_executor.qc_runner_expectations import (
+    TEST_SUITE_LAUNCHER_ARGV,
+    LauncherOutcome,
+    classify_launcher_exit,
+    launcher_refusal_message,
+)
 from scripts.dev_tools.atomic_executor.qc_toolchain import (
     TOOLCHAIN_COMMANDS,
     QCToolchain,
@@ -29,12 +35,24 @@ MISSING_EXECUTABLE_PREFIX = "Required executable not found on PATH:"
 
 @dataclass(frozen=True)
 class PreflightQCResult:
-    """Result of a pre-flight QC run with captured output."""
+    """
+    Result of a pre-flight QC run with captured output.
+
+    Attributes:
+        success: True when every step passed or failed only as expected.
+        output: Joined output of every step that ran.
+        failed_step: Name of the step that failed, when one did.
+        toolchain: Toolchain the run covered.
+        launcher_outcome: Set when the test step's launcher exit was a queue
+            timeout or a policy refusal (issue #1158, spec D12); the fix loop
+            reads this field rather than scanning the joined output.
+    """
 
     success: bool
     output: str
     failed_step: str | None = None
     toolchain: QCToolchain = QCToolchain.PYTHON
+    launcher_outcome: LauncherOutcome | None = None
 
 
 def resolve_plan_expectations(
@@ -118,11 +136,11 @@ def run_preflight_qc_with_capture(
             ("black", ["poetry", "run", "black", "--check", "."]),
             ("ruff", ["poetry", "run", "ruff", "check"]),
             ("pyright", ["poetry", "run", "pyright"]),
+            # The full suite runs through the test-execution launcher (#1158, D16).
             (
                 "pytest",
                 [
-                    "poetry",
-                    "run",
+                    *TEST_SUITE_LAUNCHER_ARGV,
                     "pytest",
                     "-n",
                     "auto",
@@ -143,7 +161,7 @@ def run_preflight_qc_with_capture(
             ("format", TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["format"]),
             ("lint", TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["lint"]),
             ("typecheck", TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["typecheck"]),
-            ("test-unit", TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["test-unit"]),
+            ("test-unit", [*TEST_SUITE_LAUNCHER_ARGV, "jest"]),
         ]
         test_step_name = "test-unit"
         expected_refs = (
@@ -238,6 +256,21 @@ def run_preflight_qc_with_capture(
         all_output.append(combined.strip() if combined else "(no output)")
 
         if result.returncode != 0:
+            # Classify the test step's launcher exit before every other branch
+            # (spec D28), with or without expectations: a queue timeout or a
+            # policy refusal is not a test result, so no parser may read it.
+            if step_name == test_step_name:
+                outcome = classify_launcher_exit(result.returncode, combined)
+                if outcome is not None:
+                    all_output.append(launcher_refusal_message(outcome))
+                    return PreflightQCResult(
+                        success=False,
+                        output="\n\n".join(all_output),
+                        failed_step=step_name,
+                        toolchain=toolchain,
+                        launcher_outcome=outcome,
+                    )
+
             if step_name != test_step_name or expectations is None:
                 return PreflightQCResult(
                     success=False,

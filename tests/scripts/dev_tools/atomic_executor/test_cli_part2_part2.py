@@ -148,6 +148,11 @@ class TestPreflightParallelCommand:
             )
 
         monkeypatch.setattr("subprocess.run", mock_run)
+        # Keep argv[0] bare so no case depends on pwsh being on PATH (#1158).
+        monkeypatch.setattr(
+            "scripts.dev_tools.atomic_executor.cli_preflight.shutil.which",
+            lambda name: name,
+        )
 
         _run_preflight_qc_with_capture(mem_fs_path)
 

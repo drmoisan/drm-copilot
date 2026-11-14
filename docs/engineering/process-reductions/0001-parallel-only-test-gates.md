@@ -17,6 +17,8 @@ Rebased over #1158: the full-suite pytest commands of `scripts/dev_tools/atomic_
 
 Rebased over #1158 (`fix_all` test steps): the Pester, pytest, Jest, and bats steps of `scripts/dev_tools/fix_all_branches.py` and `scripts/dev_tools/fix_all_branches_extra.py` now run the test-execution launcher suites `pester`, `pytest`, `jest`, and `bats` instead of their direct commands. The Pester-step block of `fix_all_branches.py` was regenerated so that both fences carry the launcher call; its description line still reverts. Two blocks were removed because their text no longer exists in those files: the `Invoke-PoshQCParallelTest` `-Command` block of `fix_all_branches.py` and the `pytest_command` block of `fix_all_branches_extra.py`. Those commands now live in the launcher's `pester` and `pytest` suites (`Invoke-PesterSuite.ps1` calling `Invoke-PoshQCParallelTest`, and `poetry run pytest -n auto` in `Get-TestExecutionPolicyDefault`), so a revert of this entry restores the serial Pester and pytest commands in those suite definitions by hand. The `tests/scripts/dev_tools/test_fix_all_branches.py` block was regenerated to carry the launcher-argv assertions of its three tests.
 
+Rebased over #1158 (preflight QC): the full-suite pytest step of `scripts/dev_tools/atomic_executor/cli_preflight.py` and the `_PYTEST_STEP` constant of `tests/scripts/dev_tools/atomic_executor/test_cli_part3.py` now start with `TEST_SUITE_LAUNCHER_ARGV` instead of `"poetry",` and `"run",`, and `test_preflight_pytest_step_runs_xdist_workers` in `tests/scripts/dev_tools/atomic_executor/test_cli_part2_part2.py` patches the PATH lookup. Those three blocks were regenerated so that both fences carry the new text; the `-n` and `auto` lines and the removed test they revert are unchanged.
+
 ## Reason and Evidence
 
 The owner decided on 2026-11-06 that tests run in parallel only. The sequential run existed to detect and fix a leak that has since been fixed, and the overhead of multiple and sequential runs was judged unacceptable.
@@ -505,7 +507,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ### Revert Block: scripts/dev_tools/atomic_executor/cli_preflight.py
 
 ````Current
-                    "run",
+                    *TEST_SUITE_LAUNCHER_ARGV,
                     "pytest",
                     "-n",
                     "auto",
@@ -515,7 +517,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ````
 
 ````Prior
-                    "run",
+                    *TEST_SUITE_LAUNCHER_ARGV,
                     "pytest",
                     "--color=no",
                     "--cov=scripts/dev_tools",
@@ -633,8 +635,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 
 ````Current
 _PYTEST_STEP = [
-    "poetry",
-    "run",
+    *TEST_SUITE_LAUNCHER_ARGV,
     "pytest",
     "-n",
     "auto",
@@ -643,8 +644,7 @@ _PYTEST_STEP = [
 
 ````Prior
 _PYTEST_STEP = [
-    "poetry",
-    "run",
+    *TEST_SUITE_LAUNCHER_ARGV,
     "pytest",
     "--color=no",
 ````
@@ -678,6 +678,11 @@ class TestPreflightParallelCommand:
             )
 
         monkeypatch.setattr("subprocess.run", mock_run)
+        # Keep argv[0] bare so no case depends on pwsh being on PATH (#1158).
+        monkeypatch.setattr(
+            "scripts.dev_tools.atomic_executor.cli_preflight.shutil.which",
+            lambda name: name,
+        )
 
         _run_preflight_qc_with_capture(mem_fs_path)
 
