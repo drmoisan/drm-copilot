@@ -62,7 +62,7 @@
 
 ### Phase 2 — Final QA
 
-- [ ] [P2-T1] Fetch `origin`. When `origin/main` advanced since P0-T1, merge it as in P0-T1 and repeat P1-T5 from the merged bytes. Write `FEATURE/evidence/other/main-sync.<timestamp>.md`.
+- [x] [P2-T1] Fetch `origin`. When `origin/main` advanced since P0-T1, merge it as in P0-T1 and repeat P1-T5 from the merged bytes. Write `FEATURE/evidence/other/main-sync.<timestamp>.md`.
   - Acceptance: the artifact names the result, and `git status --porcelain` is empty.
 - [ ] [P2-T2] Run the PowerShell final QC (format, analyzer, `Invoke-PoshQCLeakScan`) into `FEATURE/evidence/qa-gates/powershell-static.<timestamp>.md`.
   - Acceptance: zero analyzer findings, a clean leak scan, and an unchanged `git status --porcelain` across the format step.
