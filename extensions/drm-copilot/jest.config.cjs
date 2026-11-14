@@ -550,6 +550,11 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1161: the planner_worktrees validator module.
+    "./src/lib/validate/epic-planner-state-planner-worktrees.ts": {
+      lines: 85,
+      branches: 75,
+    },
     "./src/repo-automation-tool-names.ts": {
       lines: 85,
       branches: 75,

@@ -1,0 +1,20 @@
+# Preflight Fixes (round 2)
+
+Timestamp: 2026-11-09T22-50
+Plan: docs/features/active/2026-11-09-planner-worktree-removal-authorization-1161/plan.2026-11-09T16-33.md
+
+Trivial defects fixed in place in task text and the `## Existing Test Dispositions` section. No task was added, removed, or reordered, and no checkbox was changed. The round-1 record `preflight-fixes.2026-11-09T22-19.md` is not modified.
+
+1. `[P0-T1]` | incomplete static baseline | The TypeScript static baseline now includes the Prettier check, so it covers the same format, lint, and type-check steps that `[P4-T2]` compares against.
+2. `[P2-T1]` | boundary coverage made explicit | Added record-parsing rows for the tolerant-parse rule of spec `### Record match` (unparseable text, absent or non-list `planner_worktrees`, non-object entry, empty or non-string `branch` yield no candidate). Added formatter rows for the `### Deny text` rule that a non-IN_USE detail names the branch and that no detail holds a root other than the target. The codes and decision order are unchanged.
+3. `[P2-T2]` | boundary coverage made explicit, parity with `[P2-T3]` | A failed worktree listing while a candidate exists refuses with `GIT_FAILED` (spec D4, "any git failure denies"), with its own row. P2-T3 already stated this for Codex.
+4. `[P2-T2]`, `[P2-T3]` | boundary coverage made explicit | AST rows now also reject `Set-Content`, `Add-Content`, `Out-File`, and `WriteAllText` in the adapters (spec `## Data & State`: the gate never writes a checkpoint).
+5. `[P2-T3]` | missing mechanical instruction | The discovery guard seeds a suite closure from a `hooks/<name>.ps1` literal on both surfaces (`Get-EpicStateLoadedSourceClosure`), so the new Codex suite also pulls the Claude gate of the same file name into its closure. The task now states that the suite registers the baseline mocks for every census seam of that closure and calls `Invoke-EpicStateInterceptionProbe`, as the decision-surface suite does. `## Existing Test Dispositions` already required the five new suites to comply.
+6. `[P2-T3]` | boundary coverage made explicit, parity with `[P2-T2]` | Added Codex adapter rows for a detached target stanza and a non-matching `path` (AC-21).
+7. `[P2-T6]` | wording-contract token alignment | The `.DESCRIPTION` paragraph that P2-T6 writes must hold verbatim the tokens that P3-T3 asserts (`planner_worktrees`, `epic-planner-state.json`, the six codes, `policy-level control`, and the cascade token). P3-T3 does not edit the gates, so without this the rows could fail. The Codex gate help block currently has no `.DESCRIPTION` section; the task now says it gains one.
+8. `[P3-T4]` | count error | "the three new hook files" replaced with the two Claude and two Codex files, each named for its manifest (four new hook files in total under D19).
+9. `## Existing Test Dispositions` | wrong anchor | The Diagnostics, RelativeRecord, and both WorktreeResolution suites dot-source the gate in a file-level `BeforeAll`, not inside a `Describe`. The mock placement now names the `BeforeAll` that dot-sources the gate.
+10. `## Existing Test Dispositions` | inaccurate disposition reason | `tests/scripts/claude-hooks/hook-dependency-failure.Claude.Tests.ps1` B1 discovers direct edges of registered hooks only; the reason now states that each Claude gate gains one discovered row for its adapter dot-source, and that the adapter's own edges are covered by `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1` (S4: guarded and `-ErrorAction Stop`).
+11. `## Existing Test Dispositions` | missing unchanged disposition | Added `tests/scripts/claude-hooks/enforce-gate-suites.EpicStateIsolation.Probe.Tests.ps1`, which exercises `Register-EpicStateBaselineMock` without loading a gate and is therefore unaffected by the conditional planner mock.
+
+Validation after the fixes: the branch-current Python CLI (`scripts/dev_tools/validate_orchestration_artifacts.py plan`) and the MCP `validate_orchestration_artifacts` (`artifact_type: plan`) were both run on the plan.

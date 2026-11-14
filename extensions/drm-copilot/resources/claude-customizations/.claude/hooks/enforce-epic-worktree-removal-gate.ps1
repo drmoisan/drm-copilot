@@ -60,16 +60,23 @@
     token and ends with a diagnostics clause naming each run kind's status, checkpoint
     path, and matched record; the allow-or-deny decision is unchanged.
 
+    Issue #1161: after the epic and parallel allows and before the manifest branch, a planner branch
+    (enforce-worktree-removal-gate-planner.ps1) allows the removal of a preparation worktree that an
+    epic-planner-state.json planner_worktrees record names by branch, when the record is eligible, the worktree
+    is not in use, is clean, and its HEAD is on a remote-tracking ref. A refusal does not stop the cascade; when
+    the final deny is reached it appends one sentence with a code: PLANNER_WORKTREE_NOT_ELIGIBLE,
+    PLANNER_WORKTREE_DIRTY, PLANNER_WORKTREE_NOT_PUSHED, PLANNER_WORKTREE_IN_USE, PLANNER_WORKTREE_AMBIGUOUS, or
+    PLANNER_WORKTREE_GIT_FAILED. The branch is a policy-level control, not a security control: any same-session
+    writer can author a record, and the git checks bound what a record can authorize.
+
 .NOTES
-    Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 through the
-    dot-sourced resolution sibling, whose import guard denies on a failed import.
-    Filesystem reads go through injectable wrapper functions so tests can mock the
-    boundary without writing temporary files.
+    Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 through the dot-sourced resolution
+    sibling, whose import guard denies on a failed import. Filesystem reads go through injectable wrapper
+    functions so tests can mock the boundary without writing temporary files.
 #>
 [CmdletBinding()]
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
-
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Sanctioned-removal manifest reader (issue #635), consumed by the manifest branch in
@@ -81,6 +88,7 @@ try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookD
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 # Checkpoint read seams, the import guard, and run-target resolution (issue #690).
 try { . (Join-Path $PSScriptRoot 'enforce-epic-worktree-removal-gate-resolution.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-worktree-removal-gate-resolution.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-worktree-removal-gate-planner.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-worktree-removal-gate-planner.ps1' -ErrorRecord $_ }
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
 # Sanctioned-removal manifest location. Recorded here so every hook-read document this
 # gate consults is named; the module owns the read itself.
@@ -404,6 +412,9 @@ function Get-EpicWorktreeRemovalTargetDenial {
     if (Test-ParallelCheckpointAllowsWorktreeRemoval -Checkpoint $parallelCheckpoint -WorktreePath $worktreePath -BaseRoot $parallelBaseRoot -LiveWorktreeRoot $parallelLive -BranchWorktreeResolver $BranchWorktreeResolver) {
         return $null
     }
+    # Planner branch (issue #1161); a refusal falls through and closes the final deny.
+    $planner = Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $worktreePath -SessionRoot (Get-Location).Path
+    if ($planner.Outcome -eq 'Allow') { return $null }
 
     # Sanctioned-removal manifest branch (issue #635). It runs last, so an
     # epic-checkpoint-authorized or parallel-checkpoint-authorized removal still allows
@@ -429,7 +440,7 @@ function Get-EpicWorktreeRemovalTargetDenial {
         $prefix = "$($epicRead.Target.ReasonCode): $($epicRead.Target.Detail). "
     }
     $diagnostics = Get-EpicWorktreeGateDenyDiagnostics -EpicRead $epicRead -ParallelRead $parallelRead -WorktreePath $worktreePath -MainRoot $mainRoot -BranchWorktreeResolver $BranchWorktreeResolver
-    return Get-EpicWorktreeGateBlockDecision -Reason ('EPIC_WORKTREE_REMOVAL_BLOCKED: ' + $prefix + "git worktree remove for '$worktreePath' requires either an epic checkpoint features[] record with merge_status in {merged, worktree_removed}, or a parallel-orchestrator checkpoint with route_id == ""parallel"" whose matching items[] record (matched by worktree_path) has merge_status in {merged, worktree_removed}. No checkpoint authorized this removal. " + $diagnostics)
+    return Get-EpicWorktreeGateBlockDecision -Reason ('EPIC_WORKTREE_REMOVAL_BLOCKED: ' + $prefix + "git worktree remove for '$worktreePath' requires either an epic checkpoint features[] record with merge_status in {merged, worktree_removed}, or a parallel-orchestrator checkpoint with route_id == ""parallel"" whose matching items[] record (matched by worktree_path) has merge_status in {merged, worktree_removed}. No checkpoint authorized this removal. " + $diagnostics + $planner.Suffix)
 }
 
 function Invoke-EpicWorktreeRemovalGateEntryPoint {

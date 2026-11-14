@@ -93,6 +93,8 @@
     ".claude/hooks/feature-review-coverage-thresholds.ps1",
     ".claude/hooks/hook-cleanup-context.ps1",
     ".claude/hooks/hook-epic-fan-in.ps1",
+    ".claude/hooks/hook-planner-worktree-removal.ps1",
+    ".claude/hooks/enforce-worktree-removal-gate-planner.ps1",
     ".claude/hooks/hook-command-heredoc.ps1",
     ".claude/hooks/hook-command-invocation.ps1",
     ".claude/hooks/hook-command-invocation-operands.ps1",
