@@ -117,7 +117,7 @@ function Read-DocsSurfaceDeltaWorkingText {
 function Get-DocsSurfaceDeltaStaleInput {
     <#
     .SYNOPSIS
-        Returns the head snapshot inputs whose working-tree digest differs from the recorded one (private helper).
+        Returns the head snapshot inputs whose working-tree digest (Get-DocsTextSha256Hex, line endings normalized) differs from the recorded one (private helper).
     #>
     [CmdletBinding()]
     [OutputType([string[]], [object[]])]
@@ -133,7 +133,7 @@ function Get-DocsSurfaceDeltaStaleInput {
         $path = [string] $item['path']
         if (-not (Test-DocsRelativePath -Path $path)) { $stale.Add($path); continue }
         if (-not [bool] (Invoke-DocsContextMember -Member $Context.TestFile -ArgumentList @($path))) { $stale.Add($path); continue }
-        $digest = Get-DocsBytesSha256Hex -Bytes ([byte[]] (Invoke-DocsContextMember -Member $Context.ReadBytes -ArgumentList @($path)))
+        $digest = Get-DocsTextSha256Hex -Bytes ([byte[]] (Invoke-DocsContextMember -Member $Context.ReadBytes -ArgumentList @($path)))
         if (-not [string]::Equals($digest, [string] $item['sha256'], [System.StringComparison]::Ordinal)) { $stale.Add($path) }
     }
     return , $stale.ToArray()

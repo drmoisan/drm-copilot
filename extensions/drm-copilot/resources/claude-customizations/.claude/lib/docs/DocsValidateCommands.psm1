@@ -231,7 +231,7 @@ function Invoke-DocsValidateCommand {
         if ($writeReceipt) {
             $receiptPath = [string] (Get-DocsLedgerCommandMember -Table (Get-DocsLedgerCommandMember -Table $loaded -Name 'artifact_paths') -Name 'validation_receipt')
             $existing = (Read-DocsLedgerInputSet -Profile $loaded -Need @('docs-validation-receipt') -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -ListFile $Context.ListFile).Artifact['docs-validation-receipt']
-            $before = if ($null -eq $existing) { $null } else { Get-DocsBytesSha256Hex -Bytes ([byte[]] $existing['Bytes']) }
+            $before = if ($null -eq $existing) { $null } else { Get-DocsTextSha256Hex -Bytes ([byte[]] $existing['Bytes']) }
             $plans = Get-DocsArtifactWritePlan -Document @(@{ Path = $receiptPath; ArtifactKind = 'docs-validation-receipt'; ArtifactId = [string] $receipt['id']; Text = (ConvertTo-DocsJsonText -Value $receipt -Indented); BeforeSha256 = $before })
             $outcome = Invoke-DocsArtifactWrite -Plan $plans -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -WriteText $Context.WriteText
             if ($null -ne $outcome.Failed) {

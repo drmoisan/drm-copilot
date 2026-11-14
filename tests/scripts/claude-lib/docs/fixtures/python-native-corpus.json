@@ -307,6 +307,12 @@
     },
     {
       "analyzer_id": "python-cli",
+      "class": "retained",
+      "code": "CLI_UNBOUND_REGISTRATION",
+      "path": "src/pkg/cli_orphan.py"
+    },
+    {
+      "analyzer_id": "python-cli",
       "class": "scanner-only",
       "code": "CLI_CONSOLE_SCRIPT_UNSUPPORTED",
       "path": "pyproject.toml"

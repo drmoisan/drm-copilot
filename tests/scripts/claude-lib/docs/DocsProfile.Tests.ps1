@@ -121,6 +121,31 @@ Describe 'New-DocsStarterProfile' {
     It 'uses the default repository id' {
         (New-DocsStarterProfile)['repository']['id'] | Should -BeExactly 'repository'
     }
+
+    It 'defaults the documentation root to docs/guide with id guide and the source root to src, and holds no root under docs/features/ (issue #1173 B6, B7)' {
+        # Act
+        $starter = New-DocsStarterProfile
+
+        # Assert
+        @($starter['documentation_roots']).Count | Should -Be 1
+        $starter['documentation_roots'][0]['id'] | Should -BeExactly 'guide'
+        $starter['documentation_roots'][0]['path'] | Should -BeExactly 'docs/guide'
+        @($starter['documentation_roots'] | Where-Object { ([string] $_['path']).StartsWith('docs/features', [System.StringComparison]::Ordinal) }).Count | Should -Be 0
+        @($starter['surface_selection']['source_roots']) | Should -Be @('src')
+    }
+
+    It 'honors -SourceRoot and -DocumentationRoot and stays accepted with no finding' {
+        # Act
+        $starter = New-DocsStarterProfile -RepositoryId 'repo' -SourceRoot @('my_pkg', 'lib') -DocumentationRoot 'handbook/user'
+        $result = Invoke-TestProfile -Value $starter
+
+        # Assert
+        @($starter['surface_selection']['source_roots']) | Should -Be @('my_pkg', 'lib')
+        $starter['documentation_roots'][0]['path'] | Should -BeExactly 'handbook/user'
+        $starter['documentation_roots'][0]['id'] | Should -BeExactly 'guide'
+        $result.Ok | Should -BeTrue
+        $result.Findings.Count | Should -Be 0
+    }
 }
 
 Describe 'Audience identifiers' {

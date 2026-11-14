@@ -210,6 +210,22 @@ Describe 'Get-DocsPageExternalTarget' {
         # Assert
         $external | Should -Be @('docs/data.json', 'docs/img.png')
     }
+
+    It 'skips a resolved path that is not a relative path, which the link finding reports as broken (issue #1173 B7)' {
+        # Arrange
+        $pages = [string[]] @('docs/README.md')
+        $lines = @('[t](a|b.md) [u](data.json)')
+        $map = @{ 'docs/README.md' = Get-DocsPageLink -LineModel (Get-TestModel -Line $lines) }
+
+        # Act
+        $external = Get-DocsPageExternalTarget -PageLink $map -PagePath $pages
+        $outcome = Get-TestLinkFinding -PagePath 'docs/README.md' -Page @{ 'docs/README.md' = $lines } -ExistingPath $external
+
+        # Assert
+        $external | Should -Be @('docs/data.json')
+        @($outcome.Findings | ForEach-Object { $_['code'] }) | Should -Be @('DOCS_PAGE_LINK_BROKEN')
+        $outcome.Findings[0]['message'] | Should -BeLike "*'a|b.md'*"
+    }
 }
 
 Describe 'Get-DocsPageLinkFinding' {

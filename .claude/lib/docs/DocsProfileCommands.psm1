@@ -8,7 +8,11 @@
     ConvertFrom-DocsProfileText. Both follow the command function contract: they take
     -Argument and -Context, return a New-DocsCommandResult object, write no output and never
     exit. Every repository read and write goes through the command context members, which are
-    invoked only through the [scriptblock] parameter of Invoke-DocsContextMember.
+    invoked through the [scriptblock] parameter of Invoke-DocsContextMember; Context.ListFile is
+    also passed as the ListFile seam of DocsProfileSourceRoot.psm1 (issue #1173): init writes
+    the detected source root into the starter profile, and both commands append one
+    DOCS_PROFILE_SOURCE_ROOT_MISSING error finding per source root that lists no file. init also
+    reports the CI workflow it adds on a 'ci-workflow <path>' line and in the ci_workflow field.
 
     Init template rows have the form
     [pscustomobject]@{ Source = '.claude/lib/docs/templates/<file>'; Destination = '<destination-relative path>' }
@@ -28,6 +32,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSchema.psm1')
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsFinding.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsJson.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSurface.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsProfileSourceRoot.psm1') -ErrorAction Stop
 
 $script:DocsCommandIdentifierPattern = '^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$(?![\s\S])'
 
@@ -143,7 +148,14 @@ function Invoke-DocsInitCommand {
         Write only existence checks run and nothing is written. With Write every destination is
         checked first; an existing destination without Force exits 1 with one
         DOCS_INIT_TARGET_EXISTS finding per path and writes nothing. TemplateRow defaults to
-        Get-DocsInitTemplate.
+        Get-DocsInitTemplate. The starter source root is Get-DocsProfileSourceRootDefault over
+        Context.ListFile and the repository-root pyproject.toml (read only when TestFile reports
+        it); each source root that lists no file adds a DOCS_PROFILE_SOURCE_ROOT_MISSING error
+        finding and makes the exit code 1, and with -Write the writes still occur so the
+        operator can edit the profile. In dry-run and -Write modes alike, the first template row
+        whose destination starts with .github/workflows/ adds the line 'ci-workflow <path>' after
+        the '<action> <path>' lines (issue #1173), and the result field ci_workflow holds that
+        path, or $null when no row targets .github/workflows/.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -161,7 +173,12 @@ function Invoke-DocsInitCommand {
     if ($repositoryId -cnotmatch $script:DocsCommandIdentifierPattern) { return New-DocsUsageResult -Command 'init' -Message "RepositoryId '$repositoryId' is not an identifier." }
     if (-not (Test-DocsRelativePath -Path $profilePath)) { return New-DocsUsageResult -Command 'init' -Message "Profile '$profilePath' is not a repository-relative path." }
 
-    $starter = New-DocsStarterProfile -RepositoryId $repositoryId
+    $pyprojectText = $null
+    if ([bool] (Invoke-DocsContextMember -Member $Context.TestFile -ArgumentList @('pyproject.toml'))) { $pyprojectText = [string] (Invoke-DocsContextMember -Member $Context.ReadText -ArgumentList @('pyproject.toml')) }
+    $sourceRoot = Get-DocsProfileSourceRootDefault -PyprojectText $pyprojectText -ListFile $Context.ListFile
+    $starter = New-DocsStarterProfile -RepositoryId $repositoryId -SourceRoot @($sourceRoot)
+    $rootFindings = @(Get-DocsProfileSourceRootFinding -SourceRoot @($sourceRoot) -ListFile $Context.ListFile -ProfilePath $profilePath)
+    $rootExitCode = if ($rootFindings.Count -gt 0) { 1 } else { 0 }
     $profileText = ConvertTo-DocsJsonText -Value $starter -Indented
     $check = ConvertFrom-DocsProfileText -Text $profileText -ArtifactPath $profilePath -ComposedSchemaSet (Get-DocsCommandSchemaSet)
     if (-not $check.Ok) {
@@ -187,20 +204,24 @@ function Invoke-DocsInitCommand {
         $action = if (-not $exists) { 'create' } elseif ($force) { 'overwrite' } else { 'exists' }
         $planned.Add([ordered]@{ path = $target.Destination; action = $action })
     }
-    $result = [ordered]@{ profile = $starter; planned_writes = $planned.ToArray() }
-    $lines = [string[]]@($planned | ForEach-Object { "$($_.action) $($_.path)" })
-    if (-not $write) { return New-DocsCommandResult -Command 'init' -ExitCode 0 -Finding @() -Result $result -Line $lines }
+    $ciWorkflow = $null
+    foreach ($target in $targets) {
+        if ($null -ne $target.Source -and $target.Destination.StartsWith('.github/workflows/', [System.StringComparison]::Ordinal)) { $ciWorkflow = $target.Destination; break }
+    }
+    $result = [ordered]@{ profile = $starter; planned_writes = $planned.ToArray(); ci_workflow = $ciWorkflow }
+    $lines = [string[]]@(@($planned | ForEach-Object { "$($_.action) $($_.path)" }) + @(if ($null -ne $ciWorkflow) { "ci-workflow $ciWorkflow" }))
+    if (-not $write) { return New-DocsCommandResult -Command 'init' -ExitCode $rootExitCode -Finding $rootFindings -Result $result -Line $lines }
 
     if ($existing.Count -gt 0 -and -not $force) {
         $findings = @($existing | ForEach-Object { New-DocsCommandFinding -Code 'DOCS_INIT_TARGET_EXISTS' -Message "The destination $($_.Destination) already exists." -NextAction 'Pass -Force to overwrite it, or remove it first.' -ArtifactPath $_.Destination })
-        return New-DocsCommandResult -Command 'init' -ExitCode 1 -Finding $findings -Result $result -Line $lines
+        return New-DocsCommandResult -Command 'init' -ExitCode 1 -Finding (@($findings) + $rootFindings) -Result $result -Line $lines
     }
     foreach ($target in $targets) {
         $text = if ($null -eq $target.Source) { $profileText } else { [string] (Invoke-DocsContextMember -Member $Context.ReadText -ArgumentList @($target.Source)) }
         $mode = if ($existing -contains $target) { 'overwrite' } else { 'create' }
         [void](Invoke-DocsContextMember -Member $Context.WriteText -ArgumentList @($target.Destination, $text, $mode))
     }
-    return New-DocsCommandResult -Command 'init' -ExitCode 0 -Finding @() -Result $result -Line $lines
+    return New-DocsCommandResult -Command 'init' -ExitCode $rootExitCode -Finding $rootFindings -Result $result -Line $lines
 }
 
 function Invoke-DocsValidateProfileCommand {
@@ -208,9 +229,12 @@ function Invoke-DocsValidateProfileCommand {
     .SYNOPSIS
         Validates the profile named by -Profile (default Get-DocsDefaultProfilePath).
     .DESCRIPTION
-        Exit 0 when ConvertFrom-DocsProfileText returns no error finding, otherwise 1. An absent
-        profile exits 1 with DOCS_PROFILE_MISSING. Result is {profile_path, repository_id} when a
-        profile was parsed, otherwise $null.
+        Exit 0 when ConvertFrom-DocsProfileText returns no error finding and every source root
+        lists a file through Context.ListFile, otherwise 1. When a profile was parsed, one
+        DOCS_PROFILE_SOURCE_ROOT_MISSING error finding at /surface_selection/source_roots/<i> is
+        appended per source root that lists no file (issue #1173; Test-DocsProfileSemantic stays
+        pure). An absent profile exits 1 with DOCS_PROFILE_MISSING. Result is
+        {profile_path, repository_id} when a profile was parsed, otherwise $null.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -228,9 +252,16 @@ function Invoke-DocsValidateProfileCommand {
     $text = [string] (Invoke-DocsContextMember -Member $Context.ReadText -ArgumentList @($profilePath))
     $check = ConvertFrom-DocsProfileText -Text $text -ArtifactPath $profilePath -ComposedSchemaSet (Get-DocsCommandSchemaSet)
     $result = $null
-    if ($null -ne $check.Profile) { $result = [ordered]@{ profile_path = $profilePath; repository_id = [string] $check.Profile['repository']['id'] } }
-    $exitCode = if ($check.Ok) { 0 } else { 1 }
-    return New-DocsCommandResult -Command 'validate-profile' -ExitCode $exitCode -Finding $check.Findings -Result $result
+    $rootFindings = @()
+    if ($null -ne $check.Profile) {
+        $result = [ordered]@{ profile_path = $profilePath; repository_id = [string] $check.Profile['repository']['id'] }
+        $selection = $check.Profile['surface_selection']
+        if ($selection -is [System.Collections.IDictionary] -and $selection.Contains('source_roots')) {
+            $rootFindings = @(Get-DocsProfileSourceRootFinding -SourceRoot ([string[]] @($selection['source_roots'])) -ListFile $Context.ListFile -ProfilePath $profilePath)
+        }
+    }
+    $exitCode = if ($check.Ok -and $rootFindings.Count -eq 0) { 0 } else { 1 }
+    return New-DocsCommandResult -Command 'validate-profile' -ExitCode $exitCode -Finding (@($check.Findings | Where-Object { $null -ne $_ }) + $rootFindings) -Result $result
 }
 
 Export-ModuleMember -Function `

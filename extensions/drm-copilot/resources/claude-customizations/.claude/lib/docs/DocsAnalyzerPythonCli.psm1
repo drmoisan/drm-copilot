@@ -153,6 +153,82 @@ function Resolve-DocsCliDeclaration {
     return $resolved
 }
 
+function Test-DocsCliUnderPlaceholder {
+    <#
+    .SYNOPSIS
+        Reports whether a site's parent chain reaches a placeholder parser identifier (private helper).
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory = $true)] [hashtable] $Site, [Parameter(Mandatory = $true)] [string] $Placeholder, [Parameter(Mandatory = $true)] [hashtable] $File)
+
+    $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    $parent = $Site['ParentId']
+    while ($null -ne $parent -and $seen.Add([string] $parent)) {
+        if ([string] $parent -ceq $Placeholder) { return $true }
+        $known = $null
+        $parent = if ($File['SiteById'].TryGetValue([string] $parent, [ref] $known)) { $known['ParentId'] } else { $null }
+    }
+    return $false
+}
+
+function Set-DocsCliProvisionalBinding {
+    <#
+    .SYNOPSIS
+        Binds every provisional subparsers parameter to a caller in another input (issue #1173 B9) (private helper).
+    .DESCRIPTION
+        A role of function f in an input with module m binds to the first handoff, in path order,
+        whose Callee is 'm.f' and whose Position or Keyword names the parameter: the placeholder
+        'argparse:<role id>' is written into the input's memo as the resolution of the caller
+        parser, so the registrations beneath it resolve under the caller's command. A role with
+        no such handoff gets a $null memo entry and one CLI_UNBOUND_REGISTRATION per site beneath
+        it. Writes only the memo dictionaries and the aggregate.
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Fills in-memory memo dictionaries and the diagnostic aggregate only; no system state changes.')]
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $File,
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $Memo,
+        [Parameter(Mandatory = $true)] [pscustomobject] $Aggregate
+    )
+
+    $callers = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)
+    for ($index = 0; $index -lt $File.Count; $index++) {
+        foreach ($handoff in $File[$index]['Handoff']) {
+            if (-not $callers.ContainsKey([string] $handoff['Callee'])) { $callers[[string] $handoff['Callee']] = [System.Collections.Generic.List[object]]::new() }
+            $callers[[string] $handoff['Callee']].Add(@{ File = $index; Handoff = $handoff })
+        }
+    }
+    for ($index = 0; $index -lt $File.Count; $index++) {
+        $entry = $File[$index]
+        foreach ($role in $entry['Provisional']) {
+            $placeholder = 'argparse:' + [string] $role['Id']
+            $match = $null
+            $candidates = $null
+            if ($null -ne $entry['Module'] -and $callers.TryGetValue([string] $entry['Module'] + '.' + [string] $role['Function'], [ref] $candidates)) {
+                foreach ($candidate in $candidates) {
+                    $handoff = $candidate['Handoff']
+                    $byPosition = $null -ne $handoff['Position'] -and [int] $handoff['Position'] -eq [int] $role['Position']
+                    $byKeyword = $null -ne $handoff['Keyword'] -and [string] $handoff['Keyword'] -ceq [string] $role['Parameter']
+                    if ($byPosition -or $byKeyword) { $match = $candidate; break }
+                }
+            }
+            if ($null -ne $match) {
+                $caller = [int] $match['File']
+                $visiting = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+                $Memo[$index][$placeholder] = Resolve-DocsCliDeclaration -Id ('argparse:' + [string] $match['Handoff']['ParserId']) -File $File[$caller] -Memo $Memo[$caller] -Visiting $visiting
+                continue
+            }
+            $Memo[$index][$placeholder] = $null
+            foreach ($site in $entry['Site']) {
+                if (Test-DocsCliUnderPlaceholder -Site $site -Placeholder $placeholder -File $entry) {
+                    Add-DocsDiagnosticOccurrence -Aggregate $Aggregate -AnalyzerId $script:DocsCliAnalyzerId -Code 'CLI_UNBOUND_REGISTRATION' -Path ([string] $entry['Path']) -Line ([int] $site['Line']) -Severity 'warning'
+                }
+            }
+        }
+    }
+}
+
 function Invoke-DocsAnalyzerPythonCli {
     <#
     .SYNOPSIS
@@ -194,8 +270,11 @@ function Invoke-DocsAnalyzerPythonCli {
         }
         $siteById = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)
         $sites = [System.Collections.Generic.List[object]]::new()
+        $provisional = [System.Collections.Generic.List[object]]::new()
+        $handoff = [System.Collections.Generic.List[object]]::new()
         foreach ($result in @((Get-DocsArgparseCommandSite -Line $frontEnd['Lines'] -Import $frontEnd['Import'] -Receiver $frontEnd['Receiver']), (Get-DocsClickCommandSite -Line $frontEnd['Lines'] -Import $frontEnd['Import'] -Receiver $frontEnd['Receiver']), (Get-DocsTyperCommandSite -Line $frontEnd['Lines'] -Import $frontEnd['Import'] -Receiver $frontEnd['Receiver']))) {
             Add-DocsCliRecordDiagnostic -Aggregate $aggregate -Path $path -Record $result['Diagnostics']
+            if ($result.ContainsKey('Provisional')) { $provisional.AddRange([object[]] $result['Provisional']); $handoff.AddRange([object[]] $result['Handoff']) }
             foreach ($site in $result['Site']) {
                 $id = [string] $site['Framework'] + ':' + [string] $site['Id']
                 $copy = $site.Clone()
@@ -205,7 +284,7 @@ function Invoke-DocsAnalyzerPythonCli {
                 $siteById[$id] = $copy
             }
         }
-        $files.Add(@{ Path = $path; Text = $text; Module = $module; Site = $sites.ToArray(); SiteById = $siteById; Attached = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal) })
+        $files.Add(@{ Path = $path; Text = $text; Module = $module; Site = $sites.ToArray(); SiteById = $siteById; Attached = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal); Provisional = $provisional.ToArray(); Handoff = $handoff.ToArray() })
     }
 
     foreach ($script in $scripts) {
@@ -231,8 +310,12 @@ function Invoke-DocsAnalyzerPythonCli {
         $property = @{ framework = 'console-script'; name_source = 'console-script'; table = $script['Table']; attached = [bool] $script['Attached'] }
         $candidates.Add((ConvertTo-DocsCliElement -Site $site -Declaration $script['Name'] -Path $script['Path'] -SourceText $script['Text'] -ParentId $null -Property $property))
     }
-    foreach ($file in $files) {
-        $memo = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)
+    $memos = [System.Collections.Generic.List[object]]::new()
+    foreach ($file in $files) { $memos.Add([System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)) }
+    Set-DocsCliProvisionalBinding -File $files.ToArray() -Memo $memos.ToArray() -Aggregate $aggregate
+    for ($fileIndex = 0; $fileIndex -lt $files.Count; $fileIndex++) {
+        $file = $files[$fileIndex]
+        $memo = $memos[$fileIndex]
         $visiting = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
         foreach ($site in $file['Site']) {
             $resolved = Resolve-DocsCliDeclaration -Id $site['Id'] -File $file -Memo $memo -Visiting $visiting

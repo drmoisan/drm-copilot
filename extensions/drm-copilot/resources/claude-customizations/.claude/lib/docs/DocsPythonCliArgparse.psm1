@@ -55,6 +55,112 @@ function Get-DocsArgparseEnclosingFunction {
     return $null
 }
 
+function Get-DocsArgparseEnclosingDefinition {
+    <#
+    .SYNOPSIS
+        Returns @{ Index; Header } of the nearest def enclosing logical line Index, or $null (private helper).
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $Line, [Parameter(Mandatory = $true)] [int] $Index)
+
+    $indent = $Line[$Index]['Indent']
+    for ($cursor = $Index - 1; $cursor -ge 0 -and $indent -gt 0; $cursor--) {
+        if ($Line[$cursor]['Indent'] -ge $indent) { continue }
+        $indent = $Line[$cursor]['Indent']
+        $header = Get-DocsPythonDefinitionHeader -Line $Line -Index $cursor
+        if ($null -ne $header -and $header['Kind'] -cne 'class') { return @{ Index = $cursor; Header = $header } }
+    }
+    return $null
+}
+
+function Get-DocsArgparseParameterPosition {
+    <#
+    .SYNOPSIS
+        Returns the signature position of a parameter: its index among the positional parameters, -1 when keyword-only, or $null when absent (private helper).
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param([Parameter(Mandatory = $true)] [hashtable] $Header, [Parameter(Mandatory = $true)] [string] $Name)
+
+    $position = 0
+    $keywordOnly = $false
+    foreach ($parameter in $Header['Parameter']) {
+        if ($parameter['Kind'] -ceq 'slash') { continue }
+        if ($parameter['Kind'] -ceq 'star' -or $parameter['Kind'] -ceq 'starstar') { $keywordOnly = $true; continue }
+        if ([string] $parameter['Name'] -ceq $Name) { if ($keywordOnly) { return -1 } else { return $position } }
+        if (-not $keywordOnly) { $position++ }
+    }
+    return $null
+}
+
+function Get-DocsArgparseProvisionalRole {
+    <#
+    .SYNOPSIS
+        Seeds the provisional subparsers roles of one input (issue #1173 B9): @{ Role; ByKey } (private helper).
+    .DESCRIPTION
+        A role is a parameter of the innermost enclosing def that is the receiver of an
+        add_parser call and is not a tracked receiver. Role records carry Id
+        ('#param-<function>-<parameter>'), Function, Parameter, Position and DefIndex; ByKey maps
+        '<def line index>|<parameter>' to the role.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [object[]] $Line, [Parameter(Mandatory = $true)] [hashtable] $Receiver)
+
+    $roles = [System.Collections.Generic.List[object]]::new()
+    $byKey = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)
+    for ($index = 0; $index -lt $Line.Count; $index++) {
+        $tokens = $Line[$index]['Tokens']
+        $cursor = 0
+        while ($cursor -lt $tokens.Count) {
+            if ($tokens[$cursor]['Type'] -cne 'NAME' -or $tokens[$cursor]['IsKeyword']) { $cursor++; continue }
+            $call = Read-DocsPythonCall -Token $tokens -Index $cursor
+            if ($null -eq $call) { $cursor++; continue }
+            $parts = $call['CalleeParts']
+            $afterDot = $cursor -gt 0 -and $tokens[$cursor - 1]['Text'] -ceq '.'
+            if (-not $afterDot -and $parts.Count -eq 2 -and $parts[1] -ceq 'add_parser' -and -not $Receiver['Receiver'].ContainsKey($parts[0])) {
+                $definition = Get-DocsArgparseEnclosingDefinition -Line $Line -Index $index
+                $key = if ($null -eq $definition) { $null } else { [string] $definition['Index'] + '|' + $parts[0] }
+                if ($null -ne $key -and -not $byKey.ContainsKey($key)) {
+                    $position = Get-DocsArgparseParameterPosition -Header $definition['Header'] -Name $parts[0]
+                    if ($null -ne $position) {
+                        $role = @{ Id = '#param-' + $definition['Header']['Name'] + '-' + $parts[0]; Function = [string] $definition['Header']['Name']; Parameter = $parts[0]; Position = [int] $position; DefIndex = $definition['Index'] }
+                        $roles.Add($role)
+                        $byKey[$key] = $role
+                    }
+                }
+            }
+            $cursor = $call['OpenIndex'] + 1
+        }
+    }
+    return @{ Role = $roles.ToArray(); ByKey = $byKey }
+}
+
+function Resolve-DocsArgparseRole {
+    <#
+    .SYNOPSIS
+        Resolves a receiver name used on logical line Index: a tracked receiver or a provisional subparsers role (private helper).
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)] [string] $Name,
+        [Parameter(Mandatory = $true)] [int] $Index,
+        [Parameter(Mandatory = $true)] [hashtable] $Scope
+    )
+
+    if ($Scope['Receiver']['Receiver'].ContainsKey($Name)) {
+        return Resolve-DocsArgparseReceiver -Name $Name -Receiver $Scope['Receiver'] -Import $Scope['Import'] -Memo $Scope['Memo'] -Visiting $Scope['Visiting'] -Scope $Scope
+    }
+    if ($Scope['Provisional']['ByKey'].Count -eq 0) { return $null }
+    $definition = Get-DocsArgparseEnclosingDefinition -Line $Scope['Line'] -Index $Index
+    if ($null -eq $definition) { return $null }
+    $role = $null
+    if (-not $Scope['Provisional']['ByKey'].TryGetValue([string] $definition['Index'] + '|' + $Name, [ref] $role)) { return $null }
+    return @{ Kind = 'subparsers'; Parser = $role['Id']; Parent = $null }
+}
+
 function Resolve-DocsArgparseReceiver {
     <#
     .SYNOPSIS
@@ -67,7 +173,8 @@ function Resolve-DocsArgparseReceiver {
         [Parameter(Mandatory = $true)] [hashtable] $Receiver,
         [Parameter(Mandatory = $true)] [hashtable] $Import,
         [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [System.Collections.Generic.Dictionary[string, object]] $Memo,
-        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [System.Collections.Generic.HashSet[string]] $Visiting
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [System.Collections.Generic.HashSet[string]] $Visiting,
+        [Parameter(Mandatory = $true)] [hashtable] $Scope
     )
 
     $known = $null
@@ -80,7 +187,7 @@ function Resolve-DocsArgparseReceiver {
     if ((Resolve-DocsPythonQualifiedName -Name $call['Callee'] -Import $Import) -ceq $script:DocsArgparseConstructor) {
         $node = @{ Kind = 'root'; Parser = $Name; Parent = $null }
     } elseif ($parts.Count -eq 2 -and $script:DocsArgparseMethodList -ccontains $parts[1]) {
-        $parent = Resolve-DocsArgparseReceiver -Name $parts[0] -Receiver $Receiver -Import $Import -Memo $Memo -Visiting $Visiting
+        $parent = Resolve-DocsArgparseRole -Name $parts[0] -Index ([int] $binding['Index']) -Scope $Scope
         if ($null -ne $parent) {
             $method = $parts[1]
             if ($method -ceq 'add_subparsers' -and $parent['Kind'] -cin @('root', 'command')) { $node = @{ Kind = 'subparsers'; Parser = $parent['Parser']; Parent = $parts[0] } }
@@ -125,6 +232,37 @@ function Read-DocsArgparseOption {
     return @{ Name = $name; Property = $property }
 }
 
+function Get-DocsArgparseHandoff {
+    <#
+    .SYNOPSIS
+        Returns the handoffs of one call: each positional or keyword name argument that holds a subparsers receiver (private helper).
+    .DESCRIPTION
+        A handoff is @{ Callee (the qualified dotted callee); Position (zero-based, or $null for
+        a keyword); Keyword ($null for a positional argument); ParserId }. A call with a star
+        argument or an ambiguous callee has none (issue #1173 B9).
+    #>
+    [CmdletBinding()]
+    [OutputType([object[]])]
+    param(
+        [Parameter(Mandatory = $true)] [hashtable] $Call,
+        [Parameter(Mandatory = $true)] [int] $Index,
+        [Parameter(Mandatory = $true)] [hashtable] $Scope
+    )
+
+    $found = [System.Collections.Generic.List[object]]::new()
+    $qualified = Resolve-DocsPythonQualifiedName -Name $Call['Callee'] -Import $Scope['Import']
+    if ($null -eq $qualified -or $Call['HasStar']) { return , $found.ToArray() }
+    $arguments = [System.Collections.Generic.List[object]]::new()
+    for ($position = 0; $position -lt $Call['Positional'].Count; $position++) { $arguments.Add(@{ Position = $position; Keyword = $null; Argument = $Call['Positional'][$position] }) }
+    foreach ($key in $Call['Keyword'].Keys) { $arguments.Add(@{ Position = $null; Keyword = [string] $key; Argument = $Call['Keyword'][$key] }) }
+    foreach ($entry in $arguments) {
+        if ($entry['Argument']['Kind'] -cne 'name') { continue }
+        $role = Resolve-DocsArgparseRole -Name ([string] $entry['Argument']['Value']) -Index $Index -Scope $Scope
+        if ($null -ne $role -and $role['Kind'] -ceq 'subparsers') { $found.Add(@{ Callee = $qualified; Position = $entry['Position']; Keyword = $entry['Keyword']; ParserId = $role['Parser'] }) }
+    }
+    return , $found.ToArray()
+}
+
 function Get-DocsArgparseCommandSite {
     <#
     .SYNOPSIS
@@ -141,6 +279,13 @@ function Get-DocsArgparseCommandSite {
         CLI_REGISTRATION_IN_LOOP; a non-literal name yields CLI_DYNAMIC_REGISTRATION; a
         registration on an untracked receiver (parameter, attribute, call result) yields
         CLI_UNBOUND_REGISTRATION. Each diagnostic removes only its own site.
+
+        Issue #1173 B9: a parameter of the innermost enclosing def that receives add_parser is a
+        provisional subparsers role instead: its commands take the placeholder parser
+        '#param-<function>-<parameter>' as ParentId and no diagnostic is reported here; the
+        result's Provisional lists the roles. Handoff lists every call that passes a resolved
+        subparsers receiver as a positional or keyword name argument. The python-cli analyzer
+        binds the two across inputs.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -154,6 +299,9 @@ function Get-DocsArgparseCommandSite {
     $diagnostics = [System.Collections.Generic.List[object]]::new()
     $memo = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)
     $visiting = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    $provisional = Get-DocsArgparseProvisionalRole -Line $Line -Receiver $Receiver
+    $scope = @{ Line = $Line; Receiver = $Receiver; Import = $Import; Memo = $memo; Visiting = $visiting; Provisional = $provisional }
+    $handoffs = [System.Collections.Generic.List[object]]::new()
     $optionIndex = 0
     for ($index = 0; $index -lt $Line.Count; $index++) {
         $tokens = $Line[$index]['Tokens']
@@ -174,6 +322,9 @@ function Get-DocsArgparseCommandSite {
                 $cursor = $call['CloseIndex'] + 1
                 continue
             }
+            if (-not ($cursor -gt 0 -and $tokens[$cursor - 1]['Text'] -ceq '.')) {
+                foreach ($handoff in (Get-DocsArgparseHandoff -Call $call -Index $index -Scope $scope)) { $handoffs.Add($handoff) }
+            }
             if (-not $isConstructor -and $null -eq $method) { $cursor = $call['OpenIndex'] + 1; continue }
             $span = @($siteLine, $Line[$index]['EndLine'])
             $cursorAfter = $call['CloseIndex'] + 1
@@ -182,7 +333,7 @@ function Get-DocsArgparseCommandSite {
                 if (-not $isBinding -or $receiverBinding['Call']['Start'] -ne $call['Start']) { $cursor = $cursorAfter; continue }
             } else {
                 if ($parts.Count -ne 2) { $diagnostics.Add(@{ Code = 'CLI_UNBOUND_REGISTRATION'; Severity = 'warning'; Blocking = $false; Line = $siteLine }); $cursor = $cursorAfter; continue }
-                $node = Resolve-DocsArgparseReceiver -Name $parts[0] -Receiver $Receiver -Import $Import -Memo $memo -Visiting $visiting
+                $node = Resolve-DocsArgparseRole -Name $parts[0] -Index $index -Scope $scope
                 if ($null -eq $node) {
                     $other = $null
                     $trackedOther = $Receiver['Receiver'].TryGetValue($parts[0], [ref] $other) -and $script:DocsArgparseMethodList -cnotcontains $other['Call']['CalleeParts'][$other['Call']['CalleeParts'].Count - 1] -and (Resolve-DocsPythonQualifiedName -Name $other['Callee'] -Import $Import) -cne $script:DocsArgparseConstructor
@@ -237,7 +388,7 @@ function Get-DocsArgparseCommandSite {
             $cursor = $cursorAfter
         }
     }
-    return @{ Site = $sites.ToArray(); Diagnostics = $diagnostics.ToArray() }
+    return @{ Site = $sites.ToArray(); Diagnostics = $diagnostics.ToArray(); Provisional = [object[]] $provisional['Role']; Handoff = $handoffs.ToArray() }
 }
 
 Export-ModuleMember -Function Get-DocsArgparseCommandSite

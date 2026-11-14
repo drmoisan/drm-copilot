@@ -22,7 +22,7 @@ BeforeAll {
     $script:LibRoot = Join-Path -Path $script:RepositoryRoot -ChildPath '.claude/lib/docs'
     Import-Module -Name (Join-Path -Path $script:LibRoot -ChildPath 'DocsJson.psm1') -Force -ErrorAction Stop
 
-    $script:ModuleName = [string[]]@('DocsReferenceFrontMatter.psm1', 'DocsReferenceMarkers.psm1', 'DocsReferencePlan.psm1', 'DocsReferenceRender.psm1', 'DocsReferenceReport.psm1', 'DocsReferenceWriter.psm1')
+    $script:ModuleName = [string[]]@('DocsReferenceFrontMatter.psm1', 'DocsReferenceMarkers.psm1', 'DocsReferencePlan.psm1', 'DocsReferenceRender.psm1', 'DocsReferenceReport.psm1', 'DocsReferenceSplit.psm1', 'DocsReferenceWriter.psm1')
     $script:CommandModule = 'DocsReferenceWriter.psm1'
     $script:CommandFunction = [string[]]@('Invoke-DocsGenerateReferenceCommand')
     $script:ForbiddenCommand = [string[]]@('Set-Content', 'Add-Content', 'Out-File', 'New-Item', 'Remove-Item', 'Copy-Item', 'Move-Item', 'Get-Content', 'Test-Path', 'Get-Date', 'Get-Random', 'Invoke-Expression')
@@ -152,6 +152,7 @@ Describe 'reference module boundary' {
         @{ Name = 'DocsReferencePlan.psm1' }
         @{ Name = 'DocsReferenceRender.psm1' }
         @{ Name = 'DocsReferenceReport.psm1' }
+        @{ Name = 'DocsReferenceSplit.psm1' }
         @{ Name = 'DocsReferenceWriter.psm1' }
     ) {
         # Act
@@ -212,6 +213,7 @@ Describe 'reference module front-matter constants' {
         @{ Name = 'DocsReferencePlan.psm1' }
         @{ Name = 'DocsReferenceRender.psm1' }
         @{ Name = 'DocsReferenceReport.psm1' }
+        @{ Name = 'DocsReferenceSplit.psm1' }
         @{ Name = 'DocsReferenceWriter.psm1' }
     ) {
         # Act
@@ -240,6 +242,7 @@ Describe 'reference module finding codes' {
         @{ Name = 'DocsReferencePlan.psm1' }
         @{ Name = 'DocsReferenceRender.psm1' }
         @{ Name = 'DocsReferenceReport.psm1' }
+        @{ Name = 'DocsReferenceSplit.psm1' }
         @{ Name = 'DocsReferenceWriter.psm1' }
     ) {
         Get-TestPageCodeArgument -Ast (Get-TestModuleAst -Name $Name) | Should -BeNullOrEmpty
@@ -272,7 +275,7 @@ Describe 'reference property-test inventory' {
         [string[]] $missing = @($pure | Where-Object { $seeded -cnotcontains $_ })
 
         # Assert
-        $pure.Count | Should -Be 22
+        $pure.Count | Should -Be 24
         $missing | Should -BeNullOrEmpty
     }
 }

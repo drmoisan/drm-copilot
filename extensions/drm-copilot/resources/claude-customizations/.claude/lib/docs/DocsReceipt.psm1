@@ -6,7 +6,9 @@
 
 .DESCRIPTION
     ConvertTo-DocsTimestampText formats a UTC instant and rejects any other Kind.
-    Get-DocsArtifactPin pins the raw bytes of one artifact read. Get-DocsReceiptId derives the
+    Get-DocsArtifactPin pins one artifact read by Get-DocsTextSha256Hex (CRLF and lone CR mapped
+    to LF before hashing, issue #1173), so a CRLF checkout of an LF-written artifact keeps its
+    pin. Get-DocsReceiptId derives the
     receipt identifier from inputs, mode, repository, revision and validation_result only, so the
     identifier does not depend on the issue time. Measure-DocsReceiptCount builds the counts
     object of the receipt schema. New-DocsValidationReceipt builds the receipt document with its
@@ -82,7 +84,7 @@ function Get-DocsWriterVersion {
 function Get-DocsArtifactPin {
     <#
     .SYNOPSIS
-        Returns the artifact-pin {artifact_kind, path, sha256} of raw bytes, or $null when Bytes is $null (an absent artifact).
+        Returns the artifact-pin {artifact_kind, path, sha256} of Bytes hashed with Get-DocsTextSha256Hex (line endings normalized), or $null when Bytes is $null (an absent artifact).
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -93,7 +95,7 @@ function Get-DocsArtifactPin {
     )
 
     if ($null -eq $Bytes) { return $null }
-    return [ordered]@{ artifact_kind = $ArtifactKind; path = $Path; sha256 = (Get-DocsBytesSha256Hex -Bytes $Bytes) }
+    return [ordered]@{ artifact_kind = $ArtifactKind; path = $Path; sha256 = (Get-DocsTextSha256Hex -Bytes $Bytes) }
 }
 
 function Get-DocsSortedArtifactPin {

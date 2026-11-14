@@ -1,6 +1,11 @@
 """Tests for docs_python_native.cli_argparse: roots, subcommands, options."""
 
-from docs_python_native.call_sites import CliResult, CliSite
+from docs_python_native.call_sites import (
+    CliResult,
+    CliSite,
+    ProvisionalRole,
+    RoleHandoff,
+)
 from docs_python_native.cli_argparse import recognize_argparse
 from docs_python_native.imports import build_tables
 from docs_python_native.source import parse_module
@@ -162,3 +167,96 @@ class TestDiagnostics:
             "g.add_argument('--y')\n"
         )
         assert _codes(result) == ["CLI_UNBOUND_REGISTRATION"]
+
+
+REGISTER = (
+    "def register(subparsers):\n"
+    "    daily = subparsers.add_parser('daily', help='Daily')\n"
+    "    daily.add_argument('--date')\n"
+)
+CALLER = (
+    "import argparse\n"
+    "import cli_daily\n"
+    "from pkg import tools\n"
+    "def build():\n"
+    "    parser = argparse.ArgumentParser(prog='tool')\n"
+    "    subparsers = parser.add_subparsers()\n"
+    "    cli_daily.register(subparsers)\n"
+    "    tools.attach(1, target=subparsers)\n"
+    "    print(parser)\n"
+    "    return parser\n"
+)
+
+
+class TestProvisionalRole:
+    """Scenarios for the cross-module subparsers parameter of issue 1173 B9."""
+
+    def test_parameter_add_parser_receiver_is_a_provisional_subparsers_role(
+        self,
+    ) -> None:
+        """Scenario: a parameter add_parser receiver is seeded, not unbound."""
+        # Act
+        result = _recognize(REGISTER)
+
+        # Assert
+        assert result.diagnostics == []
+        assert result.provisional == [
+            ProvisionalRole("#param-register-subparsers", "register", "subparsers", 0)
+        ]
+        assert _site(result, "daily").parent_id == "#param-register-subparsers"
+        assert _site(result, "--date").parent_id == "daily"
+
+    def test_parameter_position_counts_every_preceding_parameter(self) -> None:
+        """Scenario: the provisional position is the signature index."""
+        # Act
+        result = _recognize(
+            "class K:\n    def register(self, subs):\n        subs.add_parser('x')\n"
+        )
+
+        # Assert
+        assert result.provisional == [
+            ProvisionalRole("#param-register-subs", "register", "subs", 1)
+        ]
+
+    def test_non_parameter_or_non_add_parser_receivers_stay_unbound(self) -> None:
+        """Scenario: only an add_parser receiver that is a parameter is seeded."""
+        # Act
+        result = _recognize(
+            "def f(arg):\n    other.add_parser('x')\n    arg.add_argument('--y')\n"
+            "other2.add_parser('z')\n"
+        )
+
+        # Assert
+        assert result.provisional == []
+        assert _codes(result) == ["CLI_UNBOUND_REGISTRATION"] * 3
+
+    def test_call_passing_a_subparsers_receiver_records_a_handoff(self) -> None:
+        """Scenario: positional and keyword subparsers arguments become handoffs."""
+        # Act
+        result = _recognize(CALLER)
+
+        # Assert
+        assert result.handoffs == [
+            RoleHandoff("cli_daily.register", 0, None, "parser"),
+            RoleHandoff("pkg.tools.attach", None, "target", "parser"),
+        ]
+        assert result.diagnostics == []
+
+    def test_keyword_only_parameter_has_position_minus_one(self) -> None:
+        """Scenario: a keyword-only parameter binds by keyword only."""
+        # Act
+        result = _recognize("def register(*, subs):\n    subs.add_parser('x')\n")
+
+        # Assert
+        assert result.provisional == [
+            ProvisionalRole("#param-register-subs", "register", "subs", -1)
+        ]
+
+    def test_self_referencing_receiver_resolves_to_nothing(self) -> None:
+        """Scenario: a receiver bound to its own method call is unbound, not a cycle."""
+        # Act
+        result = _recognize("p = p.add_subparsers()\np.add_parser('x')\n")
+
+        # Assert
+        assert result.sites == []
+        assert _codes(result) == ["CLI_UNBOUND_REGISTRATION"] * 2
