@@ -5,7 +5,7 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-11-14 (orchestrator decisions D-R1 to D-R3)
 - **Status:** Draft
-- **Version:** 0.5 (2026-11-14, D-R1: hook registrations are also read from the `hooks.PreToolUse` groups of `.claude/hooks/pretooluse-dispatch.json` and `.codex/hooks/pretooluse-dispatch.json`; D-R2: test isolation is proven by parallel gate runs and the leak scan, with no serial, single-process or shuffled run; D-R3: the batch-budget cost row reflects the `large`-route exemption). 0.4 (H2: owner override precedence over experiment results; `native` override drops `target_paths` and `generated_from`; see `## Owner Stop`). 0.3 (H1: `quality-tiers.yml` classification of `scripts/harness`; identifier encoding and duplicate tie-break)
+- **Version:** 0.6 (2026-11-14, D-R4 and D-R5: an owner override to `dropped` is settled `approved` with the owner-overrides `decision_ref` even when a runbook it depends on is deferred, and an empty override note yields a fixed `reason`; see `## Owner Stop`). 0.5 (2026-11-14, D-R1: hook registrations are also read from the `hooks.PreToolUse` groups of `.claude/hooks/pretooluse-dispatch.json` and `.codex/hooks/pretooluse-dispatch.json`; D-R2: test isolation is proven by parallel gate runs and the leak scan, with no serial, single-process or shuffled run; D-R3: the batch-budget cost row reflects the `large`-route exemption). 0.4 (H2: owner override precedence over experiment results; `native` override drops `target_paths` and `generated_from`; see `## Owner Stop`). 0.3 (H1: `quality-tiers.yml` classification of `scripts/harness`; identifier encoding and duplicate tie-break)
 - **Work Mode:** full-feature
 - **Primary research input:** `docs/features/active/2026-10-30-harness-survey-gold-standard-contracts-parity-matrix-1025/research/research.2026-10-30T21-08.md`
 - **Epic manifest:** `docs/features/epics/shared-agent-harness-layer/epic.md`
@@ -446,6 +446,11 @@ Decision H2 (coordinator, 2026-10-31, under the owner's standing instruction), a
 
 - An owner override in `## Owner Overrides` of the approval artifact takes precedence over an experiment result that sets a disposition, including the E3 result for `copilot:agent:*` entries and generally; the experiment result still sets `consumers` and `notes`.
 - An override to `native` removes `target_paths` and `generated_from`, which have no meaning for a `native` entry (`### Disposition Semantics`). Such an entry never carries a `pending-source:<kind>` placeholder and is settled with `decision_status: approved` unless a deferred runbook other than E3 governs its `consumers`.
+
+Decisions D-R4 and D-R5 (orchestrator, 2026-11-14, autonomous mode), applied by plan B `## Decision Application Rules`:
+
+- D-R4: an owner override to `dropped` settles the entry as `decision_status: approved` with `decision_ref` `#1025:survey/difference-approval.md#owner-overrides`, even when a non-E3 runbook (E1, E2, E4 or E6) that the entry depends on is deferred. This extends H2 to `dropped` overrides, so such an entry is not a dependent entry left `provisional` by a deferral. Rationale: a retired entry has no consumers for the runbook to inform, and `### Disposition Semantics` requires a dropped entry's `decision_ref` to point to the owner decision.
+- D-R5: a `dropped` override row with an empty note gives the entry the fixed `reason` `Retired by owner override recorded in survey/difference-approval.md`. Rationale: it keeps the schema-required non-empty `reason` without a halt; `decision_ref` carries the authority.
 
 ## Implementation Strategy
 
