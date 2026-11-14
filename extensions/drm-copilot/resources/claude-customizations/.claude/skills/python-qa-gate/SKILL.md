@@ -30,7 +30,7 @@ Run the full toolchain in this exact order. If any step fails or modifies files,
 1. `poetry run black .`
 2. `poetry run ruff check .`
 3. `poetry run pyright`
-4. `poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov`
+4. `env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest --cov-branch --cov-report=term-missing --cov`
 
 If the environment prevents running any tool, stop and report the change as **unverified**. Do not declare completion.
 

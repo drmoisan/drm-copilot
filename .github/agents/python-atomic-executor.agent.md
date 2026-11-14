@@ -266,7 +266,7 @@ Phase-gate and final-QA toolchain for Python (each task runs a task check instea
 1) Format (`poetry run black .` or repo task equivalent)
 2) Lint (`poetry run ruff check` or repo task equivalent)
 3) Type-check (`poetry run pyright` or repo task equivalent)
-4) Test (`poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov`)
+4) Test (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest --cov-branch --cov-report=term-missing --cov`, which runs `poetry run pytest -n auto`)
 
 If any step fails in final QA, fix and restart from format.
 

@@ -301,6 +301,12 @@ Describe 'Parallel gate wording' {
         @{ Id = 'EXEC-CODEX-C3'; Path = '.codex/agents/atomic-executor-c3.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
         @{ Id = 'EXEC-CODEX-C3-ELEVATED'; Path = '.codex/agents/atomic-executor-c3-elevated.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
         @{ Id = 'EXEC-CODEX-C4'; Path = '.codex/agents/atomic-executor-c4.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'QA-PY-CLAUDE'; Path = '.claude/skills/python-qa-gate/SKILL.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'QA-PY-AGENTS'; Path = '.agents/skills/python-qa-gate/SKILL.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'QA-PY-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'QA-PY-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'COPILOT-PY-EXEC'; Path = '.github/agents/python-atomic-executor.agent.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'COPILOT-PY-EXEC-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/python-atomic-executor.agent.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
     ) {
         # Arrange
         $text = Get-PgwSurfaceText -RelativePath $Path

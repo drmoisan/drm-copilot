@@ -516,7 +516,7 @@ index 8d3868715..cf3abcaa8 100644
  2. `poetry run ruff check .`
  3. `poetry run pyright`
 -4. `poetry run pytest --cov --cov-report=term-missing`
-+4. `poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov`
++4. `env -u VIRTUAL_ENV sh .agents/skills/test-execution-policy/scripts/run-test-suite.sh pytest --cov-branch --cov-report=term-missing --cov`
  
  If the environment prevents running any tool, stop and report the change as **unverified**. Do not declare completion.
  
@@ -1344,7 +1344,7 @@ index 00f8a0afc..5adf3d82d 100644
  2. `poetry run ruff check .`
  3. `poetry run pyright`
 -4. `poetry run pytest --cov --cov-report=term-missing`
-+4. `poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov`
++4. `env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest --cov-branch --cov-report=term-missing --cov`
  
  If the environment prevents running any tool, stop and report the change as **unverified**. Do not declare completion.
  
@@ -3532,7 +3532,7 @@ index 2e07f666b..99963ffb9 100644
  2) Lint (`poetry run ruff check` or repo task equivalent)
  3) Type-check (`poetry run pyright` or repo task equivalent)
 -4) Test (`poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing` or repo task equivalent)
-+4) Test (`poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov`)
++4) Test (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest --cov-branch --cov-report=term-missing --cov`, which runs `poetry run pytest -n auto`)
  
  If any step fails in final QA, fix and restart from format.
  
@@ -5357,7 +5357,7 @@ index 00f8a0afc..5adf3d82d 100644
  2. `poetry run ruff check .`
  3. `poetry run pyright`
 -4. `poetry run pytest --cov --cov-report=term-missing`
-+4. `poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov`
++4. `env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest --cov-branch --cov-report=term-missing --cov`
  
  If the environment prevents running any tool, stop and report the change as **unverified**. Do not declare completion.
  
@@ -6054,7 +6054,7 @@ index 8d3868715..cf3abcaa8 100644
  2. `poetry run ruff check .`
  3. `poetry run pyright`
 -4. `poetry run pytest --cov --cov-report=term-missing`
-+4. `poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov`
++4. `env -u VIRTUAL_ENV sh .agents/skills/test-execution-policy/scripts/run-test-suite.sh pytest --cov-branch --cov-report=term-missing --cov`
  
  If the environment prevents running any tool, stop and report the change as **unverified**. Do not declare completion.
  
@@ -8278,7 +8278,7 @@ index 2e07f666b..99963ffb9 100644
  2) Lint (`poetry run ruff check` or repo task equivalent)
  3) Type-check (`poetry run pyright` or repo task equivalent)
 -4) Test (`poetry run pytest --cov=src/lexile_corpus_tuner --cov=scripts/dev_tools --cov-report=term-missing` or repo task equivalent)
-+4) Test (`poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov`)
++4) Test (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest --cov-branch --cov-report=term-missing --cov`, which runs `poetry run pytest -n auto`)
  
  If any step fails in final QA, fix and restart from format.
  
@@ -9329,7 +9329,7 @@ new file mode 100644
 index 000000000..38ee6ccec
 --- /dev/null
 +++ b/tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1
-@@ -0,0 +1,319 @@
+@@ -0,0 +1,325 @@
 +Set-StrictMode -Version Latest
 +
 +# Contract guard for issue #1094: the mirrored skills, agents, prompts, and
@@ -9636,6 +9636,12 @@ index 000000000..38ee6ccec
 +        @{ Id = 'EXEC-CODEX-C3'; Path = '.codex/agents/atomic-executor-c3.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
 +        @{ Id = 'EXEC-CODEX-C3-ELEVATED'; Path = '.codex/agents/atomic-executor-c3-elevated.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
 +        @{ Id = 'EXEC-CODEX-C4'; Path = '.codex/agents/atomic-executor-c4.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'QA-PY-CLAUDE'; Path = '.claude/skills/python-qa-gate/SKILL.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'QA-PY-AGENTS'; Path = '.agents/skills/python-qa-gate/SKILL.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'QA-PY-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'QA-PY-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'COPILOT-PY-EXEC'; Path = '.github/agents/python-atomic-executor.agent.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'COPILOT-PY-EXEC-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/python-atomic-executor.agent.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
 +    ) {
 +        # Arrange
 +        $text = Get-PgwSurfaceText -RelativePath $Path
