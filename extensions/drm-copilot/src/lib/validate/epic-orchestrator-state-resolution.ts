@@ -285,3 +285,236 @@ export function validateIntentBlock(state: Record<string, unknown>): string[] {
   }
   return errors;
 }
+
+// Issue #1162 cross-epic dependency key and its key-gated invariants. Every message
+// is byte-identical to the Python source and pinned by the shared corpus
+// tests/fixtures/epic_cross_dependency/cross-dependency-cases.json.
+export const CROSS_EPIC_KEY = "cross_epic_depends_on";
+const CROSS_EPIC_MAIN_GATE_KEY = "cross_epic_main_gate";
+const CROSS_EPIC_MALFORMED_PREFIX = "EPIC_CROSS_DEPENDENCY_MALFORMED: ";
+const CROSS_EPIC_MAIN_GATE_PREFIX =
+  "EPIC_CROSS_DEPENDENCY_MAIN_GATE_INCOMPLETE: cross_epic_main_gate must be " +
+  "released with a verified entry for: ";
+const CROSS_EPIC_STATUSES: ReadonlySet<string> = new Set([
+  "held",
+  "released",
+  "integrated",
+  "in_main",
+]);
+const CROSS_EPIC_STRING_FIELDS = [
+  "reason",
+  "prerequisite_merge_commit_sha",
+  "verified_at",
+  "integration_merge_commit_sha",
+  "integrated_at",
+] as const;
+const EPIC_SLUG_PATTERN = /^[A-Za-z0-9._-]+$/;
+
+/**
+ * Report whether a JSON value is an integer above zero (mirrors Python `is_positive_int`).
+ *
+ * @param value Candidate value.
+ * @returns True for an integer number above zero.
+ */
+export function isPositiveInt(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value > 0;
+}
+
+/**
+ * Report whether a JSON value is one plain epic slug segment (mirrors Python `is_epic_slug`).
+ *
+ * @param value Candidate value.
+ * @returns True for a string of A-Z, a-z, 0-9, `.`, `_`, and `-` that is not `.` or `..`.
+ */
+export function isEpicSlug(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    EPIC_SLUG_PATTERN.test(value) &&
+    value !== "." &&
+    value !== ".."
+  );
+}
+
+/**
+ * Return the shape errors of one `cross_epic_depends_on` entry, in field order.
+ *
+ * @param entry One object entry of the list.
+ * @param prefix The `features[i].cross_epic_depends_on[j]` locator.
+ * @returns The errors for epic, integration_branch, issue_num, status, the optional
+ *   string fields, and prerequisite_pr_number.
+ */
+function crossEpicEntryErrors(
+  entry: Record<string, unknown>,
+  prefix: string,
+): string[] {
+  const errors: string[] = [];
+  const epic = entry["epic"];
+  if (!isEpicSlug(epic)) {
+    errors.push(
+      `${CROSS_EPIC_MALFORMED_PREFIX}${prefix}.epic must be a string of one plain segment (A-Z, a-z, 0-9, ., _, -).`,
+    );
+  }
+  const branch = entry["integration_branch"];
+  // A missing or non-string branch is reported on its own; the derived-name
+  // comparison runs only when both the branch and the epic are usable.
+  if (typeof branch !== "string" || branch.length === 0) {
+    errors.push(
+      `${CROSS_EPIC_MALFORMED_PREFIX}${prefix}.integration_branch must be a non-empty string.`,
+    );
+  } else if (isEpicSlug(epic) && branch !== `epic/${epic}-integration`) {
+    errors.push(
+      `${CROSS_EPIC_MALFORMED_PREFIX}${prefix}.integration_branch must equal epic/${epic}-integration.`,
+    );
+  }
+  if (!isPositiveInt(entry["issue_num"])) {
+    errors.push(
+      `${CROSS_EPIC_MALFORMED_PREFIX}${prefix}.issue_num must be a positive integer.`,
+    );
+  }
+  // The hold-record fields are optional; each is checked only when present.
+  if ("status" in entry) {
+    const status = entry["status"];
+    if (typeof status !== "string" || !CROSS_EPIC_STATUSES.has(status)) {
+      errors.push(
+        `${CROSS_EPIC_MALFORMED_PREFIX}${prefix}.status must be one of held, released, integrated, in_main.`,
+      );
+    }
+  }
+  for (const name of CROSS_EPIC_STRING_FIELDS) {
+    if (name in entry && typeof entry[name] !== "string") {
+      errors.push(
+        `${CROSS_EPIC_MALFORMED_PREFIX}${prefix}.${name} must be a string.`,
+      );
+    }
+  }
+  if (
+    "prerequisite_pr_number" in entry &&
+    !isPositiveInt(entry["prerequisite_pr_number"])
+  ) {
+    errors.push(
+      `${CROSS_EPIC_MALFORMED_PREFIX}${prefix}.prerequisite_pr_number must be a positive integer.`,
+    );
+  }
+  return errors;
+}
+
+/**
+ * Validate `features[].cross_epic_depends_on` shape, only where present.
+ *
+ * Mirrors Python `validate_cross_epic_dependency_shape`. Key-gated: a checkpoint
+ * whose features carry no key yields no error. Entries are located by their raw
+ * `features` index. Used by the epic-orchestrator and epic-planner validators.
+ *
+ * @param state Parsed checkpoint JSON object.
+ * @returns One `EPIC_CROSS_DEPENDENCY_MALFORMED:` error per violated rule.
+ */
+export function validateCrossEpicDependencyShape(
+  state: Record<string, unknown>,
+): string[] {
+  const rawFeatures = state["features"];
+  if (!Array.isArray(rawFeatures)) {
+    return [];
+  }
+  const errors: string[] = [];
+  (rawFeatures as unknown[]).forEach((feature, index) => {
+    if (!isObject(feature) || !(CROSS_EPIC_KEY in feature)) {
+      return;
+    }
+    const locator = `features[${String(index)}].${CROSS_EPIC_KEY}`;
+    const entries = feature[CROSS_EPIC_KEY];
+    if (!Array.isArray(entries)) {
+      errors.push(`${CROSS_EPIC_MALFORMED_PREFIX}${locator} must be a list.`);
+      return;
+    }
+    // Each entry is judged on its own so every malformed entry is reported.
+    (entries as unknown[]).forEach((entry, position) => {
+      const prefix = `${locator}[${String(position)}]`;
+      if (!isObject(entry)) {
+        errors.push(
+          `${CROSS_EPIC_MALFORMED_PREFIX}${prefix} must be an object.`,
+        );
+        return;
+      }
+      errors.push(...crossEpicEntryErrors(entry, prefix));
+    });
+  });
+  return errors;
+}
+
+/**
+ * Return the epics a released `cross_epic_main_gate` records as verified.
+ *
+ * @param state Parsed checkpoint JSON object.
+ * @returns Epic slugs of fully evidenced prerequisite entries; empty unless released.
+ */
+function verifiedMainGateEpics(state: Record<string, unknown>): Set<string> {
+  const verified = new Set<string>();
+  const gate = state[CROSS_EPIC_MAIN_GATE_KEY];
+  if (!isObject(gate)) {
+    return verified;
+  }
+  const prerequisites = gate["prerequisites"];
+  if (gate["status"] !== "released" || !Array.isArray(prerequisites)) {
+    return verified;
+  }
+  for (const item of prerequisites as unknown[]) {
+    if (!isObject(item)) {
+      continue;
+    }
+    const epic = item["epic"];
+    const sha = item["merge_commit_sha"];
+    const verifiedAt = item["verified_at"];
+    if (
+      typeof epic === "string" &&
+      isPositiveInt(item["pr_number"]) &&
+      typeof sha === "string" &&
+      sha.length > 0 &&
+      typeof verifiedAt === "string" &&
+      verifiedAt.length > 0
+    ) {
+      verified.add(epic);
+    }
+  }
+  return verified;
+}
+
+/**
+ * Validate the completion backstop of the integration-to-main hold (D5).
+ *
+ * Mirrors Python `validate_cross_epic_main_gate`: a checkpoint whose features carry
+ * an entry with a valid epic slug needs a released `cross_epic_main_gate` with one
+ * verified entry per distinct prerequisite epic.
+ *
+ * @param features Object-shaped `features[]` entries.
+ * @param state Parsed checkpoint JSON object.
+ * @returns One `EPIC_CROSS_DEPENDENCY_MAIN_GATE_INCOMPLETE:` error, or none.
+ */
+export function validateCrossEpicMainGate(
+  features: Record<string, unknown>[],
+  state: Record<string, unknown>,
+): string[] {
+  const epics: string[] = [];
+  for (const feature of features) {
+    const entries = feature[CROSS_EPIC_KEY];
+    if (!Array.isArray(entries)) {
+      continue;
+    }
+    for (const entry of entries as unknown[]) {
+      if (!isObject(entry)) {
+        continue;
+      }
+      const epic = entry["epic"];
+      if (isEpicSlug(epic) && !epics.includes(epic)) {
+        epics.push(epic);
+      }
+    }
+  }
+  if (epics.length === 0) {
+    return [];
+  }
+  const verified = verifiedMainGateEpics(state);
+  const missing = epics.filter((epic) => !verified.has(epic));
+  return missing.length === 0
+    ? []
+    : [CROSS_EPIC_MAIN_GATE_PREFIX + missing.join(", ")];
+}

@@ -30,6 +30,11 @@ import {
   resolveFeatureReference,
 } from "./epic-orchestrator-state-resolution";
 import type { FeatureReferenceIndex } from "./epic-orchestrator-state-resolution";
+import {
+  CROSS_EPIC_KEY,
+  isEpicSlug,
+  isPositiveInt,
+} from "./epic-orchestrator-state-resolution";
 
 /** The merge statuses that durably confirm a dependency edge. */
 export const MERGED_STATUSES: ReadonlySet<string> = new Set([
@@ -267,6 +272,55 @@ export function validateWaveBarrierOrdering(
           `EPIC_WAVE_BARRIER_VIOLATION: ${folder} worktree_created_at precedes dependency ${String(dependency)} merge_confirmed_at`,
         );
       }
+    }
+  }
+  // Key-gated issue #1162 check: a feature without cross_epic_depends_on adds
+  // nothing, so the result above is unchanged for older checkpoints.
+  errors.push(...validateCrossEpicStartedWhileHeld(features));
+  return errors;
+}
+
+/**
+ * Report started features whose cross-epic dependency is not integrated.
+ *
+ * Mirrors Python `validate_cross_epic_started_while_held` (issue #1162): a feature
+ * that `hasStarted` treats as started must not carry a `cross_epic_depends_on`
+ * entry whose `status` is not `integrated` or `in_main`. Entries without a valid
+ * epic slug or a positive integer `issue_num` are left to the shape check.
+ *
+ * @param features Object-shaped `features[]` entries.
+ * @returns One `EPIC_CROSS_DEPENDENCY_VIOLATION` error per held entry.
+ */
+export function validateCrossEpicStartedWhileHeld(
+  features: Record<string, unknown>[],
+): string[] {
+  const errors: string[] = [];
+  for (const feature of features) {
+    const folder = feature["feature_folder"];
+    const entries = feature[CROSS_EPIC_KEY];
+    if (
+      typeof folder !== "string" ||
+      !Array.isArray(entries) ||
+      !hasStarted(feature)
+    ) {
+      continue;
+    }
+    for (const entry of entries as unknown[]) {
+      if (!isObject(entry)) {
+        continue;
+      }
+      const epic = entry["epic"];
+      const issueNum = entry["issue_num"];
+      if (!isEpicSlug(epic) || !isPositiveInt(issueNum)) {
+        continue;
+      }
+      const status = entry["status"];
+      if (status === "integrated" || status === "in_main") {
+        continue;
+      }
+      errors.push(
+        `EPIC_CROSS_DEPENDENCY_VIOLATION: ${folder} is treated as started while cross-epic dependency ${epic}#${String(issueNum)} is not integrated`,
+      );
     }
   }
   return errors;

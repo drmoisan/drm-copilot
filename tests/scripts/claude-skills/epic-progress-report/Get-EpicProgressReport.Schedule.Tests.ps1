@@ -389,3 +389,48 @@ Describe 'Get-EpicProgressBlockedClosure (AC-34, E7)' {
         @(Get-EpicProgressBlockedClosure -Blocked @() -DependsOn $dependsOn).Count | Should -Be 0
     }
 }
+
+Describe 'Cross-epic external nodes in the schedule (issue #1162)' {
+    It 'starts the local node at time 0 under cap 1 while a pending external node runs' {
+        # The external node holds no slot, so the cap-1 local node does not wait for it.
+        $nodes = @(
+            [pscustomobject]@{ Issue = 'provider-epic#1188'; State = 'pending'; DurationSeconds = 7200; DependsOn = [string[]] @(); External = $true }
+            [pscustomobject]@{ Issue = '1201'; State = 'pending'; DurationSeconds = 3600; DependsOn = [string[]] @() }
+        )
+
+        $schedule = Invoke-EpicProgressListSchedule -Node $nodes -Cap 1
+
+        $local = @($schedule.Feature | Where-Object Issue -EQ '1201')[0]
+        $external = @($schedule.Feature | Where-Object Issue -EQ 'provider-epic#1188')[0]
+        "$($local.StartSeconds)|$($external.StartSeconds)" | Should -BeExactly '0|0'
+        $schedule.FinishSeconds | Should -Be 7200
+    }
+
+    It 'orders <Left> <Relation> <Right>' -ForEach @(
+        @{ Left = '0-alpha#12'; Right = '1201'; Relation = 'after'; Sign = 1 }
+        @{ Left = '0-alpha#12'; Right = '5'; Relation = 'after'; Sign = 1 }
+        @{ Left = '5'; Right = '0-alpha#12'; Relation = 'before'; Sign = -1 }
+        @{ Left = 'alpha#3'; Right = '0-alpha#12'; Relation = 'after'; Sign = 1 }
+    ) {
+        [math]::Sign((Compare-EpicProgressIssue -Left $Left -Right $Right)) | Should -Be $Sign
+    }
+
+    It 'returns a blocked local feature without the external node it depends on' {
+        $closure = @(Get-EpicProgressBlockedClosure -Blocked @('1201') -DependsOn @{ '1201' = [string[]] @('provider-epic#1188'); '1202' = [string[]] @() })
+
+        ($closure -join ',') | Should -BeExactly '1201'
+    }
+
+    It 'gives the same wave edges and dependency graph with a raw cross_epic_depends_on value' {
+        $features = @(Get-TestFeature -Issue '101' -Wave 1 -Folder 'f-a'; Get-TestFeature -Issue '102' -Wave 2 -Folder 'f-b')
+        $plain = [pscustomobject]@{ issue_num = '102'; feature_folder = 'f-b'; depends_on = [string[]] @('101') }
+        $keyed = [pscustomobject]@{ issue_num = '102'; feature_folder = 'f-b'; depends_on = [string[]] @('101'); cross_epic_depends_on = '[{ epic: p, integration_branch: epic/p-integration, issue_num: 7 }]' }
+
+        $plainGraph = Get-EpicProgressDependencyGraph -Feature $features -ManifestRow @($plain)
+        $keyedGraph = Get-EpicProgressDependencyGraph -Feature $features -ManifestRow @($keyed)
+
+        (ConvertTo-TestEdgeText -DependsOn $keyedGraph.DependsOn) | Should -BeExactly (ConvertTo-TestEdgeText -DependsOn $plainGraph.DependsOn)
+        "$($keyedGraph.Source)|$($keyedGraph.Message)" | Should -BeExactly "$($plainGraph.Source)|$($plainGraph.Message)"
+        (ConvertTo-TestEdgeText -DependsOn (Get-EpicProgressWaveEdge -Feature $features)) | Should -BeExactly '101:; 102:101'
+    }
+}

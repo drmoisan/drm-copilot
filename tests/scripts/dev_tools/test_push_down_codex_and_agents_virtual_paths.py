@@ -270,7 +270,12 @@ def test_helper_directory_publishes_nothing_without_stored_resources() -> None:
 
 
 EPIC_WAVE_DESTINATION_DIR = Path(".codex/lib/epic-wave")
-EPIC_WAVE_NAMES: tuple[str, ...] = ("EpicWave.psm1", "Invoke-EpicWave.ps1")
+EPIC_WAVE_NAMES: tuple[str, ...] = (
+    "EpicWave.psm1",
+    "Invoke-EpicWave.ps1",
+    "EpicCrossDependency.psm1",
+    "Invoke-EpicCrossReadiness.ps1",
+)
 
 
 def test_epic_wave_directory_publishes_stored_resources() -> None:

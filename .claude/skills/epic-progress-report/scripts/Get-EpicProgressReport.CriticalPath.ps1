@@ -33,7 +33,10 @@ function Get-EpicProgressCriticalChain {
     $chain = [System.Collections.Generic.List[string]]::new()
     $current = $Schedule.LastIssue
     while ($null -ne $current -and $byIssue.ContainsKey([string] $current) -and $chain.Count -lt $byIssue.Count) {
-        $chain.Insert(0, "#$current")
+        # An external node '<epic>#<issue>' prints as is, without the leading '#' (issue #1162).
+        $label = "#$current"
+        if ([string] $current -like '*#*') { $label = [string] $current }
+        $chain.Insert(0, $label)
         $current = $byIssue[[string] $current].Predecessor
     }
     if (-not $NoTail) { $chain.Add('tail') }
@@ -172,11 +175,14 @@ function Get-EpicProgressScheduleRange {
     foreach ($side in @(@{ Name = 'fast'; Sign = 1.0 }, @{ Name = 'slow'; Sign = -1.0 })) {
         $nodes = foreach ($record in $Feature) {
             $rate = [double] $record.Rate + $side.Sign * 2.05 * $range.StandardDeviation
+            $isExternal = ($record.PSObject.Properties.Name -contains 'External') -and [bool] $record.External
             $hasTask = @($record.Step | Where-Object { $_.Type -eq 'execution' -and $_.Status -in @('remaining', 'in_progress') }).Count -gt 0
+            if ($isExternal) { $hasTask = $record.NodeState -ne 'done' -and [int] $record.ExecutionTasks -gt 0 }
             if ($side.Name -eq 'slow' -and $hasTask -and $rate -le 0.5) { $range.NoUpperBound = $true }
             $seconds = 0.0
-            if ($record.NodeState -ne 'done') { $seconds = (Get-EpicProgressFeatureRemainingSecond -Step @($record.Step) -Rate $rate -Ledger $Ledger -Default $Default -NowUnixSeconds $NowUnixSeconds).TotalSeconds }
-            [pscustomobject]@{ Issue = $record.Issue; State = $record.NodeState; DurationSeconds = $seconds; DependsOn = [string[]] @($record.DependsOn) }
+            if ($isExternal) { $seconds = Get-EpicProgressExternalSecond -Node $record -Rate $rate }
+            elseif ($record.NodeState -ne 'done') { $seconds = (Get-EpicProgressFeatureRemainingSecond -Step @($record.Step) -Rate $rate -Ledger $Ledger -Default $Default -NowUnixSeconds $NowUnixSeconds).TotalSeconds }
+            [pscustomobject]@{ Issue = $record.Issue; State = $record.NodeState; DurationSeconds = $seconds; DependsOn = [string[]] @($record.DependsOn); External = $isExternal }
         }
         $ends[$side.Name] = (Invoke-EpicProgressListSchedule -Node @($nodes) -Cap $Cap -TailSeconds $TailSeconds).HeadlineSeconds
     }
@@ -220,6 +226,10 @@ function Get-EpicProgressCriticalPathReport {
         The routing-config default_max_parallel_features value; null when absent.
     .PARAMETER Aggregate
         The aggregate velocity from Get-EpicProgressAggregateVelocity; null for none.
+    .PARAMETER ExternalNode
+        The cross-epic external nodes from New-EpicProgressExternalNode (issue #1162); empty for none.
+    .PARAMETER CrossEdge
+        The cross-epic edges from Get-EpicProgressCrossEpicEdge; empty for none.
     .PARAMETER ItemMode
         Report on one item: one node, no cap, and no tail.
     #>
@@ -237,6 +247,8 @@ function Get-EpicProgressCriticalPathReport {
         [AllowNull()] [object] $CheckpointCap = $null,
         [AllowNull()] [object] $ConfigCap = $null,
         [AllowNull()] [object] $Aggregate = $null,
+        [AllowEmptyCollection()] [object[]] $ExternalNode = @(),
+        [AllowEmptyCollection()] [object[]] $CrossEdge = @(),
         [switch] $ItemMode
     )
 
@@ -278,14 +290,25 @@ function Get-EpicProgressCriticalPathReport {
             $excluded.Add([pscustomobject]@{ Issue = $issue; RemainingSeconds = $remaining + $blockedPart })
         } else {
             $serial += $remaining
-            $scheduled.Add([pscustomobject]@{ Issue = $issue; NodeState = $nodeStateOf[[string] $record.State]; Step = @($record.Step); Rate = $rate.TasksPerHour; DependsOn = [string[]] @($graph.DependsOn[$issue]) })
+            $crossNodes = @($CrossEdge | Where-Object { [string] $_.Issue -eq $issue } | ForEach-Object { [string] $_.Node })
+            $scheduled.Add([pscustomobject]@{ Issue = $issue; NodeState = $nodeStateOf[[string] $record.State]; Step = @($record.Step); Rate = $rate.TasksPerHour; DependsOn = [string[]] (@($graph.DependsOn[$issue]) + $crossNodes) })
         }
         $rows.Add([pscustomobject]@{ Issue = $issue; State = $record.State; TasksDone = $record.TasksDone; TasksTotal = $record.TasksTotal; Rate = $rate.TasksPerHour; RateSource = $rate.Source; RemainingSeconds = $remaining; StartSeconds = [double]::NaN; FinishSeconds = [double]::NaN; Excluded = $isExcluded })
     }
     $nodes = @($scheduled | ForEach-Object { [pscustomobject]@{ Issue = $_.Issue; State = $_.NodeState; DurationSeconds = @($rows | Where-Object Issue -EQ $_.Issue)[0].RemainingSeconds; DependsOn = $_.DependsOn } })
+    # Cross-epic external nodes (issue #1162) enter the schedule and the range at the pooled
+    # rate, hold no slot, add no feature row, and are not part of the serial sum.
+    $externalRate = $defaultRate
+    if (-not [double]::IsNaN([double] $pooled.Median)) { $externalRate = [double] $pooled.Median }
+    foreach ($node in $ExternalNode) {
+        $nodes += [pscustomobject]@{ Issue = [string] $node.Issue; State = $node.NodeState; DurationSeconds = (Get-EpicProgressExternalSecond -Node $node -Rate $externalRate); DependsOn = [string[]] @(); External = $true }
+        $scheduled.Add([pscustomobject]@{ Issue = [string] $node.Issue; NodeState = $node.NodeState; Step = @(); Rate = $externalRate; DependsOn = [string[]] @(); External = $true; ExecutionTasks = $node.ExecutionTasks; OtherSeconds = $node.OtherSeconds })
+    }
     $schedule = Invoke-EpicProgressListSchedule -Node $nodes -Cap $cap.Cap -TailSeconds $tail.TailSeconds
     foreach ($entry in $schedule.Feature) {
-        $row = @($rows | Where-Object Issue -EQ $entry.Issue)[0]
+        $matched = @($rows | Where-Object Issue -EQ $entry.Issue)
+        if ($matched.Count -eq 0) { continue }
+        $row = $matched[0]
         $row.StartSeconds = $entry.StartSeconds
         $row.FinishSeconds = $entry.FinishSeconds
     }
@@ -304,5 +327,6 @@ function Get-EpicProgressCriticalPathReport {
         Chain            = Get-EpicProgressCriticalChain -Schedule $schedule -NoTail:$ItemMode
         SerialSumSeconds = $serial + $tail.TailSeconds
         Range            = Get-EpicProgressScheduleRange -Feature @($scheduled) -Pooled $pooled -Aggregate $Aggregate -Ledger $Ledger -Default $Default -NowUnixSeconds $NowUnixSeconds -Cap $cap.Cap -TailSeconds $tail.TailSeconds
+        CrossEpic        = [object[]] @($CrossEdge | ForEach-Object { $edge = $_; $node = @($ExternalNode | Where-Object { $_.Issue -eq $edge.Node }) | Select-Object -First 1; [pscustomobject]@{ Issue = [string] $edge.Issue; Node = [string] $edge.Node; State = $(if ($null -ne $node) { $node.NodeState } else { 'pending' }); Label = $(if ($null -ne $node) { $node.Label } else { 'external (default)' }) } })
     }
 }

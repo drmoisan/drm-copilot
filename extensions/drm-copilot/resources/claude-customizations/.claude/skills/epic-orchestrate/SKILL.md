@@ -66,6 +66,9 @@ features:
   (`epic_type` in {business, enabler}, non-empty `business_outcome_hypothesis`, string-list
   `leading_indicators` / `nfrs`); when absent, validation is byte-identical to a manifest
   without it.
+- The optional per-feature key `cross_epic_depends_on` names prerequisites in other epics; it
+  never enters `depends_on` and moves no wave
+  (`## Cross-Epic Dependencies (cross_epic_depends_on)`).
 
 ## Wave Assignment
 
@@ -131,6 +134,11 @@ function of the DAG.
    with `main` as the base branch; each pull-request snapshot is classified with
    `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1 -PrJson <snapshot-json> -AsJson`
    (issue #952).
+
+When a feature carries `cross_epic_depends_on`, `epic-orchestrator` runs
+`Invoke-EpicCrossReadiness.ps1` with `-Mode main` before step 6 opens the integration-to-main PR;
+on release the main sync runs first (step 3), and the check is re-run immediately before
+`gh pr merge` (`## Cross-Epic Dependencies (cross_epic_depends_on)`).
 
 ## Merge-on-Green Kickoff Parameter
 
@@ -406,6 +414,111 @@ Layer 1 skips only the named edge while the upstream is at `worktree_created`, `
 `ci_green`, or `merge_conflict`, and its deny text is unchanged. Every other edge keeps the
 checks of `## Wave Barrier (Two-Layer Design)`.
 
+## Cross-Epic Dependencies (cross_epic_depends_on)
+
+This section applies only when a feature of the manifest carries `cross_epic_depends_on` (issue
+#1162). Without the key it does not apply, and every other section of this skill governs
+unchanged.
+
+**Syntax (D1).** The optional per-feature key `cross_epic_depends_on` is one line: an inline flow
+sequence of flow mappings, each with exactly the keys `epic`, `integration_branch`, and
+`issue_num`, for example
+`cross_epic_depends_on: [{ epic: provider-epic, integration_branch: epic/provider-epic-integration, issue_num: 1188 }]`.
+`epic` is one plain segment that differs from this manifest's `epic`; `integration_branch` is
+`epic/` plus the `epic` value plus `-integration`; `issue_num` names a `features[]` entry of the
+other epic's manifest, read with `git show` from `origin` of that integration branch, or from
+`origin/main` when the branch no longer exists. An absent key or `[]` means no edge. Cross-epic
+edges never enter `depends_on` and move no wave.
+
+**CLI.** `pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1 -Mode validate|feature|main -ManifestPath <manifest> [-Issue <issue_num>] [-WaitSeconds <0 to 540>]`
+exits 0 with compressed JSON (`Mode`, `Decision`, `Reason`, and per-edge or per-epic PR number,
+merge commit SHA, and evaluation time), 1 for a manifest error, and 2 for a usage error.
+
+**Kickoff validation.** At kickoff, alongside `Invoke-EpicWave.ps1`, run `Invoke-EpicCrossReadiness.ps1`
+with `-Mode validate`. Each manifest error begins with its code and is reported as the same
+synthetic Blocking finding as an unresolved `depends_on` entry; no feature is launched. The nine
+codes are `EPIC_CROSS_DEPENDENCY_MALFORMED`, `EPIC_CROSS_DEPENDENCY_UNSUPPORTED_FORM`,
+`EPIC_CROSS_DEPENDENCY_BRANCH_MISMATCH`, `EPIC_CROSS_DEPENDENCY_SAME_EPIC`,
+`EPIC_CROSS_DEPENDENCY_DUPLICATE`, `EPIC_CROSS_DEPENDENCY_UNRESOLVED`,
+`EPIC_CROSS_DEPENDENCY_MANIFEST_UNREADABLE`, `EPIC_CROSS_DEPENDENCY_CYCLE` (a feature-level cycle
+across this manifest and the directly referenced manifests, one hop), and
+`EPIC_CROSS_DEPENDENCY_EARLY_START_CROSS` (`early_start_on` may not name a cross-epic issue).
+
+**Launch hold.** Before a feature with cross-epic edges receives a worktree, run the CLI with
+`-Mode feature -Issue <issue_num>`. A held feature never receives a worktree and stays
+`not_started`; its intra-epic dependents wait through the wave barrier, and independent features
+proceed. The prerequisite PR is the one merged PR into the other integration branch whose listed
+files include the prerequisite feature folder under `docs/features/active/` or
+`docs/features/completed/`, or whose head branch carries the prerequisite issue number as a
+hyphen-delimited token; main-sync chore PRs never match. Each edge takes the first matching row:
+
+| Order | Condition | Decision | Reason |
+|---|---|---|---|
+| 1 | Adapter error, ancestry exit other than 0 or 1, or `PREREQ_SNAPSHOT_INVALID` | hold | `PREREQ_UNVERIFIABLE` |
+| 2 | One matching PR, the other integration branch is absent, and its merge commit is an ancestor of `origin/main` | release | `PREREQ_IN_MAIN` |
+| 3 | No matching merged PR | hold | `PREREQ_PR_NOT_FOUND` |
+| 4 | More than one matching PR | hold | `PREREQ_PR_AMBIGUOUS` |
+| 5 | Merge commit not an ancestor of the other integration branch | hold | `PREREQ_NOT_ANCESTOR` |
+| 6 | Merge commit already an ancestor of the own integration branch | release | `PREREQ_ALREADY_INTEGRATED` |
+| 7 | Otherwise | merge_required | `PREREQ_MERGED_INTEGRATION_MERGE_REQUIRED` |
+
+Every edge `release` gives `release`; any `hold` gives `hold`; otherwise `merge_required` lists
+the distinct integration branches to merge. A feature without cross-epic edges gives `release` with
+`NO_CROSS_EPIC_EDGE`. Adapter failures never fail open.
+
+**Integration merge (D4).** On `merge_required`, for each listed integration branch: fetch it from
+`origin`; when the prerequisite merge commit is already an ancestor of the own integration branch,
+make no merge; otherwise run `git merge --no-ff` of the fetched branch in the integration
+worktree, never a rebase or fast-forward, with conflicts handled as in the main-sync step, then
+push, re-fetch the own integration branch, record `integration_merge_commit_sha` and
+`integrated_at` in the hold record, and launch the feature. `PREREQ_IN_MAIN` makes no merge,
+because the main sync already brings the prerequisite in.
+
+**Context handoff (D10).** After the merge, the child delegation carries one line per cross-epic
+dependency, appended after the epic-mode kickoff line:
+`Upstream context for {issue_num}: cross-epic depends on {epic}#{dep_issue_num} (spec: {dep_spec_path}; plan: {dep_plan_path}; merged as PR #{pr}, commit {sha}, into {other_integration_branch}; integrated into {own_integration_branch} as {integration_sha}).`
+In preparation mode (`epic-plan`) the same line carries `not merged` in place of the merge facts.
+
+**Main hold (D5).** Before step 6 of `## Epic Integration Branch Lifecycle` opens the
+integration-to-main PR, run the CLI with `-Mode main`. Each distinct prerequisite epic takes the
+first matching row: `MAIN_PREREQ_UNVERIFIABLE` (adapter error, hold), `MAIN_PREREQ_PR_NOT_MERGED`
+(no merged PR from the other integration branch into `main`, hold), `MAIN_PREREQ_PR_AMBIGUOUS`
+(more than one, hold), `MAIN_PREREQ_NOT_ANCESTOR` (merge commit not an ancestor of `origin/main`,
+hold), otherwise `MAIN_PREREQ_RELEASED`. No edge gives `not_applicable`; every epic released gives
+`release`; otherwise `hold`. Open the PR only on `release` or `not_applicable`. On release the
+main sync runs first (step 3), so the PR diff no longer carries the other epic's commits. The
+check is re-run immediately before `gh pr merge`. Record the result as `cross_epic_main_gate`.
+
+**Bounded wait (D8).** Re-evaluate holds at every scheduling event. When every runnable feature is
+held and nothing is in flight, or the main hold is in force, call the CLI with `-WaitSeconds 540`;
+it polls every 60 seconds and returns at the first release or at the bound. Repeat the call at
+most 40 times, then record `blocked_reason: "external_dependency"`, regenerate `epic-status.md`,
+and stop; `/epic-run` on the same epic slug resumes. Hold records are a cache, re-derived from
+`gh` and `git` on resume.
+
+**Records (D7).** Each feature carrying the key copies `cross_epic_depends_on[]` into the epic
+checkpoint with `status` (`held`, `released`, `integrated`, `in_main`), `reason`,
+`prerequisite_pr_number`, `prerequisite_merge_commit_sha`, and `verified_at`; a held feature stays
+`not_started`. The top-level `cross_epic_main_gate` carries `status` (`held` or `released`) and
+`prerequisites[]` (`epic`, `integration_branch`, `pr_number`, `merge_commit_sha`, `verified_at`).
+`epic-status.md` gains a cross-epic table (edge, status, reason) only when the key is present.
+Validate the checkpoint through the repository CLI
+`scripts.dev_tools.validate_orchestration_artifacts` with its `epic-orchestrator-state`
+subcommand, run through Poetry in module form, because installed MCP lags these rules until the
+extension release that carries them is installed.
+
+**Status mapping (D7).** A `hold` decision records `held`. `PREREQ_IN_MAIN` records `in_main`.
+`PREREQ_ALREADY_INTEGRATED`, or a completed D4 merge, records `integrated` before the feature is
+launched. `released` is recorded only between a `merge_required` decision and its completed D4
+merge, so a feature is launched only when every entry is `integrated` or `in_main`, the two
+statuses the started-while-held invariant accepts. A main-gate `release` records
+`cross_epic_main_gate` status `released`, and a main-gate `hold` records `held`.
+
+**Disclosure (D5).** The merge-gate hook `enforce-epic-merge-gate.ps1` does not read
+`cross_epic_main_gate`. The integration-to-main hold is a skill-level policy control enforced by
+`epic-orchestrator`, with the completion invariant of the validators as a retrospective backstop,
+consistent with the checkpoint-cache doctrine.
+
 ## Worktree Cleanup
 
 After a child feature's `epic_merge.merge_commit_sha` is recorded (S9 step 6 succeeds) and
@@ -482,6 +595,10 @@ Validate the checkpoint through the
 that same call at the completion gate. The validation is implemented in
 `scripts/dev_tools/validate_epic_orchestrator_state.py`.
 
+When a feature carries `cross_epic_depends_on`, the checkpoint also carries the D7 hold records on
+that feature and the top-level `cross_epic_main_gate`, both key-gated
+(`## Cross-Epic Dependencies (cross_epic_depends_on)`).
+
 **Checkpoint hygiene (issue #673).** The coordinating session never holds a per-feature checkpoint at its own root. Before the first child delegation of a run it moves any `artifacts/orchestration/orchestrator-state.json` at its root to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and writes none there for the rest of the run, because each item's checkpoint lives in that item's worktree. A gated call the coordinator issues on an item's behalf is resolved by the item's issue number and branch, never by the coordinator root.
 
 **Integration-PR checkpoint shape (issue #663).** The integration-to-`main` pull request and its `Agent(pr-author)` delegation are gated against `artifacts/orchestration/epic-orchestrator-state.json`, and no per-feature checkpoint is written for them. Before `epic-orchestrator` opens that pull request, the epic checkpoint carries `route_id: "epic"`, `integration_branch`, `epic_issue_num`, and a `features[]` array in which every entry's `merge_status` is `merged` or `worktree_removed`. Before the `Agent(pr-author)` delegation, `epic-orchestrator` records the `pr-author` routing receipt in that file's `model_routing_receipts[]`. The pr-author gate, the epic base-branch check, the model-routing gate, and the preimplementation gate treat a call as epic scope when its branch signal (or, for a staging command or file edit, the worktree HEAD) equals `integration_branch`; the pull request base must then be `main`.
@@ -500,6 +617,9 @@ that same call at the completion gate. The validation is implemented in
 3. `docs/features/epics/<epic-slug>/epic-status.md` reflects the completed state.
 4. The epic checkpoint passes `validate_epic_orchestrator_state_text` with
    `require_complete=True`.
+
+When a feature carries `cross_epic_depends_on`, completion also requires a released
+`cross_epic_main_gate` with one entry per distinct prerequisite epic.
 
 ## Nesting Depth
 
