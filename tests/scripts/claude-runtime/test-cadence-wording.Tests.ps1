@@ -105,7 +105,9 @@ BeforeDiscovery {
         'between Phase 0 and the final QA phase', 'stages 1 to 6', 'restart from step 1', 'one clean pass',
         'Phase 0 baseline', 'no-SKIPPED rule', 'Integration and golden suites run in CI only',
         'one `Invoke-PoshQCParallelTest` run', 'one `pytest -n auto` run', 'Jest through its normal parallel workers',
-        'task-check.P<N>-T<M>.<timestamp>.md', 'phase-gate.P<N>.<timestamp>.md'
+        'task-check.P<N>-T<M>.<timestamp>.md', 'phase-gate.P<N>.<timestamp>.md',
+        # Issue #1158 (C1): the task's Pester selection runs through the launcher pester suite with -TestPath.
+        '-TestPath'
     )
     # Decision D15: the expect-fail phase and the no-change phase provisions.
     $script:CanonicalD15Token = @(
