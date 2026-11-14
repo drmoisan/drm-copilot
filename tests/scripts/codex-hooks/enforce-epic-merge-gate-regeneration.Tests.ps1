@@ -11,6 +11,8 @@
     Claude copy, and shows the review guard's stale-head denial precedes the check. No case starts a
     process, runs git or gh, or writes a file.
 #>
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'The stub mirrors the production git seam signature.')]
+param()
 
 Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
     BeforeAll {
@@ -23,7 +25,7 @@ Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
         $script:OtherHead = 'b' * 40
         $script:DenyPrefix = 'EPIC_MERGE_GATE_BLOCKED: REVIEW_GATE_REGENERATION_UNVERIFIED: '
 
-        function New-RegenerationGateEvent {
+        function Get-RegenerationGateEvent {
             <#
             .SYNOPSIS
                 Return a complete regeneration_events entry as an ordered dictionary.
@@ -78,7 +80,7 @@ Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
     Context 'decision rules' {
         It 'allows a delta outcome with a matching complete event' {
             # Arrange
-            $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($script:DeltaOutcome) -EventList @(New-RegenerationGateEvent)
+            $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($script:DeltaOutcome) -EventList @(Get-RegenerationGateEvent)
 
             # Act
             $decision = Get-EpicMergeGateRegenerationDecision -Checkpoint $checkpoint
@@ -89,9 +91,9 @@ Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
 
         It 'allows when a later complete event follows an incomplete event with the same head_sha' {
             # Arrange
-            $incomplete = New-RegenerationGateEvent
+            $incomplete = Get-RegenerationGateEvent
             $incomplete['unit_gate'] = 'not_run'
-            $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($script:DeltaOutcome) -EventList @($incomplete, (New-RegenerationGateEvent))
+            $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($script:DeltaOutcome) -EventList @($incomplete, (Get-RegenerationGateEvent))
 
             # Act
             $decision = Get-EpicMergeGateRegenerationDecision -Checkpoint $checkpoint
@@ -115,7 +117,7 @@ Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
 
         It 'denies when the only complete event carries a different head_sha' {
             # Arrange
-            $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($script:DeltaOutcome) -EventList @(New-RegenerationGateEvent -HeadSha $script:OtherHead)
+            $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($script:DeltaOutcome) -EventList @(Get-RegenerationGateEvent -HeadSha $script:OtherHead)
 
             # Act
             $decision = Get-EpicMergeGateRegenerationDecision -Checkpoint $checkpoint
@@ -135,7 +137,7 @@ Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
             @{ Field = 'outcome'; Value = 'fell_back' }
         ) {
             # Arrange
-            $regenerationEvent = New-RegenerationGateEvent
+            $regenerationEvent = Get-RegenerationGateEvent
             $regenerationEvent[$Field] = $Value
             $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($script:DeltaOutcome) -EventList @($regenerationEvent)
 
@@ -209,7 +211,7 @@ Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
 
         It 'denies a delta outcome without a matching event on a checkpoint with no review_mode' {
             # Arrange
-            $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($script:DeltaOutcome) -EventList @(New-RegenerationGateEvent -HeadSha $script:OtherHead) -Extra @{ step9_status = 'passed' }
+            $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($script:DeltaOutcome) -EventList @(Get-RegenerationGateEvent -HeadSha $script:OtherHead) -Extra @{ step9_status = 'passed' }
 
             # Act
             $decision = Get-EpicMergeGateRegenerationDecision -Checkpoint $checkpoint
@@ -235,7 +237,7 @@ Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
 
         It 'reads a checkpoint parsed as a hashtable' {
             # Arrange
-            $text = [ordered]@{ remediation_loop = [ordered]@{ review_outcomes = @($script:DeltaOutcome) }; regeneration_events = @(New-RegenerationGateEvent) } | ConvertTo-Json -Depth 10
+            $text = [ordered]@{ remediation_loop = [ordered]@{ review_outcomes = @($script:DeltaOutcome) }; regeneration_events = @(Get-RegenerationGateEvent) } | ConvertTo-Json -Depth 10
             $checkpoint = ConvertFrom-Json -InputObject $text -AsHashtable
 
             # Act
@@ -249,7 +251,7 @@ Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
             # Arrange
             $outcome = [ordered]@{} + $script:DeltaOutcome
             $outcome['head_sha'] = $null
-            $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($outcome) -EventList @(New-RegenerationGateEvent)
+            $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($outcome) -EventList @(Get-RegenerationGateEvent)
 
             # Act
             $decision = Get-EpicMergeGateRegenerationDecision -Checkpoint $checkpoint
@@ -272,7 +274,7 @@ Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
             Mock Get-EpicMergeGateReviewLiveHeadSha -MockWith ({ $liveHead }.GetNewClosure())
             Mock Invoke-DocsOnlyGitExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
             Mock Get-EpicMergeGateRegenerationDecision { [ordered]@{ Denied = $false; Reason = $null } }
-            $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($script:DeltaOutcome) -EventList @(New-RegenerationGateEvent) -Extra @{ review_mode = 'concurrent'; 'feature-folder' = 'docs/features/active/x-1' }
+            $checkpoint = ConvertTo-RegenerationGateCheckpoint -Outcomes @($script:DeltaOutcome) -EventList @(Get-RegenerationGateEvent) -Extra @{ review_mode = 'concurrent'; 'feature-folder' = 'docs/features/active/x-1' }
 
             # Act
             $decision = Get-EpicMergeGateReviewDecision -Checkpoint $checkpoint -CommandPrNumber 42 -GhRoot '/synthetic-root' -GitRoot '/synthetic-root'

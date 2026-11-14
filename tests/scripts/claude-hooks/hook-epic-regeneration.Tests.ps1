@@ -15,6 +15,8 @@
     RegenerationClassifier.psm1. No row creates a file, changes the working directory, or sets
     global state.
 #>
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Seam stubs mirror the production scriptblock signatures, and parameters read only inside nested script blocks are not seen by the rule.')]
+param()
 
 Describe 'hook-epic-regeneration.ps1 <Surface> copy (issue #1156)' -ForEach @(
     @{ Surface = 'Claude'; HookDirectory = '.claude/hooks' }

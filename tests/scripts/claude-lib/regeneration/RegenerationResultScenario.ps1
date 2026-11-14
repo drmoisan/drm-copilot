@@ -74,20 +74,20 @@ function Get-RegenerationScenarioBaseResponse {
     $process = @{ 'gen-tool --write' = @(0); 'check-tool' = @(0); 'ut-a' = @(0); 'ut-b' = @(0) }
     if ($Flow -ceq 'Tip') {
         $git = @{
-            'rev-parse -q --verify MERGE_HEAD'            = @(1)
-            'status --porcelain -z'                       = @('')
-            'diff --name-only -z'                         = @("gen/a.json$nul")
-            'ls-files --others --exclude-standard -z'     = @("gen/new.json$nul")
-            'hash-object -- gen/a.json'                   = @('blob-a')
-            'hash-object -- gen/new.json'                 = @('blob-new')
-            'hash-object -- gen/extra.json'               = @('blob-extra')
-            'hash-object -- src/x.ps1'                    = @('blob-x')
-            'hash-object -- stray.txt'                    = @('blob-stray')
-            'checkout -- gen/a.json'                      = @('')
-            'checkout -- gen/a.json src/x.ps1'            = @('')
-            'clean -f -q -- gen/new.json'                 = @('')
-            'clean -f -q -- gen/new.json stray.txt'       = @('')
-            'clean -f -q -- gen/extra.json gen/new.json'  = @('')
+            'rev-parse -q --verify MERGE_HEAD'           = @(1)
+            'status --porcelain -z'                      = @('')
+            'diff --name-only -z'                        = @("gen/a.json$nul")
+            'ls-files --others --exclude-standard -z'    = @("gen/new.json$nul")
+            'hash-object -- gen/a.json'                  = @('blob-a')
+            'hash-object -- gen/new.json'                = @('blob-new')
+            'hash-object -- gen/extra.json'              = @('blob-extra')
+            'hash-object -- src/x.ps1'                   = @('blob-x')
+            'hash-object -- stray.txt'                   = @('blob-stray')
+            'checkout -- gen/a.json'                     = @('')
+            'checkout -- gen/a.json src/x.ps1'           = @('')
+            'clean -f -q -- gen/new.json'                = @('')
+            'clean -f -q -- gen/new.json stray.txt'      = @('')
+            'clean -f -q -- gen/extra.json gen/new.json' = @('')
         }
         return @{ Git = $git; Process = $process }
     }
@@ -328,7 +328,7 @@ function Get-RegenerationScenarioCallList {
         deciding call, followed by the restore calls of the row.
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [object[]])]
     param(
         [Parameter(Mandatory = $true)] [hashtable] $Row,
         [int] $Alternative = 0
@@ -389,7 +389,7 @@ function Get-RegenerationTipScenarioCallList {
         Return the exact ordered call list of one Tip scenario alternative.
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [object[]])]
     param([Parameter(Mandatory = $true)] [hashtable] $Selected)
 
     $fixed = @{
@@ -460,13 +460,13 @@ function Register-RegenerationScenarioMock {
     foreach ($key in $selected.Process.Keys) { $process[$key] = $selected.Process[$key] }
 
     $state = @{
-        Git         = $git
-        Process     = $process
-        ConfigText  = (Get-RegenerationScenarioConfigText -Kind $selected.Config)
-        Calls       = [System.Collections.Generic.List[string]]::new()
-        ConfigReads = [System.Collections.Generic.List[string]]::new()
-        Occurrence  = @{}
-        GitCalls    = 0
+        Git          = $git
+        Process      = $process
+        ConfigText   = (Get-RegenerationScenarioConfigText -Kind $selected.Config)
+        Calls        = [System.Collections.Generic.List[string]]::new()
+        ConfigReads  = [System.Collections.Generic.List[string]]::new()
+        Occurrence   = @{}
+        GitCalls     = 0
         ProcessCalls = 0
     }
     $script:RegenerationScenarioState = $state
@@ -540,7 +540,7 @@ function Resolve-RegenerationExpectedCell {
         Resolve one Expected cell of a table row: a JSON literal unchanged, or a legend token.
     #>
     [CmdletBinding()]
-    [OutputType([object])]
+    [OutputType([object[]])]
     param(
         [Parameter(Mandatory = $true)] [hashtable] $Row,
         [Parameter(Mandatory = $true)] [AllowNull()] [AllowEmptyCollection()] [object] $Token

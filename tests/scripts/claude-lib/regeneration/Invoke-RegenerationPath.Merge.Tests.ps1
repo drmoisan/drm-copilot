@@ -73,7 +73,7 @@ Describe 'Invoke-RegenerationPath Merge rules outside the table cells' {
     It 'makes no add -A call and returns changed_paths [] with exit 0 when run 1 changes nothing' {
         $run = Invoke-MergeScenario -Row (Get-MergeRow -Id 'R73') -Git @{
             'diff --name-only -z' = @(''); 'ls-files --others --exclude-standard -z' = @('')
-            'diff --cached --name-only -z --no-renames HEAD' = @("gen/a.json${script:Nul}src/main.ps1$script:Nul")
+            'diff --cached --name-only -z --no-renames HEAD'       = @("gen/a.json${script:Nul}src/main.ps1$script:Nul")
             'diff --cached --name-only -z --no-renames MERGE_HEAD' = @("gen/a.json${script:Nul}src/feature.ps1$script:Nul")
         }
         @($run.Calls | Where-Object { $_ -cmatch '^git add -A' }).Count | Should -Be 0
@@ -89,7 +89,7 @@ Describe 'Invoke-RegenerationPath Merge rules outside the table cells' {
 
     It 'reaches the not-confined path of R60 for an untracked run-1 file present only in the M13 listing' {
         $run = Invoke-MergeScenario -Row (Get-MergeRow -Id 'R73') -Git @{
-            'diff --name-only -z' = @('', "gen/a.json$script:Nul", '')
+            'diff --name-only -z'                     = @('', "gen/a.json$script:Nul", '')
             'ls-files --others --exclude-standard -z' = @('', "stray.txt$script:Nul", '')
         }
         $run.Output.ExitCode | Should -Be 3
@@ -98,7 +98,7 @@ Describe 'Invoke-RegenerationPath Merge rules outside the table cells' {
 
     It 'reaches R66 for a run-2 file present only in the M16 untracked listing with M15 empty' {
         $run = Invoke-MergeScenario -Row (Get-MergeRow -Id 'R73') -Git @{
-            'diff --name-only -z' = @('', "gen/a.json$script:Nul", '')
+            'diff --name-only -z'                     = @('', "gen/a.json$script:Nul", '')
             'ls-files --others --exclude-standard -z' = @('', "gen/new.json$script:Nul", "gen/late.json$script:Nul")
         }
         $run.Output.ExitCode | Should -Be 3

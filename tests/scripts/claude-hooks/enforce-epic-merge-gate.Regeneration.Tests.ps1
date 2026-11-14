@@ -40,7 +40,7 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
         $script:Live = Get-EpicMergeGateReviewHead -Kind Live
         $script:DenyPrefix = 'EPIC_MERGE_GATE_BLOCKED: REVIEW_GATE_REGENERATION_UNVERIFIED: '
 
-        function New-GateRegenerationEvent {
+        function Get-GateRegenerationEvent {
             <#
             .SYNOPSIS
                 Return a complete regeneration_events entry for the given head.
@@ -70,7 +70,8 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
 
             $checkpoint = ConvertTo-EpicMergeGateReviewCheckpointJson -Override $Override -Remove $Remove
             Mock Get-ChildOrchestratorCheckpointContent -MockWith ({ $checkpoint }.GetNewClosure())
-            Mock Get-EpicMergeGateReviewLiveHeadSha -MockWith ({ $LiveHead }.GetNewClosure())
+            $liveHeadSha = $LiveHead
+            Mock Get-EpicMergeGateReviewLiveHeadSha -MockWith ({ $liveHeadSha }.GetNewClosure())
             Register-EpicMergeGateReviewChildCiSeam -HeadSha $script:Reviewed
             $envelope = @{ session_id = 'session-1156'; tool_name = 'Bash'; tool_input = @{ command = 'gh pr merge 42 --merge' } } | ConvertTo-Json -Depth 5 -Compress
             $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $envelope
@@ -103,7 +104,7 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
 
     It 'allows a delta outcome at the live head with a matching complete event' {
         # Act
-        $result = Invoke-RegenerationGateDecision -Override (Get-DeltaOverride -EventList @(New-GateRegenerationEvent))
+        $result = Invoke-RegenerationGateDecision -Override (Get-DeltaOverride -EventList @(Get-GateRegenerationEvent))
 
         # Assert
         $result.Decision | Should -Be 'allow' -Because "reason: $($result.Reason)"
@@ -127,7 +128,7 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
         @{ Field = 'head_sha'; Value = 'fedcba9876543210fedcba9876543210fedcba98' }
     ) {
         # Arrange
-        $regenerationEvent = New-GateRegenerationEvent
+        $regenerationEvent = Get-GateRegenerationEvent
         $regenerationEvent[$Field] = $Value
 
         # Act
@@ -143,7 +144,7 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
         Mock Get-EpicMergeGateRegenerationDecision { [ordered]@{ Denied = $false; Reason = $null } }
 
         # Act
-        $result = Invoke-RegenerationGateDecision -Override (Get-DeltaOverride -EventList @(New-GateRegenerationEvent)) -LiveHead $script:Live
+        $result = Invoke-RegenerationGateDecision -Override (Get-DeltaOverride -EventList @(Get-GateRegenerationEvent)) -LiveHead $script:Live
 
         # Assert
         $result.Decision | Should -Be 'deny'
@@ -190,7 +191,7 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
         BeforeAll {
             Import-Module (Join-Path $PSScriptRoot '../../../.claude/lib/regeneration/RegenerationDelta.psm1') -ErrorAction Stop
 
-            function New-R73Pair {
+            function Get-R73Pair {
                 <#
                 .SYNOPSIS
                     Build the event and delta outcome from the given cells and apply the orchestrator completion.
@@ -200,6 +201,7 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
                     Set the event's unit_gate to pass after the standard gates.
                 #>
                 [CmdletBinding()]
+                [OutputType([hashtable])]
                 param([string] $UnitGate, [switch] $PromoteUnitGate)
 
                 $regenerationEvent = New-RegenerationEvent -At '2026-11-09T22:00:00Z' -Trigger main_sync -FeatureHeadSha $null -MergeHeadSha $null -MergeBaseSha $null -Decision regenerate -Reason all_match -UnmatchedPaths @() -CommandExitCode 0 -Confined $true -Idempotent $true -UnitGate $UnitGate -DeltaCheck pass -Outcome regenerated -HeadSha $null -EvidencePath $null
@@ -220,7 +222,7 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
 
         It 'allows the completed R73 checkpoint' {
             # Act
-            $result = Invoke-RegenerationGateDecision -Override (New-R73Pair -UnitGate not_run -PromoteUnitGate)
+            $result = Invoke-RegenerationGateDecision -Override (Get-R73Pair -UnitGate not_run -PromoteUnitGate)
 
             # Assert
             $result.Decision | Should -Be 'allow' -Because "reason: $($result.Reason)"
@@ -228,7 +230,7 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
 
         It 'denies the R73 checkpoint without the unit_gate step, naming unit_gate' {
             # Act
-            $result = Invoke-RegenerationGateDecision -Override (New-R73Pair -UnitGate not_run)
+            $result = Invoke-RegenerationGateDecision -Override (Get-R73Pair -UnitGate not_run)
 
             # Assert
             $result.Decision | Should -Be 'deny'
@@ -238,7 +240,7 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
 
         It 'allows an R72 event (unit_gate pass) completed with head_sha and evidence_path only' {
             # Act
-            $result = Invoke-RegenerationGateDecision -Override (New-R73Pair -UnitGate pass)
+            $result = Invoke-RegenerationGateDecision -Override (Get-R73Pair -UnitGate pass)
 
             # Assert
             $result.Decision | Should -Be 'allow' -Because "reason: $($result.Reason)"

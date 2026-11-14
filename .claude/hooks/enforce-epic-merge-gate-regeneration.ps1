@@ -40,7 +40,7 @@ function Get-EpicMergeGateRegenerationMember {
         System.Object or $null
     #>
     [CmdletBinding()]
-    [OutputType([object])]
+    [OutputType([object[]])]
     param(
         [AllowNull()] $InputObject,
         [Parameter(Mandatory)][string] $Name

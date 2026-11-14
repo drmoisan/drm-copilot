@@ -52,7 +52,7 @@ function Get-EpicRegenerationConfigPattern {
         System.String[] or $null
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [object[]])]
     param([AllowNull()][AllowEmptyString()][string] $Text)
 
     if ([string]::IsNullOrWhiteSpace($Text)) { return $null }
@@ -172,7 +172,7 @@ function Read-EpicRegenerationConfig {
         System.String[] or $null
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [object[]])]
     param(
         [AllowNull()][AllowEmptyString()][string] $WorktreeRoot,
         [scriptblock] $TestPath = { param($Path) Test-Path -LiteralPath $Path },
@@ -264,7 +264,7 @@ function Get-EpicRegenerationAllowance {
             }
             return (Test-EpicRegenerationPathMatch -Path $Path -Pattern $epicRegenerationPatterns)
         }
-        $denyPath = { param([string] $Path) $false }
+        $denyPath = { $false }
         return (Get-EpicFanInAllowance -Scope $Scope -FilePath @() -Command $Command -StagedIndexReader $StagedIndexReader -PathPredicate $denyPath -OperandPredicate $operandPredicate)
     } catch {
         return [pscustomobject]@{ Allowed = $false; Detail = "allowance error: $($_.Exception.Message)" }

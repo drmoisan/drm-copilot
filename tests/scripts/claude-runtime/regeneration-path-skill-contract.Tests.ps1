@@ -114,7 +114,7 @@ BeforeAll {
         return @(($Text -split "`n") | Where-Object { $_ -cmatch '^[0-9]+\. ' } | ForEach-Object { [int]($_ -replace '^([0-9]+)\. .*$', '$1') })
     }
 
-    function Assert-RscContains {
+    function Assert-RscLiteralPresent {
         # Assert every literal occurs ordinally in the collapsed scope text.
         param([AllowNull()][string] $Scope, [Parameter(Mandatory)][string[]] $Literal, [Parameter(Mandatory)][string] $Label)
         $Scope | Should -Not -BeNullOrEmpty -Because "$Label must exist"
@@ -132,7 +132,7 @@ Describe 'regenerate-path skill contract (issue #1156)' {
         $scope = Get-RscSection -Text $text -Heading $Heading
 
         # Assert
-        Assert-RscContains -Scope $scope -Literal $Literal -Label "$Heading of $Prefix$File"
+        Assert-RscLiteralPresent -Scope $scope -Literal $Literal -Label "$Heading of $Prefix$File"
     }
 
     Context 'orchestrate skill structure in <Prefix>' -ForEach $script:Surface {
@@ -225,7 +225,7 @@ Describe 'regenerate-path skill contract (issue #1156)' {
 
             # Assert
             ($starts -join ',') | Should -BeExactly '1,2,3,4,5,6'
-            Assert-RscContains -Scope $stepThree -Literal $literals -Label 'step 3 of the lifecycle section'
+            Assert-RscLiteralPresent -Scope $stepThree -Literal $literals -Label 'step 3 of the lifecycle section'
             foreach ($number in @($starts | Where-Object { $_ -ne 3 })) {
                 $other = Get-RscCollapsed -Text (Get-RscNumberedItem -Text $section -Number $number)
                 foreach ($literal in $literals) { $other.Contains($literal) | Should -BeFalse -Because "step $number must not contain: $literal" }

@@ -13,6 +13,8 @@
     scriptblocks with no mock of that wrapper. No file, git repository, process,
     or wait is used.
 #>
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Seam stubs mirror the production scriptblock signatures, and parameters read only inside nested script blocks are not seen by the rule.')]
+param()
 
 BeforeDiscovery {
     $script:DiscoveryRows = @((Import-PowerShellDataFile -LiteralPath (Join-Path $PSScriptRoot 'RegenerationResultTable.psd1')).Rows)

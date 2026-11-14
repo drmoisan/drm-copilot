@@ -117,6 +117,7 @@ function New-RegenerationResult {
         Build the twenty-key entry-point result; defaults equal the usage-row cells.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory builder that changes no system state.')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidAssignmentToAutomaticVariable', 'Event', Justification = 'The parameter name mirrors the result key event that spec D17 fixes; it is a function parameter, not the automatic variable of an event action.')]
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
@@ -252,7 +253,7 @@ function Invoke-RegenerationPathCommand {
     $stage = Get-RegenerationConfigStage -Text $text
     $context = @{
         MergeRef = $MergeRef; Trigger = $Trigger; At = $at; Stage = $stage
-        Stamp = (ConvertTo-RegenerationStamp -Value $now)
+        Stamp                = (ConvertTo-RegenerationStamp -Value $now)
         InvocationConfigPath = $(if ($configPathSupplied) { $ConfigPath } else { $null })
     }
 
@@ -457,7 +458,7 @@ function Get-RegenerationSortedPath {
         Split NUL-separated listings into one ordinal-sorted, de-duplicated path list.
     #>
     [CmdletBinding()]
-    [OutputType([string[]])]
+    [OutputType([string[]], [object[]])]
     param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $Listing)
 
     $set = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::Ordinal)
