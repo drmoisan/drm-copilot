@@ -37,11 +37,11 @@
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Capture the PowerShell static baseline (policy order read per `.claude/skills/policy-compliance-order/SKILL.md`) for `.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`, `.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`, and their bundle copies: PoshQC format in check-only mode, PSScriptAnalyzer with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, and `Invoke-PoshQCLeakScan`; type check is not applicable to PowerShell, and no Python, TypeScript, or C# file is in scope.
+- [x] [P0-T1] Capture the PowerShell static baseline (policy order read per `.claude/skills/policy-compliance-order/SKILL.md`) for `.claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`, `.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`, and their bundle copies: PoshQC format in check-only mode, PSScriptAnalyzer with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, and `Invoke-PoshQCLeakScan`; type check is not applicable to PowerShell, and no Python, TypeScript, or C# file is in scope.
   - Evidence: `<FEATURE>/evidence/baseline/powershell-static.<timestamp>.md` with each step's command, exit code, and finding count, and the formatter's no-change observation (a check-only run that rewrites nothing).
-- [ ] [P0-T2] Run the `Phase 0 baseline` of the Pester gate through the launcher `pester` suite (`.claude/skills/test-execution-policy/scripts/run-test-suite.sh`).
+- [x] [P0-T2] Run the `Phase 0 baseline` of the Pester gate through the launcher `pester` suite (`.claude/skills/test-execution-policy/scripts/run-test-suite.sh`).
   - Evidence: `<FEATURE>/evidence/baseline/pester-gate.<timestamp>.md` with the returned `ExitCode`, pass and fail counts read from `artifacts/pester/pester-junit.xml` (per-shard files under `artifacts/pester/parallel/` when shards fail), repo-wide line coverage, and the per-file line coverage of both root epic-scope files read from `artifacts/pester/powershell-coverage.xml`.
-- [ ] [P0-T3] Run the `Phase 0 baseline` of the pytest gate through the launcher `pytest` suite (`.claude/skills/test-execution-policy/scripts/run-test-suite.sh`).
+- [x] [P0-T3] Run the `Phase 0 baseline` of the pytest gate through the launcher `pytest` suite (`.claude/skills/test-execution-policy/scripts/run-test-suite.sh`).
   - Evidence: `<FEATURE>/evidence/baseline/pytest-gate.<timestamp>.md` with exit code, pass and fail counts, and the pass state of `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` and the five push-down contract suites named in AC-12.
 
 ### Phase 1 — Fail-Before Regression Rows
