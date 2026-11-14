@@ -227,6 +227,22 @@ Describe 'Claude preimplementation gate parallel records leg (issue #1182)' {
             Should -Invoke Get-WorktreeRunCheckpointText -Times 0 -Exactly -ParameterFilter { ([string]$Path -replace '\\', '/').EndsWith('/parallel-orchestrator-state.json', [System.StringComparison]::Ordinal) }
             Should -Invoke Get-EpicScopeWorktreeHeadBranch -Times 0 -Exactly
         }
+
+        It '(h) starts no worktree listing for an absolute non-receipt path' {
+            # Arrange
+            $path = '/synthetic-worktrees/coordinator/scripts/x.ps1'
+            $toolInput = [pscustomobject]@{ file_path = $path; content = '{}' }
+
+            # Act
+            $leg = Get-OrchestrationParallelRecordsResult -ToolInput $toolInput -FilePath $path
+
+            # Assert: the leg declines before any listing call; the gate's own resolution lists afterwards.
+            $leg.Allowed | Should -BeFalse
+            $leg.DenySuffix | Should -BeExactly ''
+            Should -Invoke Get-OrchestrationGateWorktreeList -Times 0 -Exactly
+            $decision = Get-ParallelRecordsGateDecision -Payload (ConvertTo-ParallelRecordsPayload -FilePath $path)
+            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:Blocked
+        }
     }
 
     Context 'AC-12 never throws' {
@@ -259,10 +275,11 @@ Describe 'Claude preimplementation gate parallel records leg (issue #1182)' {
             $decision = Get-ParallelRecordsGateDecision -Payload (ConvertTo-ParallelRecordsPayload -FilePath $script:AbsoluteReceipt)
 
             # Assert
+            $targetUnresolved = 'PREIMPLEMENTATION_GATE_BLOCKED: TARGET_WORKTREE_NOT_DERIVABLE: the target worktree of this single-feature call could not be resolved: the worktree listing failed or named no worktree; resolver source SessionRoot: the worktree list failed: locked. Implementation operations require an identifiable target worktree whose checkpoint is ready.'
             $leg.Allowed | Should -BeFalse
             $leg.DenySuffix | Should -BeExactly ''
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -Not -BeLike '*Parallel records leg*'
+            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $targetUnresolved
         }
 
         It 'declines with an empty suffix for <Case>' -ForEach @(
