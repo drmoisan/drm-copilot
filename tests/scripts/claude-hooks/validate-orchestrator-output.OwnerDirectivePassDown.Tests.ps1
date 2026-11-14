@@ -310,3 +310,53 @@ Describe 'source read seam (F1)' {
         Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly
     }
 }
+
+Describe 'non-ASCII directive text (issue #1187)' {
+    BeforeAll {
+        # Three entries whose texts hold an em dash, curly quotes, and a non-BMP character; every character is built from its code point.
+        $script:NonAsciiEntries = @(
+            (Get-PassDownStopEntry -Id 'OD-1' -Text ('Run the items in parallel ' + [char]0x2014 + ' the merge cost is lower.'))
+            (Get-PassDownStopEntry -Id 'OD-2' -Text ('Use the ' + [char]0x201C + 'fast' + [char]0x201D + ' route for the items.'))
+            (Get-PassDownStopEntry -Id 'OD-3' -Text ('Ship the items in parallel ' + [char]::ConvertFromUtf32(0x1F600) + ' today.'))
+        )
+        $script:ItemLedgerPath = "$script:Item/artifacts/orchestration/owner-directives.jsonl"
+    }
+
+    It 'allows an item checkpoint that holds every selected non-ASCII entry' {
+        # Arrange: the entries are selected from the epic parent checkpoint and the item checkpoint holds all three.
+        Register-PassDownStopSeam -Files @{ '/synthetic-worktrees/epic/artifacts/orchestration/epic-orchestrator-state.json' = (Get-PassDownStopParent -Kind epic -Directive $script:NonAsciiEntries) } -Parent $script:EpicParent
+
+        # Act
+        $decision = Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (Get-PassDownStopItem -Link epic -Directive $script:NonAsciiEntries)
+
+        # Assert
+        $decision | Should -BeNullOrEmpty
+    }
+
+    It 'blocks an item checkpoint missing a non-ASCII entry selected from the item ledger' {
+        Register-PassDownStopSeam -Files @{ $script:ItemLedgerPath = ($script:NonAsciiEntries -join "`n") }
+        $decision = Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (Get-PassDownStopItem -Directive @($script:NonAsciiEntries[0], $script:NonAsciiEntries[1]))
+        $decision.Message | Should -BeLike 'OWNER_DIRECTIVE_BLOCKED: OWNER_DIRECTIVE_RELAY_MISSING: *lacks OD-3*'
+        $decision.Repairable | Should -BeTrue
+    }
+
+    It 'accepts non-ASCII item ledger lines with matching digests' {
+        Register-PassDownStopSeam -Files @{ $script:ItemLedgerPath = ($script:NonAsciiEntries -join "`n") }
+        Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (Get-PassDownStopItem -Directive $script:NonAsciiEntries) | Should -BeNullOrEmpty
+    }
+
+    It 'reports a non-ASCII ledger line with a mismatched digest as OWNER_DIRECTIVE_LEDGER_INVALID' {
+        # Arrange: the em-dash entry whose text_sha256 is the digest of the hyphen-substituted text.
+        $altered = Get-PassDownStopEntry -Id 'OD-1' -Text 'Run the items in parallel - the merge cost is lower.'
+        $alteredDigest = ($altered | ConvertFrom-Json).text_sha256
+        $originalDigest = ($script:NonAsciiEntries[0] | ConvertFrom-Json).text_sha256
+        $mismatched = $script:NonAsciiEntries[0].Replace($originalDigest, $alteredDigest)
+        Register-PassDownStopSeam -Files @{ $script:ItemLedgerPath = $mismatched }
+
+        # Act
+        $decision = Invoke-PassDownStop -ArtifactType 'orchestrator-state' -Root $script:Item -CheckpointText (Get-PassDownStopItem)
+
+        # Assert
+        $decision.Message | Should -BeLike 'OWNER_DIRECTIVE_BLOCKED: OWNER_DIRECTIVE_LEDGER_INVALID: item-ledger: *text_sha256*'
+    }
+}
