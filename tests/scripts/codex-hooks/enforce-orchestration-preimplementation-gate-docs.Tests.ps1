@@ -204,6 +204,7 @@ Describe 'Codex preimplementation gate docs-estate leg (issue #1169)' {
 
     Context 'Codex copy of hook-docs-estate-context.ps1 (issue #1169)' {
         It 'parses a valid profile and rejects <Case> (codex)' -ForEach @(
+            @{ Case = 'empty text'; Text = '' }
             @{ Case = 'malformed JSON'; Text = '{"artifact_kind":' }
             @{ Case = 'another artifact kind'; Text = '{"artifact_kind":"x","documentation_roots":[{"path":"docs"}],"artifact_paths":{}}' }
             @{ Case = 'empty documentation roots'; Text = '{"artifact_kind":"docs-profile","documentation_roots":[],"artifact_paths":{}}' }
@@ -233,6 +234,22 @@ Describe 'Codex preimplementation gate docs-estate leg (issue #1169)' {
         ) {
             # Arrange
             $profileDocument = ConvertFrom-DocsEstateProfileText -Text $script:ValidProfile
+
+            # Act
+            $result = Test-DocsEstatePath -RelativePath $Path -Profile $profileDocument -InitWorkflowPath $script:DocsOnlyInitWorkflowPath
+
+            # Assert
+            $result | Should -Be $Expected
+        }
+
+        It 'classifies <Path> as <Expected> under a narrow profile with a flat artifact path (codex)' -ForEach @(
+            @{ Path = 'docs/reference/b.md'; Expected = $true }
+            @{ Path = 'docs/documentation-estate/x.json'; Expected = $true }
+            @{ Path = 'docs/other/a.md'; Expected = $false }
+        ) {
+            # Arrange
+            $narrow = '{"artifact_kind":"docs-profile","documentation_roots":[{"path":"docs/reference"}],"artifact_paths":{"validation_receipt":"docs/documentation-estate/docs-validation-receipt.json","flat":"receipt.json"}}'
+            $profileDocument = ConvertFrom-DocsEstateProfileText -Text $narrow
 
             # Act
             $result = Test-DocsEstatePath -RelativePath $Path -Profile $profileDocument -InitWorkflowPath $script:DocsOnlyInitWorkflowPath
