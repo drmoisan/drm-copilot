@@ -212,6 +212,7 @@ Describe 'Invoke-PreToolUseDispatchEntryPoint non-ASCII output (issue #1187)' {
     It 'emits the dependency-failure deny of the script tail with every character below U+0080' {
         # Arrange: a dependency-failure deny whose reason holds an em dash, curly quotes, and a non-BMP character. The
         # mock body builds the reason itself because it runs under the script scope of the &-invoked entry script.
+        $expected = 'HOOK_DISPATCH_BLOCKED: dep ' + [char]0x2014 + ' ' + [char]0x201C + 'q' + [char]0x201D + ' ' + [char]::ConvertFromUtf32(0x1F600)
         Mock Get-HookDependencyFailureDecision { [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'deny'; permissionDecisionReason = ('HOOK_DISPATCH_BLOCKED: dep ' + [char]0x2014 + ' ' + [char]0x201C + 'q' + [char]0x201D + ' ' + [char]::ConvertFromUtf32(0x1F600)) } } }
 
         # Act: run the script through the & route so the dependency-failure emit after the dot-source guard executes.
@@ -220,7 +221,7 @@ Describe 'Invoke-PreToolUseDispatchEntryPoint non-ASCII output (issue #1187)' {
         # Assert
         $emitted.Count | Should -Be 1
         [regex]::IsMatch([string] $emitted[0], '[^\u0000-\u007F]') | Should -BeFalse -Because 'the emitted JSON escapes every non-ASCII character'
-        ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:TailReason
+        ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason | Should -BeExactly $expected
     }
 
     It 'defaults ReadPayload to Read-ClaudeHookRawPayload with the UTF-8 reader' {
