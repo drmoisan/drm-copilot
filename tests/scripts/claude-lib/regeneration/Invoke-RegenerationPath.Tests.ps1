@@ -431,12 +431,16 @@ Describe 'Invoke-RegenerationPath seam defaults (AST)' {
         $block.Extent.Text | Should -Match '\$LASTEXITCODE'
     }
 
-    It '(h) the process -Invoker default starts one ProcessStartInfo with UseShellExecute false, forwards output to [Console]::Error.WriteLine and returns ExitCode' {
+    It '(h) the process -Invoker default resolves argv[0], starts one ProcessStartInfo from the start spec with UseShellExecute false, forwards output to [Console]::Error.WriteLine and returns ExitCode' {
         $block = Get-SeamDefault -FunctionName 'Invoke-RegenerationProcess' -ParameterName 'Invoker'
+        $commands = @($block.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true))
+        ($commands | ForEach-Object { $_.GetCommandName() }) -join '|' | Should -BeExactly 'Resolve-RegenerationExecutable|Get-RegenerationProcessStartSpec'
+        @($commands | Where-Object { $_.InvocationOperator -ne [System.Management.Automation.Language.TokenKind]::Unknown }).Count | Should -Be 0 -Because 'no call operator or dot invocation starts anything'
+        Test-ParameterBinding -Command $commands[1] -Parameter 'ComSpec' -Variable 'env:ComSpec' | Should -BeTrue
         $members = @($block.FindAll({ param($node) $node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] }, $true))
         $construction = @($members | Where-Object { $_.Static -and $_.Member.Value -ceq 'new' -and $_.Expression.TypeName.FullName -ceq 'System.Diagnostics.ProcessStartInfo' })
         $construction.Count | Should -Be 1
-        $construction[0].Arguments[0].Extent.Text | Should -Match '\$FilePath'
+        $construction[0].Arguments[0].Extent.Text | Should -Match '\$spec\.FileName'
         $start = @($members | Where-Object { $_.Static -and $_.Member.Value -ceq 'Start' -and $_.Expression.TypeName.FullName -ceq 'System.Diagnostics.Process' })
         $start.Count | Should -Be 1
         $argumentAdd = @($members | Where-Object { -not $_.Static -and $_.Member.Value -ceq 'Add' -and $_.Expression.Extent.Text -ceq '$info.ArgumentList' })
@@ -444,7 +448,8 @@ Describe 'Invoke-RegenerationPath seam defaults (AST)' {
         $argumentAdd[0].Arguments[0].Extent.Text | Should -Match '\$item'
         $loop = @($block.FindAll({ param($node) $node -is [System.Management.Automation.Language.ForEachStatementAst] }, $true))
         $loop.Count | Should -Be 1
-        $loop[0].Condition.Extent.Text | Should -BeExactly '$ArgumentList'
+        $loop[0].Condition.Extent.Text | Should -BeExactly '$spec.ArgumentList'
+        $loop[0].Body.Extent.Text.Contains($argumentAdd[0].Extent.Text) | Should -BeTrue -Because 'the argument Add runs inside the loop over the spec ArgumentList'
         $assignments = @($block.FindAll({ param($node) $node -is [System.Management.Automation.Language.AssignmentStatementAst] }, $true))
         $shell = @($assignments | Where-Object { $_.Left.Extent.Text -ceq '$info.UseShellExecute' })
         $shell.Count | Should -Be 1
@@ -465,8 +470,19 @@ Describe 'Invoke-RegenerationPath seam defaults (AST)' {
                 }, $true))
         $exitCode.Count | Should -Be 1
         $exitCode[0].Expression.Extent.Text | Should -BeExactly '$process'
-        $commands = @($block.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true))
-        $commands.Count | Should -Be 0 -Because 'the default starts the process through .NET only: no call operator, cmdlet, or expression invocation'
+    }
+
+    It '(h) the -Resolver default runs one Get-Command with -Name bound to $Name and -CommandType Application and no other command than Select-Object' {
+        $block = Get-SeamDefault -FunctionName 'Resolve-RegenerationExecutable' -ParameterName 'Resolver'
+        $getCommand = Get-AstCommand -Root $block -Name 'Get-Command'
+        $getCommand.Count | Should -Be 1
+        Test-ParameterBinding -Command $getCommand[0] -Parameter 'Name' -Variable 'Name' | Should -BeTrue
+        $elements = $getCommand[0].CommandElements
+        $typeIndex = @(0..($elements.Count - 1) | Where-Object { $elements[$_] -is [System.Management.Automation.Language.CommandParameterAst] -and $elements[$_].ParameterName -ceq 'CommandType' })
+        $typeIndex.Count | Should -Be 1
+        $elements[$typeIndex[0] + 1].Extent.Text | Should -BeExactly 'Application'
+        $others = @($block.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true) | Where-Object { @('Get-Command', 'Select-Object') -cnotcontains $_.GetCommandName() })
+        $others.Count | Should -Be 0
     }
 
     It '(h) no seam default writes to the success or host stream' {
@@ -475,7 +491,8 @@ Describe 'Invoke-RegenerationPath seam defaults (AST)' {
             (Get-SeamDefault -FunctionName 'Read-RegenerationConfigText' -ParameterName 'TestPath'),
             (Get-SeamDefault -FunctionName 'Read-RegenerationConfigText' -ParameterName 'ReadText'),
             (Get-SeamDefault -FunctionName 'Invoke-RegenerationGitExe' -ParameterName 'Invoker'),
-            (Get-SeamDefault -FunctionName 'Invoke-RegenerationProcess' -ParameterName 'Invoker')
+            (Get-SeamDefault -FunctionName 'Invoke-RegenerationProcess' -ParameterName 'Invoker'),
+            (Get-SeamDefault -FunctionName 'Resolve-RegenerationExecutable' -ParameterName 'Resolver')
         )
         foreach ($block in $defaults) {
             foreach ($name in @('Write-Output', 'Write-Host', 'Out-Host')) {
