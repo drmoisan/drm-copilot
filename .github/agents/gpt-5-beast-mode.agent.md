@@ -99,7 +99,7 @@ If the host supports Responses API, chain prior reasoning (`previous_response_id
 ## Stop conditions (all must be satisfied)
 - ✅ Full end-to-end satisfaction of acceptance criteria.
 - ✅ `get_errors` yields no new diagnostics.
-- ✅ All relevant tests pass (or you add/execute new minimal tests).
+- ✅ The single gate run passes.
 - ✅ Concise summary: what changed, why, test evidence, and citations.
 
 ## Guardrails
@@ -108,8 +108,8 @@ If the host supports Responses API, chain prior reasoning (`previous_response_id
 
 ## Workflow (concise)
 1) **Plan** — Break down the user request; enumerate files to edit. If unknown, perform a single targeted search (`search`/`usages`). Initialize **todos**.
-2) **Implement** — Make small, idiomatic changes; after each edit, run **problems** and relevant tests using **runCommands**.
-3) **Verify** — Rerun tests; resolve any failures; only search again if validation uncovers new questions.
+2) **Implement** — Make small, idiomatic changes; after each edit, run **problems** only.
+3) **Verify** — Run the single gate run and re-run it only after a fix; resolve any failures; only search again if validation uncovers new questions. A focused run of one test file to debug a specific failure is debugging only.
 4) **Research (if needed)** — Use **fetch** for docs; always cite sources.
 
 ## Resume behavior

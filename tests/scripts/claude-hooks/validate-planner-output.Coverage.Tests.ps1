@@ -15,6 +15,8 @@ BeforeAll {
     $hookPath = Join-Path $PSScriptRoot '../../../.claude/hooks/validate-planner-output.ps1'
     . $hookPath
     . (Join-Path $PSScriptRoot '../../../.claude/hooks/subagentstop-envelope.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
 
     function Get-ValidPlannerReviewRecord {
         param([string] $Preflight = 'ALL CLEAR')
@@ -32,6 +34,10 @@ UNRESOLVED-GAPS: NONE
 PREFLIGHT: $Preflight
 "@.Trim()
     }
+}
+
+Describe 'epic-state baseline isolation (issue #1105)' {
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 }
 
 Describe 'validate-planner-output entry point (issues #786 and #903)' {
@@ -174,7 +180,12 @@ Describe 'validate-planner-output entry point (issues #786 and #903)' {
     It 'E-PLN-6 exits 2 naming subagentstop-envelope.ps1 when the helper fails to load, with stop_hook_active true' {
         # Arrange
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: subagentstop-envelope.ps1' } -ParameterFilter { $ChildPath -eq 'subagentstop-envelope.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'subagentstop-envelope.ps1') { throw 'simulated load failure: subagentstop-envelope.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
 
         # Act
         $result = Invoke-HookTail -StdinText '{"last_assistant_message":"PREFLIGHT: ALL CLEAR","stop_hook_active":true}'

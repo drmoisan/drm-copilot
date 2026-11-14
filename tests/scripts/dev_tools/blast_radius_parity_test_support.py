@@ -74,9 +74,6 @@ PORTABLE_SHARED_SURFACES = frozenset(
         "package-lock.json",
         # Separator-free. The Python analogue of the entry above.
         "poetry.lock",
-        # Separator-free. The repo-root tier map every repository using this
-        # runtime is required to carry by .claude/rules/quality-tiers.md.
-        "quality-tiers.yml",
     }
 )
 
@@ -163,6 +160,12 @@ DECLARED_TOP_LEVEL_KEYS = (
     | frozenset(CLASS_TWO_TOLERANCE_KEY_ASSERTIONS)
     | frozenset(CLASS_THREE_KEYS)
 )
+
+
+# Overlay directive keys (issue #1006). A destination overlay may carry these
+# keys, but the overlay composers consume them, so they never appear in a
+# composed or committed truth table and belong to no truth-table key class.
+OVERLAY_DIRECTIVE_KEYS = ("shared_surfaces_demote",)
 
 
 def config_key(config: Mapping[str, object], key: str) -> object:

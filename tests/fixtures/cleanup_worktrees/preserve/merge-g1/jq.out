@@ -1,0 +1,1 @@
+tests/fixtures/cleanup_worktrees/preserve/merge-g1/wt	notes/n.md	modified	PRESERVE	STILL_RELEVANT	notes/n.md	true	false	- [Notes](n.md) - merged notes	lf	object	clean	cleanup-wt-host-tokens-v1	preserve/merge-g1 fixture: the worktree deleted a base line

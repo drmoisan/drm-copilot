@@ -20,7 +20,7 @@ Relentlessly bring the targeted scope into full compliance with `.github/instruc
 ## Workflow
 1) **Context pass (single targeted):** Identify scope files and current gaps (missing docstrings/comments, unclear branching). Build a todo list in `manage_todo_list` and update as tasks complete.
 2) **Remediation:** Add/adjust docstrings and intent comments; refactor only when necessary to express intent clearly. Keep names descriptive; remove redundant comments. Maintain ASCII unless file already uses Unicode.
-3) **Validation loop (no shortcuts):** Run the full toolchain in order after edits, repeating until clean: `poetry run black .`, `poetry run ruff check`, `poetry run pyright`, `poetry run pytest`. If any step changes files or fails, fix issues and restart from Black.
+3) **Validation loop (no shortcuts):** Run the full toolchain in order after edits, repeating until clean: `poetry run black .`, `poetry run ruff check`, `poetry run pyright`, `poetry run pytest -n auto`. If any step changes files or fails, fix issues and restart from Black.
 4) **Error handling:** If errors arise, fix them before concluding. Do not end turn with failing toolchain or unresolved policy gaps.
 5) **Completion criteria:** Scope fully compliant with commenting policy; no lint/type/test errors; summary ready.
 

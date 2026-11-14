@@ -1,6 +1,6 @@
 ---
 name: invoke-csharp-engineer
-description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates.
+description: Invoke the csharp-typed-engineer worker to design, implement, and verify C# changes within typed repository boundaries. Applies CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain, the 1-3 production-file small-path budget, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
 ---
 
 # Implement C# Skill
@@ -30,7 +30,7 @@ If the estimated scope exceeds the small-path budget, this skill defers to the o
 ## Output Paths
 
 - C# source and test files within the approved scope.
-- Baseline evidence under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
+- Baseline evidence (static and `Phase 0 baseline` test-suite) under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
 - This location is canonical per evidence-and-timestamp-conventions and is not overridable. See `.agents/skills/evidence-and-timestamp-conventions/SKILL.md` for the canonical evidence path authority.
 - Plan artifacts under the active feature folder when the task is feature-scoped.
 
@@ -42,7 +42,7 @@ The worker must return the following reporting block:
 2. Baseline (CSharpier, .NET Analyzers, Nullable Analysis, MSTest, coverage status).
 3. Plan (design and test strategy).
 4. Diffs (patch-style or full-file replacements).
-5. QA Gate Results (CSharpier, .NET Analyzers, Nullable Analysis, MSTest, and coverage deltas, or clearly marked **unverified**).
+5. QA Gate Results (CSharpier, .NET Analyzers, Nullable Analysis, MSTest, and coverage deltas against the baseline, with failures and per-file coverage read from the single gate run, or clearly marked **unverified**).
 
 ## Worker Routing
 

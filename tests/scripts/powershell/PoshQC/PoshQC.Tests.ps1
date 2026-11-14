@@ -115,7 +115,7 @@ Describe 'Install-PoshQCTool' {
         Install-PoshQCTool -GetRepository { [pscustomobject]@{ InstallationPolicy = 'Untrusted' } } `
             -SetRepository { throw 'cannot set' } -FindModule {
             param([string] $Name)
-            [pscustomobject]@{ Name = $Name; Version = [version]'5.9.5' }
+            [pscustomobject]@{ Name = $Name; Version = [version]'6.2.5' }
         } `
             -InstallModule { param([string] $Name, [string] $Version) [void] $Name; [void] $Version } -RegisterRepository { } -SetTls { } -Logger {
             param([string] $Message, [string] $Level)
@@ -132,7 +132,7 @@ Describe 'Install-PoshQCTool' {
 
         Install-PoshQCTool -FindModule {
             param([string] $Name)
-            [pscustomobject]@{ Name = $Name; Version = [version]'5.9.5' }
+            [pscustomobject]@{ Name = $Name; Version = [version]'6.2.5' }
         } -InstallModule {
             param([string] $Name, [string] $Version)
             [void] $Name
@@ -150,7 +150,7 @@ Describe 'Install-PoshQCTool' {
 
     It 'throws when an injected install operation fails' {
         { Install-PoshQCTool -FindModule { param([string] $Name) [void] $Name } -InstallModule { param([string] $Name, [string] $Version) [void] $Name; [void] $Version; throw 'boom' } -SetTls { } -GetRepository { $null } -RegisterRepository { } -SetRepository { } -Logger { param([string] $Message, [string] $Level) [void] $Message; [void] $Level } } |
-            Should -Throw '*Failed to install PSScriptAnalyzer 1.22.0: boom*'
+            Should -Throw '*Failed to install PSScriptAnalyzer 1.25.0: boom*'
     }
 }
 

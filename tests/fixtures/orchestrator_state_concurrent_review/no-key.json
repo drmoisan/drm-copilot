@@ -1,0 +1,6 @@
+{
+  "name": "no-key",
+  "notes": "A checkpoint without the key is sequential, so the missing review record is not an error.",
+  "checkpoint": {},
+  "expected_errors": []
+}

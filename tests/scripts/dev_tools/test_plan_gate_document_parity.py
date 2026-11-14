@@ -87,8 +87,8 @@ _ROWS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
         "g13",
         _task_plan(41),
         (
-            "Line 1: plan size `41 tasks, 41 lines` exceeds the guideline of 40 "
-            "tasks or 400 lines and carries no `## Size Justification` section; "
+            "Line 1: plan size `41 tasks, 41 lines` exceeds the guideline of 20 "
+            "tasks or 250 lines and carries no `## Size Justification` section; "
             "split the item or state why the size is necessary.",
         ),
     ),

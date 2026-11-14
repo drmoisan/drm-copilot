@@ -11,9 +11,12 @@ Purpose:
 Responsibilities:
     Given a mapping of `feature_folder -> depends_on` entries, compute each
     feature's wave number via memoized recursion, and raise a dedicated
-    exception when the manifest contains a dependency cycle. This module does
-    not read or write any manifest file; it operates purely on the mapping
-    passed in by the caller.
+    exception when the manifest contains a dependency cycle or a `depends_on`
+    entry that is not a manifest key. This module does not read or write any
+    manifest file; it operates purely on the mapping passed in by the caller.
+    It is this repository's parity reference for the PowerShell implementation
+    shipped under `.claude/lib/epic-wave/`; both read the shared corpus
+    `tests/fixtures/epic_wave/wave-computation-cases.json`.
 
 Usage:
     Callers (for example the epic-orchestrator agent) parse an epic manifest
@@ -69,6 +72,46 @@ class EpicWaveCycleError(ValueError):
         )
 
 
+class EpicWaveUnresolvedReferenceError(ValueError):
+    """Raised when a `depends_on` entry is not a feature folder in the manifest.
+
+    Purpose:
+        Signal that a feature depends on a name that is not a key of the
+        manifest, so its dependency has no defined wave number and silently
+        treating it as wave 0 would hide a planning error.
+
+    Attributes:
+        feature_folder (str): The feature folder that carries the dangling
+            `depends_on` entry.
+        dependency (str): The `depends_on` entry that is not a manifest key.
+    """
+
+    def __init__(self, feature_folder: str, dependency: str) -> None:
+        """Initialize the exception with the feature and its missing dependency.
+
+        Args:
+            feature_folder (str): The feature folder that carries the entry.
+            dependency (str): The unresolved `depends_on` entry.
+
+        Returns:
+            None.
+
+        Raises:
+            None.
+
+        Side Effects:
+            None.
+        """
+
+        self.feature_folder = feature_folder
+        self.dependency = dependency
+        super().__init__(
+            f"Epic dependency manifest references unresolved feature folder "
+            f"{dependency!r} from feature folder {feature_folder!r}; every "
+            f"depends_on entry must be a feature folder in the manifest."
+        )
+
+
 def compute_wave_numbers(
     manifest: Mapping[str, Sequence[str]],
 ) -> dict[str, int]:
@@ -91,6 +134,8 @@ def compute_wave_numbers(
         EpicWaveCycleError: If the manifest's `depends_on` edges form a
             cycle, so no finite wave number can be assigned to the features
             on that cycle.
+        EpicWaveUnresolvedReferenceError: If a `depends_on` entry is not a
+            key of `manifest`, so the dependency has no defined wave number.
 
     Side Effects:
         None. This function is pure: it does not read or write any file, and
@@ -117,6 +162,8 @@ def compute_wave_numbers(
         Raises:
             EpicWaveCycleError: If `feature_folder` is already on the active
                 recursion path (a cycle).
+            EpicWaveUnresolvedReferenceError: If `feature_folder` lists a
+                dependency that is not a key of `manifest`.
 
         Side Effects:
             Populates `wave_numbers` and `in_progress` as a side effect of
@@ -138,6 +185,13 @@ def compute_wave_numbers(
                 # Walk each dependency, resolving it first (recursively) so
                 # this feature's wave is one layer above the deepest
                 # dependency it relies on.
+                for dependency in depends_on:
+                    # A dependency outside the manifest has no wave number;
+                    # reject it instead of treating it as a root.
+                    if dependency not in manifest:
+                        raise EpicWaveUnresolvedReferenceError(
+                            feature_folder, dependency
+                        )
                 wave_number = 1 + max(resolve(dependency) for dependency in depends_on)
         finally:
             in_progress.discard(feature_folder)

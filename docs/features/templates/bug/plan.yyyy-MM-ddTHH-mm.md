@@ -7,7 +7,7 @@
 - **Status:** <template>
 - **Version:** <version_number>
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+**Fail-closed evidence rule:** Include explicit baseline artifact tasks (static baselines and one `Phase 0 baseline` run of each test gate), final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
 
 **Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
 
@@ -27,21 +27,22 @@
 - [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
 - [ ] [P0-T3] List required environment/fixtures/data: <notes>
 
-**Phase 1 — Preparation**
+**Phase 1 — Preparation** (no-change phase: it changes no tracked file, so it has no `[phase-gate]` task; the next gate covers it)
 - [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
 - [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
 
 **Phase 2 — Regression Test (must fail first)**
 - [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/<issue>-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+- [ ] [P2-T2] [phase-gate] Run the full toolchain loop (stages 1 to 6) per `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill; the unit stage passes when its only failures are the expected failures of [P2-T1], each confirmed failing, and `<FEATURE>/evidence/qa-gates/phase-gate.P2.<timestamp>.md` lists them by name
 
 **Phase 3 — Minimal Fix**
 - [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+- [ ] [P3-T2] [phase-gate] Run the full toolchain loop (stages 1 to 6) per `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill and record `<FEATURE>/evidence/qa-gates/phase-gate.P3.<timestamp>.md`
 
 **Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
+- [ ] [P4-T1] Re-run the repro to confirm expected behavior
 - [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+- [ ] [P4-T3] Record the baseline (static and `Phase 0 baseline`), post-change, and comparison artifact paths and the per-file threshold results for each in-scope language where coverage is required
 
 **Phase 5 — Documentation & Status**
 - [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope

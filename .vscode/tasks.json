@@ -394,7 +394,7 @@
 			],
 			"command": "poetry",
 			"group": {
-				"isDefault": true,
+				"isDefault": false,
 				"kind": "test"
 			},
 			"label": "QC: 4 Pytest: run tests",
@@ -411,7 +411,56 @@
 			"args": [
 				"run",
 				"pytest",
-				"--cov=src/lexile_corpus_tuner",
+				"-n",
+				"auto"
+			],
+			"command": "poetry",
+			"detail": "Runs the pytest suite in pytest-xdist workers (-n auto on the command line, never in addopts).",
+			"group": {
+				"isDefault": true,
+				"kind": "test"
+			},
+			"label": "QC: 4 Pytest: run tests (parallel)",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"pytest",
+				"-n",
+				"auto",
+				"--cov-branch",
+				"--cov-report=term-missing",
+				"--cov-report=lcov:artifacts/python/lcov.info",
+				"--cov"
+			],
+			"command": "poetry",
+			"detail": "Runs the pytest suite in pytest-xdist workers with branch coverage and the lcov report.",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "QC: 4 Pytest: run tests with coverage (parallel)",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"run",
+				"pytest",
 				"--cov=scripts/dev_tools",
 				"--cov-report=term-missing",
 				"--cov-report=lcov:artifacts/python/lcov.info"
@@ -597,6 +646,31 @@
 				"-ExecutionPolicy",
 				"Bypass",
 				"-Command",
+				"& { Import-Module '${workspaceFolder}/scripts/powershell/PoshQC'; Invoke-PoshQCLeakScan -Root '${workspaceFolder}' }"
+			],
+			"command": "pwsh",
+			"detail": "Statically scans the Pester tests for state that leaks between test files, against config/poshqc-leak-allowlist.json. Runs no test.",
+			"group": {
+				"isDefault": false,
+				"kind": "build"
+			},
+			"label": "PoshQC: 2c leak scan",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
 				"& { Import-Module '${workspaceFolder}/scripts/powershell/PoshQC'; Invoke-PoshQCTest -Root '${workspaceFolder}' }"
 			],
 			"command": "pwsh",
@@ -616,10 +690,35 @@
 			"type": "shell"
 		},
 		{
+			"args": [
+				"-NoLogo",
+				"-NoProfile",
+				"-ExecutionPolicy",
+				"Bypass",
+				"-Command",
+				"& { Import-Module '${workspaceFolder}/scripts/powershell/PoshQC'; exit (Invoke-PoshQCParallelTest -Root '${workspaceFolder}').ExitCode }"
+			],
+			"command": "pwsh",
+			"detail": "Runs the Pester suite as concurrent shard processes and merges the JUnit and coverage output.",
+			"group": {
+				"isDefault": false,
+				"kind": "test"
+			},
+			"label": "PoshQC: 4 test (Pester, parallel)",
+			"presentation": {
+				"close": false,
+				"panel": "new",
+				"reveal": "always",
+				"showReuseMessage": false
+			},
+			"problemMatcher": [],
+			"type": "shell"
+		},
+		{
 			"dependsOn": [
 				"TS: 4 Jest: unit tests with coverage",
-				"QC: 4 Pytest: run tests with coverage",
-				"PoshQC: 4 test (Pester)"
+				"QC: 4 Pytest: run tests with coverage (parallel)",
+				"PoshQC: 4 test (Pester, parallel)"
 			],
 			"dependsOrder": "sequence",
 			"detail": "Runs Jest, Python, and PowerShell tests with coverage to refresh all Koverage sources.",
@@ -639,13 +738,14 @@
 			"dependsOn": [
 				"JSON: format",
 				"JSON: validate",
-				"QC: Black: format",
-				"QC: Ruff: lint",
-				"QC: Pyright: type-check",
-				"QC: Pytest: run tests with coverage",
+				"QC: 1 Black: format",
+				"QC: 2 Ruff: lint",
+				"QC: 3 Pyright: type-check",
+				"QC: 4 Pytest: run tests with coverage (parallel)",
 				"PoshQC: 1 format",
 				"PoshQC: 2 analyze",
-				"PoshQC: 4 test (Pester)"
+				"PoshQC: 2c leak scan",
+				"PoshQC: 4 test (Pester, parallel)"
 			],
 			"dependsOrder": "sequence",
 			"group": {

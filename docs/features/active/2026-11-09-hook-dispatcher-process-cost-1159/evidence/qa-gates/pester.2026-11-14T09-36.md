@@ -1,0 +1,6 @@
+# Pester gate — feature-review R4 (cycle 2) coverage re-measure at the merged head
+
+Timestamp: 2026-11-14T09-36
+Command: sh SCRATCH/r5-1159-pester.sh (from the item worktree root: pwsh -NoProfile; Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCParallelTest -Root <worktree root>; exit with the returned ExitCode), started 2026-11-14T09:18:10Z, ended 2026-11-14T09:36:44Z, at head 5a58ecdc239fce59d73db7194cfaa371f3df355a
+EXIT_CODE: 0
+Output Summary: Run by the feature-review agent because the main-sync merge commit 5a58ecdc2 (09:14:01Z) postdated every coverage report in the item worktree. 8 of 8 shards exit 0; workers=8; wall-clock 1113.92 s. JUnit: 25036 tests, 0 failures, 0 errors, 16 skipped. Repo-wide line coverage 95.99% (41589/43326). New production files: HookDispatch.psm1 100.00% (107/107), HookDispatchRunner.psm1 98.82% (84/85), .claude/hooks/invoke-pretooluse-dispatch.ps1 100.00% (37/37), .codex/hooks/invoke-pretooluse-dispatch.ps1 100.00% (35/35), .codex/hooks/hook-dispatch.ps1 99.35% (154/155), HookProcessCost.psm1 99.44% (176/177), Measure-HookProcessCost.ps1 86.36% (38/44); total 98.59% (631/640). All 48 changed production PowerShell files are in the report and none is below 85%; the 38 with a row in baseline/pester.2026-11-10T04-30.md show no drop. Coverage artifact written 2026-11-14T09:36:44Z.

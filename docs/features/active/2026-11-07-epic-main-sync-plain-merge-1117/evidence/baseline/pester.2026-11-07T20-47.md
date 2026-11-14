@@ -1,0 +1,4 @@
+Timestamp: 2026-11-07T20-47
+Command: Import-Module scripts/powershell/PoshQC/PoshQC.psd1; (Invoke-PoshQCParallelTest).ExitCode  (sh-launched PowerShell 7 script under SCRATCH, 8 workers)
+EXIT_CODE: 0
+Output Summary: Phase 0 baseline, one Invoke-PoshQCParallelTest run, workers=8, wall-clock 433.28s, ExitCode 0, all 8 shards exited 0. Counts from merged artifacts/pester/pester-junit.xml: tests=15994, failures=0, errors=0, skipped/disabled=10, so passed=15984 and failed=0. No failing tests. Repo-wide line coverage from merged artifacts/pester/powershell-coverage.xml (JaCoCo report-level LINE counter): covered=24578, missed=1540, 94.10 percent (INSTRUCTION covered 38391, missed 2894). Pester has no branch coverage. Per-file production coverage is not applicable: no PowerShell production file is touched by this plan.

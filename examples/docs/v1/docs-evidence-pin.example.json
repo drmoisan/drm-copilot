@@ -1,0 +1,36 @@
+{
+  "$schema": "urn:drm-copilot:docs:1.0.0:docs-evidence-pin",
+  "schema_version": "1.0.0",
+  "artifact_kind": "docs-evidence-pin",
+  "id": "example-repo.docs-evidence-pins",
+  "extensions": {},
+  "repository": "example-repo",
+  "pins": [
+    {
+      "pin_id": "pin-analyzer-option",
+      "element_id": "cli-option-4dac82ff130bd249bc5405947e1c0d29de1b7374d2aba5fb490213d36cd1ba85",
+      "element_kind": "cli-option",
+      "page_path": "docs/reference/cli-reference.md",
+      "symbol": "tool docs inventory --analyzer",
+      "source_path": "src/example_pkg/cli.py",
+      "source_sha256": "1f97434955fc6aa365c34d7613682e04664efa44462364b9a9242289a7181e27",
+      "revision": null,
+      "claim": null,
+      "pinned_at": "2026-10-30T12:05:00Z",
+      "pinned_by": {"kind": "tool", "id": "drm-copilot-docs"}
+    },
+    {
+      "pin_id": "pin-inventory-command",
+      "element_id": "cli-command-b9cda1283b765831a04bf07223320d70c1f07de9da312b21731f40e8790cf00a",
+      "element_kind": "cli-command",
+      "page_path": "docs/reference/cli-reference.md",
+      "symbol": "tool docs inventory",
+      "source_path": "src/example_pkg/cli.py",
+      "source_sha256": "8b304e96e932f1c57d546e313d43adda522406b14e8803b07d6ab9f6824ae2f7",
+      "revision": "0123456789abcdef0123456789abcdef01234567",
+      "claim": "The inventory command writes the surface inventory snapshot.",
+      "pinned_at": "2026-10-30T12:00:00Z",
+      "pinned_by": {"kind": "agent", "id": "docs-reconciler"}
+    }
+  ]
+}

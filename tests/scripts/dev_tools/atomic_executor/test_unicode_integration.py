@@ -1,6 +1,9 @@
 """
-Integration regression coverage for Unicode subprocess output handling.
+Integration regression coverage for Unicode subprocess output handling, and
+unit tests for the QCRunner path-filter helpers.
 """
+
+# pyright: reportPrivateUsage=false
 
 from __future__ import annotations
 
@@ -87,3 +90,46 @@ def test_resolve_executable_handles_cmd_tools_on_windows() -> None:
         assert resolved_exe.endswith(".cmd") or resolved_exe.endswith(".exe")
     else:
         assert resolved_exe == "npm"
+
+
+class TestQCRunnerFilterHelpers:
+    """Tests for _filter_* helper methods."""
+
+    def test_filter_python_files_keeps_py_only(self, mem_fs_path: Path) -> None:
+        """_filter_python_files() keeps only .py files."""
+        runner = QCRunner(mem_fs_path)
+        files = ["src/module.py", "tests/test.py", "README.md", "config.yaml"]
+        result = runner._filter_python_files(
+            files
+        )  # pyright: ignore[reportPrivateUsage]
+        assert result == ["src/module.py", "tests/test.py"]
+
+    def test_filter_python_files_returns_empty_for_no_py(
+        self, mem_fs_path: Path
+    ) -> None:
+        """_filter_python_files() returns empty list when no .py files."""
+        runner = QCRunner(mem_fs_path)
+        files = ["README.md", "config.yaml", "data.json"]
+        result = runner._filter_python_files(
+            files
+        )  # pyright: ignore[reportPrivateUsage]
+        assert result == []
+
+    def test_filter_test_files_keeps_tests_only(self, mem_fs_path: Path) -> None:
+        """_filter_test_files() keeps only files in tests/ directories."""
+        runner = QCRunner(mem_fs_path)
+        files = [
+            "tests/test_module.py",
+            "src/tests/test_helper.py",
+            "src/module.py",
+            "test_outside.py",
+        ]
+        result = runner._filter_test_files(files)  # pyright: ignore[reportPrivateUsage]
+        assert result == ["tests/test_module.py", "src/tests/test_helper.py"]
+
+    def test_filter_test_files_requires_py_extension(self, mem_fs_path: Path) -> None:
+        """_filter_test_files() requires .py extension."""
+        runner = QCRunner(mem_fs_path)
+        files = ["tests/test_module.py", "tests/README.md", "tests/data.json"]
+        result = runner._filter_test_files(files)  # pyright: ignore[reportPrivateUsage]
+        assert result == ["tests/test_module.py"]

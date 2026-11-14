@@ -15,6 +15,7 @@ Describe 'enforce-model-routing-receipt.ps1' {
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
 
         function Get-SyntheticCheckpoint {
             param([string[]] $ReceiptAgents)

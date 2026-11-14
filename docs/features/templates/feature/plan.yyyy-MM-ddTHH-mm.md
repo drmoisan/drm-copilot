@@ -23,19 +23,19 @@
 > - Start every task with a **strong verb** (Implement, Create, Update, Verify).
 > - No "bucket" tasks like "Refactor module" or "Write tests"; split them into specific, verifiable steps.
 > - **Self-Validating Phases:** Include necessary test creation/update tasks *within* the phase that implements the code. Do not defer verification to a final "Testing" phase.
-> - Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for every language in scope when policy requires coverage.
+> - Include explicit baseline artifact tasks (static baselines and one `Phase 0 baseline` run of each test gate), final-QA artifact tasks, and coverage-comparison tasks for every language in scope when policy requires coverage.
 > - Name the expected artifact path or location in each evidence-producing task's acceptance criteria.
 > - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
 
-### Phase 0: Compliance & Context
-- [ ] [P0-T1] Confirm alignment with repo policies by reading `.github/instructions/general-code-change.instructions.md`, `.github/instructions/python-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`, and `.github/instructions/python-unit-test.instructions.md` before touching code
-  - Acceptance: Development log contains policy review timestamp prior to Phase 1 commits
+### Phase 0: Context & Inputs
+- [ ] [P0-T1] <Atomic task>
 
 ### Phase 1: <Phase Name>
 - [ ] [P1-T1] <Atomic task with strong verb>
 - [ ] [P1-T2] <Atomic task>
   - Preconditions: <optional>
   - Acceptance: <optional>
+- [ ] [P1-T3] [phase-gate] Run the full toolchain loop (stages 1 to 6) per `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill and record `<FEATURE>/evidence/qa-gates/phase-gate.P1.<timestamp>.md`
 
 ### Phase 2: <Phase Name>
 - [ ] [P2-T1] <Atomic task>
@@ -57,7 +57,7 @@
 - Unit: ...
 - Integration: ...
 - Manual/CLI: ...
-- Coverage evidence: list baseline artifact paths, post-change artifact paths, and comparison artifact paths for each in-scope language
+- Coverage evidence: list baseline artifact paths (static and `Phase 0 baseline`), post-change artifact paths, and comparison artifact paths, with the per-file threshold results from the single gate run, for each in-scope language
 
 ## Open Questions / Notes
 

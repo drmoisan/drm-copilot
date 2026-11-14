@@ -212,3 +212,19 @@ def test_asserted_messages_match_typescript_twin() -> None:
     )
 
     assert missing == []
+
+
+def test_dependency_on_skipped_feature_reports_unresolved_reference() -> None:
+    """Report, rather than raise, a dependency on a feature left out of the graph."""
+
+    # Feature 101 has a non-list depends_on, so it is skipped when the wave
+    # manifest is built, yet feature 102 still resolves its reference to it.
+    state = _state([_feature(101, depends_on="101"), _feature(102, depends_on=[101])])
+
+    errors = _errors(state)
+
+    assert DEPENDS_ON_ERROR in errors
+    assert any(
+        error.startswith("Epic dependency manifest references unresolved")
+        for error in errors
+    )

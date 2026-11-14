@@ -1,0 +1,3567 @@
+{
+  "description": "Issue 1022 shared Python surface corpus: inputs under the source root src, expected elements of the python-cli, python-http, python-public-api and python-architecture analyzers, and expected diagnostics. Golden element_id, parent_id and source_sha256 values are recorded by the independent [P2-T3] helper.",
+  "expected_diagnostics": [
+    {
+      "analyzer_id": "python-architecture",
+      "code": "PYTHON_ENCODING_UNSUPPORTED",
+      "path": "src/pkg/lex_encoding.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "PYTHON_ENCODING_UNSUPPORTED",
+      "path": "src/pkg/lex_encoding.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "PYTHON_ENCODING_UNSUPPORTED",
+      "path": "src/pkg/lex_encoding.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PYTHON_ENCODING_UNSUPPORTED",
+      "path": "src/pkg/lex_encoding.py"
+    },
+    {
+      "analyzer_id": "python-architecture",
+      "code": "PYTHON_LEXER_UNTERMINATED",
+      "path": "src/pkg/lex_unterminated.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "PYTHON_LEXER_UNTERMINATED",
+      "path": "src/pkg/lex_unterminated.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "PYTHON_LEXER_UNTERMINATED",
+      "path": "src/pkg/lex_unterminated.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PYTHON_LEXER_UNTERMINATED",
+      "path": "src/pkg/lex_unterminated.py"
+    },
+    {
+      "analyzer_id": "python-architecture",
+      "code": "PYTHON_LEXER_UNCLASSIFIED",
+      "path": "src/pkg/lex_unclassified.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "PYTHON_LEXER_UNCLASSIFIED",
+      "path": "src/pkg/lex_unclassified.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "PYTHON_LEXER_UNCLASSIFIED",
+      "path": "src/pkg/lex_unclassified.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PYTHON_LEXER_UNCLASSIFIED",
+      "path": "src/pkg/lex_unclassified.py"
+    },
+    {
+      "analyzer_id": "python-architecture",
+      "code": "PYTHON_INDENTATION_INVALID",
+      "path": "src/pkg/lex_indent.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "PYTHON_INDENTATION_INVALID",
+      "path": "src/pkg/lex_indent.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "PYTHON_INDENTATION_INVALID",
+      "path": "src/pkg/lex_indent.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PYTHON_INDENTATION_INVALID",
+      "path": "src/pkg/lex_indent.py"
+    },
+    {
+      "analyzer_id": "python-architecture",
+      "code": "PYTHON_IMPORT_STAR_FRAMEWORK",
+      "path": "src/pkg/lex_imports.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "PYTHON_IMPORT_STAR_FRAMEWORK",
+      "path": "src/pkg/lex_imports.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "PYTHON_IMPORT_STAR_FRAMEWORK",
+      "path": "src/pkg/lex_imports.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PYTHON_IMPORT_STAR_FRAMEWORK",
+      "path": "src/pkg/lex_imports.py"
+    },
+    {
+      "analyzer_id": "python-architecture",
+      "code": "PYTHON_IMPORT_NESTED_FRAMEWORK",
+      "path": "src/pkg/lex_imports.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "PYTHON_IMPORT_NESTED_FRAMEWORK",
+      "path": "src/pkg/lex_imports.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "PYTHON_IMPORT_NESTED_FRAMEWORK",
+      "path": "src/pkg/lex_imports.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PYTHON_IMPORT_NESTED_FRAMEWORK",
+      "path": "src/pkg/lex_imports.py"
+    },
+    {
+      "analyzer_id": "python-architecture",
+      "code": "PYTHON_BINDING_AMBIGUOUS",
+      "path": "src/pkg/lex_imports.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "PYTHON_BINDING_AMBIGUOUS",
+      "path": "src/pkg/lex_imports.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "PYTHON_BINDING_AMBIGUOUS",
+      "path": "src/pkg/lex_imports.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PYTHON_BINDING_AMBIGUOUS",
+      "path": "src/pkg/lex_imports.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PYTHON_IDENTIFIER_NON_ASCII",
+      "path": "src/pkg/api_naming.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "CLI_DYNAMIC_REGISTRATION",
+      "path": "src/pkg/_cli_argparse_diag.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "CLI_REGISTRATION_IN_LOOP",
+      "path": "src/pkg/_cli_argparse_diag.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "CLI_UNBOUND_REGISTRATION",
+      "path": "src/pkg/_cli_argparse_diag.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "CLI_PARENTS_UNRESOLVED",
+      "path": "src/pkg/_cli_argparse_diag.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "CLI_CUSTOM_CLASS",
+      "path": "src/pkg/_cli_click_diag.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "CLI_DECORATOR_INDIRECT",
+      "path": "src/pkg/_cli_click_diag.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "CLI_REGISTRATION_IN_LOOP",
+      "path": "src/pkg/_cli_click_diag.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "CLI_UNBOUND_REGISTRATION",
+      "path": "src/pkg/_cli_click_diag.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "CLI_CUSTOM_CLASS",
+      "path": "src/pkg/_cli_typer_diag.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "CLI_TYPER_PARAMETER_UNRESOLVED",
+      "path": "src/pkg/_cli_typer_diag.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "CLI_CONSOLE_SCRIPT_UNSUPPORTED",
+      "path": "pyproject.toml"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "HTTP_PREFIX_DYNAMIC",
+      "path": "src/pkg/_http_fastapi.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "HTTP_METHOD_VIEW_UNRESOLVED",
+      "path": "src/pkg/_http_flask.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "HTTP_DYNAMIC_ROUTE",
+      "path": "src/pkg/_http_diag.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "HTTP_ROUTE_IN_LOOP",
+      "path": "src/pkg/_http_diag.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "HTTP_MOUNT_UNRESOLVED",
+      "path": "src/pkg/_http_diag.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "HTTP_UNBOUND_ROUTE",
+      "path": "src/pkg/_http_diag.py"
+    },
+    {
+      "analyzer_id": "python-http",
+      "code": "HTTP_INCLUDE_UNRESOLVED",
+      "path": "src/pkg/_http_diag.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PUBLIC_API_STAR_IMPORT",
+      "path": "src/pkg/api_all.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PUBLIC_API_NAME_UNRESOLVED",
+      "path": "src/pkg/api_all.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PUBLIC_API_CONDITIONAL_DEFINITION",
+      "path": "src/pkg/api_naming.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PUBLIC_API_UNPACKING_TARGET",
+      "path": "src/pkg/api_naming.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PUBLIC_API_DYNAMIC_ALL",
+      "path": "src/pkg/api_dynamic.py"
+    },
+    {
+      "analyzer_id": "python-public-api",
+      "code": "PUBLIC_API_MODULE_NOT_IMPORTABLE",
+      "path": "src/pkg/bad-name.py"
+    },
+    {
+      "analyzer_id": "python-architecture",
+      "code": "ARCHITECTURE_DYNAMIC_IMPORT",
+      "path": "src/pkg/arch.py"
+    },
+    {
+      "analyzer_id": "python-architecture",
+      "code": "ARCHITECTURE_RELATIVE_IMPORT_UNRESOLVED",
+      "path": "src/pkg/arch.py"
+    },
+    {
+      "analyzer_id": "python-architecture",
+      "code": "ARCHITECTURE_RELATIVE_IMPORT_UNRESOLVED",
+      "path": "src/toplevel.py"
+    },
+    {
+      "analyzer_id": "python-architecture",
+      "code": "ARCHITECTURE_MODULE_NAME_INVALID",
+      "path": "src/pkg/bad-name.py"
+    }
+  ],
+  "expected_elements": [
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "tool",
+      "element_id": "cli-command-d8e4d98ee1e896824b1619e729d9febc461fa5ad9d3b5aa7f1ea954b3cb9b5b5",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 5,
+        "start": 5
+      },
+      "name": "tool",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "pyproject.toml",
+      "properties": [
+        {
+          "name": "attached",
+          "value": true
+        },
+        {
+          "name": "framework",
+          "value": "console-script"
+        },
+        {
+          "name": "name_source",
+          "value": "console-script"
+        },
+        {
+          "name": "table",
+          "value": "project.scripts"
+        }
+      ],
+      "source_sha256": "35ba6fc18889b0be1afd352ac3ec6ec08d7c8bf37257b2f850569dacb5dbcf27"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "typ-script",
+      "element_id": "cli-command-eaf4dd1b360ba8a886141f9277de3e7f4dd7b3d1f34d3ba947f819ddc5060bf9",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 6,
+        "start": 6
+      },
+      "name": "typ-script",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "pyproject.toml",
+      "properties": [
+        {
+          "name": "attached",
+          "value": true
+        },
+        {
+          "name": "framework",
+          "value": "console-script"
+        },
+        {
+          "name": "name_source",
+          "value": "console-script"
+        },
+        {
+          "name": "table",
+          "value": "project.scripts"
+        }
+      ],
+      "source_sha256": "11d2a5d0cc93397bd71d64c44978c736b62e68c0499ca7c283508f305a0957c2"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "missing",
+      "element_id": "cli-command-7c488304e53eb00802845d3a48e9972d36d73ca8d4baf7ba7994a0a0d090f15a",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 7,
+        "start": 7
+      },
+      "name": "missing",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "pyproject.toml",
+      "properties": [
+        {
+          "name": "attached",
+          "value": false
+        },
+        {
+          "name": "framework",
+          "value": "console-script"
+        },
+        {
+          "name": "name_source",
+          "value": "console-script"
+        },
+        {
+          "name": "table",
+          "value": "project.scripts"
+        }
+      ],
+      "source_sha256": "1030d09fcb80bba1888e8252a96c0d8357ef8b6f007cb3910f6c26b63e1b4fe1"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "gui",
+      "element_id": "cli-command-3aa46dcf86c384908e976e39299fd2192b496866ae5d29611fc9c4c0458f3f28",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 10,
+        "start": 10
+      },
+      "name": "gui",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "pyproject.toml",
+      "properties": [
+        {
+          "name": "attached",
+          "value": false
+        },
+        {
+          "name": "framework",
+          "value": "console-script"
+        },
+        {
+          "name": "name_source",
+          "value": "console-script"
+        },
+        {
+          "name": "table",
+          "value": "project.gui-scripts"
+        }
+      ],
+      "source_sha256": "6da864e590a1f25858af22befb680821548970e66593c23bcea838f08a3178e2"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "poet",
+      "element_id": "cli-command-9d14685abf059b9955c96267a02f7d67fa7768461777908338c658774ac421d0",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 13,
+        "start": 13
+      },
+      "name": "poet",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "pyproject.toml",
+      "properties": [
+        {
+          "name": "attached",
+          "value": false
+        },
+        {
+          "name": "framework",
+          "value": "console-script"
+        },
+        {
+          "name": "name_source",
+          "value": "console-script"
+        },
+        {
+          "name": "table",
+          "value": "tool.poetry.scripts"
+        }
+      ],
+      "source_sha256": "d922ed28922e5b34f6ff86dc51dd2cbe33487347fd9f0dca00af46e92ccb4e80"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "tool --verbose",
+      "element_id": "cli-option-316ad80ff70b3febadf60046599a4d2570cdd8ae5a8f7f8674da6162bc1e9541",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 6,
+        "start": 6
+      },
+      "name": "--verbose",
+      "parent_declaration": "tool",
+      "parent_id": "cli-command-d8e4d98ee1e896824b1619e729d9febc461fa5ad9d3b5aa7f1ea954b3cb9b5b5",
+      "parent_path": "pyproject.toml",
+      "path": "src/pkg/_cli_argparse.py",
+      "properties": [
+        {
+          "name": "action",
+          "value": "store_true"
+        },
+        {
+          "name": "framework",
+          "value": "argparse"
+        },
+        {
+          "name": "has_default",
+          "value": false
+        },
+        {
+          "name": "help",
+          "value": "Verbose output"
+        },
+        {
+          "name": "positional",
+          "value": false
+        },
+        {
+          "name": "short",
+          "value": "-v"
+        }
+      ],
+      "source_sha256": "ea8acfd00f3f4c755f92caf8d64a8172bc5c22788cf8d00c2d4acaa84d37a023"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "tool path",
+      "element_id": "cli-option-69119a6577b8ebece48721e55d18cbe9c4073501f9117fc858b95d7024984e1e",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 7,
+        "start": 7
+      },
+      "name": "path",
+      "parent_declaration": "tool",
+      "parent_id": "cli-command-d8e4d98ee1e896824b1619e729d9febc461fa5ad9d3b5aa7f1ea954b3cb9b5b5",
+      "parent_path": "pyproject.toml",
+      "path": "src/pkg/_cli_argparse.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "argparse"
+        },
+        {
+          "name": "has_default",
+          "value": false
+        },
+        {
+          "name": "positional",
+          "value": true
+        }
+      ],
+      "source_sha256": "3e461a4566d7d56b6c2f6d4ca9d88448d6fdfe8e706f719a6e0dcea91723e325"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "tool run",
+      "element_id": "cli-command-22a5c3dfb6b26f5a5fc983b4a9bdea5088ea364e51e26ac1eeb45f65e88366a1",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 9,
+        "start": 9
+      },
+      "name": "run",
+      "parent_declaration": "tool",
+      "parent_id": "cli-command-d8e4d98ee1e896824b1619e729d9febc461fa5ad9d3b5aa7f1ea954b3cb9b5b5",
+      "parent_path": "pyproject.toml",
+      "path": "src/pkg/_cli_argparse.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "argparse"
+        },
+        {
+          "name": "help",
+          "value": "Run it"
+        }
+      ],
+      "source_sha256": "4dfd171a28e8588aeb9be0f4a4094cca01bfd09214ef601bb2e40750671d2158"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "tool run --count",
+      "element_id": "cli-option-da282baafe0959e6bae75e01613b4d73af65102d5ef7a7072efa4772aa2a8518",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 10,
+        "start": 10
+      },
+      "name": "--count",
+      "parent_declaration": "tool run",
+      "parent_id": "cli-command-22a5c3dfb6b26f5a5fc983b4a9bdea5088ea364e51e26ac1eeb45f65e88366a1",
+      "parent_path": "src/pkg/_cli_argparse.py",
+      "path": "src/pkg/_cli_argparse.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "argparse"
+        },
+        {
+          "name": "has_default",
+          "value": true
+        },
+        {
+          "name": "positional",
+          "value": false
+        },
+        {
+          "name": "required",
+          "value": false
+        }
+      ],
+      "source_sha256": "a49ce8f7a371f030a0ea08c4d7dbb98435adfdf5341993f67eae17f2eac4eb7a"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "tool run --fast",
+      "element_id": "cli-option-6399a4ccd6c6384f3890255f95df4765dd3d470800b1c6e63ab3dd1795da662b",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 12,
+        "start": 12
+      },
+      "name": "--fast",
+      "parent_declaration": "tool run",
+      "parent_id": "cli-command-22a5c3dfb6b26f5a5fc983b4a9bdea5088ea364e51e26ac1eeb45f65e88366a1",
+      "parent_path": "src/pkg/_cli_argparse.py",
+      "path": "src/pkg/_cli_argparse.py",
+      "properties": [
+        {
+          "name": "action",
+          "value": "store_true"
+        },
+        {
+          "name": "framework",
+          "value": "argparse"
+        },
+        {
+          "name": "has_default",
+          "value": false
+        },
+        {
+          "name": "positional",
+          "value": false
+        }
+      ],
+      "source_sha256": "02516c74ed3a7cc43ed6cbadc9f1f853d32633080a09a1c3a2ad79a507c39f15"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "tool run deep",
+      "element_id": "cli-command-f92124872a91ebf6b60322975e2b885631a2d723ae0a80cf3984d85223ac8928",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 14,
+        "start": 14
+      },
+      "name": "deep",
+      "parent_declaration": "tool run",
+      "parent_id": "cli-command-22a5c3dfb6b26f5a5fc983b4a9bdea5088ea364e51e26ac1eeb45f65e88366a1",
+      "parent_path": "src/pkg/_cli_argparse.py",
+      "path": "src/pkg/_cli_argparse.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "argparse"
+        }
+      ],
+      "source_sha256": "8619388d5b5f6c009cead573a9a7fe836a274f560d7ecbadf7fbc52c44ab9bf4"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "tool run deep --level",
+      "element_id": "cli-option-f5b6b1f0da30298d9014e179bbe4e1443f861cabef66f78b8eb1b8b577ab19d9",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 15,
+        "start": 15
+      },
+      "name": "--level",
+      "parent_declaration": "tool run deep",
+      "parent_id": "cli-command-f92124872a91ebf6b60322975e2b885631a2d723ae0a80cf3984d85223ac8928",
+      "parent_path": "src/pkg/_cli_argparse.py",
+      "path": "src/pkg/_cli_argparse.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "argparse"
+        },
+        {
+          "name": "has_default",
+          "value": false
+        },
+        {
+          "name": "positional",
+          "value": false
+        },
+        {
+          "name": "short",
+          "value": "-l"
+        }
+      ],
+      "source_sha256": "10b55c3c8e81b47f2a28df762dc6d6687bd2e5a2ad697c64e84d93bf664376fa"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "diag",
+      "element_id": "cli-command-ad885923c31cc878c32b94e5703346b5467ab5b125f8874d928ad79a46502c1f",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 8,
+        "start": 8
+      },
+      "name": "diag",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_argparse_diag.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "argparse"
+        },
+        {
+          "name": "name_source",
+          "value": "literal"
+        }
+      ],
+      "source_sha256": "8e3d0e1c5c5d712d7f799a971422226704e2ba6e68882680a3f1e9808109cd5f"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "child",
+      "element_id": "cli-command-254f0a307da8568de8207d7503a95107369f80ab91d88ddcb9b4945ef21e0f7f",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 14,
+        "start": 14
+      },
+      "name": "child",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_argparse_diag.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "argparse"
+        },
+        {
+          "name": "name_source",
+          "value": "literal"
+        }
+      ],
+      "source_sha256": "5f90959c85d0e8e6c74352c12c2df00d0dfee0e6d6027b967df5210d902b51ba"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "child --own",
+      "element_id": "cli-option-48b0225c57e0e5b4fc169396c5bb1fcf0bef4dde8d22e9473f271928c4c3fad7",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 15,
+        "start": 15
+      },
+      "name": "--own",
+      "parent_declaration": "child",
+      "parent_id": "cli-command-254f0a307da8568de8207d7503a95107369f80ab91d88ddcb9b4945ef21e0f7f",
+      "parent_path": "src/pkg/_cli_argparse_diag.py",
+      "path": "src/pkg/_cli_argparse_diag.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "argparse"
+        },
+        {
+          "name": "has_default",
+          "value": false
+        },
+        {
+          "name": "positional",
+          "value": false
+        }
+      ],
+      "source_sha256": "0c7e71c2b2c5cefcbc5fab58f1135dba92ec4fbf340655ee68e57c6fe6e31c59"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "main",
+      "element_id": "cli-command-1bc0796e7a3297eeb83a9e3bd0df0b81e394e962dbb1d21c9caf686fcd24e49d",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 7,
+        "start": 5
+      },
+      "name": "main",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_click.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "click"
+        },
+        {
+          "name": "name_source",
+          "value": "literal"
+        }
+      ],
+      "source_sha256": "3c09229a8d35abbb74a6d26cd0f604e54c9df53beb9ccbeb677a57f3f7fbc516"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "main --debug",
+      "element_id": "cli-option-9f17dcf174b6c8a441a3d28f6d3800e137123207c97928078cbb91fdc578e4f9",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 6,
+        "start": 6
+      },
+      "name": "--debug",
+      "parent_declaration": "main",
+      "parent_id": "cli-command-1bc0796e7a3297eeb83a9e3bd0df0b81e394e962dbb1d21c9caf686fcd24e49d",
+      "parent_path": "src/pkg/_cli_click.py",
+      "path": "src/pkg/_cli_click.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "click"
+        },
+        {
+          "name": "has_default",
+          "value": true
+        },
+        {
+          "name": "help",
+          "value": "Debug"
+        },
+        {
+          "name": "positional",
+          "value": false
+        }
+      ],
+      "source_sha256": "20736bdc8da1ee763bab48521f587e719ab685c80a780dad1b875cf3cfd454ec"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "main sync",
+      "element_id": "cli-command-b46151441c4913a5b52afaa20901cd40ee284224f392fd92cdaa6e92c88ecce6",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 14,
+        "start": 11
+      },
+      "name": "sync",
+      "parent_declaration": "main",
+      "parent_id": "cli-command-1bc0796e7a3297eeb83a9e3bd0df0b81e394e962dbb1d21c9caf686fcd24e49d",
+      "parent_path": "src/pkg/_cli_click.py",
+      "path": "src/pkg/_cli_click.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "click"
+        }
+      ],
+      "source_sha256": "28651554b291a0de25c2cdbb0ba7bf0935bc472dd4a722b9e57894e916209130"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "main sync --name",
+      "element_id": "cli-option-e296f41ca8a005503917afed3b9710e4d55044be19512f9823ec177c428bafb2",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 12,
+        "start": 12
+      },
+      "name": "--name",
+      "parent_declaration": "main sync",
+      "parent_id": "cli-command-b46151441c4913a5b52afaa20901cd40ee284224f392fd92cdaa6e92c88ecce6",
+      "parent_path": "src/pkg/_cli_click.py",
+      "path": "src/pkg/_cli_click.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "click"
+        },
+        {
+          "name": "has_default",
+          "value": false
+        },
+        {
+          "name": "positional",
+          "value": false
+        },
+        {
+          "name": "required",
+          "value": true
+        },
+        {
+          "name": "short",
+          "value": "-n"
+        }
+      ],
+      "source_sha256": "b512fb03c44801abe97fb7d44293f0e3b011fffca268950f2b671d8c80457132"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "main sync target",
+      "element_id": "cli-option-55de9943d0bba0499deb2104d2b4159ffce793a34812e4c9dcba2ae2029e0498",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 13,
+        "start": 13
+      },
+      "name": "target",
+      "parent_declaration": "main sync",
+      "parent_id": "cli-command-b46151441c4913a5b52afaa20901cd40ee284224f392fd92cdaa6e92c88ecce6",
+      "parent_path": "src/pkg/_cli_click.py",
+      "path": "src/pkg/_cli_click.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "click"
+        },
+        {
+          "name": "has_default",
+          "value": false
+        },
+        {
+          "name": "positional",
+          "value": true
+        }
+      ],
+      "source_sha256": "8a050fc481ac525c63dd272ff555cc7481c0728671242eaf0278d5006ff78649"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "main nested",
+      "element_id": "cli-command-861db7dcb72d1d899ccca37b94508ec3a5dc3b852e6a3d75f15d252ba1fe5f4c",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 19,
+        "start": 18
+      },
+      "name": "nested",
+      "parent_declaration": "main",
+      "parent_id": "cli-command-1bc0796e7a3297eeb83a9e3bd0df0b81e394e962dbb1d21c9caf686fcd24e49d",
+      "parent_path": "src/pkg/_cli_click.py",
+      "path": "src/pkg/_cli_click.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "click"
+        }
+      ],
+      "source_sha256": "ec0ca9529613ff162f8532e7813eda0958054b1e3584691bc5bf5135f0f9f88d"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "main nested deep",
+      "element_id": "cli-command-23a53c1782116b1bbc20c18eb8403f909f9795362c5a4d298ea1167a8c2d88e4",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 26,
+        "start": 23
+      },
+      "name": "deep",
+      "parent_declaration": "main nested",
+      "parent_id": "cli-command-861db7dcb72d1d899ccca37b94508ec3a5dc3b852e6a3d75f15d252ba1fe5f4c",
+      "parent_path": "src/pkg/_cli_click.py",
+      "path": "src/pkg/_cli_click.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "click"
+        }
+      ],
+      "source_sha256": "d6b0c0e4eef1fadae5a0b19978cf7b4bfe1a69ef410000788975de44abf49f71"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "main plain",
+      "element_id": "cli-command-53660d1ca069b63d3c2b7a95355f5ae18d0c9191a85d4b3ffbd8e37b2a5169f3",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 31,
+        "start": 30
+      },
+      "name": "plain",
+      "parent_declaration": "main",
+      "parent_id": "cli-command-1bc0796e7a3297eeb83a9e3bd0df0b81e394e962dbb1d21c9caf686fcd24e49d",
+      "parent_path": "src/pkg/_cli_click.py",
+      "path": "src/pkg/_cli_click.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "click"
+        }
+      ],
+      "source_sha256": "afc66492c1449c130f998055275c53c519f1ee1f92d128aa377329d3bf241b8a"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "main extra",
+      "element_id": "cli-command-21378ccebfbff71e7f5447cffde8b5952548be6c2fa336a19b1bb9a2c1d6da59",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 36,
+        "start": 35
+      },
+      "name": "extra",
+      "parent_declaration": "main",
+      "parent_id": "cli-command-1bc0796e7a3297eeb83a9e3bd0df0b81e394e962dbb1d21c9caf686fcd24e49d",
+      "parent_path": "src/pkg/_cli_click.py",
+      "path": "src/pkg/_cli_click.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "click"
+        }
+      ],
+      "source_sha256": "6d17c8bc40e0dda2e9af182bbb813411088e1cffb49bbf34a3fbc00cc7e2fa34"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "okgroup",
+      "element_id": "cli-command-78cb60c3ab3c319b850431d74366eb475b031c3516e1d48ef5fcfb2efb8f60ad",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 31,
+        "start": 30
+      },
+      "name": "okgroup",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_click_diag.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "click"
+        },
+        {
+          "name": "name_source",
+          "value": "literal"
+        }
+      ],
+      "source_sha256": "534e20fddd86c3ec14f2eb4749f334404649eed52e0ebd9934198d547cf9be01"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "ok",
+      "element_id": "cli-command-4a0a9b3034d4d07bb95532b43029b7fd6ec98401e96617912ebda64c08d488b3",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 36,
+        "start": 35
+      },
+      "name": "ok",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_click_diag.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "click"
+        },
+        {
+          "name": "name_source",
+          "value": "literal"
+        }
+      ],
+      "source_sha256": "cce52ca3b14d90e2776aaf074814c7c7727ac70d141f323e4722b064974b5cc5"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "typ-script --verbose",
+      "element_id": "cli-option-267620c08031c3ed1a1b64e73f3c9d51047a4cf7cc635824a9a86772d75e7710",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 10,
+        "start": 10
+      },
+      "name": "--verbose",
+      "parent_declaration": "typ-script",
+      "parent_id": "cli-command-eaf4dd1b360ba8a886141f9277de3e7f4dd7b3d1f34d3ba947f819ddc5060bf9",
+      "parent_path": "pyproject.toml",
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        },
+        {
+          "name": "has_default",
+          "value": true
+        },
+        {
+          "name": "positional",
+          "value": false
+        }
+      ],
+      "source_sha256": "77a125f0a2120ce006c222955e31ce16af2e14db3ae6d81ec73ad1cc64d07533"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "typ-script sub",
+      "element_id": "cli-command-357211bd690da35ae37cd3b019f67c27679a3049db8cd00fdc4988aae4595c39",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 6,
+        "start": 6
+      },
+      "name": "sub",
+      "parent_declaration": "typ-script",
+      "parent_id": "cli-command-eaf4dd1b360ba8a886141f9277de3e7f4dd7b3d1f34d3ba947f819ddc5060bf9",
+      "parent_path": "pyproject.toml",
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        }
+      ],
+      "source_sha256": "cc5da23b4d55ed243869d8684e76b6696fc00a05e6dbb8b04c0dcf5c83c99424"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "typ-script run-task",
+      "element_id": "cli-command-2b5bcbd47198a999fc091c0b065da30f2903588139700c910a09a2562249306e",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 20,
+        "start": 14
+      },
+      "name": "run-task",
+      "parent_declaration": "typ-script",
+      "parent_id": "cli-command-eaf4dd1b360ba8a886141f9277de3e7f4dd7b3d1f34d3ba947f819ddc5060bf9",
+      "parent_path": "pyproject.toml",
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        }
+      ],
+      "source_sha256": "066f92609832391d469ece822f7a60eefd78772d8d88119754a4a5420523a3cf"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "typ-script run-task name",
+      "element_id": "cli-option-3cbc0aad6fcd067ddf3d3cc5f8f5d0c2749ef116c79c97676b07c1dc8be79e1b",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 16,
+        "start": 16
+      },
+      "name": "name",
+      "parent_declaration": "typ-script run-task",
+      "parent_id": "cli-command-2b5bcbd47198a999fc091c0b065da30f2903588139700c910a09a2562249306e",
+      "parent_path": "src/pkg/_cli_typer.py",
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        },
+        {
+          "name": "has_default",
+          "value": false
+        },
+        {
+          "name": "positional",
+          "value": true
+        }
+      ],
+      "source_sha256": "ad4007137b69c9eb1d0444a8e28c2bf2587b0f4317cab3ab641f38833e37c356"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "typ-script run-task --count",
+      "element_id": "cli-option-d467be625d79c5bc0b29a456da230ae555d82353e465a90fa65d2ce29fa959dc",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 17,
+        "start": 17
+      },
+      "name": "--count",
+      "parent_declaration": "typ-script run-task",
+      "parent_id": "cli-command-2b5bcbd47198a999fc091c0b065da30f2903588139700c910a09a2562249306e",
+      "parent_path": "src/pkg/_cli_typer.py",
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        },
+        {
+          "name": "has_default",
+          "value": true
+        },
+        {
+          "name": "positional",
+          "value": false
+        }
+      ],
+      "source_sha256": "7e2e50ca25c153489be68ebe5a14f3e8c95c50a49cfc898960b9bf08aec9291e"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "typ-script run-task --flag",
+      "element_id": "cli-option-0d0ba49af8825c4b316bae73eddde5e00947d0a5adaebb98099762057f3b1c72",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 18,
+        "start": 18
+      },
+      "name": "--flag",
+      "parent_declaration": "typ-script run-task",
+      "parent_id": "cli-command-2b5bcbd47198a999fc091c0b065da30f2903588139700c910a09a2562249306e",
+      "parent_path": "src/pkg/_cli_typer.py",
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        },
+        {
+          "name": "has_default",
+          "value": true
+        },
+        {
+          "name": "help",
+          "value": "Flag it"
+        },
+        {
+          "name": "positional",
+          "value": false
+        },
+        {
+          "name": "short",
+          "value": "-f"
+        }
+      ],
+      "source_sha256": "acd79f8f49604e2d70be73eaf5b72a159bc5948077e2d1ba459487ff7d0e0fd2"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "typ-script run-task --tag",
+      "element_id": "cli-option-cab98b827eb79b6077abd3f910e07c53e705915d8ffcb932a12aa99edb853f09",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 19,
+        "start": 19
+      },
+      "name": "--tag",
+      "parent_declaration": "typ-script run-task",
+      "parent_id": "cli-command-2b5bcbd47198a999fc091c0b065da30f2903588139700c910a09a2562249306e",
+      "parent_path": "src/pkg/_cli_typer.py",
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        },
+        {
+          "name": "has_default",
+          "value": true
+        },
+        {
+          "name": "positional",
+          "value": false
+        }
+      ],
+      "source_sha256": "5bcdeec3c68c0488a3911bfe01f05510996cbee9251ea8c933571b072a796427"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "typ-script explicit-name",
+      "element_id": "cli-command-ce1e38ff50445c601aed4880a5ff967ffc51f516119bde4ec0e4e0d650b27107",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 25,
+        "start": 24
+      },
+      "name": "explicit-name",
+      "parent_declaration": "typ-script",
+      "parent_id": "cli-command-eaf4dd1b360ba8a886141f9277de3e7f4dd7b3d1f34d3ba947f819ddc5060bf9",
+      "parent_path": "pyproject.toml",
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        }
+      ],
+      "source_sha256": "3ea7c1aec4feb8bdde67b4c31561b1c5144b4e71209383caa37ede3a8f8c0cb5"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "typ-script sub inner-thing",
+      "element_id": "cli-command-d63978efa6a662143f148710cbe0da2a1f0d5383b22282d7fbe3fdecddf2d81b",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 30,
+        "start": 29
+      },
+      "name": "inner-thing",
+      "parent_declaration": "typ-script sub",
+      "parent_id": "cli-command-357211bd690da35ae37cd3b019f67c27679a3049db8cd00fdc4988aae4595c39",
+      "parent_path": "src/pkg/_cli_typer.py",
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        }
+      ],
+      "source_sha256": "c63dba540708acad4cd4cce370fdae6075f6aea323b38648187a826acc9b7623"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "typ-script sub inner-thing item",
+      "element_id": "cli-option-7bd6f313b3c79dae7260c907aa7a34c2b546c3062f43f72a19b8ea3932dbe569",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 30,
+        "start": 30
+      },
+      "name": "item",
+      "parent_declaration": "typ-script sub inner-thing",
+      "parent_id": "cli-command-d63978efa6a662143f148710cbe0da2a1f0d5383b22282d7fbe3fdecddf2d81b",
+      "parent_path": "src/pkg/_cli_typer.py",
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        },
+        {
+          "name": "has_default",
+          "value": false
+        },
+        {
+          "name": "positional",
+          "value": true
+        }
+      ],
+      "source_sha256": "66b9f1ebbb4fdc7b775bd0286af501f9172cea36d23907edffee9fc8bbe0769b"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "pkg._cli_typer",
+      "element_id": "cli-command-2eae1f12c6063bd7f0960e1a2e1e52cb7ca5b3be0066885f1e437ce4716b6402",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 34,
+        "start": 34
+      },
+      "name": "pkg._cli_typer",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        },
+        {
+          "name": "name_source",
+          "value": "module"
+        }
+      ],
+      "source_sha256": "af8503beda87d15d4f78f79b1ba8dbba730fcbf521a37dedca4e19a8b271b37b"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "pkg._cli_typer --value",
+      "element_id": "cli-option-549051664db25a22f45208b0fb133981f661509504bd8cb6e95c0157fc9470bb",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 34,
+        "start": 34
+      },
+      "name": "--value",
+      "parent_declaration": "pkg._cli_typer",
+      "parent_id": "cli-command-2eae1f12c6063bd7f0960e1a2e1e52cb7ca5b3be0066885f1e437ce4716b6402",
+      "parent_path": "src/pkg/_cli_typer.py",
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        },
+        {
+          "name": "has_default",
+          "value": true
+        },
+        {
+          "name": "positional",
+          "value": false
+        }
+      ],
+      "source_sha256": "af8503beda87d15d4f78f79b1ba8dbba730fcbf521a37dedca4e19a8b271b37b"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "tdiag",
+      "element_id": "cli-command-b7b4ab158c7e2bbc466582e899ae33a9f30baab4b4957c7ddd077b95e7eaec77",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 9,
+        "start": 9
+      },
+      "name": "tdiag",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_typer_diag.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        },
+        {
+          "name": "name_source",
+          "value": "literal"
+        }
+      ],
+      "source_sha256": "4b87fca16db4aff3d0a1c02a2b8f70d2261fc14a53cf90a84b9eafa7a4c1e41d"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "tdiag unresolved",
+      "element_id": "cli-command-e174d4a8870fd5b7504acc1198bf4e813ad5c541204d311f6a93d6e967096fea",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 13,
+        "start": 12
+      },
+      "name": "unresolved",
+      "parent_declaration": "tdiag",
+      "parent_id": "cli-command-b7b4ab158c7e2bbc466582e899ae33a9f30baab4b4957c7ddd077b95e7eaec77",
+      "parent_path": "src/pkg/_cli_typer_diag.py",
+      "path": "src/pkg/_cli_typer_diag.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        }
+      ],
+      "source_sha256": "4bef0dd49128b891deea8ea44b04dc1f18c529b0f019b303d8318fc8c1b6b7df"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "tdiag unresolved --other",
+      "element_id": "cli-option-1faeae7a775562da69dad5dede3c864b0f96bbba15c60253351c901a75cfe8f4",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 13,
+        "start": 13
+      },
+      "name": "--other",
+      "parent_declaration": "tdiag unresolved",
+      "parent_id": "cli-command-e174d4a8870fd5b7504acc1198bf4e813ad5c541204d311f6a93d6e967096fea",
+      "parent_path": "src/pkg/_cli_typer_diag.py",
+      "path": "src/pkg/_cli_typer_diag.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "typer"
+        },
+        {
+          "name": "has_default",
+          "value": true
+        },
+        {
+          "name": "positional",
+          "value": false
+        }
+      ],
+      "source_sha256": "ecfe39e6d4492e3d55a28decf49aafa96e9ed2ea59bd8892d2e485b3df1cc1a5"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET /",
+      "element_id": "http-route-2374077c69d2ef7c498aa305a9219e09f64e69b5086ec80ea14e117a6ee2282e",
+      "kind": "http-route",
+      "line_range": {
+        "end": 10,
+        "start": 9
+      },
+      "name": "root",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_fastapi.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "27975fd759f68c9f49a25ce2b9f0ed21a1a2819b06513fb44554569156d490e8"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET /ping",
+      "element_id": "http-route-2f2920ae4153321f5d0144a81098b69ad585e0d5843f7adcaf86028ab83d0c66",
+      "kind": "http-route",
+      "line_range": {
+        "end": 15,
+        "start": 14
+      },
+      "name": "ping",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_fastapi.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "2ec9421361dc21d7970c4ec3f9740b98c021ed49d1344cf09841b9da9d483223"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "POST /ping",
+      "element_id": "http-route-31f3fa4f1470be5ee6fba01c95b1be1874dc7ee3bef909d1f34cd71bf01b94c2",
+      "kind": "http-route",
+      "line_range": {
+        "end": 15,
+        "start": 14
+      },
+      "name": "ping",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_fastapi.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "2ec9421361dc21d7970c4ec3f9740b98c021ed49d1344cf09841b9da9d483223"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "WEBSOCKET /ws",
+      "element_id": "http-route-12f18d6f3317b2b76602a2005edac4cbaa2279dc9f064599e24481d6e86cfbab",
+      "kind": "http-route",
+      "line_range": {
+        "end": 20,
+        "start": 19
+      },
+      "name": "socket",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_fastapi.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "websocket"
+        }
+      ],
+      "source_sha256": "713a3b70a1a6e981fd78de7f0dcf75694f0a6eb2373a695443838882ac5c1ed5"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET /items/{item_id}",
+      "element_id": "http-route-5bca9ee62643e195c115e86dee19985f3702c0eccf2bc91e22f5ba37b9666467",
+      "kind": "http-route",
+      "line_range": {
+        "end": 25,
+        "start": 24
+      },
+      "name": "read_item",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_fastapi.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "881e3afc7cd112f5b116a7c41378559459aa230614afecb9eabcd2c16ec577c4"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET /v2/items/{item_id}",
+      "element_id": "http-route-1f551e76378c4cca23563db397e23366dec8760104ed0a221a84bd7235bd93c4",
+      "kind": "http-route",
+      "line_range": {
+        "end": 25,
+        "start": 24
+      },
+      "name": "read_item",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_fastapi.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "881e3afc7cd112f5b116a7c41378559459aa230614afecb9eabcd2c16ec577c4"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "POST /items/",
+      "element_id": "http-route-94450ec3681192175329a251314e982f1a998c2c17b375e935e4667d8e566c69",
+      "kind": "http-route",
+      "line_range": {
+        "end": 30,
+        "start": 29
+      },
+      "name": "create_item",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_fastapi.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "190017fd833ce04ed2dcf052af19f03d640271f63efd0e39c14dcee9427ee1dc"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "POST /v2/items/",
+      "element_id": "http-route-52a46e46fc0baffb4114a6484839cc1f792b590b2e37476cbbefd9adfc06a74a",
+      "kind": "http-route",
+      "line_range": {
+        "end": 30,
+        "start": 29
+      },
+      "name": "create_item",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_fastapi.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "190017fd833ce04ed2dcf052af19f03d640271f63efd0e39c14dcee9427ee1dc"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "HEAD /health",
+      "element_id": "http-route-7546e3efbb221eca225d663d23ef26df8ea58ec3fccc15619bc37078a79728fe",
+      "kind": "http-route",
+      "line_range": {
+        "end": 37,
+        "start": 37
+      },
+      "name": "/health",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_fastapi.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "7e2d119fc0f5ac08f11fb2ca0bef08452fc76d403dbc0549ae8388e64709a086"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET <dynamic>/items/{item_id}",
+      "element_id": "http-route-6bbc1d52958011613aa71a4ddd909448f764d55fb28a62358762f03b301f137b",
+      "kind": "http-route",
+      "line_range": {
+        "end": 42,
+        "start": 41
+      },
+      "name": "dynamic_item",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_fastapi.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": false
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "f68ab8dfaae09bdf66fdddfcee746caa58af999637b82ed394b330be1ea25beb"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET /orphan/x",
+      "element_id": "http-route-b589236e18990fd90747d294c50f33dd45dc5fa6d0eb9987dc452dd5f19f814a",
+      "kind": "http-route",
+      "line_range": {
+        "end": 52,
+        "start": 51
+      },
+      "name": "orphan_x",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_fastapi.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": false
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "eada1f5c712ca28c07bea50515fe73a71dd202dc0b5032fc1964071c1c3313a1"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET /users/u/{user_id}",
+      "element_id": "http-route-5e54418b7f0af14dfc462ad5ccfb18244159fdaf1a0f0beaaefbfda8cea163a4",
+      "kind": "http-route",
+      "line_range": {
+        "end": 7,
+        "start": 6
+      },
+      "name": "get_user",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_routers.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "90532176c782a78295e4b7959669896c265f48100a040f7a34a7706b91af6594"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "DELETE /users/u/{user_id}",
+      "element_id": "http-route-dc5b96f9a32802602abf3774d7a04dee21e4800d5aa0217384e81506c3ebf131",
+      "kind": "http-route",
+      "line_range": {
+        "end": 12,
+        "start": 11
+      },
+      "name": "delete_user",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_routers.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "493c10b3965a513d65340dff24991dce4acbcb6da272731aab437055b1987e15"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET /",
+      "element_id": "http-route-a35caa2424d43f3ed4c706d69cc45a3ebd92a06b75c8aee0f293cc1cd9e5aecb",
+      "kind": "http-route",
+      "line_range": {
+        "end": 13,
+        "start": 12
+      },
+      "name": "index",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_flask.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "flask"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "6fec4cfd95861220f228f31dc912ba591be4de7d9b4103ac2819fb24226e04b0"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET /multi",
+      "element_id": "http-route-8d7b2da908c66fdc62582d6baa6f16b6fd00bd32f14dac2c483a4f531b394098",
+      "kind": "http-route",
+      "line_range": {
+        "end": 18,
+        "start": 17
+      },
+      "name": "multi",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_flask.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "flask"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "3a69b98183212e9f165821bb4bd3d38ad6f1918315b61da3ea4e22d61b0bac2d"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "POST /multi",
+      "element_id": "http-route-bf64e0a2111cb4153d88c65fd8da2c21d380b4dcd7f3eb951551b8e4522a10b7",
+      "kind": "http-route",
+      "line_range": {
+        "end": 18,
+        "start": 17
+      },
+      "name": "multi",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_flask.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "flask"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "3a69b98183212e9f165821bb4bd3d38ad6f1918315b61da3ea4e22d61b0bac2d"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET /bp/items/<int:item_id>",
+      "element_id": "http-route-17ceb002e2a6308530a2d4ce56db0c78d1d9bc033f92c37ac4cf270e4284f34e",
+      "kind": "http-route",
+      "line_range": {
+        "end": 23,
+        "start": 22
+      },
+      "name": "item",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_flask.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "flask"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "c55514cd1f35ce966e1bf133f92a9c0f2c329d7925d5ae3c4b282f7303948361"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET /other/items/<int:item_id>",
+      "element_id": "http-route-f793ac6b1aae2fc3d70fe7d9b15df7ba15eaab7e728f949ad002b9b6fbf5baa3",
+      "kind": "http-route",
+      "line_range": {
+        "end": 23,
+        "start": 22
+      },
+      "name": "item",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_flask.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "flask"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "c55514cd1f35ce966e1bf133f92a9c0f2c329d7925d5ae3c4b282f7303948361"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "POST /bp/items",
+      "element_id": "http-route-e19e1da2ad64990ca881a584cb7aa22c59872f8b895417c9a7fed843ec4e1bef",
+      "kind": "http-route",
+      "line_range": {
+        "end": 28,
+        "start": 27
+      },
+      "name": "add_item",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_flask.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "flask"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "d13db5535fe5d22a545bb08325bf1ea8f19a1de554e08e76e13e52262cb0ff82"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "POST /other/items",
+      "element_id": "http-route-c8ec6eb1adb5325d24f8485303f69af9ab6c008b87ea99dbbdf6ce8acae728e7",
+      "kind": "http-route",
+      "line_range": {
+        "end": 28,
+        "start": 27
+      },
+      "name": "add_item",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_flask.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "flask"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "d13db5535fe5d22a545bb08325bf1ea8f19a1de554e08e76e13e52262cb0ff82"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "PUT /rule",
+      "element_id": "http-route-5e27d6be9d09428e29d91188c940d08b6e315c02835d4db14ce681a84dcac420",
+      "kind": "http-route",
+      "line_range": {
+        "end": 34,
+        "start": 34
+      },
+      "name": "/rule",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_flask.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "flask"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "d617e895d5d016fabfe23940e1000acb63189728e484ca4b95f804ae9e4c211c"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET /a/cycle",
+      "element_id": "http-route-3289e18538376cf747092868943cc513eff6640c4ecb2a4988d70bd53266e493",
+      "kind": "http-route",
+      "line_range": {
+        "end": 41,
+        "start": 40
+      },
+      "name": "cycle",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_diag.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": false
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "c9409a68d5cb9a1e0c0ba1a783a9f799af85467ae5f1067c7a8092ada315fd37"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-http",
+      "declaration": "GET /fine",
+      "element_id": "http-route-c388222da4c7a1ca426de45afc76624918d30dddba345fbbfa87bbf0fe763ff8",
+      "kind": "http-route",
+      "line_range": {
+        "end": 46,
+        "start": 45
+      },
+      "name": "fine",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_diag.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "fastapi"
+        },
+        {
+          "name": "mounted",
+          "value": true
+        },
+        {
+          "name": "prefix_resolved",
+          "value": true
+        },
+        {
+          "name": "protocol",
+          "value": "http"
+        }
+      ],
+      "source_sha256": "051fe0798baa8b689424e6c03f63991780c395d0d1e845fde312d5da99df72d0"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.util.helper",
+      "element_id": "public-symbol-6afdb314162e13accf71910b1374d978d8e24f2f086bd0f2eada321a50efb607",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 3,
+        "start": 3
+      },
+      "name": "helper",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/util.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "function"
+        }
+      ],
+      "source_sha256": "1e11d8f1e218a3509f3b20b6e21d89e9718426d8b420803ae91b355072c01da6"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.util.Helper",
+      "element_id": "public-symbol-2b3b5079d73c648445f2ae9f7c35759382be2d7e9cd9af44f59f4770d570f780",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 6,
+        "start": 6
+      },
+      "name": "Helper",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/util.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "class"
+        }
+      ],
+      "source_sha256": "99f2cec50b277ba4f19b74629ef6cf05c8863c15ace3809c16dab68033c928a9"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.util.CONSTANT",
+      "element_id": "public-symbol-1c57275e35e99be7cb2dc395f08df6e96413bb0c9b5af95d0a026c0a05fde268",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 9,
+        "start": 9
+      },
+      "name": "CONSTANT",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/util.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "variable"
+        }
+      ],
+      "source_sha256": "34d4faa1929723c6f3ee69f2f14db6f6cda472b869cc20f06dc6c1930f4be83c"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.config.Settings",
+      "element_id": "public-symbol-ddf7c8e15603fa7644d0d97c4383e5c305ce091a3c74dc57632064cbf2cdde80",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 1,
+        "start": 1
+      },
+      "name": "Settings",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/config.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "class"
+        }
+      ],
+      "source_sha256": "69185682509b5b6138c20f20697ebf9d15587ccb6f314f17e85a0539aa0b78d3"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.config.settings",
+      "element_id": "public-symbol-5772fd7dab0c5cc7be70d72b1701d1bd230697320d6a973548a027a171fa8c59",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 5,
+        "start": 5
+      },
+      "name": "settings",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/config.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "variable"
+        }
+      ],
+      "source_sha256": "a8f4bf18761602d3b590b37d398fa99779730a77b68138fdd14073492e3766ed"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_all.first",
+      "element_id": "public-symbol-61a69ee556dc7fb2f606ee43213b1a66cce8e1e0d0ffd9cb4397c057c17908c7",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 11,
+        "start": 11
+      },
+      "name": "first",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_all.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "all"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "function"
+        }
+      ],
+      "source_sha256": "f61c132276a514c185fbc7004359c4d0c8a1958739c0ec595158868d5f064fb4"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_all.helper",
+      "element_id": "public-symbol-bddf846b4d6f504ef6c81732893f45b250a1549ed38d76d1e240df8fa444e17b",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 2,
+        "start": 2
+      },
+      "name": "helper",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_all.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "all"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "import"
+        }
+      ],
+      "source_sha256": "7f78c7188ca94a4442c7104834db062bc5693b5ae00459131f5446fc42e003ee"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_all.second",
+      "element_id": "public-symbol-7e37a2b44813c93d1f48e2044e07308baf396b7adbbebff2c462f6a91d94a263",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 15,
+        "start": 15
+      },
+      "name": "second",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_all.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "all"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "class"
+        }
+      ],
+      "source_sha256": "30c3db89f85206601bc2721003090d94d68d035f10690486392b3240a3dc07d0"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_all.third",
+      "element_id": "public-symbol-50efd3e03189f928760f7ea715af4b2bc17e9489559b4a7a92b25c6f75ab6575",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 19,
+        "start": 19
+      },
+      "name": "third",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_all.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "all"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "variable"
+        }
+      ],
+      "source_sha256": "b6905cad756143515a2f0f92b8d7f2bbfbdca6b294314de85a1d34fc21f3c631"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_all.ghost",
+      "element_id": "public-symbol-fe19e62839a39af416d4e622c41fbb7bc5846138706258473f801ddc3a82bc1b",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 8,
+        "start": 8
+      },
+      "name": "ghost",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_all.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "all"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "unresolved"
+        }
+      ],
+      "source_sha256": "18f327def68ba5780091de52bfdae99de3807450149f42d2cdd38a7ea8e8ac43"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_all_tuple.alpha",
+      "element_id": "public-symbol-322fa06b23b138298749791bfe6845bb9020a2e986e32f4dfa54479f86abb3bf",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 4,
+        "start": 4
+      },
+      "name": "alpha",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_all_tuple.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "all"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "async-function"
+        }
+      ],
+      "source_sha256": "cb1f27ca781ef39be6f82ad5e73821b43a132b1aa9d13c612781bb807d2448f2"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_naming.platform_value",
+      "element_id": "public-symbol-0d72a42d02c73f6439c12506e81e5777d3381ebfbe5114207461ad41b244aaa9",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 5,
+        "start": 5
+      },
+      "name": "platform_value",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_naming.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "variable"
+        }
+      ],
+      "source_sha256": "55fa3de3face106da6bb54333c45199a9fabce23bff25d756c1e38d7e8f1acdb"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_naming.optional",
+      "element_id": "public-symbol-e0c945878f42d0def85b7d191d00e662499b10840acc37f3904d5891f081c4ec",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 10,
+        "start": 10
+      },
+      "name": "optional",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_naming.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "variable"
+        }
+      ],
+      "source_sha256": "41b5c772077b4fad01bb5839024bb9a6975c9972211fee4a188550be1c0d933f"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_naming.cleanup",
+      "element_id": "public-symbol-c4b49133c96e6017eff384e55d25091276c03e4a9f6bca8d05802cc96c835536",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 14,
+        "start": 14
+      },
+      "name": "cleanup",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_naming.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "variable"
+        }
+      ],
+      "source_sha256": "48b4f5ed9c17b151555b27ad4513849a8444ec06fb3291276359ebb999c19f3b"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_naming.a",
+      "element_id": "public-symbol-4472e1b0b02908197d491d8c4d94d95eb7484e10c6dd7e979316e07891d9e523",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 16,
+        "start": 16
+      },
+      "name": "a",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_naming.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "variable"
+        }
+      ],
+      "source_sha256": "0ae728edff8cdfac5e9e3ed1e0fef9b6072834f0f276048641d2c73ff8d168ad"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_naming.b",
+      "element_id": "public-symbol-07fb24028e3c45cd7be0d84170829dddfac85ffec14c0ace14ce6c1d1528fca1",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 16,
+        "start": 16
+      },
+      "name": "b",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_naming.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "variable"
+        }
+      ],
+      "source_sha256": "0ae728edff8cdfac5e9e3ed1e0fef9b6072834f0f276048641d2c73ff8d168ad"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_naming.typed",
+      "element_id": "public-symbol-763567a0291c249b7ffdbc260bfa406a6e58e6de9fec8182034cbe004f917d0e",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 17,
+        "start": 17
+      },
+      "name": "typed",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_naming.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "variable"
+        }
+      ],
+      "source_sha256": "83a1852f53277c27835991055905a70e7dceaf62f496a82702d73c407f23f3c5"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_naming.decorated",
+      "element_id": "public-symbol-8193e240d5c86dae7a86a92ad373c61ba5d95319e1221870169d3bfefae41b3d",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 23,
+        "start": 22
+      },
+      "name": "decorated",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_naming.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "function"
+        }
+      ],
+      "source_sha256": "5c3ecaebccd3a8ceb5f5db29db9c89e2b5370cbaef442d65897b15d2903ac607"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_naming.Klass",
+      "element_id": "public-symbol-88b9aa53204dbff5353203ec4ac362328a0aeb1041da692ddf5340352257fdd1",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 27,
+        "start": 27
+      },
+      "name": "Klass",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_naming.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "class"
+        }
+      ],
+      "source_sha256": "a5729adca77566d738abe97e22bf28310c328e48cec666f846b9b8ef3f5b29b4"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_naming.App",
+      "element_id": "public-symbol-fad501b504df080a5452f8d36acc28c7b35aae374d796d16b952d8a1fcca06f2",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 35,
+        "start": 35
+      },
+      "name": "App",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_naming.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "variable"
+        }
+      ],
+      "source_sha256": "ac5f3bc07383d8433a99b04ae9770680200576ed3163d2fcd26e830665dfcdb8"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_naming.app",
+      "element_id": "public-symbol-ff6dfcf880722cda0c1ab857e0c47d537a2e024619faef50e352f3d387fc7c44",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 36,
+        "start": 36
+      },
+      "name": "app",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_naming.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "variable"
+        }
+      ],
+      "source_sha256": "cac8fce26388930c1078274af79f23f5898a16fcb701428ed145784f3414ace8"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_dynamic.one",
+      "element_id": "public-symbol-2a1ded6105e17d7026f5d5f84fa156702221810e03313d515609564333844f2b",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 6,
+        "start": 6
+      },
+      "name": "one",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_dynamic.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "function"
+        }
+      ],
+      "source_sha256": "fc09444be05159c9a5a3396e9d788ff0fcf9a49ff54d821a1b4f7ac095015dce"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.api_dynamic.two",
+      "element_id": "public-symbol-8837715e864bcf31f0adb4271dded99b0ebd42df2b944abb408c12d5f45cec42",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 10,
+        "start": 10
+      },
+      "name": "two",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_dynamic.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "function"
+        }
+      ],
+      "source_sha256": "74fcbe5c085ccdeb567aca35f0b830c703276065c8ca3dac4f3faca61475a195"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.arch.load",
+      "element_id": "public-symbol-ca2dd850446bdafac9765a7e6e6c736785e4f09b664bee5152106ad968abfe7f",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 12,
+        "start": 12
+      },
+      "name": "load",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/arch.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "function"
+        }
+      ],
+      "source_sha256": "84ff6dfd573052743ee6b23d87ff505f2752880937625769c0dc95649ffe2dcb"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "toplevel.VALUE",
+      "element_id": "public-symbol-bcf4693474281c26c2e1dc46a6245e3688460763668f75b31a316969dd6230e2",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 3,
+        "start": 3
+      },
+      "name": "VALUE",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/toplevel.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "variable"
+        }
+      ],
+      "source_sha256": "e13df8c44af5dea1e412403910b99cc5a48f2ccbf68a66b3374d6ab9cef9fc65"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.lex_imports.inner",
+      "element_id": "public-symbol-4adc658480e6207a930af31a4c166c85b3dbf0fc32ff8150f34349767e8b7a5c",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 6,
+        "start": 6
+      },
+      "name": "inner",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/lex_imports.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "function"
+        }
+      ],
+      "source_sha256": "6d4edbb5d01f751345a71925a3c815f4a3d9d944b8d34fea634791f012a4046f"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg",
+      "element_id": "architecture-component-303d782630f7bd983a8b8eaa73742ab0862d7eb6796b39284d64f0352b388bac",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "pkg",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/__init__.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "package"
+        },
+        {
+          "name": "import-0001",
+          "value": "pkg.util"
+        },
+        {
+          "name": "import_count",
+          "value": 1
+        }
+      ],
+      "source_sha256": "1b5af566d6a24b8b78f2df1e0bc5888161e4bbdccd57940693b4f581928493bd"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg.util",
+      "element_id": "architecture-component-fcb34138acad0c642470fc5c437b64e31e24c1b854b631773820a7aecd80ac5b",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "util",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/util.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "a14e932f6ec4ec229ecf4f71a46574c284de5dac2ff39350b8e214d6593b0041"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg.config",
+      "element_id": "architecture-component-553847895318f4005df7201f6cba5519e20f19021ce93a01db5ec4675c64e6c6",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "config",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/config.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "412a717e7118cf04347e8555728e6875f973499ed423779c9d0c8a99bed296f4"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg._cli_argparse",
+      "element_id": "architecture-component-8418e3b58ee1fc8ed17c447be12800538ac67aaface1fbf4bd741df6e4b8c693",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "_cli_argparse",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_argparse.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "6943f8bd5c3a432102a76113c40ce302131300b2d6b81aea221060e63835bed9"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg._cli_argparse_diag",
+      "element_id": "architecture-component-3c0941d14d320d711c45b4aab40e38c8dc604990deb6c056927c5157567f285c",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "_cli_argparse_diag",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_argparse_diag.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "934af86afc5cc6731aa35146b2afea02f75e32faa0cd6a189c50b05042f12360"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg._cli_click",
+      "element_id": "architecture-component-1f4c0f249000b19e240b7bcdd154f5cc853873a5c060675124b0aca75f427940",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "_cli_click",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_click.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "1fb16309f06a08f952ff3e29679a82f014f1f24fbe89228a110a9b8a4618388a"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg._cli_click_diag",
+      "element_id": "architecture-component-a4a36dc6f8cbda90c98f9332e9fb26b4dec368826508f87ddf2624699893be63",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "_cli_click_diag",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_click_diag.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "9ffec0c17ef75448bfb61621fe72f5754f03d2682623e37c1fd248b1d756f0fa"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg._cli_typer",
+      "element_id": "architecture-component-bc2155cca311418428fd0a3108dba62f467452338078e5ff5bc7e7d96889244e",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "_cli_typer",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_typer.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "c89ee730f35116683b4629e9ba3984637cd11f939f94970d4e21c4a7f2d1879c"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg._cli_typer_diag",
+      "element_id": "architecture-component-ca857a9cfbc4fe476ae5a63c044fb010f03943bc39b2c149b71643855fb6dcac",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "_cli_typer_diag",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_cli_typer_diag.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "d36852e7da169eb15d347bbb9354cd65064269bd4734d3d3d17fcd6df1f5e08c"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg._http_fastapi",
+      "element_id": "architecture-component-d780e81e52c3e77c089778865c2bd234aa0213d126a982e8e14b354f42f8be1d",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "_http_fastapi",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_fastapi.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import-0001",
+          "value": "pkg._http_routers"
+        },
+        {
+          "name": "import-0002",
+          "value": "pkg.config"
+        },
+        {
+          "name": "import_count",
+          "value": 2
+        }
+      ],
+      "source_sha256": "4fc647921b78c3b1b113bc1e5152f7781f23b8e2f65ab9b395b2d6c149bbfcf1"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg._http_routers",
+      "element_id": "architecture-component-29c28784902c9bb03bf27996733b52c32cad2d207e896fd7de5908a41aed9eec",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "_http_routers",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_routers.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "e3ba16a81a4961687e2b935f5835421f39a9b37d58274d94f69da4731d6e1ba3"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg._http_flask",
+      "element_id": "architecture-component-28fa15c3be29394f4aa515790cb01738664d0efa9ccf5759852b7b000b5cb600",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "_http_flask",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_flask.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "c1ee12c88bc0f2c2e452a49413eb5e33d1474b717fe8220e804158f3b1f11934"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg._http_diag",
+      "element_id": "architecture-component-95b68e292ebad28814ae1dd5c7e7a88361a3fef0f335a95720169c0fc336cb64",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "_http_diag",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/_http_diag.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "830e96f843aa462f991a990fc3448fd20256e850b0633096d1d7d6bf5ddf20aa"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg.api_all",
+      "element_id": "architecture-component-80ea41f54b2ef0a264582784782e0c3c24bd943a732163065afa19fbd7b24b20",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "api_all",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_all.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import-0001",
+          "value": "pkg.util"
+        },
+        {
+          "name": "import_count",
+          "value": 1
+        }
+      ],
+      "source_sha256": "d1ed534c69745c9714dc41ff9b8f13db911ee2613cb788969127cfc06d621efc"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg.api_all_tuple",
+      "element_id": "architecture-component-79159ce2f8c1506429b06646999daeccd7992f0635ca08910876ced62f2d5e2e",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "api_all_tuple",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_all_tuple.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "912787e4f646534102bab50e70e81f688360a16d966a1b25c5b176b9e888d4ac"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg.api_naming",
+      "element_id": "architecture-component-32550f455fc605c9a263d97dc788a88e7f1687d092276169f8b81bdeba9f397d",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "api_naming",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_naming.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import-0001",
+          "value": "pkg.util"
+        },
+        {
+          "name": "import_count",
+          "value": 1
+        }
+      ],
+      "source_sha256": "18ab94b222daabaad5f22ca178794bf1c6c3c7adb974eea9e8ee2ed342f09989"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg.api_dynamic",
+      "element_id": "architecture-component-c5a416a11f0a5b39ddc147b0a5ac547c47a9c07778a76ef99aea0ef80c136dc0",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "api_dynamic",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/api_dynamic.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import-0001",
+          "value": "pkg.util"
+        },
+        {
+          "name": "import_count",
+          "value": 1
+        }
+      ],
+      "source_sha256": "685fef2a2921abf8fe24522962a7add234713580191fbb6f0c203c531e1c6411"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg.arch",
+      "element_id": "architecture-component-02ef35614973e5ac205ae11773d06e2f18cbbeb01388f9b7626675314a904189",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "arch",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/arch.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import-0001",
+          "value": "pkg.api_naming"
+        },
+        {
+          "name": "import-0002",
+          "value": "pkg.config"
+        },
+        {
+          "name": "import-0003",
+          "value": "pkg.util"
+        },
+        {
+          "name": "import_count",
+          "value": 3
+        }
+      ],
+      "source_sha256": "196f6d97112daf3e10a8376ef0ccaf724078d5498f3698b08a335f2dd280f842"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "toplevel",
+      "element_id": "architecture-component-a59bfbc9af0d8df7085799986c759a15f9785734500404ddafcb9491975d8615",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "toplevel",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/toplevel.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "6a6c0f7536bd0c69eb49c29eb74d388e8eb3fe49817a6e6465255fa904c7d2f4"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg.lex_imports",
+      "element_id": "architecture-component-20ebf5a5357435e7798a94847756cdeff9597f9b0755f9d714109d87e7e76deb",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "lex_imports",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/lex_imports.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import-0001",
+          "value": "pkg.config"
+        },
+        {
+          "name": "import-0002",
+          "value": "pkg.util"
+        },
+        {
+          "name": "import_count",
+          "value": 2
+        }
+      ],
+      "source_sha256": "e9ab88d7abf3325244a7553dbe77d044b2687e30d987b06e8c1eb2903a8ad2b6"
+    }
+  ],
+  "inputs": {
+    "pyproject.toml": "[project]\nname = \"pkg\"\n\n[project.scripts]\ntool = \"pkg._cli_argparse:build\"\ntyp-script = \"pkg._cli_typer:app\"\nmissing = \"pkg.nowhere:main\"\n\n[project.gui-scripts]\ngui = \"pkg._cli_click:nested_grp\"\n\n[tool.poetry.scripts]\npoet = \"pkg._cli_click:fine\"\nmulti = \"\"\"\npkg.x:y\n\"\"\"\n",
+    "src/pkg/__init__.py": "\"\"\"Package.\"\"\"\nfrom . import util\n",
+    "src/pkg/_cli_argparse.py": "import argparse\n\n\ndef build():\n    parser = argparse.ArgumentParser(prog=\"argtool\", description=\"d\")\n    parser.add_argument(\"--verbose\", \"-v\", action=\"store_true\", help=\"Verbose output\")\n    parser.add_argument(\"path\")\n    sub = parser.add_subparsers(dest=\"command\")\n    run = sub.add_parser(\"run\", help=\"Run it\")\n    run.add_argument(\"--count\", type=int, default=3, required=False)\n    group = run.add_mutually_exclusive_group()\n    group.add_argument(\"--fast\", action=\"store_true\")\n    nested = run.add_subparsers()\n    deep = nested.add_parser(\"deep\")\n    deep.add_argument(\"--level\", \"-l\")\n    return parser\n",
+    "src/pkg/_cli_argparse_diag.py": "import argparse\nfrom argparse import ArgumentParser\n\nNAME = \"dyn\"\n\n\ndef build(parser_arg):\n    parser = ArgumentParser(prog=\"diag\")\n    parser.add_argument(NAME)\n    parser.add_argument(f\"--{NAME}\")\n    for item in (\"a\", \"b\"):\n        parser.add_argument(\"--loop\")\n    parser_arg.add_argument(\"--unbound\")\n    child = ArgumentParser(prog=\"child\", parents=[parser])\n    child.add_argument(\"--own\")\n    return parser\n",
+    "src/pkg/_cli_click.py": "import click\nfrom click import command\n\n\n@click.group(name=\"main\")\n@click.option(\"--debug/--no-debug\", default=False, help=\"Debug\")\ndef cli_group():\n    pass\n\n\n@cli_group.command()\n@click.option(\"-n\", \"--name\", required=True)\n@click.argument(\"target\")\ndef sync_command(name, target):\n    pass\n\n\n@cli_group.group(\"nested\")\ndef nested_grp():\n    pass\n\n\n@nested_grp.command(\n    name=\"deep\",\n)\ndef deep_cmd():\n    pass\n\n\n@command\ndef plain_cmd():\n    pass\n\n\n@click.command()\ndef extra_command():\n    pass\n\n\ncli_group.add_command(plain_cmd)\ncli_group.add_command(extra_command, name=\"extra\")\n",
+    "src/pkg/_cli_click_diag.py": "import click\n\n\nclass CustomGroup(click.Group):\n    pass\n\n\n@click.group(cls=CustomGroup)\ndef custom():\n    pass\n\n\ncollection = click.CommandCollection(sources=[custom])\n\nshortcut = click.command\n\n\n@shortcut()\ndef indirect():\n    pass\n\n\ndef wrapped():\n    pass\n\n\nwrapped = click.command()(wrapped)\n\n\n@click.group(name=\"okgroup\")\ndef ok_group():\n    pass\n\n\n@click.command(name=\"ok\")\ndef fine():\n    pass\n\n\nfor alias in (\"a\", \"b\"):\n    ok_group.add_command(fine, name=alias)\n\n\ndef attach(group):\n    group.add_command(fine)\n",
+    "src/pkg/_cli_typer.py": "import typer\nfrom typing import Annotated\n\napp = typer.Typer(name=\"typ\")\nsub = typer.Typer()\napp.add_typer(sub, name=\"sub\")\n\n\n@app.callback()\ndef main_callback(verbose: bool = False):\n    pass\n\n\n@app.command()\ndef run_task(\n    name: str,\n    count: int = 3,\n    flag: bool = typer.Option(False, \"--flag\", \"-f\", help=\"Flag it\"),\n    tag: Annotated[str, typer.Option()] = \"x\",\n):\n    pass\n\n\n@app.command(\"explicit-name\")\ndef other():\n    pass\n\n\n@sub.command()\ndef inner_thing(item: Annotated[str, typer.Argument()]):\n    pass\n\n\ndef standalone(value: int = 1):\n    pass\n\n\ntyper.run(standalone)\n",
+    "src/pkg/_cli_typer_diag.py": "import typer\n\n\nclass MyTyper(typer.Typer):\n    pass\n\n\ncustom = typer.Typer(name=\"custom\", cls=MyTyper)\napp = typer.Typer(name=\"tdiag\")\n\n\n@app.command()\ndef unresolved(value: dict = make_default(), other: str = \"s\"):\n    pass\n",
+    "src/pkg/_http_diag.py": "from fastapi import FastAPI, APIRouter\nfrom starlette.staticfiles import StaticFiles\n\napp = FastAPI()\nPATH = \"/dyn\"\n\n\n@app.get(PATH)\ndef dynamic_path():\n    pass\n\n\n@app.api_route(\"/m\", methods=METHODS)\ndef dynamic_methods():\n    pass\n\n\nfor route in (\"/a\", \"/b\"):\n    @app.get(route)\n    def looped():\n        pass\n\n\napp.mount(\"/static\", StaticFiles(directory=\"s\"))\napp.include_router(external_router)\n\n\ndef make(router):\n    @router.get(\"/unbound\")\n    def unbound():\n        pass\n\n\na = APIRouter(prefix=\"/a\")\nb = APIRouter(prefix=\"/b\")\na.include_router(b)\nb.include_router(a)\n\n\n@a.get(\"/cycle\")\ndef cycle():\n    pass\n\n\n@app.get(\"/fine\")\ndef fine():\n    pass\n",
+    "src/pkg/_http_fastapi.py": "from fastapi import FastAPI, APIRouter\nfrom pkg.config import settings\nfrom . import _http_routers\n\napp = FastAPI()\nitems = APIRouter(prefix=\"/items\")\n\n\n@app.get(\"/\")\ndef root():\n    pass\n\n\n@app.api_route(\"/ping\", methods=[\"GET\", \"POST\"])\nasync def ping():\n    pass\n\n\n@app.websocket(\"/ws\")\nasync def socket():\n    pass\n\n\n@items.get(\"/{item_id}\")\ndef read_item(item_id: int):\n    pass\n\n\n@items.post(\"/\")\ndef create_item():\n    pass\n\n\napp.include_router(items)\napp.include_router(items, prefix=\"/v2\")\napp.include_router(_http_routers.users, prefix=\"/users\")\napp.add_api_route(\"/health\", root, methods=[\"HEAD\"])\ndynamic = APIRouter(prefix=settings.prefix)\n\n\n@dynamic.get(\"/items/{item_id}\")\ndef dynamic_item(item_id: int):\n    pass\n\n\napp.include_router(dynamic)\n\norphan = APIRouter(prefix=\"/orphan\")\n\n\n@orphan.get(\"/x\")\ndef orphan_x():\n    pass\n",
+    "src/pkg/_http_flask.py": "from flask import Flask, Blueprint\nfrom flask.views import MethodView\n\napp = Flask(__name__)\nbp = Blueprint(\"bp\", __name__, url_prefix=\"/bp\")\n\n\nclass ItemView(MethodView):\n    pass\n\n\n@app.route(\"/\")\ndef index():\n    pass\n\n\n@app.route(\"/multi\", methods=[\"GET\", \"POST\"])\ndef multi():\n    pass\n\n\n@bp.get(\"/items/<int:item_id>\")\ndef item(item_id):\n    pass\n\n\n@bp.post(\"/items\")\ndef add_item():\n    pass\n\n\napp.register_blueprint(bp)\napp.register_blueprint(bp, url_prefix=\"/other/\")\napp.add_url_rule(\"/rule\", view_func=index, methods=[\"PUT\"])\napp.add_url_rule(\"/view\", view_func=ItemView.as_view(\"item\"))\n",
+    "src/pkg/_http_routers.py": "from fastapi import APIRouter\n\nusers = APIRouter(prefix=\"/u\")\n\n\n@users.get(\"/{user_id}\")\ndef get_user(user_id: int):\n    pass\n\n\n@users.delete(\"/{user_id}\")\ndef delete_user(user_id: int):\n    pass\n",
+    "src/pkg/api_all.py": "\"\"\"All forms.\"\"\"\nfrom pkg.util import helper\nfrom pkg.util import *\n\n__all__ = [\"first\", \"helper\"]\n__all__ += [\"second\"]\n__all__.extend([\"third\"])\n__all__.append(\"ghost\")\n\n\ndef first():\n    pass\n\n\nclass second:\n    pass\n\n\nthird: int = 3\n",
+    "src/pkg/api_all_tuple.py": "__all__: list[str] = (\"alpha\",)\r\r\rasync def alpha():\r    pass\r",
+    "src/pkg/api_dynamic.py": "from pkg.util import *\n\n__all__ = [\"one\"] + [\"two\"]\n\n\ndef one():\n    pass\n\n\ndef two():\n    pass\n",
+    "src/pkg/api_naming.py": "import os\nfrom pkg import util\n\nif os.name == \"nt\":\n    platform_value = 1\nelse:\n    platform_value = 2\n\ntry:\n    optional = util.helper(1)\nexcept Exception:\n    optional = None\nfinally:\n    cleanup = True\n\na = b = 3\ntyped: int\n(x, y) = (1, 2)\nm, n = 1, 2\n\n\n@decorator_name\ndef decorated():\n    pass\n\n\nclass Klass:\n    member = 1\n\n\ndef _hidden():\n    pass\n\n\nApp = 1\napp = 2\n\n\ndef caf\u00e9():\n    pass\n",
+    "src/pkg/arch.py": "import pkg.util\nimport importlib\nfrom . import config\nfrom .util import helper as h\nfrom ..outside import thing\nfrom typing import TYPE_CHECKING\n\nif TYPE_CHECKING:\n    from pkg.api_naming import Klass\n\n\ndef load(name):\n    import json\n    from pkg import util\n    return importlib.import_module(name), __import__(\"os\"), util, json\n",
+    "src/pkg/bad-name.py": "value = 1\n",
+    "src/pkg/config.py": "\uFEFFclass Settings:\n    prefix = \"/dyn\"\n\n\nsettings = Settings()\n",
+    "src/pkg/lex_encoding.py": "# -*- coding: latin-1 -*-\nx = 1\n",
+    "src/pkg/lex_imports.py": "from click import *\nfrom pkg.util import helper\nfrom pkg.config import helper\n\n\ndef inner():\n    import typer\n    return typer\n",
+    "src/pkg/lex_indent.py": "if a:\n        b = 1\n    c = 2",
+    "src/pkg/lex_unclassified.py": "x = $y\n",
+    "src/pkg/lex_unterminated.py": "x = \"open\ny = 1\n",
+    "src/pkg/util.py": "\"\"\"Utilities.\"\"\"\r\n\r\ndef helper(value):\r\n    return value\r\n\r\nclass Helper:\r\n    pass\r\n\r\nCONSTANT = 1\r\n_private = 2\r\n",
+    "src/toplevel.py": "from . import sibling\n\nVALUE = 1\n"
+  },
+  "source_roots": ["src"]
+}

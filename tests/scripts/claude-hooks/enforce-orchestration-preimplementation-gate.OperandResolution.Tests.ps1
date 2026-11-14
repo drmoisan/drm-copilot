@@ -7,15 +7,17 @@
 
 .DESCRIPTION
     Covers the Write/Edit path leg and the Bash command leg, whose checkpoint is read
-    beneath the worktree that contains the operand; the fail-closed import guard for the
+    beneath the worktree that contains the operand (resolved by Resolve-HookTargetWorktree
+    over the mocked worktree-list wrapper since issue #1010); the fail-closed import guard for the
     worktree-resolution modules; and a parse-tree scan showing that no checkpoint read in
     the gate or its siblings uses a relative literal.
 
     The outermost BeforeAll follows the epic-state isolation pattern: the hook is
     dot-sourced first, then EpicScopeResolution.psm1 and WorktreeRunResolution.psm1 are
     imported without -Force and their checkpoint-text seams are mocked $null, so no row
-    reads an epic checkpoint on the host. Every checkpoint read seam is mocked; no test
-    creates or writes a file, reads a wall clock, starts a process, or touches the network.
+    reads an epic checkpoint on the host. Every checkpoint read seam and the worktree-list
+    wrapper Get-OrchestrationGateWorktreeList are mocked; no test creates or writes a file,
+    reads a wall clock, starts a process, or touches the network.
 #>
 
 BeforeAll {
@@ -57,17 +59,14 @@ BeforeAll {
         Mock -CommandName Resolve-OrchestrationGateTarget -MockWith { $target }.GetNewClosure()
     }
 
-    # Place operands by prefix for the real operand resolver: a path under w-item ascends
-    # to w-item, and any other path to the session worktree.
+    # Place operands for the real target resolver (issue #1010): the worktree-list wrapper
+    # returns an in-memory listing of w-item and the session worktree, so a path under
+    # w-item resolves to w-item and any other path to the session worktree.
     function Set-OperandPlacement {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
         param()
-        $session = $script:Session
-        Mock -CommandName Find-WorktreeResolutionRoot -ModuleName WorktreeRunResolution -MockWith {
-            param([string] $Path)
-            if ($Path.StartsWith('/synthetic-worktrees/w-item')) { return '/synthetic-worktrees/w-item' }
-            return $session
-        }.GetNewClosure()
+        $listing = "worktree $($script:Session)`nbranch refs/heads/main`n`nworktree /synthetic-worktrees/w-item`nbranch refs/heads/feature/item`n"
+        Mock -CommandName Get-OrchestrationGateWorktreeList -MockWith { $listing }.GetNewClosure()
     }
 }
 

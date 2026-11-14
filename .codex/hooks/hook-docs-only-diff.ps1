@@ -4,8 +4,8 @@
 
 .DESCRIPTION
     Shared by enforce-pr-author-skill.docs-only.ps1 (create side) and by the Claude and Codex
-    copies of enforce-epic-merge-gate.ps1 (merge side). The file defines functions only: it
-    imports nothing, dot-sources nothing, and has no entry point. At call time
+    copies of enforce-epic-merge-gate.ps1 (merge side). The file defines functions and one
+    constant only: it imports nothing, dot-sources nothing, and has no entry point. At call time
     Get-DocsOnlyMergeExemption uses Read-CommandLineSegment, Test-CommandLineSegmentRawScan,
     Get-CommandLineStructuralMatch, Test-CommandLineFlag, and Get-CommandLineFlagValue from
     the command parsers every consumer already loads.
@@ -35,7 +35,10 @@
                                                exits 0.
       M7 DOCS_ONLY_EXEMPTION_DIFF_FAILED     - non-empty diff output ends with NUL.
       M8 DOCS_ONLY_EXEMPTION_EMPTY_DIFF      - the diff lists at least one path.
-      M9 DOCS_ONLY_EXEMPTION_NON_DOCS_PATH   - every listed path starts with docs/ (ordinal).
+      M9 DOCS_ONLY_EXEMPTION_NON_DOCS_PATH   - every listed path starts with docs/ (ordinal) or
+                                               is ordinally equal to the docs-init workflow
+                                               path $script:DocsOnlyInitWorkflowPath
+                                               (.github/workflows/_docs-quality.yml, #1169).
 
     No-fetch policy: no function here fetches or writes a ref. A missing origin/<base> ref or
     a head commit that is not present locally denies, and the M5 reason names the command
@@ -63,6 +66,10 @@
     the seam bodies run without starting a process, and pass a test-local process starter
     through the -ProcessStarter parameter of Invoke-DocsOnlyBoundedNative.
 #>
+
+# The one non-docs/ path the docs-only exemptions admit (issue #1169): the workflow file that
+# docs-init writes. Held once here and read by the E7, M9, and docs-estate legs.
+$script:DocsOnlyInitWorkflowPath = '.github/workflows/_docs-quality.yml'
 
 function ConvertFrom-DocsOnlyNameList {
     <#
@@ -99,7 +106,8 @@ function Get-DocsOnlyPathViolation {
     .DESCRIPTION
         An empty set returns DOCS_ONLY_EXEMPTION_EMPTY_DIFF. Otherwise the first path that does
         not start with docs/ under ordinal comparison, or that is not longer than docs/ itself,
-        returns DOCS_ONLY_EXEMPTION_NON_DOCS_PATH naming that path.
+        returns DOCS_ONLY_EXEMPTION_NON_DOCS_PATH naming that path. A path ordinally equal to
+        $script:DocsOnlyInitWorkflowPath is admitted (issue #1169); no glob or prefix applies.
     .PARAMETER Path
         The changed paths, repository-relative, as git reports them.
     .OUTPUTS
@@ -116,6 +124,9 @@ function Get-DocsOnlyPathViolation {
         return 'DOCS_ONLY_EXEMPTION_EMPTY_DIFF: the branch diff lists no path.'
     }
     foreach ($entry in $paths) {
+        if ([string]::Equals($entry, $script:DocsOnlyInitWorkflowPath, [System.StringComparison]::Ordinal)) {
+            continue
+        }
         if ($entry.Length -le 5 -or -not $entry.StartsWith('docs/', [System.StringComparison]::Ordinal)) {
             return "DOCS_ONLY_EXEMPTION_NON_DOCS_PATH: '$entry' is outside docs/."
         }

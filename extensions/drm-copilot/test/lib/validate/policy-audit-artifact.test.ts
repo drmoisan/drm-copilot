@@ -20,6 +20,9 @@ const TYPESCRIPT_EVIDENCE_REFERENCE =
 const TYPESCRIPT_EVIDENCE_REFERENCE_NO_LABEL =
   "docs/features/active/example/evidence/baseline/typescript.md; " +
   "docs/features/active/example/evidence/qa-gates/typescript.md.";
+const NO_PRE_CHANGE_RUN = "N/A - no pre-change run";
+const POWERSHELL_NUMERIC_POST_CHANGE =
+  "Post-change: 86% commands, 84% functions. Change: N/A.";
 
 /**
  * Build a policy-audit document that satisfies the validator so focused tests
@@ -77,6 +80,61 @@ function buildValidPolicyAuditText(): string {
     "## Appendix A: Test Inventory",
     "## Appendix B: Toolchain Commands Reference",
   ].join("\n");
+}
+
+/**
+ * Replace text that the fixture must hold, so a stale search string fails the
+ * test instead of leaving the numeric baseline in place.
+ *
+ * @param text Document text.
+ * @param search Exact text to replace.
+ * @param replacement Text to substitute.
+ * @returns The document with the replacement applied.
+ */
+function replaceRequired(
+  text: string,
+  search: string,
+  replacement: string,
+): string {
+  if (!text.includes(search)) {
+    throw new Error(`Fixture text not found: ${search}`);
+  }
+  return text.replace(search, replacement);
+}
+
+/**
+ * Build the valid document with every retained baseline field recording no
+ * pre-change run, in the form the policy-audit template states.
+ */
+function buildNoPreChangeRunPolicyAuditText(): string {
+  const evidenceRoot = "docs/features/active/example/evidence";
+  const replacements: readonly (readonly [string, string])[] = [
+    ["91% lines, 88% functions | 93%", `${NO_PRE_CHANGE_RUN} | 93%`],
+    ["84% commands, 82% functions | 86%", `${NO_PRE_CHANGE_RUN} | 86%`],
+    [
+      `TypeScript baseline coverage artifact: ${evidenceRoot}/baseline/typescript.md`,
+      `TypeScript baseline coverage artifact: ${NO_PRE_CHANGE_RUN}`,
+    ],
+    [
+      `PowerShell baseline coverage artifact: ${evidenceRoot}/baseline/powershell.md`,
+      `PowerShell baseline coverage artifact: ${NO_PRE_CHANGE_RUN}`,
+    ],
+    [
+      "Baseline: 91% lines, 88% functions -> Post-change: 93% lines, " +
+        "90% functions. Change: +2% lines, +2% functions.",
+      `Baseline: ${NO_PRE_CHANGE_RUN} -> Post-change: 93% lines, ` +
+        "90% functions. Change: N/A.",
+    ],
+    [
+      "Baseline: 84% commands, 82% functions -> Post-change: 86% commands, " +
+        "84% functions. Change: +2% commands, +2% functions.",
+      `Baseline: ${NO_PRE_CHANGE_RUN} -> ${POWERSHELL_NUMERIC_POST_CHANGE}`,
+    ],
+  ];
+  return replacements.reduce(
+    (text, [search, replacement]) => replaceRequired(text, search, replacement),
+    buildValidPolicyAuditText(),
+  );
 }
 
 describe("validatePolicyAuditText", () => {
@@ -330,5 +388,39 @@ describe("validatePolicyAuditSubstantiveRequirements", () => {
     expect(errors).toContain(
       "Policy audit missing coverage metrics table rows.",
     );
+  });
+
+  it("accepts an audit that records no pre-change run", () => {
+    // Arrange
+    const text = buildNoPreChangeRunPolicyAuditText();
+
+    // Act
+    const errors = validatePolicyAuditSubstantiveRequirements(text);
+
+    // Assert
+    expect(errors).toEqual([]);
+  });
+
+  it("accepts the no-pre-change-run comparison line only through the later Post-change percentage", () => {
+    // Arrange: the PowerShell line carries no other percentage after `Baseline:`,
+    // so its baseline check can only reach the `Post-change:` value.
+    const missingBaseline =
+      "Policy audit comparison line missing numeric baseline for PowerShell.";
+    const withPercentage = buildNoPreChangeRunPolicyAuditText();
+    const withoutPercentage = replaceRequired(
+      withPercentage,
+      POWERSHELL_NUMERIC_POST_CHANGE,
+      "Post-change: N/A. Change: N/A.",
+    );
+
+    // Act
+    const acceptedErrors =
+      validatePolicyAuditSubstantiveRequirements(withPercentage);
+    const rejectedErrors =
+      validatePolicyAuditSubstantiveRequirements(withoutPercentage);
+
+    // Assert
+    expect(acceptedErrors).not.toContain(missingBaseline);
+    expect(rejectedErrors).toContain(missingBaseline);
   });
 });

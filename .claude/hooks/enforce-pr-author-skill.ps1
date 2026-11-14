@@ -76,13 +76,13 @@ param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 $script:PrContextArtifactPath = 'artifacts/pr_context.summary.txt'
 # Null until the resolution step assigns the absolute path of the resolved worktree's
 # checkpoint (issue #673); a relative default here was the process-directory binding.
 $script:OrchestratorStateCheckpointPath = $null
 
-try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
 
 function Get-PrContextArtifactExistence {
     <#
@@ -192,8 +192,8 @@ try { . (Join-Path $PSScriptRoot 'enforce-pr-author-skill.epic-base-branch.ps1')
 # Dot-source the receipt-verification and bypass-reason helpers. Guarded so dot-sourcing this
 # hook in tests loads the helpers too (issue #501 headroom split).
 try { . (Join-Path $PSScriptRoot 'enforce-pr-author-skill-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-pr-author-skill-helpers.ps1' -ErrorRecord $_ }
-try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
-try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
 
 function Invoke-PrAuthorSkillDecision {
     <#

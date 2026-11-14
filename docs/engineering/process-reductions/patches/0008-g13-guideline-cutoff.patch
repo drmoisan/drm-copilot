@@ -1,0 +1,1853 @@
+diff --git a/.agents/skills/atomic-plan-contract/SKILL.md b/.agents/skills/atomic-plan-contract/SKILL.md
+index f53d6e1cd..a9d77c2e3 100644
+--- a/.agents/skills/atomic-plan-contract/SKILL.md
++++ b/.agents/skills/atomic-plan-contract/SKILL.md
+@@ -31,7 +31,7 @@ Rules:
+ - **Literals only where they are the asserted value.** A plan quotes a literal when an acceptance condition asserts that exact value. It does not quote file contents, command output, or prose for context.
+ - **Tool routes are not restated.** Tool routes, launchers, wrapper scripts, command-text restrictions, the batch budget, hook context, and CI shape are owned by the `execution-environment` skill. A plan references that skill instead of restating its content.
+ - **Changed existing behavior names its asserting tests.** A task that changes the observable behavior of an existing function, script, fixture, or test stub (its signature, argv, output, exit status, or the files it writes) names every existing test that asserts that behavior and states each test's disposition: unchanged because it is unaffected, or updated, with the reason for the update. The tests are found by searching the test tree for the symbol, the file name, and the asserted output. A test that asserts the current behavior and is outside the task's file set fails once the change lands, and the plan's own acceptance condition then cannot be met. The planner's adversarial self-review includes this search for every task that changes existing behavior.
+-- **Size guideline.** A plan stays within 40 canonical tasks and 400 physical lines. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task.
++- **Size guideline.** A plan stays within 20 canonical tasks and 250 physical lines. A plan file stamped before `PLAN_GUIDELINE_CUTOFF` (the instant of the G13 commit, compared in the zone of each stamp shape) keeps the legacy pair of 40 canonical tasks and 400 physical lines, and a plan validated without a path uses the new pair. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task. The installed MCP validator applies 40 and 400 until a release carrying the lowered guideline is installed, so the planner's MCP self-check does not report a plan between the two pairs: the planner holds a new plan to 20 tasks and 250 lines itself, and preflight applies the new pair through the Python CLI route of `## Validator Gate`.
+ - **Task target.** A plan targets 15 to 20 canonical tasks. The target is authoring guidance that no validator checks; the limit the validator enforces is the one the `Size guideline` bullet states.
+ - **Pre-Mortem.** Every plan carries a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the plan prevents that failure class, or states "not applicable" followed by the reason. The `Test isolation` bullet names the parallel gates the plan uses: one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers, each re-run only after a fix. The `Mirror parity` bullet also covers the execution-environment brief: a plan that alters a fact the brief states (for example, it adds or renames a CI job, changes a required status context, a tool route, or a batch-budget rule) includes a task that updates the brief in the same change, in all six byte-identical copies, and the bullet names that task. Without that task the brief states a superseded fact once the change lands, which breaks the brief's own maintenance rule. The planner SubagentStop hook blocks a plan without a complete section.
+ - **Final-phase self-review.** The final phase of every plan contains a self-review task that walks the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base and writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item. A FAIL row is fixed and the QA loop is re-run before the self-review is rewritten; the plan does not complete with a FAIL row.
+@@ -215,7 +215,7 @@ Before a plan can be treated as approved:
+ - reject the plan if that validator exits non-zero,
+ - do not treat human-readable summaries as a substitute for validator success.
+ 
+-The validator applies the acceptance-gate rules of `.claude/rules/plan-acceptance-gates.md`. G1 through G9 judge the commands a plan states as acceptance conditions; G10 reports a SCRATCH definition not namespaced by issue number; and the document-level rules G11, G12, and G13 report a line-number citation, a commit-SHA citation, and a plan above 40 tasks or 400 lines without a non-empty `## Size Justification` section. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13 only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
++The validator applies the acceptance-gate rules of `.claude/rules/plan-acceptance-gates.md`. G1 through G9 judge the commands a plan states as acceptance conditions; G10 reports a SCRATCH definition not namespaced by issue number; and the document-level rules G11, G12, and G13 report a line-number citation, a commit-SHA citation, and a plan above the size guideline without a non-empty `## Size Justification` section. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13, and the lowered G13 guideline with its cutoff, only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
+ 
+ ## Plan-Path Continuity Contract (Mandatory)
+ 
+diff --git a/.claude/agents/atomic-planner.md b/.claude/agents/atomic-planner.md
+index 3d5961104..8b14a1cda 100644
+--- a/.claude/agents/atomic-planner.md
++++ b/.claude/agents/atomic-planner.md
+@@ -49,7 +49,7 @@ Generate plans using the atomic plan contract defined in the `atomic-plan-contra
+ - Phase 0: baseline capture (language-specific static tool baselines and one parallel test-suite baseline run per gate, the `Phase 0 baseline`)
+ - Final phase: full QA loop for each applicable language, ending with the self-review task that writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`
+ 
+-Every plan is design-level per `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: tasks name files, symbols, behavior, tests, and acceptance; anchors are symbols, headings, or test names, never line numbers or commit SHAs; literals appear only where they are the asserted value; tool routes and launchers are not restated because the `execution-environment` skill owns them; and a plan above 40 tasks or 400 lines carries a `## Size Justification` section. Every plan carries a `## Pre-Mortem` section with one bullet for each of `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`; the planner SubagentStop hook blocks a plan without it.
++Every plan is design-level per `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: tasks name files, symbols, behavior, tests, and acceptance; anchors are symbols, headings, or test names, never line numbers or commit SHAs; literals appear only where they are the asserted value; tool routes and launchers are not restated because the `execution-environment` skill owns them; and a plan above the G13 guideline of 20 tasks and 250 lines (40 and 400 for a plan file stamped before `PLAN_GUIDELINE_CUTOFF`) carries a `## Size Justification` section. Every plan carries a `## Pre-Mortem` section with one bullet for each of `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`; the planner SubagentStop hook blocks a plan without it.
+ 
+ ## Requirements
+ 
+diff --git a/.claude/rules/plan-acceptance-gates.md b/.claude/rules/plan-acceptance-gates.md
+index 993331aab..2e3a1ba39 100644
+--- a/.claude/rules/plan-acceptance-gates.md
++++ b/.claude/rules/plan-acceptance-gates.md
+@@ -16,12 +16,14 @@ This rule governs the acceptance-gate rules the plan validator applies to an ato
+ 
+ The rules are enforced by `scripts/dev_tools/plan_gate_discrimination.py` and by the TypeScript parity port at `extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts` with its shared-predicate module `plan-gate-rules.ts`. G1 through G9 are fed by the command extractor (`scripts/dev_tools/plan_gate_commands.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts`); G10 reads the whole document through `scripts/dev_tools/plan_gate_scratch.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts`, and G11 through G13 read it through `scripts/dev_tools/plan_gate_document.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-document.ts`. Enforcement is validator logic plus this prose file. No JSON Schema is authored, imported, or read.
+ 
+-## Scope of Invocation — no grandfathering or exemption mechanism
++## Scope of Invocation — no exemption marker
+ 
+ The plan validator only ever runs against the single artifact it is pointed at. No CI job, test, or scheduled task sweeps the committed plan corpus, and none is added by this feature. A pre-existing plan that would produce a finding is therefore never evaluated unless someone deliberately points the validator at it.
+ 
+ That scope is the argument against a grandfathering list, an exemption marker, a per-plan suppression comment, and an allowlist file. Each of those mechanisms exists to protect an existing corpus from a newly added sweep. With no sweep there is nothing to protect, and the mechanism would add a suppression surface whose only reachable use is to silence a finding on the plan currently being authored — which is precisely the case the gate exists to report.
+ 
++One dated exception exists, and it is not a marker. G13 selects its guideline by comparing the plan-file stamp with the `PLAN_GUIDELINE_CUTOFF` entry for the zone of the stamp's name shape; the two entries are the one instant of the G13 commit that lowered the guideline, written in America/New_York and in UTC. It is not a suppression surface: a new plan's stamp comes from the feature-folder tooling, and the Plan-Path Continuity Contract keeps it stable, so a plan being authored cannot select the older guideline through its text. It exists so that plans written before the guideline was lowered need no edit, which matters because parallel runs verify `plan-hash`. The plan path reaches the rule by its own parameter, not through the repository seam, so the stamp applies with or without a context.
++
+ The consequence is that adding a rule to this set is cheap in migration cost and expensive in authoring cost. Weigh a new rule on its false-positive rate at authoring time, not on how many committed plans it would have flagged.
+ 
+ ## Rule Table
+@@ -43,7 +45,7 @@ Every finding string begins with the square-bracketed `P#-T#` identifier of the
+ | **G10** | An unfenced logical line of the plan document (a physical line plus its indented continuation lines) that matches the SCRATCH definition predicate, and whose text after the first definition match carries neither an `issue-<issue-num>` nor an `issue-<digits>` namespace. One finding per logical line, reported against its first physical line. | **Blocking** |
+ | **G11** | A line-number citation in unfenced text, in any of three forms: the prose form `\b[Ll]ines?[ \t]+[0-9]+` evaluated with inline code spans masked; the path form `[A-Za-z0-9_./-]+\.[A-Za-z][A-Za-z0-9]{0,5}:[0-9]+` evaluated including inline code, skipped when the enclosing whitespace-delimited token contains `://`; and the anchor form `#L[0-9]+`. A line position moves whenever `main` moves. One finding per match. | **Blocking** |
+ | **G12** | A commit-SHA citation in unfenced text, including inline code: a bounded run `\b[0-9a-f]{7,40}\b` that holds at least one digit and at least one letter, is not preceded by `-`, `_`, or `.`, and is not followed by `-` or `_`. The adjacency conditions are checked in code, not by lookbehind. One finding per match. | **Blocking** |
+-| **G13** | A plan whose unfenced canonical task lines exceed `PLAN_TASK_GUIDELINE` (40) or whose physical lines exceed `PLAN_LINE_GUIDELINE` (400), with no `## Size Justification` heading followed by at least one non-blank, non-heading line before the next heading of level one or two. One finding per document. | **Blocking** |
++| **G13** | A plan whose unfenced canonical task lines exceed `PLAN_TASK_GUIDELINE` (20) or whose physical lines exceed `PLAN_LINE_GUIDELINE` (250), or, for a plan file stamped before the `PLAN_GUIDELINE_CUTOFF` entry of its stamp zone, exceed `LEGACY_PLAN_TASK_GUIDELINE` (40) or `LEGACY_PLAN_LINE_GUIDELINE` (400), with no `## Size Justification` heading followed by at least one non-blank, non-heading line before the next heading of level one or two. One finding per document. | **Blocking** |
+ 
+ G1 through G13 are the complete shipped set. G1 through G6 were added by issue #486, G7 through G9 by issue #519, G10 by issue #932, and G11 through G13 by issue #964.
+ 
+@@ -191,9 +193,11 @@ The finding message is ``Line N: commit-SHA citation `<match>` names a commit th
+ 
+ ### G13 — ships as Blocking because its exoneration is author-controlled
+ 
+-G13 reports a plan above 40 canonical task lines or 400 physical lines that carries no `## Size Justification` section with content. The guideline numbers were derived from the issue #962 item, whose specification maps to an estimated 35 to 45 design-level tasks in 300 to 400 lines. G13 ships Blocking because the author controls its exoneration: a plan that needs more states why in one paragraph, which costs less than a preflight round. A justification section that holds only blank lines or headings does not exonerate. The severity is a single constant in each runtime (`G13_SEVERITY`), and a parity test asserts the two constants agree.
++G13 reports a plan above 20 canonical task lines or 250 physical lines that carries no `## Size Justification` section with content. The first guideline, 40 tasks and 400 lines, was derived from the issue #962 item, whose specification maps to an estimated 35 to 45 design-level tasks in 300 to 400 lines. Issue #1097 lowered it to 20 tasks and 250 lines from the 31 plans in `docs/features/active/` written after G13 shipped: their median was 41 tasks and 148 lines, the 16 plans above 40 tasks all carried a justification, and 400 lines bound on 1 of the 31 plans while allowing 20 lines per task over 20 tasks. 250 lines leaves room for 20 tasks at the observed rate of up to about 6 lines per task plus a fixed preamble and Pre-Mortem. G13 ships Blocking because the author controls its exoneration: a plan that needs more states why in one paragraph, which costs less than a preflight round. A justification section that holds only blank lines or headings does not exonerate. The severity is a single constant in each runtime (`G13_SEVERITY`), and a parity test asserts the two constants agree.
++
++A plan file stamped before the guideline was lowered keeps `LEGACY_PLAN_TASK_GUIDELINE` (40) and `LEGACY_PLAN_LINE_GUIDELINE` (400). The stamp is read from the path by `plan_file_stamp` and `planFileStamp`, which split it on both `/` and `\`, match case-sensitively, and recognize four name shapes, each with the zone `PLAN_STAMP_ZONES` assigns it: `plan.<stamp>.md` in America/New_York, because the feature-folder tooling stamps plan files in that zone; and `plan.remediation-cycle-<N>.<stamp>.md`, `remediation-plan.<stamp>.md`, and `remediation/<stamp>/remediation-plan.md` in UTC, because a remediation plan carries the UTC stamp of the review that produced it, and the one committed cycle plan's stamp lies inside its cycle's UTC review window. Any other name, and a plan validated with no path, uses the current pair. A stamp keeps the legacy pair only when it sorts strictly before the cutoff entry of its own zone; a stamp equal to that entry or after it uses 20 and 250. The cutoff is one instant, the clock reading of the commit that lowered the guideline, written once per zone: `PLAN_GUIDELINE_CUTOFF` (America/New_York `2026-11-07T18-31`, UTC `2026-11-07T23-31`). A New York stamp compared with a UTC stamp would misread plans written up to five hours before the rule existed, so each stamp is compared only with its own zone's entry. The validators compare strings and convert no time.
+ 
+-The finding message is ``Line 1: plan size `<T> tasks, <L> lines` exceeds the guideline of 40 tasks or 400 lines and carries no `## Size Justification` section; split the item or state why the size is necessary.``
++The finding message is ``Line 1: plan size `<T> tasks, <L> lines` exceeds the guideline of <G> tasks or <N> lines and carries no `## Size Justification` section; split the item or state why the size is necessary.``, where `<G>` and `<N>` are the pair that applied: 20 and 250, or 40 and 400 for a plan stamped before the cutoff.
+ 
+ ### Known false-positive classes — G11 and G12
+ 
+@@ -318,7 +322,7 @@ The prohibition is enforced by tests, not only by prose: a parity test asserts t
+ - Where an acceptance condition is a search, assert a short, single-line, non-interpolated token that the plan quotes verbatim.
+ - Prefer a named test over a phrase search whenever a test can carry the assertion.
+ - Cite a symbol, a heading, or a test name. Never cite a line number, a `path:line` locator, a `#L` anchor, or a commit SHA; name the branch, the ref, or the merge-base derivation instead (G11, G12).
+-- Keep a plan within 40 tasks and 400 lines; a plan that needs more carries a non-empty `## Size Justification` section (G13).
++- Keep a plan within 20 tasks and 250 lines; a plan that needs more carries a non-empty `## Size Justification` section (G13). A plan file stamped before `PLAN_GUIDELINE_CUTOFF` is held to 40 tasks and 400 lines.
+ 
+ `.claude/skills/atomic-plan-contract/SKILL.md` carries the authoring-side statement of this guidance and cross-references this file.
+ 
+@@ -328,5 +332,5 @@ The prohibition is enforced by tests, not only by prose: a parity test asserts t
+ - `scripts/dev_tools/validate_orchestration_artifacts.py` routes the existing `plan` artifact type through the two-channel entry point, prints each Warning to stderr prefixed with `PLAN GATE WARNING: `, and derives its exit code from the error channel alone. No new flag, option, or artifact type is added.
+ - The TypeScript parity port is dispatched from `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` for the existing `plan` artifact type. The MCP `validate_orchestration_artifacts` input-schema property-key set is unchanged; Warnings surface on an optional `warnings` field that is absent when there are none.
+ - `scripts/dev_tools/plan_gate_scratch.py` evaluates G10, the document-level SCRATCH definition rule, and `evaluate_plan_gates` in `scripts/dev_tools/plan_gate_discrimination.py` calls it on every invocation, with or without a context. The TypeScript twin `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` is called the same way from `evaluatePlanGates`. Through the Python CLI a G10 finding is printed as an error and the process exits 1; through the MCP service call it causes the call to throw with the message included.
+-- `scripts/dev_tools/plan_gate_document.py` evaluates G11, G12, and G13, and `evaluate_plan_gates` calls it on every invocation immediately after G10, with or without a context. The TypeScript twin `extensions/drm-copilot/src/lib/validate/plan-gate-document.ts` is called the same way from `evaluatePlanGates`. The MCP validator applies these rules only after the extension release that carries them is installed; until then, branch-current validation runs through `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan <path>`.
++- `scripts/dev_tools/plan_gate_document.py` evaluates G11, G12, and G13, and `evaluate_plan_gates` calls it on every invocation immediately after G10, with or without a context. The TypeScript twin `extensions/drm-copilot/src/lib/validate/plan-gate-document.ts` is called the same way from `evaluatePlanGates`. The MCP validator applies these rules only after the extension release that carries them is installed; until then, branch-current validation runs through `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan <path>`. The same lag applies to the lowered G13 guideline and its cutoff: the installed MCP validator applies 40 tasks and 400 lines until a release carrying the change is installed, so a planner holds a new plan to 20 tasks and 250 lines itself, and preflight applies the new pair through the Python CLI.
+ - `.claude/hooks/validate-planner-output.ps1` carries no part of G1 through G13 enforcement. It separately rejects a line-reference locator in a `CITATION:` entry of the planner internal-review record, which is consistent with G11 but is a hook rule, not a validator rule.
+diff --git a/.claude/skills/atomic-plan-contract/SKILL.md b/.claude/skills/atomic-plan-contract/SKILL.md
+index d11135dbd..a768a7b17 100644
+--- a/.claude/skills/atomic-plan-contract/SKILL.md
++++ b/.claude/skills/atomic-plan-contract/SKILL.md
+@@ -31,7 +31,7 @@ Rules:
+ - **Literals only where they are the asserted value.** A plan quotes a literal when an acceptance condition asserts that exact value. It does not quote file contents, command output, or prose for context.
+ - **Tool routes are not restated.** Tool routes, launchers, wrapper scripts, command-text restrictions, the batch budget, hook context, and CI shape are owned by the `execution-environment` skill. A plan references that skill instead of restating its content.
+ - **Changed existing behavior names its asserting tests.** A task that changes the observable behavior of an existing function, script, fixture, or test stub (its signature, argv, output, exit status, or the files it writes) names every existing test that asserts that behavior and states each test's disposition: unchanged because it is unaffected, or updated, with the reason for the update. The tests are found by searching the test tree for the symbol, the file name, and the asserted output. A test that asserts the current behavior and is outside the task's file set fails once the change lands, and the plan's own acceptance condition then cannot be met. The planner's adversarial self-review includes this search for every task that changes existing behavior.
+-- **Size guideline.** A plan stays within 40 canonical tasks and 400 physical lines. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task.
++- **Size guideline.** A plan stays within 20 canonical tasks and 250 physical lines. A plan file stamped before `PLAN_GUIDELINE_CUTOFF` (the instant of the G13 commit, compared in the zone of each stamp shape) keeps the legacy pair of 40 canonical tasks and 400 physical lines, and a plan validated without a path uses the new pair. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task. The installed MCP validator applies 40 and 400 until a release carrying the lowered guideline is installed, so the planner's MCP self-check does not report a plan between the two pairs: the planner holds a new plan to 20 tasks and 250 lines itself, and preflight applies the new pair through the Python CLI route of `## Validator Gate`.
+ - **Task target.** A plan targets 15 to 20 canonical tasks. The target is authoring guidance that no validator checks; the limit the validator enforces is the one the `Size guideline` bullet states.
+ - **Pre-Mortem.** Every plan carries a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the plan prevents that failure class, or states "not applicable" followed by the reason. The `Test isolation` bullet names the parallel gates the plan uses: one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers, each re-run only after a fix. The `Mirror parity` bullet also covers the execution-environment brief: a plan that alters a fact the brief states (for example, it adds or renames a CI job, changes a required status context, a tool route, or a batch-budget rule) includes a task that updates the brief in the same change, in all six byte-identical copies, and the bullet names that task. Without that task the brief states a superseded fact once the change lands, which breaks the brief's own maintenance rule. The planner SubagentStop hook blocks a plan without a complete section.
+ - **Final-phase self-review.** The final phase of every plan contains a self-review task that walks the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base and writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item. A FAIL row is fixed and the QA loop is re-run before the self-review is rewritten; the plan does not complete with a FAIL row.
+@@ -233,7 +233,7 @@ Before a plan can be treated as approved:
+ 
+ The same validator call also applies the acceptance-gate rules defined in `.claude/rules/plan-acceptance-gates.md`, starting with G1 through G6. Those rules report acceptance conditions that cannot fail — a coverage argument that collects no data, or a search for a literal that returns zero matches whatever the executor does. They run automatically on the existing `plan` route with no additional flag. Blocking findings appear in the validator's error output and fail the gate; Warnings are surfaced without failing it, prefixed with `PLAN GATE WARNING: ` on the CLI and carried on the optional `warnings` field of the MCP result. Read that rule file before authoring acceptance conditions.
+ 
+-The same call additionally applies the rules G7, G8, G8b, and G9, which report a write-mode command observed only by its exit code, an unanchored `git diff`, a name-listing diff with no companion span, and a coverage command that prints no table. All four ship in the Warning channel, so they surface without failing the gate. The same call also applies G10, a document-level rule that reports a SCRATCH definition not namespaced by issue number. G10 ships in the Blocking channel and reports each finding with a `Line N: ` prefix rather than a task identifier, because the definition sits outside any task window. The same call also applies the document-level rules G11, G12, and G13, which report a line-number citation, a commit-SHA citation, and a plan above 40 tasks or 400 lines without a non-empty `## Size Justification` section; all three ship in the Blocking channel with the `Line N: ` prefix. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13 only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
++The same call additionally applies the rules G7, G8, G8b, and G9, which report a write-mode command observed only by its exit code, an unanchored `git diff`, a name-listing diff with no companion span, and a coverage command that prints no table. All four ship in the Warning channel, so they surface without failing the gate. The same call also applies G10, a document-level rule that reports a SCRATCH definition not namespaced by issue number. G10 ships in the Blocking channel and reports each finding with a `Line N: ` prefix rather than a task identifier, because the definition sits outside any task window. The same call also applies the document-level rules G11, G12, and G13, which report a line-number citation, a commit-SHA citation, and a plan above the size guideline without a non-empty `## Size Justification` section; all three ship in the Blocking channel with the `Line N: ` prefix. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13, and the lowered G13 guideline with its cutoff, only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
+ 
+ ## Wrap-Tolerant Assertion Authoring (Mandatory)
+ 
+diff --git a/.github/agents/atomic_planning.agent.md b/.github/agents/atomic_planning.agent.md
+index c6dfdf1f8..2ecc627aa 100644
+--- a/.github/agents/atomic_planning.agent.md
++++ b/.github/agents/atomic_planning.agent.md
+@@ -109,7 +109,7 @@ For `minor-audit`, preflight-required plan gates MUST include baseline evidence
+ 
+ Follow `### Single-Pass Preflight` in the `atomic-plan-contract` skill. The preflight directive belongs in the delegation prompt, never in the plan file. The preflight executor fixes trivial defects in place and returns only substantive defects as `PREFLIGHT-DEFECT:` lines. A plan returns to the planner at most once: apply every listed change in one revision of the same file; if the confirming preflight still reports a substantive defect, the orchestrator halts with `blocked_reason: "validator_failed"`.
+ 
+-Every plan follows `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: anchors are symbols, headings, or test names (never line numbers or commit SHAs), literals appear only where they are the asserted value, tool routes are not restated, a plan above 40 tasks or 400 lines carries `## Size Justification`, every plan carries a `## Pre-Mortem` section with the seven labels, and the final phase ends with the self-review task.
++Every plan follows `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: anchors are symbols, headings, or test names (never line numbers or commit SHAs), literals appear only where they are the asserted value, tool routes are not restated, a plan above the G13 guideline of 20 tasks and 250 lines (40 and 400 for a plan file stamped before `PLAN_GUIDELINE_CUTOFF`) carries `## Size Justification`, every plan carries a `## Pre-Mortem` section with the seven labels, and the final phase ends with the self-review task.
+ 
+ If the `atomic_executor` delegation cannot be started, resumed, or completed, you MUST stop and report blocked state. You MUST NOT self-approve or finalize the plan.
+ 
+diff --git a/.github/skills/atomic-plan-contract/SKILL.md b/.github/skills/atomic-plan-contract/SKILL.md
+index 26cb4c205..3bbae1135 100644
+--- a/.github/skills/atomic-plan-contract/SKILL.md
++++ b/.github/skills/atomic-plan-contract/SKILL.md
+@@ -31,7 +31,7 @@ Rules:
+ - **Literals only where they are the asserted value.** A plan quotes a literal when an acceptance condition asserts that exact value. It does not quote file contents, command output, or prose for context.
+ - **Tool routes are not restated.** Tool routes, launchers, wrapper scripts, command-text restrictions, the batch budget, hook context, and CI shape are owned by the `execution-environment` skill. A plan references that skill instead of restating its content.
+ - **Changed existing behavior names its asserting tests.** A task that changes the observable behavior of an existing function, script, fixture, or test stub (its signature, argv, output, exit status, or the files it writes) names every existing test that asserts that behavior and states each test's disposition: unchanged because it is unaffected, or updated, with the reason for the update. The tests are found by searching the test tree for the symbol, the file name, and the asserted output. A test that asserts the current behavior and is outside the task's file set fails once the change lands, and the plan's own acceptance condition then cannot be met. The planner's adversarial self-review includes this search for every task that changes existing behavior.
+-- **Size guideline.** A plan stays within 40 canonical tasks and 400 physical lines. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task.
++- **Size guideline.** A plan stays within 20 canonical tasks and 250 physical lines. A plan file stamped before `PLAN_GUIDELINE_CUTOFF` (the instant of the G13 commit, compared in the zone of each stamp shape) keeps the legacy pair of 40 canonical tasks and 400 physical lines, and a plan validated without a path uses the new pair. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task. The installed MCP validator applies 40 and 400 until a release carrying the lowered guideline is installed, so the planner's MCP self-check does not report a plan between the two pairs: the planner holds a new plan to 20 tasks and 250 lines itself, and preflight applies the new pair through the Python CLI route of `## Validator Gate`.
+ - **Task target.** A plan targets 15 to 20 canonical tasks. The target is authoring guidance that no validator checks; the limit the validator enforces is the one the `Size guideline` bullet states.
+ - **Pre-Mortem.** Every plan carries a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the plan prevents that failure class, or states "not applicable" followed by the reason. The `Test isolation` bullet names the parallel gates the plan uses: one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers, each re-run only after a fix. The `Mirror parity` bullet also covers the execution-environment brief: a plan that alters a fact the brief states (for example, it adds or renames a CI job, changes a required status context, a tool route, or a batch-budget rule) includes a task that updates the brief in the same change, in all six byte-identical copies, and the bullet names that task. Without that task the brief states a superseded fact once the change lands, which breaks the brief's own maintenance rule. The planner SubagentStop hook blocks a plan without a complete section.
+ - **Final-phase self-review.** The final phase of every plan contains a self-review task that walks the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base and writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item. A FAIL row is fixed and the QA loop is re-run before the self-review is rewritten; the plan does not complete with a FAIL row.
+@@ -201,7 +201,7 @@ Before a plan can be treated as approved:
+ - reject the plan if that validator exits non-zero,
+ - do not treat human-readable summaries as a substitute for validator success.
+ 
+-The validator applies the acceptance-gate rules of `.claude/rules/plan-acceptance-gates.md`. G1 through G9 judge the commands a plan states as acceptance conditions; G10 reports a SCRATCH definition not namespaced by issue number; and the document-level rules G11, G12, and G13 report a line-number citation, a commit-SHA citation, and a plan above 40 tasks or 400 lines without a non-empty `## Size Justification` section. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13 only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
++The validator applies the acceptance-gate rules of `.claude/rules/plan-acceptance-gates.md`. G1 through G9 judge the commands a plan states as acceptance conditions; G10 reports a SCRATCH definition not namespaced by issue number; and the document-level rules G11, G12, and G13 report a line-number citation, a commit-SHA citation, and a plan above the size guideline without a non-empty `## Size Justification` section. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13, and the lowered G13 guideline with its cutoff, only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
+ 
+ ## Plan-Path Continuity Contract (Mandatory)
+ 
+diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-planner.md b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-planner.md
+index 3d5961104..8b14a1cda 100644
+--- a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-planner.md
++++ b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-planner.md
+@@ -49,7 +49,7 @@ Generate plans using the atomic plan contract defined in the `atomic-plan-contra
+ - Phase 0: baseline capture (language-specific static tool baselines and one parallel test-suite baseline run per gate, the `Phase 0 baseline`)
+ - Final phase: full QA loop for each applicable language, ending with the self-review task that writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`
+ 
+-Every plan is design-level per `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: tasks name files, symbols, behavior, tests, and acceptance; anchors are symbols, headings, or test names, never line numbers or commit SHAs; literals appear only where they are the asserted value; tool routes and launchers are not restated because the `execution-environment` skill owns them; and a plan above 40 tasks or 400 lines carries a `## Size Justification` section. Every plan carries a `## Pre-Mortem` section with one bullet for each of `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`; the planner SubagentStop hook blocks a plan without it.
++Every plan is design-level per `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: tasks name files, symbols, behavior, tests, and acceptance; anchors are symbols, headings, or test names, never line numbers or commit SHAs; literals appear only where they are the asserted value; tool routes and launchers are not restated because the `execution-environment` skill owns them; and a plan above the G13 guideline of 20 tasks and 250 lines (40 and 400 for a plan file stamped before `PLAN_GUIDELINE_CUTOFF`) carries a `## Size Justification` section. Every plan carries a `## Pre-Mortem` section with one bullet for each of `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`; the planner SubagentStop hook blocks a plan without it.
+ 
+ ## Requirements
+ 
+diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/rules/plan-acceptance-gates.md b/extensions/drm-copilot/resources/claude-customizations/.claude/rules/plan-acceptance-gates.md
+index 993331aab..2e3a1ba39 100644
+--- a/extensions/drm-copilot/resources/claude-customizations/.claude/rules/plan-acceptance-gates.md
++++ b/extensions/drm-copilot/resources/claude-customizations/.claude/rules/plan-acceptance-gates.md
+@@ -16,12 +16,14 @@ This rule governs the acceptance-gate rules the plan validator applies to an ato
+ 
+ The rules are enforced by `scripts/dev_tools/plan_gate_discrimination.py` and by the TypeScript parity port at `extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts` with its shared-predicate module `plan-gate-rules.ts`. G1 through G9 are fed by the command extractor (`scripts/dev_tools/plan_gate_commands.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-commands.ts`); G10 reads the whole document through `scripts/dev_tools/plan_gate_scratch.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts`, and G11 through G13 read it through `scripts/dev_tools/plan_gate_document.py` and `extensions/drm-copilot/src/lib/validate/plan-gate-document.ts`. Enforcement is validator logic plus this prose file. No JSON Schema is authored, imported, or read.
+ 
+-## Scope of Invocation — no grandfathering or exemption mechanism
++## Scope of Invocation — no exemption marker
+ 
+ The plan validator only ever runs against the single artifact it is pointed at. No CI job, test, or scheduled task sweeps the committed plan corpus, and none is added by this feature. A pre-existing plan that would produce a finding is therefore never evaluated unless someone deliberately points the validator at it.
+ 
+ That scope is the argument against a grandfathering list, an exemption marker, a per-plan suppression comment, and an allowlist file. Each of those mechanisms exists to protect an existing corpus from a newly added sweep. With no sweep there is nothing to protect, and the mechanism would add a suppression surface whose only reachable use is to silence a finding on the plan currently being authored — which is precisely the case the gate exists to report.
+ 
++One dated exception exists, and it is not a marker. G13 selects its guideline by comparing the plan-file stamp with the `PLAN_GUIDELINE_CUTOFF` entry for the zone of the stamp's name shape; the two entries are the one instant of the G13 commit that lowered the guideline, written in America/New_York and in UTC. It is not a suppression surface: a new plan's stamp comes from the feature-folder tooling, and the Plan-Path Continuity Contract keeps it stable, so a plan being authored cannot select the older guideline through its text. It exists so that plans written before the guideline was lowered need no edit, which matters because parallel runs verify `plan-hash`. The plan path reaches the rule by its own parameter, not through the repository seam, so the stamp applies with or without a context.
++
+ The consequence is that adding a rule to this set is cheap in migration cost and expensive in authoring cost. Weigh a new rule on its false-positive rate at authoring time, not on how many committed plans it would have flagged.
+ 
+ ## Rule Table
+@@ -43,7 +45,7 @@ Every finding string begins with the square-bracketed `P#-T#` identifier of the
+ | **G10** | An unfenced logical line of the plan document (a physical line plus its indented continuation lines) that matches the SCRATCH definition predicate, and whose text after the first definition match carries neither an `issue-<issue-num>` nor an `issue-<digits>` namespace. One finding per logical line, reported against its first physical line. | **Blocking** |
+ | **G11** | A line-number citation in unfenced text, in any of three forms: the prose form `\b[Ll]ines?[ \t]+[0-9]+` evaluated with inline code spans masked; the path form `[A-Za-z0-9_./-]+\.[A-Za-z][A-Za-z0-9]{0,5}:[0-9]+` evaluated including inline code, skipped when the enclosing whitespace-delimited token contains `://`; and the anchor form `#L[0-9]+`. A line position moves whenever `main` moves. One finding per match. | **Blocking** |
+ | **G12** | A commit-SHA citation in unfenced text, including inline code: a bounded run `\b[0-9a-f]{7,40}\b` that holds at least one digit and at least one letter, is not preceded by `-`, `_`, or `.`, and is not followed by `-` or `_`. The adjacency conditions are checked in code, not by lookbehind. One finding per match. | **Blocking** |
+-| **G13** | A plan whose unfenced canonical task lines exceed `PLAN_TASK_GUIDELINE` (40) or whose physical lines exceed `PLAN_LINE_GUIDELINE` (400), with no `## Size Justification` heading followed by at least one non-blank, non-heading line before the next heading of level one or two. One finding per document. | **Blocking** |
++| **G13** | A plan whose unfenced canonical task lines exceed `PLAN_TASK_GUIDELINE` (20) or whose physical lines exceed `PLAN_LINE_GUIDELINE` (250), or, for a plan file stamped before the `PLAN_GUIDELINE_CUTOFF` entry of its stamp zone, exceed `LEGACY_PLAN_TASK_GUIDELINE` (40) or `LEGACY_PLAN_LINE_GUIDELINE` (400), with no `## Size Justification` heading followed by at least one non-blank, non-heading line before the next heading of level one or two. One finding per document. | **Blocking** |
+ 
+ G1 through G13 are the complete shipped set. G1 through G6 were added by issue #486, G7 through G9 by issue #519, G10 by issue #932, and G11 through G13 by issue #964.
+ 
+@@ -191,9 +193,11 @@ The finding message is ``Line N: commit-SHA citation `<match>` names a commit th
+ 
+ ### G13 — ships as Blocking because its exoneration is author-controlled
+ 
+-G13 reports a plan above 40 canonical task lines or 400 physical lines that carries no `## Size Justification` section with content. The guideline numbers were derived from the issue #962 item, whose specification maps to an estimated 35 to 45 design-level tasks in 300 to 400 lines. G13 ships Blocking because the author controls its exoneration: a plan that needs more states why in one paragraph, which costs less than a preflight round. A justification section that holds only blank lines or headings does not exonerate. The severity is a single constant in each runtime (`G13_SEVERITY`), and a parity test asserts the two constants agree.
++G13 reports a plan above 20 canonical task lines or 250 physical lines that carries no `## Size Justification` section with content. The first guideline, 40 tasks and 400 lines, was derived from the issue #962 item, whose specification maps to an estimated 35 to 45 design-level tasks in 300 to 400 lines. Issue #1097 lowered it to 20 tasks and 250 lines from the 31 plans in `docs/features/active/` written after G13 shipped: their median was 41 tasks and 148 lines, the 16 plans above 40 tasks all carried a justification, and 400 lines bound on 1 of the 31 plans while allowing 20 lines per task over 20 tasks. 250 lines leaves room for 20 tasks at the observed rate of up to about 6 lines per task plus a fixed preamble and Pre-Mortem. G13 ships Blocking because the author controls its exoneration: a plan that needs more states why in one paragraph, which costs less than a preflight round. A justification section that holds only blank lines or headings does not exonerate. The severity is a single constant in each runtime (`G13_SEVERITY`), and a parity test asserts the two constants agree.
++
++A plan file stamped before the guideline was lowered keeps `LEGACY_PLAN_TASK_GUIDELINE` (40) and `LEGACY_PLAN_LINE_GUIDELINE` (400). The stamp is read from the path by `plan_file_stamp` and `planFileStamp`, which split it on both `/` and `\`, match case-sensitively, and recognize four name shapes, each with the zone `PLAN_STAMP_ZONES` assigns it: `plan.<stamp>.md` in America/New_York, because the feature-folder tooling stamps plan files in that zone; and `plan.remediation-cycle-<N>.<stamp>.md`, `remediation-plan.<stamp>.md`, and `remediation/<stamp>/remediation-plan.md` in UTC, because a remediation plan carries the UTC stamp of the review that produced it, and the one committed cycle plan's stamp lies inside its cycle's UTC review window. Any other name, and a plan validated with no path, uses the current pair. A stamp keeps the legacy pair only when it sorts strictly before the cutoff entry of its own zone; a stamp equal to that entry or after it uses 20 and 250. The cutoff is one instant, the clock reading of the commit that lowered the guideline, written once per zone: `PLAN_GUIDELINE_CUTOFF` (America/New_York `2026-11-07T18-31`, UTC `2026-11-07T23-31`). A New York stamp compared with a UTC stamp would misread plans written up to five hours before the rule existed, so each stamp is compared only with its own zone's entry. The validators compare strings and convert no time.
+ 
+-The finding message is ``Line 1: plan size `<T> tasks, <L> lines` exceeds the guideline of 40 tasks or 400 lines and carries no `## Size Justification` section; split the item or state why the size is necessary.``
++The finding message is ``Line 1: plan size `<T> tasks, <L> lines` exceeds the guideline of <G> tasks or <N> lines and carries no `## Size Justification` section; split the item or state why the size is necessary.``, where `<G>` and `<N>` are the pair that applied: 20 and 250, or 40 and 400 for a plan stamped before the cutoff.
+ 
+ ### Known false-positive classes — G11 and G12
+ 
+@@ -318,7 +322,7 @@ The prohibition is enforced by tests, not only by prose: a parity test asserts t
+ - Where an acceptance condition is a search, assert a short, single-line, non-interpolated token that the plan quotes verbatim.
+ - Prefer a named test over a phrase search whenever a test can carry the assertion.
+ - Cite a symbol, a heading, or a test name. Never cite a line number, a `path:line` locator, a `#L` anchor, or a commit SHA; name the branch, the ref, or the merge-base derivation instead (G11, G12).
+-- Keep a plan within 40 tasks and 400 lines; a plan that needs more carries a non-empty `## Size Justification` section (G13).
++- Keep a plan within 20 tasks and 250 lines; a plan that needs more carries a non-empty `## Size Justification` section (G13). A plan file stamped before `PLAN_GUIDELINE_CUTOFF` is held to 40 tasks and 400 lines.
+ 
+ `.claude/skills/atomic-plan-contract/SKILL.md` carries the authoring-side statement of this guidance and cross-references this file.
+ 
+@@ -328,5 +332,5 @@ The prohibition is enforced by tests, not only by prose: a parity test asserts t
+ - `scripts/dev_tools/validate_orchestration_artifacts.py` routes the existing `plan` artifact type through the two-channel entry point, prints each Warning to stderr prefixed with `PLAN GATE WARNING: `, and derives its exit code from the error channel alone. No new flag, option, or artifact type is added.
+ - The TypeScript parity port is dispatched from `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` for the existing `plan` artifact type. The MCP `validate_orchestration_artifacts` input-schema property-key set is unchanged; Warnings surface on an optional `warnings` field that is absent when there are none.
+ - `scripts/dev_tools/plan_gate_scratch.py` evaluates G10, the document-level SCRATCH definition rule, and `evaluate_plan_gates` in `scripts/dev_tools/plan_gate_discrimination.py` calls it on every invocation, with or without a context. The TypeScript twin `extensions/drm-copilot/src/lib/validate/plan-gate-scratch.ts` is called the same way from `evaluatePlanGates`. Through the Python CLI a G10 finding is printed as an error and the process exits 1; through the MCP service call it causes the call to throw with the message included.
+-- `scripts/dev_tools/plan_gate_document.py` evaluates G11, G12, and G13, and `evaluate_plan_gates` calls it on every invocation immediately after G10, with or without a context. The TypeScript twin `extensions/drm-copilot/src/lib/validate/plan-gate-document.ts` is called the same way from `evaluatePlanGates`. The MCP validator applies these rules only after the extension release that carries them is installed; until then, branch-current validation runs through `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan <path>`.
++- `scripts/dev_tools/plan_gate_document.py` evaluates G11, G12, and G13, and `evaluate_plan_gates` calls it on every invocation immediately after G10, with or without a context. The TypeScript twin `extensions/drm-copilot/src/lib/validate/plan-gate-document.ts` is called the same way from `evaluatePlanGates`. The MCP validator applies these rules only after the extension release that carries them is installed; until then, branch-current validation runs through `poetry run python -m scripts.dev_tools.validate_orchestration_artifacts plan <path>`. The same lag applies to the lowered G13 guideline and its cutoff: the installed MCP validator applies 40 tasks and 400 lines until a release carrying the change is installed, so a planner holds a new plan to 20 tasks and 250 lines itself, and preflight applies the new pair through the Python CLI.
+ - `.claude/hooks/validate-planner-output.ps1` carries no part of G1 through G13 enforcement. It separately rejects a line-reference locator in a `CITATION:` entry of the planner internal-review record, which is consistent with G11 but is a hook rule, not a validator rule.
+diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md
+index d11135dbd..a768a7b17 100644
+--- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md
++++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md
+@@ -31,7 +31,7 @@ Rules:
+ - **Literals only where they are the asserted value.** A plan quotes a literal when an acceptance condition asserts that exact value. It does not quote file contents, command output, or prose for context.
+ - **Tool routes are not restated.** Tool routes, launchers, wrapper scripts, command-text restrictions, the batch budget, hook context, and CI shape are owned by the `execution-environment` skill. A plan references that skill instead of restating its content.
+ - **Changed existing behavior names its asserting tests.** A task that changes the observable behavior of an existing function, script, fixture, or test stub (its signature, argv, output, exit status, or the files it writes) names every existing test that asserts that behavior and states each test's disposition: unchanged because it is unaffected, or updated, with the reason for the update. The tests are found by searching the test tree for the symbol, the file name, and the asserted output. A test that asserts the current behavior and is outside the task's file set fails once the change lands, and the plan's own acceptance condition then cannot be met. The planner's adversarial self-review includes this search for every task that changes existing behavior.
+-- **Size guideline.** A plan stays within 40 canonical tasks and 400 physical lines. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task.
++- **Size guideline.** A plan stays within 20 canonical tasks and 250 physical lines. A plan file stamped before `PLAN_GUIDELINE_CUTOFF` (the instant of the G13 commit, compared in the zone of each stamp shape) keeps the legacy pair of 40 canonical tasks and 400 physical lines, and a plan validated without a path uses the new pair. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task. The installed MCP validator applies 40 and 400 until a release carrying the lowered guideline is installed, so the planner's MCP self-check does not report a plan between the two pairs: the planner holds a new plan to 20 tasks and 250 lines itself, and preflight applies the new pair through the Python CLI route of `## Validator Gate`.
+ - **Task target.** A plan targets 15 to 20 canonical tasks. The target is authoring guidance that no validator checks; the limit the validator enforces is the one the `Size guideline` bullet states.
+ - **Pre-Mortem.** Every plan carries a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the plan prevents that failure class, or states "not applicable" followed by the reason. The `Test isolation` bullet names the parallel gates the plan uses: one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers, each re-run only after a fix. The `Mirror parity` bullet also covers the execution-environment brief: a plan that alters a fact the brief states (for example, it adds or renames a CI job, changes a required status context, a tool route, or a batch-budget rule) includes a task that updates the brief in the same change, in all six byte-identical copies, and the bullet names that task. Without that task the brief states a superseded fact once the change lands, which breaks the brief's own maintenance rule. The planner SubagentStop hook blocks a plan without a complete section.
+ - **Final-phase self-review.** The final phase of every plan contains a self-review task that walks the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base and writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item. A FAIL row is fixed and the QA loop is re-run before the self-review is rewritten; the plan does not complete with a FAIL row.
+@@ -233,7 +233,7 @@ Before a plan can be treated as approved:
+ 
+ The same validator call also applies the acceptance-gate rules defined in `.claude/rules/plan-acceptance-gates.md`, starting with G1 through G6. Those rules report acceptance conditions that cannot fail — a coverage argument that collects no data, or a search for a literal that returns zero matches whatever the executor does. They run automatically on the existing `plan` route with no additional flag. Blocking findings appear in the validator's error output and fail the gate; Warnings are surfaced without failing it, prefixed with `PLAN GATE WARNING: ` on the CLI and carried on the optional `warnings` field of the MCP result. Read that rule file before authoring acceptance conditions.
+ 
+-The same call additionally applies the rules G7, G8, G8b, and G9, which report a write-mode command observed only by its exit code, an unanchored `git diff`, a name-listing diff with no companion span, and a coverage command that prints no table. All four ship in the Warning channel, so they surface without failing the gate. The same call also applies G10, a document-level rule that reports a SCRATCH definition not namespaced by issue number. G10 ships in the Blocking channel and reports each finding with a `Line N: ` prefix rather than a task identifier, because the definition sits outside any task window. The same call also applies the document-level rules G11, G12, and G13, which report a line-number citation, a commit-SHA citation, and a plan above 40 tasks or 400 lines without a non-empty `## Size Justification` section; all three ship in the Blocking channel with the `Line N: ` prefix. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13 only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
++The same call additionally applies the rules G7, G8, G8b, and G9, which report a write-mode command observed only by its exit code, an unanchored `git diff`, a name-listing diff with no companion span, and a coverage command that prints no table. All four ship in the Warning channel, so they surface without failing the gate. The same call also applies G10, a document-level rule that reports a SCRATCH definition not namespaced by issue number. G10 ships in the Blocking channel and reports each finding with a `Line N: ` prefix rather than a task identifier, because the definition sits outside any task window. The same call also applies the document-level rules G11, G12, and G13, which report a line-number citation, a commit-SHA citation, and a plan above the size guideline without a non-empty `## Size Justification` section; all three ship in the Blocking channel with the `Line N: ` prefix. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13, and the lowered G13 guideline with its cutoff, only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
+ 
+ ## Wrap-Tolerant Assertion Authoring (Mandatory)
+ 
+diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md
+index f53d6e1cd..a9d77c2e3 100644
+--- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md
++++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md
+@@ -31,7 +31,7 @@ Rules:
+ - **Literals only where they are the asserted value.** A plan quotes a literal when an acceptance condition asserts that exact value. It does not quote file contents, command output, or prose for context.
+ - **Tool routes are not restated.** Tool routes, launchers, wrapper scripts, command-text restrictions, the batch budget, hook context, and CI shape are owned by the `execution-environment` skill. A plan references that skill instead of restating its content.
+ - **Changed existing behavior names its asserting tests.** A task that changes the observable behavior of an existing function, script, fixture, or test stub (its signature, argv, output, exit status, or the files it writes) names every existing test that asserts that behavior and states each test's disposition: unchanged because it is unaffected, or updated, with the reason for the update. The tests are found by searching the test tree for the symbol, the file name, and the asserted output. A test that asserts the current behavior and is outside the task's file set fails once the change lands, and the plan's own acceptance condition then cannot be met. The planner's adversarial self-review includes this search for every task that changes existing behavior.
+-- **Size guideline.** A plan stays within 40 canonical tasks and 400 physical lines. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task.
++- **Size guideline.** A plan stays within 20 canonical tasks and 250 physical lines. A plan file stamped before `PLAN_GUIDELINE_CUTOFF` (the instant of the G13 commit, compared in the zone of each stamp shape) keeps the legacy pair of 40 canonical tasks and 400 physical lines, and a plan validated without a path uses the new pair. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task. The installed MCP validator applies 40 and 400 until a release carrying the lowered guideline is installed, so the planner's MCP self-check does not report a plan between the two pairs: the planner holds a new plan to 20 tasks and 250 lines itself, and preflight applies the new pair through the Python CLI route of `## Validator Gate`.
+ - **Task target.** A plan targets 15 to 20 canonical tasks. The target is authoring guidance that no validator checks; the limit the validator enforces is the one the `Size guideline` bullet states.
+ - **Pre-Mortem.** Every plan carries a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the plan prevents that failure class, or states "not applicable" followed by the reason. The `Test isolation` bullet names the parallel gates the plan uses: one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers, each re-run only after a fix. The `Mirror parity` bullet also covers the execution-environment brief: a plan that alters a fact the brief states (for example, it adds or renames a CI job, changes a required status context, a tool route, or a batch-budget rule) includes a task that updates the brief in the same change, in all six byte-identical copies, and the bullet names that task. Without that task the brief states a superseded fact once the change lands, which breaks the brief's own maintenance rule. The planner SubagentStop hook blocks a plan without a complete section.
+ - **Final-phase self-review.** The final phase of every plan contains a self-review task that walks the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base and writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item. A FAIL row is fixed and the QA loop is re-run before the self-review is rewritten; the plan does not complete with a FAIL row.
+@@ -215,7 +215,7 @@ Before a plan can be treated as approved:
+ - reject the plan if that validator exits non-zero,
+ - do not treat human-readable summaries as a substitute for validator success.
+ 
+-The validator applies the acceptance-gate rules of `.claude/rules/plan-acceptance-gates.md`. G1 through G9 judge the commands a plan states as acceptance conditions; G10 reports a SCRATCH definition not namespaced by issue number; and the document-level rules G11, G12, and G13 report a line-number citation, a commit-SHA citation, and a plan above 40 tasks or 400 lines without a non-empty `## Size Justification` section. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13 only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
++The validator applies the acceptance-gate rules of `.claude/rules/plan-acceptance-gates.md`. G1 through G9 judge the commands a plan states as acceptance conditions; G10 reports a SCRATCH definition not namespaced by issue number; and the document-level rules G11, G12, and G13 report a line-number citation, a commit-SHA citation, and a plan above the size guideline without a non-empty `## Size Justification` section. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13, and the lowered G13 guideline with its cutoff, only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
+ 
+ ## Plan-Path Continuity Contract (Mandatory)
+ 
+diff --git a/extensions/drm-copilot/resources/customizations/.github/agents/atomic_planning.agent.md b/extensions/drm-copilot/resources/customizations/.github/agents/atomic_planning.agent.md
+index c6dfdf1f8..2ecc627aa 100644
+--- a/extensions/drm-copilot/resources/customizations/.github/agents/atomic_planning.agent.md
++++ b/extensions/drm-copilot/resources/customizations/.github/agents/atomic_planning.agent.md
+@@ -109,7 +109,7 @@ For `minor-audit`, preflight-required plan gates MUST include baseline evidence
+ 
+ Follow `### Single-Pass Preflight` in the `atomic-plan-contract` skill. The preflight directive belongs in the delegation prompt, never in the plan file. The preflight executor fixes trivial defects in place and returns only substantive defects as `PREFLIGHT-DEFECT:` lines. A plan returns to the planner at most once: apply every listed change in one revision of the same file; if the confirming preflight still reports a substantive defect, the orchestrator halts with `blocked_reason: "validator_failed"`.
+ 
+-Every plan follows `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: anchors are symbols, headings, or test names (never line numbers or commit SHAs), literals appear only where they are the asserted value, tool routes are not restated, a plan above 40 tasks or 400 lines carries `## Size Justification`, every plan carries a `## Pre-Mortem` section with the seven labels, and the final phase ends with the self-review task.
++Every plan follows `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: anchors are symbols, headings, or test names (never line numbers or commit SHAs), literals appear only where they are the asserted value, tool routes are not restated, a plan above the G13 guideline of 20 tasks and 250 lines (40 and 400 for a plan file stamped before `PLAN_GUIDELINE_CUTOFF`) carries `## Size Justification`, every plan carries a `## Pre-Mortem` section with the seven labels, and the final phase ends with the self-review task.
+ 
+ If the `atomic_executor` delegation cannot be started, resumed, or completed, you MUST stop and report blocked state. You MUST NOT self-approve or finalize the plan.
+ 
+diff --git a/extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md b/extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md
+index 26cb4c205..3bbae1135 100644
+--- a/extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md
++++ b/extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md
+@@ -31,7 +31,7 @@ Rules:
+ - **Literals only where they are the asserted value.** A plan quotes a literal when an acceptance condition asserts that exact value. It does not quote file contents, command output, or prose for context.
+ - **Tool routes are not restated.** Tool routes, launchers, wrapper scripts, command-text restrictions, the batch budget, hook context, and CI shape are owned by the `execution-environment` skill. A plan references that skill instead of restating its content.
+ - **Changed existing behavior names its asserting tests.** A task that changes the observable behavior of an existing function, script, fixture, or test stub (its signature, argv, output, exit status, or the files it writes) names every existing test that asserts that behavior and states each test's disposition: unchanged because it is unaffected, or updated, with the reason for the update. The tests are found by searching the test tree for the symbol, the file name, and the asserted output. A test that asserts the current behavior and is outside the task's file set fails once the change lands, and the plan's own acceptance condition then cannot be met. The planner's adversarial self-review includes this search for every task that changes existing behavior.
+-- **Size guideline.** A plan stays within 40 canonical tasks and 400 physical lines. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task.
++- **Size guideline.** A plan stays within 20 canonical tasks and 250 physical lines. A plan file stamped before `PLAN_GUIDELINE_CUTOFF` (the instant of the G13 commit, compared in the zone of each stamp shape) keeps the legacy pair of 40 canonical tasks and 400 physical lines, and a plan validated without a path uses the new pair. A plan that needs more carries a `## Size Justification` section with at least one line stating why the size is necessary (validator rule G13). Files produced by one generator run count as one generator task. The installed MCP validator applies 40 and 400 until a release carrying the lowered guideline is installed, so the planner's MCP self-check does not report a plan between the two pairs: the planner holds a new plan to 20 tasks and 250 lines itself, and preflight applies the new pair through the Python CLI route of `## Validator Gate`.
+ - **Task target.** A plan targets 15 to 20 canonical tasks. The target is authoring guidance that no validator checks; the limit the validator enforces is the one the `Size guideline` bullet states.
+ - **Pre-Mortem.** Every plan carries a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the plan prevents that failure class, or states "not applicable" followed by the reason. The `Test isolation` bullet names the parallel gates the plan uses: one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers, each re-run only after a fix. The `Mirror parity` bullet also covers the execution-environment brief: a plan that alters a fact the brief states (for example, it adds or renames a CI job, changes a required status context, a tool route, or a batch-budget rule) includes a task that updates the brief in the same change, in all six byte-identical copies, and the bullet names that task. Without that task the brief states a superseded fact once the change lands, which breaks the brief's own maintenance rule. The planner SubagentStop hook blocks a plan without a complete section.
+ - **Final-phase self-review.** The final phase of every plan contains a self-review task that walks the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base and writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item. A FAIL row is fixed and the QA loop is re-run before the self-review is rewritten; the plan does not complete with a FAIL row.
+@@ -201,7 +201,7 @@ Before a plan can be treated as approved:
+ - reject the plan if that validator exits non-zero,
+ - do not treat human-readable summaries as a substitute for validator success.
+ 
+-The validator applies the acceptance-gate rules of `.claude/rules/plan-acceptance-gates.md`. G1 through G9 judge the commands a plan states as acceptance conditions; G10 reports a SCRATCH definition not namespaced by issue number; and the document-level rules G11, G12, and G13 report a line-number citation, a commit-SHA citation, and a plan above 40 tasks or 400 lines without a non-empty `## Size Justification` section. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13 only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
++The validator applies the acceptance-gate rules of `.claude/rules/plan-acceptance-gates.md`. G1 through G9 judge the commands a plan states as acceptance conditions; G10 reports a SCRATCH definition not namespaced by issue number; and the document-level rules G11, G12, and G13 report a line-number citation, a commit-SHA citation, and a plan above the size guideline without a non-empty `## Size Justification` section. The complete shipped set is therefore G1 through G13. The installed MCP validator applies G11 through G13, and the lowered G13 guideline with its cutoff, only after the extension release that carries them is installed; until then, validate a plan with the repository's Python CLI `scripts/dev_tools/validate_orchestration_artifacts.py` and its `plan` subcommand, as the `execution-environment` skill states.
+ 
+ ## Plan-Path Continuity Contract (Mandatory)
+ 
+diff --git a/extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts b/extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts
+index 460a2c2e6..8a1c7a608 100644
+--- a/extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts
++++ b/extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts
+@@ -231,9 +231,15 @@ export function validateArtifactWithWarnings(input: ValidateArtifactInput): {
+ } {
+   // The plan route is handled ahead of the type switch because it is the only
+   // route that produces two channels and the only one that needs a repository
+-  // seam built from the dispatcher's wiring fields.
++  // seam built from the dispatcher's wiring fields. The artifact path reaches
++  // G13 by its own parameter, so it selects the guideline even when a wiring
++  // field is absent and no context is built.
+   if (input.artifactType === "plan") {
+-    const report = evaluatePlanGates(input.text, buildPlanGateContext(input));
++    const report = evaluatePlanGates(
++      input.text,
++      buildPlanGateContext(input),
++      input.artifactPath,
++    );
+     return {
+       errors: [...validatePlanText(input.text), ...report.blocking],
+       warnings: report.warnings,
+diff --git a/extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts b/extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts
+index 61c7444be..b8efa052b 100644
+--- a/extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts
++++ b/extensions/drm-copilot/src/lib/validate/plan-gate-discrimination.ts
+@@ -3,7 +3,6 @@ import { extractPlanCommands, type PlanCommand } from "./plan-gate-commands";
+ import { evaluateDocumentGates } from "./plan-gate-document";
+ import { evaluateObservabilityGates } from "./plan-gate-observability";
+ import {
+-  BLOCKING_CHANNEL,
+   covValues,
+   emptyPlanGateReport,
+   evaluateCovValue,
+@@ -220,9 +219,7 @@ function evaluateLiteral(
+     "tracked tree and is not quoted in the plan; the search returns zero " +
+     "matches whatever the executor does. Quote the exact literal the task " +
+     "will create, or assert a literal that exists.";
+-  const channel =
+-    G5_SEVERITY === BLOCKING_CHANNEL ? report.blocking : report.warnings;
+-  channel.push(finding);
++  report.warnings.push(finding);
+ }
+ 
+ /**
+@@ -268,12 +265,15 @@ function evaluateLiteralRules(
+  * @param context Repository seam. When omitted only the context-free rules G1,
+  *     G4, G7, G8, G8b, and G10 to G13 run. G10 to G13 are document-level and
+  *     can add Blocking findings without a context.
++ * @param planPath Plan-file path, passed to G13 by its own parameter so the
++ *     stamp selects the guideline with or without a context.
+  * @returns Blocking and Warning findings in source order. A failing repository
+  *     seam degrades to zero literal findings rather than propagating.
+  */
+ export function evaluatePlanGates(
+   text: string,
+   context?: PlanGateContext,
++  planPath?: string,
+ ): PlanGateReport {
+   const report = emptyPlanGateReport();
+   const commands = extractPlanCommands(text);
+@@ -297,6 +297,6 @@ export function evaluatePlanGates(
+   // G10 to G13 are document-level and context-free, so they run on every
+   // invocation, G11 to G13 after G10.
+   evaluateScratchGate(report, text);
+-  evaluateDocumentGates(report, text);
++  evaluateDocumentGates(report, text, planPath);
+   return report;
+ }
+diff --git a/extensions/drm-copilot/src/lib/validate/plan-gate-document.ts b/extensions/drm-copilot/src/lib/validate/plan-gate-document.ts
+index 27bdb0e91..1c7fd5957 100644
+--- a/extensions/drm-copilot/src/lib/validate/plan-gate-document.ts
++++ b/extensions/drm-copilot/src/lib/validate/plan-gate-document.ts
+@@ -43,9 +43,43 @@ export const G12_SEVERITY: string = "blocking";
+ export const G13_SEVERITY: string = "blocking";
+ 
+ /** G13 guideline for canonical task lines. */
+-export const PLAN_TASK_GUIDELINE = 40;
++export const PLAN_TASK_GUIDELINE = 20;
+ /** G13 guideline for physical lines. */
+-export const PLAN_LINE_GUIDELINE = 400;
++export const PLAN_LINE_GUIDELINE = 250;
++/** G13 task guideline kept by a plan file stamped before its zone's cutoff. */
++export const LEGACY_PLAN_TASK_GUIDELINE = 40;
++/** G13 line guideline kept by a plan file stamped before its zone's cutoff. */
++export const LEGACY_PLAN_LINE_GUIDELINE = 400;
++
++const NEW_YORK_ZONE = "America/New_York";
++const UTC_ZONE = "UTC";
++
++/**
++ * Stamp zone of each plan-file name shape: the feature-folder tooling stamps
++ * `plan.<stamp>.md` in America/New_York, and remediation plans carry the UTC
++ * stamp of the review that produced them.
++ */
++export const PLAN_STAMP_ZONES: Readonly<Record<string, string>> = Object.freeze(
++  {
++    plan: "America/New_York",
++    "plan-remediation-cycle": "UTC",
++    "remediation-plan": "UTC",
++    "remediation-folder": "UTC",
++  },
++);
++
++/**
++ * G13 guideline cutoff: one instant, the clock reading of the G13 commit,
++ * written once per stamp zone. Each entry is a `yyyy-MM-ddTHH-mm` stamp.
++ */
++export const PLAN_GUIDELINE_CUTOFF: Readonly<Record<string, string>> =
++  Object.freeze({
++    "America/New_York": "2026-11-07T18-31",
++    UTC: "2026-11-07T23-31",
++  });
++
++/** A plan-file stamp with the zone of its name shape. */
++export type PlanFileStamp = readonly [stamp: string, zone: string];
+ 
+ /** G11 prose form, evaluated with inline code spans masked. */
+ export const G11_PROSE_PATTERN = String.raw`\b[Ll]ines?[ \t]+[0-9]+`;
+@@ -76,6 +110,35 @@ const DIGITS = "0123456789";
+ const HEX_LETTERS = "abcdef";
+ const SHA_BEFORE_REJECT = "-_.";
+ const SHA_AFTER_REJECT = "-_";
++const STAMP_TEXT = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}";
++/**
++ * K4 shapes as patterns over the end of a path, each paired with its zone.
++ * Each pattern starts at the path start or a `/` or `\` separator and holds no
++ * separator itself, so it matches only a full file name (and, for the folder
++ * form, the two full segments above it). Matching is case-sensitive.
++ */
++const STAMP_SHAPES: readonly (readonly [RegExp, string])[] = [
++  [
++    new RegExp(String.raw`(?:^|[\\/])plan\.(${STAMP_TEXT})\.md$`),
++    NEW_YORK_ZONE,
++  ],
++  [
++    new RegExp(
++      String.raw`(?:^|[\\/])plan\.remediation-cycle-[0-9]+\.(${STAMP_TEXT})\.md$`,
++    ),
++    UTC_ZONE,
++  ],
++  [
++    new RegExp(String.raw`(?:^|[\\/])remediation-plan\.(${STAMP_TEXT})\.md$`),
++    UTC_ZONE,
++  ],
++  [
++    new RegExp(
++      String.raw`(?:^|[\\/])remediation[\\/](${STAMP_TEXT})[\\/]remediation-plan\.md$`,
++    ),
++    UTC_ZONE,
++  ],
++];
+ 
+ /**
+  * Return every physical line outside a fenced code block with its number.
+@@ -283,17 +346,76 @@ export function shaCitationMessage(lineNumber: number, value: string): string {
+   );
+ }
+ 
++/**
++ * Return the stamp of a plan-file path with the zone of its name shape.
++ *
++ * Reads the K4 shapes `plan.<stamp>.md` (America/New_York),
++ * `plan.remediation-cycle-<N>.<stamp>.md`, `remediation-plan.<stamp>.md`, and
++ * `remediation/<stamp>/remediation-plan.md` (all UTC). The path is split on
++ * both `/` and `\`, matching is case-sensitive, and each name must match
++ * fully. The path is parsed as text and never read from disk.
++ *
++ * @param path Plan-file path, relative or absolute, or `undefined`.
++ * @returns `[stamp, zone]` for a recognized shape; `undefined` for any other
++ *     name, an empty path, or no path.
++ */
++export function planFileStamp(path?: string): PlanFileStamp | undefined {
++  // Try each shape in order; the shapes cannot both match one path, and an
++  // absent or empty path matches none of them.
++  for (const [pattern, zone] of STAMP_SHAPES) {
++    const stamp = pattern.exec(path ?? "")?.[1];
++    if (stamp !== undefined) {
++      return [stamp, zone];
++    }
++  }
++  return undefined;
++}
++
++/**
++ * Return the G13 task and line guideline that applies to a plan stamp.
++ *
++ * A stamp is compared, as a string, with the cutoff entry of its own zone, so
++ * a UTC stamp is never read against the New York entry.
++ *
++ * @param stamped `[stamp, zone]` from {@link planFileStamp}, or `undefined`.
++ * @param cutoff Cutoff stamp per zone; tests inject a fixed pair.
++ * @returns The legacy pair when a stamp exists and sorts strictly before its
++ *     zone's entry; otherwise the current pair.
++ */
++export function planSizeGuideline(
++  stamped: PlanFileStamp | undefined,
++  cutoff: Readonly<Record<string, string>> = PLAN_GUIDELINE_CUTOFF,
++): readonly [number, number] {
++  // Only a stamped plan from before the cutoff keeps the legacy pair; an
++  // unstamped plan and a stamp at or after the cutoff use the current pair.
++  // A zone with no cutoff entry compares with the empty string, which no
++  // stamp sorts before, so it uses the current pair.
++  if (stamped !== undefined && stamped[0] < (cutoff[stamped[1]] ?? "")) {
++    return [LEGACY_PLAN_TASK_GUIDELINE, LEGACY_PLAN_LINE_GUIDELINE];
++  }
++  return [PLAN_TASK_GUIDELINE, PLAN_LINE_GUIDELINE];
++}
++
+ /**
+  * Return the G13 finding string, byte-identical to Python.
+  *
+  * @param tasks Canonical task-line count.
+  * @param lines Physical-line count.
++ * @param guideline The task and line guideline that applied.
+  * @returns The finding string.
+  */
+-export function planSizeMessage(tasks: number, lines: number): string {
++export function planSizeMessage(
++  tasks: number,
++  lines: number,
++  guideline: readonly [number, number] = [
++    PLAN_TASK_GUIDELINE,
++    PLAN_LINE_GUIDELINE,
++  ],
++): string {
++  const [taskGuideline, lineGuideline] = guideline;
+   return (
+     `Line 1: plan size \`${String(tasks)} tasks, ${String(lines)} lines\` exceeds the ` +
+-    `guideline of ${String(PLAN_TASK_GUIDELINE)} tasks or ${String(PLAN_LINE_GUIDELINE)} ` +
++    `guideline of ${String(taskGuideline)} tasks or ${String(lineGuideline)} ` +
+     "lines and carries no `## Size Justification` section; split the item " +
+     "or state why the size is necessary."
+   );
+@@ -313,12 +435,18 @@ function channelFor(report: PlanGateReport, severity: string): string[] {
+ /**
+  * Append the G11, G12, and G13 findings for a plan document to the report.
+  *
++ * G13 selects its guideline from the stamp of `planPath`: a plan stamped
++ * before the cutoff of its stamp zone keeps the legacy pair, and a plan with
++ * no path or no recognized stamp uses the current pair.
++ *
+  * @param report Report whose channels receive the findings.
+  * @param text Full plan document text.
++ * @param planPath Plan-file path, used only to read its stamp.
+  */
+ export function evaluateDocumentGates(
+   report: PlanGateReport,
+   text: string,
++  planPath?: string,
+ ): void {
+   const g11 = channelFor(report, G11_SEVERITY);
+   for (const [lineNumber, value] of lineCitations(text)) {
+@@ -329,9 +457,11 @@ export function evaluateDocumentGates(
+     g12.push(shaCitationMessage(lineNumber, value));
+   }
+   const [tasks, lines] = planSize(text);
+-  const overGuideline =
+-    tasks > PLAN_TASK_GUIDELINE || lines > PLAN_LINE_GUIDELINE;
++  const guideline = planSizeGuideline(planFileStamp(planPath));
++  const overGuideline = tasks > guideline[0] || lines > guideline[1];
+   if (overGuideline && !hasSizeJustification(text)) {
+-    channelFor(report, G13_SEVERITY).push(planSizeMessage(tasks, lines));
++    channelFor(report, G13_SEVERITY).push(
++      planSizeMessage(tasks, lines, guideline),
++    );
+   }
+ }
+diff --git a/extensions/drm-copilot/test/lib/validate/plan-gate-document-parity.test.ts b/extensions/drm-copilot/test/lib/validate/plan-gate-document-parity.test.ts
+index f58c3a780..99e9449e1 100644
+--- a/extensions/drm-copilot/test/lib/validate/plan-gate-document-parity.test.ts
++++ b/extensions/drm-copilot/test/lib/validate/plan-gate-document-parity.test.ts
+@@ -66,7 +66,7 @@ const ROWS: ReadonlyArray<[string, string, readonly string[]]> = [
+     "g13",
+     taskPlan(41),
+     [
+-      "Line 1: plan size `41 tasks, 41 lines` exceeds the guideline of 40 tasks or 400 lines and carries no `## Size Justification` section; split the item or state why the size is necessary.",
++      "Line 1: plan size `41 tasks, 41 lines` exceeds the guideline of 20 tasks or 250 lines and carries no `## Size Justification` section; split the item or state why the size is necessary.",
+     ],
+   ],
+ ];
+diff --git a/extensions/drm-copilot/test/lib/validate/plan-gate-guideline-cutoff.test.ts b/extensions/drm-copilot/test/lib/validate/plan-gate-guideline-cutoff.test.ts
+new file mode 100644
+index 000000000..deefd62ea
+--- /dev/null
++++ b/extensions/drm-copilot/test/lib/validate/plan-gate-guideline-cutoff.test.ts
+@@ -0,0 +1,382 @@
++import { describe, expect, it } from "@jest/globals";
++
++import type { FileSystem } from "../../../src/lib/file-system";
++import type {
++  CommandResult,
++  CommandRunner,
++} from "../../../src/lib/subprocess-runner";
++import { validateArtifactWithWarnings } from "../../../src/lib/validate/orchestration-artifacts";
++import {
++  evaluateDocumentGates,
++  LEGACY_PLAN_LINE_GUIDELINE,
++  LEGACY_PLAN_TASK_GUIDELINE,
++  PLAN_LINE_GUIDELINE,
++  PLAN_STAMP_ZONES,
++  PLAN_TASK_GUIDELINE,
++  planFileStamp,
++  planSizeGuideline,
++} from "../../../src/lib/validate/plan-gate-document";
++import { emptyPlanGateReport } from "../../../src/lib/validate/plan-gate-rules";
++
++/**
++ * Tests for the G13 guideline cutoff and plan-file stamp reader (issue #1097).
++ *
++ * Every row below is duplicated as a double-quoted literal in
++ * `tests/scripts/dev_tools/test_plan_gate_guideline_cutoff.py`, which asserts
++ * that each Python row appears verbatim here. Every test injects the fixed
++ * cutoff pair, which names one instant in both zones, and reads no clock and
++ * no committed cutoff value.
++ */
++
++/** One instant written in both zones: 10:00 in New York is 15:00 UTC. */
++const CUTOFF: Readonly<Record<string, string>> = {
++  "America/New_York": "2026-11-07T10-00",
++  UTC: "2026-11-07T15-00",
++};
++const LEGACY: readonly [number, number] = [40, 400];
++const NEW: readonly [number, number] = [20, 250];
++
++const STAMP_ROWS: readonly (readonly [string, string, string])[] = [
++  ["plan.2026-11-07T09-59.md", "2026-11-07T09-59", "America/New_York"],
++  ["docs\\f\\plan.2026-11-07T09-59.md", "2026-11-07T09-59", "America/New_York"],
++  [
++    "/repo/docs/f/plan.2026-11-07T09-59.md",
++    "2026-11-07T09-59",
++    "America/New_York",
++  ],
++  [
++    "C:\\repo\\f\\plan.2026-11-07T09-59.md",
++    "2026-11-07T09-59",
++    "America/New_York",
++  ],
++  ["plan.remediation-cycle-1.2026-11-07T14-59.md", "2026-11-07T14-59", "UTC"],
++  [
++    "docs\\f\\plan.remediation-cycle-12.2026-11-07T14-59.md",
++    "2026-11-07T14-59",
++    "UTC",
++  ],
++  [
++    "/repo/docs/f/plan.remediation-cycle-1.2026-11-07T14-59.md",
++    "2026-11-07T14-59",
++    "UTC",
++  ],
++  [
++    "C:\\repo\\f\\plan.remediation-cycle-1.2026-11-07T14-59.md",
++    "2026-11-07T14-59",
++    "UTC",
++  ],
++  ["remediation-plan.2026-11-07T14-59.md", "2026-11-07T14-59", "UTC"],
++  ["docs\\f\\remediation-plan.2026-11-07T14-59.md", "2026-11-07T14-59", "UTC"],
++  [
++    "/repo/docs/f/remediation-plan.2026-11-07T14-59.md",
++    "2026-11-07T14-59",
++    "UTC",
++  ],
++  [
++    "C:\\repo\\f\\remediation-plan.2026-11-07T14-59.md",
++    "2026-11-07T14-59",
++    "UTC",
++  ],
++  [
++    "remediation/2026-11-07T14-59/remediation-plan.md",
++    "2026-11-07T14-59",
++    "UTC",
++  ],
++  [
++    "docs\\f\\remediation\\2026-11-07T14-59\\remediation-plan.md",
++    "2026-11-07T14-59",
++    "UTC",
++  ],
++  [
++    "/repo/f/remediation/2026-11-07T14-59/remediation-plan.md",
++    "2026-11-07T14-59",
++    "UTC",
++  ],
++  [
++    "C:\\repo\\f\\remediation\\2026-11-07T14-59\\remediation-plan.md",
++    "2026-11-07T14-59",
++    "UTC",
++  ],
++];
++
++const REJECTED_NAMES: readonly string[] = [
++  "plan.md",
++  "plan.yyyy-MM-ddTHH-mm.md",
++  "remediation-plan-ledger.2026-11-07T06-50.md",
++  "remediation/2026-11-07T14-59/plan.md",
++  "remediation-plan.md",
++  "Plan.2026-11-07T09-59.md",
++  "",
++];
++
++const BOUNDARY_ROWS: readonly (readonly [string, readonly [number, number]])[] =
++  [
++    ["plan.2026-11-07T09-59.md", LEGACY],
++    ["plan.2026-11-07T10-00.md", NEW],
++    ["plan.2026-11-07T10-01.md", NEW],
++    ["remediation-plan.2026-11-07T14-59.md", LEGACY],
++    ["remediation-plan.2026-11-07T15-00.md", NEW],
++    ["remediation-plan.2026-11-07T15-01.md", NEW],
++  ];
++
++const K4_SHAPE_ROWS: readonly (readonly [string, readonly [number, number]])[] =
++  [
++    ["plan.2026-11-07T09-59.md", LEGACY],
++    ["plan.2026-11-07T10-00.md", NEW],
++    ["plan.remediation-cycle-1.2026-11-07T14-59.md", LEGACY],
++    ["plan.remediation-cycle-1.2026-11-07T15-00.md", NEW],
++    ["remediation-plan.2026-11-07T14-59.md", LEGACY],
++    ["remediation-plan.2026-11-07T15-00.md", NEW],
++    ["remediation/2026-11-07T14-59/remediation-plan.md", LEGACY],
++    ["remediation/2026-11-07T15-00/remediation-plan.md", NEW],
++  ];
++
++const UTC_ROWS: readonly (readonly [string, readonly [number, number]])[] = [
++  ["remediation-plan.2026-11-07T14-30.md", LEGACY],
++  ["plan.remediation-cycle-1.2026-11-07T14-30.md", LEGACY],
++  ["remediation/2026-11-07T14-30/remediation-plan.md", LEGACY],
++  ["plan.2026-11-07T14-30.md", NEW],
++];
++
++const LEGACY_MESSAGE =
++  "Line 1: plan size `41 tasks, 41 lines` exceeds the guideline of 40 tasks or 400 lines and carries no `## Size Justification` section; split the item or state why the size is necessary.";
++const NEW_MESSAGE =
++  "Line 1: plan size `41 tasks, 41 lines` exceeds the guideline of 20 tasks or 250 lines and carries no `## Size Justification` section; split the item or state why the size is necessary.";
++const OLD_PLAN_PATH = "docs/features/active/f/plan.2026-01-01T00-00.md";
++const FUTURE_PLAN_PATH = "docs/features/active/f/plan.2099-12-31T23-59.md";
++const MESSAGE_ROWS: readonly (readonly [string | undefined, string])[] = [
++  [OLD_PLAN_PATH, LEGACY_MESSAGE],
++  [FUTURE_PLAN_PATH, NEW_MESSAGE],
++  [undefined, NEW_MESSAGE],
++];
++
++/** Read-only filesystem stub that answers negatively and reads nothing. */
++const STUB_FILE_SYSTEM: FileSystem = {
++  glob: () => [],
++  isFile: () => false,
++  exists: () => false,
++  isDirectory: () => false,
++  listDirectory: () => [],
++  readTextFile: () => "",
++  writeTextFile: () => undefined,
++  ensureDir: () => undefined,
++};
++
++/** Command runner stub that answers every git query with empty output. */
++class EmptyRunner implements CommandRunner {
++  public run(): CommandResult {
++    return { stdout: "", stderr: "", code: 0 };
++  }
++}
++
++/**
++ * Return a plan made only of canonical task lines.
++ *
++ * @param taskCount Number of task lines.
++ * @returns The plan text.
++ */
++function taskPlan(taskCount: number): string {
++  let text = "";
++  for (let index = 0; index < taskCount; index += 1) {
++    text += `- [ ] [P1-T${String(index)}] Step.\n`;
++  }
++  return text;
++}
++
++/**
++ * Return the G13 findings the document gates report for a plan.
++ *
++ * @param text Plan text.
++ * @param planPath Plan-file path, or `undefined`.
++ * @returns The G13 findings.
++ */
++function g13Findings(text: string, planPath: string | undefined): string[] {
++  const report = emptyPlanGateReport();
++  evaluateDocumentGates(report, text, planPath);
++  return report.blocking.filter((finding) => finding.includes("plan size"));
++}
++
++/**
++ * Return the G13 findings of the dispatcher's error channel.
++ *
++ * @param errors Errors returned by `validateArtifactWithWarnings`.
++ * @returns The G13 findings.
++ */
++function sizeErrors(errors: readonly string[]): string[] {
++  return errors.filter((error) => error.includes("plan size"));
++}
++
++describe("G13 guideline cutoff", () => {
++  it("test_guideline_constants_match_typescript", () => {
++    // Arrange / Act / Assert
++    expect([PLAN_TASK_GUIDELINE, PLAN_LINE_GUIDELINE]).toEqual(NEW);
++    expect([LEGACY_PLAN_TASK_GUIDELINE, LEGACY_PLAN_LINE_GUIDELINE]).toEqual(
++      LEGACY,
++    );
++    expect(PLAN_STAMP_ZONES).toEqual({
++      plan: "America/New_York",
++      "plan-remediation-cycle": "UTC",
++      "remediation-plan": "UTC",
++      "remediation-folder": "UTC",
++    });
++  });
++
++  it.each(STAMP_ROWS)(
++    "test_plan_file_stamp_reads_each_k4_shape %s",
++    (path, stamp, zone) => {
++      // Arrange / Act
++      const result = planFileStamp(path);
++
++      // Assert
++      expect(result).toEqual([stamp, zone]);
++    },
++  );
++
++  it.each([...REJECTED_NAMES, undefined])(
++    "test_plan_file_stamp_rejects_other_names %s",
++    (path) => {
++      // Arrange / Act
++      const result = planFileStamp(path);
++
++      // Assert
++      expect(result).toBeUndefined();
++    },
++  );
++
++  it.each(BOUNDARY_ROWS)(
++    "test_guideline_boundary_rows %s",
++    (path, expected) => {
++      // Arrange
++      const stamped = planFileStamp(path);
++
++      // Act
++      const guideline = planSizeGuideline(stamped, CUTOFF);
++
++      // Assert
++      expect(guideline).toEqual(expected);
++    },
++  );
++
++  it.each(K4_SHAPE_ROWS)(
++    "test_guideline_k4_shape_rows %s",
++    (path, expected) => {
++      // Arrange
++      const stamped = planFileStamp(path);
++
++      // Act
++      const guideline = planSizeGuideline(stamped, CUTOFF);
++
++      // Assert
++      expect(guideline).toEqual(expected);
++    },
++  );
++
++  it.each(UTC_ROWS)(
++    "test_utc_stamp_is_not_read_against_new_york_cutoff %s",
++    (path, expected) => {
++      // Arrange
++      const stamped = planFileStamp(path);
++
++      // Act
++      const guideline = planSizeGuideline(stamped, CUTOFF);
++
++      // Assert
++      expect(guideline).toEqual(expected);
++    },
++  );
++
++  it("test_guideline_for_a_zone_without_a_cutoff_entry_is_new", () => {
++    // Arrange
++    const stamped = planFileStamp("remediation-plan.2026-11-07T14-59.md");
++
++    // Act
++    const guideline = planSizeGuideline(stamped, {
++      "America/New_York": "2026-11-07T10-00",
++    });
++
++    // Assert
++    expect(guideline).toEqual(NEW);
++  });
++
++  it("test_guideline_without_path_is_new", () => {
++    // Arrange
++    const stamped = planFileStamp(undefined);
++
++    // Act
++    const guideline = planSizeGuideline(stamped, CUTOFF);
++
++    // Assert
++    expect(guideline).toEqual(NEW);
++  });
++
++  it.each(MESSAGE_ROWS)(
++    "test_g13_message_states_the_guideline_that_applied %s",
++    (planPath, expected) => {
++      // Arrange
++      const text = taskPlan(41);
++
++      // Act
++      const findings = g13Findings(text, planPath);
++
++      // Assert
++      expect(findings).toEqual([expected]);
++    },
++  );
++
++  it("test_g13_keeps_legacy_result_for_older_stamp", () => {
++    // Arrange
++    const text = taskPlan(25);
++
++    // Act
++    const stamped = g13Findings(text, OLD_PLAN_PATH);
++    const unstamped = g13Findings(text, undefined);
++
++    // Assert
++    expect(stamped).toEqual([]);
++    expect(unstamped).toHaveLength(1);
++  });
++
++  it("test_plan_path_reaches_g13_without_a_context", () => {
++    // Arrange
++    const text = taskPlan(25);
++
++    // Act
++    const result = validateArtifactWithWarnings({
++      artifactType: "plan",
++      text,
++      artifactPath: OLD_PLAN_PATH,
++    });
++
++    // Assert
++    expect(sizeErrors(result.errors)).toEqual([]);
++  });
++
++  it("keeps the stamp result with full repository wiring", () => {
++    // Arrange
++    const text = taskPlan(25);
++
++    // Act
++    const result = validateArtifactWithWarnings({
++      artifactType: "plan",
++      text,
++      artifactPath: OLD_PLAN_PATH,
++      fs: STUB_FILE_SYSTEM,
++      root: "/repo",
++      runner: new EmptyRunner(),
++    });
++
++    // Assert
++    expect(sizeErrors(result.errors)).toEqual([]);
++  });
++
++  it("applies the current guideline when no artifact path is supplied", () => {
++    // Arrange
++    const text = taskPlan(25);
++
++    // Act
++    const result = validateArtifactWithWarnings({ artifactType: "plan", text });
++
++    // Assert
++    expect(sizeErrors(result.errors)).toHaveLength(1);
++  });
++});
+diff --git a/scripts/dev_tools/plan_gate_discrimination.py b/scripts/dev_tools/plan_gate_discrimination.py
+index f835ba73d..0d1d03fef 100644
+--- a/scripts/dev_tools/plan_gate_discrimination.py
++++ b/scripts/dev_tools/plan_gate_discrimination.py
+@@ -363,7 +363,10 @@ def _evaluate_literal_rules(
+ 
+ 
+ def evaluate_plan_gates(
+-    text: str, *, context: PlanGateContext | None = None
++    text: str,
++    *,
++    context: PlanGateContext | None = None,
++    plan_path: str | None = None,
+ ) -> PlanGateReport:
+     """Evaluate the plan acceptance-gate rule set against plan text.
+ 
+@@ -373,6 +376,9 @@ def evaluate_plan_gates(
+             context-free rules G1, G4, G7, G8, G8b, and G10 to G13 run. G10 to
+             G13 are document-level and can add Blocking findings without a
+             context.
++        plan_path (str | None): Plan-file path, passed to G13 by its own
++            parameter so the stamp selects the guideline with or without a
++            context.
+ 
+     Returns:
+         PlanGateReport: Blocking and Warning findings in source order.
+@@ -407,5 +413,5 @@ def evaluate_plan_gates(
+     # G10 to G13 are document-level and context-free, so they run on every
+     # invocation, G11 to G13 after G10.
+     evaluate_scratch_gate(report, text)
+-    evaluate_document_gates(report, text)
++    evaluate_document_gates(report, text, plan_path=plan_path)
+     return report
+diff --git a/scripts/dev_tools/plan_gate_document.py b/scripts/dev_tools/plan_gate_document.py
+index b1fe3add4..16d4076d8 100644
+--- a/scripts/dev_tools/plan_gate_document.py
++++ b/scripts/dev_tools/plan_gate_document.py
+@@ -35,6 +35,7 @@ Side effects:
+ from __future__ import annotations
+ 
+ import re
++from types import MappingProxyType
+ from typing import TYPE_CHECKING
+ 
+ from scripts.dev_tools.plan_gate_commands import (
+@@ -45,6 +46,8 @@ from scripts.dev_tools.plan_gate_commands import (
+ from scripts.dev_tools.plan_gate_scratch import FENCE_RE
+ 
+ if TYPE_CHECKING:
++    from collections.abc import Mapping
++
+     from scripts.dev_tools.plan_gate_discrimination import PlanGateReport
+ 
+ # Channel names, declared here rather than imported, for the same import-cycle
+@@ -58,9 +61,33 @@ G11_SEVERITY: str = BLOCKING_CHANNEL
+ G12_SEVERITY: str = BLOCKING_CHANNEL
+ G13_SEVERITY: str = BLOCKING_CHANNEL
+ 
+-# G13 size guideline: canonical task lines and physical lines.
+-PLAN_TASK_GUIDELINE = 40
+-PLAN_LINE_GUIDELINE = 400
++# G13 size guideline: canonical task lines and physical lines. A plan file whose
++# stamp sorts before the cutoff of its stamp zone keeps the legacy pair.
++PLAN_TASK_GUIDELINE = 20
++PLAN_LINE_GUIDELINE = 250
++LEGACY_PLAN_TASK_GUIDELINE = 40
++LEGACY_PLAN_LINE_GUIDELINE = 400
++
++# Stamp zone of each plan-file name shape: the feature-folder tooling stamps
++# `plan.<stamp>.md` in America/New_York, and remediation plans carry the UTC
++# stamp of the review that produced them.
++PLAN_STAMP_ZONES: Mapping[str, str] = MappingProxyType(
++    {
++        "plan": "America/New_York",
++        "plan-remediation-cycle": "UTC",
++        "remediation-plan": "UTC",
++        "remediation-folder": "UTC",
++    }
++)
++
++# G13 guideline cutoff: one instant, the clock reading of the G13 commit,
++# written once per stamp zone. Each entry is a `yyyy-MM-ddTHH-mm` stamp.
++PLAN_GUIDELINE_CUTOFF: Mapping[str, str] = MappingProxyType(
++    {
++        "America/New_York": "2026-11-07T18-31",
++        "UTC": "2026-11-07T23-31",
++    }
++)
+ 
+ # G11 prose form, evaluated with inline code spans masked.
+ G11_PROSE_PATTERN = r"\b[Ll]ines?[ \t]+[0-9]+"
+@@ -85,6 +112,21 @@ _WHITESPACE_RE = re.compile(PLAN_WHITESPACE_CLASS)
+ _JUSTIFICATION_HEADING_RE = re.compile(r"^##[ \t]+Size Justification[ \t]*$")
+ _SECTION_END_RE = re.compile(r"^#{1,2}(?:[ \t]|$)")
+ _HEADING_RE = re.compile(r"^#{1,6}(?:[ \t]|$)")
++_STAMP_TEXT = r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}"
++_STAMP_RE = re.compile(_STAMP_TEXT, re.ASCII)
++_PATH_SEPARATOR_RE = re.compile(r"[\\/]")
++# K4 file-name shapes whose stamp sits in the name, in match order.
++_NAME_SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
++    ("plan", re.compile(rf"plan\.({_STAMP_TEXT})\.md", re.ASCII)),
++    (
++        "plan-remediation-cycle",
++        re.compile(rf"plan\.remediation-cycle-[0-9]+\.({_STAMP_TEXT})\.md", re.ASCII),
++    ),
++    (
++        "remediation-plan",
++        re.compile(rf"remediation-plan\.({_STAMP_TEXT})\.md", re.ASCII),
++    ),
++)
+ _DIGITS = frozenset("0123456789")
+ _HEX_LETTERS = frozenset("abcdef")
+ _SHA_BEFORE_REJECT = frozenset("-_.")
+@@ -285,12 +327,122 @@ def sha_citation_message(line_number: int, value: str) -> str:
+     )
+ 
+ 
+-def plan_size_message(tasks: int, lines: int) -> str:
+-    """Return the G13 finding string, byte-identical to the TypeScript twin."""
++def plan_file_stamp(path: str | None) -> tuple[str, str] | None:
++    """Return the stamp of a plan-file path with the zone of its name shape.
++
++    Purpose:
++        Read the K4 stamp shapes: `plan.<stamp>.md` (America/New_York),
++        `plan.remediation-cycle-<N>.<stamp>.md`, `remediation-plan.<stamp>.md`,
++        and `remediation/<stamp>/remediation-plan.md` (all UTC). The path is
++        split on both `/` and `\\`, so a Windows path and a POSIX path read
++        the same. Matching is case-sensitive and each name must match fully.
++
++    Args:
++        path (str | None): Plan-file path, relative or absolute, or `None`.
++
++    Returns:
++        tuple[str, str] | None: `(stamp, zone)` for a recognized shape, with the
++        zone taken from `PLAN_STAMP_ZONES`; `None` for any other name, an
++        empty path, or no path.
++
++    Raises:
++        None.
++
++    Side Effects:
++        None. The path is parsed as text and never read from disk.
++    """
++
++    if not path:
++        return None
++    segments = _PATH_SEPARATOR_RE.split(path)
++    name = segments[-1]
++    # Try the shapes whose stamp sits in the file name; the first full match
++    # decides the shape, and the shapes cannot both match one name.
++    for shape, pattern in _NAME_SHAPES:
++        match = pattern.fullmatch(name)
++        if match is not None:
++            return match.group(1), PLAN_STAMP_ZONES[shape]
++    # The folder form carries its stamp in the parent segment, under a
++    # `remediation` segment, and only for the exact name `remediation-plan.md`.
++    is_folder_form = (
++        name == "remediation-plan.md"
++        and len(segments) >= 3
++        and _STAMP_RE.fullmatch(segments[-2]) is not None
++        and segments[-3] == "remediation"
++    )
++    if is_folder_form:
++        return segments[-2], PLAN_STAMP_ZONES["remediation-folder"]
++    return None
++
++
++def plan_size_guideline(
++    stamped: tuple[str, str] | None,
++    *,
++    cutoff: Mapping[str, str] = PLAN_GUIDELINE_CUTOFF,
++) -> tuple[int, int]:
++    """Return the G13 task and line guideline that applies to a plan stamp.
+ 
++    Purpose:
++        Keep the legacy pair for a plan written before G13 lowered the
++        guideline. A stamp is compared, as a string, with the cutoff entry of
++        its own zone, so a UTC stamp is never read against the New York entry.
++
++    Args:
++        stamped (tuple[str, str] | None): `(stamp, zone)` from
++            `plan_file_stamp`, or `None` when the plan has no recognized stamp.
++        cutoff (Mapping[str, str]): Cutoff stamp per zone. Defaults to
++            `PLAN_GUIDELINE_CUTOFF`; tests inject a fixed pair.
++
++    Returns:
++        tuple[int, int]: The legacy pair when a stamp exists and sorts strictly
++        before its zone's cutoff entry; otherwise the current pair, including
++        for a zone the cutoff mapping holds no entry for.
++
++    Raises:
++        None.
++
++    Side Effects:
++        None.
++    """
++
++    # Only a stamped plan from before the cutoff keeps the legacy pair; an
++    # unstamped plan and a stamp at or after the cutoff use the current pair.
++    # A zone with no entry compares with the empty string, which no stamp
++    # sorts before.
++    if stamped is not None:
++        stamp, zone = stamped
++        if stamp < cutoff.get(zone, ""):
++            return LEGACY_PLAN_TASK_GUIDELINE, LEGACY_PLAN_LINE_GUIDELINE
++    return PLAN_TASK_GUIDELINE, PLAN_LINE_GUIDELINE
++
++
++def plan_size_message(
++    tasks: int,
++    lines: int,
++    *,
++    guideline: tuple[int, int] = (PLAN_TASK_GUIDELINE, PLAN_LINE_GUIDELINE),
++) -> str:
++    """Return the G13 finding string, byte-identical to the TypeScript twin.
++
++    Args:
++        tasks (int): Canonical task-line count.
++        lines (int): Physical-line count.
++        guideline (tuple[int, int]): The task and line guideline that applied.
++
++    Returns:
++        str: The finding string naming the guideline that applied.
++
++    Raises:
++        None.
++
++    Side Effects:
++        None.
++    """
++
++    task_guideline, line_guideline = guideline
+     return (
+         f"Line 1: plan size `{tasks} tasks, {lines} lines` exceeds the "
+-        f"guideline of {PLAN_TASK_GUIDELINE} tasks or {PLAN_LINE_GUIDELINE} "
++        f"guideline of {task_guideline} tasks or {line_guideline} "
+         "lines and carries no `## Size Justification` section; split the item "
+         "or state why the size is necessary."
+     )
+@@ -302,12 +454,19 @@ def _channel(report: PlanGateReport, severity: str) -> list[str]:
+     return report.blocking if severity == BLOCKING_CHANNEL else report.warnings
+ 
+ 
+-def evaluate_document_gates(report: PlanGateReport, text: str) -> None:
++def evaluate_document_gates(
++    report: PlanGateReport, text: str, *, plan_path: str | None = None
++) -> None:
+     """Append the G11, G12, and G13 findings for a plan document to the report.
+ 
++    G13 selects its guideline from the stamp of `plan_path`: a plan stamped
++    before the cutoff of its stamp zone keeps the legacy pair, and a plan with
++    no path or no recognized stamp uses the current pair.
++
+     Args:
+         report (PlanGateReport): Report whose channels receive the findings.
+         text (str): Full plan document text.
++        plan_path (str | None): Plan-file path, used only to read its stamp.
+ 
+     Returns:
+         None.
+@@ -328,6 +487,9 @@ def evaluate_document_gates(report: PlanGateReport, text: str) -> None:
+         g12.append(sha_citation_message(line_number, value))
+ 
+     tasks, lines = plan_size(text)
+-    over_guideline = tasks > PLAN_TASK_GUIDELINE or lines > PLAN_LINE_GUIDELINE
++    guideline = plan_size_guideline(plan_file_stamp(plan_path))
++    over_guideline = tasks > guideline[0] or lines > guideline[1]
+     if over_guideline and not has_size_justification(text):
+-        _channel(report, G13_SEVERITY).append(plan_size_message(tasks, lines))
++        _channel(report, G13_SEVERITY).append(
++            plan_size_message(tasks, lines, guideline=guideline)
++        )
+diff --git a/scripts/dev_tools/validate_orchestration_artifacts.py b/scripts/dev_tools/validate_orchestration_artifacts.py
+index afd0daa2d..7518f1a0b 100644
+--- a/scripts/dev_tools/validate_orchestration_artifacts.py
++++ b/scripts/dev_tools/validate_orchestration_artifacts.py
+@@ -101,7 +101,10 @@ def validate_plan_text(text: str) -> list[str]:
+ 
+ 
+ def validate_plan_text_with_warnings(
+-    text: str, *, context: PlanGateContext | None = None
++    text: str,
++    *,
++    context: PlanGateContext | None = None,
++    plan_path: str | None = None,
+ ) -> tuple[list[str], list[str]]:
+     """Validate plan structure and gates on two severity channels.
+ 
+@@ -114,6 +117,8 @@ def validate_plan_text_with_warnings(
+         text (str): Full plan document text.
+         context (PlanGateContext | None): Repository seam. When `None` only the
+             context-free gate rules run.
++        plan_path (str | None): Plan-file path whose stamp selects the G13
++            guideline; `None` applies the current guideline.
+ 
+     Returns:
+         tuple[list[str], list[str]]: Element 0 is the structural errors
+@@ -127,7 +132,7 @@ def validate_plan_text_with_warnings(
+         May query the injected `git` seam via the supplied context.
+     """
+ 
+-    report = evaluate_plan_gates(text, context=context)
++    report = evaluate_plan_gates(text, context=context, plan_path=plan_path)
+     return _plan_structure_errors(text) + report.blocking, report.warnings
+ 
+ 
+@@ -371,7 +376,7 @@ def _plan_channels(args: argparse.Namespace) -> tuple[list[str], list[str]]:
+ 
+     text = _read_text(Path(args.path))
+     context = build_plan_gate_context(Path(getattr(args, "workspace_root", ".")))
+-    return validate_plan_text_with_warnings(text, context=context)
++    return validate_plan_text_with_warnings(text, context=context, plan_path=args.path)
+ 
+ 
+ def _validate_from_args_with_warnings(
+diff --git a/tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1 b/tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1
+index 38ef8b62a..c0cff0b20 100644
+--- a/tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1
++++ b/tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1
+@@ -34,6 +34,13 @@ BeforeDiscovery {
+         @{ Check = 'LIGHT-ROUTE'; Section = 'MCP Surfaces Run the Installed Extension'; Required = @('invariant 8') }
+         @{ Check = 'LIGHT-CONTRACT-TEST'; Section = 'Contract Tests That Pin Mirrored Files'; Required = @('light-remediation-skill-contract.Tests.ps1') }
+     )
++    # The two planner agents and their bundles restate the G13 guideline.
++    $script:PlannerAgent = @(
++        @{ Id = 'CLAUDE-PLANNER'; Path = '.claude/agents/atomic-planner.md' }
++        @{ Id = 'CLAUDE-PLANNER-BUNDLE'; Path = "$resources/claude-customizations/.claude/agents/atomic-planner.md" }
++        @{ Id = 'COPILOT-PLANNER'; Path = '.github/agents/atomic_planning.agent.md' }
++        @{ Id = 'COPILOT-PLANNER-BUNDLE'; Path = "$resources/customizations/.github/agents/atomic_planning.agent.md" }
++    )
+     $script:ModeSurface = @(
+         @{ Id = 'HANDOFF-CLAUDE'; Path = '.claude/skills/remediation-handoff-atomic-planner/SKILL.md' }
+         @{ Id = 'HANDOFF-AGENTS'; Path = '.agents/skills/remediation-handoff-atomic-planner/SKILL.md' }
+@@ -169,6 +176,31 @@ Describe 'Planning contract wording' {
+         $range | Should -BeGreaterThan $target -Because "$Path must state the 15 to 20 task target in that bullet"
+     }
+ 
++    It 'PCW-SIZE-GUIDELINE-<Copy> states the lowered guideline and its cutoff in the size bullet' -ForEach $script:ContractCopy {
++        # Arrange
++        $text = Get-PcwSurfaceText -RelativePath $Path
++        $guideline = $text.IndexOf('**Size guideline.**', [System.StringComparison]::Ordinal)
++        $target = $text.IndexOf('**Task target.**', [System.StringComparison]::Ordinal)
++
++        # Act
++        $bullet = if ($guideline -ge 0 -and $target -gt $guideline) { $text.Substring($guideline, $target - $guideline) } else { '' }
++
++        # Assert
++        $bullet | Should -Not -BeNullOrEmpty -Because "$Path must keep the size guideline bullet before the task target"
++        $bullet.Contains('20 canonical tasks and 250 physical lines') | Should -BeTrue -Because "$Path must state the lowered guideline"
++        $bullet.Contains('PLAN_GUIDELINE_CUTOFF') | Should -BeTrue -Because "$Path must name the cutoff that keeps older plans on the legacy pair"
++        $text.Contains('40 tasks or 400 lines') | Should -BeFalse -Because "$Path must not state the superseded guideline"
++    }
++
++    It 'PCW-SIZE-AGENT-<Id> states the lowered guideline with its cutoff' -ForEach $script:PlannerAgent {
++        # Arrange / Act
++        $text = Get-PcwSurfaceText -RelativePath $Path
++
++        # Assert
++        $text.Contains('PLAN_GUIDELINE_CUTOFF') | Should -BeTrue -Because "$Path must name the cutoff"
++        $text.Contains('40 tasks or 400 lines') | Should -BeFalse -Because "$Path must not state the superseded guideline"
++    }
++
+     It 'PCW-POLICY-READ-REMOVED-<Copy> carries no routine policy-read requirement' -ForEach $script:ContractCopy {
+         # Arrange
+         $forbidden = @(
+diff --git a/tests/scripts/dev_tools/test_plan_gate_document_docs.py b/tests/scripts/dev_tools/test_plan_gate_document_docs.py
+index 8ea4adc41..b06337608 100644
+--- a/tests/scripts/dev_tools/test_plan_gate_document_docs.py
++++ b/tests/scripts/dev_tools/test_plan_gate_document_docs.py
+@@ -8,7 +8,12 @@ Copilot `.github`, and their bundled copies).
+ 
+ from __future__ import annotations
+ 
++import datetime as dt
++import re
+ from pathlib import Path
++from zoneinfo import ZoneInfo
++
++from scripts.dev_tools.plan_gate_document import PLAN_GUIDELINE_CUTOFF
+ 
+ _REPO_ROOT = Path(__file__).resolve().parents[3]
+ _RESOURCES = _REPO_ROOT / "extensions" / "drm-copilot" / "resources"
+@@ -62,8 +67,29 @@ _RULE_TOKENS = (
+     "| **G13** |",
+     "G1 through G13 are the complete shipped set.",
+     "`scripts/dev_tools/plan_gate_document.py` evaluates G11, G12, and G13",
+-    "`PLAN_TASK_GUIDELINE` (40)",
+-    "`PLAN_LINE_GUIDELINE` (400)",
++    "`PLAN_TASK_GUIDELINE` (20)",
++    "`PLAN_LINE_GUIDELINE` (250)",
++    "`LEGACY_PLAN_TASK_GUIDELINE` (40)",
++    "`LEGACY_PLAN_LINE_GUIDELINE` (400)",
++    "`PLAN_STAMP_ZONES`",
++    "`PLAN_GUIDELINE_CUTOFF`",
++)
++_STAMP_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}")
++_TS_DOCUMENT_MODULE = (
++    _REPO_ROOT
++    / "extensions"
++    / "drm-copilot"
++    / "src"
++    / "lib"
++    / "validate"
++    / "plan-gate-document.ts"
++)
++_RULE_CUTOFF_RE = re.compile(
++    r"`PLAN_GUIDELINE_CUTOFF` \(America/New_York `([^`]+)`, UTC `([^`]+)`\)"
++)
++_TS_CUTOFF_RE = re.compile(
++    r"export const PLAN_GUIDELINE_CUTOFF[^{]*\{"
++    r'\s*"America/New_York": "([^"]+)",\s*"?UTC"?: "([^"]+)"'
+ )
+ _CORPUS_NOTE = (
+     "The corpus measurement informed the false-positive class list and did not "
+@@ -130,6 +156,39 @@ def test_rule_file_bundle_copy_is_byte_identical_for_g13() -> None:
+     assert b"| **G13** |" in bundled
+ 
+ 
++def test_cutoff_value_is_identical_in_rule_file_and_both_validators() -> None:
++    """The committed cutoff pair is one instant, stated identically three times.
++
++    The pair is read from the Python module, the TypeScript module, and the
++    rule file's cutoff token. Its UTC entry, read as a UTC minute and
++    converted to America/New_York, formats to its New York entry; no clock is
++    read.
++    """
++
++    # Arrange
++    rule_match = _RULE_CUTOFF_RE.search(_RULE_FILE.read_text(encoding="utf-8"))
++    ts_match = _TS_CUTOFF_RE.search(_TS_DOCUMENT_MODULE.read_text(encoding="utf-8"))
++    assert rule_match is not None, "rule file lacks the cutoff token"
++    assert ts_match is not None, "plan-gate-document.ts lacks the cutoff literal"
++    python_pair = (
++        PLAN_GUIDELINE_CUTOFF["America/New_York"],
++        PLAN_GUIDELINE_CUTOFF["UTC"],
++    )
++
++    # Act
++    utc_minute = dt.datetime.strptime(python_pair[1], "%Y-%m-%dT%H-%M").replace(
++        tzinfo=dt.UTC
++    )
++    new_york = utc_minute.astimezone(ZoneInfo("America/New_York"))
++
++    # Assert
++    assert set(PLAN_GUIDELINE_CUTOFF) == {"America/New_York", "UTC"}
++    assert rule_match.groups() == python_pair, f"rule file pair {rule_match.groups()}"
++    assert ts_match.groups() == python_pair, f"TypeScript pair {ts_match.groups()}"
++    assert all(_STAMP_RE.fullmatch(entry) for entry in python_pair), python_pair
++    assert new_york.strftime("%Y-%m-%dT%H-%M") == python_pair[0], python_pair
++
++
+ def test_plan_contract_copies_carry_design_level_section() -> None:
+     """Every atomic-plan-contract copy has the design-level section and G1-G13."""
+ 
+diff --git a/tests/scripts/dev_tools/test_plan_gate_document_parity.py b/tests/scripts/dev_tools/test_plan_gate_document_parity.py
+index 3fad720e2..b280e373e 100644
+--- a/tests/scripts/dev_tools/test_plan_gate_document_parity.py
++++ b/tests/scripts/dev_tools/test_plan_gate_document_parity.py
+@@ -87,8 +87,8 @@ _ROWS: tuple[tuple[str, str, tuple[str, ...]], ...] = (
+         "g13",
+         _task_plan(41),
+         (
+-            "Line 1: plan size `41 tasks, 41 lines` exceeds the guideline of 40 "
+-            "tasks or 400 lines and carries no `## Size Justification` section; "
++            "Line 1: plan size `41 tasks, 41 lines` exceeds the guideline of 20 "
++            "tasks or 250 lines and carries no `## Size Justification` section; "
+             "split the item or state why the size is necessary.",
+         ),
+     ),
+diff --git a/tests/scripts/dev_tools/test_plan_gate_guideline_cutoff.py b/tests/scripts/dev_tools/test_plan_gate_guideline_cutoff.py
+new file mode 100644
+index 000000000..d386879c0
+--- /dev/null
++++ b/tests/scripts/dev_tools/test_plan_gate_guideline_cutoff.py
+@@ -0,0 +1,371 @@
++"""Unit tests for the G13 guideline cutoff and plan-file stamp reader (issue #1097).
++
++G13 applies 20 tasks and 250 physical lines, except to a plan file whose stamp
++sorts before the `PLAN_GUIDELINE_CUTOFF` entry of its stamp zone, which keeps
++40 tasks and 400 lines. Every test injects the fixed cutoff pair below, which
++names one instant in both zones, and reads no clock and no committed cutoff
++value. The boundary, shape, zone, and message rows are duplicated as
++double-quoted literals in
++`extensions/drm-copilot/test/lib/validate/plan-gate-guideline-cutoff.test.ts`,
++and `test_typescript_suite_carries_identical_rows` fails when they diverge.
++"""
++
++from __future__ import annotations
++
++import json
++import re
++from pathlib import Path
++
++import pytest
++
++from scripts.dev_tools.plan_gate_discrimination import PlanGateReport
++from scripts.dev_tools.plan_gate_document import (
++    LEGACY_PLAN_LINE_GUIDELINE,
++    LEGACY_PLAN_TASK_GUIDELINE,
++    PLAN_LINE_GUIDELINE,
++    PLAN_STAMP_ZONES,
++    PLAN_TASK_GUIDELINE,
++    evaluate_document_gates,
++    plan_file_stamp,
++    plan_size_guideline,
++)
++from scripts.dev_tools.validate_orchestration_artifacts import (
++    validate_plan_text_with_warnings,
++)
++
++_REPO_ROOT = Path(__file__).resolve().parents[3]
++_TS_MODULE = (
++    _REPO_ROOT
++    / "extensions"
++    / "drm-copilot"
++    / "src"
++    / "lib"
++    / "validate"
++    / "plan-gate-document.ts"
++)
++_TS_SUITE = (
++    _REPO_ROOT
++    / "extensions"
++    / "drm-copilot"
++    / "test"
++    / "lib"
++    / "validate"
++    / "plan-gate-guideline-cutoff.test.ts"
++)
++
++# One instant written in both zones: 10:00 in New York is 15:00 UTC.
++_CUTOFF = {"America/New_York": "2026-11-07T10-00", "UTC": "2026-11-07T15-00"}
++_LEGACY = (40, 400)
++_NEW = (20, 250)
++
++_STAMP_ROWS: tuple[tuple[str, str, str], ...] = (
++    ("plan.2026-11-07T09-59.md", "2026-11-07T09-59", "America/New_York"),
++    ("docs\\f\\plan.2026-11-07T09-59.md", "2026-11-07T09-59", "America/New_York"),
++    ("/repo/docs/f/plan.2026-11-07T09-59.md", "2026-11-07T09-59", "America/New_York"),
++    ("C:\\repo\\f\\plan.2026-11-07T09-59.md", "2026-11-07T09-59", "America/New_York"),
++    ("plan.remediation-cycle-1.2026-11-07T14-59.md", "2026-11-07T14-59", "UTC"),
++    (
++        "docs\\f\\plan.remediation-cycle-12.2026-11-07T14-59.md",
++        "2026-11-07T14-59",
++        "UTC",
++    ),
++    (
++        "/repo/docs/f/plan.remediation-cycle-1.2026-11-07T14-59.md",
++        "2026-11-07T14-59",
++        "UTC",
++    ),
++    (
++        "C:\\repo\\f\\plan.remediation-cycle-1.2026-11-07T14-59.md",
++        "2026-11-07T14-59",
++        "UTC",
++    ),
++    ("remediation-plan.2026-11-07T14-59.md", "2026-11-07T14-59", "UTC"),
++    ("docs\\f\\remediation-plan.2026-11-07T14-59.md", "2026-11-07T14-59", "UTC"),
++    ("/repo/docs/f/remediation-plan.2026-11-07T14-59.md", "2026-11-07T14-59", "UTC"),
++    ("C:\\repo\\f\\remediation-plan.2026-11-07T14-59.md", "2026-11-07T14-59", "UTC"),
++    ("remediation/2026-11-07T14-59/remediation-plan.md", "2026-11-07T14-59", "UTC"),
++    (
++        "docs\\f\\remediation\\2026-11-07T14-59\\remediation-plan.md",
++        "2026-11-07T14-59",
++        "UTC",
++    ),
++    (
++        "/repo/f/remediation/2026-11-07T14-59/remediation-plan.md",
++        "2026-11-07T14-59",
++        "UTC",
++    ),
++    (
++        "C:\\repo\\f\\remediation\\2026-11-07T14-59\\remediation-plan.md",
++        "2026-11-07T14-59",
++        "UTC",
++    ),
++)
++
++_REJECTED_NAMES: tuple[str, ...] = (
++    "plan.md",
++    "plan.yyyy-MM-ddTHH-mm.md",
++    "remediation-plan-ledger.2026-11-07T06-50.md",
++    "remediation/2026-11-07T14-59/plan.md",
++    "remediation-plan.md",
++    "Plan.2026-11-07T09-59.md",
++    "",
++)
++
++_BOUNDARY_ROWS: tuple[tuple[str, tuple[int, int]], ...] = (
++    ("plan.2026-11-07T09-59.md", _LEGACY),
++    ("plan.2026-11-07T10-00.md", _NEW),
++    ("plan.2026-11-07T10-01.md", _NEW),
++    ("remediation-plan.2026-11-07T14-59.md", _LEGACY),
++    ("remediation-plan.2026-11-07T15-00.md", _NEW),
++    ("remediation-plan.2026-11-07T15-01.md", _NEW),
++)
++
++_K4_SHAPE_ROWS: tuple[tuple[str, tuple[int, int]], ...] = (
++    ("plan.2026-11-07T09-59.md", _LEGACY),
++    ("plan.2026-11-07T10-00.md", _NEW),
++    ("plan.remediation-cycle-1.2026-11-07T14-59.md", _LEGACY),
++    ("plan.remediation-cycle-1.2026-11-07T15-00.md", _NEW),
++    ("remediation-plan.2026-11-07T14-59.md", _LEGACY),
++    ("remediation-plan.2026-11-07T15-00.md", _NEW),
++    ("remediation/2026-11-07T14-59/remediation-plan.md", _LEGACY),
++    ("remediation/2026-11-07T15-00/remediation-plan.md", _NEW),
++)
++
++_UTC_ROWS: tuple[tuple[str, tuple[int, int]], ...] = (
++    ("remediation-plan.2026-11-07T14-30.md", _LEGACY),
++    ("plan.remediation-cycle-1.2026-11-07T14-30.md", _LEGACY),
++    ("remediation/2026-11-07T14-30/remediation-plan.md", _LEGACY),
++    ("plan.2026-11-07T14-30.md", _NEW),
++)
++
++_LEGACY_MESSAGE = (
++    "Line 1: plan size `41 tasks, 41 lines` exceeds the guideline of 40 tasks "
++    "or 400 lines and carries no `## Size Justification` section; split the "
++    "item or state why the size is necessary."
++)
++_NEW_MESSAGE = (
++    "Line 1: plan size `41 tasks, 41 lines` exceeds the guideline of 20 tasks "
++    "or 250 lines and carries no `## Size Justification` section; split the "
++    "item or state why the size is necessary."
++)
++_OLD_PLAN_PATH = "docs/features/active/f/plan.2026-01-01T00-00.md"
++_FUTURE_PLAN_PATH = "docs/features/active/f/plan.2099-12-31T23-59.md"
++_MESSAGE_ROWS: tuple[tuple[str | None, str], ...] = (
++    (_OLD_PLAN_PATH, _LEGACY_MESSAGE),
++    (_FUTURE_PLAN_PATH, _NEW_MESSAGE),
++    (None, _NEW_MESSAGE),
++)
++
++
++def _task_plan(task_count: int) -> str:
++    """Return a plan made only of `task_count` canonical task lines."""
++
++    return "".join(f"- [ ] [P1-T{index}] Step.\n" for index in range(task_count))
++
++
++def _g13_findings(text: str, plan_path: str | None) -> list[str]:
++    """Return the G13 findings `evaluate_document_gates` reports for a plan."""
++
++    report = PlanGateReport()
++    evaluate_document_gates(report, text, plan_path=plan_path)
++    return [finding for finding in report.blocking if "plan size" in finding]
++
++
++def test_guideline_constants_match_typescript() -> None:
++    """Both validators declare the same guideline pairs and stamp-zone rows."""
++
++    # Arrange
++    source = _TS_MODULE.read_text(encoding="utf-8")
++    zones_block = re.search(
++        r"export const PLAN_STAMP_ZONES[^{]*\{(?P<body>[^}]*)\}", source
++    )
++
++    # Act: read each guideline constant the TypeScript module exports.
++    numbers = {
++        name: int(match.group(1))
++        for name in (
++            "PLAN_TASK_GUIDELINE",
++            "PLAN_LINE_GUIDELINE",
++            "LEGACY_PLAN_TASK_GUIDELINE",
++            "LEGACY_PLAN_LINE_GUIDELINE",
++        )
++        if (match := re.search(rf"export const {name} = ([0-9]+);", source))
++    }
++    assert zones_block is not None, "plan-gate-document.ts declares no zone table"
++    ts_zones = dict(
++        re.findall(r'"?([A-Za-z-]+)"?: "([^"]+)"', zones_block.group("body"))
++    )
++
++    # Assert
++    assert numbers == {
++        "PLAN_TASK_GUIDELINE": 20,
++        "PLAN_LINE_GUIDELINE": 250,
++        "LEGACY_PLAN_TASK_GUIDELINE": 40,
++        "LEGACY_PLAN_LINE_GUIDELINE": 400,
++    }, f"TypeScript guideline constants differ: {numbers}"
++    assert (PLAN_TASK_GUIDELINE, PLAN_LINE_GUIDELINE) == _NEW
++    assert (LEGACY_PLAN_TASK_GUIDELINE, LEGACY_PLAN_LINE_GUIDELINE) == _LEGACY
++    assert ts_zones == dict(PLAN_STAMP_ZONES), f"zone tables differ: {ts_zones}"
++
++
++@pytest.mark.parametrize(("path", "stamp", "zone"), _STAMP_ROWS)
++def test_plan_file_stamp_reads_each_k4_shape(path: str, stamp: str, zone: str) -> None:
++    """Each K4 shape yields its stamp and zone under both separators and prefixes."""
++
++    # Arrange / Act
++    result = plan_file_stamp(path)
++
++    # Assert
++    assert result == (stamp, zone), f"{path} read as {result}"
++
++
++@pytest.mark.parametrize("path", [*_REJECTED_NAMES, None])
++def test_plan_file_stamp_rejects_other_names(path: str | None) -> None:
++    """A name outside the K4 shapes, an empty path, and no path yield no stamp."""
++
++    # Arrange / Act
++    result = plan_file_stamp(path)
++
++    # Assert
++    assert result is None, f"{path} unexpectedly read as {result}"
++
++
++@pytest.mark.parametrize(("path", "expected"), _BOUNDARY_ROWS)
++def test_guideline_boundary_rows(path: str, expected: tuple[int, int]) -> None:
++    """The minute before each zone's entry keeps the legacy pair; the entry does not."""
++
++    # Arrange
++    stamped = plan_file_stamp(path)
++
++    # Act
++    guideline = plan_size_guideline(stamped, cutoff=_CUTOFF)
++
++    # Assert
++    assert guideline == expected, f"{path} applied {guideline}"
++
++
++@pytest.mark.parametrize(("path", "expected"), _K4_SHAPE_ROWS)
++def test_guideline_k4_shape_rows(path: str, expected: tuple[int, int]) -> None:
++    """Each K4 shape is compared with the cutoff entry of its own zone."""
++
++    # Arrange
++    stamped = plan_file_stamp(path)
++
++    # Act
++    guideline = plan_size_guideline(stamped, cutoff=_CUTOFF)
++
++    # Assert
++    assert guideline == expected, f"{path} applied {guideline}"
++
++
++@pytest.mark.parametrize(("path", "expected"), _UTC_ROWS)
++def test_utc_stamp_is_not_read_against_new_york_cutoff(
++    path: str, expected: tuple[int, int]
++) -> None:
++    """A UTC stamp after the New York entry but before the instant keeps 40 and 400."""
++
++    # Arrange
++    stamped = plan_file_stamp(path)
++
++    # Act
++    guideline = plan_size_guideline(stamped, cutoff=_CUTOFF)
++
++    # Assert
++    assert guideline == expected, f"{path} applied {guideline}"
++
++
++def test_guideline_for_a_zone_without_a_cutoff_entry_is_new() -> None:
++    """A stamp whose zone has no cutoff entry uses 20 and 250."""
++
++    # Arrange
++    stamped = plan_file_stamp("remediation-plan.2026-11-07T14-59.md")
++
++    # Act
++    guideline = plan_size_guideline(
++        stamped, cutoff={"America/New_York": "2026-11-07T10-00"}
++    )
++
++    # Assert
++    assert guideline == _NEW, f"zone without an entry applied {guideline}"
++
++
++def test_guideline_without_path_is_new() -> None:
++    """A plan validated without a path uses 20 and 250."""
++
++    # Arrange
++    stamped = plan_file_stamp(None)
++
++    # Act
++    guideline = plan_size_guideline(stamped, cutoff=_CUTOFF)
++
++    # Assert
++    assert guideline == _NEW, f"no-path plan applied {guideline}"
++
++
++@pytest.mark.parametrize(("plan_path", "expected"), _MESSAGE_ROWS)
++def test_g13_message_states_the_guideline_that_applied(
++    plan_path: str | None, expected: str
++) -> None:
++    """The G13 message names the pair that applied to the plan's stamp."""
++
++    # Arrange
++    text = _task_plan(41)
++
++    # Act
++    findings = _g13_findings(text, plan_path)
++
++    # Assert
++    assert findings == [expected], f"unexpected G13 findings: {findings}"
++
++
++def test_g13_keeps_legacy_result_for_older_stamp() -> None:
++    """A 25-task plan passes under its older stamp and fails without a path."""
++
++    # Arrange
++    text = _task_plan(25)
++
++    # Act
++    stamped_findings = _g13_findings(text, _OLD_PLAN_PATH)
++    unstamped_findings = _g13_findings(text, None)
++
++    # Assert
++    assert stamped_findings == [], f"older stamp reported: {stamped_findings}"
++    assert len(unstamped_findings) == 1, f"no-path findings: {unstamped_findings}"
++
++
++def test_plan_path_reaches_g13_without_a_context() -> None:
++    """The plan path selects the guideline when no repository context is supplied."""
++
++    # Arrange
++    text = _task_plan(25)
++
++    # Act
++    with_path, _ = validate_plan_text_with_warnings(
++        text, context=None, plan_path=_OLD_PLAN_PATH
++    )
++    without_path, _ = validate_plan_text_with_warnings(text, context=None)
++
++    # Assert
++    assert not [e for e in with_path if "plan size" in e], f"G13 reported: {with_path}"
++    assert len([e for e in without_path if "plan size" in e]) == 1
++
++
++def test_typescript_suite_carries_identical_rows() -> None:
++    """Every row and the injected pair appear verbatim in the TypeScript suite."""
++
++    # Arrange
++    suite = _TS_SUITE.read_text(encoding="utf-8")
++    literals: list[str] = [*_CUTOFF.values(), _LEGACY_MESSAGE, _NEW_MESSAGE]
++    # Collect each path, stamp, and zone string of the shared row tables.
++    for path, stamp, zone in _STAMP_ROWS:
++        literals.extend((path, stamp, zone))
++    # Collect the path of each guideline row and each rejected non-empty name.
++    for path, _ in (*_BOUNDARY_ROWS, *_K4_SHAPE_ROWS, *_UTC_ROWS):
++        literals.append(path)
++    literals.extend(name for name in _REJECTED_NAMES if name)
++
++    # Act: a JSON string literal is the double-quoted TypeScript spelling.
++    missing = [value for value in literals if json.dumps(value) not in suite]
++
++    # Assert
++    assert missing == [], f"rows missing from the TypeScript suite: {missing}"
+diff --git a/tests/scripts/dev_tools/test_validate_orchestration_artifacts_plan_gates.py b/tests/scripts/dev_tools/test_validate_orchestration_artifacts_plan_gates.py
+index f0094d7e6..5123f8f30 100644
+--- a/tests/scripts/dev_tools/test_validate_orchestration_artifacts_plan_gates.py
++++ b/tests/scripts/dev_tools/test_validate_orchestration_artifacts_plan_gates.py
+@@ -333,16 +333,19 @@ def test_plan_branch_builds_context_and_calls_two_channel_entry_point(
+     # Arrange
+     monkeypatch.setattr(validator, "_read_text", build_read_text_stub(_CLEAN_PLAN))
+     builder_calls: list[Path] = []
+-    entry_point_calls: list[bool] = []
++    entry_point_calls: list[tuple[bool, str | None]] = []
+ 
+     def _fake_builder(workspace_root: Path) -> PlanGateContext:
+         builder_calls.append(workspace_root)
+         return _stub_context()
+ 
+     def _fake_entry_point(
+-        text: str, *, context: PlanGateContext | None = None
++        text: str,
++        *,
++        context: PlanGateContext | None = None,
++        plan_path: str | None = None,
+     ) -> tuple[list[str], list[str]]:
+-        entry_point_calls.append(context is not None)
++        entry_point_calls.append((context is not None, plan_path))
+         return [], []
+ 
+     monkeypatch.setattr(validator, "build_plan_gate_context", _fake_builder)
+@@ -357,7 +360,7 @@ def test_plan_branch_builds_context_and_calls_two_channel_entry_point(
+     assert exit_code == 0
+     assert len(builder_calls) == 1
+     assert builder_calls[0] == Path("sub/root")
+-    assert entry_point_calls == [True]
++    assert entry_point_calls == [(True, "ignored.md")]
+ 
+ 
+ def test_non_plan_route_returns_an_empty_warning_channel(

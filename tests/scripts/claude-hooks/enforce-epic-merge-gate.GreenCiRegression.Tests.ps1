@@ -62,6 +62,8 @@ Describe 'enforce-epic-merge-gate existing branches around the green-CI branch (
 
     It 'branch 1 still allows epic_mode true with step9_status passed' {
         # Arrange
+        # Branch 1 now requires a verified CI run (issue #1130); the child-CI decision is mocked to Verified.
+        Mock -CommandName Get-EpicMergeGateChildCiDecision -MockWith { [ordered]@{ Verified = $true; Reason = '' } }
         Mock Get-ChildOrchestratorCheckpointContent { '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":42}}' }
 
         # Act

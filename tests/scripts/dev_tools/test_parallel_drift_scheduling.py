@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, cast
 from scripts.dev_tools._blast_radius_conflicts import ConflictResult, conflicts
 from scripts.dev_tools._parallel_drift_scheduling import (
     existing_edge_pairs,
+    item_access,
     item_band,
     observed_pair_is_edge,
 )
@@ -53,6 +54,7 @@ def tolerant_config(
                 "possible_overlap": 2,
                 "append_only": 1,
                 "module": 2,
+                "contract": 8,
             },
             "band_durations": {"C1": 1, "C2": 2, "C3": 4, "C4": 8},
             "default_band": default_band,
@@ -253,3 +255,35 @@ def test_observed_decision_uses_the_injected_relation() -> None:
     assert len(captured) == 1
     assert captured[0][0] is radius
     assert captured[0][1] == peer_radius(peer)
+
+
+def test_item_access_reads_both_declared_lists() -> None:
+    """An item's read_paths and separable_paths are returned as tuples (#1164)."""
+    record = dict(item(445, ["src/app.py", "docs/spec.md"]))
+    record["read_paths"] = ["docs/spec.md"]
+    record["separable_paths"] = ["src/app.py"]
+
+    access = item_access([record], 445)
+
+    assert access.read_paths == ("docs/spec.md",)
+    assert access.separable_paths == ("src/app.py",)
+
+
+def test_item_access_reads_malformed_lists_as_empty() -> None:
+    """A non-list value or a list holding a blank entry prices like no declaration."""
+    record = dict(item(445, ["src/app.py"]))
+    record["read_paths"] = "src/app.py"
+    record["separable_paths"] = ["src/app.py", ""]
+
+    access = item_access([record], 445)
+
+    assert access.read_paths == ()
+    assert access.separable_paths == ()
+
+
+def test_item_access_returns_no_access_for_an_absent_item() -> None:
+    """An issue number no item records yields empty access lists (fail closed)."""
+    access = item_access([dict(item(445, ["src/app.py"]))], 999)
+
+    assert access.read_paths == ()
+    assert access.separable_paths == ()

@@ -8,7 +8,8 @@
 
 .DESCRIPTION
     This is the structural regression guard for AC-8. It derives the hook set by parsing
-    .claude/settings.json rather than hard-coding a list, so a newly registered PreToolUse
+    .claude/settings.json and the dispatcher registry .claude/hooks/pretooluse-dispatch.json
+    (issue #1159) rather than hard-coding a list, so a newly registered PreToolUse
     hook is automatically in scope and cannot be added with the old transport.
 
     Per hook file it asserts two things over the file text:
@@ -66,9 +67,13 @@ $contractForbiddenLiteral = @(
 # hooks.PreToolUse[].hooks[].command entry in the `pwsh -NoProfile -File <path>` form.
 # Deriving the set rather than hard-coding it is what puts a newly registered hook
 # automatically in scope.
+# Issue #1159: settings.json registers the dispatcher, and the dispatched hooks are registered
+# in .claude/hooks/pretooluse-dispatch.json, so both sources contribute to the set.
 $contractSettings = Get-Content -LiteralPath $contractSettingsPath -Raw | ConvertFrom-Json
+$contractRegistryPath = Join-Path -Path $contractRepoRoot -ChildPath '.claude/hooks/pretooluse-dispatch.json'
+$contractRegistry = Get-Content -LiteralPath $contractRegistryPath -Raw | ConvertFrom-Json
 $contractHookPath = [System.Collections.Generic.List[string]]::new()
-foreach ($matcherEntry in @($contractSettings.hooks.PreToolUse)) {
+foreach ($matcherEntry in @($contractSettings.hooks.PreToolUse) + @($contractRegistry.hooks.PreToolUse)) {
     foreach ($hookEntry in @($matcherEntry.hooks)) {
         $command = [string]$hookEntry.command
         if ($command -match '-File\s+(?<path>\S+\.ps1)') {

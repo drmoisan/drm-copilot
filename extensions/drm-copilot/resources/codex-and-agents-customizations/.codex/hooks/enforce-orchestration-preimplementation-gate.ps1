@@ -8,6 +8,7 @@
     shell-divergent command shape denies (research/research.2026-10-08T14-00.md in the issue
     #732 feature folder). The payload carries no workdir either, so the session root is the
     default target of a segment without an explicit -C (issue #738, decision D4).
+    Issue #1160: stage-2 mention-host confirmation (-commands sibling) and bookkeeping leg (-bookkeeping sibling).
 #>
 [CmdletBinding()]
 param()
@@ -27,14 +28,15 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-h
 # normative contract and which lacks headroom; leaving that file byte-untouched is the
 # proof the issue #539 exemption is behaviourally unchanged.
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-modes.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-modes.ps1' -ErrorRecord $_ }
-# Epic-scope command and path legs (issue #707, porting issue #663 decision D2), plus the
-# two per-mode read seams relocated from this file to keep it inside the 500-line cap.
+# Epic-scope legs (issue #707, porting #663 D2) plus two per-mode read seams moved out for the 500-line cap.
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-epic-scope.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-cleanup.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-cleanup.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-docs.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-docs.ps1' -ErrorRecord $_ }
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
-# The readiness checkpoint this gate reads and names in its block message.
-$script:CheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-commands.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-commands.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-bookkeeping.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-bookkeeping.ps1' -ErrorRecord $_ }
 
 # Every orchestration checkpoint a planner or orchestrator surface writes. Writing one
 # of these is orchestration bookkeeping, not implementation, so the gate must not
@@ -167,9 +169,10 @@ function Test-ImplementationCommand {
     $isStaging = @('add', 'commit').Where({ Test-CommandLineInvocation -CommandText $normalizedCommand -CommandWord 'git' -SubcommandPath @($_) }).Count -gt 0
 
     for ($index = 0; $index -lt $implementationCommandPatterns.Count; $index++) {
-        if (-not (($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }) -or ($index -eq 0 -and $isStaging))) {
-            continue
-        }
+        $structural = ($index -eq 0 -and $isStaging)
+        if (-not ($structural -or ($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }))) { continue }
+        # Stage 2 (issue #1160): a regex-only hit is dropped when every governed word is a mention-host operand.
+        if (-not $structural -and -not (Test-OrchestrationGateInvocationConfirmed -CommandText $normalizedCommand -PatternIndex $index)) { continue }
         # Allow-side only (issue #539). Index 0 is the git staging trigger, whose pattern
         # text is unchanged. It is the sole leg the orchestration-bookkeeping exemption may
         # clear, and only when no other implementation pattern matches the same line: the
@@ -270,7 +273,7 @@ function Test-OrchestrationReady {
     }
     $lifecycleReady = $false
     if ($Payload.PSObject.Properties.Name -contains 'lifecycle_ready') {
-        $lifecycleReady = [bool]$Payload.lifecycle_ready
+        $lifecycleReady = ($Payload.lifecycle_ready -is [bool]) -and $Payload.lifecycle_ready
     }
 
     if (-not $issueNum -or -not $featureFolder -or -not $routeId -or -not $lifecycleReady) {
@@ -282,17 +285,6 @@ function Test-OrchestrationReady {
         $routeId -and
         $lifecycleReady
     )
-}
-
-function Get-CheckpointContent {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param()
-
-    if (-not (Test-Path -LiteralPath $script:CheckpointPath)) {
-        return ''
-    }
-    return Get-Content -Raw -LiteralPath $script:CheckpointPath
 }
 
 function Get-OrchestrationPreimplementationGateAllowDecision {
@@ -445,8 +437,13 @@ function Invoke-OrchestrationPreimplementationGateDecision {
             Get-OrchestrationModeDenyReason -Mode $mode -Failure $failure)
     }
 
+    # Truthiness fall-through is kept: an empty -CheckpointRaw resolves like an unbound one.
+    # The checkpoint is read beneath the worktree the call targets (issue #1010).
+    $checkpointPath = ''
     if (-not $CheckpointRaw) {
-        $CheckpointRaw = Get-CheckpointContent
+        $read = Read-OrchestrationGateCheckpoint -Mode 'single-feature' -FilePath $filePath -Command $command
+        if (-not $read.Resolved) { return Get-OrchestrationPreimplementationGateBlockDecision -Reason $read.DenyReason }
+        $CheckpointRaw = $read.Raw; $checkpointPath = [string]$read.Path
     }
     try {
         $checkpoint = ConvertFrom-CheckpointJson -Json $CheckpointRaw
@@ -457,7 +454,10 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     if (Test-OrchestrationReady -Payload $checkpoint) {
         return Get-OrchestrationPreimplementationGateAllowDecision
     }
-    return Get-OrchestrationPreimplementationGateBlockDecision -Reason 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
+    if (($cleanup = Get-OrchestrationCleanupContextResult -FilePath $filePath -Content (Get-StringProperty -Value $toolInput -Name 'content') -Command $command -AllowPatchManifest).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Cleanup-context legs (issue #1026).
+    if (($bookkeeping = Get-OrchestrationBookkeepingStagingResult -Command $command -CheckpointPath $checkpointPath).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Bookkeeping staging leg (issue #1160).
+    if (($docs = Get-OrchestrationDocsEstateContextResult -FilePath $filePath -Command $command).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Docs-estate leg (issue #1169).
+    return Get-OrchestrationPreimplementationGateBlockDecision -Reason ('PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.' + $cleanup.DenySuffix + $bookkeeping.DenySuffix + $docs.DenySuffix)
 }
 
 if ($MyInvocation.InvocationName -eq '.') {
@@ -486,7 +486,7 @@ try {
     # path enters the same untouched Test-ImplementationPath decision flow. Any
     # other well-formed tool name maps to no records, so the hook allows.
     foreach ($toolInput in @(ConvertTo-CodexFileEditInput -Payload $payload)) {
-        $mappedRaw = @{ file_path = [string]$toolInput.file_path } | ConvertTo-Json -Compress
+        $mappedRaw = @{ file_path = [string]$toolInput.file_path; content = $(if ($toolName -ceq 'Write') { [string]$toolInput.content } else { '' }) } | ConvertTo-Json -Compress
         $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $mappedRaw
         if ($decision.hookSpecificOutput.permissionDecision -eq 'deny') {
             $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output

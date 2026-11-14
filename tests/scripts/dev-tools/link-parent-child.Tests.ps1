@@ -1,9 +1,20 @@
 Set-StrictMode -Version Latest
 
 BeforeAll {
+    # Save the prior value for AfterAll; the variable is process-wide and would leak to later suites.
+    $script:PriorSkipScriptExecution = [Environment]::GetEnvironmentVariable('POSHQC_SKIP_SCRIPT_EXECUTION')
     $env:POSHQC_SKIP_SCRIPT_EXECUTION = '1'
     $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\scripts\dev-tools\link-parent-child.ps1"
     . $script:scriptPath
+}
+
+AfterAll {
+    if ($null -eq $script:PriorSkipScriptExecution) {
+        Remove-Item -Path Env:\POSHQC_SKIP_SCRIPT_EXECUTION -ErrorAction SilentlyContinue
+    }
+    else {
+        $env:POSHQC_SKIP_SCRIPT_EXECUTION = $script:PriorSkipScriptExecution
+    }
 }
 
 Describe "link-parent-child.ps1 - Read-IssueNumber" {

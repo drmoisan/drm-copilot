@@ -18,6 +18,11 @@ BeforeAll {
     $script:ModulePath = (Resolve-Path "$PSScriptRoot/../../../scripts/dev-tools/SideloadedExtensionPublish.psm1").Path
     Import-Module $script:ModulePath -Force
 
+    # Portable fixture root for the paths the module joins (fully qualified on every host and
+    # never created); opaque working-directory values that are only compared stay literal.
+    $script:FixtureRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'sideloadedextensionpublish-root'
+    $script:ExtRoot = Join-Path $script:FixtureRoot 'ext'
+
     Mock -CommandName Invoke-SideloadedExtensionProcess -ModuleName SideloadedExtensionPublish -MockWith { throw 'unmocked host seam: Invoke-SideloadedExtensionProcess' }
     Mock -CommandName New-Item -ModuleName SideloadedExtensionPublish -MockWith { throw 'unmocked host seam: New-Item' }
     Mock -CommandName Remove-Item -ModuleName SideloadedExtensionPublish -MockWith { throw 'unmocked host seam: Remove-Item' }
@@ -298,12 +303,12 @@ Describe 'Invoke-NpmCiWithRetry' {
         Mock -CommandName Remove-Item -ModuleName SideloadedExtensionPublish -MockWith { }
 
         # Act
-        Invoke-NpmCiWithRetry -WorkingDirectory 'C:\fixture\ext' -ForceCleanup -Sleep $script:recordSleep -WarningAction SilentlyContinue
+        Invoke-NpmCiWithRetry -WorkingDirectory $script:ExtRoot -ForceCleanup -Sleep $script:recordSleep -WarningAction SilentlyContinue
 
         # Assert
         Should -Invoke -CommandName Stop-Process -ModuleName SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter { $Id -eq 4242 }
         Should -Invoke -CommandName Remove-Item -ModuleName SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
-            ($LiteralPath -replace '\\', '/') -eq 'C:/fixture/ext/node_modules'
+            ($LiteralPath -replace '\\', '/') -eq ((Join-Path $script:ExtRoot 'node_modules') -replace '\\', '/')
         }
         Should -Invoke -CommandName Invoke-ExternalCommand -ModuleName SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
             ($ArgumentList -join ' ') -eq 'cache clean --force'
@@ -343,10 +348,10 @@ Describe 'Invoke-ProjectCompile' {
     It 'runs the npm compile script when package.json defines one' {
         Mock -CommandName Get-PackageManifest -ModuleName SideloadedExtensionPublish -MockWith { [pscustomobject]@{ scripts = [pscustomobject]@{ compile = 'tsc -p ./' } } }
 
-        Invoke-ProjectCompile -ProjectRoot 'C:\fixture\ext'
+        Invoke-ProjectCompile -ProjectRoot $script:ExtRoot
 
         Should -Invoke -CommandName Invoke-ExternalCommand -ModuleName SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
-            $FilePath -eq 'npm' -and ($ArgumentList -join ' ') -eq 'run compile' -and $WorkingDirectory -eq 'C:\fixture\ext'
+            $FilePath -eq 'npm' -and ($ArgumentList -join ' ') -eq 'run compile' -and $WorkingDirectory -eq $script:ExtRoot
         }
     }
 
@@ -354,7 +359,7 @@ Describe 'Invoke-ProjectCompile' {
         Mock -CommandName Get-PackageManifest -ModuleName SideloadedExtensionPublish -MockWith { [pscustomobject]@{ scripts = [pscustomobject]@{ test = 'jest' } } }
         Mock -CommandName Test-Path -ModuleName SideloadedExtensionPublish -MockWith { $true }
 
-        Invoke-ProjectCompile -ProjectRoot 'C:\fixture\ext'
+        Invoke-ProjectCompile -ProjectRoot $script:ExtRoot
 
         Should -Invoke -CommandName Invoke-ExternalCommand -ModuleName SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
             $FilePath -eq 'npx' -and ($ArgumentList -join ' ') -eq '--yes tsc -p ./'
@@ -365,7 +370,7 @@ Describe 'Invoke-ProjectCompile' {
         Mock -CommandName Get-PackageManifest -ModuleName SideloadedExtensionPublish -MockWith { [pscustomobject]@{ name = 'no-scripts' } }
         Mock -CommandName Test-Path -ModuleName SideloadedExtensionPublish -MockWith { $false }
 
-        Invoke-ProjectCompile -ProjectRoot 'C:\fixture\ext'
+        Invoke-ProjectCompile -ProjectRoot $script:ExtRoot
 
         Should -Invoke -CommandName Invoke-ExternalCommand -ModuleName SideloadedExtensionPublish -Times 0 -Exactly
     }

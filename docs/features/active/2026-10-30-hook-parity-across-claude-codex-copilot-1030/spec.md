@@ -186,7 +186,12 @@ E2 (language-native analyzer exception): not applicable; no analyzer is produced
 
 ## Execution-Time Gating (owner decision E3)
 
-Phase 0 re-checks against `origin/main` before any edit and records each check under
+Phase 0 re-checks before any edit: check (a) at `origin/main` together with a containment check
+that the parallel run's merges are in the epic integration branch
+`origin/epic/shared-agent-harness-layer-integration`, and checks (b) to (e) at that integration
+branch, with the scope base derived as the merge base of the integration branch and `HEAD`
+(reconciled 2026-10-31 with the plan's `INTEGRATION` and `BASE` terms, because epic children merge
+into the integration branch, not `main`). It records each check under
 `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md` with `Timestamp`, `Command`, `EXIT_CODE`
 and `Output Summary`.
 
@@ -233,7 +238,7 @@ or negative result on (e) converts the dependent item to `DEFER`.
 
 ## Acceptance Criteria
 
-- [ ] Phase 0 evidence exists under `<FEATURE>/evidence/baseline/` recording checks (a) to (f) of `## Execution-Time Gating` against `origin/main`, each with `Timestamp`, `Command`, `EXIT_CODE` and `Output Summary`, and any mismatch on (a) to (d) or (f) resulted in a plan revision before implementation began.
+- [ ] Phase 0 evidence exists under `<FEATURE>/evidence/baseline/` recording checks (a) to (f) of `## Execution-Time Gating` at the refs that section names, each with `Timestamp`, `Command`, `EXIT_CODE` and `Output Summary`, and any mismatch on (a) to (d) or (f) resulted in a plan revision before implementation began.
 - [ ] Every hook registration enumerated by child 1's inventory module at execution time from `.claude/settings.json`, `.claude/agents/*.md` frontmatter, `.codex/config.toml` and `.github/hooks/*.json` has exactly one matrix entry with `disposition: native`, a `parity_group` and a `decision_ref` to the child 5 disposition record; `tests/scripts/harness/HarnessParityMatrix.RepoGate.Tests.ps1` passes.
 - [ ] Shared function (restated per OQ-1): every Claude `hook-registration` `parity_group` either has a Codex member or carries a gap class with its reason, and every Codex `parity_group` without a Claude member carries a `CODEX-NATIVE` note; `tests/scripts/harness/HarnessHookParity.RepoGate.Tests.ps1` passes on the committed matrix.
 - [ ] `tests/scripts/harness/HarnessHookParity.RepoGate.Tests.ps1` includes in-memory negative cases proving the gate fails for a Claude group with no Codex member and no gap class, and for an unmatched Codex group with no `CODEX-NATIVE` note.

@@ -42,6 +42,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 Set-StrictMode -Version Latest
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-target-worktree.ps1' -ErrorRecord $_ }
 $ErrorActionPreference = 'Stop'
 $script:SubagentStopReportAndHaltLine = 'This condition is not repairable by the subagent. Report it to the operator and halt.'
 
@@ -85,86 +86,6 @@ function Test-IsPreflightPlan {
     param([Parameter(Mandatory = $true)] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $Lines)
 
     return @($Lines | Where-Object { $_ -match '(?i)^\s*DIRECTIVE:\s*PREFLIGHT VALIDATION ONLY\s*$' }).Count -gt 0
-}
-
-function Get-JsonPropertyValue {
-    # Returns a named property of a parsed JSON object, or $null; safe under StrictMode.
-    [CmdletBinding()]
-    [OutputType([object])]
-    param([AllowNull()] [object] $Object, [Parameter(Mandatory = $true)] [string] $Name)
-
-    if ($null -eq $Object -or -not ($Object -is [System.Management.Automation.PSCustomObject])) {
-        return $null
-    }
-    $property = @($Object.PSObject.Properties | Where-Object { $_.Name -ceq $Name })
-    if ($property.Count -eq 0) {
-        return $null
-    }
-    return $property[0].Value
-}
-
-function Get-TranscriptPathFromEnvelope {
-    # Returns agent_transcript_path from the SubagentStop envelope with a leading ~ expanded, or $null.
-    [CmdletBinding()]
-    [OutputType([string])]
-    param([AllowNull()] [object] $Envelope)
-
-    $path = Get-JsonPropertyValue -Object $Envelope -Name 'agent_transcript_path'
-    if (-not ($path -is [string]) -or [string]::IsNullOrWhiteSpace($path)) {
-        return $null
-    }
-    if ($path.StartsWith('~')) {
-        $path = $HOME + $path.Substring(1)
-    }
-    return $path
-}
-
-function Get-TranscriptFirstUserText {
-    # Returns the text of the first `user` entry of transcript JSONL lines, or $null when none parses.
-    [CmdletBinding()]
-    [OutputType([string])]
-    param([AllowEmptyString()] [string[]] $Lines = @())
-
-    foreach ($line in $Lines) {
-        if ([string]::IsNullOrWhiteSpace($line)) {
-            continue
-        }
-        try {
-            $entry = ConvertFrom-Json -InputObject $line -ErrorAction Stop
-        }
-        catch {
-            continue
-        }
-        if ((Get-JsonPropertyValue -Object $entry -Name 'type') -ne 'user') {
-            continue
-        }
-        $container = Get-JsonPropertyValue -Object $entry -Name 'message'
-        if ($null -eq $container) {
-            $container = $entry
-        }
-        $content = Get-JsonPropertyValue -Object $container -Name 'content'
-        if ($content -is [string]) {
-            return $content
-        }
-        $textBlocks = @(@($content) | Where-Object { (Get-JsonPropertyValue -Object $_ -Name 'type') -eq 'text' })
-        $texts = @($textBlocks | ForEach-Object { [string](Get-JsonPropertyValue -Object $_ -Name 'text') })
-        if ($texts.Count -gt 0) {
-            return ($texts -join "`n")
-        }
-    }
-    return $null
-}
-
-function Read-TranscriptHead {
-    # File seam: returns the first 50 lines of the transcript at Path, or $null when no file exists.
-    [CmdletBinding()]
-    [OutputType([string[]])]
-    param([Parameter(Mandatory = $true)] [string] $Path)
-
-    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
-        return $null
-    }
-    return [string[]]@(Get-Content -LiteralPath $Path -TotalCount 50 -ErrorAction Stop)
 }
 
 function Test-IsPreflightRun {
@@ -218,10 +139,18 @@ function Get-PreflightRunBlockDecision {
     <#
     .SYNOPSIS
         Applies the single-pass preflight output rules (issue #964); every block is repairable.
+    .DESCRIPTION
+        The preflight-fix-record value is resolved beneath Target's worktree root (issue #1105):
+        the docs/features/ rule reads the repository-relative value and Test-PreflightFixRecord
+        probes the item copy. Without a Target, or for the session root, the value is unchanged.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
-    param([Parameter(Mandatory = $true)] [string] $AgentOutput)
+    param(
+        [Parameter(Mandatory = $true)] [string] $AgentOutput,
+        [AllowNull()] [object] $Target,
+        [AllowNull()] [AllowEmptyString()] [string] $SessionRoot
+    )
 
     if (-not (Test-HasCanonicalBlockedText -AgentOutput $AgentOutput)) {
         return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: blocked preflight output must include the exact text `BLOCKED at preflight (before [P0-T1])` plus a concrete plan delta.' }
@@ -244,8 +173,14 @@ function Get-PreflightRunBlockDecision {
     if ([regex]::IsMatch($AgentOutput, '(?m)^\s*PREFLIGHT-FIX:\s*\S')) {
         $record = [regex]::Match($AgentOutput, '(?im)^\s*preflight-fix-record:\s*`?(?<Path>[^\s`]+)`?\s*$')
         $recordPath = if ($record.Success) { ($record.Groups['Path'].Value -replace '\\', '/') -replace '^\./', '' } else { '' }
-        if (-not $recordPath.StartsWith('docs/features/', [System.StringComparison]::OrdinalIgnoreCase) -or -not (Test-PreflightFixRecord -Path $recordPath)) {
-            return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: a `PREFLIGHT-FIX:` line requires a `preflight-fix-record: <path>` line naming an existing record under docs/features/.' }
+        $root = if ([string]::IsNullOrWhiteSpace($SessionRoot)) { (Get-Location).Path } else { $SessionRoot }
+        $targetRoot = if ($null -eq $Target) { $null } else { [string]$Target.WorktreeRoot }
+        $location = Resolve-SubagentStopArtifactLocation -Path $recordPath -WorktreeRoot $targetRoot -SessionRoot $root -Target $Target
+        if ($location.Rejected) {
+            return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: preflight-fix-record '$recordPath' is rejected: $($location.RejectionDetail)." }
+        }
+        if (-not ([string]$location.RelativePath).StartsWith('docs/features/', [System.StringComparison]::OrdinalIgnoreCase) -or -not (Test-PreflightFixRecord -Path $location.ProbePath)) {
+            return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: a `PREFLIGHT-FIX:` line requires a `preflight-fix-record: <path>` line naming an existing record under docs/features/.' + (Get-SubagentStopTargetNote -Target $Target -ProbePath $location.ProbePath -SessionRoot $root) }
         }
     }
     return @{ Ok = $true; Message = $null }
@@ -353,16 +288,23 @@ function Get-ExecutorOutputBlockDecision {
         Returns @{ Ok = $true; Message = $null } to allow, or a hashtable with Ok = $false, a
         Repairable boolean, and Message. Repairable is $false for a non-preflight BLOCKED claim
         and for a plan with no task checkboxes; every other block is repairable by the subagent.
-        TranscriptPath and ReadTranscriptHead feed Test-IsPreflightRun. An execution run that
+        TranscriptPath and ReadTranscriptHead feed Test-IsPreflightRun and the target resolution;
+        the transcript head is read at most once per invocation. An execution run that
         stops with the canonical preflight BLOCKED text, a plan delta, and no checked task is a
         preflight block inside a combined proportionate run and is allowed.
+        plan-path and preflight-fix-record are resolved once against the item worktree that
+        produced them (Resolve-SubagentStopTargetWorktree, issue #1105), from an absolute
+        advertised path or from the delegation prompt in the transcript; only the item copies
+        are read. SessionRoot and WorktreeListInvoker are test seams.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
         [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $AgentOutput,
         [AllowNull()] [AllowEmptyString()] [string] $TranscriptPath,
-        [scriptblock] $ReadTranscriptHead
+        [scriptblock] $ReadTranscriptHead,
+        [AllowNull()] [AllowEmptyString()] [string] $SessionRoot,
+        [scriptblock] $WorktreeListInvoker
     )
 
     if ([string]::IsNullOrWhiteSpace($agentOutput)) {
@@ -374,18 +316,43 @@ function Get-ExecutorOutputBlockDecision {
         return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: agent output does not advertise a plan-path. Executor must report `plan-path: <path>` per atomic-plan-contract.' }
     }
 
-    $file = Get-PlanFileContent -Path $planPath
+    $root = if ([string]::IsNullOrWhiteSpace($SessionRoot)) { (Get-Location).Path } else { $SessionRoot }
+    $advertised = [System.Collections.Generic.List[string]]::new()
+    $advertised.Add($planPath)
+    $recordMatch = [regex]::Match($agentOutput, '(?im)^\s*preflight-fix-record:\s*`?(?<Path>[^\s`]+)`?\s*$')
+    if ($recordMatch.Success) { $advertised.Add($recordMatch.Groups['Path'].Value) }
+    $transcriptEnvelope = if ([string]::IsNullOrWhiteSpace($TranscriptPath)) { $null } else { [pscustomobject]@{ agent_transcript_path = $TranscriptPath } }
+    # Issue #1105 (F2): the transcript head is read once per invocation, and the resolver and the run
+    # classifier both receive a reader that returns those lines; a thrown read counts as no transcript.
+    $headReader = $ReadTranscriptHead
+    if ($null -ne $transcriptEnvelope) {
+        if ($null -eq $ReadTranscriptHead) { $ReadTranscriptHead = ${function:Read-TranscriptHead} }
+        $transcriptHead = $null
+        try { $transcriptHead = & $ReadTranscriptHead $TranscriptPath } catch { $transcriptHead = $null }
+        $headReader = { param([string] $Path) $null = $Path; $transcriptHead }.GetNewClosure()
+    }
+    $targetArguments = @{ Envelope = $transcriptEnvelope; AdvertisedPath = $advertised.ToArray(); SessionRoot = $root }
+    if ($null -ne $headReader) { $targetArguments['ReadTranscriptHead'] = $headReader }
+    if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+    $target = Resolve-SubagentStopTargetWorktree @targetArguments
+    $location = Resolve-SubagentStopArtifactLocation -Path $planPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root -Target $target
+    if ($location.Rejected) {
+        return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: executor advertised plan-path '$planPath', which is rejected: $($location.RejectionDetail)." }
+    }
+    $probePath = $location.ProbePath
+
+    $file = Get-PlanFileContent -Path $probePath
     if (-not $file.Exists) {
-        return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: executor advertised plan-path '$planPath' but no file exists at that location." }
+        return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: executor advertised plan-path '$planPath' but no file exists at that location.$(Get-SubagentStopTargetNote -Target $target -ProbePath $probePath -SessionRoot $root)" }
     }
 
     $runArguments = @{ AgentOutput = $agentOutput; PlanLines = [string[]]@($file.Lines); TranscriptPath = $TranscriptPath }
-    if ($null -ne $ReadTranscriptHead) { $runArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
+    if ($null -ne $headReader) { $runArguments['ReadTranscriptHead'] = $headReader }
     if (Test-IsPreflightRun @runArguments) {
         if ($agentOutput -cnotmatch 'BLOCKED' -and -not (Test-HasPreflightSignal -AgentOutput $agentOutput)) {
             return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: preflight output must include `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`.' }
         }
-        return Get-PreflightRunBlockDecision -AgentOutput $agentOutput
+        return Get-PreflightRunBlockDecision -AgentOutput $agentOutput -Target $target -SessionRoot $root
     }
 
     if ($agentOutput -cmatch 'BLOCKED') {

@@ -41,6 +41,17 @@ Use the `drm-copilot: Sync AGENTS.md from Instructions` command (command ID: `dr
 
 Use the `drm-copilot: New Claude Worktree Session` command (command ID: `drmCopilotExtension.newClaudeWorktreeSession`) from the Command Palette to open an integrated PowerShell terminal that creates a new git worktree, navigates into it, optionally installs and activates the poetry environment when the workspace declares poetry, and then starts an interactive `claude` session. The command prompts for an optional objective to pass to `claude` as the initial prompt.
 
+How the session is delivered:
+
+- The setup steps and the `claude` launch run as one PowerShell script that is passed to the shell at process start through `-NoLogo -NoExit -EncodedCommand <base64>`. Nothing is typed into the terminal input stream, so the session does not depend on shell start-up timing and behaves the same in a local Windows terminal and in a Linux dev container.
+- The terminal is created with `hideFromUser` and then shown immediately. A hidden-at-creation terminal is skipped by the Python extension's automatic environment activation, so no activation text is injected into the session.
+- Setup is fail-fast: setup stops at the first failed step (a non-zero exit code from `git worktree add` or `poetry install`, or a terminating error such as a failed `New-Item` or `Set-Location`), a red failure message is written, and `claude` is not started. The terminal stays open at an interactive prompt.
+- Each step prints a `Write-Host` progress banner (for example `==> Adding git worktree`) before it runs, in place of a per-command echo.
+- When the workspace uses poetry, the virtual environment is activated from `.venv/Scripts/Activate.ps1` or `.venv/bin/Activate.ps1`, whichever exists in the new worktree.
+- The objective is embedded in the encoded script. An objective long enough to push the encoded argument past 30000 characters is rejected before the terminal is created.
+- Terminal shell-integration decorations (command markers) may be absent in these terminals, because the shell is started with an encoded command.
+- `drm-copilot: New Codex Worktree Session` (command ID: `drmCopilotExtension.newCodexWorktreeSession`) uses the same delivery, banners, fail-fast setup, and activation probe, with its trust and post-codex steps in place of the pre-`claude` step.
+
 ### Injecting a pre-`claude` script
 
 The command can run a local PowerShell script in the new worktree immediately before `claude` is started. This lets a repository carry its own pre-session setup (for example, copying machine-local configuration, seeding environment variables, or running a repo-specific bootstrap) in the local repository rather than centrally in the extension.
@@ -49,8 +60,9 @@ How it works:
 
 - The script path is read from the `drmCopilotExtension.newClaudeWorktreeSession.preClaudeScriptPath` configuration setting.
 - The default value is `.claude/hooks/pre-claude-session.ps1`, resolved relative to the new worktree root.
-- After the worktree is created, navigated into, and (when applicable) the poetry environment is installed and activated, the command runs the configured script if it exists in the worktree, then starts `claude`.
-- The script runs only when it exists: the command emits a runtime existence guard (`if (Test-Path -LiteralPath '<path>') { & '<path>' }`), so a missing script is not an error and the session proceeds directly to `claude`.
+- After the worktree is created, navigated into, and (when applicable) the poetry environment is installed and activated, the session script runs the configured script if it exists in the worktree, then starts `claude`.
+- The script runs only when it exists: the session script includes a runtime existence guard (`if (Test-Path -LiteralPath '<path>') { & '<path>' }`), so a missing script is not an error and the session proceeds directly to `claude`.
+- Non-terminating errors written by the script do not stop the session; a terminating error thrown by the script stops setup and `claude` is not started.
 
 To use the default convention, commit a PowerShell script to the repository at `.claude/hooks/pre-claude-session.ps1`. Because the script lives in the repository, it is present in the new worktree after `git worktree add` and runs automatically on the next worktree session.
 
@@ -65,7 +77,7 @@ To use a different path, set the configuration value in the repository's `.vscod
 Notes:
 
 - The path is resolved relative to the worktree root and is embedded with PowerShell single-quote escaping, so paths containing spaces or apostrophes are preserved literally.
-- Leaving the setting empty or whitespace-only suppresses the pre-`claude` step entirely; no additional command is sent.
+- Leaving the setting empty or whitespace-only suppresses the pre-`claude` step entirely; the session script contains no pre-`claude` step or banner.
 - The script runs in the worktree's PowerShell session before `claude` takes over the terminal.
 
 ## Remove Secondary Worktrees
@@ -113,6 +125,14 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `run_poshqc_suite`
 - `resolve_policy_audit_template_asset`
 - `validate_orchestration_artifacts`
+- `run_docs_check`
+- `run_docs_inventory`
+- `run_docs_coverage`
+- `update_docs_ledger`
+- `generate_docs_reference`
+- `validate_docs_artifacts`
+
+The six docs tools run the workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1` with `pwsh -NoProfile -File <script> -Command <subcommand> -Json`, with the workspace root as working directory. They require PowerShell 7.4 or later on `PATH` (there is no fallback to Windows PowerShell) and the pushed-down `.claude/lib/docs/` library in the target workspace; run `push_down_claude_customizations` first when it is missing. Only `update_docs_ledger` can change files, and only when `write` is `true`; every other docs tool is read-only.
 
 ### MCP Runtime Expectations
 
@@ -167,6 +187,12 @@ If the server is launched from a different working directory, pass `workspace_ro
 - run_poshqc_analyze_autofix: required `workspace_root`, optional `scan_folders`
 - run_poshqc_suite: required `workspace_root`, optional `scan_folders`
 - validate_orchestration_artifacts: required `workspace_root`, required `artifact_type`, required `artifact_path`, optional `require_complete`
+- `run_docs_check`: required `workspace_root`, optional `profile`, optional `paths`
+- `run_docs_inventory`: required `workspace_root`, optional `profile`, optional `analyzers`, optional `revision`
+- `run_docs_coverage`: required `workspace_root`, optional `profile`
+- `update_docs_ledger`: required `workspace_root`, required `operation`, required `actor_kind`, required `actor_id`, optional `profile`, `element` or `limit`, `disposition`, `pages`, `rationale`, `owner`, `target`, `dimension`, `state`, `claim`, and `write` (default `false`, a dry run); the fields each operation requires or permits are checked before launch
+- `generate_docs_reference`: required `workspace_root`, optional `profile`, optional `snapshot`, optional `output_directory` (always a dry run)
+- `validate_docs_artifacts`: required `workspace_root`, required `mode`, required `revision`, optional `profile` (never persists a receipt)
 
 ### MCP Result Shape
 
@@ -178,11 +204,21 @@ MCP tool calls return structured JSON with:
 - `artifacts` when the workflow has deterministic or discovered output paths
 - `summary`
 - `stderr_excerpt` when a subprocess failure surfaces stderr diagnostics
+- `docs` for the docs tools: the `Invoke-DocsCommand.ps1 -Json` envelope (`command`, `exit_code`, `findings`, `ok`, `result`) passed through unchanged; `ok` equals the envelope `ok`, `summary` is `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>`, and `stderr_excerpt` is added only for exit code 3
+
+A docs tool that fails before or instead of producing a valid envelope returns `ok: false` without `docs`, and its `summary` begins with one of these host failure codes:
+
+- `DOCS_INPUT_INVALID`: the input failed validation; no process was started.
+- `DOCS_WORKSPACE_ROOT_INVALID`: `workspace_root` is missing, not a string, or not absolute.
+- `DOCS_ENTRY_SCRIPT_MISSING`: `.claude/lib/docs/Invoke-DocsCommand.ps1` is absent; run `push_down_claude_customizations`.
+- `DOCS_PWSH_UNAVAILABLE`: `pwsh` is not on `PATH` or could not be started.
+- `DOCS_RUNTIME_UNAVAILABLE`: the host provides no docs command runtime.
+- `DOCS_ENVELOPE_EMPTY`, `DOCS_ENVELOPE_MALFORMED`, `DOCS_ENVELOPE_EXIT_MISMATCH`, `DOCS_ENVELOPE_COMMAND_MISMATCH`: stdout was empty, was not one valid envelope, or disagreed with the process exit code or the requested subcommand.
 
 ## Runtime Requirements
 
 - All commands run in-process in TypeScript; no `python` interpreter is required for any extension or MCP command.
-- PowerShell commands prefer `pwsh` and fall back to `powershell` on Windows when available.
+- PowerShell commands prefer `pwsh` and fall back to `powershell` on Windows when available. The docs tools are the exception: they require `pwsh` (PowerShell 7.4 or later) and the pushed-down `.claude/lib/docs/` library in the workspace.
 - An open workspace folder is required for workspace-targeted VS Code commands.
 - MCP clients must build the package so `out/mcp-server.js` exists before launching the server.
 

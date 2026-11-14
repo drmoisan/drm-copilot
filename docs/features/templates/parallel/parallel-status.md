@@ -85,3 +85,15 @@ parent-side project-file resolution and rendered empty when no item carries the 
 | issue_num | path | resolved_at | merged_against | merge_commit_sha | entries_added_from_ours | entries_added_from_theirs | version_resolutions |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | _(populated from `items[].mergeable_conflicts_resolved`; empty until a project-file conflict is resolved by the parent)_ | | | | | | | |
+
+## Tolerated Overlaps
+
+Projection of `tolerated_overlaps[]` (issue #1013). The `later_item`, `conflicted`, and
+`resolution_minutes` cells come from the entry's `observed_resolution` object, written by
+`parallel-orchestrator` for the later-merging item of a tolerated pair, and are empty for an entry
+that carries none. Nothing reads these values to change a weight. An empty array renders this
+section empty rather than omitting it.
+
+| a | b | reasons | cost | benefit | later_item | conflicted | resolution_minutes |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| _(populated from `tolerated_overlaps[]`; empty when the run has no tolerated overlap)_ | | | | | | | |

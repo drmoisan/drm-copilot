@@ -61,7 +61,7 @@ BeforeAll {
         try {
             [Console]::SetOut($out)
             [Console]::SetError($err)
-            $exitCode = Invoke-CodexFileSizeLimitEntryPoint -PayloadRaw $PayloadRaw -RepositoryRoot $script:Root -ReadFileContent $Reader
+            $exitCode = Invoke-CodexFileSizeLimitEntryPoint -PayloadRaw $PayloadRaw -RepositoryRoot $script:Root -ReadFileContent $Reader -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
         } finally {
             [Console]::SetOut($originalOut)
             [Console]::SetError($originalError)
@@ -281,6 +281,11 @@ Describe 'Codex enforce-file-size-limit.ps1' {
         }
 
         It 'denies an Update when the reconstruction call yields no record for the patched path' {
+            # Parse the initial record normally; only reconstruction returns no record.
+            $initialParser = (Get-Command ConvertTo-CodexFileEditInput -CommandType Function).ScriptBlock
+            Mock ConvertTo-CodexFileEditInput -ParameterFilter { -not $ResolveUpdateContent } -MockWith {
+                & $initialParser @PesterBoundParameters
+            }
             Mock ConvertTo-CodexFileEditInput { @() } -ParameterFilter { $ResolveUpdateContent }
             $payload = ConvertTo-CodexFileSizePatchPayload -Patch "*** Begin Patch`n*** Update File: src/app.ts`n@@`n+x`n*** End Patch"
 

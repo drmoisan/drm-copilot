@@ -16,7 +16,11 @@ Responsibilities:
     extension pattern ``FILE_EXTENSION_PATTERN_TEXT``, and the closed
     ``KNOWN_FILE_NAMES`` set, which ``classify_path_token`` uses in place of
     the former extension allowlist to decide whether a final path component
-    names a file (issue #797). Classification itself, line partitioning,
+    names a file (issue #797). Also own the generic-contract predicate
+    ``is_generic_contract_token`` and its stem constant
+    ``GENERIC_CONTRACT_STEMS``, which every contract-filtering site uses to
+    reject a default spreadsheet sheet-tab name such as ``Sheet1`` (issue
+    #1006). Classification itself, line partitioning,
     inline-code extraction, and contract-identifier harvesting stay in
     ``scripts/dev_tools/_blast_radius_extraction.py``; radius construction,
     module resolution, and finding emission stay in the facade.
@@ -50,6 +54,14 @@ Invariants / Constraints:
       module; this Python module remains the authoritative reference. A Pester
       parity test reads ``KNOWN_FILE_NAMES`` and ``FILE_EXTENSION_PATTERN_TEXT``
       from this source and pins the PowerShell values equal to them.
+    - ``GENERIC_CONTRACT_STEMS`` is a code constant, not a configuration key:
+      default sheet-tab names never name an exported symbol, schema, or CLI
+      identifier in any repository. The predicate rejects a non-ASCII token
+      before matching (the issue #903 precedent), because a character such as
+      the Kelvin sign or the long s folds to an ASCII letter under .NET
+      case-insensitive matching. A Pester parity test reads
+      ``GENERIC_CONTRACT_STEMS`` from this source and pins
+      ``$script:GenericContractStem`` in the PowerShell port equal to it.
 
 Side Effects:
     None. Every function is pure: no filesystem access, no subprocess, no
@@ -103,6 +115,19 @@ KNOWN_FILE_NAMES: frozenset[str] = frozenset(
         ".gitkeep .gitmodules .vscodeignore .npmignore .npmrc .nvmrc .editorconfig "
         ".prettierrc .prettierignore .eslintignore .shellcheckrc"
     ).split()
+)
+
+# Default spreadsheet sheet-tab stems (issue #1006). A spreadsheet application
+# names a new worksheet or chart sheet with one of these stems followed by a
+# number, so a spec that mentions ``Sheet1`` names a worksheet, not a contract.
+# Workbook and object names (``Book``, ``Table``, ``PivotTable``) are a
+# different class and are not listed. The set is closed and is pinned equal to
+# ``$script:GenericContractStem`` in the PowerShell port by a Pester parity test
+# that reads this constant from the source text, so edit both files together.
+GENERIC_CONTRACT_STEMS: tuple[str, ...] = tuple("Sheet Chart".split())
+GENERIC_CONTRACT_RE = re.compile(
+    "(?:" + "|".join(GENERIC_CONTRACT_STEMS) + ")[0-9]+",
+    re.IGNORECASE | re.ASCII,
 )
 
 
@@ -223,3 +248,33 @@ def is_file_shaped_component(component: str) -> bool:
     if not extension.isascii():
         return False
     return FILE_EXTENSION_RE.fullmatch(extension.lower()) is not None
+
+
+def is_generic_contract_token(token: str) -> bool:
+    """Report whether a contract token is a default sheet-tab name (issue #1006).
+
+    Two unrelated work items whose specs both named the worksheet ``Sheet1`` in
+    an interface section were given a hard ``contract_dependency`` edge,
+    because the contract harvest accepts any separator-free token carrying a
+    letter. A default sheet-tab name identifies no exported symbol, schema, or
+    CLI identifier, so every contract-filtering site rejects it with this
+    predicate.
+
+    Args:
+        token (str): One candidate contract identifier. The empty string is
+            accepted and reports ``False``.
+
+    Returns:
+        bool: ``True`` only when ``token`` is ASCII and fully matches a member
+        of ``GENERIC_CONTRACT_STEMS`` followed by one or more ASCII digits,
+        compared case-insensitively; otherwise ``False``. A non-ASCII token is
+        rejected before matching, so a look-alike such as a Kelvin sign or a
+        full-width digit never matches.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None; the input is not mutated.
+    """
+    return token.isascii() and GENERIC_CONTRACT_RE.fullmatch(token) is not None

@@ -191,3 +191,53 @@ Describe 'OrchestratorStateEpicWaveBarrier port' {
         @($script:U13Result).Count | Should -Be 0
     }
 }
+
+Describe 'OrchestratorStateEpicWaveBarrier cross-epic append (issue #1162)' {
+    BeforeAll {
+        $script:WaveBarrierPath = (Resolve-Path "$PSScriptRoot/../../../../.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1").Path
+        $script:CrossError = 'EPIC_CROSS_DEPENDENCY_VIOLATION: 2026-10-08-bravo-902 is treated as started while cross-epic dependency provider-epic#1188 is not integrated'
+        $script:Alpha = '{"feature_folder": "2026-10-08-alpha-901", "issue_num": 901, "depends_on": [], "merge_status": "not_started"}'
+    }
+
+    It 'appends the cross-epic violation after the wave-barrier violation' {
+        $bravo = '{"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created", "cross_epic_depends_on": [{"epic": "provider-epic", "integration_branch": "epic/provider-epic-integration", "issue_num": 1188, "status": "held"}]}'
+
+        $errors = Get-OrchestratorStateEpicWaveBarrierError -CheckpointText ('{"features":[' + $script:Alpha + ',' + $bravo + ']}')
+
+        $errors.Count | Should -Be 2
+        $errors[0] | Should -BeExactly 'EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency 2026-10-08-alpha-901 is not merged'
+        $errors[1] | Should -BeExactly $script:CrossError
+    }
+
+    It 'returns the barrier lines unchanged for a checkpoint without the key' {
+        $bravo = '{"feature_folder": "2026-10-08-bravo-902", "issue_num": 902, "depends_on": ["2026-10-08-alpha-901"], "merge_status": "worktree_created"}'
+
+        $errors = Get-OrchestratorStateEpicWaveBarrierError -CheckpointText ('{"features":[' + $script:Alpha + ',' + $bravo + ']}')
+
+        $errors.Count | Should -Be 1
+        $errors[0] | Should -BeLike 'EPIC_WAVE_BARRIER_VIOLATION:*'
+    }
+
+    It 'imports the cross-epic module at module scope with -ErrorAction Stop outside any try' {
+        $tokens = $null
+        $parseErrors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:WaveBarrierPath, [ref] $tokens, [ref] $parseErrors)
+        $imports = @($ast.FindAll({
+                    param($Node)
+                    $Node -is [System.Management.Automation.Language.CommandAst] -and
+                    $Node.GetCommandName() -eq 'Import-Module' -and
+                    $Node.Extent.Text -like '*OrchestratorStateEpicCrossDependency.psm1*'
+                }, $true))
+
+        @($parseErrors).Count | Should -Be 0
+        $imports.Count | Should -Be 1
+        $imports[0].Extent.Text | Should -Match '-ErrorAction\s+Stop'
+        $parent = $imports[0].Parent
+        $insideTryOrFunction = $false
+        while ($null -ne $parent) {
+            if ($parent -is [System.Management.Automation.Language.TryStatementAst] -or $parent -is [System.Management.Automation.Language.FunctionDefinitionAst]) { $insideTryOrFunction = $true }
+            $parent = $parent.Parent
+        }
+        $insideTryOrFunction | Should -BeFalse
+    }
+}

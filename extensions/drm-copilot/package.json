@@ -3,7 +3,7 @@
   "displayName": "drm-copilot",
   "description": "Repository automation, customization publishing, and MCP bridge for drm-copilot workflows.",
   "icon": "resources/icon.png",
-  "version": "1.1.23",
+  "version": "1.2.3",
   "publisher": "DanMoisan",
   "license": "MIT",
   "repository": {
@@ -246,7 +246,8 @@
     "js-yaml": "^4.2.0",
     "@hono/node-server": "^2.0.5",
     "brace-expansion": "^5.0.12",
-    "minimatch": "^10.2.5",
+    "minimatch": "^11.0.3",
+    "glob": "^14.0.3",
     "handlebars": "^4.7.10",
     "babel-plugin-istanbul": {
       "test-exclude": "^7.0.2"
@@ -259,14 +260,14 @@
     "@types/node": "26.x",
     "@types/vscode": "^1.138.0",
     "esbuild": "^0.28.2",
-    "eslint": "^10.12.0",
+    "eslint": "^10.14.0",
     "jest": "^30.5.2",
     "prettier": "^3.9.10",
     "ts-jest": "^29.4.15",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.71.2"
+    "typescript-eslint": "^8.72.1"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.31.0"
+    "@modelcontextprotocol/sdk": "^1.32.2"
   }
 }

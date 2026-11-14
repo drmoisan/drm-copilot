@@ -11,6 +11,12 @@ tools:
   - Glob
   - WebFetch
   - "Write(<FEATURE>/runbooks/**)"
+hooks:
+  SubagentStop:
+    - matcher: "human-exception-runbook"
+      hooks:
+        - type: command
+          command: pwsh -NoProfile -File .claude/hooks/validate-human-exception-runbook-output.ps1
 ---
 
 # Human-Exception-Runbook Agent
@@ -35,11 +41,22 @@ callable MCP documentation tool exists in this repository at this time. A repo-w
 mechanism. This limitation is documented in the two-axis-model-selection spec (Out of Scope) and is
 not resolved by this agent.
 
+## Tool Command Version Rule
+
+Every tool command in a counted shell block of the runbook is checked against the version pinned in
+the repository's lockfile or marked as not verified, with a `Version check:` line immediately after
+the closing fence, as the skill's `## Tool Command Version Rule` states. Mark `verified` only when the
+command was checked against documentation or help for exactly the pinned version and the citation
+names that version. The `validate-human-exception-runbook-output.ps1` SubagentStop hook blocks
+termination until every finding is repaired.
+
 ## Output
 
 - Write the runbook to `<FEATURE>/runbooks/<name>.runbook.md` and return the `runbook_path` to the
   caller. The orchestrator records `runbook_path` in the checkpoint; this agent does not modify the
   checkpoint.
+- End the final message with the line `runbook_path: <path>` so the SubagentStop hook can read the
+  written runbook.
 
 ## Constraints
 

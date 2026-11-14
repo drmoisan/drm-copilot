@@ -1,0 +1,19 @@
+{
+  "name": "last-entry-not-object",
+  "notes": "A last entry that is not an object is not a PASS record.",
+  "checkpoint": {
+    "review_mode": "concurrent",
+    "remediation_loop": {
+      "review_outcomes": [
+        {
+          "verdict": "PASS",
+          "head_sha": "abcdef0123456789abcdef0123456789abcdef01"
+        },
+        "PASS"
+      ]
+    }
+  },
+  "expected_errors": [
+    "Checkpoint completion validation failed: review_mode concurrent requires a last review_outcomes entry with verdict PASS."
+  ]
+}

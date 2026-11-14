@@ -231,9 +231,15 @@ export function validateArtifactWithWarnings(input: ValidateArtifactInput): {
 } {
   // The plan route is handled ahead of the type switch because it is the only
   // route that produces two channels and the only one that needs a repository
-  // seam built from the dispatcher's wiring fields.
+  // seam built from the dispatcher's wiring fields. The artifact path reaches
+  // G13 by its own parameter, so it selects the guideline even when a wiring
+  // field is absent and no context is built.
   if (input.artifactType === "plan") {
-    const report = evaluatePlanGates(input.text, buildPlanGateContext(input));
+    const report = evaluatePlanGates(
+      input.text,
+      buildPlanGateContext(input),
+      input.artifactPath,
+    );
     return {
       errors: [...validatePlanText(input.text), ...report.blocking],
       warnings: report.warnings,
