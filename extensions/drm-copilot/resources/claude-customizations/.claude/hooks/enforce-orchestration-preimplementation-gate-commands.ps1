@@ -24,10 +24,11 @@
          governed word.
       3. A record that carries the governed word as a whole token is not a mention-host record
          (Test-OrchestrationGateMentionHostRecord): it is not led by a host of
-         Get-OrchestrationGateMentionHostTable, it is led by a NotHost command word, or it
-         carries an executing option (rg --pre or --hostname-bin, git -O, a git short-option
-         bundle holding O, or --open-files-in-pager, sort --compress-program, or a GNU
-         abbreviation of an executing long option). A PowerShell non-command expression record
+         Get-OrchestrationGateMentionHostTable (a subcommand-scoped host counts only when its
+         listed subcommand is the token directly after its command word, decision D19), it is
+         led by a NotHost command word, or it carries an executing option (rg --pre or
+         --hostname-bin, git -O, a git short-option bundle holding O, or --open-files-in-pager,
+         sort --compress-program, or a GNU abbreviation of an executing long option). A PowerShell non-command expression record
          is accepted only when its text contains neither '::' nor '.Invoke'. An expanded
          wrapper record is judged through its payload records, and it confirms the hit when no
          payload record carries the word.
@@ -104,15 +105,17 @@ function Get-OrchestrationGateMentionHostTable {
 function Test-OrchestrationGateMentionHostRecord {
     <#
     .SYNOPSIS
-        Report whether a record is led by a non-executing mention host (decisions D2, D16, D17).
+        Report whether a record is led by a non-executing mention host (decisions D2, D16, D17, D19).
     .DESCRIPTION
         Returns $true when the command word of the record, after transparent wrappers, is a
-        host of the table (a group host, or a subcommand-scoped host with a listed
-        subcommand), is not listed in NotHost, and no later token is an executing option of
-        that host: a token that starts with a listed option, a long option whose nonempty
-        name is a prefix of a listed long option's name (GNU abbreviation), or, for git, a
-        single-dash token whose option letters contain the uppercase O. Returns $false for a
-        record with no command word. HostTable is Get-OrchestrationGateMentionHostTable.
+        host of the table (a group host, or a subcommand-scoped host whose token directly
+        after the command word is a listed subcommand, so an option or option value before
+        the subcommand keeps the hit, decision D19), is not listed in NotHost, and no later
+        token is an executing option of that host: a token that starts with a listed option,
+        a long option whose nonempty name is a prefix of a listed long option's name (GNU
+        abbreviation), or, for git, a single-dash token whose option letters contain the
+        uppercase O. Returns $false for a record with no command word. HostTable is
+        Get-OrchestrationGateMentionHostTable.
     #>
     [CmdletBinding()]
     [OutputType([bool])]
@@ -132,10 +135,7 @@ function Test-OrchestrationGateMentionHostRecord {
     $flatHosts = @($HostTable.Search) + @($HostTable.Process) + @($HostTable.Output) + @($HostTable.ReadAndFilter) + @($HostTable.Lookup)
     $isHost = $flatHosts -contains $leaf
     if (-not $isHost -and $HostTable.Subcommand.Contains($leafKey)) {
-        $subcommand = ''
-        for ($next = $wordIndex + 1; $next -lt $tokens.Count; $next++) {
-            if (-not $tokens[$next].StartsWith('-', [System.StringComparison]::Ordinal)) { $subcommand = $tokens[$next]; break }
-        }
+        $subcommand = if ($wordIndex + 1 -lt $tokens.Count) { $tokens[$wordIndex + 1] } else { '' }
         $isHost = @($HostTable.Subcommand[$leafKey]) -ccontains $subcommand
     }
     if ($isHost -and $HostTable.ExecutingOption.Contains($leafKey)) {
