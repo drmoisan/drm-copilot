@@ -123,12 +123,12 @@ The added CI step is a single Prettier check; no constraint.
 
 
 ## Acceptance Criteria
-- [ ] Root `npm run format:check` succeeds after the change; before the change it fails and lists the fixtures named in the issue.
-- [ ] The decoded JSON value of each fixture named in the issue is identical before and after formatting.
-- [ ] Any additional file flagged by the full root `format:check` is formatted in the same change, with no content change.
-- [ ] The docs Pester suites under `tests/scripts/claude-lib/docs/` pass in a parallel run.
-- [ ] `tests/scripts/claude-lib/docs/python/test_docs_python_native_corpus.py` passes in a parallel run.
-- [ ] `.github/workflows/_root-typescript-tests.yml` contains a step named "Check root formatting" running `npm run format:check`, after "Install root dependencies", and it applies to every OS leg of the job matrix.
+- [x] Root `npm run format:check` succeeds after the change; before the change it fails and lists the fixtures named in the issue.
+- [x] The decoded JSON value of each fixture named in the issue is identical before and after formatting.
+- [x] Any additional file flagged by the full root `format:check` is formatted in the same change, with no content change.
+- [x] The docs Pester suites under `tests/scripts/claude-lib/docs/` pass in a parallel run.
+- [x] `tests/scripts/claude-lib/docs/python/test_docs_python_native_corpus.py` passes in a parallel run.
+- [x] `.github/workflows/_root-typescript-tests.yml` contains a step named "Check root formatting" running `npm run format:check`, after "Install root dependencies", and it applies to every OS leg of the job matrix.
 - [ ] `.prettierignore`, Prettier configuration, `ci.yml` and the `ci-required-gate` needs list are unchanged, and no new CI job or Python file is added.
 - [ ] CI-dependent: a green CI run on the final branch head exercises the new step on each OS leg (rule `modified-workflow-needs-green-run`). Stays unchecked until S9.
 - [ ] CI-dependent: the existing contract tests that pin workflow and brief contents (`CiRequiredGateWorkflow.Tests.ps1`, `test_execution_environment_brief_contracts.py`) pass in that CI run. Stays unchecked until S9.
