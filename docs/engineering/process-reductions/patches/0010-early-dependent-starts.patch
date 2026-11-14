@@ -117,12 +117,13 @@ index d6627bfd5a0c49b1a066723eb7548795ddcfeb53..54e7b84be87189ac026c48a67d448675
 +`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
 +field runs exactly as described above.
 diff --git a/.claude/agents/epic-orchestrator.md b/.claude/agents/epic-orchestrator.md
-index 13d551fa6b321b2842fb4e31bb9f2966d41dccef..b8bfd8c52bedcc32442bd25e4ca851892423507c 100644
+index 3856737ae2f801701d5ed18f12ff7754d4b17022..7036d9312678b82b63edcab6f026436d09b302fa 100644
 --- a/.claude/agents/epic-orchestrator.md
 +++ b/.claude/agents/epic-orchestrator.md
-@@ -16,6 +16,7 @@ tools:
+@@ -16,7 +16,8 @@ tools:
    - "Bash(gh *)"
    - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
+   - "Bash(pwsh -NoProfile -File .claude/lib/regeneration/Invoke-RegenerationPath.ps1*)"
    - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
 +  - "Bash(poetry run python -m scripts.dev_tools.validate_orchestration_artifacts *)"
    - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
@@ -420,10 +421,10 @@ index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da14720868733
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/.claude/skills/epic-orchestrate/SKILL.md b/.claude/skills/epic-orchestrate/SKILL.md
-index c312f554b12b9b28ac1c6685542d1aba47d69e50..3ea75b39f8c4c40b1a33e5f93f20aa2305f30800 100644
+index 4966a6fbb59c4c8693735208d9ce5c60e8d35072..327b341c06b784bfa5ebdd3921b750d79a572d34 100644
 --- a/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/.claude/skills/epic-orchestrate/SKILL.md
-@@ -304,6 +304,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
+@@ -318,7 +318,94 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
  `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
  on resume, not from in-memory completion notifications alone.
  
@@ -487,6 +488,7 @@ index c312f554b12b9b28ac1c6685542d1aba47d69e50..3ea75b39f8c4c40b1a33e5f93f20aa23
 +   path stops the child with `blocked_reason: "premise_falsified"`, unsynced and with no PR.
 +7. Child: run `git merge --no-ff origin/<integration_branch>`. The sync is a merge, not a rebase.
 +   A conflict enters `## Merge-Conflict Handling (Fan-In)`.
+    When the child's feature worktree holds a valid config, the child-side check and the regenerate path run first, as `## Merge-Conflict Remediation` in `.claude/skills/orchestrate/SKILL.md` states.
 +8. Child: re-run the local gate, commit, push, record `early_start_synced_at`, and only then
 +   start S7 or S8.
 +9. Parent: before the `pr_open` write, check
@@ -724,12 +726,13 @@ index 3d8b784de6f9c6e36893c1a3ba715a170a24f10b..1e42901c63e114b5c692dc2fbed534b9
      "./src/lib/validate/orchestrator-state-remediation.ts": {
        lines: 85,
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md
-index 13d551fa6b321b2842fb4e31bb9f2966d41dccef..b8bfd8c52bedcc32442bd25e4ca851892423507c 100644
+index 3856737ae2f801701d5ed18f12ff7754d4b17022..7036d9312678b82b63edcab6f026436d09b302fa 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md
-@@ -16,6 +16,7 @@ tools:
+@@ -16,7 +16,8 @@ tools:
    - "Bash(gh *)"
    - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
+   - "Bash(pwsh -NoProfile -File .claude/lib/regeneration/Invoke-RegenerationPath.ps1*)"
    - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
 +  - "Bash(poetry run python -m scripts.dev_tools.validate_orchestration_artifacts *)"
    - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
@@ -1027,10 +1030,10 @@ index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da14720868733
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-index c312f554b12b9b28ac1c6685542d1aba47d69e50..3ea75b39f8c4c40b1a33e5f93f20aa2305f30800 100644
+index 4966a6fbb59c4c8693735208d9ce5c60e8d35072..327b341c06b784bfa5ebdd3921b750d79a572d34 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-@@ -304,6 +304,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
+@@ -318,7 +318,94 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
  `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
  on resume, not from in-memory completion notifications alone.
  
@@ -1094,6 +1097,7 @@ index c312f554b12b9b28ac1c6685542d1aba47d69e50..3ea75b39f8c4c40b1a33e5f93f20aa23
 +   path stops the child with `blocked_reason: "premise_falsified"`, unsynced and with no PR.
 +7. Child: run `git merge --no-ff origin/<integration_branch>`. The sync is a merge, not a rebase.
 +   A conflict enters `## Merge-Conflict Handling (Fan-In)`.
+    When the child's feature worktree holds a valid config, the child-side check and the regenerate path run first, as `## Merge-Conflict Remediation` in `.claude/skills/orchestrate/SKILL.md` states.
 +8. Child: re-run the local gate, commit, push, record `early_start_synced_at`, and only then
 +   start S7 or S8.
 +9. Parent: before the `pr_open` write, check
@@ -3230,10 +3234,10 @@ index 0000000000000000000000000000000000000000..bdcde4f875b92f58c0aab776b490034e
 +    }
 +}
 diff --git a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-index 790b42488ec4a6b9ed0262a5bfc82c0d4329ec1a..968f49c566474da9679b401ee1ce9b5d1ba691e1 100644
+index e5c4290a38d80d64710905c68f2d45a16a75e753..ca7171ad0619de95952f968721bfcda6f2bfaffa 100644
 --- a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
 +++ b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-@@ -219,23 +219,32 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
+@@ -219,34 +219,43 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
  # stays live for both entries. The merge of origin/main after #1138 combined both
  # skill edits, so the skill digest below is the merged result of #1129, #1130,
  # #1136, #1138, and #1141.
@@ -3255,16 +3259,27 @@ index 790b42488ec4a6b9ed0262a5bfc82c0d4329ec1a..968f49c566474da9679b401ee1ce9b5d
  # after the merge of origin/main that brought in #1165, which did not edit the
  # epic skill, so the skill digest below is the merged result of #1129, #1130,
  # #1136, #1138, #1141, #1146, #1097, and #1157.
+ #
+ # RE-BASELINED by issue #1156 on 2026-11-14. That change added to the epic agent
+ # `tools:` list the Bash grant for
+ # `.claude/lib/regeneration/Invoke-RegenerationPath.ps1`, and to the epic skill
+ # the new `## Integration-Tip Regeneration` section, the main-sync regenerate
+ # path in item 3 of `## Epic Integration Branch Lifecycle`, and the child-side
+ # check sentences in `## Merge-Conflict Handling (Fan-In)` and item 7 of
+ # `## Early Dependent Starts (early_start)`. Both digests moved, and the pin stays
+ # live for both entries. The digests were recomputed after the merge of origin/main
+ # that brought in #1157, #1161, #1163, #1164, and #1167, so both digests below are
+ # the merged result of the entries above and #1156.
  PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
      (
          ".claude/agents/epic-orchestrator.md",
--        "5ff9c66f58595fa91a1f568a18a0a5aae5d1736a9dd1b13a9bbbab459df7899c",
-+        "142e42d15a73fb595c2b60691d15b1808bc244a24fecd240b59c72558905a7c8",
+-        "eec4ebff7cace9183eaacce275ae441a5fb3f84ece44f28a232a3ab3129467ad",
++        "51897bdd9647229425cea07aa2fba89581da001c1637b87b43d113b2a94aaa3f",
      ),
      (
          ".claude/skills/epic-orchestrate/SKILL.md",
--        "30b1500bec4840bec1e0f1a9765883c681c8d4e5d606a016126e2480473675c4",
-+        "ef59580f8306d5ae8f313d80cb7d25e3718828fcb2a1c116a8491d7b04921517",
+-        "42caefc1571055e4904740470ab18947776aab5d902880d4551c86353131fa7a",
++        "2ec79d6f2ea87d40765e7ff5bb6708e154ba922019ce4b8b1b8c064e3ce1110d",
      ),
  )
  
