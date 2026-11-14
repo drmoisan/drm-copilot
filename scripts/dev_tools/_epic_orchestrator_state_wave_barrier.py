@@ -38,7 +38,10 @@ from __future__ import annotations
 from typing import Any, cast
 
 from scripts.dev_tools._epic_orchestrator_state_resolution import (
+    CROSS_EPIC_KEY,
     build_feature_reference_index,
+    is_epic_slug,
+    is_positive_int,
     resolve_feature_reference,
 )
 
@@ -61,6 +64,12 @@ EARLY_START_UNMERGED_FORMAT = (
 EARLY_START_UNSYNCED_FORMAT = (
     "EPIC_WAVE_BARRIER_VIOLATION: {0} is at pr_open or later without a string "
     "synced_at for early_start dependency {1}"
+)
+# Issue #1162: a started feature whose cross-epic entry is not integrated.
+CROSS_EPIC_INTEGRATED_STATUSES = ("integrated", "in_main")
+CROSS_EPIC_VIOLATION_FORMAT = (
+    "EPIC_CROSS_DEPENDENCY_VIOLATION: {0} is treated as started while cross-epic "
+    "dependency {1}#{2} is not integrated"
 )
 
 
@@ -336,4 +345,57 @@ def validate_wave_barrier_ordering(features: list[dict[str, Any]]) -> list[str]:
                     f"EPIC_WAVE_BARRIER_VIOLATION: {folder} worktree_created_at "
                     f"precedes dependency {dependency} merge_confirmed_at"
                 )
+    # Key-gated issue #1162 check: a feature without cross_epic_depends_on adds
+    # nothing, so the result above is unchanged for older checkpoints.
+    errors.extend(validate_cross_epic_started_while_held(features))
+    return errors
+
+
+def validate_cross_epic_started_while_held(
+    features: list[dict[str, Any]],
+) -> list[str]:
+    """Report started features whose cross-epic dependency is not integrated.
+
+    Purpose:
+        The Layer 2 analogue of the wave barrier for issue #1162. A feature
+        that ``feature_has_started`` treats as started must not carry a
+        ``cross_epic_depends_on`` entry whose ``status`` is not ``integrated``
+        or ``in_main``. Entries without a valid epic slug or a positive integer
+        ``issue_num`` are left to the shape check.
+
+    Args:
+        features (list[dict[str, Any]]): Object-shaped features[] entries.
+
+    Returns:
+        list[str]: One ``EPIC_CROSS_DEPENDENCY_VIOLATION`` error per held entry.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    errors: list[str] = []
+    # Only started features with a string folder and a list value are checked.
+    for feature in features:
+        folder = feature.get("feature_folder")
+        entries = feature.get(CROSS_EPIC_KEY)
+        if not isinstance(folder, str) or not isinstance(entries, list):
+            continue
+        if not feature_has_started(feature):
+            continue
+        # Every well-formed entry must record an integrated prerequisite.
+        for entry in cast("list[Any]", entries):
+            if not isinstance(entry, dict):
+                continue
+            record = cast("dict[str, Any]", entry)
+            epic = record.get("epic")
+            issue_num = record.get("issue_num")
+            if not is_epic_slug(epic) or not is_positive_int(issue_num):
+                continue
+            status = record.get("status")
+            if isinstance(status, str) and status in CROSS_EPIC_INTEGRATED_STATUSES:
+                continue
+            errors.append(CROSS_EPIC_VIOLATION_FORMAT.format(folder, epic, issue_num))
     return errors

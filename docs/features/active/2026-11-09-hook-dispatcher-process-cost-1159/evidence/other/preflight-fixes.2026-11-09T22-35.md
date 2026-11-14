@@ -1,0 +1,12 @@
+# Preflight Fixes (round 2)
+
+Timestamp: 2026-11-09T22-35
+Plan: docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159/plan.2026-11-09T16-31.md
+
+Round-1 record `preflight-fixes.2026-11-09T22-20.md` is unchanged. Round-1 defects 1-4 were verified as resolved by the planner revision before this pass.
+
+## Fixes
+
+1. [P4-T3] | missing disposition for an existing asserting test | `tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1` `It` `registers root provenance, attestation, planning, wave, merge, worktree, and stop gates` requires `enforce-epic-root-invocation.ps1`, `enforce-epic-planning-only.ps1`, `enforce-codex-model-routing.ps1`, `enforce-epic-wave-barrier.ps1`, `enforce-epic-merge-gate.ps1` and `enforce-epic-worktree-removal-gate.ps1` in the `.codex/config.toml` text. All six are registered only under `[[hooks.PreToolUse]]` tables, which [P3-T3] replaces. The plan recorded the file as "Unchanged (verified unaffected)". Moved it to the re-target list: the names that leave `config.toml` are read from `.codex/hooks/pretooluse-dispatch.json`, and the non-PreToolUse names and other config assertions stay on `config.toml`. The test's intent (each gate is registered) is unchanged.
+2. [P3-T3] | literal formatting (schema of the new table) | The same file's `It` `uses the current nested command-handler hook schema` requires `[[hooks.PreToolUse.hooks]]` and forbids `command` lines directly under a `[[hooks.<Event>]]` table. Stated that the single dispatcher hook sits in a nested `[[hooks.PreToolUse.hooks]]` table, which is the schema every existing table uses. No assertion changes.
+3. [P3-T4] | missing disposition for an existing asserting test | `tests/scripts/claude-lib/discovery-validation/DiscoveryCapability.Tests.ps1` `It` `registers the <Event> handler of <HostName> for every discovery agent or controlled tool` calls `Get-DiscoveryHostRegistration` on the raw `.claude/settings.json` and `.codex/config.toml` text for four PreToolUse rows (`enforce-discovery-artifact-gate.ps1` and `enforce-discovery-planning-gate.ps1` per runtime). After [P3-T3] that text no longer names those gates, so the rows fail. Added the disposition: those four rows take their entries from the runtime's `pretooluse-dispatch.json` groups, the other rows are unchanged, and each row still requires the handler to be registered for every admitted name. The file is already in [P3-T4]'s file set.

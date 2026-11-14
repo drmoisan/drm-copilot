@@ -167,6 +167,35 @@ if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compr
         @($loaders).Count | Should -Be 0 -Because ('hooks loading the retired validator: ' + (@($loaders) -join ', '))
     }
 
+    It 'registers no hook whose tail passes an entry-point pipeline to exit' {
+        # Arrange: every registered PreToolUse hook, enumerated from the registrations at test time (issue #1159, D13).
+        # `exit (Invoke-<X>EntryPoint)` places the decision JSON the entry point writes to the pipeline inside the
+        # exit operand, so the JSON never reaches stdout and a deny becomes an allow.
+        $claudeMirror = "$($script:RepoRoot)/extensions/drm-copilot/resources/claude-customizations"
+        $codexMirror = "$($script:RepoRoot)/extensions/drm-copilot/resources/codex-and-agents-customizations"
+        $preToolUseRows = @(
+            foreach ($pair in @(@($script:RepoRoot, $script:RepoRoot, 'repository'), @($claudeMirror, $codexMirror, 'mirror'))) {
+                foreach ($r in @(Get-HookRegistration -ClaudeRoot $pair[0] -CodexRoot $pair[1] | Where-Object { $_.Hook -ne 'INLINE' -and $_.Event -eq 'PreToolUse' })) {
+                    [pscustomobject]@{ Root = $pair[2]; Hook = $r.Hook; RootPath = $r.Root }
+                }
+            })
+        # Act
+        $offenders = foreach ($row in $preToolUseRows) {
+            $text = Get-Content -LiteralPath (Join-HookGraphPath -Left $row.RootPath -Right $row.Hook) -Raw
+            $tokens = $null; $parseErrors = $null
+            $ast = [System.Management.Automation.Language.Parser]::ParseInput($text, [ref]$tokens, [ref]$parseErrors)
+            $statements = @($ast.EndBlock.Statements)
+            if ($statements.Count -eq 0) { continue }
+            $last = $statements[-1]
+            if ($last -isnot [System.Management.Automation.Language.ExitStatementAst] -or $null -eq $last.Pipeline) { continue }
+            $entryCalls = @($last.Pipeline.FindAll({ param($n) $n -is [System.Management.Automation.Language.CommandAst] -and "$($n.GetCommandName())" -like 'Invoke-*EntryPoint' }, $true))
+            if ($entryCalls.Count -gt 0) { "$($row.Root) $($row.Hook)" }
+        }
+        # Assert
+        $preToolUseRows.Count | Should -BeGreaterThan 0 -Because 'the registration discovery is non-empty'
+        @($offenders) | Should -BeNullOrEmpty -Because ('hooks whose tail passes an entry-point call to exit: ' + (@($offenders) -join ', '))
+    }
+
     It 'S8: names every exemption with its justification' {
         @($script:Exemptions | Where-Object { $_.Kind -eq 'Design' } | ForEach-Object Id) | Should -Be @('D2', 'D3', 'D4')
         foreach ($entry in $script:Exemptions) {

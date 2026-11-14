@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "stage": "plan",
+  "research_path": "docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159/research/research.2026-11-09T21-47.md",
+  "spec_path": "docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159/spec.md",
+  "plan_path": "docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159/plan.2026-11-09T16-31.md",
+  "plan_hash": "b27d8347091f2405d953b226d136c0e5f4cf2319",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "PREFLIGHT: ALL CLEAR",
+  "recorded_at": "2026-11-09T23:16:00Z",
+  "supersedes": "docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159/evidence/other/preparation-receipt.2026-11-09T22-38.json",
+  "notes": "Re-plan under owner directive OD-2026-11-09-max-parallel: sibling-merge gate removed, pre-merge integration pass [P7-T1] added, spec D15 adopted, D9 unchanged. Preflight fix records preflight-fixes.2026-11-09T23-00.md and preflight-fixes.2026-11-09T23-13.md."
+}

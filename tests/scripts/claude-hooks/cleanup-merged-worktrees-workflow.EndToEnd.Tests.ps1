@@ -21,7 +21,7 @@
     null-mocked there; the five hooks define no function name with two different bodies and
     share their script-scope literals, so one scope composes them. Each Context arranges one
     workflow step and asserts the decision of every composed hook registered for that tool call.
-    The inventory row reads .claude/settings.json and fails when a hook registered for the Bash,
+    The inventory row reads .claude/hooks/pretooluse-dispatch.json and fails when a hook registered for the Bash,
     Write, Edit, or Agent matchers is neither composed nor listed in the exemption table with a
     reason; the exempted hooks are covered by the post-merge live run.
 
@@ -94,6 +94,7 @@ BeforeAll {
         'enforce-parallel-drift-gate.ps1'        = 'gates parallel delegations; the workflow is not a parallel run'
         'enforce-docs-role-write-scope.ps1'      = 'acts only for the four documentation roles; the workflow runs in the main session, which carries no agent_type'
         'enforce-worktree-poetry-venv.ps1'       = 'denies mutating Poetry commands aimed at an outside VIRTUAL_ENV; the workflow runs no Poetry command'
+        'enforce-test-execution-policy.ps1'      = 'denies test-suite runs outside the test-execution launcher; the workflow starts no test suite'
         'enforce-owner-directive-pass-down.ps1'  = 'acts only for worker agent types and for delegations to workers or orchestrator; the workflow delegates only pr-author from the main session'
     }
 
@@ -163,10 +164,10 @@ Describe 'cleanup-merged-worktrees workflow end to end with no checkpoint (issue
     }
 
     It 'lists every hook registered for the Bash, Write|Edit, and Agent matchers as composed or exempted' {
-        # Arrange
-        $settings = Get-Content -Raw -LiteralPath (Resolve-Path "$PSScriptRoot/../../../.claude/settings.json").Path | ConvertFrom-Json
+        # Arrange: issue #1159 registers the PreToolUse hooks in the dispatcher registry beside them.
+        $registry = Get-Content -Raw -LiteralPath (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/pretooluse-dispatch.json").Path | ConvertFrom-Json
         $tools = @('Bash', 'Write', 'Edit', 'Agent')
-        $registered = @(foreach ($entry in @($settings.hooks.PreToolUse)) {
+        $registered = @(foreach ($entry in @($registry.hooks.PreToolUse)) {
                 if (@(([string]$entry.matcher) -split '\|' | Where-Object { $tools -ccontains $_ }).Count -eq 0) { continue }
                 foreach ($hook in @($entry.hooks)) {
                     $match = [regex]::Match([string]$hook.command, '\.claude/hooks/(?<leaf>[A-Za-z0-9._-]+\.ps1)')

@@ -60,7 +60,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 Set-StrictMode -Version Latest
 
-try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 
 $script:MermaidModulePath = Join-Path -Path $PSScriptRoot -ChildPath '../lib/mermaid/MermaidValidation.psm1'
 $script:MermaidSkillPointer = 'See .claude/skills/mermaid-diagram/SKILL.md.'
@@ -81,7 +81,7 @@ function Import-MermaidValidationModule {
     if (-not (Test-Path -LiteralPath $script:MermaidModulePath -PathType Leaf)) { return $false }
 
     try {
-        Import-Module -Name $script:MermaidModulePath -Force -ErrorAction Stop
+        Import-Module -Name $script:MermaidModulePath -ErrorAction Stop
     } catch {
         return $false
     }

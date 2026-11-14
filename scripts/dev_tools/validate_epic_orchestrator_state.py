@@ -24,6 +24,8 @@ from scripts.dev_tools._epic_orchestrator_state_resolution import (
     build_feature_reference_index,
     detect_dependency_cycle,
     resolve_feature_reference,
+    validate_cross_epic_dependency_shape,
+    validate_cross_epic_main_gate,
     validate_intent_block,
 )
 from scripts.dev_tools._epic_orchestrator_state_wave_barrier import (
@@ -338,6 +340,9 @@ def _validate_completion(
             "Epic checkpoint completion validation failed: "
             "epic_merge_pr.merge_commit_sha is missing or empty."
         )
+    # Key-gated issue #1162 backstop: a checkpoint without cross-epic edges adds
+    # no completion error.
+    errors.extend(validate_cross_epic_main_gate(features, state))
     return errors
 
 
@@ -396,6 +401,8 @@ def validate_epic_orchestrator_state_text(
     # Presence-gated: only runs when the checkpoint carries a top-level intent
     # object, so an intent-free checkpoint stays byte-identical.
     errors.extend(validate_intent_block(state_map))
+    # Key-gated issue #1162 shape check of features[].cross_epic_depends_on.
+    errors.extend(validate_cross_epic_dependency_shape(state_map))
     errors.extend(
         launch_binding.validate_epic_child_launch_bindings(
             state_map,

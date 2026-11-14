@@ -126,6 +126,8 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these 
 
 `Output Summary:` is mandatory for each command-step artifact and must concisely summarize the essential result signal (for example: pass/fail status, key counts, coverage headline, or primary diagnostic).
 
+Local test gates exclude the integration and golden lanes: CI integration and golden lanes are evidence, and a step that would run a lane locally records a non-blocking deviation under evidence/other/.
+
 ## Evidence Filename Timestamps in Plans
 
 Plans name evidence artifacts `<name>.<timestamp>.md` and never fix a plan-time stamp in an evidence filename. An acceptance condition identifies a consumed evidence artifact by the derivation in `evidence-and-timestamp-conventions` (`### Evidence Filename Timestamp`): the lexicographically greatest file matching `<name>.*.md`, not a pre-stamped literal path. This section governs artifact paths only: asserted search tokens remain concrete.
@@ -147,7 +149,7 @@ For any language in scope where repository policy requires coverage validation:
 
 This section defines when the toolchain runs during plan execution. Other plan-execution surfaces reference this section instead of restating it.
 
-- **Task check (after each task).** After each task, the executor runs a task check: format, lint, and type check scoped to the files the task changed, then the task's test selection. The task's test selection is the mirrored test files under `tests/` of each changed production file, plus every test file that imports, dot-sources, or names a changed module or file; for a changed Markdown or configuration path, it is the contract tests that read that path. Integration and golden suites are never part of the task's test selection. A task check is not a gate: it measures no coverage and does not replace the phase gate. Its evidence is a new append-only file per task, `<FEATURE>/evidence/other/task-check.P<N>-T<M>.<timestamp>.md`, which records the changed files, the selection and the rule that produced it, and each command with its exit code.
+- **Task check (after each task).** After each task, the executor runs a task check: format, lint, and type check scoped to the files the task changed, then the task's test selection. The task's test selection is the mirrored test files under `tests/` of each changed production file, plus every test file that imports, dot-sources, or names a changed module or file; for a changed Markdown or configuration path, it is the contract tests that read that path. Integration and golden suites are never part of the task's test selection. The task's Pester selection runs through the test-execution launcher `pester` suite with `-TestPath` and the selected test files, as the `test-execution-policy` skill states. A task check is not a gate: it measures no coverage and does not replace the phase gate. Its evidence is a new append-only file per task, `<FEATURE>/evidence/other/task-check.P<N>-T<M>.<timestamp>.md`, which records the changed files, the selection and the rule that produced it, and each command with its exit code.
 - **Phase gate (after each phase).** The last task of every phase between Phase 0 and the final QA phase carries the `[phase-gate]` tag, placed after the task ID as `[expect-fail]` is. That task runs stages 1 to 6 of the toolchain loop across the repository: format, lint, type check, architecture-boundary tests, the full unit suite, and contract checks. The unit stage is one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers. On a failure or an auto-fix, fix the cause and restart from step 1; the phase closes only after one clean pass. Its evidence is `<FEATURE>/evidence/qa-gates/phase-gate.P<N>.<timestamp>.md`. Phase 0 needs no gate task, and the loop of the final QA phase is its own gate.
 - **Expect-fail phase.** A phase may end with tests tagged `[expect-fail]` that fail by design until a later phase. Its `[phase-gate]` task still runs the full loop: the unit stage passes when its only failures are the plan's named `[expect-fail]` tests that a later phase makes pass, each confirmed failing, and every other test passes. The gate evidence lists those expected failures by name.
 - **No-change phase.** A phase that changes no tracked file, such as an investigation or reproduction phase that only writes evidence, is a no-change phase and needs no `[phase-gate]` task; the next gate covers it.
@@ -161,6 +163,8 @@ Run the full toolchain loop for each applicable language in order:
 2) Linting
 3) Type checking (if applicable)
 4) Testing
+
+A launcher exit 75 means the machine test-suite lock was busy: the gate is re-run after the holder finishes and is recorded as a queue timeout, not a failure (see the `test-execution-policy` skill).
 
 For languages with mandatory coverage policy, step 4 must use coverage-enabled test commands and persist numeric coverage evidence.
 

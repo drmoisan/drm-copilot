@@ -63,12 +63,12 @@ BeforeAll {
 Describe 'host registration parsing' {
     It 'registers the <Event> handler of <HostName> for every discovery agent or controlled tool' -ForEach @(
         @{ HostName = 'claude-code'; File = '.claude/settings.json'; Event = 'SubagentStart'; Handler = 'record-discovery-agent-start.ps1'; Kind = 'agents' }
-        @{ HostName = 'claude-code'; File = '.claude/settings.json'; Event = 'PreToolUse'; Handler = 'enforce-discovery-artifact-gate.ps1'; Kind = 'tools' }
+        @{ HostName = 'claude-code'; File = '.claude/settings.json'; Event = 'PreToolUse'; Handler = 'enforce-discovery-artifact-gate.ps1'; Kind = 'tools'; Registry = '.claude/hooks/pretooluse-dispatch.json' }
         @{ HostName = 'claude-code'; File = '.claude/settings.json'; Event = 'SubagentStop'; Handler = 'validate-discovery-artifact-gate.ps1'; Kind = 'agents' }
-        @{ HostName = 'claude-code'; File = '.claude/settings.json'; Event = 'PreToolUse'; Handler = 'enforce-discovery-planning-gate.ps1'; Kind = 'planning' }
+        @{ HostName = 'claude-code'; File = '.claude/settings.json'; Event = 'PreToolUse'; Handler = 'enforce-discovery-planning-gate.ps1'; Kind = 'planning'; Registry = '.claude/hooks/pretooluse-dispatch.json' }
         @{ HostName = 'codex'; File = '.codex/config.toml'; Event = 'SubagentStart'; Handler = 'record-subagent-routing-attestation.ps1'; Kind = 'variants' }
-        @{ HostName = 'codex'; File = '.codex/config.toml'; Event = 'PreToolUse'; Handler = 'enforce-discovery-artifact-gate.ps1'; Kind = 'tools' }
-        @{ HostName = 'codex'; File = '.codex/config.toml'; Event = 'PreToolUse'; Handler = 'enforce-discovery-planning-gate.ps1'; Kind = 'planning' }
+        @{ HostName = 'codex'; File = '.codex/config.toml'; Event = 'PreToolUse'; Handler = 'enforce-discovery-artifact-gate.ps1'; Kind = 'tools'; Registry = '.codex/hooks/pretooluse-dispatch.json' }
+        @{ HostName = 'codex'; File = '.codex/config.toml'; Event = 'PreToolUse'; Handler = 'enforce-discovery-planning-gate.ps1'; Kind = 'planning'; Registry = '.codex/hooks/pretooluse-dispatch.json' }
         @{ HostName = 'codex'; File = '.codex/config.toml'; Event = 'SubagentStop'; Handler = 'validate-discovery-agent-output.ps1'; Kind = 'agents' }
         @{ HostName = 'codex'; File = '.codex/config.toml'; Event = 'SubagentStop'; Handler = 'validate-codex-subagent-routing.ps1'; Kind = 'variants' }
         @{ HostName = 'github-copilot'; File = '.github/hooks/discovery.json'; Event = 'SubagentStart'; Handler = 'discovery-agent-start.ps1'; Kind = 'agents' }
@@ -76,7 +76,11 @@ Describe 'host registration parsing' {
         @{ HostName = 'github-copilot'; File = '.github/hooks/discovery.json'; Event = 'PreToolUse'; Handler = 'discovery-planning.ps1'; Kind = 'planning' }
         @{ HostName = 'github-copilot'; File = '.github/hooks/discovery.json'; Event = 'SubagentStop'; Handler = 'discovery-agent-stop.ps1'; Kind = 'agents' }
     ) {
-        $registration = Get-DiscoveryHostRegistration -HostName $HostName -ConfigurationText (Get-RepoText $File)
+        # PreToolUse handlers of Claude and Codex are dispatched (issue #1159): their groups live in the runtime's
+        # registry, so those rows read the registry groups; every other row reads the registration file.
+        $registryFile = $_['Registry']
+        $text = if ($registryFile) { Get-RepoText $registryFile } else { Get-RepoText $File }
+        $registration = Get-DiscoveryHostRegistration -HostName $(if ($registryFile) { 'claude-code' } else { $HostName }) -ConfigurationText $text
         $registration.Parsed | Should -BeTrue
         $admitted = switch ($Kind) {
             'agents' { $script:Roles }
@@ -85,6 +89,38 @@ Describe 'host registration parsing' {
             'planning' { @('Agent') }
         }
         Test-DiscoveryHandlerRegistered -Registration $registration -Event $Event -HandlerName $Handler -Admitted $admitted | Should -BeTrue
+    }
+
+    It 'admits a dispatched <HostName> tool handler through the dispatcher registration and its registry' -ForEach @(
+        @{ HostName = 'claude-code'; Registration = '{"hooks":{"PreToolUse":[{"matcher":"Bash|Write|Agent|mcp__.*","hooks":[{"type":"command","command":"pwsh -NoProfile -File .claude/hooks/invoke-pretooluse-dispatch.ps1"}]}]}}' }
+        @{ HostName = 'codex'; Registration = "[[hooks.PreToolUse]]`nmatcher = `"^(Bash|Write|Agent|mcp__.*)$`"`n`n[[hooks.PreToolUse.hooks]]`ncommand = 'pwsh -NoProfile -File `".codex/hooks/invoke-pretooluse-dispatch.ps1`"'`n" }
+    ) {
+        $registry = '{"isolation":"in-process","hooks":{"PreToolUse":[{"matcher":"Bash|Write|Agent|mcp__.*","hooks":[{"type":"command","command":"pwsh -NoProfile -File hooks/enforce-discovery-artifact-gate.ps1"}]}]}}'
+        $registration = Get-DiscoveryHostRegistration -HostName $HostName -ConfigurationText $Registration
+        $reader = { param([string]$Path) if ($Path -eq 'root/hooks/pretooluse-dispatch.json') { return , [System.Text.Encoding]::UTF8.GetBytes($registry) } return $null }.GetNewClosure()
+        $merged = Add-DiscoveryDispatchRegistryEntry -Registration $registration -RegistryPath 'root/hooks/pretooluse-dispatch.json' -ReadBytes $reader
+        Test-DiscoveryHandlerRegistered -Registration $registration -Event 'PreToolUse' -HandlerName 'enforce-discovery-artifact-gate.ps1' -Admitted @('Bash') | Should -BeFalse
+        Test-DiscoveryHandlerRegistered -Registration $merged -Event 'PreToolUse' -HandlerName 'enforce-discovery-artifact-gate.ps1' -Admitted @('Bash', 'Write', 'Agent', 'mcp__drm-copilot__run_discovery_repo_inventory') | Should -BeTrue
+    }
+
+    It 'adds no registry entry when the registry is unreadable or the registration names no dispatcher' {
+        $registration = Get-DiscoveryHostRegistration -HostName 'claude-code' -ConfigurationText '{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"pwsh -NoProfile -File .claude/hooks/invoke-pretooluse-dispatch.ps1"}]}]}}'
+        $plain = Get-DiscoveryHostRegistration -HostName 'claude-code' -ConfigurationText '{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"pwsh -NoProfile -File .claude/hooks/other.ps1"}]}]}}'
+        $registryBytes = [System.Text.Encoding]::UTF8.GetBytes('{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"pwsh x/enforce-discovery-artifact-gate.ps1"}]}]}}')
+        @((Add-DiscoveryDispatchRegistryEntry -Registration $registration -RegistryPath 'r' -ReadBytes { param([string]$Path) $null = $Path; return $null }).Entries).Count | Should -Be 1
+        @((Add-DiscoveryDispatchRegistryEntry -Registration $registration -RegistryPath 'r' -ReadBytes { param([string]$Path) $null = $Path; return , [byte[]]@(0xC3, 0x28) }).Entries).Count | Should -Be 1
+        @((Add-DiscoveryDispatchRegistryEntry -Registration $registration -RegistryPath 'r' -ReadBytes { param([string]$Path) $null = $Path; return , [System.Text.Encoding]::UTF8.GetBytes('{not json') }).Entries).Count | Should -Be 1
+        $reader = { param([string]$Path) $null = $Path; return , $registryBytes }.GetNewClosure()
+        @((Add-DiscoveryDispatchRegistryEntry -Registration $plain -RegistryPath 'r' -ReadBytes $reader).Entries).Count | Should -Be 1
+    }
+
+    It 'reports tool_event unsupported for <HostName> when the dispatcher registry is unreadable' -ForEach @(
+        @{ HostName = 'claude-code'; Registry = '.claude/hooks/pretooluse-dispatch.json' }
+        @{ HostName = 'codex'; Registry = '.codex/hooks/pretooluse-dispatch.json' }
+    ) {
+        $observation = Get-Observation -HostName $HostName -Reader (Get-ProbeReader -Omit @($Registry))
+        $observation['controls']['tool_event'] | Should -BeFalse
+        $observation['status'] | Should -Be 'unsupported'
     }
 
     It 'reads a Copilot hook command from powershell, then bash, then the legacy command key' {

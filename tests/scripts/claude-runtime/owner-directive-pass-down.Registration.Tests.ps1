@@ -5,7 +5,7 @@
     Registration and packaging of the owner-directive pass-down hook (issue #1157).
 
 .DESCRIPTION
-    Reads both committed settings copies and classifies the ledger and decision-file paths through
+    Reads both committed PreToolUse registry copies and both settings copies, and classifies the ledger and decision-file paths through
     the preimplementation gate. No test writes a file or starts a process.
 #>
 
@@ -28,8 +28,9 @@ AfterAll {
 
 Describe 'owner-directive pass-down hook registration' {
     It 'registers exactly one PreToolUse pass-down group in <Path>' -ForEach @(
-        @{ Path = '.claude/settings.json' }
-        @{ Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/settings.json' }
+        # Issue #1159: PreToolUse hooks are registered in the dispatcher registry, not in settings.json.
+        @{ Path = '.claude/hooks/pretooluse-dispatch.json' }
+        @{ Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/pretooluse-dispatch.json' }
     ) {
         # Arrange
         $text = Get-Content -LiteralPath (Join-Path $script:RepoRoot $Path) -Raw

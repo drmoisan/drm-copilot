@@ -12,6 +12,8 @@ import json
 import re
 from pathlib import Path
 
+import pytest
+
 from scripts.dev_tools.plan_gate_discrimination import PlanGateReport
 from scripts.dev_tools.plan_gate_document import evaluate_document_gates
 
@@ -44,6 +46,7 @@ _REQUIRED_HEADINGS = (
     "## Coverage and File-Size Gates",
     "## Test Runtime",
     "## Test Isolation Checks",
+    "## Test Execution Policy",
 )
 # The 20 contexts of ruleset 15241672 read on 2026-11-04, plus the issue #1074 gate.
 _OS = ("ubuntu-latest", "windows-latest")
@@ -628,3 +631,36 @@ def test_brief_test_runtime_section_orders_diagnosis_before_parallelism() -> Non
 
     # Assert
     assert missing == [], f"Test Runtime lacks {missing}"
+
+
+# Issue #1158: the test-execution launcher, its hook, the queue re-run rule, the MCP
+# gap, and the D13 lane statement (task P6-T7 writes the two lane tokens together with
+# the process-reduction ledger entry for the local lane exclusion).
+_TEST_EXECUTION_TOKENS = (
+    "run-test-suite.sh",
+    "TEST_EXECUTION_POLICY_BLOCKED:",
+    "TEST_EXECUTION_QUEUE_TIMEOUT:",
+    "enforce-test-execution-policy.ps1",
+    "test-execution launcher governs",
+    "machine test-suite lock",
+    "CI integration and golden lanes are evidence",
+    "non-blocking deviation",
+)
+
+
+@pytest.mark.parametrize("relative_path", _BRIEF_COPIES)
+def test_brief_copy_states_test_execution_policy(relative_path: str) -> None:
+    """Each brief copy names the launcher, the hook, the D13 rules, and the MCP gap."""
+
+    # Arrange
+    text = _collapse(_read(relative_path))
+    poshqc_section = _section(
+        "## PowerShell Route and PoshQC MCP Limits", relative_path
+    )
+
+    # Act
+    missing = _missing(text, _TEST_EXECUTION_TOKENS)
+
+    # Assert
+    assert missing == [], f"{relative_path} lacks {missing}"
+    assert "extension release" in poshqc_section, f"{relative_path} lacks the MCP gap"

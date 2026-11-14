@@ -385,6 +385,40 @@ Describe 'enforce-epic-merge-gate review guard (issue #1097)' {
         Should -Invoke Invoke-DocsOnlyGitExe -Times 0 -Exactly
     }
 
+    Context 'regeneration_events without review_kind (issue #1156)' {
+        It 'RG-REGENERATION-EVENTS-WITHOUT-KIND-KEEP-DECISION (<Label>)' -ForEach @(
+            @{ Label = 'concurrent review'; Remove = @() }
+            @{ Label = 'sequential child-CI branch'; Remove = @('review_mode') }
+            @{ Label = 'sequential green-CI branch'; Remove = @('review_mode', 'epic_mode') }
+        ) {
+            # Arrange: the same row with and without a complete regeneration_events entry and no review_kind.
+            $reviewed = Get-EpicMergeGateReviewHead -Kind Reviewed
+            $regenerationEvent = [ordered]@{ head_sha = $reviewed; outcome = 'regenerated'; idempotent = $true; confined = $true; unit_gate = 'pass'; delta_check = 'pass' }
+            $without = @{ Name = 'without-events'; LiveHead = $reviewed; Expected = 'allow'; Override = @{}; Remove = $Remove }
+            $with = @{ Name = 'with-events'; LiveHead = $reviewed; Expected = 'allow'; Override = @{ regeneration_events = @($regenerationEvent) }; Remove = $Remove }
+
+            # Act
+            $withoutResult = Invoke-ReviewGuardRow -Row $without
+            $withResult = Invoke-ReviewGuardRow -Row $with
+
+            # Assert
+            $withResult.Decision | Should -BeExactly $withoutResult.Decision
+            $withResult.Reason | Should -BeExactly $withoutResult.Reason
+        }
+
+        It 'RG-REGENERATION-SEQUENTIAL-CHILD-CI-STILL-ALLOWS' {
+            # Arrange
+            $reviewed = Get-EpicMergeGateReviewHead -Kind Reviewed
+            $row = @{ Name = 'sequential-with-events'; LiveHead = $reviewed; Expected = 'allow'; Override = @{ regeneration_events = @() }; Remove = @('review_mode') }
+
+            # Act
+            $result = Invoke-ReviewGuardRow -Row $row
+
+            # Assert
+            $result.Decision | Should -Be 'allow' -Because "reason: $($result.Reason)"
+        }
+    }
+
     It 'RG-TWIN-IS-BYTE-IDENTICAL' {
         # Arrange
         $root = (Resolve-Path "$PSScriptRoot/../../..").Path

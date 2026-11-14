@@ -129,6 +129,8 @@ Describe 'epic-progress-report SKILL.md structure and content' {
             '| State | Features |', '| Blocked | <blocked> |', '| Wave | Children | Steps | Done |'
             '| Type | Done | In progress | Remaining | Blocked | Median | Samples | Subtotal |'
             'no measured duration; default <n> min', '**Unmapped and composite stage time:**', '(approx)'
+            # Issue #1162 (D9): the cross-epic line and the default label of an external node.
+            '**Cross-epic:**', 'external (default)'
         )
         # Issue #1153 (E1) superseded the #1118 sentence that no velocity or range line is printed.
         $section.Contains('No velocity, standard-deviation, straight-line, or range line is printed') | Should -BeFalse
@@ -318,7 +320,7 @@ Describe 'epic-progress-report delivery' {
         $manifestPaths = @((Get-Content -LiteralPath $script:manifestPath -Raw | ConvertFrom-Json).paths)
         $files = @(Get-TestSkillFile)
 
-        $files.Count | Should -Be 13
+        $files.Count | Should -Be 14
         foreach ($file in $files) {
             @($manifestPaths | Where-Object { $_ -ceq $file }).Count | Should -Be 1 -Because "$file must be listed once in core.json"
         }
@@ -327,7 +329,7 @@ Describe 'epic-progress-report delivery' {
     It 'mirrors every skill-folder file byte-identically in the bundle' {
         $files = @(Get-TestSkillFile)
 
-        $files.Count | Should -Be 13
+        $files.Count | Should -Be 14
         foreach ($file in $files) {
             $canonical = Join-Path -Path $script:repositoryRoot -ChildPath $file
             $copy = Join-Path -Path $script:bundleRoot -ChildPath $file

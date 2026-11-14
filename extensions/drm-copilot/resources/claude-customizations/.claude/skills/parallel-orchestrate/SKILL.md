@@ -567,6 +567,8 @@ the escalation path.
   item, sets `merge_status: pr_open`, regenerates `parallel-status.md`, and re-enters
   `## Per-Item Merge to Main (Merge-on-Green)` at the durable `gh pr checks` confirmation step.
 
+After the issue #643 resolver escalates, the child applies the regenerate path of `## Merge-Conflict Remediation` in the orchestrate skill first, and only a fallback writes the synthetic Blocking finding and consumes an attempt.
+
 1. On a conflicted `gh pr merge --merge`, or a `not_queued` merge confirmation whose `mergeable`
    value is `CONFLICTING`, the parent detects the failure and re-delegates that item's
    child orchestration, passing the conflict signal and the instruction to resolve against

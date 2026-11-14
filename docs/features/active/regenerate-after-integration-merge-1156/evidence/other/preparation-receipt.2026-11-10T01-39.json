@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "stage": "plan",
+  "research_path": "docs/features/active/regenerate-after-integration-merge-1156/research/research.2026-11-09T21-35.md",
+  "spec_path": "docs/features/active/regenerate-after-integration-merge-1156/spec.md",
+  "plan_path": "docs/features/active/regenerate-after-integration-merge-1156/plan.2026-11-09T16-31.md",
+  "plan_hash": "afbba024654a74b49ea08e9079930a9e370eddef",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "REVISIONS REQUIRED",
+  "preflight_defects": [
+    "[P2-T1] | design-check gap: a spec rule with no test that would fail if broken | Spec D18 item 6 (the -ConfigPath suffix appears only when the caller passes -ConfigPath) and D16 (no script parameter is Mandatory or carries ValidateSet) depend on the script body, and every planned test calls Invoke-RegenerationPathCommand directly with mocked seams. Required change: extend the existing non-table AST check in [P2-T1] to assert that the script body outside function definitions holds exactly one Invoke-RegenerationPathCommand call whose only argument is the splatted @PSBoundParameters, one ConvertTo-RegenerationResultJson call, and one exit, and that the script param block declares -Mode, -MergeRef, -Trigger, and -ConfigPath with no Mandatory argument and no ValidateSet attribute; add AC3.7 (script-layer forwarding) to the task's Covers list. No task is added or reordered."
+  ],
+  "preflight_fix_record": "docs/features/active/regenerate-after-integration-merge-1156/evidence/other/preflight-fixes.2026-11-10T01-37.md",
+  "planning_cycle": "two planner revisions and two preflights in this run; first preflight returned 5 substantive defects (resolved), final preflight returned 1 substantive defect (open); halted per atomic-plan-contract At most one return",
+  "recorded_at": "2026-11-10T01:39:20Z"
+}

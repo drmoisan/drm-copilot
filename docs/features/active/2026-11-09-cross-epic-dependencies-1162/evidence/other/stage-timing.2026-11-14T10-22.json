@@ -1,0 +1,85 @@
+{
+  "issue": 1162,
+  "written_at": "2026-11-14T10:22:28Z",
+  "note": "Wall-clock figures including queueing; merge stage not captured.",
+  "stage_timing": [
+    {
+      "stage": "promotion",
+      "attempt": 1,
+      "started_at": "2026-11-09T21:30:00Z",
+      "ended_at": "2026-11-09T21:35:00Z"
+    },
+    {
+      "stage": "research",
+      "attempt": 1,
+      "started_at": "2026-11-09T21:35:00Z",
+      "ended_at": "2026-11-09T21:48:51Z"
+    },
+    {
+      "stage": "feature_documents",
+      "attempt": 1,
+      "started_at": "2026-11-09T21:48:51Z",
+      "ended_at": "2026-11-09T21:56:53Z"
+    },
+    {
+      "stage": "atomic_planning",
+      "attempt": 1,
+      "started_at": "2026-11-09T21:56:53Z",
+      "ended_at": "2026-11-09T22:09:46Z"
+    },
+    {
+      "stage": "preflight",
+      "attempt": 1,
+      "started_at": "2026-11-09T22:09:46Z",
+      "ended_at": "2026-11-09T22:22:26Z"
+    },
+    {
+      "stage": "atomic_planning",
+      "attempt": 2,
+      "started_at": "2026-11-09T22:22:26Z",
+      "ended_at": "2026-11-09T22:29:59Z"
+    },
+    {
+      "stage": "preflight",
+      "attempt": 2,
+      "started_at": "2026-11-09T22:29:59Z",
+      "ended_at": "2026-11-09T22:39:52Z"
+    },
+    {
+      "stage": "atomic_execution",
+      "attempt": 1,
+      "started_at": "2026-11-10T03:09:58Z",
+      "ended_at": "2026-11-11T05:58:00Z"
+    },
+    {
+      "stage": "atomic_execution",
+      "attempt": 2,
+      "started_at": "2026-11-14T05:18:30Z",
+      "ended_at": "2026-11-14T07:09:07Z"
+    },
+    {
+      "stage": "feature_review",
+      "attempt": 1,
+      "started_at": "2026-11-14T07:09:07Z",
+      "ended_at": "2026-11-14T07:38:21Z"
+    },
+    {
+      "stage": "remediation",
+      "attempt": 1,
+      "started_at": "2026-11-14T07:38:21Z",
+      "ended_at": "2026-11-14T09:52:01Z"
+    },
+    {
+      "stage": "pr_author",
+      "attempt": 1,
+      "started_at": "2026-11-14T09:52:42Z",
+      "ended_at": "2026-11-14T09:55:09Z"
+    },
+    {
+      "stage": "ci",
+      "attempt": 1,
+      "started_at": "2026-11-14T09:55:09Z",
+      "ended_at": "2026-11-14T10:22:10Z"
+    }
+  ]
+}

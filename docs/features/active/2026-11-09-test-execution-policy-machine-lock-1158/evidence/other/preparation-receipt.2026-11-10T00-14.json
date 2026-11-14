@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "stage": "plan",
+  "research_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/research/research.2026-11-09T21-35.md",
+  "spec_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/spec.md",
+  "plan_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/plan.2026-11-09T16-31.md",
+  "plan_hash": "b34322dad3e27817dca1787487ba7c15b0a87601",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "REVISIONS REQUIRED",
+  "preflight_open_defects": [
+    "[P5-T1], [P5-T2], [P5-T3], spec D12/D16 | wrong design (exit-code collision) | pytest itself exits 2 on collection errors and interruptions, and the launcher passes that through. As planned, a real pytest exit 2 is treated as a policy refusal in run_full_loop_with_artifacts, run_preflight_qc_fix_loop, run_pytest_with_expectations, and fix_all. Required change: classify refusal as exit 2 plus a captured line starting TEST_EXECUTION_POLICY_BLOCKED:, and queue timeout as exit 75 or a TEST_EXECUTION_QUEUE_TIMEOUT: line; on paths without captured output convert only 75; add tests that pytest exit 2 without the prefix keeps today's handling; revise D12/D16.",
+    "[P1-T1], [P4-T1], spec ## Hook | design gap (runner detection bypass) | Read-CommandLineInvocationSegment on 'env -u VIRTUAL_ENV poetry run pytest -n auto' returns CommandWord env, and Skip-CommandLineTransparentWrapper stops at the -u argument, so that form (required in agent worktrees), 'FOO=1 pytest', and 'timeout 600 npx jest' bypass the direct-runner denial. Required change: the hook matcher skips VAR=value tokens and the wrappers env (with option arguments), timeout, time, command, and nohup, with deny and allow cases; P7-T5 gate prefix uses env -u VIRTUAL_ENV.",
+    "[P3-T1], spec ## Inputs / Outputs suites.workingDirectory | design check: rule with no failing test | No case proves that a suite's workingDirectory reaches StartSuiteProcess. Required change: add a case asserting jest-extension starts in extensions/drm-copilot and the built-in pytest suite starts at the repository root."
+  ],
+  "preflight_fix_record": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/evidence/other/preflight-fixes.2026-11-10T00-11.md",
+  "recorded_at": "2026-11-10T00:14:00Z"
+}

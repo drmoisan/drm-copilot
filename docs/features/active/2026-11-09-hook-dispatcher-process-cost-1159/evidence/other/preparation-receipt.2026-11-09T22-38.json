@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "stage": "preparation",
+  "issue_num": "1159",
+  "parallel_slug": "harness-learnings-2026-11-09",
+  "branch_name": "feature/hook-dispatcher-process-cost-1159",
+  "research_path": "docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159/research/research.2026-11-09T21-47.md",
+  "spec_path": "docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159/spec.md",
+  "user_story_path": "docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159/user-story.md",
+  "plan_path": "docs/features/active/2026-11-09-hook-dispatcher-process-cost-1159/plan.2026-11-09T16-31.md",
+  "plan_hash": "sha256:a5d47ccd0834f141d395e47a3d8af3050bec673e2f7517419456c49b1594543e",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "PREFLIGHT: ALL CLEAR",
+  "preflight_rounds": 2,
+  "execution_precondition": "Execution starts only after #1157, #1158, #1160 and #1163 merge; plan task P0-T1 verifies this and merges origin/main, and P0-T2 re-derives the PreToolUse inventory.",
+  "recorded_at": "2026-11-09T22:38:20Z"
+}

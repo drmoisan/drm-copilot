@@ -1,0 +1,103 @@
+{
+  "issue": 1158,
+  "pr": 1184,
+  "note": "Wall-clock times read from the clock and git history; include queueing; the merge stage is not captured.",
+  "stage_timing": [
+    {
+      "stage": "S4_atomic_planning_revision",
+      "attempt": 5,
+      "started_at": "2026-11-10T01:07:02Z",
+      "ended_at": "2026-11-10T01:25:31Z"
+    },
+    {
+      "stage": "S4_preflight",
+      "attempt": 5,
+      "started_at": "2026-11-10T01:25:31Z",
+      "ended_at": "2026-11-10T01:45:00Z"
+    },
+    {
+      "stage": "S4_atomic_planning_revision",
+      "attempt": 6,
+      "started_at": "2026-11-10T01:46:00Z",
+      "ended_at": "2026-11-10T02:02:48Z"
+    },
+    {
+      "stage": "S4_preflight",
+      "attempt": 6,
+      "started_at": "2026-11-10T02:02:48Z",
+      "ended_at": "2026-11-10T02:18:00Z"
+    },
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 1,
+      "started_at": "2026-11-10T03:09:45Z",
+      "ended_at": "2026-11-10T04:40:31Z"
+    },
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 2,
+      "started_at": "2026-11-11T03:52:55Z",
+      "ended_at": "2026-11-11T05:57:30Z"
+    },
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 3,
+      "started_at": "2026-11-14T03:47:28Z",
+      "ended_at": "2026-11-14T11:34:19Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 1,
+      "started_at": "2026-11-14T11:35:30Z",
+      "ended_at": "2026-11-14T11:52:52Z"
+    },
+    {
+      "stage": "remediation_cycle_1_plan",
+      "attempt": 1,
+      "started_at": "2026-11-14T11:52:52Z",
+      "ended_at": "2026-11-14T12:07:15Z"
+    },
+    {
+      "stage": "remediation_cycle_1_preflight",
+      "attempt": 1,
+      "started_at": "2026-11-14T12:07:15Z",
+      "ended_at": "2026-11-14T12:16:28Z"
+    },
+    {
+      "stage": "remediation_cycle_1_plan",
+      "attempt": 2,
+      "started_at": "2026-11-14T12:16:28Z",
+      "ended_at": "2026-11-14T12:19:58Z"
+    },
+    {
+      "stage": "remediation_cycle_1_preflight",
+      "attempt": 2,
+      "started_at": "2026-11-14T12:19:58Z",
+      "ended_at": "2026-11-14T12:28:58Z"
+    },
+    {
+      "stage": "remediation_cycle_1_execute",
+      "attempt": 1,
+      "started_at": "2026-11-14T12:28:58Z",
+      "ended_at": "2026-11-14T15:36:58Z"
+    },
+    {
+      "stage": "remediation_cycle_1_reaudit",
+      "attempt": 1,
+      "started_at": "2026-11-14T15:36:58Z",
+      "ended_at": "2026-11-14T15:52:54Z"
+    },
+    {
+      "stage": "S8_create_pr",
+      "attempt": 1,
+      "started_at": "2026-11-14T15:52:54Z",
+      "ended_at": "2026-11-14T15:58:41Z"
+    },
+    {
+      "stage": "S9_ci_green",
+      "attempt": 1,
+      "started_at": "2026-11-14T15:58:41Z",
+      "ended_at": "2026-11-14T16:26:59Z"
+    }
+  ]
+}
