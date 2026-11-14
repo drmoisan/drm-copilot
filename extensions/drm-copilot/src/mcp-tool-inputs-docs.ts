@@ -10,6 +10,7 @@
  */
 
 import { DocsHostError } from "./docs-command-envelope";
+import { checkDocsLedgerInput } from "./mcp-tool-inputs-docs-ledger-batch";
 
 /**
  * Path-segment character class of the docs-common `relative-path` pattern. The
@@ -40,6 +41,7 @@ export const DOCS_LEDGER_OPERATIONS = [
   "unpin",
   "set-dimension",
   "sync-refs",
+  "bind-page-refs",
 ] as const;
 export const DOCS_DISPOSITIONS = [
   "documented",
@@ -86,7 +88,8 @@ export type DocsFieldSpec =
       readonly grammar: DocsGrammar;
       readonly unique: boolean;
     }
-  | { readonly type: "boolean" };
+  | { readonly type: "boolean" }
+  | { readonly type: "object-array" };
 
 /** One row of a declarative input table. */
 export interface DocsInputRow {
@@ -157,7 +160,8 @@ export const DOCS_TOOL_INPUT_TABLES = {
     subcommand: "update-ledger",
     rows: [
       PROFILE_ROW,
-      row("operation", "Operation", oneOf(DOCS_LEDGER_OPERATIONS), true),
+      row("operation", "Operation", oneOf(DOCS_LEDGER_OPERATIONS)),
+      row("operations", "Operations", { type: "object-array" }),
       row("element", "Element", { type: "string", grammar: "element-id" }),
       row("limit", "Limit", { type: "string", grammar: "limit" }),
       row("disposition", "Disposition", oneOf(DOCS_DISPOSITIONS)),
@@ -244,6 +248,7 @@ export const DOCS_LEDGER_OPERATION_RULES: Readonly<
     ["rationale"],
   ),
   "sync-refs": rule("none", false, []),
+  "bind-page-refs": rule("none", false, []),
 };
 
 /** Rejection of a docs tool input before any process starts. */
@@ -262,6 +267,8 @@ export interface ResolvedDocsToolInput {
   readonly subcommand: string;
   /** Option tokens in declarative-table order, ready to follow `-Json`. */
   readonly options: ReadonlyArray<string>;
+  /** Standard input: the operations document of an update_docs_ledger batch. */
+  readonly stdin?: string;
 }
 
 type InputRecord = Readonly<Record<string, unknown>>;
@@ -353,6 +360,8 @@ function emitRow(row: DocsInputRow, raw: unknown): ReadonlyArray<string> {
         );
       }
       return [name, raw];
+    case "object-array":
+      return [name, "-"];
     case "string":
       return [name, checkString(row.field, spec.grammar, raw)];
     case "string-array": {
@@ -485,8 +494,14 @@ export function resolveDocsToolInput(
     }
     options.push(...emitRow(row, raw));
   }
-  if (toolName === "update_docs_ledger") {
-    checkLedgerOperation(input);
-  }
-  return { workspaceRoot, subcommand: table.subcommand, options };
+  const stdin =
+    toolName === "update_docs_ledger"
+      ? checkDocsLedgerInput(input, checkLedgerOperation)
+      : undefined;
+  return {
+    workspaceRoot,
+    subcommand: table.subcommand,
+    options,
+    ...(stdin === undefined ? {} : { stdin }),
+  };
 }

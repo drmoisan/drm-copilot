@@ -34,6 +34,7 @@ BeforeAll {
         'unpin'           = @('Profile', 'Write', 'Element', 'Page')
         'set-dimension'   = @('Profile', 'Write', 'Element', 'Page', 'Dimension', 'State', 'Rationale')
         'sync-refs'       = @('Profile', 'Write')
+        'bind-page-refs'  = @('Profile', 'Write')
     }
     $script:Base = @{
         'set-disposition' = @('Element', 'Disposition')
@@ -42,6 +43,7 @@ BeforeAll {
         'unpin'           = @('Element', 'Page')
         'set-dimension'   = @('Element', 'Page', 'Dimension', 'State')
         'sync-refs'       = @()
+        'bind-page-refs'  = @()
     }
 }
 
@@ -75,7 +77,7 @@ Describe 'DocsLedgerCommands argument properties' {
                 $checked++
             }
         }
-        $checked | Should -Be 72
+        $checked | Should -Be 84
     }
 
     It 'property Test-DocsValidateArgument: accepts exactly the four modes with a full revision, or no revision under docs-complete WriteReceipt; WriteReceipt only with docs-complete' {

@@ -61,7 +61,7 @@ function Get-DocsCommandTable {
         [pscustomobject]@{ Name = 'inventory'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsInventory.psm1'); Function = 'Invoke-DocsInventoryCommand'; Option = @{ Profile = 'value'; Analyzer = 'multi'; Revision = 'value'; Write = 'switch'; AnalysisMethod = 'value' } }
         # --- 1023: coverage, update-ledger, validate ---
         [pscustomobject]@{ Name = 'coverage'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerCommands.psm1'); Function = 'Invoke-DocsCoverageCommand'; Option = @{ Profile = 'value' } }
-        [pscustomobject]@{ Name = 'update-ledger'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerCommands.psm1'); Function = 'Invoke-DocsUpdateLedgerCommand'; Option = @{ Profile = 'value'; Operation = 'value'; Element = 'value'; Limit = 'value'; Disposition = 'value'; Page = 'multi'; Rationale = 'value'; Owner = 'value'; Target = 'value'; Dimension = 'value'; State = 'value'; Claim = 'value'; ActorKind = 'value'; ActorId = 'value'; Write = 'switch' } }
+        [pscustomobject]@{ Name = 'update-ledger'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerCommands.psm1'); Function = 'Invoke-DocsUpdateLedgerCommand'; Option = @{ Profile = 'value'; Operation = 'value'; Operations = 'value'; Element = 'value'; Limit = 'value'; Disposition = 'value'; Page = 'multi'; Rationale = 'value'; Owner = 'value'; Target = 'value'; Dimension = 'value'; State = 'value'; Claim = 'value'; ActorKind = 'value'; ActorId = 'value'; Write = 'switch' } }
         [pscustomobject]@{ Name = 'validate'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsValidateCommands.psm1'); Function = 'Invoke-DocsValidateCommand'; Option = @{ Profile = 'value'; Mode = 'value'; Revision = 'value'; WriteReceipt = 'switch' }; Note = 'With -WriteReceipt in docs-complete mode, -Revision defaults to the snapshot revision of the inventory; otherwise -Revision is required.' }
         # --- 1024: generate-reference ---
         [pscustomobject]@{ Name = 'generate-reference'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsReferenceWriter.psm1'); Function = 'Invoke-DocsGenerateReferenceCommand'; Option = @{ Profile = 'value'; Snapshot = 'value'; OutputDirectory = 'value'; Write = 'switch' } }
@@ -464,7 +464,8 @@ function New-DocsCommandContext {
         Returns the real command context for RepositoryRoot.
     .DESCRIPTION
         Members: RepositoryRoot, ReadText, ReadBytes, TestFile, ListFile, WriteText, UtcNow,
-        InvokeProcess, ResolveRevision, ReadRevisionText, TestAncestor, ListChangedPath. Relative paths are checked with Test-DocsRelativePath before any access.
+        InvokeProcess, ReadStdin, ResolveRevision, ReadRevisionText, TestAncestor, ListChangedPath. Relative paths are checked with Test-DocsRelativePath before any access.
+        ReadStdin (issue #1173) returns the whole standard input as text (update-ledger -Operations -).
         ReadText decodes through ConvertFrom-DocsUtf8Bytes and throws an item-not-found error for
         an absent file. WriteText forwards the full path, text and mode to Write-DocsFileText;
         InvokeProcess forwards its four arguments to Invoke-DocsProcess with the repository root
@@ -502,6 +503,7 @@ function New-DocsCommandContext {
     $writeText = { param($RelativePath, $Text, $Mode, [scriptblock] $Operation = $writeTextOperation) & $Operation $root $RelativePath $Text $Mode }.GetNewClosure()
     $invokeProcess = { param($FilePath, $ArgumentList, $StdinText, $TimeoutSeconds, [scriptblock] $Operation = $invokeProcessOperation) & $Operation $root $FilePath $ArgumentList $StdinText $TimeoutSeconds }.GetNewClosure()
     $utcNow = { [datetime]::UtcNow }
+    $readStdin = { [Console]::In.ReadToEnd() }
     # Revision members (issue #1034): closures over the root whose InvokeProcess parameter defaults
     # to the InvokeProcess member above, so every git call goes through Invoke-DocsProcess.
     $resolveRevisionOperation = ${function:Resolve-DocsContextRevision}
@@ -523,6 +525,7 @@ function New-DocsCommandContext {
         WriteText        = $writeText
         UtcNow           = $utcNow
         InvokeProcess    = $invokeProcess
+        ReadStdin        = $readStdin
         ResolveRevision  = $resolveRevision
         ReadRevisionText = $readRevisionText
         TestAncestor     = $testAncestor

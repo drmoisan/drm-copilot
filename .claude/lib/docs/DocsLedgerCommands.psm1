@@ -38,6 +38,8 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsReceipt.psm1'
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsValidation.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerMutation.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsCoverageReport.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerBindRefs.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerBatch.psm1') -ErrorAction Stop
 
 $script:DocsLedgerCommandIdentifierPattern = '^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$(?![\s\S])'
 $script:DocsLedgerCommandActorKind = [string[]]@('human', 'agent', 'tool')
@@ -52,6 +54,7 @@ $script:DocsLedgerCommandOperation = [ordered]@{
     'unpin'           = @{ Required = [string[]]@('Page'); Optional = [string[]]@(); Target = 'element'; OnePage = $true }
     'set-dimension'   = @{ Required = [string[]]@('Page', 'Dimension', 'State'); Optional = [string[]]@('Rationale'); Target = 'element'; OnePage = $true }
     'sync-refs'       = @{ Required = [string[]]@(); Optional = [string[]]@(); Target = 'none'; OnePage = $false }
+    'bind-page-refs'  = @{ Required = [string[]]@(); Optional = [string[]]@(); Target = 'none'; OnePage = $false }
 }
 $script:DocsLedgerCommandArtifactPathKey = @{
     'surface-inventory-snapshot' = 'inventory_snapshot'
@@ -360,7 +363,7 @@ function ConvertFrom-DocsLedgerCommandArtifact {
 function Read-DocsLedgerCommandDocumentSet {
     <#
     .SYNOPSIS
-        Reads the snapshot (required), ledger, matrix and pin collection (absent ones are fresh documents); returns @{ Result; View; Ledger; Matrix; PinSet; Snapshot; Path; Sha256; Present; PagePath } where Result is an exit-1 result on an absent snapshot or an invalid input (private helper).
+        Reads the snapshot (required), ledger, matrix and pin collection (absent ones are fresh documents); returns @{ Result; View; Ledger; Matrix; PinSet; Snapshot; Path; Sha256; Present; PagePath; PageReference } where Result is an exit-1 result on an absent snapshot or an invalid input, and PageReference holds the surface_refs of the pages read through ReadText when -PageReference is set (private helper).
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -370,7 +373,9 @@ function Read-DocsLedgerCommandDocumentSet {
         [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $ComposedSchemaSet,
         [Parameter(Mandatory = $true)] [scriptblock] $ReadBytes,
         [Parameter(Mandatory = $true)] [scriptblock] $TestFile,
-        [Parameter(Mandatory = $true)] [scriptblock] $ListFile
+        [Parameter(Mandatory = $true)] [scriptblock] $ListFile,
+        [AllowNull()] [scriptblock] $ReadText,
+        [switch] $PageReference
     )
 
     $kinds = @('surface-inventory-snapshot', 'docs-coverage-ledger', 'docs-parity-matrix', 'docs-evidence-pin')
@@ -384,7 +389,7 @@ function Read-DocsLedgerCommandDocumentSet {
         $sha256[$kind] = $null
         $present[$kind] = $null -ne $inputs.Artifact[$kind]
     }
-    $outcome = @{ Result = $null; View = $null; Ledger = $null; Matrix = $null; PinSet = $null; Snapshot = $null; Path = $pathOf; Sha256 = $sha256; Present = $present; PagePath = $inputs.PagePath }
+    $outcome = @{ Result = $null; View = $null; Ledger = $null; Matrix = $null; PinSet = $null; Snapshot = $null; Path = $pathOf; Sha256 = $sha256; Present = $present; PagePath = $inputs.PagePath; PageReference = $null }
     if (-not $present['surface-inventory-snapshot']) {
         $finding = New-DocsFinding -Code 'DOCS_INPUT_UNREADABLE' -Severity 'error' -ArtifactPath $pathOf['surface-inventory-snapshot'] -Message "The surface-inventory-snapshot artifact at $($pathOf['surface-inventory-snapshot']) does not exist." -NextAction 'Generate the inventory snapshot, or correct artifact_paths in the docs profile.'
         $outcome.Result = New-DocsCommandResult -Command $Command -ExitCode 1 -Finding @($finding)
@@ -415,6 +420,7 @@ function Read-DocsLedgerCommandDocumentSet {
     $ledgerPin = [ordered]@{ artifact_kind = 'docs-coverage-ledger'; path = $pathOf['docs-coverage-ledger']; sha256 = $ledgerSha256 }
     $outcome.Matrix = if ($present['docs-parity-matrix']) { $parsed['docs-parity-matrix'] } else { New-DocsParityMatrixDocument -RepositoryId $repository -SnapshotPin $snapshotPin -LedgerPin $ledgerPin }
     $outcome.PinSet = if ($present['docs-evidence-pin']) { $parsed['docs-evidence-pin'] } else { New-DocsPinCollectionDocument -RepositoryId $repository }
+    if ($PageReference) { $outcome.PageReference = Get-DocsLedgerPageReference -PagePath $inputs.PagePath -ReadText $ReadText }
     return $outcome
 }
 
@@ -549,7 +555,7 @@ function Invoke-DocsLedgerOperation {
     foreach ($key in @($view.PrecisionLimit.Keys)) { if ([string] $view.PrecisionLimit[$key]['DiagnosticId'] -ceq $limitId) { $limit = $view.PrecisionLimit[$key] } }
     $element = if ($elementId.Length -gt 0 -and $view.Element.Contains($elementId)) { $view.Element[$elementId] } else { $null }
     # remove-entry targets the ledger entry (an orphan may name an element that left the snapshot).
-    $needsElement = $operation -cne 'sync-refs' -and $operation -cne 'remove-entry' -and $limitId.Length -eq 0
+    $needsElement = $operation -cne 'sync-refs' -and $operation -cne 'remove-entry' -and $operation -cne 'bind-page-refs' -and $limitId.Length -eq 0
     if ($needsElement -and $null -eq $element) { return @{ Finding = (New-DocsLedgerCommandTargetFinding -Message "The element $elementId is not in the current snapshot." -ArtifactPath $Documents.Path['surface-inventory-snapshot'] -RelatedId @($elementId)) } }
     if ($limitId.Length -gt 0 -and $operation -ceq 'set-disposition' -and $null -eq $limit) { return @{ Finding = (New-DocsLedgerCommandTargetFinding -Message "The precision-limit diagnostic $limitId is not in the current snapshot." -ArtifactPath $Documents.Path['surface-inventory-snapshot'] -RelatedId @($limitId)) } }
     switch ($operation) {
@@ -603,6 +609,9 @@ function Invoke-DocsLedgerOperation {
             $pinIds = [string[]]@(@(Get-DocsLedgerCommandMember -Table $pinSet -Name 'pins') | Where-Object { [string] (Get-DocsLedgerCommandMember -Table $_ -Name 'element_id') -ceq $elementId -and [string] (Get-DocsLedgerCommandMember -Table $_ -Name 'page_path') -ceq $firstPage } | ForEach-Object { [string] $_['pin_id'] })
             $matrix = Merge-DocsParityDimension -Matrix $matrix -ElementId $elementId -Kind ([string] $element['kind']) -PagePath $firstPage -Dimension ([string] $Argument['Dimension']) -State ([string] $Argument['State']) -Rationale (Get-DocsLedgerCommandArgumentValue -Argument $Argument -Name 'Rationale' -Default $null) -PinId $pinIds
         }
+        'bind-page-refs' {
+            $ledger = Update-DocsLedgerPageBinding -Ledger $ledger -View $view -Reference $Documents.PageReference -ElementId $elementId -Actor $actor
+        }
         'sync-refs' {
             $snapshotPin = [ordered]@{ artifact_kind = 'surface-inventory-snapshot'; path = [string] $Documents.Path['surface-inventory-snapshot']; sha256 = [string] $view.Sha256 }
             $ledger = Merge-DocsLedgerSnapshotRef -Ledger $ledger -SnapshotPin $snapshotPin -SnapshotView $view
@@ -613,10 +622,50 @@ function Invoke-DocsLedgerOperation {
     return @{ Ledger = $ledger; Matrix = $matrix; PinSet = $pinSet; Finding = $null }
 }
 
+function Get-DocsLedgerCommandOutcome {
+    <#
+    .SYNOPSIS
+        Runs the newly-introduced rule comparison over the loaded and changed documents; returns @{ After; Text; Changed; Introduced; NewErrors; Preexisting } (private helper).
+    .DESCRIPTION
+        Rules of changed documents are compared on every field except pointer; Preexisting counts
+        the prior error findings. Used by the single path and once per Invoke-DocsLedgerBatch run.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)] [hashtable] $Documents,
+        [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $Applied,
+        [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $DocsProfile,
+        [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $ComposedSchemaSet
+    )
+
+    $before = [ordered]@{ 'docs-coverage-ledger' = $Documents.Ledger; 'docs-parity-matrix' = $Documents.Matrix; 'docs-evidence-pin' = $Documents.PinSet }
+    $after = [ordered]@{ 'docs-coverage-ledger' = $Applied.Ledger; 'docs-parity-matrix' = $Applied.Matrix; 'docs-evidence-pin' = $Applied.PinSet }
+    $text = @{}
+    $changed = @{}
+    foreach ($kind in @($after.Keys)) {
+        $text[$kind] = ConvertTo-DocsJsonText -Value $after[$kind] -Indented
+        $changed[$kind] = (ConvertTo-DocsCanonicalJson -Value $after[$kind]) -cne (ConvertTo-DocsCanonicalJson -Value $before[$kind])
+    }
+    $pageOwners = [object[]]@(Get-DocsLedgerCommandMember -Table $DocsProfile -Name 'page_owners')
+    $allKinds = [string[]]@($after.Keys)
+    $changedKinds = [string[]]@($allKinds | Where-Object { $changed[$_] })
+    $ledgerBefore = if ($Documents.Present['docs-coverage-ledger']) { [string] $Documents.Sha256['docs-coverage-ledger'] } else { Get-DocsSha256Hex -Text (ConvertTo-DocsJsonText -Value $Documents.Ledger -Indented) }
+    $ledgerAfter = if ($changed['docs-coverage-ledger']) { Get-DocsSha256Hex -Text $text['docs-coverage-ledger'] } else { $ledgerBefore }
+    $common = @{ View = $Documents.View; Path = $Documents.Path; PagePath = $Documents.PagePath; PageOwner = $pageOwners; ComposedSchemaSet = $ComposedSchemaSet }
+    $allBefore = Get-DocsLedgerCommandRuleFinding @common -Document $before -LedgerSha256 $ledgerBefore -Kind $allKinds
+    $beforeFindings = Get-DocsLedgerCommandRuleFinding @common -Document $before -LedgerSha256 $ledgerBefore -Kind $changedKinds
+    $afterFindings = Get-DocsLedgerCommandRuleFinding @common -Document $after -LedgerSha256 $ledgerAfter -Kind $changedKinds -IncludeSchema
+    $beforeKeys = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    foreach ($finding in $beforeFindings) { [void]$beforeKeys.Add((Get-DocsLedgerCommandFindingKey -Finding $finding)) }
+    $introduced = [object[]]@($afterFindings | Where-Object { -not $beforeKeys.Contains((Get-DocsLedgerCommandFindingKey -Finding $_)) })
+    return @{ After = $after; Text = $text; Changed = $changed; Introduced = $introduced; NewErrors = [object[]]@($introduced | Where-Object { [string] $_['severity'] -ceq 'error' }); Preexisting = @($allBefore | Where-Object { [string] $_['severity'] -ceq 'error' }).Count }
+}
+
 function Invoke-DocsUpdateLedgerCommand {
     <#
     .SYNOPSIS
-        Applies one update-ledger operation to the ledger, matrix and pin collection; dry run by default, committed with -Write through Invoke-DocsArtifactWrite.
+        Applies one update-ledger operation, or an operations batch, to the ledger, matrix and pin collection; dry run by default, committed with -Write through Invoke-DocsArtifactWrite.
     .DESCRIPTION
         Exit 2 for a usage error before any read. Exit 1 with a null result when the profile does
         not load, the snapshot is absent or invalid, a named target does not exist
@@ -626,7 +675,13 @@ function Invoke-DocsUpdateLedgerCommand {
         operation introduced. Exit 3 (DOCS_CLI_RUNTIME) for a read failure, a non-UTC clock, or
         a commit conflict or write failure (the message names the path and status; related_paths
         holds that path and every path already written). A created document carries the 1020
-        header with a repository-derived id.
+        header with a repository-derived id. Issue #1173: bind-page-refs reads the Markdown pages
+        through Context.ReadText, binds each surface_refs element as documented with the union of
+        its pages, and warns DOCS_LEDGER_BIND_REF_UNKNOWN per unknown id. -Operations <path|-> reads
+        an operations document through Context.ReadText or Context.ReadStdin (exit 2 when it is
+        invalid, or with -Operation or a per-operation option) and applies it through
+        Invoke-DocsLedgerBatch: one document load, one rule comparison, one Invoke-DocsArtifactWrite
+        call; an item error exits 1 with the item index and writes nothing.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -636,7 +691,8 @@ function Invoke-DocsUpdateLedgerCommand {
     )
 
     $command = 'update-ledger'
-    $usage = Test-DocsUpdateLedgerArgument -Argument $Argument
+    $batch = Test-DocsLedgerCommandOption -Argument $Argument -Name 'Operations'
+    $usage = if ($batch) { Test-DocsLedgerBatchArgument -Argument $Argument } else { Test-DocsUpdateLedgerArgument -Argument $Argument }
     if ($null -ne $usage) { return New-DocsCommandResult -Command $command -ExitCode 2 -Finding @($usage) }
     try {
         $issuedAt = Get-DocsLedgerCommandTimestamp -UtcNow $Context.UtcNow
@@ -644,49 +700,44 @@ function Invoke-DocsUpdateLedgerCommand {
         $profilePath = [string] (Get-DocsLedgerCommandArgumentValue -Argument $Argument -Name 'Profile' -Default (Get-DocsDefaultProfilePath))
         $profileRead = Read-DocsLedgerCommandProfile -Command $command -ProfilePath $profilePath -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -ComposedSchemaSet $schemas
         if ($null -ne $profileRead.Result) { return $profileRead.Result }
-        $documents = Read-DocsLedgerCommandDocumentSet -Command $command -Profile $profileRead.Profile -ComposedSchemaSet $schemas -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -ListFile $Context.ListFile
-        if ($null -ne $documents.Result) { return $documents.Result }
-        $applied = Invoke-DocsLedgerOperation -Argument $Argument -Documents $documents -IssuedAt $issuedAt
-        if ($null -ne $applied.Finding) { return New-DocsCommandResult -Command $command -ExitCode 1 -Finding @($applied.Finding) }
-
-        $before = [ordered]@{ 'docs-coverage-ledger' = $documents.Ledger; 'docs-parity-matrix' = $documents.Matrix; 'docs-evidence-pin' = $documents.PinSet }
-        $after = [ordered]@{ 'docs-coverage-ledger' = $applied.Ledger; 'docs-parity-matrix' = $applied.Matrix; 'docs-evidence-pin' = $applied.PinSet }
-        $text = @{}
-        $changed = @{}
-        foreach ($kind in @($after.Keys)) {
-            $text[$kind] = ConvertTo-DocsJsonText -Value $after[$kind] -Indented
-            $changed[$kind] = (ConvertTo-DocsCanonicalJson -Value $after[$kind]) -cne (ConvertTo-DocsCanonicalJson -Value $before[$kind])
+        $items = @()
+        if ($batch) {
+            $operationsText = Read-DocsLedgerOperationText -Source ([string] $Argument['Operations']) -ReadText $Context.ReadText -ReadStdin $Context.ReadStdin
+            $parsed = ConvertFrom-DocsLedgerOperationText -Text $operationsText -ActorKind ([string] $Argument['ActorKind']) -ActorId ([string] $Argument['ActorId']) -ProfilePath ([string] $Argument['Profile']) -ValidateArgument ${function:Test-DocsUpdateLedgerArgument}
+            if ($null -ne $parsed.Finding) { return New-DocsCommandResult -Command $command -ExitCode 2 -Finding @($parsed.Finding) }
+            $items = @($parsed.Item)
         }
-        # The newly-introduced rule compares the rules of the changed documents before and after the operation;
-        # preexisting_errors counts the error findings of every rule set before it.
-        $pageOwners = [object[]]@(Get-DocsLedgerCommandMember -Table $profileRead.Profile -Name 'page_owners')
-        $allKinds = [string[]]@($after.Keys)
-        $changedKinds = [string[]]@($allKinds | Where-Object { $changed[$_] })
-        $ledgerBefore = if ($documents.Present['docs-coverage-ledger']) { [string] $documents.Sha256['docs-coverage-ledger'] } else { Get-DocsSha256Hex -Text (ConvertTo-DocsJsonText -Value $documents.Ledger -Indented) }
-        $ledgerAfter = if ($changed['docs-coverage-ledger']) { Get-DocsSha256Hex -Text $text['docs-coverage-ledger'] } else { $ledgerBefore }
-        $allBefore = Get-DocsLedgerCommandRuleFinding -View $documents.View -Document $before -Path $documents.Path -LedgerSha256 $ledgerBefore -PagePath $documents.PagePath -PageOwner $pageOwners -ComposedSchemaSet $schemas -Kind $allKinds
-        $preexisting = @($allBefore | Where-Object { [string] $_['severity'] -ceq 'error' }).Count
-        $beforeFindings = Get-DocsLedgerCommandRuleFinding -View $documents.View -Document $before -Path $documents.Path -LedgerSha256 $ledgerBefore -PagePath $documents.PagePath -PageOwner $pageOwners -ComposedSchemaSet $schemas -Kind $changedKinds
-        $afterFindings = Get-DocsLedgerCommandRuleFinding -View $documents.View -Document $after -Path $documents.Path -LedgerSha256 $ledgerAfter -PagePath $documents.PagePath -PageOwner $pageOwners -ComposedSchemaSet $schemas -Kind $changedKinds -IncludeSchema
-        $beforeKeys = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
-        foreach ($finding in $beforeFindings) { [void]$beforeKeys.Add((Get-DocsLedgerCommandFindingKey -Finding $finding)) }
-        $introduced = [object[]]@($afterFindings | Where-Object { -not $beforeKeys.Contains((Get-DocsLedgerCommandFindingKey -Finding $_)) })
-        $newErrors = [object[]]@($introduced | Where-Object { [string] $_['severity'] -ceq 'error' })
-        if ($newErrors.Count -gt 0) { return New-DocsCommandResult -Command $command -ExitCode 1 -Finding $newErrors }
-
-        $plannedDocuments = @(foreach ($kind in @($after.Keys)) {
-                if (-not $changed[$kind] -and -not $documents.Present[$kind]) { continue }
-                @{ Path = $documents.Path[$kind]; ArtifactKind = $kind; ArtifactId = [string] $after[$kind]['id']; Text = $text[$kind]; BeforeSha256 = $documents.Sha256[$kind] }
+        $binds = ($batch -and @($items | Where-Object { [string] $_.Argument['Operation'] -ceq 'bind-page-refs' }).Count -gt 0) -or [string] $Argument['Operation'] -ceq 'bind-page-refs'
+        $load = { Read-DocsLedgerCommandDocumentSet -Command $command -Profile $profileRead.Profile -ComposedSchemaSet $schemas -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -ListFile $Context.ListFile -ReadText $Context.ReadText -PageReference:$binds }
+        if ($batch) {
+            $compare = { param($Documents, $After) Get-DocsLedgerCommandOutcome -Documents $Documents -Applied $After -DocsProfile $profileRead.Profile -ComposedSchemaSet $schemas }
+            $run = Invoke-DocsLedgerBatch -Item $items -LoadDocument $load -ApplyOperation ${function:Invoke-DocsLedgerOperation} -CompareRule $compare -IssuedAt $issuedAt
+            $documents = $run.Documents
+            if ($null -ne $documents.Result) { return $documents.Result }
+            if (@($run.Finding).Count -gt 0) { return New-DocsCommandResult -Command $command -ExitCode 1 -Finding @($run.Finding) }
+            $outcome = $run.Outcome
+        } else {
+            $documents = Read-DocsLedgerCommandDocumentSet -Command $command -Profile $profileRead.Profile -ComposedSchemaSet $schemas -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -ListFile $Context.ListFile -ReadText $Context.ReadText -PageReference:$binds
+            if ($null -ne $documents.Result) { return $documents.Result }
+            $applied = Invoke-DocsLedgerOperation -Argument $Argument -Documents $documents -IssuedAt $issuedAt
+            if ($null -ne $applied.Finding) { return New-DocsCommandResult -Command $command -ExitCode 1 -Finding @($applied.Finding) }
+            $outcome = Get-DocsLedgerCommandOutcome -Documents $documents -Applied $applied -DocsProfile $profileRead.Profile -ComposedSchemaSet $schemas
+            if (@($outcome.NewErrors).Count -gt 0) { return New-DocsCommandResult -Command $command -ExitCode 1 -Finding @($outcome.NewErrors) }
+        }
+        $warnings = if ($binds) { @(Get-DocsLedgerPageReferenceWarning -Reference $documents.PageReference -View $documents.View) } else { @() }
+        $plannedDocuments = @(foreach ($kind in @($outcome.After.Keys)) {
+                if (-not $outcome.Changed[$kind] -and -not $documents.Present[$kind]) { continue }
+                @{ Path = $documents.Path[$kind]; ArtifactKind = $kind; ArtifactId = [string] $outcome.After[$kind]['id']; Text = $outcome.Text[$kind]; BeforeSha256 = $documents.Sha256[$kind] }
             })
         $plans = Get-DocsArtifactWritePlan -Document $plannedDocuments
         $write = [bool] (Get-DocsLedgerCommandArgumentValue -Argument $Argument -Name 'Write' -Default $false)
-        $outcome = Invoke-DocsArtifactWrite -Plan $plans -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -WriteText $Context.WriteText -DryRun:(-not $write)
-        if ($null -ne $outcome.Failed) {
-            return New-DocsLedgerCommandRuntimeResult -Command $command -Message "The write of $($outcome.Failed['Path']) ended with status $($outcome.Failed['Status']): $($outcome.Failed['Message'])" -ArtifactPath ([string] $outcome.Failed['Path']) -RelatedPath (@([string] $outcome.Failed['Path']) + @($outcome.WrittenPath))
+        $commit = Invoke-DocsArtifactWrite -Plan $plans -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -WriteText $Context.WriteText -DryRun:(-not $write)
+        if ($null -ne $commit.Failed) {
+            return New-DocsLedgerCommandRuntimeResult -Command $command -Message "The write of $($commit.Failed['Path']) ended with status $($commit.Failed['Status']): $($commit.Failed['Message'])" -ArtifactPath ([string] $commit.Failed['Path']) -RelatedPath (@([string] $commit.Failed['Path']) + @($commit.WrittenPath))
         }
-        $writes = [object[]]@($outcome.Write | ForEach-Object { [ordered]@{ path = $_['Path']; artifact_kind = $_['ArtifactKind']; artifact_id = $_['ArtifactId']; sha256 = $_['Sha256']; status = $_['Status'] } })
-        $result = [ordered]@{ dry_run = (-not $write); preexisting_errors = [long] $preexisting; writes = $writes }
-        return New-DocsCommandResult -Command $command -ExitCode 0 -Finding $introduced -Result $result -Line ([string[]]@($writes | ForEach-Object { "$($_['status']) $($_['path'])" }))
+        $writes = [object[]]@($commit.Write | ForEach-Object { [ordered]@{ path = $_['Path']; artifact_kind = $_['ArtifactKind']; artifact_id = $_['ArtifactId']; sha256 = $_['Sha256']; status = $_['Status'] } })
+        $result = [ordered]@{ dry_run = (-not $write); preexisting_errors = [long] $outcome.Preexisting; writes = $writes }
+        return New-DocsCommandResult -Command $command -ExitCode 0 -Finding (@($outcome.Introduced) + $warnings) -Result $result -Line ([string[]]@($writes | ForEach-Object { "$($_['status']) $($_['path'])" }))
     } catch {
         return New-DocsLedgerCommandRuntimeResult -Command $command -Message "The command failed: $($_.Exception.Message)"
     }

@@ -29,6 +29,7 @@ const MINIMAL: Readonly<Record<string, Record<string, unknown>>> = {
     state: "pass",
   },
   "sync-refs": {},
+  "bind-page-refs": {},
 };
 
 /** A valid value for every per-operation field. */
@@ -199,5 +200,83 @@ describe("update_docs_ledger per-operation table", () => {
     expect(limitDocumented.options).toEqual(
       expect.arrayContaining(["-Limit", "-Disposition"]),
     );
+  });
+});
+
+describe("update_docs_ledger operations field (issue #1173 B2.5)", () => {
+  const OPERATIONS = [
+    { operation: "remove-entry", element: ELEMENT },
+    { operation: "bind-page-refs" },
+  ];
+
+  it("resolves operations to -Operations - with the serialized document as stdin", () => {
+    // Act
+    const resolved = resolveDocsToolInput("update_docs_ledger", {
+      workspace_root: ROOT,
+      operations: OPERATIONS,
+      ...ACTOR,
+      write: true,
+    });
+
+    // Assert
+    expect(resolved.options).toEqual([
+      "-Operations",
+      "-",
+      "-ActorKind",
+      "human",
+      "-ActorId",
+      "maintainer",
+      "-Write",
+    ]);
+    expect(JSON.parse(resolved.stdin ?? "")).toEqual({
+      operations: OPERATIONS,
+    });
+  });
+
+  it("leaves stdin undefined for a single operation", () => {
+    // Act
+    const resolved = ledger("bind-page-refs", {});
+
+    // Assert
+    expect(resolved.options.slice(0, 2)).toEqual([
+      "-Operation",
+      "bind-page-refs",
+    ]);
+    expect(resolved.stdin).toBeUndefined();
+  });
+
+  it.each([
+    [
+      "both operation and operations",
+      { operation: "sync-refs", operations: OPERATIONS },
+      "exactly one of operation and operations",
+    ],
+    [
+      "neither operation nor operations",
+      {},
+      "exactly one of operation and operations",
+    ],
+    [
+      "a per-operation field beside operations",
+      { operations: OPERATIONS, element: ELEMENT },
+      "operations does not accept element",
+    ],
+    [
+      "an invalid operations item",
+      { operations: [{ operation: "sync-refs" }] },
+      "sync-refs is not a batch item",
+    ],
+  ])("rejects %s", (_case, fields, fragment) => {
+    // Act
+    const act = (): unknown =>
+      resolveDocsToolInput("update_docs_ledger", {
+        workspace_root: ROOT,
+        ...ACTOR,
+        ...fields,
+      });
+
+    // Assert
+    expect(act).toThrow(DocsInputError);
+    expect(act).toThrow(fragment);
   });
 });

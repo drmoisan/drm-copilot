@@ -32,10 +32,25 @@ Root steps run `Invoke-DocsCommand.ps1` from the docs helper library that the Cl
      `dimension` (`exists`, `accurate`, `example_present`, `owner_assigned` or
      `diataxis_mode`), `state` (`pass`, `fail`, `not-assessed` or
      `not-applicable`), and optionally `rationale`;
-   - `sync-refs`: no element, limit or page field.
+   - `sync-refs`: no element, limit or page field; it refreshes the snapshot and
+     ledger pins only;
+   - `bind-page-refs`: no element, limit or page field; it binds every snapshot
+     element named in the front-matter `surface_refs` of a page as `documented`
+     with the union of its pages, warns for an unknown id and removes no binding.
+   `pin` must precede `set-dimension` with `dimension: accurate` and
+   `state: pass` for the same element and page; without the pin the change is
+   rejected with `DOCS_MATRIX_ACCURACY_UNPINNED`.
    Always supply `actor_kind: agent` and `actor_id: docs-reconciler`. Call first
    without `write` (a dry run), read the planned change, then call again with
    `write: true` only for the change that is applied.
+   For many changes, call `update_docs_ledger` once with `operations` (an array
+   of items with the fields above) instead of `operation`; the CLI form is
+   `-Operations <path>` or `-Operations -` (standard input). The batch is
+   all-or-nothing: an invalid item, an unknown target or an introduced error
+   rejects the whole batch, names the item index and writes nothing. sync-refs is
+   not a batch item; run it as its own call. A `set-dimension` item with
+   `dimension: accurate` and `state: pass` may carry `claim`, which pins the page
+   first.
 3. Call `validate_docs_artifacts` with `workspace_root`, `profile`, `mode`
    (`ledger` or `matrix`) and `revision` to confirm the artifacts stay valid. The
    tool never persists a receipt.

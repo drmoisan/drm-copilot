@@ -235,6 +235,36 @@ describe("handleDocsTool", () => {
     expect(returned).toEqual(diagnostics);
   });
 
+  it("passes the resolved operations stdin to runDocsCommand unchanged (issue #1173 B2.5)", async () => {
+    // Arrange
+    const service = serviceReturning(envelope("update-ledger", 0));
+    const operations = [{ operation: "bind-page-refs" }];
+
+    // Act
+    await handleDocsTool(
+      "update_docs_ledger",
+      {
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
+        operations,
+        actor_kind: "agent",
+        actor_id: "docs-reconciler",
+      },
+      service,
+    );
+    const request = service.runDocsCommand?.mock.calls[0]?.[0];
+
+    // Assert
+    expect(request?.options).toEqual([
+      "-Operations",
+      "-",
+      "-ActorKind",
+      "agent",
+      "-ActorId",
+      "docs-reconciler",
+    ]);
+    expect(JSON.parse(request?.stdin ?? "")).toEqual({ operations });
+  });
+
   it("pins the generate_docs_reference result key set of the 1024 contract", async () => {
     // Arrange
     const outcome = envelope("generate-reference", 0, {

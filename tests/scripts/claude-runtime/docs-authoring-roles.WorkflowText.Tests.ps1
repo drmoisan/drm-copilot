@@ -8,9 +8,10 @@
     Each row reads one committed copy, extracts one `## ` section, collapses whitespace runs to one
     space and checks a token with an ordinal Contains. Codex agent text is read through
     Get-DocsCodexEmbeddedText. Rows cover the B1 root inventory step and snapshot sentence, the B1
-    brief sentence, the B12 page-name restriction, and the estate defaults of B6, B7, B8 and B13
-    (the docs-init Steps and Result, the docs-inventory-surface default exclusions). No test
-    writes a file.
+    brief sentence, the B12 page-name restriction, the estate defaults of B6, B7, B8 and B13
+    (the docs-init Steps and Result, the docs-inventory-surface default exclusions), and the B2
+    and B3 rules of the docs-reconcile-behavior skill and the docs-reconciler agent (operations
+    batch, bind-page-refs, pin ordering). No test writes a file.
 #>
 
 BeforeDiscovery {
@@ -38,6 +39,16 @@ BeforeDiscovery {
             @{ Copy = $key; Path = "$($roots[$key])/docs-init/SKILL.md"; Heading = 'Steps'; Tokens = @($workflowPath, '`ci-workflow <path>`', '`docs/guide`', '`pyproject.toml`', '`DOCS_PROFILE_SOURCE_ROOT_MISSING`') }
             @{ Copy = $key; Path = "$($roots[$key])/docs-init/SKILL.md"; Heading = 'Result'; Tokens = @($workflowPath, '`ci-workflow`') }
             @{ Copy = $key; Path = "$($roots[$key])/docs-inventory-surface/SKILL.md"; Heading = 'Steps'; Tokens = @('`__pycache__`', '`node_modules`', '`.pyc` or `.pyo`', 'before the profile `exclusions`') }
+        }
+    )
+    $batchTokens = @('`operations`', '`-Operations', '`bind-page-refs`', 'all-or-nothing', 'sync-refs is not a batch item', 'item index', '`pin` must precede `set-dimension` with `dimension: accurate` and `state: pass` for the same element and page')
+    $script:BatchRows = @(
+        foreach ($key in $roots.Keys) {
+            @{ Copy = $key; Path = "$($roots[$key])/docs-reconcile-behavior/SKILL.md"; Heading = 'Steps'; Codex = $false; Tokens = $batchTokens }
+        }
+        $reconcilers = Get-DocsAuthoringAgentPath -Role 'docs-reconciler'
+        foreach ($key in $reconcilers.Keys) {
+            @{ Copy = $key; Path = $reconcilers[$key]; Heading = 'MCP Tool Inputs'; Codex = ($key -like 'Codex*'); Tokens = $batchTokens }
         }
     )
 }
@@ -98,6 +109,19 @@ Describe 'execution-environment brief docs-snapshot sentence (B1)' {
 
 Describe 'runtime page-name restriction (B12)' {
     It 'states the page-name restriction in the <Heading> section of <Path>' -ForEach $script:PageNameRows {
+        # Arrange
+        $text = Read-DocsAuthoringText -RelativePath $Path
+        if ($Codex) { $text = Get-DocsCodexEmbeddedText -Text $text }
+        $section = Get-DocsWorkflowSectionText -Text $text -Heading $Heading
+
+        # Assert
+        $section | Should -Not -BeNullOrEmpty -Because "$Path has a ## $Heading section"
+        foreach ($token in $Tokens) { $section.Contains($token, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "$Path states '$token'" }
+    }
+}
+
+Describe 'update-ledger batch, bind-page-refs and pin ordering in the reconcile skill and agent (B2, B3)' {
+    It 'states the batch, bind-page-refs and pin-ordering rules in the <Heading> section of <Path>' -ForEach $script:BatchRows {
         # Arrange
         $text = Read-DocsAuthoringText -RelativePath $Path
         if ($Codex) { $text = Get-DocsCodexEmbeddedText -Text $text }

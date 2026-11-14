@@ -136,6 +136,32 @@ describe("repo automation MCP server docs tools", () => {
     }
   });
 
+  it("passes an update_docs_ledger operations batch to runDocsCommand with -Operations - and the document as stdin (issue #1173)", async () => {
+    // Arrange
+    service.runDocsCommand?.mockResolvedValueOnce({
+      envelope: envelope(0),
+      stderr: "",
+    });
+    const operations = [{ operation: "bind-page-refs" }];
+
+    // Act
+    const result = (await client.callTool({
+      name: "update_docs_ledger",
+      arguments: {
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
+        operations,
+        actor_kind: "agent",
+        actor_id: "docs-reconciler",
+      },
+    })) as ToolCallResult;
+    const request = service.runDocsCommand?.mock.calls[0]?.[0];
+
+    // Assert
+    expect(result.isError).toBeFalsy();
+    expect(request?.options.slice(0, 2)).toEqual(["-Operations", "-"]);
+    expect(JSON.parse(request?.stdin ?? "")).toEqual({ operations });
+  });
+
   it("returns isError for invalid input without calling runDocsCommand", async () => {
     // Act
     const result = await callCheck({

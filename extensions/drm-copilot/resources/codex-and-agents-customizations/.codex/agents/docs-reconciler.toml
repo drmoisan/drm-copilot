@@ -54,11 +54,20 @@ The root session supplies:
 - `run_docs_coverage`: `workspace_root`, `profile`.
 - `update_docs_ledger`: `workspace_root`, `profile`, `operation` (one of
   `set-disposition`, `remove-entry`, `pin`, `unpin`, `set-dimension`,
-  `sync-refs`), `element` or `limit`, and the fields the operation needs from
-  `disposition`, `pages`, `rationale`, `owner`, `target`, `dimension`, `state`
-  and `claim`. Always supply `actor_kind: agent` and `actor_id: docs-reconciler`.
-  Call it first without `write` (a dry run), then with `write: true` only for the
-  change that is applied.
+  `sync-refs`, `bind-page-refs`), `element` or `limit`, and the fields the
+  operation needs from `disposition`, `pages`, `rationale`, `owner`, `target`,
+  `dimension`, `state` and `claim`. Always supply `actor_kind: agent` and
+  `actor_id: docs-reconciler`. Call it first without `write` (a dry run), then
+  with `write: true` only for the change that is applied. `pin` must precede
+  `set-dimension` with `dimension: accurate` and `state: pass` for the same
+  element and page. `bind-page-refs` binds every element named in page
+  `surface_refs` as documented with the union of its pages and removes no binding;
+  `sync-refs` only refreshes the snapshot and ledger pins. For many changes, pass
+  `operations` (an array of items with these fields) instead of `operation`; the
+  CLI form is `-Operations`. The batch is all-or-nothing: an invalid item, an
+  unknown target or an introduced error rejects the whole batch with the item
+  index and writes nothing. sync-refs is not a batch item; run it as its own call.
+  An accurate-pass item may carry a `claim`, which pins the page first.
 - `validate_docs_artifacts`: `workspace_root`, `profile`, `mode` (`ledger` or
   `matrix`) and `revision` (40 or 64 lowercase hexadecimal characters). The tool
   never persists a receipt.

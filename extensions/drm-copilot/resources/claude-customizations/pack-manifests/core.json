@@ -390,6 +390,8 @@
     ".claude/lib/docs/DocsValidation.psm1",
     ".claude/lib/docs/DocsCoverageReport.psm1",
     ".claude/lib/docs/DocsLedgerCommands.psm1",
+    ".claude/lib/docs/DocsLedgerBatch.psm1",
+    ".claude/lib/docs/DocsLedgerBindRefs.psm1",
     ".claude/lib/docs/DocsPageMarkdown.psm1",
     ".claude/lib/docs/DocsPageFrontMatter.psm1",
     ".claude/lib/docs/DocsPageMetadata.psm1",

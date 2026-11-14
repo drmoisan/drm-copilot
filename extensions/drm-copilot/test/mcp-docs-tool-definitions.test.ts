@@ -65,12 +65,8 @@ describe("DOCS_TOOL_DEFINITIONS", () => {
       run_docs_check: ["workspace_root"],
       run_docs_inventory: ["workspace_root"],
       run_docs_coverage: ["workspace_root"],
-      update_docs_ledger: [
-        "workspace_root",
-        "operation",
-        "actor_kind",
-        "actor_id",
-      ],
+      // Issue #1173: operation and operations are mutually exclusive, so neither is schema-required.
+      update_docs_ledger: ["workspace_root", "actor_kind", "actor_id"],
       generate_docs_reference: ["workspace_root"],
       validate_docs_artifacts: ["workspace_root", "mode", "revision"],
     });
@@ -185,5 +181,23 @@ describe("DOCS_TOOL_DEFINITIONS", () => {
         next: "validate_discovery_artifacts",
       });
     }
+  });
+});
+
+describe("update_docs_ledger operations schema (issue #1173 B2.5)", () => {
+  it("advertises operations as an array of objects with a description", () => {
+    // Act
+    const schema = propertiesOf("update_docs_ledger")["operations"] as {
+      readonly type: string;
+      readonly items: { readonly type: string };
+      readonly minItems: number;
+      readonly description: string;
+    };
+
+    // Assert
+    expect(schema.type).toBe("array");
+    expect(schema.items.type).toBe("object");
+    expect(schema.minItems).toBe(1);
+    expect(schema.description).toContain("sync-refs");
   });
 });
