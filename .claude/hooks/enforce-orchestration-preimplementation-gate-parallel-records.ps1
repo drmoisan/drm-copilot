@@ -16,7 +16,9 @@
                  normalized to '/', is exactly artifacts/pr_body_<digits>.receipt.json
                  (case-sensitive), or an absolute path whose remainder beneath its enclosing
                  registered worktree root (Get-HookTargetWorktreeEnclosingRoot,
-                 Get-HookTargetWorktreeRelativePath) is exactly that.
+                 Get-HookTargetWorktreeRelativePath) is exactly that. An absolute path whose
+                 normalized text does not end with /artifacts/pr_body_<digits>.receipt.json
+                 (case-sensitive) declines before any worktree listing call is made.
       Q2 Root  - R is the session root for a relative path and the enclosing registered root for
                  an absolute path.
       Q3       - no per-feature checkpoint beneath R: Get-WorktreeRunCheckpointText at
@@ -44,6 +46,7 @@
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateModelReceipts.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateModelReceipts.psm1' -ErrorRecord $_ }
 
 $script:OrchestrationParallelRecordsReceiptPattern = '^artifacts/pr_body_[0-9]+\.receipt\.json$'
+$script:OrchestrationParallelRecordsReceiptSuffixPattern = '/artifacts/pr_body_[0-9]+\.receipt\.json$'
 
 function Get-OrchestrationParallelRecordsRoot {
     <#
@@ -65,6 +68,9 @@ function Get-OrchestrationParallelRecordsRoot {
         return $SessionRoot
     }
     if ($normalized -notmatch '^([A-Za-z]:/|/(?!/))' -or $FilePath -match $script:OrchestrationTargetNonLocalPattern) {
+        return $null
+    }
+    if ($normalized -cnotmatch $script:OrchestrationParallelRecordsReceiptSuffixPattern) {
         return $null
     }
     $roots = [string[]]@(@(Get-OrchestrationCleanupListingRecord -SessionRoot $SessionRoot) | ForEach-Object { [string]$_.Root })
