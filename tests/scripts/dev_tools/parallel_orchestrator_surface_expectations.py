@@ -238,6 +238,17 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # epic skill, so the skill digest below is the merged result of #1129, #1130,
 # #1136, #1138, #1141, #1146, #1097, and #1157.
 #
+# RE-BASELINED by issue #1156 on 2026-11-14. That change added to the epic agent
+# `tools:` list the Bash grant for
+# `.claude/lib/regeneration/Invoke-RegenerationPath.ps1`, and to the epic skill
+# the new `## Integration-Tip Regeneration` section, the main-sync regenerate
+# path in item 3 of `## Epic Integration Branch Lifecycle`, and the child-side
+# check sentences in `## Merge-Conflict Handling (Fan-In)` and item 7 of
+# `## Early Dependent Starts (early_start)`. Both digests moved, and the pin stays
+# live for both entries. The digests were recomputed after the merge of origin/main
+# that brought in #1157, #1161, #1163, #1164, and #1167, so both digests below are
+# the merged result of the entries above and #1156.
+#
 # RE-BASELINED by issue #1162. That change added the
 # `## Cross-Epic Dependencies (cross_epic_depends_on)` section to the epic skill
 # with reference sentences in its manifest, lifecycle, checkpoint, and completion
@@ -246,15 +257,17 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # the bytes after the merge of origin/main that brought in #1157, #1160, #1161,
 # #1163, #1164, and #1167, so each digest below is the merged result of the
 # changes listed above plus #1162. Remediation cycle 1 of #1162 then added the
-# status-mapping (D7) paragraph to both surfaces, and both digests moved again.
+# status-mapping (D7) paragraph to both surfaces, and both digests moved again;
+# they were recomputed after the merge of origin/main that brought in #1156, so
+# each digest below is the merged result of #1156 and #1162.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "8ba9e581ffacc89e049eb0f5c20731e7be1ffbf7473d7787c674636dd3ac2683",
+        "5561f79d2942aef31b168027564256f80bdfe501b7c19fc80c962abcece4af03",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "7eb85f0bf7abf3942872708a34c438a1e05ca2d337eedb8a123dcf9a0525afbe",
+        "e334237b27c2188d2aafd0dc6d4f97c6493ba3f59a0b72772d86f74830e77e80",
     ),
 )
 

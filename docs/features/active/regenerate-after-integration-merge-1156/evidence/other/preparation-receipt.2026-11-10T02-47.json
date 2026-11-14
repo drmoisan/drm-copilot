@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "stage": "plan",
+  "research_path": "docs/features/active/regenerate-after-integration-merge-1156/research/research.2026-11-09T21-35.md",
+  "spec_path": "docs/features/active/regenerate-after-integration-merge-1156/spec.md",
+  "plan_path": "docs/features/active/regenerate-after-integration-merge-1156/plan.2026-11-09T16-31.md",
+  "plan_hash": "46dddd7d448ca703ba018f76217b5356d724d5f8",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "ALL CLEAR",
+  "preflight_defects": [],
+  "resolved_this_run": [
+    "[P2-T1] AST check (f): guarded Import-Module for the three regeneration modules, $PSScriptRoot join, -ErrorAction Stop, before Invoke-RegenerationPathCommand",
+    "[P2-T1] Read-RegenerationConfigText -TestPath/-ReadText seams with direct in-memory cases",
+    "[P1-T3] builder field-mapping cases (New-RegenerationEvent, New-RegenerationDeltaReviewOutcome, New-IntegrationRegenerationEntry)",
+    "[P2-T1] ConvertTo-RegenerationResultJson R73-shaped round-trip (depth and one-element arrays)"
+  ],
+  "preflight_fix_record": "docs/features/active/regenerate-after-integration-merge-1156/evidence/other/preflight-fixes.2026-11-10T02-47.md",
+  "planning_cycle": "two planner revisions and two preflights in this run; first preflight closed the two targeted defects and returned 2 new substantive defects; second revision closed them; final preflight returned ALL CLEAR with 4 in-place trivial fixes",
+  "recorded_at": "2026-11-10T02:47:58Z"
+}

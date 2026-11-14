@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "stage": "plan",
+  "research_path": "docs/features/active/regenerate-after-integration-merge-1156/research/research.2026-11-09T21-35.md",
+  "spec_path": "docs/features/active/regenerate-after-integration-merge-1156/spec.md",
+  "plan_path": "docs/features/active/regenerate-after-integration-merge-1156/plan.2026-11-09T16-31.md",
+  "plan_hash": "72de524fc287a703d3c36cef1359470a7f92813c",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "REVISIONS REQUIRED",
+  "preflight_defects": [
+    "[P2-T1] design-check gap (spec D16, AC3.7): Validate mode with a valid config must state and assert decision null, event null, evidence_text null, unit_gate not_run, reason null, and the ordinal-sorted twenty-key set; the -ForEach config-stage matrix rows must also assert the three SHA fields null, and the Tip and Validate rows evidence_text null and unit_gate not_run",
+    "[P2-T2] design-check gap (spec D16, AC3.1): every exit-3 and exit-1 It must assert result-level outcome fell_back; the success It must also assert decision regenerate and reason all_match",
+    "[P2-T3] design-check gap (spec D16): reason is null on every Tip result; the exit-1 git-failure result carries outcome not_applied; the failing git hash-object It asserts outcome not_applied and every Tip It asserts reason null"
+  ],
+  "preflight_fix_record": null,
+  "recorded_at": "2026-11-10T00:04:00Z"
+}
