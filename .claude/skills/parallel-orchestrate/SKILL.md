@@ -675,10 +675,21 @@ repeat: a substep whose outcome already holds is skipped. The five substeps run 
    `git diff --name-only origin/main...HEAD` lists only `docs/` paths; when it lists any other
    path, stop and report without forcing, rebasing, or splitting the branch. The coordinator holds
    no `artifacts/orchestration/orchestrator-state.json`, so the existing documentation-only
-   exemptions apply to these commands. Push the branch, delegate the pull request to
-   `Agent(pr-author)` with a `branch:` label in place of an issue number, merge it with
-   `gh pr merge <PR> --merge` naming the pull request number, and confirm the merge with the step 3
-   procedure of `## Per-Item Merge to Main (Merge-on-Green)`.
+   exemptions apply to these commands. Push the branch. Before the delegation, refresh the PR
+   context with `mcp__drm-copilot__collect_pr_context` at the coordinator root with base `main`,
+   then record the pr-author model selection in `artifacts/orchestration/parallel-orchestrator-state.json`:
+   one `complexity_assessments[]` entry for the records phase and one `model_routing_receipts[]`
+   entry of shape `{ agent, phase, complexity_band, fable_policy, table_model, clamped_from, model }`
+   with `agent` `pr-author` and `model` resolved by `Resolve-DelegationModel -Agent pr-author` for
+   the assessed band and the run's `fable_policy`. Delegate the pull request to `Agent(pr-author)`
+   non-isolated, with exactly one `branch: parallel/<slug>-plan` line, no canonical issue-number
+   line, and `model` equal to the receipt's `model`; the model-routing gate and the
+   preimplementation gate read that receipt from the parallel checkpoint (issue #1182). pr-author
+   opens the pull request with `gh pr create --head parallel/<slug>-plan --base main`. Never record
+   the records pull request number in `items[]`, because the merge gate would then resolve the
+   parallel target and skip its docs-only branch. Merge it with `gh pr merge <PR> --merge` naming
+   the pull request number, and confirm the merge with the step 3 procedure of
+   `## Per-Item Merge to Main (Merge-on-Green)`.
 4. **Scratch worktrees.** After the merge of the run-document pull request is confirmed, run the
    `cleanup-merged-worktrees` report with
    `bash .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`. Run the same script
@@ -690,9 +701,11 @@ repeat: a substep whose outcome already holds is skipped. The five substeps run 
 5. **Report.** Report every deferral. The named deferral cases are LV1, an item worktree whose
    removal was refused after unlock because the item's harness process still holds it; LV2, a
    run-document pull request still open because the merge queue has not merged it or `origin/main`
-   was absent when the merge gate evaluated it; and LV3, a run-document pull request that needs
-   manual authoring because the `Agent(pr-author)` delegation without an issue number failed its
-   model-routing receipt check. Each scratch worktree left in place is also a deferral.
+   was absent when the merge gate evaluated it; and LV3, a residual deferral for a run-document pull
+   request whose `Agent(pr-author)` delegation, or whose receipt Write, is still denied after the
+   receipt is recorded: report the `PARALLEL_RECORDS_*` sub-code that the deny text names (for
+   example `PARALLEL_RECORDS_RUN_NOT_CLOSED` or `PARALLEL_RECORDS_RECEIPT_INVALID`) and author the
+   pull request manually. Each scratch worktree left in place is also a deferral.
 
 ## Documentation Maintenance Boundaries
 
@@ -754,16 +767,21 @@ as prose invariants in `.claude/rules/parallel-orchestration.md`, and enforced b
 add no field to it that `.claude/rules/parallel-orchestration.md` does not declare,
 and extend no enum in it. The declared optional item fields are `mergeable_conflicts_resolved`,
 `preparation_status`, `plan_hash`, `base_commit`, and `band_source`, and the declared optional
-top-level field is `precedence[]` (`## Prepared-Item Admission (issue #1047)` of the rule).
+top-level fields are `precedence[]` (`## Prepared-Item Admission (issue #1047)` of the rule) and
+`model_routing_receipts[]` and `complexity_assessments[]` (`## Scope and Backward Compatibility` of
+the rule, issue #1182).
 
 Fields `parallel-orchestrator` writes to `artifacts/orchestration/parallel-orchestrator-state.json`:
 `objective`, `route_id: "parallel"`, `parallel_slug`, `parallel_manifest_path`,
 `parallel_status_doc_path`, `mode`, `max_concurrency`, `completed_steps`, `next_step`,
 `last_updated`, `current_cohort`, `recolor_generation`, `cohorts[]`, `items[]` — each item entry
 carrying `issue_num`, `feature_folder`, `state`, `blast_radius`, `worktree_path`, `branch_name`,
-`pr_number`, `pr_url`, `merge_status`, `merge_commit_sha`, and the lifecycle timestamps — and the
+`pr_number`, `pr_url`, `merge_status`, `merge_commit_sha`, and the lifecycle timestamps — the
 three receipt arrays `delegation_receipts[]`, `skill_receipts[]`, and `mcp_call_receipts[]`,
-populated with the `parallel` route's required names from `config/orchestration-routing.json`.
+populated with the `parallel` route's required names from `config/orchestration-routing.json`, and,
+at Run Closing, `model_routing_receipts[]` and `complexity_assessments[]` with the pr-author entries
+of the records pull request (the optional tolerated keys declared in
+`.claude/rules/parallel-orchestration.md`, issue #1182).
 
 The `merge_status` enum has exactly eight members: `not_started`, `worktree_created`, `pr_open`,
 `ci_green`, `merged`, `worktree_removed`, `blocked_drift`, and `blocked_ci_loop_limit`. An absent
