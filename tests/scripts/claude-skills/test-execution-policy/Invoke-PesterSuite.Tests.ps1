@@ -21,7 +21,6 @@ Describe 'Invoke-PesterSuite.ps1 (<Copy>)' -ForEach $script:Copies {
     BeforeAll {
         $repoRoot = (Resolve-Path "$PSScriptRoot/../../../..").Path
         $script:ScriptPath = Join-Path $repoRoot $Copy
-        . $script:ScriptPath
         $script:Names = @('Root', 'WorkerCount', 'ExcludeTag', 'ExcludeTestFileSuffix')
 
         $modulePath = Join-Path $repoRoot 'scripts/powershell/PoshQC/PoshQC.psm1'
@@ -31,6 +30,9 @@ Describe 'Invoke-PesterSuite.ps1 (<Copy>)' -ForEach $script:Copies {
             if ($loadedPath -ne $resolvedModulePath) { Remove-Module -ModuleInfo $module -Force }
         }
         Import-Module -Name $resolvedModulePath -Force
+        # Dot-source after the forced import: a PoshQC-hosted shard runs this file in the PoshQC session
+        # state, and the forced re-import would discard functions defined there before it.
+        . $script:ScriptPath
     }
 
     It 'keeps a dash-leading word that is not a declared name as a value' {

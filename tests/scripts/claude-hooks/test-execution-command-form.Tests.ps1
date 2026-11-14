@@ -49,7 +49,7 @@ Describe 'test-execution-command-form (<Folder>)' -ForEach $script:Copies {
     Context 'direct runner forms' {
         It 'reports runner <Runner> for <Command>' -ForEach @(
             @{ Command = 'pytest -q'; Runner = 'pytest' }
-            @{ Command = 'PYTEST -q'; Runner = 'pytest' }
+            @{ Command = 'PYTEST -q'; Runner = 'pytest'; Form = 'upper-case command word' }
             @{ Command = '"pytest" -q'; Runner = 'pytest' }
             @{ Command = "'poetry' run 'pytest'"; Runner = 'pytest' }
             @{ Command = "p'y'test"; Runner = 'pytest' }

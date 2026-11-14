@@ -17,7 +17,6 @@ BeforeAll {
     $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../../..").Path
     $script:LauncherPath = Join-Path $script:RepoRoot '.claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1'
     $script:PesterSuitePath = Join-Path $script:RepoRoot '.claude/skills/test-execution-policy/scripts/Invoke-PesterSuite.ps1'
-    . $script:LauncherPath
     $script:RepoConfigText = Get-Content -LiteralPath (Join-Path $script:RepoRoot 'config/test-execution-policy.json') -Raw
 
     $modulePath = Join-Path $script:RepoRoot 'scripts/powershell/PoshQC/PoshQC.psm1'
@@ -27,6 +26,9 @@ BeforeAll {
         if ($loadedPath -ne $resolvedModulePath) { Remove-Module -ModuleInfo $module -Force }
     }
     Import-Module -Name $resolvedModulePath -Force
+    # Dot-source after the forced import: a PoshQC-hosted shard runs this file in the PoshQC session
+    # state, and the forced re-import would discard functions defined there before it.
+    . $script:LauncherPath
     $script:ParallelParameterName = @((Get-Command -Name Invoke-PoshQCParallelTest).Parameters.Keys)
 
     $script:ForeignHolder = '{"pid":4242,"processStartUtc":"2026-01-01T00:00:00.0000000Z","suite":"pester","commandLine":[],"worktreeRoot":"/other","acquiredAtUtc":"2026-01-01T00:00:00.0000000Z","policyVersion":1}'
