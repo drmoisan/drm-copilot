@@ -48,6 +48,11 @@
     The epic-scope path is not subject to this rule. Only the JSON boolean true waives the line;
     a string or number such as "true" or 1 does not (issue #1001).
 
+    Parallel records leg (issue #1182): a checkpoint-free Agent(pr-author) whose prompt carries one
+    'branch: parallel/<slug>-plan' line is checked against the pr-author entry of
+    model_routing_receipts in the parallel checkpoint beneath the resolved root
+    (Get-ModelRoutingParallelRecordsDecision), after the cleanup leg and before the docs-estate leg.
+
 .NOTES
     Compatible with PowerShell 7+. Read-only presence-gating deterrent.
 #>
@@ -67,6 +72,12 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWor
 try { . (Join-Path $PSScriptRoot 'hook-cleanup-context.ps1') } catch { Add-HookDependencyFailure -Name 'hook-cleanup-context.ps1' -ErrorRecord $_ }
 # Docs-estate delegation leg (issue #1169): the checkpoint-free Agent(pr-author) of a documentation run.
 try { . (Join-Path $PSScriptRoot 'enforce-model-routing-receipt-docs.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-model-routing-receipt-docs.ps1' -ErrorRecord $_ }
+# Parallel records delegation leg (issue #1182): the Run Closing Agent(pr-author) of a closed parallel run.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTargetResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeTargetResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateModelReceipts.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateModelReceipts.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-parallel-records-context.ps1') } catch { Add-HookDependencyFailure -Name 'hook-parallel-records-context.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-model-routing-receipt-parallel.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-model-routing-receipt-parallel.ps1' -ErrorRecord $_ }
 function Get-ModelRoutingCheckpoint {
     <#
     .SYNOPSIS
@@ -373,8 +384,16 @@ function Invoke-ModelRoutingReceiptDecision {
 
     # Issue #1169: a checkpoint-free documentation run delegates pr-author through the docs-estate
     # leg; without a docs profile beneath the resolved root its suffix is empty.
+    $parallelSuffix = ''
     $docsSuffix = ''
     if ($subagent -eq 'pr-author' -and $null -eq $checkpoint) {
+        # Issue #1182: the Run Closing records delegation of a closed parallel run reads its receipt
+        # from the parallel checkpoint; any other prompt declines with an empty suffix.
+        $parallel = Get-ModelRoutingParallelRecordsDecision -PromptText $prompt -WorktreeRoot $resolution.WorktreeRoot
+        if ($parallel.Allowed) {
+            return $allow
+        }
+        $parallelSuffix = [string]$parallel.DenySuffix
         $docs = Get-ModelRoutingDocsEstateDecision -PromptText $prompt -WorktreeRoot $resolution.WorktreeRoot
         if ($docs.Allowed) {
             return $allow
@@ -386,7 +405,7 @@ function Invoke-ModelRoutingReceiptDecision {
         hookSpecificOutput = [ordered]@{
             hookEventName            = 'PreToolUse'
             permissionDecision       = 'deny'
-            permissionDecisionReason = "MODEL_ROUTING_RECEIPT_BLOCKED: cannot delegate to '$subagent' before a model_routing_receipts entry for it is recorded in the orchestrator checkpoint. Perform Model Selection (record the complexity assessment and routing receipt) before delegating." + $docsSuffix
+            permissionDecisionReason = "MODEL_ROUTING_RECEIPT_BLOCKED: cannot delegate to '$subagent' before a model_routing_receipts entry for it is recorded in the orchestrator checkpoint. Perform Model Selection (record the complexity assessment and routing receipt) before delegating." + $parallelSuffix + $docsSuffix
         }
     }
 }
