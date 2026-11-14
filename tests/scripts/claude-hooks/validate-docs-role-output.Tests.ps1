@@ -41,6 +41,10 @@ BeforeDiscovery {
 BeforeAll {
     $script:Hook = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.claude/hooks/validate-docs-role-output.ps1'))
     . $script:Hook
+    # Issue #1163: the hook dot-sources subagentstop-target-worktree.ps1, which brings
+    # WorktreeItemResolution.psm1 into its closure, so its read seams carry baseline mocks.
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
     $script:AddedFunctions = @(
         'Add-HookDependencyFailure', 'Test-HookDependencyFailure', 'Get-HookDependencyFailureReason', 'Get-HookDependencyFailureDecision',
         'Get-SubagentStopEnvelopeAnomalyReason', 'Read-SubagentStopEnvelope', 'Exit-SubagentStopBlock',
@@ -98,6 +102,10 @@ BeforeAll {
 AfterAll {
     foreach ($name in $script:AddedFunctions) { Remove-Item -LiteralPath "function:$name" -ErrorAction SilentlyContinue }
     foreach ($name in 'HookDependencyFailures', 'HookDependencyGuardLoadFailed', 'DocsRoleOutputReportAndHaltLine', 'Hook', 'AddedFunctions', 'ValidOutput') { Remove-Variable -Name $name -Scope Script -ErrorAction SilentlyContinue }
+}
+
+Describe 'epic-state baseline isolation (issue #1163)' {
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 }
 
 Describe 'Invoke-DocsRoleOutputValidation' {

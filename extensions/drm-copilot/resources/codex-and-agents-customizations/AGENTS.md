@@ -50,6 +50,8 @@ Run the full toolchain in this exact order and repeat until all steps pass in a 
 
 **Restart from step 1** if any step fails or auto-fixes any files. Do not stop the loop until all four steps complete without errors in a single pass.
 
+This loop is the phase-gate and final-QA requirement; integration tests run in CI for phase gates and the final QA loop. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+
 ## File Size Limit
 
 - File size follows three tiers for production code, test code, and reusable script files, counted in logical lines (a trailing line terminator does not add a line):

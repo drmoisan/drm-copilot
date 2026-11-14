@@ -33,6 +33,8 @@
 #>
 
 # Shared recorded-path matcher and main-checkout-root seam (issue #995).
+# Branch resolver for a host-moved worktree_path record (issue #1163).
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/AgentTargetWorktree.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'AgentTargetWorktree.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunRecordPath.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunRecordPath.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 
@@ -91,10 +93,13 @@ function Resolve-EpicWorktreeGateRunTarget {
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)][ValidateSet('epic', 'parallel')][string] $Kind,
-        [AllowNull()][AllowEmptyString()][string] $WorktreePath
+        [AllowNull()][AllowEmptyString()][string] $WorktreePath,
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
 
-    return Resolve-WorktreeRunTargetByRecord -Kind $Kind -RecordField worktree_path -Value $WorktreePath -SessionRoot (Get-Location).Path
+    $arguments = @{ Kind = $Kind; RecordField = 'worktree_path'; Value = $WorktreePath; SessionRoot = (Get-Location).Path }
+    if ($null -ne $BranchWorktreeResolver) { $arguments['BranchWorktreeResolver'] = $BranchWorktreeResolver }
+    return Resolve-WorktreeRunTargetByRecord @arguments
 }
 
 function Read-EpicWorktreeGateRunCheckpoint {
@@ -114,10 +119,11 @@ function Read-EpicWorktreeGateRunCheckpoint {
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)][ValidateSet('epic', 'parallel')][string] $Kind,
-        [AllowNull()][AllowEmptyString()][string] $WorktreePath
+        [AllowNull()][AllowEmptyString()][string] $WorktreePath,
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
 
-    $target = Resolve-EpicWorktreeGateRunTarget -Kind $Kind -WorktreePath $WorktreePath
+    $target = Resolve-EpicWorktreeGateRunTarget -Kind $Kind -WorktreePath $WorktreePath -BranchWorktreeResolver $BranchWorktreeResolver
     $checkpoint = $null
     $path = $null
     if ($target.Status -eq 'SessionRoot' -or $target.Status -eq 'OtherWorktree') {
@@ -157,7 +163,9 @@ function Find-EpicWorktreeGateParallelItemRecord {
         [AllowNull()]
         [string] $WorktreePath,
 
-        [AllowNull()][AllowEmptyCollection()][string[]] $BaseRoot = @()
+        [AllowNull()][AllowEmptyCollection()][string[]] $BaseRoot = @(),
+        [AllowNull()][AllowEmptyCollection()][string[]] $LiveWorktreeRoot = @(),
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
 
     if ($null -eq $Checkpoint -or [string]::IsNullOrWhiteSpace($WorktreePath)) {
@@ -177,7 +185,8 @@ function Find-EpicWorktreeGateParallelItemRecord {
         if ($itemProps -notcontains 'worktree_path') {
             continue
         }
-        if (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$item.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot) {
+        $branch = if ($itemProps -contains 'branch_name') { [string]$item.branch_name } else { '' }
+        if (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$item.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot -RecordedBranch $branch -LiveWorktreeRoot $LiveWorktreeRoot -BranchWorktreeResolver $BranchWorktreeResolver) {
             return $item
         }
     }
@@ -212,7 +221,8 @@ function Get-EpicWorktreeGateDenyDiagnostics {
         [Parameter(Mandatory)] $EpicRead,
         [Parameter(Mandatory)] $ParallelRead,
         [AllowNull()][AllowEmptyString()][string] $WorktreePath,
-        [AllowNull()][AllowEmptyString()][string] $MainRoot
+        [AllowNull()][AllowEmptyString()][string] $MainRoot,
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
 
     $parts = foreach ($kind in @('epic', 'parallel')) {
@@ -226,11 +236,12 @@ function Get-EpicWorktreeGateDenyDiagnostics {
         }
         else {
             $baseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $MainRoot -Read $read
+            $liveRoot = [string[]] @($read.Target.PSObject.Properties | Where-Object { $_.Name -eq 'LiveRoot' } | ForEach-Object { $_.Value })
             $record = if ($kind -eq 'epic') {
-                Find-EpicWorktreeFeatureRecord -Checkpoint $read.Checkpoint -WorktreePath $WorktreePath -BaseRoot $baseRoot
+                Find-EpicWorktreeFeatureRecord -Checkpoint $read.Checkpoint -WorktreePath $WorktreePath -BaseRoot $baseRoot -LiveWorktreeRoot $liveRoot -BranchWorktreeResolver $BranchWorktreeResolver
             }
             else {
-                Find-EpicWorktreeGateParallelItemRecord -Checkpoint $read.Checkpoint -WorktreePath $WorktreePath -BaseRoot $baseRoot
+                Find-EpicWorktreeGateParallelItemRecord -Checkpoint $read.Checkpoint -WorktreePath $WorktreePath -BaseRoot $baseRoot -LiveWorktreeRoot $liveRoot -BranchWorktreeResolver $BranchWorktreeResolver
             }
             $arrayName = if ($kind -eq 'epic') { 'features' } else { 'items' }
             $recordText = if ($null -eq $record) {

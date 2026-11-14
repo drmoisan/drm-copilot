@@ -106,7 +106,8 @@ Describe 'Resolve-OrchestratorOutputItemTarget' {
 
     It 'returns Fallback with the failure detail when the resolver throws' {
         # Arrange
-        Mock Resolve-HookTargetWorktree { throw 'synthetic resolver failure' }
+        # Issue #1163: the helper resolves through Resolve-AgentTargetWorktree, so the failing collaborator is mocked there; the asserted fallback is unchanged.
+        Mock Resolve-AgentTargetWorktree { throw 'synthetic resolver failure' }
 
         # Act
         $target = Invoke-ItemTarget -Reader (Get-TranscriptReader -Prompt 'branch: bug/sample-1145')

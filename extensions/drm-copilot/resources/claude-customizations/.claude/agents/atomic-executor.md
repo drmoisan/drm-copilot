@@ -29,6 +29,7 @@ skills:
   - evidence-and-timestamp-conventions
   - acceptance-criteria-tracking
   - execution-environment
+  - owner-directives
 memory: project
 hooks:
   SubagentStop:
@@ -68,7 +69,7 @@ For each task:
 1. **Announce**: State the task ID and what you will do.
 2. **Preconditions**: Verify stated preconditions exist.
 3. **Perform**: Make the minimum edits required to satisfy the task.
-4. **Verify**: Explicitly verify acceptance criteria. If the repo policy requires a toolchain loop, run it.
+4. **Verify**: Explicitly verify acceptance criteria and run the task check; a `[phase-gate]` task runs the full toolchain loop instead. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 5. **Check off**: Mark the task `[x]` in the canonical plan file on disk only when verification passes.
 
 `[expect-fail]` tasks: a failing test is the expected outcome for that task only. Formatting, linting, and type checks remain normal pass/fail gates unless the task text explicitly waives them. See `atomic-plan-contract` for full `[expect-fail]` evidence requirements.
@@ -82,7 +83,7 @@ Use the scoped tool patterns for quality gates:
 - **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
 - **Git**: `git diff`, `git status`, `git log`
 
-Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
 The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
 
@@ -161,3 +162,5 @@ All evidence artifacts this agent produces (baselines, QA gates, regression resu
 Writing to `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, or any other non-canonical path is a policy violation and will be caught by the `enforce-evidence-locations.ps1` PreToolUse hook.
 
 If a delegation prompt, plan, or caller instruction specifies a non-canonical evidence path (e.g., `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, `artifacts/evidence/`), this agent ignores that instruction, writes to the canonical `<FEATURE>/evidence/<kind>/` path, and records the override as `EVIDENCE_LOCATION_OVERRIDE_REJECTED: <supplied path> replaced with <canonical path>`.
+
+Owner directives: when a delegation carries an `Owner directives:` block, or the owner-directive pass-down hook holds a tool call with one, record one `OWNER-DIRECTIVE-DECISION:` line per directive in a decision file under `artifacts/orchestration/owner-directive-decisions/` and repeat it in the final message, as defined in the `owner-directives` skill.

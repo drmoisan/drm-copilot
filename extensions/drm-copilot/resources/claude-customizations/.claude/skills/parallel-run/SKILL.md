@@ -50,6 +50,12 @@ $ARGUMENTS
 
 ## Scope
 
+Two items run sequentially if and only if the expected merge time exceeds the expected time gained by running them in parallel.
+
+Both estimates are integer minutes: merge time is the summed overlap-class weights, and a path that one side only reads costs 0; gain is the shorter of the two band durations. Hard classes are always edges. At `tolerance_percent` 100 the rule is exactly merge time greater than gain, and a tie runs in parallel. `--after` flags and planner-proposed orderings pass the same test and are rejected with `precedence_not_justified` unless marked as a correctness ordering with `--reason`.
+
+The planner applies this rule when it seeds the cohorts this run consumes (`### Integration-cost scheduling (issue #722)` of `.claude/rules/parallel-orchestration.md`).
+
 This skill adds no procedure of its own beyond kickoff-artifact resolution. Cohort consumption and
 ordering, the cohort barrier, `max_concurrency` slot filling, the per-item branch and worktree
 lifecycle, the child kickoff parameter, model selection, per-item merge to `main` on green,

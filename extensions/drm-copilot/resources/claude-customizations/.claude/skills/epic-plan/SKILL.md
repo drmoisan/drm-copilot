@@ -140,9 +140,37 @@ As each child preparation completes:
 2. Back-fill the child's `issue_num` (and resolved `feature_folder`) into the epic manifest.
 3. Update the planning checkpoint's `features[]` entry (`preparation_status`, `plan_path`,
    `preflight_status`).
-4. Remove the child worktree once its branch is merged.
+4. Remove the child worktree once its branch is merged, following `## Preparation Worktree Records`.
 
 After the final fan-in, push the integration branch.
+
+## Preparation Worktree Records
+
+The worktree-removal gates allow a plain removal of a preparation worktree only when
+`artifacts/orchestration/epic-planner-state.json` records it in `planner_worktrees`, keyed by
+branch:
+
+1. When a preparation child completes, read the branch its worktree has checked out (from the
+   completion notification or `git worktree list --porcelain`) and append a `planner_worktrees`
+   entry with `branch`, `purpose: "preparation"`, `preparation_status: "prepared"`, the feature's
+   `feature_folder`, and optionally `path` and `recorded_at`. `path` is repository-relative to the
+   main checkout; never record an absolute path.
+2. After the branch is merged into the integration branch and pushed, set
+   `preparation_status: "fanned_in"`.
+3. Remove the worktree with a plain `git worktree remove <path>` in its own Bash call, without
+   `--force`. When the removal succeeds, set `preparation_status: "removed"`.
+4. When a removal gate denies, record the `PLANNER_WORKTREE_<CODE>` code from the deny text in the
+   checkpoint and leave the worktree in place. Never detach HEAD or use `--force` to free a branch.
+
+The gates allow the removal only when the record is eligible (`prepared` or `fanned_in`), the
+worktree is not in use (not the session root or main checkout, not locked, and not claimed by a
+live orchestrator or epic checkpoint), clean, and its HEAD commit is on
+`refs/remotes/origin/<integration_branch>` or `refs/remotes/origin/<branch>`. `preparing` and
+`abandoned` are recordable and never eligible.
+
+This is a policy-level control, not a security control: any writer in the session can author a
+record, and the git checks bound what a record can authorize. `git worktree remove` deletes
+ignored files in the worktree, including the child's gitignored checkpoint; this is accepted.
 
 ## Kickoff Prompt Artifact
 

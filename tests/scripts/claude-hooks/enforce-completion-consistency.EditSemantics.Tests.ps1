@@ -65,7 +65,7 @@ Describe 'enforce-completion-consistency.ps1 edit semantics (issue #736)' {
                 [string] $CheckpointText
             )
             $reader = { param($Path) $CheckpointText }.GetNewClosure()
-            return Invoke-CompletionConsistencyDecision -ToolInputRaw $Json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null }
+            return Invoke-CompletionConsistencyDecision -ToolInputRaw $Json -CheckpointReader $reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
         }
     }
 

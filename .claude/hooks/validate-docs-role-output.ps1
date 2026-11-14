@@ -25,6 +25,7 @@ param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'docs-role-contract.ps1') } catch { Add-HookDependencyFailure -Name 'docs-role-contract.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-target-worktree.ps1' -ErrorRecord $_ }
 
 $script:DocsRoleOutputReportAndHaltLine = 'This condition is not repairable by the subagent. Report it to the operator and halt.'
 
@@ -41,8 +42,19 @@ function Invoke-DocsRoleOutputValidation {
     <#
     .SYNOPSIS
         Reads the SubagentStop envelope, validates a documentation role's output and applies the re-entry policy.
+    .DESCRIPTION
+        Each docs-profile, docs-snapshot, and docs-pages-written value is probed beneath the item
+        worktree that Resolve-SubagentStopTargetWorktree resolves from the envelope (issue #1163);
+        an unresolved present identity blocks repairably before any probe, and with no identity
+        the repository-relative probe is unchanged.
     .PARAMETER InputText
         The envelope text; omit to read standard input.
+    .PARAMETER SessionRoot
+        The hook's session root; defaults to the current location.
+    .PARAMETER ReadTranscriptHead
+        Optional transcript reader passed to Resolve-SubagentStopTargetWorktree.
+    .PARAMETER WorktreeListInvoker
+        Optional worktree-list seam passed to Resolve-SubagentStopTargetWorktree.
     .OUTPUTS
         @{ Ok; Message } for a validation result, or the dependency-failure decision object
         (ExitCode, Reason) when a dependency failed to load.
@@ -50,7 +62,10 @@ function Invoke-DocsRoleOutputValidation {
     [CmdletBinding()]
     [OutputType([hashtable], [pscustomobject])]
     param(
-        [AllowNull()] [AllowEmptyString()] [string] $InputText
+        [AllowNull()] [AllowEmptyString()] [string] $InputText,
+        [string] $SessionRoot = (Get-Location).Path,
+        [scriptblock] $ReadTranscriptHead,
+        [scriptblock] $WorktreeListInvoker
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'DOCS_ROLE_OUTPUT_BLOCKED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
@@ -65,7 +80,22 @@ function Invoke-DocsRoleOutputValidation {
         $decision = @{ Ok = $false; Repairable = $false; Message = 'payload anomaly - ' + (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly) + '.' }
     }
     else {
-        $decision = Test-DocsRoleOutput -Role $agentType -Text ([string]$envelope.AssistantText) -TestFile { param([string] $Path) Test-DocsRoleOutputFile -Path $Path }
+        $targetArguments = @{ Envelope = $envelope.Envelope; AdvertisedPath = @(); SessionRoot = $SessionRoot }
+        if ($null -ne $ReadTranscriptHead) { $targetArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
+        if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+        $docsTarget = Resolve-SubagentStopTargetWorktree @targetArguments
+        $docsSessionRoot = $SessionRoot
+        if ($null -ne $docsTarget.ReasonCode) {
+            $decision = @{ Ok = $false; Repairable = $true; Message = "target worktree resolution returned $($docsTarget.ReasonCode) ($($docsTarget.Detail)); no output path was probed." }
+        }
+        else {
+            $decision = Test-DocsRoleOutput -Role $agentType -Text ([string]$envelope.AssistantText) -TestFile {
+                param([string] $Path)
+                $location = Resolve-SubagentStopArtifactLocation -Path $Path -WorktreeRoot $docsTarget.WorktreeRoot -SessionRoot $docsSessionRoot -Target $docsTarget
+                if ($location.Rejected) { return $false }
+                Test-DocsRoleOutputFile -Path $location.ProbePath
+            }
+        }
     }
     if ($decision.Ok) { return @{ Ok = $true; Message = $null } }
 
