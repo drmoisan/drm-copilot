@@ -218,6 +218,8 @@ These pass every validator rule and are found only by reading the plan against t
 
 The test-execution launcher governs where a policy file or its mirror names a direct test command: a local suite runs through `.claude/skills/test-execution-policy/scripts/run-test-suite.sh`, or `Invoke-TestSuite.ps1` through `pwsh -NoProfile -File`, even where a rule file or its skill mirror names a direct runner command (#1158). The `test-execution-policy` skill states the configuration, the exit codes, and the hook rules.
 
+Local test gates exclude the integration and golden lanes: CI integration and golden lanes are evidence, and a step that would run a lane locally records a non-blocking deviation under evidence/other/.
+
 - Exit 75 with a stderr line starting `TEST_EXECUTION_QUEUE_TIMEOUT:`: the machine test-suite lock was busy; re-run the gate after the holder finishes and record it as a queue timeout, not a failure.
 - Exit 2 with a first line starting `TEST_EXECUTION_POLICY_BLOCKED:`: the launcher refused the command (invalid configuration, unknown suite, lane selection, or worker-reduction token).
 - `config/test-execution-policy.json` holds the repository's settings; `requireLauncher`, `localLanes.exclude`, and `machineLock.enabled` switch the three behaviors off.

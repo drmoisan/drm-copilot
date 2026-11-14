@@ -126,6 +126,8 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these 
 
 `Output Summary:` is mandatory for each command-step artifact and must concisely summarize the essential result signal (for example: pass/fail status, key counts, coverage headline, or primary diagnostic).
 
+Local test gates exclude the integration and golden lanes: CI integration and golden lanes are evidence, and a step that would run a lane locally records a non-blocking deviation under evidence/other/.
+
 ## Evidence Filename Timestamps in Plans
 
 Plans name evidence artifacts `<name>.<timestamp>.md` and never fix a plan-time stamp in an evidence filename. An acceptance condition identifies a consumed evidence artifact by the derivation in `evidence-and-timestamp-conventions` (`### Evidence Filename Timestamp`): the lexicographically greatest file matching `<name>.*.md`, not a pre-stamped literal path. This section governs artifact paths only: asserted search tokens remain concrete.
