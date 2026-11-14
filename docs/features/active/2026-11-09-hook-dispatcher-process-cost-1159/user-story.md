@@ -60,7 +60,7 @@ Every PreToolUse tool call starts one `pwsh -NoProfile -File` process per matchi
 - [x] A dispatcher self-failure denies the call with a `HOOK_DISPATCH_BLOCKED:` reason (or exits 2 with stderr when its own guard cannot load) instead of failing open.
 - [x] The Python-invocation guard admits only the dispatcher runner's single registry-resolved `&` call, with fixtures proving every other dynamic `&` call is still reported.
 - [x] The pull request reports before and after process count, CPU seconds and wall time, and states any scenario whose wall time increased.
-- [ ] Bundle settings and config, bundle mirrors of every new or edited hook file, both pack manifests, `README.md`, `docs/engineering/claude-code-architecture.md` and every copy of the execution-environment brief are updated consistently, and the push-down contract tests pass.
+- [x] Bundle settings and config, bundle mirrors of every new or edited hook file, both pack manifests, `README.md`, `docs/engineering/claude-code-architecture.md` and every copy of the execution-environment brief are updated consistently, and the push-down contract tests pass.
 
 ## Non-Goals
 

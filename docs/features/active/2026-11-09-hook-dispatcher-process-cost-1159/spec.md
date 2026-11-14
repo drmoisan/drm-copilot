@@ -198,9 +198,9 @@ Issue AC 4 — the PR reports before and after cost:
 Issue AC 5 — registration, documentation and push-down payload consistent:
 
 - [x] The bundle copies `extensions/drm-copilot/resources/claude-customizations/.claude/settings.json` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml` carry the same single dispatcher registration as their repository sources, and every new dispatcher file and registry has a byte-identical bundle mirror, as do the D6-edited hooks.
-- [ ] Both `pack-manifests/core.json` files list every new dispatcher file and registry, and the push-down resource contract, pack-manifest completeness and dependency-closure tests pass, with the registries scanned as hook-command sources.
+- [x] Both `pack-manifests/core.json` files list every new dispatcher file and registry, and the push-down resource contract, pack-manifest completeness and dependency-closure tests pass, with the registries scanned as hook-command sources.
 - [x] `README.md`, `docs/engineering/claude-code-architecture.md`, and every copy of the execution-environment brief that carries `## Hook Execution Context` describe the dispatcher registration and the registry; the brief copies remain byte-identical and the `## Batch Budget` statement refers to the registry group matcher.
-- [ ] Every existing test that pinned the per-hook registration shape is updated to read the registry, and `tests/scripts/claude-runtime/HookDependencyGraph.Helpers.ps1` enumerates registry hooks so the dependency-guard, dependency-failure and imported-module stdout suites still cover every dispatched hook.
+- [x] Every existing test that pinned the per-hook registration shape is updated to read the registry, and `tests/scripts/claude-runtime/HookDependencyGraph.Helpers.ps1` enumerates registry hooks so the dependency-guard, dependency-failure and imported-module stdout suites still cover every dispatched hook.
 - [x] The `pr-author` agent-frontmatter PreToolUse hook and all non-PreToolUse registrations (SessionStart, SubagentStart, SubagentStop, UserPromptSubmit, Codex non-PreToolUse events) are unchanged.
 
 Quality gates:
