@@ -18,6 +18,7 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
         $script:UnderTest = (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/hooks/enforce-epic-merge-gate.ps1')).Path
         $script:HelperDefinedBeforeGate = $null -ne (Get-Command Get-EpicMergeGateRegenerationDecision -ErrorAction SilentlyContinue)
         . $script:UnderTest
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         . (Join-Path $PSScriptRoot 'EpicMergeGateReview.Cases.Helpers.ps1')
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
@@ -95,6 +96,8 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
             return @{ remediation_loop = [ordered]@{ review_outcomes = @($outcome) }; regeneration_events = @($EventList) }
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     It 'loads Get-EpicMergeGateRegenerationDecision only through the entry file' {
         # Assert

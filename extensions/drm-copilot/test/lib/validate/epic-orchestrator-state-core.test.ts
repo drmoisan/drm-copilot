@@ -476,8 +476,9 @@ describe("validateEpicOrchestratorStateText presence-gated intent block", () => 
 
 describe("validateEpicOrchestratorStateText integration_regenerations tolerance", () => {
   it("accepts a valid epic checkpoint carrying integration_regenerations (issue #1156)", () => {
+    // Arrange: a valid epic checkpoint plus one integration-tip regeneration entry.
     const state = buildValidEpicState();
-    state.integration_regenerations = [
+    state["integration_regenerations"] = [
       {
         trigger: "post_feature_merge",
         after_feature_issue_num: 1156,
@@ -492,6 +493,8 @@ describe("validateEpicOrchestratorStateText integration_regenerations tolerance"
         verified_at: "2026-11-09T23:00:00Z",
       },
     ];
+
+    // Act / Assert: the validator tolerates the key and reports no error.
     expect(validateEpicOrchestratorStateText(JSON.stringify(state))).toEqual(
       [],
     );

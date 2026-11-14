@@ -20,6 +20,15 @@ Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
         $script:CodexHelperPath = Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-merge-gate-regeneration.ps1'
         $script:ClaudeHelperPath = Join-Path $script:RepoRoot '.claude/hooks/enforce-epic-merge-gate-regeneration.ps1'
         . $script:CodexHelperPath
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        if (Get-Command Get-ChildOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-ChildOrchestratorCheckpointContent { $null } }
+        if (Get-Command Get-EpicOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-EpicOrchestratorCheckpointContent { $null } }
+        if (Get-Command Get-ParallelOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-ParallelOrchestratorCheckpointContent { $null } }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 
         $script:LiveHead = 'a' * 40
         $script:OtherHead = 'b' * 40
@@ -76,6 +85,8 @@ Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
         $script:DeltaOutcome = [ordered]@{ verdict = 'PASS'; findings = @(); head_sha = $script:LiveHead; review_kind = 'regeneration_delta'; evidence_path = 'docs/features/active/x-1/evidence/qa-gates/regeneration-delta.2026-11-09T22-00.md' }
         $script:FullReviewOutcome = [ordered]@{ verdict = 'PASS'; findings = @(); head_sha = $script:LiveHead }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     Context 'decision rules' {
         It 'allows a delta outcome with a matching complete event' {
@@ -339,6 +350,15 @@ Describe 'Codex enforce-epic-merge-gate.ps1 regeneration wiring (issue #1156)' {
         $script:EntryPath = Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-merge-gate.ps1'
         $script:HelperDefinedBeforeGate = $null -ne (Get-Command Get-EpicMergeGateRegenerationDecision -ErrorAction SilentlyContinue)
         . $script:EntryPath
+        . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+        Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        if (Get-Command Get-ChildOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-ChildOrchestratorCheckpointContent { $null } }
+        if (Get-Command Get-EpicOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-EpicOrchestratorCheckpointContent { $null } }
+        if (Get-Command Get-ParallelOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-ParallelOrchestratorCheckpointContent { $null } }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
+        Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
         Mock Invoke-DocsOnlyGhExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
         Mock Invoke-DocsOnlyGitExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
 
@@ -390,6 +410,8 @@ Describe 'Codex enforce-epic-merge-gate.ps1 regeneration wiring (issue #1156)' {
         $script:FullOutcome = [ordered]@{ verdict = 'PASS'; findings = @(); head_sha = $script:Head }
         $script:CompleteEvent = [ordered]@{ head_sha = $script:Head; outcome = 'regenerated'; idempotent = $true; confined = $true; unit_gate = 'pass'; delta_check = 'pass' }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     It 'loads Get-EpicMergeGateRegenerationDecision only through the entry file' {
         # Assert
