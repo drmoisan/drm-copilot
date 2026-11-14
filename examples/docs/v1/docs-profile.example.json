@@ -1,0 +1,50 @@
+{
+  "$schema": "urn:drm-copilot:docs:1.0.0:docs-profile",
+  "schema_version": "1.0.0",
+  "artifact_kind": "docs-profile",
+  "id": "example-repo.docs-profile",
+  "extensions": {},
+  "repository": {"id": "example-repo"},
+  "audiences": [
+    {"id": "maintainers", "description": "People who change and release the example repository."},
+    {"id": "end-users", "description": "People who run the example command-line tool."}
+  ],
+  "documentation_roots": [
+    {"id": "docs-root", "path": "docs", "audience_ids": ["maintainers", "end-users"]}
+  ],
+  "surface_selection": {
+    "element_kinds": ["cli-command", "cli-option", "http-route", "config-key", "public-symbol", "architecture-component"],
+    "source_roots": ["src", "config"],
+    "exclusions": [
+      {"path_or_glob": "src/example_pkg/vendor/**", "rationale": "Vendored code is documented by its upstream project."}
+    ]
+  },
+  "page_owners": [
+    {"path_or_glob": "docs/reference/**", "owner": "docs-team"},
+    {"path_or_glob": "docs", "owner": "maintainer-team"}
+  ],
+  "diataxis_policy": {
+    "modes": ["tutorial", "how-to", "reference", "explanation"],
+    "required_front_matter": ["owner", "last_reviewed", "audience", "diataxis_mode", "surface_refs"],
+    "directory_modes": [
+      {"path_or_glob": "docs/reference", "mode": "reference"},
+      {"path_or_glob": "docs/guides/**", "mode": "how-to"}
+    ]
+  },
+  "completion_gates": {
+    "docs_complete": {
+      "required_dispositions_complete": true,
+      "allow_deferred": true,
+      "max_stale_pages": 0,
+      "required_parity_dimensions": ["exists", "accurate", "owner_assigned"]
+    },
+    "integration_pr_gate": {"enabled": false}
+  },
+  "artifact_paths": {
+    "inventory_snapshot": "docs/documentation-estate/surface-inventory-snapshot.json",
+    "coverage_ledger": "docs/documentation-estate/docs-coverage-ledger.json",
+    "parity_matrix": "docs/documentation-estate/docs-parity-matrix.json",
+    "evidence_pins": "docs/documentation-estate/docs-evidence-pins.json",
+    "validation_receipt": "docs/documentation-estate/docs-validation-receipt.json"
+  }
+}

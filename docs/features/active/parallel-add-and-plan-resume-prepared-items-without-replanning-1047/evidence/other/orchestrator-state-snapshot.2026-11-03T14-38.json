@@ -1,0 +1,287 @@
+{
+  "objective": "Let /parallel-add and /parallel-plan admit items that already have research, a spec, a plan or a preflight and resume at the first incomplete stage (issue 1047); the owner decided Q1 to Q14, recorded in the promoted record.",
+  "change_budget_estimate": "Large: parallel-add and parallel-plan skills, rules text, a PowerShell helper, mirrors and tests",
+  "path_selected": "large",
+  "route_id": "large",
+  "promotion-type": "feature",
+  "short-name": "parallel-add-and-plan-resume-prepared-items-without-replanning",
+  "relativeFile": "docs/features/potential/promoted/2026-10-31-parallel-add-and-plan-resume-prepared-items-without-replanning.md",
+  "long-name": "parallel-add-and-plan-resume-prepared-items-without-replanning",
+  "issue-num": "1047",
+  "feature-folder": "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047",
+  "work-mode": "full-feature",
+  "plan-path": "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/plan.2026-11-03T06-52.md",
+  "branch": "feature/parallel-add-and-plan-resume-prepared-items-1047",
+  "lifecycle_ready": true,
+  "completed_steps": [
+    "S1_scope",
+    "S3_promotion",
+    "S3a_feature_folder",
+    "S3b_research",
+    "S3c_feature_documents",
+    "S4_atomic_planning",
+    "S5_atomic_execution",
+    "S6_pre_review_commit"
+  ],
+  "next_step": "S7_feature_review",
+  "pre_review_commit": "ac6f6b6db",
+  "pause": {
+    "paused_at": "2026-11-03T14:37:00Z",
+    "reason": "Owner instruction relayed by the coordinator: pause; work to be re-opened in a Codespace. No new delegation, no PR.",
+    "pushed_head": "ce21e8f4a4bc0a71236f30ed1125e5a14deffee1",
+    "resume_at": "S7_feature_review: re-run the full feature review against the merge base of origin/main and HEAD with a new timestamp; then Post-Review Outcome Evaluation, remediation if needed, PR gate (S8, step8_status delegated before pr-author), S9.",
+    "review_artifacts_present": [
+      "policy-audit.2026-11-03T14-31.md (attempt 1, incomplete, fails validator)",
+      "code-review.2026-11-03T14-31.md (attempt 1, incomplete, fails validator; five candidate findings, none confirmed blocking; candidate 2 Major unverified: no admitted plan hash for a prepared-then-added item)",
+      "feature-audit.2026-11-03T14-31.md (attempt 1, passes validator)",
+      "policy-audit.2026-11-03T14-35.md, code-review.2026-11-03T14-35.md, feature-audit.2026-11-03T14-35.md (attempt 2, in progress at pause; unvalidated, may be partial)"
+    ],
+    "no_remediation_inputs": true,
+    "attempt_2_reviewer_still_running_at_pause": true,
+    "note": "Attempt 2 was delegated before the pause and could not be cancelled from this session; any files it writes after ce21e8f4a are uncommitted in the item worktree. Earlier last_updated values in this checkpoint ran ahead of the clock; this pause record uses clock-read UTC."
+  },
+  "artifact_errors": [
+    {
+      "step": "S7_feature_review",
+      "attempt": 1,
+      "detail": "feature-review stopped early, treating the session-root stop-hook message as an owner pause; policy-audit.2026-11-03T14-31.md and code-review.2026-11-03T14-31.md fail the validator (template headings, findings table); no verdict and no remediation-inputs. Review re-requested once.",
+      "recorded_at": "2026-11-03T15:45:00Z"
+    }
+  ],
+  "main_sync": { "merged_main": "3ba4795ab", "merge_commit": "fd66abe40", "overlap": "pack-manifests/core.json auto-merged; both entry sets present" },
+  "mcp_pr_context": { "tool": "collect_pr_context", "ok": true, "head_sha": "fd66abe40e0d900ef1c5653be828d7c5af2de23c" },
+  "spec_path": "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/spec.md",
+  "user_story_path": "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/user-story.md",
+  "research_path": "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/research/research.2026-11-03T12-30.md",
+  "phase_commits": {
+    "S3b_research": "1d6b09ad0",
+    "S3c_feature_documents": "ca31548e4",
+    "S4_plan_written": "4710f9c4c",
+    "S4_preflight_cleared": "fa86f65ef",
+    "S5_execution_last": "d4adafdfb",
+    "S6_pre_review_commit": "ac6f6b6db",
+    "main_merge": "fd66abe40",
+    "pause_partial_review": "ce21e8f4a"
+  },
+  "plan_metrics": { "tasks": 58, "lines": 342, "installed_validator": "ok", "branch_validator": "plan validation passed (exit 0)" },
+  "preflight_rounds": [
+    { "round": 1, "signal": "PREFLIGHT: ALL CLEAR", "convergence": "CONVERGENCE: NO FURTHER ROUNDS EXPECTED", "fixes": 6, "defects": 0, "fix_record": "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/evidence/other/preflight-fixes.2026-11-03T12-47.md", "commit": "fa86f65ef" }
+  ],
+  "open_decision_resolution": {
+    "D1": "No edit to existing Python or the TypeScript port (Q6). The planner checkpoint keeps its ready value prepared; the five preparation_status values are tolerated item fields; prepared maps to cleared.",
+    "D2": "Tolerated precedence[] plus a Layer 1 barrier-hook check and a helper test-cohorts rejection; the Layer 2 Python validator gap is accepted and documented.",
+    "D3": "A plan that never cleared preflight always runs preflight; fully prepared includes a cleared preflight (Q12).",
+    "D4": "Infer cleared for pre-feature branches only from a committed preflight evidence file containing PREFLIGHT: ALL CLEAR committed at or after the plan's last commit; otherwise cap at plan.",
+    "D5": "Precedence comes from operator flags only; Phase 0 prose is not parsed.",
+    "D6": "A withdrawn predecessor releases the constraint; a blocked predecessor holds the dependent.",
+    "D7": "Single item as assigned by the coordinator; no split. Scope kept to the record's acceptance criteria plus the turn-gap rule.",
+    "D8": "Receipt at <feature-folder>/evidence/other/preparation-receipt.<yyyy-MM-ddTHH-mm>.json; the greatest name wins; nothing deleted (Q13).",
+    "Q14": "Not recorded in the promoted record, the issue body, or the worktree; reported to the coordinator as a gap. No conflict between the promoted record and the issue body was found."
+  },
+  "step5_status": "completed",
+  "execution_summary": {
+    "tasks_complete": 58,
+    "last_task": "P8-T14",
+    "head": "d4adafdfb",
+    "pester_full_single_process": "13912 passed, 0 failed",
+    "pester_parallel_shards": "13912 passed, 0 failed (pass 2)",
+    "pytest_contracts": "410 passed serial and -n auto",
+    "coverage_new_files": "100.00, 100.00, 96.15 percent line",
+    "shuffle_seeds": [11, 23, 47],
+    "ac_spec": "18 of 21 checked; AC-14 and AC-21 pending CI; AC-01 contradicts AC-09/AC-16 as written",
+    "ac_user_story": "9 of 11 checked"
+  },
+  "step6_status": "pending",
+  "step7_status": "pending",
+  "step8_status": "pending",
+  "step9_status": "pending",
+  "step10_status": "pending",
+  "blocked_reason": "none",
+  "model_budget": {
+    "fable_policy": "disabled"
+  },
+  "last_updated": "2026-11-03T14:37:00Z",
+  "delegation_receipts": {
+    "agents": [
+      {
+        "agent_name": "task-researcher",
+        "step": "S3b_research",
+        "agent_id": "task-researcher-1047-s3b",
+        "skill_source": ".claude/agents/task-researcher.md",
+        "started_at": "2026-11-03T11:56:00Z",
+        "completed_at": "2026-11-03T12:30:00Z",
+        "result_signal": "research-path returned",
+        "artifact_paths": ["docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/research/research.2026-11-03T12-30.md"]
+      },
+      {
+        "agent_name": "prd-feature",
+        "step": "S3c_feature_documents",
+        "agent_id": "prd-feature-1047-s3c",
+        "skill_source": ".claude/agents/prd-feature.md",
+        "started_at": "2026-11-03T12:46:00Z",
+        "completed_at": "2026-11-03T12:53:00Z",
+        "result_signal": "spec-path and user-story-path returned",
+        "artifact_paths": [
+          "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/spec.md",
+          "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/user-story.md",
+          "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/issue.md"
+        ]
+      },
+      {
+        "agent_name": "atomic-planner",
+        "step": "S4_atomic_planning",
+        "agent_id": "atomic-planner-1047-s4",
+        "skill_source": ".claude/agents/atomic-planner.md",
+        "started_at": "2026-11-03T12:56:00Z",
+        "completed_at": "2026-11-03T13:15:00Z",
+        "result_signal": "PLANNER-INTERNAL-REVIEW: PASS; SELF-REVIEW: RE-DERIVED THIS PASS",
+        "artifact_paths": ["docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/plan.2026-11-03T06-52.md"]
+      },
+      {
+        "agent_name": "atomic-executor",
+        "step": "S4_preflight",
+        "agent_id": "atomic-executor-1047-s4-preflight",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-11-03T13:18:00Z",
+        "completed_at": "2026-11-03T13:30:00Z",
+        "result_signal": "PREFLIGHT: ALL CLEAR",
+        "artifact_paths": ["docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/evidence/other/preflight-fixes.2026-11-03T12-47.md"]
+      },
+      {
+        "agent_name": "atomic-executor",
+        "step": "S5_atomic_execution",
+        "agent_id": "atomic-executor-1047-s5",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-11-03T13:33:00Z",
+        "completed_at": "2026-11-03T15:07:00Z",
+        "result_signal": "58 of 58 tasks complete; last task P8-T14 at d4adafdfb",
+        "artifact_paths": [
+          "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/plan.2026-11-03T06-52.md",
+          "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/evidence/qa-gates/self-review.2026-11-03T14-21.md"
+        ]
+      },
+      {
+        "agent_name": "prd-feature",
+        "step": "S5_spec_correction",
+        "agent_id": "prd-feature-1047-s5-ac01",
+        "skill_source": ".claude/agents/prd-feature.md",
+        "started_at": "2026-11-03T15:11:00Z",
+        "completed_at": "2026-11-03T15:12:00Z",
+        "result_signal": "AC-01 narrowed; decision D9 recorded",
+        "artifact_paths": [
+          "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/spec.md",
+          "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047/user-story.md"
+        ]
+      },
+      {
+        "agent_name": "commit-message",
+        "step": "S6_pre_review_commit",
+        "agent_id": "commit-message-1047-s6",
+        "skill_source": ".claude/agents/commit-message.md",
+        "started_at": "2026-11-03T15:14:00Z",
+        "completed_at": "2026-11-03T15:15:00Z",
+        "result_signal": "message returned; committed as ac6f6b6db",
+        "artifact_paths": []
+      }
+    ],
+    "promotion": {
+      "issue": {
+        "ok": true,
+        "tool": "potential_to_issue",
+        "issue_url": "https://github.com/drmoisan/drm-copilot/issues/1047"
+      },
+      "feature_folder": {
+        "ok": true,
+        "tool": "new_active_feature_folder",
+        "destination_path": "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047"
+      }
+    }
+  },
+  "mcp_call_receipts": [
+    {
+      "tool": "new_active_feature_folder",
+      "ok": true,
+      "evidence": "folder docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047 present in the item worktree"
+    }
+  ],
+  "skill_receipts": [
+    { "skill": "orchestrate", "required": true, "evidence": "read:.claude/skills/orchestrate/SKILL.md" },
+    { "skill": "feature-promotion-lifecycle", "required": true, "evidence": "read:.claude/skills/feature-promotion-lifecycle/SKILL.md" },
+    { "skill": "atomic-plan-contract", "required": true, "evidence": "read:.claude/skills/atomic-plan-contract/SKILL.md" },
+    { "skill": "execution-environment", "required": true, "evidence": "read:.claude/skills/execution-environment/SKILL.md" }
+  ],
+  "model_routing_preflight": {
+    "status": "pass",
+    "checked_at": "2026-11-03T12:10:00Z",
+    "validator_command": "mcp__drm-copilot__validate_orchestration_artifacts orchestrator-state require_model_routing=true",
+    "output_summary": "ok: true; Validated orchestrator-state artifact at artifacts/orchestration/orchestrator-state.json"
+  },
+  "complexity_assessments": [
+    {
+      "phase": "S3b_research",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": ["concurrency_or_ordering", "cross_module_contract_change"],
+      "rationale": "Adds a precedence (ordering) input to cohort scheduling, a preparation_status stage machine, and new run-checkpoint and manifest fields consumed by parallel-plan, parallel-add, and parallel-orchestrate.",
+      "assessed_at": "2026-11-03T12:10:00Z"
+    },
+    {
+      "phase": "S3c_feature_documents",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": ["concurrency_or_ordering", "cross_module_contract_change"],
+      "rationale": "Spec defines the precedence ordering contract, the preparation_status stage machine, and checkpoint and scheduling-record schema consumed across parallel skills.",
+      "assessed_at": "2026-11-03T12:45:00Z"
+    },
+    {
+      "phase": "S4_atomic_planning",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": ["concurrency_or_ordering", "cross_module_contract_change"],
+      "rationale": "Plan spans three new PowerShell modules, a hook edit, three skills, the rule, two agents, settings, bundle mirrors, and pinned contract tests.",
+      "assessed_at": "2026-11-03T12:55:00Z"
+    },
+    {
+      "phase": "S5_atomic_execution",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": ["concurrency_or_ordering", "cross_module_contract_change"],
+      "rationale": "Execution implements the precedence ordering lift, stage machine, and cross-skill schema changes with mirrored bundles and pinned contract tests.",
+      "assessed_at": "2026-11-03T13:32:00Z"
+    },
+    {
+      "phase": "S5_spec_correction",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": ["concurrency_or_ordering", "cross_module_contract_change"],
+      "rationale": "Correct an internal contradiction between AC-01 and AC-09/AC-16 of the feature's cross-module contract spec.",
+      "assessed_at": "2026-11-03T15:10:00Z"
+    },
+    {
+      "phase": "S6_pre_review_commit",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": ["concurrency_or_ordering", "cross_module_contract_change"],
+      "rationale": "Commit message for the spec correction within the same feature band.",
+      "assessed_at": "2026-11-03T15:20:00Z"
+    },
+    {
+      "phase": "S7_feature_review",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": ["concurrency_or_ordering", "cross_module_contract_change"],
+      "rationale": "Review of new PowerShell modules, a hook edit, and cross-skill contract changes with mirrors.",
+      "assessed_at": "2026-11-03T15:25:00Z"
+    }
+  ],
+  "model_routing_receipts": [
+    { "agent": "task-researcher", "phase": "S3b_research", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "prd-feature", "phase": "S3c_feature_documents", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "atomic-planner", "phase": "S4_atomic_planning", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "atomic-executor", "phase": "S4_atomic_planning", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "atomic-executor", "phase": "S5_atomic_execution", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "prd-feature", "phase": "S5_spec_correction", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "commit-message", "phase": "S6_pre_review_commit", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" },
+    { "agent": "feature-review", "phase": "S7_feature_review", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus" }
+  ]
+}

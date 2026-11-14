@@ -38,8 +38,8 @@ than the repository's default branch.
 Extracting each job into its own reusable workflow file can change the composed
 check-run name GitHub reports for that job (the name GitHub Actions uses to compose a
 check-run name is derived from the calling job and, for reusable workflows invoked via
-`uses:`, the reusable workflow's own job name). Because branch protection's
-`required_status_checks` list matches on the literal check-run `context` string, any
+`uses:`, the reusable workflow's own job name). Because the `required_status_checks`
+rule of ruleset 15241672 (`protect-main`) matches on the literal check-run `context` string, any
 naming drift introduced by this kind of refactor must be reconciled explicitly rather
 than assumed. Follow this 4-step procedure whenever a job is extracted into (or
 renamed within) a reusable workflow:
@@ -57,23 +57,28 @@ renamed within) a reusable workflow:
    gh api repos/{owner}/{repo}/commits/{head_sha}/check-runs
    ```
 
-3. **Update branch protection with the confirmed new context strings.**
-   Read the current required-status-check configuration, then patch it with the
-   confirmed post-extraction context strings, removing any stale pre-extraction
-   context string that is no longer produced:
+3. **Update the ruleset with the confirmed new context strings.**
+   This repository enforces required checks through a repository ruleset, not through
+   classic branch protection. Read the ruleset and save the response as the rollback
+   source, then send a `PUT` whose body carries the six writable fields (`name`,
+   `target`, `enforcement`, `bypass_actors`, `conditions`, `rules`) with only the
+   `required_status_checks` parameters changed to the confirmed context strings:
 
    ```bash
-   gh api repos/{owner}/{repo}/branches/{branch}/protection/required_status_checks \
-     --method PATCH \
-     -f 'checks[][context]=<confirmed-context-string>'
+   gh api repos/{owner}/{repo}/rulesets/{ruleset_id} > ruleset.backup.json
+   gh api --method PUT repos/{owner}/{repo}/rulesets/{ruleset_id} --input ruleset.updated.json
    ```
 
-   (Repeat the `-f 'checks[][context]=...'` field once per required context, or supply
-   the full `checks` array via a JSON payload file with `--input`.)
+   The endpoints are `GET /repos/{owner}/{repo}/rulesets/{ruleset_id}` and
+   `PUT /repos/{owner}/{repo}/rulesets/{ruleset_id}`. The `GET` response omits
+   `bypass_actors` when the token lacks write access to the ruleset; do not send a
+   `PUT` built from such a response. The issue #1074 runbook
+   (`runbook/ruleset-single-required-gate.md` in the issue #1074 feature folder) gives a
+   complete body builder and the rollback command.
 
 4. **Document both old and new context strings plus the exact commands used.**
    Record the pre-extraction context strings, the confirmed post-extraction context
-   strings, and the exact `gh api` GET/PATCH commands executed, so the change is
+   strings, and the exact `gh api` GET/PUT commands executed, so the change is
    auditable and reversible.
 
 ## Scope of This Refactor
@@ -118,9 +123,11 @@ The decision is `code=true` (a full run) for every event other than `pull_reques
 
 ### The `run-heavy` input
 
-`_quality-checks.yml`, `_security-scan.yml`, `_build-check.yml`, `_poshqc.yml`, `_shell-coverage.yml`, and `_drm-copilot-extension-tests.yml` declare a boolean input `run-heavy` (default `true`) under both `workflow_call` and `workflow_dispatch`. `ci.yml` passes `run-heavy: ${{ needs.changes.outputs.code != 'false' }}`. When the input is `false`, each required job still starts under its full-run name and every step is skipped, so the job reports `success`. In `_poshqc.yml`, the `poshqc` job, which reports `poshqc / PowerShell QC`, runs with every step gated, and every other job is skipped at job level; when the file has the sharded shape of #953, `poshqc` is the aggregator and keeps `if: always()`. A job skipped at job level keeps its step conditions unchanged. A standalone dispatch, or a caller that omits the input, runs in full. `root-typescript-tests` and `npm-audit-gate` are skipped at job level when `code` is `false`, and `docs-validation` always runs. The `CI full run` job runs only when `code` is not `false`; it marks a run as a valid base for later decisions and is not a required check.
+`_quality-checks.yml`, `_security-scan.yml`, `_build-check.yml`, `_poshqc.yml`, `_shell-coverage.yml`, and `_drm-copilot-extension-tests.yml` declare a boolean input `run-heavy` (default `true`) under both `workflow_call` and `workflow_dispatch`. `ci.yml` passes `run-heavy: ${{ needs.changes.outputs.code != 'false' }}`. When the input is `false`, each required job still starts under its full-run name and every step is skipped, so the job reports `success`. In `_poshqc.yml`, the `poshqc` job, which reports `poshqc / PowerShell QC`, runs with every step gated, and every other job is skipped at job level; when the file has the sharded shape of #953, `poshqc` is the aggregator and keeps `if: always()`. A job skipped at job level keeps its step conditions unchanged. A standalone dispatch, or a caller that omits the input, runs in full. `root-typescript-tests` and `npm-audit-gate` are skipped at job level when `code` is `false`, and `docs-validation` always runs. The `CI full run` job runs only when `code` is not `false`; it marks a run as a valid base for later decisions and is not a required check. The `ci-required-gate` job (check name `CI Required Gate`, issue #1074) takes no `run-heavy` input: it needs every other `ci.yml` job, runs under `if: always()`, and accepts `skipped` only for `full-run-marker`, `root-typescript-tests`, and `npm-audit-gate`, and only when `code` is exactly `false` (see `## CI Required Gate (Issue #1074)`).
 
 ### Required contexts under a docs-only run
+
+The 20 contexts below are the `required_status_checks` of ruleset 15241672 read on 2026-11-04. Rows 11 to 18 never report on a docs-only run, so a docs-only head stays blocked until the ruleset requires `CI Required Gate` instead (row 21).
 
 | # | Required context (ruleset 15241672) | Behaviour when `code=false` | Reported conclusion |
 |---|---|---|---|
@@ -130,14 +137,41 @@ The decision is `code=true` (a full run) for every event other than `pull_reques
 | 4 | `poshqc / PowerShell QC` | the `poshqc` job runs with every step gated (as the aggregator with `if: always()` in the sharded shape); every other `_poshqc.yml` job skipped at job level | `success` |
 | 5 | `shell-coverage / Shell Coverage (Bats + kcov)` | job runs; every step skipped, including the upload step | `success` |
 | 6 | `security-scan / Security Scanning` | job runs; every step skipped | `success` |
-| 7 | `quality-checks7 / Code Quality & Tests (3.10)` | matrix expands; every step skipped | `success` |
-| 8 | `quality-checks7 / Code Quality & Tests (3.11)` | same as row 7 | `success` |
-| 9 | `quality-checks7 / Code Quality & Tests (3.12)` | same as row 7 | `success` |
-| 10 | `quality-checks7 / Code Quality & Tests (3.13)` | same as row 7 | `success` |
-| 11 | `build-check / Build Package` | job runs; every step skipped | `success` |
+| 7 | `quality-checks7 / Code Quality & Tests (3.11)` | matrix expands; every step skipped | `success` |
+| 8 | `quality-checks7 / Code Quality & Tests (3.12)` | same as row 7 | `success` |
+| 9 | `quality-checks7 / Code Quality & Tests (3.13)` | same as row 7 | `success` |
+| 10 | `build-check / Build Package` | job runs; every step skipped | `success` |
+| 11 | `poshqc / PowerShell QC shard 1` | the `poshqc-shard` matrix job is skipped at job level, so its matrix name is never expanded | never reports |
+| 12 | `poshqc / PowerShell QC shard 2` | same as row 11 | never reports |
+| 13 | `poshqc / PowerShell QC shard 3` | same as row 11 | never reports |
+| 14 | `root-typescript-tests / Root TypeScript Tests (ubuntu-latest)` | the `root-typescript-tests` caller is skipped in `ci.yml`, so the called workflow never starts | never reports |
+| 15 | `root-typescript-tests / Root TypeScript Tests (windows-latest)` | same as row 14 | never reports |
+| 16 | `NPM Audit Gate / npm audit (extensions/drm-copilot)` | the `npm-audit-gate` caller is skipped in `ci.yml` | never reports |
+| 17 | `NPM Audit Gate / npm audit (.)` | same as row 16 | never reports |
+| 18 | `NPM Audit Gate / npm audit (packages/mcp-server)` | same as row 16 | never reports |
+| 19 | `poshqc / PowerShell QC static` | skipped at job level (not a matrix job) | `skipped`, which counts as passing |
+| 20 | `poshqc / PowerShell hook suites (Linux)` | skipped at job level (not a matrix job) | `skipped`, which counts as passing |
+| 21 | `CI Required Gate` (not yet required; the single required context after the post-merge ruleset edit) | runs under `if: always()`; accepts `skipped` for the three skipped callers | `success` |
 
 Non-required jobs under `code=false`: `Change scope` reports `success`, `CI full run` is `skipped`, and the `root-typescript-tests` and `npm-audit-gate` callers are `skipped`.
 
 ### Security scan
 
 On a full run, `security-scan / Security Scanning` installs the Poetry export plugin, exports the locked dependencies, and runs `safety check` under `bash` with `pipefail`, so the scan reads every locked package. The scan step carries `continue-on-error: true` and does not fail the required check: the first full run of issue #962 reported 101 pre-existing findings in 14 packages of `poetry.lock` (listed in the issue #962 feature folder, `evidence/other/security-scan-findings.2026-10-17T01-18.md`), and the step stays non-blocking until those dependencies are upgraded. Findings and export errors remain visible in the step log.
+
+## CI Required Gate (Issue #1074)
+
+The last job of `ci.yml`, `ci-required-gate`, reports the check context `CI Required Gate` (a top-level job, so the context carries no caller prefix; it is reported by the GitHub Actions app, `app.id` 15368). It needs every other `ci.yml` job (`changes`, `full-run-marker`, `quality-checks7`, `security-scan`, `docs-validation`, `build-check`, `poshqc`, `shell-coverage`, `drm-copilot-extension-tests`, `root-typescript-tests`, `npm-audit-gate`), runs under `if: always()` on `ubuntu-latest` with `contents: read`, and passes `${{ toJSON(needs) }}` in the `NEEDS_JSON` environment variable to `scripts/ci/Invoke-CiRequiredGate.ps1`. The decision is made by `Get-CiRequiredGateDecision` in `scripts/ci/CiRequiredGate.psm1`. The script writes a per-job table (`Job`, `Result`, `Accepted`, `Verdict`) to the job summary and the log and ends with `exit 0` (green) or `exit 1` (red). The gate reads only `needs`; it reads no pull-request event field.
+
+The scope is docs-only only when `needs.changes.outputs.code` is exactly the string `false`; any other value, including an empty or missing value, is full scope. The decision rules, evaluated over every key of `NEEDS_JSON`:
+
+| Condition | Gate |
+|---|---|
+| `NEEDS_JSON` blank, not parseable as an object, or missing `changes`, `docs-validation`, or any member of the skippable set (`full-run-marker`, `root-typescript-tests`, `npm-audit-gate`) | red (configuration error) |
+| any job result is `failure` or `cancelled` | red |
+| any job result outside {`success`, `skipped`} | red (unknown value, fail closed) |
+| `changes` result is not `success` | red (scope cannot be trusted) |
+| scope full (`code` is not exactly `false`) | green only if every needed job is `success` |
+| scope docs-only (`code` is exactly `false`) | green only if `changes`, `quality-checks7`, `security-scan`, `docs-validation`, `build-check`, `poshqc`, `shell-coverage`, and `drm-copilot-extension-tests` are `success`, and `full-run-marker`, `root-typescript-tests`, and `npm-audit-gate` are each `skipped` or `success` |
+
+Until the owner applies the post-merge ruleset edit described in the issue #1074 runbook, `CI Required Gate` is an additional check that is not required. After the edit it is the single required context of ruleset 15241672, and the individual job contexts remain visible. A new `ci.yml` job must be added to the gate's `needs:` list; `tests/scripts/workflows/CiRequiredGateWorkflow.Tests.ps1` derives the expected list from the file and fails until it is.

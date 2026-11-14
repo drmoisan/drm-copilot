@@ -40,6 +40,7 @@ from typing import TYPE_CHECKING, cast
 from scripts.dev_tools._blast_radius_glob import is_path_subsumed
 from scripts.dev_tools._parallel_drift_scheduling import (
     existing_edge_pairs,
+    item_access,
     item_band,
     observed_pair_is_edge,
 )
@@ -105,7 +106,10 @@ DRIFT_ACTION_HALTED_LATER_STARTED_ITEM = "halted_later_started_item"
 
 
 def detect_escaped_paths(
-    changed: Sequence[str], declared: Sequence[str]
+    changed: Sequence[str],
+    declared: Sequence[str],
+    *,
+    read_paths: Sequence[str] = (),
 ) -> tuple[str, ...]:
     """Return the changed paths not subsumed by a declared blast radius.
 
@@ -123,22 +127,31 @@ def detect_escaped_paths(
         declared (Sequence[str]): The item's declared ``blast_radius.paths``, which
             may mix concrete paths, listed directories, and globs. An empty
             collection covers nothing, so every changed path escapes.
+        read_paths (Sequence[str]): The item's declared ``read_paths`` (issue
+            #1164, spec B5.5). A changed path that one of them covers is an
+            observed write to a path the item declared it only reads, so it is
+            reported as an escape exactly like an undeclared write.
 
     Returns:
         tuple[str, ...]: The escaping paths, deduplicated and ordinally sorted.
         Every member is a member of ``changed``; empty means no escape.
 
     Raises:
-        ParallelDriftInputError: If either argument is a bare string or holds a
+        ParallelDriftInputError: If an argument is a bare string or holds a
             blank or non-string entry.
     """
     changed_paths = require_paths(changed, "changed", allow_empty=True)
     declared_paths = require_paths(declared, "declared", allow_empty=True)
+    read_only_paths = require_paths(read_paths, "read_paths", allow_empty=True)
 
-    # Keep the paths no declared entry covers; the declared collection is passed
-    # whole so the predicate applies all three of its coverage rules.
+    # Keep the paths no declared entry covers, and the paths a read-only
+    # declaration covers; each collection is passed whole so the predicate
+    # applies all three of its coverage rules.
     return tuple(
-        path for path in changed_paths if not is_path_subsumed(path, declared_paths)
+        path
+        for path in changed_paths
+        if not is_path_subsumed(path, declared_paths)
+        or (read_only_paths and is_path_subsumed(path, read_only_paths))
     )
 
 
@@ -285,7 +298,8 @@ def recompute_conflicts_with_observed(
     Design section 7 step 4: substitute the drifting item's observed radius for
     its declared one and re-evaluate every concurrently in-flight peer through
     the integration-cost scheduling rule over F1's contention relation, using
-    each item's ``complexity_band`` (issue #722). At tolerance 0, or with the
+    each item's ``complexity_band`` (issue #722) and each peer's declared
+    ``read_paths`` and ``separable_paths`` (issue #1164). At tolerance 0, or with the
     conflict_tolerance key absent, the result equals the conflict-only result.
     The observed radius comes from
     ``build_observed_radius``. ``conflict_edges[]`` is read only, for edge identity
@@ -349,6 +363,7 @@ def recompute_conflicts_with_observed(
             observed_band=observed_band,
             peer_band=item_band(items, item_key),
             relation=conflicts,
+            peer_access=item_access(items, item_key),
         ):
             newly_conflicting.add(pair)
     return tuple(sorted(newly_conflicting))

@@ -1,0 +1,43 @@
+{
+  "description": "Issue #1013 D-5 rule 4 boundary: three same-file candidate pairs whose cost is one below, at, and one above benefit * combination_threshold_percent / 100.",
+  "notes": "combination_threshold_percent 400; every item is C3 (duration 4), so each pair has benefit 4 and the qualifying cost is 4*400/100 = 16. Pair (1,2) shares src/below.py (same_file 8), below/CHANGELOG.md (matches **/CHANGELOG.md, append_only 1), and modules b1, b2, b3 (2*3 = 6): cost 15, 1500 < 1600, not qualifying. Pair (3,4) shares src/at1.py and src/at2.py: cost 8+8 = 16, 1600 >= 1600, qualifies. Pair (5,6) shares src/above1.py, src/above2.py, and above/CHANGELOG.md: cost 8+8+1 = 17, 1700 >= 1600, qualifies. Every pair is a candidate through a same-file overlap; no two pairs share an entry. Combinations: [3,4] (primary 3, savings 16) and [5,6] (primary 5, savings 17).",
+  "tags": ["#1013"],
+  "config": {
+    "version": 1,
+    "shared_surfaces": [],
+    "shared_surface_globs": [],
+    "mandate_reads": [],
+    "mergeable_paths": [],
+    "conflict_tolerance": {
+      "tolerance_percent": 100,
+      "weights": { "same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2, "contract": 8 },
+      "band_durations": { "C1": 1, "C2": 2, "C3": 4, "C4": 8 },
+      "default_band": "C1",
+      "append_only_paths": ["**/CHANGELOG.md"],
+      "combination_threshold_percent": 400
+    },
+    "modules": {},
+    "over_breadth_fraction": 0.25
+  },
+  "cases": [
+    {
+      "name": "boundary",
+      "items": [
+        { "key": 1, "band": "C3", "radius": { "paths": ["below/CHANGELOG.md", "src/below.py"], "modules": ["b1", "b2", "b3"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 2, "band": "C3", "radius": { "paths": ["below/CHANGELOG.md", "src/below.py"], "modules": ["b1", "b2", "b3"], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 3, "band": "C3", "radius": { "paths": ["src/at1.py", "src/at2.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 4, "band": "C3", "radius": { "paths": ["src/at1.py", "src/at2.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 5, "band": "C3", "radius": { "paths": ["above/CHANGELOG.md", "src/above1.py", "src/above2.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } },
+        { "key": 6, "band": "C3", "radius": { "paths": ["above/CHANGELOG.md", "src/above1.py", "src/above2.py"], "modules": [], "shared_surfaces": [], "contracts": [], "source": "declared", "computed_at": "2026-10-30T00-00" } }
+      ],
+      "expected_pairs": [
+        { "a": 3, "b": 4, "cost": 16, "benefit": 4 },
+        { "a": 5, "b": 6, "cost": 17, "benefit": 4 }
+      ],
+      "expected_combinations": [
+        { "members": [3, 4], "primary": 3, "pairs": [{ "a": 3, "b": 4, "cost": 16, "benefit": 4 }], "estimated_savings": 16 },
+        { "members": [5, 6], "primary": 5, "pairs": [{ "a": 5, "b": 6, "cost": 17, "benefit": 4 }], "estimated_savings": 17 }
+      ]
+    }
+  ]
+}

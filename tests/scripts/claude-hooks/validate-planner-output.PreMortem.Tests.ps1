@@ -10,6 +10,8 @@
 
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-planner-output.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
 
     function Get-PreMortemPlanLine {
         # Returns a structurally valid plan; -PreMortem supplies the Pre-Mortem section lines.
@@ -46,6 +48,10 @@ UNRESOLVED-GAPS: NONE
 PREFLIGHT: ALL CLEAR
 "@.Trim()
     }
+}
+
+Describe 'epic-state baseline isolation (issue #1105)' {
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 }
 
 Describe 'validate-planner-output Pre-Mortem and locator rules (issue #964)' {

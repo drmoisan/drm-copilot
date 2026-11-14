@@ -1,0 +1,170 @@
+{
+  "isolation": "in-process",
+  "notes": [
+    "Generated (issue #1159, D10) from the [[hooks.PreToolUse]] tables of .codex/config.toml at the merge base of origin/main and HEAD, in the same group and hook order; regenerate rather than hand-edit.",
+    "isolation in-process runs each selected hook in the dispatcher process in its own script scope; per-process (or an absent isolation field) runs each hook as its own pwsh -NoProfile -File child.",
+    "A new PreToolUse hook is registered in this registry, not beside the dispatcher table in .codex/config.toml; the dispatcher timeout is the sum of the hook timeouts listed here."
+  ],
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/validate-bash.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/validate-bash.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-promotion-mcp-only.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-promotion-mcp-only.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-merge-gate.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-merge-gate.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-worktree-removal-gate.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-worktree-removal-gate.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-worktree-poetry-venv.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-worktree-poetry-venv.ps1\"",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "^(Bash|shell_command|apply_patch|Edit|Write|mcp__.*)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-discovery-artifact-gate.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-discovery-artifact-gate.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-root-invocation.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-root-invocation.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-codex-model-routing.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-codex-model-routing.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-planning-only.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-planning-only.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-wave-barrier.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-wave-barrier.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-child-worktree-binding.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-child-worktree-binding.ps1\"",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "^(apply_patch|Edit|Write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/check-python-test-purity.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/check-python-test-purity.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-python-batch-budget.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-python-batch-budget.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/check-powershell-test-purity.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/check-powershell-test-purity.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-powershell-batch-budget.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-powershell-batch-budget.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-evidence-locations.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-evidence-locations.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-file-size-limit.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-file-size-limit.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-checkpoint-monotonic.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-checkpoint-monotonic.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-completion-consistency.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-completion-consistency.ps1\"",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "^(Agent|Task|spawn_agent|run_subagent|delegate)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-discovery-artifact-gate.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-discovery-artifact-gate.ps1\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-discovery-planning-gate.ps1\"",
+            "command_windows": "pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)/.codex/hooks/enforce-discovery-planning-gate.ps1\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

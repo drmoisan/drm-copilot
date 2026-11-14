@@ -1,0 +1,48 @@
+# Python Reversed-Order Run (remediation cycle 1)
+
+Timestamp: 2026-11-03T19-58
+Task: [P6-T10]
+Command: poetry run pytest -p no:cacheprovider --collect-only -q tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py, node IDs reversed, then poetry run pytest -p no:cacheprovider -v <38 reversed node IDs> in one process (project addopts in effect)
+EXIT_CODE: 0
+Output Summary: 38 passed, 0 failed in 0.35 s; the -v execution order equals the reversed collection order.
+
+Executed order (reversed):
+
+- test_frozen_epic_surface_matches_pinned_baseline_digest[.claude/skills/epic-orchestrate/SKILL.md-84b0555d0db146274fc5bfb9f06909c0b892a1f59522cc9feb0312d08721cf30]
+- test_frozen_epic_surface_matches_pinned_baseline_digest[.claude/agents/epic-orchestrator.md-e0691d2a05dfd97b886694262eb900293f38d9927fc2803f7e4574af856ce740]
+- test_delivered_runtime_files_carry_no_prescriptive_epic_literal[relative_path2]
+- test_delivered_runtime_files_carry_no_prescriptive_epic_literal[relative_path1]
+- test_delivered_runtime_files_carry_no_prescriptive_epic_literal[relative_path0]
+- test_run_skill_stop_path_names_parallel_plan_and_plan_path_resume
+- test_skill_names_both_f7_dependency_block_reasons
+- test_checkpoint_section_states_the_four_arrays_never_written
+- test_seam_status_template_realises_projections_prescribed_by_skill
+- test_seam_status_template_realises_cohort_columns_prescribed_by_skill
+- test_seam_status_template_realises_header_fields_prescribed_by_skill
+- test_kickoff_section_carries_no_child_merge_instruction
+- test_orchestrate_skill_section_states_its_required_obligations[completion-both-run-modes]
+- test_orchestrate_skill_section_states_its_required_obligations[checkpoint-eight-merge-status-values]
+- test_orchestrate_skill_section_states_its_required_obligations[boundaries-regeneration-list]
+- test_orchestrate_skill_section_states_its_required_obligations[boundaries-generated-projection-rules]
+- test_orchestrate_skill_section_states_its_required_obligations[merge-conflict-exhaustion-and-f8-handoff]
+- test_orchestrate_skill_section_states_its_required_obligations[merge-on-green-turn-gap-redelegation]
+- test_orchestrate_skill_section_states_its_required_obligations[merge-on-green-parent-executes-merge]
+- test_orchestrate_skill_section_states_its_required_obligations[cohort-barrier-and-slot-filling-order]
+- test_orchestrate_skill_section_states_its_required_obligations[kickoff-plan-hash-verification]
+- test_orchestrate_skill_section_states_its_required_obligations[kickoff-resume-at-plan-path]
+- test_orchestrate_skill_section_states_its_required_obligations[kickoff-feature-folder-and-issue-number]
+- test_orchestrate_skill_section_states_its_required_obligations[kickoff-never-carries-foreign-markers]
+- test_orchestrate_skill_section_states_its_required_obligations[kickoff-marker-and-main-base]
+- test_orchestrate_skill_reserved_sections_carry_one_line_reserved_body
+- test_orchestrate_skill_reserved_wave_four_sections_close_the_file
+- test_orchestrate_skill_first_thirteen_headings_match_required_layout
+- test_orchestrate_skill_intro_heading_precedes_prerequisites
+- test_agent_body_contains_exactly_the_nine_required_headings
+- test_status_template_begins_with_generated_file_banner
+- test_run_skill_argument_hint_is_the_parallel_slug
+- test_orchestrate_skill_argument_hint_accepts_manifest_path_or_slug
+- test_skill_frontmatter_forks_the_parallel_orchestrator_agent[relative_path1]
+- test_skill_frontmatter_forks_the_parallel_orchestrator_agent[relative_path0]
+- test_agent_subagent_stop_hook_targets_parallel_checkpoint
+- test_agent_tools_allowlist_grants_only_the_records_pr_author_channel
+- test_agent_frontmatter_declares_parallel_orchestrator_identity

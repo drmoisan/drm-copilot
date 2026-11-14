@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:docs:1.0.0:page-metadata",
+  "title": "Documentation page metadata",
+  "description": "Front-matter fields of one documentation page. Required fields are profile data (diataxis_policy.required_front_matter), so the schema declares shapes only and has no required list.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "owner": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+    "last_reviewed": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/review-date"},
+    "audience": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/audience-id"}},
+    "diataxis_mode": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/diataxis-mode"},
+    "surface_refs": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-ids"},
+    "title": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"},
+    "extensions": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/extensions"}
+  }
+}

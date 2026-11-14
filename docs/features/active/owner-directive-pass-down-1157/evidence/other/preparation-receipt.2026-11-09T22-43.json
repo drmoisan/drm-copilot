@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "stage": "preparation",
+  "issue_num": "1157",
+  "branch_name": "feature/owner-directive-pass-down-1157",
+  "research_path": "docs/features/active/owner-directive-pass-down-1157/research/research.2026-11-09T21-37.md",
+  "spec_path": "docs/features/active/owner-directive-pass-down-1157/spec.md",
+  "plan_path": "docs/features/active/owner-directive-pass-down-1157/plan.2026-11-09T16-32.md",
+  "plan_hash": "3d3d5834920cc1f077bd48e2fb8a49aa42b09ff3",
+  "plan_hash_kind": "git blob object id of the plan file bytes",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "PREFLIGHT: ALL CLEAR",
+  "preflight_rounds": 2,
+  "recorded_at": "2026-11-09T22:43:45Z"
+}

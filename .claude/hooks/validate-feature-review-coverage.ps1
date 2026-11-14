@@ -56,15 +56,35 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 try { . (Join-Path $PSScriptRoot 'feature-review-coverage-thresholds.ps1') } catch { Add-HookDependencyFailure -Name 'feature-review-coverage-thresholds.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'validate-feature-review-coverage-metrics.ps1') } catch { Add-HookDependencyFailure -Name 'validate-feature-review-coverage-metrics.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'validate-feature-review-coverage-rules.ps1') } catch { Add-HookDependencyFailure -Name 'validate-feature-review-coverage-rules.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'validate-feature-review-coverage-freshness.ps1') } catch { Add-HookDependencyFailure -Name 'validate-feature-review-coverage-freshness.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-target-worktree.ps1' -ErrorRecord $_ }
 
 $ErrorActionPreference = 'Stop'
 
 function Invoke-FeatureReviewCoverageValidation {
+    <#
+    .SYNOPSIS
+        Reads the SubagentStop envelope and validates the review artifacts and coverage verdicts.
+    .DESCRIPTION
+        The review artifact paths are resolved once against the item worktree that produced them
+        (Resolve-SubagentStopTargetWorktree, issue #1105). A not-derivable or ambiguous resolution
+        blocks (repairable) and reads nothing from the session root. For an item root other than
+        the session root, the PR context summary, the root CLAUDE.md, and the coverage reports are
+        read beneath the item root only, after the freshness decision of
+        validate-feature-review-coverage-freshness.ps1 passes. The session-root case is unchanged.
+        SessionRoot, ReadTranscriptHead, WorktreeListInvoker, CheckpointIssueReader, and GitInvoker
+        are test seams.
+    #>
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
-        [AllowNull()] [AllowEmptyString()] [string] $InputText
+        [AllowNull()] [AllowEmptyString()] [string] $InputText,
+        [AllowNull()] [AllowEmptyString()] [string] $SessionRoot,
+        [scriptblock] $ReadTranscriptHead,
+        [scriptblock] $WorktreeListInvoker,
+        [scriptblock] $CheckpointIssueReader,
+        [scriptblock] $GitInvoker
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-feature-review-coverage:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
@@ -92,25 +112,46 @@ function Invoke-FeatureReviewCoverageValidation {
                 @{ Token = 'feature-audit-path'; Stem = 'feature-audit'; Description = 'feature audit artifact' }
             )
 
+            # Issue #1105: resolve the item worktree once from every advertised review path.
+            $advertised = @{}
+            foreach ($token in @('policy-audit-path', 'code-review-path', 'feature-audit-path', 'remediation-inputs-path')) { $advertised[$token] = Get-ReviewArtifactPathFromOutput -AgentOutput $agentOutput -Token $token }
+            $root = if ([string]::IsNullOrWhiteSpace($SessionRoot)) { (Get-Location).Path } else { $SessionRoot }
+            $targetArguments = @{ Envelope = $envelope.Envelope; AdvertisedPath = [string[]]@($advertised.Values | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }); SessionRoot = $root }
+            if ($null -ne $ReadTranscriptHead) { $targetArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
+            if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+            if ($null -ne $CheckpointIssueReader) { $targetArguments['CheckpointIssueReader'] = $CheckpointIssueReader }
+            $target = Resolve-SubagentStopTargetWorktree @targetArguments
+            if ($null -ne $target.ReasonCode) {
+                $finding = @{ Message = "validate-feature-review-coverage: target worktree resolution returned $($target.ReasonCode) ($($target.Detail)); the review artifacts and coverage reports cannot be located, and the session root is not read. Name the item branch as the first branch: label in the delegation prompt, or give the canonical issue line of an item whose worktree checkpoint records that issue."; HasRepairable = $true; HasNonRepairable = $false }
+                break
+            }
+            $itemRoot = if (Test-SubagentStopSessionRoot -WorktreeRoot $target.WorktreeRoot -SessionRoot $root) { '' } else { [string]$target.WorktreeRoot }
+
             $artifactMeta = @{}
             $errors = [System.Collections.Generic.List[string]]::new()
 
             foreach ($artifact in $requiredArtifacts) {
-                $path = Get-ReviewArtifactPathFromOutput -AgentOutput $agentOutput -Token $artifact.Token
+                $path = $advertised[$artifact.Token]
                 if ($null -eq $path) {
                     $errors.Add("missing $($artifact.Token): <path> for the required $($artifact.Description)")
                     continue
                 }
 
-                $metadata = Get-ReviewArtifactInfo -Path $path -Stem $artifact.Stem
+                $location = Resolve-SubagentStopArtifactLocation -Path $path -WorktreeRoot $target.WorktreeRoot -SessionRoot $root
+                if ($location.Rejected) {
+                    $errors.Add("$($artifact.Token) '$path' is rejected: $($location.RejectionDetail)")
+                    continue
+                }
+                $metadata = Get-ReviewArtifactInfo -Path $location.RelativePath -Stem $artifact.Stem
                 if ($null -eq $metadata) {
                     $errors.Add("$($artifact.Token) '$path' is outside the required docs/features/active/.../$($artifact.Stem).<timestamp>.md location")
                     continue
                 }
 
-                $file = Get-ArtifactFileContent -Path $path
+                $file = Get-ArtifactFileContent -Path $location.ProbePath
                 if (-not $file.Exists) {
-                    $errors.Add("$($artifact.Token) '$path' was advertised for the $($artifact.Description) but no file exists at that location")
+                    $note = (Get-SubagentStopTargetNote -Target $target -ProbePath $location.ProbePath -SessionRoot $root).TrimEnd('.')
+                    $errors.Add("$($artifact.Token) '$path' was advertised for the $($artifact.Description) but no file exists at that location$(if ($note) { ';' + $note })")
                     continue
                 }
 
@@ -130,17 +171,22 @@ function Invoke-FeatureReviewCoverageValidation {
                     }
                 }
 
-                $remediationPath = Get-ReviewArtifactPathFromOutput -AgentOutput $agentOutput -Token 'remediation-inputs-path'
+                $remediationPath = $advertised['remediation-inputs-path']
                 if ($null -ne $remediationPath) {
-                    $remediation = Get-ReviewArtifactInfo -Path $remediationPath -Stem 'remediation-inputs'
-                    if ($null -eq $remediation) {
+                    $remediationLocation = Resolve-SubagentStopArtifactLocation -Path $remediationPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root
+                    $remediation = Get-ReviewArtifactInfo -Path $remediationLocation.RelativePath -Stem 'remediation-inputs'
+                    if ($remediationLocation.Rejected) {
+                        $errors.Add("remediation-inputs-path '$remediationPath' is rejected: $($remediationLocation.RejectionDetail)")
+                    }
+                    elseif ($null -eq $remediation) {
                         $errors.Add("remediation-inputs-path '$remediationPath' is outside the required docs/features/active/.../remediation-inputs.<timestamp>.md location")
                     }
                     elseif ($remediation.Folder -ne $reference.Folder -or $remediation.Timestamp -ne $reference.Timestamp) {
                         $errors.Add('remediation-inputs artifact must share the same feature folder and timestamp as the policy audit artifact.')
                     }
-                    elseif (-not (Get-ArtifactFileContent -Path $remediationPath).Exists) {
-                        $errors.Add("remediation-inputs-path '$remediationPath' was advertised but no file exists at that location")
+                    elseif (-not (Get-ArtifactFileContent -Path $remediationLocation.ProbePath).Exists) {
+                        $note = (Get-SubagentStopTargetNote -Target $target -ProbePath $remediationLocation.ProbePath -SessionRoot $root).TrimEnd('.')
+                        $errors.Add("remediation-inputs-path '$remediationPath' was advertised but no file exists at that location$(if ($note) { ';' + $note })")
                     }
                 }
             }
@@ -151,14 +197,24 @@ function Invoke-FeatureReviewCoverageValidation {
                 break
             }
 
-            $prSummary = Get-ArtifactFileContent -Path 'artifacts/pr_context.summary.txt'
+            $prSummary = if ($itemRoot) { Get-ArtifactFileContent -Path 'artifacts/pr_context.summary.txt' -Root $itemRoot } else { Get-ArtifactFileContent -Path 'artifacts/pr_context.summary.txt' }
             $changedLanguages = if ($prSummary.Exists) { Get-ChangedLanguageSet -Lines $prSummary.Lines } else { [ordered]@{} }
+            if ($itemRoot) {
+                $freshnessArguments = @{ WorktreeRoot = $itemRoot; SessionRoot = $root; Source = $target.Source; ChangedLanguage = $changedLanguages }
+                if ($null -ne $GitInvoker) { $freshnessArguments['GitInvoker'] = $GitInvoker }
+                $freshness = Get-FeatureReviewCoverageFreshnessDecision @freshnessArguments
+                if ($null -ne $freshness) {
+                    $message = "validate-feature-review-coverage: coverage inputs in the item worktree are absent or stale:`n  - " + ($freshness.Reasons -join "`n  - ")
+                    $finding = @{ Message = $message; HasRepairable = $freshness.HasRepairable; HasNonRepairable = $freshness.HasNonRepairable }
+                    break
+                }
+            }
             if ($changedLanguages.Count -eq 0) {
                 break
             }
 
             $policyAuditText = $artifactMeta['policy-audit'].Text
-            $claudeMd = Get-FeatureReviewClaudeMdText
+            $claudeMd = if ($itemRoot) { Get-FeatureReviewClaudeMdText -Root $itemRoot } else { Get-FeatureReviewClaudeMdText }
             if ($null -ne $claudeMd.ReadError) {
                 $finding = @{ Message = "validate-feature-review-coverage: root CLAUDE.md exists but could not be read ($($claudeMd.ReadError)); coverage floors cannot be resolved, so the gate fails closed."; HasRepairable = $false; HasNonRepairable = $true }
                 break
@@ -166,8 +222,8 @@ function Invoke-FeatureReviewCoverageValidation {
             $thresholds = Get-FeatureReviewCoverageThreshold -ClaudeMdText $claudeMd.Text
             $coverageFailures = [System.Collections.Generic.List[hashtable]]::new()
             foreach ($lang in $changedLanguages.Keys) {
-                $repoPct = Get-LanguageRepoCoverage -Language $lang
-                $branchPct = Get-LanguageBranchCoverage -Language $lang
+                $repoPct = if ($itemRoot) { Get-LanguageRepoCoverage -Language $lang -Root $itemRoot } else { Get-LanguageRepoCoverage -Language $lang }
+                $branchPct = if ($itemRoot) { Get-LanguageBranchCoverage -Language $lang -Root $itemRoot } else { Get-LanguageBranchCoverage -Language $lang }
                 $result = Test-LanguageCoverageRow -AuditText $policyAuditText -Language $lang -RepoWidePct $repoPct -BranchPct $branchPct -LineFloor $thresholds.Line -BranchFloor $thresholds.Branch -LineSource $thresholds.LineSource -BranchSource $thresholds.BranchSource
                 if (-not $result.Ok) {
                     $coverageFailures.Add($result)

@@ -1,10 +1,10 @@
 {
   "$schema": "urn:drm-copilot:discovery:2.0.0:parity-matrix",
-  "schema_version": "2.0.0",
   "artifact_kind": "parity-matrix",
-  "id": "{{parity_id}}",
-  "source_repositories": "{{source_repositories}}",
-  "target_repositories": "{{target_repositories}}",
   "entries": [],
-  "extensions": {}
+  "extensions": {},
+  "id": "{{parity_id}}",
+  "schema_version": "2.0.0",
+  "source_repositories": "{{source_repositories}}",
+  "target_repositories": "{{target_repositories}}"
 }

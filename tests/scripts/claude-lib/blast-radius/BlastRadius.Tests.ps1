@@ -486,7 +486,7 @@ Describe 'Exported facade surface' {
             $exported = @((Get-Module BlastRadius).ExportedFunctions.Keys)
 
             # Assert: the facade surface is exactly the documented contract.
-            $exported.Count | Should -Be 14
+            $exported.Count | Should -Be 15
         }
     }
 }

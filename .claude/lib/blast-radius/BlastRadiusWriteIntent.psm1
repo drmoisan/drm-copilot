@@ -343,9 +343,12 @@ function Get-WriteIntentSpecContract {
             continue
         }
 
+        # A default spreadsheet sheet-tab name such as Sheet1 is not a contract
+        # (issue #1006).
         foreach ($token in @(Get-SingleWordToken -Line $line)) {
             if ($token.IndexOf('/') -lt 0 -and $token.IndexOf('*') -lt 0 -and
-                $token.IndexOf('?') -lt 0 -and $script:ContractLetterPattern.IsMatch($token)) {
+                $token.IndexOf('?') -lt 0 -and $script:ContractLetterPattern.IsMatch($token) -and
+                -not (Test-GenericContractToken -Token $token)) {
                 $identifier.Add($token)
             }
         }

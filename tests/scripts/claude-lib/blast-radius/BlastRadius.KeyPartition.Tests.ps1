@@ -171,6 +171,16 @@ Describe 'Committed blast-radius truth table cross-copy key partition' {
             # and neither copy may declare a key outside the declared set.
             $missingKey.ToArray() | Should -BeNullOrEmpty
             $unclassifiedKey.ToArray() | Should -BeNullOrEmpty
+
+            # Assert: overlay directive keys (issue #1006) are consumed by the
+            # overlay composers, so each is disjoint from every declared
+            # truth-table key and absent from both committed copies. Mirrors
+            # OVERLAY_DIRECTIVE_KEYS in blast_radius_parity_test_support.py.
+            $overlayDirectiveKey = @('shared_surfaces_demote')
+            foreach ($key in $overlayDirectiveKey) {
+                $declaredTopLevelKey | Should -Not -Contain $key
+                @($unionKey) | Should -Not -Contain $key
+            }
         }
 
         It 'requires a populated shared-surface list and module map in both copies' {

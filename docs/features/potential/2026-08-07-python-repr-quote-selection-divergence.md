@@ -18,7 +18,7 @@ input value contains a single quote.
 Verified occurrences, by file and line (function definition line of the local `pythonRepr`
 implementation):
 
-1. `extensions/drm-copilot/src/lib/validate/parallel-state-shared.ts:112-132`
+1. `extensions/drm-copilot/src/lib/validate/parallel-state-shared.ts` (`pythonRepr`): fixed by issue #1164, pinned by the apostrophe cases of `tests/fixtures/parallel_state_scheduling/`
 2. `extensions/drm-copilot/src/lib/validate/epic-planner-state-core.ts:63`
 3. `extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-resolution.ts:52`
 4. `extensions/drm-copilot/src/lib/validate/codex-topology-resolver.ts:87`

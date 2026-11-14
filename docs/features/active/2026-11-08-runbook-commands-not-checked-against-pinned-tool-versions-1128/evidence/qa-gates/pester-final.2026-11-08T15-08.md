@@ -1,0 +1,7 @@
+# Pester final gate (P5-T2)
+
+Timestamp: 2026-11-08T15-08
+Command: Invoke-PoshQCParallelTest -Root <worktree> (via sh launcher SCRATCH/run-pester.sh; the gate run after the last tree change)
+EXIT_CODE: 0
+Output Summary: workers=8; wall-clock=1021.52s; exit code=0. Tests 19648, failed 0, skipped 10, passed 19638 (Phase 0 baseline: 19584 tests, 0 failed, 10 skipped, 19574 passed; +64 tests from the three new test files, no new failure). Repo-wide line coverage 95.57% (covered 35453, missed 1643, total 37096) against baseline 95.56%. Per-file comparison of all 370 baseline files against the final report: 0 drops, 0 files with changed line counts, 2 new files. New files: .claude/lib/runbook/RunbookCommandVersion.psm1 100% (91 of 91 lines), .claude/hooks/validate-human-exception-runbook-output.ps1 93.1% (54 of 58 lines), both at or above 85%.
+Note: an earlier gate run of the same suite (after the same code, before the test fix) showed .claude/lib/orchestrator-state/OrchestratorState.psm1 at 99.12% against 100% at baseline, because the lazy Import-Module line of the default Invoke-OrchestratorStatePreflight invoker runs only when no earlier test file in the same shard process has imported OrchestratorStateUnconditional. That order dependence was fixed on the victim side in tests/scripts/claude-lib/orchestrator-state/OrchestratorState.Tests.ps1 (the U-family test now removes the OrchestratorStateUnconditional module before it runs), and this run is the re-run after that fix.

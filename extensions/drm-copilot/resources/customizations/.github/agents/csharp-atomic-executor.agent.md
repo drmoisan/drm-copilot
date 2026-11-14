@@ -1,6 +1,6 @@
 ---
 name: csharp-atomic-executor
-description: Execute atomic_planner plans verbatim with atomic_executor rigor and C#-specialized quality gates (csharpier, analyzers, nullable/type safety, and dotnet test).
+description: Execute atomic_planner plans verbatim with atomic_executor rigor and C#-specialized quality gates (csharpier, analyzers, nullable/type safety, and MSTest).
 argument-hint: "Provide the approved atomic plan text or path. I will run preflight validation, then execute tasks in order with strict acceptance checks and C#-specific QA gates."
 tools: [vscode, execute/testFailure, execute/getTerminalOutput, execute/killTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, read/terminalSelection, read/terminalLastCommand, agent, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
 ---
@@ -35,7 +35,7 @@ Before executing any implementation tasks, you must ensure you have read and are
 
 Enforce implications (non-exhaustive):
 - Bugfix workflow: smallest failing regression test first, then minimal fix.
-- Toolchain loop: format → lint → type-check → test; repeat until clean.
+- Toolchain loop: format → lint → type-check → test, run as a task check after each task and as the full loop at each phase gate and in the final QA loop. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 - Dependencies: do not add new deps unless explicitly approved.
 - Secrets: never write secrets; never auto-create `.env` without explicit request.
 
@@ -44,7 +44,7 @@ Additional guardrails (for quality + determinism):
 - Tests must be deterministic and isolated: no network, no external processes, no mutable machine state assumptions, and no runtime filesystem temp files.
 - Do not weaken type checking to "make Pyright pass" (e.g., broad `Any`, loosening config, or blanket ignores). Prefer minimal typed adapters and line-specific ignores with justification.
 
-If the plan does not include Phase 0 tasks that cover the above, treat the plan as **invalid** and request a corrected plan. (Do not "silently add" Phase 0; that is replanning.)
+If the plan does not include Phase 0, treat the plan as **invalid** and request a corrected plan. (Do not "silently add" Phase 0; that is replanning.)
 
 Plan format, Phase 0 requirements, baseline capture schema, and final QA loop rules are defined in the `atomic-plan-contract` skill.
 
@@ -85,7 +85,7 @@ During preflight (before [P0-T1]), resolve work mode from feature `issue.md` mar
 
 If the marker is missing or malformed, fail closed to `full-feature`.
 
-When selected mode is `minor-audit`, preflight MUST reject plans that do not include explicit baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks. In these cases return:
+When selected mode is `minor-audit`, preflight MUST reject plans that do not include explicit baseline evidence tasks (static baselines and the `Phase 0 baseline` test-suite run), targeted verification evidence tasks read from the gate run, and end-state evidence tasks. In these cases return:
 
 `PREFLIGHT: REVISIONS REQUIRED`
 
@@ -118,6 +118,9 @@ Validation-only required output:
 
 Single-pass rules (`### Single-Pass Preflight` in the `atomic-plan-contract` skill):
   - Review the entire plan in one pass and classify every defect as trivial or substantive.
+  - Run the design check: within this same pass, with no new delegation and no new artifact, name
+    for each spec rule, parameter, and boundary the task that implements it and the test that would
+    fail if the rule were broken; a gap is a substantive defect.
   - Fix trivial defects in place, in task text only; never add, remove, or reorder tasks. Record each
     fix in `<FEATURE>/evidence/other/preflight-fixes.<timestamp>.md`. This in-place edit is the only file
     write validation-only mode permits.
@@ -142,8 +145,8 @@ Confirm all of the following; otherwise stop and request a corrected plan:
   `- [ ] [P#-T#] ...` or `- [x] [P#-T#] ...`
 - Phase numbers in IDs match the phase heading.
 - Task numbers are sequential within each phase.
-- Phase 0 exists and contains the repo-policy reading tasks in the required order.
-- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0).
+- Phase 0 exists.
+- For plans that change code or tests: Phase 0 also includes baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in Section 0): static baselines and one `Phase 0 baseline` run of each test gate.
 - Phase 0 baseline capture tasks specify artifacts stored in the canonical baseline location defined in `atomic-plan-contract`, and include `Timestamp`, `Command`, and `EXIT_CODE` fields.
 - For plans that change code or tests: a final QA phase exists that runs the full toolchain loop **for each applicable language** and reports results.
 - Any **TDD Red** regression-test task (i.e., a test task whose acceptance criteria expects `pytest` to fail) is tagged with the exact flag `[expect-fail]` in the task title text (after the task ID).
@@ -190,7 +193,7 @@ Start with:
 
 ### 3.4 Verification (mandatory before check-off)
 - Explicitly verify the acceptance criteria.
-- If the repo policy requires a toolchain loop, run it at the appropriate points (or per plan).
+- Run the task check for the task; a `[phase-gate]` task runs the full toolchain loop instead. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 - If the task changes code/tests and the plan does not explicitly specify verification commands, prefer repo-defined tasks/commands and ensure the final QA phase executes the full toolchain loop for each language touched by the plan (per the table in Section 0).
 - For tasks tagged with `[expect-fail]`:
   - Treat a **failing** test run (as specified in the task acceptance criteria) as the expected outcome for that task.
@@ -243,7 +246,7 @@ If the user says "resume", "continue", or "try again":
 - Be concise but exact.
 - Do not paste large code blocks unless the user asks.
 - Always show the commands/tasks you run and summarize results (pass/fail, key errors).
-- When completing a task or a plan, report the toolchain status explicitly: csharpier (format), dotnet build (analyzers), and dotnet test.
+- When completing a task or a plan, report the toolchain status explicitly: csharpier (format), msbuild (analyzers and nullable), and vstest.console.exe (MSTest).
 - Always end with the updated checklist so the user can see progress.
 
 ---
@@ -258,11 +261,11 @@ Always enforce repo policy order:
 4) `.github/instructions/general-unit-test.instructions.md`
 5) `.github/instructions/csharp-unit-test.instructions.md`
 
-Required toolchain for C# tasks:
+Phase-gate and final-QA toolchain for C# (each task runs a task check instead). Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 1) Format (`csharpier .` or repo task equivalent)
-2) Analyze/lint (`dotnet build -p:EnableNETAnalyzers=true -p:EnforceCodeStyleInBuild=true` or repo task equivalent)
-3) Type-check (`dotnet build -p:Nullable=enable -p:TreatWarningsAsErrors=true` or repo task equivalent)
-4) Test (`dotnet test --collect:"XPlat Code Coverage"` or repo task equivalent)
+2) Analyze/lint (`msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` or repo task equivalent)
+3) Type-check (`msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true` or repo task equivalent)
+4) Test (`vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` or repo task equivalent)
 
 If any step fails in final QA, fix and restart from format.
 
@@ -273,7 +276,7 @@ If any step fails in final QA, fix and restart from format.
 - Preserve public API compatibility unless the plan explicitly approves a breaking change.
 
 ### 7.3 Zero-regression deltas (required)
-Compared to baseline, reject completion if any regression appears:
+Compared to the `Phase 0 baseline`, with test and coverage results read from the single gate run, reject completion if any regression appears:
 - New analyzer warnings/errors
 - New compiler/type/nullable diagnostics
 - New failing tests
@@ -282,7 +285,7 @@ Compared to baseline, reject completion if any regression appears:
 At completion, report:
 - analyzer delta
 - type-check delta
-- failing test delta
+- failing test delta from the single gate run
 - per-file coverage delta (and overall if applicable)
 - AC Status Summary per `acceptance-criteria-tracking`
 - final updated checklist status

@@ -18,6 +18,11 @@ BeforeAll {
     $script:ModulePath = (Resolve-Path "$PSScriptRoot/../../../scripts/dev-tools/HostBootstrap.psm1").Path
     Import-Module $script:ModulePath -Force
 
+    # Portable fixture root for the paths the module joins (fully qualified on every host and
+    # never created); opaque values that are only compared stay literal.
+    $script:FixtureRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'hostbootstrap-root'
+    $script:AppData = Join-Path $script:FixtureRoot 'AppData'
+
     Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrap -MockWith { throw 'unmocked host seam: Invoke-HostNativeCommand' }
     Mock -CommandName Set-HostEnvironmentVariable -ModuleName HostBootstrap -MockWith { throw 'unmocked host seam: Set-HostEnvironmentVariable' }
     Mock -CommandName Get-HostEnvironmentVariable -ModuleName HostBootstrap -MockWith { throw 'unmocked host seam: Get-HostEnvironmentVariable' }
@@ -148,8 +153,8 @@ Describe 'Install-PoetryWithPip' {
             $null = $StreamToHost
             [pscustomobject]@{ Output = @('Successfully installed poetry-fixture-1.0'); ExitCode = 0 }
         }
-        Mock -CommandName Get-HostEnvironmentVariable -ModuleName HostBootstrap -MockWith { 'C:\fixture\AppData' } -ParameterFilter { $Name -eq 'APPDATA' }
-        Mock -CommandName Get-ChildItem -ModuleName HostBootstrap -MockWith { [pscustomobject]@{ Directory = [pscustomobject]@{ FullName = 'C:\fixture\AppData\Python\Scripts' } } }
+        Mock -CommandName Get-HostEnvironmentVariable -ModuleName HostBootstrap -MockWith { $script:AppData } -ParameterFilter { $Name -eq 'APPDATA' }
+        Mock -CommandName Get-ChildItem -ModuleName HostBootstrap -MockWith { [pscustomobject]@{ Directory = [pscustomobject]@{ FullName = (Join-Path -Path $script:AppData -ChildPath 'Python' -AdditionalChildPath 'Scripts') } } }
         Mock -CommandName Add-DirectoryToUserPath -ModuleName HostBootstrap -MockWith { }
         Mock -CommandName Get-SessionPathFromMachineAndUser -ModuleName HostBootstrap -MockWith { 'C:\machine;C:\user' }
         Mock -CommandName Set-HostEnvironmentVariable -ModuleName HostBootstrap -MockWith { }
@@ -162,8 +167,8 @@ Describe 'Install-PoetryWithPip' {
         Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter {
             $FilePath -eq 'C:\fixture\python.exe' -and ($ArgumentList -join ' ') -eq '-m pip install --user poetry' -and $StreamToHost
         }
-        Should -Invoke -CommandName Get-ChildItem -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $Path -eq 'C:\fixture\AppData\Python' }
-        Should -Invoke -CommandName Add-DirectoryToUserPath -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $DirectoryPath -eq 'C:\fixture\AppData\Python\Scripts' }
+        Should -Invoke -CommandName Get-ChildItem -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $Path -eq (Join-Path $script:AppData 'Python') }
+        Should -Invoke -CommandName Add-DirectoryToUserPath -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $DirectoryPath -eq (Join-Path -Path $script:AppData -ChildPath 'Python' -AdditionalChildPath 'Scripts') }
         Should -Invoke -CommandName Set-HostEnvironmentVariable -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter {
             $Name -eq 'Path' -and $Value -eq 'C:\machine;C:\user' -and $Target -eq 'Process'
         }

@@ -68,6 +68,13 @@ import {
   DiscoveryServiceBase,
   type DiscoveryServiceDeps,
 } from "./repo-automation-service-discovery";
+import type { DiscoveryProcessLauncher } from "./discovery-runtime";
+import {
+  createDefaultDocsDependencies,
+  invokeDocsCommand,
+  type DocsCommandOutcome,
+  type DocsCommandRequest,
+} from "./repo-automation-execute-docs";
 
 export type {
   RepoAutomationExecutionResult,
@@ -97,6 +104,11 @@ export interface RepoAutomationServiceOptions {
   readonly pushDownFileSystem?: PushDownFileSystem;
   /** Optional discovery runtime/authority seams; production uses the Node defaults. */
   readonly discovery?: DiscoveryServiceDeps;
+  /** Optional docs launcher and `pwsh` resolver seams; production uses the Node defaults. */
+  readonly docs?: {
+    readonly launcher?: DiscoveryProcessLauncher;
+    readonly resolvePwsh?: () => string | undefined;
+  };
 }
 
 class DefaultRepoAutomationService
@@ -115,9 +127,11 @@ class DefaultRepoAutomationService
   private readonly checkoutContext: HandoffCheckoutContext;
   private readonly resolvePromptDeps: ResolvePromptServiceDeps;
   private readonly pushDownDeps: PushDownServiceDeps;
+  private readonly docsOptions: RepoAutomationServiceOptions["docs"];
 
   constructor(options: RepoAutomationServiceOptions) {
     super(options.output, options.discovery);
+    this.docsOptions = options.docs;
     this.extensionRoot = options.extensionRoot;
     this.output = options.output;
     this.templateRoot = buildTemplateRoot(this.extensionRoot);
@@ -434,6 +448,18 @@ class DefaultRepoAutomationService
       ...input,
       fileSystem: this.fileSystem,
     });
+  }
+
+  async runDocsCommand(
+    request: DocsCommandRequest,
+  ): Promise<DocsCommandOutcome> {
+    return invokeDocsCommand(
+      request,
+      createDefaultDocsDependencies({
+        fileSystem: this.fileSystem,
+        ...this.docsOptions,
+      }),
+    );
   }
 
   private async executeScript(

@@ -1,0 +1,122 @@
+{
+  "issue-num": "1096",
+  "stage_timing": [
+    {
+      "stage": "research",
+      "attempt": 1,
+      "started_at": "2026-11-07T07:08:21Z",
+      "ended_at": "2026-11-07T07:21:54Z"
+    },
+    {
+      "stage": "spec",
+      "attempt": 1,
+      "started_at": "2026-11-07T07:21:54Z",
+      "ended_at": "2026-11-07T07:29:35Z"
+    },
+    {
+      "stage": "planning",
+      "attempt": 1,
+      "started_at": "2026-11-07T07:29:35Z",
+      "ended_at": "2026-11-07T07:41:41Z"
+    },
+    {
+      "stage": "preflight",
+      "attempt": 1,
+      "started_at": "2026-11-07T07:41:41Z",
+      "ended_at": "2026-11-07T07:56:25Z"
+    },
+    {
+      "stage": "planning",
+      "attempt": 2,
+      "started_at": "2026-11-07T07:56:25Z",
+      "ended_at": "2026-11-07T08:05:38Z"
+    },
+    {
+      "stage": "preflight",
+      "attempt": 2,
+      "started_at": "2026-11-07T08:05:38Z",
+      "ended_at": "2026-11-07T08:12:45Z"
+    },
+    {
+      "stage": "planning",
+      "attempt": 3,
+      "started_at": "2026-11-07T13:40:03Z",
+      "ended_at": "2026-11-07T13:50:42Z"
+    },
+    {
+      "stage": "preflight",
+      "attempt": 3,
+      "started_at": "2026-11-07T13:50:42Z",
+      "ended_at": "2026-11-07T14:02:57Z",
+      "note": "Covers amendment preflight round 1 and the following planner revision; no separate stage was opened for the revision."
+    },
+    {
+      "stage": "preflight",
+      "attempt": 4,
+      "started_at": "2026-11-07T14:02:57Z",
+      "ended_at": "2026-11-07T14:04:58Z"
+    },
+    {
+      "stage": "execution",
+      "attempt": 1,
+      "started_at": "2026-11-07T14:04:58Z",
+      "ended_at": "2026-11-07T15:49:44Z"
+    },
+    {
+      "stage": "review",
+      "attempt": 1,
+      "started_at": "2026-11-07T15:49:44Z",
+      "ended_at": "2026-11-07T16:08:03Z"
+    },
+    {
+      "stage": "remediation_cycle_1",
+      "attempt": 1,
+      "started_at": "2026-11-07T16:08:03Z",
+      "ended_at": "2026-11-07T16:42:46Z"
+    },
+    {
+      "stage": "remediation_cycle_1",
+      "attempt": 2,
+      "started_at": "2026-11-07T16:43:01Z",
+      "ended_at": "2026-11-07T17:21:09Z",
+      "note": "Resume after the P2-T1 plan revision; attempt 1 closed at the revision."
+    },
+    {
+      "stage": "review",
+      "attempt": 2,
+      "started_at": "2026-11-07T17:21:09Z",
+      "ended_at": "2026-11-07T17:31:33Z"
+    },
+    {
+      "stage": "pr",
+      "attempt": 1,
+      "started_at": "2026-11-07T17:31:33Z",
+      "ended_at": "2026-11-07T17:34:46Z"
+    },
+    {
+      "stage": "ci",
+      "attempt": 1,
+      "started_at": "2026-11-07T17:34:46Z",
+      "ended_at": "2026-11-07T17:35:37Z",
+      "note": "No CI ran: PR reported CONFLICTING."
+    },
+    {
+      "stage": "remediation_cycle_2",
+      "attempt": 1,
+      "started_at": "2026-11-07T17:35:37Z",
+      "ended_at": "2026-11-07T18:35:43Z"
+    },
+    {
+      "stage": "review",
+      "attempt": 3,
+      "started_at": "2026-11-07T18:35:43Z",
+      "ended_at": "2026-11-07T18:48:37Z"
+    },
+    {
+      "stage": "ci",
+      "attempt": 2,
+      "started_at": "2026-11-07T18:48:37Z",
+      "ended_at": "2026-11-07T19:17:03Z"
+    }
+  ]
+}

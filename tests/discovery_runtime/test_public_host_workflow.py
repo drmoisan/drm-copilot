@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
@@ -128,7 +128,7 @@ def run(
         bounded_object(request, limits=ParseLimits()),
         io=case.io if io is None else io,
         repository_reader=case.service.repository,
-        clock=lambda: datetime(2026, 10, 20, tzinfo=timezone.utc),
+        clock=lambda: datetime(2026, 10, 20, tzinfo=UTC),
         analyzer_registry=InstalledInventoryRegistry(),
     )
 

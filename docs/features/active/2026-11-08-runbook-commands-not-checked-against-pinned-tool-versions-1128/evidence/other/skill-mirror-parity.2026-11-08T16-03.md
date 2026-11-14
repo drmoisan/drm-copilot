@@ -1,0 +1,6 @@
+# Skill mirror parity (P3-T2)
+
+Timestamp: 2026-11-08T16-03
+Command: sha256sum of the four copies of human-exception-runbook/SKILL.md (.claude/skills, claude-customizations bundle, .agents/skills, codex-and-agents-customizations bundle); git diff against the commit before the remediation for the two .agents copies
+EXIT_CODE: 0
+Output Summary: The pre-existing state is two pairs, not four equal copies: the .claude copy and its claude-customizations bundle copy are equal (2a8d50f3727d61fb49baea503198fb0166dc444f52091bf22ace3057926bd62a after the edit), and the .agents copy and its codex-and-agents-customizations bundle copy are equal (f66e42419c53055d93dcc902559e2b8ed9c1ac562107ab3060a37712eed6cf9c after the edit); the .agents pair differs from the .claude pair by its frontmatter block and its .agents path references. The first execution of this task copied the .claude file over the .agents pair, which dropped that frontmatter and changed those references; this was reverted to the pre-remediation text and the same one-bullet edit was applied, leaving a 2-line change (one removed, one added) in each .agents copy. P3-T2's acceptance wording of four equal hashes does not match the repository; the equivalent invariant (each pair equal) holds. .claude/agents/human-exception-runbook.md is unchanged.

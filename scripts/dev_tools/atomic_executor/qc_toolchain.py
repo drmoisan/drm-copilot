@@ -8,10 +8,10 @@ supported toolchains (Python and TypeScript).
 from __future__ import annotations
 
 import re
-from enum import Enum
+from enum import StrEnum
 
 
-class QCToolchain(str, Enum):
+class QCToolchain(StrEnum):
     """Supported QC toolchains."""
 
     PYTHON = "python"
@@ -48,8 +48,9 @@ PYTHON_TOOLCHAIN_COMMANDS: dict[str, list[str]] = {
         "poetry",
         "run",
         "pytest",
+        "-n",
+        "auto",
         "--color=no",
-        "--cov=src/lexile_corpus_tuner",
         "--cov=scripts/dev_tools",
         "--cov-report=term-missing",
     ],

@@ -49,6 +49,7 @@ from scripts.dev_tools._parallel_state_common import (
     scan_prohibited_keys,
     validate_items,
 )
+from scripts.dev_tools._parallel_state_records import validate_scheduling_decisions
 from scripts.dev_tools._parallel_state_structures import (
     collect_issue_numbers,
     validate_cohort_shapes,
@@ -196,6 +197,9 @@ def _validate_collections(state: dict[str, object]) -> list[str]:
         errors.extend(
             validate_conflict_edges(state.get("conflict_edges"), issue_nums, CONTEXT)
         )
+    # The recorded scheduling estimates and verdicts are checked when present
+    # (issue #1164); a checkpoint without them gains no error.
+    errors.extend(validate_scheduling_decisions(state, issue_nums, CONTEXT))
     if "mutations" in state:
         errors.extend(
             validate_mutations(state.get("mutations"), issue_nums, generation, CONTEXT)

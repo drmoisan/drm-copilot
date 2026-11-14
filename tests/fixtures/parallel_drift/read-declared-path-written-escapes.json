@@ -1,0 +1,120 @@
+{
+  "name": "read-declared-path-written-escapes",
+  "description": "Issue #1164 (spec B5.5): item 446 declares docs/spec.md in both blast_radius.paths and read_paths, then writes it. A write to a read-declared path is an escape, reported exactly like an undeclared write; no in-flight peer overlaps, so nothing is halted.",
+  "item_key": 446,
+  "changed_paths": [
+    "docs/spec.md"
+  ],
+  "at": "2026-11-09T10-00",
+  "computed_at": "2026-11-09T10-05",
+  "state": {
+    "items": [
+      {
+        "issue_num": 446,
+        "state": "in_flight",
+        "complexity_band": "C2",
+        "read_paths": [
+          "docs/spec.md"
+        ],
+        "blast_radius": {
+          "paths": [
+            "docs/spec.md",
+            "src/app.py"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-11-09T09-00"
+        }
+      },
+      {
+        "issue_num": 445,
+        "state": "in_flight",
+        "complexity_band": "C2",
+        "blast_radius": {
+          "paths": [
+            "src/other.py"
+          ],
+          "modules": [],
+          "shared_surfaces": [],
+          "contracts": [],
+          "source": "declared",
+          "computed_at": "2026-11-09T09-00"
+        }
+      }
+    ],
+    "conflict_edges": []
+  },
+  "config": {
+    "shared_surfaces": [
+      ".claude/settings.json"
+    ],
+    "shared_surface_globs": [],
+    "modules": {
+      "python-dev-tools": [
+        "scripts/dev_tools/**"
+      ],
+      "mcp-server": [
+        "packages/mcp-server/**"
+      ]
+    },
+    "conflict_tolerance": {
+      "tolerance_percent": 100,
+      "weights": {
+        "same_file": 90,
+        "possible_overlap": 20,
+        "append_only": 10,
+        "module": 10,
+        "separable": 15,
+        "contract": 90
+      },
+      "band_durations": {
+        "C1": 30,
+        "C2": 45,
+        "C3": 90,
+        "C4": 180
+      },
+      "default_band": "C1",
+      "append_only_paths": [
+        "**/CHANGELOG.md"
+      ]
+    }
+  },
+  "expected": {
+    "result": "no_new_conflict",
+    "item_key": 446,
+    "at": "2026-11-09T10-00",
+    "computed_at": "2026-11-09T10-05",
+    "escaped_paths": [
+      "docs/spec.md"
+    ],
+    "newly_conflicting_pairs": [],
+    "halted_item_keys": [],
+    "drift_event": {
+      "item_key": 446,
+      "declared": [
+        "docs/spec.md",
+        "src/app.py"
+      ],
+      "observed": [
+        "docs/spec.md"
+      ],
+      "escaped_paths": [
+        "docs/spec.md"
+      ],
+      "at": "2026-11-09T10-00",
+      "action": "raised_blocking_finding"
+    },
+    "observed_radius": {
+      "paths": [
+        "docs/spec.md"
+      ],
+      "modules": [],
+      "shared_surfaces": [],
+      "contracts": [],
+      "source": "observed",
+      "computed_at": "2026-11-09T10-05"
+    }
+  }
+}

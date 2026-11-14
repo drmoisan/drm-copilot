@@ -157,7 +157,8 @@ function Test-EpicPlanningBashAllowed {
         '^\s*git\s+worktree\s+list\b',
         '^\s*gh\s+(?:issue|pr)\s+view\b',
         '^\s*(?:rg|Get-Content|Get-ChildItem|Test-Path|Select-String)\b',
-        '^\s*(?:poetry\s+run\s+)?(?:python|py)\s+-m\s+scripts\.dev_tools\.(?:validate_[A-Za-z0-9_.-]+|epic_wave_computation)\b'
+        '^\s*(?:poetry\s+run\s+)?(?:python|py)\s+-m\s+scripts\.dev_tools\.(?:validate_[A-Za-z0-9_.-]+|epic_wave_computation)\b',
+        '^\s*pwsh\s+-NoProfile\s+-File\s+\.codex/lib/epic-wave/Invoke-EpicWave\.ps1(?:\s+-ManifestPath\s+[A-Za-z0-9_./:\\-]+)?\s*$'
     )
     foreach ($pattern in $allowedPatterns) {
         if ($Command -match $pattern) {

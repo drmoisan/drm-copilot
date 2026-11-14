@@ -34,6 +34,7 @@ _REQUIRED_HEADINGS = (
     "## PowerShell Route and PoshQC MCP Limits",
     "## Batch Budget",
     "## Hook Execution Context",
+    "## Worktree Python Environment",
     "## MCP Surfaces Run the Installed Extension",
     "## CI Shape and Required Checks",
     "## CI-Only Failure Classes",
@@ -44,18 +45,25 @@ _REQUIRED_HEADINGS = (
     "## Test Runtime",
     "## Test Isolation Checks",
 )
+# The 20 contexts of ruleset 15241672 read on 2026-11-04, plus the issue #1074 gate.
+_OS = ("ubuntu-latest", "windows-latest")
 _REQUIRED_CONTEXTS = (
-    "drm-copilot-extension-tests / drm-copilot Extension Tests (ubuntu-latest)",
-    "drm-copilot-extension-tests / drm-copilot Extension Tests (windows-latest)",
+    *(f"drm-copilot-extension-tests / drm-copilot Extension Tests ({o})" for o in _OS),
+    *(f"root-typescript-tests / Root TypeScript Tests ({o})" for o in _OS),
+    *(f"quality-checks7 / Code Quality & Tests (3.{v})" for v in (11, 12, 13)),
+    *(f"NPM Audit Gate / npm audit ({m})" for m in (".", "packages/mcp-server")),
+    "NPM Audit Gate / npm audit (extensions/drm-copilot)",
+    *(f"poshqc / PowerShell QC{s}" for s in ("", " static", " shard 1", " shard 2")),
+    "poshqc / PowerShell QC shard 3",
+    "poshqc / PowerShell hook suites (Linux)",
     "docs-validation / Documentation Validation",
-    "poshqc / PowerShell QC",
     "shell-coverage / Shell Coverage (Bats + kcov)",
     "security-scan / Security Scanning",
-    "quality-checks7 / Code Quality & Tests (3.10)",
-    "quality-checks7 / Code Quality & Tests (3.11)",
-    "quality-checks7 / Code Quality & Tests (3.12)",
-    "quality-checks7 / Code Quality & Tests (3.13)",
     "build-check / Build Package",
+    "CI Required Gate",
+)
+_REMOVED_DOCS_ONLY_CLAIM = (
+    "every required context reports `success` without running its suite"
 )
 _CLAUDE_AGENTS = (
     "task-researcher",
@@ -87,10 +95,10 @@ def _collapse(text: str) -> str:
     return _WHITESPACE.sub(" ", text)
 
 
-def _section(heading: str) -> str:
-    """Return the whitespace-collapsed body of one `## ` section of the brief."""
+def _section(heading: str, relative_path: str = _BRIEF) -> str:
+    """Return the whitespace-collapsed body of one `## ` section of a brief copy."""
 
-    text = _read(_BRIEF)
+    text = _read(relative_path)
     start = text.index(f"\n{heading}\n") + len(heading) + 2
     end = text.find("\n## ", start)
     return _collapse(text[start : end if end != -1 else len(text)])
@@ -225,6 +233,64 @@ def test_brief_batch_budget_section_states_cap_codes_and_exemptions() -> None:
     assert missing == [], f"Batch Budget lacks {missing}"
 
 
+def test_brief_worktree_python_environment_section_states_bootstrap() -> None:
+    """The Worktree Python Environment section states the bootstrap and the guard."""
+
+    # Arrange
+    section = _section("## Worktree Python Environment")
+
+    # Act
+    missing = _missing(
+        section,
+        (
+            "env -u VIRTUAL_ENV poetry install",
+            "WORKTREE_VENV_BLOCKED:",
+            "enforce-worktree-poetry-venv.ps1",
+            "PYTHONPATH",
+            "push-down",
+        ),
+    )
+
+    # Assert
+    assert missing == [], f"Worktree Python Environment lacks {missing}"
+
+
+def test_brief_command_text_restrictions_states_preferred_forms() -> None:
+    """The brief states the preferred-forms table and the corrected Codex attribution.
+
+    Issue #1165: the table maps each intent to its form for an agent-isolated
+    worktree and for a sibling worktree, the Codex hook is stated to have no
+    cd-chained leg, and the Worktree Python Environment section names the
+    directory-option form of the bootstrap.
+    """
+
+    # Arrange
+    restrictions = _section("## Command-Text Restrictions")
+    python_environment = _section("## Worktree Python Environment")
+
+    # Act
+    missing = _missing(
+        restrictions,
+        (
+            "| Intent | Agent-isolated worktree | Sibling worktree |",
+            "git -C <abs>",
+            "poetry -C <abs>",
+            "npm --prefix <abs>",
+            "Read or Grep tool",
+            "absolute-path read",
+            "sh <SCRATCH>/<file>.sh",
+            ".claude/rules/bash-command-shape.md",
+            "has no cd-chained leg",
+        ),
+    ) + _missing(python_environment, ("poetry -C <worktree root>",))
+
+    # Assert
+    assert missing == [], f"brief lacks preferred-form tokens {missing}"
+    assert (
+        "`.codex/hooks/validate-bash.ps1` for Codex; functions" not in restrictions
+    ), "the brief still attributes the cd-chained functions to the Codex hook"
+
+
 def test_brief_ci_section_names_jobs_and_required_contexts() -> None:
     """The CI section names every job, the change scope, and each required context."""
 
@@ -237,6 +303,7 @@ def test_brief_ci_section_names_jobs_and_required_contexts() -> None:
         (
             "`poshqc / PowerShell hook suites (Linux)`",
             "`poshqc / PowerShell QC static`",
+            "the `Invoke-PoshQCLeakScan` leak scan",
             "`poshqc / PowerShell QC shard 1`",
             "the aggregator `poshqc / PowerShell QC`",
             "`Change scope`",
@@ -246,17 +313,21 @@ def test_brief_ci_section_names_jobs_and_required_contexts() -> None:
             "`scripts/ci/Invoke-CiChangeScope.ps1`",
             "`config/ci-docs-only-paths.json`",
             "`run-heavy: false`",
-            "every required context reports `success` without running its suite",
             "`merge_group`",
             "ruleset 15241672",
-            "2026-10-16",
             "Refresh rule",
+            "`scripts/ci/Invoke-CiRequiredGate.ps1`",
+            "never report on a docs-only run",
+            "2026-11-04",
+            "single required context",
+            "reports no expanded context",
             *(f"`{context}`" for context in _REQUIRED_CONTEXTS),
         ),
     )
 
     # Assert
     assert missing == [], f"CI section lacks {missing}"
+    assert _REMOVED_DOCS_ONLY_CLAIM not in section, "the false docs-only claim remains"
 
 
 def test_brief_is_preloaded_by_four_claude_agents() -> None:
@@ -429,8 +500,8 @@ def test_brief_npm_run_tokens_exist_in_package_json() -> None:
     assert "vitest" not in _read(_BRIEF).lower()
 
 
-def test_brief_test_isolation_requires_seeded_pester_shuffle() -> None:
-    """The isolation section requires seeded Jest, reversed Python, seeded Pester."""
+def test_brief_test_isolation_states_parallel_gates() -> None:
+    """The isolation section states the parallel gates and the debugging exception."""
 
     # Arrange
     section = _section("## Test Isolation Checks")
@@ -439,17 +510,92 @@ def test_brief_test_isolation_requires_seeded_pester_shuffle() -> None:
     missing = _missing(
         section,
         (
-            "`node run-jest.cjs --randomize --seed=<n>`",
-            "with the seed recorded",
-            "reversed-order run of the new or changed Python test modules",
-            "seeded shuffled file-order run of the touched Pester suites",
-            "at least three seeds",
-            "each seed and its file order recorded",
+            "Invoke-PoshQCParallelTest",
+            "pytest -n auto",
+            "normal parallel workers",
+            "re-run only after a fix",
+            "debugging only",
+            "never a gate or evidence",
+            "parallel gates govern",
+            "Invoke-PoshQCLeakScan",
         ),
     )
 
     # Assert
     assert missing == [], f"Test Isolation Checks lacks {missing}"
+
+
+def test_brief_copies_carry_no_removed_run_tokens() -> None:
+    """No brief copy names a test run that the parallel gates replaced."""
+
+    # Arrange
+    tokens = (
+        "single-process",
+        "seeded",
+        "shuffled",
+        "reversed-order",
+        "--randomize",
+        "at least three seeds",
+        "which is the CI shape",
+        "isolation reference",
+        "in addition to the serial runs",
+    )
+
+    # Act
+    # Fold case and collapse wrapping per copy, so a reintroduced token fails
+    # in whichever mirrored copy holds it.
+    found = {
+        path: [
+            token
+            for token in tokens
+            if token.casefold() in _collapse(_read(path)).casefold()
+        ]
+        for path in _BRIEF_COPIES
+    }
+    offending = {path: hits for path, hits in found.items() if hits}
+
+    # Assert
+    assert offending == {}, f"brief copies name removed runs: {offending}"
+
+
+def test_brief_passages_state_parallel_gate_facts() -> None:
+    """Every copy carries the other edited passages of the parallel-gate change."""
+
+    # Arrange
+    passages = {
+        "## CI-Only Failure Classes": (
+            "Files in one shard share a process",
+            "a leak surfaces when shard contents change",
+            "`Invoke-PoshQCLeakScan` is the check for such leaks",
+        ),
+        "## PowerShell Route and PoshQC MCP Limits": (
+            "`Invoke-PoshQCParallelTest`",
+            "`ExitCode`",
+            "only after a fully green run",
+            "`artifacts/pester/parallel/shard-<i>/`",
+            "No MCP tool exposes `Invoke-PoshQCLeakScan`",
+        ),
+        "## Test Runtime": ("of the `fix_all` pytest step",),
+        "## Contract Tests That Pin Mirrored Files": (
+            "`tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`",
+        ),
+        "## Coverage and File-Size Gates": (
+            "single gate run",
+            "Phase 0 baseline",
+        ),
+    }
+
+    # Act
+    # Check each passage in each copy, because the copies are the mirrored surface.
+    missing = {
+        (path, heading): lacking
+        for path in _BRIEF_COPIES
+        for heading, tokens in passages.items()
+        if (lacking := _missing(_section(heading, path), tokens))
+    }
+
+    # Assert
+    assert missing == {}, f"brief passages lack parallel-gate facts: {missing}"
 
 
 def test_brief_test_runtime_section_orders_diagnosis_before_parallelism() -> None:
@@ -470,6 +616,13 @@ def test_brief_test_runtime_section_orders_diagnosis_before_parallelism() -> Non
             "wall-clock time only",
             "-p <module>",
             "PYTHONPATH",
+            "Parallel workers",
+            "-n auto",
+            "addopts",
+            "physical cores",
+            "Pester 6",
+            "Invoke-PoshQCParallelTest",
+            "testsuite",
         ),
     )
 

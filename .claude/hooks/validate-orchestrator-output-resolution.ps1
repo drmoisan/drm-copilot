@@ -181,6 +181,9 @@ function Resolve-OrchestratorOutputCheckpointPath {
         The agent's final output text, scanned for the run identity literals.
     .PARAMETER SessionRoot
         The calling process's path, used only to find the repository.
+    .PARAMETER ItemTarget
+        Optional Resolve-OrchestratorOutputItemTarget result (issue #1145). When it is non-null,
+        the orchestrator-state target comes from Resolve-OrchestratorOutputItemOperandTarget.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -188,7 +191,8 @@ function Resolve-OrchestratorOutputCheckpointPath {
         [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $ArtifactType,
         [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $CheckpointPath,
         [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $AgentOutput,
-        [Parameter(Mandatory = $true)] [string] $SessionRoot
+        [Parameter(Mandatory = $true)] [string] $SessionRoot,
+        [AllowNull()] [object] $ItemTarget
     )
 
     if (-not $script:OrchestratorOutputRunKind.ContainsKey($ArtifactType)) {
@@ -203,10 +207,12 @@ function Resolve-OrchestratorOutputCheckpointPath {
         return (ConvertTo-OrchestratorOutputResolution -Resolved $false -Status 'Rejected' -ReasonCode $script:OrchestratorOutputMismatchReasonCode -Detail $shape.Detail)
     }
 
-    # Routing table: item resolves the session worktree; epic and parallel take the agent
+    # Routing table: item resolves the delegation-prompt target when one is supplied (issue #1145),
+    # otherwise the session worktree; epic and parallel take the agent
     # output's literal first and fall back to discovery over the live run checkpoints.
     if ($kind -eq 'item') {
-        $target = Resolve-WorktreeOperandTarget -Path '' -SessionRoot $SessionRoot
+        if ($null -ne $ItemTarget) { $target = Resolve-OrchestratorOutputItemOperandTarget -ItemTarget $ItemTarget -SessionRoot $SessionRoot }
+        else { $target = Resolve-WorktreeOperandTarget -Path '' -SessionRoot $SessionRoot }
     }
     else {
         $signal = Find-WorktreeRunIdentitySignal -Text $AgentOutput

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # parallel-manifest-validate.sh: sourceable bash port of
 # scripts/dev_tools/parallel_manifest_contract.py. Validates a parallel-run
-# manifest document against invariants M1 through M8 and exposes the two
+# manifest document against invariants M1 through M9 and exposes the two
 # default-resolving accessors that every consumer uses instead of reading
 # `mode` and `max_concurrency` directly.
 #
@@ -10,7 +10,8 @@
 # (M2 parallel, M3 mode, M4 max_concurrency, M5 created_at) in schema field
 # order; then the M7 prohibited-key scan, deep results in document order
 # followed by the top-level results; then the M6 items collection; then the
-# key-gated M8 expected_conflict_components assertion.
+# key-gated M8 expected_conflict_components assertion and the key-gated M9
+# pair_decisions record (parallel-manifest-pairs.sh).
 #
 # Every error string begins with the literal prefix `Parallel manifest` and
 # ends with a period. The Python module remains the repository authority.
@@ -32,6 +33,10 @@ PM_LIB_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=.claude/lib/bash/parallel-items-validate.sh
 # shellcheck disable=SC1091
 source "$PM_LIB_DIR/parallel-items-validate.sh"
+# The key-gated invariant M9 (issue #1164) lives in its own sourced file.
+# shellcheck source=.claude/lib/bash/parallel-manifest-pairs.sh
+# shellcheck disable=SC1091
+source "$PM_LIB_DIR/parallel-manifest-pairs.sh"
 
 # Literal context prefix for every error this module and its helpers emit.
 PM_CONTEXT="Parallel manifest"
@@ -265,9 +270,11 @@ pm_validate_text() {
 	# The manifest carries `kind` on every item, unlike the orchestrator
 	# checkpoint, so the shared item validator is asked to require it (S1).
 	pi_validate_items "items" "$PM_CONTEXT" 1
-	# M8 runs last because its membership check resolves against the same items
-	# collection the previous call validated.
+	# M8 runs after the items check because its membership check resolves
+	# against the same items collection the previous call validated.
 	pm_validate_expected_components
+	# M9 runs after M8 and resolves its endpoints against the same items.
+	pm_validate_pair_decisions
 	return 0
 }
 

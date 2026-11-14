@@ -22,7 +22,13 @@
         'Get-PoshQCCoverageLineSummary',
         'New-PoshQCShardManifest',
         'Test-PoshQCShardCompleteness',
-        'Test-PoshQCShardTestCount'
+        'Test-PoshQCShardTestCount',
+        'Get-PoshQCParallelWorkerCount',
+        'Merge-PoshQCJunitReport',
+        'ConvertTo-PoshQCShardWeight',
+        'Export-PoshQCShardWeight',
+        'Invoke-PoshQCParallelTest',
+        'Invoke-PoshQCLeakScan'
     )
     CmdletsToExport      = @()
     VariablesToExport    = @()

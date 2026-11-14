@@ -1,11 +1,12 @@
 """Contract tests for the epic integration branch pre-wave main-sync step.
 
-These tests pin issue #902. The epic integration branch is created from
-``origin/main`` once; without a pre-wave main-sync step it falls behind
-``origin/main`` while child waves run. The skill text must instruct
+These tests pin issue #902 as amended by issue #1117. The epic integration
+branch is created from ``origin/main`` once; without a pre-wave main-sync step it
+falls behind ``origin/main`` while child waves run. The skill text must instruct
 ``epic-orchestrator`` to count the commits ``origin/main`` has that the
-integration branch lacks and, when the count is non-zero, to run the main-sync
-as a dedicated chore child item before the wave launches.
+integration branch lacks and, when the count is non-zero, to merge
+``origin/main`` into the integration branch itself and push it before the wave
+launches. The former dedicated child item wording must not return.
 
 The step is runtime procedure text in Markdown, so the repository's
 text-fragment contract-test convention is the applicable verification surface.
@@ -39,17 +40,23 @@ CODEX_BUNDLE_PATH = (
     ".agents/skills/epic-orchestrate/SKILL.md"
 )
 
-# The twelve fragments both the Claude step and the Codex paragraph must carry.
+# The eight fragments both the Claude step and the Codex paragraph must carry.
 MAIN_SYNC_FRAGMENTS: tuple[str, ...] = (
     "`git fetch origin main` and then",
     "`git rev-list --count ",
     "..origin/main`",
     "zero count proceeds directly to the wave",
+    "merges `origin/main`",
+    "before the wave launches",
+    "pushes the integration branch",
+    "no rebase, no force-push",
+)
+
+# Wording of the retired dedicated sync child item that must not return.
+REMOVED_CHILD_ITEM_PHRASES: tuple[str, ...] = (
     "dedicated chore child item",
     "`epic-852-main-sync`",
-    "merges `origin/main`",
     "PR into the integration branch",
-    "before the wave launches",
     "`features[]`",
     "manifest child's issue number",
     "one main-sync child",
@@ -108,7 +115,7 @@ def normalize_whitespace(text: str) -> str:
 
 
 def contains_phrase(haystack: str, phrase: str) -> bool:
-    """Report whether a phrase appears in text, ignoring line wrapping.
+    """Report whether a phrase appears in text, ignoring wrapping and case.
 
     Args:
         haystack (str): Raw text to search.
@@ -116,10 +123,14 @@ def contains_phrase(haystack: str, phrase: str) -> bool:
 
     Returns:
         bool: ``True`` when the normalized phrase appears in the normalized
-        haystack.
+        haystack, compared case-insensitively so that a fragment matches at a
+        sentence start as well as mid-sentence.
     """
 
-    return normalize_whitespace(phrase) in normalize_whitespace(haystack)
+    return (
+        normalize_whitespace(phrase).casefold()
+        in normalize_whitespace(haystack).casefold()
+    )
 
 
 def section_body(text: str, heading: str) -> str | None:
@@ -163,6 +174,24 @@ def assert_main_sync_fragments(label: str, body: str) -> None:
         assert contains_phrase(
             body, fragment
         ), f"{label}: missing main-sync fragment: {fragment}"
+
+
+def assert_no_child_item_wording(label: str, body: str) -> None:
+    """Assert that no retired child-item phrase appears in a section body.
+
+    Args:
+        label (str): Surface label used in the failure message.
+        body (str): The raw section body to search.
+
+    Raises:
+        AssertionError: When any retired phrase is present; the message names it.
+    """
+
+    # Check every retired phrase so the failure names the first one that returned.
+    for phrase in REMOVED_CHILD_ITEM_PHRASES:
+        assert not contains_phrase(
+            body, phrase
+        ), f"{label}: retired child-item wording present: {phrase}"
 
 
 def remove_block(text: str, start_prefix: str, stop_prefix: str) -> str:
@@ -286,6 +315,27 @@ def test_contract_fails_when_codex_main_sync_paragraph_removed() -> None:
     # Assert
     with pytest.raises(AssertionError, match="missing main-sync fragment"):
         assert_main_sync_fragments("codex-removed", stripped)
+
+
+@pytest.mark.parametrize(("relative_path", "heading"), SURFACES)
+def test_child_item_wording_absent_from_lifecycle_section(
+    relative_path: str, heading: str
+) -> None:
+    """No parity surface carries the retired dedicated sync child wording."""
+    # Arrange
+    body = read_section(relative_path, heading)
+    # Act / Assert
+    assert_no_child_item_wording(relative_path, body)
+
+
+def test_contract_fails_when_child_item_wording_returns() -> None:
+    """Re-inserting retired child-item wording makes the contract fail."""
+    # Arrange
+    body = read_section(CLAUDE_SKILL_PATH, CLAUDE_HEADING)
+    regressed = body + "\nThe sync runs as a dedicated chore child item.\n"
+    # Act / Assert
+    with pytest.raises(AssertionError, match="retired child-item wording"):
+        assert_no_child_item_wording("claude-regressed", regressed)
 
 
 def test_contract_fails_on_pre_change_lifecycle_text() -> None:

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "exemptGlobalVariables": [
+    {
+      "name": "LASTEXITCODE",
+      "reason": "Any native command overwrites $global:LASTEXITCODE, and a reader of it after a fake native call receives the fake's own value; restoring it in every writer would change no behavior (issue #1096, Decision 2)."
+    }
+  ],
+  "entries": [
+    {
+      "path": "tests/scripts/dev-tools/run-actionlint.EnvironmentIsolation.Tests.ps1",
+      "kind": "env",
+      "name": "[string]$key",
+      "reason": "Class C2: the write is the restore itself; it sits in the $script:restoreEnvironment scriptblock, which the AfterEach block of the same file invokes through a scriptblock variable, a route the scan's pairing rules do not follow."
+    },
+    {
+      "path": "tests/scripts/dev-tools/run-actionlint.EnvironmentIsolation.Tests.ps1",
+      "kind": "env",
+      "name": "$key",
+      "reason": "Class C2: the write is the restore itself; it sits in the $script:restoreEnvironment scriptblock, which the AfterEach block of the same file invokes through a scriptblock variable, a route the scan's pairing rules do not follow."
+    }
+  ]
+}

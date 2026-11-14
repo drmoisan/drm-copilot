@@ -1,0 +1,65 @@
+{
+  "issue-num": "1105",
+  "stage_timing": [
+    {
+      "stage": "promotion",
+      "attempt": 1,
+      "started_at": "2026-11-07T13:48:43Z",
+      "ended_at": "2026-11-07T13:50:07Z"
+    },
+    {
+      "stage": "research",
+      "attempt": 1,
+      "started_at": "2026-11-07T13:50:07Z",
+      "ended_at": "2026-11-07T14:02:41Z"
+    },
+    {
+      "stage": "spec",
+      "attempt": 1,
+      "started_at": "2026-11-07T14:02:41Z",
+      "ended_at": "2026-11-07T14:05:57Z"
+    },
+    {
+      "stage": "planning",
+      "attempt": 1,
+      "started_at": "2026-11-07T14:05:57Z",
+      "ended_at": "2026-11-07T14:31:20Z"
+    },
+    {
+      "stage": "execution",
+      "attempt": 1,
+      "started_at": "2026-11-07T14:31:20Z",
+      "ended_at": "2026-11-07T15:28:30Z"
+    },
+    {
+      "stage": "review",
+      "attempt": 1,
+      "started_at": "2026-11-07T15:28:30Z",
+      "ended_at": "2026-11-07T15:43:21Z"
+    },
+    {
+      "stage": "remediation",
+      "attempt": 1,
+      "started_at": "2026-11-07T15:43:21Z",
+      "ended_at": "2026-11-07T17:36:34Z"
+    },
+    {
+      "stage": "pr",
+      "attempt": 1,
+      "started_at": "2026-11-07T17:36:34Z",
+      "ended_at": "2026-11-07T17:39:40Z"
+    },
+    {
+      "stage": "ci",
+      "attempt": 1,
+      "started_at": "2026-11-07T17:39:40Z",
+      "ended_at": "2026-11-07T17:56:32Z"
+    },
+    {
+      "stage": "ci",
+      "attempt": 2,
+      "started_at": "2026-11-07T17:56:32Z",
+      "ended_at": null
+    }
+  ]
+}
