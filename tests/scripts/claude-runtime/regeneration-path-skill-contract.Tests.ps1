@@ -63,6 +63,11 @@ BeforeDiscovery {
         @{ Id = 'RSC-BRIEF-CI'; File = '.claude/skills/execution-environment/SKILL.md'; Heading = '## CI Shape and Required Checks'; Literal = @('dispatches CI on the integration branch after each child merge') }
         @{ Id = 'RSC-BRIEF-CONTRACT'; File = '.claude/skills/execution-environment/SKILL.md'; Heading = '## Contract Tests That Pin Mirrored Files'; Literal = @('regeneration-path-skill-contract.Tests.ps1') }
     )
+
+    $script:StartRow = @(
+        @{ File = $orchestrate; Scope = 'item 2 of ## Merge-Conflict Remediation'; Kind = 'Item' }
+        @{ File = '.claude/rules/orchestrator-state.md'; Scope = 'the Config rules paragraph of ## Regeneration-Path Scope and Backward Compatibility'; Kind = 'Paragraph' }
+    )
 }
 
 BeforeAll {
@@ -133,6 +138,32 @@ Describe 'regenerate-path skill contract (issue #1156)' {
 
         # Assert
         Assert-RscLiteralPresent -Scope $scope -Literal $Literal -Label "$Heading of $Prefix$File"
+    }
+
+    It 'states the start-time resolution and batch refusal in <Scope> of <Prefix><File>' -ForEach @(foreach ($row in $script:StartRow) { foreach ($surface in $script:Surface) { $row + @{ Prefix = $surface.Prefix } } }) {
+        # Arrange
+        $text = Get-RscText -Path ($Prefix + $File)
+        $startLiteral = @(
+            'resolves to an application through PATH (and PATHEXT on Windows)', 'runs through ComSpec /d /c',
+            'a batch path holding a double quote or one of & | < > ^ %',
+            'a batch argument holding whitespace, a double quote, or one of & | < > ^ % ( )', 'is refused before the start'
+        )
+
+        # Act
+        if ($Kind -ceq 'Item') {
+            $scopeText = Get-RscNumberedItem -Text (Get-RscSection -Text $text -Heading $script:RemediationHeading) -Number 2
+        }
+        else {
+            $section = Get-RscSection -Text $text -Heading '## Regeneration-Path Scope and Backward Compatibility'
+            $paragraph = @(($section -split "`n`n") | Where-Object { $_.Contains('Config rules,') })
+            $paragraph.Count | Should -Be 1
+            $scopeText = $paragraph[0]
+        }
+        $refusalCount = ([regex]::Matches((Get-RscCollapsed -Text $text), [regex]::Escape('is refused before the start'))).Count
+
+        # Assert
+        Assert-RscLiteralPresent -Scope $scopeText -Literal $startLiteral -Label "$Scope of $Prefix$File"
+        $refusalCount | Should -Be 1
     }
 
     Context 'orchestrate skill structure in <Prefix>' -ForEach $script:Surface {
