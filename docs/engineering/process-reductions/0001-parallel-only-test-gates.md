@@ -19,6 +19,8 @@ Rebased over #1158 (`fix_all` test steps): the Pester, pytest, Jest, and bats st
 
 Rebased over #1158 (preflight QC): the full-suite pytest step of `scripts/dev_tools/atomic_executor/cli_preflight.py` and the `_PYTEST_STEP` constant of `tests/scripts/dev_tools/atomic_executor/test_cli_part3.py` now start with `TEST_SUITE_LAUNCHER_ARGV` instead of `"poetry",` and `"run",`, and `test_preflight_pytest_step_runs_xdist_workers` in `tests/scripts/dev_tools/atomic_executor/test_cli_part2_part2.py` patches the PATH lookup. Those three blocks were regenerated so that both fences carry the new text; the `-n` and `auto` lines and the removed test they revert are unchanged.
 
+Rebased over #1158 (VS Code tasks): the parallel test tasks of `.vscode/tasks.json` now start `pwsh` with the test-execution launcher. The block that records the default-group change of `QC: 4 Pytest: run tests (parallel)` was regenerated so that both fences carry `"command": "pwsh",`; its `isDefault` lines still revert. The new `VsCodeQualityTasks.Tests.ps1` cases sit after the recorded block, so that block is unchanged.
+
 ## Reason and Evidence
 
 The owner decided on 2026-11-06 that tests run in parallel only. The sequential run existed to detect and fix a leak that has since been fixed, and the overhead of multiple and sequential runs was judged unacceptable.
@@ -409,7 +411,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ### Revert Block: .vscode/tasks.json
 
 ````Current
-			"command": "poetry",
+			"command": "pwsh",
 			"detail": "Runs the pytest suite in pytest-xdist workers (-n auto on the command line, never in addopts).",
 			"group": {
 				"isDefault": true,
@@ -419,7 +421,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ````
 
 ````Prior
-			"command": "poetry",
+			"command": "pwsh",
 			"detail": "Runs the pytest suite in pytest-xdist workers (-n auto on the command line, never in addopts).",
 			"group": {
 				"isDefault": false,
