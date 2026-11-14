@@ -319,4 +319,22 @@ Describe 'Parallel gate wording' {
         $missing | Should -BeNullOrEmpty -Because "$Path must name the launcher suites"
         $held | Should -BeNullOrEmpty -Because "$Path must not name a direct pytest toolchain command"
     }
+
+    It 'PGW-SCOPED-<Id> names the scoped Pester route' -ForEach @(
+        @{ Id = 'CLAUDE'; Path = '.claude/skills/test-execution-policy/SKILL.md' }
+        @{ Id = 'AGENTS'; Path = '.agents/skills/test-execution-policy/SKILL.md' }
+        @{ Id = 'GITHUB'; Path = '.github/skills/test-execution-policy/SKILL.md' }
+        @{ Id = 'CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/test-execution-policy/SKILL.md' }
+        @{ Id = 'AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/test-execution-policy/SKILL.md' }
+        @{ Id = 'GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/test-execution-policy/SKILL.md' }
+    ) {
+        # Arrange
+        $text = Get-PgwSurfaceText -RelativePath $Path
+
+        # Act
+        $missing = @(@('-TestPath', 'fail-before proof') | Where-Object { -not $text.Contains($_) })
+
+        # Assert
+        $missing | Should -BeNullOrEmpty -Because "$Path must state the scoped Pester route (C1)"
+    }
 }

@@ -33,6 +33,10 @@ Built-in suites: `pytest` (`poetry run pytest -n auto`), `pester` (`Invoke-Peste
 
 The `pester` suite runs `pwsh -NoProfile -NonInteractive -File` with the launcher-sibling `Invoke-PesterSuite.ps1`, which imports `scripts/powershell/PoshQC/PoshQC.psd1`, calls `Invoke-PoshQCParallelTest` with `-Root .` and no `-WorkerCount`, and exits with the result's `ExitCode`. It reads its arguments as follows: a word equal, ignoring case, to `-` plus a declared parameter name of `Invoke-PoshQCParallelTest` starts a key; every other word is a value of the current key, so a suffix such as `-integration.test.ts` stays a value; a key with no value is `$true`; a repeated key appends; and a value before any key stops the script with exit 1 and a message starting `Invoke-PesterSuite: unexpected argument`. It runs only through the launcher; a direct `pwsh -File` call of it, or a script that calls it, is a direct runner for the hook.
 
+### Scoped Pester runs
+
+A task check, a fail-before proof, and a consumer-suite check run their Pester selection through the launcher `pester` suite followed by `-TestPath` and the test files or folders, for example `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath tests/scripts/powershell/PoshQC tests/scripts/claude-hooks/enforce-test-execution-policy.Tests.ps1`. The suite passes `-TestPath` to `Invoke-PoshQCParallelTest`, which resolves the selection to its test files and runs them under the machine test-suite lock with the integration and golden lanes excluded, starting at most one shard per file. The hook denies a lane path in that list. The merged files under `artifacts/pester/` then cover the selection only and are not gate evidence. Such a run replaces a direct one-process Pester run.
+
 ## Exit Codes and Messages
 
 | Code | Meaning |
