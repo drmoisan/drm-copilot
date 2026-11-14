@@ -227,10 +227,11 @@ BeforeDiscovery {
         @{ Id = 'AGENTS'; Path = '.agents/skills/execution-environment/SKILL.md' }
         @{ Id = 'GITHUB'; Path = '.github/skills/execution-environment/SKILL.md' }
     ) -Check @(
-        (Get-TcwCheck -Heading '## Test Isolation Checks' -Required @('task-check evidence', 'never as a gate result or coverage evidence', $anchor))
+        (Get-TcwCheck -Heading '## Test Isolation Checks' -Required @('task-check evidence', 'never as a gate result or coverage evidence', $anchor, '-TestPath'))
         (Get-TcwCheck -Heading '## Test Runtime' -Required @('its phase-gate QC loop') -Forbidden @('its full QC loop'))
         (Get-TcwCheck -Heading '## Contract Tests That Pin Mirrored Files' -Required @('test-cadence-wording.Tests.ps1'))
-        (Get-TcwCheck -Heading '## PowerShell Route and PoshQC MCP Limits' -Required @('Run.Path', 'New-PesterConfiguration'))
+        # Issue #1158 (C1): a task check runs its Pester selection through the launcher pester suite with -TestPath.
+        (Get-TcwCheck -Heading '## PowerShell Route and PoshQC MCP Limits' -Required @('-TestPath', 'run-test-suite.sh pester'))
     )
 
     # Gate layout per template under decision D15: the bug template gates its expect-fail
