@@ -64,7 +64,7 @@ Version 1 shape:
 
 - `version` (required): JSON integer `1`.
 - `regeneration` (required key, value an object or `null`):
-  - `command` (required): non-empty array of non-empty strings; argv executed with no shell from the worktree root.
+  - `command` (required): non-empty array of non-empty strings; argv executed with no shell from the worktree root. The first element resolves to an application through PATH (and PATHEXT on Windows); a resolved `.cmd` or `.bat` file runs through `ComSpec` with `/d /c` and refuses an argument holding whitespace, a double quote, or a `cmd.exe` metacharacter (`&|<>^%()`); a name that does not resolve is a start failure.
   - `paths` (required): non-empty array of declared path patterns.
   - `idempotency_check` (optional): non-empty array of non-empty strings; argv that must exit 0 after run 2.
   - `unit_gate` (optional): non-empty array whose every element is a non-empty array of non-empty strings; each element is one argv run in order and each must exit 0. Absent means the standard parallel gates of `## Test Isolation Checks` in the execution-environment brief, run by the orchestrator.
