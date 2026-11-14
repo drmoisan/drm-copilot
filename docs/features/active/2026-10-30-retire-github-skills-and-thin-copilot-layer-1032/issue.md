@@ -8,7 +8,7 @@
 
 - Issue: #1032
 - Issue URL: https://github.com/drmoisan/drm-copilot/issues/1032
-- Last Updated: 2026-10-30
+- Last Updated: 2026-11-14
 - Work Mode: full-feature
 
 ## Problem / Why
@@ -20,7 +20,7 @@ Epic #1018 moves the three agent ecosystems in this repository onto shared cross
 - Retire `.github/skills` after its three unique sections, in `feature-promotion-lifecycle` and `feature-review-workflow`, are ported to the shared skill source or recorded as stale.
 - Retire `.github/agents`, or reduce it to a generated file, according to the result of child 1's experiment on whether the Copilot CLI and Copilot cloud agent read Claude-format `.claude/agents`.
 - Keep a thin Copilot layer: prompts, handoffs and hooks stay native in `.github`; `.github/copilot-instructions.md` holds Copilot-only text.
-- Deliver Copilot collision controls in workspace `.vscode/settings.json` if workspace scope works (child 1 experiment E4); otherwise document them. `.vscode/settings.json` is gitignored, so the delivery approach is an owner question with a default.
+- Deliver Copilot collision controls in workspace `.vscode/settings.json` if workspace scope works (child 1 experiment E4); otherwise document them. `.vscode/settings.json` is now a tracked file, so the keys are added to it directly, with no copy step.
 - Update the push-down packs and bundled extension mirrors for every removed file.
 
 ## Acceptance Criteria (early draft)
@@ -34,7 +34,7 @@ Epic #1018 moves the three agent ecosystems in this repository onto shared cross
 ## Constraints & Risks
 
 - Depends on children 4 (push-down consolidation and packs) and 5 (hook parity) and on child 1's experiment results; planned before they exist (owner decision E3), so the plan carries a Phase 0 gate that re-checks them.
-- Execution starts only after the parallel run `bugs-1001-1002-1003-1006` merges; that run edits `.github/skills/execution-environment/SKILL.md`.
+- The parallel run `bugs-1001-1002-1003-1006` has merged and issue #1013 is closed (verified 2026-11-14), so no parallel-run start constraint remains; each plan re-checks its edited anchors at the merge base before editing.
 - Language rule: anything pushed down is PowerShell or bash; TypeScript only for MCP tools and extension commands; no new Python.
 
 ## Test Conditions to Consider
