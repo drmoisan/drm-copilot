@@ -49,6 +49,8 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        # Issue #1161: the entry point reads the gitignored planner checkpoint; its git seam fails without a process.
+        Mock Invoke-CodexPlannerWorktreeGitExe { [pscustomobject]@{ ExitCode = 1; Output = [string[]] @() } }
 
         # Synthetic rooted prefixes chosen per host OS. [System.IO.Path]::IsPathRooted treats a
         # drive-letter path (a letter, a colon, and a slash) as rooted only on Windows; on Linux
@@ -257,6 +259,36 @@ Describe 'Codex enforce-epic-worktree-removal-gate decision surface (issue #545)
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason |
                 Should -Match '^EPIC_WORKTREE_REMOVAL_BLOCKED'
+        }
+
+        It 'reads the planner, epic, and target checkpoints through the entry point and appends the planner refusal (issue #1161)' {
+            # Arrange: every checkpoint the body reads is an in-memory text behind a path-filtered mock, so no file is read.
+            $planner = '{"integration_branch":"epic/alpha","planner_worktrees":[{"branch":"feature/alpha-1","purpose":"preparation","preparation_status":"prepared"}]}'
+            $listing = [string[]] @("worktree $($script:SyntheticRoot)", 'branch refs/heads/main', '', "worktree $($script:SyntheticTarget)", 'branch refs/heads/feature/alpha-1', '')
+            Mock Test-Path -ParameterFilter { $LiteralPath -like '*epic-orchestrator-state.json' } -MockWith { $true }
+            Mock Get-Content -ParameterFilter { $LiteralPath -like '*epic-orchestrator-state.json' } -MockWith { '{"features":[]}' }
+            Mock Test-Path -ParameterFilter { $LiteralPath -like '*epic-planner-state.json' } -MockWith { $true }
+            Mock Get-Content -ParameterFilter { $LiteralPath -like '*epic-planner-state.json' } -MockWith { $planner }.GetNewClosure()
+            Mock Test-Path -ParameterFilter { $LiteralPath -like '*worktree-9f2a1c*orchestrator-state.json' } -MockWith { $true }
+            Mock Get-Content -ParameterFilter { $LiteralPath -like '*worktree-9f2a1c*orchestrator-state.json' } -MockWith { '{"next_step":"S6_review"}' }
+            Mock Invoke-CodexPlannerWorktreeGitExe {
+                param([string[]] $GitArgs)
+                if ($GitArgs -contains 'worktree') { return [pscustomobject]@{ ExitCode = 0; Output = $listing } }
+                return [pscustomobject]@{ ExitCode = 1; Output = [string[]] @() }
+            }.GetNewClosure()
+            $payload = ConvertTo-CodexWorktreeDecisionPayload -Command ('git worktree remove "' + $script:SyntheticTarget + '"') -WorkingDirectory $script:SyntheticRoot
+
+            # Act
+            $result = Invoke-CodexWorktreeGateEntryPoint -HookPath $script:UnderTest -PayloadRaw $payload
+
+            # Assert: the deny carries the planner sentence for U4, so all three reads reached the decision.
+            $result.ExitCode | Should -Be 0
+            $result.Stderr | Should -BeNullOrEmpty
+            $reason = ($result.Stdout | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason
+            $reason | Should -Match '^EPIC_WORKTREE_REMOVAL_BLOCKED'
+            $reason | Should -BeLike '*Planner worktree: PLANNER_WORKTREE_IN_USE: U4 *'
+            Should -Invoke Get-Content -Times 1 -Exactly -ParameterFilter { $LiteralPath -like '*worktree-9f2a1c*orchestrator-state.json' }
+            Should -Invoke Get-Content -Times 1 -Exactly -ParameterFilter { $LiteralPath -like '*epic-planner-state.json' }
         }
 
         It 'writes the reason to stderr and exits 2 for malformed stdin' {

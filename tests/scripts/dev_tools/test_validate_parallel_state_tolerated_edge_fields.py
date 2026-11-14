@@ -1,10 +1,10 @@
-"""Validator tolerance for the scheduling layer's extra fields (issue #722).
+"""Validator acceptance of the scheduling layer's recorded fields (issue #722).
 
-The integration-cost scheduling layer records three tolerated-not-validated
-fields on each conflict edge (``hard``, ``cost``, ``benefit``) and a
-``tolerated_overlaps`` list on the planner and orchestrator checkpoints. No
-validator reads them, so a checkpoint carrying them must validate with zero
-errors, while the four-member edge reason enum stays enforced. The valid
+The integration-cost scheduling layer records three fields on each conflict
+edge (``hard``, ``cost``, ``benefit``) and a ``tolerated_overlaps`` list on the
+planner and orchestrator checkpoints. Since issue #1164 the validators check
+these fields when present, so a checkpoint carrying valid values must validate
+with zero errors, while the four-member edge reason enum stays enforced. The valid
 checkpoint builders are shared with the existing validator test modules rather
 than duplicated; orchestrator edges use the split-cohort builder, because an
 edge between two items of one cohort is a cohort-barrier violation.
@@ -134,7 +134,12 @@ def test_planner_state_accepts_combined_item_and_combinations_list() -> None:
 
 
 def test_out_of_enum_reason_is_still_rejected() -> None:
-    """Extra fields do not relax the four-member reason enum."""
+    """The estimate fields do not relax the four-member reason enum.
+
+    The tolerated overlap names the edge's own pair, so the scheduling-decision
+    check of issue #1164 also reports the pair as present in both lists, after
+    the enum error of the edge validator.
+    """
     state = orchestrator_structures.state_with_edges(
         [dict(SCHEDULED_EDGE, reason="same_file")]
     )
@@ -147,4 +152,8 @@ def test_out_of_enum_reason_is_still_rejected() -> None:
         "path_overlap, module_overlap, shared_surface_overlap, "
         "contract_dependency; found: 'same_file'."
     )
-    assert errors == [expected]
+    both_lists = (
+        "Parallel checkpoint pair (444, 445) is in both conflict_edges and "
+        "tolerated_overlaps."
+    )
+    assert errors == [expected, both_lists]

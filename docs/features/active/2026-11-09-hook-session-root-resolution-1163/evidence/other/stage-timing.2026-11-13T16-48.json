@@ -1,0 +1,92 @@
+[
+  {
+    "stage": "S4_atomic_planning_revision",
+    "attempt": 1,
+    "started_at": "2026-11-09T22:45:40Z",
+    "ended_at": "2026-11-09T23:01:42Z"
+  },
+  {
+    "stage": "S4_preflight",
+    "attempt": 1,
+    "started_at": "2026-11-09T23:01:42Z",
+    "ended_at": "2026-11-09T23:09:00Z"
+  },
+  {
+    "stage": "S5_atomic_execution",
+    "attempt": 1,
+    "started_at": "2026-11-10T03:10:10Z",
+    "ended_at": "2026-11-11T03:54:02Z"
+  },
+  {
+    "stage": "S5_atomic_execution",
+    "attempt": 2,
+    "started_at": "2026-11-11T03:55:47Z",
+    "ended_at": "2026-11-12T12:32:21Z"
+  },
+  {
+    "stage": "S5_atomic_execution",
+    "attempt": 3,
+    "started_at": "2026-11-12T12:32:21Z",
+    "ended_at": "2026-11-13T13:42:59Z"
+  },
+  {
+    "stage": "S5_atomic_execution",
+    "attempt": 4,
+    "started_at": "2026-11-13T13:42:59Z",
+    "ended_at": "2026-11-13T14:15:32Z"
+  },
+  {
+    "stage": "S7_feature_review",
+    "attempt": 1,
+    "started_at": "2026-11-13T14:16:19Z",
+    "ended_at": "2026-11-13T14:29:55Z"
+  },
+  {
+    "stage": "remediation.cycle_1.execute",
+    "attempt": 1,
+    "started_at": "2026-11-13T14:29:55Z",
+    "ended_at": "2026-11-13T14:58:19Z"
+  },
+  {
+    "stage": "remediation.cycle_1.reaudit",
+    "attempt": 1,
+    "started_at": "2026-11-13T14:58:19Z",
+    "ended_at": "2026-11-13T15:08:04Z"
+  },
+  {
+    "stage": "S8_create_pr",
+    "attempt": 1,
+    "started_at": "2026-11-13T15:08:38Z",
+    "ended_at": "2026-11-13T15:12:38Z"
+  },
+  {
+    "stage": "S9_ci_green",
+    "attempt": 1,
+    "started_at": "2026-11-13T15:12:38Z",
+    "ended_at": "2026-11-13T15:36:15Z"
+  },
+  {
+    "stage": "remediation.cycle_2.plan",
+    "attempt": 1,
+    "started_at": "2026-11-13T15:36:15Z",
+    "ended_at": "2026-11-13T15:43:34Z"
+  },
+  {
+    "stage": "remediation.cycle_2.execute",
+    "attempt": 1,
+    "started_at": "2026-11-13T15:43:34Z",
+    "ended_at": "2026-11-13T16:09:29Z"
+  },
+  {
+    "stage": "remediation.cycle_2.reaudit",
+    "attempt": 1,
+    "started_at": "2026-11-13T16:09:29Z",
+    "ended_at": "2026-11-13T16:19:08Z"
+  },
+  {
+    "stage": "S9_ci_green",
+    "attempt": 2,
+    "started_at": "2026-11-13T16:19:08Z",
+    "ended_at": null
+  }
+]

@@ -35,7 +35,7 @@ Before executing any implementation tasks, you must ensure you have read and are
 
 Enforce implications (non-exhaustive):
 - Bugfix workflow: smallest failing regression test first, then minimal fix.
-- Toolchain loop: format → lint → type-check → test; repeat until clean.
+- Toolchain loop: format → lint → type-check → test, run as a task check after each task and as the full loop at each phase gate and in the final QA loop. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 - Dependencies: do not add new deps unless explicitly approved.
 - Secrets: never write secrets; never auto-create `.env` without explicit request.
 
@@ -193,7 +193,7 @@ Start with:
 
 ### 3.4 Verification (mandatory before check-off)
 - Explicitly verify the acceptance criteria.
-- If the repo policy requires a toolchain loop, run it at the appropriate points (or per plan).
+- Run the task check for the task; a `[phase-gate]` task runs the full toolchain loop instead. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 - If the task changes code/tests and the plan does not explicitly specify verification commands, prefer repo-defined tasks/commands and ensure the final QA phase executes the full toolchain loop for each language touched by the plan (per the table in Section 0).
 - For tasks tagged with `[expect-fail]`:
   - Treat a **failing** test run (as specified in the task acceptance criteria) as the expected outcome for that task.
@@ -261,7 +261,7 @@ Always enforce repo policy order:
 4) `.github/instructions/general-unit-test.instructions.md`
 5) `.github/instructions/powershell-unit-test.instructions.md`
 
-Required toolchain for PowerShell tasks:
+Phase-gate and final-QA toolchain for PowerShell (each task runs a task check instead). Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 1) Format (`mcp__drm-copilot__run_poshqc_format`)
 2) Analyze (`mcp__drm-copilot__run_poshqc_analyze`)
 3) Test (one `Invoke-PoshQCParallelTest` run)

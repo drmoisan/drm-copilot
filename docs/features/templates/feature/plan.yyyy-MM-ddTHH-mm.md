@@ -35,6 +35,7 @@
 - [ ] [P1-T2] <Atomic task>
   - Preconditions: <optional>
   - Acceptance: <optional>
+- [ ] [P1-T3] [phase-gate] Run the full toolchain loop (stages 1 to 6) per `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill and record `<FEATURE>/evidence/qa-gates/phase-gate.P1.<timestamp>.md`
 
 ### Phase 2: <Phase Name>
 - [ ] [P2-T1] <Atomic task>

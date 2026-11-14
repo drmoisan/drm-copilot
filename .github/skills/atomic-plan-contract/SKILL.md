@@ -71,6 +71,8 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
 - explicit post-implementation small-audit handoff,
 - reduced artifact checks required by short-path policy.
 
+Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+
 ## Minimal-Audit Directive Contract (Small Path)
 
 For short-path planning handoffs, orchestrators MUST include:
@@ -141,6 +143,17 @@ For any language in scope where repository policy requires coverage validation:
 - Each changed file meets the coverage thresholds and shows no drop against the `Phase 0 baseline`; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
 - If required coverage values are unavailable, the plan outcome MUST be remediation-required and MUST NOT be reported as PASS.
 
+## Test Cadence (Mandatory)
+
+This section defines when the toolchain runs during plan execution. Other plan-execution surfaces reference this section instead of restating it.
+
+- **Task check (after each task).** After each task, the executor runs a task check: format, lint, and type check scoped to the files the task changed, then the task's test selection. The task's test selection is the mirrored test files under `tests/` of each changed production file, plus every test file that imports, dot-sources, or names a changed module or file; for a changed Markdown or configuration path, it is the contract tests that read that path. Integration and golden suites are never part of the task's test selection. A task check is not a gate: it measures no coverage and does not replace the phase gate. Its evidence is a new append-only file per task, `<FEATURE>/evidence/other/task-check.P<N>-T<M>.<timestamp>.md`, which records the changed files, the selection and the rule that produced it, and each command with its exit code.
+- **Phase gate (after each phase).** The last task of every phase between Phase 0 and the final QA phase carries the `[phase-gate]` tag, placed after the task ID as `[expect-fail]` is. That task runs stages 1 to 6 of the toolchain loop across the repository: format, lint, type check, architecture-boundary tests, the full unit suite, and contract checks. The unit stage is one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers. On a failure or an auto-fix, fix the cause and restart from step 1; the phase closes only after one clean pass. Its evidence is `<FEATURE>/evidence/qa-gates/phase-gate.P<N>.<timestamp>.md`. Phase 0 needs no gate task, and the loop of the final QA phase is its own gate.
+- **Expect-fail phase.** A phase may end with tests tagged `[expect-fail]` that fail by design until a later phase. Its `[phase-gate]` task still runs the full loop: the unit stage passes when its only failures are the plan's named `[expect-fail]` tests that a later phase makes pass, each confirmed failing, and every other test passes. The gate evidence lists those expected failures by name.
+- **No-change phase.** A phase that changes no tracked file, such as an investigation or reproduction phase that only writes evidence, is a no-change phase and needs no `[phase-gate]` task; the next gate covers it.
+- **Final QA loop (unchanged).** The final QA loop in the next section remains a full run with coverage compared with the `Phase 0 baseline`, and the no-SKIPPED rule is unchanged.
+- **CI-only suites.** Integration and golden suites run in CI only.
+
 ## Final QA Loop (Required for Code/Test Changes)
 
 Run the full toolchain loop for each applicable language in order:
@@ -154,6 +167,8 @@ For languages with mandatory coverage policy, step 4 must use coverage-enabled t
 If any step fails or changes files, restart the loop from step 1 until a clean pass completes.
 
 The format, lint, and type-check results of each language are recorded in one final-QC static artifact per language, with each step's command, exit code, and finding count; reviewers read that artifact and do not re-run format, lint, or type checks.
+
+Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
 ## No-SKIPPED Rule for Planned Command Tasks
 

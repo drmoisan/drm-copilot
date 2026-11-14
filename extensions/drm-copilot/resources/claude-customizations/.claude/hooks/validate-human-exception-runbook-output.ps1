@@ -89,7 +89,7 @@ function Get-HumanExceptionRunbookDecision {
     if ($null -ne $ReadTranscriptHead) { $targetArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
     if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
     $target = Resolve-SubagentStopTargetWorktree @targetArguments
-    $location = Resolve-SubagentStopArtifactLocation -Path $runbookPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root
+    $location = Resolve-SubagentStopArtifactLocation -Path $runbookPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root -Target $target
     if ($location.Rejected) {
         return @{ Ok = $false; Message = "$script:ReasonPrefix runbook path '$runbookPath' is rejected: $($location.RejectionDetail)." }
     }
