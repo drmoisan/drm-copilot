@@ -63,6 +63,7 @@
     {"analyzer_id": "python-cli", "class": "retained", "code": "CLI_UNBOUND_REGISTRATION", "path": "src/pkg/_cli_click_diag.py"},
     {"analyzer_id": "python-cli", "class": "retained", "code": "CLI_CUSTOM_CLASS", "path": "src/pkg/_cli_typer_diag.py"},
     {"analyzer_id": "python-cli", "class": "retained", "code": "CLI_TYPER_PARAMETER_UNRESOLVED", "path": "src/pkg/_cli_typer_diag.py"},
+    {"analyzer_id": "python-cli", "class": "retained", "code": "CLI_UNBOUND_REGISTRATION", "path": "src/pkg/cli_orphan.py"},
     {"analyzer_id": "python-cli", "class": "scanner-only", "code": "CLI_CONSOLE_SCRIPT_UNSUPPORTED", "path": "pyproject.toml"},
     {"analyzer_id": "python-http", "class": "retained", "code": "HTTP_PREFIX_DYNAMIC", "path": "src/pkg/_http_fastapi.py"},
     {"analyzer_id": "python-http", "class": "retained", "code": "HTTP_METHOD_VIEW_UNRESOLVED", "path": "src/pkg/_http_flask.py"},

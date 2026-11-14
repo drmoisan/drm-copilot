@@ -58,6 +58,46 @@ class CliSite:
     is_group: bool = False
 
 
+@dataclass(frozen=True)
+class ProvisionalRole:
+    """A function parameter used as an add_parser receiver (issue 1173 B9).
+
+    The recognizer cannot know which subparsers object the parameter holds, so the
+    commands registered through it take the placeholder parser identifier site_id as
+    their parent. analyze_cli binds the placeholder to a caller in another module, or
+    reports the registrations under it as CLI_UNBOUND_REGISTRATION.
+
+    Attributes:
+        site_id: The recognizer-local placeholder parser identifier.
+        function: The name of the function that declares the parameter.
+        parameter: The parameter name.
+        position: The zero-based position of the parameter in the signature.
+    """
+
+    site_id: str
+    function: str
+    parameter: str
+    position: int
+
+
+@dataclass(frozen=True)
+class RoleHandoff:
+    """A call that passes a resolved subparsers receiver to a function (issue 1173 B9).
+
+    Attributes:
+        callee: The qualified dotted name of the called function.
+        position: The zero-based positional argument index, or None for a keyword.
+        keyword: The keyword name, or None for a positional argument.
+        parser_id: The recognizer-local identifier of the parser that owns the
+            subparsers receiver.
+    """
+
+    callee: str
+    position: int | None
+    keyword: str | None
+    parser_id: str
+
+
 @dataclass
 class CliResult:
     """The sites and raw diagnostics of one recognizer over one input.
@@ -65,10 +105,14 @@ class CliResult:
     Attributes:
         sites: The recognized sites in creation order.
         diagnostics: The raw diagnostics of the recognizer.
+        provisional: The provisional subparsers parameters (argparse only).
+        handoffs: The calls that pass a subparsers receiver on (argparse only).
     """
 
     sites: list[CliSite] = field(default_factory=lambda: [])
     diagnostics: list[RawDiagnostic] = field(default_factory=lambda: [])
+    provisional: list[ProvisionalRole] = field(default_factory=lambda: [])
+    handoffs: list[RoleHandoff] = field(default_factory=lambda: [])
 
 
 def has_star(call: ast.Call) -> bool:

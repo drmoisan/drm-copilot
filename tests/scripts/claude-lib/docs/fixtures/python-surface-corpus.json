@@ -285,6 +285,11 @@
       "analyzer_id": "python-architecture",
       "code": "ARCHITECTURE_MODULE_NAME_INVALID",
       "path": "src/pkg/bad-name.py"
+    },
+    {
+      "analyzer_id": "python-cli",
+      "code": "CLI_UNBOUND_REGISTRATION",
+      "path": "src/pkg/cli_orphan.py"
     }
   ],
   "expected_elements": [
@@ -1502,6 +1507,95 @@
         }
       ],
       "source_sha256": "ecfe39e6d4492e3d55a28decf49aafa96e9ed2ea59bd8892d2e485b3df1cc1a5"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "shared",
+      "element_id": "cli-command-0ae8f19c17438c2f3895fcc8dd46a40d47072a5323ae31e2f72364270b692e3a",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 6,
+        "start": 6
+      },
+      "name": "shared",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/cli.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "argparse"
+        },
+        {
+          "name": "name_source",
+          "value": "literal"
+        }
+      ],
+      "source_sha256": "aed53b5618159f9e1ca0dff8e283e3dadb92d9920dcebcc9a94ef32b945cfb40"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "shared daily",
+      "element_id": "cli-command-d589b98ed8c1035a6d195d5a963d4e4c01e7dbee63550a40528a0ca1bfc1dd9d",
+      "kind": "cli-command",
+      "line_range": {
+        "end": 2,
+        "start": 2
+      },
+      "name": "daily",
+      "parent_declaration": "shared",
+      "parent_id": "cli-command-0ae8f19c17438c2f3895fcc8dd46a40d47072a5323ae31e2f72364270b692e3a",
+      "parent_path": "src/pkg/cli.py",
+      "path": "src/pkg/cli_daily.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "argparse"
+        },
+        {
+          "name": "help",
+          "value": "Daily report"
+        }
+      ],
+      "source_sha256": "9684fdea8cdc4852ede843356dede66362e3050e6210f3eb6e89aca4ab1315a1"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-cli",
+      "declaration": "shared daily --date",
+      "element_id": "cli-option-329f0df8217dec776af59380e56dd5f7738210d94e51ba6c23180a044fbc38fb",
+      "kind": "cli-option",
+      "line_range": {
+        "end": 3,
+        "start": 3
+      },
+      "name": "--date",
+      "parent_declaration": "shared daily",
+      "parent_id": "cli-command-d589b98ed8c1035a6d195d5a963d4e4c01e7dbee63550a40528a0ca1bfc1dd9d",
+      "parent_path": "src/pkg/cli_daily.py",
+      "path": "src/pkg/cli_daily.py",
+      "properties": [
+        {
+          "name": "framework",
+          "value": "argparse"
+        },
+        {
+          "name": "has_default",
+          "value": false
+        },
+        {
+          "name": "help",
+          "value": "Report date"
+        },
+        {
+          "name": "positional",
+          "value": false
+        }
+      ],
+      "source_sha256": "d43c51d41a856f000788ce056830b960feb5180b2c9e31ce1a07ab36371fea91"
     },
     {
       "analysis_method": "scanner",
@@ -3012,6 +3106,87 @@
     },
     {
       "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.cli.main",
+      "element_id": "public-symbol-0167b18995d67dde63aeb667bbbb592809b561919dcc7944f619bdd0146f871e",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 5,
+        "start": 5
+      },
+      "name": "main",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/cli.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "function"
+        }
+      ],
+      "source_sha256": "c2e31257dc0ae1d593037c280c9ad50819b8a6c8cf728be0716d00a3eecc04bb"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.cli_daily.register",
+      "element_id": "public-symbol-8543dbb642631b09c334a5fba36d6311ab14e9f7eeb5e4d2b17bde09fb1f7470",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 1,
+        "start": 1
+      },
+      "name": "register",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/cli_daily.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "function"
+        }
+      ],
+      "source_sha256": "f16362227e2235a539ff3cf8ef8a37adc917919e52f08a0a811515c7790d8cf8"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-public-api",
+      "declaration": "pkg.cli_orphan.register",
+      "element_id": "public-symbol-69b7ae2cef489671f0ba517df1e871dcddc0e23e75804c939fcf18bb0b040f3d",
+      "kind": "public-symbol",
+      "line_range": {
+        "end": 1,
+        "start": 1
+      },
+      "name": "register",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/cli_orphan.py",
+      "properties": [
+        {
+          "name": "basis",
+          "value": "naming"
+        },
+        {
+          "name": "symbol_kind",
+          "value": "function"
+        }
+      ],
+      "source_sha256": "f16362227e2235a539ff3cf8ef8a37adc917919e52f08a0a811515c7790d8cf8"
+    },
+    {
+      "analysis_method": "scanner",
       "analyzer_id": "python-architecture",
       "declaration": "pkg",
       "element_id": "architecture-component-303d782630f7bd983a8b8eaa73742ab0862d7eb6796b39284d64f0352b388bac",
@@ -3533,6 +3708,82 @@
         }
       ],
       "source_sha256": "e9ab88d7abf3325244a7553dbe77d044b2687e30d987b06e8c1eb2903a8ad2b6"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg.cli",
+      "element_id": "architecture-component-d6802615d01edfa8cae5a2ffcfcb8de6f79741d9d9b2310727c520583b6bd7f0",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "cli",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/cli.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import-0001",
+          "value": "pkg.cli_daily"
+        },
+        {
+          "name": "import_count",
+          "value": 1
+        }
+      ],
+      "source_sha256": "17a1a1cf3e5163bb99928d04c44efa7d19afe7e309da9f8620e42915aaa2be2a"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg.cli_daily",
+      "element_id": "architecture-component-352b518e8df3cf0bda32bc9630b0d2f95729d1bb748e974fc49b47d46916f624",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "cli_daily",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/cli_daily.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "30e091ec8fb133d6b6405deef74f4ded02d2bc4e3ffd277942853cbd1417aa30"
+    },
+    {
+      "analysis_method": "scanner",
+      "analyzer_id": "python-architecture",
+      "declaration": "pkg.cli_orphan",
+      "element_id": "architecture-component-a7c2ac6c343e7ac3283d02d26bf00103b5cac8a0f0981e3716215c6844c9839e",
+      "kind": "architecture-component",
+      "line_range": null,
+      "name": "cli_orphan",
+      "parent_declaration": null,
+      "parent_id": null,
+      "parent_path": null,
+      "path": "src/pkg/cli_orphan.py",
+      "properties": [
+        {
+          "name": "component_kind",
+          "value": "module"
+        },
+        {
+          "name": "import_count",
+          "value": 0
+        }
+      ],
+      "source_sha256": "12e585c1072dee5a928a283117c41e58eeb8d7dc65f07a0ffca97940e04b1a11"
     }
   ],
   "inputs": {
@@ -3554,6 +3805,9 @@
     "src/pkg/api_naming.py": "import os\nfrom pkg import util\n\nif os.name == \"nt\":\n    platform_value = 1\nelse:\n    platform_value = 2\n\ntry:\n    optional = util.helper(1)\nexcept Exception:\n    optional = None\nfinally:\n    cleanup = True\n\na = b = 3\ntyped: int\n(x, y) = (1, 2)\nm, n = 1, 2\n\n\n@decorator_name\ndef decorated():\n    pass\n\n\nclass Klass:\n    member = 1\n\n\ndef _hidden():\n    pass\n\n\nApp = 1\napp = 2\n\n\ndef caf\u00e9():\n    pass\n",
     "src/pkg/arch.py": "import pkg.util\nimport importlib\nfrom . import config\nfrom .util import helper as h\nfrom ..outside import thing\nfrom typing import TYPE_CHECKING\n\nif TYPE_CHECKING:\n    from pkg.api_naming import Klass\n\n\ndef load(name):\n    import json\n    from pkg import util\n    return importlib.import_module(name), __import__(\"os\"), util, json\n",
     "src/pkg/bad-name.py": "value = 1\n",
+    "src/pkg/cli.py": "import argparse\nfrom pkg import cli_daily\n\n\ndef main():\n    parser = argparse.ArgumentParser(prog=\"shared\")\n    subparsers = parser.add_subparsers()\n    cli_daily.register(subparsers)\n    return parser\n",
+    "src/pkg/cli_daily.py": "def register(subparsers):\n    daily = subparsers.add_parser(\"daily\", help=\"Daily report\")\n    daily.add_argument(\"--date\", help=\"Report date\")\n",
+    "src/pkg/cli_orphan.py": "def register(subparsers):\n    orphan = subparsers.add_parser(\"orphan\")\n    orphan.add_argument(\"--flag\")\n",
     "src/pkg/config.py": "\uFEFFclass Settings:\n    prefix = \"/dyn\"\n\n\nsettings = Settings()\n",
     "src/pkg/lex_encoding.py": "# -*- coding: latin-1 -*-\nx = 1\n",
     "src/pkg/lex_imports.py": "from click import *\nfrom pkg.util import helper\nfrom pkg.config import helper\n\n\ndef inner():\n    import typer\n    return typer\n",

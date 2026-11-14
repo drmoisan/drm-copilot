@@ -2,7 +2,9 @@
 
 Reproduces DocsPythonCliArgparse.psm1 of issue 1022 over the syntax tree. Group
 receivers (add_argument_group, add_mutually_exclusive_group) map to their parser;
-aliases= is not read.
+aliases= is not read. A function parameter used as an add_parser receiver is a
+provisional subparsers role, and a call that passes a resolved subparsers receiver to a
+function is a handoff; analyze_cli binds the two across modules (issue 1173 B9).
 """
 
 from __future__ import annotations
@@ -18,6 +20,8 @@ from docs_python_native.call_sites import (
     CliResult,
     CliSite,
     PropertyValue,
+    ProvisionalRole,
+    RoleHandoff,
     binding_name,
     has_keyword,
     has_star,
@@ -60,14 +64,136 @@ class _Node:
     parser: str
 
 
+@dataclass
+class _Scope:
+    """The function scope of the calls of one input and its provisional roles.
+
+    Built once per input by _scope. Maps every node inside a function body to the
+    innermost def that contains it, and every (def, parameter) pair that is an
+    add_parser receiver to its ProvisionalRole (issue 1173 B9).
+
+    Attributes:
+        owner: Node to the innermost enclosing def.
+        roles: (def, parameter name) to the provisional role, in source order.
+    """
+
+    owner: dict[ast.AST, ast.FunctionDef | ast.AsyncFunctionDef]
+    roles: dict[tuple[ast.AST, str], ProvisionalRole]
+
+
+def _scope(tree: ast.Module, tables: ModuleTables) -> _Scope:
+    """Map nodes to their innermost def and seed the provisional subparsers roles.
+
+    Args:
+        tree: The parsed module.
+        tables: The file's binding tables.
+
+    Returns:
+        The scope. A role is seeded for a parameter of the innermost enclosing def that
+        is the receiver of an add_parser call and is not a tracked receiver name.
+    """
+    defs = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+    ]
+    owner: dict[ast.AST, ast.FunctionDef | ast.AsyncFunctionDef] = {}
+    # Map body nodes outermost def first, so an inner def (which starts later)
+    # overwrites the owner of its own nodes.
+    for function in sorted(defs, key=lambda d: (d.lineno, d.col_offset)):
+        # Every node of every body statement belongs to this def until overwritten.
+        for statement in function.body:
+            for inner in ast.walk(statement):
+                owner[inner] = function
+    roles: dict[tuple[ast.AST, str], ProvisionalRole] = {}
+    # Seed one role per (def, parameter) that receives an add_parser call.
+    for node in ast.walk(tree):
+        func = node.func if isinstance(node, ast.Call) else None
+        if not (
+            isinstance(func, ast.Attribute)
+            and func.attr == "add_parser"
+            and isinstance(func.value, ast.Name)
+            and func.value.id not in tables.receivers
+            and node in owner
+        ):
+            continue
+        function = owner[node]
+        position = _parameter_position(function, func.value.id)
+        key = (function, func.value.id)
+        if position is not None and key not in roles:
+            site_id = f"#param-{function.name}-{func.value.id}"
+            roles[key] = ProvisionalRole(
+                site_id, function.name, func.value.id, position
+            )
+    return _Scope(owner, roles)
+
+
+def _parameter_position(
+    function: ast.FunctionDef | ast.AsyncFunctionDef, name: str
+) -> int | None:
+    """Return the signature position of a parameter of a def.
+
+    Args:
+        function: The def.
+        name: The parameter name.
+
+    Returns:
+        The zero-based position among the positional parameters, -1 for a keyword-only
+        parameter (bound by keyword only), or None when the def has no such parameter.
+    """
+    positional = [*function.args.posonlyargs, *function.args.args]
+    # Positional parameters bind by position or keyword; keyword-only ones by keyword.
+    for index, argument in enumerate(positional):
+        if argument.arg == name:
+            return index
+    if any(argument.arg == name for argument in function.args.kwonlyargs):
+        return -1
+    return None
+
+
+def _role(
+    name: str,
+    call: ast.AST,
+    tables: ModuleTables,
+    scope: _Scope,
+    memo: dict[str, _Node | None],
+    visiting: set[str],
+) -> _Node | None:
+    """Resolve a receiver name used by a call: a tracked receiver or a provisional role.
+
+    Args:
+        name: The receiver name.
+        call: The call (or receiver binding call) that uses the name.
+        tables: The file's binding tables.
+        scope: The function scope and provisional roles of the input.
+        memo: Resolved receiver roles by name.
+        visiting: Names on the current resolution path.
+
+    Returns:
+        The role of a tracked receiver; for an untracked name that is a seeded
+        parameter of the call's innermost def, a subparsers role whose parser is the
+        placeholder identifier; otherwise None.
+    """
+    if name in tables.receivers:
+        return _resolve(name, tables, scope, memo, visiting)
+    function = scope.owner.get(call)
+    role = None if function is None else scope.roles.get((function, name))
+    return None if role is None else _Node("subparsers", role.site_id)
+
+
 def _resolve(
-    name: str, tables: ModuleTables, memo: dict[str, _Node | None], visiting: set[str]
+    name: str,
+    tables: ModuleTables,
+    scope: _Scope,
+    memo: dict[str, _Node | None],
+    visiting: set[str],
 ) -> _Node | None:
     """Resolve a receiver name to its argparse role through its constructor chain.
 
     Args:
         name: The receiver name.
         tables: The file's binding tables.
+        scope: The function scope and provisional roles of the input.
         memo: Resolved roles by name; filled as names resolve.
         visiting: Names on the current resolution path, to stop on a cycle.
 
@@ -87,7 +213,7 @@ def _resolve(
     if tables.qualify(receiver.callee) == CONSTRUCTOR:
         node = _Node("root", name)
     elif len(parts) == 2 and parts[1] in METHODS:
-        parent = _resolve(parts[0], tables, memo, visiting)
+        parent = _role(parts[0], receiver.call, tables, scope, memo, visiting)
         if parent is not None:
             method = parts[1]
             # Routing: add_subparsers on a parser, add_parser on a subparsers object,
@@ -201,6 +327,8 @@ def recognize_argparse(parsed: ParsedModule, tables: ModuleTables) -> CliResult:
         return result
     owner = statement_index(tree)
     memo: dict[str, _Node | None] = {}
+    scope = _scope(tree, tables)
+    result.provisional.extend(scope.roles.values())
     option_index = 0
     # Each argparse call is classified in order: unbound receiver, constructor or
     # method, loop placement, then command or option site.
@@ -215,6 +343,7 @@ def recognize_argparse(parsed: ParsedModule, tables: ModuleTables) -> CliResult:
         callee = dotted_name(node.func)
         if callee is None:
             continue
+        result.handoffs.extend(_handoffs(node, callee, tables, scope, memo))
         parts = callee.split(".")
         constructor = tables.qualify(callee) == CONSTRUCTOR
         method = parts[-1] if len(parts) >= 2 and parts[-1] in METHODS else None
@@ -231,7 +360,7 @@ def recognize_argparse(parsed: ParsedModule, tables: ModuleTables) -> CliResult:
             if len(parts) != 2:
                 result.diagnostics.append(RawDiagnostic(UNBOUND, span[0]))
                 continue
-            target = _resolve(parts[0], tables, memo, set())
+            target = _role(parts[0], node, tables, scope, memo, set())
             if target is None:
                 if not _tracked_other(tables, parts[0]):
                     result.diagnostics.append(RawDiagnostic(UNBOUND, span[0]))
@@ -263,6 +392,45 @@ def recognize_argparse(parsed: ParsedModule, tables: ModuleTables) -> CliResult:
             )
         )
     return result
+
+
+def _handoffs(
+    call: ast.Call,
+    callee: str,
+    tables: ModuleTables,
+    scope: _Scope,
+    memo: dict[str, _Node | None],
+) -> list[RoleHandoff]:
+    """Return the handoffs of one call: subparsers receivers passed as arguments.
+
+    Args:
+        call: Any call with a dotted callee.
+        callee: The dotted callee as written.
+        tables: The file's binding tables.
+        scope: The function scope and provisional roles of the input.
+        memo: Resolved receiver roles by name.
+
+    Returns:
+        One RoleHandoff per positional or keyword argument that is a name resolving to
+        a subparsers role; empty for a call with a star argument or an ambiguous callee.
+    """
+    qualified = tables.qualify(callee)
+    if qualified is None or has_star(call):
+        return []
+    found: list[RoleHandoff] = []
+    # Positional arguments bind by index, keyword arguments by name.
+    arguments: list[tuple[int | None, str | None, ast.expr]] = [
+        (index, None, value) for index, value in enumerate(call.args)
+    ]
+    arguments.extend((None, item.arg, item.value) for item in call.keywords)
+    # Keep each argument that is a plain name holding a subparsers receiver.
+    for position, name, value in arguments:
+        if not isinstance(value, ast.Name):
+            continue
+        role = _role(value.id, call, tables, scope, memo, set())
+        if role is not None and role.kind == "subparsers":
+            found.append(RoleHandoff(qualified, position, name, role.parser))
+    return found
 
 
 def _looped(context: Context) -> bool:
