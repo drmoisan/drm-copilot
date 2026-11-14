@@ -6,7 +6,7 @@
 
 Review-Verdict: REMEDIATION_REQUIRED
 Remediation-Path: full
-Remediation-Mode: proportionate
+Remediation-Mode: design
 
 ## Source audit artifacts
 
