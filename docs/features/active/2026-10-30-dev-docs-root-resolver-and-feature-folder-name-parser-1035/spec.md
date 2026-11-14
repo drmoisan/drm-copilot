@@ -3,9 +3,9 @@
 - **Issue:** #1035 (Phase 1 of #1016; references #1016 and does not close it — no Closes, Fixes or Resolves line for #1016)
 - **Parent (optional):** epic #1018 (`docs/features/epics/shared-agent-harness-layer/epic.md`), child 2
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-30
-- **Status:** Ready for planning
-- **Version:** 1.0
+- **Last Updated:** 2026-11-14
+- **Status:** Ready for planning (refreshed; see "Refresh Amendments")
+- **Version:** 1.1
 - **Work Mode:** full-feature (acceptance criteria in this file and in `user-story.md`)
 - **Branch:** `feature/dev-docs-root-resolver-phase1-1035`
 - **Research:** `research/research.2026-10-30T21-15.md` (inventory and proposed contracts)
@@ -90,6 +90,7 @@ docs/
 
 - Copies that must stay byte-identical: `config/orchestration-routing.json`, `extensions/drm-copilot/resources/config/orchestration-routing.json`, `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json` (pinned by `tests/scripts/dev_tools/test_orchestration_routing_config_parity.py`).
 - Rationale: this is the only configuration file that the Python, PowerShell and TypeScript code already read and that both the Claude and Codex push-downs already publish. The Claude routing merge keeps a destination's existing top-level keys, so a destination value survives a Claude push-down.
+- Distinct from the documentation-estate docs profile: `development_docs_root` names the development-records root only. It is not the docs-profile `documentation_roots` list (production documentation, `docs/documentation-estate/docs-profile.json`), and the docs lib under `.claude/lib/docs/` neither reads `config/orchestration-routing.json` nor this key; no task changes the docs lib or the docs MCP tools.
 - Known limitation, recorded for epic child 4: the Codex push-down writes this file without merging, so a destination that later sets `.dev` loses the value on a Codex push-down. Phase 1 keeps the default, so behavior is unaffected.
 
 ### Closed value set
@@ -199,6 +200,7 @@ The resolver takes the workspace root as an argument (not a module-relative path
 
 - `Resolve-DevelopmentDocsRoot -WorkspaceRoot <path> [-ReadText <scriptblock>] [-TestDirectory <scriptblock>]` (I/O only through injected script blocks)
 - `Get-DevelopmentDocsPath -Root <root> -Area <area>`
+- `Get-DevelopmentDocsKnownRoot` (the members of `KNOWN_DEVELOPMENT_DOCS_ROOTS`, in order; matchers that recognize any path under a root use it)
 - `Get-DevelopmentDocsKnownRootPrefix -Area <area>` and `Get-DevelopmentDocsKnownRootPattern -Area <area>` (regex-escaped union, both separators)
 - `ConvertFrom-FeatureFolderName -Name <name>` and `ConvertTo-FeatureFolderName -IssueNumber <n> -Feature <feature>`
 
@@ -366,20 +368,39 @@ Specific dispositions recorded from research:
 - `build_discovery_runtime.py` `RESOURCE_ROOTS` stays (out of scope; discovery moves in Phase 3).
 - The Claude/Codex twin `feature-folder-resolution.ps1` keeps byte identity and stays pure.
 
+### Consumers inventoried at the 2026-11-14 refresh
+
+Files that reference `docs/features` on the refreshed tree and that the research inventory does not name. Each was read and classified with the same codes.
+
+| File | Symbol | Disposition |
+| --- | --- | --- |
+| `.claude/hooks/enforce-epic-merge-gate-review.ps1` and byte-identical `.codex/hooks/` twin | `Test-EpicMergeGateReviewFeatureFolder` prefix test | Route (union); `Unresolved` detail text unchanged |
+| `.claude/hooks/hook-epic-fan-in.ps1` and byte-identical `.codex/hooks/` twin | `Get-EpicFanInStatusDocRelativePath`, `Get-EpicMergedFeatureRoots` | Route (union): the status document and merged-feature roots are accepted under either known root; with no declared status path the `docs/features` form is derived, as today |
+| `.claude/lib/epic-wave/EpicCrossDependency.psm1` | `Get-EpicCrossDependencyPrerequisitePr` prefixes; `Read-EpicCrossManifestText` manifest path | Route (union for the prefixes; resolver for the manifest path) |
+| `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1` | template paths, `-RunFolder` check and slug strip, scheduling-record path | Route (resolver for paths; union for the check and strip); usage message unchanged |
+| `.claude/lib/review-verdict/ReviewVerdictEligibility.psm1` | `$script:FeatureRoot`, `$script:PotentialRoot`, `$script:PotentialTemplate`, `$script:ActiveFolderPattern` and their predicates | Route (union); decision details unchanged |
+| `.codex/hooks/feature-review-coverage-target.ps1` | `Get-CodexReviewPolicyAuditPath` token, span and shape patterns; `Select-CodexReviewPolicyAudit` | Route (union); `AUDIT_NOT_NAMED` reason unchanged. It replaces `.codex/hooks/validate-feature-review-coverage.ps1`, which no longer holds a `docs/features` reference (issue #1114) |
+| `scripts/dev-tools/Get-StageTimingReport.ps1` | default `EvidenceRoot` | Route (resolver root) |
+| `.claude/hooks/enforce-prd-feature-before-planner.ps1`, `.claude/hooks/hook-command-invocation.ps1`, `.claude/hooks/hook-command-scanner.ps1` and the two `.codex/hooks/hook-command-*.ps1` twins, `.claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1`, `.claude/lib/parallel-admission/ParallelAdmissionPrecedence.psm1` | help text and spec citations | Stay |
+| `scripts/dev-tools/ProcessReductionChain.psm1` | `Get-ProcessReductionMappedSource` template mapping | Stay: it maps a bundled template mirror to this repository's tracked template source for the process-reduction ledger replay; the tracked layout changes only with the Phase 3 move (child 7) |
+| `scripts/dev_tools/json_config.py` | `EXCLUDE_GLOBS` entry `docs/features/**` | Stay in Phase 1 (see "JSON Governance") |
+
 ## CI Docs-Only Scope (D-12)
 
 `config/ci-docs-only-paths.json` (matched by ordinal prefix in `scripts/ci/CiChangeScope.psm1`):
 
-- Add include prefix `.dev/`.
-- Add exclude prefixes `.dev/templates/` and `.dev/potential/template.md` (mirroring today's `docs/features/templates/` and `docs/features/potential/template.md` exclusions).
-- Add exclude prefixes `.dev/engineering/` and `.dev/discovery/`, because `docs/engineering/` and `docs/discovery/` are not docs-only today (OQ-3).
+The allowlist no longer includes `docs/` as a whole: since issue #973 it lists the seven include prefixes `docs/features/active/`, `docs/features/archive/`, `docs/features/completed/`, `docs/features/epics/`, `docs/features/parallel/`, `docs/features/potential/` and `docs/research/`, and the exclude prefixes `docs/features/potential/template.md` and `docs/features/templates/`. The `.dev` additions mirror that classification through the area map (refresh amendment A-3):
+
+- Add the include prefixes `.dev/active/`, `.dev/archive/`, `.dev/completed/`, `.dev/epics/`, `.dev/parallel/`, `.dev/potential/` and `.dev/research/`.
+- Add the exclude prefix `.dev/potential/template.md`.
+- `.dev/templates/`, `.dev/engineering/`, `.dev/discovery/` and `.dev/backlog.md` match no include prefix, so they are not docs-only, as `docs/features/templates/`, `docs/engineering/`, `docs/discovery/` and `docs/features/backlog.md` are not today (OQ-3).
 - Existing `docs/` include and exclude prefixes are unchanged.
 
-The execution-environment brief section `## CI Shape and Required Checks` (all byte-identical copies) and `.github/workflows/README.md` are updated in the same change, as the brief's maintenance rule requires. The allowlist file is not itself docs-only, so this change runs full CI.
+The execution-environment brief section `## CI Shape and Required Checks` (all byte-identical copies) and `.github/workflows/README.md` are updated in the same change, as the brief's maintenance rule requires. The brief's `## Hook Execution Context` statement of the post-fan-in and merged-feature follow-up allowances names `docs/features` paths that this child widens to the union, so the same brief update amends it. The allowlist file is not itself docs-only, so this change runs full CI.
 
 ## JSON Governance (D-14)
 
-`GOVERNED_GLOBS` in `scripts/dev_tools/json_config.py` and `extensions/drm-copilot/src/lib/json-config.ts` gain `.dev/**/*.json`; `docs/**/*.json` stays.
+`GOVERNED_GLOBS` in `scripts/dev_tools/json_config.py` and `extensions/drm-copilot/src/lib/json-config.ts` gain `.dev/**/*.json`; `docs/**/*.json` stays. The Python `EXCLUDE_GLOBS` entry `docs/features/**` (finalized feature records) stays unchanged in Phase 1 and gains no `.dev` form: no `.dev` tree exists before the move, and whether `.dev` records are excluded from governance is decided with the flip by child 7 (refresh amendment A-5). The TypeScript `EXCLUDE_GLOBS` has no feature-folder entry today and is unchanged.
 
 ## Dot-Folder Handling (D-13)
 
@@ -422,25 +443,6 @@ All such tests use in-memory fakes; no temporary files are created.
 | Python resolver | Python, by extending `scripts/dev_tools/json_config.py` in place | Module docstring widens from JSON governance to repository layout configuration | Existing Python consumers read the key, so a Python resolver is required. No new Python scripts, tools, generators, checkers or entry points (epic language directive). `json_config` imports nothing from `scripts.dev_tools`, so no import cycle |
 | Enforcement hooks | PowerShell | none | Hooks do not invoke Python |
 
-## Execution Precondition
-
-Execution starts only after the parallel run `bugs-1001-1002-1003-1006` has merged to `main`. The plan names each file below, and its Phase 0 gate re-checks each against current `origin/main` and stops for re-planning when a named file, symbol or heading has moved. Overlapping files (research section 9):
-
-- `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`
-- `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1`
-- `.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1`
-- `.claude/lib/blast-radius/BlastRadius.psm1`, `BlastRadiusTokenShape.psm1`, `BlastRadiusWriteIntent.psm1` and their bundle copies
-- `scripts/dev_tools/compute_blast_radius.py`, `_blast_radius_token_shapes.py`, `_blast_radius_write_intent.py`
-- `.claude/agents/epic-orchestrator.md`, `parallel-orchestrator.md`, `parallel-planner.md` and the bundle copies of the latter two
-- `.claude/settings.json`
-- the execution-environment brief, all copies
-- `extensions/drm-copilot/jest.config.cjs`, `package.json`, `CHANGELOG.md`
-- `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json`, `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json`
-- tests: `test_parallel_planner_surface_contracts.py`, `test_execution_environment_brief_contracts.py`, `test_push_down_*_resource_contracts.py`, `test_push_down_*_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, `claude-architecture-doc.Tests.ps1`, `hook-dependency-guard-completeness.Tests.ps1`, `ClaudeLibModuleConvention.Tests.ps1`, `parallel_orchestrator_surface_test_support.py`
-- read but not edited: `scripts/dev_tools/generate_codex_agent_variants.py`, `config/poshqc-coverage.json`, `config/file-size-baseline.json`
-
-The blast-radius files carry the heaviest overlap and belong in a late plan phase after a second conflict re-check.
-
 ## Implementation Strategy
 
 - Key and resolvers: routing-config key in all copies; TypeScript `root.ts`; Python additions to `json_config.py`; PowerShell `DevelopmentDocsRoot.psm1` with bundle and Codex source copies; Codex `VIRTUAL_RESOURCE_DIRECTORIES` entries (TypeScript and the existing Python twin); pack manifests; Jest coverage entries.
@@ -448,7 +450,7 @@ The blast-radius files carry the heaviest overlap and belong in a late plan phas
 - Consumers: TypeScript, Python and PowerShell consumers per the research inventory; bundle copies.
 - Write-scope contract: `write-scopes.ts`, checker test, agent frontmatter and Codex base literals, generator run and `--check`, `.claude/settings.json`, `PINNED_FROZEN_SURFACE_HASHES` re-baseline with a dated comment for each changed pinned agent file.
 - CI docs-only allowlist, brief copies and workflow README.
-- Blast-radius consumers last, after a second conflict re-check.
+- Blast-radius consumers in a late phase.
 - Dependencies: none added.
 - Logging: resolver errors carry the configuration path, the key and the offending value.
 - Rollout: default unchanged; the flip is child 7.
@@ -456,7 +458,7 @@ The blast-radius files carry the heaviest overlap and belong in a late plan phas
 ## Owner Questions (recorded interpretations awaiting confirmation)
 
 - **OQ-1.** An absent key resolves the default `docs/features` and does not probe `.dev` first (R-2). Reason: D-8 describes a one-release fallback after the flip, and probing `.dev` in Phase 1 would change behavior in a destination that has a `.dev` folder for an unrelated purpose.
-- **OQ-3.** `.dev/engineering/` and `.dev/discovery/` are excluded from the CI docs-only scope, preserving today's classification of `docs/engineering/` and `docs/discovery/`. In `hook-docs-only-diff.ps1`, `.dev/` is added as a whole because that hook exempts `docs/` as a whole today.
+- **OQ-3.** `.dev/engineering/` and `.dev/discovery/` are outside the CI docs-only scope (no include prefix covers them), preserving today's classification of `docs/engineering/` and `docs/discovery/`. In `hook-docs-only-diff.ps1`, `.dev/` is added as a whole because that hook exempts `docs/` as a whole today.
 - **OQ-4.** When the folder-creation tool has no issue number, it keeps the current slug (no issue prefix) rather than failing.
 - **OQ-5.** Extension and MCP package version bumps (`extensions/drm-copilot/package.json`, `CHANGELOG.md`) happen at epic fan-in, not in this child.
 - OQ-2 (new Python library module versus extending `json_config.py`) is settled by the delegation for this child: extend `json_config.py` in place.
@@ -483,13 +485,14 @@ The blast-radius files carry the heaviest overlap and belong in a late plan phas
 - [ ] Pester tests for `enforce-orchestration-preimplementation-gate.ps1` (Claude and Codex) and `validate-task-researcher-output.ps1` show that paths under `.dev/active/`, `.dev/epics/` and `.dev/research/` are recognized alongside their `docs/features` and `docs/research` forms.
 - [ ] `new-potential-entry.ps1` in `scripts/dev-tools/` and in `extensions/drm-copilot/resources/templates/` accepts `-DevelopmentDocsRoot` with the default `docs/features`, the two copies have equal text, and a test shows `RepoAutomationService.newPotentialEntry` passes the resolved root.
 - [ ] A resolver error (malformed routing JSON or an out-of-set value) causes a hook that reads the key to fail closed with a reason naming the configuration file and key, asserted by a Pester test.
+- [ ] Each consumer in "Consumers inventoried at the 2026-11-14 refresh" with a Route disposition accepts its `.dev` form (matchers) or uses the resolved root (writers), asserted by a `.dev` case in that file's existing Pester suite, and each Stay row appears on the residual-search allowlist.
 
 ### CI docs-only scope and JSON governance
 
-- [ ] `config/ci-docs-only-paths.json` includes `.dev/` and excludes `.dev/templates/`, `.dev/potential/template.md`, `.dev/engineering/` and `.dev/discovery/`, with existing `docs/` entries unchanged; `tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1` asserts that `.dev/active/x/spec.md` is docs-only and that `.dev/templates/x.md`, `.dev/potential/template.md`, `.dev/engineering/x.md` and `.dev/discovery/x.md` are not, and passes.
+- [ ] `config/ci-docs-only-paths.json` includes `.dev/active/`, `.dev/archive/`, `.dev/completed/`, `.dev/epics/`, `.dev/parallel/`, `.dev/potential/` and `.dev/research/` and excludes `.dev/potential/template.md`, with existing `docs/` entries unchanged; `tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1` asserts that `.dev/active/x/spec.md` is docs-only and that `.dev/templates/x.md`, `.dev/potential/template.md`, `.dev/engineering/x.md` and `.dev/discovery/x.md` are not, and passes.
 - [ ] `tests/scripts/ci/CiChangeScope.Tests.ps1`, `Invoke-CiChangeScope.Tests.ps1`, `Invoke-CiChangeScopeMergeBase.Tests.ps1` and `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1` pass.
 - [ ] A Pester test shows `Get-DocsOnlyDiffTextViolation` in `hook-docs-only-diff.ps1` treats a `.dev/` path as docs-only.
-- [ ] The execution-environment brief section `## CI Shape and Required Checks` and `.github/workflows/README.md` list the `.dev/` docs-only prefix and its exclusions, and `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` passes.
+- [ ] The execution-environment brief section `## CI Shape and Required Checks` and `.github/workflows/README.md` list the `.dev/` docs-only prefixes and the `.dev` exclusion, and `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` passes.
 - [ ] `GOVERNED_GLOBS` in `scripts/dev_tools/json_config.py` and in `extensions/drm-copilot/src/lib/json-config.ts` contains both `.dev/**/*.json` and `docs/**/*.json`; a Python test using the `mem_fs_path` fixture and a Jest test using the in-memory fake each show that governed-file discovery returns a JSON file under `.dev/`.
 
 ### Dot-folder handling
@@ -525,9 +528,22 @@ The blast-radius files carry the heaviest overlap and belong in a late plan phas
 ### Scope boundary, quality and evidence
 
 - [ ] After this child, the repository contains no `.dev/` directory, `development_docs_root` is `docs/features`, no existing feature folder is renamed, and no migration command is added.
-- [ ] Each new TypeScript production file under `src/lib/development-docs/` has its own `coverageThreshold` entry in `extensions/drm-copilot/jest.config.cjs` with `lines: 85` and `branches: 75`, and coverage evidence for changed code meets 85% line coverage in every language and 75% branch coverage for Python and TypeScript, recorded under the feature folder's `evidence/coverage/`.
+- [ ] Each new TypeScript production file under `src/lib/development-docs/` has its own `coverageThreshold` entry in `extensions/drm-copilot/jest.config.cjs` with `lines: 85` and `branches: 75`, and coverage evidence for changed code meets 85% line coverage in every language and 75% branch coverage for Python and TypeScript, recorded under the feature folder's `evidence/qa-gates/`.
 - [ ] The seven-stage toolchain passes in a single pass for Python, PowerShell and TypeScript, and no changed production file exceeds 800 lines.
-- [ ] A Phase 0 evidence artifact under the feature folder's `evidence/baseline/` records that the parallel run `bugs-1001-1002-1003-1006` has merged and that each file in "Execution Precondition" was re-checked against `origin/main` before any edit.
+
+## Refresh Amendments (2026-11-14)
+
+Recorded by the planner refresh of this child; each keeps Phase 1 scope and re-opens no decision D-1 to D-22.
+
+- A-1. The parallel run `bugs-1001-1002-1003-1006` and item #1013 have merged and their issues are closed (orchestrator decision AD-2). The `Execution Precondition` section and the acceptance criterion that required a Phase 0 artifact recording that merge are removed; the blast-radius consumers stay in a late phase without a second conflict re-check.
+- A-2. Seventeen production files that reference `docs/features` and that the research inventory does not name are classified in "Consumers inventoried at the 2026-11-14 refresh", with one new acceptance criterion. `.codex/hooks/validate-feature-review-coverage.ps1` no longer holds a reference; its successor `.codex/hooks/feature-review-coverage-target.ps1` is routed instead.
+- A-3. The CI docs-only additions mirror the current per-area allowlist (issue #973) instead of adding `.dev/` as a whole with four excludes; the classification of every `.dev` sample path in the acceptance criterion is unchanged, and `.dev/backlog.md` stays outside the docs-only scope as `docs/features/backlog.md` is.
+- A-4. The PowerShell module adds `Get-DevelopmentDocsKnownRoot`, which the whole-root matchers of A-2 use.
+- A-5. The Python `EXCLUDE_GLOBS` entry `docs/features/**` stays unchanged in Phase 1.
+- A-6. `development_docs_root` is stated to be distinct from the docs-profile `documentation_roots`.
+- A-7. Coverage evidence is recorded under `evidence/qa-gates/`, the canonical evidence kind; `evidence/coverage/` is not a canonical kind.
+- A-8. No acceptance criterion in this file or in `user-story.md` requires shuffled, reversed or single-process test runs, so the parallel-only test rule needs no criterion change.
+- A-9. The criterion that limits changed expectations in existing tests to folder-naming and status-line expectations excludes the expectation changes that other criteria of this spec mandate. These are the `CiDocsOnlyPathsConfig.Tests.ps1` rows required by the CI docs-only criterion (`starts every include prefix with docs/ (AC-15)`, `configures exactly the D3 include prefixes and extensions (AC-15)`, and the `.dev` rows added to its `-ForEach` cases); the `Write(/.dev/active/**)` entry of the feature-review agent tuple in `test_completion_gate_documentation_contracts.py`, required by the literal-set criterion; and the `.claude/agents/epic-orchestrator.md` digest in `PINNED_FROZEN_SURFACE_HASHES` with its dated comment, required by the re-baseline criterion. The criterion's text is unchanged; the plan's self-review records the enumeration against the branch diff.
 
 ## Definition of Done
 
