@@ -1,0 +1,6 @@
+# Review Pester gate at the reviewed head (feature review)
+
+Timestamp: 2026-11-14T23-33
+Command: sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester (through the gitignored helper artifacts/scratch-issue-1188/review-pester-gate.sh, which retries on exit 75; one attempt was needed)
+EXIT_CODE: 0
+Output Summary: Run by the feature-review agent at head aca57bf07214fb4436a7459beb1b587eedd6af35 (an origin/main merge newer than the executor's final coverage report), clean worktree. Invoke-PoshQCParallelTest, 8 workers, wall-clock 942.33 s, exit code 0; finished 2026-11-14T23-50. Merged JUnit (artifacts/pester/pester-junit.xml): 27137 tests, 0 failures, 0 errors, 22 disabled or skipped. Repo-wide line coverage 96.04% (44590 of 46430) from artifacts/pester/powershell-coverage.xml. Per-file line coverage: .claude/hooks/enforce-orchestration-preimplementation-gate-operands.ps1 154/154 (100%); .codex/hooks/enforce-orchestration-preimplementation-gate-operands.ps1 154/154 (100%); .claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 133/136 (97.79%); .codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1 152/155 (98.06%). The per-file figures equal the executor's final gate (evidence/qa-gates/final-qc-pester.2026-11-14T23-10.md); the repo-wide denominator grew with files added by the origin/main merge.
