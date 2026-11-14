@@ -31,8 +31,11 @@ import shutil
 from io import StringIO
 from typing import TYPE_CHECKING
 
+from .fix_all_branches import run_launcher_test_step
+
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from contextlib import AbstractContextManager
     from types import ModuleType
 
     from .fix_all import BranchResult, CommandRunner, StepLogger
@@ -46,11 +49,13 @@ def run_python_branch(
     max_black_retries: int,
     max_ruff_retries: int,
     api: ModuleType,
+    suite_lock: AbstractContextManager[object] | None = None,
 ) -> BranchResult:
     """Run the Python Black/Ruff/Pyright/Pytest branch with auto-fix retry.
 
     Black runs with retry, Ruff runs with an auto-fix retry loop that
-    re-verifies Black after any fix, then Pyright and Pytest run.
+    re-verifies Black after any fix, then Pyright and the launcher ``pytest``
+    suite run.
 
     Args:
         factory: Builds a ``CommandRunner`` for a named branch and logger.
@@ -59,6 +64,7 @@ def run_python_branch(
         max_black_retries: Maximum Black formatting attempts.
         max_ruff_retries: Maximum Ruff auto-fix attempts.
         api: ``fix_all`` module reference (step helpers, BranchResult).
+        suite_lock: Optional lock held while the launcher ``pytest`` suite runs.
 
     Returns:
         BranchResult: Success when all steps pass, else failure tagged with
@@ -146,15 +152,16 @@ def run_python_branch(
             failed_step="Pyright: type-check",
         )
 
-    # The suite runs on parallel workers with and without coverage (issue #1096).
-    pytest_command: list[str] = ["poetry", "run", "pytest", "-n", "auto"]
+    # The launcher ``pytest`` suite runs ``poetry run pytest -n auto`` on parallel
+    # workers (issues #1096, #1158); the coverage arguments follow as extras.
+    pytest_extras: list[str] = []
     pytest_step_name = (
         "Pytest: test with coverage" if include_coverage else "Pytest: test"
     )
     # Coverage toggle: append coverage flags and switch the step name only
     # when coverage is requested.
     if include_coverage:
-        pytest_command.extend(
+        pytest_extras.extend(
             [
                 "--cov=scripts/dev_tools",
                 "--cov-report=term-missing",
@@ -162,7 +169,7 @@ def run_python_branch(
         )
 
     emit_status_transition("python", pytest_step_name)
-    if not api.run_simple_step(
+    if not run_launcher_test_step(
         step_number=4,
         description=(
             "Running Pytest with coverage..."
@@ -172,9 +179,12 @@ def run_python_branch(
         step_name=pytest_step_name,
         success_message="Pytest passed",
         failure_message="Pytest failed. Please review errors above.",
-        command=pytest_command,
+        suite="pytest",
+        extras=pytest_extras,
         runner=branch_runner,
         logger=branch_logger,
+        suite_lock=suite_lock,
+        api=api,
     ):
         output = branch_stream.getvalue()
         emit_status_transition("python", "FAIL")
@@ -219,10 +229,13 @@ def run_typescript_branch(
     emit_status_transition: Callable[[str, str], None],
     include_coverage: bool,
     api: ModuleType,
+    suite_lock: AbstractContextManager[object] | None = None,
 ) -> BranchResult:
-    """Run the TypeScript format -> lint -> type-check -> test branch via npm.
+    """Run the TypeScript format -> lint -> type-check -> test branch.
 
     Mirrors the linear PowerShell-branch structure (no auto-fix retry loop).
+    The format, lint, and type-check steps run through npm; the test step runs
+    the launcher ``jest`` suite.
 
     Args:
         factory: Builds a ``CommandRunner`` for a named branch and logger.
@@ -231,6 +244,7 @@ def run_typescript_branch(
             name.
         api: ``fix_all`` module reference (StepLogger, BranchResult,
             run_simple_step).
+        suite_lock: Optional lock held while the launcher ``jest`` suite runs.
 
     Returns:
         BranchResult: Success when all steps pass, else failure tagged with
@@ -324,16 +338,13 @@ def run_typescript_branch(
             failed_step="TSC: type-check",
         )
 
-    # Switch Jest step name and command on coverage, mirroring the python branch.
-    jest_command = (
-        [npm, "run", "test:unit:coverage"]
-        if include_coverage
-        else [npm, "run", "test:unit"]
-    )
+    # Switch the Jest step name and extras on coverage, mirroring the python
+    # branch; the launcher ``jest`` suite replaces the npm test scripts (#1158).
+    jest_extras = ["--coverage"] if include_coverage else []
     jest_step_name = "Jest: test with coverage" if include_coverage else "Jest: test"
 
     emit_status_transition("typescript", jest_step_name)
-    if not api.run_simple_step(
+    if not run_launcher_test_step(
         step_number=4,
         description=(
             "Running Jest with coverage..." if include_coverage else "Running Jest..."
@@ -341,9 +352,12 @@ def run_typescript_branch(
         step_name=jest_step_name,
         success_message="Jest passed",
         failure_message="Jest failed. Please review errors above.",
-        command=jest_command,
+        suite="jest",
+        extras=jest_extras,
         runner=branch_runner,
         logger=branch_logger,
+        suite_lock=suite_lock,
+        api=api,
     ):
         output = branch_stream.getvalue()
         emit_status_transition("typescript", "FAIL")

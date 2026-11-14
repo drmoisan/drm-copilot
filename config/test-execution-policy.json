@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "lanes": {
+    "integration": {
+      "fileNameSuffixes": [
+        ".integration.test.ts",
+        ".integration.test.js",
+        "_integration.py",
+        ".integration.tests.ps1",
+        "-integration.test.ts",
+        "integration.tests.ps1"
+      ]
+    }
+  },
+  "suites": {
+    "jest-extension": {
+      "workingDirectory": "extensions/drm-copilot",
+      "command": ["node", "run-jest.cjs"],
+      "runner": "jest"
+    },
+    "bats": {
+      "command": ["bash", "scripts/bash/shell-qc.sh", "test"],
+      "runner": "bats"
+    }
+  }
+}
