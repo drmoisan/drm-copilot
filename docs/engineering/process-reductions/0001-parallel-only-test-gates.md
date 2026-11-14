@@ -13,6 +13,8 @@ The reduction landed across this branch's commits, before the ledger rule reache
 
 Rebased over PR #1108 (issue #1106): after `main` merged PR #1108, which renamed the C# test framework to MSTest and the Pester version to Pester v6 and removed another project's example word from the policy-audit instructions, the stored patch sections of the sixteen paths whose reverse check that merge broke were regenerated so that they carry PR #1108's wording; their hunks are unchanged apart from that wording, and every other section is unchanged.
 
+Rebased over #1158: the full-suite pytest commands of `scripts/dev_tools/atomic_executor/qc_runner.py` (`FULL_TEST` and the `full_test` argument of `run_full_loop_with_artifacts`) now start with the test-execution launcher words `TEST_SUITE_LAUNCHER_ARGV` instead of `"poetry",` and `"run",`, and `tests/scripts/dev_tools/atomic_executor/test_qc_runner.py` asserts that argv. The two `qc_runner.py` blocks and the two `test_qc_runner.py` blocks under `### Later Landing: #1096` were regenerated so that their `Current` and `Prior` fences carry the launcher words; the `-n` and `auto` lines they revert are unchanged.
+
 ## Reason and Evidence
 
 The owner decided on 2026-11-06 that tests run in parallel only. The sequential run existed to detect and fix a leak that has since been fixed, and the overhead of multiple and sequential runs was judged unacceptable.
@@ -600,7 +602,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ### Revert Block: scripts/dev_tools/atomic_executor/qc_runner.py
 
 ````Current
-        "run",
+        *TEST_SUITE_LAUNCHER_ARGV,
         "pytest",
         "-n",
         "auto",
@@ -611,7 +613,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ````
 
 ````Prior
-        "run",
+        *TEST_SUITE_LAUNCHER_ARGV,
         "pytest",
         "--color=no",
         "--cov=scripts/dev_tools",
@@ -622,7 +624,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ### Revert Block: scripts/dev_tools/atomic_executor/qc_runner.py
 
 ````Current
-                "run",
+                *TEST_SUITE_LAUNCHER_ARGV,
                 "pytest",
                 "-n",
                 "auto",
@@ -631,7 +633,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ````
 
 ````Prior
-                "run",
+                *TEST_SUITE_LAUNCHER_ARGV,
                 "pytest",
                 "--cov=scripts/dev_tools",
                 "--cov-report=term-missing",
@@ -773,7 +775,7 @@ class TestPreflightParallelCommand:
             max_loops=1,
         )
 
-        assert pytest_argv[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+        assert pytest_argv[:8] == [*TEST_SUITE_LAUNCHER_ARGV, "pytest", "-n", "auto"]
         assert "--cov=src/lexile_corpus_tuner" not in pytest_argv
 
     def test_python_toolchain_pytest_command_runs_xdist_workers(self) -> None:
@@ -794,7 +796,7 @@ class TestPreflightParallelCommand:
 ### Revert Block: tests/scripts/dev_tools/atomic_executor/test_qc_runner.py
 
 ````Current
-            "run",
+            *TEST_SUITE_LAUNCHER_ARGV,
             "pytest",
             "-n",
             "auto",
@@ -805,7 +807,7 @@ class TestPreflightParallelCommand:
 ````
 
 ````Prior
-            "run",
+            *TEST_SUITE_LAUNCHER_ARGV,
             "pytest",
             "--color=no",
             "--cov=scripts/dev_tools",

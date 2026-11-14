@@ -390,6 +390,9 @@ class QCRunner(QCRunnerProcessMixin):
             toolchain=toolchain,
         )
         failure = result.failure
+        # Only the test step runs through the launcher; a format, lint, or type-check
+        # failure, and a test failure without a launcher outcome, return unchanged so
+        # the caller builds its usual fix prompt.
         if failure is not None and failure.step in ("pytest", "test-unit"):
             outcome = classify_launcher_exit(failure.returncode, failure.output)
             if outcome is not None:
