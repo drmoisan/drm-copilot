@@ -81,7 +81,7 @@ Describe 'enforce-orchestration-preimplementation-gate-commands.ps1 (issue #1160
                 $table = Get-OrchestrationGateMentionHostTable
 
                 @($table.ExecutingOption.Keys) | Should -Be @('rg', 'git', 'sort')
-                $table.ExecutingOption.rg | Should -Be @('--pre')
+                $table.ExecutingOption.rg | Should -Be @('--pre', '--hostname-bin')
                 $table.ExecutingOption.git | Should -Be @('-O', '--open-files-in-pager')
                 $table.ExecutingOption.sort | Should -Be @('--compress-program')
             }
