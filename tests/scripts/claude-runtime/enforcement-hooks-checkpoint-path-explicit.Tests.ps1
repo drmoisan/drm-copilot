@@ -123,6 +123,9 @@ Describe 'enforcement hooks supply the checkpoint path explicitly' {
             '.claude/hooks/enforce-pr-author-skill.epic-base-branch.ps1'
             '.claude/hooks/enforce-model-routing-receipt.ps1'
             '.claude/hooks/enforce-prd-feature-before-planner.ps1'
+            '.claude/hooks/hook-parallel-records-context.ps1'
+            '.claude/hooks/enforce-model-routing-receipt-parallel.ps1'
+            '.claude/hooks/enforce-orchestration-preimplementation-gate-parallel-records.ps1'
         )
         $literal = 'orchestrator-state.json'
 

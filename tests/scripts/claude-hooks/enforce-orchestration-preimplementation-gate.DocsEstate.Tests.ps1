@@ -25,6 +25,9 @@ BeforeAll {
     if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Mock Get-WorktreeResolutionGitFileText { $null } }
     Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
     Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent' -Surface 'Codex'
+    # Issue #1182: the parallel records leg calls these from hook scope, where the module-scoped baseline mocks do not reach.
+    Mock Get-EpicScopeWorktreeHeadBranch { $null }
+    Mock Get-WorktreeRunCheckpointText { $null }
 
     $script:Blocked = 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
     $script:Session = ConvertTo-HookTargetWorktreeNormalizedPath -Path (Get-Location).Path
