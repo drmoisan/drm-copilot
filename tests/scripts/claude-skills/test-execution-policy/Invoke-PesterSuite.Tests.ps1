@@ -125,4 +125,17 @@ Describe 'Invoke-PesterSuite.ps1 (<Copy>)' -ForEach $script:Copies {
         $recorded['ExcludeTestFileSuffix'] | Should -BeExactly '-integration.test.ts'
         $recorded.ContainsKey('WorkerCount') | Should -BeFalse
     }
+
+    It 'reads TestPath through the default GetParameterName as the scoped entry (C1)' {
+        # Arrange
+        $recorded = @{}
+
+        # Act
+        $null = Invoke-PesterSuite -ArgumentList @('-TestPath', 'tests/a.Tests.ps1', 'tests/dir') -RepositoryRoot '/repo' -ImportModule { param([string] $Path) [void] $Path } -InvokeParallelTest { param([hashtable] $Parameter) foreach ($key in $Parameter.Keys) { $recorded[$key] = $Parameter[$key] }; [pscustomobject]@{ ExitCode = 0 } }.GetNewClosure()
+
+        # Assert
+        ($recorded['TestPath'] -join '|') | Should -BeExactly 'tests/a.Tests.ps1|tests/dir'
+        @($recorded['TestPath']).Count | Should -Be 2
+        $recorded.ContainsKey('WorkerCount') | Should -BeFalse
+    }
 }

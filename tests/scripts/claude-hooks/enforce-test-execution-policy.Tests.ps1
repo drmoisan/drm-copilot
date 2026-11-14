@@ -204,6 +204,7 @@ Describe 'enforce-test-execution-policy launcher (issue #1158)' {
         @{ Command = 'pwsh -NoProfile -File .agents/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1 pytest -v' }
         @{ Command = 'env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest -k smoke' }
         @{ Command = 'sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest -k pytest' }
+        @{ Command = 'sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath tests/scripts/powershell/PoshQC/PoshQC.ParallelScoped.Tests.ps1 tests/scripts/claude-hooks' }
     ) {
         # Act / Assert
         (Invoke-HookCase -Command $Command).Reason | Should -BeNullOrEmpty
@@ -215,6 +216,7 @@ Describe 'enforce-test-execution-policy launcher (issue #1158)' {
         @{ Name = 'a lane marker'; Command = "sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest -m golden"; Expected = '*local golden lane is CI-only evidence*' }
         @{ Name = 'a lane tag'; Command = "sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -Tag Integration"; Expected = '*local integration lane is CI-only evidence*' }
         @{ Name = 'a worker token'; Command = "sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest --runInBand"; Expected = '*worker-reduction token*' }
+        @{ Name = 'a scoped Pester lane path'; Command = "sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath tests/x/Foo.integration.tests.ps1"; Expected = '*local integration lane is CI-only evidence*' }
     ) {
         # Act / Assert
         (Invoke-HookCase -Command $Command).Reason | Should -BeLike $Expected
