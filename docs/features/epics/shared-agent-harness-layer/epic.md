@@ -37,13 +37,13 @@ features:
     feature_folder: 2026-10-30-retire-github-skills-and-thin-copilot-layer-1032
     depends_on: [1029, 1030]
   - issue_num: 1049
-    feature_folder: pushed-down-vendored-code-coverage-carve-out
+    feature_folder: 2026-10-31-pushed-down-vendored-code-coverage-carve-out-1049
     depends_on: [1029]
   - issue_num: 1050
-    feature_folder: push-down-ci-workflows-per-ecosystem-pack
+    feature_folder: 2026-10-31-push-down-ci-workflows-per-ecosystem-pack-1050
     depends_on: [1049, 1028, 1029]
   - issue_num: 1051
-    feature_folder: push-down-integration-mcp-tools-and-skill
+    feature_folder: 2026-10-31-push-down-integration-mcp-tools-and-skill-1051
     depends_on: [1049, 1050]
   - issue_num: 1016
     feature_folder: 2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production-1016
@@ -73,16 +73,16 @@ and are not re-opened here.
 
 | Child | Feature (hint) | Issue | Wave | Band |
 | --- | --- | --- | --- | --- |
-| 1 Survey, gold-standard contracts, parity matrix, Copilot and Codex experiments | harness-survey-gold-standard-contracts-parity-matrix | #1025 | 0 | C4 |
+| 1 Survey, gold-standard contracts, parity matrix, Copilot and Codex experiments | 2026-10-30-harness-survey-gold-standard-contracts-parity-matrix-1025 | #1025 | 0 | C4 |
 | 2 #1016 Phase 1: resolver, configured root, folder-name parser, folder creation by issue number | 2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035 | #1035 (references #1016, does not close it) | 0 | C3 |
-| 3 Generators and shared-source pipeline (skills, rules, MCP, agents; all with --check) | shared-source-generators-skills-rules-mcp-agents | new | 1 | C3 |
-| 4 Push-down consolidation and per-ecosystem pack selection | push-down-consolidation-and-ecosystem-packs | new | 2 | C3 |
-| 5 Hook parity | hook-parity-across-claude-codex-copilot | new | 2 | C3 |
-| 6 Retirements and the thin Copilot layer | retire-github-skills-and-thin-copilot-layer | new | 3 | C3 |
-| 8 Vendored-code coverage carve-out for pushed-down files | pushed-down-vendored-code-coverage-carve-out | #1049 | 3 | C3 |
-| 9 Push down CI workflows per ecosystem pack | push-down-ci-workflows-per-ecosystem-pack | #1050 | 4 | C3 |
-| 10 Push-down integration MCP tools and skill | push-down-integration-mcp-tools-and-skill | #1051 | 5 | C3 |
-| 7 #1016 Phases 2 and 3: migration command, move to .dev, feature-folder rename, default flip | dev-docs-root-migration-and-feature-folder-rename | #1016 (adopted) | 6 | C3 |
+| 3 Generators and shared-source pipeline (skills, rules, MCP, agents; all with --check) | 2026-10-30-shared-source-generators-skills-rules-mcp-agents-1028 | #1028 | 1 | C3 |
+| 4 Push-down consolidation and per-ecosystem pack selection | 2026-10-30-push-down-consolidation-and-ecosystem-packs-1029 | #1029 | 2 | C3 |
+| 5 Hook parity | 2026-10-30-hook-parity-across-claude-codex-copilot-1030 | #1030 | 2 | C3 |
+| 6 Retirements and the thin Copilot layer | 2026-10-30-retire-github-skills-and-thin-copilot-layer-1032 | #1032 | 3 | C3 |
+| 8 Vendored-code coverage carve-out for pushed-down files | 2026-10-31-pushed-down-vendored-code-coverage-carve-out-1049 | #1049 | 3 | C3 |
+| 9 Push down CI workflows per ecosystem pack | 2026-10-31-push-down-ci-workflows-per-ecosystem-pack-1050 | #1050 | 4 | C3 |
+| 10 Push-down integration MCP tools and skill | 2026-10-31-push-down-integration-mcp-tools-and-skill-1051 | #1051 | 5 | C3 |
+| 7 #1016 Phases 2 and 3: migration command, move to .dev, feature-folder rename, default flip | 2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production-1016 | #1016 (adopted) | 6 | C3 |
 
 Waves are 0-indexed (longest-path layering).
 
@@ -317,6 +317,35 @@ recorded below at fan-in.
 | 1051 | No: no `integration-needed` file or detect/validate tools | none found | kept |
 
 No child is fully superseded at the coordinator pass.
+
+### Per-child refresh results (citation-level check by each preparation run)
+
+| Issue | Superseded | Scope change | Plan(s) after refresh | Preflight |
+| --- | --- | --- | --- | --- |
+| 1025 | none | none | plan A plan.2026-10-30T17-06.md (43 tasks); plan B owner-decision-plan.md (16 tasks) | plan A: halted at the revision limit (3 design-check defects: [P2-T2], [P2-T3], [P2-T4] need additional test rows); plan B: ALL CLEAR |
+| 1035 | none | none | plan.2026-10-30T17-11.md (82 tasks) | halted at the revision limit (2 defects: the `-Area` signature of `Get-DevelopmentDocsKnownRootPattern` versus the plan's root-only form and D-P18; hook WorkspaceRoot choice and Codex import order untested) |
+| 1028 | none | Phase 0 waits on the merged parallel run removed | plan.2026-10-30T18-30.md (33 tasks) | halted at the revision limit (1 defect: [P5-T3] write-mode `generate_codex_agent_variants` acceptance condition unsatisfiable once [P5-T2] changes an agent body; required change recorded in its preflight-result evidence of 2026-11-14) |
+| 1029 | partial: the `ci-workflows` skill exception was already removed on main; the parallel-run wait is obsolete | narrowed accordingly | plan.2026-10-30T18-37.md (40 tasks) | halted at the revision limit (3 defects: [P2-T6] no test asserts `push_down_report` mode `apply`; [P3-T5] no test fails if `overwrite_unmanaged` or the Copilot packs value is dropped between `dispatchRepoAutomationTool` and the harness; [P2-T1]/[P2-T2] inconsistent `shared.json` path-set definition) |
+| 1030 | partial: #1159 already gives each runtime one PreToolUse dispatcher and registry (registration-shape parity); OQ-4 settled by the brief | spec narrowed to v0.3; five SubagentStop validator ports deferred; C1 not expressible, C2 deferred | plan.2026-10-30T18-37.md (20 tasks) | ALL CLEAR |
+| 1032 | none | H3 retirement split into its own plan | plan.2026-10-30T18-39.md (36), plan-h3-sync-writer-retirement.md (18), plan-agents-branch-a.md (13), plan-agents-branch-b.md (13) | all four ALL CLEAR |
+| 1049 | none | none | plan.2026-10-31T14-03.md (40 tasks) | halted at the revision limit (3 defects: [P3-T4] brief edit inside process-reduction ledger region 0001; [P3-T2] feature-review step inside ledger regions 0001, 0006, 0009; [P2-T5] no test for a higher minor schema version) |
+| 1050 | none (one required context `CI Required Gate` already exists; the required-check data reflects it) | none | plan.2026-11-14T09-31.md (20 tasks) | halted at the revision limit (2 defects: pinned actionlint 1.7.12 rejects `job.workflow_repository` and `job.workflow_sha`; spec S6 has no test for the manifest hash and `schema_version` 1.0.0) |
+| 1051 | none | none | plan.2026-11-14T10-43.md (19 tasks) | ALL CLEAR |
+| 1016 | none | Phase 0 gate covers children 1 to 6 and 8 to 10 | stage A plan.2026-10-30T18-59.md (29 tasks); stage B plan.2026-10-30T23-35.md (40 tasks) | stage A: ALL CLEAR; stage B: halted at the revision limit (2 defects: [P3-T4] feature-template byte identity for CES-TEMPLATES-BYTE-IDENTICAL; [P3-T10] preflight-fix-record path sentence in the atomic-plan-contract copies) |
+
+All fifteen plans pass the repository Python CLI plan validator on the integration branch. No child
+was removed. Each halted plan carries its open defects with the required change in its feature
+folder's preflight evidence and in its child checkpoint. A halted plan needs one more planner
+revision and one confirming preflight. Under the atomic-plan-contract one-return rule, that needs an
+`extra_planner_revision` owner directive recorded by the main session in the child's ledger. The
+planner subagent cannot record one, and OD-1 is not a recorded directive.
+
+### Waves after the refresh
+
+The dependency set is unchanged, and `Invoke-EpicWave.ps1` returns the same layering: wave 0 =
+{1025, 1035}; wave 1 = {1028}; wave 2 = {1029, 1030}; wave 3 = {1032, 1049}; wave 4 = {1050};
+wave 5 = {1051}; wave 6 = {1016}. The execution precondition on the parallel run
+`bugs-1001-1002-1003-1006` is satisfied: issues 1001, 1002, 1003, 1006 and 1013 are closed.
 
 ## Complexity Assessment
 

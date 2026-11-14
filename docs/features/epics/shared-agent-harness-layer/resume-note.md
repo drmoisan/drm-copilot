@@ -67,3 +67,30 @@ Promoted records: docs/features/potential/promoted/2026-10-31-pushed-down-vendor
    `docs/features/epics/shared-agent-harness-layer/epic-kickoff.md`, set `next_step` to
    `EPIC_EXECUTION_READY`, and run the epic-planner-state validator with
    `require_ready_for_execution`.
+
+---
+
+## Current state (appended 2026-11-14T20-58 UTC; the record above is kept as history)
+
+Planning was refreshed on 2026-11-14 under OD-1 (autonomous mode). `origin/main` was merged into
+the integration branch and into every child branch. All ten children were checked for superseded
+work and re-planned or prepared. No child was removed. Details per child, decisions and open
+defects: `epic.md` sections `## Planning Refresh 2026-11-14` and `### Per-child refresh results`.
+
+Cleared (PREFLIGHT: ALL CLEAR): #1030; #1032 (all four plans); #1051; #1025 plan B; #1016 stage A.
+
+Halted at the one-revision preflight limit, each with its open defects and required changes
+recorded: #1025 plan A, #1035, #1028, #1029, #1049, #1050, #1016 stage B.
+
+The epic is not yet execution-ready. The kickoff artifacts are written and list the halted
+plans. The planning checkpoint `next_step` is `AWAITING_EXTRA_PLANNER_REVISIONS`.
+
+### Exact next step
+
+1. The main session records one `extra_planner_revision` directive per halted plan in the ledger
+   `artifacts/orchestration/owner-directives.jsonl` of that child's worktree (scope: the child
+   issue, its branch, step `S4`). The planner subagent cannot write the ledger.
+2. Re-run the epic planner. It sends each halted child one planner revision that carries the
+   recorded defects, then one confirming preflight. Use at most two child orchestrators at a time.
+3. Fan in, set `next_step` to `EPIC_EXECUTION_READY`, update the kickoff status table, and run the
+   epic-planner-state validator with `require_ready_for_execution`.
