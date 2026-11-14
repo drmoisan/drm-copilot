@@ -160,4 +160,92 @@ Describe 'Codex preimplementation gate post-fan-in allowance (issue #1136)' {
             $reason.Contains("'merge-in-progress'") | Should -BeFalse
         }
     }
+
+    Context 'regeneration allowance wiring (issue #1156)' {
+        BeforeAll {
+            $script:EpicScopeAst = [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $script:RepoRoot '.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1'), [ref]$null, [ref]$null)
+
+            function Get-AstArgumentText {
+                # Return the extent text of the argument that follows a named parameter of a command.
+                param([Parameter(Mandatory)] $CommandAst, [Parameter(Mandatory)] [string] $Name)
+                $elements = @($CommandAst.CommandElements)
+                for ($i = 0; $i -lt $elements.Count - 1; $i++) {
+                    if ($elements[$i] -is [System.Management.Automation.Language.CommandParameterAst] -and $elements[$i].ParameterName -ceq $Name) { return $elements[$i + 1].Extent.Text }
+                }
+                return $null
+            }
+        }
+
+        It 'admits git add -- gen/a.json under merge-in-progress when the allowance reports Allowed, passing the leg arguments' {
+            # Arrange
+            Set-EpicScopeSeam -CheckpointText $script:FanInEpicJson
+            Mock Get-EpicRegenerationAllowance { [pscustomobject]@{ Allowed = $true; Detail = 'mocked allowed' } }
+
+            # Act
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw (@{ command = 'git add -- gen/a.json' } | ConvertTo-Json -Compress) -CheckpointRaw $script:NotReadySingleFeature
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow' -Because ([string]$decision.hookSpecificOutput.permissionDecisionReason)
+            Should -Invoke Get-EpicRegenerationAllowance -Times 1 -Exactly -ParameterFilter { $ConfigReader -is [scriptblock] -and $StagedIndexReader -is [scriptblock] }
+            Should -Invoke Get-EpicRegenerationAllowance -Times 1 -Exactly -ParameterFilter {
+                $Command -ceq 'git add -- gen/a.json' -and @($FilePath).Count -eq 1 -and [string]@($FilePath)[0] -ceq '' -and
+                $Scope.Branch -ceq 'epic/sample-epic-integration' -and $Scope.WorktreeRoot -ceq '/synthetic-worktrees/epic-coordinator'
+            }
+        }
+
+        It 'denies a matching regeneration commit with the unchanged reason when the readiness failure is not merge-in-progress' {
+            # Arrange
+            Set-EpicScopeSeam -CheckpointText (Get-FanInFixtureText -Kind 'blank-manifest')
+            $payload = @{ command = 'git commit -m regen -- gen/a.json' } | ConvertTo-Json -Compress
+            Mock Get-EpicRegenerationAllowance { [pscustomobject]@{ Allowed = $false; Detail = 'mocked not allowed' } }
+            $today = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $payload -CheckpointRaw $script:NotReadySingleFeature
+            Mock Get-EpicRegenerationAllowance { [pscustomobject]@{ Allowed = $true; Detail = 'mocked allowed' } }
+
+            # Act
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $payload -CheckpointRaw $script:NotReadySingleFeature
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $today.hookSpecificOutput.permissionDecisionReason
+            $decision.hookSpecificOutput.permissionDecisionReason.Contains("'epic_manifest_path'") | Should -BeTrue
+            Should -Invoke Get-EpicRegenerationAllowance -Times 0 -Exactly
+        }
+
+        It 'holds exactly one guarded dot-source of hook-epic-regeneration.ps1 after the fan-in dot-source and before the first function' {
+            # Arrange
+            $statements = @($script:EpicScopeAst.EndBlock.Statements)
+            $index = @(for ($i = 0; $i -lt $statements.Count; $i++) { if ($statements[$i] -is [System.Management.Automation.Language.TryStatementAst] -and $statements[$i].Body.Extent.Text.Contains('hook-epic-regeneration.ps1')) { $i } })
+            $fanIn = @(for ($i = 0; $i -lt $statements.Count; $i++) { if ($statements[$i] -is [System.Management.Automation.Language.TryStatementAst] -and $statements[$i].Body.Extent.Text.Contains('hook-epic-fan-in.ps1')) { $i } })
+            $firstFunction = @(for ($i = 0; $i -lt $statements.Count; $i++) { if ($statements[$i] -is [System.Management.Automation.Language.FunctionDefinitionAst]) { $i } })[0]
+
+            # Assert
+            $index.Count | Should -Be 1
+            $try = $statements[$index[0]]
+            ($try.Body.Statements[0].Extent.Text -replace '\s+', ' ') | Should -BeExactly ". (Join-Path `$PSScriptRoot 'hook-epic-regeneration.ps1')"
+            ($try.CatchClauses[0].Body.Extent.Text -replace '\s+', ' ') | Should -BeExactly "{ Add-HookDependencyFailure -Name 'hook-epic-regeneration.ps1' -ErrorRecord `$_ }"
+            $index[0] | Should -BeGreaterThan $fanIn[0]
+            $index[0] | Should -BeLessThan $firstFunction
+        }
+
+        It 'calls Get-EpicRegenerationAllowance once in Get-OrchestrationEpicScopeDecision under the exact merge-in-progress guard' {
+            # Arrange
+            $function = $script:EpicScopeAst.Find({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Get-OrchestrationEpicScopeDecision' }, $true)
+            $calls = @($script:EpicScopeAst.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] -and $node.GetCommandName() -ceq 'Get-EpicRegenerationAllowance' }, $true))
+            $readerAssignment = $function.Find({ param($node) $node -is [System.Management.Automation.Language.AssignmentStatementAst] -and $node.Left.Extent.Text -ceq '$reader' }, $true)
+
+            # Assert
+            $calls.Count | Should -Be 1
+            $call = $calls[0]
+            ($call.Extent.StartOffset -gt $function.Extent.StartOffset -and $call.Extent.EndOffset -lt $function.Extent.EndOffset) | Should -BeTrue
+            $guard = $call.Parent
+            while ($null -ne $guard -and $guard -isnot [System.Management.Automation.Language.IfStatementAst]) { $guard = $guard.Parent }
+            $guard.Clauses[0].Item1.Extent.Text.Contains("`$failure -ceq 'merge-in-progress'") | Should -BeTrue
+            $call.Extent.StartOffset | Should -BeGreaterThan $readerAssignment.Extent.EndOffset
+            Get-AstArgumentText -CommandAst $call -Name 'ConfigReader' | Should -BeExactly '${function:Read-EpicRegenerationConfig}'
+            Get-AstArgumentText -CommandAst $call -Name 'StagedIndexReader' | Should -BeExactly '$reader'
+            Get-AstArgumentText -CommandAst $call -Name 'Scope' | Should -BeExactly '$Scope'
+            Get-AstArgumentText -CommandAst $call -Name 'FilePath' | Should -BeExactly '$legPaths'
+            Get-AstArgumentText -CommandAst $call -Name 'Command' | Should -BeExactly '$legCommand'
+        }
+    }
 }

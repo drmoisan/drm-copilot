@@ -237,14 +237,25 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # after the merge of origin/main that brought in #1165, which did not edit the
 # epic skill, so the skill digest below is the merged result of #1129, #1130,
 # #1136, #1138, #1141, #1146, #1097, and #1157.
+#
+# RE-BASELINED by issue #1156 on 2026-11-14. That change added to the epic agent
+# `tools:` list the Bash grant for
+# `.claude/lib/regeneration/Invoke-RegenerationPath.ps1`, and to the epic skill
+# the new `## Integration-Tip Regeneration` section, the main-sync regenerate
+# path in item 3 of `## Epic Integration Branch Lifecycle`, and the child-side
+# check sentences in `## Merge-Conflict Handling (Fan-In)` and item 7 of
+# `## Early Dependent Starts (early_start)`. Both digests moved, and the pin stays
+# live for both entries. The digests were recomputed after the merge of origin/main
+# that brought in #1157, #1161, #1163, #1164, and #1167, so both digests below are
+# the merged result of the entries above and #1156.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "142e42d15a73fb595c2b60691d15b1808bc244a24fecd240b59c72558905a7c8",
+        "51897bdd9647229425cea07aa2fba89581da001c1637b87b43d113b2a94aaa3f",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "ef59580f8306d5ae8f313d80cb7d25e3718828fcb2a1c116a8491d7b04921517",
+        "2ec79d6f2ea87d40765e7ff5bb6708e154ba922019ce4b8b1b8c064e3ce1110d",
     ),
 )
 

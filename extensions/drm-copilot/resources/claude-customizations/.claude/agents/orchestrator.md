@@ -138,6 +138,8 @@ Remediation mode lives in the inputs file: each `remediation-inputs.<entry-ts>.m
 
 Cycle-aware `next_step` uses the form `remediation.cycle_N.{plan,preflight,execute,reaudit,exit_check}`, where `N` is `completed_attempts + 1` (the active cycle number) and the sub-step names the current position in the loop; `current_cycle` remains a record position in `cycles[]`.
 
+The regenerate path writes no remediation_loop.cycles[] entry, leaves completed_attempts unchanged on success or fallback, and records regeneration_events[] plus a regeneration_delta review outcome.
+
 ### CI Monitoring and Post-PR Remediation
 
 After the PR is opened, the orchestrator monitors every CI check on the live PR head SHA. A failed check is not handled outside the loop: it transitions into `remediation.cycle_N+1.inputs` (written as a `remediation-inputs.<timestamp>.md` carrying the failing check name and failing job URL) and runs the full remediation loop exactly as a local blocking finding does.
