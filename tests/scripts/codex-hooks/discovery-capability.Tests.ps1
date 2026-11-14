@@ -10,7 +10,7 @@
     protected store holds the host observations the Codex PreToolUse gate recorded for the
     capability sentinel agent (seeded through the shared fixtures). Whether Codex places agent_id
     on a PreToolUse payload is observed, never assumed: an observation without it is unsupported.
-    The registration rows read .codex/config.toml directly. No file is written and no process,
+    The registration rows read .codex/config.toml and .codex/hooks/pretooluse-dispatch.json directly. No file is written and no process,
     network or clock is touched.
 #>
 
@@ -112,10 +112,15 @@ Describe 'discovery-capability-probe.ps1 (Codex)' {
         }
 
         It 'registers the artifact gate on the broad and spawn PreToolUse groups, the planning gate on spawn, and the output validator on the discovery stop group' {
-            $script:Config | Should -Match '(?m)^matcher = "\^\(Agent\|Task\|spawn_agent\|run_subagent\|delegate\)\$"'
-            # Each registration carries a command and a command_windows line.
-            ([regex]::Matches($script:Config, 'enforce-discovery-artifact-gate\.ps1"''')).Count | Should -Be 4
-            ([regex]::Matches($script:Config, 'enforce-discovery-planning-gate\.ps1"''')).Count | Should -Be 2
+            # Issue #1159: the PreToolUse groups are registered in .codex/hooks/pretooluse-dispatch.json.
+            $registry = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.codex/hooks/pretooluse-dispatch.json') | ConvertFrom-Json
+            $groups = @($registry.hooks.PreToolUse)
+            @($groups | Where-Object { $_.matcher -ceq '^(Agent|Task|spawn_agent|run_subagent|delegate)$' }).Count | Should -Be 1
+            # Each registration carries the hook in both command and command_windows.
+            $artifact = @($groups | ForEach-Object { $_.hooks } | Where-Object { [string]$_.command -like '*enforce-discovery-artifact-gate.ps1*' -and [string]$_.command_windows -like '*enforce-discovery-artifact-gate.ps1*' })
+            $planning = @($groups | ForEach-Object { $_.hooks } | Where-Object { [string]$_.command -like '*enforce-discovery-planning-gate.ps1*' -and [string]$_.command_windows -like '*enforce-discovery-planning-gate.ps1*' })
+            $artifact.Count | Should -Be 2
+            $planning.Count | Should -Be 1
             $script:Config | Should -Match '(?m)^matcher = "legacy-parity-analyst\|runtime-characterization-analyst\|requirements-reconciler\|migration-coverage-reviewer"'
             ([regex]::Matches($script:Config, 'validate-discovery-agent-output\.ps1"''')).Count | Should -Be 2
         }

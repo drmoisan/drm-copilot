@@ -44,8 +44,9 @@ Describe 'documentation role hook registration' {
     }
 
     It 'registers exactly one PreToolUse write-scope group in <Path>' -ForEach @(
-        @{ Path = '.claude/settings.json' }
-        @{ Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/settings.json' }
+        # Issue #1159: PreToolUse groups are registered in the dispatcher registry, not in settings.json.
+        @{ Path = '.claude/hooks/pretooluse-dispatch.json' }
+        @{ Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/pretooluse-dispatch.json' }
     ) {
         # Act
         $settings = Read-DocsAuthoringText -RelativePath $Path | ConvertFrom-Json

@@ -41,7 +41,7 @@
 
 try { . (Join-Path $PSScriptRoot 'hook-docs-estate-context.ps1') } catch { Add-HookDependencyFailure -Name 'hook-docs-estate-context.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDependencyFailure -Name 'hook-docs-only-diff.ps1' -ErrorRecord $_ }
-try { Import-Module (Join-Path $PSScriptRoot '../lib/docs/DocsReceiptRevision.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DocsReceiptRevision.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/docs/DocsReceiptRevision.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DocsReceiptRevision.psm1' -ErrorRecord $_ }
 
 function Get-ModelRoutingDocsEstateFileText {
     <#

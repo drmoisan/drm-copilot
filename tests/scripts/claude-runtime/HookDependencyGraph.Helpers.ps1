@@ -67,7 +67,8 @@ function Get-HookRegistration {
         Returns the PreToolUse and SubagentStop hook registrations of both surfaces.
     .DESCRIPTION
         Reads .claude/settings.json under ClaudeRoot and .codex/config.toml under CodexRoot through
-        ReadText, with the same matching as the research Q3 enumeration (Get-RegisteredHook). A
+        ReadText, then the PreToolUse dispatcher registry beside each surface's hooks (issue #1159;
+        a registry that ReadText returns as $null adds no entry), with the same matching as the research Q3 enumeration (Get-RegisteredHook). A
         registration whose command names no hook file yields one INLINE entry. Each entry carries
         Surface, Event, Root, Hook (root-relative, forward slashes, or INLINE) and Path (Root joined
         with Hook, or INLINE). Entries are unique by Surface, Event, and Hook.
@@ -101,6 +102,7 @@ function Get-HookRegistration {
             }
         }
     }
+    Get-HookGraphRegistryEntry -Surface 'claude' -Root $ClaudeRoot -RegistryPath '.claude/hooks/pretooluse-dispatch.json' -Seen $seen -ReadText $ReadText
     $configText = & $ReadText (Join-HookGraphPath -Left $CodexRoot -Right '.codex/config.toml')
     if ($configText) {
         $hookEvent = ''
@@ -112,6 +114,43 @@ function Get-HookRegistration {
                 if ($seen.ContainsKey($key)) { continue }
                 $seen[$key] = $true
                 [pscustomobject]@{ Surface = 'codex'; Event = $hookEvent; Root = $CodexRoot; Hook = $m.Value; Path = (Join-HookGraphPath -Left $CodexRoot -Right $m.Value) }
+            }
+        }
+    }
+    Get-HookGraphRegistryEntry -Surface 'codex' -Root $CodexRoot -RegistryPath '.codex/hooks/pretooluse-dispatch.json' -Seen $seen -ReadText $ReadText
+}
+
+function Get-HookGraphRegistryEntry {
+    <#
+    .SYNOPSIS
+        Returns the PreToolUse hook entries of one PreToolUse dispatcher registry (issue #1159).
+    .DESCRIPTION
+        Reads <Root>/<RegistryPath> through ReadText; a $null or empty text adds no entry. Every
+        hooks.PreToolUse[].hooks[].command naming a <surface> hooks script yields one entry with
+        Event PreToolUse, unless Seen already holds the Surface, Event and Hook key.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)] [ValidateSet('claude', 'codex')] [string] $Surface,
+        [Parameter(Mandatory)] [string] $Root,
+        [Parameter(Mandatory)] [string] $RegistryPath,
+        [Parameter(Mandatory)] [hashtable] $Seen,
+        [Parameter(Mandatory)] [scriptblock] $ReadText
+    )
+
+    $registryText = & $ReadText (Join-HookGraphPath -Left $Root -Right $RegistryPath)
+    if (-not $registryText) { return }
+    $registry = $registryText | ConvertFrom-Json
+    if ($null -eq $registry.hooks -or $registry.hooks.PSObject.Properties.Name -notcontains 'PreToolUse') { return }
+    $pattern = '\.' + $Surface + '/hooks/[\w.-]+\.ps1'
+    foreach ($group in @($registry.hooks.PreToolUse)) {
+        foreach ($hook in @($group.hooks)) {
+            foreach ($m in [regex]::Matches([string]$hook.command, $pattern)) {
+                $key = "$Surface|PreToolUse|$($m.Value)"
+                if ($Seen.ContainsKey($key)) { continue }
+                $Seen[$key] = $true
+                [pscustomobject]@{ Surface = $Surface; Event = 'PreToolUse'; Root = $Root; Hook = $m.Value; Path = (Join-HookGraphPath -Left $Root -Right $m.Value) }
             }
         }
     }

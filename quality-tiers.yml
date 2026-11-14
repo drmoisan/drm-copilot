@@ -70,6 +70,9 @@ projects:
   - path: ".claude/lib/hook-payload"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/hook-dispatch"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
   - path: ".claude/lib/mermaid"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
