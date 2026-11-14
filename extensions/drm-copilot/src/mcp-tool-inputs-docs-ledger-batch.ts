@@ -19,7 +19,7 @@ import {
   DocsInputError,
   matchesDocsGrammar,
   type DocsGrammar,
-} from "./mcp-tool-inputs-docs";
+} from "./mcp-tool-inputs-docs-grammar";
 
 /** Fields one operations item may carry. */
 export const DOCS_LEDGER_BATCH_ITEM_FIELDS = [
