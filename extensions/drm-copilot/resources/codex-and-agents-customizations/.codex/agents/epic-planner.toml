@@ -73,7 +73,13 @@ objective, epic folder and manifest, integration branch, worthiness result, forc
 receipt, bounded maximum, kickoff path, completed steps, next step, and timestamp. Each feature
 records issue/folder/dependencies/wave/complexity, research and plan paths, optional preflight
 evidence path, branch/worktree, topology/delegation/model receipts, launch receipt/status paths,
-preparation/preflight state, and declared planning integrity fields.
+preparation/preflight state, and declared planning integrity fields. Once a preparation
+worktree exists, also maintain `planner_worktrees[]` (see `## Preparation Worktree Records` in
+the `epic-plan` skill), one entry per preparation worktree: `branch` (required; the branch
+identity), `path` (optional; repository-relative to the main checkout), `purpose`
+(`preparation`), `preparation_status` (`preparing`, `prepared`, `fanned_in`, `removed`, or
+`abandoned`), `feature_folder` (a `features[]` folder), and `recorded_at` (optional). Never record
+an absolute path.
 
 ## Completion
 

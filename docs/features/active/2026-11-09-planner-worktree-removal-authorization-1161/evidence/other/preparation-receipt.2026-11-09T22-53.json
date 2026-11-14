@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "stage": "preparation",
+  "issue_num": "1161",
+  "branch_name": "feature/planner-worktree-removal-authorization-1161",
+  "parallel_slug": "harness-learnings-2026-11-09",
+  "research_path": "docs/features/active/2026-11-09-planner-worktree-removal-authorization-1161/research/research.2026-11-09T21-36.md",
+  "spec_path": "docs/features/active/2026-11-09-planner-worktree-removal-authorization-1161/spec.md",
+  "plan_path": "docs/features/active/2026-11-09-planner-worktree-removal-authorization-1161/plan.2026-11-09T16-33.md",
+  "plan_hash": "9128f972a2f7b927f271e716013971f608997a71",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "PREFLIGHT: ALL CLEAR",
+  "recorded_at": "2026-11-09T22:53:02Z"
+}

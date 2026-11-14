@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from typing import Any, cast
 
 from scripts.dev_tools._epic_orchestrator_state_launch_binding import (
@@ -303,6 +304,97 @@ def _validate_ready_features(
     return errors
 
 
+PLANNER_WORKTREE_STATUSES = "preparing prepared fanned_in removed abandoned".split()
+_PLANNER_PREFIX = "Epic planner checkpoint planner_worktrees"
+_PLANNER_BRANCH = re.compile(r"[A-Za-z0-9][A-Za-z0-9._/-]*")
+# The recorded_at blank set: space, tab, LF, CR, VT, FF and nothing else. The
+# TypeScript twin RECORDED_AT_BLANK uses the same six characters (not str.strip).
+_RECORDED_AT_BLANK_CHARS = " \t\n\r\x0b\x0c"
+
+
+def _is_planner_branch(value: object) -> bool:
+    """Return whether ``value`` is a valid ``planner_worktrees[].branch`` name."""
+
+    if not isinstance(value, str) or not _PLANNER_BRANCH.fullmatch(value):
+        return False
+    return ".." not in value and not value.endswith(("/", ".", ".lock"))
+
+
+def _is_planner_relative_path(value: object) -> bool:
+    """Return whether ``value`` is a safe path relative to the main checkout.
+
+    A drive prefix or any colon, a leading ``/``, a backslash, and an empty,
+    ``.``, or ``..`` segment each name a location outside the main checkout.
+    """
+
+    if not isinstance(value, str) or value[:1] in ("", "/") or ":" in value:
+        return False
+    return "\\" not in value and not {"", ".", ".."} & set(value.split("/"))
+
+
+def _validate_planner_worktrees(
+    state: dict[str, Any], indexed_features: list[tuple[int, dict[str, Any]]]
+) -> list[str]:
+    """Validate the optional ``planner_worktrees`` records (issue #1161).
+
+    Args:
+        state: The parsed checkpoint object; nothing is checked without the key.
+        indexed_features: The object entries of ``features`` with their indices.
+
+    Returns:
+        Errors in entry order; within an entry: branch or uniqueness, path,
+        purpose, preparation_status, feature_folder, recorded_at. A present
+        ``recorded_at`` is blank when every character is in
+        ``_RECORDED_AT_BLANK_CHARS``.
+    """
+
+    if "planner_worktrees" not in state:
+        return []
+    value = state["planner_worktrees"]
+    if not isinstance(value, list):
+        return [f"{_PLANNER_PREFIX} must be a list when present."]
+    # Collect the feature_folder values an entry's string feature_folder may name.
+    folders = [feature.get("feature_folder") for _, feature in indexed_features]
+    errors: list[str] = []
+    add = errors.append
+    seen: set[str] = set()
+    # Walk the entries in order; a repeated branch is reported after its first entry.
+    for index, item in enumerate(cast("list[object]", value)):
+        prefix = f"{_PLANNER_PREFIX}[{index}]"
+        if not isinstance(item, dict):
+            add(f"{prefix} must be an object.")
+            continue
+        entry = cast("dict[str, Any]", item)
+        branch = entry.get("branch")
+        # An invalid branch reports its shape only; a valid one is checked for repeats.
+        if not _is_planner_branch(branch):
+            add(f"{prefix}.branch must be a non-empty branch name.")
+        elif branch in seen:
+            add(f"{prefix}.branch must be unique: {branch}.")
+        else:
+            seen.add(cast("str", branch))
+        # The optional path and recorded_at fields are checked only when present.
+        if "path" in entry and not _is_planner_relative_path(entry["path"]):
+            add(
+                f"{prefix}.path must be a repository-relative path without a drive, "
+                "a leading slash, a backslash, or dot segments."
+            )
+        if entry.get("purpose") != "preparation":
+            add(f"{prefix}.purpose must be preparation.")
+        if entry.get("preparation_status") not in PLANNER_WORKTREE_STATUSES:
+            add(
+                f"{prefix}.preparation_status must be one of: "
+                "preparing, prepared, fanned_in, removed, abandoned."
+            )
+        folder = entry.get("feature_folder")
+        if not isinstance(folder, str) or folder not in folders:
+            add(f"{prefix}.feature_folder must name a features[] feature_folder.")
+        recorded = entry.get("recorded_at", "absent")
+        if not (isinstance(recorded, str) and recorded.strip(_RECORDED_AT_BLANK_CHARS)):
+            add(f"{prefix}.recorded_at must be a non-empty string when present.")
+    return errors
+
+
 def validate_epic_planner_state_text(
     text: str,
     *,
@@ -354,6 +446,7 @@ def validate_epic_planner_state_text(
             "Epic planner checkpoint max_parallel_features must be an integer "
             "from 1 through 8."
         )
+    errors.extend(_validate_planner_worktrees(state, indexed_features))
 
     if verdict == "non_epic" and state.get("next_step") != NON_EPIC_NEXT_STEP:
         errors.append(
