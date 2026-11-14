@@ -2,8 +2,8 @@
 
 - Issue: #1035 (epic #1018, child 2: Phase 1 of #1016 only; references #1016 and does not close it)
 - Owner: drmoisan
-- Status: Ready for planning
-- Last Updated: 2026-10-30
+- Status: Ready for planning (refreshed 2026-11-14; spec "Refresh Amendments" A-1 and A-3 change two criteria below)
+- Last Updated: 2026-11-14
 - Spec: `spec.md` in this folder (full #1016 design; Phases 2 and 3 are delivered by epic child 7)
 
 ## Story Statement
@@ -23,7 +23,7 @@ Today no shared constant exists: TypeScript has `ACTIVE_FEATURE_DOCS_DIRECTORY` 
 - Persona: Repository maintainer (this repository)
   - Maintains hooks, validators, MCP tools and scripts across Python, PowerShell and TypeScript.
   - Cares about no behavior change in Phase 1, full toolchain passes, and mirror and contract parity.
-  - Constraints: no new Python scripts or entry points; enforcement hooks do not invoke Python; execution waits for the parallel run `bugs-1001-1002-1003-1006` to merge.
+  - Constraints: no new Python scripts or entry points; enforcement hooks do not invoke Python.
   - Goal: a single key and resolver per runtime so that no consumer hard-codes `docs/features`.
 - Persona: Destination-repository maintainer
   - Receives `.claude/`, `.codex/` and `config/` through the Claude and Codex push-downs.
@@ -63,12 +63,12 @@ Today no shared constant exists: TypeScript has `ACTIVE_FEATURE_DOCS_DIRECTORY` 
 - [ ] With the default key, the full Python, PowerShell and TypeScript test suites pass, and the only changed expectations in existing tests are the folder-naming and status-line expectations for supplied issue numbers.
 - [ ] A recorded repository search over the production roots for `docs/features` returns only the resolver constant definitions and the recorded allowlist of Stay rows, stored under the feature folder's `evidence/` directory.
 - [ ] Matcher tests in each runtime show that the feature-folder record validators accept both `docs/features/active/<folder>` and `.dev/active/<folder>` independent of the configured value.
-- [ ] `config/ci-docs-only-paths.json` includes `.dev/` and excludes `.dev/templates/`, `.dev/potential/template.md`, `.dev/engineering/` and `.dev/discovery/`, and `CiDocsOnlyPathsConfig.Tests.ps1` asserts that classification and passes.
+- [ ] `config/ci-docs-only-paths.json` includes the `.dev` forms of its seven docs-only include prefixes and excludes `.dev/potential/template.md`, so `.dev/templates/`, `.dev/engineering/` and `.dev/discovery/` stay outside the docs-only scope, and `CiDocsOnlyPathsConfig.Tests.ps1` asserts that classification and passes (spec refresh amendment A-3).
+- [ ] Each production consumer found at the 2026-11-14 refresh (spec "Consumers inventoried at the 2026-11-14 refresh") is routed with a `.dev` test or recorded as a Stay row on the residual-search allowlist.
 - [ ] `GOVERNED_GLOBS` in Python and TypeScript contains `.dev/**/*.json` and `docs/**/*.json`, and a test in each runtime finds a JSON file under `.dev/` using in-memory fixtures.
 - [ ] Each in-house `RealFileSystem.glob` consumer named in `spec.md` (`iterGovernedFiles`, `json-validator.ts`, `evidence-locations.ts`, `verification-evidence.ts`, `feature-docs-parsers.ts`) has a test that finds a file under `.dev`, the include-dot behavior of `compileGlob` is documented with a test, and `isExcludedDirectoryName(".dev")` is asserted `true`.
 - [ ] The new PowerShell module exists with equal text in its Claude, Claude-bundle and Codex source locations; the Codex publication entry exists in TypeScript and the existing Python push-down twin; the Claude and Codex `pack-manifests/core.json` files list it; and the resource-contract, pack-manifest completeness, dependency-closure, `ClaudeLibModuleConvention.Tests.ps1` and `hook-dependency-guard-completeness.Tests.ps1` suites pass.
 - [ ] The seven-stage toolchain passes in a single pass for Python, PowerShell and TypeScript; coverage of changed code meets 85% line coverage in every language and 75% branch coverage for Python and TypeScript; no changed production file exceeds 800 lines.
-- [ ] A Phase 0 evidence artifact under `evidence/baseline/` records that the parallel run `bugs-1001-1002-1003-1006` has merged and that each overlapping file listed in `spec.md` was re-checked against `origin/main` before any edit.
 
 ### Destination-repository maintainer
 
