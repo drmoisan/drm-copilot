@@ -3,100 +3,115 @@
 <#
 .SYNOPSIS
     Registration contract for the enforce-test-execution-policy hook (issue #1158, spec D23, D31,
-    registration branch A).
+    registration branch B).
 
 .DESCRIPTION
-    Reads only committed files: .claude/settings.json and its bundle copy (parsed JSON), and
-    .codex/config.toml and its bundle copy (line scan in the Get-CodexHookRegistration pattern of
-    codex-bundle-hook-probe.Tests.ps1).
+    Issue #1159 moved PreToolUse hooks into the dispatcher registries, so the hook is a member of
+    .claude/hooks/pretooluse-dispatch.json, .codex/hooks/pretooluse-dispatch.json, and their bundle
+    copies, in one group that admits Bash and the two PoshQC MCP tool names and directly follows the
+    Bash group. The settings and config copies keep only the dispatcher entry, and the Codex
+    dispatcher timeout equals the sum of the member timeouts of the matching registry copy. Reads
+    only committed files: the registries as parsed JSON, the settings copies as parsed JSON, and the
+    config copies by line scan.
 #>
 
 BeforeDiscovery {
-    $script:SettingsFiles = @(
+    $script:RegistryFiles = @(
+        @{ Runtime = 'claude'; Path = '.claude/hooks/pretooluse-dispatch.json'; BashMatcher = 'Bash'; Matcher = 'Bash|mcp__drm-copilot__run_poshqc_test|mcp__drm-copilot__run_poshqc_suite' }
+        @{ Runtime = 'claude'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/pretooluse-dispatch.json'; BashMatcher = 'Bash'; Matcher = 'Bash|mcp__drm-copilot__run_poshqc_test|mcp__drm-copilot__run_poshqc_suite' }
+        @{ Runtime = 'codex'; Path = '.codex/hooks/pretooluse-dispatch.json'; BashMatcher = '^Bash$'; Matcher = '^(Bash|mcp__drm-copilot__run_poshqc_test|mcp__drm-copilot__run_poshqc_suite)$' }
+        @{ Runtime = 'codex'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/pretooluse-dispatch.json'; BashMatcher = '^Bash$'; Matcher = '^(Bash|mcp__drm-copilot__run_poshqc_test|mcp__drm-copilot__run_poshqc_suite)$' }
+    )
+    $script:DirectFiles = @(
         @{ Path = '.claude/settings.json' }
         @{ Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/settings.json' }
-    )
-    $script:ConfigFiles = @(
         @{ Path = '.codex/config.toml' }
         @{ Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml' }
+    )
+    $script:TimeoutPairs = @(
+        @{ Config = '.codex/config.toml'; Registry = '.codex/hooks/pretooluse-dispatch.json' }
+        @{ Config = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml'; Registry = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/pretooluse-dispatch.json' }
     )
 }
 
 BeforeAll {
     $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
     $script:ClaudeCommand = 'pwsh -NoProfile -File .claude/hooks/enforce-test-execution-policy.ps1'
-    $script:ClaudeMcpMatcher = 'mcp__drm-copilot__run_poshqc_test|mcp__drm-copilot__run_poshqc_suite'
-    $script:CodexMcpMatcher = '^(mcp__drm-copilot__run_poshqc_test|mcp__drm-copilot__run_poshqc_suite)$'
+    $script:CodexCommand = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-test-execution-policy.ps1"'
 
-    function Get-CodexRegistrationEntry {
-        # One record per [[hooks.PreToolUse.hooks]] table: its group matcher, command, command_windows, and timeout.
+    function Get-CodexPreToolUseTimeout {
+        # The timeout values of every [[hooks.PreToolUse.hooks]] table of a config.toml copy.
         param([Parameter(Mandatory)][string] $ConfigPath)
-        $entries = [System.Collections.Generic.List[object]]::new()
-        $eventName = $null
-        $matcher = $null
-        $current = $null
+        $timeouts = [System.Collections.Generic.List[int]]::new()
+        $inPreToolUse = $false
         foreach ($line in (Get-Content -LiteralPath $ConfigPath)) {
-            if ($line -match '^\[\[hooks\.(?<event>[A-Za-z]+)\]\]$') { $eventName = $Matches['event']; $matcher = $null; $current = $null; continue }
-            if ($line -match '^\[\[hooks\.[A-Za-z]+\.hooks\]\]$') {
-                $current = [pscustomobject]@{ Event = $eventName; Matcher = $matcher; Command = ''; CommandWindows = ''; Timeout = '' }
-                $entries.Add($current)
-                continue
-            }
-            if ($null -eq $current -and $line -match '^matcher\s*=\s*"(?<matcher>.+)"\s*$') { $matcher = $Matches['matcher']; continue }
-            if ($null -ne $current -and $line -match '^command\s*=\s*(?<value>.+)$') { $current.Command = $Matches['value']; continue }
-            if ($null -ne $current -and $line -match '^command_windows\s*=\s*(?<value>.+)$') { $current.CommandWindows = $Matches['value']; continue }
-            if ($null -ne $current -and $line -match '^timeout\s*=\s*(?<value>\d+)\s*$') { $current.Timeout = $Matches['value']; continue }
+            if ($line -match '^\[\[hooks\.(?<table>[A-Za-z.]+)\]\]$') { $inPreToolUse = $Matches['table'] -like 'PreToolUse*'; continue }
+            if ($inPreToolUse -and $line -match '^timeout\s*=\s*(?<value>\d+)\s*$') { $timeouts.Add([int]$Matches['value']) }
         }
-        return $entries.ToArray()
+        return $timeouts.ToArray()
     }
 }
 
-Describe 'Claude registration of enforce-test-execution-policy (<Path>)' -ForEach $script:SettingsFiles {
+Describe 'Registry membership of enforce-test-execution-policy (<Path>)' -ForEach $script:RegistryFiles {
     BeforeAll {
-        $settings = Get-Content -LiteralPath (Join-Path $script:RepoRoot $Path) -Raw | ConvertFrom-Json
-        $script:Groups = @($settings.hooks.PreToolUse)
+        $script:Groups = @((Get-Content -LiteralPath (Join-Path $script:RepoRoot $Path) -Raw | ConvertFrom-Json).hooks.PreToolUse)
+        $script:Expected = if ($Runtime -eq 'claude') { $script:ClaudeCommand } else { $script:CodexCommand }
     }
 
-    It 'registers the hook as the last command of the Bash group' {
+    It 'holds the hook in exactly one group, the Bash and PoshQC MCP group' {
         # Act
-        $bash = @($script:Groups | Where-Object { $_.matcher -ceq 'Bash' })
+        $holding = @($script:Groups | Where-Object { @($_.hooks | Where-Object { [string]$_.command -like '*enforce-test-execution-policy.ps1*' }).Count -gt 0 })
 
         # Assert
-        $bash.Count | Should -Be 1
-        @($bash[0].hooks)[-1].command | Should -BeExactly $script:ClaudeCommand
+        $holding.Count | Should -Be 1
+        $holding[0].matcher | Should -BeExactly $Matcher
+        @($holding[0].hooks).Count | Should -Be 1
+        [string]@($holding[0].hooks)[0].command | Should -BeExactly $script:Expected
     }
 
-    It 'registers exactly one PoshQC MCP group that holds the hook' {
+    It 'places the group directly after the Bash group, so the hook runs after the Bash hooks' {
         # Act
-        $mcp = @($script:Groups | Where-Object { $_.matcher -ceq $script:ClaudeMcpMatcher })
+        $matchers = @($script:Groups | ForEach-Object { [string]$_.matcher })
+        $bashIndex = [array]::IndexOf($matchers, $BashMatcher)
 
         # Assert
-        $mcp.Count | Should -Be 1
-        @($mcp[0].hooks | Where-Object { $_.command -ceq $script:ClaudeCommand }).Count | Should -Be 1
+        $bashIndex | Should -BeGreaterOrEqual 0
+        $matchers[$bashIndex + 1] | Should -BeExactly $Matcher
+    }
+
+    It 'gives the Codex member command_windows and timeout 30 like its neighbours' -Skip:($Runtime -ne 'codex') {
+        # Act
+        $member = @(@($script:Groups | Where-Object { $_.matcher -ceq $Matcher })[0].hooks)[0]
+
+        # Assert
+        [string]$member.command_windows | Should -BeExactly $script:CodexCommand
+        [int]$member.timeout | Should -Be 30
     }
 }
 
-Describe 'Codex registration of enforce-test-execution-policy (<Path>)' -ForEach $script:ConfigFiles {
-    BeforeAll {
-        $script:Entries = @(Get-CodexRegistrationEntry -ConfigPath (Join-Path $script:RepoRoot $Path) | Where-Object { $_.Event -eq 'PreToolUse' })
-    }
-
-    It 'registers the twin in the ^Bash$ group with command_windows and timeout 30' {
+Describe 'No direct registration of enforce-test-execution-policy (<Path>)' -ForEach $script:DirectFiles {
+    It 'leaves the hook out of the settings or config copy, which registers only the dispatcher' {
         # Act
-        $bash = @($script:Entries | Where-Object { $_.Matcher -ceq '^Bash$' -and $_.Command -like '*/.codex/hooks/enforce-test-execution-policy.ps1*' })
+        $text = Get-Content -LiteralPath (Join-Path $script:RepoRoot $Path) -Raw
 
         # Assert
-        $bash.Count | Should -Be 1
-        $bash[0].CommandWindows | Should -BeLike '*git rev-parse --show-toplevel*/.codex/hooks/enforce-test-execution-policy.ps1*'
-        $bash[0].Timeout | Should -Be '30'
+        $text | Should -Not -BeLike '*enforce-test-execution-policy.ps1*'
+        $text | Should -BeLike '*invoke-pretooluse-dispatch.ps1*'
     }
+}
 
-    It 'registers exactly one PoshQC MCP group that holds the twin' {
+Describe 'Codex dispatcher timeout sum (<Config>)' -ForEach $script:TimeoutPairs {
+    It 'equals the sum of the member timeouts of the matching registry copy' {
+        # Arrange
+        $sum = 0
+        foreach ($group in @((Get-Content -LiteralPath (Join-Path $script:RepoRoot $Registry) -Raw | ConvertFrom-Json).hooks.PreToolUse)) {
+            foreach ($hook in @($group.hooks)) { $sum += [int]$hook.timeout }
+        }
+
         # Act
-        $mcp = @($script:Entries | Where-Object { $_.Matcher -ceq $script:CodexMcpMatcher })
+        $timeouts = @(Get-CodexPreToolUseTimeout -ConfigPath (Join-Path $script:RepoRoot $Config))
 
         # Assert
-        $mcp.Count | Should -Be 1
-        $mcp[0].Command | Should -BeLike '*/.codex/hooks/enforce-test-execution-policy.ps1*'
+        $timeouts | Should -Be @($sum)
     }
 }
