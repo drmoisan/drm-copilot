@@ -7911,7 +7911,7 @@ index 38ee6ccec..aff2e574b 100644
      $script:ReviewCommandForbidden = $script:ReviewForbidden + @('run_poshqc_test')
      $script:ExecutorListForbidden = @('`mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`')
      $script:D13Required = @('CI integration and golden lanes are evidence', 'non-blocking deviation', 'machine test-suite lock')
-@@ -20,8 +22,8 @@
+@@ -22,8 +24,8 @@
      $script:ReviewLauncherForbidden = $script:ReviewCommandForbidden + @('npm run test:unit:coverage')
      $script:CopilotPesterForbidden = @('mcp_drmcopilotext_run_poshqc_test')
      $script:CopilotFocusedForbidden = @('-k slug_extraction')
@@ -7922,7 +7922,7 @@ index 38ee6ccec..aff2e574b 100644
  }
  
  Describe 'Parallel gate wording' {
-@@ -77,20 +79,20 @@
+@@ -79,20 +81,20 @@
      }
  
      It 'PGW-<Id> carries the required wording and no forbidden wording' -ForEach @(
@@ -7957,7 +7957,7 @@ index 38ee6ccec..aff2e574b 100644
          @{ Id = 'REVIEW-CLAUDE'; Path = '.claude/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired + $script:D13Required + @('run-test-suite.sh'); Forbidden = $script:ReviewLauncherForbidden }
          @{ Id = 'REVIEW-AGENTS'; Path = '.agents/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired + $script:D13Required + @('run-test-suite.sh'); Forbidden = $script:ReviewLauncherForbidden }
          @{ Id = 'REVIEW-GITHUB'; Path = '.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
-@@ -99,9 +101,9 @@
+@@ -101,9 +103,9 @@
          @{ Id = 'REVIEW-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
          @{ Id = 'ADAPTER-AGENTS'; Path = '.agents/skills/repo-automation-adapter/SKILL.md'; Required = @('not a validation gate', 'Invoke-PoshQCParallelTest'); Forbidden = @() }
          @{ Id = 'ADAPTER-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/repo-automation-adapter/SKILL.md'; Required = @('not a validation gate', 'Invoke-PoshQCParallelTest'); Forbidden = @() }
@@ -7970,7 +7970,7 @@ index 38ee6ccec..aff2e574b 100644
          @{ Id = 'EXEC-CODEX-POWERSHELL'; Path = '.codex/agents/powershell-atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = @('run_poshqc_test') }
          @{ Id = 'COPILOT-EXEC'; Path = '.github/agents/atomic_executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
          @{ Id = 'COPILOT-EXEC-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/atomic_executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
-@@ -129,8 +131,8 @@
+@@ -131,8 +133,8 @@
          @{ Id = 'COPILOT-STAGED-REVIEW-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/staged-review.agent.md'; Required = @('Invoke-PoshQCParallelTest', 'pytest -n auto', 'debugging only'); Forbidden = @() }
          @{ Id = 'AUDIT-TEMPLATE'; Path = 'docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
          @{ Id = 'AUDIT-TEMPLATE-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
@@ -7981,7 +7981,7 @@ index 38ee6ccec..aff2e574b 100644
          @{ Id = 'BRIEF-CLAUDE'; Path = '.claude/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
          @{ Id = 'BRIEF-AGENTS'; Path = '.agents/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
          @{ Id = 'BRIEF-GITHUB'; Path = '.github/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
-@@ -178,18 +180,13 @@
+@@ -180,18 +182,13 @@
  
      Context 'Class sweep' {
          BeforeAll {
@@ -8006,7 +8006,7 @@ index 38ee6ccec..aff2e574b 100644
                  'Run the regression to confirm'
              )
  
-@@ -288,7 +285,7 @@
+@@ -290,7 +287,7 @@
                  })
  
              # Assert

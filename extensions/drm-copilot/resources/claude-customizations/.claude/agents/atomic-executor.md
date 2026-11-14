@@ -78,9 +78,9 @@ For each task:
 
 Use the scoped tool patterns for quality gates:
 
-- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
 - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
-- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
 - **Git**: `git diff`, `git status`, `git log`
 
 Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.

@@ -18,6 +18,8 @@ BeforeDiscovery {
     $script:ReviewCommandForbidden = $script:ReviewForbidden + @('run_poshqc_test')
     $script:ExecutorListForbidden = @('`mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`')
     $script:D13Required = @('CI integration and golden lanes are evidence', 'non-blocking deviation', 'machine test-suite lock')
+    # Finding F1 of the #1158 review: the direct pytest toolchain commands that the launcher pytest suite replaces.
+    $script:DirectPytestForbidden = @('`poetry run pyright`, `poetry run pytest ', '4. `poetry run pytest ', 'Test (`poetry run pytest ')
     $script:ExecutorRouteForbidden = $script:ExecutorListForbidden + @('Bash(poetry run pytest', 'Bash(npx jest')
     $script:ReviewLauncherForbidden = $script:ReviewCommandForbidden + @('npm run test:unit:coverage')
     $script:CopilotPesterForbidden = @('mcp_drmcopilotext_run_poshqc_test')
@@ -288,5 +290,27 @@ Describe 'Parallel gate wording' {
             $tokens.Count | Should -Be 12 -Because 'the plan names 12 run-class sweep tokens'
             $missed | Should -BeNullOrEmpty -Because 'a reintroduced token must fail the sweep'
         }
+    }
+
+    It 'PGW-LAUNCHER-<Id> names the launcher and no direct pytest toolchain command' -ForEach @(
+        @{ Id = 'EXEC-CLAUDE'; Path = '.claude/agents/atomic-executor.md'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CODEX'; Path = '.codex/agents/atomic-executor.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CODEX-C1'; Path = '.codex/agents/atomic-executor-c1.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CODEX-C2'; Path = '.codex/agents/atomic-executor-c2.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CODEX-C3'; Path = '.codex/agents/atomic-executor-c3.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CODEX-C3-ELEVATED'; Path = '.codex/agents/atomic-executor-c3-elevated.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CODEX-C4'; Path = '.codex/agents/atomic-executor-c4.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+    ) {
+        # Arrange
+        $text = Get-PgwSurfaceText -RelativePath $Path
+
+        # Act
+        $missing = @($Required | Where-Object { -not $text.Contains($_) })
+        $held = @(Get-PgwTokenHit -Content $text -SearchToken $Forbidden)
+
+        # Assert
+        $missing | Should -BeNullOrEmpty -Because "$Path must name the launcher suites"
+        $held | Should -BeNullOrEmpty -Because "$Path must not name a direct pytest toolchain command"
     }
 }

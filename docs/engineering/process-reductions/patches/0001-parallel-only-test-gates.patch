@@ -589,10 +589,10 @@ index 867c9004b..b376e183c 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -1418,10 +1418,10 @@ index f80112d1f..c1a039de4 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -1434,10 +1434,10 @@ index 4464c31f9..d105a767a 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -1450,10 +1450,10 @@ index f1bb06a14..b4908bb79 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -1466,10 +1466,10 @@ index 092b0c85d..0b57102cc 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -1482,10 +1482,10 @@ index f634c47d3..7aa91892e 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -1498,10 +1498,10 @@ index 5ccea44fc..7d32673e0 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -4602,10 +4602,10 @@ index 867c9004b..b376e183c 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -6164,10 +6164,10 @@ index f80112d1f..c1a039de4 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -6180,10 +6180,10 @@ index 4464c31f9..d105a767a 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -6196,10 +6196,10 @@ index f1bb06a14..b4908bb79 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -6212,10 +6212,10 @@ index 092b0c85d..0b57102cc 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -6228,10 +6228,10 @@ index f634c47d3..7aa91892e 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -6244,10 +6244,10 @@ index 5ccea44fc..7d32673e0 100644
  Use the scoped tool patterns for quality gates:
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
-+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
++- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, and the launcher `pytest` suite (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`), which runs `poetry run pytest -n auto`
  - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
++- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the launcher `pester` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`)
  - **Git**: `git diff`, `git status`, `git log`
  
  Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
@@ -9329,7 +9329,7 @@ new file mode 100644
 index 000000000..38ee6ccec
 --- /dev/null
 +++ b/tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1
-@@ -0,0 +1,295 @@
+@@ -0,0 +1,319 @@
 +Set-StrictMode -Version Latest
 +
 +# Contract guard for issue #1094: the mirrored skills, agents, prompts, and
@@ -9348,6 +9348,8 @@ index 000000000..38ee6ccec
 +    $script:ReviewCommandForbidden = $script:ReviewForbidden + @('run_poshqc_test')
 +    $script:ExecutorListForbidden = @('`mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`')
 +    $script:D13Required = @('CI integration and golden lanes are evidence', 'non-blocking deviation', 'machine test-suite lock')
++    # Finding F1 of the #1158 review: the direct pytest toolchain commands that the launcher pytest suite replaces.
++    $script:DirectPytestForbidden = @('`poetry run pyright`, `poetry run pytest ', '4. `poetry run pytest ', 'Test (`poetry run pytest ')
 +    $script:ExecutorRouteForbidden = $script:ExecutorListForbidden + @('Bash(poetry run pytest', 'Bash(npx jest')
 +    $script:ReviewLauncherForbidden = $script:ReviewCommandForbidden + @('npm run test:unit:coverage')
 +    $script:CopilotPesterForbidden = @('mcp_drmcopilotext_run_poshqc_test')
@@ -9623,6 +9625,28 @@ index 000000000..38ee6ccec
 +            $tokens.Count | Should -Be 38 -Because 'the plan names 38 sweep tokens'
 +            $missed | Should -BeNullOrEmpty -Because 'a reintroduced token must fail the sweep'
 +        }
++    }
++
++    It 'PGW-LAUNCHER-<Id> names the launcher and no direct pytest toolchain command' -ForEach @(
++        @{ Id = 'EXEC-CLAUDE'; Path = '.claude/agents/atomic-executor.md'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'EXEC-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'EXEC-CODEX'; Path = '.codex/agents/atomic-executor.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'EXEC-CODEX-C1'; Path = '.codex/agents/atomic-executor-c1.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'EXEC-CODEX-C2'; Path = '.codex/agents/atomic-executor-c2.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'EXEC-CODEX-C3'; Path = '.codex/agents/atomic-executor-c3.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'EXEC-CODEX-C3-ELEVATED'; Path = '.codex/agents/atomic-executor-c3-elevated.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
++        @{ Id = 'EXEC-CODEX-C4'; Path = '.codex/agents/atomic-executor-c4.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
++    ) {
++        # Arrange
++        $text = Get-PgwSurfaceText -RelativePath $Path
++
++        # Act
++        $missing = @($Required | Where-Object { -not $text.Contains($_) })
++        $held = @(Get-PgwTokenHit -Content $text -SearchToken $Forbidden)
++
++        # Assert
++        $missing | Should -BeNullOrEmpty -Because "$Path must name the launcher suites"
++        $held | Should -BeNullOrEmpty -Because "$Path must not name a direct pytest toolchain command"
 +    }
 +}
 diff --git a/tests/scripts/codex-hooks/feature-review-coverage-narrowing-parity.Tests.ps1 b/tests/scripts/codex-hooks/feature-review-coverage-narrowing-parity.Tests.ps1
