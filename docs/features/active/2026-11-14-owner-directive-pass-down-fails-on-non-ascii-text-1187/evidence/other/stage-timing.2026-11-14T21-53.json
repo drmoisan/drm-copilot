@@ -1,0 +1,47 @@
+{
+  "issue-num": "1187",
+  "stage_timing": [
+    {
+      "stage": "S2_research",
+      "attempt": 1,
+      "started_at": "2026-11-14T18:13:55Z",
+      "ended_at": "2026-11-14T18:22:06Z"
+    },
+    {
+      "stage": "S3b_feature_documents",
+      "attempt": 1,
+      "started_at": "2026-11-14T18:22:06Z",
+      "ended_at": "2026-11-14T18:26:29Z"
+    },
+    {
+      "stage": "S4_atomic_planning",
+      "attempt": 1,
+      "started_at": "2026-11-14T18:26:29Z",
+      "ended_at": "2026-11-14T18:42:46Z"
+    },
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 1,
+      "started_at": "2026-11-14T18:42:46Z",
+      "ended_at": "2026-11-14T21:25:14Z"
+    },
+    {
+      "stage": "S8_create_pr",
+      "attempt": 1,
+      "started_at": "2026-11-14T21:25:14Z",
+      "ended_at": "2026-11-14T21:28:17Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 1,
+      "started_at": "2026-11-14T21:28:17Z",
+      "ended_at": "2026-11-14T21:53:54Z"
+    },
+    {
+      "stage": "S9_ci_and_merge",
+      "attempt": 1,
+      "started_at": "2026-11-14T21:53:54Z",
+      "ended_at": null
+    }
+  ]
+}

@@ -191,7 +191,7 @@ Seeded from issue (each item is covered by acceptance criteria below):
 - [x] AC-17: No changed or new file exceeds 800 logical lines, and each changed or new test and production file in this item stays below 500 logical lines.
 - [x] AC-18: No copy of the execution-environment brief is modified, because no fact it states changes (D-10); the branch diff against `main` shows no change to any brief copy.
 - [x] AC-19: The comment-based help of both dispatchers states the UTF-8 stdin decode, the ASCII-escaped output, and (Claude dispatcher) that the `per-process` isolation mode is not covered by the decode fix.
-- [ ] AC-20: The full PowerShell toolchain loop (Invoke-Formatter, PSScriptAnalyzer, Pester through the test-execution launcher in parallel, and the Python contract tests) passes in a single pass, and CI on the PR head is green.
+- [x] AC-20: The full PowerShell toolchain loop (Invoke-Formatter, PSScriptAnalyzer, Pester through the test-execution launcher in parallel, and the Python contract tests) passes in a single pass, and CI on the PR head is green.
 
 Verification note (executor, P3-T4): `evidence/qa-gates/ac-verification.2026-11-14T21-19.md` maps AC-1 to AC-19 to their evidence paths. AC-20 stays unchecked: its local part passed (final static, Pester, and pytest gates under `evidence/qa-gates/`), and its CI part is pending for the orchestrator at S9.
 
