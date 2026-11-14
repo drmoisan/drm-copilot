@@ -38,6 +38,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 Set-StrictMode -Version Latest
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-target-worktree.ps1' -ErrorRecord $_ }
 $ErrorActionPreference = 'Stop'
 $script:SubagentStopReportAndHaltLine = 'This condition is not repairable by the subagent. Report it to the operator and halt.'
 
@@ -116,7 +117,7 @@ function Invoke-RequiredArtifactOutputValidation {
     if (-not $envelope.IsValid) { $decision = @{ Ok = $false; Repairable = $false; Message = ('{0} payload anomaly - {1}' -f ("$AgentName hook:"), (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)) } }
     else {
         $agentOutput = $envelope.AssistantText
-        $decision = Get-RequiredArtifactOutputBlockDecision -AgentOutput ([string]$agentOutput) -AgentName $AgentName -RequiredArtifact $RequiredArtifact
+        $decision = Get-RequiredArtifactOutputBlockDecision -AgentOutput ([string]$agentOutput) -AgentName $AgentName -RequiredArtifact $RequiredArtifact -Envelope $envelope.Envelope
     }
     if ($decision.Ok) { return @{ Ok = $true; Message = $null } }
     if (-not $decision.Repairable) {
@@ -134,6 +135,11 @@ function Get-RequiredArtifactOutputBlockDecision {
         Returns @{ Ok = $true; Message = $null } to allow, or a hashtable with Ok = $false, a
         Repairable boolean, and Message. A malformed RequiredArtifact spec is a registration
         defect the subagent cannot clear, so it is not repairable; the other blocks are.
+        The advertised paths are resolved once against the item worktree that produced them
+        (Resolve-SubagentStopTargetWorktree, issue #1105): each contract regex reads the
+        repository-relative value and Test-ArtifactFile probes the item copy only. Envelope,
+        SessionRoot, ReadTranscriptHead, and WorktreeListInvoker feed that resolution; without
+        an envelope or an absolute path the session root applies and nothing changes.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -142,35 +148,56 @@ function Get-RequiredArtifactOutputBlockDecision {
         [AllowEmptyString()]
         [string] $AgentOutput,
         [string] $AgentName,
-        [string[]] $RequiredArtifact
+        [string[]] $RequiredArtifact,
+        [AllowNull()] [object] $Envelope,
+        [AllowNull()] [AllowEmptyString()] [string] $SessionRoot,
+        [scriptblock] $ReadTranscriptHead,
+        [scriptblock] $WorktreeListInvoker
     )
 
     if ([string]::IsNullOrWhiteSpace($agentOutput)) {
         return @{ Ok = $false; Repairable = $true; Message = "$AgentName hook: agent output is empty (last_assistant_message carries no text); artifact paths must be reported before termination." }
     }
 
-    $errors = [System.Collections.Generic.List[string]]::new()
+    $specs = [System.Collections.Generic.List[hashtable]]::new()
     foreach ($specText in $RequiredArtifact) {
         try {
-            $spec = ConvertTo-ArtifactSpec -Spec $specText
+            $specs.Add((ConvertTo-ArtifactSpec -Spec $specText))
         }
         catch {
             return @{ Ok = $false; Repairable = $false; Message = "$AgentName hook: $($_.Exception.Message)" }
         }
+    }
 
-        $path = Get-ArtifactPathFromOutput -AgentOutput $agentOutput -Token $spec.Token
+    $advertised = @{}
+    foreach ($spec in $specs) { $advertised[$spec.Token] = Get-ArtifactPathFromOutput -AgentOutput $agentOutput -Token $spec.Token }
+    $root = if ([string]::IsNullOrWhiteSpace($SessionRoot)) { (Get-Location).Path } else { $SessionRoot }
+    $targetArguments = @{ Envelope = $Envelope; AdvertisedPath = [string[]]@($advertised.Values | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }); SessionRoot = $root }
+    if ($null -ne $ReadTranscriptHead) { $targetArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
+    if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+    $target = Resolve-SubagentStopTargetWorktree @targetArguments
+
+    $errors = [System.Collections.Generic.List[string]]::new()
+    foreach ($spec in $specs) {
+        $path = $advertised[$spec.Token]
         if ($null -eq $path) {
             $errors.Add("missing $($spec.Token): <path> for the required $($spec.Description)")
             continue
         }
 
-        if (-not [regex]::IsMatch($path, $spec.Pattern)) {
+        $location = Resolve-SubagentStopArtifactLocation -Path $path -WorktreeRoot $target.WorktreeRoot -SessionRoot $root -Target $target
+        if ($location.Rejected) {
+            $errors.Add("$($spec.Token) '$path' is rejected: $($location.RejectionDetail)")
+            continue
+        }
+        if (-not [regex]::IsMatch($location.RelativePath, $spec.Pattern)) {
             $errors.Add("$($spec.Token) '$path' does not match the required location for the $($spec.Description)")
             continue
         }
 
-        if (-not (Test-ArtifactFile -Path $path)) {
-            $errors.Add("$($spec.Token) '$path' was advertised for the $($spec.Description) but no file exists at that location")
+        if (-not (Test-ArtifactFile -Path $location.ProbePath)) {
+            $note = (Get-SubagentStopTargetNote -Target $target -ProbePath $location.ProbePath -SessionRoot $root).TrimEnd('.')
+            $errors.Add("$($spec.Token) '$path' was advertised for the $($spec.Description) but no file exists at that location$(if ($note) { ';' + $note })")
         }
     }
 

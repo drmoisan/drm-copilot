@@ -1,0 +1,1 @@
+tests/fixtures/cleanup_worktrees/preserve/merge-eof-union/wt	notes/n.md	modified	PRESERVE	STILL_RELEVANT	notes/n.md	true	true		lf	object	clean	cleanup-wt-host-tokens-v1	preserve/merge-eof-union fixture: both sides appended at end of file

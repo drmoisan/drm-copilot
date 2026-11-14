@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:docs:1.0.0:common",
+  "title": "Docs v1 shared definitions",
+  "description": "Definitions only; this document has no root object. Artifact schemas reference these definitions through urn:drm-copilot:docs:1.0.0:common#/$defs/<name>, and the docs runtime composes them in memory before validation.",
+  "$defs": {
+    "identifier": {"type": "string", "pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$(?![\\s\\S])"},
+    "text": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "revision": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$(?![\\s\\S])"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$(?![\\s\\S])"},
+    "timestamp": {"type": "string", "format": "date-time", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{1,9})?Z$"},
+    "relative-path": {
+      "type": "string", "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^/\\\\:\\x00-\\x1f\\u2028\\u2029*?<>|]+(?:/[^/\\\\:\\x00-\\x1f\\u2028\\u2029*?<>|]+)*$(?![\\s\\S])",
+      "description": "Workspace-relative POSIX spelling. Resolution, reserved names, case aliases and symlinks require the shared path policy."
+    },
+    "path-or-glob": {
+      "type": "string", "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^/\\\\:\\x00-\\x1f\\u2028\\u2029<>|]+(?:/[^/\\\\:\\x00-\\x1f\\u2028\\u2029<>|]+)*$(?![\\s\\S])"
+    },
+    "identifiers": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+    "paths": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/relative-path"}},
+    "validation-outcome": {"enum": ["pass", "fail"]},
+    "exclusion": {
+      "type": "object", "additionalProperties": false, "required": ["path_or_glob", "rationale"],
+      "properties": {"path_or_glob": {"$ref": "#/$defs/path-or-glob"}, "rationale": {"$ref": "#/$defs/text"}}
+    },
+    "exclusions": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/exclusion"}},
+    "extensions": {
+      "type": "object", "additionalProperties": false,
+      "patternProperties": {"^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)+$(?![\\s\\S])": {"$ref": "#/$defs/json-value"}},
+      "description": "Namespaced data only; never merged into core IDs, claims, gates, references or dimensions."
+    },
+    "json-value": {
+      "anyOf": [
+        {"type": ["string", "number", "boolean", "null"]},
+        {"type": "array", "items": {"$ref": "#/$defs/json-value"}},
+        {"type": "object", "additionalProperties": {"$ref": "#/$defs/json-value"}}
+      ]
+    },
+    "element-kind": {"enum": ["cli-command", "cli-option", "http-route", "config-key", "public-symbol", "architecture-component"]},
+    "analysis-method": {"enum": ["native", "scanner"]},
+    "audience-id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$(?![\\s\\S])"},
+    "audience-ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/audience-id"}},
+    "element-id": {"type": "string", "pattern": "^(?:cli-command|cli-option|http-route|config-key|public-symbol|architecture-component)-[0-9a-f]{64}$"},
+    "element-ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/element-id"}},
+    "disposition": {"enum": ["documented", "excluded", "deferred"]},
+    "parity-dimension": {"enum": ["exists", "accurate", "example_present", "owner_assigned", "diataxis_mode"]},
+    "parity-state": {"enum": ["pass", "fail", "not-assessed", "not-applicable"]},
+    "diataxis-mode": {"enum": ["tutorial", "how-to", "reference", "explanation"]},
+    "front-matter-field": {"enum": ["owner", "last_reviewed", "audience", "diataxis_mode", "surface_refs"]},
+    "review-date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "docs-artifact-kind": {"enum": ["docs-profile", "surface-inventory-snapshot", "docs-coverage-ledger", "docs-parity-matrix", "docs-evidence-pin", "docs-validation-receipt"]},
+    "artifact-pin": {
+      "type": "object", "additionalProperties": false,
+      "required": ["artifact_kind", "path", "sha256"],
+      "properties": {
+        "artifact_kind": {"$ref": "#/$defs/docs-artifact-kind"},
+        "path": {"$ref": "#/$defs/relative-path"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "page-binding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["page_path", "anchor"],
+      "properties": {
+        "page_path": {"$ref": "#/$defs/relative-path"},
+        "anchor": {"anyOf": [{"$ref": "#/$defs/text"}, {"type": "null"}]}
+      }
+    },
+    "actor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": {"enum": ["human", "agent", "tool"]},
+        "id": {"$ref": "#/$defs/identifier"}
+      }
+    },
+    "finding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["code", "severity", "artifact_path", "pointer", "related_ids", "related_paths", "message", "next_action"],
+      "properties": {
+        "code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+        "severity": {"enum": ["error", "warning", "info"]},
+        "artifact_path": {"anyOf": [{"$ref": "#/$defs/relative-path"}, {"type": "null"}]},
+        "pointer": {"type": "string", "pattern": "^(?:/(?:[^~/]|~[01])*)*$"},
+        "related_ids": {"$ref": "#/$defs/identifiers"},
+        "related_paths": {"$ref": "#/$defs/paths"},
+        "message": {"$ref": "#/$defs/text"},
+        "next_action": {"$ref": "#/$defs/text"}
+      }
+    },
+    "diagnostic": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "code", "severity", "path", "message", "analyzer_id", "blocking", "extensions"],
+      "properties": {
+        "id": {"$ref": "#/$defs/identifier"},
+        "code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+        "severity": {"enum": ["information", "warning", "error"]},
+        "path": {"anyOf": [{"$ref": "#/$defs/relative-path"}, {"type": "null"}]},
+        "message": {"$ref": "#/$defs/text"},
+        "analyzer_id": {"$ref": "#/$defs/identifier"},
+        "blocking": {"type": "boolean"},
+        "extensions": {"$ref": "#/$defs/extensions"}
+      }
+    }
+  }
+}

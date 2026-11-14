@@ -1,0 +1,67 @@
+{
+  "objective": "deliver parallel run admission-seed",
+  "completed_steps": ["kickoff_parsed"],
+  "next_step": "cohort_0_launch",
+  "last_updated": "2026-11-03T10-00",
+  "route_id": "parallel",
+  "parallel_slug": "admission-seed",
+  "parallel_manifest_path": "docs/features/parallel/admission-seed/parallel.md",
+  "parallel_status_doc_path": "docs/features/parallel/admission-seed/parallel-status.md",
+  "mode": "open",
+  "max_concurrency": 4,
+  "current_cohort": 0,
+  "recolor_generation": 0,
+  "cohorts": [
+    {"index": 0, "generation": 0, "item_keys": [1101]},
+    {"index": 1, "generation": 0, "item_keys": [1102]}
+  ],
+  "items": [
+    {
+      "issue_num": 1101,
+      "feature_folder": "docs/features/active/admission-seed-alpha-1101",
+      "state": "scheduled",
+      "merge_status": "not_started",
+      "branch_name": "feature/admission-seed-alpha-1101",
+      "blast_radius": {
+        "paths": ["scripts/sample/alpha.ps1", "docs/features/active/admission-seed-alpha-1101/**"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-03T10-00"
+      },
+      "preparation_status": "cleared",
+      "plan_hash": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+      "base_commit": "b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0",
+      "complexity_band": "C2",
+      "band_source": "planner_checkpoint"
+    },
+    {
+      "issue_num": 1102,
+      "feature_folder": "docs/features/active/admission-seed-beta-1102",
+      "state": "scheduled",
+      "merge_status": "not_started",
+      "branch_name": "feature/admission-seed-beta-1102",
+      "blast_radius": {
+        "paths": ["scripts/sample/beta.ps1", "docs/features/active/admission-seed-beta-1102/**"],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-03T10-00"
+      },
+      "preparation_status": "cleared",
+      "plan_hash": "c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2c2",
+      "base_commit": "b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0",
+      "complexity_band": "C2",
+      "band_source": "planner_checkpoint"
+    }
+  ],
+  "conflict_edges": [],
+  "tolerated_overlaps": [],
+  "precedence": [
+    {"before": 1101, "after": 1102, "source": "operator", "recorded_at": "2026-11-03T10-00"}
+  ],
+  "mutations": [],
+  "drift_events": []
+}

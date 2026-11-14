@@ -29,7 +29,7 @@ The repository maintains parallel customization surfaces for three coding-agent 
 1. **Standing instructions** — [CLAUDE.md](CLAUDE.md) and [.claude/rules/](.claude/rules/) provide persistent policy context. `CLAUDE.md` carries repository-wide tone, the policy-compliance reading order, and architectural context. Rule files carry language-specific toolchain and coding standards, scoped by file path through YAML frontmatter (for example `python.md`, `typescript.md`, `powershell.md`, `csharp.md`, `quality-tiers.md`, `architecture-boundaries.md`, `orchestrator-state.md`, `ci-workflows.md`, `benchmark-baselines.md`).
 2. **Skills** — [.claude/skills/](.claude/skills/) define reusable, user-invocable workflows. Each `SKILL.md` declares its own `allowed-tools`, `context`, and `agent` routing. The catalog includes `orchestrate`, `epic-orchestrate`, `feature-promotion-lifecycle`, `atomic-plan-contract`, `execute-hard-lock`, `feature-review-workflow`, `pr-author`, `pr-context-artifacts`, `pr-base-branch-merge-base`, `commit-message`, `research-issue`, `acceptance-criteria-tracking`, `policy-compliance-order`, `evidence-and-timestamp-conventions`, the per-language change-budget routers and QA gates (`python-`, `powershell-`, `csharp-`), the orchestration state machines, `remediation-handoff-atomic-planner`, `human-exception-runbook`, the review skills (`review-feature`, `review-epic`, `review-staged`), and the cross-ecosystem translator `translate-copilot-to-claude` (Claude-to-Codex conversion is handled by the Codex-native converter described below, not a separate translator skill).
 3. **Subagents** — [.claude/agents/](.claude/agents/) define named specialist personas, each declaring its tool allowlist, model, preloaded skills, hooks, and memory scope. The current roster is `orchestrator`, `epic-orchestrator`, `atomic-planner`, `atomic-executor`, `feature-review`, `epic-review`, `staged-review`, `task-researcher`, `prd-feature`, `status-updater`, `pr-author`, `commit-message`, `human-exception-runbook`, and the language engineers `python-typed-engineer`, `typescript-engineer`, `powershell-typed-engineer`, and `csharp-typed-engineer`.
-4. **Enforcement** — [.claude/settings.json](.claude/settings.json) defines tool/path permissions, and [.claude/hooks/](.claude/hooks/) contains `PreToolUse` and `SubagentStop` scripts that block dangerous commands and validate completion gates (for example `enforce-pr-author-skill.ps1`, `enforce-promotion-mcp-only.ps1`, `enforce-orchestration-preimplementation-gate.ps1`, `enforce-checkpoint-monotonic.ps1`, the per-language batch-budget and test-purity checks, and the `validate-*-output.ps1` gates for each subagent).
+4. **Enforcement** — [.claude/settings.json](.claude/settings.json) defines tool/path permissions, and [.claude/hooks/](.claude/hooks/) contains `PreToolUse` and `SubagentStop` scripts that block dangerous commands and validate completion gates (for example `enforce-pr-author-skill.ps1`, `enforce-promotion-mcp-only.ps1`, `enforce-orchestration-preimplementation-gate.ps1`, `enforce-checkpoint-monotonic.ps1`, the per-language batch-budget and test-purity checks, and the `validate-*-output.ps1` gates for each subagent). `PreToolUse` hooks are registered once per runtime through a dispatcher (`.claude/hooks/invoke-pretooluse-dispatch.ps1` and `.codex/hooks/invoke-pretooluse-dispatch.ps1`) that reads the hook list from the registry beside it (`pretooluse-dispatch.json`), runs every hook whose matcher admits the tool, and emits one combined decision; the registry's `isolation` field selects `in-process` (shipped) or `per-process` (the default when the field is absent), and a new `PreToolUse` hook is added to that registry.
 
 ### Orchestration model
 
@@ -286,14 +286,24 @@ Limitations: the push-down never deletes destination files, so a file already pr
 
 ### Root toolchain
 
-- Python 3.10+
+- Python 3.11+
 - Poetry
 
 ### Extension development
 
 - VS Code (engine `^1.138.0`)
-- Node.js 20+ recommended
-- npm
+- Node.js 26.13.0
+- npm 11.20.0
+
+### Development environment baseline
+
+The Windows host manifest and both devcontainers use Python 3.13.18, Node.js 26.13.0/npm 11.20.0, PowerShell 7.6.9, and Poetry 2.5.1. Shell validation uses shfmt 3.14.1, ShellCheck 0.11.0, and actionlint 1.7.12. Both containers accept later Python patches within 3.13 and retain their separate platform settings.
+
+Both images also install Git >=2.56.0, GitHub CLI 2.103.3, .NET SDK 10.0.403, uv 0.13.7, Claude Code 2.1.318, claude-swap 0.29.0, Codex 0.166.0, Pester 6.2.0, and PSScriptAnalyzer 1.25.0. See [.devcontainer/README.md](.devcontainer/README.md) for the shared setup and local Linux dependency volumes.
+
+Run `scripts/dev-tools/bootstrap-host.ps1` without `-Apply` to preview missing or below-minimum managed tools. Apply mode installs or upgrades them according to `scripts/host-tools.manifest.json`; equal or newer host versions remain unchanged, and unreadable versions fail explicitly.
+
+Python 3.11/3.12 compatibility jobs, consumer engine requirements, and release-publishing runtime pins remain independent of this development baseline.
 
 ### Standalone MCP package
 
@@ -314,7 +324,7 @@ Limitations: the push-down never deletes destination files, so a file already pr
 
 - Python: Poetry-managed Black, Ruff, Pyright, and Pytest (installed via `poetry install`).
 - TypeScript: Node.js with Prettier, ESLint, `tsc`, and the configured test runner (installed via `npm ci`).
-- PowerShell: PowerShell 7+ and the bundled PoshQC module (PSScriptAnalyzer, Pester 5.x); install tooling with `Install-PoshQCTools`.
+- PowerShell: PowerShell 7+ and the bundled PoshQC module (PSScriptAnalyzer, Pester 6.2.x); install tooling with `Install-PoshQCTools`.
 - Modern C#: the .NET 8+ SDK with the CSharpier dotnet tool and the analyzer/test packages restored by the solution.
 - Legacy VSTO C#: the .NET Framework build toolchain (`msbuild`, `vstest.console.exe`) plus CSharpier.
 - Bash: `shfmt`, `shellcheck`, `bats`, and (for coverage) `kcov`.
@@ -327,8 +337,8 @@ The repository defines a separate, fully specified quality toolchain for each su
 |---|---|---|---|---|---|
 | Python | Black | Ruff | Pyright (strict) | Pytest | pytest-cov |
 | TypeScript | Prettier | ESLint (typescript-eslint) | `tsc` | Vitest (Jest in the bundled extension) | c8 / coverage provider |
-| PowerShell | PoshQC `Invoke-Formatter` | PSScriptAnalyzer (PoshQC) | n/a | Pester v5 | Pester + kcov export |
-| Modern C# (.NET 8+, No-COM) | CSharpier | .NET / Roslyn analyzers | Nullable reference types | xUnit + NSubstitute + FluentAssertions | XPlat Code Coverage |
+| PowerShell | PoshQC `Invoke-Formatter` | PSScriptAnalyzer (PoshQC) | n/a | Pester v6 | Pester + kcov export |
+| Modern C# (.NET 8+, No-COM) | CSharpier | .NET / Roslyn analyzers | Nullable reference types | MSTest + NSubstitute + FluentAssertions | XPlat Code Coverage |
 | Legacy VSTO C# (.NET Framework) | CSharpier | .NET analyzers via `msbuild` | Nullable via `msbuild` | MSTest via `vstest.console.exe` | `/EnableCodeCoverage` |
 | Bash / shell | shfmt | shellcheck | n/a | Bats | kcov |
 
@@ -359,7 +369,7 @@ Canonical rule: [.claude/rules/powershell.md](.claude/rules/powershell.md). All 
 
 - format: `mcp__drm-copilot__run_poshqc_format` (or `Invoke-PoshQCFormat`)
 - analyze: `mcp__drm-copilot__run_poshqc_analyze` (autofix: `mcp__drm-copilot__run_poshqc_analyze_autofix`)
-- test (Pester v5): `mcp__drm-copilot__run_poshqc_test` (or `Invoke-PoshQCTest`)
+- test (Pester v6): `mcp__drm-copilot__run_poshqc_test` (or `Invoke-PoshQCTest`)
 - full suite: `mcp__drm-copilot__run_poshqc_suite`
 
 There is no type-check stage for PowerShell. Pester runs use the repo config at `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`.
@@ -371,9 +381,9 @@ Canonical rule: [.claude/rules/csharp.md](.claude/rules/csharp.md). This ecosyst
 - format: `dotnet tool restore` then `dotnet csharpier check .` (auto-format with `dotnet csharpier .`)
 - lint + nullable: `dotnet build` (analyzers and `Nullable=enable` enforced as errors via `Directory.Build.props`)
 - architecture: `NetArchTest.Rules` in `*.ArchitectureTests` projects
-- test: `dotnet test --collect:"XPlat Code Coverage"` (xUnit + NSubstitute + FluentAssertions)
+- test: `dotnet test --collect:"XPlat Code Coverage"` (MSTest + NSubstitute + FluentAssertions)
 
-Determinism is enforced through an injected `TimeProvider` (`FakeTimeProvider` in tests); `DateTime.Now`, `DateTime.UtcNow`, `Random.Shared`, `Thread.Sleep`, and `Task.Delay` are banned via `BannedApiAnalyzers`. T1/T2 modules add `CsCheck` property tests, T1 modules add `Stryker.NET` mutation testing, and T1 classifier modules add `Verify.Xunit` golden tests.
+Determinism is enforced through an injected `TimeProvider` (`FakeTimeProvider` in tests); `DateTime.Now`, `DateTime.UtcNow`, `Random.Shared`, `Thread.Sleep`, and `Task.Delay` are banned via `BannedApiAnalyzers`. T1/T2 modules add `CsCheck` property tests, T1 modules add `Stryker.NET` mutation testing, and T1 classifier modules add `Verify.MSTest` golden tests.
 
 ### Legacy VSTO C# (.NET Framework)
 
@@ -415,7 +425,7 @@ When the current directory is inside this repository, the prompt renders as `(dr
 
 The repository uses the following GitHub Actions workflows under [.github/workflows/](.github/workflows/):
 
-- `ci.yml` — Python quality and tests across Python 3.10–3.13, security scanning, documentation validation (README and LICENSE presence), package build/install verification, PowerShell formatting/analysis/tests (PoshQC on Windows), shell coverage (Bats + kcov), and `extensions/drm-copilot` tests on Ubuntu and Windows.
+- `ci.yml` — Python quality and tests across Python 3.11–3.13 (coverage measured on 3.13 only), security scanning, documentation validation (README and LICENSE presence), package build/install verification, PowerShell formatting/analysis/tests (PoshQC on Windows), shell coverage (Bats + kcov), and `extensions/drm-copilot` tests on Ubuntu and Windows.
 - `publish-mcp-npm.yml` — tag-driven npm publication of `@danmoisan/drm-copilot-mcp`, gated on the extension test matrix.
 - `publish-extension.yml` — tag-driven publication of the VS Code extension to the Marketplace, gated on the extension test matrix; pull requests that touch the extension build and package without publishing.
 - `npm-audit-gate.yml` — npm dependency audit gate.

@@ -49,7 +49,7 @@ If any instructions conflict, **halt and notify the user**.
 
 ## 4) Zero-regression quality gates (hard stop)
 
-Hard stop if any of these occur compared to baseline:
+Hard stop if any of these occur compared to the `Phase 0 baseline`, with test and coverage results read from the single gate run:
 
 - New Ruff findings
 - New Pyright diagnostics
@@ -77,8 +77,8 @@ If the environment prevents running tools, STOP implementation and provide a pla
 2) Capture baseline by running repo commands/tasks:
    - Ruff status (pass/fail + key diagnostics)
    - Pyright status (pass/fail + key diagnostics)
-   - Relevant Pytest subset (failures + key tracebacks)
-   - Coverage baseline for touched files (and overall if enforced)
+   - Pytest failures + key tracebacks from one `pytest -n auto` run with coverage, the `Phase 0 baseline`
+   - Coverage baseline for touched files (and overall if enforced) from that run
 3) Summarize root cause / design constraint in one paragraph.
 
 Before exiting Phase A, perform a quick line-count check on all in-scope files and apply the tiered file-size policy: at 500 lines, look for a logical split; at 700 lines, split more aggressively; if any file is above 800 lines or planned additions would push it above 800, decide upfront to split it now (a hard stop, regardless of logical separability, counting new files against the budget) before Phase B. If uncertain, treat it as at-risk and plan for a split rather than discovering it mid-execution. If an approved plan would leave a file above 800 lines, halt and seek clarification before proceeding.
@@ -90,7 +90,7 @@ However, if a plan is provided in the initial prompt, it is already implicitly a
 
 **All clarifications/approvals must be resolved before entering Phase B. Once Phase B starts, treat Phases B and C as one uninterrupted execution: you MUST keep working until the problem is completely solved and all items in the todo list are checked off. Do not end your turn until every step is completed and verified. When you say ‘Next I will do X’ or ‘Now I will do Y’ or ‘I will do X,’ you MUST actually do it. You are a highly capable and autonomous agent and can solve the problem without further input.** 
 
-- Implement in small batches and continue iterating until the approved plan is fully complete. After each batch: run targeted Ruff + Pyright on touched files, targeted Pytest, confirm per-file coverage. If work remains, immediately start the next batch.
+- Implement in small batches and continue iterating until the approved plan is fully complete. After each batch: run targeted Ruff + Pyright on touched files. Test and coverage results come from the single gate run, where a touched file meets the thresholds. A focused run of one test file to debug a specific failure is debugging only. If work remains, immediately start the next batch.
 - Stop mid-stream only if 
   (a) a gate fails (then self-correct and rerun that gate until clean), 
   (b) scope/budget expansion is required, or 
@@ -102,8 +102,8 @@ However, if a plan is provided in the initial prompt, it is already implicitly a
 - Report deltas:
   - Ruff delta (must be 0 new findings)
   - Pyright delta (must be 0 new diagnostics)
-  - Test failures delta (must be 0 new failures)
-  - Per-file coverage delta for touched files (must be >= baseline)
+  - Test failures delta in the single gate run (must be 0 new failures)
+  - Per-file coverage delta for touched files, read from the single gate run (must be >= the `Phase 0 baseline`)
   - Overall coverage delta if applicable (must be >= baseline)
 
 # Python design rules (pythonic + strongly typed)

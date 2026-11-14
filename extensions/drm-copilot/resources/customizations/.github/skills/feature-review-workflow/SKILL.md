@@ -42,11 +42,20 @@ Always apply:
   - `code-review-template` for `code-review.<timestamp>.md`
   - `feature-audit-template` for `feature-audit.<timestamp>.md`
 - The MCP-resolved asset is the authoritative template source for review artifacts in this workflow.
+- Baseline fields are read from the plan's `Phase 0 baseline` artifact. A baseline field is recorded as `N/A - no pre-change run` only for a language or file with no pre-change run (a new file, or an item whose plan predates the `Phase 0 baseline` rule and captured static baselines only), and the comparison line then reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
 
 ### No silent fixes
 
 - Do not clean up code during review.
 - If checks fail, document the failure and include exact remediation guidance.
+
+### Process-reduction ledger
+
+- This rule applies only when `docs/engineering/process-reductions/` exists, so a repository without that folder is unaffected.
+- A change that reduces evidence, plan tasks, gates, or review process adds its ledger entry in the same commit, in the format of that folder's `README.md`.
+- A branch diff that makes such a reduction with no entry is a Blocking finding.
+- The reviewer confirms from the branch log that each reduction is its own commit, with the `reduction: NNNN` token in its subject.
+- One-off waivers for a single item are not entries.
 
 ### Work-mode acceptance-criteria contract
 
@@ -84,15 +93,16 @@ Always apply:
   - Use `policy-audit-template-usage` and the MCP `template` asset to drive the artifact structure.
    - Include exact command references for the checks that were run.
    - Validate the resulting `policy-audit.<timestamp>.md` immediately after writing it.
+   - Write a `## CI Cross-check` section after `## 7. Code Quality Checks`: a table `| Check | Claimed outcome | Claimed figure | Head | Source |` with one row per CI check whose result the review relies on, that is, the format, lint, type, and test checks of each changed language and `quality-checks7 / Code Quality & Tests (3.13)` for the Python total. The outcome is `pass` or `fail` from local evidence, and the head is read from `git log` of the reviewed branch. An absent or empty section is a reviewer contract error.
 
 5. **Run required checks**
    - Prefer repo-defined, check-only commands.
    - Default order:
-     1. formatting check
-     2. lint check
-     3. type check
+     1. formatting check, read from the language's final-QC static artifact and not re-run
+     2. lint check, read from the same static artifact and not re-run
+     3. type check, read from the same static artifact and not re-run
      4. tests
-   - Run the smallest relevant subset first when the repo policy permits it.
+   - A focused run of one test file to debug a specific failure is debugging only; a review check does not rest on it.
    - If a tool cannot run in the environment, mark the affected section unverified or partial with a concrete reason.
 
 6. **Produce the code review**
@@ -123,7 +133,11 @@ Always apply:
      - toolchain checks fail
      - the code review contains blockers
      - required acceptance criteria are FAIL or PARTIAL
-     - coverage below the governing thresholds (the root `CLAUDE.md` thresholds when stated, otherwise the defaults: line 85%, branch 75% for branch-capable languages; repo-wide per language, modified files including any regression on changed lines, or new files)
+     - coverage below the governing thresholds (the root `CLAUDE.md` thresholds when stated, otherwise the defaults: line 85%, branch 75% for branch-capable languages; repo-wide per language, modified files including any regression on changed lines against the `Phase 0 baseline`, or new files)
+   - Choose the remediation path. Write one line `Remediation-Path: light` or `Remediation-Path: full` into the remediation inputs, and inside each blocking finding block one line `Finding-Scope: contained` or `Finding-Scope: design`. A missing path line reads as `full`, and a missing scope line reads as `design`. These lines never contain the substrings the orchestrator counts.
+   - Write `Remediation-Path: light` only when all of these hold: at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`; no change to a spec acceptance criterion, a public interface, or the file inventory beyond the branch diff plus tests and mirrors; no change to a validator contract, hook decision, or production logic beyond the finding's named location; the cycle is opened by a review; and the prior cycle was not light. Otherwise write `Remediation-Path: full`. The orchestrator may move a cycle to a heavier path and never to a lighter one.
+   - With `Remediation-Path: light`, also write a `## Light Fix Tasks` section: one canonical `- [ ] [P0-T1] ...` line per fix, numbered in order, each naming the file and the finding it fixes. Write no checkbox line anywhere else in the file, because the executor stop hook counts every checkbox line of the file it executes.
+   - The remediation plan target stays for both paths, because this review contract requires it.
    - Create `remediation-inputs.<timestamp>.md` first.
    - Create the target remediation plan file from the canonical plan template.
    - Hand off plan creation through `remediation-handoff-atomic-planner`.
@@ -161,6 +175,16 @@ The tiered file-size policy (section 4, Module & File Structure, in `.github/ins
 - Report each covered file at or above 700 lines as a non-blocking `Warning` row in the Findings Table of `code-review.<timestamp>.md`, naming the file and its line count. Do not write the Warning to `remediation-inputs.<timestamp>.md`, and do not give it a remediation severity label.
 - Report a covered file above 800 lines that has no entry in `config/file-size-baseline.json`, and any added or increased entry in `config/file-size-baseline.json`, as a blocking policy finding.
 - Produce no finding for the 500-line guidance tier.
+
+## Documentation Surface Check
+
+This check turns a documented-surface change without a matching coverage-ledger change into a blocking finding. It uses the evidence model: inspect the existing artifacts and do not rerun any documentation tooling.
+
+1. When `docs/documentation-estate/docs-profile.json` is absent on the branch head, the check is not applicable and produces no finding.
+2. List the changed paths with `git diff --name-only <merge-base>..HEAD`. When no changed path lies under an entry of the profile's `surface_selection.source_roots`, the check produces no finding.
+3. When at least one changed path lies under such an entry, require the newest `<FEATURE>/evidence/qa-gates/docs-surface-delta.<timestamp>.md` (the lexicographically greatest matching file), carrying the fields `Timestamp`, `Command`, `EXIT_CODE`, and `Output Summary`.
+4. When that artifact is absent, or records `EXIT_CODE: 1`, report the blocking finding `surface-change-without-ledger-change` with the line `Remediability: autonomous` and a `Remediability-Evidence:` line stating that the coverage ledger can be updated on the branch and the `surface-delta` evidence regenerated without an external dependency. Name the changed source paths in the finding.
+5. When the artifact records `EXIT_CODE: 0`, the check passes.
 
 ## Constraints
 

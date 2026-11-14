@@ -42,6 +42,7 @@
 [CmdletBinding()]
 param()
 . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1')
+try { . (Join-Path $PSScriptRoot 'enforce-pr-author-skill.cleanup.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-pr-author-skill.cleanup.ps1' -ErrorRecord $_ }
 
 function Invoke-PrAuthorDocsOnlyGitExe {
     <#

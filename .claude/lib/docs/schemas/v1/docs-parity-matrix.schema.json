@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:docs:1.0.0:docs-parity-matrix",
+  "title": "Docs v1 parity matrix",
+  "description": "Binds documented surface elements to pages and records the state of each parity dimension.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "extensions", "repository", "snapshot_ref", "ledger_ref", "rows"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:docs:1.0.0:docs-parity-matrix"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact_kind": {"const": "docs-parity-matrix"},
+    "id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+    "extensions": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/extensions"},
+    "repository": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+    "snapshot_ref": {
+      "$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/artifact-pin",
+      "properties": {"artifact_kind": {"const": "surface-inventory-snapshot"}}
+    },
+    "ledger_ref": {
+      "$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/artifact-pin",
+      "properties": {"artifact_kind": {"const": "docs-coverage-ledger"}}
+    },
+    "rows": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/row"}}
+  },
+  "$defs": {
+    "row": {
+      "type": "object", "additionalProperties": false,
+      "required": ["element_id", "kind", "page_path", "dimensions", "extensions"],
+      "properties": {
+        "element_id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-id"},
+        "kind": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-kind"},
+        "page_path": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
+        "dimensions": {
+          "type": "object", "additionalProperties": false,
+          "required": ["exists", "accurate", "example_present", "owner_assigned", "diataxis_mode"],
+          "properties": {
+            "exists": {"$ref": "#/$defs/dimension-result"},
+            "accurate": {"$ref": "#/$defs/dimension-result"},
+            "example_present": {"$ref": "#/$defs/dimension-result"},
+            "owner_assigned": {"$ref": "#/$defs/dimension-result"},
+            "diataxis_mode": {"$ref": "#/$defs/dimension-result"}
+          }
+        },
+        "extensions": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/extensions"}
+      }
+    },
+    "dimension-result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "rationale", "evidence_pin_ids"],
+      "properties": {
+        "state": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/parity-state"},
+        "rationale": {"anyOf": [{"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"}, {"type": "null"}]},
+        "evidence_pin_ids": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifiers"}
+      },
+      "if": {"properties": {"state": {"enum": ["fail", "not-applicable"]}}, "required": ["state"]},
+      "then": {"properties": {"rationale": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"}}}
+    }
+  }
+}

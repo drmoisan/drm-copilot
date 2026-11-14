@@ -43,7 +43,11 @@ BeforeAll {
     . (Join-Path $script:HookRoot 'hooks/enforce-model-routing-receipt.ps1')
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
     Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
+    # Capture the committed-fixture reader while retaining the null isolation baseline.
+    $script:FixtureReader_730f8bfa_GetModelRoutingCheckpoint = (Get-Command -Name Get-ModelRoutingCheckpoint -CommandType Function).ScriptBlock
     Mock Get-ModelRoutingCheckpoint -ParameterFilter { $CheckpointPath -notlike "/synthetic-worktrees/*" -and $CheckpointPath -notlike "*tests?fixtures*" -and $CheckpointPath -notlike "*f5-seam-root*" } -MockWith { $null }
+    # Capture the committed-fixture reader while retaining the null isolation baseline.
+    $script:FixtureReader_730f8bfa_GetWorktreeItemCheckpointText = & (Get-Module -Name WorktreeItemResolution) { (Get-Command -Name Get-WorktreeItemCheckpointText -CommandType Function).ScriptBlock }
     Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution -ParameterFilter { $Path -notlike "*tests?fixtures*" } -MockWith { $null }
     Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeItemResolution.psm1')
@@ -98,9 +102,22 @@ BeforeAll {
     }
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeRunResolution.psm1')
     Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+    Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
 }
 
 Describe 'enforce-model-routing-receipt.ps1 worktree-resolution matrix' {
+
+    BeforeEach {
+        # Restore only committed-fixture reads for this test; other paths retain the null baseline.
+        Mock Get-ModelRoutingCheckpoint -MockWith {
+            if ($CheckpointPath -notlike "/synthetic-worktrees/*" -and $CheckpointPath -notlike "*tests?fixtures*" -and $CheckpointPath -notlike "*f5-seam-root*") { throw 'Unexpected real-reader call outside fixture paths' }
+            & $script:FixtureReader_730f8bfa_GetModelRoutingCheckpoint @PesterBoundParameters
+        }
+        Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution -MockWith {
+            if ($Path -notlike "*tests?fixtures*") { throw 'Unexpected real-reader call outside fixture paths' }
+            & $script:FixtureReader_730f8bfa_GetWorktreeItemCheckpointText @PesterBoundParameters
+        }
+    }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 

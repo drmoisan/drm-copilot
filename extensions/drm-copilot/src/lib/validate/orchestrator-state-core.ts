@@ -3,6 +3,7 @@ import { compareCodePoint } from "../string-ordering";
 import { VALID_BLOCKED_REASONS } from "./orchestrator-state-blocked-reason";
 import { validateCodexModelRoutingState } from "./orchestrator-state-codex-model-routing";
 import { validateCodexTopologyState } from "./orchestrator-state-codex-topology";
+import { validateConcurrentReviewCompletion } from "./orchestrator-state-concurrent-review";
 import {
   PROMOTION_RECEIPT_KEYS,
   PROMOTION_RECEIPT_NAMESPACE_KEY,
@@ -46,7 +47,7 @@ export { VALID_BLOCKED_REASONS };
  *     - Delegate the optional remediation and human-interaction blocks.
  *     - Under `requireComplete`, enforce completion-safe statuses, the PR/CI
  *       route-aware PR/CI gates, mandatory phases, the preparation terminal
- *       contract, and the routing contract.
+ *       contract, the routing contract, and the concurrent review record.
  *
  * Invariants / Constraints:
  *     - Error-message strings are identical to the Python source.
@@ -434,6 +435,7 @@ export function validateOrchestratorStateText(
         routingMatrix,
       }),
     );
+    errors.push(...validateConcurrentReviewCompletion(stateMap));
   }
 
   // Existence-only model-routing gate; independent of requireComplete and a

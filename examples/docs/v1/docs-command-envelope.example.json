@@ -1,0 +1,21 @@
+{
+  "command": "validate-profile",
+  "exit_code": 1,
+  "findings": [
+    {
+      "code": "DOCS_PROFILE_AUDIENCE_UNKNOWN",
+      "severity": "error",
+      "artifact_path": "docs/documentation-estate/docs-profile.json",
+      "pointer": "/documentation_roots/0/audience_ids/1",
+      "related_ids": ["operators"],
+      "related_paths": [],
+      "message": "Field audience_ids references the audience operators, which the profile does not declare in audiences.",
+      "next_action": "Declare the audience in audiences or remove the reference."
+    }
+  ],
+  "ok": false,
+  "result": {
+    "profile_path": "docs/documentation-estate/docs-profile.json",
+    "repository_id": "example-repo"
+  }
+}

@@ -106,6 +106,7 @@ def base_success_responses(
         "powershell": {
             "PoshQC: format": [make_result(0)],
             "PoshQC: analyze": [make_result(0)],
+            "PoshQC: leak scan": [make_result(0)],
             "PoshQC: test": [make_result(0)],
         },
         "typescript": {
@@ -389,6 +390,7 @@ def test_powershell_test_failure_returns_fail_result() -> None:
     responses["powershell"] = {
         "PoshQC: format": [make_result(0)],
         "PoshQC: analyze": [make_result(0)],
+        "PoshQC: leak scan": [make_result(0)],
         "PoshQC: test": [make_result(1, "pester error")],
     }
     factory = FakeRunnerFactory(responses)
@@ -406,7 +408,12 @@ def test_powershell_test_failure_returns_fail_result() -> None:
     # Assert
     assert exit_code == 1
     powershell_calls = [call[0] for call in factory.runners["powershell"].calls]
-    assert powershell_calls == ["PoshQC: format", "PoshQC: analyze", "PoshQC: test"]
+    assert powershell_calls == [
+        "PoshQC: format",
+        "PoshQC: analyze",
+        "PoshQC: leak scan",
+        "PoshQC: test",
+    ]
     assert "PowerShell tests failed" in read_log(logger)
 
 

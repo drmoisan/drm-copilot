@@ -56,6 +56,8 @@ const EXTENSION_ROOT = path.resolve(__dirname, "..", "..");
 const REPO_ROOT = path.resolve(EXTENSION_ROOT, "..", "..");
 const RESOURCES = prepack.SOURCE_DIR;
 const MCP_PACKAGE_ROOT = path.join(REPO_ROOT, "packages", "mcp-server");
+const PYTHON_HELPER_NEGATION =
+  "!resources/claude-customizations/.claude/lib/docs/python/**/*.py";
 
 const ROLES = [
   "legacy-parity-analyst",
@@ -181,14 +183,30 @@ describe("discovery resource packaging", () => {
     const patterns = vscodeIgnorePatterns();
     expect(patterns).toContain("**/*.py");
     expect(patterns).toContain("resources/scripts/**");
+    // The issue #1031 docs helper is the only Python carve-out, admitted by both distributables.
+    expect(patterns).toContain(PYTHON_HELPER_NEGATION);
     for (const relative of [
       "lib/discovery-validation/helper.py",
       "customizations/.github/hooks/handler.py",
       "scripts/dev_tools/validate_discovery_artifacts.py",
+      "claude-customizations/.claude/lib/docs/helper.py",
+      "codex-and-agents-customizations/.codex/lib/docs/python/run_docs_python_native.py",
+      "claude-customizations/.claude/lib/docs/python/__pycache__/source.cpython-312.pyc",
+      "claude-customizations/.claude/lib/docs/python/docs_python_native/__pycache__",
+      "claude-customizations/.claude/lib/docs/python/docs_python_native/source.pyc",
+      "claude-customizations/.claude/lib/docs/python/docs_python_native/source.pyo",
     ]) {
       expect(
         prepack.shouldCopy(path.join(RESOURCES, ...relative.split("/"))),
       ).toBe(false);
+    }
+    for (const relative of [
+      "claude-customizations/.claude/lib/docs/python/run_docs_python_native.py",
+      "claude-customizations/.claude/lib/docs/python/docs_python_native/source.py",
+    ]) {
+      expect(
+        prepack.shouldCopy(path.join(RESOURCES, ...relative.split("/"))),
+      ).toBe(true);
     }
   });
 
@@ -197,14 +215,21 @@ describe("discovery resource packaging", () => {
     // beneath resources/ only when it is anchored there or begins with `**/`, so every
     // anchored pattern must be the removed Python tree and every `**/` pattern must be a
     // Python or bytecode pattern; all other patterns name top-level source and tooling.
+    // The only negation is the issue #1031 docs helper carve-out, which re-admits files.
     const pythonPatterns = new Set([
       "**/__pycache__/**",
       "**/*.pyc",
       "**/*.pyo",
       "**/*.py",
     ]);
+    const negations = vscodeIgnorePatterns().filter((pattern) =>
+      pattern.startsWith("!"),
+    );
+    expect(negations).toEqual([PYTHON_HELPER_NEGATION]);
     for (const pattern of vscodeIgnorePatterns()) {
-      if (pattern.startsWith("**/")) {
+      if (pattern.startsWith("!")) {
+        continue;
+      } else if (pattern.startsWith("**/")) {
         expect(pythonPatterns.has(pattern)).toBe(true);
       } else if (pattern.startsWith("resources/")) {
         expect(pattern).toBe("resources/scripts/**");

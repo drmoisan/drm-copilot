@@ -214,4 +214,30 @@ Describe '_poshqc.yml workflow invariants' {
         $job | Should -Match '(?m)^ +\$shardCount = \[int\] \(Get-Content -Raw -LiteralPath artifacts/shards/poshqc-test-results-shard-1/shard-files\.json \| ConvertFrom-Json\)\.shardCount[ \t]*$'
         @([regex]::Matches($job, '1\.\.\$shardCount')).Count | Should -Be 2
     }
+
+    It 'WF06-LEAK-SCAN-STEP runs Invoke-PoshQCLeakScan in poshqc-static right after Analyze PowerShell, with no continue-on-error and no step-level if (issue #1096)' {
+        # Arrange: split the poshqc-static job into steps, each with its own body.
+        $steps = [System.Collections.Generic.List[object]]::new()
+        foreach ($line in ($script:JobText['poshqc-static'] -split "`n")) {
+            if ($line -match '^ {6}- name:[ \t]*(?<Name>.+?)[ \t]*$') {
+                $steps.Add([pscustomobject]@{ Name = $Matches['Name']; Body = [System.Collections.Generic.List[string]]::new() })
+            } elseif ($steps.Count -gt 0) {
+                $steps[$steps.Count - 1].Body.Add($line)
+            }
+        }
+        $names = @($steps | ForEach-Object { $_.Name })
+
+        # Act
+        $scanIndex = [array]::IndexOf($names, 'Scan Pester tests for leaked state')
+        $analyzeIndex = [array]::IndexOf($names, 'Analyze PowerShell')
+
+        # Assert
+        $scanIndex | Should -BeGreaterThan -1 -Because 'poshqc-static carries the leak-scan step'
+        $scanIndex | Should -Be ($analyzeIndex + 1) -Because 'the scan follows Analyze PowerShell'
+        $body = $steps[$scanIndex].Body -join "`n"
+        $body | Should -Match '(?m)^ +Invoke-PoshQCLeakScan -Root "\$\{\{ github\.workspace \}\}"[ \t]*$'
+        $body | Should -Match '(?m)^ {8}shell:[ \t]*pwsh[ \t]*$'
+        $body | Should -Not -Match '(?m)^ {8}continue-on-error:'
+        $body | Should -Not -Match '(?m)^ {8}if:'
+    }
 }

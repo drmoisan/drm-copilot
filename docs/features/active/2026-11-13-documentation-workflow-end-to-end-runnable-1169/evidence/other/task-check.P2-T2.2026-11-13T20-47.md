@@ -1,0 +1,13 @@
+# Task Check P2-T2
+
+Timestamp: 2026-11-13T20-47
+Command: sh SCRATCH/issue-1169-tc.sh P2-T2 <files> <tests> (pwsh 7: Invoke-Formatter and Invoke-ScriptAnalyzer with scripts/powershell/PoshQC/settings/pssa.settings.psd1, one retry on an analyzer exception; Invoke-Pester with Run.Path = the selection); sh SCRATCH/issue-1169-pyc.sh <contract tests>
+EXIT_CODE: 0
+Output Summary:
+- Changed production files (with bundle copies): .claude/lib/docs/DocsValidateCommands.psm1 (-Revision optional only with -WriteReceipt in docs-complete mode and defaulted to the snapshot revision; a null or absent snapshot revision is a usage error naming inventory -Revision; a passing docs-complete result is checked with Get-DocsReceiptRevisionDecision against HEAD and a denial returns exit 1 with DOCS_RECEIPT_REVISION_REJECTED and no write); .claude/lib/docs/Invoke-DocsCommand.ps1 (TestAncestor and ListChangedPath members after ReadRevisionText through Test-DocsContextAncestor and Get-DocsContextChangedPath; help lists both; the validate row Note printed by Get-DocsCommandUsage).
+- Changed test support: Docs.TestSupport.psm1 (twelve members, AncestorMap and ChangedPathMap, Revisions), DocumentationEstateFixture.TestSupport.psm1 (maps passed through), DocsLedger.TestSupport.psm1 (ResolveRevision, ReadRevisionText, TestAncestor, ListChangedPath, Revisions).
+- Changed suites: Invoke-DocsCommand.RevisionContext.Tests.ps1, DocsValidateCommands.Tests.ps1, DocsLedgerCommands.Properties.Tests.ps1, DocsLedger.TestSupport.Tests.ps1, DocsCompleteIntegration.Tests.ps1, EndToEndDocumentationEstate.Tests.ps1 (HEAD mapped to the snapshot revision; the end-to-end scenario moves HEAD from R1 to R2 through Revisions).
+- Format and lint (the 11 changed files): 0 formatter differences, 0 analyzer findings. The first lint pass reported PSAvoidAssignmentToAutomaticVariable ($Profile parameter, renamed $ProfileDocument) and two PSUseOutputTypeCorrectly findings (OutputType declarations corrected); one run also hit the known intermittent PSScriptAnalyzer 1.25 NullReferenceException, after which the launcher retries a file once.
+- Selection rule: every test file naming DocsValidateCommands, Invoke-DocsCommand, Docs.TestSupport, DocsLedger.TestSupport, DocumentationEstateFixture, or Invoke-DocsValidateCommand (git grep over tests/, 49 suites), plus tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1; contract tests reading the Claude bundle.
+- Pester: 970 passed, 0 failed, 0 skipped; exit 0. Invoke-DocsCommand.Tests.ps1 (help case and member-name parity case) passes unchanged.
+- pytest: Claude push-down resource, pack-manifest completeness, and dependency-closure tests: 34 passed; exit 0.

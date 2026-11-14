@@ -44,9 +44,9 @@ For an epic-worthy objective:
 2. Record goal, scope, non-goals, shared design, acceptance criteria, decomposition rationale,
    production-file estimates, and integration risks.
 3. Add `depends_on` edges only for real upstream contracts.
-4. Compute execution waves with the longest-path formula in
-   `scripts/dev_tools/epic_wave_computation.py`; unresolved references and cycles block
-   preparation.
+4. Compute execution waves with the longest-path formula by running
+   `pwsh -NoProfile -File .codex/lib/epic-wave/Invoke-EpicWave.ps1 -ManifestPath <manifest>`; unresolved references and cycles block
+   preparation (the Python module `epic_wave_computation` is this repository's parity reference).
 5. Assess each child as C1-C4 using the central policy. Record the assessed band, rationale,
    deployment agent, model, reasoning effort, and the monotonic orchestration complexity ceiling.
 6. Set `max_parallel_features` to an integer from 1 through 8. Use the routing-policy default of
@@ -166,6 +166,14 @@ Each child selects the exact `preparation` route from the central routing config
 Promotion must use worktree-aware MCP calls and receipts. A child must not claim feature
 completion, create a PR, execute the atomic plan, or monitor CI.
 
+A manifest feature may carry the optional one-line key `cross_epic_depends_on`, which names
+prerequisite features in other epics (issue #1162; see
+`## Cross-Epic Dependencies (cross_epic_depends_on)` of `epic-orchestrate`). Copy the value into
+`features[].cross_epic_depends_on` of the planner checkpoint, where it is shape-validated only;
+preparation is not held. The preparation prompt of such a feature carries one line per cross-epic
+dependency, with `not merged` in place of the merge facts:
+`Upstream context for {issue_num}: cross-epic depends on {epic}#{dep_issue_num} (spec: {dep_spec_path}; plan: {dep_plan_path}; not merged).`
+
 ## Fan-In
 
 As each preparation finishes:
@@ -178,12 +186,41 @@ As each preparation finishes:
    `preflight_evidence_path`, and `preflight_status: "PREFLIGHT: ALL CLEAR"` in the planner
    checkpoint. `research_path` must be under `docs/features/<feature>/research/` inside the feature folder.
    Each child references its immutable receipt and the shared `wave.<wave_id>.status.json` path.
-5. Remove the worktree only after its preparation branch is merged.
+5. Remove the worktree only after its preparation branch is merged, following
+   `## Preparation Worktree Records`.
 
 Push the integration branch after final fan-in.
 
 There is no mid-planning approval pause. The planner completes promotion, research, feature
 documents, atomic planning, and preflight before stopping at the user execution boundary.
+
+## Preparation Worktree Records
+
+The worktree-removal gate allows a plain removal of a preparation worktree only when the
+repository-root `artifacts/orchestration/epic-planner-state.json` records it in
+`planner_worktrees`, keyed by branch:
+
+1. When a preparation child completes, read the branch its worktree has checked out (from the
+   completion notification or `git worktree list --porcelain`) and append a `planner_worktrees`
+   entry with `branch`, `purpose: "preparation"`, `preparation_status: "prepared"`, the feature's
+   `feature_folder`, and optionally `path` and `recorded_at`. `path` is repository-relative to the
+   main checkout; never record an absolute path.
+2. After the branch is merged into the integration branch and pushed, set
+   `preparation_status: "fanned_in"`.
+3. Remove the worktree with a plain `git worktree remove <path>` in its own shell command, without
+   `--force`. When the removal succeeds, set `preparation_status: "removed"`.
+4. When the removal gate denies, record the `PLANNER_WORKTREE_<CODE>` code from the deny text in the
+   checkpoint and leave the worktree in place. Never detach HEAD or use `--force` to free a branch.
+
+The gate allows the removal only when the record is eligible (`prepared` or `fanned_in`), the
+worktree is not in use (not the working directory or main checkout, not locked, and not claimed by
+its own orchestrator checkpoint or the repository-root epic checkpoint), clean, and its HEAD commit
+is on `refs/remotes/origin/<integration_branch>` or `refs/remotes/origin/<branch>`. `preparing` and
+`abandoned` are recordable and never eligible.
+
+This is a policy-level control, not a security control: any writer in the session can author a
+record, and the git checks bound what a record can authorize. `git worktree remove` deletes
+ignored files in the worktree, including the child's gitignored checkpoint; this is accepted.
 
 ## Execution-Readiness Gate
 

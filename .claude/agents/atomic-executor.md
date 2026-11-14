@@ -29,6 +29,7 @@ skills:
   - evidence-and-timestamp-conventions
   - acceptance-criteria-tracking
   - execution-environment
+  - owner-directives
 memory: project
 hooks:
   SubagentStop:
@@ -68,7 +69,7 @@ For each task:
 1. **Announce**: State the task ID and what you will do.
 2. **Preconditions**: Verify stated preconditions exist.
 3. **Perform**: Make the minimum edits required to satisfy the task.
-4. **Verify**: Explicitly verify acceptance criteria. If the repo policy requires a toolchain loop, run it.
+4. **Verify**: Explicitly verify acceptance criteria and run the task check; a `[phase-gate]` task runs the full toolchain loop instead. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 5. **Check off**: Mark the task `[x]` in the canonical plan file on disk only when verification passes.
 
 `[expect-fail]` tasks: a failing test is the expected outcome for that task only. Formatting, linting, and type checks remain normal pass/fail gates unless the task text explicitly waives them. See `atomic-plan-contract` for full `[expect-fail]` evidence requirements.
@@ -77,12 +78,16 @@ For each task:
 
 Use the scoped tool patterns for quality gates:
 
-- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
+- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
 - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
-- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
+- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
 - **Git**: `git diff`, `git status`, `git log`
 
-Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files.
+Run toolchain in order: format, lint, type-check, test. Restart from step 1 if any step fails or changes files. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+
+The Phase 0 baseline and the final gate are each one run of these gates, and the final gate is compared with the `Phase 0 baseline`: no new failing test and no per-file or repo-wide coverage drop.
+
+The format, lint, and type-check results of each language go into one final-QC static artifact per language, with each step's command, exit code, and finding count; each test gate keeps its own artifact.
 
 ## Scratch Location
 
@@ -101,6 +106,7 @@ A run is a preflight run when its delegation prompt carries the directive `DIREC
 
 - **Review the entire plan in one pass.** Check every phase, task, and prose region; do not stop at the first defect.
 - **Classify every defect.** Trivial defects (stale or misspelled anchors, citation corrections including G11 and G12 findings, typos, literal formatting that does not change what is asserted, evidence filename spelling) are fixed in place. Substantive defects (missing or extra tasks, wrong file set or design, an acceptance criterion without a task, an assertion change, ordering, scope) are returned.
+- Run the design check: within this same pass, with no new delegation and no new artifact, name for each spec rule, parameter, and boundary the task that implements it and the test that would fail if the rule were broken; a gap is a substantive defect.
 - **Fix in task text only.** Edit task text and plan preamble in the same plan file. Never add, remove, or reorder tasks. Record every fix in `<FEATURE>/evidence/other/preflight-fixes.<timestamp>.md`.
 - **Return exactly one signal**, `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`, followed by one `CONVERGENCE:` line and then one line per defect:
   - `PREFLIGHT-FIX: <task id or heading> | <defect class> | <change made>`
@@ -111,7 +117,7 @@ A run is a preflight run when its delegation prompt carries the directive `DIREC
 
 ## Blocking Protocol
 
-Blocking is permitted only during preflight validation (before `[P0-T1]`). This includes a combined preflight-and-execute run of a proportionate remediation cycle: the run first performs single-pass preflight, fixes trivial defects in place, and stops before `[P0-T1]` only when a substantive defect remains. When preflight-blocked:
+Blocking is permitted only during preflight validation (before `[P0-T1]`). This includes a combined preflight-and-execute run of a proportionate remediation cycle: the run first performs single-pass preflight, fixes trivial defects in place, and stops before `[P0-T1]` only when a substantive defect remains. A light remediation run has no preflight, and stops the same way before `[P0-T1]` only when a fix task cannot be done at its named location. When preflight-blocked:
 
 1. State: `BLOCKED at preflight (before [P0-T1])`.
 2. Provide a short, concrete explanation of why.
@@ -156,3 +162,5 @@ All evidence artifacts this agent produces (baselines, QA gates, regression resu
 Writing to `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, or any other non-canonical path is a policy violation and will be caught by the `enforce-evidence-locations.ps1` PreToolUse hook.
 
 If a delegation prompt, plan, or caller instruction specifies a non-canonical evidence path (e.g., `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, `artifacts/evidence/`), this agent ignores that instruction, writes to the canonical `<FEATURE>/evidence/<kind>/` path, and records the override as `EVIDENCE_LOCATION_OVERRIDE_REJECTED: <supplied path> replaced with <canonical path>`.
+
+Owner directives: when a delegation carries an `Owner directives:` block, or the owner-directive pass-down hook holds a tool call with one, record one `OWNER-DIRECTIVE-DECISION:` line per directive in a decision file under `artifacts/orchestration/owner-directive-decisions/` and repeat it in the final message, as defined in the `owner-directives` skill.

@@ -1,11 +1,12 @@
 /**
- * Validator tolerance for the scheduling layer's extra fields (issue #722).
+ * Validator acceptance of the scheduling layer's recorded fields (issue #722).
  *
- * The integration-cost scheduling layer records three tolerated-not-validated
- * fields on each conflict edge (`hard`, `cost`, `benefit`) and a
- * `tolerated_overlaps` list on the planner and orchestrator checkpoints. No
- * validator reads them, so a checkpoint carrying them must validate with zero
- * errors, while the four-member edge reason enum stays enforced. These cases
+ * The integration-cost scheduling layer records three fields on each conflict
+ * edge (`hard`, `cost`, `benefit`) and a `tolerated_overlaps` list on the
+ * planner and orchestrator checkpoints. Since issue #1164 the validators check
+ * these fields when present, so a checkpoint carrying valid values must
+ * validate with zero errors, while the four-member edge reason enum stays
+ * enforced. These cases
  * mirror `tests/scripts/dev_tools/test_validate_parallel_state_tolerated_edge_fields.py`
  * and assert the byte-identical error literal the Python validator emits.
  */
@@ -15,6 +16,7 @@ import {
   buildBlastRadius,
   buildPlannerRoutingFields,
   buildValidParallelState,
+  itemAt,
   validateState,
   type JsonRecord,
 } from "./parallel-state-test-support";
@@ -36,6 +38,24 @@ const TOLERATED_OVERLAP: JsonRecord = {
   reasons: ["path_overlap", "module_overlap"],
   cost: 1,
   benefit: 2,
+};
+
+/** The observed_resolution telemetry object (issue #1013, spec D-3). */
+const OBSERVED_RESOLUTION: JsonRecord = {
+  later_item: 445,
+  conflicted: true,
+  conflict_detected_at: "2026-10-30T12-00",
+  resolved_at: "2026-10-30T12-40",
+  resolution_minutes: 40,
+  recorded_at: "2026-10-30T12-41",
+};
+
+/** A combination record in the planner's combinations list (issue #1013, D-5). */
+const COMBINATION: JsonRecord = {
+  members: [444, 990],
+  primary: 444,
+  pairs: [{ a: 444, b: 990, cost: 16, benefit: 2 }],
+  estimated_savings: 16,
 };
 
 /**
@@ -175,8 +195,56 @@ describe("issue #722: tolerated scheduling fields", () => {
     expect(readyErrors).toEqual([]);
   });
 
+  it("accepts a tolerated overlap carrying observed_resolution (issue #1013)", () => {
+    // Arrange: the D-3 telemetry object on an orchestrator tolerated overlap.
+    const state = buildValidParallelState();
+    state["tolerated_overlaps"] = [
+      { ...TOLERATED_OVERLAP, observed_resolution: { ...OBSERVED_RESOLUTION } },
+    ];
+
+    // Act
+    const errors = validateState(state);
+
+    // Assert
+    expect(errors).toEqual([]);
+  });
+
+  it("accepts an orchestrator item carrying combined_issue_nums (issue #1013)", () => {
+    // Arrange
+    const state = buildValidParallelState();
+    itemAt(state, 0)["combined_issue_nums"] = [990];
+
+    // Act
+    const errors = validateState(state);
+
+    // Assert
+    expect(errors).toEqual([]);
+  });
+
+  it("accepts a planner combined item and a combinations list (issue #1013)", () => {
+    // Arrange
+    const state = buildValidPlannerState();
+    state["items"] = [
+      {
+        ...buildPlannerItem(444, "parallel-schema-validators"),
+        combined_issue_nums: [990],
+      },
+      buildPlannerItem(445, "parallel-cohort-scheduler"),
+    ];
+    state["combinations"] = [{ ...COMBINATION }];
+
+    // Act
+    const plainErrors = validatePlanner(state, false);
+    const readyErrors = validatePlanner(state, true);
+
+    // Assert
+    expect(plainErrors).toEqual([]);
+    expect(readyErrors).toEqual([]);
+  });
+
   it("still rejects an edge reason outside the four-member enum", () => {
-    // Arrange: extra fields must not relax the reason enum.
+    // Arrange: the estimate fields must not relax the reason enum. The overlap
+    // names the edge's own pair, so issue #1164 also reports both lists.
     const state = orchestratorStateWithEdges([
       { ...SCHEDULED_EDGE, reason: "same_file" },
     ]);
@@ -185,11 +253,13 @@ describe("issue #722: tolerated scheduling fields", () => {
     // Act
     const errors = validateState(state);
 
-    // Assert: exactly the existing reason-enum error is reported.
+    // Assert: the reason-enum error, then the both-lists error.
     expect(errors).toEqual([
       "Parallel checkpoint conflict_edges[0] reason must be one of " +
         "path_overlap, module_overlap, shared_surface_overlap, " +
         "contract_dependency; found: 'same_file'.",
+      "Parallel checkpoint pair (444, 445) is in both conflict_edges and " +
+        "tolerated_overlaps.",
     ]);
   });
 });

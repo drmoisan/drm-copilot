@@ -13,7 +13,9 @@ Edge rule:
     edge iff conflict AND (hard OR cost * 100 > benefit * tolerance_percent),
     with hard, cost, and benefit defined by ``decide_pair``, ``pair_cost``, and
     ``pair_benefit``. The recorded reason is the first kind of the relation's
-    reason list, so the reason enum is unchanged.
+    reason list, so the reason enum is unchanged. ``schedule_conflict_edges``
+    then applies the aggregate cap of ``_blast_radius_aggregate`` (issue
+    #1013), promoting tolerated overlaps until every item is within its cap.
 
 Invariants, constraints, and side effects:
     No overlap semantics are defined here: the entry-pair overlap primitive, the
@@ -29,6 +31,7 @@ from dataclasses import asdict, dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, cast
 
+from scripts.dev_tools._blast_radius_aggregate import select_capped_pairs
 from scripts.dev_tools._blast_radius_conflicts import (
     CONFLICT_CONTRACT_DEPENDENCY,
     CONFLICT_SHARED_SURFACE_OVERLAP,
@@ -53,11 +56,13 @@ if TYPE_CHECKING:
     ]
 
 __all__ = [
+    "COMBINATION_THRESHOLD_DEFAULT",
     "CONFIG_CONFLICT_TOLERANCE",
     "HARD_REASON_KINDS",
     "STRICT_CONFLICT_TOLERANCE",
     "ConflictEdge",
     "ConflictTolerance",
+    "ItemAccess",
     "PairDecision",
     "SchedulingItem",
     "SchedulingResult",
@@ -79,9 +84,18 @@ _MEMBER_NAMES: tuple[str, ...] = tuple(
     "tolerance_percent weights band_durations default_band append_only_paths".split()
 )
 WEIGHT_NAMES: tuple[str, ...] = tuple(
-    "same_file possible_overlap append_only module".split()
+    "same_file possible_overlap append_only module contract".split()
 )
 BAND_NAMES: tuple[str, ...] = ("C1", "C2", "C3", "C4")
+
+# The one optional weight (issue #1164): the merge time of a path both items
+# declare separable. It joins the exact weight-name set only when present.
+SEPARABLE_WEIGHT = "separable"
+
+# The one optional member (issue #1013): the issue-combination threshold, a
+# percentage of the pair benefit, read as this default when absent.
+_COMBINATION_THRESHOLD = "combination_threshold_percent"
+COMBINATION_THRESHOLD_DEFAULT = 400
 
 # Reason kinds that make a conflict an edge at every tolerance: a shared surface
 # or a contract dependency cannot be reconciled by a merge step.
@@ -101,11 +115,14 @@ class ConflictTolerance:
     Attributes:
         tolerance_percent (int): Percentage of the benefit a cost may reach
             before the pair becomes an edge; 0 is zero tolerance.
-        weights (Mapping[str, int]): Cost weight per name in ``WEIGHT_NAMES``.
+        weights (Mapping[str, int]): Cost weight per name in ``WEIGHT_NAMES``,
+            plus ``separable`` when the configuration carries it.
         band_durations (Mapping[str, int]): Duration per band in ``BAND_NAMES``.
         default_band (str): Band used for an item that records none.
         append_only_paths (tuple[str, ...]): Append-only file patterns, matched
             with the mergeable matcher.
+        combination_threshold_percent (int): Percentage of the pair benefit a
+            candidate pair's cost must reach to qualify for issue combination.
     """
 
     tolerance_percent: int
@@ -113,6 +130,7 @@ class ConflictTolerance:
     band_durations: Mapping[str, int]
     default_band: str
     append_only_paths: tuple[str, ...]
+    combination_threshold_percent: int = COMBINATION_THRESHOLD_DEFAULT
 
     def __post_init__(self) -> None:
         """Copy both maps into read-only views so the record stays immutable."""
@@ -151,12 +169,36 @@ STRICT_CONFLICT_TOLERANCE = ConflictTolerance(
 
 
 @dataclass(frozen=True)
+class ItemAccess:
+    """An item's optional access declarations (issue #1164, spec section B5).
+
+    Both lists name members of the item's ``blast_radius.paths``; neither removes
+    a path from the radius. They only lower the weight of an overlapping path
+    pair: a path one side only reads costs 0, and a path both sides declare
+    separable costs the configured ``separable`` weight.
+
+    Attributes:
+        read_paths (tuple[str, ...]): Radius paths the item only reads.
+        separable_paths (tuple[str, ...]): Radius paths whose edits are
+            section-separable.
+    """
+
+    read_paths: tuple[str, ...] = ()
+    separable_paths: tuple[str, ...] = ()
+
+
+# The access of an item that declares neither list: every weight is unchanged.
+NO_ACCESS = ItemAccess()
+
+
+@dataclass(frozen=True)
 class SchedulingItem:
-    """One work item: its ``issue_num`` key, declared radius, and optional band."""
+    """One work item: its ``issue_num`` key, radius, optional band, and access."""
 
     key: int
     radius: BlastRadius
     band: str | None = None
+    access: ItemAccess = NO_ACCESS
 
 
 @dataclass(frozen=True)
@@ -235,7 +277,11 @@ def config_conflict_tolerance(config: Mapping[str, object]) -> ConflictTolerance
     if value is None:
         return STRICT_CONFLICT_TOLERANCE
 
-    member = _require_names(require_mapping(value, _LABEL), _MEMBER_NAMES, _LABEL)
+    raw = require_mapping(value, _LABEL)
+    # The optional member joins the exact name set only when it is present, so
+    # every other unknown name is still rejected.
+    optional = (_COMBINATION_THRESHOLD,) if _COMBINATION_THRESHOLD in raw else ()
+    member = _require_names(raw, _MEMBER_NAMES + optional, _LABEL)
     default_band = member["default_band"]
     if default_band not in BAND_NAMES:
         raise ValueError(f'{_LABEL}["default_band"] must be one of {BAND_NAMES}.')
@@ -244,13 +290,24 @@ def config_conflict_tolerance(config: Mapping[str, object]) -> ConflictTolerance
         tolerance_percent=_require_int(
             member["tolerance_percent"], f'{_LABEL}["tolerance_percent"]', minimum=0
         ),
-        weights=_read_int_map(member["weights"], WEIGHT_NAMES, "weights"),
+        weights=_read_int_map(
+            member["weights"], WEIGHT_NAMES, "weights", optional=(SEPARABLE_WEIGHT,)
+        ),
         band_durations=_read_int_map(
             member["band_durations"], BAND_NAMES, "band_durations"
         ),
         default_band=cast("str", default_band),
         append_only_paths=require_str_tuple(
             member["append_only_paths"], f'{_LABEL}["append_only_paths"]'
+        ),
+        combination_threshold_percent=(
+            _require_int(
+                member[_COMBINATION_THRESHOLD],
+                f'{_LABEL}["{_COMBINATION_THRESHOLD}"]',
+                minimum=0,
+            )
+            if optional
+            else COMBINATION_THRESHOLD_DEFAULT
         ),
     )
 
@@ -260,6 +317,9 @@ def pair_cost(
     radius_b: BlastRadius,
     config: Mapping[str, object],
     tolerance: ConflictTolerance,
+    *,
+    access_a: ItemAccess = NO_ACCESS,
+    access_b: ItemAccess = NO_ACCESS,
 ) -> int:
     """Compute the integer integration cost of running two items concurrently.
 
@@ -269,10 +329,15 @@ def pair_cost(
         config (Mapping[str, object]): Parsed truth table; only
             ``mergeable_paths`` is read, for the exclusion the relation uses.
         tolerance (ConflictTolerance): Weights and append-only patterns.
+        access_a (ItemAccess): First item's access declarations.
+        access_b (ItemAccess): Second item's access declarations.
 
     Returns:
-        int: Summed path-pair weights plus the module weight times the number of
-        shared modules. Mergeable paths contribute 0.
+        int: Summed path-pair weights, plus the module weight times the number
+        of shared modules, plus the contract weight times the number of
+        distinct shared contract identifiers (the set the relation intersects
+        for ``contract_dependency``, each identifier counted once). Mergeable
+        paths contribute 0.
     """
     mergeable = config_mergeable_paths(config)
     paths_a = exclude_mergeable_paths(radius_a.paths, mergeable)
@@ -281,13 +346,18 @@ def pair_cost(
     # Enumerate the overlapping pairs with the relation's own primitive, so the
     # cost covers exactly the pairs the relation could report.
     cost = sum(
-        _path_pair_weight(entry_a, entry_b, tolerance)
+        _path_pair_weight(entry_a, entry_b, tolerance, access_a, access_b)
         for entry_a in paths_a
         for entry_b in paths_b
         if _entries_overlap(entry_a, entry_b)
     )
     shared_modules = set(radius_a.modules) & set(radius_b.modules)
-    return cost + tolerance.weights["module"] * len(shared_modules)
+    shared_contracts = set(radius_a.contracts) & set(radius_b.contracts)
+    return (
+        cost
+        + tolerance.weights["module"] * len(shared_modules)
+        + tolerance.weights["contract"] * len(shared_contracts)
+    )
 
 
 def pair_benefit(
@@ -317,6 +387,8 @@ def decide_pair(
     band_a: str | None = None,
     band_b: str | None = None,
     relation: ConflictRelation = conflicts,
+    access_a: ItemAccess = NO_ACCESS,
+    access_b: ItemAccess = NO_ACCESS,
 ) -> PairDecision:
     """Decide whether one pair is an edge, a tolerated overlap, or neither.
 
@@ -329,6 +401,9 @@ def decide_pair(
         relation (ConflictRelation): Callable with the ``conflicts`` signature,
             called exactly once; injectable so drift detection can pass its own
             patchable reference.
+        access_a (ItemAccess): First item's access declarations, used only to
+            price the pair; detection is unchanged.
+        access_b (ItemAccess): Second item's access declarations.
 
     Returns:
         PairDecision: The verdict; without a conflict every other field is empty.
@@ -345,7 +420,9 @@ def decide_pair(
     # Project the reason records to their kinds, which keep canonical order.
     reasons = tuple(reason.kind for reason in result.reasons)
     hard = any(kind in HARD_REASON_KINDS for kind in reasons)
-    cost = pair_cost(radius_a, radius_b, config, tolerance)
+    cost = pair_cost(
+        radius_a, radius_b, config, tolerance, access_a=access_a, access_b=access_b
+    )
     benefit = pair_benefit(band_a, band_b, tolerance)
 
     # Tolerance 0 is stated explicitly rather than left to the inequality, so
@@ -377,7 +454,7 @@ def schedule_conflict_edges(
         ValueError: If two items share a key, or conflict_tolerance or a band is
             invalid.
     """
-    config_conflict_tolerance(config)
+    tolerance = config_conflict_tolerance(config)
     ordered = _ordered_items(items)
 
     # Pairs are visited in (a, b) order with a < b, so both lists come out sorted.
@@ -391,6 +468,8 @@ def schedule_conflict_edges(
                 config,
                 band_a=first.band,
                 band_b=second.band,
+                access_a=first.access,
+                access_b=second.access,
             )
             # An edge is recorded as an edge; a conflict within tolerance is
             # recorded as a tolerated overlap; a non-conflicting pair is dropped.
@@ -415,22 +494,83 @@ def schedule_conflict_edges(
                         decision.benefit,
                     )
                 )
-    return SchedulingResult(edges=tuple(edges), tolerated_overlaps=tuple(tolerated))
+    return _apply_aggregate_cap(edges, tolerated, ordered, tolerance)
 
 
-def _path_pair_weight(entry_a: str, entry_b: str, tolerance: ConflictTolerance) -> int:
-    """Weigh one overlapping path pair.
+def _apply_aggregate_cap(
+    edges: list[ConflictEdge],
+    tolerated: list[ToleratedOverlap],
+    ordered: Sequence[SchedulingItem],
+    tolerance: ConflictTolerance,
+) -> SchedulingResult:
+    """Promote the cap-selected tolerated overlaps to edges (issue #1013, D-2).
+
+    Each promoted overlap becomes a non-hard edge recording its first reason,
+    cost, and benefit; both lists are re-sorted by ``(a, b)``. At tolerance 0
+    nothing is tolerated, so the pass is a no-op.
+    """
+    bands = {item.key: item.band for item in ordered}
+    promoted = set(select_capped_pairs(tolerated, bands, tolerance))
+    for overlap in tolerated:
+        if (overlap.a, overlap.b) in promoted:
+            edges.append(
+                ConflictEdge(
+                    overlap.a,
+                    overlap.b,
+                    overlap.reasons[0],
+                    False,
+                    overlap.cost,
+                    overlap.benefit,
+                )
+            )
+    kept = [o for o in tolerated if (o.a, o.b) not in promoted]
+    return SchedulingResult(
+        edges=tuple(sorted(edges, key=lambda edge: (edge.a, edge.b))),
+        tolerated_overlaps=tuple(kept),
+    )
+
+
+def _path_pair_weight(
+    entry_a: str,
+    entry_b: str,
+    tolerance: ConflictTolerance,
+    access_a: ItemAccess = NO_ACCESS,
+    access_b: ItemAccess = NO_ACCESS,
+) -> int:
+    """Weigh one overlapping path pair (spec section B2; first matching row wins).
+
+    Args:
+        entry_a (str): Item A's blast-radius entry of the overlapping pair.
+        entry_b (str): Item B's blast-radius entry of the overlapping pair.
+        tolerance (ConflictTolerance): The configured weights.
+        access_a (ItemAccess): Item A's access lists; empty by default.
+        access_b (ItemAccess): Item B's access lists; empty by default.
 
     Returns:
-        int: append_only when a concrete entry of the pair is append-only
-        (checked first, so a registry named by both items stays cheap), else
-        same_file for two equal concrete entries, else possible_overlap.
+        int: 0 when ``entry_a`` is in A's read_paths or ``entry_b`` is in B's
+        read_paths; else append_only when a concrete entry of the pair is
+        append-only (so a registry named by both items stays cheap); else the
+        separable weight when both entries are declared separable on their own
+        side and the weight is configured; else same_file for two equal
+        concrete entries; else possible_overlap. Without access lists the
+        result equals the weight before issue #1164 for every input.
     """
-    # Only a concrete entry can name an append-only file; the order of the two
-    # tests below is the append-only precedence the spec requires.
+    # A path one side only reads costs nothing to integrate.
+    if entry_a in access_a.read_paths or entry_b in access_b.read_paths:
+        return 0
+    # Only a concrete entry can name an append-only file; append-only precedes
+    # every write class, as the spec requires.
     concrete = tuple(entry for entry in (entry_a, entry_b) if not is_glob_entry(entry))
     if any(matches_mergeable_path(e, tolerance.append_only_paths) for e in concrete):
         return tolerance.weights["append_only"]
+    # Separable pricing needs the declaration on both sides and a configured
+    # weight; otherwise the pair falls through to the write classes below.
+    if (
+        SEPARABLE_WEIGHT in tolerance.weights
+        and entry_a in access_a.separable_paths
+        and entry_b in access_b.separable_paths
+    ):
+        return tolerance.weights[SEPARABLE_WEIGHT]
     if len(concrete) == 2 and entry_a == entry_b:
         return tolerance.weights["same_file"]
     return tolerance.weights["possible_overlap"]
@@ -484,12 +624,40 @@ def _require_int(value: object, label: str, *, minimum: int) -> int:
     return value
 
 
-def _read_int_map(value: object, names: tuple[str, ...], member: str) -> dict[str, int]:
-    """Read a nested map with exactly ``names``, each an integer >= 1."""
+def _read_int_map(
+    value: object,
+    names: tuple[str, ...],
+    member: str,
+    *,
+    optional: tuple[str, ...] = (),
+) -> dict[str, int]:
+    """Read a nested map with exactly ``names``, each an integer >= 1.
+
+    An ``optional`` name joins the exact name set only when the map carries it,
+    so every other unknown name is still rejected and an absent optional name
+    leaves the result without that key.
+
+    Args:
+        value (object): The deserialized nested map.
+        names (tuple[str, ...]): The required names, in result order.
+        member (str): The config member name used in error labels.
+        optional (tuple[str, ...]): Names accepted only when present.
+
+    Returns:
+        dict[str, int]: Each present name mapped to its integer value.
+
+    Raises:
+        TypeError: If the value is not a mapping or a named value is not an
+        integer.
+        ValueError: If a name is missing or unknown, or a value is below 1.
+    """
     label = f'{_LABEL}["{member}"]'
-    mapping = _require_names(require_mapping(value, label), names, label)
+    raw = require_mapping(value, label)
+    # Accept an optional name only when the map carries it, after the required names.
+    present = names + tuple(name for name in optional if name in raw)
+    mapping = _require_names(raw, present, label)
     # Validate each named value in the fixed name order.
     return {
         name: _require_int(mapping[name], f'{label}["{name}"]', minimum=1)
-        for name in names
+        for name in present
     }

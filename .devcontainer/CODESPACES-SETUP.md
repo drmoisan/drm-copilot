@@ -32,7 +32,7 @@ This avoids conflicts where one environment's config interferes with the other.
    - Look for **"Dev container configuration"** section
    - Click the dropdown to expand options
    - **Select:** `.devcontainer/codespaces/devcontainer.json`
-   - Leave other settings as default (Machine type: 2-core is fine, can upgrade later)
+   - Leave other settings as default. The configuration declares `hostRequirements` of 16 cores, 64 GB memory and 64 GB storage, so only machine types that meet it are offered. The full test suites run under `pytest -n auto` and concurrent Pester shards, and agent orchestration runs many processes at once, so a 2-core machine is not enough.
 
 6. **Click "Create codespace"**
 
@@ -97,9 +97,11 @@ Once your Codespace is created, you should have:
 
 ### ✅ Correct Configuration
 - **OS:** Debian Bookworm (not Ubuntu)
-- **Python:** 3.13.x (not 3.12.x)
-- **Poetry:** 2.2.1
-- **PowerShell:** 7.6+
+- **Python:** 3.13.18 (not 3.12.x)
+- **Poetry:** 2.5.1
+- **Node.js/npm:** 26.13.0 / 11.20.0
+- **shfmt/ShellCheck/actionlint:** 3.14.1 / 0.11.0 / 1.7.12
+- **PowerShell:** 7.6.9
 - **Shell tools:** shellcheck, shfmt, bashdb, actionlint
 
 ### Verification Command

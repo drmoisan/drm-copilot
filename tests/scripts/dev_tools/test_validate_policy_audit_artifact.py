@@ -19,6 +19,10 @@ extract_policy_audit_comparison_lines = cast(
     "Callable[[str], dict[str, str]]",
     vars(policy_validator)["_extract_policy_audit_comparison_lines"],
 )
+comparison_line_has_labelled_percentage = cast(
+    "Callable[[str, str], bool]",
+    vars(policy_validator)["_comparison_line_has_labelled_percentage"],
+)
 
 TYPESCRIPT_COVERAGE_ROW = (
     "| TypeScript | 2 files | 12 tests | [✅] 12 pass, 0 fail | "
@@ -37,6 +41,7 @@ TYPESCRIPT_EVIDENCE_REFERENCE_NO_LABEL = (
     "docs/features/active/example/evidence/baseline/typescript.md; "
     "docs/features/active/example/evidence/qa-gates/typescript.md."
 )
+NO_PRE_CHANGE_RUN = "N/A - no pre-change run"
 
 
 def build_valid_policy_audit_text() -> str:
@@ -475,3 +480,101 @@ def test_validate_policy_audit_text_rejects_missing_mcp_template_resolver_pass()
     errors = policy_validator.validate_policy_audit_text(text)
 
     assert any("resolve_policy_audit_template_asset" in error for error in errors)
+
+
+def test_validate_policy_audit_text_accepts_no_pre_change_run_record() -> None:
+    """Accept an audit whose retained baseline fields record no pre-change run.
+
+    Purpose:
+        Confirm that the unchanged validator passes an audit filled in the form
+        the policy-audit template now states: every retained baseline field set
+        to the no-pre-change-run value, with numeric post-change coverage.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify that no validation error is reported.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    # Arrange
+    evidence_root = "docs/features/active/example/evidence"
+    replacements = (
+        ("91% lines, 88% functions | 93%", f"{NO_PRE_CHANGE_RUN} | 93%"),
+        ("84% commands, 82% functions | 86%", f"{NO_PRE_CHANGE_RUN} | 86%"),
+        (
+            f"TypeScript baseline coverage artifact: {evidence_root}/baseline/"
+            "typescript.md",
+            f"TypeScript baseline coverage artifact: {NO_PRE_CHANGE_RUN}",
+        ),
+        (
+            f"PowerShell baseline coverage artifact: {evidence_root}/baseline/"
+            "powershell.md",
+            f"PowerShell baseline coverage artifact: {NO_PRE_CHANGE_RUN}",
+        ),
+        (
+            "Baseline: 91% lines, 88% functions -> Post-change: 93% lines, "
+            "90% functions. Change: +2% lines, +2% functions.",
+            f"Baseline: {NO_PRE_CHANGE_RUN} -> Post-change: 93% lines, "
+            "90% functions. Change: N/A.",
+        ),
+        (
+            "Baseline: 84% commands, 82% functions -> Post-change: 86% commands, "
+            "84% functions. Change: +2% commands, +2% functions.",
+            f"Baseline: {NO_PRE_CHANGE_RUN} -> Post-change: 86% commands, "
+            "84% functions. Change: N/A.",
+        ),
+    )
+    text = build_valid_policy_audit_text()
+    # Apply each field change and require a hit, so a stale fixture string
+    # cannot leave a numeric baseline field in place and pass vacuously.
+    for old, new in replacements:
+        assert old in text, old
+        text = text.replace(old, new)
+
+    # Act
+    errors = policy_validator.validate_policy_audit_text(text)
+
+    # Assert
+    assert errors == []
+
+
+def test_comparison_line_baseline_label_reaches_later_percentage() -> None:
+    """Pin why the no-pre-change-run comparison line passes the baseline check.
+
+    Purpose:
+        The labelled-percentage search runs past the `N/A` baseline value to the
+        later `Post-change:` percentage. The accepted line depends on that reach,
+        so the same line with no percentage must be rejected.
+
+    Args:
+        None.
+
+    Returns:
+        None: Assertions verify the helper result for both lines.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    # Arrange
+    baseline = f"- Python: Baseline: {NO_PRE_CHANGE_RUN}"
+    with_percentage = f"{baseline} -> Post-change: 93% lines. Change: N/A."
+    without_percentage = f"{baseline} -> Post-change: N/A. Change: N/A."
+
+    # Act
+    accepted = comparison_line_has_labelled_percentage(with_percentage, "Baseline:")
+    rejected = comparison_line_has_labelled_percentage(without_percentage, "Baseline:")
+
+    # Assert
+    assert accepted is True
+    assert rejected is False

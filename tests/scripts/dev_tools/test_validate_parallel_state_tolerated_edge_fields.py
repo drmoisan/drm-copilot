@@ -1,16 +1,18 @@
-"""Validator tolerance for the scheduling layer's extra fields (issue #722).
+"""Validator acceptance of the scheduling layer's recorded fields (issue #722).
 
-The integration-cost scheduling layer records three tolerated-not-validated
-fields on each conflict edge (``hard``, ``cost``, ``benefit``) and a
-``tolerated_overlaps`` list on the planner and orchestrator checkpoints. No
-validator reads them, so a checkpoint carrying them must validate with zero
-errors, while the four-member edge reason enum stays enforced. The valid
+The integration-cost scheduling layer records three fields on each conflict
+edge (``hard``, ``cost``, ``benefit``) and a ``tolerated_overlaps`` list on the
+planner and orchestrator checkpoints. Since issue #1164 the validators check
+these fields when present, so a checkpoint carrying valid values must validate
+with zero errors, while the four-member edge reason enum stays enforced. The valid
 checkpoint builders are shared with the existing validator test modules rather
 than duplicated; orchestrator edges use the split-cohort builder, because an
 edge between two items of one cohort is a cohort-barrier violation.
 """
 
 from __future__ import annotations
+
+from typing import cast
 
 from tests.scripts.dev_tools import (
     test_validate_parallel_orchestrator_state_structures as orchestrator_structures,
@@ -82,8 +84,62 @@ def test_planner_state_accepts_tolerated_overlaps_list() -> None:
     assert validate_planner(state, ready=True) == []
 
 
+# The observed_resolution telemetry object (issue #1013, spec D-3).
+OBSERVED_RESOLUTION: dict[str, object] = {
+    "later_item": 445,
+    "conflicted": True,
+    "conflict_detected_at": "2026-10-30T12-00",
+    "resolved_at": "2026-10-30T12-40",
+    "resolution_minutes": 40,
+    "recorded_at": "2026-10-30T12-41",
+}
+
+# A combination record in the planner's combinations list (issue #1013, D-5).
+COMBINATION: dict[str, object] = {
+    "members": [444, 990],
+    "primary": 444,
+    "pairs": [{"a": 444, "b": 990, "cost": 16, "benefit": 2}],
+    "estimated_savings": 16,
+}
+
+
+def test_orchestrator_state_accepts_observed_resolution() -> None:
+    """A tolerated overlap carrying observed_resolution yields no errors."""
+    state = build_valid_parallel_state()
+    state["tolerated_overlaps"] = [
+        dict(TOLERATED_OVERLAP, observed_resolution=dict(OBSERVED_RESOLUTION))
+    ]
+
+    assert validate_orchestrator(state) == []
+
+
+def test_orchestrator_state_accepts_combined_issue_nums() -> None:
+    """An orchestrator item carrying combined_issue_nums yields no errors."""
+    state = build_valid_parallel_state()
+    items = cast("list[dict[str, object]]", state["items"])
+    items[0]["combined_issue_nums"] = [990]
+
+    assert validate_orchestrator(state) == []
+
+
+def test_planner_state_accepts_combined_item_and_combinations_list() -> None:
+    """A planner combined item and a combinations list yield no errors."""
+    state = build_valid_planner_state()
+    items = cast("list[dict[str, object]]", state["items"])
+    items[0]["combined_issue_nums"] = [990]
+    state["combinations"] = [dict(COMBINATION)]
+
+    assert validate_planner(state) == []
+    assert validate_planner(state, ready=True) == []
+
+
 def test_out_of_enum_reason_is_still_rejected() -> None:
-    """Extra fields do not relax the four-member reason enum."""
+    """The estimate fields do not relax the four-member reason enum.
+
+    The tolerated overlap names the edge's own pair, so the scheduling-decision
+    check of issue #1164 also reports the pair as present in both lists, after
+    the enum error of the edge validator.
+    """
     state = orchestrator_structures.state_with_edges(
         [dict(SCHEDULED_EDGE, reason="same_file")]
     )
@@ -96,4 +152,8 @@ def test_out_of_enum_reason_is_still_rejected() -> None:
         "path_overlap, module_overlap, shared_surface_overlap, "
         "contract_dependency; found: 'same_file'."
     )
-    assert errors == [expected]
+    both_lists = (
+        "Parallel checkpoint pair (444, 445) is in both conflict_edges and "
+        "tolerated_overlaps."
+    )
+    assert errors == [expected, both_lists]

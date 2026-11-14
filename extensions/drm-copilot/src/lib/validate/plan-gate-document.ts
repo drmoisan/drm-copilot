@@ -43,9 +43,43 @@ export const G12_SEVERITY: string = "blocking";
 export const G13_SEVERITY: string = "blocking";
 
 /** G13 guideline for canonical task lines. */
-export const PLAN_TASK_GUIDELINE = 40;
+export const PLAN_TASK_GUIDELINE = 20;
 /** G13 guideline for physical lines. */
-export const PLAN_LINE_GUIDELINE = 400;
+export const PLAN_LINE_GUIDELINE = 250;
+/** G13 task guideline kept by a plan file stamped before its zone's cutoff. */
+export const LEGACY_PLAN_TASK_GUIDELINE = 40;
+/** G13 line guideline kept by a plan file stamped before its zone's cutoff. */
+export const LEGACY_PLAN_LINE_GUIDELINE = 400;
+
+const NEW_YORK_ZONE = "America/New_York";
+const UTC_ZONE = "UTC";
+
+/**
+ * Stamp zone of each plan-file name shape: the feature-folder tooling stamps
+ * `plan.<stamp>.md` in America/New_York, and remediation plans carry the UTC
+ * stamp of the review that produced them.
+ */
+export const PLAN_STAMP_ZONES: Readonly<Record<string, string>> = Object.freeze(
+  {
+    plan: "America/New_York",
+    "plan-remediation-cycle": "UTC",
+    "remediation-plan": "UTC",
+    "remediation-folder": "UTC",
+  },
+);
+
+/**
+ * G13 guideline cutoff: one instant, the clock reading of the G13 commit,
+ * written once per stamp zone. Each entry is a `yyyy-MM-ddTHH-mm` stamp.
+ */
+export const PLAN_GUIDELINE_CUTOFF: Readonly<Record<string, string>> =
+  Object.freeze({
+    "America/New_York": "2026-11-07T18-31",
+    UTC: "2026-11-07T23-31",
+  });
+
+/** A plan-file stamp with the zone of its name shape. */
+export type PlanFileStamp = readonly [stamp: string, zone: string];
 
 /** G11 prose form, evaluated with inline code spans masked. */
 export const G11_PROSE_PATTERN = String.raw`\b[Ll]ines?[ \t]+[0-9]+`;
@@ -76,6 +110,35 @@ const DIGITS = "0123456789";
 const HEX_LETTERS = "abcdef";
 const SHA_BEFORE_REJECT = "-_.";
 const SHA_AFTER_REJECT = "-_";
+const STAMP_TEXT = "[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}";
+/**
+ * K4 shapes as patterns over the end of a path, each paired with its zone.
+ * Each pattern starts at the path start or a `/` or `\` separator and holds no
+ * separator itself, so it matches only a full file name (and, for the folder
+ * form, the two full segments above it). Matching is case-sensitive.
+ */
+const STAMP_SHAPES: readonly (readonly [RegExp, string])[] = [
+  [
+    new RegExp(String.raw`(?:^|[\\/])plan\.(${STAMP_TEXT})\.md$`),
+    NEW_YORK_ZONE,
+  ],
+  [
+    new RegExp(
+      String.raw`(?:^|[\\/])plan\.remediation-cycle-[0-9]+\.(${STAMP_TEXT})\.md$`,
+    ),
+    UTC_ZONE,
+  ],
+  [
+    new RegExp(String.raw`(?:^|[\\/])remediation-plan\.(${STAMP_TEXT})\.md$`),
+    UTC_ZONE,
+  ],
+  [
+    new RegExp(
+      String.raw`(?:^|[\\/])remediation[\\/](${STAMP_TEXT})[\\/]remediation-plan\.md$`,
+    ),
+    UTC_ZONE,
+  ],
+];
 
 /**
  * Return every physical line outside a fenced code block with its number.
@@ -284,16 +347,75 @@ export function shaCitationMessage(lineNumber: number, value: string): string {
 }
 
 /**
+ * Return the stamp of a plan-file path with the zone of its name shape.
+ *
+ * Reads the K4 shapes `plan.<stamp>.md` (America/New_York),
+ * `plan.remediation-cycle-<N>.<stamp>.md`, `remediation-plan.<stamp>.md`, and
+ * `remediation/<stamp>/remediation-plan.md` (all UTC). The path is split on
+ * both `/` and `\`, matching is case-sensitive, and each name must match
+ * fully. The path is parsed as text and never read from disk.
+ *
+ * @param path Plan-file path, relative or absolute, or `undefined`.
+ * @returns `[stamp, zone]` for a recognized shape; `undefined` for any other
+ *     name, an empty path, or no path.
+ */
+export function planFileStamp(path?: string): PlanFileStamp | undefined {
+  // Try each shape in order; the shapes cannot both match one path, and an
+  // absent or empty path matches none of them.
+  for (const [pattern, zone] of STAMP_SHAPES) {
+    const stamp = pattern.exec(path ?? "")?.[1];
+    if (stamp !== undefined) {
+      return [stamp, zone];
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Return the G13 task and line guideline that applies to a plan stamp.
+ *
+ * A stamp is compared, as a string, with the cutoff entry of its own zone, so
+ * a UTC stamp is never read against the New York entry.
+ *
+ * @param stamped `[stamp, zone]` from {@link planFileStamp}, or `undefined`.
+ * @param cutoff Cutoff stamp per zone; tests inject a fixed pair.
+ * @returns The legacy pair when a stamp exists and sorts strictly before its
+ *     zone's entry; otherwise the current pair.
+ */
+export function planSizeGuideline(
+  stamped: PlanFileStamp | undefined,
+  cutoff: Readonly<Record<string, string>> = PLAN_GUIDELINE_CUTOFF,
+): readonly [number, number] {
+  // Only a stamped plan from before the cutoff keeps the legacy pair; an
+  // unstamped plan and a stamp at or after the cutoff use the current pair.
+  // A zone with no cutoff entry compares with the empty string, which no
+  // stamp sorts before, so it uses the current pair.
+  if (stamped !== undefined && stamped[0] < (cutoff[stamped[1]] ?? "")) {
+    return [LEGACY_PLAN_TASK_GUIDELINE, LEGACY_PLAN_LINE_GUIDELINE];
+  }
+  return [PLAN_TASK_GUIDELINE, PLAN_LINE_GUIDELINE];
+}
+
+/**
  * Return the G13 finding string, byte-identical to Python.
  *
  * @param tasks Canonical task-line count.
  * @param lines Physical-line count.
+ * @param guideline The task and line guideline that applied.
  * @returns The finding string.
  */
-export function planSizeMessage(tasks: number, lines: number): string {
+export function planSizeMessage(
+  tasks: number,
+  lines: number,
+  guideline: readonly [number, number] = [
+    PLAN_TASK_GUIDELINE,
+    PLAN_LINE_GUIDELINE,
+  ],
+): string {
+  const [taskGuideline, lineGuideline] = guideline;
   return (
     `Line 1: plan size \`${String(tasks)} tasks, ${String(lines)} lines\` exceeds the ` +
-    `guideline of ${String(PLAN_TASK_GUIDELINE)} tasks or ${String(PLAN_LINE_GUIDELINE)} ` +
+    `guideline of ${String(taskGuideline)} tasks or ${String(lineGuideline)} ` +
     "lines and carries no `## Size Justification` section; split the item " +
     "or state why the size is necessary."
   );
@@ -313,12 +435,18 @@ function channelFor(report: PlanGateReport, severity: string): string[] {
 /**
  * Append the G11, G12, and G13 findings for a plan document to the report.
  *
+ * G13 selects its guideline from the stamp of `planPath`: a plan stamped
+ * before the cutoff of its stamp zone keeps the legacy pair, and a plan with
+ * no path or no recognized stamp uses the current pair.
+ *
  * @param report Report whose channels receive the findings.
  * @param text Full plan document text.
+ * @param planPath Plan-file path, used only to read its stamp.
  */
 export function evaluateDocumentGates(
   report: PlanGateReport,
   text: string,
+  planPath?: string,
 ): void {
   const g11 = channelFor(report, G11_SEVERITY);
   for (const [lineNumber, value] of lineCitations(text)) {
@@ -329,9 +457,11 @@ export function evaluateDocumentGates(
     g12.push(shaCitationMessage(lineNumber, value));
   }
   const [tasks, lines] = planSize(text);
-  const overGuideline =
-    tasks > PLAN_TASK_GUIDELINE || lines > PLAN_LINE_GUIDELINE;
+  const guideline = planSizeGuideline(planFileStamp(planPath));
+  const overGuideline = tasks > guideline[0] || lines > guideline[1];
   if (overGuideline && !hasSizeJustification(text)) {
-    channelFor(report, G13_SEVERITY).push(planSizeMessage(tasks, lines));
+    channelFor(report, G13_SEVERITY).push(
+      planSizeMessage(tasks, lines, guideline),
+    );
   }
 }

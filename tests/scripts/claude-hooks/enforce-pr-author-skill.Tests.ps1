@@ -18,6 +18,7 @@ Describe 'enforce-pr-author-skill.ps1' {
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
 
         # SHA-256 (lowercase hex) of a single 0x41 ('A') byte, used by the receipt allow/hash tests.
         $script:HashOf0x41 = '559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd'

@@ -62,6 +62,19 @@ Describe 'Get-PoshQCScanConfigFolder' {
         } | Should -Throw "*config/poshqc-scan.json*absolute*"
     }
 
+    It 'throws an error naming the file for a POSIX-rooted entry' {
+        {
+            Get-PoshQCScanConfigFolder -Root '/repo' -TestPathExists { param([string] $Path) [void] $Path; $true } -ReadContent { param([string] $Path) [void] $Path; '{ "version": 1, "test": { "scanFolders": ["/absolute/path"] } }' }
+        } | Should -Throw "*config/poshqc-scan.json*absolute*"
+    }
+
+    It 'throws an error naming the file for a backslash-rooted entry' {
+        # The JSON text escapes each backslash, so the parsed entry is \absolute\path.
+        {
+            Get-PoshQCScanConfigFolder -Root '/repo' -TestPathExists { param([string] $Path) [void] $Path; $true } -ReadContent { param([string] $Path) [void] $Path; '{ "version": 1, "test": { "scanFolders": ["\\absolute\\path"] } }' }
+        } | Should -Throw "*config/poshqc-scan.json*absolute*"
+    }
+
     It 'throws an error naming the file for an entry containing a parent traversal segment' {
         {
             Get-PoshQCScanConfigFolder -Root '/repo' -TestPathExists { param([string] $Path) [void] $Path; $true } -ReadContent { param([string] $Path) [void] $Path; '{ "version": 1, "test": { "scanFolders": ["../outside"] } }' }

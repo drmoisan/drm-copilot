@@ -93,7 +93,9 @@ function Get-PoshQCScanConfigFolder {
         if ([string]::IsNullOrWhiteSpace($folderText)) {
             throw "Scan configuration '$ConfigRelativePath' contains a blank 'test.scanFolders' entry."
         }
-        if ([IO.Path]::IsPathRooted($folderText)) {
+        # Host-independent rule: a drive-qualified entry or one beginning with '/' or '\' is
+        # rejected on every host; the .NET rooted-path test accepts 'C:/x' on Linux and rejects it on Windows.
+        if ($folderText -match '^(?:[A-Za-z]:|[\\/])') {
             throw "Scan configuration '$ConfigRelativePath' entry '$folderText' must be a workspace-relative path, not an absolute path."
         }
         # Reject parent-directory traversal in any path segment.

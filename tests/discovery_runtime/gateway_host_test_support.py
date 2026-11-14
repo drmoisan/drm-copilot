@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
@@ -46,7 +46,7 @@ if TYPE_CHECKING:
 HOST, SESSION, AGENT = "codex", "session-alpha", "agent-alpha"
 ROLE, INVOCATION = "legacy-parity-analyst", "invocation-alpha"
 # Inside the control grant's window (issued 00:00:00Z, expires 00:01:00Z).
-NOW = datetime(2026, 1, 1, 0, 0, 45, tzinfo=timezone.utc)
+NOW = datetime(2026, 1, 1, 0, 0, 45, tzinfo=UTC)
 READ_REFERENCE = "protected-read-000000000002"
 FINALIZE_REFERENCE = "protected-final-00000000003"
 CONTRACTS = "docs/migration/discovery/feature-contracts"

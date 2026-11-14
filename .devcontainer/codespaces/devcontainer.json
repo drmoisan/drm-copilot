@@ -6,20 +6,25 @@
     "dockerfile": "Dockerfile"
   },
   "remoteUser": "vscode",
+  "hostRequirements": {
+    "cpus": 16,
+    "memory": "64gb",
+    "storage": "64gb"
+  },
   "containerEnv": {
     "TZ": "America/New_York",
     "BG_WORKTREE_PATH": "/workspaces/${localWorkspaceFolderBasename}-bg"
   },
-  "features": {
-    "ghcr.io/devcontainers/features/git:1": {
-      "version": "latest"
-    },
-    "ghcr.io/devcontainers/features/github-cli:1": {
-      "version": "latest"
-    }
-  },
-
   "customizations": {
+    "codespaces": {
+      "repositories": {
+        "drmoisan/drm-copilot": {
+          "permissions": {
+            "actions": "write"
+          }
+        }
+      }
+    },
     "vscode": {
       "extensions": [
         "ms-python.python",

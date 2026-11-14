@@ -30,7 +30,7 @@ All filenames must include a timestamp in ISO-8601 format `yyyy-MM-ddTHH-mm` (e.
 1. `policy-audit.<timestamp>.md`
    - A completed Policy Audit document based on the repo's policy-audit template and the policy_audit template guidance.
    - Must include PASS/PARTIAL/FAIL (or equivalent) statuses with concrete evidence (commands run, outputs, file references).
-   - For languages in scope with mandatory coverage policy, MUST include numeric baseline/post/new-code coverage values and command evidence; `UNVERIFIED` is not allowed for a PASS verdict.
+   - For languages in scope with mandatory coverage policy, MUST include numeric baseline/post/new-code coverage values (baseline from the `Phase 0 baseline` artifact, post-change and per-file values from the single gate run) and command evidence; `UNVERIFIED` is not allowed for a PASS verdict.
 
 2. `code-review.<timestamp>.md`
    - A feature-level code review relative to the base branch, emphasizing strongly typed Python best practices and repo compliance.
@@ -49,7 +49,6 @@ For short-path/minor-audit reviews, the reviewer MUST verify all of the followin
 - `${feature-folder}/issue.md` contains an explicit `## Acceptance Criteria` section, and only that section is used for minor-audit acceptance validation.
 - `${feature-folder}/spec.md` does not exist.
 - `${feature-folder}/user-story.md` does not exist.
-- `phase0-instructions-read.md` exists in the canonical baseline location with the required metadata fields.
 - every baseline command-step artifact required by the approved plan exists and includes `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`.
 - plan checklist state matches artifact evidence on disk; do not accept blanket or inferred checkoffs.
 

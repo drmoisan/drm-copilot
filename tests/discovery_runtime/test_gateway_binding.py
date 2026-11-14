@@ -5,7 +5,7 @@ from __future__ import annotations
 import io
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from types import ModuleType
 from typing import TYPE_CHECKING
@@ -78,7 +78,7 @@ def test_main_binds_one_outer_reader_to_the_fixed_service(
             expected UTC clock zone. Returns datetime; memory-only effects;
             AssertionError on mismatch.
             """
-            assert zone is timezone.utc
+            assert zone is UTC
             return NOW
 
     bindings: list[tuple[str, str | None]] = []

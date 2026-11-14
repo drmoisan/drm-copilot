@@ -21,7 +21,7 @@ BeforeAll {
     $script:TrustedGallery = { [pscustomobject]@{ InstallationPolicy = 'Trusted' } }
     $script:PresentModule = {
         param([string] $Name)
-        [pscustomobject]@{ Name = $Name; Version = [version]'5.9.5' }
+        [pscustomobject]@{ Name = $Name; Version = [version]'6.2.5' }
     }
     $script:NoOpInstall = { param([string] $Name, [string] $Version) [void] $Name; [void] $Version }
 }
@@ -70,7 +70,7 @@ Describe 'Install-PoshQCTool default Logger (issue #953)' {
 
         # Act / Assert
         { Install-PoshQCTool -SetTls { } -GetRepository $script:TrustedGallery -RegisterRepository { } -SetRepository { } -FindModule $absentModule -InstallModule $script:NoOpInstall 6>$null } |
-            Should -Throw -ExpectedMessage 'Failed to install PSScriptAnalyzer 1.22.0.'
+            Should -Throw -ExpectedMessage 'Failed to install PSScriptAnalyzer 1.25.0.'
     }
 }
 

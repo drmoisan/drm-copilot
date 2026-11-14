@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import io
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, cast
 
 import pytest
@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from drm_copilot_discovery.service_contracts import Clock, ServiceIO
 
 REQUEST = b'{"operation":"doctor","mode":"structural"}'
-NOW = datetime(2026, 1, 1, tzinfo=timezone.utc)
+NOW = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 @pytest.fixture(autouse=True)

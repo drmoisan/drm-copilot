@@ -119,7 +119,7 @@ Coverage metrics are mandatory for every language that has changed files in the 
 ### Coverage Thresholds
 
 - **Governing thresholds**: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently.
-- **New and modified files**: line coverage must meet the governing line threshold (and the branch threshold where measured); modified files must also show no regression on changed lines.
+- **New and modified files**: line coverage must meet the governing line threshold (and the branch threshold where measured), read from the single gate run, and new behavior is tested; modified files must also show no regression on changed lines against the `Phase 0 baseline`.
 - **Repo-wide**: coverage for each language must meet the governing thresholds.
 
 ### Verification Procedure
@@ -131,9 +131,11 @@ For each language that has changed files in the feature branch:
 3. If the artifact exists:
    - Parse the repo-wide coverage percentage and report it in the policy audit.
    - If repo-wide coverage is below the governing line threshold, flag as FAIL and add to remediation triggers.
+   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a local artifact that shows the Python total below a threshold is still FAIL.
    - For each new file: if line coverage is below the governing line threshold, flag as FAIL and add to remediation triggers.
-   - For each modified file: if line coverage has regressed from baseline or is below the governing line threshold, flag as FAIL and add to remediation triggers.
+   - For each modified file: if line coverage has regressed from the `Phase 0 baseline` or, read from the single gate run, is below the governing line threshold, flag as FAIL and add to remediation triggers.
 4. If no coverage artifact is found for a language that has changed files, flag as **FAIL** with reason: "coverage artifact absent for [language]; coverage verification is mandatory for all languages with changed files." Add to remediation triggers.
+5. Write `## CI Cross-check` into the policy audit after `## 7. Code Quality Checks`: one row per CI check whose result the review relies on, with the columns `Check | Claimed outcome | Claimed figure | Head | Source`, the outcome `pass` or `fail` from local evidence, and the head from `git log` of the reviewed branch.
 
 The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
 
@@ -144,6 +146,16 @@ The tiered file-size policy (`## File Size Limit` in `.agents/skills/general-cod
 - Report each covered file at or above 700 lines as a non-blocking `Warning` row in the Findings Table of `code-review.<timestamp>.md`, naming the file and its line count. Do not write the Warning to `remediation-inputs.<timestamp>.md`, and do not give it a remediation severity label.
 - Report a covered file above 800 lines that has no entry in `config/file-size-baseline.json`, and any added or increased entry in `config/file-size-baseline.json`, as a blocking policy finding.
 - Produce no finding for the 500-line guidance tier.
+
+## Documentation Surface Check
+
+This check turns a documented-surface change without a matching coverage-ledger change into a blocking finding. It uses the evidence model: inspect the existing artifacts and do not rerun any documentation tooling.
+
+1. When `docs/documentation-estate/docs-profile.json` is absent on the branch head, the check is not applicable and produces no finding.
+2. List the changed paths with `git diff --name-only <merge-base>..HEAD`. When no changed path lies under an entry of the profile's `surface_selection.source_roots`, the check produces no finding.
+3. When at least one changed path lies under such an entry, require the newest `<FEATURE>/evidence/qa-gates/docs-surface-delta.<timestamp>.md` (the lexicographically greatest matching file), carrying the fields `Timestamp`, `Command`, `EXIT_CODE`, and `Output Summary`.
+4. When that artifact is absent, or records `EXIT_CODE: 1`, report the blocking finding `surface-change-without-ledger-change` with the line `Remediability: autonomous` and a `Remediability-Evidence:` line stating that the coverage ledger can be updated on the branch and the `surface-delta` evidence regenerated without an external dependency. Name the changed source paths in the finding.
+5. When the artifact records `EXIT_CODE: 0`, the check passes.
 
 ## Evidence Location Invariant
 

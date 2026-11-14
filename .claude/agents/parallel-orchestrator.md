@@ -23,6 +23,7 @@ tools:
   - "Bash(bash .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/project-file-merge/Resolve-MergeableConflict.ps1*)"
   - "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-drift/Invoke-ParallelDriftDetection.ps1*)"
+  - "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
   - "Bash(dotnet tool restore*)"
@@ -115,6 +116,8 @@ run through the bundled entry point `.claude/lib/bash/mutate-parallel-run.sh`. T
 records the same destination-runtime posture.
 
 ## Startup Protocol
+
+Agent-tool preflight, before step 1: confirm that `Agent` is in the available tool list before any other work. When it is absent, record `blocked_reason: "spawn_agent_unavailable"` in the parallel checkpoint, do no specialist work, and return a line beginning `AGENT_TOOL_UNAVAILABLE:` that names the three causes and both remedies. The causes are `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` set below 3 (the configured limit), a run started inside a subagent or fork (one extra nesting layer), and a Claude Code version older than 2.1.219. The remedies are to raise or unset `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`, or to use the main-session fallback in `## Nesting Depth` of the `parallel-orchestrate` skill, in which the main session launches each per-item `Agent(orchestrator)` itself. When a child returns a line beginning `AGENT_TOOL_UNAVAILABLE:`, halt with the same reason and record `spawn_agent_unavailable`; do not do the child's work in its place. When an `Agent(orchestrator)` call is denied with a reason beginning `NESTING_DEPTH_INSUFFICIENT:`, halt with that reason and record `spawn_agent_unavailable` in the same way; do not do the child's work in its place.
 
 On every invocation:
 
@@ -211,7 +214,21 @@ pull request with a `gh` command. There are also no upstream-context citation li
 `depends_on` field, so no item cites another item's output. Ordering exists only as blast-radius
 overlap expressed by the cohort table.
 
+A combined item (issue #1013), whose entry carries `combined_issue_nums`, receives the
+`Combined issues: #A #B` line after kickoff element 3, as the skill's
+`## Parallel-Mode Kickoff Parameter` section defines, so its child names every member on its
+author-asserted autoclose line and its one pull request closes every member issue. A combined item
+remediates as one unit: one child, one `remediation_loop`, and one pull request. It never splits
+back into separate pull requests, and it is merged, blocked, or removed as a whole.
+
 ## Cohort Scheduling
+
+Two items run sequentially if and only if the expected merge time exceeds the expected time gained by running them in parallel.
+
+Both estimates are integer minutes: merge time is the summed overlap-class weights, and a path that one side only reads costs 0; gain is the shorter of the two band durations. Hard classes are always edges. At `tolerance_percent` 100 the rule is exactly merge time greater than gain, and a tie runs in parallel. `--after` flags and planner-proposed orderings pass the same test and are rejected with `precedence_not_justified` unless marked as a correctness ordering with `--reason`.
+
+The planner applies this rule at seeding, and `/parallel-add` applies it to each admission, so the
+cohort table and the recorded edges already reflect it.
 
 You consume the `cohorts[]` table that `parallel-planner` seeded. You never compute a cohort
 partition and never recolor one: cohort computation belongs to the cohort-scheduler library that
@@ -247,8 +264,9 @@ fields you write are `objective`, `route_id: "parallel"`, `parallel_slug`,
 `parallel_manifest_path`, `parallel_status_doc_path`, `mode`, `max_concurrency`,
 `completed_steps`, `next_step`, `last_updated`, `current_cohort`, `recolor_generation`,
 `cohorts[]`, `items[]` (each carrying `issue_num`, `feature_folder`, `state`, `blast_radius`,
-`worktree_path`, `branch_name`, `pr_number`, `pr_url`, `merge_status`, `merge_commit_sha`, and the
-lifecycle timestamps), and the three receipt arrays `delegation_receipts[]`, `skill_receipts[]`,
+`worktree_path`, `branch_name`, `pr_number`, `pr_url`, `merge_status`, `merge_commit_sha`, the
+admission fields `preparation_status`, `plan_hash`, `base_commit`, and `band_source`, and the
+lifecycle timestamps), the top-level `precedence[]` list, and the three receipt arrays `delegation_receipts[]`, `skill_receipts[]`,
 and `mcp_call_receipts[]` populated with the `parallel` route's required names from
 `config/orchestration-routing.json`.
 
@@ -256,7 +274,9 @@ The checkpoint schema is owned by F3 and is defined once in
 `.claude/rules/parallel-orchestration.md`, enforced by
 `scripts/dev_tools/validate_parallel_orchestrator_state.py`. You consume that schema and
 add no field to it that the rule file does not declare.
-`mergeable_conflicts_resolved` is the one declared optional item field.
+The declared optional item fields are `mergeable_conflicts_resolved`, `preparation_status`,
+`plan_hash`, `base_commit`, and `band_source`, and the declared optional top-level field is
+`precedence[]` (`## Prepared-Item Admission (issue #1047)` of the rule file).
 The `parallel-orchestrate` skill's `## Parallel-Level Checkpoint` section carries the
 full enumeration, the `merge_status` transition chain you write, and the arrays that are read-only
 to you. Validate through `mcp__drm-copilot__validate_orchestration_artifacts` with
@@ -268,6 +288,13 @@ for the three .NET verification commands are scoped to that step and to no other
 only reason those commands appear in your allowlist at all. That step's one optional item field is
 `mergeable_conflicts_resolved`, declared in the rule file and appended to an item after a
 parent-side resolution.
+
+You also write the tolerated-not-validated telemetry object
+`tolerated_overlaps[].observed_resolution` (issue #1013), declared in the rule file: the detection
+fields when the later-merging item of a tolerated pair hits a merge conflict, and the resolution
+fields at that item's confirmed merge, per the skill's `## Per-Item Merge-Conflict Handling` and
+`## Per-Item Merge to Main (Merge-on-Green)` sections. Nothing reads it, and no weight changes
+from it.
 
 ## Documentation Maintenance
 

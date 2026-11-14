@@ -35,6 +35,7 @@ Side effects:
 from __future__ import annotations
 
 import re
+from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 from scripts.dev_tools.plan_gate_commands import (
@@ -45,6 +46,8 @@ from scripts.dev_tools.plan_gate_commands import (
 from scripts.dev_tools.plan_gate_scratch import FENCE_RE
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from scripts.dev_tools.plan_gate_discrimination import PlanGateReport
 
 # Channel names, declared here rather than imported, for the same import-cycle
@@ -58,9 +61,33 @@ G11_SEVERITY: str = BLOCKING_CHANNEL
 G12_SEVERITY: str = BLOCKING_CHANNEL
 G13_SEVERITY: str = BLOCKING_CHANNEL
 
-# G13 size guideline: canonical task lines and physical lines.
-PLAN_TASK_GUIDELINE = 40
-PLAN_LINE_GUIDELINE = 400
+# G13 size guideline: canonical task lines and physical lines. A plan file whose
+# stamp sorts before the cutoff of its stamp zone keeps the legacy pair.
+PLAN_TASK_GUIDELINE = 20
+PLAN_LINE_GUIDELINE = 250
+LEGACY_PLAN_TASK_GUIDELINE = 40
+LEGACY_PLAN_LINE_GUIDELINE = 400
+
+# Stamp zone of each plan-file name shape: the feature-folder tooling stamps
+# `plan.<stamp>.md` in America/New_York, and remediation plans carry the UTC
+# stamp of the review that produced them.
+PLAN_STAMP_ZONES: Mapping[str, str] = MappingProxyType(
+    {
+        "plan": "America/New_York",
+        "plan-remediation-cycle": "UTC",
+        "remediation-plan": "UTC",
+        "remediation-folder": "UTC",
+    }
+)
+
+# G13 guideline cutoff: one instant, the clock reading of the G13 commit,
+# written once per stamp zone. Each entry is a `yyyy-MM-ddTHH-mm` stamp.
+PLAN_GUIDELINE_CUTOFF: Mapping[str, str] = MappingProxyType(
+    {
+        "America/New_York": "2026-11-07T18-31",
+        "UTC": "2026-11-07T23-31",
+    }
+)
 
 # G11 prose form, evaluated with inline code spans masked.
 G11_PROSE_PATTERN = r"\b[Ll]ines?[ \t]+[0-9]+"
@@ -85,6 +112,21 @@ _WHITESPACE_RE = re.compile(PLAN_WHITESPACE_CLASS)
 _JUSTIFICATION_HEADING_RE = re.compile(r"^##[ \t]+Size Justification[ \t]*$")
 _SECTION_END_RE = re.compile(r"^#{1,2}(?:[ \t]|$)")
 _HEADING_RE = re.compile(r"^#{1,6}(?:[ \t]|$)")
+_STAMP_TEXT = r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}"
+_STAMP_RE = re.compile(_STAMP_TEXT, re.ASCII)
+_PATH_SEPARATOR_RE = re.compile(r"[\\/]")
+# K4 file-name shapes whose stamp sits in the name, in match order.
+_NAME_SHAPES: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("plan", re.compile(rf"plan\.({_STAMP_TEXT})\.md", re.ASCII)),
+    (
+        "plan-remediation-cycle",
+        re.compile(rf"plan\.remediation-cycle-[0-9]+\.({_STAMP_TEXT})\.md", re.ASCII),
+    ),
+    (
+        "remediation-plan",
+        re.compile(rf"remediation-plan\.({_STAMP_TEXT})\.md", re.ASCII),
+    ),
+)
 _DIGITS = frozenset("0123456789")
 _HEX_LETTERS = frozenset("abcdef")
 _SHA_BEFORE_REJECT = frozenset("-_.")
@@ -285,12 +327,122 @@ def sha_citation_message(line_number: int, value: str) -> str:
     )
 
 
-def plan_size_message(tasks: int, lines: int) -> str:
-    """Return the G13 finding string, byte-identical to the TypeScript twin."""
+def plan_file_stamp(path: str | None) -> tuple[str, str] | None:
+    """Return the stamp of a plan-file path with the zone of its name shape.
 
+    Purpose:
+        Read the K4 stamp shapes: `plan.<stamp>.md` (America/New_York),
+        `plan.remediation-cycle-<N>.<stamp>.md`, `remediation-plan.<stamp>.md`,
+        and `remediation/<stamp>/remediation-plan.md` (all UTC). The path is
+        split on both `/` and `\\`, so a Windows path and a POSIX path read
+        the same. Matching is case-sensitive and each name must match fully.
+
+    Args:
+        path (str | None): Plan-file path, relative or absolute, or `None`.
+
+    Returns:
+        tuple[str, str] | None: `(stamp, zone)` for a recognized shape, with the
+        zone taken from `PLAN_STAMP_ZONES`; `None` for any other name, an
+        empty path, or no path.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None. The path is parsed as text and never read from disk.
+    """
+
+    if not path:
+        return None
+    segments = _PATH_SEPARATOR_RE.split(path)
+    name = segments[-1]
+    # Try the shapes whose stamp sits in the file name; the first full match
+    # decides the shape, and the shapes cannot both match one name.
+    for shape, pattern in _NAME_SHAPES:
+        match = pattern.fullmatch(name)
+        if match is not None:
+            return match.group(1), PLAN_STAMP_ZONES[shape]
+    # The folder form carries its stamp in the parent segment, under a
+    # `remediation` segment, and only for the exact name `remediation-plan.md`.
+    is_folder_form = (
+        name == "remediation-plan.md"
+        and len(segments) >= 3
+        and _STAMP_RE.fullmatch(segments[-2]) is not None
+        and segments[-3] == "remediation"
+    )
+    if is_folder_form:
+        return segments[-2], PLAN_STAMP_ZONES["remediation-folder"]
+    return None
+
+
+def plan_size_guideline(
+    stamped: tuple[str, str] | None,
+    *,
+    cutoff: Mapping[str, str] = PLAN_GUIDELINE_CUTOFF,
+) -> tuple[int, int]:
+    """Return the G13 task and line guideline that applies to a plan stamp.
+
+    Purpose:
+        Keep the legacy pair for a plan written before G13 lowered the
+        guideline. A stamp is compared, as a string, with the cutoff entry of
+        its own zone, so a UTC stamp is never read against the New York entry.
+
+    Args:
+        stamped (tuple[str, str] | None): `(stamp, zone)` from
+            `plan_file_stamp`, or `None` when the plan has no recognized stamp.
+        cutoff (Mapping[str, str]): Cutoff stamp per zone. Defaults to
+            `PLAN_GUIDELINE_CUTOFF`; tests inject a fixed pair.
+
+    Returns:
+        tuple[int, int]: The legacy pair when a stamp exists and sorts strictly
+        before its zone's cutoff entry; otherwise the current pair, including
+        for a zone the cutoff mapping holds no entry for.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    # Only a stamped plan from before the cutoff keeps the legacy pair; an
+    # unstamped plan and a stamp at or after the cutoff use the current pair.
+    # A zone with no entry compares with the empty string, which no stamp
+    # sorts before.
+    if stamped is not None:
+        stamp, zone = stamped
+        if stamp < cutoff.get(zone, ""):
+            return LEGACY_PLAN_TASK_GUIDELINE, LEGACY_PLAN_LINE_GUIDELINE
+    return PLAN_TASK_GUIDELINE, PLAN_LINE_GUIDELINE
+
+
+def plan_size_message(
+    tasks: int,
+    lines: int,
+    *,
+    guideline: tuple[int, int] = (PLAN_TASK_GUIDELINE, PLAN_LINE_GUIDELINE),
+) -> str:
+    """Return the G13 finding string, byte-identical to the TypeScript twin.
+
+    Args:
+        tasks (int): Canonical task-line count.
+        lines (int): Physical-line count.
+        guideline (tuple[int, int]): The task and line guideline that applied.
+
+    Returns:
+        str: The finding string naming the guideline that applied.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    task_guideline, line_guideline = guideline
     return (
         f"Line 1: plan size `{tasks} tasks, {lines} lines` exceeds the "
-        f"guideline of {PLAN_TASK_GUIDELINE} tasks or {PLAN_LINE_GUIDELINE} "
+        f"guideline of {task_guideline} tasks or {line_guideline} "
         "lines and carries no `## Size Justification` section; split the item "
         "or state why the size is necessary."
     )
@@ -302,12 +454,19 @@ def _channel(report: PlanGateReport, severity: str) -> list[str]:
     return report.blocking if severity == BLOCKING_CHANNEL else report.warnings
 
 
-def evaluate_document_gates(report: PlanGateReport, text: str) -> None:
+def evaluate_document_gates(
+    report: PlanGateReport, text: str, *, plan_path: str | None = None
+) -> None:
     """Append the G11, G12, and G13 findings for a plan document to the report.
+
+    G13 selects its guideline from the stamp of `plan_path`: a plan stamped
+    before the cutoff of its stamp zone keeps the legacy pair, and a plan with
+    no path or no recognized stamp uses the current pair.
 
     Args:
         report (PlanGateReport): Report whose channels receive the findings.
         text (str): Full plan document text.
+        plan_path (str | None): Plan-file path, used only to read its stamp.
 
     Returns:
         None.
@@ -328,6 +487,9 @@ def evaluate_document_gates(report: PlanGateReport, text: str) -> None:
         g12.append(sha_citation_message(line_number, value))
 
     tasks, lines = plan_size(text)
-    over_guideline = tasks > PLAN_TASK_GUIDELINE or lines > PLAN_LINE_GUIDELINE
+    guideline = plan_size_guideline(plan_file_stamp(plan_path))
+    over_guideline = tasks > guideline[0] or lines > guideline[1]
     if over_guideline and not has_size_justification(text):
-        _channel(report, G13_SEVERITY).append(plan_size_message(tasks, lines))
+        _channel(report, G13_SEVERITY).append(
+            plan_size_message(tasks, lines, guideline=guideline)
+        )

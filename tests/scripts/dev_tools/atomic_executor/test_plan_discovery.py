@@ -1,17 +1,24 @@
-"""Tests for plan discovery utilities.
+"""Tests for plan discovery utilities and the real PromptBuilder file system.
 
 These tests avoid filesystem temp paths by monkeypatching Path methods.
+TestRealPromptBuilderFileSystem covers the sorted glob result of the real
+file system adapter, which the PromptBuilder cases in test_prompt_builder.py
+do not assert.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
 
 from scripts.dev_tools.atomic_executor.plan_discovery import (
     parse_timestamped_plan_filename,
     resolve_feature_plan,
+)
+from scripts.dev_tools.atomic_executor.prompt_builder import (
+    RealPromptBuilderFileSystem,
 )
 
 
@@ -112,3 +119,18 @@ class TestResolveFeaturePlan:
 
         with pytest.raises(FileNotFoundError, match="Missing required plan file"):
             resolve_feature_plan(feature_dir)
+
+
+class TestRealPromptBuilderFileSystem:
+    """Coverage of the real file system adapter that main's cases do not assert."""
+
+    def test_real_file_system_glob_sorts_matches(self) -> None:
+        """RealPromptBuilderFileSystem.glob returns the matches in sorted order."""
+        directory = Mock(spec=Path)
+        directory.glob.return_value = iter([Path("b.md"), Path("a.md")])
+
+        assert RealPromptBuilderFileSystem().glob(directory, "*.md") == [
+            Path("a.md"),
+            Path("b.md"),
+        ]
+        directory.glob.assert_called_once_with("*.md")

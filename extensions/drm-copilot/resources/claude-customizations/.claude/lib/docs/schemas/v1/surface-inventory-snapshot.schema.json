@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:docs:1.0.0:surface-inventory-snapshot",
+  "title": "Docs v1 surface inventory snapshot",
+  "description": "The documentable surface of one repository at one revision, produced by the registered analyzers. Element identifiers depend only on kind, path and declaration.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "extensions", "repository", "revision", "profile_sha256", "analyzers", "inputs", "elements", "diagnostics", "captured_at"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:docs:1.0.0:surface-inventory-snapshot"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact_kind": {"const": "surface-inventory-snapshot"},
+    "id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+    "extensions": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/extensions"},
+    "repository": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+    "revision": {"anyOf": [{"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/revision"}, {"type": "null"}]},
+    "profile_sha256": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/sha256"},
+    "analyzers": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/analyzer"}},
+    "inputs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/input"}},
+    "elements": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/element"}},
+    "diagnostics": {"type": "array", "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/diagnostic"}},
+    "captured_at": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/timestamp"}
+  },
+  "$defs": {
+    "analyzer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "version", "analysis_method"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+        "version": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"},
+        "analysis_method": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/analysis-method"}
+      }
+    },
+    "input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256", "size"],
+      "properties": {
+        "path": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
+        "sha256": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/sha256"},
+        "size": {"type": "integer", "minimum": 0}
+      }
+    },
+    "line-range": {
+      "type": "object", "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": {"type": "integer", "minimum": 1},
+        "end": {"type": "integer", "minimum": 1}
+      }
+    },
+    "element-property": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "value"],
+      "properties": {
+        "name": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+        "value": {"type": ["string", "number", "boolean", "null"]}
+      }
+    },
+    "element": {
+      "type": "object", "additionalProperties": false,
+      "required": ["element_id", "kind", "path", "declaration", "name", "parent_id", "analyzer_id", "analysis_method", "source_sha256", "line_range", "properties", "extensions"],
+      "properties": {
+        "element_id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-id"},
+        "kind": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-kind"},
+        "path": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
+        "declaration": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"},
+        "name": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"},
+        "parent_id": {"anyOf": [{"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-id"}, {"type": "null"}]},
+        "analyzer_id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+        "analysis_method": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/analysis-method"},
+        "source_sha256": {
+          "$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/sha256",
+          "description": "SHA-256 of the declaration lines selected by line_range (normalized per spec), not of the whole file"
+        },
+        "line_range": {"anyOf": [{"$ref": "#/$defs/line-range"}, {"type": "null"}]},
+        "properties": {"type": "array", "items": {"$ref": "#/$defs/element-property"}},
+        "extensions": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/extensions"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"kind": {"const": "cli-option"}}, "required": ["kind"]},
+          "then": {"properties": {"parent_id": {"type": "string", "pattern": "^cli-command-"}}}
+        },
+        {
+          "if": {"properties": {"kind": {"enum": ["cli-command", "cli-option", "http-route", "config-key", "public-symbol"]}}, "required": ["kind"]},
+          "then": {"properties": {"line_range": {"type": "object"}}}
+        }
+      ]
+    }
+  }
+}

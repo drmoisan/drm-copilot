@@ -68,8 +68,9 @@ Whenever the user asks you to plan or break down work, you must output:
 
 The plan must be executable by the `atomic_executor` agent without replanning. In particular:
 
-- If the plan changes code or tests, it MUST include baseline tool results capture tasks in **Phase 0**.
+- If the plan changes code or tests, it MUST include baseline tool results capture tasks in **Phase 0**: static baselines and one `Phase 0 baseline` run of each test gate.
 - If the plan changes code or tests, it MUST include a final **QA phase** that runs the full toolchain loop and reports results.
+- If the plan changes code or tests, every phase between Phase 0 and the final QA phase MUST end with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop. A phase that ends with `[expect-fail]` tests keeps its `[phase-gate]` task, whose unit stage accepts only those named expected failures; a no-change phase, one that changes no tracked file, needs no gate task.
 
 ### 2.1 Phase structure
 
@@ -79,7 +80,7 @@ Follow the canonical phase heading and structure rules in the `atomic-plan-contr
 
 Follow the canonical task formatting rules in the `atomic-plan-contract` skill.
 
-### 2.3 Phase 0 — Context & Inputs (Mandatory Policy & Research)
+### 2.3 Phase 0 — Context & Inputs
 
 Phase 0 content, baseline capture schema, and toolchain mapping are defined in the `atomic-plan-contract` skill.
 
@@ -101,7 +102,7 @@ When planning from a feature folder, resolve the selected work mode in this exac
 3. Explicit workflow override only if repo policy permits and only if reconciled against `issue.md`.
 4. fail closed to `full-feature` when the marker is missing or malformed.
 
-For `minor-audit`, preflight-required plan gates MUST include baseline evidence, targeted verification evidence, and end-state evidence tasks. For `full-feature`, retain full-document and full QA obligations. For `full-bug`, require spec-driven documentation and full QA obligations.
+For `minor-audit`, preflight-required plan gates MUST include baseline evidence (static baselines and the `Phase 0 baseline` test-suite run), targeted verification evidence read from the gate run, and end-state evidence tasks. For `full-feature`, retain full-document and full QA obligations. For `full-bug`, require spec-driven documentation and full QA obligations.
 
 ---
 
@@ -109,7 +110,7 @@ For `minor-audit`, preflight-required plan gates MUST include baseline evidence,
 
 Follow `### Single-Pass Preflight` in the `atomic-plan-contract` skill. The preflight directive belongs in the delegation prompt, never in the plan file. The preflight executor fixes trivial defects in place and returns only substantive defects as `PREFLIGHT-DEFECT:` lines. A plan returns to the planner at most once: apply every listed change in one revision of the same file; if the confirming preflight still reports a substantive defect, the orchestrator halts with `blocked_reason: "validator_failed"`.
 
-Every plan follows `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: anchors are symbols, headings, or test names (never line numbers or commit SHAs), literals appear only where they are the asserted value, tool routes are not restated, a plan above 40 tasks or 400 lines carries `## Size Justification`, every plan carries a `## Pre-Mortem` section with the seven labels, and the final phase ends with the self-review task.
+Every plan follows `## Design-Level Plan Contract (Mandatory)` in the `atomic-plan-contract` skill: anchors are symbols, headings, or test names (never line numbers or commit SHAs), literals appear only where they are the asserted value, tool routes are not restated, a plan above the G13 guideline of 20 tasks and 250 lines (40 and 400 for a plan file stamped before `PLAN_GUIDELINE_CUTOFF`) carries `## Size Justification`, every plan carries a `## Pre-Mortem` section with the seven labels, and the final phase ends with the self-review task.
 
 If the `atomic_executor` delegation cannot be started, resumed, or completed, you MUST stop and report blocked state. You MUST NOT self-approve or finalize the plan.
 
@@ -400,7 +401,7 @@ Examples:
 
 * Good:
    `- [ ] [P1-T1] [expect-fail] Add parameterized test for slug extraction in tests/.../test_ck12_catalog.py`
-   - Acceptance: `poetry run pytest tests/... -k slug_extraction` fails with a tuple/type mismatch.
+   - Acceptance: the `poetry run pytest -n auto` gate fails with a tuple/type mismatch in the new test.
 
 * Bad (missing tag):
    `- [ ] [P1-T1] Add failing regression test for slug extraction ...`
@@ -645,6 +646,7 @@ Before sending any response that includes a plan, you must quickly self-check:
 * If the plan changes code or tests:
    * Did Phase 0 include baseline capture tasks for the **language-specific toolchains** applicable to the files being changed (per the table in §2.3)?
    * Did you include a final QA phase that runs the toolchain loop **for each applicable language** and reports results?
+   * Does every phase between Phase 0 and the final QA phase end with a `[phase-gate]` task (an `[expect-fail]` phase keeps its gate; a no-change phase needs none)?
 * If writing to a plan file, did you follow the path selection and update rules in §9?
 * Did you perform the **Cognitive Review** (Section 11) and add tasks for security, performance, and edge cases?
 

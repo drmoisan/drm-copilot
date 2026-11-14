@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "stage": "preparation",
+  "issue_num": "1162",
+  "branch": "feature/cross-epic-dependencies-1162",
+  "parallel_slug": "harness-learnings-2026-11-09",
+  "research_path": "docs/features/active/2026-11-09-cross-epic-dependencies-1162/research/research.2026-11-09T21-50.md",
+  "spec_path": "docs/features/active/2026-11-09-cross-epic-dependencies-1162/spec.md",
+  "plan_path": "docs/features/active/2026-11-09-cross-epic-dependencies-1162/plan.2026-11-09T16-32.md",
+  "plan_hash": "92c7743114cc2a1524ba8e4902cc7e412ad3eac9",
+  "plan_hash_algorithm": "git blob object id (git hash-object)",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "PREFLIGHT: ALL CLEAR",
+  "preflight_rounds": 2,
+  "recorded_at": "2026-11-09T22:39:06Z"
+}

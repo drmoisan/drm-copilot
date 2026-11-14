@@ -147,6 +147,48 @@ function Get-CheckpointObjectMember {
     return @{ Present = $false; Value = $null }
 }
 
+function Get-CheckpointObjectOrdinalMember {
+    <#
+    .SYNOPSIS
+        Read a member from a deserialized JSON object by ordinal name comparison.
+    .DESCRIPTION
+        Same contract as Get-CheckpointObjectMember, except that a member is present
+        only when a property name equals Name ordinally, as a Python dict or a
+        TypeScript object key lookup does. Get-CheckpointObjectMember matches names
+        without regard to case, which PowerShell property access does by default, so
+        keys introduced for the light remediation path (issue #1097, review item N1)
+        read through this function to keep the three runtimes in agreement. A
+        non-object owner reports the member as absent rather than throwing.
+    .PARAMETER Owner
+        The deserialized JSON value expected to be an object. May be $null.
+    .PARAMETER Name
+        The member name to read, compared ordinally.
+    .OUTPUTS
+        System.Collections.Hashtable with keys Present (bool) and Value (object).
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [object] $Owner,
+
+        [Parameter(Mandatory = $true)]
+        [string] $Name
+    )
+
+    if (-not (Test-CheckpointObjectValue -Value $Owner)) {
+        return @{ Present = $false; Value = $null }
+    }
+
+    foreach ($property in $Owner.PSObject.Properties) {
+        if ($property.Name -ceq $Name) {
+            return @{ Present = $true; Value = $property.Value }
+        }
+    }
+    return @{ Present = $false; Value = $null }
+}
+
 function Get-CheckpointOrdinalSortedName {
     <#
     .SYNOPSIS
@@ -378,6 +420,7 @@ Export-ModuleMember -Function `
     Test-CheckpointListValue, `
     Get-CheckpointObjectMemberName, `
     Get-CheckpointObjectMember, `
+    Get-CheckpointObjectOrdinalMember, `
     Get-CheckpointOrdinalSortedName, `
     Test-PythonZeroEquivalent, `
     Test-PythonValueEqual, `
