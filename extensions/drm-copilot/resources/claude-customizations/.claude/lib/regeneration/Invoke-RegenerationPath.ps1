@@ -19,9 +19,10 @@
 
     Every git, process, file, and clock access goes through
     Invoke-RegenerationGitExe, Invoke-RegenerationProcess,
-    Read-RegenerationConfigText, and the -UtcNow scriptblock; each seam default is
-    the only code that touches the system. Dot-sourcing the script defines the
-    functions without running the body.
+    Resolve-RegenerationExecutable (whose -Resolver default reads PATH, and
+    PATHEXT on Windows), Read-RegenerationConfigText, and the -UtcNow scriptblock;
+    each seam default is the only code that touches the system. Dot-sourcing the
+    script defines the functions without running the body.
 
 .PARAMETER Mode
     Merge, Tip, or Validate (ordinal, case-sensitive).
@@ -86,10 +87,84 @@ function Invoke-RegenerationGitExe {
     return [pscustomobject]@{ ExitCode = [int] $returned[0].ExitCode; Output = [string] $output }
 }
 
+function Resolve-RegenerationExecutable {
+    <#
+    .SYNOPSIS
+        Resolve an argv[0] name to an application path; an unresolvable name throws.
+
+    .DESCRIPTION
+        The -Resolver default is the only code that reads PATH (and PATHEXT on
+        Windows); it returns the Source of the first application match, so a
+        Windows shim such as npm resolves to npm.cmd.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)] [string] $Name,
+        [scriptblock] $Resolver = {
+            param($Name)
+            Get-Command -Name $Name -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty Source
+        }
+    )
+
+    $resolved = [string] (& $Resolver -Name $Name)
+    if ([string]::IsNullOrEmpty($resolved)) {
+        throw "executable $Name cannot be resolved"
+    }
+    return $resolved
+}
+
+function Get-RegenerationProcessStartSpec {
+    <#
+    .SYNOPSIS
+        Return the FileName and ArgumentList that start one resolved executable.
+
+    .DESCRIPTION
+        A path whose extension is .cmd or .bat (ordinal, case-insensitive) cannot
+        be started directly, so it runs through ComSpec with /d, /c, the path, and
+        each argument as its own item. cmd.exe re-parses its command tail, so a
+        batch argument holding whitespace, a double quote, or one of the characters
+        & | < > ^ % ( ) throws, because it would not reach the batch file
+        unchanged. Every other path starts directly with the arguments unchanged.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)] [string] $ResolvedPath,
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [string[]] $ArgumentList,
+        [AllowNull()] [AllowEmptyString()] [string] $ComSpec
+    )
+
+    $extension = [System.IO.Path]::GetExtension($ResolvedPath)
+    $isBatch = [string]::Equals($extension, '.cmd', [System.StringComparison]::OrdinalIgnoreCase) -or
+    [string]::Equals($extension, '.bat', [System.StringComparison]::OrdinalIgnoreCase)
+    if (-not $isBatch) {
+        return [pscustomobject]@{ FileName = $ResolvedPath; ArgumentList = [string[]] @($ArgumentList) }
+    }
+
+    if ([string]::IsNullOrEmpty($ComSpec)) {
+        throw "ComSpec is not set; batch file $ResolvedPath cannot be started"
+    }
+    foreach ($argument in $ArgumentList) {
+        if ($argument -match '[\s"&|<>^%()]') {
+            throw "batch file argument '$argument' holds whitespace, a quote, or a cmd.exe metacharacter"
+        }
+    }
+    $items = [System.Collections.Generic.List[string]]::new()
+    $items.AddRange([string[]] @('/d', '/c', $ResolvedPath))
+    $items.AddRange([string[]] @($ArgumentList))
+    return [pscustomobject]@{ FileName = $ComSpec; ArgumentList = $items.ToArray() }
+}
+
 function Invoke-RegenerationProcess {
     <#
     .SYNOPSIS
-        Run one argv with no shell and return its exit code; a start failure throws.
+        Run one argv and return its exit code; a start failure throws.
+
+    .DESCRIPTION
+        The -Invoker default resolves argv[0] through Resolve-RegenerationExecutable
+        and starts it with no shell; a resolved .cmd or .bat file runs through
+        ComSpec /d /c (Get-RegenerationProcessStartSpec).
     #>
     [CmdletBinding()]
     [OutputType([int])]
@@ -97,8 +172,10 @@ function Invoke-RegenerationProcess {
         [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [string[]] $Argv,
         [scriptblock] $Invoker = {
             param($FilePath, $ArgumentList)
-            $info = [System.Diagnostics.ProcessStartInfo]::new([string] $FilePath)
-            foreach ($item in $ArgumentList) { $info.ArgumentList.Add([string] $item) }
+            $resolved = Resolve-RegenerationExecutable -Name $FilePath
+            $spec = Get-RegenerationProcessStartSpec -ResolvedPath $resolved -ArgumentList $ArgumentList -ComSpec $env:ComSpec
+            $info = [System.Diagnostics.ProcessStartInfo]::new([string] $spec.FileName)
+            foreach ($item in $spec.ArgumentList) { $info.ArgumentList.Add([string] $item) }
             $info.UseShellExecute = $false
             $info.RedirectStandardOutput = $true
             $info.RedirectStandardError = $true
