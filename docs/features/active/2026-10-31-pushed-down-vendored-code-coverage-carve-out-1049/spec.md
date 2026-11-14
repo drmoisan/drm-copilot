@@ -3,7 +3,7 @@
 - **Issue:** #1049
 - **Parent (optional):** epic #1018 `shared-agent-harness-layer`, child 8 (wave 3)
 - **Owner:** drmoisan
-- **Last Updated:** 2026-10-31
+- **Last Updated:** 2026-11-14
 - **Status:** Draft (preparation mode; planning only)
 - **Version:** 0.2
 - **Design input:** `research/research.2026-10-31T18-20.md` (sections `## Recommended Design` and `## Owner Questions`, adopted with their defaults)
@@ -121,7 +121,7 @@ The check and derivation are PowerShell in a new PoshQC submodule, `scripts/powe
 
 ### Exemption Report
 
-- Path: `artifacts/pester/vendored-coverage-exemptions.json`, next to `powershell-coverage.xml`.
+- Path: `vendored-coverage-exemptions.json` beside the coverage output file of the `Invoke-PoshQCTest` run: in `artifacts/pester/` by default, and in the shard folder under `artifacts/pester/parallel/` in an `Invoke-PoshQCParallelTest` run (decision AD-2).
 - Content: entries `{ path, status, manifest_sha256, actual_sha256 }`, sorted ordinally by `path`; no timestamps, no absolute paths, no host or user names.
 
 ### This Repository
@@ -162,7 +162,7 @@ The sentence "No production file may be excluded from measurement." under `## Co
 
 ### Feature-Review
 
-One step is added to `.claude/agents/feature-review.md` `## Coverage Verification` (or to child 3's agent source under `scripts/harness-generation/sources/agents/` if the generator owns that file): read `artifacts/pester/vendored-coverage-exemptions.json` when present, flag any hand-written production-path exclusion as Blocking, and flag hand-edited manifest hashes as Blocking. The policy-audit templates are unchanged (OQ-6 default).
+One step is added to `.claude/agents/feature-review.md` `## Coverage Verification` (or to child 3's agent source under `scripts/harness-generation/sources/agents/` if the generator owns that file): read `vendored-coverage-exemptions.json` beside the coverage output file when present, flag any hand-written production-path exclusion as Blocking, and flag hand-edited manifest hashes as Blocking. The policy-audit templates are unchanged (OQ-6 default).
 
 ### Destination Documentation
 
@@ -207,7 +207,7 @@ Owner rule (epic `## Shared Design`, language directive refined 2026-10-30, summ
 - [ ] With the opt-in set, an invalid manifest (malformed JSON, unknown major version, absolute, drive-letter, UNC or `..` path) fails the coverage run with a message naming `.push-down-manifest.json`, and an absent manifest exempts nothing and logs one warning.
 - [ ] `Resolve-PoshQCCoveragePopulation` subtracts `exempt` paths only for the `config` source with `exempt_unchanged_push_down_files` set to `true`, leaves the `settings` and fallback sources unchanged, and no exclusion path is written to any configuration file.
 - [ ] A Pester case with a destination-added `.claude/hooks/*.ps1` file absent from the manifest shows the file reported `unlisted` and retained in the coverage population.
-- [ ] `artifacts/pester/vendored-coverage-exemptions.json` is written when the opt-in is set, with entries sorted by path and no timestamps or absolute paths.
+- [ ] `vendored-coverage-exemptions.json` is written beside the coverage output file when the opt-in is set, with entries sorted by path and no timestamps or absolute paths.
 - [ ] The rule's **Enforcement** sentence keeps hand-written production-path exclusions Blocking, recognizes the manifest-derived run-time exemption verified through the exemption report, and makes hand-edited manifest hashes without a push-down run Blocking; `.claude/agents/feature-review.md` `## Coverage Verification` (or its generator source) contains the matching step.
 - [ ] The rule paragraph and `scripts/powershell/PoshQC/README.md` (and its bundle copy) state that pushed-down code is tested upstream, that a modified copy is owned and tested locally, and that recreated duplicate tests of unmodified pushed-down files may be removed.
 - [ ] A Pester repo-gate test asserts that this repository's `config/poshqc-coverage.json` does not declare `exempt_unchanged_push_down_files` and that the repository root has no `.push-down-manifest.json`.
@@ -259,3 +259,12 @@ Defaults are adopted provisionally; the plan proceeds on them unless the owner a
 - [x] Unit coverage areas: manifest generation (paths, hashes, ordering); the destination check (unchanged, modified, added, removed file); exclusion-list derivation.
 - [x] Integration scenarios: push to a scratch destination, run its coverage configuration, modify one hook and confirm it re-enters the denominator.
 - [ ] CLI/API examples
+
+## Decisions (2026-11-14 planning refresh)
+
+Taken by the planner during the 2026-11-14 plan revision, against the tree at that date. The provisional owner answers OQ-1 to OQ-7 stand unchanged.
+
+- **AD-1. Report writer location.** The default report writer, which creates the report directory and writes the file, is a function in `PoshQC.VendoredCoverage.psm1`. `Invoke-PoshQCTest` gains only one seam parameter that defaults to that function and one call site. Rationale: `PoshQC.Testing.psm1` already sits near the 500-line guidance tier after issue #1048 added `-TestResultPath` and `-CoverageOutputPath`, so the write logic belongs in the new module, where it is tested directly; every file stays under the 800-line limit.
+- **AD-2. Report location.** The exemption report `vendored-coverage-exemptions.json` is written in the directory of the effective coverage output file of the `Invoke-PoshQCTest` run: `artifacts/pester/` by default, and the shard folder under `artifacts/pester/parallel/` in an `Invoke-PoshQCParallelTest` run. `Invoke-PoshQCParallelTest` and `PoshQC.Parallel.psm1` are not changed. Rationale: shards run concurrently with per-shard output paths, so one fixed path would be written by several processes at once; the coverage output file is the artifact a reviewer already reads, and the report beside it is found the same way in both run shapes. The README, the feature-review step and the brief say "beside the coverage output file".
+- **AD-3. Run without a coverage output path.** When the run has no effective coverage output file, the report is written in `artifacts/pester/` under the run root. Rationale: the report is the only evidence of what was exempted, because PoshQC MCP results carry no output, so an opted-in run always writes it; `artifacts/pester/` is the default location of AD-2.
+- **AD-4. Parity list.** `scripts/powershell/PoshQC/README.md` is already listed in `POSHQC_PARITY_PATHS` of `tests/scripts/dev_tools/test_poshqc_bundled_parity.py`, so only `PoshQC.VendoredCoverage.psm1` is added. Rationale: the list is a tuple of unique paths, and a duplicate entry adds no check.

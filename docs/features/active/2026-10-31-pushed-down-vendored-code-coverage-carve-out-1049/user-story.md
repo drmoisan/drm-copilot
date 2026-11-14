@@ -28,7 +28,7 @@ The push-down copies hooks, skills, agents, libraries and rules into destination
 - Scenario: maintainer opts in
   1. The maintainer runs the push-down; the destination receives `.push-down-manifest.json` with a path and hash for each written file.
   2. The maintainer adds `"exempt_unchanged_push_down_files": true` to `config/poshqc-coverage.json`.
-  3. The maintainer runs PoshQC coverage through the MCP tool. Unchanged pushed-down files are dropped from the population; `artifacts/pester/vendored-coverage-exemptions.json` lists each path with its status.
+  3. The maintainer runs PoshQC coverage through the MCP tool. Unchanged pushed-down files are dropped from the population; `vendored-coverage-exemptions.json` beside the coverage output file lists each path with its status.
   4. The maintainer removes the recreated duplicate tests of the unmodified pushed-down files.
   5. Later the maintainer edits one pushed-down hook and adds a new hook under `.claude/hooks/`. The next run reports the edited hook `modified` and the new hook `unlisted`; both stay in the denominator and need local tests.
 - Scenario: reviewer checks a branch
@@ -43,7 +43,7 @@ The push-down copies hooks, skills, agents, libraries and rules into destination
 - [ ] As a maintainer, a hook I add under `.claude/hooks/` stays in my coverage denominator.
 - [ ] As a maintainer, I enable the exemption with one boolean key in `config/poshqc-coverage.json` and write no exclusion path by hand.
 - [ ] As a maintainer, an invalid manifest with the opt-in set fails my coverage run with a message naming `.push-down-manifest.json`, and a missing manifest exempts nothing.
-- [ ] As a reviewer, I can verify the exemption from `artifacts/pester/vendored-coverage-exemptions.json`, which is sorted and contains no timestamps or absolute paths.
+- [ ] As a reviewer, I can verify the exemption from `vendored-coverage-exemptions.json` beside the coverage output file, which is sorted and contains no timestamps or absolute paths.
 - [ ] As a reviewer, the rule and the feature-review coverage step treat hand-written production-path exclusions and hand-edited manifest hashes as Blocking, and recognize the manifest-derived exemption.
 - [ ] As a maintainer, the rule and the PoshQC README state that pushed-down code is tested upstream, that a modified copy is owned and tested locally, and that recreated duplicate tests of unmodified pushed-down files may be removed.
 - [ ] As a maintainer of this repository, I can confirm that this repository does not opt in and keeps its own tests, enforced by a repo-gate test.
