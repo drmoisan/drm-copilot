@@ -130,8 +130,8 @@ The added CI step is a single Prettier check; no constraint.
 - [x] `tests/scripts/claude-lib/docs/python/test_docs_python_native_corpus.py` passes in a parallel run.
 - [x] `.github/workflows/_root-typescript-tests.yml` contains a step named "Check root formatting" running `npm run format:check`, after "Install root dependencies", and it applies to every OS leg of the job matrix.
 - [x] `.prettierignore`, Prettier configuration, `ci.yml` and the `ci-required-gate` needs list are unchanged, and no new CI job or Python file is added.
-- [ ] CI-dependent: a green CI run on the final branch head exercises the new step on each OS leg (rule `modified-workflow-needs-green-run`). Stays unchecked until S9.
-- [ ] CI-dependent: the existing contract tests that pin workflow and brief contents (`CiRequiredGateWorkflow.Tests.ps1`, `test_execution_environment_brief_contracts.py`) pass in that CI run. Stays unchecked until S9.
+- [x] CI-dependent: a green CI run on the final branch head exercises the new step on each OS leg (rule `modified-workflow-needs-green-run`). Stays unchecked until S9.
+- [x] CI-dependent: the existing contract tests that pin workflow and brief contents (`CiRequiredGateWorkflow.Tests.ps1`, `test_execution_environment_brief_contracts.py`) pass in that CI run. Stays unchecked until S9.
 
 ## Risks & Mitigations
 - Technical or operational risks: a root file other than the fixtures named in the issue (TS tests, `src/hello-typescript.ts`, root configs) may be unformatted and fail only in CI; static analysis could not confirm this.
