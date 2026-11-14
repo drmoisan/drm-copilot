@@ -66,6 +66,9 @@ features:
   (`epic_type` in {business, enabler}, non-empty `business_outcome_hypothesis`, string-list
   `leading_indicators` / `nfrs`); when absent, validation is byte-identical to a manifest
   without it.
+- The optional per-feature key `cross_epic_depends_on` names prerequisites in other epics; it
+  never enters `depends_on` and moves no wave
+  (`## Cross-Epic Dependencies (cross_epic_depends_on)`).
 
 ## Wave Assignment
 
@@ -77,8 +80,10 @@ wave(f) = 0                                   if depends_on(f) is empty
 wave(f) = 1 + max(wave(d) for d in depends_on(f))   otherwise
 ```
 
-`scripts/dev_tools/epic_wave_computation.py` is the canonical, tested reference implementation
-of this formula.
+`pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1 -ManifestPath <manifest>` is the shipped, tested
+implementation of this formula (exit 0 with the JSON wave map, 1 for a cycle, self-loop, or
+unresolved reference, 2 for a usage error); the Python module `epic_wave_computation` is this
+repository's parity reference.
 
 Compute this via memoized recursion with cycle detection: a `feature_folder` encountered while
 still being resolved (i.e., it appears in its own dependency chain) indicates a cycle in the
@@ -99,20 +104,15 @@ function of the DAG.
    `git fetch origin main` and then
    `git rev-list --count origin/epic/<epic-slug>-integration..origin/main`. A zero count
    proceeds directly to the wave. A non-zero count means `origin/main` has commits the
-   integration branch lacks, and the main-sync runs as a dedicated chore child item before the
-   wave launches, following the `epic-852-main-sync` / PR #882 pattern. Before delegating it,
-   `epic-orchestrator` writes the sync child's `features[]` row (with `depends_on: []`) and its
-   own `waves[]` entry to the epic checkpoint, because `enforce-epic-wave-barrier.ps1` denies a
-   delegation whose feature record is absent. The sync child must not reuse a manifest child's
-   issue number; it uses the epic issue number or a dedicated chore issue. Its branch is created
-   from the integration branch, merges `origin/main` with a merge commit
-   (`git merge --no-ff origin/main`; no rebase, no force-push), resolves any conflict inside its
-   own remediation loop, and opens a PR into the integration branch. The wave does not launch
-   until that PR has merged into the integration branch and the sync entry's `merge_status` is
-   `merged`. At most one main-sync child runs per wave: after it merges, `epic-orchestrator`
-   re-runs step 2 and launches the wave without repeating the count, and commits that reach
-   `origin/main` afterwards are picked up by the next wave's check or by the final integration
-   PR in step 6.
+   integration branch lacks. Before the wave launches, `epic-orchestrator` merges `origin/main`
+   into the integration branch (`git merge --no-ff origin/main`, resolving any conflicts; no
+   rebase, no force-push), pushes the integration branch, re-runs step 2, and launches the wave.
+   Commits that reach `origin/main` afterwards are picked up by the next wave's check or by the
+   final integration PR in step 6.
+   When that merge conflicts, the main-sync regenerate path runs only when the integration worktree holds a valid config/orchestration-regeneration.json (issue #1156).
+   In that case `epic-orchestrator` aborts the conflicted merge and runs `pwsh -NoProfile -File .claude/lib/regeneration/Invoke-RegenerationPath.ps1 -Mode Merge -MergeRef origin/main -Trigger main_sync` in the integration worktree.
+   On exit 0 it commits during the in-progress merge with `git commit -F <message file>`, pushes the integration branch, dispatches and verifies CI before the wave launches as `## Integration-Tip Regeneration` states, and appends an integration_regenerations[] entry with trigger main_sync.
+   On any other exit the fallback runs this step unchanged: a fresh merge of `origin/main` with the conflict resolved as above.
 4. Each child feature's worktree/branch (created via
    `Agent(orchestrator, isolation: "worktree", run_in_background: true)`) is branched from
    `origin/<integration_branch>`, not `origin/main`. The child's own `orchestrator` instance
@@ -135,6 +135,11 @@ function of the DAG.
    `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1 -PrJson <snapshot-json> -AsJson`
    (issue #952).
 
+When a feature carries `cross_epic_depends_on`, `epic-orchestrator` runs
+`Invoke-EpicCrossReadiness.ps1` with `-Mode main` before step 6 opens the integration-to-main PR;
+on release the main sync runs first (step 3), and the check is re-run immediately before
+`gh pr merge` (`## Cross-Epic Dependencies (cross_epic_depends_on)`).
+
 ## Merge-on-Green Kickoff Parameter
 
 When `epic-orchestrator` delegates a child feature to `Agent(orchestrator)`, the prompt includes
@@ -149,6 +154,17 @@ recording `epic_merge: { merge_commit_sha, target_branch, merged_at }`. The chil
 `epic_merge` only after the merge is confirmed by polling and ancestry check against
 `origin/<integration_branch>` (S9 step 6). Standalone (non-epic)
 orchestration is unchanged: `epic_mode` absent or `false` makes S9 step 6 a no-op.
+
+Epic-child CI verification (issue #1130): the child verifies CI on its own head before S9 step 6
+merges. When no check whose `workflow` is `CI` exists on the child head, for example because the
+repository's `CI` workflow does not list `epic/**` in its `pull_request` branches, the child runs
+the S9 dispatch fallback of `.claude/skills/orchestrate/SKILL.md` and records
+`ci_gate.dispatch_run_id`. When a child reports that it is blocked at S9 because no `CI` run exists
+on its head, `epic-orchestrator` dispatches `CI` once on the child branch
+(`gh workflow run CI --ref <child branch>`) as the fallback and resumes the child at S9 to record
+the run. A child merge into the integration branch is never accepted without a green `CI` run on
+the child head SHA: `enforce-epic-merge-gate-child-ci.ps1` denies it with
+`EPIC_CHILD_CI_NOT_VERIFIED`.
 
 The run gates `enforce-orchestration-preimplementation-gate.ps1` and `enforce-epic-wave-barrier.ps1` locate the epic checkpoint by the `integration_branch:` value of this line. They select the live worktree whose `artifacts/orchestration/epic-orchestrator-state.json` records `route_id` `epic` and that integration branch, prefer the worktree that has the branch checked out when more than one records it, and deny the delegation with `TARGET_WORKTREE_NOT_DERIVABLE` or `TARGET_WORKTREE_AMBIGUOUS` when none or more than one remains. A stale copy of the epic checkpoint is moved to `artifacts/orchestration/handoff/` rather than left at a worktree root. The child run's own delegations to implementation agents carry the canonical issue-number line and `branch:` label defined in `.claude/skills/orchestrate/SKILL.md` `## Issue Number Consistency`.
 
@@ -228,12 +244,26 @@ concrete path is resolved from the checkpoint's current state, so the dependent 
 `orchestrator`/`atomic-planner` is told exactly which upstream artifacts are relevant rather than
 being expected to rediscover prior design decisions from the diff alone.
 
+A recorded `Owner directives:` block is passed verbatim to each child whose scope matches an
+entry, as defined in the `owner-directives` skill; `epic-orchestrator` never authors or edits
+entries. Pass-down is hook-level: the coordinator records a directive for the epic in the
+ledger `artifacts/orchestration/owner-directives.jsonl` of the epic worktree, and on Claude Code
+the PreToolUse hook `enforce-owner-directive-pass-down.ps1` reads the epic checkpoint and that
+ledger for every child worker, so a directive reaches a running child without the epic
+orchestrator acting. An entry whose scope names the epic issue and the integration branch
+applies to every child (epic fan-out). The orchestrator stop hook reports
+`OWNER_DIRECTIVE_RELAY_MISSING` for a running child (`merge_status` `worktree_created`,
+`pr_open`, `ci_green`, or `merge_conflict`) whose checkpoint neither holds a selected entry nor
+links back to this epic.
+
 ## Merge-Conflict Handling (Fan-In)
 
 The merge-conflict remediation loop runs inside the child feature's own `orchestrator` instance
 (the same one that executes S9 step 6), reusing the existing R1–R5 loop
 (`.claude/skills/orchestrate/SKILL.md` "Remediation Loop (R1–R5)") unmodified — no new loop is
 owned by `epic-orchestrator`.
+
+When the child's feature worktree holds a valid config, the child-side check and the regenerate path run first: the child confirms CI on the integration tip as `## Integration-Tip Regeneration` states, then applies the regenerate path of `## Merge-Conflict Remediation` in `.claude/skills/orchestrate/SKILL.md`, and only its fallback starts the procedure below (issue #1156).
 
 Procedure, triggered by S9 step 6's merge failure:
 
@@ -255,6 +285,8 @@ Procedure, triggered by S9 step 6's merge failure:
    `step9_status: "blocked_conflict_loop_limit"` (parallel to `blocked_ci_loop_limit`), does not
    write DONE, and halts. It reports this status to `epic-orchestrator`, which mirrors it into
    the epic checkpoint's per-feature `merge_status: "blocked_conflict_loop_limit"` field.
+6. A resolved conflict produces a new child head, so S9 runs again against it, and the fan-in
+   merge is accepted only with a green `CI` run on that new head (issue #1130).
 
 ## Wave Barrier (Two-Layer Design)
 
@@ -294,16 +326,227 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged, 
 `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
 on resume, not from in-memory completion notifications alone.
 
+## Early Dependent Starts (early_start)
+
+This section applies only to a feature whose manifest entry carries `early_start_on`. Without
+that field this section does not apply, and every other section of this skill governs unchanged.
+Under the main-session fallback of `## Nesting Depth`, no `epic-orchestrator` runs the parent
+steps below, so the feature keeps the wave barrier and its `early_start_on` field is not acted on.
+
+**Opt-in.** A feature opts in through the manifest field `early_start_on: <upstream issue_num>`,
+which must be one of its `depends_on` values. The manifest is human-authored and the wave
+computation reads only `depends_on`, so the field moves no wave. The dependent may then start
+before its upstream merges, once the upstream has settled its interface, and it may reach
+`pr_open` only after the upstream merged and the dependent merged that result into its branch.
+
+**Key and writers.**
+
+- `features[].early_start` on the dependent holds `dependency`, `upstream_branch`,
+  `interface_settled_at`, `interface_evidence`, and later `synced_at`. `epic-orchestrator`, the
+  only writer of `features[]`, writes it from the manifest field and the evidence file.
+- `<upstream FEATURE>/evidence/other/interface-settled.<timestamp>.md` carries `Timestamp:`,
+  `Upstream-Head:`, and `Interface-Paths:` (repository-relative paths). The upstream child writes
+  it (a plan task, otherwise its `orchestrator` after S5) and pushes it to the upstream branch;
+  the upstream's kickoff prompt asks for it only when a dependent names that upstream.
+- `early_start_synced_at` is a tolerated top-level key of the dependent child's checkpoint,
+  written by the child from the clock in step 8.
+- `early_start.synced_at` on the epic feature is written by `epic-orchestrator` in the write that
+  moves the feature to `pr_open` or later, after the ancestry check of step 9.
+
+The bounded child return keeps its eight fields; the parent reads the child key from the child
+checkpoint under `worktree_path`.
+
+**Procedure.**
+
+1. Parent: while an armed dependent waits, look for the evidence file on
+   `origin/<upstream_branch>` every 30 seconds for at most 90 minutes. When none appears, keep the
+   wave barrier.
+2. Parent: write `early_start`, `merge_status: "worktree_created"`, and `worktree_created_at`,
+   then validate the epic checkpoint through the D9 route: the repository CLI
+   `scripts.dev_tools.validate_orchestration_artifacts` with its `epic-orchestrator-state`
+   subcommand, run through Poetry in module form. Installed MCP lags this rule (D9) until the
+   extension release that carries it is installed. An `EPIC_WAVE_BARRIER_VIOLATION` that names the
+   feature means the route lacks the rule (installed MCP, or an integration branch older than this
+   reduction): remove the three values and keep the barrier. The same fallback applies when the
+   sibling `epic-wave-barrier-early-start.ps1` is absent or Layer 1 denies the launch. When the
+   repository CLI is absent or does not run (a destination repository without `scripts/dev_tools/`),
+   the parent likewise removes the three values and keeps the barrier.
+3. Parent: launch with the literal `Epic mode: true` kickoff line plus
+   `Early start: true. dependency: <dep_issue_num>. upstream_branch: <branch>. interface_evidence: <path>. Run the child procedure of ## Early Dependent Starts (early_start) before S7 and S8.`
+   and, for the dependency, the line
+   `Upstream context for <issue_num>: early start on <dep_issue_num> (spec: <path>; plan: <path>; upstream_branch: <branch>; not merged).`
+4. Child: branch from `origin/<integration_branch>`, then run `git fetch origin <upstream_branch>`
+   and `git merge --no-ff origin/<upstream_branch>` before the first plan task.
+5. Child: after S6, wait for the upstream merge. Run
+   `gh pr list --head <upstream_branch> --base <integration_branch> --state merged --json number,mergeCommit`
+   every 30 seconds for at most 90 minutes, then
+   `git merge-base --is-ancestor <merge commit> origin/<integration_branch>`. When the wait ends
+   without a merge, stop with `blocked_reason: "policy_hold"`.
+6. Child: run `git diff --name-only <Upstream-Head> <merge commit> -- <Interface-Paths>`. Any listed
+   path stops the child with `blocked_reason: "premise_falsified"`, unsynced and with no PR.
+7. Child: run `git merge --no-ff origin/<integration_branch>`. The sync is a merge, not a rebase.
+   A conflict enters `## Merge-Conflict Handling (Fan-In)`.
+   When the child's feature worktree holds a valid config, the child-side check and the regenerate path run first, as `## Merge-Conflict Remediation` in `.claude/skills/orchestrate/SKILL.md` states.
+8. Child: re-run the local gate, commit, push, record `early_start_synced_at`, and only then
+   start S7 or S8.
+9. Parent: before the `pr_open` write, check
+   `git merge-base --is-ancestor <upstream merge_commit_sha> origin/<child branch>`. Write
+   `synced_at` only when the check passes and the child key exists; otherwise Layer 2 reports the
+   unsynced message below.
+10. Parent: after a stop in step 5 or step 6, read the diff against the child's plan. When no task
+    cites a changed symbol, or the stop was the wait bound, record fresh `interface_settled_at` and
+    `interface_evidence` and delegate once more on a branch `<child branch>-r<n>` from the pushed
+    child branch, resuming at step 5; otherwise the edge stops with `premise_falsified`.
+    `early_start` stays recorded, because removing it from a started feature would turn a truthful
+    record into a barrier violation.
+
+The sync of steps 5 to 8 finishes before S7 and S8, so the reviewed head is always a post-sync
+head; conflict cycles of an early child are never light.
+
+**Messages.** Layer 2 judges the one edge that a valid record names by its own table: a dependent
+at `not_started` or `worktree_created` reports nothing; at any later or unknown status an unmerged
+upstream reports
+`EPIC_WAVE_BARRIER_VIOLATION: <f> is at pr_open or later while early_start dependency <d> is not merged`,
+and a merged upstream without a non-empty string `synced_at` reports
+`EPIC_WAVE_BARRIER_VIOLATION: <f> is at pr_open or later without a string synced_at for early_start dependency <d>`.
+The validators compare no timestamps on this edge; the ancestry check of step 9 proves the sync.
+Layer 1 skips only the named edge while the upstream is at `worktree_created`, `pr_open`,
+`ci_green`, or `merge_conflict`, and its deny text is unchanged. Every other edge keeps the
+checks of `## Wave Barrier (Two-Layer Design)`.
+
+## Cross-Epic Dependencies (cross_epic_depends_on)
+
+This section applies only when a feature of the manifest carries `cross_epic_depends_on` (issue
+#1162). Without the key it does not apply, and every other section of this skill governs
+unchanged.
+
+**Syntax (D1).** The optional per-feature key `cross_epic_depends_on` is one line: an inline flow
+sequence of flow mappings, each with exactly the keys `epic`, `integration_branch`, and
+`issue_num`, for example
+`cross_epic_depends_on: [{ epic: provider-epic, integration_branch: epic/provider-epic-integration, issue_num: 1188 }]`.
+`epic` is one plain segment that differs from this manifest's `epic`; `integration_branch` is
+`epic/` plus the `epic` value plus `-integration`; `issue_num` names a `features[]` entry of the
+other epic's manifest, read with `git show` from `origin` of that integration branch, or from
+`origin/main` when the branch no longer exists. An absent key or `[]` means no edge. Cross-epic
+edges never enter `depends_on` and move no wave.
+
+**CLI.** `pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1 -Mode validate|feature|main -ManifestPath <manifest> [-Issue <issue_num>] [-WaitSeconds <0 to 540>]`
+exits 0 with compressed JSON (`Mode`, `Decision`, `Reason`, and per-edge or per-epic PR number,
+merge commit SHA, and evaluation time), 1 for a manifest error, and 2 for a usage error.
+
+**Kickoff validation.** At kickoff, alongside `Invoke-EpicWave.ps1`, run `Invoke-EpicCrossReadiness.ps1`
+with `-Mode validate`. Each manifest error begins with its code and is reported as the same
+synthetic Blocking finding as an unresolved `depends_on` entry; no feature is launched. The nine
+codes are `EPIC_CROSS_DEPENDENCY_MALFORMED`, `EPIC_CROSS_DEPENDENCY_UNSUPPORTED_FORM`,
+`EPIC_CROSS_DEPENDENCY_BRANCH_MISMATCH`, `EPIC_CROSS_DEPENDENCY_SAME_EPIC`,
+`EPIC_CROSS_DEPENDENCY_DUPLICATE`, `EPIC_CROSS_DEPENDENCY_UNRESOLVED`,
+`EPIC_CROSS_DEPENDENCY_MANIFEST_UNREADABLE`, `EPIC_CROSS_DEPENDENCY_CYCLE` (a feature-level cycle
+across this manifest and the directly referenced manifests, one hop), and
+`EPIC_CROSS_DEPENDENCY_EARLY_START_CROSS` (`early_start_on` may not name a cross-epic issue).
+
+**Launch hold.** Before a feature with cross-epic edges receives a worktree, run the CLI with
+`-Mode feature -Issue <issue_num>`. A held feature never receives a worktree and stays
+`not_started`; its intra-epic dependents wait through the wave barrier, and independent features
+proceed. The prerequisite PR is the one merged PR into the other integration branch whose listed
+files include the prerequisite feature folder under `docs/features/active/` or
+`docs/features/completed/`, or whose head branch carries the prerequisite issue number as a
+hyphen-delimited token; main-sync chore PRs never match. Each edge takes the first matching row:
+
+| Order | Condition | Decision | Reason |
+|---|---|---|---|
+| 1 | Adapter error, ancestry exit other than 0 or 1, or `PREREQ_SNAPSHOT_INVALID` | hold | `PREREQ_UNVERIFIABLE` |
+| 2 | One matching PR, the other integration branch is absent, and its merge commit is an ancestor of `origin/main` | release | `PREREQ_IN_MAIN` |
+| 3 | No matching merged PR | hold | `PREREQ_PR_NOT_FOUND` |
+| 4 | More than one matching PR | hold | `PREREQ_PR_AMBIGUOUS` |
+| 5 | Merge commit not an ancestor of the other integration branch | hold | `PREREQ_NOT_ANCESTOR` |
+| 6 | Merge commit already an ancestor of the own integration branch | release | `PREREQ_ALREADY_INTEGRATED` |
+| 7 | Otherwise | merge_required | `PREREQ_MERGED_INTEGRATION_MERGE_REQUIRED` |
+
+Every edge `release` gives `release`; any `hold` gives `hold`; otherwise `merge_required` lists
+the distinct integration branches to merge. A feature without cross-epic edges gives `release` with
+`NO_CROSS_EPIC_EDGE`. Adapter failures never fail open.
+
+**Integration merge (D4).** On `merge_required`, for each listed integration branch: fetch it from
+`origin`; when the prerequisite merge commit is already an ancestor of the own integration branch,
+make no merge; otherwise run `git merge --no-ff` of the fetched branch in the integration
+worktree, never a rebase or fast-forward, with conflicts handled as in the main-sync step, then
+push, re-fetch the own integration branch, record `integration_merge_commit_sha` and
+`integrated_at` in the hold record, and launch the feature. `PREREQ_IN_MAIN` makes no merge,
+because the main sync already brings the prerequisite in.
+
+**Context handoff (D10).** After the merge, the child delegation carries one line per cross-epic
+dependency, appended after the epic-mode kickoff line:
+`Upstream context for {issue_num}: cross-epic depends on {epic}#{dep_issue_num} (spec: {dep_spec_path}; plan: {dep_plan_path}; merged as PR #{pr}, commit {sha}, into {other_integration_branch}; integrated into {own_integration_branch} as {integration_sha}).`
+In preparation mode (`epic-plan`) the same line carries `not merged` in place of the merge facts.
+
+**Main hold (D5).** Before step 6 of `## Epic Integration Branch Lifecycle` opens the
+integration-to-main PR, run the CLI with `-Mode main`. Each distinct prerequisite epic takes the
+first matching row: `MAIN_PREREQ_UNVERIFIABLE` (adapter error, hold), `MAIN_PREREQ_PR_NOT_MERGED`
+(no merged PR from the other integration branch into `main`, hold), `MAIN_PREREQ_PR_AMBIGUOUS`
+(more than one, hold), `MAIN_PREREQ_NOT_ANCESTOR` (merge commit not an ancestor of `origin/main`,
+hold), otherwise `MAIN_PREREQ_RELEASED`. No edge gives `not_applicable`; every epic released gives
+`release`; otherwise `hold`. Open the PR only on `release` or `not_applicable`. On release the
+main sync runs first (step 3), so the PR diff no longer carries the other epic's commits. The
+check is re-run immediately before `gh pr merge`. Record the result as `cross_epic_main_gate`.
+
+**Bounded wait (D8).** Re-evaluate holds at every scheduling event. When every runnable feature is
+held and nothing is in flight, or the main hold is in force, call the CLI with `-WaitSeconds 540`;
+it polls every 60 seconds and returns at the first release or at the bound. Repeat the call at
+most 40 times, then record `blocked_reason: "external_dependency"`, regenerate `epic-status.md`,
+and stop; `/epic-run` on the same epic slug resumes. Hold records are a cache, re-derived from
+`gh` and `git` on resume.
+
+**Records (D7).** Each feature carrying the key copies `cross_epic_depends_on[]` into the epic
+checkpoint with `status` (`held`, `released`, `integrated`, `in_main`), `reason`,
+`prerequisite_pr_number`, `prerequisite_merge_commit_sha`, and `verified_at`; a held feature stays
+`not_started`. The top-level `cross_epic_main_gate` carries `status` (`held` or `released`) and
+`prerequisites[]` (`epic`, `integration_branch`, `pr_number`, `merge_commit_sha`, `verified_at`).
+`epic-status.md` gains a cross-epic table (edge, status, reason) only when the key is present.
+Validate the checkpoint through the repository CLI
+`scripts.dev_tools.validate_orchestration_artifacts` with its `epic-orchestrator-state`
+subcommand, run through Poetry in module form, because installed MCP lags these rules until the
+extension release that carries them is installed.
+
+**Status mapping (D7).** A `hold` decision records `held`. `PREREQ_IN_MAIN` records `in_main`.
+`PREREQ_ALREADY_INTEGRATED`, or a completed D4 merge, records `integrated` before the feature is
+launched. `released` is recorded only between a `merge_required` decision and its completed D4
+merge, so a feature is launched only when every entry is `integrated` or `in_main`, the two
+statuses the started-while-held invariant accepts. A main-gate `release` records
+`cross_epic_main_gate` status `released`, and a main-gate `hold` records `held`.
+
+**Disclosure (D5).** The merge-gate hook `enforce-epic-merge-gate.ps1` does not read
+`cross_epic_main_gate`. The integration-to-main hold is a skill-level policy control enforced by
+`epic-orchestrator`, with the completion invariant of the validators as a retrospective backstop,
+consistent with the checkpoint-cache doctrine.
+
 ## Worktree Cleanup
 
 After a child feature's `epic_merge.merge_commit_sha` is recorded (S9 step 6 succeeds) and
 `epic-orchestrator` mirrors that into its own checkpoint's `merge_status: "merged"` and
-`merge_confirmed_at`, `epic-orchestrator` (running from the main repository checkout, not any
+`merge_confirmed_at`, recording the child's `pr_number` and `merge_commit_sha` in the matching
+`features[]` entry, `epic-orchestrator` (running from the main repository checkout, not any
 child worktree) issues `git worktree remove <worktree_path>`, gated by
 `.claude/hooks/enforce-epic-worktree-removal-gate.ps1`, which denies with reason
 `EPIC_WORKTREE_REMOVAL_BLOCKED` unless the epic checkpoint's matching `features[]` record has
 `merge_status` in `{merged, worktree_removed}`. On success, `epic-orchestrator` sets
 `merge_status: "worktree_removed"` and `worktree_removed_at`.
+
+## Integration-Tip Regeneration
+
+This section applies only to a repository that declares the regenerate path of `## Merge-Conflict Remediation` in `.claude/skills/orchestrate/SKILL.md` (issue #1156). It keeps generated files on the integration branch current after each child merge, so later child syncs do not conflict on them.
+
+- **Default-off.** In this skill, the integration-tip flow runs only when the integration worktree holds a valid config/orchestration-regeneration.json.
+  `epic-orchestrator` checks this with `pwsh -NoProfile -File .claude/lib/regeneration/Invoke-RegenerationPath.ps1 -Mode Validate` in the integration worktree; a valid config is one for which Validate mode exits 0, and the term has that meaning throughout this skill.
+  Without a valid config, `epic-orchestrator` runs no Tip mode, dispatches no CI, waits for nothing, and appends no entry, so the epic proceeds exactly as before.
+- **Post-merge flow.** After it records a child's `merge_status: "merged"`, the epic orchestrator fetches and fast-forwards the integration worktree, then runs `pwsh -NoProfile -File .claude/lib/regeneration/Invoke-RegenerationPath.ps1 -Mode Tip` there.
+  When the result is applied and lists changed paths, it stages them with `git add -- <changed paths>`, commits with `git commit -F <message file>` (admitted by the preimplementation allowance `Get-EpicRegenerationAllowance`), and pushes the regeneration commit.
+  It then dispatches `CI` on the integration branch with `gh workflow run CI --ref <integration branch>`, even when no regeneration commit was made, and locates the run with `gh run list --commit <integration tip> --workflow CI`; the epic orchestrator polls every 30 seconds for at most 90 minutes.
+  It appends an integration_regenerations[] entry with trigger post_feature_merge, the merged child's issue number, the merge and regeneration commits, the command exit code, confined, idempotent, outcome, the CI run id and conclusion, and the verification time.
+  The epic orchestrator does not merge another child and does not launch another wave until the integration tip has a successful completed CI run.
+- **Not applied.** When the Tip result is not applied, the entry point has restored every path it changed, no regeneration commit is made, the CI dispatch and wait still run, and the entry records outcome not_applied. Later child syncs then reach the feature-side classifier as usual.
+- **Child verification.** In epic mode, the child-side check applies: the child runs Validate mode in its feature worktree before merging the integration branch, in fan-in conflict handling and in early-start step 7.
+  With a valid config it confirms that the integration tip has a successful completed CI run through `gh run list --commit <integration tip> --workflow CI`; the child polls every 30 seconds for at most 90 minutes, and on timeout it follows the existing wait branch with `blocked_reason: "awaiting_ci"`.
+  Without a valid config the child does not wait.
 
 ## Documentation Maintenance Boundaries
 
@@ -352,9 +595,17 @@ Validate the checkpoint through the
 that same call at the completion gate. The validation is implemented in
 `scripts/dev_tools/validate_epic_orchestrator_state.py`.
 
+When a feature carries `cross_epic_depends_on`, the checkpoint also carries the D7 hold records on
+that feature and the top-level `cross_epic_main_gate`, both key-gated
+(`## Cross-Epic Dependencies (cross_epic_depends_on)`).
+
 **Checkpoint hygiene (issue #673).** The coordinating session never holds a per-feature checkpoint at its own root. Before the first child delegation of a run it moves any `artifacts/orchestration/orchestrator-state.json` at its root to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and writes none there for the rest of the run, because each item's checkpoint lives in that item's worktree. A gated call the coordinator issues on an item's behalf is resolved by the item's issue number and branch, never by the coordinator root.
 
 **Integration-PR checkpoint shape (issue #663).** The integration-to-`main` pull request and its `Agent(pr-author)` delegation are gated against `artifacts/orchestration/epic-orchestrator-state.json`, and no per-feature checkpoint is written for them. Before `epic-orchestrator` opens that pull request, the epic checkpoint carries `route_id: "epic"`, `integration_branch`, `epic_issue_num`, and a `features[]` array in which every entry's `merge_status` is `merged` or `worktree_removed`. Before the `Agent(pr-author)` delegation, `epic-orchestrator` records the `pr-author` routing receipt in that file's `model_routing_receipts[]`. The pr-author gate, the epic base-branch check, the model-routing gate, and the preimplementation gate treat a call as epic scope when its branch signal (or, for a staging command or file edit, the worktree HEAD) equals `integration_branch`; the pull request base must then be `main`.
+
+**Post-fan-in allowance (issue #1136).** Once fan-in is complete, meaning every `features[]` entry records `merge_status` `merged` or `worktree_removed`, the preimplementation gate admits a narrow set of writes on the integration branch that its epic-scope readiness predicate would otherwise deny with `'merge-in-progress'`. The allowance applies only when the worktree HEAD equals `integration_branch` and only for that exact readiness failure. It admits a Write or Edit of `artifacts/pr_body_<N>.md` or `artifacts/pr_body_<N>.receipt.json`, and a `git add` or `git commit` of the status document `docs/features/epics/<epic_feature_folder>/epic-status.md`, where the slug is one plain path segment and agrees with `epic_status_doc_path` when that field is set. A commit may carry only `-m`, `--message`, `-F`, `--file`, and `--trailer`, followed by no pathspec or by `-- <status doc>`; a commit without a pathspec is admitted only when the staged index of the integration worktree is exactly the status document. Two limits apply: a `-F` value or any other token containing a backslash makes the command unresolvable, so use a forward-slash path or `-m`; and in a chained `git add ... && git commit ...` without a pathspec the index is read before the add runs, so issue the commit separately or name `-- <status doc>`. Every other path and command keeps its deny. The allowance (`hook-epic-fan-in.ps1`) is a policy-level control, not a security control.
+
+**Merged-feature follow-up allowance (issue #1141).** Before fan-in is complete, a follow-up on a child feature that has already merged into the integration branch, such as an evidence or documentation correction, is made in the integration worktree on the integration branch. The preimplementation gate admits it for the same exact `'merge-in-progress'` readiness failure, on the integration branch only, when the matching `features[]` entry of the epic checkpoint qualifies: `merge_status` is `merged` or `worktree_removed`, the `feature_folder` basename (after an optional `docs/features/active/` or `docs/features/completed/` prefix) is one plain path segment, `merge_commit_sha` is 40 or 64 lowercase hex characters, and `pr_number` is an integer greater than 0. The allowed roots are `docs/features/active/<basename>/` and `docs/features/completed/<basename>/` of each qualifying feature, plus the epic status document. The gate admits a Write or Edit whose path lies under an allowed root, a `git add [--] <paths>` whose every operand does, and a `git commit` carrying only `-m`, `--message`, `-F`, `--file`, or `--trailer`, followed by `-- <paths>` under the allowed roots or by no pathspec when the staged index is non-empty and every entry lies under an allowed root. `-a`, `--all`, `--amend`, `-A`, any other flag, globs, `..` segments, backslashes, chained non-git commands, and sibling folders such as `<basename>-x/` keep their unchanged deny. The epic checkpoint entry is the only evidence: the allowance reads no per-item checkpoint. Code corrections are not follow-ups; they go through a new orchestrated child. Agents never hand-author a readiness checkpoint to pass the gate. The allowance (`Get-EpicMergedFeatureFollowUpAllowance` in `hook-epic-fan-in.ps1`) is a policy-level control, not a security control.
 
 ## Completion Requirements
 
@@ -366,3 +617,16 @@ that same call at the completion gate. The validation is implemented in
 3. `docs/features/epics/<epic-slug>/epic-status.md` reflects the completed state.
 4. The epic checkpoint passes `validate_epic_orchestrator_state_text` with
    `require_complete=True`.
+
+When a feature carries `cross_epic_depends_on`, completion also requires a released
+`cross_epic_main_gate` with one entry per distinct prerequisite epic.
+
+## Nesting Depth
+
+This chain runs three levels of subagents below the main session: the coordinator at depth 1, each per-feature `orchestrator` at depth 2, and the specialists that orchestrator delegates to at depth 3. Only the depth-2 orchestrator needs the `Agent` tool below the coordinator; specialists do not delegate.
+
+Requirement: Claude Code 2.1.219 or later, `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` unset or at least 3, and the skill invoked from the main session. A run started inside a subagent or fork adds one layer, and a lower limit withholds the `Agent` tool from the per-feature orchestrators.
+
+Outcome when the depth is insufficient: an agent that starts without the `Agent` tool records `blocked_reason: "spawn_agent_unavailable"`, does no specialist work, and returns a line beginning `AGENT_TOOL_UNAVAILABLE`; a coordinator that receives that line from a child halts with the same reason instead of doing the child's work. The `enforce-epic-invocation-origin.ps1` hook also denies a chain delegation with `NESTING_DEPTH_INSUFFICIENT:` when the configured limit is below 3.
+
+Fallback: when the depth cannot be raised, the main session itself launches each per-feature `Agent(orchestrator)` with the same delegation prompt the coordinator would have sent, including `Preparation mode: true` on the preparation path, so each orchestrator runs at depth 1 and its specialists at depth 2.

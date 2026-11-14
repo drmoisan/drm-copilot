@@ -156,7 +156,7 @@ Introduce the smallest seam that enables reliable unit testing. Preferred order:
 
 ## 5) Zero-regression quality gates (hard stop)
 
-Hard stop if any of these regress compared to baseline:
+Hard stop if any of these regress compared to the `Phase 0 baseline`, with test and coverage results read from the single gate run:
 
 - New analyzer findings
 - New compiler/nullable warnings or errors
@@ -184,8 +184,8 @@ If tools cannot run in the environment, STOP implementation and provide plan + p
 2) Capture baseline using repo tasks/commands:
    - analyzer findings (count + key diagnostics),
    - compiler/type-check findings (count + key diagnostics),
-   - relevant failing tests (names + key messages),
-   - coverage baseline for touched files (and overall if enforced).
+   - failing tests (names + key messages) from one run of the test gate, the `Phase 0 baseline`,
+   - coverage baseline for touched files (and overall if enforced) from that run.
 3) Determine invocation mode:
   - if `DIRECTIVE: ORCHESTRATOR HANDOFF MODE` is present, use orchestrator handoff mode and validate full context package.
   - otherwise use direct mode.
@@ -218,8 +218,8 @@ If a plan is supplied in the initial prompt, it is implicitly approved.
 
 **All clarifications/approvals must be resolved before entering Phase C. Once Phase C starts, treat Phases C and D as one uninterrupted execution: you MUST keep working until the problem is completely solved and all items in the todo list are checked off. Do not end your turn until every step is completed and verified. When you say you will do a step, you MUST actually do it. You are autonomous and expected to finish end-to-end unless blocked by an explicit scope gate or missing user approval.**
 
-- Implement in small batches; after each batch run targeted analyzer/build checks + targeted MSTest tests.
-- Confirm coverage does not regress for touched files.
+- Implement in small batches; after each batch run targeted analyzer/build checks. A focused run of one test file to debug a specific failure is debugging only.
+- A touched file meets the coverage thresholds and shows no coverage drop against the `Phase 0 baseline`, read from the single gate run.
 - Continue immediately to next batch until approved plan is complete.
 - Stop mid-stream only if:
   - a quality gate fails (then self-correct and rerun),
@@ -233,8 +233,8 @@ If a plan is supplied in the initial prompt, it is implicitly approved.
 - Report deltas:
   - analyzer findings delta (must be 0 new findings),
   - compiler/type-check findings delta (must be 0 new findings),
-  - failing tests delta (must be 0 new failures),
-  - per-file coverage delta for touched files (must be >= baseline),
+  - failing tests delta in the single gate run (must be 0 new failures),
+  - per-file coverage delta for touched files, read from the single gate run (must be >= the `Phase 0 baseline`),
   - overall coverage delta if applicable (must be >= baseline).
 
 Orchestrator handoff mode completion gate:

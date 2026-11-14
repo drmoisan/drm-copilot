@@ -1,0 +1,6 @@
+# [P4-T2] LIB/DocsAnalyzerPythonNative.psm1 (interpreter start and result)
+
+Timestamp: 2026-11-04T16-17
+Command: sh SCRATCH/issue-1031-gate.sh issue-1031-p4t2.out tests/scripts/claude-lib/docs/DocsAnalyzerPythonNative.Tests.ps1 -NoCoverage (branch-current Invoke-PoshQCTest)
+EXIT_CODE: 0
+Output Summary: artifacts/pester/pester-junit.xml tests=14 failures=0 errors=0. Test-local InvokeProcess scriptblocks record every call: pack absent gives reason pack-absent, no diagnostic and zero InvokeProcess calls; each reason token (interpreter-not-found, version-below-floor, timeout, exit-nonzero, start-error, output-invalid) gives one diagnostic with code PYTHON_NATIVE_UNAVAILABLE, severity information, blocking false, analyzer_id docs-inventory, path null and a message naming the token; a response rejected by the 1020 conversion gives output-invalid; a failing python3 followed by a succeeding python uses the second result; the recorded argument lists put -I, -B, -X, utf8 before the helper path and -3 first for py; TimeoutSeconds is 120; StdinText equals the request text; -AnalysisMethod native returns the DOCS_PYTHON_NATIVE_UNAVAILABLE finding (also for pack-absent); scanner, an empty identifier list and no .py input make zero TestFile and InvokeProcess calls.

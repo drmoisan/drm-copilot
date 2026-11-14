@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:docs:1.0.0:docs-profile",
+  "title": "Docs v1 documentation profile",
+  "description": "Runtime configuration that describes one repository's documentation estate. All repository specificity lives in this artifact; framework code stays domain-neutral.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "extensions", "repository", "audiences", "documentation_roots", "surface_selection", "page_owners", "diataxis_policy", "completion_gates", "artifact_paths"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:docs:1.0.0:docs-profile"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact_kind": {"const": "docs-profile"},
+    "id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+    "extensions": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/extensions"},
+    "repository": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id"],
+      "properties": {"id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"}}
+    },
+    "audiences": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/audience"}},
+    "documentation_roots": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/documentation-root"}},
+    "surface_selection": {"$ref": "#/$defs/surface-selection"},
+    "page_owners": {"type": "array", "items": {"$ref": "#/$defs/page-owner"}},
+    "diataxis_policy": {"$ref": "#/$defs/diataxis-policy"},
+    "completion_gates": {"$ref": "#/$defs/completion-gates"},
+    "artifact_paths": {"$ref": "#/$defs/artifact-paths"}
+  },
+  "$defs": {
+    "audience": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "description"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/audience-id"},
+        "description": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"}
+      }
+    },
+    "documentation-root": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "path", "audience_ids"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+        "path": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
+        "audience_ids": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/audience-ids"}
+      }
+    },
+    "surface-selection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["element_kinds", "source_roots", "exclusions"],
+      "properties": {
+        "element_kinds": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-kind"}},
+        "source_roots": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/paths", "minItems": 1},
+        "exclusions": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/exclusions"},
+        "analyzers": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifiers"}
+      }
+    },
+    "page-owner": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path_or_glob", "owner"],
+      "properties": {
+        "path_or_glob": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/path-or-glob"},
+        "owner": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"}
+      }
+    },
+    "diataxis-policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["modes", "required_front_matter", "directory_modes"],
+      "properties": {
+        "modes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/diataxis-mode"}},
+        "required_front_matter": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/front-matter-field"}},
+        "directory_modes": {"type": "array", "items": {"$ref": "#/$defs/directory-mode"}}
+      }
+    },
+    "directory-mode": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path_or_glob", "mode"],
+      "properties": {
+        "path_or_glob": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/path-or-glob"},
+        "mode": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/diataxis-mode"}
+      }
+    },
+    "completion-gates": {
+      "type": "object", "additionalProperties": false,
+      "required": ["docs_complete", "integration_pr_gate"],
+      "properties": {
+        "docs_complete": {
+          "type": "object", "additionalProperties": false,
+          "required": ["required_dispositions_complete", "allow_deferred", "max_stale_pages", "required_parity_dimensions"],
+          "properties": {
+            "required_dispositions_complete": {"const": true},
+            "allow_deferred": {"type": "boolean"},
+            "max_stale_pages": {"type": "integer", "minimum": 0},
+            "required_parity_dimensions": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/parity-dimension"}}
+          }
+        },
+        "integration_pr_gate": {
+          "type": "object", "additionalProperties": false,
+          "required": ["enabled"],
+          "properties": {"enabled": {"type": "boolean"}}
+        }
+      }
+    },
+    "artifact-paths": {
+      "type": "object", "additionalProperties": false,
+      "required": ["inventory_snapshot", "coverage_ledger", "parity_matrix", "evidence_pins", "validation_receipt"],
+      "properties": {
+        "inventory_snapshot": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
+        "coverage_ledger": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
+        "parity_matrix": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
+        "evidence_pins": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
+        "validation_receipt": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"}
+      }
+    }
+  }
+}

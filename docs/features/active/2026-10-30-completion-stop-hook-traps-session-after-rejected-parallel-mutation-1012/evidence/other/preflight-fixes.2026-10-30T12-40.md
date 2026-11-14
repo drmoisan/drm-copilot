@@ -1,0 +1,14 @@
+# Preflight Fixes (Issue #1012)
+
+Timestamp: 2026-10-30T12-40
+Plan: docs/features/active/2026-10-30-completion-stop-hook-traps-session-after-rejected-parallel-mutation-1012/plan.2026-10-30T08-10.md
+
+All fixes are task-text edits. No task was added, removed, or reordered, and no asserted outcome changed.
+
+1. [P1-T2] (AC-7 Rejected row) - fixture precondition. `Resolve-OrchestratorOutputCheckpointPath` reports `Rejected` for a well-shaped leaf such as `artifacts/orchestration/other.json` only after a target resolves (`Test-OrchestratorOutputCheckpointLeaf` mismatch); with no live checkpoint the result is `NoTarget`, and after the change the valid signal would allow, so the row's "blocks as `Rejected`" assertion could not hold. The row now adds `parallel_slug: run-a` and a live root holding a valid `run-a` checkpoint, matching the pattern of `R14 rejects the item checkpoint leaf for an epic validation before any read`.
+2. [P1-T2] (AC-9 rows) - observation seam. The rows compare `Ok`, `Repairable`, and `Message`, but `Invoke-OrchestratorOutputValidation` returns only `Ok` and `Message`. The task now states that the comparison is made on the result of `Get-OrchestratorOutputBlockDecision`.
+3. [P1-T4] - acceptance wording. [P1-T3] names its module as failing, not individual rows, and `test_skill_does_not_restate_full_code_set` passes before any skill names a code. The acceptance now states which [P1-T3] tests must be listed as failing and that this one may pass before the change.
+4. [P2-T1] - asserted literals. The task now quotes the literals `output signal` and `not one of the nine enums`, which `test_rule_section_states_output_signal_and_not_an_enum` in [P1-T3] asserts.
+5. [P3-T2], [P3-T3], [P3-T4] - asserted literals. The tasks now quote `emits no rejection signal` and `run-existence check is evaluated first`, which [P1-T3] asserts. The previous [P3-T2] wording ("rejections emit no rejection signal") reads naturally as the plural form `emit`, which the [P1-T3] substring check would not match.
+6. [P5-T8] - command text and comparison set. The `$(git merge-base ...)` substitution is refused by the worktree isolation guard, so `BASE` is now derived by its own command. `git status --porcelain` collapses an untracked directory into one entry, so `--untracked-files=all` is added. The three planning records present before [P0-T1] (`issue.md`, `research/research.2026-10-30T12-15.md`, and the staged `docs/features/potential/promoted/2026-10-30-completion-stop-hook-traps-session-after-rejected-parallel-mutation.md`) are not written by the plan and would otherwise appear in the union, so they are excluded by full path. The File Inventory and the prohibited-path checks are unchanged.
+7. [P5-T9] - command text. Same `$(...)` substitution change as fix 6, and `--untracked-files=all` added to the porcelain listing.

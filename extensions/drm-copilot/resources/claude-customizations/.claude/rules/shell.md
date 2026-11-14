@@ -31,6 +31,8 @@ Run the toolchain in this order and restart from step 1 if any step fails or rew
 Do not stop the loop until formatting, linting, and testing complete without errors in a
 single pass. Do not substitute the VS Code task wrappers for the native command in automation.
 
+Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+
 ## Native Invocation and Environment
 
 - The toolchain is native bash: the wrapper `scripts/bash/shell-qc.sh` and its library

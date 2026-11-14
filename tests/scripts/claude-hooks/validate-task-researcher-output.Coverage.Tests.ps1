@@ -22,6 +22,8 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
         }
 
         . (Join-Path $PSScriptRoot 'SubagentStopEnvelope.Helpers.ps1')
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
 
         function Invoke-TaskResearcherOutputStdinEntry {
             # Drives the hook through the & route with stdin and stderr redirected; both are restored in finally.
@@ -46,6 +48,8 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
             return [pscustomobject]@{ ExitCode = $exitCode; Stderr = $errorWriter.ToString(); Thrown = $thrown }
         }
     }
+
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 
     It 'exits 2 with a stderr reason when last_assistant_message lacks a research-path' -Tag 'E3-Entry' {
         # Arrange
@@ -155,7 +159,12 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
 
     It 'exits 2 with the validate-task-researcher-output: prefix when subagentstop-envelope.ps1 fails to load' -Tag 'E3-Entry' {
         # Arrange: only the helper dot-source fails; the dependency guard loads normally.
-        Mock Join-Path { throw 'simulated load failure: subagentstop-envelope.ps1' } -ParameterFilter { $ChildPath -eq 'subagentstop-envelope.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'subagentstop-envelope.ps1') { throw 'simulated load failure: subagentstop-envelope.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage "research-path: $script:ResearchPath"
         # Act
         try { $result = Invoke-TaskResearcherOutputStdinEntry -Stdin $stdin }
@@ -208,6 +217,8 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
 Describe 'Test-IsValidResearchFileName rule R1 (issue #905)' {
     BeforeAll {
         . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-task-researcher-output.ps1')
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
     }
 
     It 'R1 accepts <Name>' -ForEach @(
@@ -267,6 +278,8 @@ Describe 'Test-IsValidResearchFileName rule R1 (issue #905)' {
 Describe 'Test-NumericDerivationEvidence rule R3 (issue #905)' {
     BeforeAll {
         . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-task-researcher-output.ps1')
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
         # The thirteen lines Get-CompleteNumericDerivationEvidence (validate-task-researcher-output.Tests.ps1) returns with its defaults.
         $script:R3EvidenceText = @(
             '- Numeric spec.md acceptance criterion: 2 reflection call sites'
@@ -330,6 +343,8 @@ Describe 'Invoke-TaskResearcherOutputValidation dependency decision in process (
     BeforeAll {
         . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-task-researcher-output.ps1')
         . (Join-Path $PSScriptRoot 'SubagentStopEnvelope.Helpers.ps1')
+        . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
     }
 
     It 'returns the guard ExitCode and Reason object in process when a dependency failure is recorded (S6 by design)' {

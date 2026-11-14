@@ -7,12 +7,16 @@
     epic checkpoint from the active session receipt before any local checkpoint exists. Native
     compatibility paths use the local epic context. Mutation remains blocked until every
     dependency is merged or worktree_removed.
+    The one edge that a valid early_start record of the feature names is skipped while its
+    upstream is at worktree_created, pr_open, ci_green, or merge_conflict (issue #1097,
+    predicates in the sibling epic-wave-barrier-early-start.ps1).
 #>
 [CmdletBinding()]
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 try { . (Join-Path $PSScriptRoot 'codex-epic-child-launch-attestation.ps1') } catch { Add-HookDependencyFailure -Name 'codex-epic-child-launch-attestation.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'epic-wave-barrier-early-start.ps1') } catch { Add-HookDependencyFailure -Name 'epic-wave-barrier-early-start.ps1' -ErrorRecord $_ }
 
 $script:AllowedDependencyStatuses = @('merged', 'worktree_removed')
 
@@ -121,8 +125,15 @@ function Test-CodexWaveDependenciesReady {
         @($Feature.depends_on).Count -eq 0) {
         return $true
     }
+    # Issue #1097: the record that a valid early_start dependency names, keyed like each edge.
+    $earlyStartReference = Get-EpicWaveEarlyStartReference -Feature $Feature
+    $earlyStartRecord = if ($null -ne $earlyStartReference) { Find-CodexWaveFeature -Checkpoint $EpicCheckpoint -Key ([string]$earlyStartReference) } else { $null }
     foreach ($dependency in @($Feature.depends_on)) {
         $record = Find-CodexWaveFeature -Checkpoint $EpicCheckpoint -Key ([string]$dependency)
+        # The early-start edge with a usable upstream branch is not required to be merged.
+        if (Test-EpicWaveEarlyStartEdge -ExemptRecord $earlyStartRecord -DependencyRecord $record) {
+            continue
+        }
         if ($null -eq $record -or
             @($record.PSObject.Properties.Name) -notcontains 'merge_status' -or
             $script:AllowedDependencyStatuses -notcontains [string]$record.merge_status) {

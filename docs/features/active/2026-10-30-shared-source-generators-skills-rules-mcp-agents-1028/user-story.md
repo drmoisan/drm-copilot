@@ -4,7 +4,7 @@
 - Parent: epic #1018, child 3
 - Owner: drmoisan
 - Status: Draft
-- Last Updated: 2026-10-30T23-10
+- Last Updated: 2026-10-31
 - Work Mode: full-feature
 - Spec: `docs/features/active/2026-10-30-shared-source-generators-skills-rules-mcp-agents-1028/spec.md`
 
@@ -61,6 +61,7 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 ### Instructions
 
 - [ ] `AGENTS.md` is a hand-authored source with no generated-file header and no embedded rule copies, and `CLAUDE.md` imports it with `@AGENTS.md` and adds only Claude-only text.
+- [ ] Running the Codex native converter (MCP tool, extension command or Poetry script) on a source set with standing-guidance files no longer writes or overwrites `AGENTS.md`; the converter report lists those files as not emitted with a reason, and the TypeScript and Python implementations behave the same (owner decision H3).
 
 ### MCP server configuration
 
@@ -93,7 +94,7 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 
 - Re-opening any settled design decision in the epic record.
 - Symlinked mirrors.
-- Generating hooks (child 5), pushing generators or generated layers down to destination repositories and per-ecosystem pack selection (child 4), and retiring `.github/skills`, `.github/agents`, `scripts/dev-tools/sync-agents-from-instructions.ps1` or the Codex native converter's `AGENTS.md` output (child 6, per OQ-6).
+- Generating hooks (child 5), pushing generators or generated layers down to destination repositories and per-ecosystem pack selection (child 4), and retiring `.github/skills`, `.github/agents` or `scripts/dev-tools/sync-agents-from-instructions.ps1` (child 6; for `sync-agents-from-instructions.ps1`, per OQ-6 as decided by owner H3). Redirecting the Codex native converter so it no longer writes `AGENTS.md` is in scope for this child (H3).
 - Editing `.github/copilot-instructions.md` (child 6).
 - Editing child 2's files or spec, including `extensions/drm-copilot/src/lib/development-docs/write-scopes.ts` and `.claude/lib/development-docs/DevelopmentDocsRoot.psm1`; the amendment that OQ-9 requires belongs to child 2's owner.
 - Editing `scripts/dev_tools/generate_codex_agent_variants.py`, `scripts/dev-tools/Invoke-FullRelease.ps1` or any CI workflow file.

@@ -1,6 +1,6 @@
 ---
 name: invoke-powershell-engineer
-description: Invoke the powershell-typed-engineer worker to design, implement, and verify PowerShell changes within typed repository boundaries. Applies PoshQC formatting, analysis, and testing with a one-to-two production-file direct-mode budget and zero-regression quality gates.
+description: Invoke the powershell-typed-engineer worker to design, implement, and verify PowerShell changes within typed repository boundaries. Applies PoshQC formatting, analysis, and testing with a one-to-two production-file direct-mode budget and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
 ---
 
 # Implement PowerShell Skill
@@ -27,7 +27,7 @@ If the estimated scope exceeds the direct-mode budget, this skill defers to the 
 ## Output Paths
 
 - PowerShell source (`*.ps1`, `*.psm1`, `*.psd1`) and Pester test (`*.Tests.ps1`) files within the approved scope.
-- Baseline evidence under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
+- Baseline evidence (static and `Phase 0 baseline` test-suite) under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
 - This location is canonical per evidence-and-timestamp-conventions and is not overridable. See `.agents/skills/evidence-and-timestamp-conventions/SKILL.md` for the canonical evidence path authority.
 - Plan artifacts under the active feature folder when the task is feature-scoped.
 
@@ -39,7 +39,7 @@ The worker must return the `powershell-qa-gate` reporting block:
 2. Baseline (PSScriptAnalyzer, Pester, coverage status).
 3. Plan (design and test strategy, including minimal DI seams and external executable wrapper mock strategy).
 4. Diffs (patch-style or full-file replacements).
-5. QA Gate Results (PSScriptAnalyzer, Pester, and coverage deltas, or clearly marked **unverified**).
+5. QA Gate Results (PSScriptAnalyzer, Pester, and coverage deltas against the baseline, with failures and per-file coverage read from the single gate run, or clearly marked **unverified**).
 
 ## Worker Routing
 

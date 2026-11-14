@@ -26,7 +26,10 @@ BeforeAll {
     Mock -CommandName Stop-Process -ModuleName SideloadedExtensionPublish -MockWith { throw 'unmocked host seam: Stop-Process' }
     Mock -CommandName Get-Process -ModuleName SideloadedExtensionPublish -MockWith { throw 'unmocked host seam: Get-Process' }
 
-    $script:fixtureVsixPath = 'C:\fixture\vsix\drm-copilot-20260102-030405.vsix'
+    $script:FixtureRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'publish-sideloaded-extension-root'
+    $script:Repo = Join-Path $script:FixtureRoot 'repo'
+    $script:VsixDir = Join-Path $script:FixtureRoot 'vsix'
+    $script:fixtureVsixPath = Join-Path $script:VsixDir 'drm-copilot-20260102-030405.vsix'
 }
 
 AfterAll {
@@ -35,12 +38,16 @@ AfterAll {
 
 Describe 'publish-sideloaded-extension.ps1 entry point - real orchestrator' {
     BeforeEach {
+        # The mocks run while the entry script is executing, where $script: names the entry
+        # script's scope, so they close over local copies of the fixture paths.
+        $vsixDir = $script:VsixDir
+        $extensionRoot = Join-Path -Path $script:Repo -ChildPath 'extensions' -AdditionalChildPath 'drm-copilot'
         Mock -CommandName Test-Path -ModuleName SideloadedExtensionPublish -MockWith {
             param([string]$LiteralPath)
-            $LiteralPath -ne 'C:\fixture\vsix'
-        }
+            $LiteralPath -ne $vsixDir
+        }.GetNewClosure()
         Mock -CommandName Assert-RequiredCommandAvailable -ModuleName SideloadedExtensionPublish -MockWith { }
-        Mock -CommandName Resolve-ExtensionProjectRoot -ModuleName SideloadedExtensionPublish -MockWith { 'C:\fixture\repo\extensions\drm-copilot' }
+        Mock -CommandName Resolve-ExtensionProjectRoot -ModuleName SideloadedExtensionPublish -MockWith { $extensionRoot }.GetNewClosure()
         Mock -CommandName Resolve-VSCodeCliCommand -ModuleName SideloadedExtensionPublish -MockWith { 'code' }
         Mock -CommandName Write-Information -ModuleName SideloadedExtensionPublish -MockWith { }
         Mock -CommandName Invoke-NpmCiWithRetry -ModuleName SideloadedExtensionPublish -MockWith { }
@@ -50,7 +57,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - real orchestrator' {
 
     It 'AC05-PUBLISH-WHATIF-NOSEAMS makes no state-changing seam call under -WhatIf' {
         # Act
-        $output = @(& $script:entryPath -RepoRoot 'C:\fixture\repo' -VsixOutputDir 'C:\fixture\vsix' -WhatIf)
+        $output = @(& $script:entryPath -RepoRoot $script:Repo -VsixOutputDir $script:VsixDir -WhatIf)
 
         # Assert
         $output[-1] | Should -BeLike '*drm-copilot-*.vsix'
@@ -65,7 +72,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - real orchestrator' {
         # Act: the preference is set in a child scope that the entry script inherits.
         $output = @(& {
                 Set-Variable -Name WhatIfPreference -Value $true
-                @(& $script:entryPath -RepoRoot 'C:\fixture\repo' -VsixOutputDir 'C:\fixture\vsix')
+                @(& $script:entryPath -RepoRoot $script:Repo -VsixOutputDir $script:VsixDir)
             })
 
         # Assert
@@ -80,7 +87,8 @@ Describe 'publish-sideloaded-extension.ps1 entry point - real orchestrator' {
 
 Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     BeforeEach {
-        Mock -CommandName Invoke-SideloadedExtensionPublish -MockWith { Write-Output 'C:\fixture\vsix\drm-copilot-20260102-030405.vsix' }
+        $fixtureVsixPath = $script:fixtureVsixPath
+        Mock -CommandName Invoke-SideloadedExtensionPublish -MockWith { Write-Output $fixtureVsixPath }.GetNewClosure()
     }
 
     It 'AC05-PUBLISH-VSIX-OUTPUT returns the VSIX path and resolves both default expressions' {
@@ -99,7 +107,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     }
 
     It 'AC05-PUBLISH-CODECOMMAND-BOUNDEMPTY forwards an explicitly bound empty -CodeCommand' {
-        $null = & $script:entryPath -RepoRoot 'C:\fixture\repo' -CodeCommand ''
+        $null = & $script:entryPath -RepoRoot $script:Repo -CodeCommand ''
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
             $PesterBoundParameters.ContainsKey('CodeCommand') -and $PesterBoundParameters['CodeCommand'] -eq ''
@@ -107,7 +115,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     }
 
     It 'AC05-PUBLISH-CODECOMMAND-UNBOUND forwards no CodeCommand key when -CodeCommand is not supplied' {
-        $null = & $script:entryPath -RepoRoot 'C:\fixture\repo'
+        $null = & $script:entryPath -RepoRoot $script:Repo
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
             -not $PesterBoundParameters.ContainsKey('CodeCommand')
@@ -115,7 +123,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     }
 
     It 'AC05-PUBLISH-CONFIRM-FORWARDED forwards -Confirm:$false' {
-        $null = & $script:entryPath -RepoRoot 'C:\fixture\repo' -Confirm:$false
+        $null = & $script:entryPath -RepoRoot $script:Repo -Confirm:$false
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
             $PesterBoundParameters.ContainsKey('Confirm') -and -not [bool]$PesterBoundParameters['Confirm']
@@ -123,7 +131,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     }
 
     It 'forwards -Verbose and -WarningAction and does not forward -ErrorAction' {
-        $null = & $script:entryPath -RepoRoot 'C:\fixture\repo' -Verbose -WarningAction SilentlyContinue -ErrorAction Stop 4>$null
+        $null = & $script:entryPath -RepoRoot $script:Repo -Verbose -WarningAction SilentlyContinue -ErrorAction Stop 4>$null
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
             $PesterBoundParameters.ContainsKey('Verbose') -and
@@ -135,7 +143,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     }
 
     It 'forwards the switch parameters as passed' {
-        $null = & $script:entryPath -RepoRoot 'C:\fixture\repo' -UseInsiders -SkipNpmCi -SkipCompile -SkipInstall -Force
+        $null = & $script:entryPath -RepoRoot $script:Repo -UseInsiders -SkipNpmCi -SkipCompile -SkipInstall -Force
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
             $UseInsiders -and $SkipNpmCi -and $SkipCompile -and $SkipInstall -and $Force -and
@@ -146,7 +154,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     It 'AC13-WHATIF-INHERITED forwards WhatIf true when WhatIfPreference is inherited and -WhatIf is unbound' {
         & {
             Set-Variable -Name WhatIfPreference -Value $true
-            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo'
+            $null = & $script:entryPath -RepoRoot $script:Repo
         }
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
@@ -157,7 +165,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     It 'AC13-WHATIF-BOUND-FALSE-WINS forwards WhatIf false when -WhatIf:$false is bound under an inherited true preference' {
         & {
             Set-Variable -Name WhatIfPreference -Value $true
-            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo' -WhatIf:$false
+            $null = & $script:entryPath -RepoRoot $script:Repo -WhatIf:$false
         }
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
@@ -168,7 +176,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     It 'AC13-CONFIRM-NONE forwards Confirm false for an inherited ConfirmPreference of None' {
         & {
             Set-Variable -Name ConfirmPreference -Value 'None'
-            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo'
+            $null = & $script:entryPath -RepoRoot $script:Repo
         }
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
@@ -179,7 +187,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     It 'AC13-CONFIRM-LOW forwards Confirm true for an inherited ConfirmPreference of Low' {
         & {
             Set-Variable -Name ConfirmPreference -Value 'Low'
-            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo'
+            $null = & $script:entryPath -RepoRoot $script:Repo
         }
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
@@ -190,7 +198,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     It 'AC13-CONFIRM-HIGH adds no Confirm key for an inherited ConfirmPreference of High' {
         & {
             Set-Variable -Name ConfirmPreference -Value 'High'
-            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo'
+            $null = & $script:entryPath -RepoRoot $script:Repo
         }
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
@@ -201,7 +209,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     It 'AC13-VERBOSE-INHERITED forwards Verbose true for an inherited VerbosePreference of Continue' {
         & {
             Set-Variable -Name VerbosePreference -Value 'Continue'
-            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo' 4>$null
+            $null = & $script:entryPath -RepoRoot $script:Repo 4>$null
         }
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
@@ -212,7 +220,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     It 'AC13-DEBUG-INHERITED forwards Debug true for an inherited DebugPreference of Continue' {
         & {
             Set-Variable -Name DebugPreference -Value 'Continue'
-            $null = & $script:entryPath -RepoRoot 'C:\fixture\repo' 5>$null
+            $null = & $script:entryPath -RepoRoot $script:Repo 5>$null
         }
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
@@ -221,7 +229,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     }
 
     It 'AC13-BOUND-DEBUG-INFO-PROGRESS forwards bound -Debug, -InformationAction, and -ProgressAction' {
-        $null = & $script:entryPath -RepoRoot 'C:\fixture\repo' -Debug -InformationAction Continue -ProgressAction SilentlyContinue 5>$null
+        $null = & $script:entryPath -RepoRoot $script:Repo -Debug -InformationAction Continue -ProgressAction SilentlyContinue 5>$null
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
             $PesterBoundParameters.ContainsKey('Debug') -and
@@ -234,7 +242,7 @@ Describe 'publish-sideloaded-extension.ps1 entry point - parameter forwarding' {
     }
 
     It 'AC13-DEFAULT-NO-WHATIF adds no WhatIf key under default preferences' {
-        $null = & $script:entryPath -RepoRoot 'C:\fixture\repo'
+        $null = & $script:entryPath -RepoRoot $script:Repo
 
         Should -Invoke -CommandName Invoke-SideloadedExtensionPublish -Times 1 -Exactly -ParameterFilter {
             -not $PesterBoundParameters.ContainsKey('WhatIf')

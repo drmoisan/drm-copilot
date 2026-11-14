@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "stage": "plan",
+  "research_path": "docs/features/active/regenerate-after-integration-merge-1156/research/research.2026-11-09T21-35.md",
+  "spec_path": "docs/features/active/regenerate-after-integration-merge-1156/spec.md",
+  "plan_path": "docs/features/active/regenerate-after-integration-merge-1156/plan.2026-11-09T16-31.md",
+  "plan_hash": "971922c12a45bb1b37037dc8372abcb68e436039",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "REVISIONS REQUIRED",
+  "preflight_defects": [
+    "[P2-T1] | design-check gap: a rule in the script entry body has no test that fails (spec AC3.7, the script body prints one JSON object) | Check (b) places the Import-Module calls for RegenerationConfig.psm1, RegenerationClassifier.psm1, and RegenerationDelta.psm1 on the guarded path while dot-sourcing tests import the modules in BeforeAll, so deleting an import fails no test. Required change: add AST check (f) to Invoke-RegenerationPath.Tests.ps1 asserting the guarded if body holds, before its Invoke-RegenerationPathCommand call, one Import-Module per module built by a $PSScriptRoot join with -ErrorAction Stop, failing when any import is removed or moved; drop the 'or inside a function that Invoke-RegenerationPathCommand calls' alternative from (b) or name that function exactly.",
+    "[P2-T1] | design-check gap: a default-off rule sits in an adapter wrapper that every test mocks (spec ### Config file default-off and ### Entry point config stage) | Read-RegenerationConfigText -ConfigPath returns $null for an absent file but every table row mocks it. Required change: give Read-RegenerationConfigText injected -TestPath/-ReadText scriptblock seams (defaults Test-Path -LiteralPath and Get-Content -Raw) and add direct in-memory cases: absent file returns $null with the reader never called; present file returns the reader's text; both seams receive exactly the supplied -ConfigPath."
+  ],
+  "resolved_this_run": [
+    "[P2-T1] script-layer AST checks (param block without Mandatory/ValidateSet, @PSBoundParameters forwarding, one ConvertTo-RegenerationResultJson call, one exit; AC3.7 in Covers)",
+    "[P3-T3]/[P3-T4] allowance config root and joined path; epic-scope wiring argument forwarding on both surfaces",
+    "[P2-T1] AST check (b) import and strict-mode placement"
+  ],
+  "preflight_fix_record": "docs/features/active/regenerate-after-integration-merge-1156/evidence/other/preflight-fixes.2026-11-10T01-59.md",
+  "preflight_fix_reversal_record": "docs/features/active/regenerate-after-integration-merge-1156/evidence/other/preflight-fix-reversal.2026-11-10T02-01.md",
+  "planning_cycle": "two planner revisions and two preflights in this run; first preflight returned 2 substantive defects (resolved by the second revision); final preflight returned 2 new substantive defects in [P2-T1] (open); halted per atomic-plan-contract At most one return",
+  "recorded_at": "2026-11-10T02:15:45Z"
+}

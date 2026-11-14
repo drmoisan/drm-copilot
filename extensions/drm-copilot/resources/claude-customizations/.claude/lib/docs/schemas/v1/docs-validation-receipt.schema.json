@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:docs:1.0.0:docs-validation-receipt",
+  "title": "Docs v1 validation receipt",
+  "description": "Result of one documentation validation run, bound to its pinned inputs and revision.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "extensions", "mode", "repository", "revision", "inputs", "counts", "validation_result", "findings", "issued_at", "writer"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:docs:1.0.0:docs-validation-receipt"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact_kind": {"const": "docs-validation-receipt"},
+    "id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+    "extensions": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/extensions"},
+    "mode": {"enum": ["profile", "ledger", "matrix", "docs-complete"]},
+    "repository": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+    "revision": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/revision"},
+    "inputs": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/artifact-pin"}},
+    "counts": {"$ref": "#/$defs/counts"},
+    "validation_result": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/validation-outcome"},
+    "findings": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/finding"}},
+    "issued_at": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/timestamp"},
+    "writer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["tool", "version"],
+      "properties": {
+        "tool": {"const": "drm-copilot-docs"},
+        "version": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"}
+      }
+    }
+  },
+  "$defs": {
+    "count": {"type": "integer", "minimum": 0},
+    "counts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["elements_total", "undocumented", "stale_pages", "by_disposition", "by_kind"],
+      "properties": {
+        "elements_total": {"$ref": "#/$defs/count"},
+        "undocumented": {"$ref": "#/$defs/count"},
+        "stale_pages": {"$ref": "#/$defs/count"},
+        "by_disposition": {
+          "type": "object", "additionalProperties": false,
+          "required": ["documented", "excluded", "deferred"],
+          "properties": {
+            "documented": {"$ref": "#/$defs/count"},
+            "excluded": {"$ref": "#/$defs/count"},
+            "deferred": {"$ref": "#/$defs/count"}
+          }
+        },
+        "by_kind": {
+          "type": "object", "additionalProperties": false,
+          "required": ["cli-command", "cli-option", "http-route", "config-key", "public-symbol", "architecture-component"],
+          "properties": {
+            "cli-command": {"$ref": "#/$defs/count"},
+            "cli-option": {"$ref": "#/$defs/count"},
+            "http-route": {"$ref": "#/$defs/count"},
+            "config-key": {"$ref": "#/$defs/count"},
+            "public-symbol": {"$ref": "#/$defs/count"},
+            "architecture-component": {"$ref": "#/$defs/count"}
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"validation_result": {"const": "pass"}}, "required": ["validation_result"]},
+      "then": {"properties": {"findings": {"items": {"properties": {"severity": {"enum": ["warning", "info"]}}}}}},
+      "else": {"properties": {"findings": {"minItems": 1, "contains": {"properties": {"severity": {"const": "error"}}, "required": ["severity"]}}}}
+    }
+  ]
+}

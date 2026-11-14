@@ -145,6 +145,8 @@ For baseline evidence artifacts stored under `evidence/baseline/`, include an ou
 
 The summary should be concise, human-readable, and include the most important result signal (e.g., “All checks passed”, “767 passed”, coverage total, or a brief error description).
 
+A Phase 0 test-suite baseline artifact's `Output Summary:` records the pass and fail counts and the numeric coverage of its one parallel gate run (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, or one Jest coverage run); the final gate is compared with this `Phase 0 baseline`.
+
 If a fail-before run is required but impossible, include a short exception dossier with:
 - `WhyFailingRunImpossible: <1–3 sentences>`
 - An alternative proof section (e.g., absence-of-test proof)

@@ -76,6 +76,11 @@ Describe 'validate-orchestrator-output.ps1 SubagentStop envelope' {
         }
     }
 
+    AfterAll {
+        # The hook replaces the run module; discard only the stale fixture-owned scope binding.
+        Reset-EpicStateProbeModuleBinding
+    }
+
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     It 'E-ORC-1 blocks with exit 2 when last_assistant_message is empty' {
@@ -168,7 +173,12 @@ Describe 'validate-orchestrator-output.ps1 SubagentStop envelope' {
     It 'E-ORC-7 exits 2 naming subagentstop-envelope.ps1 when the helper fails to load, with stop_hook_active true' {
         # Arrange
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: subagentstop-envelope.ps1' } -ParameterFilter { $ChildPath -eq 'subagentstop-envelope.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'subagentstop-envelope.ps1') { throw 'simulated load failure: subagentstop-envelope.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
 
         # Act
         $result = Invoke-HookTail -StdinText '{"last_assistant_message":"Final summary.","stop_hook_active":true}'

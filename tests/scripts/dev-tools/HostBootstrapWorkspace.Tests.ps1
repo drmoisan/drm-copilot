@@ -17,6 +17,15 @@ BeforeAll {
     $script:ModulePath = (Resolve-Path "$PSScriptRoot/../../../scripts/dev-tools/HostBootstrapWorkspace.psm1").Path
     Import-Module $script:ModulePath -Force
 
+    # Portable fixture root: fully qualified on every host (the checkout drive on Windows,
+    # '/' elsewhere) and never created; every fixture path and expectation is joined from it.
+    $script:FixtureRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'hostbootstrapworkspace-root'
+    $script:Ws = Join-Path $script:FixtureRoot 'ws'
+    $script:Repo = Join-Path $script:FixtureRoot 'repo'
+    $script:Cwd = Join-Path $script:FixtureRoot 'cwd'
+    $script:PoetryExe = Join-Path $script:FixtureRoot 'poetry.exe'
+    $script:PythonExe = Join-Path $script:FixtureRoot 'python.exe'
+
     Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith { throw 'unmocked host seam: Invoke-HostNativeCommand' }
     Mock -CommandName New-Item -ModuleName HostBootstrapWorkspace -MockWith { throw 'unmocked host seam: New-Item' }
     Mock -CommandName Invoke-HostBootstrapVerifyScript -ModuleName HostBootstrapWorkspace -MockWith { throw 'unmocked host seam: Invoke-HostBootstrapVerifyScript' }
@@ -143,7 +152,7 @@ Describe 'process wrappers' {
 
     Context 'Invoke-HostBootstrapPoetry' {
         It 'AC11-POETRY-STREAMS passes -StreamToHost and emits no captured output when poetry exits 0' {
-            Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Source = 'C:\fixture\poetry.exe' } } -ParameterFilter { $Name -eq 'poetry' }
+            Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Source = $script:PoetryExe } } -ParameterFilter { $Name -eq 'poetry' }
             Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith {
                 param([string]$FilePath, [string[]]$ArgumentList, [switch]$StreamToHost)
                 $null = $FilePath
@@ -154,12 +163,12 @@ Describe 'process wrappers' {
 
             @(Invoke-HostBootstrapPoetry -PoetryArgs @('install', '--no-interaction')).Count | Should -Be 0
             Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter {
-                $FilePath -eq 'C:\fixture\poetry.exe' -and ($ArgumentList -join ' ') -eq 'install --no-interaction' -and $StreamToHost
+                $FilePath -eq $script:PoetryExe -and ($ArgumentList -join ' ') -eq 'install --no-interaction' -and $StreamToHost
             }
         }
 
         It 'throws when poetry exits nonzero' {
-            Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Source = 'C:\fixture\poetry.exe' } } -ParameterFilter { $Name -eq 'poetry' }
+            Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Source = $script:PoetryExe } } -ParameterFilter { $Name -eq 'poetry' }
             Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Output = @(); ExitCode = 2 } }
 
             { Invoke-HostBootstrapPoetry -PoetryArgs @('install') } | Should -Throw -ExpectedMessage 'poetry command failed with exit code 2'
@@ -167,7 +176,7 @@ Describe 'process wrappers' {
 
         It 'AC11-PYTHON-POETRY-STREAMS passes -StreamToHost and emits no captured output when python -m poetry exits 0' {
             Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { } -ParameterFilter { $Name -eq 'poetry' }
-            Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Source = 'C:\fixture\python.exe' } } -ParameterFilter { $Name -eq 'python' }
+            Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Source = $script:PythonExe } } -ParameterFilter { $Name -eq 'python' }
             Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith {
                 param([string]$FilePath, [string[]]$ArgumentList, [switch]$StreamToHost)
                 $null = $FilePath
@@ -178,13 +187,13 @@ Describe 'process wrappers' {
 
             @(Invoke-HostBootstrapPoetry -PoetryArgs @('install', '--no-interaction')).Count | Should -Be 0
             Should -Invoke -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter {
-                $FilePath -eq 'C:\fixture\python.exe' -and ($ArgumentList -join ' ') -eq '-m poetry install --no-interaction' -and $StreamToHost
+                $FilePath -eq $script:PythonExe -and ($ArgumentList -join ' ') -eq '-m poetry install --no-interaction' -and $StreamToHost
             }
         }
 
         It 'throws when python -m poetry exits nonzero' {
             Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { } -ParameterFilter { $Name -eq 'poetry' }
-            Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Source = 'C:\fixture\python.exe' } } -ParameterFilter { $Name -eq 'python' }
+            Mock -CommandName Get-Command -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Source = $script:PythonExe } } -ParameterFilter { $Name -eq 'python' }
             Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Output = @(); ExitCode = 3 } }
 
             { Invoke-HostBootstrapPoetry -PoetryArgs @('install') } | Should -Throw -ExpectedMessage 'python -m poetry failed with exit code 3'
@@ -220,13 +229,33 @@ Describe 'Get-ProjectRepositoriesFromManifest' {
 
 Describe 'Resolve-WorkspaceRoot' {
     It 'returns the current location when the path is blank' {
-        Mock -CommandName Get-Location -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Path = 'C:\fixture\cwd' } }
+        Mock -CommandName Get-Location -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Path = $script:Cwd } }
 
-        Resolve-WorkspaceRoot -WorkspaceRootPath '  ' | Should -BeExactly 'C:\fixture\cwd'
+        Resolve-WorkspaceRoot -WorkspaceRootPath '  ' | Should -BeExactly $script:Cwd
     }
 
     It 'returns the full form of an explicit path' {
-        Resolve-WorkspaceRoot -WorkspaceRootPath 'C:\fixture\ws' | Should -BeExactly 'C:\fixture\ws'
+        Resolve-WorkspaceRoot -WorkspaceRootPath $script:Ws | Should -BeExactly $script:Ws
+    }
+
+    It 'resolves a relative path against the PowerShell location, not the process directory' {
+        # Arrange: Set-Location does not move the process directory, so the two differ here
+        # as they do after a location change in an interactive session.
+        $priorProcessDirectory = [Environment]::CurrentDirectory
+        Push-Location -LiteralPath $PSScriptRoot
+        try {
+            [Environment]::CurrentDirectory = [System.IO.Path]::GetPathRoot($PSScriptRoot)
+
+            # Act
+            $actual = Resolve-WorkspaceRoot -WorkspaceRootPath 'relative-ws'
+
+            # Assert
+            $actual | Should -BeExactly (Join-Path $PSScriptRoot 'relative-ws')
+        }
+        finally {
+            [Environment]::CurrentDirectory = $priorProcessDirectory
+            Pop-Location
+        }
     }
 }
 
@@ -234,18 +263,18 @@ Describe 'Initialize-WorkspaceRoot' {
     It 'reports an existing workspace root without creating it' {
         Mock -CommandName Test-Path -ModuleName HostBootstrapWorkspace -MockWith { $true }
 
-        $actual = @(Initialize-WorkspaceRoot -WorkspaceRootPath 'C:\fixture\ws' -ApplyMode)
+        $actual = @(Initialize-WorkspaceRoot -WorkspaceRootPath $script:Ws -ApplyMode)
 
-        $actual | Should -Be @('[OK] Workspace root exists: C:\fixture\ws')
+        $actual | Should -Be @("[OK] Workspace root exists: $($script:Ws)")
         Should -Invoke -CommandName New-Item -ModuleName HostBootstrapWorkspace -Times 0 -Exactly
     }
 
     It 'reports the planned creation in dry run' {
         Mock -CommandName Test-Path -ModuleName HostBootstrapWorkspace -MockWith { $false }
 
-        $actual = @(Initialize-WorkspaceRoot -WorkspaceRootPath 'C:\fixture\ws')
+        $actual = @(Initialize-WorkspaceRoot -WorkspaceRootPath $script:Ws)
 
-        $actual | Should -Be @('- Would create workspace root: C:\fixture\ws')
+        $actual | Should -Be @("- Would create workspace root: $($script:Ws)")
         Should -Invoke -CommandName New-Item -ModuleName HostBootstrapWorkspace -Times 0 -Exactly
     }
 
@@ -253,10 +282,10 @@ Describe 'Initialize-WorkspaceRoot' {
         Mock -CommandName Test-Path -ModuleName HostBootstrapWorkspace -MockWith { $false }
         Mock -CommandName New-Item -ModuleName HostBootstrapWorkspace -MockWith { }
 
-        $actual = @(Initialize-WorkspaceRoot -WorkspaceRootPath 'C:\fixture\ws' -ApplyMode)
+        $actual = @(Initialize-WorkspaceRoot -WorkspaceRootPath $script:Ws -ApplyMode)
 
-        $actual | Should -Be @('[OK] Created workspace root: C:\fixture\ws')
-        Should -Invoke -CommandName New-Item -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter { $Path -eq 'C:\fixture\ws' -and $ItemType -eq 'Directory' }
+        $actual | Should -Be @("[OK] Created workspace root: $($script:Ws)")
+        Should -Invoke -CommandName New-Item -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Ws -and $ItemType -eq 'Directory' }
     }
 }
 
@@ -268,16 +297,16 @@ Describe 'Sync-ProjectsFromManifest' {
     It 'throws when a project has no url' {
         $projects = @([pscustomobject]@{ name = 'no-url' })
 
-        { Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath 'C:\fixture\ws' } | Should -Throw -ExpectedMessage "Each projectRepositories entry must include a non-empty 'url'."
+        { Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath $script:Ws } | Should -Throw -ExpectedMessage "Each projectRepositories entry must include a non-empty 'url'."
     }
 
     It 'derives the target path from the url in dry run' {
         Mock -CommandName Test-Path -ModuleName HostBootstrapWorkspace -MockWith { $false }
         $projects = @([pscustomobject]@{ url = 'https://example.invalid/org/sample-repo.git' })
 
-        $actual = @(Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath 'C:\fixture\ws')
+        $actual = @(Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath $script:Ws)
 
-        $actual | Should -Be @('- Would clone https://example.invalid/org/sample-repo.git to C:\fixture\ws\sample-repo')
+        $actual | Should -Be @("- Would clone https://example.invalid/org/sample-repo.git to $(Join-Path $script:Ws 'sample-repo')")
         Should -Invoke -CommandName Invoke-HostBootstrapGit -ModuleName HostBootstrapWorkspace -Times 0 -Exactly
     }
 
@@ -285,9 +314,9 @@ Describe 'Sync-ProjectsFromManifest' {
         Mock -CommandName Test-Path -ModuleName HostBootstrapWorkspace -MockWith { $true }
         $projects = @([pscustomobject]@{ url = 'https://example.invalid/org/sample-repo.git'; targetPath = 'custom-dir' })
 
-        $actual = @(Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath 'C:\fixture\ws' -ApplyMode)
+        $actual = @(Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath $script:Ws -ApplyMode)
 
-        $actual | Should -Be @('[OK] Project already present: C:\fixture\ws\custom-dir')
+        $actual | Should -Be @("[OK] Project already present: $(Join-Path $script:Ws 'custom-dir')")
         Should -Invoke -CommandName Invoke-HostBootstrapGit -ModuleName HostBootstrapWorkspace -Times 0 -Exactly
     }
 
@@ -295,9 +324,9 @@ Describe 'Sync-ProjectsFromManifest' {
         Mock -CommandName Test-Path -ModuleName HostBootstrapWorkspace -MockWith { $false }
         $projects = @([pscustomobject]@{ url = 'https://example.invalid/org/sample-repo.git'; targetPath = 'custom-dir' })
 
-        $actual = @(Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath 'C:\fixture\ws')
+        $actual = @(Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath $script:Ws)
 
-        $actual | Should -Be @('- Would clone https://example.invalid/org/sample-repo.git to C:\fixture\ws\custom-dir')
+        $actual | Should -Be @("- Would clone https://example.invalid/org/sample-repo.git to $(Join-Path $script:Ws 'custom-dir')")
     }
 
     It 'clones the project through the git wrapper in apply mode' {
@@ -305,11 +334,11 @@ Describe 'Sync-ProjectsFromManifest' {
         Mock -CommandName Invoke-HostBootstrapGit -ModuleName HostBootstrapWorkspace -MockWith { }
         $projects = @([pscustomobject]@{ url = 'https://example.invalid/org/sample-repo.git' })
 
-        $actual = @(Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath 'C:\fixture\ws' -ApplyMode)
+        $actual = @(Sync-ProjectsFromManifest -Projects $projects -WorkspaceRootPath $script:Ws -ApplyMode)
 
-        $actual | Should -Be @('Cloning https://example.invalid/org/sample-repo.git into C:\fixture\ws\sample-repo')
+        $actual | Should -Be @("Cloning https://example.invalid/org/sample-repo.git into $(Join-Path $script:Ws 'sample-repo')")
         Should -Invoke -CommandName Invoke-HostBootstrapGit -ModuleName HostBootstrapWorkspace -Times 1 -Exactly -ParameterFilter {
-            ($GitArgs -join '|') -eq 'clone|https://example.invalid/org/sample-repo.git|C:\fixture\ws\sample-repo'
+            ($GitArgs -join '|') -eq "clone|https://example.invalid/org/sample-repo.git|$(Join-Path $script:Ws 'sample-repo')"
         }
     }
 }
@@ -318,13 +347,33 @@ Describe 'Resolve-ProjectRepoRoot' {
     It 'AC08-RESOLVE-EMPTY-PROJECTS returns the default repo root for an empty project list' {
         Mock -CommandName Test-Path -ModuleName HostBootstrapWorkspace -MockWith { $true }
 
-        Resolve-ProjectRepoRoot -RepoRootPath '' -WorkspaceRootPath 'C:\fixture\ws' -Projects @() | Should -BeExactly (Resolve-Path "$PSScriptRoot/../../..").Path
+        Resolve-ProjectRepoRoot -RepoRootPath '' -WorkspaceRootPath $script:Ws -Projects @() | Should -BeExactly (Resolve-Path "$PSScriptRoot/../../..").Path
     }
 
     It 'returns the full form of an explicit repo root' {
         $projects = @([pscustomobject]@{ name = 'other'; url = 'https://example.invalid/other.git' })
 
-        Resolve-ProjectRepoRoot -RepoRootPath 'C:\fixture\repo' -WorkspaceRootPath 'C:\fixture\ws' -Projects $projects | Should -BeExactly 'C:\fixture\repo'
+        Resolve-ProjectRepoRoot -RepoRootPath $script:Repo -WorkspaceRootPath $script:Ws -Projects $projects | Should -BeExactly $script:Repo
+    }
+
+    It 'resolves a relative explicit repo root against the PowerShell location, not the process directory' {
+        # Arrange: the PowerShell location and the process directory differ.
+        $projects = @([pscustomobject]@{ name = 'other'; url = 'https://example.invalid/other.git' })
+        $priorProcessDirectory = [Environment]::CurrentDirectory
+        Push-Location -LiteralPath $PSScriptRoot
+        try {
+            [Environment]::CurrentDirectory = [System.IO.Path]::GetPathRoot($PSScriptRoot)
+
+            # Act
+            $actual = Resolve-ProjectRepoRoot -RepoRootPath 'relative-repo' -WorkspaceRootPath $script:Ws -Projects $projects
+
+            # Assert
+            $actual | Should -BeExactly (Join-Path $PSScriptRoot 'relative-repo')
+        }
+        finally {
+            [Environment]::CurrentDirectory = $priorProcessDirectory
+            Pop-Location
+        }
     }
 
     It 'returns the default repo root when it contains pyproject.toml' {
@@ -332,7 +381,7 @@ Describe 'Resolve-ProjectRepoRoot' {
         $projects = @([pscustomobject]@{ name = 'other'; url = 'https://example.invalid/other.git' })
         $expected = (Resolve-Path "$PSScriptRoot/../../..").Path
 
-        $actual = Resolve-ProjectRepoRoot -RepoRootPath '' -WorkspaceRootPath 'C:\fixture\ws' -Projects $projects
+        $actual = Resolve-ProjectRepoRoot -RepoRootPath '' -WorkspaceRootPath $script:Ws -Projects $projects
 
         $actual | Should -BeExactly $expected
     }
@@ -341,20 +390,20 @@ Describe 'Resolve-ProjectRepoRoot' {
         Mock -CommandName Test-Path -ModuleName HostBootstrapWorkspace -MockWith { $false }
         $projects = @([pscustomobject]@{ name = 'drm-copilot'; url = 'https://example.invalid/drm-copilot.git'; targetPath = 'custom-dir' })
 
-        Resolve-ProjectRepoRoot -RepoRootPath '' -WorkspaceRootPath 'C:\fixture\ws' -Projects $projects | Should -BeExactly 'C:\fixture\ws\custom-dir'
+        Resolve-ProjectRepoRoot -RepoRootPath '' -WorkspaceRootPath $script:Ws -Projects $projects | Should -BeExactly (Join-Path $script:Ws 'custom-dir')
     }
 
     It 'falls back to the drm-copilot folder name when the project target path is empty' {
         Mock -CommandName Test-Path -ModuleName HostBootstrapWorkspace -MockWith { $false }
         $projects = @([pscustomobject]@{ name = 'drm-copilot'; url = 'https://example.invalid/drm-copilot.git'; targetPath = '' })
 
-        Resolve-ProjectRepoRoot -RepoRootPath '' -WorkspaceRootPath 'C:\fixture\ws' -Projects $projects | Should -BeExactly 'C:\fixture\ws\drm-copilot'
+        Resolve-ProjectRepoRoot -RepoRootPath '' -WorkspaceRootPath $script:Ws -Projects $projects | Should -BeExactly (Join-Path $script:Ws 'drm-copilot')
     }
 
     It 'returns an empty string when no root can be resolved' {
         Mock -CommandName Test-Path -ModuleName HostBootstrapWorkspace -MockWith { $false }
         $projects = @([pscustomobject]@{ name = 'other'; url = 'https://example.invalid/other.git' })
 
-        Resolve-ProjectRepoRoot -RepoRootPath '' -WorkspaceRootPath 'C:\fixture\ws' -Projects $projects | Should -BeExactly ''
+        Resolve-ProjectRepoRoot -RepoRootPath '' -WorkspaceRootPath $script:Ws -Projects $projects | Should -BeExactly ''
     }
 }

@@ -27,7 +27,12 @@
     ordering check (OrchestratorStateEpicWaveBarrier.psm1, issue #840) runs after the
     routing dispatch passes. For orchestrator-state, the adopted feature-folder probe
     (validate-orchestrator-output-feature-folder.ps1, issue #992) runs after the routing
-    dispatch passes, and only when the checkpoint waives new_active_feature_folder.
+    dispatch passes, and only when the checkpoint waives new_active_feature_folder. For every
+    type, the owner-directive check (OrchestratorStateOwnerDirectives.psm1, issue #1139) runs
+    after the routing dispatch passes and before those branches, only when the checkpoint has a
+    top-level owner_directives or owner_directive_records key. The owner-directive relay check
+    (validate-orchestrator-output-owner-pass-down.ps1, issue #1157) follows it and is active only
+    when the checkpoint, its ledger, or a linked parent holds a directive source.
 
 .NOTES
     Reads the SubagentStop envelope from stdin through Read-SubagentStopEnvelope
@@ -41,6 +46,8 @@
     every validation, naming the file, before any read. A failed Layer 2 import
     blocks the epic leg only.
     An unhandled error during validation blocks with exit 2 and a reason (issue #928).
+    The orchestrator-state worktree comes from the delegation prompt through the sibling
+    validate-orchestrator-output-target.ps1 (issue #1145); its fallback note goes to stderr on allow.
 #>
 
 [CmdletBinding()]
@@ -56,10 +63,17 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 Set-StrictMode -Version Latest
 
 try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-resolution.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-resolution.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-target-worktree.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-target.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-target.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-routing.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-routing.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-rejection.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-rejection.ps1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateEpicWaveBarrier.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateOwnerDirectives.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateOwnerDirectiveSelection.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateOwnerDirectiveSelection.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateOwnerDirectiveDecision.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateOwnerDirectiveDecision.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'validate-orchestrator-output-owner-pass-down.ps1') } catch { Add-HookDependencyFailure -Name 'validate-orchestrator-output-owner-pass-down.ps1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateCompletion.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateCompletion.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateUnconditional.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateUnconditional.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorState.psm1') -Force -Global -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorState.psm1' -ErrorRecord $_ }
@@ -94,6 +108,30 @@ function Get-CheckpointFileContent {
 
     $content = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
     return @{ Exists = $true; Content = $content }
+}
+
+function Test-OrchestratorOutputOwnerDirectiveKey {
+    <#
+    .SYNOPSIS
+        Reports whether a checkpoint's top-level property names include an owner-directive key.
+    .DESCRIPTION
+        Returns $true only when an element equals owner_directives or owner_directive_records
+        under ordinal comparison, so a case variant such as Owner_Directives does not count
+        (issue #1139).
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [AllowEmptyString()] [string[]] $PropertyName
+    )
+
+    foreach ($candidate in $PropertyName) {
+        if ([string]::Equals($candidate, 'owner_directives', [System.StringComparison]::Ordinal) -or
+            [string]::Equals($candidate, 'owner_directive_records', [System.StringComparison]::Ordinal)) {
+            return $true
+        }
+    }
+    return $false
 }
 
 function Test-HumanInteractionShape {
@@ -203,21 +241,31 @@ function Invoke-OrchestratorOutputValidation {
         [scriptblock] $RoutingInvoker,
 
         [Parameter(Mandatory = $false)]
-        [scriptblock] $FeatureFolderGitInvoker
+        [scriptblock] $FeatureFolderGitInvoker,
+
+        [scriptblock] $ReadTranscriptHead,
+        [scriptblock] $WorktreeListInvoker
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
+    $itemTarget = $null
     $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
     if (-not $envelope.IsValid) { $decision = @{ Ok = $false; Repairable = $false; Message = ('{0} payload anomaly - {1}' -f 'orchestrator hook:', (Get-SubagentStopEnvelopeAnomalyReason -Anomaly $envelope.Anomaly)) } }
     else {
         $agentOutput = $envelope.AssistantText
-        $blockArguments = @{ AgentOutput = ([string]$agentOutput); CheckpointPath = $CheckpointPath; ArtifactType = $ArtifactType; SessionRoot = $SessionRoot }
+        # Issue #1145: the orchestrator-state worktree comes from the delegation prompt; seams are forwarded only when bound.
+        $targetArguments = @{ ArtifactType = $ArtifactType; Envelope = $envelope.Envelope; AgentOutput = ([string]$agentOutput); CheckpointPath = $CheckpointPath; SessionRoot = $SessionRoot }
+        foreach ($seam in @('ReadTranscriptHead', 'WorktreeListInvoker')) { if ($PSBoundParameters.ContainsKey($seam)) { $targetArguments[$seam] = $PSBoundParameters[$seam] } }
+        $itemTarget = Resolve-OrchestratorOutputItemTarget @targetArguments
+        $blockArguments = @{ AgentOutput = ([string]$agentOutput); CheckpointPath = $CheckpointPath; ArtifactType = $ArtifactType; SessionRoot = $SessionRoot; ItemTarget = $itemTarget }
         if ($PSBoundParameters.ContainsKey('RoutingInvoker')) { $blockArguments['RoutingInvoker'] = $RoutingInvoker }
         if ($PSBoundParameters.ContainsKey('FeatureFolderGitInvoker')) { $blockArguments['FeatureFolderGitInvoker'] = $FeatureFolderGitInvoker }
         $decision = Get-OrchestratorOutputBlockDecision @blockArguments
     }
-    if ($decision.Ok) { return @{ Ok = $true; Message = $null } }
+    $note = Get-OrchestratorOutputFallbackNote -ItemTarget $itemTarget
+    if ($decision.Ok) { return @{ Ok = $true; Message = $null; Note = $note } }
+    if ($note) { $decision.Message = $decision.Message + "`n" + $note }
     if (-not $decision.Repairable) {
         if ($envelope.StopHookActive) { return @{ Ok = $true; Message = $null } }
         if (-not $decision.Message.Contains('to the operator and halt.')) { $decision.Message = $decision.Message + "`n" + $script:SubagentStopReportAndHaltLine }
@@ -235,6 +283,10 @@ function Get-OrchestratorOutputBlockDecision {
         the condition (message content, its checkpoint, or its runbook) and $false when it cannot
         (a registration argument, an internal evaluation failure, or a state it may not clear).
         The caller applies the re-entry policy to that flag.
+        An unresolved parallel-orchestrator-state checkpoint (status NoTarget) is allowed when the
+        output ends with a valid PARALLEL_MUTATION_REJECTED: <code> line and no live worktree holds
+        contradicting parallel checkpoint text (Get-OrchestratorOutputRejectionDecision, issue #1012);
+        otherwise the unresolved block carries the hint from Get-ParallelMutationRejectionHint.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -248,7 +300,9 @@ function Get-OrchestratorOutputBlockDecision {
         [scriptblock] $RoutingInvoker,
 
         [Parameter(Mandatory = $false)]
-        [scriptblock] $FeatureFolderGitInvoker
+        [scriptblock] $FeatureFolderGitInvoker,
+
+        [AllowNull()] [object] $ItemTarget
     )
 
     if ([string]::IsNullOrWhiteSpace($agentOutput)) {
@@ -258,15 +312,18 @@ function Get-OrchestratorOutputBlockDecision {
     # Resolve the run checkpoint before any read (issue #787). A failed import, or an
     # unresolved, ambiguous, or mismatched target, blocks here, so nothing is read.
     try {
-        $resolution = Resolve-OrchestratorOutputCheckpointPath -ArtifactType $ArtifactType -CheckpointPath $CheckpointPath -AgentOutput ([string]$agentOutput) -SessionRoot $SessionRoot
+        $resolution = Resolve-OrchestratorOutputCheckpointPath -ArtifactType $ArtifactType -CheckpointPath $CheckpointPath -AgentOutput ([string]$agentOutput) -SessionRoot $SessionRoot -ItemTarget $ItemTarget
     }
     catch {
         return @{ Ok = $false; Repairable = $false; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: NoTarget (RESOLVER_FAILED): {1}' -f $ArtifactType, $_.Exception.Message) }
     }
     if (-not $resolution.Resolved) {
+        # Issue #1012: a parallel stop that wrote no state and ends with a valid rejection signal is allowed.
+        $rejectionDecision = Get-OrchestratorOutputRejectionDecision -ArtifactType $ArtifactType -Resolution $resolution -AgentOutput ([string]$agentOutput) -SessionRoot $SessionRoot
+        if ($null -ne $rejectionDecision) { return $rejectionDecision }
         $resolutionRepairable = ($resolution.Status -in @('NoTarget', 'Ambiguous')) -and ($ArtifactType -in @('epic-orchestrator-state', 'parallel-orchestrator-state'))
         return @{ Ok = $false; Repairable = $resolutionRepairable; Message = ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: {0}: {1} ({2}): {3}' -f
-                $ArtifactType, $resolution.Status, $resolution.ReasonCode, $resolution.Detail) }
+                $ArtifactType, $resolution.Status, $resolution.ReasonCode, $resolution.Detail) + (Get-ParallelMutationRejectionHint -ArtifactType $ArtifactType -Status ([string]$resolution.Status) -AgentOutput ([string]$agentOutput)) }
     }
 
     $file = Get-CheckpointFileContent -Path $resolution.CheckpointPath
@@ -335,6 +392,20 @@ function Get-OrchestratorOutputBlockDecision {
         return @{ Ok = $false; Repairable = $true; Message = "ROUTING_CONTRACT_BLOCKED: $($routingResult.ErrorText)" }
     }
 
+    # Issue #1139: the owner-directive rules, for every type, only when the parsed checkpoint has a
+    # top-level owner key; the module re-reads the raw text, so ISO dates stay strings.
+    if (Test-OrchestratorOutputOwnerDirectiveKey -PropertyName $checkpointProps) {
+        try { $ownerResult = Get-OrchestratorStateOwnerDirectiveError -CheckpointText $file.Content }
+        catch { return @{ Ok = $false; Repairable = $true; Message = 'OWNER_DIRECTIVE_BLOCKED: ' + $_.Exception.Message } }
+        $ownerErrors = @($ownerResult | Where-Object { $_ })
+        if ($ownerErrors.Count -gt 0) { return @{ Ok = $false; Repairable = $true; Message = 'OWNER_DIRECTIVE_BLOCKED: ' + ($ownerErrors -join '; ') } }
+    }
+    # Issue #1157: the owner-directive relay check; key-gated inside the sibling, so a checkpoint without a source is unaffected.
+    if (-not [string]::IsNullOrWhiteSpace([string]$resolution.WorktreeRoot)) {
+        $passDown = Get-OrchestratorOutputOwnerPassDownDecision -ArtifactType $ArtifactType -CheckpointText $file.Content -WorktreeRoot ([string]$resolution.WorktreeRoot) -SessionRoot $SessionRoot
+        if ($null -ne $passDown) { return $passDown }
+    }
+
     # Issue #992: a waived new_active_feature_folder must name a folder committed in HEAD of the run
     # worktree. The validators only see the declared record, so the hook probes git once.
     if ($ArtifactType -eq 'orchestrator-state') {
@@ -365,4 +436,5 @@ if ($null -ne $dependencyDecision) { [Console]::Error.WriteLine($dependencyDecis
 try { $result = Invoke-OrchestratorOutputValidation -CheckpointPath $CheckpointPath -ArtifactType $ArtifactType }
 catch { Exit-SubagentStopBlock -Message ('ORCHESTRATOR_CHECKPOINT_UNRESOLVED: validator error: ' + ([string]$_.Exception.Message -split "`r?`n")[0] + '; the gate fails closed.' + "`n" + $script:SubagentStopReportAndHaltLine) }
 if (-not $result.Ok) { Exit-SubagentStopBlock -Message $result.Message }
+Write-OrchestratorOutputAllowNote -Result $result
 exit 0

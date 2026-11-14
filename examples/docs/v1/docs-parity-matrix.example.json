@@ -1,0 +1,33 @@
+{
+  "$schema": "urn:drm-copilot:docs:1.0.0:docs-parity-matrix",
+  "schema_version": "1.0.0",
+  "artifact_kind": "docs-parity-matrix",
+  "id": "example-repo.docs-parity-matrix",
+  "extensions": {},
+  "repository": "example-repo",
+  "snapshot_ref": {
+    "artifact_kind": "surface-inventory-snapshot",
+    "path": "docs/documentation-estate/surface-inventory-snapshot.json",
+    "sha256": "7f62a6c9f6f380f34b7ca7b2b05d7d5f2a86a3108209a459fbb3f8b91fa18557"
+  },
+  "ledger_ref": {
+    "artifact_kind": "docs-coverage-ledger",
+    "path": "docs/documentation-estate/docs-coverage-ledger.json",
+    "sha256": "51d99999e75e67b798fb820a6b6737ffe183335c83665b2c53203bdf437150ce"
+  },
+  "rows": [
+    {
+      "element_id": "cli-command-b9cda1283b765831a04bf07223320d70c1f07de9da312b21731f40e8790cf00a",
+      "kind": "cli-command",
+      "page_path": "docs/reference/cli-reference.md",
+      "dimensions": {
+        "exists": {"state": "pass", "rationale": null, "evidence_pin_ids": ["pin-inventory-command"]},
+        "accurate": {"state": "pass", "rationale": null, "evidence_pin_ids": ["pin-inventory-command"]},
+        "example_present": {"state": "fail", "rationale": "The page lists the command without a usage example.", "evidence_pin_ids": []},
+        "owner_assigned": {"state": "pass", "rationale": null, "evidence_pin_ids": []},
+        "diataxis_mode": {"state": "not-applicable", "rationale": "Generated reference pages carry a fixed mode.", "evidence_pin_ids": []}
+      },
+      "extensions": {}
+    }
+  ]
+}

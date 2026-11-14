@@ -18,6 +18,11 @@ BeforeAll {
     $script:ModulePath = (Resolve-Path "$PSScriptRoot/../../../scripts/dev-tools/HostTooling.psm1").Path
     Import-Module $script:ModulePath -Force
 
+    # Portable fixture root: fully qualified on every host and never created. A path on a
+    # drive that does not exist would stop the Get-Content mock from binding -Raw.
+    $script:FixtureRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'hosttooling-root'
+    $script:ManifestPath = Join-Path $script:FixtureRoot 'host-tools.manifest.json'
+
     Mock -CommandName Invoke-HostNativeCommand -ModuleName HostTooling -MockWith { throw 'unmocked host seam: Invoke-HostNativeCommand' }
     Mock -CommandName Set-HostEnvironmentVariable -ModuleName HostTooling -MockWith { throw 'unmocked host seam: Set-HostEnvironmentVariable' }
     Mock -CommandName Get-HostEnvironmentVariable -ModuleName HostTooling -MockWith { throw 'unmocked host seam: Get-HostEnvironmentVariable' }
@@ -49,7 +54,7 @@ Describe 'Read-HostToolsManifest' {
         Mock -CommandName Get-Content -ModuleName HostTooling -MockWith { throw 'Get-Content must not be called' }
 
         # Act
-        $actual = Read-HostToolsManifest -Path 'C:\fixture\host-tools.manifest.json'
+        $actual = Read-HostToolsManifest -Path $script:ManifestPath
 
         # Assert
         $actual | Should -BeNullOrEmpty
@@ -62,7 +67,7 @@ Describe 'Read-HostToolsManifest' {
         Mock -CommandName Get-Content -ModuleName HostTooling -MockWith { '{"requiredCommands":["git","node"]}' }
 
         # Act
-        $actual = Read-HostToolsManifest -Path 'C:\fixture\host-tools.manifest.json'
+        $actual = Read-HostToolsManifest -Path $script:ManifestPath
 
         # Assert
         @($actual.requiredCommands) | Should -Be @('git', 'node')

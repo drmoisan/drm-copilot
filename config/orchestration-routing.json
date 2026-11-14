@@ -412,5 +412,39 @@
       "requirements-reconciler",
       "migration-coverage-reviewer"
     ]
+  },
+  "docs_operations": {
+    "documentation-workflow": {
+      "logical_agent": "root",
+      "mcp_tools": []
+    },
+    "docs-init": {
+      "logical_agent": "root",
+      "mcp_tools": []
+    },
+    "docs-inventory-surface": {
+      "logical_agent": "docs-architect",
+      "mcp_tools": ["run_docs_inventory"]
+    },
+    "docs-plan-ia": {
+      "logical_agent": "docs-architect",
+      "mcp_tools": ["run_docs_inventory", "run_docs_coverage", "run_docs_check"]
+    },
+    "docs-author-page": {
+      "logical_agent": "docs-author",
+      "mcp_tools": ["generate_docs_reference", "run_docs_check"]
+    },
+    "docs-reconcile-behavior": {
+      "logical_agent": "docs-reconciler",
+      "mcp_tools": ["run_docs_coverage", "update_docs_ledger", "validate_docs_artifacts"]
+    },
+    "docs-review-coverage": {
+      "logical_agent": "docs-coverage-reviewer",
+      "mcp_tools": ["run_docs_coverage", "validate_docs_artifacts", "run_docs_check"]
+    },
+    "docs-validate": {
+      "logical_agent": "docs-coverage-reviewer",
+      "mcp_tools": ["validate_docs_artifacts", "run_docs_check"]
+    }
   }
 }

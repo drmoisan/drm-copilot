@@ -55,7 +55,12 @@ Describe 'feature-folder-order handler proof' {
     It 'H1 enforce-feature-folder-order.ps1 denies that plan write with FEATURE_FOLDER_ORDER_BLOCKED: when feature-folder-resolution.ps1 fails to load' {
         # Arrange: re-dot-source the hook with the resolver dot-source forced to fail.
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: feature-folder-resolution.ps1' } -ParameterFilter { $ChildPath -eq 'feature-folder-resolution.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-folder-resolution.ps1') { throw 'simulated load failure: feature-folder-resolution.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $script:FeatureFolderOrderHook
             $script:FeatureFolderOrderResolutionImportFailure | Should -Be 'feature-folder-resolution.ps1' -Because 'E-CONSTRUCTION'
@@ -111,7 +116,12 @@ Describe 'feature-folder-order handler proof' {
 
         # Arrange and Act: failure state.
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: feature-folder-resolution.ps1' } -ParameterFilter { $ChildPath -eq 'feature-folder-resolution.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-folder-resolution.ps1') { throw 'simulated load failure: feature-folder-resolution.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $script:FeatureFolderOrderHook
             $script:FeatureFolderOrderResolutionImportFailure | Should -Be 'feature-folder-resolution.ps1' -Because 'E-CONSTRUCTION'
@@ -168,7 +178,12 @@ Describe 'preimplementation gate modes handler proof on the claude surface' {
     It 'H2 claude preimplementation gate denies that epic delegation naming feature-folder-resolution-import when feature-folder-resolution.ps1 fails to load' {
         # Arrange: re-dot-source the gate, which re-dot-sources the modes sibling, with the resolver forced to fail.
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: feature-folder-resolution.ps1' } -ParameterFilter { $ChildPath -eq 'feature-folder-resolution.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-folder-resolution.ps1') { throw 'simulated load failure: feature-folder-resolution.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $script:ClaudeGateHook
             $script:OrchestrationFeatureFolderResolutionImportFailure | Should -Be 'feature-folder-resolution.ps1' -Because 'E-CONSTRUCTION'
@@ -185,7 +200,12 @@ Describe 'preimplementation gate modes handler proof on the claude surface' {
 
     It 'H2 claude preimplementation gate denies that parallel delegation naming feature-folder-resolution-import when feature-folder-resolution.ps1 fails to load' {
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: feature-folder-resolution.ps1' } -ParameterFilter { $ChildPath -eq 'feature-folder-resolution.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-folder-resolution.ps1') { throw 'simulated load failure: feature-folder-resolution.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $script:ClaudeGateHook
             $script:OrchestrationFeatureFolderResolutionImportFailure | Should -Be 'feature-folder-resolution.ps1' -Because 'E-CONSTRUCTION'
@@ -231,7 +251,12 @@ Describe 'prd-feature planner handler proof' {
 
     It 'H3 enforce-prd-feature-before-planner.ps1 denies that delegation with PRD_FEATURE_BLOCKED: when feature-folder-resolution.ps1 fails to load' {
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: feature-folder-resolution.ps1' } -ParameterFilter { $ChildPath -eq 'feature-folder-resolution.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-folder-resolution.ps1') { throw 'simulated load failure: feature-folder-resolution.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $script:PrdPlannerHook
             $script:PrdFeatureFolderResolutionImportFailure | Should -Be 'feature-folder-resolution.ps1' -Because 'E-CONSTRUCTION'
@@ -281,7 +306,12 @@ Describe 'epic wave barrier handler proof' {
 
     It 'H4 enforce-epic-wave-barrier.ps1 denies that delegation with EPIC_WAVE_BARRIER_BLOCKED: when feature-folder-resolution.ps1 fails to load' {
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: feature-folder-resolution.ps1' } -ParameterFilter { $ChildPath -eq 'feature-folder-resolution.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-folder-resolution.ps1') { throw 'simulated load failure: feature-folder-resolution.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $script:WaveBarrierHook
             $script:EpicWaveBarrierResolutionImportFailure | Should -Be 'feature-folder-resolution.ps1' -Because 'E-CONSTRUCTION'
@@ -331,7 +361,12 @@ Describe 'parallel drift gate handler proof' {
 
     It 'H5 enforce-parallel-drift-gate.ps1 denies that delegation with PARALLEL_DRIFT_GATE_BLOCKED: when feature-folder-resolution.ps1 fails to load' {
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: feature-folder-resolution.ps1' } -ParameterFilter { $ChildPath -eq 'feature-folder-resolution.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-folder-resolution.ps1') { throw 'simulated load failure: feature-folder-resolution.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $script:DriftGateHook
             $script:ParallelDriftGateResolutionImportFailure | Should -Be 'feature-folder-resolution.ps1' -Because 'E-CONSTRUCTION'
@@ -381,7 +416,12 @@ Describe 'parallel cohort barrier handler proof' {
 
     It 'H6 enforce-parallel-cohort-barrier.ps1 denies that delegation with PARALLEL_COHORT_BARRIER_BLOCKED: when feature-folder-resolution.ps1 fails to load' {
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: feature-folder-resolution.ps1' } -ParameterFilter { $ChildPath -eq 'feature-folder-resolution.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'feature-folder-resolution.ps1') { throw 'simulated load failure: feature-folder-resolution.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $script:CohortBarrierHook
             $script:ParallelCohortBarrierResolutionImportFailure | Should -Be 'feature-folder-resolution.ps1' -Because 'E-CONSTRUCTION'
@@ -457,5 +497,40 @@ Describe 'orchestrator output validator handler proof' {
         $result.Thrown | Should -BeNullOrEmpty -Because "the hook must not throw ($($result.Thrown))"
         $result.ExitCode | Should -Be 2
         $result.Stderr.Contains('OrchestratorStateEpicWaveBarrier.psm1') | Should -BeTrue -Because $result.Stderr
+    }
+
+    It 'H9 validate-orchestrator-output.ps1 exits 2 naming OrchestratorStateOwnerDirectives.psm1 when the owner-directive import fails' {
+        Mock Import-Module { }
+        Mock Import-Module { throw 'simulated load failure: OrchestratorStateOwnerDirectives.psm1' } -ParameterFilter { $Name -like '*OrchestratorStateOwnerDirectives.psm1' }
+        $result = Invoke-OrchestratorOutputHookProcess
+        $result.Thrown | Should -BeNullOrEmpty -Because "the hook must not throw ($($result.Thrown))"
+        $result.ExitCode | Should -Be 2
+        $result.Stderr.Contains('OrchestratorStateOwnerDirectives.psm1') | Should -BeTrue -Because $result.Stderr
+    }
+
+    It 'H10 validate-orchestrator-output.ps1 exits 2 naming <Dependency> when the pass-down module import fails' -ForEach @(
+        @{ Dependency = 'OrchestratorStateOwnerDirectiveSelection.psm1' }, @{ Dependency = 'OrchestratorStateOwnerDirectiveDecision.psm1' }
+    ) {
+        Mock Import-Module { }
+        $failedDependency = $Dependency
+        Mock Import-Module { throw "simulated load failure: $failedDependency" } -ParameterFilter { $Name -like "*$failedDependency" }
+        $result = Invoke-OrchestratorOutputHookProcess
+        $result.Thrown | Should -BeNullOrEmpty -Because "the hook must not throw ($($result.Thrown))"
+        $result.ExitCode | Should -Be 2
+        $result.Stderr.Contains($Dependency) | Should -BeTrue -Because $result.Stderr
+    }
+
+    It 'H10 validate-orchestrator-output.ps1 exits 2 naming validate-orchestrator-output-owner-pass-down.ps1 when the sibling fails to load' {
+        Mock Import-Module { }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'validate-orchestrator-output-owner-pass-down.ps1') { throw 'simulated load failure: validate-orchestrator-output-owner-pass-down.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
+        $result = Invoke-OrchestratorOutputHookProcess
+        $result.Thrown | Should -BeNullOrEmpty -Because "the hook must not throw ($($result.Thrown))"
+        $result.ExitCode | Should -Be 2
+        $result.Stderr.Contains('validate-orchestrator-output-owner-pass-down.ps1') | Should -BeTrue -Because $result.Stderr
     }
 }

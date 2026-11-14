@@ -36,6 +36,10 @@
 #                                               scenario authored before the target-aware
 #                                               key existed supplies only the bare form,
 #                                               so the fallback preserves their behavior.
+#   merge-base <a> <b>  (no --is-ancestor)   -> merge-base-of.<a>.<b>
+#   cat-file blob <oid>                      -> cat-file.<oid>
+#   merge-file ... <o1> <o2> <o3>            -> merge-file.<o1>.<o2>.<o3> (last three
+#                                               non-option operands)
 #   rev-list ... main..<branch>              -> rev-list.<branch>
 #   rev-list ... <rev>   (no .. range)       -> rev-list.<rev>
 #   diff --quiet main...<branch>             -> diff-quiet.<branch>
@@ -56,7 +60,9 @@
 #   branch -D <name>                         -> branch-D.<name>
 #   fetch ...                                -> fetch
 #   remote                                   -> remote
-#   hash-object ... -- <path>                -> hash-object.<path>
+#   hash-object ... -- <path>  (no -w)       -> hash-object.<path>
+#   hash-object -w ... -- <path>             -> hash-object-w.<final -C component>.<path>,
+#                                               so a key never holds a host path
 #   log ... --find-object=<oid> ...          -> log.find-object.<oid>
 #   diff-index --cached --quiet <commit> --  -> diff-index.<commit>
 #   reset --hard                             -> reset-hard
@@ -72,23 +78,21 @@
 # these subcommand names and depends on that read-only guarantee, not on their absence
 # from this stub.
 #
-# add             -> cleanup_worktrees_preserve_lib.sh:400,402 (preserve_commit_plan);
-#                    reached only by preserve / --preserve.
-# worktree add    -> cleanup_worktrees_actions_lib.sh:103 (create_consolidation_worktree);
-#                    not reachable from any wrapper dispatch arm (report/apply/preserve).
-# worktree remove -> cleanup_worktrees_actions_lib.sh:191 (cleanup_consolidation_on_abort,
-#                    not reachable, same as above) and
-#                    cleanup_worktrees_actions_lib.sh:292 (remove_worktree_safe, via
+# add             -> preserve_commit_plan; reached only by preserve / --preserve.
+# hash-object -w  -> preserve_merge_decide (writes unreferenced blobs); reached only by
+#                    preserve / --preserve, for a record whose target already exists.
+# merge-file      -> preserve_merge_decide (--object-id writes the merged blob); reached
+#                    only by preserve / --preserve, same condition.
+# worktree add    -> create_consolidation_worktree; not reachable from any wrapper
+#                    dispatch arm (report/apply/preserve).
+# worktree remove -> cleanup_consolidation_on_abort (not reachable, same as above) and
+#                    remove_worktree_safe (via delete_candidate); reached by --apply /
+#                    apply for the second site.
+# cherry-pick     -> cherry_pick_candidates; not reachable from any wrapper dispatch arm.
+# branch -D       -> the consolidation teardown (not reachable) and delete_branch (via
 #                    delete_candidate); reached by --apply / apply for the second site.
-# cherry-pick     -> cleanup_worktrees_actions_lib.sh:147,157,164
-#                    (cherry_pick_candidates); not reachable from any wrapper dispatch arm.
-# branch -D       -> cleanup_worktrees_actions_lib.sh:198 (consolidation teardown, not
-#                    reachable) and cleanup_worktrees_actions_lib.sh:317 (delete_branch,
-#                    via delete_candidate); reached by --apply / apply for the second site.
-# reset --hard    -> cleanup_worktrees_dirt_lib.sh:483 (clear_disposable_dirt); reached
-#                    only by --apply --clear-disposable.
-# clean -fd       -> cleanup_worktrees_dirt_lib.sh:488 (clear_disposable_dirt); reached
-#                    only by --apply --clear-disposable.
+# reset --hard    -> clear_disposable_dirt; reached only by --apply --clear-disposable.
+# clean -fd       -> clear_disposable_dirt; reached only by --apply --clear-disposable.
 #
 # "Not reachable from any wrapper dispatch arm" means create_consolidation_worktree,
 # cherry_pick_candidates, and cleanup_consolidation_on_abort have no caller under
@@ -234,7 +238,32 @@ merge-base)
 		fi
 		respond "merge-base.${tip_key}"
 	fi
+	# merge-base <a> <b> (no --is-ancestor): a merge-base QUERY whose stdout is the base
+	# commit, keyed merge-base-of.<a>.<b> so it can never replay an ancestry fixture.
+	if [[ -n ${2:-} && -n ${3:-} ]]; then
+		respond "merge-base-of.$(sanitize "$2").$(sanitize "$3")"
+	fi
 	exit 0
+	;;
+cat-file)
+	# cat-file blob <oid>: KEY is cat-file.<sanitized oid>, the last operand.
+	cfoid=""
+	for a in "$@"; do cfoid=$a; done
+	respond "cat-file.$(sanitize "$cfoid")"
+	;;
+merge-file)
+	# merge-file [options] <current> <base> <other>: KEY is
+	# merge-file.<o1>.<o2>.<o3> over the last three non-option operands.
+	mfops=()
+	for a in "${@:2}"; do
+		[[ $a == -* ]] && continue
+		mfops+=("$(sanitize "$a")")
+	done
+	mfkey="merge-file"
+	if ((${#mfops[@]} >= 3)); then
+		mfkey="merge-file.${mfops[-3]}.${mfops[-2]}.${mfops[-1]}"
+	fi
+	respond "$mfkey"
 	;;
 rev-list)
 	# Prefer the range argument (contains ..) and key on the branch after the dots. A
@@ -358,18 +387,24 @@ remote)
 	respond "remote"
 	;;
 hash-object)
-	# hash-object [-t <type>] -- <path>: KEY is hash-object.<sanitized path after -->.
-	# This is a READ of a working-tree file's blob id. The stub defines no -w behavior
-	# because the dirt classifier never writes an object.
+	# hash-object [-t <type>] -- <path>: KEY is hash-object.<sanitized path after -->,
+	# the dirt classifier's READ of a working-tree file's blob id. With -w (the preserve
+	# merge decision, which writes an unreferenced blob) the KEY is
+	# hash-object-w.<final -C component>.<path>, so fixture keys are host-independent.
 	hopath=""
+	howrite=0
 	seen_dashdash=0
 	for a in "$@"; do
 		if ((seen_dashdash == 1)); then
 			hopath=$a
 			break
 		fi
+		[[ $a == "-w" ]] && howrite=1
 		[[ $a == "--" ]] && seen_dashdash=1
 	done
+	if ((howrite == 1)); then
+		respond "hash-object-w.$(sanitize "${dash_c_path##*/}").$(sanitize "$hopath")"
+	fi
 	respond "hash-object.$(sanitize "$hopath")"
 	;;
 log)

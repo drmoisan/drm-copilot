@@ -30,9 +30,16 @@ Describe 'enforce-powershell-batch-budget.ps1' {
         $script:NoCheckpoint = { param([string] $Path) [void] $Path; '' }
     }
 
+    # Snapshot each environment value this suite assigns and restore it, rather than clearing it, so the
+    # suite leaves the process environment as it found it (issue #1096).
+    BeforeEach {
+        $script:PriorToolInput = $env:CLAUDE_TOOL_INPUT
+        $script:PriorSessionId = $env:CLAUDE_SESSION_ID
+    }
+
     AfterEach {
-        $env:CLAUDE_TOOL_INPUT = $null
-        $env:CLAUDE_SESSION_ID = $null
+        $env:CLAUDE_TOOL_INPUT = $script:PriorToolInput
+        $env:CLAUDE_SESSION_ID = $script:PriorSessionId
     }
 
     It 'allows a new production file under the production cap and records it' {

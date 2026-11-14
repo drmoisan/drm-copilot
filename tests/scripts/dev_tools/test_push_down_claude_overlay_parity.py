@@ -16,8 +16,12 @@ import re
 from pathlib import Path
 from typing import cast
 
+import pytest
+
 from scripts.dev_tools.push_down_claude_blast_radius_overlay import (
     BLAST_RADIUS_OVERLAY_RELATIVE_PATH,
+    SHARED_SURFACES_DEMOTE_KEY,
+    BlastRadiusOverlayError,
     compose_blast_radius_overlay,
 )
 from scripts.dev_tools.push_down_claude_customizations import EXCLUDED_RELATIVE_PATHS
@@ -33,6 +37,12 @@ OVERLAY_PATH = "config/blast-radius.local.json"
 _STRING = re.compile(r"\"([^\"\\]*)\"")
 _OVERLAY_CONSTANT = re.compile(
     r"export\s+const\s+BLAST_RADIUS_OVERLAY_RELATIVE_PATH\s*=\s*\"([^\"\\]*)\""
+)
+TS_OVERLAY_DEMOTE = (
+    "extensions/drm-copilot/src/lib/push-down/claude-blast-radius-overlay-demote.ts"
+)
+_DEMOTE_CONSTANT = re.compile(
+    r"export\s+const\s+SHARED_SURFACES_DEMOTE_KEY\s*=\s*\"([^\"\\]*)\""
 )
 
 
@@ -77,14 +87,37 @@ def test_ac11_overlay_excluded_in_both_implementations() -> None:
 
 
 def test_ac16_corpus_composition_matches_expected() -> None:
-    """The Python composition reproduces every shared corpus case."""
+    """The Python composition reproduces every shared corpus case.
+
+    A case carrying ``expected_error`` asserts the full error message instead of
+    an expected text (issue #1006).
+    """
 
     paths = sorted(CORPUS_DIR.glob("*.json"))
 
     assert len(paths) >= 6, paths
+    # Each corpus file is one case: either an expected composed text or an
+    # expected composition error.
     for path in paths:
         case = cast("dict[str, str]", json.loads(path.read_text(encoding="utf-8")))
+        if "expected_error" in case:
+            with pytest.raises(BlastRadiusOverlayError) as raised:
+                compose_blast_radius_overlay(
+                    case["base_text"], case["overlay_text"], OVERLAY_PATH
+                )
+            assert str(raised.value) == case["expected_error"], path.name
+            continue
         composed = compose_blast_radius_overlay(
             case["base_text"], case["overlay_text"], OVERLAY_PATH
         )
         assert composed == case["expected_text"], path.name
+
+
+def test_shared_surfaces_demote_key_constants_match() -> None:
+    """The TypeScript and Python demotion directive keys are equal (issue #1006)."""
+
+    text = (REPO_ROOT / TS_OVERLAY_DEMOTE).read_text(encoding="utf-8")
+    match = _DEMOTE_CONSTANT.search(text)
+
+    assert match is not None, f"{TS_OVERLAY_DEMOTE}: demote key constant not found"
+    assert match.group(1) == SHARED_SURFACES_DEMOTE_KEY == "shared_surfaces_demote"

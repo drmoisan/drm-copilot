@@ -1,0 +1,6 @@
+# PSScriptAnalyzer baseline (cycle 1)
+
+Timestamp: 2026-11-03T20-40
+Command: Invoke-ScriptAnalyzer -Recurse -Settings scripts/powershell/PoshQC/settings/pssa.settings.psd1 over .claude/lib/docs and tests/scripts/claude-lib/docs (launched through a sh script under SCRATCH)
+EXIT_CODE: 0
+Output Summary: 0 findings over both folders.

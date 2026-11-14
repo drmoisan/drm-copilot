@@ -1,0 +1,6 @@
+# Stage D PowerShell Format and Lint
+
+Timestamp: 2026-11-07T09-59
+Command: sh SCRATCH/issue-1097-d-qc.sh, which runs `Invoke-PoshQCFormat` check-only (a no-op `-WriteFile`) over the folders of every `.ps1`, `.psm1`, and `.psd1` file changed since the merge base of `origin/main` and `HEAD`, then `Invoke-ScriptAnalyzer` per file with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`
+EXIT_CODE: 0
+Output Summary: 16 changed PowerShell files, including the four guard copies. Each of the 16 has an `Already formatted: ` line and none has a `Formatted: ` line (targets-not-formatted=0; 651 `Already formatted: ` lines and 0 `Formatted: ` lines over the scanned folders). Analyzer findings: 0. Type checking does not apply to PowerShell. Earlier passes of this loop, each followed by a repair and a restart: the first pass found `OrchestratorStateLightCycle.Tests.ps1` unformatted (two continuation-line indents; formatted with `Invoke-PoshQCFormat`) and stopped on the PSScriptAnalyzer 1.25 null-reference defect on the first file of a fresh process, which a warm-up call on `scripts/powershell/PoshQC/PoshQC.psd1` now absorbs; the second pass reported two `PSReviewUnusedParameter` findings in `enforce-epic-merge-gate.ReviewGuard.Tests.ps1`, fixed by assigning the closure's parameters to locals.

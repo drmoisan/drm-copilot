@@ -129,6 +129,22 @@ completion notification. A blocked item (`blocked_ci_loop_limit` or `blocked_dri
 `merged` nor `worktree_removed`, so it holds every conflicting later-cohort neighbour and,
 transitively, the tail of its own conflict component; items outside that component are unaffected.
 
+**Precedence.** An item named as `after` in an active `precedence[]` entry (the operator ordering
+input declared in `## Prepared-Item Admission (issue #1047)` of
+`.claude/rules/parallel-orchestration.md`) may start only when its `before` item has `merge_status`
+`merged` or `worktree_removed`, whatever the two items' cohorts. A `withdrawn` predecessor releases
+the constraint, and a `blocked` predecessor holds its dependent. Layer 1 enforces this rule through
+`Test-ParallelCohortBarrierClear` in `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`,
+which denies a target whose predecessor is not released and fails closed on a missing predecessor
+record. The `/parallel-add` skill runs the helper's `test-precedence` subcommand for each new
+ordering and rejects an unjustified flag with `precedence_not_justified` (issue #1164): a
+`kind: "cost"` entry must name a returned edge, and a `kind: "correctness"` entry needs a
+non-empty `reason`. A legacy entry without kind is held the same way: it is honoured unchanged by
+this rule and is not re-tested. A tolerated pair, whose merge time does not exceed its gain, runs
+without a barrier. Layer 2 does not check the precedence ordering: the Python orchestrator-state
+validator checks the shape of `precedence[]` entries (`kind`, `reason`) when present but not the
+ordering, and its retrospective invariant reads `conflict_edges[]` only.
+
 **`current_cohort` is a progress indicator, not a gate.** `current_cohort` is the LOWEST
 current-generation cohort index that still contains a non-terminal, non-withdrawn item. It is
 recomputed and written only on durable confirmation from `git worktree list --porcelain`,
@@ -256,10 +272,19 @@ carries exactly these five elements.
    The child needs it for its own operation, and F7's Layer 1 hook resolves the target item by
    scanning the prompt for exactly that path shape, so the path is emitted as a bare path token.
 3. The canonical issue number line, which is the item key.
+   For a combined item (issue #1013), element 3 is followed by the line `Combined issues: #A #B`,
+   naming every other member issue of the combination recorded in the item's
+   `combined_issue_nums`, and the prompt instructs the child to carry every member on its pr-author
+   line, `Author-asserted autoclose issues: #A #B`, so the one pull request closes every member
+   issue. The added line is part of element 3, not a further element.
 4. The item's committed `plan-path`, together with the resume instruction: resume at atomic
    execution from that plan rather than re-running promotion, research, or planning. The item's
    prepared feature folder and approved atomic plan are already committed and preflight-clear on the
    item's own pushed feature branch.
+   The prompt also carries the item's admitted plan hash as `plan-hash: <hex>` and instructs the child, before any other step, to run `git rev-parse HEAD:<plan-path>` and to stop with `blocked_reason: premise_falsified` when the printed hash differs from `<hex>`.
+   The `<hex>` value is the item's `plan_hash` from the orchestrator checkpoint item, else the
+   kickoff `## Integrity` row for its plan path. The check runs before the child reconciles with
+   `origin/main`, so a plan that changed after admission never reaches atomic execution.
    The execution child starts a new checkpoint in its own worktree, and the preparation checkpoint
    does not carry over, so the prompt also instructs the child to verify the item's GitHub issue
    read-only (gh issue view), not to call `potential_to_issue` or the promotion-entry tool, and to
@@ -278,6 +303,8 @@ carries exactly these five elements.
 Spawn parameters, passed on the `Agent` call and never written into the prompt text:
 `isolation: "worktree"`, `run_in_background: true`, branch base `origin/main`, and `model` equal to
 that item's model routing receipt's resolved model.
+
+A recorded `Owner directives:` block is not a kickoff element. The coordinator records a directive for an item in the ledger `artifacts/orchestration/owner-directives.jsonl` of that item's worktree, or of the parallel worktree, with the item's issue and branch as its scope; there is no run-wide fan-out, so each entry applies only to the item it names. Pass-down is hook-level: on Claude Code the PreToolUse hook `enforce-owner-directive-pass-down.ps1` reads the item's checkpoint and ledger and the parallel checkpoint and ledger for every worker of that item, so the directive reaches a running child without the parallel orchestrator acting. The parallel orchestrator never authors or edits entries (pass-through rule of the `owner-directives` skill).
 
 **Band and receipt source.** The parent reads each item's `complexity_band` and
 `model_routing_receipt` from the planner checkpoint `artifacts/orchestration/parallel-planner-state.json`.
@@ -399,6 +426,23 @@ Procedure, per item:
    CI-dependent acceptance criteria. When either check fails, do not record
    `merge_status: ci_green` and do not run `gh pr merge`; the item waits until its child pushes
    the check-off and re-runs S9, and the parent does not commit the check-off itself.
+   **Turn gap.** A child can end its turn with its pull request open and its CI green gate still
+   pending. On every child completion, read the child checkpoint
+   `<worktree>/artifacts/orchestration/orchestrator-state.json`, with the worktree path located by
+   `git worktree list --porcelain`. When its `step9_status` is not `passed` or its `blocked_reason`
+   is `awaiting_ci`, keep `merge_status: pr_open` and treat the item as not done: poll
+   `gh pr checks` through the parser above until the conclusion is terminal, then
+   re-delegate the child once to resume at the CI green gate, by the same re-delegation mechanism as
+   `## Per-Item Merge-Conflict Handling`; a CI-failure cycle counts toward `remediation_loop`.
+   Record `ci_green` only after that resumed run reports its CI green gate `passed`.
+   **Concurrent review.** When the child checkpoint records `review_mode: "concurrent"`, do not
+   record `merge_status: ci_green` and do not run `gh pr merge` until its last
+   `review_outcomes[]` entry is `PASS` at a current head, as the join in
+   `## Concurrent Review and CI (review_mode)` of `.claude/skills/orchestrate/SKILL.md` defines it;
+   keep `merge_status: pr_open` and treat the item as not done. Issue #1097 amends
+   `.claude/skills/orchestrate/SKILL.md` for every new run and adds no parallel-specific condition
+   to the child's PR Creation Gate. The merge gate reads the child through the item target, so
+   this step is the backstop when that target does not resolve.
 3. Execute `gh pr merge --merge <PR>` for that item's pull request, whose base is `main`.
    Do not pass `--delete-branch` or `--auto`. A zero exit status does not prove a merge: when
    `main` uses a merge queue, `gh pr merge` exits 0 after it enqueues the pull request or enables
@@ -483,6 +527,16 @@ unattended. When `main` uses a merge queue, the queue replaces that `gh pr updat
 step 3 enqueues each green pull request, the queue validates it against the latest `main`
 together with the entries ahead of it, and step 3's confirmation polling waits for the merge.
 
+**Resolution telemetry write (issue #1013).** When step 4 records `merge_status: merged` for an
+item that is the later-merging item of a tolerated pair (an entry of the checkpoint's
+`tolerated_overlaps` whose peer is already `merged` or `worktree_removed`), complete that entry's
+`observed_resolution` object in the same checkpoint write. When a conflict was detected for the
+pair, set `resolved_at` to the first `ci_green` confirmation that followed the detection,
+`resolution_minutes` to the whole minutes between `conflict_detected_at` and `resolved_at`, and
+`recorded_at`. When no conflict occurred, set `later_item`, `conflicted: false`,
+`conflict_detected_at` and `resolved_at` to null, `resolution_minutes: 0`, and `recorded_at`.
+Nothing reads `observed_resolution`; it is recorded for measurement only.
+
 ## Per-Item Merge-Conflict Handling
 
 Remediation is child-owned and parent-initiated. The conflict is always between one item's own
@@ -505,13 +559,15 @@ the escalation path.
   every entry added from each side and every version choice, then runs the three commands
   `dotnet tool restore --tool-manifest <worktree_path>/.config/dotnet-tools.json`,
   `dotnet csharpier check <worktree_path>`, and
-  `dotnet build <worktree_path>/<solution>`, each with path arguments rather than `cd`.
+  `dotnet build <worktree_path>/<solution>`, each with path arguments rather than `cd` (forms: the Command-Text Restrictions table of the `execution-environment` brief).
   A failing check reverts with
-  `git -C <worktree_path> reset --hard HEAD~1`
+  `git -C <worktree_path> reset --keep HEAD~1`
   and escalates with the tool output as the finding.
 - (d) On success the parent pushes the item branch, records `mergeable_conflicts_resolved` on the
   item, sets `merge_status: pr_open`, regenerates `parallel-status.md`, and re-enters
   `## Per-Item Merge to Main (Merge-on-Green)` at the durable `gh pr checks` confirmation step.
+
+After the issue #643 resolver escalates, the child applies the regenerate path of `## Merge-Conflict Remediation` in the orchestrate skill first, and only a fallback writes the synthetic Blocking finding and consumes an attempt.
 
 1. On a conflicted `gh pr merge --merge`, or a `not_queued` merge confirmation whose `mergeable`
    value is `CONFLICTING`, the parent detects the failure and re-delegates that item's
@@ -550,6 +606,19 @@ Boundary with F8: a merge conflict between two same-cohort items is evidence tha
 blast radius under-reported, and this feature records the child's blocked or remediated outcome
 only, leaving drift recording in `drift_events[]`, quiesce of admission, conflict recomputation
 against the observed radius, and requeue of the later-started item to F8.
+
+**Detection telemetry write (issue #1013).** When the item whose merge conflicted is the
+later-merging item of a tolerated pair whose peer is already `merged` or `worktree_removed`, set
+`later_item`, `conflicted: true`, and `conflict_detected_at` on that `tolerated_overlaps` entry's
+`observed_resolution` object, unless they are already set. Attribution is non-exclusive: the one
+conflict episode is recorded on every such tolerated pair. The resolution fields are written in
+`## Per-Item Merge to Main (Merge-on-Green)`.
+
+**Combined item remediation (issue #1013).** A combined item, whose checkpoint entry carries
+`combined_issue_nums`, remediates as one unit: one child, one `remediation_loop`, and one pull
+request. A combined item that fails review or CI is remediated within that one child and pull
+request, never splits back into separate pull requests, and is merged, blocked, or removed as a
+whole.
 
 ## Worktree Cleanup
 
@@ -657,6 +726,11 @@ commit message, the pull-request body, and an evidence artifact at
 `docs/features/parallel/<slug>/evidence/other/mergeable-conflicts.<yyyy-MM-ddTHH-mm>.md` carrying
 `Timestamp`, `Command`, `EXIT_CODE`, and the script's JSON output verbatim.
 
+The projection's `## Tolerated Overlaps` heading (issue #1013) renders `tolerated_overlaps[]`: one
+row per entry with `a`, `b`, `reasons`, `cost`, `benefit`, and, from the entry's
+`observed_resolution` object when present, `later_item`, `conflicted`, and `resolution_minutes`.
+An entry without `observed_resolution` renders those three cells empty.
+
 Regeneration boundaries — regenerate at each of the following, not only at final completion:
 
 - Run kickoff, seeding the initial projection from the manifest and the seeded cohorts.
@@ -666,6 +740,7 @@ Regeneration boundaries — regenerate at each of the following, not only at fin
 - Every append to `mutations[]`.
 - Every append to `drift_events[]`.
 - Every append to an item's `mergeable_conflicts_resolved`.
+- Every write of an `observed_resolution`.
 - Run completion in `closed` mode, or run close in `open` mode.
 
 Defining the `mutations[]` and `drift_events[]` appends as regeneration boundaries here means F6 and
@@ -677,8 +752,9 @@ This section is consumption documentation only. The checkpoint schema is owned b
 as prose invariants in `.claude/rules/parallel-orchestration.md`, and enforced by
 `scripts/dev_tools/validate_parallel_orchestrator_state.py`. Consume that schema;
 add no field to it that `.claude/rules/parallel-orchestration.md` does not declare,
-and extend no enum in it. `mergeable_conflicts_resolved` is the one declared optional item
-field.
+and extend no enum in it. The declared optional item fields are `mergeable_conflicts_resolved`,
+`preparation_status`, `plan_hash`, `base_commit`, and `band_source`, and the declared optional
+top-level field is `precedence[]` (`## Prepared-Item Admission (issue #1047)` of the rule).
 
 Fields `parallel-orchestrator` writes to `artifacts/orchestration/parallel-orchestrator-state.json`:
 `objective`, `route_id: "parallel"`, `parallel_slug`, `parallel_manifest_path`,
@@ -744,6 +820,16 @@ No completion condition involves a run-level pull request. There is no final int
 request on this surface, so completion keys on the per-item terminal states above and on nothing
 else. The Run Closing run-document pull request is a bookkeeping pull request that lands the run's
 generated documents; it is not a run-level integration pull request and merges no item work.
+
+## Nesting Depth
+
+This chain runs three levels of subagents below the main session: the coordinator at depth 1, each per-item `orchestrator` at depth 2, and the specialists that orchestrator delegates to at depth 3. Only the depth-2 orchestrator needs the `Agent` tool below the coordinator; specialists do not delegate.
+
+Requirement: Claude Code 2.1.219 or later, `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` unset or at least 3, and the skill invoked from the main session. A run started inside a subagent or fork adds one layer, and a lower limit withholds the `Agent` tool from the per-item orchestrators.
+
+Outcome when the depth is insufficient: an agent that starts without the `Agent` tool records `blocked_reason: "spawn_agent_unavailable"`, does no specialist work, and returns a line beginning `AGENT_TOOL_UNAVAILABLE`; a coordinator that receives that line from a child halts with the same reason instead of doing the child's work. The `enforce-epic-invocation-origin.ps1` hook also denies a chain delegation with `NESTING_DEPTH_INSUFFICIENT:` when the configured limit is below 3.
+
+Fallback: when the depth cannot be raised, the main session itself launches each per-item `Agent(orchestrator)` with the same delegation prompt the coordinator would have sent, including `Preparation mode: true` on the preparation path, so each orchestrator runs at depth 1 and its specialists at depth 2.
 
 ## Mutation Protocol (F6)
 
@@ -991,7 +1077,10 @@ denies with a reason prefixed `PARALLEL_WORKTREE_REMOVAL_BLOCKED`. Commands that
 `git worktree remove` always allow. This is the mechanical counterpart to `## Worktree Cleanup`.
 `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` fires on the same command and now carries a
 matching parallel allow-branch keyed on the same checkpoint, so both gates must allow for a removal
-to proceed.
+to proceed. Both gates also carry a planner allow branch (issue #1161), evaluated before the
+manifest branch, that allows removing an epic-planner preparation worktree recorded by branch in
+`planner_worktrees` of `artifacts/orchestration/epic-planner-state.json` when it is eligible, not
+in use, clean, and pushed; it reads no parallel-planner checkpoint.
 
 **Invocation-origin extension.** `.claude/hooks/enforce-epic-invocation-origin.ps1` was extended
 additively so `$script:GatedSubagentTypes` lists `epic-planner`, `epic-orchestrator`,

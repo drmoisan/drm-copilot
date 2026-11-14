@@ -6,12 +6,22 @@
 #>
 
 Describe 'enforce-epic-wave-barrier.ps1' {
+
+    BeforeEach {
+        # Restore only committed-fixture reads for this test; other paths retain the null baseline.
+        Mock Get-EpicWaveBarrierCheckpointContent -MockWith {
+            if ($Path -notlike "/synthetic-worktrees/*") { throw 'Unexpected real-reader call outside fixture paths' }
+            & $script:FixtureReader_e23677d9_GetEpicWaveBarrierCheckpointContent @PesterBoundParameters
+        }
+    }
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-wave-barrier.ps1").Path
         . $script:UnderTest
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeItemResolution.psm1')).Path -ErrorAction Stop
         Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/WorktreeRunResolution.psm1')).Path -ErrorAction Stop
+        # Capture the committed-fixture reader while retaining the null isolation baseline.
+        $script:FixtureReader_e23677d9_GetEpicWaveBarrierCheckpointContent = (Get-Command -Name Get-EpicWaveBarrierCheckpointContent -CommandType Function).ScriptBlock
         Mock Get-EpicWaveBarrierCheckpointContent -ParameterFilter { $Path -notlike "/synthetic-worktrees/*" } -MockWith { $null }
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
@@ -266,6 +276,27 @@ Describe 'enforce-epic-wave-barrier.ps1' {
             $emitted = Invoke-EpicWaveBarrierEntryPoint -ToolInputRaw $nested
             $emitted[-1] | Should -Be 0
             ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        }
+    }
+
+    Context 'script tail (issue #1159, D13)' {
+        It 'emits the deny JSON and exits 0 when the whole script runs in process' {
+            # Arrange: a PreToolUse payload without tool_input, which the shared payload reader denies as an anomaly.
+            $payload = '{"session_id":"d13-tail","hook_event_name":"PreToolUse","tool_name":"Agent"}'
+            $priorIn = [Console]::In
+            try {
+                # Act: run the script through the & route so the statements after the dot-source guard execute.
+                [Console]::SetIn([System.IO.StringReader]::new($payload))
+                $emitted = @(& $script:UnderTest)
+                $exitCode = $LASTEXITCODE
+            } finally {
+                [Console]::SetIn($priorIn)
+            }
+
+            # Assert: the tail writes the decision JSON to the pipeline and exits with the entry-point code.
+            $exitCode | Should -Be 0
+            $emitted.Count | Should -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
     }
 }

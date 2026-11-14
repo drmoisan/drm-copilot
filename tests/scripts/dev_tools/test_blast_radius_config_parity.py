@@ -39,6 +39,9 @@ from typing import TYPE_CHECKING
 import pytest
 
 from scripts.dev_tools.compute_blast_radius import conflicts, derive_blast_radius
+from scripts.dev_tools.push_down_claude_blast_radius_overlay import (
+    SHARED_SURFACES_DEMOTE_KEY,
+)
 from tests.scripts.dev_tools.blast_radius_parity_test_support import (
     BUNDLED_CONFIG,
     BYTE_EQUAL_KEYS,
@@ -47,6 +50,7 @@ from tests.scripts.dev_tools.blast_radius_parity_test_support import (
     CLASS_TWO_KEY_ASSERTIONS,
     CLASS_TWO_KEYS,
     DECLARED_TOP_LEVEL_KEYS,
+    OVERLAY_DIRECTIVE_KEYS,
     PAYLOAD_MODULE_NAMES,
     PORTABLE_SHARED_SURFACES,
     ROOT_SURFACE_FILENAME,
@@ -237,6 +241,14 @@ def test_every_top_level_key_is_classified_and_shared_by_both_copies() -> None:
         "Every top-level key in either committed copy must be classified by "
         f"DECLARED_TOP_LEVEL_KEYS; unclassified keys {unclassified}."
     )
+
+    # Assert: overlay directive keys (issue #1006) are consumed by the overlay
+    # composers, so each is disjoint from every truth-table key class and is
+    # absent from both committed copies.
+    directive_keys = frozenset(OVERLAY_DIRECTIVE_KEYS)
+    assert directive_keys == {SHARED_SURFACES_DEMOTE_KEY}
+    assert not directive_keys & DECLARED_TOP_LEVEL_KEYS
+    assert not directive_keys & all_keys
 
 
 def test_class_two_bundled_shared_surfaces_are_the_portable_set() -> None:

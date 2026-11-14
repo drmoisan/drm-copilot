@@ -55,6 +55,12 @@
         from the Python source and pins them equal. A non-ASCII extension is
         rejected before lower-casing (issue #903); ToLowerInvariant then matches
         Python's str.lower on ASCII input, and known-name membership is ordinal.
+      - Test-GenericContractToken (issue #1006) ports is_generic_contract_token.
+        Its stem array equals GENERIC_CONTRACT_STEMS; a Pester parity test reads
+        the Python constant from the source and pins $script:GenericContractStem
+        equal to it. A token is first checked ordinally to be ASCII, because a
+        .NET case-insensitive match folds the Kelvin sign and the long s to
+        ASCII letters while Python re.ASCII does not (the issue #903 precedent).
     CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
@@ -113,6 +119,20 @@ $script:KnownFileName = [System.Collections.Generic.HashSet[string]]::new(
         '.eslintignore', '.shellcheckrc'
     ),
     [StringComparer]::Ordinal)
+
+# Default spreadsheet sheet-tab stems (issue #1006). A spreadsheet application
+# names a new worksheet or chart sheet with one of these stems followed by a
+# number, so a spec that mentions Sheet1 names a worksheet, not a contract. The
+# array is closed and is pinned equal to GENERIC_CONTRACT_STEMS in the Python
+# reference by a Pester parity test, so edit both files together. The pattern is
+# anchored with \A and \z to match Python's re.fullmatch, and the ASCII pattern
+# is applied first with -cmatch so the comparison is ordinal.
+$script:GenericContractStem = [string[]]@('Sheet', 'Chart')
+$script:GenericContractPattern = [regex]::new(
+    '\A(?:' + ($script:GenericContractStem -join '|') + ')[0-9]+\z',
+    [System.Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+    [System.Text.RegularExpressions.RegexOptions]::CultureInvariant)
+$script:AsciiOnlyPattern = '\A[\x00-\x7F]*\z'
 
 function Test-PlaceholderMarker {
     <#
@@ -263,7 +283,42 @@ function Test-FileShapedComponent {
     return $script:FileExtensionPattern.IsMatch($extension.ToLowerInvariant())
 }
 
+function Test-GenericContractToken {
+    <#
+    .SYNOPSIS
+        Report whether a contract token is a default sheet-tab name (issue #1006).
+
+    .DESCRIPTION
+        Port of is_generic_contract_token. Two unrelated work items whose specs
+        both named the worksheet Sheet1 in an interface section were given a
+        hard contract_dependency edge, because the contract harvest accepts any
+        separator-free token carrying a letter. A default sheet-tab name
+        identifies no exported symbol, schema, or CLI identifier, so every
+        contract-filtering site rejects it with this predicate.
+
+    .PARAMETER Token
+        One candidate contract identifier. The empty string is accepted and
+        reports false.
+
+    .OUTPUTS
+        System.Boolean. True only when the token is ASCII and fully matches a
+        stem of $script:GenericContractStem followed by one or more ASCII
+        digits, compared case-insensitively; otherwise false.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string] $Token
+    )
+
+    if ($Token -cnotmatch $script:AsciiOnlyPattern) { return $false }
+    return $script:GenericContractPattern.IsMatch($Token)
+}
+
 Export-ModuleMember -Function `
     Test-PlaceholderMarker, `
     Test-MultipleFeatureFolderSpan, `
-    Test-FileShapedComponent
+    Test-FileShapedComponent, `
+    Test-GenericContractToken

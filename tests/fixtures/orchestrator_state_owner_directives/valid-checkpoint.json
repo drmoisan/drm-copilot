@@ -1,0 +1,46 @@
+{
+  "objective": "Validate the owner-directive fixture checkpoint.",
+  "completed_steps": [],
+  "next_step": "S5",
+  "last_updated": "2026-11-08T15:05:00Z",
+  "owner_directives": [
+    {
+      "id": "OD-1",
+      "text": "Approve one more planner revision for the owner-directive plan.",
+      "text_sha256": "b9ccabcf8f4542c3e19fdff525fc2498b2716c040f0aeab1a0d1b2457f5c3826",
+      "class": "extra_planner_revision",
+      "recorded_at": "2026-11-08T14:05:00Z",
+      "expires_at": "2026-11-09T14:05:00Z",
+      "scope": { "issue": 1139, "branch": "feature/owner-directive-relay", "step": "S5" },
+      "issued_by_session": "coordinator-session-1139"
+    },
+    {
+      "id": "OD-2",
+      "text": "Merge the pull request without waiting for the required checks.",
+      "text_sha256": "e6d251b6c331b0e9be78ec2f8be66c665267b78d4021fd556e12ae1fa5cf622f",
+      "class": "gate_bypass",
+      "recorded_at": "2026-11-08T14:10:00Z",
+      "expires_at": "2026-11-09T14:10:00Z",
+      "scope": { "issue": 1139, "branch": "feature/owner-directive-relay", "step": "S9" },
+      "issued_by_session": "coordinator-session-1139"
+    }
+  ],
+  "owner_directive_records": [
+    {
+      "directive_id": "OD-1",
+      "class": "extra_planner_revision",
+      "outcome": "honored",
+      "reason": "The owner approved one additional planner revision for this item.",
+      "decided_by": "orchestrator",
+      "decided_at": "2026-11-08T15:00:00Z"
+    },
+    {
+      "directive_id": "OD-2",
+      "class": "gate_bypass",
+      "outcome": "refused",
+      "reason": "Bypassing a required gate is an always-refused class.",
+      "decided_by": "orchestrator",
+      "decided_at": "2026-11-08T15:01:00Z"
+    }
+  ]
+}

@@ -11,7 +11,8 @@
     check of the module that imports it at run time (FR-7.3). C5 and C6 cover the D2 mermaid
     exemption, C7 the validate-bash token (D4), and C8 a SubagentStop validator that sets
     $ErrorActionPreference = 'Stop' when both the helper and a dependency fail (FR-3.3). C9 proves
-    the merge gate denies when its green-CI sibling fails to load (issue #997). Hooks run
+    the merge gate denies when its green-CI sibling fails to load (issue #997), and C10 does the
+    same for its review guard sibling (issue #1097). Hooks run
     through the & route or are dot-sourced inside the It; no test creates, renames, moves, or
     deletes a file.
 #>
@@ -39,7 +40,8 @@ Describe 'Claude hook dependency-failure special cases (issue #786)' {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path -replace '\\', '/'
         . (Join-Path $PSScriptRoot '../claude-runtime/HookDependencyGraph.Helpers.ps1')
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
-        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Reset-EpicStateProbeModuleBinding
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
         if (Get-Command Get-ArtifactFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ArtifactFileContent' -Surface 'Codex' }
         if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChangedLanguageSet' -Surface 'Codex' }
         if (Get-Command Get-CheckpointFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex' }
@@ -152,7 +154,12 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
     It 'C2: reports a nested hook-command-scanner.ps1 load failure under enforce-pr-author-skill.epic-base-branch.ps1 as that top-level dependency' {
         # Arrange: the nested scanner path resolves to a file that does not exist.
         Mock Import-Module { }
-        Mock Join-Path { 'synthetic-missing/hook-command-scanner.ps1' } -ParameterFilter { $ChildPath -eq 'hook-command-scanner.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'hook-command-scanner.ps1') { 'synthetic-missing/hook-command-scanner.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-pr-author-skill.ps1' }
         finally { Initialize-HookDependencyState }
         $reason = Get-DenyReason -Result $result
@@ -162,7 +169,12 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
 
     It 'C3: denies through the merge gate when enforce-epic-merge-gate-authorization.ps1 fails to load' {
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: enforce-epic-merge-gate-authorization.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-epic-merge-gate-authorization.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-epic-merge-gate-authorization.ps1') { throw 'simulated load failure: enforce-epic-merge-gate-authorization.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-epic-merge-gate.ps1' }
         finally { Initialize-HookDependencyState }
         $reason = Get-DenyReason -Result $result
@@ -237,11 +249,46 @@ function Import-Module { if ([string]`$args[0] -like '*$failModule') { throw 'si
 
     It 'C9: denies through the merge gate when enforce-epic-merge-gate-green-ci.ps1 fails to load' {
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: enforce-epic-merge-gate-green-ci.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-epic-merge-gate-green-ci.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-epic-merge-gate-green-ci.ps1') { throw 'simulated load failure: enforce-epic-merge-gate-green-ci.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-epic-merge-gate.ps1' }
         finally { Initialize-HookDependencyState }
         $reason = Get-DenyReason -Result $result
         $reason.StartsWith('EPIC_MERGE_GATE_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
         $reason.Contains('enforce-epic-merge-gate-green-ci.ps1') | Should -BeTrue -Because $reason
+    }
+
+    It 'C10: denies through the merge gate when enforce-epic-merge-gate-review.ps1 fails to load' {
+        Mock Import-Module { }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-epic-merge-gate-review.ps1') { throw 'simulated load failure: enforce-epic-merge-gate-review.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
+        try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-epic-merge-gate.ps1' }
+        finally { Initialize-HookDependencyState }
+        $reason = Get-DenyReason -Result $result
+        $reason.StartsWith('EPIC_MERGE_GATE_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
+        $reason.Contains('enforce-epic-merge-gate-review.ps1') | Should -BeTrue -Because $reason
+    }
+
+    It 'C11: denies through the merge gate when enforce-epic-merge-gate-child-ci.ps1 fails to load' {
+        Mock Import-Module { }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-epic-merge-gate-child-ci.ps1') { throw 'simulated load failure: enforce-epic-merge-gate-child-ci.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
+        try { $result = Invoke-HookProcess -Hook '.claude/hooks/enforce-epic-merge-gate.ps1' }
+        finally { Initialize-HookDependencyState }
+        $reason = Get-DenyReason -Result $result
+        $reason.StartsWith('EPIC_MERGE_GATE_BLOCKED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
+        $reason.Contains('enforce-epic-merge-gate-child-ci.ps1') | Should -BeTrue -Because $reason
     }
 }

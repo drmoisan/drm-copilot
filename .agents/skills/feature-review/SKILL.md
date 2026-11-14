@@ -64,7 +64,11 @@ The verdict follows from the classes of all blocking findings: no blocking findi
 The remediation inputs file carries these line formats:
 - one line `Review-Verdict: <VERDICT>` for the review,
 - inside each blocking finding block, one line `Remediability: <class>`,
-- inside each blocking finding block, one line `Remediability-Evidence: <text>` stating why the class applies.
+- inside each blocking finding block, one line `Remediability-Evidence: <text>` stating why the class applies,
+- one line `Remediation-Path: light` or `Remediation-Path: full` for the review (`full` when the line is absent),
+- inside each blocking finding block, one line `Finding-Scope: contained` or `Finding-Scope: design` (`design` when the line is absent).
+
+`Remediation-Path: light` is allowed only when there are at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`, the fix changes no spec acceptance criterion, public interface, validator contract, or hook decision, no file inventory beyond the branch diff plus tests and mirrors, and no production logic beyond the finding's named location, the cycle is opened by a review, and the prior cycle was not light. With that line the review also writes a `## Light Fix Tasks` section: one canonical `- [ ] [P0-T1] ...` line per fix, numbered in order and naming the file and the finding, and no checkbox line anywhere else in the file. The `remediation-plan.<timestamp>.md` target stays for both paths, because this review contract requires it.
 
 These lines, including the evidence text, never contain the substrings the orchestrator counts when it counts blocking findings, so their presence does not change the blocking count.
 
@@ -128,6 +132,16 @@ The tiered file-size policy (`## File Size Limit` in `.agents/skills/general-cod
 - Report each covered file at or above 700 lines as a non-blocking `Warning` row in the Findings Table of `code-review.<timestamp>.md`, naming the file and its line count. Do not write the Warning to `remediation-inputs.<timestamp>.md`, and do not give it a remediation severity label.
 - Report a covered file above 800 lines that has no entry in `config/file-size-baseline.json`, and any added or increased entry in `config/file-size-baseline.json`, as a blocking policy finding.
 - Produce no finding for the 500-line guidance tier.
+
+## Documentation Surface Check
+
+This check turns a documented-surface change without a matching coverage-ledger change into a blocking finding. It uses the evidence model: inspect the existing artifacts and do not rerun any documentation tooling.
+
+1. When `docs/documentation-estate/docs-profile.json` is absent on the branch head, the check is not applicable and produces no finding.
+2. List the changed paths with `git diff --name-only <merge-base>..HEAD`. When no changed path lies under an entry of the profile's `surface_selection.source_roots`, the check produces no finding.
+3. When at least one changed path lies under such an entry, require the newest `<FEATURE>/evidence/qa-gates/docs-surface-delta.<timestamp>.md` (the lexicographically greatest matching file), carrying the fields `Timestamp`, `Command`, `EXIT_CODE`, and `Output Summary`.
+4. When that artifact is absent, or records `EXIT_CODE: 1`, report the blocking finding `surface-change-without-ledger-change` with the line `Remediability: autonomous` and a `Remediability-Evidence:` line stating that the coverage ledger can be updated on the branch and the `surface-delta` evidence regenerated without an external dependency. Name the changed source paths in the finding.
+5. When the artifact records `EXIT_CODE: 0`, the check passes.
 
 ## Review Constraints
 

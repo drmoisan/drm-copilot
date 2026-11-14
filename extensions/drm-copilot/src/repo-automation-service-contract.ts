@@ -22,6 +22,10 @@ import type {
 } from "./mcp-repo-automation-tool-definitions-handoff";
 import type { DiscoveryServiceResult } from "./discovery-service-types";
 import type {
+  DocsCommandOutcome,
+  DocsCommandRequest,
+} from "./repo-automation-execute-docs";
+import type {
   ConfigureDiscoveryWorkspaceInput,
   ConsumeDiscoveryRootGrantInput,
   ConsumeDiscoveryToolAuthorizationInput,
@@ -295,4 +299,9 @@ export interface RepoAutomationService {
   discoveryCapabilitySentinel?(
     input: DiscoveryCapabilitySentinelInput,
   ): Promise<RepoAutomationExecutionResult>;
+  /**
+   * Run one validated docs subcommand through the workspace's
+   * `Invoke-DocsCommand.ps1` and return the parsed envelope (issue #1036).
+   */
+  runDocsCommand?(request: DocsCommandRequest): Promise<DocsCommandOutcome>;
 }

@@ -306,6 +306,37 @@ function Test-DiscoveryHandlerRegistered {
     return $true
 }
 
+function Add-DiscoveryDispatchRegistryEntry {
+    <#
+    .SYNOPSIS
+        Adds the groups of the PreToolUse dispatcher registry as PreToolUse entries (issue #1159).
+    .DESCRIPTION
+        When a PreToolUse entry of the registration invokes invoke-pretooluse-dispatch.ps1, the hooks
+        are listed in the registry pretooluse-dispatch.json of the hooks directory (settings shape
+        for both hosts). Its PreToolUse groups are read through the ReadBytes seam and appended as
+        PreToolUse entries, so a dispatched handler is seen as registered under its group matcher.
+        An unreadable or unparseable registry adds no entry; a registration that names no
+        dispatcher is returned unchanged.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)][pscustomobject]$Registration,
+        [Parameter(Mandatory = $true)][string]$RegistryPath,
+        [Parameter(Mandatory = $true)][scriptblock]$ReadBytes
+    )
+
+    $dispatcher = @($Registration.Entries | Where-Object { $_.Event -eq 'PreToolUse' -and ([string]$_.Command).Contains('invoke-pretooluse-dispatch.ps1') })
+    if (-not $Registration.Parsed -or $dispatcher.Count -eq 0) { return $Registration }
+    $bytes = & $ReadBytes $RegistryPath
+    if ($null -eq $bytes) { return $Registration }
+    try { $text = [System.Text.UTF8Encoding]::new($false, $true).GetString([byte[]]@($bytes)) } catch { return $Registration }
+    $registry = Get-DiscoveryHostRegistration -HostName 'claude-code' -ConfigurationText $text
+    if (-not $registry.Parsed) { return $Registration }
+    $entries = @($Registration.Entries) + @($registry.Entries | Where-Object { $_.Event -eq 'PreToolUse' })
+    return [pscustomobject]@{ Parsed = $true; Entries = $entries }
+}
+
 function Get-DiscoveryCapabilityObservation {
     <#
     .SYNOPSIS
@@ -355,6 +386,7 @@ function Get-DiscoveryCapabilityObservation {
         try { $configurationText = [System.Text.UTF8Encoding]::new($false, $true).GetString($configurationBytes) } catch { $configurationText = $null }
     } else { [byte[]]$configurationBytes = @() }
     $registration = Get-DiscoveryHostRegistration -HostName $HostName -ConfigurationText $configurationText
+    $registration = Add-DiscoveryDispatchRegistryEntry -Registration $registration -RegistryPath "$root/$($layout.Directory)/pretooluse-dispatch.json" -ReadBytes $ReadBytes
     $handlers = [System.Collections.Generic.List[object]]::new()
     foreach ($lifecycle in $script:HandlerEvents) {
         $handlerName = $layout[$lifecycle]
@@ -464,5 +496,6 @@ Export-ModuleMember -Function `
     Get-DiscoveryObservationEvidence, `
     Get-DiscoveryHostRegistration, `
     Test-DiscoveryHandlerRegistered, `
+    Add-DiscoveryDispatchRegistryEntry, `
     Get-DiscoveryCapabilityObservation, `
     Write-DiscoveryCapabilityAttestation

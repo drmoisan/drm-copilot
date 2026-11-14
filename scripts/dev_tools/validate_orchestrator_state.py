@@ -17,6 +17,9 @@ from scripts.dev_tools._orchestrator_state_complexity import (
     COMPLEXITY_ASSESSMENTS_KEY,
     _validate_complexity_assessments,
 )
+from scripts.dev_tools._orchestrator_state_concurrent_review import (
+    validate_concurrent_review_completion,
+)
 from scripts.dev_tools._orchestrator_state_human_interaction import (
     HUMAN_INTERACTION_KEY,
     _validate_human_interaction,
@@ -405,6 +408,7 @@ def validate_orchestrator_state_text(
         errors.extend(validate_phase_completeness(state_map))
         errors.extend(validate_routing_contract(state_map))
         errors.extend(validate_preparation_terminal_contract(state_map))
+        errors.extend(validate_concurrent_review_completion(state_map))
 
     if require_pr_creation_ready:
         # Independent of require_complete: the pre-PR-creation readiness gate

@@ -84,6 +84,7 @@ def base_success_responses(
         "powershell": {
             "PoshQC: format": [make_result(0)],
             "PoshQC: analyze": [make_result(0)],
+            "PoshQC: leak scan": [make_result(0)],
             "PoshQC: test": [make_result(0)],
         },
         "typescript": {
@@ -318,6 +319,7 @@ def test_pipeline_runs_steps_in_order() -> None:
     assert [call[0] for call in factory.runners["powershell"].calls] == [
         "PoshQC: format",
         "PoshQC: analyze",
+        "PoshQC: leak scan",
         "PoshQC: test",
     ]
     assert [call[0] for call in factory.runners["typescript"].calls] == [

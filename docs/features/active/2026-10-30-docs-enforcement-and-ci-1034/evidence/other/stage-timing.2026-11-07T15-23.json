@@ -1,0 +1,26 @@
+[
+  {
+    "stage": "remediation_cycle_4",
+    "attempt": 1,
+    "started_at": "2026-11-07T13:41:25Z",
+    "ended_at": "2026-11-07T14:58:00Z"
+  },
+  {
+    "stage": "pr_creation",
+    "attempt": 1,
+    "started_at": "2026-11-07T14:58:00Z",
+    "ended_at": "2026-11-07T15:01:33Z"
+  },
+  {
+    "stage": "ci_gate",
+    "attempt": 1,
+    "started_at": "2026-11-07T15:01:33Z",
+    "ended_at": "2026-11-07T15:22:54Z"
+  },
+  {
+    "stage": "merge",
+    "attempt": 1,
+    "started_at": "2026-11-07T15:22:54Z",
+    "ended_at": null
+  }
+]

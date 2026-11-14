@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import argparse
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 try:
@@ -150,7 +150,7 @@ class AgenticSyncer:
         Returns:
             SyncSummary: Summary of per-file decisions and timing.
         """
-        started = datetime.now(timezone.utc)
+        started = datetime.now(UTC)
         actions: list[SyncAction] = []
 
         # Process each governance root separately to avoid cross-category matches.
@@ -171,7 +171,7 @@ class AgenticSyncer:
                 )
                 actions.append(action)
 
-        finished = datetime.now(timezone.utc)
+        finished = datetime.now(UTC)
         return SyncSummary(
             repo_left=str(left_repo),
             repo_right=str(right_repo),

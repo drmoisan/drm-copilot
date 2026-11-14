@@ -1,0 +1,258 @@
+{
+  "objective": "Fix the cleanup-worktrees workflow being blocked by the checkpoint gates (issue 1026), now that the gate fixes from issues 1010 and 1011 have merged.",
+  "change_budget_estimate": "Large: preimplementation gate cleanup-context leg (Claude hook and Codex twin), PR-author consolidation readiness (docs-only leg), cleanup-merged-worktrees skill text, execution-environment brief (six copies), bundled mirrors, Pester tests. More than three production files and cross-runtime parity.",
+  "path_selected": "large",
+  "route_id": "large",
+  "route_change": {
+    "from": "small",
+    "to": "large",
+    "reason": "Reproduction (evidence/regression-testing/reproduction.2026-11-03T11-56.md) confirmed four blockers spanning the preimplementation gate, the PR-author hook, the skill, and the brief, with Codex and bundle parity: more than three production files.",
+    "changed_at": "2026-11-03T11:58:00Z"
+  },
+  "promotion-type": "bug",
+  "short-name": "cleanup-worktrees-workflow-blocked-by-checkpoint-gates",
+  "relativeFile": "docs/features/potential/promoted/2026-10-30-cleanup-worktrees-workflow-blocked-by-checkpoint-gates.md",
+  "long-name": "cleanup-worktrees-workflow-blocked-by-checkpoint-gates",
+  "issue-num": "1026",
+  "feature-folder": "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026",
+  "work-mode": "full-bug",
+  "plan-path": "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/plan.2026-11-03T06-52.md",
+  "branch": "bug/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026",
+  "lifecycle_ready": true,
+  "completed_steps": [
+    "S1_scope",
+    "S3_promotion",
+    "S3a_feature_folder",
+    "S3a_reproduction",
+    "S3b_research",
+    "S4_spec",
+    "S5_atomic_planning",
+    "S5_preflight"
+  ],
+  "design_decisions": {
+    "recorded_at": "2026-11-03T12:12:35Z",
+    "basis": "Autonomous-mode decisions on research Open Questions 2-7.",
+    "run_id_binding": "none: no PR-side carrier exists; the diff allowlist, branch, and fresh manifest bound the PR",
+    "codex_non_goals": "accepted: Codex has no PR-author gate, no checkpoint-backed model-routing receipt gate, no manifest removal branch, and no cleanup skill; only the preimplementation-gate legs are mirrored",
+    "scratch_temp_root": "accept both the long-name and 8.3 short-name spelling of the OS temporary root (measured: GetTempPath returns long form, scratchpad is short form)",
+    "agent_memory_prefix": "kept in the allowlist (zero tracked files here; effective in consumer repositories)",
+    "pr_context_location": "skill text directs collect_pr_context with workspace_root set to the consolidation worktree",
+    "jq_on_host": "out of scope (script-internal --preserve dependency, not a gate)"
+  },
+  "reproduction": {
+    "result": "partially_still_broken",
+    "evidence": "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/evidence/regression-testing/reproduction.2026-11-03T11-56.md",
+    "still_broken": [
+      "manifest Write denied: enforce-orchestration-preimplementation-gate.ps1 Test-ImplementationPath",
+      "SCRATCH .ps1/.py Write denied: enforce-orchestration-preimplementation-gate.ps1 Test-ImplementationPath",
+      "git add/commit of docs and agent-memory paths denied: Test-ImplementationCommand with Test-ExemptOrchestrationStagingCommand (helpers)",
+      "consolidation PR carrying .claude/agent-memory paths denied: enforce-pr-author-skill-helpers.ps1 Get-PrAuthorBypassReason via hook-docs-only-diff.ps1 Get-DocsOnlyDiffTextViolation",
+      "cleanup-merged-worktrees SKILL.md step 4 requires the per-feature --require-pr-creation-ready preflight"
+    ],
+    "not_reproduced": [
+      "git push (not classified as implementation)",
+      "--apply and --preserve script-internal git calls",
+      "removal gate manifest branch exists (issue 635); blocked only transitively by the manifest write"
+    ]
+  },
+  "next_step": "S6_atomic_execution:P9-T5",
+  "preflight_confirm": {
+    "status": "clear",
+    "signal": "PREFLIGHT: ALL CLEAR; CONVERGENCE: NO FURTHER ROUNDS EXPECTED; no fixes",
+    "completed_at": "2026-11-03T14:07:00Z"
+  },
+  "plan_revision": {
+    "count": 1,
+    "reason": "execution blocked at P8-T7: wrong file set (Discovery guard baseline mocks in 24 suites)",
+    "commit": "c65432ce9",
+    "planner_signal": "PLANNER-INTERNAL-REVIEW: PASS; SELF-REVIEW: RE-DERIVED THIS PASS; repository CLI plan validation exit 0"
+  },
+  "execution_progress": {
+    "status": "paused_by_owner",
+    "previous_block": "P8-T7 (resolved by plan revision c65432ce9)",
+    "checked_through": "P9-T4",
+    "last_pushed_commit": "79244e2c4",
+    "spec_ac_checked": "17 of 21",
+    "defect": "PREFLIGHT-DEFECT [P8-T7]/[P9-T8] wrong file set: the Discovery guard requires a Get-CleanupWorktreeManifestContent baseline mock in 24 existing PR-author and model-routing suites; P9-T8 forbids editing them",
+    "evidence": "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/evidence/other/parity-and-guard-tests.2026-11-03T13-47.md"
+  },
+  "preflight": {
+    "iterations": 1,
+    "final_status": "clear",
+    "fix_record": "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/evidence/other/preflight-fixes.2026-11-03T12-48.md"
+  },
+  "step5_status": "in_progress",
+  "step6_status": "pending",
+  "step7_status": "pending",
+  "step8_status": "pending",
+  "step9_status": "pending",
+  "step10_status": "pending",
+  "blocked_reason": "none",
+  "pause": {
+    "recorded_at": "2026-11-03T14:36:00Z",
+    "source": "owner pause relayed by the coordinator (to the executor, then to this orchestrator at 2026-11-03T14:35Z); the owner will re-open the work in a Codespace",
+    "snapshot": "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/evidence/other/orchestrator-state-snapshot.2026-11-03T14-35.json",
+    "head_sha": "79244e2c49cb9b52d036aa266b897589aa5f0102",
+    "worktree_clean": true,
+    "last_completed_task": "P9-T4",
+    "next_task": "P9-T5",
+    "plan_tasks_checked": "49 of 55",
+    "spec_ac_checked": "17 of 21 (open: AC13, AC18, AC20, AC21)",
+    "resume_instruction": "resume atomic-executor at P9-T5 through P9-T10, then S7 feature review, remediation as needed, pr-author, S9"
+  },
+  "model_budget": {
+    "fable_policy": "disabled"
+  },
+  "last_updated": "2026-11-03T14:36:00Z",
+  "delegation_receipts": {
+    "agents": [
+      {
+        "step": "S3b_research",
+        "agent_name": "task-researcher",
+        "agent_id": "research-1026",
+        "skill_source": ".claude/agents/task-researcher.md",
+        "started_at": "2026-11-03T11:59:00Z",
+        "completed_at": "2026-11-03T12:11:41Z",
+        "result_signal": "research-path: docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/research/research.2026-11-03T12-06.md",
+        "artifact_paths": [
+          "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/research/research.2026-11-03T12-06.md"
+        ]
+      },
+      {
+        "step": "S4_spec",
+        "agent_name": "prd-feature",
+        "agent_id": "spec-1026",
+        "skill_source": ".claude/agents/prd-feature.md",
+        "started_at": "2026-11-03T12:14:00Z",
+        "completed_at": "2026-11-03T12:19:00Z",
+        "result_signal": "spec-path: docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/spec.md (21 acceptance criteria)",
+        "artifact_paths": [
+          "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/spec.md"
+        ]
+      },
+      {
+        "step": "S5_atomic_planning",
+        "agent_name": "atomic-planner",
+        "agent_id": "planner-1026",
+        "skill_source": ".claude/agents/atomic-planner.md",
+        "started_at": "2026-11-03T12:21:00Z",
+        "completed_at": "2026-11-03T12:37:00Z",
+        "result_signal": "PLANNER-INTERNAL-REVIEW: PASS; SELF-REVIEW: RE-DERIVED THIS PASS; plan validation passed (repository CLI, exit 0); 54 tasks, 10 phases",
+        "artifact_paths": [
+          "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/plan.2026-11-03T06-52.md"
+        ]
+      },
+      {
+        "step": "S5_preflight",
+        "agent_name": "atomic-executor",
+        "agent_id": "preflight-1026",
+        "skill_source": ".claude/agents/atomic-executor.md",
+        "started_at": "2026-11-03T12:39:00Z",
+        "completed_at": "2026-11-03T12:54:00Z",
+        "result_signal": "PREFLIGHT: ALL CLEAR; CONVERGENCE: NO FURTHER ROUNDS EXPECTED; 12 PREFLIGHT-FIX lines, 0 PREFLIGHT-DEFECT lines; plan re-validated (repository CLI, exit 0)",
+        "artifact_paths": [
+          "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/evidence/other/preflight-fixes.2026-11-03T12-48.md",
+          "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026/plan.2026-11-03T06-52.md"
+        ]
+      }
+    ],
+    "promotion": {
+      "issue": {
+        "ok": true,
+        "tool": "potential_to_issue",
+        "issue_url": "https://github.com/drmoisan/drm-copilot/issues/1026"
+      },
+      "feature_folder": {
+        "ok": true,
+        "tool": "new_active_feature_folder",
+        "destination_path": "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026"
+      }
+    }
+  },
+  "mcp_call_receipts": [
+    {
+      "tool": "new_active_feature_folder",
+      "ok": true,
+      "evidence": "folder docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026 present in the item worktree"
+    }
+  ],
+  "model_routing_preflight": {
+    "status": "pass",
+    "checked_at": "2026-11-03T11:59:00Z",
+    "validator_command": "poetry run python scripts/dev_tools/validate_orchestration_artifacts.py orchestrator-state --require-model-routing artifacts/orchestration/orchestrator-state.json",
+    "output_summary": "orchestrator-state validation passed; exit 0"
+  },
+  "skill_receipts": [],
+  "complexity_assessments": [
+    {
+      "phase": "research",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": ["cross_module_contract_change"],
+      "rationale": "Relaxes an enforcement-gate contract shared by Claude hooks, Codex twins, the PR-author hook, and the cleanup skill.",
+      "assessed_at": "2026-11-03T11:58:00Z"
+    },
+    {
+      "phase": "spec",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": ["cross_module_contract_change"],
+      "rationale": "Spec defines new allow legs in three enforcement gates shared with Codex twins and the cleanup skill.",
+      "assessed_at": "2026-11-03T12:13:00Z"
+    },
+    {
+      "phase": "planning",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": ["cross_module_contract_change"],
+      "rationale": "Plan spans three gates, Codex twins, bundle mirrors, skill and six brief copies under pinned line caps.",
+      "assessed_at": "2026-11-03T12:20:00Z"
+    },
+    {
+      "phase": "execution",
+      "band": "C3",
+      "floor": "C3",
+      "signals_present": ["cross_module_contract_change"],
+      "rationale": "Preflight and execution of a 54-task plan changing enforcement-gate contracts across Claude, Codex, and bundle copies.",
+      "assessed_at": "2026-11-03T12:38:00Z"
+    }
+  ],
+  "model_routing_receipts": [
+    {
+      "agent": "task-researcher",
+      "phase": "research",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "prd-feature",
+      "phase": "spec",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-planner",
+      "phase": "planning",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "execution",
+      "complexity_band": "C3",
+      "fable_policy": "disabled",
+      "table_model": "opus",
+      "clamped_from": null,
+      "model": "opus"
+    }
+  ]
+}

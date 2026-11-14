@@ -101,7 +101,7 @@ param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Issue #669 owns worktree location and path normalisation; issue #673 owns the
 # portable-identity resolution this gate now selects a worktree with. Both imports are
 # unguarded on purpose: a resolution module that cannot be loaded is itself the
@@ -109,8 +109,8 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.ps
 # a permissive path. Both are required rather than one: the absolute-path join the probe
 # step below calls is exported only by the first, because a module whose exports are pinned
 # by an explicit list does not re-export a sibling's functions to its own importer.
-try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTargetResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeTargetResolution.psm1' -ErrorRecord $_ }
-try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTargetResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeTargetResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-prd-feature-before-planner-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-prd-feature-before-planner-helpers.ps1' -ErrorRecord $_ }
 function Get-PrdFeatureFileExistence {
     <#

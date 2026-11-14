@@ -67,7 +67,7 @@ Describe 'enforce-completion-consistency.ps1 Codex fail-closed checkpoint handli
                 [Parameter(Mandatory)]
                 [scriptblock] $Reader
             )
-            return Invoke-CompletionConsistencyDecision -ToolInputRaw $Json -CheckpointReader $Reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null }
+            return Invoke-CompletionConsistencyDecision -ToolInputRaw $Json -CheckpointReader $Reader -FolderExistsCheck { param($p) $false } -RoutingMatrixReader { $null } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
         }
     }
 
