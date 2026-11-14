@@ -3,7 +3,8 @@
  *
  * Runs the workspace copy of `.claude/lib/docs/Invoke-DocsCommand.ps1` with
  * `pwsh -NoProfile -File <script> -Command <subcommand> -Json <options>`, with
- * the workspace root as working directory and empty stdin, once per call and
+ * the workspace root as working directory and the request stdin (empty unless
+ * an update_docs_ledger operations batch supplies its document), once per call and
  * without retry. Before launch it checks, in order, the absolute workspace
  * root, the entry script and `pwsh`. TypeScript writes nothing.
  */
@@ -33,6 +34,8 @@ export interface DocsCommandRequest {
   readonly subcommand: string;
   /** Option tokens in declarative-table order. */
   readonly options: ReadonlyArray<string>;
+  /** Standard input of the process; empty when absent (issue #1173 operations batch). */
+  readonly stdin?: string;
 }
 
 /** Injected collaborators of {@link invokeDocsCommand}. */
@@ -168,7 +171,7 @@ export async function invokeDocsCommand(
   const outcome = await deps.launcher.launch(
     pwshPath,
     buildDocsCommandArguments(request.subcommand, request.options),
-    { cwd: request.workspaceRoot, stdin: "" },
+    { cwd: request.workspaceRoot, stdin: request.stdin ?? "" },
   );
   if (outcome.launchError !== undefined) {
     throw new DocsHostError(

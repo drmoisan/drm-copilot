@@ -15,7 +15,8 @@
     Resolve-DocsPageLinkTarget skips URI schemes, // prefixes and empty targets; splits at the
     first #, drops a ?query, percent-decodes, resolves a leading / from the repository root and
     any other path against the page directory with POSIX segment normalization. Backslash is
-    not a separator. Get-DocsPageLinkFinding reports DOCS_PAGE_LINK_BROKEN,
+    not a separator. Get-DocsPageExternalTarget omits a resolved path that fails
+    Test-DocsRelativePath, so the check command never probes it. Get-DocsPageLinkFinding reports DOCS_PAGE_LINK_BROKEN,
     DOCS_PAGE_LINK_ESCAPES_REPOSITORY, DOCS_PAGE_ANCHOR_MISSING and DOCS_PAGE_LINK_ANCHOR_MISSING
     and returns the page edges used for orphan detection.
 
@@ -36,6 +37,7 @@ $ErrorActionPreference = 'Stop'
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsFinding.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsPageMarkdown.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSurface.psm1') -ErrorAction Stop
 
 $script:DocsPageInlineLinkPattern = '(?<bang>!?)\[(?<text>(?:[^\[\]]|\[[^\[\]]*\])*)\]\([ \t]*(?<dest><[^<>]*>|[^\s()<>]*(?:\([^\s()]*\)[^\s()<>]*)*)(?:[ \t]+(?:"[^"]*"|''[^'']*''|\([^()]*\)))?[ \t]*\)'
 $script:DocsPageDefinitionPattern = '^ {0,3}\[(?<label>[^\]]+)\]:[ \t]*(?<dest><[^<>]*>|\S+)'
@@ -227,9 +229,11 @@ function Get-DocsPageExternalTarget {
     .SYNOPSIS
         Returns the sorted, de-duplicated resolved link paths that are neither pages nor page directories.
     .DESCRIPTION
-        PageLink maps each page path to its Get-DocsPageLink records. Skipped targets and
-        targets above the repository root are not returned. These are the paths whose existence
-        the check command asks Context.TestFile about.
+        PageLink maps each page path to its Get-DocsPageLink records. Skipped targets, targets
+        above the repository root and resolved paths that fail Test-DocsRelativePath (for example
+        a target holding '|', issue #1173) are not returned. These are the paths whose existence
+        the check command asks Context.TestFile about, so a malformed target never reaches it and
+        Get-DocsPageLinkFinding reports it as DOCS_PAGE_LINK_BROKEN.
     #>
     [CmdletBinding()]
     [OutputType([string[]], [object[]])]
@@ -244,6 +248,8 @@ function Get-DocsPageExternalTarget {
         foreach ($link in @($PageLink[$page])) {
             $resolved = Resolve-DocsPageLinkTarget -PagePath ([string] $page) -Target ([string] $link.Target)
             if ($resolved.Skip -or $resolved.EscapesRepository -or ([string] $resolved.Path).Length -eq 0) { continue }
+            # A path outside the docs common relative-path grammar cannot exist; the link finding reports it as broken.
+            if (-not (Test-DocsRelativePath -Path ([string] $resolved.Path))) { continue }
             $found = Find-DocsPageLinkPage -Path $resolved.Path -PageSet $pages
             if ($null -eq $found.Page -and -not $found.Directory) { [void]$external.Add([string] $resolved.Path) }
         }

@@ -1,0 +1,11 @@
+# Task Check P1-T2
+
+Timestamp: 2026-11-14T18-37
+Command: sh SCRATCH/issue-1173-c1-tsfiles.sh src/mcp-tool-inputs-docs.ts src/mcp-tool-inputs-docs-grammar.ts src/mcp-tool-inputs-docs-ledger-batch.ts jest.docs-coverage.json (Prettier check, ESLint, npm run typecheck); sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest-extension "--testPathPatterns=(mcp-tool-inputs-docs|mcp-docs-tool-definitions|repo-automation-execute-docs)" --json --outputFile=SCRATCH/issue-1173-c1-tc-p1t2.json
+EXIT_CODE: 0
+Output Summary:
+- Changed files: extensions/drm-copilot/src/mcp-tool-inputs-docs-grammar.ts (new; the D-1 symbols moved unchanged), extensions/drm-copilot/src/mcp-tool-inputs-docs.ts (moved definitions removed; import from the grammar module; named re-exports of every moved exported symbol, export type for DocsGrammar), extensions/drm-copilot/src/mcp-tool-inputs-docs-ledger-batch.ts (import statement now names ./mcp-tool-inputs-docs-grammar), extensions/drm-copilot/jest.docs-coverage.json (entry ./src/mcp-tool-inputs-docs-grammar.ts with lines 85 and branches 75; existing entries kept).
+- Re-search before the edit (extensions/drm-copilot/test, tests, extensions/drm-copilot/src, packages for mcp-tool-inputs-docs): hits are the six test files and four source files the plan lists, plus the new import-graph test; no further hit. Disposition: all unchanged.
+- Selection (rule: every test file under extensions/drm-copilot/test that imports any of the three modules, plus the import-graph test): mcp-tool-inputs-docs.test.ts, mcp-tool-inputs-docs.ledger.test.ts, mcp-tool-inputs-docs.reference.test.ts, mcp-tool-inputs-docs-ledger-batch.test.ts, mcp-docs-tool-definitions.test.ts, repo-automation-execute-docs.test.ts, mcp-tool-inputs-docs.import-graph.test.ts.
+- Prettier check: exit 0. ESLint: exit 0 (one "File ignored" warning for the JSON file, which the lint configuration does not cover). Typecheck: exit 0.
+- Jest selection: exit 0; 7 suites passed, 0 failed; 68 tests passed, 0 failed. The three P1-T1 tests that failed now pass: has no import cycle reachable from mcp-tool-inputs-docs.ts, has no import cycle reachable from mcp-tool-inputs-docs-ledger-batch.ts, keeps mcp-tool-inputs-docs-grammar.ts free of imports of either docs input module.

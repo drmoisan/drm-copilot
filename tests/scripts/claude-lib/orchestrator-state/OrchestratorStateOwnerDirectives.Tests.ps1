@@ -200,6 +200,42 @@ Describe 'OrchestratorStateOwnerDirectives block rules B1-B8' {
         Assert-OwnerDirectiveSingleError -Text $text -Expected $script:B5
     }
 
+    It 'B5 digest of U+1F600 equals the SHA-256 of bytes F0 9F 98 80' {
+        $expected = [System.Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData([byte[]] @(0xF0, 0x9F, 0x98, 0x80))).ToLowerInvariant()
+        $digest = InModuleScope OrchestratorStateOwnerDirectives { Get-OwnerDirectiveTextDigest -Text ([char]::ConvertFromUtf32(0x1F600)) }
+        $digest | Should -BeExactly $expected
+    }
+
+    It 'B5 accepts text containing <Name> with its UTF-8 digest' -ForEach @(
+        @{ Name = 'an em dash'; Text = ('Run the items in parallel ' + [char]0x2014 + ' the merge cost is lower.') }
+        @{ Name = 'curly quotes'; Text = ('Use the ' + [char]0x201C + 'fast' + [char]0x201D + ' route for the items.') }
+        @{ Name = 'a non-BMP character'; Text = ('Ship the items in parallel ' + [char]::ConvertFromUtf32(0x1F600) + ' today.') }
+    ) {
+        $directiveText = $Text
+        $text = Edit-OwnerDirectiveFixture -WithoutRecords -Edit {
+            param($root)
+            $root['owner_directives'][0]['text'] = ConvertTo-OwnerDirectiveJsonValue $directiveText
+            $root['owner_directives'][0]['text_sha256'] = ConvertTo-OwnerDirectiveJsonValue (Get-TestTextDigest -Text $directiveText)
+        }
+        $errors = Get-OrchestratorStateOwnerDirectiveError -CheckpointText $text
+        $errors.Count | Should -Be 0 -Because ($errors -join ' | ')
+    }
+
+    It 'B5 rejects text containing <Name> whose digest covers the substituted text' -ForEach @(
+        @{ Name = 'an em dash'; Text = ('Run the items in parallel ' + [char]0x2014 + ' the merge cost is lower.'); Altered = 'Run the items in parallel - the merge cost is lower.' }
+        @{ Name = 'curly quotes'; Text = ('Use the ' + [char]0x201C + 'fast' + [char]0x201D + ' route for the items.'); Altered = 'Use the "fast" route for the items.' }
+        @{ Name = 'a non-BMP character'; Text = ('Ship the items in parallel ' + [char]::ConvertFromUtf32(0x1F600) + ' today.'); Altered = 'Ship the items in parallel  today.' }
+    ) {
+        $directiveText = $Text
+        $alteredText = $Altered
+        $text = Edit-OwnerDirectiveFixture -WithoutRecords -Edit {
+            param($root)
+            $root['owner_directives'][0]['text'] = ConvertTo-OwnerDirectiveJsonValue $directiveText
+            $root['owner_directives'][0]['text_sha256'] = ConvertTo-OwnerDirectiveJsonValue (Get-TestTextDigest -Text $alteredText)
+        }
+        Assert-OwnerDirectiveSingleError -Text $text -Expected $script:B5
+    }
+
     It 'B6 rejects the class <Class>' -ForEach @(
         @{ Class = 'approval' }
         @{ Class = 'Scheduling' }

@@ -11,6 +11,7 @@
     Get-DocsRoleRequiredToken names the tokens each role must report, ConvertFrom-DocsRoleOutput
     parses them, and Test-DocsRoleOutput applies the value rules. File existence is checked only
     through the injected -TestFile scriptblock, so callers and tests control the file-system boundary.
+    docs-profile and docs-pages-written must exist; docs-snapshot is checked for relative form only.
 
 .NOTES
     PowerShell 7+. Byte-identical bundled mirror at
@@ -138,18 +139,21 @@ function Get-DocsRoleIntegerFinding {
 }
 
 function Get-DocsRolePathFinding {
-    # Returns the findings for one reported repository path: relative form, optional .md suffix, existence through the seam.
+    # Returns the findings for one reported repository path: relative form, optional .md suffix, and existence
+    # through the seam unless -SkipExistence is set, in which case only the form rules apply (issue #1173).
     [CmdletBinding()]
     [OutputType([string[]])]
     param(
         [Parameter(Mandatory)] [string] $Token,
         [AllowEmptyString()] [string] $Path,
         [Parameter(Mandatory)] [scriptblock] $TestFile,
-        [switch] $RequireMarkdown
+        [switch] $RequireMarkdown,
+        [switch] $SkipExistence
     )
 
     if (-not (Test-DocsRoleRelativePath -Value $Path)) { return [string[]]@("$Token path '$Path' must be repository-relative with forward slashes") }
     if ($RequireMarkdown -and -not $Path.EndsWith('.md', [System.StringComparison]::Ordinal)) { return [string[]]@("$Token path '$Path' must end with .md") }
+    if ($SkipExistence) { return [string[]]@() }
     if (-not [bool](& $TestFile $Path)) { return [string[]]@("$Token path '$Path' does not exist") }
     return [string[]]@()
 }
@@ -170,9 +174,10 @@ function Get-DocsRoleSpecificFinding {
     $exitToken = $null
     switch -CaseSensitive ($Role) {
         'docs-architect' {
-            foreach ($token in 'docs-profile', 'docs-snapshot') {
-                if ($Tokens.ContainsKey($token)) { foreach ($f in (Get-DocsRolePathFinding -Token $token -Path $Tokens[$token] -TestFile $TestFile)) { $findings.Add($f) } }
-            }
+            # docs-profile must exist; docs-snapshot is checked for relative form only, because the role cannot
+            # write it and on a first run it does not exist until the root inventory step persists it (issue #1173).
+            if ($Tokens.ContainsKey('docs-profile')) { foreach ($f in (Get-DocsRolePathFinding -Token 'docs-profile' -Path $Tokens['docs-profile'] -TestFile $TestFile)) { $findings.Add($f) } }
+            if ($Tokens.ContainsKey('docs-snapshot')) { foreach ($f in (Get-DocsRolePathFinding -Token 'docs-snapshot' -Path $Tokens['docs-snapshot'] -TestFile $TestFile -SkipExistence)) { $findings.Add($f) } }
             if ($Tokens.ContainsKey('docs-pages-planned')) { $f = Get-DocsRoleIntegerFinding -Token 'docs-pages-planned' -Value $Tokens['docs-pages-planned']; if ($f) { $findings.Add($f) } }
             if ($result -ceq 'PASS' -and -not [regex]::IsMatch([string]$Text, '(?m)^## Information Architecture[ \t]*\r?$')) {
                 $findings.Add('docs-result PASS requires a ## Information Architecture section in the report')

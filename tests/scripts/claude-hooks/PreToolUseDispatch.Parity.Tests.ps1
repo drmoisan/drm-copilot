@@ -228,6 +228,30 @@ Describe 'PreToolUse dispatcher registration shape (issue #1159)' {
     }
 }
 
+Describe 'PreToolUse dispatcher stdin reader parity (issue #1187)' {
+    It 'defines the Claude and Codex stdin readers with equal bodies apart from the name' {
+        # Arrange: the two reader definitions, parsed from the two dispatchers only.
+        $readers = @(
+            @{ Path = Join-Path $script:RepoRoot '.claude/hooks/invoke-pretooluse-dispatch.ps1'; Name = 'Read-PreToolUseDispatchStandardInput' }
+            @{ Path = Join-Path $script:RepoRoot '.codex/hooks/invoke-pretooluse-dispatch.ps1'; Name = 'Read-CodexPreToolUseDispatchStandardInput' }
+        )
+
+        # Act
+        $bodies = foreach ($reader in $readers) {
+            $tokens = $null; $parseErrors = $null
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile($reader.Path, [ref] $tokens, [ref] $parseErrors)
+            $readerName = $reader.Name
+            $definition = $ast.Find({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $readerName }, $true)
+            $definition | Should -Not -BeNullOrEmpty -Because "$($reader.Path) must define $readerName"
+            $definition.Body.Extent.Text
+        }
+
+        # Assert: ordinal equality of the two function bodies.
+        @($bodies).Count | Should -Be 2
+        [string]::Equals([string] $bodies[0], [string] $bodies[1], [System.StringComparison]::Ordinal) | Should -BeTrue -Because 'the Codex reader duplicates the Claude reader body exactly'
+    }
+}
+
 Describe 'PreToolUse dispatcher per-hook parity (issue #1159)' {
     It '<Runtime> envelope <Key> yields the same per-hook and combined decisions in both modes' -ForEach $script:EnvelopeRows {
         # Act: every selected hook as its own process, concurrently, and the dispatcher once with the per-hook trace.

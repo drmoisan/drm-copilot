@@ -1,7 +1,7 @@
 ---
 owner: "<owner-id>"
 last_reviewed: "<yyyy-mm-dd>"
-audience: "<audience-id>"
+audience: ["<audience-id>"]
 diataxis_mode: "reference"
 surface_refs: ["<element-id>"]
 ---

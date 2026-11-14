@@ -109,22 +109,122 @@ Describe 'Invoke-CodexPreToolUseDispatchEntryPoint' {
 
 Describe 'Codex invoke-pretooluse-dispatch.ps1 script tail' {
     It 'denies a payload without a tool name through the registry beside the script when run in process' {
-        # Arrange: the default payload and registry readers run; a payload without tool_name selects no hook.
+        # Arrange: the default payload reader is mocked to return a payload without tool_name, so no row reads the
+        # process stdin; the default registry reader runs.
         $entryPath = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../../.codex/hooks/invoke-pretooluse-dispatch.ps1')).ProviderPath
-        $priorIn = [Console]::In
-        try {
-            # Act: run the script through the & route so the statements after the dot-source guard execute.
-            [Console]::SetIn([System.IO.StringReader]::new('{"session_id":"dispatch-tail","hook_event_name":"PreToolUse"}'))
-            $emitted = @(& $entryPath)
-            $exitCode = $LASTEXITCODE
-        } finally {
-            [Console]::SetIn($priorIn)
-        }
+        Mock Read-CodexPreToolUseDispatchStandardInput { '{"session_id":"dispatch-tail","hook_event_name":"PreToolUse"}' }
+
+        # Act: run the script through the & route so the statements after the dot-source guard execute.
+        $emitted = @(& $entryPath)
+        $exitCode = $LASTEXITCODE
 
         # Assert
         $exitCode | Should -Be 0
         $emitted.Count | Should -Be 1
         ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason | Should -BeLike 'HOOK_DISPATCH_BLOCKED: *tool_name*'
+        Should -Invoke Read-CodexPreToolUseDispatchStandardInput -Times 1 -Exactly
+    }
+}
+
+Describe 'Read-CodexPreToolUseDispatchStandardInput (issue #1187)' {
+    It 'decodes <Name> from UTF-8 bytes exactly' -ForEach @(
+        @{ Name = 'an em dash'; Text = ('{"t":"a' + [char]0x2014 + 'b"}') }
+        @{ Name = 'curly quotes'; Text = ('{"t":"' + [char]0x201C + 'q' + [char]0x201D + '"}') }
+        @{ Name = 'a non-BMP character'; Text = ('{"t":"x' + [char]::ConvertFromUtf32(0x1F600) + '"}') }
+    ) {
+        # Arrange
+        $stream = [System.IO.MemoryStream]::new([System.Text.UTF8Encoding]::new($false).GetBytes($Text))
+
+        # Act
+        $result = Read-CodexPreToolUseDispatchStandardInput -OpenStream { $stream }.GetNewClosure()
+
+        # Assert
+        $result | Should -BeExactly $Text
+    }
+
+    It 'strips a leading UTF-8 byte order mark' {
+        $stream = [System.IO.MemoryStream]::new([byte[]] @(0xEF, 0xBB, 0xBF, 0x61, 0x62, 0x63))
+        Read-CodexPreToolUseDispatchStandardInput -OpenStream { $stream }.GetNewClosure() | Should -BeExactly 'abc'
+    }
+
+    It 'maps an invalid byte to U+FFFD without throwing' {
+        $stream = [System.IO.MemoryStream]::new([byte[]] @(0x61, 0xFF, 0x62))
+        Read-CodexPreToolUseDispatchStandardInput -OpenStream { $stream }.GetNewClosure() | Should -BeExactly ('a' + [char]0xFFFD + 'b')
+    }
+
+    It 'disposes the stream it reads' {
+        $stream = [System.IO.MemoryStream]::new([byte[]] @(0x61))
+        $null = Read-CodexPreToolUseDispatchStandardInput -OpenStream { $stream }.GetNewClosure()
+        $stream.CanRead | Should -BeFalse
+    }
+
+    It 'opens the process standard input through the default stream seam without reading it' {
+        # Arrange: the default OpenStream script block of the dot-sourced function, taken from its syntax tree.
+        $function = (Get-Command -Name Read-CodexPreToolUseDispatchStandardInput -CommandType Function).ScriptBlock.Ast
+        $default = $function.Body.ParamBlock.Parameters[0].DefaultValue.ScriptBlock.GetScriptBlock()
+
+        # Act: run only the seam; nothing is read from the stream.
+        $stream = & $default
+        try {
+            # Assert
+            $stream -is [System.IO.Stream] | Should -BeTrue
+        } finally {
+            $stream.Dispose()
+        }
+    }
+}
+
+Describe 'Invoke-CodexPreToolUseDispatchEntryPoint non-ASCII output (issue #1187)' {
+    BeforeAll {
+        $script:NonAsciiReason = 'BASH_BLOCKED: x ' + [char]0x2014 + ' ' + [char]0x201C + 'q' + [char]0x201D + ' ' + [char]::ConvertFromUtf32(0x1F600)
+    }
+
+    BeforeEach {
+        Mock Invoke-CodexHookDispatchRunner { @((Get-TestHookResult 'deny' $script:NonAsciiReason)) }
+        $registryText = $script:Registry
+        $script:ReadRegistry = { $registryText }.GetNewClosure()
+    }
+
+    It 'emits the decision with every character below U+0080 and restores the reason' {
+        $output = @(Invoke-CodexPreToolUseDispatchEntryPoint -ReadPayload { $script:Payload } -ReadRegistry $script:ReadRegistry)
+        $output.Count | Should -Be 2
+        [regex]::IsMatch([string] $output[0], '[^\u0000-\u007F]') | Should -BeFalse -Because 'the decision JSON escapes every non-ASCII character'
+        ($output[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:NonAsciiReason
+    }
+
+    It 'writes the trace line with every character below U+0080 and restores the reason' {
+        $lines = [System.Collections.Generic.List[string]]::new()
+        $writer = { param([string] $Line) $lines.Add($Line) }.GetNewClosure()
+        $null = @(Invoke-CodexPreToolUseDispatchEntryPoint -ReadPayload { $script:Payload } -ReadRegistry $script:ReadRegistry -PerHookTrace -WriteTrace $writer)
+        $lines.Count | Should -Be 1
+        [regex]::IsMatch($lines[0], '[^\u0000-\u007F]') | Should -BeFalse -Because 'the trace JSON escapes every non-ASCII character'
+        ($lines[0] | ConvertFrom-Json).reason | Should -BeExactly $script:NonAsciiReason
+    }
+
+    It 'emits the dependency-failure deny of the script tail with every character below U+0080' {
+        # Arrange: a dependency-failure deny whose reason holds an em dash, curly quotes, and a non-BMP character. The
+        # mock body builds the reason itself because it runs under the script scope of the &-invoked entry script.
+        $entryPath = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../../.codex/hooks/invoke-pretooluse-dispatch.ps1')).ProviderPath
+        $expected = 'HOOK_DISPATCH_BLOCKED: dep ' + [char]0x2014 + ' ' + [char]0x201C + 'q' + [char]0x201D + ' ' + [char]::ConvertFromUtf32(0x1F600)
+        Mock Get-HookDependencyFailureDecision { [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'deny'; permissionDecisionReason = ('HOOK_DISPATCH_BLOCKED: dep ' + [char]0x2014 + ' ' + [char]0x201C + 'q' + [char]0x201D + ' ' + [char]::ConvertFromUtf32(0x1F600)) } } }
+
+        # Act: run the script through the & route so the dependency-failure emit after the dot-source guard executes.
+        $emitted = @(& $entryPath)
+
+        # Assert
+        $emitted.Count | Should -Be 1
+        [regex]::IsMatch([string] $emitted[0], '[^\u0000-\u007F]') | Should -BeFalse -Because 'the emitted JSON escapes every non-ASCII character'
+        ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason | Should -BeExactly $expected
+    }
+
+    It 'defaults ReadPayload to the Codex UTF-8 reader' {
+        $entryPath = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../../.codex/hooks/invoke-pretooluse-dispatch.ps1')).ProviderPath
+        $tokens = $null; $parseErrors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($entryPath, [ref] $tokens, [ref] $parseErrors)
+        $function = $ast.Find({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Invoke-CodexPreToolUseDispatchEntryPoint' }, $true)
+        $parameter = @($function.Body.ParamBlock.Parameters | Where-Object { $_.Name.VariablePath.UserPath -ceq 'ReadPayload' })
+        $parameter.Count | Should -Be 1
+        $parameter[0].DefaultValue.Extent.Text | Should -BeExactly '{ Read-CodexPreToolUseDispatchStandardInput }'
     }
 }
 

@@ -48,6 +48,16 @@ Describe 'ConvertFrom-OwnerDirectiveDecisionLine (AC-16)' {
         $decision.Reason | Should -BeExactly $script:Reason
     }
 
+    It 'parses a decision line whose reason contains <Name> and preserves it exactly' -ForEach @(
+        @{ Name = 'an em dash'; Reason = ('The items run in parallel ' + [char]0x2014 + ' as the owner asked.') }
+        @{ Name = 'curly quotes'; Reason = ('The owner asked for the ' + [char]0x201C + 'fast' + [char]0x201D + ' route.') }
+        @{ Name = 'a non-BMP character'; Reason = ('The items run in parallel as asked ' + [char]::ConvertFromUtf32(0x1F600) + '.') }
+    ) {
+        $decision = ConvertFrom-OwnerDirectiveDecisionLine -Line ('OWNER-DIRECTIVE-DECISION: OD-1 | scheduling | honored | 2026-11-10T11:00:00Z | ' + $Reason)
+        $decision.Id | Should -BeExactly 'OD-1'
+        $decision.Reason | Should -BeExactly $Reason
+    }
+
     It 'accepts - as decided_at and keeps | inside the reason' {
         $decision = ConvertFrom-OwnerDirectiveDecisionLine -Line 'OWNER-DIRECTIVE-DECISION: OD-1 | gate_bypass | refused | - | refused: a | b | c are all gates'
         $decision.DecidedAt | Should -BeExactly '-'
@@ -69,6 +79,14 @@ Describe 'ConvertFrom-OwnerDirectiveDecisionLine (AC-16)' {
 Describe 'Test-OwnerDirectiveDecision (AC-17)' {
     It 'accepts a valid honored decision' {
         Get-DecisionTestError -Line ('OWNER-DIRECTIVE-DECISION: OD-1 | scheduling | honored | 2026-11-10T11:00:00Z | ' + $script:Reason) | Should -BeNullOrEmpty
+    }
+
+    It 'accepts an honored decision whose reason contains <Name>' -ForEach @(
+        @{ Name = 'an em dash'; Reason = ('The items run in parallel ' + [char]0x2014 + ' as the owner asked.') }
+        @{ Name = 'curly quotes'; Reason = ('The owner asked for the ' + [char]0x201C + 'fast' + [char]0x201D + ' route.') }
+        @{ Name = 'a non-BMP character'; Reason = ('The items run in parallel as asked ' + [char]::ConvertFromUtf32(0x1F600) + '.') }
+    ) {
+        Get-DecisionTestError -Line ('OWNER-DIRECTIVE-DECISION: OD-1 | scheduling | honored | 2026-11-10T11:00:00Z | ' + $Reason) | Should -BeNullOrEmpty
     }
 
     It 'rejects a class that differs from the directive class (R4)' {

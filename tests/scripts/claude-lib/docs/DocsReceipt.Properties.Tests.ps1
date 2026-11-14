@@ -78,7 +78,7 @@ Describe 'DocsReceipt properties' {
         $first | Should -BeExactly '1.0.0'
     }
 
-    It 'property Get-DocsArtifactPin: sha256 equals Get-DocsBytesSha256Hex of seeded byte arrays' {
+    It 'property Get-DocsArtifactPin: sha256 equals Get-DocsTextSha256Hex of seeded byte arrays (issue #1173)' {
         foreach ($seed in Get-DocsLedgerTestSeed) {
             # Arrange
             $random = [System.Random]::new($seed)
@@ -90,7 +90,7 @@ Describe 'DocsReceipt properties' {
                 $pin = Get-DocsArtifactPin -ArtifactKind $kind -Path 'estate/a.json' -Bytes $bytes
 
                 # Assert
-                $pin['sha256'] | Should -BeExactly (Get-DocsBytesSha256Hex -Bytes $bytes) -Because "seed=$seed round $round"
+                $pin['sha256'] | Should -BeExactly (Get-DocsTextSha256Hex -Bytes $bytes) -Because "seed=$seed round $round"
                 $pin['artifact_kind'] | Should -BeExactly $kind -Because "seed=$seed round $round"
                 $null -eq (Get-DocsArtifactPin -ArtifactKind $kind -Path 'estate/a.json' -Bytes $null) | Should -BeTrue -Because "seed=$seed round $round"
             }

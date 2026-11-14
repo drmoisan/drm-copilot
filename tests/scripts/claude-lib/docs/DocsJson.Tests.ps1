@@ -247,6 +247,37 @@ Describe 'Canonical JSON and SHA-256 delegation' {
     }
 }
 
+Describe 'Get-DocsTextSha256Hex (issue #1173 B11)' {
+    It 'returns one hash for the LF, CRLF and lone-CR byte forms of one text' {
+        # Arrange (byte forms built in memory, because committed text fixtures are normalized to LF)
+        $utf8 = [System.Text.UTF8Encoding]::new($false)
+        $lf = $utf8.GetBytes("{`n  `"a`": 1,`n  `"b`": `"x`"`n}`n")
+        $crlf = $utf8.GetBytes("{`r`n  `"a`": 1,`r`n  `"b`": `"x`"`r`n}`r`n")
+        $cr = $utf8.GetBytes("{`r  `"a`": 1,`r  `"b`": `"x`"`r}`r")
+        $mixed = $utf8.GetBytes("{`r`n  `"a`": 1,`r  `"b`": `"x`"`n}`r`n")
+
+        # Act
+        $hashes = @($lf, $crlf, $cr, $mixed | ForEach-Object { Get-DocsTextSha256Hex -Bytes $_ })
+
+        # Assert
+        @($hashes | Sort-Object -Unique).Count | Should -Be 1
+        $hashes[0] | Should -BeExactly (Get-DocsBytesSha256Hex -Bytes $lf)
+        (Get-DocsBytesSha256Hex -Bytes $crlf) | Should -Not -BeExactly $hashes[0] -Because 'the raw-byte hash still differs'
+    }
+
+    It 'equals Get-DocsBytesSha256Hex for LF-only content, empty content and content that keeps a BOM' {
+        # Arrange
+        $bom = [byte[]]@(0xEF, 0xBB, 0xBF) + [System.Text.UTF8Encoding]::new($false).GetBytes("x`n")
+        $bomCrlf = [byte[]]@(0xEF, 0xBB, 0xBF) + [System.Text.UTF8Encoding]::new($false).GetBytes("x`r`n")
+
+        # Act / Assert
+        foreach ($bytes in @([byte[]]@(), [byte[]]@(0x61, 0x0A, 0x62), $bom)) {
+            Get-DocsTextSha256Hex -Bytes $bytes | Should -BeExactly (Get-DocsBytesSha256Hex -Bytes $bytes)
+        }
+        Get-DocsTextSha256Hex -Bytes $bomCrlf | Should -BeExactly (Get-DocsBytesSha256Hex -Bytes $bom) -Because 'the BOM is kept and only line endings change'
+    }
+}
+
 Describe 'ConvertFrom-DocsUtf8Bytes' {
     It 'returns a non-null empty string for zero bytes' {
         # Act
