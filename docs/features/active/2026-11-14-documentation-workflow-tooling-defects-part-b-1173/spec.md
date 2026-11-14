@@ -325,13 +325,13 @@ Exit codes follow the existing contract: 0 success, 1 findings, 2 argument or in
 - [x] Every new `.claude/lib/docs` module is listed in `core.json` and bundled byte-identically, and the mirror, push-down contract, pack-manifest and Codex generator parity checks pass.
 - [x] Every item B1-B13 has at least one regression test that fails before the change and passes after it (for B10, the parity tests that prove the verdict).
 - [x] Each changed PowerShell file has at least 85% line coverage and each changed TypeScript or Python file has at least 85% line and 75% branch coverage, with no regression on changed lines.
-- [ ] The full seven-stage toolchain loop passes in a single pass with parallel-only test runs and no test-order dependence.
-- [ ] CI is green on the final pull request head.
+- [x] The full seven-stage toolchain loop passes in a single pass with parallel-only test runs and no test-order dependence.
+- [x] CI is green on the final pull request head.
 
 ## Definition of Done
 
 - [x] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
+- [x] Behavior matches acceptance criteria in all documented environments
 - [x] Tests updated/added (unit/integration as applicable)
 - [x] Edge cases and error handling covered by tests
 - [x] Docs updated (skills, agents, brief, and their mirrors)

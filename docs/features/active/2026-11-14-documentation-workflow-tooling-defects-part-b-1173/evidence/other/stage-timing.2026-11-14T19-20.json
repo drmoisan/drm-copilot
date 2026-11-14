@@ -1,0 +1,56 @@
+[
+  {
+    "stage": "research",
+    "attempt": 1,
+    "started_at": "2026-11-14T05:17:42Z",
+    "ended_at": "2026-11-14T05:32:36Z"
+  },
+  {
+    "stage": "spec",
+    "attempt": 1,
+    "started_at": "2026-11-14T05:32:36Z",
+    "ended_at": "2026-11-14T05:41:45Z"
+  },
+  {
+    "stage": "planning",
+    "attempt": 1,
+    "started_at": "2026-11-14T05:41:45Z",
+    "ended_at": "2026-11-14T06:44:21Z"
+  },
+  {
+    "stage": "execution",
+    "attempt": 1,
+    "started_at": "2026-11-14T06:44:21Z",
+    "ended_at": "2026-11-14T17:20:21Z"
+  },
+  {
+    "stage": "pr",
+    "attempt": 1,
+    "started_at": "2026-11-14T17:21:51Z",
+    "ended_at": "2026-11-14T17:27:09Z"
+  },
+  {
+    "stage": "review",
+    "attempt": 1,
+    "started_at": "2026-11-14T17:27:09Z",
+    "ended_at": "2026-11-14T18:01:29Z"
+  },
+  {
+    "stage": "remediation",
+    "attempt": 1,
+    "started_at": "2026-11-14T18:01:29Z",
+    "ended_at": "2026-11-14T18:45:23Z"
+  },
+  {
+    "stage": "review",
+    "attempt": 2,
+    "started_at": "2026-11-14T18:45:23Z",
+    "ended_at": "2026-11-14T19:18:46Z"
+  },
+  {
+    "stage": "ci",
+    "attempt": 2,
+    "started_at": "2026-11-14T18:45:23Z",
+    "ended_at": "2026-11-14T19:18:46Z"
+  }
+]
