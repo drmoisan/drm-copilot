@@ -80,9 +80,7 @@ Describe 'Test-DocsEstatePath (issue #1169)' {
     It 'admits <Label>' -ForEach @(
         @{ Label = 'a path under the docs/ root'; Path = 'docs/reference/a.md' }
         @{ Label = 'a non-Markdown path under the docs/ root'; Path = 'docs/documentation-estate/.vale.ini' }
-        @{ Label = 'a path in an artifact_paths directory'; Path = 'estate/docs-coverage-ledger.json' }
         @{ Label = 'the docs-init workflow constant'; Path = '.github/workflows/_docs-quality.yml' }
-        @{ Label = 'a .md path under a root outside docs/'; Path = 'guide/start.md' }
     ) {
         # Act
         $result = Test-DocsEstatePath -RelativePath $Path -Profile $script:Profile1169 -InitWorkflowPath $script:DocsOnlyInitWorkflowPath
@@ -92,6 +90,8 @@ Describe 'Test-DocsEstatePath (issue #1169)' {
     }
 
     It 'rejects <Label>' -ForEach @(
+        @{ Label = 'a path in an artifact_paths directory outside docs/'; Path = 'estate/docs-coverage-ledger.json' }
+        @{ Label = 'a .md path under a root outside docs/'; Path = 'guide/start.md' }
         @{ Label = 'a non-Markdown path under a root outside docs/'; Path = 'guide/start.txt' }
         @{ Label = 'a source path'; Path = 'src/a.ps1' }
         @{ Label = 'a root without a following segment'; Path = 'docs' }
@@ -126,6 +126,45 @@ Describe 'Test-DocsEstatePath (issue #1169)' {
 
         # Assert
         $result | Should -BeFalse
+    }
+
+    Context 'narrow profile: root docs/reference and one docs/ artifact directory' {
+        BeforeAll {
+            $script:NarrowProfile = ConvertFrom-DocsEstateProfileText -Text (Get-TestProfileText -Roots @(@{ path = 'docs/reference' }) -ArtifactPaths @{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json' })
+            $script:NarrowFlatProfile = ConvertFrom-DocsEstateProfileText -Text (Get-TestProfileText -Roots @(@{ path = 'docs/reference' }) -ArtifactPaths @{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json'; flat = 'receipt.json' })
+        }
+
+        It 'admits <Label> (narrow profile)' -ForEach @(
+            @{ Label = 'a docs/ artifact-directory path under no root'; Path = 'docs/documentation-estate/docs-coverage-ledger.json' }
+            @{ Label = 'a path under the non-docs root docs/reference'; Path = 'docs/reference/b.md' }
+        ) {
+            # Act
+            $result = Test-DocsEstatePath -RelativePath $Path -Profile $script:NarrowProfile -InitWorkflowPath $script:DocsOnlyInitWorkflowPath
+
+            # Assert
+            $result | Should -BeTrue -Because "$Path is in the narrow profile's docs path set"
+        }
+
+        It 'rejects <Label> (narrow profile)' -ForEach @(
+            @{ Label = 'a docs/ path under no root and no artifact directory'; Path = 'docs/other/a.md' }
+            @{ Label = 'a prefix-sharing root'; Path = 'docs/referencex/a.md' }
+            @{ Label = 'a prefix-sharing artifact directory'; Path = 'docs/documentation-estatex/a.json' }
+            @{ Label = 'an upper-case root segment'; Path = 'docs/Reference/a.md' }
+        ) {
+            # Act
+            $result = Test-DocsEstatePath -RelativePath $Path -Profile $script:NarrowProfile -InitWorkflowPath $script:DocsOnlyInitWorkflowPath
+
+            # Assert
+            $result | Should -BeFalse -Because "'$Path' is outside the narrow profile's docs path set"
+        }
+
+        It 'rejects a docs/ path under no root when a flat artifact path is present (narrow profile)' {
+            # Act
+            $result = Test-DocsEstatePath -RelativePath 'docs/other/a.md' -Profile $script:NarrowFlatProfile -InitWorkflowPath $script:DocsOnlyInitWorkflowPath
+
+            # Assert
+            $result | Should -BeFalse -Because 'an artifact path with no directory admits no path'
+        }
     }
 }
 

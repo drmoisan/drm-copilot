@@ -33,6 +33,9 @@ Describe 'Codex preimplementation gate docs-estate leg (issue #1169)' {
         $script:Nul = [string][char]0
         $script:Listing = "worktree $($script:Session)`nbranch refs/heads/main`n`nworktree /synthetic-worktrees/docs-run`nbranch refs/heads/docs/estate`n"
         $script:ValidProfile = ([ordered]@{ artifact_kind = 'docs-profile'; documentation_roots = @(@{ id = 'docs-root'; path = 'docs' }, @{ id = 'guide'; path = 'guide' }); artifact_paths = [ordered]@{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json' } } | ConvertTo-Json -Depth 6 -Compress)
+        # Under the pre-CR3 rule this profile admits guide/start.md (a .md file under a root) and
+        # scripts/evil.ps1 (under an artifact directory); under the CR3 rule it admits neither.
+        $script:DiscriminatingProfile = ([ordered]@{ artifact_kind = 'docs-profile'; documentation_roots = @(@{ id = 'docs-root'; path = 'docs' }, @{ id = 'guide'; path = 'guide' }); artifact_paths = [ordered]@{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json'; extra = 'scripts/x.json' } } | ConvertTo-Json -Depth 6 -Compress)
 
         function ConvertTo-CodexDocsMappedInput {
             param([string] $FilePath = '', [string] $Command = '')
@@ -79,6 +82,18 @@ Describe 'Codex preimplementation gate docs-estate leg (issue #1169)' {
         }
     }
 
+    AfterAll {
+        # Remove the top-level functions of the dot-sourced gate and of the docs-leg files it loads.
+        foreach ($file in @('enforce-orchestration-preimplementation-gate.ps1', 'enforce-orchestration-preimplementation-gate-docs.ps1', 'hook-docs-estate-context.ps1') | ForEach-Object { Join-Path $script:RepoRoot ".codex/hooks/$_" }) {
+            $tokens = $null
+            $parseErrors = $null
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile($file, [ref]$tokens, [ref]$parseErrors)
+            foreach ($definition in $ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $false)) {
+                Remove-Item -LiteralPath ('Function:\' + $definition.Name) -ErrorAction SilentlyContinue
+            }
+        }
+    }
+
     BeforeEach {
         Set-CodexDocsEstateFixture
     }
@@ -87,7 +102,7 @@ Describe 'Codex preimplementation gate docs-estate leg (issue #1169)' {
 
     It 'allows <Label> (codex)' -ForEach @(
         @{ Label = 'a relative git add of docs paths'; Command = 'git add -- docs/a.md .github/workflows/_docs-quality.yml'; Path = '' }
-        @{ Label = 'a git -C <absolute root> add'; Command = 'git -C /synthetic-worktrees/docs-run add -- guide/start.md'; Path = '' }
+        @{ Label = 'a git -C <absolute root> add'; Command = 'git -C /synthetic-worktrees/docs-run add -- docs/guide/start.md'; Path = '' }
         @{ Label = 'a git commit -F with no pathspec'; Command = 'git commit -F artifacts/commit-message.txt'; Path = '' }
         @{ Label = 'a git commit with a single --file= option'; Command = 'git commit --file=artifacts/commit-message.txt'; Path = '' }
         @{ Label = 'a git commit with a single --message= option'; Command = 'git commit --message=docs'; Path = '' }
@@ -122,6 +137,23 @@ Describe 'Codex preimplementation gate docs-estate leg (issue #1169)' {
 
         # Assert
         Assert-CodexDocsEstateSubCodeDeny -Decision $decision -SubCode $SubCode
+    }
+
+    It 'denies <SubCode> for <Kind> <Outside> outside docs/ under the discriminating profile (codex)' -ForEach @(
+        @{ Kind = 'an add operand'; Outside = 'guide/start.md'; SubCode = 'DOCS_LEG_PATH_NOT_ALLOWED'; Command = 'git add -- docs/a.md guide/start.md' }
+        @{ Kind = 'an add operand'; Outside = 'scripts/evil.ps1'; SubCode = 'DOCS_LEG_PATH_NOT_ALLOWED'; Command = 'git add -- docs/a.md scripts/evil.ps1' }
+        @{ Kind = 'a staged path'; Outside = 'guide/start.md'; SubCode = 'DOCS_LEG_STAGED_PATH_NOT_ALLOWED'; Command = 'git commit -F artifacts/commit-message.txt' }
+        @{ Kind = 'a staged path'; Outside = 'scripts/evil.ps1'; SubCode = 'DOCS_LEG_STAGED_PATH_NOT_ALLOWED'; Command = 'git commit -F artifacts/commit-message.txt' }
+    ) {
+        # Arrange
+        Set-CodexDocsEstateFixture -ProfileText $script:DiscriminatingProfile -Staged "docs/a.md$($script:Nul)$Outside$($script:Nul)"
+
+        # Act
+        $decision = Get-CodexDocsEstateDecision -MappedInput (ConvertTo-CodexDocsMappedInput -Command $Command)
+
+        # Assert
+        Assert-CodexDocsEstateSubCodeDeny -Decision $decision -SubCode $SubCode
+        [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*'$Outside'*"
     }
 
     It 'denies <Label> with the unchanged deny text (codex)' -ForEach @(
@@ -193,7 +225,7 @@ Describe 'Codex preimplementation gate docs-estate leg (issue #1169)' {
             @{ Path = 'docs/a.md'; Expected = $true }
             @{ Path = 'docs/documentation-estate/x.json'; Expected = $true }
             @{ Path = '.github/workflows/_docs-quality.yml'; Expected = $true }
-            @{ Path = 'guide/start.md'; Expected = $true }
+            @{ Path = 'guide/start.md'; Expected = $false }
             @{ Path = 'guide/start.txt'; Expected = $false }
             @{ Path = 'src/a.ps1'; Expected = $false }
             @{ Path = 'docs/../src/a.ps1'; Expected = $false }

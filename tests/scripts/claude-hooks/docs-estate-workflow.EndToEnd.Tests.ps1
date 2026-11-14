@@ -147,6 +147,20 @@ BeforeAll {
     }
 }
 
+AfterAll {
+    # Remove the top-level functions of the four dot-sourced hooks and of the docs-leg files they load.
+    $hookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks").Path
+    $loaded = @('enforce-orchestration-preimplementation-gate.ps1', 'enforce-model-routing-receipt.ps1', 'enforce-pr-author-skill.ps1', 'enforce-docs-complete-gate.ps1', 'enforce-orchestration-preimplementation-gate-docs.ps1', 'enforce-model-routing-receipt-docs.ps1', 'hook-docs-estate-context.ps1')
+    foreach ($file in $loaded | ForEach-Object { Join-Path $hookRoot $_ }) {
+        $tokens = $null
+        $parseErrors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($file, [ref]$tokens, [ref]$parseErrors)
+        foreach ($definition in $ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $false)) {
+            Remove-Item -LiteralPath ('Function:\' + $definition.Name) -ErrorAction SilentlyContinue
+        }
+    }
+}
+
 Describe 'docs-estate workflow end to end (issue #1169)' {
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 

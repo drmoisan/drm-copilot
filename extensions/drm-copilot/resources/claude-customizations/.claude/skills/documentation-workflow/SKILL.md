@@ -73,9 +73,9 @@ Rules:
 - A session root that holds another item's checkpoint makes every docs leg decline. This is
   intended fail-closed behavior: decline to run the stage there, and run it from a root that holds
   no checkpoint.
-- Only docs path set changes may be on the branch: paths under the profile's documentation roots
-  and artifact directories, and the docs-init workflow file. Any other path is denied at commit,
-  PR creation, and merge.
+- Only docs path set changes may be on the branch: paths under `docs/` that lie under the
+  profile's documentation roots or artifact directories, and the docs-init workflow file. Any
+  other path is denied at commit, PR creation, and merge.
 
 ## Refresh After Rebase or Source Change
 

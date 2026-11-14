@@ -38,10 +38,10 @@ In scope: Part A of `issue.md`, items A1 to A5.
 - **Docs profile:** `docs/documentation-estate/docs-profile.json` beneath R.
 - **Structurally valid profile:** a JSON object with `artifact_kind` equal to `docs-profile`, a non-empty `documentation_roots` array whose `path` values are plain repository-relative paths, and an `artifact_paths` object whose values are strings. The hooks validate the structure only, because the Codex hooks cannot import `.claude/lib`.
 - **Docs path set:** a repository-relative path is in the set when it passes the character-class and `..` rules of `Test-CleanupConsolidationRelativePath` and at least one of the following holds:
-  1. It lies under the directory of an `artifact_paths` value.
-  2. It equals the shared docs-init workflow constant (A3).
-  3. It lies under a `documentation_roots[].path`. When that root is not under `docs/`, the path must also end in `.md`.
-  All comparisons are ordinal and segment-anchored.
+  1. It equals the shared docs-init workflow constant (A3).
+  2. It starts with `docs/` and lies under the directory of an `artifact_paths` value.
+  3. It starts with `docs/` and lies under a `documentation_roots[].path`.
+  All comparisons are ordinal and segment-anchored. Revised in remediation cycle 1 (CR3): a documentation root or artifact directory outside `docs/` admits no path, so the A1 and A2 legs agree with E7 and M9.
 - **Docs-init workflow constant:** the literal `.github/workflows/_docs-quality.yml`, held once as `$script:DocsOnlyInitWorkflowPath` in `.claude/hooks/hook-docs-only-diff.ps1`.
 
 ## Behavior
@@ -177,7 +177,7 @@ Each criterion names the Pester suite intended to prove it. Suite names under `t
 - [x] With no checkpoint at R, a structurally valid profile, and every operand in the docs path set, `git add -- <paths>` is allowed by the Claude and Codex preimplementation gates. Suites: `claude-hooks/enforce-orchestration-preimplementation-gate.DocsEstate.Tests.ps1` and `codex-hooks/enforce-orchestration-preimplementation-gate-docs.Tests.ps1`.
 - [x] With the same preconditions and a readable, non-empty staged index entirely in the docs path set, `git commit -F <file>` with no pathspec is allowed by both gates. Same suites.
 - [x] Each of the following denies, and the deny reason ends with the docs-estate suffix naming the listed sub-code: an invalid profile (`DOCS_LEG_PROFILE_INVALID`); an add operand outside the docs path set (`DOCS_LEG_PATH_NOT_ALLOWED`); an unreadable or non-NUL-terminated staged index (`DOCS_LEG_STAGED_INDEX_UNREADABLE`); an empty staged index (`DOCS_LEG_STAGED_INDEX_EMPTY`); a staged path outside the docs path set (`DOCS_LEG_STAGED_PATH_NOT_ALLOWED`). Same suites.
-- [x] A path under a documentation root outside `docs/` is allowed only when it ends in `.md`, and a non-`.md` path under that root denies with `DOCS_LEG_PATH_NOT_ALLOWED`. Suites: the same gate suites and `claude-hooks/hook-docs-estate-context.Tests.ps1`.
+- [ ] A path under a documentation root or an artifact directory outside `docs/` is not in the docs path set: as a `git add` operand it denies with `DOCS_LEG_PATH_NOT_ALLOWED`, and as a staged path of a commit it denies with `DOCS_LEG_STAGED_PATH_NOT_ALLOWED`. Suites: the same gate suites and `claude-hooks/hook-docs-estate-context.Tests.ps1`.
 - [x] A docs-path `git add` chained with a `pytest`, `ruff`, or `Invoke-Pester` segment, a commit that carries a pathspec, and a commit with any option other than `-m`, `--message`, `-F`, `--file`, or `--trailer` each deny with the existing deny text and an empty docs suffix. Same gate suites.
 - [x] With a checkpoint present at R, ready or not, the docs leg does not allow, and the gate's existing checkpoint-governed behavior is unchanged. Same gate suites.
 - [x] Without a profile file at R, every gate deny reason is byte-identical to the reason produced before this change. Same gate suites.
@@ -192,6 +192,7 @@ Each criterion names the Pester suite intended to prove it. Suite names under `t
 - [x] Each of the following denies with the named sub-code: a missing or duplicated `branch:` line, a missing or duplicated `base:` line, or a value containing `..` (`DOCS_DELEGATION_LABEL_INVALID`); an invalid profile (`DOCS_DELEGATION_PROFILE_INVALID`); an unresolvable `origin/<base>` or `HEAD`, a git timeout, or a non-NUL-terminated diff (`DOCS_DELEGATION_DIFF_UNREADABLE`); an empty diff (`DOCS_DELEGATION_DIFF_EMPTY`); a diff path outside the docs path set (`DOCS_DELEGATION_PATH_NOT_ALLOWED`); a receipt that is absent, unreadable, of the wrong kind or mode, or not `pass` (`DOCS_DELEGATION_RECEIPT_INVALID`); a receipt that fails the A4 rule (the A4 reason code). Same suite.
 - [x] With a checkpoint present, the docs leg does not apply and the existing receipt check governs. Without a profile file, the deny text is byte-identical to the text produced before this change. Same suite.
 - [x] The cleanup delegation exemption keeps its behavior. Suite: the existing `claude-hooks/enforce-model-routing-receipt.Cleanup.Tests.ps1` passes unchanged.
+- [ ] A diff path under a documentation root or an artifact directory outside `docs/` denies with `DOCS_DELEGATION_PATH_NOT_ALLOWED`. Same suite as the first A2 criterion.
 
 ### A3
 

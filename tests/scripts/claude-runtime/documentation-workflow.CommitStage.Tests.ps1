@@ -94,6 +94,14 @@ Describe 'documentation-workflow commit stage (issue #1169)' {
         foreach ($token in $tokens) { $section.Contains($token, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "the stage states '$token'" }
     }
 
+    It 'limits the docs path set to paths under docs/ in <Path>' -ForEach $script:WorkflowCopyRows {
+        # Arrange
+        $section = Get-CommitStageSection -RelativePath $Path -Heading '## Commit, Receipt and Pull Request'
+
+        # Assert
+        $section.Contains('paths under `docs/` that lie under', [System.StringComparison]::Ordinal) | Should -BeTrue -Because 'a documentation root or artifact directory outside docs/ admits no path (CR3)'
+    }
+
     It 'lists the seven refresh steps in order in <Path>' -ForEach $script:WorkflowCopyRows {
         # Arrange
         $section = Get-CommitStageSection -RelativePath $Path -Heading '## Refresh After Rebase or Source Change'

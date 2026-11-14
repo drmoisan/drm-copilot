@@ -32,6 +32,9 @@ BeforeAll {
     $script:Nul = [string][char]0
     $script:Listing = "worktree $($script:Session)`nbranch refs/heads/main`n`nworktree $($script:DocsRun)`nbranch refs/heads/docs/estate`n"
     $script:ValidProfile = ([ordered]@{ artifact_kind = 'docs-profile'; documentation_roots = @(@{ id = 'docs-root'; path = 'docs' }, @{ id = 'guide'; path = 'guide' }); artifact_paths = [ordered]@{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json' } } | ConvertTo-Json -Depth 6 -Compress)
+    # Under the pre-CR3 rule this profile admits guide/start.md (a .md file under a root) and
+    # scripts/evil.ps1 (under an artifact directory); under the CR3 rule it admits neither.
+    $script:DiscriminatingProfile = ([ordered]@{ artifact_kind = 'docs-profile'; documentation_roots = @(@{ id = 'docs-root'; path = 'docs' }, @{ id = 'guide'; path = 'guide' }); artifact_paths = [ordered]@{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json'; extra = 'scripts/x.json' } } | ConvertTo-Json -Depth 6 -Compress)
 
     function ConvertTo-DocsEstatePayload {
         param([string] $Tool, [string] $FilePath = '', [string] $Command = '')
@@ -76,6 +79,19 @@ BeforeAll {
     }
 }
 
+AfterAll {
+    # Remove the top-level functions of the dot-sourced gate and of the docs-leg files it loads.
+    $hookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks").Path
+    foreach ($file in @('enforce-orchestration-preimplementation-gate.ps1', 'enforce-orchestration-preimplementation-gate-docs.ps1', 'hook-docs-estate-context.ps1') | ForEach-Object { Join-Path $hookRoot $_ }) {
+        $tokens = $null
+        $parseErrors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($file, [ref]$tokens, [ref]$parseErrors)
+        foreach ($definition in $ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $false)) {
+            Remove-Item -LiteralPath ('Function:\' + $definition.Name) -ErrorAction SilentlyContinue
+        }
+    }
+}
+
 Describe 'Claude preimplementation gate docs-estate leg (issue #1169)' {
     BeforeEach {
         Set-DocsEstateSeam
@@ -87,7 +103,6 @@ Describe 'Claude preimplementation gate docs-estate leg (issue #1169)' {
         It 'allows <Label>' -ForEach @(
             @{ Label = 'a relative git add of docs paths'; Command = 'git add -- docs/a.md docs/documentation-estate/docs-coverage-ledger.json' }
             @{ Label = 'a git add of the docs-init workflow path'; Command = 'git add -- .github/workflows/_docs-quality.yml docs/documentation-estate/.vale.ini' }
-            @{ Label = 'a git add of a .md path under a root outside docs/'; Command = 'git add -- guide/start.md' }
             @{ Label = 'a git -C <absolute root> add'; Command = 'git -C /synthetic-worktrees/docs-run add -- docs/a.md' }
             @{ Label = 'a relative git commit -F with no pathspec'; Command = 'git commit -F artifacts/commit-message.txt' }
             @{ Label = 'a git -C <absolute root> commit -m'; Command = 'git -C /synthetic-worktrees/docs-run commit -m "docs: refresh"' }
@@ -154,6 +169,45 @@ Describe 'Claude preimplementation gate docs-estate leg (issue #1169)' {
 
             # Assert
             Assert-DocsEstateSubCodeDeny -Decision $decision -SubCode 'DOCS_LEG_PATH_NOT_ALLOWED'
+        }
+
+        It 'denies DOCS_LEG_PATH_NOT_ALLOWED for a git add of a .md path under a root outside docs/' {
+            # Act
+            $decision = Get-DocsEstateDecision -Payload (ConvertTo-DocsEstatePayload -Tool 'Bash' -Command 'git add -- guide/start.md')
+
+            # Assert
+            Assert-DocsEstateSubCodeDeny -Decision $decision -SubCode 'DOCS_LEG_PATH_NOT_ALLOWED'
+            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*'guide/start.md'*"
+        }
+
+        It 'denies DOCS_LEG_PATH_NOT_ALLOWED for an add operand <Outside> outside docs/ under the discriminating profile' -ForEach @(
+            @{ Outside = 'guide/start.md' }
+            @{ Outside = 'scripts/evil.ps1' }
+        ) {
+            # Arrange
+            Set-DocsEstateSeam -ProfileText $script:DiscriminatingProfile
+
+            # Act
+            $decision = Get-DocsEstateDecision -Payload (ConvertTo-DocsEstatePayload -Tool 'Bash' -Command "git add -- docs/a.md $Outside")
+
+            # Assert
+            Assert-DocsEstateSubCodeDeny -Decision $decision -SubCode 'DOCS_LEG_PATH_NOT_ALLOWED'
+            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*'$Outside'*"
+        }
+
+        It 'denies DOCS_LEG_STAGED_PATH_NOT_ALLOWED for a staged path <Outside> outside docs/ under the discriminating profile' -ForEach @(
+            @{ Outside = 'guide/start.md' }
+            @{ Outside = 'scripts/evil.ps1' }
+        ) {
+            # Arrange
+            Set-DocsEstateSeam -ProfileText $script:DiscriminatingProfile -Staged "docs/a.md$($script:Nul)$Outside$($script:Nul)"
+
+            # Act
+            $decision = Get-DocsEstateDecision -Payload (ConvertTo-DocsEstatePayload -Tool 'Bash' -Command 'git commit -F artifacts/commit-message.txt')
+
+            # Assert
+            Assert-DocsEstateSubCodeDeny -Decision $decision -SubCode 'DOCS_LEG_STAGED_PATH_NOT_ALLOWED'
+            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*'$Outside'*"
         }
 
         It 'denies <SubCode> for <Label>' -ForEach @(

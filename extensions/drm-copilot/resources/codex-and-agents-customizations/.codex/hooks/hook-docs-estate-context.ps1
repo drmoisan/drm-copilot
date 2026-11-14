@@ -16,12 +16,12 @@
                                           artifact_paths is an object of string values. The
                                           hooks check structure only, because the Codex hooks
                                           cannot import .claude/lib.
-      Test-DocsEstatePath               - the docs path set: a plain relative path that lies
-                                          under the directory of an artifact_paths value, equals
-                                          the docs-init workflow path, or lies under a
-                                          documentation root (a root outside docs/ admits .md
-                                          files only). Every comparison is ordinal and
-                                          segment-anchored.
+      Test-DocsEstatePath               - the docs path set: a plain relative path that equals
+                                          the docs-init workflow path, or that starts with docs/
+                                          and lies under the directory of an artifact_paths value
+                                          or under a documentation root. A root or artifact
+                                          directory outside docs/ admits no path. Every
+                                          comparison is ordinal and segment-anchored.
       Get-DocsEstateDelegationLabel     - the branch and base of a delegation prompt that carries
                                           exactly one line-anchored 'branch: <name>' line and
                                           exactly one 'base: <branch>' line, each a conservative
@@ -134,6 +134,9 @@ function Test-DocsEstatePath {
     if (-not [string]::IsNullOrEmpty($InitWorkflowPath) -and [string]::Equals($path, $InitWorkflowPath, [System.StringComparison]::Ordinal)) {
         return $true
     }
+    if (-not $path.StartsWith('docs/', [System.StringComparison]::Ordinal)) {
+        return $false
+    }
     $artifactPaths = $ProfileDocument['artifact_paths']
     if ($artifactPaths -is [hashtable]) {
         foreach ($key in $artifactPaths.Keys) {
@@ -151,10 +154,7 @@ function Test-DocsEstatePath {
     foreach ($root in @($ProfileDocument['documentation_roots'])) {
         $rootPath = [string]$root['path']
         $prefix = $rootPath + '/'
-        if ($path.Length -le $prefix.Length -or -not $path.StartsWith($prefix, [System.StringComparison]::Ordinal)) {
-            continue
-        }
-        if ($rootPath -ceq 'docs' -or $rootPath.StartsWith('docs/', [System.StringComparison]::Ordinal) -or $path.EndsWith('.md', [System.StringComparison]::Ordinal)) {
+        if ($path.Length -gt $prefix.Length -and $path.StartsWith($prefix, [System.StringComparison]::Ordinal)) {
             return $true
         }
     }

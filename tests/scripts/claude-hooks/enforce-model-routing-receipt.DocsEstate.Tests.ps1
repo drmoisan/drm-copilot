@@ -88,6 +88,18 @@ BeforeAll {
     }
 }
 
+AfterAll {
+    # Remove the top-level functions of the dot-sourced gate and of the docs-leg files it loads.
+    foreach ($file in @('enforce-model-routing-receipt.ps1', 'enforce-model-routing-receipt-docs.ps1', 'enforce-orchestration-preimplementation-gate-docs.ps1', 'hook-docs-estate-context.ps1') | ForEach-Object { Join-Path $script:HookRoot "hooks/$_" }) {
+        $tokens = $null
+        $parseErrors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($file, [ref]$tokens, [ref]$parseErrors)
+        foreach ($definition in $ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $false)) {
+            Remove-Item -LiteralPath ('Function:\' + $definition.Name) -ErrorAction SilentlyContinue
+        }
+    }
+}
+
 Describe 'model-routing gate docs-estate delegation leg (issue #1169)' {
     BeforeEach {
         Set-DocsEstateRoutingFixture
@@ -188,6 +200,24 @@ Describe 'model-routing gate docs-estate delegation leg (issue #1169)' {
             # Assert
             Assert-DocsEstateRoutingDeny -Decision $decision -SubCode 'DOCS_DELEGATION_PATH_NOT_ALLOWED'
             [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*'src/a.ps1'*"
+        }
+
+        It 'denies DOCS_DELEGATION_PATH_NOT_ALLOWED for a diff path <Outside> outside docs/ under a root or artifact directory' -ForEach @(
+            @{ Outside = 'guide/start.md' }
+            @{ Outside = 'scripts/evil.ps1' }
+        ) {
+            # Arrange
+            # Under the pre-CR3 rule this profile admits guide/start.md (a .md file under a root) and
+            # scripts/evil.ps1 (under an artifact directory); under the CR3 rule it admits neither.
+            $profileText = [ordered]@{ artifact_kind = 'docs-profile'; documentation_roots = @(@{ id = 'docs-root'; path = 'docs' }, @{ id = 'guide'; path = 'guide' }); artifact_paths = [ordered]@{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json'; extra = 'scripts/x.json' } } | ConvertTo-Json -Depth 6 -Compress
+            Set-DocsEstateRoutingFixture -ProfileText $profileText -DiffOutput "docs/a.md$($script:Nul)$Outside$($script:Nul)"
+
+            # Act
+            $decision = Get-DocsEstateRoutingDecision
+
+            # Assert
+            Assert-DocsEstateRoutingDeny -Decision $decision -SubCode 'DOCS_DELEGATION_PATH_NOT_ALLOWED'
+            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*'$Outside'*"
         }
 
         It 'denies DOCS_DELEGATION_RECEIPT_INVALID for <Case>' -ForEach @(
