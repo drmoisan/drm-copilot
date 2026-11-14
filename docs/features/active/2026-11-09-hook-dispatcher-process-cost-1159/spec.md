@@ -210,7 +210,7 @@ Quality gates:
 ## Definition of Done
 
 - [x] Acceptance criteria documented and mapped to tests or evidence
-- [ ] Behavior matches acceptance criteria on Windows and on the Linux hook-suite CI job
+- [x] Behavior matches acceptance criteria on Windows and on the Linux hook-suite CI job
 - [x] Tests updated/added (unit and process-level parity)
 - [x] Edge cases and error handling covered by tests
 - [x] Docs updated (README, architecture doc, execution-environment brief copies)
