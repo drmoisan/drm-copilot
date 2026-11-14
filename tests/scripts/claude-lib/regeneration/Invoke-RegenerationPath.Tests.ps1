@@ -385,28 +385,42 @@ Describe 'Invoke-RegenerationPath seam defaults (AST)' {
         $block.Extent.Text | Should -Match '\$LASTEXITCODE'
     }
 
-    It '(h) the process -Invoker default pipes one call-operator invocation to [Console]::Error.WriteLine and reads $LASTEXITCODE' {
+    It '(h) the process -Invoker default starts one ProcessStartInfo with UseShellExecute false, forwards output to [Console]::Error.WriteLine and returns ExitCode' {
         $block = Get-SeamDefault -FunctionName 'Invoke-RegenerationProcess' -ParameterName 'Invoker'
-        $invocations = @($block.FindAll({
+        $members = @($block.FindAll({ param($node) $node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] }, $true))
+        $construction = @($members | Where-Object { $_.Static -and $_.Member.Value -ceq 'new' -and $_.Expression.TypeName.FullName -ceq 'System.Diagnostics.ProcessStartInfo' })
+        $construction.Count | Should -Be 1
+        $construction[0].Arguments[0].Extent.Text | Should -Match '\$FilePath'
+        $start = @($members | Where-Object { $_.Static -and $_.Member.Value -ceq 'Start' -and $_.Expression.TypeName.FullName -ceq 'System.Diagnostics.Process' })
+        $start.Count | Should -Be 1
+        $argumentAdd = @($members | Where-Object { -not $_.Static -and $_.Member.Value -ceq 'Add' -and $_.Expression.Extent.Text -ceq '$info.ArgumentList' })
+        $argumentAdd.Count | Should -Be 1
+        $argumentAdd[0].Arguments[0].Extent.Text | Should -Match '\$item'
+        $loop = @($block.FindAll({ param($node) $node -is [System.Management.Automation.Language.ForEachStatementAst] }, $true))
+        $loop.Count | Should -Be 1
+        $loop[0].Condition.Extent.Text | Should -BeExactly '$ArgumentList'
+        $assignments = @($block.FindAll({ param($node) $node -is [System.Management.Automation.Language.AssignmentStatementAst] }, $true))
+        $shell = @($assignments | Where-Object { $_.Left.Extent.Text -ceq '$info.UseShellExecute' })
+        $shell.Count | Should -Be 1
+        $shell[0].Right.Extent.Text | Should -BeExactly '$false'
+        foreach ($redirect in @('$info.RedirectStandardOutput', '$info.RedirectStandardError')) {
+            $set = @($assignments | Where-Object { $_.Left.Extent.Text -ceq $redirect })
+            $set.Count | Should -Be 1 -Because "$redirect is assigned once"
+            $set[0].Right.Extent.Text | Should -BeExactly '$true'
+        }
+        @($members | Where-Object { $_.Member.Value -ceq 'ReadToEndAsync' }).Count | Should -Be 2
+        @($members | Where-Object { $_.Member.Value -ceq 'WaitForExit' }).Count | Should -Be 1
+        $errorWrites = @($members | Where-Object { @('WriteLine', 'Write') -ccontains $_.Member.Value -and $_.Expression.Extent.Text -eq '[Console]::Error' })
+        $errorWrites.Count | Should -Be 2
+        $exitCode = @($block.FindAll({
                     param($node)
-                    $node -is [System.Management.Automation.Language.CommandAst] -and
-                    $node.InvocationOperator -eq [System.Management.Automation.Language.TokenKind]::Ampersand
+                    $node -is [System.Management.Automation.Language.MemberExpressionAst] -and
+                    $node -isnot [System.Management.Automation.Language.InvokeMemberExpressionAst] -and $node.Member.Value -ceq 'ExitCode'
                 }, $true))
-        $invocations.Count | Should -Be 1
-        $invocations[0].CommandElements.Count | Should -Be 2
-        $invocations[0].CommandElements[0].VariablePath.UserPath | Should -BeExactly 'FilePath'
-        $invocations[0].CommandElements[1].Splatted | Should -BeTrue
-        $invocations[0].CommandElements[1].VariablePath.UserPath | Should -BeExactly 'ArgumentList'
-        $pipeline = $invocations[0].Parent
-        [object]::ReferenceEquals($pipeline.PipelineElements[0], $invocations[0]) | Should -BeTrue
-        $last = $pipeline.PipelineElements[$pipeline.PipelineElements.Count - 1]
-        $writeLine = @($last.FindAll({
-                    param($node)
-                    $node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and $node.Member.Value -ceq 'WriteLine' -and
-                    $node.Expression.Extent.Text -eq '[Console]::Error'
-                }, $true))
-        $writeLine.Count | Should -Be 1
-        $block.Extent.Text | Should -Match '\$LASTEXITCODE'
+        $exitCode.Count | Should -Be 1
+        $exitCode[0].Expression.Extent.Text | Should -BeExactly '$process'
+        $commands = @($block.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true))
+        $commands.Count | Should -Be 0 -Because 'the default starts the process through .NET only: no call operator, cmdlet, or expression invocation'
     }
 
     It '(h) no seam default writes to the success or host stream' {

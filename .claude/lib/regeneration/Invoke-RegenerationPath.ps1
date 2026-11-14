@@ -97,8 +97,22 @@ function Invoke-RegenerationProcess {
         [Parameter(Mandatory = $true)] [AllowEmptyCollection()] [string[]] $Argv,
         [scriptblock] $Invoker = {
             param($FilePath, $ArgumentList)
-            & $FilePath @ArgumentList 2>&1 | ForEach-Object { [Console]::Error.WriteLine($_) }
-            $LASTEXITCODE
+            $info = [System.Diagnostics.ProcessStartInfo]::new([string] $FilePath)
+            foreach ($item in $ArgumentList) { $info.ArgumentList.Add([string] $item) }
+            $info.UseShellExecute = $false
+            $info.RedirectStandardOutput = $true
+            $info.RedirectStandardError = $true
+            $process = [System.Diagnostics.Process]::Start($info)
+            if ($null -eq $process) { throw "process $FilePath was not started" }
+            try {
+                $stdout = $process.StandardOutput.ReadToEndAsync()
+                $stderr = $process.StandardError.ReadToEndAsync()
+                $process.WaitForExit()
+                [Console]::Error.WriteLine($stdout.Result)
+                [Console]::Error.WriteLine($stderr.Result)
+                [int] $process.ExitCode
+            }
+            finally { $process.Dispose() }
         }
     )
 
