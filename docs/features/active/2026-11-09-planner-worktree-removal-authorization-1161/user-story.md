@@ -47,7 +47,7 @@ Epic-planner operator story:
 - [x] A dirty recorded worktree is denied with `PLANNER_WORKTREE_DIRTY`, including when the command carries `--force`.
 - [x] A recorded worktree that is in use is denied with `PLANNER_WORKTREE_IN_USE`, with a detail beginning with the condition identifier, for each of U1 (session root or planner-checkpoint root), U2 (main checkout), U3 (git-locked worktree), U4 (preparation checkpoint unparseable or not at `S5_atomic_execution`), and U5 (adopted by an epic-orchestrator checkpoint).
 - [x] A recorded worktree whose `HEAD` is on neither remote-tracking ref is denied with `PLANNER_WORKTREE_NOT_PUSHED`; an ineligible record is denied with `PLANNER_WORKTREE_NOT_ELIGIBLE`; an ambiguous record is denied with `PLANNER_WORKTREE_AMBIGUOUS`; a git failure is denied with `PLANNER_WORKTREE_GIT_FAILED`.
-- [ ] No recorded value, fixture, or evidence file carries an absolute host path; the validators reject a `path` with a drive, a leading slash, a backslash, a `:`, or a dot segment.
+- [x] No recorded value, fixture, or evidence file carries an absolute host path; the validators reject a `path` with a drive, a leading slash, a backslash, a `:`, or a dot segment.
 
 Gate maintainer story:
 
