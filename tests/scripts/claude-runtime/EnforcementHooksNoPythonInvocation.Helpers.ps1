@@ -310,6 +310,63 @@ function Test-SiblingScriptLoadExpression {
     return ($hasScriptRoot -and $hasScriptFile)
 }
 
+function Test-HookDispatchRunnerInvocation {
+    <#
+    .SYNOPSIS
+        Carve-out (c) for class 3 (issue #1159): returns $true only for an '&' call of a variable
+        inside the PreToolUse dispatcher runner whose value the same function assigns from the
+        registry resolver.
+    .DESCRIPTION
+        Admitted pairs (file suffix, function, resolver): HookDispatchRunner.psm1 under
+        .claude/lib/hook-dispatch with Invoke-HookDispatchRunner and Resolve-HookDispatchScriptPath;
+        .codex/hooks/hook-dispatch.ps1 with Invoke-CodexHookDispatchRunner and
+        Resolve-CodexHookDispatchScriptPath. The resolver returns only a validated hooks-folder
+        '.ps1' path (leaf ^[a-z0-9][a-z0-9.-]*\.ps1$, existence checked when the registry is read),
+        so the call can never name an interpreter. Every other dynamic '&' call stays reported.
+        This is a carve-out, not an allowlist entry.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.Language.CommandAst]$Command,
+
+        [Parameter(Mandatory = $true)]
+        [string]$SourceLabel
+    )
+
+    $label = $SourceLabel -replace '\\', '/'
+    $pairs = @(
+        @{ Suffix = '.claude/lib/hook-dispatch/HookDispatchRunner.psm1'; Function = 'Invoke-HookDispatchRunner'; Resolver = 'Resolve-HookDispatchScriptPath' },
+        @{ Suffix = '.codex/hooks/hook-dispatch.ps1'; Function = 'Invoke-CodexHookDispatchRunner'; Resolver = 'Resolve-CodexHookDispatchScriptPath' }
+    )
+    $pair = @($pairs | Where-Object { $label -eq $_.Suffix -or $label.EndsWith('/' + $_.Suffix, [System.StringComparison]::Ordinal) }) | Select-Object -First 1
+    if ($null -eq $pair) { return $false }
+    if ($Command.InvocationOperator -ne [System.Management.Automation.Language.TokenKind]::Ampersand) { return $false }
+    $operand = $Command.CommandElements[0]
+    if ($operand -isnot [System.Management.Automation.Language.VariableExpressionAst]) { return $false }
+
+    $function = $Command.Parent
+    while ($null -ne $function -and $function -isnot [System.Management.Automation.Language.FunctionDefinitionAst]) { $function = $function.Parent }
+    if ($null -eq $function -or $function.Name -ne $pair.Function) { return $false }
+
+    $variableName = Get-VariableName -Variable $operand
+    $resolverAssignments = @($function.Body.FindAll({
+                param($node)
+                $node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                (Get-VariableName -Variable $node.Left) -eq $variableName -and
+                $null -ne $node.Right.Find({ param($inner) $inner -is [System.Management.Automation.Language.CommandAst] -and $inner.GetCommandName() -eq $pair.Resolver }, $true)
+            }, $true))
+    $otherAssignments = @($function.Body.FindAll({
+                param($node)
+                $node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                (Get-VariableName -Variable $node.Left) -eq $variableName
+            }, $true))
+    return ($resolverAssignments.Count -ge 1 -and $resolverAssignments.Count -eq $otherAssignments.Count)
+}
+
 function Get-PythonInvocationFinding {
     <#
     .SYNOPSIS
@@ -366,6 +423,10 @@ function Get-PythonInvocationFinding {
             }
             # Carve-out (b): dot-sourcing a path variable (sibling helper load).
             if ($command.InvocationOperator -eq $dotOperator) {
+                continue
+            }
+            # Carve-out (c): the dispatcher runner's call of a registry-resolved hook script.
+            if (Test-HookDispatchRunnerInvocation -Command $command -SourceLabel $SourceLabel) {
                 continue
             }
 

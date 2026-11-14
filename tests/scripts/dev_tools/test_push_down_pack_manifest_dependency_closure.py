@@ -404,7 +404,9 @@ def _command_gaps(
 def test_claude_command_text_closure() -> None:
     """Hooks named by settings and manifested agent frontmatter are published.
 
-    `.claude/settings.json` is checked against `E(core)`; each manifested
+    `.claude/settings.json` and the PreToolUse dispatcher registry
+    `.claude/hooks/pretooluse-dispatch.json` are checked against `E(core)`;
+    each manifested
     `.claude/agents/*.md` is checked against the effective set of every
     manifest that lists it.
     """
@@ -412,6 +414,15 @@ def test_claude_command_text_closure() -> None:
     surface = claude_surface()
     gaps = _command_gaps(
         surface, ".claude/settings.json", "settings", surface.core_name
+    )
+    # Issue #1159: the PreToolUse hooks are named by the dispatcher registry.
+    gaps.extend(
+        _command_gaps(
+            surface,
+            ".claude/hooks/pretooluse-dispatch.json",
+            "settings",
+            surface.core_name,
+        )
     )
     # Check each manifested agent's frontmatter hooks against its listing pack.
     for pack, paths in sorted(surface.manifests.items()):
@@ -428,10 +439,24 @@ def test_claude_command_text_closure() -> None:
 
 
 def test_codex_command_text_closure() -> None:
-    """Hooks named by the bundled `.codex/config.toml` are published by core."""
+    """Hooks named by the bundled `.codex/config.toml` and registry are published.
+
+    Both `.codex/config.toml` and the PreToolUse dispatcher registry
+    `.codex/hooks/pretooluse-dispatch.json` are checked against `E(core)`.
+    """
 
     surface = codex_surface()
-    assert _command_gaps(surface, ".codex/config.toml", "toml", surface.core_name) == []
+    gaps = _command_gaps(surface, ".codex/config.toml", "toml", surface.core_name)
+    # Issue #1159: the PreToolUse hooks are named by the dispatcher registry.
+    gaps.extend(
+        _command_gaps(
+            surface,
+            ".codex/hooks/pretooluse-dispatch.json",
+            "settings",
+            surface.core_name,
+        )
+    )
+    assert gaps == []
 
 
 @pytest.mark.parametrize("expected_path", ISSUE_984_CLAUDE_CORE_PATHS)

@@ -234,6 +234,61 @@ function Invoke-Thing {
         }
     }
 
+    Context 'carve-out (c) - dispatcher runner call of a registry-resolved hook (issue #1159)' {
+        BeforeAll {
+            $script:RunnerFixture = @'
+function Invoke-HookDispatchRunner {
+    param([object[]] $Selected)
+    foreach ($hook in $Selected) {
+        $hookScriptPath = Resolve-HookDispatchScriptPath -Hook $hook
+        $captured = @(& $hookScriptPath *>&1)
+    }
+}
+'@
+            $script:CodexRunnerFixture = $script:RunnerFixture.Replace('Invoke-HookDispatchRunner', 'Invoke-CodexHookDispatchRunner').Replace('Resolve-HookDispatchScriptPath', 'Resolve-CodexHookDispatchScriptPath')
+        }
+
+        It 'reports no finding for the runner call in <Label>' -ForEach @(
+            @{ Label = '.claude/lib/hook-dispatch/HookDispatchRunner.psm1'; Codex = $false }
+            @{ Label = 'extensions/drm-copilot/resources/claude-customizations/.claude/lib/hook-dispatch/HookDispatchRunner.psm1'; Codex = $false }
+            @{ Label = '.codex/hooks/hook-dispatch.ps1'; Codex = $true }
+        ) {
+            $fixture = if ($Codex) { $script:CodexRunnerFixture } else { $script:RunnerFixture }
+            $findings = Get-PythonInvocationFinding -ScriptText $fixture -SourceLabel $Label
+            @($findings).Count | Should -Be 0
+        }
+
+        It 'still reports the same call in any other file' {
+            $findings = Get-PythonInvocationFinding -ScriptText $script:RunnerFixture -SourceLabel '.claude/lib/hook-dispatch/HookDispatch.psm1'
+            @($findings | Where-Object { $_.Kind -eq 'DynamicInvocation' }).Count | Should -Be 1
+        }
+
+        It 'still reports the same call in any other function' {
+            $fixture = $script:RunnerFixture.Replace('function Invoke-HookDispatchRunner', 'function Invoke-OtherRunner')
+            $findings = Get-PythonInvocationFinding -ScriptText $fixture -SourceLabel '.claude/lib/hook-dispatch/HookDispatchRunner.psm1'
+            @($findings | Where-Object { $_.Kind -eq 'DynamicInvocation' }).Count | Should -Be 1
+        }
+
+        It 'still reports a call whose operand is not assigned from the resolver' {
+            $fixture = $script:RunnerFixture.Replace('Resolve-HookDispatchScriptPath -Hook $hook', 'Get-InterpreterPath')
+            $findings = Get-PythonInvocationFinding -ScriptText $fixture -SourceLabel '.claude/lib/hook-dispatch/HookDispatchRunner.psm1'
+            @($findings | Where-Object { $_.Kind -eq 'DynamicInvocation' }).Count | Should -Be 1
+        }
+
+        It 'still reports a call whose operand is also assigned from another source' {
+            $fixture = $script:RunnerFixture.Replace('        $captured =', "        `$hookScriptPath = 'python'`n        `$captured =")
+            $findings = Get-PythonInvocationFinding -ScriptText $fixture -SourceLabel '.claude/lib/hook-dispatch/HookDispatchRunner.psm1'
+            @($findings | Where-Object { $_.Kind -eq 'DynamicInvocation' }).Count | Should -Be 1
+        }
+
+        It 'still reports another dynamic call inside the runner' {
+            $fixture = $script:RunnerFixture.Replace('        $captured =', "        & `$toolPath -m foo`n        `$captured =")
+            $findings = Get-PythonInvocationFinding -ScriptText $fixture -SourceLabel '.claude/lib/hook-dispatch/HookDispatchRunner.psm1'
+            @($findings | Where-Object { $_.Kind -eq 'DynamicInvocation' }).Count | Should -Be 1
+            $findings[0].Detail | Should -Match 'toolPath'
+        }
+    }
+
     Context 'detection class 4 - arbitrary text execution' {
         It 'detects an Invoke-Expression call' {
             # Arrange

@@ -6,12 +6,14 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $script:HookRoot = Join-Path $script:RepoRoot '.codex/hooks'
         $script:ConfigPath = Join-Path $script:RepoRoot '.codex/config.toml'
+        # Issue #1159: config.toml registers only the dispatcher; the hook groups live in its registry.
+        $script:RegistryPath = Join-Path $script:HookRoot 'pretooluse-dispatch.json'
         $script:PwshPath = (Get-Command pwsh -CommandType Application -ErrorAction Stop | Select-Object -First 1).Source
         . (Join-Path $script:HookRoot 'enforce-epic-wave-barrier.ps1')
 
         # Candidate tool names probed against each matcher regex. A future
         # registration cannot silently escape coverage, because the registration
-        # set and the admitted names are both derived from config.toml.
+        # set and the admitted names are both derived from the dispatcher registry.
         $script:CandidateToolNames = @('Bash', 'shell_command', 'apply_patch', 'Edit', 'Write', 'mcp__drm_copilot__run_poshqc_format')
 
         function Get-CodexPreToolUseRegistration {
@@ -53,6 +55,24 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
                 }
             }
 
+            return , $registrations.ToArray()
+        }
+
+        function Get-CodexPreToolUseRegistryRegistration {
+            <#
+                Reads the Codex PreToolUse dispatcher registry text and returns one record
+                per registered handler: its group matcher regex and its hook file name.
+            #>
+            param([Parameter(Mandatory)][AllowEmptyString()][string] $RegistryText)
+
+            $registrations = [System.Collections.Generic.List[object]]::new()
+            foreach ($group in @(($RegistryText | ConvertFrom-Json).hooks.PreToolUse)) {
+                foreach ($hook in @($group.hooks)) {
+                    if ([string]$hook.command -match '/\.codex/hooks/(?<hook>[^/"]+\.ps1)') {
+                        $registrations.Add([pscustomobject]@{ Matcher = [string]$group.matcher; HookName = $Matches['hook'] })
+                    }
+                }
+            }
             return , $registrations.ToArray()
         }
 
@@ -142,8 +162,40 @@ Describe 'Every registered Codex PreToolUse handler accepts every tool name its 
             }
         }
 
-        $script:Registrations = Get-CodexPreToolUseRegistration -ConfigPath $script:ConfigPath
+        $script:RegistryText = Get-Content -LiteralPath $script:RegistryPath -Raw
+        $script:Registrations = Get-CodexPreToolUseRegistryRegistration -RegistryText $script:RegistryText
         $script:RegisteredHookNames = @($script:Registrations | ForEach-Object { $_.HookName } | Select-Object -Unique)
+    }
+
+    It 'registers one PreToolUse table invoking the dispatcher in command and command_windows' {
+        # Arrange: the raw config.toml lines and the registry timeout sum (spec AC 2, D7).
+        $lines = @(Get-Content -LiteralPath $script:ConfigPath)
+        $timeoutSum = 0
+        foreach ($group in @(($script:RegistryText | ConvertFrom-Json).hooks.PreToolUse)) { foreach ($hook in @($group.hooks)) { $timeoutSum += [int]$hook.timeout } }
+
+        # Act: collect the lines of the PreToolUse section, which ends at the next table of another event.
+        $tables = @($lines | Where-Object { $_ -match '^\[\[hooks\.PreToolUse\]\]$' })
+        $section = [System.Collections.Generic.List[string]]::new()
+        $inSection = $false
+        foreach ($line in $lines) {
+            if ($line -match '^\[\[hooks\.(?<table>[A-Za-z.]+)\]\]$') { $inSection = $Matches['table'] -like 'PreToolUse*'; if (-not $inSection) { continue } }
+            if ($inSection) { $section.Add($line) }
+        }
+        $hookTables = @($section | Where-Object { $_ -match '^\[\[hooks\.PreToolUse\.hooks\]\]$' })
+        $commands = @($section | Where-Object { $_ -match '^command\s*=' })
+        $windowsCommands = @($section | Where-Object { $_ -match '^command_windows\s*=' })
+        $timeouts = @($section | Where-Object { $_ -match '^timeout\s*=\s*(?<value>\d+)\s*$' } | ForEach-Object { [int]($_ -replace '^timeout\s*=\s*', '') })
+
+        # Assert
+        $tables.Count | Should -Be 1
+        $hookTables.Count | Should -Be 1
+        $commands.Count | Should -Be 1
+        $commands[0] | Should -BeLike '*.codex/hooks/invoke-pretooluse-dispatch.ps1*'
+        $windowsCommands.Count | Should -Be 1
+        $windowsCommands[0] | Should -BeLike '*.codex/hooks/invoke-pretooluse-dispatch.ps1*'
+        $timeouts.Count | Should -Be 1
+        $timeouts[0] | Should -Be $timeoutSum
+        $timeoutSum | Should -BeGreaterThan 0
     }
 
     It 'parses at least three matcher groups and every registered handler from config.toml' {

@@ -32,7 +32,7 @@
 [CmdletBinding()]
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
-try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'docs-role-contract.ps1') } catch { Add-HookDependencyFailure -Name 'docs-role-contract.ps1' -ErrorRecord $_ }
 
 $script:DocsWriteScopeWriteTools = @('Write', 'Edit', 'MultiEdit', 'NotebookEdit')
