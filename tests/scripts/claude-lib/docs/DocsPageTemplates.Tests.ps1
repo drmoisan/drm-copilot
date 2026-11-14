@@ -24,11 +24,11 @@ BeforeAll {
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'Docs.TestSupport.psm1') -Force -ErrorAction Stop
 
     $script:Expected = [ordered]@{
-        '.claude/lib/docs/templates/page-check/markdownlint.json'                    = '.markdownlint.json'
-        '.claude/lib/docs/templates/page-check/vale.ini'                             = '.vale.ini'
-        '.claude/lib/docs/templates/page-check/vale/DocsBase/HeadingPunctuation.yml' = '.vale/styles/DocsBase/HeadingPunctuation.yml'
-        '.claude/lib/docs/templates/page-check/vale/DocsBase/Placeholders.yml'       = '.vale/styles/DocsBase/Placeholders.yml'
-        '.claude/lib/docs/templates/page-check/vale/Project/accept.txt'              = '.vale/styles/config/vocabularies/Project/accept.txt'
+        '.claude/lib/docs/templates/page-check/markdownlint.json'                    = 'docs/documentation-estate/.markdownlint.json'
+        '.claude/lib/docs/templates/page-check/vale.ini'                             = 'docs/documentation-estate/.vale.ini'
+        '.claude/lib/docs/templates/page-check/vale/DocsBase/HeadingPunctuation.yml' = 'docs/documentation-estate/.vale/styles/DocsBase/HeadingPunctuation.yml'
+        '.claude/lib/docs/templates/page-check/vale/DocsBase/Placeholders.yml'       = 'docs/documentation-estate/.vale/styles/DocsBase/Placeholders.yml'
+        '.claude/lib/docs/templates/page-check/vale/Project/accept.txt'              = 'docs/documentation-estate/.vale/styles/config/vocabularies/Project/accept.txt'
     }
     $script:TemplateFile = @(Get-ChildItem -LiteralPath $script:TemplateRoot -File -Recurse)
     $script:SourceText = @{}
@@ -155,6 +155,25 @@ Describe 'init with the page-check templates' {
             $write[0].Mode | Should -BeExactly 'create'
             $write[0].Text | Should -BeExactly $script:SourceText[$source] -Because $source
         }
-        $test.Files['.vale/styles/config/vocabularies/Project/accept.txt'] | Should -BeExactly ''
+        $test.Files['docs/documentation-estate/.vale/styles/config/vocabularies/Project/accept.txt'] | Should -BeExactly ''
+    }
+
+    It 'plans and writes no linter configuration at the repository root (issue #1169)' {
+        # Arrange
+        $test = New-DocsTestContext -File $script:SourceText
+
+        # Act
+        $planned = Invoke-DocsInitCommand -Argument @{} -Context $test.Context
+        $written = Invoke-DocsInitCommand -Argument @{ Write = $true } -Context $test.Context
+        $paths = @(@($planned.Result.planned_writes | ForEach-Object { [string] $_.path }) + @($test.WriteLog | ForEach-Object { [string] $_.RelativePath }))
+
+        # Assert
+        $written.ExitCode | Should -Be 0
+        $paths.Count | Should -BeGreaterThan 0
+        foreach ($path in $paths) {
+            $path | Should -Not -BeExactly '.markdownlint.json'
+            $path | Should -Not -BeExactly '.vale.ini'
+            $path.StartsWith('.vale/', [System.StringComparison]::Ordinal) | Should -BeFalse -Because "'$path' must not be written under the root .vale/ directory"
+        }
     }
 }

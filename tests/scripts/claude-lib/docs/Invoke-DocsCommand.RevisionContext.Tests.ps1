@@ -3,8 +3,9 @@
 
 <#
 .SYNOPSIS
-    Unit tests for the ResolveRevision and ReadRevisionText members of New-DocsCommandContext
-    in .claude/lib/docs/Invoke-DocsCommand.ps1 (issue #1034).
+    Unit tests for the ResolveRevision and ReadRevisionText members (issue #1034) and the
+    TestAncestor and ListChangedPath members (issue #1169) of New-DocsCommandContext in
+    .claude/lib/docs/Invoke-DocsCommand.ps1.
 
 .DESCRIPTION
     The script is dot-sourced to load its functions. The private operations
@@ -231,6 +232,169 @@ Describe 'New-DocsCommandContext revision members' {
 
         # Act
         if ($Member -eq 'ResolveRevision') { $null = & $context.ResolveRevision 'main' } else { $null = & $context.ReadRevisionText $script:Revision 'docs/a.json' }
+
+        # Assert
+        Should -Invoke -CommandName Invoke-DocsProcess -Times 1 -Exactly -ParameterFilter { $FilePath -ceq 'git' -and $TimeoutSeconds -eq 30 }
+    }
+}
+
+Describe 'Test-DocsContextAncestor (issue #1169)' {
+    It 'makes one bounded git merge-base --is-ancestor call with the exact argv and empty stdin' {
+        # Arrange
+        $recorder = Get-TestRecordingProcess -Result @{ ExitCode = 0; Stdout = ''; Stderr = ''; TimedOut = $false }
+        $other = 'fedcba9876543210fedcba9876543210fedcba98'
+
+        # Act
+        $result = Test-DocsContextAncestor 'root-dir' $script:Revision $other $recorder.Process
+
+        # Assert
+        $result | Should -BeTrue
+        $recorder.Calls.Count | Should -Be 1
+        $recorder.Calls[0].FilePath | Should -BeExactly 'git'
+        $recorder.Calls[0].ArgumentList | Should -Be @('-C', 'root-dir', 'merge-base', '--is-ancestor', $script:Revision, $other)
+        $recorder.Calls[0].StdinText | Should -BeExactly ''
+        $recorder.Calls[0].TimeoutSeconds | Should -Be 30
+    }
+
+    It 'returns <Expected> for <Case>' -ForEach @(
+        @{ Case = 'exit 1 (not an ancestor)'; ExitCode = 1; TimedOut = $false; Expected = 'false' }
+        @{ Case = 'exit 128'; ExitCode = 128; TimedOut = $false; Expected = 'null' }
+        @{ Case = 'a timeout'; ExitCode = 0; TimedOut = $true; Expected = 'null' }
+    ) {
+        # Arrange
+        $recorder = Get-TestRecordingProcess -Result @{ ExitCode = $ExitCode; Stdout = ''; Stderr = ''; TimedOut = $TimedOut }
+
+        # Act
+        $result = Test-DocsContextAncestor 'root-dir' $script:Revision $script:Revision $recorder.Process
+
+        # Assert
+        if ($Expected -eq 'null') { $null -eq $result | Should -BeTrue } else { $result | Should -BeFalse; $null -eq $result | Should -BeFalse }
+    }
+
+    It 'throws DOCS_CONTEXT_REVISION_INVALID for the <Position> revision with no process call' -ForEach @(
+        @{ Position = 'ancestor'; Ancestor = 'abc'; Descendant = '0123456789abcdef0123456789abcdef01234567' }
+        @{ Position = 'descendant'; Ancestor = '0123456789abcdef0123456789abcdef01234567'; Descendant = $null }
+    ) {
+        # Arrange
+        $recorder = Get-TestRecordingProcess
+
+        # Act and Assert
+        { Test-DocsContextAncestor 'root-dir' $Ancestor $Descendant $recorder.Process } | Should -Throw 'DOCS_CONTEXT_REVISION_INVALID*'
+        $recorder.Calls.Count | Should -Be 0
+    }
+}
+
+Describe 'Get-DocsContextChangedPath (issue #1169)' {
+    It 'returns the NUL-split paths of one bounded git diff call with the exact argv' {
+        # Arrange
+        $recorder = Get-TestRecordingProcess -Result @{ ExitCode = 0; Stdout = "docs/a.md`0src/b c.ps1`0"; Stderr = ''; TimedOut = $false }
+        $other = 'fedcba9876543210fedcba9876543210fedcba98'
+
+        # Act
+        $result = Get-DocsContextChangedPath 'root-dir' $script:Revision $other $recorder.Process
+
+        # Assert
+        $result | Should -Be @('docs/a.md', 'src/b c.ps1')
+        $recorder.Calls.Count | Should -Be 1
+        $recorder.Calls[0].FilePath | Should -BeExactly 'git'
+        $recorder.Calls[0].ArgumentList | Should -Be @('-C', 'root-dir', 'diff', '--name-only', '-z', '--no-renames', '--no-relative', $script:Revision, $other)
+        $recorder.Calls[0].StdinText | Should -BeExactly ''
+        $recorder.Calls[0].TimeoutSeconds | Should -Be 30
+    }
+
+    It 'returns an empty array for empty output' {
+        # Arrange
+        $recorder = Get-TestRecordingProcess -Result @{ ExitCode = 0; Stdout = ''; Stderr = ''; TimedOut = $false }
+
+        # Act
+        $result = Get-DocsContextChangedPath 'root-dir' $script:Revision $script:Revision $recorder.Process
+
+        # Assert
+        $null -eq $result | Should -BeFalse -Because 'an empty diff is an empty array, not $null'
+        @($result).Count | Should -Be 0
+    }
+
+    It 'returns $null for <Case>' -ForEach @(
+        @{ Case = 'a non-zero exit'; ExitCode = 128; TimedOut = $false; Stdout = '' }
+        @{ Case = 'a timeout'; ExitCode = 0; TimedOut = $true; Stdout = "docs/a.md`0" }
+        @{ Case = 'output without a trailing NUL'; ExitCode = 0; TimedOut = $false; Stdout = 'docs/a.md' }
+    ) {
+        # Arrange
+        $recorder = Get-TestRecordingProcess -Result @{ ExitCode = $ExitCode; Stdout = $Stdout; Stderr = ''; TimedOut = $TimedOut }
+
+        # Act
+        $result = Get-DocsContextChangedPath 'root-dir' $script:Revision $script:Revision $recorder.Process
+
+        # Assert
+        $null -eq $result | Should -BeTrue
+    }
+
+    It 'throws DOCS_CONTEXT_REVISION_INVALID for the <Position> revision with no process call' -ForEach @(
+        @{ Position = 'from'; From = 'ABC'; To = '0123456789abcdef0123456789abcdef01234567' }
+        @{ Position = 'to'; From = '0123456789abcdef0123456789abcdef01234567'; To = '' }
+    ) {
+        # Arrange
+        $recorder = Get-TestRecordingProcess
+
+        # Act and Assert
+        { Get-DocsContextChangedPath 'root-dir' $From $To $recorder.Process } | Should -Throw 'DOCS_CONTEXT_REVISION_INVALID*'
+        $recorder.Calls.Count | Should -Be 0
+    }
+}
+
+Describe 'New-DocsCommandContext receipt revision members (issue #1169)' {
+    BeforeAll {
+        $script:Context = New-DocsCommandContext -RepositoryRoot $script:RepositoryRootPath
+        $script:Other = 'fedcba9876543210fedcba9876543210fedcba98'
+    }
+
+    It 'exposes TestAncestor and ListChangedPath after ReadRevisionText with their leading parameters' {
+        # Act
+        $names = @($script:Context.PSObject.Properties | ForEach-Object { $_.Name })
+        $ancestorNames = @($script:Context.TestAncestor.Ast.ParamBlock.Parameters | ForEach-Object { $_.Name.VariablePath.UserPath })
+        $changedNames = @($script:Context.ListChangedPath.Ast.ParamBlock.Parameters | ForEach-Object { $_.Name.VariablePath.UserPath })
+
+        # Assert
+        $names[-3..-1] | Should -Be @('ReadRevisionText', 'TestAncestor', 'ListChangedPath')
+        $ancestorNames[0..1] | Should -Be @('Ancestor', 'Descendant')
+        $changedNames[0..1] | Should -Be @('FromRevision', 'ToRevision')
+    }
+
+    It '<Member> runs the injected InvokeProcess with the context root after -C' -ForEach @(
+        @{ Member = 'TestAncestor' }
+        @{ Member = 'ListChangedPath' }
+    ) {
+        # Arrange
+        $recorder = Get-TestRecordingProcess -Result @{ ExitCode = 0; Stdout = ''; Stderr = ''; TimedOut = $false }
+
+        # Act
+        $null = & $script:Context.$Member $script:Revision $script:Other -InvokeProcess $recorder.Process
+
+        # Assert
+        $recorder.Calls.Count | Should -Be 1
+        $recorder.Calls[0].ArgumentList[1] | Should -BeExactly $script:Context.RepositoryRoot
+    }
+
+    It 'passes the root and both revisions to an injected Operation of TestAncestor and ListChangedPath' {
+        # Act
+        $ancestor = & $script:Context.TestAncestor $script:Revision $script:Other -Operation { param($Root, $Ancestor, $Descendant, $InvokeProcess) "$Root|$Ancestor|$Descendant|$($null -ne $InvokeProcess)" }
+        $changed = & $script:Context.ListChangedPath $script:Revision $script:Other -Operation { param($Root, $FromRevision, $ToRevision, $InvokeProcess) "$Root|$FromRevision|$ToRevision|$($null -ne $InvokeProcess)" }
+
+        # Assert
+        $ancestor | Should -BeExactly "$($script:Context.RepositoryRoot)|$($script:Revision)|$($script:Other)|True"
+        $changed | Should -BeExactly "$($script:Context.RepositoryRoot)|$($script:Revision)|$($script:Other)|True"
+    }
+
+    It 'routes the default wiring of <Member> through Invoke-DocsProcess once with git and a 30-second wait' -ForEach @(
+        @{ Member = 'TestAncestor' }
+        @{ Member = 'ListChangedPath' }
+    ) {
+        # Arrange
+        Mock -CommandName Invoke-DocsProcess -MockWith { @{ ExitCode = 0; Stdout = ''; Stderr = ''; TimedOut = $false } }
+        $context = New-DocsCommandContext -RepositoryRoot $script:RepositoryRootPath
+
+        # Act
+        $null = & $context.$Member $script:Revision $script:Other
 
         # Assert
         Should -Invoke -CommandName Invoke-DocsProcess -Times 1 -Exactly -ParameterFilter { $FilePath -ceq 'git' -and $TimeoutSeconds -eq 30 }

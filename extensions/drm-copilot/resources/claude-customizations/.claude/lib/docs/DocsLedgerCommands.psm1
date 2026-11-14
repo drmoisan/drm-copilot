@@ -1,17 +1,19 @@
 <#
 .SYNOPSIS
-    The coverage, update-ledger and validate command functions of the documentation library,
-    their argument validators and the input loader.
+    The coverage and update-ledger command functions of the documentation library, their
+    argument validator, the input loader, and the shared private helpers of the ledger commands.
 
 .DESCRIPTION
-    The argument validators check value grammars and the per-operation option sets before any
-    read and return one DOCS_CLI_ARGUMENTS finding or $null. Read-DocsLedgerInputSet reads the
+    The argument validator checks value grammars and the per-operation option sets before any
+    read and returns one DOCS_CLI_ARGUMENTS finding or $null. Read-DocsLedgerInputSet reads the
     artifacts a command needs through scriptblock parameters (an absent artifact is $null; a
     read failure other than absence propagates). The command functions take -Argument and
     -Context, return a New-DocsCommandResult object, write no output and never exit. Context
     members are passed to [scriptblock] parameters and never invoked through a member
-    expression; only update-ledger and validate -WriteReceipt pass WriteText, and only to
-    Invoke-DocsArtifactWrite. Identifier and path comparisons are ordinal and case-sensitive.
+    expression; only update-ledger passes WriteText here, and only to Invoke-DocsArtifactWrite.
+    Identifier and path comparisons are ordinal and case-sensitive. The validate command lives in
+    DocsValidateCommands.psm1 (issue #1169), which calls the private helpers this module exports
+    for it (Get-DocsLedgerCommandMember through Read-DocsLedgerCommandProfile in the export list).
 
 .NOTES
     Issue #1023. Requires PowerShell 7.4 or later. No external module dependencies.
@@ -193,30 +195,6 @@ function Test-DocsUpdateLedgerArgument {
         }
         if ($spec.OnePage -and $pages.Count -ne 1) { return New-DocsLedgerCommandUsageFinding -Command $command -Message "The operation '$operation' takes exactly one -Page." }
     }
-    return $null
-}
-
-function Test-DocsValidateArgument {
-    <#
-    .SYNOPSIS
-        Returns one DOCS_CLI_ARGUMENTS finding for an invalid validate argument map, or $null when it is valid.
-    .DESCRIPTION
-        Checks, before any read: Profile is a relative path; Mode is one of profile, ledger,
-        matrix and docs-complete; Revision is a full revision (Test-DocsFullRevision); and
-        WriteReceipt is given only with Mode docs-complete.
-    #>
-    [CmdletBinding()]
-    [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param([Parameter(Mandatory = $true)] [System.Collections.IDictionary] $Argument)
-
-    $command = 'validate'
-    if ((Test-DocsLedgerCommandOption -Argument $Argument -Name 'Profile') -and -not (Test-DocsRelativePath -Path ([string] $Argument['Profile']))) { return New-DocsLedgerCommandUsageFinding -Command $command -Message "Profile '$($Argument['Profile'])' is not a repository-relative path." }
-    if (-not (Test-DocsLedgerCommandOption -Argument $Argument -Name 'Mode')) { return New-DocsLedgerCommandUsageFinding -Command $command -Message 'The -Mode option is required.' }
-    $mode = [string] $Argument['Mode']
-    if ((Get-DocsValidationMode) -cnotcontains $mode) { return New-DocsLedgerCommandUsageFinding -Command $command -Message "Mode '$mode' is not one of $((Get-DocsValidationMode) -join ', ')." }
-    if (-not (Test-DocsLedgerCommandOption -Argument $Argument -Name 'Revision')) { return New-DocsLedgerCommandUsageFinding -Command $command -Message 'The -Revision option is required.' }
-    if (-not (Test-DocsFullRevision -Revision ([string] $Argument['Revision']))) { return New-DocsLedgerCommandUsageFinding -Command $command -Message "Revision '$($Argument['Revision'])' is not a full lowercase hexadecimal revision." }
-    if ((Test-DocsLedgerCommandOption -Argument $Argument -Name 'WriteReceipt') -and [bool] $Argument['WriteReceipt'] -and $mode -cne 'docs-complete') { return New-DocsLedgerCommandUsageFinding -Command $command -Message '-WriteReceipt is permitted only with -Mode docs-complete.' }
     return $null
 }
 
@@ -714,72 +692,16 @@ function Invoke-DocsUpdateLedgerCommand {
     }
 }
 
-function Invoke-DocsValidateCommand {
-    <#
-    .SYNOPSIS
-        Validates the documentation artifacts in one mode and returns the receipt; with -WriteReceipt in docs-complete mode the receipt is persisted.
-    .DESCRIPTION
-        Exit 0 with the pass receipt, exit 1 with the fail receipt (a null result when the profile
-        does not load), exit 2 for a usage error before any read, exit 3 (DOCS_CLI_RUNTIME) for a
-        read failure, a non-UTC clock, the receipt defect guard, or a receipt write conflict or
-        failure. Without -WriteReceipt the WriteText member is never read; with it the receipt
-        (pass or fail) is written to artifact_paths.validation_receipt, and only that document.
-    #>
-    [CmdletBinding()]
-    [OutputType([pscustomobject])]
-    param(
-        [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $Argument,
-        [Parameter(Mandatory = $true)] [object] $Context
-    )
-
-    $command = 'validate'
-    $usage = Test-DocsValidateArgument -Argument $Argument
-    if ($null -ne $usage) { return New-DocsCommandResult -Command $command -ExitCode 2 -Finding @($usage) }
-    try {
-        $issuedAt = Get-DocsLedgerCommandTimestamp -UtcNow $Context.UtcNow
-        $schemas = Get-DocsLedgerCommandSchemaSet
-        $mode = [string] $Argument['Mode']
-        $revision = [string] $Argument['Revision']
-        $writeReceipt = [bool] (Get-DocsLedgerCommandArgumentValue -Argument $Argument -Name 'WriteReceipt' -Default $false)
-        $profilePath = [string] (Get-DocsLedgerCommandArgumentValue -Argument $Argument -Name 'Profile' -Default (Get-DocsDefaultProfilePath))
-        $profileRead = Read-DocsLedgerCommandProfile -Command $command -ProfilePath $profilePath -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -ComposedSchemaSet $schemas
-        if ($null -eq $profileRead.Bytes) { return $profileRead.Result }
-        $profileText = ConvertFrom-DocsUtf8Bytes -Bytes $profileRead.Bytes
-        $artifact = [ordered]@{ 'docs-profile' = @{ Path = $profilePath; Bytes = $profileRead.Bytes } }
-        $pagePath = [string[]]@()
-        $loaded = (ConvertFrom-DocsProfileText -Text $profileText -ArtifactPath $profilePath -ComposedSchemaSet $schemas).Profile
-        if ($null -ne $loaded) {
-            $inputs = Read-DocsLedgerInputSet -Profile $loaded -Need (Get-DocsValidationInputKind -Mode $mode) -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -ListFile $Context.ListFile
-            foreach ($kind in @($inputs.Artifact.Keys)) { $artifact[$kind] = $inputs.Artifact[$kind] }
-            $pagePath = $inputs.PagePath
-        }
-        $validation = Invoke-DocsValidation -Mode $mode -Revision $revision -IssuedAt $issuedAt -ProfileText $profileText -ProfilePath $profilePath -Artifact $artifact -PagePath $pagePath -ComposedSchemaSet $schemas
-        if ($null -eq $validation.Receipt) { return New-DocsCommandResult -Command $command -ExitCode 1 -Finding $validation.Findings }
-        $receipt = $validation.Receipt
-        $exitCode = if ($validation.Ok) { 0 } else { 1 }
-        $lines = [System.Collections.Generic.List[string]]::new()
-        $lines.Add("receipt $($receipt['id']) $mode $($receipt['validation_result'])")
-        if ($writeReceipt) {
-            $receiptPath = [string] (Get-DocsLedgerCommandMember -Table (Get-DocsLedgerCommandMember -Table $loaded -Name 'artifact_paths') -Name 'validation_receipt')
-            $existing = (Read-DocsLedgerInputSet -Profile $loaded -Need @('docs-validation-receipt') -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -ListFile $Context.ListFile).Artifact['docs-validation-receipt']
-            $before = if ($null -eq $existing) { $null } else { Get-DocsBytesSha256Hex -Bytes ([byte[]] $existing['Bytes']) }
-            $plans = Get-DocsArtifactWritePlan -Document @(@{ Path = $receiptPath; ArtifactKind = 'docs-validation-receipt'; ArtifactId = [string] $receipt['id']; Text = (ConvertTo-DocsJsonText -Value $receipt -Indented); BeforeSha256 = $before })
-            $outcome = Invoke-DocsArtifactWrite -Plan $plans -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -WriteText $Context.WriteText
-            if ($null -ne $outcome.Failed) {
-                return New-DocsLedgerCommandRuntimeResult -Command $command -Message "The write of $($outcome.Failed['Path']) ended with status $($outcome.Failed['Status']): $($outcome.Failed['Message'])" -ArtifactPath $receiptPath -RelatedPath (@($receiptPath) + @($outcome.WrittenPath))
-            }
-            foreach ($plan in $outcome.Write) { $lines.Add("$($plan['Status']) $($plan['Path'])") }
-        }
-        return New-DocsCommandResult -Command $command -ExitCode $exitCode -Finding $validation.Findings -Result $receipt -Line $lines.ToArray()
-    } catch {
-        return New-DocsLedgerCommandRuntimeResult -Command $command -Message "The command failed: $($_.Exception.Message)"
-    }
-}
-
 Export-ModuleMember -Function `
     Test-DocsUpdateLedgerArgument, `
-    Test-DocsValidateArgument, `
     Read-DocsLedgerInputSet, `
     Invoke-DocsCoverageCommand, `
     Invoke-DocsUpdateLedgerCommand, `
-    Invoke-DocsValidateCommand
+    Get-DocsLedgerCommandMember, `
+    Test-DocsLedgerCommandOption, `
+    New-DocsLedgerCommandUsageFinding, `
+    Get-DocsLedgerCommandSchemaSet, `
+    Get-DocsLedgerCommandArgumentValue, `
+    New-DocsLedgerCommandRuntimeResult, `
+    Get-DocsLedgerCommandTimestamp, `
+    Read-DocsLedgerCommandProfile

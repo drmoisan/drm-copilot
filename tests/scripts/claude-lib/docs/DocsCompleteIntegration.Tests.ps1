@@ -104,7 +104,7 @@ Describe 'docs-complete integration' {
     It 'exits 0 with a pass receipt on the complete fixture' {
         # Arrange
         $estate = New-TestEstate
-        $test = New-DocsLedgerTestContext -File $estate.Files
+        $test = New-DocsLedgerTestContext -File $estate.Files -RevisionMap @{ HEAD = $script:Revision } # Issue #1169: HEAD resolves to the snapshot revision.
 
         # Act
         $run = Invoke-TestCommand -Command 'validate' -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision) -Test $test
@@ -124,7 +124,7 @@ Describe 'docs-complete integration' {
         $estate = New-TestEstate -Undocumented -Stale
         $element = $estate.View.Element[$estate.Ids[2]]
         $staleElement = $estate.View.Element[$estate.Ids[4]]
-        $test = New-DocsLedgerTestContext -File $estate.Files
+        $test = New-DocsLedgerTestContext -File $estate.Files -RevisionMap @{ HEAD = $script:Revision } # Issue #1169: HEAD resolves to the snapshot revision.
 
         # Act
         $run = Invoke-TestCommand -Command 'validate' -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision) -Test $test
@@ -152,7 +152,7 @@ Describe 'docs-complete integration' {
     It 'exits 0 with a pass receipt after set-disposition Write and pin Write' {
         # Arrange: one recording context carries the estate through the three commands.
         $estate = New-TestEstate -Undocumented -Stale
-        $test = New-DocsLedgerTestContext -File $estate.Files
+        $test = New-DocsLedgerTestContext -File $estate.Files -RevisionMap @{ HEAD = $script:Revision } # Issue #1169: HEAD resolves to the snapshot revision.
         $before = Invoke-TestCommand -Command 'validate' -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision) -Test $test
         $before.Outcome.ExitCode | Should -Be 1
 

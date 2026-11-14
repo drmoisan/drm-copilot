@@ -28,7 +28,11 @@
       5. A pull request that is not an epic integration branch merging into main allows.
       6. The receipt path (RECEIPT_PATH_INVALID) and the receipt at that path are checked
          against headRefOid with Test-DocsCompleteGateReceipt; a failing reason denies. A receipt
-         that exists but cannot be read denies RECEIPT_UNREADABLE.
+         that exists but cannot be read denies RECEIPT_UNREADABLE. The revision step is the
+         receipt revision rule (issue #1169): Get-DocsCompleteGateRevisionInput reads the
+         inventory snapshot revision and surface_selection.source_roots beneath the receipt root
+         and, only when the receipt revision differs from headRefOid, supplies ancestry and the
+         changed paths through Invoke-DocsOnlyGitExe; a timeout or a non-zero exit supplies $null.
 
     Every deny reason reads DOCS_COMPLETE_GATE_BLOCKED: <REASON_CODE>: <reason and remediation>.
     The head revision is always the pull request headRefOid and never the local HEAD, because
@@ -274,6 +278,83 @@ function Get-DocsCompleteGateReceiptRoot {
     return [string] $resolved.WorktreeRoot
 }
 
+function ConvertFrom-DocsCompleteGateJsonText {
+    <#
+    .SYNOPSIS
+        Parses JSON text into a hashtable, or returns $null for absent, unreadable, or non-object text.
+    .PARAMETER Text
+        The JSON text.
+    .OUTPUTS
+        System.Collections.Hashtable or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([AllowNull()] [object] $Text)
+
+    if ($Text -isnot [string] -or $Text.Length -eq 0) { return $null }
+    try { $value = ConvertFrom-Json -InputObject $Text -AsHashtable -ErrorAction Stop } catch { return $null }
+    if ($value -is [hashtable]) { return $value }
+    return $null
+}
+
+function Get-DocsCompleteGateRevisionInput {
+    <#
+    .SYNOPSIS
+        Collects the inputs of the receipt revision rule beneath the receipt root (issue #1169).
+    .DESCRIPTION
+        Reads surface_selection.source_roots and artifact_paths.inventory_snapshot from the profile
+        text, the snapshot revision from the snapshot file beneath ReceiptRoot, and the receipt
+        revision from the receipt text. Only when the receipt revision is a full lowercase object
+        id that differs from HeadRevision does it run git merge-base --is-ancestor and git diff
+        --name-only -z --no-renames --no-relative through the bounded Invoke-DocsOnlyGitExe seam.
+        Exit 0 and 1 of the ancestry call answer $true and $false; any other exit, including the
+        timeout code 124, answers $null. A diff that fails or is not NUL-terminated answers $null.
+        Never throws.
+    .PARAMETER ProfileText
+        The profile text beneath the receipt root.
+    .PARAMETER ReceiptText
+        The receipt text, or $null.
+    .PARAMETER ReceiptRoot
+        The root the receipt and snapshot are read beneath and git runs in.
+    .PARAMETER HeadRevision
+        The pull request head revision.
+    .OUTPUTS
+        System.Collections.Hashtable with SnapshotRevision, IsAncestor, ChangedPath, and SourceRoot.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [AllowNull()] [object] $ProfileText,
+        [AllowNull()] [object] $ReceiptText,
+        [Parameter(Mandatory)] [string] $ReceiptRoot,
+        [Parameter(Mandatory)] [AllowEmptyString()] [string] $HeadRevision
+    )
+
+    $result = @{ SnapshotRevision = $null; IsAncestor = $null; ChangedPath = $null; SourceRoot = [string[]]@() }
+    $profileValue = ConvertFrom-DocsCompleteGateJsonText -Text $ProfileText
+    if ($null -ne $profileValue) {
+        if ($profileValue['surface_selection'] -is [hashtable]) { $result.SourceRoot = [string[]]@(@($profileValue['surface_selection']['source_roots']) | Where-Object { $_ -is [string] }) }
+        $snapshotPath = if ($profileValue['artifact_paths'] -is [hashtable]) { $profileValue['artifact_paths']['inventory_snapshot'] } else { $null }
+        if ($snapshotPath -is [string] -and $snapshotPath.Length -gt 0) {
+            try { $snapshotText = Get-DocsCompleteGateFileText -Path (Join-Path -Path $ReceiptRoot -ChildPath $snapshotPath) } catch { $snapshotText = $null }
+            $snapshot = ConvertFrom-DocsCompleteGateJsonText -Text $snapshotText
+            if ($null -ne $snapshot -and $snapshot['revision'] -is [string]) { $result.SnapshotRevision = [string] $snapshot['revision'] }
+        }
+    }
+    $receipt = ConvertFrom-DocsCompleteGateJsonText -Text $ReceiptText
+    $receiptRevision = if ($null -ne $receipt -and $receipt['revision'] -is [string]) { [string] $receipt['revision'] } else { '' }
+    $fullRevision = '^(?:[0-9a-f]{40}|[0-9a-f]{64})$'
+    if ($receiptRevision -cnotmatch $fullRevision -or $HeadRevision -cnotmatch $fullRevision -or $receiptRevision -ceq $HeadRevision) { return $result }
+    $ancestry = Invoke-DocsOnlyGitExe -WorktreeRoot $ReceiptRoot -GitArgs @('merge-base', '--is-ancestor', $receiptRevision, $HeadRevision)
+    if ($null -ne $ancestry -and $ancestry.ExitCode -eq 0) { $result.IsAncestor = $true } elseif ($null -ne $ancestry -and $ancestry.ExitCode -eq 1) { $result.IsAncestor = $false }
+    $diff = Invoke-DocsOnlyGitExe -WorktreeRoot $ReceiptRoot -GitArgs @('diff', '--name-only', '-z', '--no-renames', '--no-relative', $receiptRevision, $HeadRevision)
+    if ($null -ne $diff -and $diff.ExitCode -eq 0) {
+        $text = [string] $diff.Output
+        if ($text.Length -eq 0 -or $text.EndsWith([char]0)) { $result.ChangedPath = [string[]]@(ConvertFrom-DocsOnlyNameList -Text $text) }
+    }
+    return $result
+}
+
 function Invoke-DocsCompleteGateDecision {
     <#
     .SYNOPSIS
@@ -337,7 +418,13 @@ function Invoke-DocsCompleteGateDecision {
     } catch {
         return Get-DocsCompleteGateBlockDecision -Code 'RECEIPT_UNREADABLE' -Message "The validation receipt exists but could not be read ($($_.Exception.GetBaseException().GetType().Name)); the gate fails closed. Make the file readable and retry."
     }
-    $receipt = Test-DocsCompleteGateReceipt -ReceiptText $receiptText -HeadRevision $pr.HeadRefOid
+    # Issue #1169: the receipt revision rule reads the snapshot and source roots beneath the receipt root.
+    $receiptProfileText = $profileText
+    if (-not [string]::Equals($receiptRoot, $root, [System.StringComparison]::Ordinal)) {
+        try { $receiptProfileText = Get-DocsCompleteGateFileText -Path (Join-Path -Path $receiptRoot -ChildPath $script:DocsCompleteGateProfilePath) } catch { $receiptProfileText = $null }
+    }
+    $revisionInput = Get-DocsCompleteGateRevisionInput -ProfileText $receiptProfileText -ReceiptText $receiptText -ReceiptRoot $receiptRoot -HeadRevision $pr.HeadRefOid
+    $receipt = Test-DocsCompleteGateReceipt -ReceiptText $receiptText -HeadRevision $pr.HeadRefOid -SnapshotRevision $revisionInput.SnapshotRevision -IsAncestor $revisionInput.IsAncestor -ChangedPath $revisionInput.ChangedPath -SourceRoot $revisionInput.SourceRoot
     if (-not $receipt.Allow) { return Get-DocsCompleteGateBlockDecision -Code $receipt.Reason -Message $receipt.Message }
     return Get-DocsCompleteGateAllowDecision
 }

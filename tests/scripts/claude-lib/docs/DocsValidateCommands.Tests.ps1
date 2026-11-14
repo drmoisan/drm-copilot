@@ -3,20 +3,21 @@
 
 <#
 .SYNOPSIS
-    Unit tests for the validate subcommand of .claude/lib/docs/DocsLedgerCommands.psm1 (the
-    DocsLedgerCommands suite family).
+    Unit tests for the validate subcommand and its argument validator in
+    .claude/lib/docs/DocsValidateCommands.psm1 (issue #1169; moved from the DocsLedgerCommands
+    suite family with the functions).
 
 .DESCRIPTION
     Runs validate through Invoke-DocsCommandCli over the recording in-memory context of
     DocsLedger.TestSupport.psm1: zero writes without -WriteReceipt, the receipt write on pass and
-    fail, the revision pin, mode checks, exit codes 0 to 3, envelopes and the text summary.
-    Assertions use codes, exit codes, pointers and identifiers, never Test-Json message text. No
-    file is written.
+    fail, the revision pin, mode checks, exit codes 0 to 3, envelopes and the text summary. The
+    Test-DocsValidateArgument cases moved here from DocsLedgerCommands.Tests.ps1. Assertions use
+    codes, exit codes, pointers and identifiers, never Test-Json message text. No file is written.
 #>
 
 BeforeAll {
     $script:LibraryRoot = Join-Path -Path $PSScriptRoot -ChildPath '../../../../.claude/lib'
-    foreach ($name in 'DocsJson', 'DocsFinding', 'DocsSurface', 'DocsSchema', 'DocsProfile', 'DocsLedger', 'DocsLedgerRules', 'DocsParity', 'DocsEvidencePins', 'DocsStaleness', 'DocsReceipt', 'DocsValidation', 'DocsLedgerMutation', 'DocsCoverageReport', 'DocsLedgerCommands') {
+    foreach ($name in 'DocsJson', 'DocsFinding', 'DocsSurface', 'DocsSchema', 'DocsProfile', 'DocsLedger', 'DocsLedgerRules', 'DocsParity', 'DocsEvidencePins', 'DocsStaleness', 'DocsReceipt', 'DocsValidation', 'DocsLedgerMutation', 'DocsCoverageReport', 'DocsLedgerCommands', 'DocsValidateCommands') {
         Import-Module -Name (Join-Path -Path $script:LibraryRoot -ChildPath "docs/$name.psm1") -Force -ErrorAction Stop
     }
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedger.TestSupport.psm1') -Force -ErrorAction Stop
@@ -27,6 +28,8 @@ BeforeAll {
     $script:IssuedAt = '2026-03-01T12:00:00Z'
     $script:Page = 'docs/reference/Cli.md'
     $script:Revision = '0123456789abcdef0123456789abcdef01234567'
+    # Issue #1169: docs-complete applies the receipt revision rule against HEAD, so every context resolves HEAD to the snapshot revision.
+    $script:HeadMap = @{ HEAD = $script:Revision }
     $script:ProfilePath = 'docs/documentation-estate/docs-profile.json'
     $script:ReceiptPath = 'estate/docs-validation-receipt.json'
     $script:Modes = @('profile', 'ledger', 'matrix', 'docs-complete')
@@ -91,6 +94,14 @@ BeforeAll {
         param([object[]] $Finding, [string] $Code)
         , @($Finding | Where-Object { $_['code'] -ceq $Code })
     }
+
+    function Assert-TestUsageFinding {
+        param([object] $Finding, [string] $Fragment)
+        $null -eq $Finding | Should -BeFalse -Because "a finding is expected ($Fragment)"
+        $Finding['code'] | Should -BeExactly 'DOCS_CLI_ARGUMENTS'
+        $Finding['severity'] | Should -BeExactly 'error'
+        if ($Fragment.Length -gt 0) { $Finding['message'].Contains($Fragment, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "the message names $Fragment" }
+    }
 }
 
 AfterAll {
@@ -107,8 +118,8 @@ Describe 'validate' {
     It 'makes zero WriteText calls without WriteReceipt in every mode' {
         foreach ($mode in $script:Modes) {
             # Arrange
-            $test = New-DocsLedgerTestContext -File $script:Files
-            $failing = New-DocsLedgerTestContext -File (New-TestEstate -Snapshot $script:Snapshot)
+            $test = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files
+            $failing = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File (New-TestEstate -Snapshot $script:Snapshot)
 
             # Act
             $run = Invoke-TestValidate -Argument @('-Mode', $mode, '-Revision', $script:Revision) -Test $test
@@ -127,10 +138,10 @@ Describe 'validate' {
 
     It 'writes only the receipt at validation_receipt on pass and on fail with WriteReceipt' {
         # Arrange
-        $pass = New-DocsLedgerTestContext -File $script:Files
+        $pass = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files
         $failFiles = New-TestEstate -Snapshot $script:Snapshot -Set $script:Complete
         $failFiles[$script:ReceiptPath] = '{"old": true}'
-        $fail = New-DocsLedgerTestContext -File $failFiles -UtcNow ([datetime]::new(2026, 3, 2, 8, 0, 0, [System.DateTimeKind]::Utc))
+        $fail = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $failFiles -UtcNow ([datetime]::new(2026, 3, 2, 8, 0, 0, [System.DateTimeKind]::Utc))
 
         # Act
         $passRun = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision, '-WriteReceipt') -Test $pass
@@ -162,8 +173,8 @@ Describe 'validate' {
         $unpinnedSet = Get-TestCompleteSet -Snapshot $unpinned
 
         # Act
-        $ledger = Invoke-TestValidate -Argument @('-Mode', 'ledger', '-Revision', $other) -Test (New-DocsLedgerTestContext -File $script:Files)
-        $matrix = Invoke-TestValidate -Argument @('-Mode', 'matrix', '-Revision', $script:Revision) -Test (New-DocsLedgerTestContext -File (New-TestEstate -Snapshot $unpinned -Set $unpinnedSet))
+        $ledger = Invoke-TestValidate -Argument @('-Mode', 'ledger', '-Revision', $other) -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files)
+        $matrix = Invoke-TestValidate -Argument @('-Mode', 'matrix', '-Revision', $script:Revision) -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File (New-TestEstate -Snapshot $unpinned -Set $unpinnedSet))
 
         # Assert
         $ledger.Result['revision'] | Should -BeExactly $other
@@ -175,7 +186,7 @@ Describe 'validate' {
     It 'exits 2 for WriteReceipt with any other mode' {
         foreach ($mode in 'profile', 'ledger', 'matrix') {
             # Arrange
-            $test = New-DocsLedgerTestContext -File $script:Files
+            $test = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files
 
             # Act
             $run = Invoke-TestValidate -Argument @('-Mode', $mode, '-Revision', $script:Revision, '-WriteReceipt') -Test $test
@@ -193,12 +204,12 @@ Describe 'validate' {
         # Arrange
         $set = Get-TestCompleteSet -Snapshot $script:Snapshot
         $set.Ledger['entries'] = [object[]]@($set.Ledger['entries'] | Where-Object { -not $_['extensions'].Contains('docs.precision-limit') })
-        $test = New-DocsLedgerTestContext -File (New-TestEstate -Snapshot $script:Snapshot -Set $set)
+        $test = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File (New-TestEstate -Snapshot $script:Snapshot -Set $set)
         $limit = $set.View.PrecisionLimit[@($set.View.PrecisionLimit.Keys)[0]]
 
         # Act
         $run = Invoke-TestValidate -Argument @('-Mode', 'ledger', '-Revision', $script:Revision) -Test $test
-        $profileRun = Invoke-TestValidate -Argument @('-Mode', 'profile', '-Revision', $script:Revision) -Test (New-DocsLedgerTestContext -File (New-TestEstate -Snapshot $script:Snapshot -Set $set))
+        $profileRun = Invoke-TestValidate -Argument @('-Mode', 'profile', '-Revision', $script:Revision) -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File (New-TestEstate -Snapshot $script:Snapshot -Set $set))
 
         # Assert
         $run.Outcome.ExitCode | Should -Be 1
@@ -215,7 +226,7 @@ Describe 'validate' {
     It 'exits 1 with DOCS_SNAPSHOT_UNPINNED for a null snapshot revision in docs-complete' {
         # Arrange
         $unpinned = New-DocsLedgerTestSnapshot -NoRevision
-        $test = New-DocsLedgerTestContext -File (New-TestEstate -Snapshot $unpinned -Set (Get-TestCompleteSet -Snapshot $unpinned))
+        $test = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File (New-TestEstate -Snapshot $unpinned -Set (Get-TestCompleteSet -Snapshot $unpinned))
 
         # Act
         $run = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision) -Test $test
@@ -237,10 +248,10 @@ Describe 'validate' {
         $semantic['documentation_roots'][0]['audience_ids'] = @('maintainers', 'operators')
 
         # Act
-        $missing = Invoke-TestValidate -Argument @('-Mode', 'profile', '-Revision', $script:Revision) -Test (New-DocsLedgerTestContext -File (New-TestEstate -NoProfile))
-        $schema = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision) -Test (New-DocsLedgerTestContext -File (New-TestEstate -ProfileDocument $broken -Set $script:Complete))
-        $parse = Invoke-TestValidate -Argument @('-Mode', 'profile', '-Revision', $script:Revision, '-Profile', 'p.json') -Test (New-DocsLedgerTestContext -File @{ 'p.json' = '{"id":' })
-        $semanticRun = Invoke-TestValidate -Argument @('-Mode', 'profile', '-Revision', $script:Revision) -Test (New-DocsLedgerTestContext -File (New-TestEstate -ProfileDocument $semantic))
+        $missing = Invoke-TestValidate -Argument @('-Mode', 'profile', '-Revision', $script:Revision) -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File (New-TestEstate -NoProfile))
+        $schema = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision) -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File (New-TestEstate -ProfileDocument $broken -Set $script:Complete))
+        $parse = Invoke-TestValidate -Argument @('-Mode', 'profile', '-Revision', $script:Revision, '-Profile', 'p.json') -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File @{ 'p.json' = '{"id":' })
+        $semanticRun = Invoke-TestValidate -Argument @('-Mode', 'profile', '-Revision', $script:Revision) -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File (New-TestEstate -ProfileDocument $semantic))
 
         # Assert
         $missing.Outcome.ExitCode | Should -Be 1
@@ -260,7 +271,7 @@ Describe 'validate' {
     It 'exits 2 for a missing Mode, an invalid Revision and an unknown option before any read' {
         foreach ($arguments in @(, @('-Revision', $script:Revision)), @(, @('-Mode', 'ledger')), @(, @('-Mode', 'ledger', '-Revision', 'ABC')), @(, @('-Mode', 'ledger', '-Revision', $script:Revision, '-Unknown', 'x')), @(, @('-Mode', 'all', '-Revision', $script:Revision)), @(, @('-Mode', 'ledger', '-Revision', $script:Revision, '-Profile', '/abs.json'))) {
             # Arrange
-            $test = New-DocsLedgerTestContext -File $script:Files
+            $test = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files
 
             # Act
             $run = Invoke-TestValidate -Argument $arguments[0] -Test $test
@@ -276,9 +287,9 @@ Describe 'validate' {
 
     It 'exits 3 for an injected read failure, a receipt write failure and a non-UTC clock' {
         # Arrange
-        $readFail = New-DocsLedgerTestContext -File $script:Files -ReadBytesFailure @{ 'estate/docs-parity-matrix.json' = 'permission denied' }
-        $writeFail = New-DocsLedgerTestContext -File $script:Files -WriteTextFailure @{ $script:ReceiptPath = 'disk full' }
-        $local = New-DocsLedgerTestContext -File $script:Files -UtcNow ([datetime]::new(2026, 3, 1, 12, 0, 0, [System.DateTimeKind]::Local))
+        $readFail = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files -ReadBytesFailure @{ 'estate/docs-parity-matrix.json' = 'permission denied' }
+        $writeFail = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files -WriteTextFailure @{ $script:ReceiptPath = 'disk full' }
+        $local = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files -UtcNow ([datetime]::new(2026, 3, 1, 12, 0, 0, [System.DateTimeKind]::Local))
 
         # Act
         $readRun = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision) -Test $readFail
@@ -312,23 +323,23 @@ Describe 'validate' {
 
         # Act and Assert
         $codes = foreach ($case in $cases) {
-            $run = Invoke-TestValidate -Argument $case.Argument -Test (New-DocsLedgerTestContext -File $case.Files -UtcNow ([datetime]::new(2026, 3, 1, 12, 0, 0, $case.Clock)))
+            $run = Invoke-TestValidate -Argument $case.Argument -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $case.Files -UtcNow ([datetime]::new(2026, 3, 1, 12, 0, 0, $case.Clock)))
             (Test-DocsArtifactText -ArtifactKind 'docs-command-envelope' -JsonText $run.Outcome.Stdout -ComposedSchemaSet $script:Composed).Count | Should -Be 0 -Because ($case.Argument -join ' ')
             $run.Envelope['command'] | Should -BeExactly 'validate'
             $run.Envelope['ok'] | Should -Be ($run.Outcome.ExitCode -eq 0)
             $run.Outcome.ExitCode
         }
         @($codes) | Should -Be @(0, 1, 2, 3)
-        $first = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision, '-WriteReceipt') -Test (New-DocsLedgerTestContext -File $script:Files)
-        $second = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision, '-WriteReceipt') -Test (New-DocsLedgerTestContext -File $script:Files)
+        $first = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision, '-WriteReceipt') -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files)
+        $second = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision, '-WriteReceipt') -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files)
         $first.Outcome.Stdout | Should -BeExactly $second.Outcome.Stdout
         (Test-DocsArtifactText -ArtifactKind 'docs-validation-receipt' -JsonText (ConvertTo-DocsJsonText -Value $first.Result) -ComposedSchemaSet $script:Composed).Count | Should -Be 0
     }
 
     It 'prints the summary line without Json' {
         # Act
-        $pass = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision, '-WriteReceipt') -Test (New-DocsLedgerTestContext -File $script:Files) -Text
-        $fail = Invoke-TestValidate -Argument @('-Mode', 'ledger', '-Revision', ('f' * 40)) -Test (New-DocsLedgerTestContext -File $script:Files) -Text
+        $pass = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision, '-WriteReceipt') -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files) -Text
+        $fail = Invoke-TestValidate -Argument @('-Mode', 'ledger', '-Revision', ('f' * 40)) -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files) -Text
 
         # Assert
         $passLines = @($pass.Outcome.Stdout.TrimEnd("`n") -split "`n")
@@ -339,5 +350,170 @@ Describe 'validate' {
         $failLines[0] | Should -Match '^error DOCS_REVISION_MISMATCH estate/surface-inventory-snapshot.json/revision: '
         $failLines[-1] | Should -BeExactly 'validate: exit=1 errors=1 warnings=0 infos=0'
         $pass.Outcome.Stdout.Contains('{', [System.StringComparison]::Ordinal) | Should -BeFalse
+    }
+}
+
+Describe 'Test-DocsValidateArgument' {
+    It 'rejects invalid Revision and relative path values' {
+        # Act and Assert
+        Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Mode = 'ledger'; Revision = $script:Revision.ToUpperInvariant() }) -Fragment 'Revision'
+        Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Mode = 'ledger'; Revision = 'abc' }) -Fragment 'Revision'
+        Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Mode = 'ledger'; Revision = $script:Revision; Profile = '/abs.json' }) -Fragment 'repository-relative'
+    }
+
+    It 'rejects WriteReceipt outside docs-complete' {
+        foreach ($mode in 'profile', 'ledger', 'matrix') {
+            Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Mode = $mode; Revision = $script:Revision; WriteReceipt = $true }) -Fragment '-WriteReceipt'
+        }
+        $null -eq (Test-DocsValidateArgument -Argument @{ Mode = 'docs-complete'; Revision = $script:Revision; WriteReceipt = $true }) | Should -BeTrue
+        $null -eq (Test-DocsValidateArgument -Argument @{ Mode = 'matrix'; Revision = $script:Revision; WriteReceipt = $false }) | Should -BeTrue
+        Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Revision = $script:Revision }) -Fragment '-Mode'
+        Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Mode = 'all'; Revision = $script:Revision }) -Fragment 'all'
+        Assert-TestUsageFinding -Finding (Test-DocsValidateArgument -Argument @{ Mode = 'ledger' }) -Fragment '-Revision'
+    }
+
+    It 'returns null for valid arguments' {
+        $null -eq (Test-DocsValidateArgument -Argument @{ Mode = 'profile'; Revision = 'f' * 64; Profile = 'p.json' }) | Should -BeTrue
+    }
+}
+
+Describe 'validate receipt revision (issue #1169)' {
+    BeforeAll {
+        $script:Snapshot = New-DocsLedgerTestSnapshot
+        $script:Complete = Get-TestCompleteSet -Snapshot $script:Snapshot
+        $script:Files = New-TestEstate -Snapshot $script:Snapshot -Set $script:Complete
+        $script:Head = 'fedcba9876543210fedcba9876543210fedcba98'
+        $script:Pair = "$($script:Revision)..$($script:Head)"
+    }
+
+    It 'defaults -Revision to the snapshot revision under -WriteReceipt and writes that revision' {
+        # Arrange
+        $test = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files
+
+        # Act
+        $run = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-WriteReceipt') -Test $test
+        $written = (ConvertFrom-DocsJsonText -Text $test.WriteLog[0].Text).Value
+
+        # Assert
+        $run.Outcome.ExitCode | Should -Be 0
+        $run.Result['revision'] | Should -BeExactly $script:Revision
+        $test.WriteLog.Count | Should -Be 1
+        $test.WriteLog[0].RelativePath | Should -BeExactly $script:ReceiptPath
+        $written['revision'] | Should -BeExactly $script:Revision -Because 'the persisted receipt carries the snapshot revision'
+    }
+
+    It 'returns a usage error naming inventory -Revision for a <Case> snapshot revision and writes nothing' -ForEach @(
+        @{ Case = 'null'; Absent = $false }
+        @{ Case = 'absent'; Absent = $true }
+    ) {
+        # Arrange
+        $files = if ($Absent) { $estate = New-TestEstate -Snapshot $script:Snapshot -Set $script:Complete; $estate.Remove('estate/surface-inventory-snapshot.json'); $estate } else { $unpinned = New-DocsLedgerTestSnapshot -NoRevision; New-TestEstate -Snapshot $unpinned -Set (Get-TestCompleteSet -Snapshot $unpinned) }
+        $test = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $files
+
+        # Act
+        $run = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-WriteReceipt') -Test $test
+
+        # Assert
+        $run.Outcome.ExitCode | Should -Be 2
+        @($run.Envelope['findings']).Count | Should -Be 1
+        $run.Envelope['findings'][0]['code'] | Should -BeExactly 'DOCS_CLI_ARGUMENTS'
+        $run.Envelope['findings'][0]['message'] | Should -BeLike '*inventory -Revision*'
+        $run.Result | Should -BeNullOrEmpty
+        Get-TestWriteCallCount -Test $test | Should -Be 0
+    }
+
+    It 'still requires -Revision without -WriteReceipt in <Mode> mode' -ForEach @(
+        @{ Mode = 'docs-complete' }
+        @{ Mode = 'ledger' }
+    ) {
+        # Arrange
+        $test = New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File $script:Files
+
+        # Act
+        $run = Invoke-TestValidate -Argument @('-Mode', $Mode) -Test $test
+
+        # Assert
+        $run.Outcome.ExitCode | Should -Be 2
+        $run.Envelope['findings'][0]['message'] | Should -BeLike '*-Revision*'
+        $test.CallLog.Count | Should -Be 0 -Because 'a usage error is reported before any context read'
+    }
+}
+
+Describe 'validate receipt revision rule against HEAD (issue #1169)' {
+    BeforeAll {
+        $script:Snapshot = New-DocsLedgerTestSnapshot
+        $script:Complete = Get-TestCompleteSet -Snapshot $script:Snapshot
+        $script:Files = New-TestEstate -Snapshot $script:Snapshot -Set $script:Complete
+        $script:Head = 'fedcba9876543210fedcba9876543210fedcba98'
+        $script:Pair = "$($script:Revision)..$($script:Head)"
+    }
+
+    It 'allows an ancestor snapshot revision with no source drift and writes the receipt' {
+        # Arrange
+        $test = New-DocsLedgerTestContext -RevisionMap @{ HEAD = $script:Head } -AncestorMap @{ $script:Pair = $true } -ChangedPathMap @{ $script:Pair = @('docs/a.md', 'srcx/b.py') } -File $script:Files
+
+        # Act
+        $run = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-WriteReceipt') -Test $test
+
+        # Assert
+        $run.Outcome.ExitCode | Should -Be 0
+        $test.WriteLog.Count | Should -Be 1
+    }
+
+    It 'reports DOCS_RECEIPT_REVISION_REJECTED beginning with <Reason> and writes no receipt' -ForEach @(
+        @{ Reason = 'RECEIPT_SOURCE_DRIFT'; Ancestor = $true; Changed = @('docs/a.md', 'src/tool.py'); Mapped = $true }
+        @{ Reason = 'RECEIPT_REVISION_NOT_ANCESTOR'; Ancestor = $false; Changed = @(); Mapped = $true }
+        @{ Reason = 'RECEIPT_REVISION_UNRESOLVED'; Ancestor = $true; Changed = @(); Mapped = $false }
+    ) {
+        # Arrange
+        $headMap = if ($Mapped) { @{ HEAD = $script:Head } } else { @{} }
+        $test = New-DocsLedgerTestContext -RevisionMap $headMap -AncestorMap @{ $script:Pair = $Ancestor } -ChangedPathMap @{ $script:Pair = $Changed } -File $script:Files
+
+        # Act
+        $withWrite = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-WriteReceipt') -Test $test
+        $withoutWrite = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision) -Test $test
+        $finding = Get-TestCode -Finding @($withWrite.Envelope['findings']) -Code 'DOCS_RECEIPT_REVISION_REJECTED'
+
+        # Assert
+        $withWrite.Outcome.ExitCode | Should -Be 1
+        $withoutWrite.Outcome.ExitCode | Should -Be 1 -Because 'the rule applies in docs-complete mode with or without -WriteReceipt'
+        $finding.Count | Should -Be 1
+        $finding[0]['severity'] | Should -BeExactly 'error'
+        $finding[0]['message'] | Should -BeLike "$Reason*"
+        $withWrite.Result | Should -BeNullOrEmpty
+        Get-TestWriteCallCount -Test $test | Should -Be 0 -Because 'a rejected revision is never written as a pass receipt'
+    }
+
+    It 'names the drifted source path in the rejection message' {
+        # Arrange
+        $test = New-DocsLedgerTestContext -RevisionMap @{ HEAD = $script:Head } -AncestorMap @{ $script:Pair = $true } -ChangedPathMap @{ $script:Pair = @('src/tool.py') } -File $script:Files
+
+        # Act
+        $run = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-WriteReceipt') -Test $test
+        $finding = Get-TestCode -Finding @($run.Envelope['findings']) -Code 'DOCS_RECEIPT_REVISION_REJECTED'
+
+        # Assert
+        $finding[0]['message'] | Should -BeLike "*'src/tool.py'*"
+        $finding[0]['message'] | Should -BeLike '*Refresh After Rebase or Source Change*'
+    }
+
+    It 'leaves the ledger mode untouched by the rule' {
+        # Arrange: HEAD is unmapped, which would deny docs-complete.
+        $test = New-DocsLedgerTestContext -File $script:Files
+
+        # Act
+        $run = Invoke-TestValidate -Argument @('-Mode', 'ledger', '-Revision', $script:Revision) -Test $test
+
+        # Assert
+        $run.Outcome.ExitCode | Should -Be 0
+    }
+
+    It 'states the -WriteReceipt default of -Revision in the -Help output' {
+        # Act
+        $help = Invoke-DocsCommandCli -Help
+
+        # Assert
+        $help.ExitCode | Should -Be 0
+        $help.Stdout | Should -BeLike '*-Revision defaults to the snapshot revision*'
     }
 }

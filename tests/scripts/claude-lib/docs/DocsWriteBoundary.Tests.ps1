@@ -12,8 +12,8 @@
     no filesystem write primitive outside Write-DocsFileText in Invoke-DocsCommand.ps1; a
     scriptblock named WriteText is invoked only inside Invoke-DocsArtifactWrite and the 1024
     page write Invoke-DocsReferencePageWrite in DocsReferenceWriter.psm1; among the 1023
-    modules only DocsLedgerCommands.psm1 accesses the WriteText member; and
-    Invoke-DocsArtifactWrite is referenced only from DocsLedgerCommands.psm1. A positive control
+    modules only DocsLedgerCommands.psm1 and DocsValidateCommands.psm1 (issue #1169) access the
+    WriteText member; and Invoke-DocsArtifactWrite is referenced only from those two modules. A positive control
     proves the helper over an in-memory source string. No file is written.
 #>
 
@@ -24,7 +24,7 @@ BeforeAll {
     $script:WriteCommand = @('Set-Content', 'Add-Content', 'Out-File', 'New-Item', 'Copy-Item', 'Move-Item', 'Remove-Item', 'Tee-Object', 'Export-Csv', 'Export-Clixml')
     $script:WriteType = @('System.IO.File', 'IO.File', 'System.IO.FileStream', 'IO.FileStream', 'System.IO.StreamWriter', 'IO.StreamWriter', 'System.IO.Directory', 'IO.Directory')
     $script:WriteMember = @('WriteAllText', 'WriteAllBytes', 'WriteAllLines', 'AppendAllText', 'AppendAllLines', 'AppendText', 'Create', 'CreateText', 'CreateDirectory', 'OpenWrite', 'Delete', 'Copy', 'Move', 'Replace', 'new')
-    $script:Module1023 = @('DocsLedger.psm1', 'DocsLedgerRules.psm1', 'DocsParity.psm1', 'DocsEvidencePins.psm1', 'DocsStaleness.psm1', 'DocsReceipt.psm1', 'DocsValidation.psm1', 'DocsLedgerMutation.psm1', 'DocsCoverageReport.psm1', 'DocsLedgerCommands.psm1')
+    $script:Module1023 = @('DocsLedger.psm1', 'DocsLedgerRules.psm1', 'DocsParity.psm1', 'DocsEvidencePins.psm1', 'DocsStaleness.psm1', 'DocsReceipt.psm1', 'DocsValidation.psm1', 'DocsLedgerMutation.psm1', 'DocsCoverageReport.psm1', 'DocsLedgerCommands.psm1', 'DocsValidateCommands.psm1')
 
     [string[]] $names = @(Get-ChildItem -LiteralPath $script:LibraryRoot -File | Where-Object { $_.Extension -ceq '.ps1' -or $_.Extension -ceq '.psm1' } | ForEach-Object { $_.Name })
     [Array]::Sort($names, [System.StringComparer]::Ordinal)
@@ -148,25 +148,27 @@ Describe 'Write boundary of .claude/lib/docs' {
         @($invocations | ForEach-Object { "$($_.Path)/$($_.Function)" } | Sort-Object -Unique) | Should -Be @('DocsLedgerMutation.psm1/Invoke-DocsArtifactWrite', 'DocsReferenceWriter.psm1/Invoke-DocsReferencePageWrite')
     }
 
-    It 'accesses the WriteText member only in DocsLedgerCommands.psm1 among 1023 modules' {
+    It 'accesses the WriteText member only in DocsLedgerCommands.psm1 and DocsValidateCommands.psm1 among 1023 modules' {
         # Act
         $accesses = @(foreach ($name in $script:Module1023) { Find-DocsMemberAccess -SourceText $script:Source[$name] -Path $name -MemberName 'WriteText' })
 
         # Assert
         $accesses.Count | Should -BeGreaterThan 0 -Because 'the update-ledger and validate commands pass the member to the boundary'
-        @($accesses | ForEach-Object { $_.Path } | Sort-Object -Unique) | Should -Be @('DocsLedgerCommands.psm1')
-        @($accesses | ForEach-Object { $_.Function } | Sort-Object -Unique) | Should -Be @('Invoke-DocsUpdateLedgerCommand', 'Invoke-DocsValidateCommand')
-        @(Find-DocsVariableInvocation -SourceText $script:Source['DocsLedgerCommands.psm1'] -Path 'DocsLedgerCommands.psm1' -VariableName 'WriteText').Count | Should -Be 0 -Because 'the command module passes the member on and never invokes it'
+        @($accesses | ForEach-Object { $_.Path } | Sort-Object -Unique) | Should -Be @('DocsLedgerCommands.psm1', 'DocsValidateCommands.psm1')
+        @($accesses | ForEach-Object { "$($_.Path)/$($_.Function)" } | Sort-Object -Unique) | Should -Be @('DocsLedgerCommands.psm1/Invoke-DocsUpdateLedgerCommand', 'DocsValidateCommands.psm1/Invoke-DocsValidateCommand')
+        foreach ($name in 'DocsLedgerCommands.psm1', 'DocsValidateCommands.psm1') {
+            @(Find-DocsVariableInvocation -SourceText $script:Source[$name] -Path $name -VariableName 'WriteText').Count | Should -Be 0 -Because 'the command modules pass the member on and never invoke it'
+        }
     }
 
-    It 'references Invoke-DocsArtifactWrite only from DocsLedgerCommands.psm1' {
+    It 'references Invoke-DocsArtifactWrite only from DocsLedgerCommands.psm1 and DocsValidateCommands.psm1' {
         # Act
         $references = @(foreach ($name in $script:Source.Keys) { Find-DocsCommandReference -SourceText $script:Source[$name] -Path $name -CommandName 'Invoke-DocsArtifactWrite' })
 
         # Assert
         $references.Count | Should -BeGreaterThan 0
-        @($references | ForEach-Object { $_.Path } | Sort-Object -Unique) | Should -Be @('DocsLedgerCommands.psm1')
-        @($references | ForEach-Object { $_.Function } | Sort-Object -Unique) | Should -Be @('Invoke-DocsUpdateLedgerCommand', 'Invoke-DocsValidateCommand')
+        @($references | ForEach-Object { $_.Path } | Sort-Object -Unique) | Should -Be @('DocsLedgerCommands.psm1', 'DocsValidateCommands.psm1')
+        @($references | ForEach-Object { "$($_.Path)/$($_.Function)" } | Sort-Object -Unique) | Should -Be @('DocsLedgerCommands.psm1/Invoke-DocsUpdateLedgerCommand', 'DocsValidateCommands.psm1/Invoke-DocsValidateCommand')
     }
 
     It 'reports a write call in an in-memory source string' {
