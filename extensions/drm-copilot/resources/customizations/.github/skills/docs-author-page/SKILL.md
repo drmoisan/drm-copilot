@@ -48,6 +48,9 @@ documentation root, so `run_docs_check` does not scan them.
    documentation root).
 5. Call `run_docs_check` with `workspace_root`, `profile` and `paths` set to the
    pages written, and fix every finding the check reports on those pages.
+6. A subagent write of a Markdown page whose name contains the words `report`,
+   `summary`, `findings` or `analysis` may be refused by the runtime. Report such a
+   page as unwritten; the root writes it.
 
 ## Result
 

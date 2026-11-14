@@ -20,6 +20,19 @@ BeforeDiscovery {
 
 BeforeAll {
     . (Join-Path $PSScriptRoot 'DocsAuthoringRoles.Helpers.ps1')
+    # Issue #1173 (B4): the page front-matter checker runs over each substituted template.
+    $script:DocsLibrary = Join-Path -Path $PSScriptRoot -ChildPath '../../../.claude/lib/docs'
+    Import-Module -Name (Join-Path -Path $script:DocsLibrary -ChildPath 'DocsPageFrontMatter.psm1') -Force -ErrorAction Stop
+    # No -Force: bind to the DocsSchema instance that DocsPageFrontMatter imported.
+    Import-Module -Name (Join-Path -Path $script:DocsLibrary -ChildPath 'DocsSchema.psm1') -ErrorAction Stop
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '../claude-lib/docs/Docs.TestSupport.psm1') -Force -ErrorAction Stop
+    $script:ComposedSchema = (Get-DocsComposedSchemaSet -SchemaSet (Get-DocsTestSchemaText)).Schemas
+    $script:Substitution = [ordered]@{
+        '<owner-id>'    = 'team-docs'
+        '<yyyy-mm-dd>'  = '2026-11-14'
+        '<audience-id>' = 'developers'
+        '<element-id>'  = 'cli-command-' + ('0123456789abcdef' * 4)
+    }
 
     function Get-TemplatePart {
         # Splits a template into its front-matter lines and its body.
@@ -34,6 +47,7 @@ AfterAll {
     foreach ($name in 'Get-TemplatePart', 'Get-DocsAuthoringRepoRoot', 'Read-DocsAuthoringText', 'Get-DocsAuthoringNamedSet', 'Get-DocsAuthoringAgentPath', 'Get-DocsAuthoringSkillRoot', 'Get-DocsFrontMatterList', 'Get-DocsCodexEmbeddedText', 'Get-DocsCommandRowOption', 'Get-DocsMcpToolNameDefinition', 'Get-DocsPackManifestPath') {
         Remove-Item -LiteralPath "function:$name" -ErrorAction SilentlyContinue
     }
+    Remove-Module -Name DocsPageFrontMatter, DocsPageMetadata, DocsPageMarkdown, DocsSchema, DocsSchemaWalk, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
 }
 
 Describe 'docs-author-page templates' {
@@ -58,6 +72,21 @@ Describe 'docs-author-page templates' {
         $part.StartsWithFence | Should -BeTrue
         @($fields.Keys | Sort-Object) | Should -Be @('audience', 'diataxis_mode', 'last_reviewed', 'owner', 'surface_refs')
         $fields['diataxis_mode'] | Should -BeExactly $Mode
+    }
+
+    It 'passes the page front-matter checker with no DOCS_PAGE_AUDIENCE_INVALID after placeholder substitution in <Path> (issue #1173)' -ForEach $script:TemplateRows {
+        # Arrange: substitute the front-matter placeholders in memory.
+        $text = Read-DocsAuthoringText -RelativePath $Path
+        foreach ($placeholder in $script:Substitution.Keys) { $text = $text.Replace($placeholder, $script:Substitution[$placeholder]) }
+        $parsed = ConvertFrom-DocsPageFrontMatter -Text $text -PagePath 'docs/guide/page.md'
+
+        # Act
+        $findings = @(Test-DocsPageFrontMatter -FrontMatter $parsed.Value -PagePath 'docs/guide/page.md' -ComposedSchemaSet $script:ComposedSchema -RequiredField @('owner', 'last_reviewed', 'audience', 'diataxis_mode', 'surface_refs') -AudienceId @('developers') -FieldLine $parsed.FieldLine)
+        $codes = @($findings | ForEach-Object { $_.code })
+
+        # Assert
+        $parsed.Findings.Count | Should -Be 0 -Because "the substituted front matter of $Path parses"
+        $codes | Should -Not -Contain 'DOCS_PAGE_AUDIENCE_INVALID' -Because ($codes -join ', ')
     }
 
     It 'gives <Path> the body rules of the <Mode> mode' -ForEach $script:TemplateRows {

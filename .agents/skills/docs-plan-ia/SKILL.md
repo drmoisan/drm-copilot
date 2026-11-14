@@ -26,6 +26,10 @@ Root steps run `Invoke-DocsCommand.ps1` from the docs helper library that the Cl
    the templates of `docs-author-page`: tutorial, how-to, explanation or one of
    the four reference families.
 5. Give each planned page an owner and an audience from the profile.
+6. Give each planned page a file name that does not contain the words `report`,
+   `summary`, `findings` or `analysis`, or assign such a page to a root step: a
+   subagent write of a Markdown page with one of those words in its name may be
+   refused by the runtime.
 
 ## Result
 

@@ -217,6 +217,19 @@ Describe 'Invoke-DocsRoleOutputValidation' {
         Should -Invoke Test-DocsRoleOutputFile -Times 1 -Exactly -ParameterFilter { $Path -eq 'docs/guide/index.md' }
     }
 
+    It 'allows a first-run architect PASS whose relative snapshot path does not exist yet and probes only the profile (issue #1173)' {
+        # Arrange
+        Mock Test-DocsRoleOutputFile { param([string] $Path) $Path -ne 'docs/documentation-estate/inventory.json' }
+
+        # Act
+        $result = Invoke-DocsRoleOutputValidation -InputText (ConvertTo-DocsRoleEnvelope -AgentType 'docs-architect' -Text $script:ValidOutput['docs-architect'])
+
+        # Assert
+        $result.Ok | Should -BeTrue -Because $result.Message
+        Should -Invoke Test-DocsRoleOutputFile -Times 1 -Exactly -ParameterFilter { $Path -eq 'docs/documentation-estate/docs-profile.json' }
+        Should -Invoke Test-DocsRoleOutputFile -Times 0 -Exactly -ParameterFilter { $Path -eq 'docs/documentation-estate/inventory.json' }
+    }
+
     It 'returns the dependency decision when a dependency failure is recorded' {
         # Arrange
         Add-HookDependencyFailure -Name 'docs-role-contract.ps1'

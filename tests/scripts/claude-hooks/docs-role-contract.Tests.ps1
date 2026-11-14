@@ -222,6 +222,33 @@ Describe 'Test-DocsRoleOutput' {
         $result.Message.Contains('docs-profile path') | Should -BeTrue -Because $result.Message
     }
 
+    It 'accepts a first-run architect PASS whose relative snapshot path does not exist yet (issue #1173)' {
+        # Arrange: the profile exists and the snapshot has not been persisted by the root inventory step.
+        $testFile = { param([string] $Path) $Path -ne 'docs/documentation-estate/inventory.json' }
+
+        # Act
+        $result = Test-DocsRoleOutput -Role 'docs-architect' -Text $script:ValidOutput['docs-architect'] -TestFile $testFile
+
+        # Assert
+        $result.Ok | Should -BeTrue -Because $result.Message
+        $result.Message | Should -BeNullOrEmpty
+    }
+
+    It 'rejects a non-relative docs-snapshot path whatever the file seam reports (issue #1173)' {
+        # Arrange
+        $text = Get-DocsRoleOutputWithValue -Role 'docs-architect' -Token 'docs-snapshot' -Value '/docs/documentation-estate/inventory.json'
+        $noneExist = { param([string] $Path) $null -eq $Path }
+
+        # Act
+        $result = Test-DocsRoleOutput -Role 'docs-architect' -Text $text -TestFile $noneExist
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Repairable | Should -BeTrue
+        $result.Message.Contains("docs-snapshot path '/docs/documentation-estate/inventory.json' must be repository-relative with forward slashes") | Should -BeTrue -Because $result.Message
+        $result.Message.Contains('docs-snapshot path ''/docs/documentation-estate/inventory.json'' does not exist') | Should -BeFalse -Because $result.Message
+    }
+
     It 'blocks a duplicated token and names it' {
         # Act
         $result = Test-DocsRoleOutput -Role 'docs-author' -Text ($script:ValidOutput['docs-author'] + "`ndocs-findings: 2") -TestFile $script:AllExist

@@ -72,7 +72,7 @@ Parity checks that must pass: `test_push_down_claude_resource_contracts.py`, `te
 
 #### B2.1 Operations document
 
-- Shape: `{ "operations": [ { "operation": "...", ... } ] }`. Item fields use the MCP field names: `operation`, `element`, `limit`, `disposition`, `pages`, `rationale`, `owner`, `target`, `dimension`, `state`, `claim`.
+- Shape: `{ "operations": [ { "operation": "...", ... } ] }`. Item fields use the MCP field names: `operation`, `element`, `limit`, `disposition`, `pages`, `rationale`, `owner`, `target`, `dimension`, `state`, `claim`. Item fields map through the existing `update_docs_ledger` field table, so the page of a `pin`, `unpin` or `set-dimension` item is given in `pages`, and `target` is the `set-disposition` target text (premise correction PC-2).
 - Parsing and validation live in a new module `.claude/lib/docs/DocsLedgerBatch.psm1`, function `ConvertFrom-DocsLedgerOperationText`.
 - Each item is mapped to the existing argument-map names and validated by the unchanged `Test-DocsUpdateLedgerArgument` with the batch's actor kind, actor id and profile. The single-operation grammar remains the only grammar.
 - Rejected inputs (exit 2, finding pointer `/operations/<i>` for item errors): text that is not JSON; a root without an `operations` array; an empty array; an item that is not an object; an unknown key; an item whose `operation` is `sync-refs` (it rewrites every entry and remains a separate call); an item that fails `Test-DocsUpdateLedgerArgument`.
@@ -166,11 +166,11 @@ Parity checks that must pass: `test_push_down_claude_resource_contracts.py`, `te
 - Root cause: `New-DocsStarterProfile` (`DocsProfile.psm1`) hard-codes `source_roots = @('src')`; neither `init` nor `validate-profile` tests a source root.
 - Required behavior:
   1. `validate-profile`, and `init` after building the profile, report an error `DOCS_PROFILE_SOURCE_ROOT_MISSING` at `/surface_selection/source_roots/<i>` for each source root for which `Context.ListFile` returns no file. The command exits 1 when such a finding exists. `Test-DocsProfileSemantic` stays pure; the check lives in the command layer.
-  2. New module `.claude/lib/docs/DocsProfileSourceRoot.psm1` detects the init default in this order: `src` when it lists files; otherwise the package directory from `pyproject.toml` (`[tool.poetry].packages[].include`, else `[project].name`, else `[tool.poetry].name`, with `-` mapped to `_`) when that directory lists files, read with `DocsTomlKeys.psm1`; otherwise `.`.
+  2. New module `.claude/lib/docs/DocsProfileSourceRoot.psm1` detects the init default in this order: `src` when it lists files; otherwise the package directory from `pyproject.toml` (`[tool.poetry].packages[].include`, else `[project].name`, else `[tool.poetry].name`, with `-` mapped to `_`) when that directory lists files, read with `DocsTomlKeys.psm1`; when neither lists files, `src` is retained, and `init` and `validate-profile` then report `DOCS_PROFILE_SOURCE_ROOT_MISSING` for it (premise correction PC-1: a `.` source root is not a valid repository-relative path, because the common schema `relative-path` pattern and `Test-DocsRelativePath` reject a `.` segment and `Get-DocsContextFileList` throws `DOCS_CONTEXT_PATH_INVALID` for it).
   3. `New-DocsStarterProfile` gains `-SourceRoot` with default `@('src')`, so existing callers are unchanged.
-- Detection of `package.json` and `.csproj` package roots is not added; `src` or `.` covers those layouts and the validate-profile error reports any mismatch.
+- Detection of `package.json` and `.csproj` package roots is not added; `src` or the `pyproject.toml` package directory covers those layouts, and the `validate-profile` error reports any mismatch so the operator can edit the profile.
 - Mirrors: M-LIB, M-MANIFEST; `docs-init` skill text (M-SKILL) if it states the default.
-- Tests: new `tests/scripts/claude-lib/docs/DocsProfileSourceRoot.Tests.ps1` (each detection branch, `-` to `_` mapping, fallback to `.`); `validate-profile` missing-root error and existing-root pass.
+- Tests: new `tests/scripts/claude-lib/docs/DocsProfileSourceRoot.Tests.ps1` (each detection branch, `-` to `_` mapping, the retained `src` fallback when neither candidate lists files); `validate-profile` missing-root error and existing-root pass.
 
 ### B7. Malformed link targets are findings, and the starter root avoids planning trees
 
@@ -261,7 +261,7 @@ Invoke-DocsCommand.ps1 -Command generate-reference -PathPrefix pkg/core -PathPre
 ```json
 { "operations": [
   { "operation": "set-disposition", "element": "<id>", "disposition": "documented", "pages": ["docs/guide/api.md"] },
-  { "operation": "set-dimension", "element": "<id>", "target": "docs/guide/api.md", "dimension": "accurate", "state": "pass", "claim": "<claim text>" },
+  { "operation": "set-dimension", "element": "<id>", "pages": ["docs/guide/api.md"], "dimension": "accurate", "state": "pass", "claim": "<claim text>" },
   { "operation": "bind-page-refs" }
 ] }
 ```
@@ -301,8 +301,8 @@ Exit codes follow the existing contract: 0 success, 1 findings, 2 argument or in
 
 ## Acceptance Criteria
 
-- [ ] B1: `docs-role-contract.ps1` accepts a `docs-architect` report with a valid profile, a repository-relative `docs-snapshot` path that does not exist, and `docs-result: PASS`, and still rejects a non-relative `docs-snapshot` value; a first-run regression test covers both cases.
-- [ ] B1: every M-SKILL copy of `documentation-workflow` contains a root `inventory -Write` step before the inventory role is delegated, and every M-BRIEF copy states that `docs-snapshot` is checked for relative form only; skill-text tests assert both.
+- [x] B1: `docs-role-contract.ps1` accepts a `docs-architect` report with a valid profile, a repository-relative `docs-snapshot` path that does not exist, and `docs-result: PASS`, and still rejects a non-relative `docs-snapshot` value; a first-run regression test covers both cases.
+- [x] B1: every M-SKILL copy of `documentation-workflow` contains a root `inventory -Write` step before the inventory role is delegated, and every M-BRIEF copy states that `docs-snapshot` is checked for relative form only; skill-text tests assert both.
 - [ ] B2: `update-ledger -Operations <path>` and `update-ledger -Operations -` (standard input) apply an operations document with one load, one introduced-error comparison and one write, and the written ledger, matrix and pins are byte-identical to sequential single-operation application of the same operations; an equivalence test and a partition property test pass.
 - [ ] B2: a batch containing an item with an introduced error, an invalid target, an unknown key, or a `sync-refs` operation writes nothing and reports the item index; supplying `-Operation` with `-Operations` exits 2.
 - [ ] B2: `bind-page-refs` sets `documented` and the union of page bindings for every snapshot element referenced in page `surface_refs`, warns on unknown ids, removes no binding, and is idempotent; tests cover each rule.
@@ -311,16 +311,16 @@ Exit codes follow the existing contract: 0 success, 1 findings, 2 argument or in
 - [ ] B2: every M-SKILL copy of `docs-reconcile-behavior` and every M-AGENT copy of `docs-reconciler` document `-Operations`, `bind-page-refs`, the all-or-nothing rule, and that `sync-refs` is not a batch item.
 - [ ] B3: every M-SKILL copy of `docs-reconcile-behavior` and every M-AGENT copy of `docs-reconciler` state that `pin` must precede `set-dimension accurate pass` for the same element and page; a skill-text test asserts it.
 - [ ] B3: a batch `set-dimension accurate pass` item with a `claim` produces a pin and no introduced error; without a claim or prior pin the batch is rejected with `DOCS_MATRIX_ACCURACY_UNPINNED`; a claim on any other item is rejected.
-- [ ] B4: every `docs-author-page` template copy in every M-SKILL root declares `audience: ["<audience-id>"]`, and a test running each template's substituted front matter through `Test-DocsPageFrontMatter` reports no `DOCS_PAGE_AUDIENCE_INVALID`.
+- [x] B4: every `docs-author-page` template copy in every M-SKILL root declares `audience: ["<audience-id>"]`, and a test running each template's substituted front matter through `Test-DocsPageFrontMatter` reports no `DOCS_PAGE_AUDIENCE_INVALID`.
 - [ ] B5: `generate-reference` splits a family page whose rendered size exceeds the split budget into an index page and group pages (and ordinal parts for an oversize group), every emitted page is at or below the budget, output is deterministic, and a family at or below the budget is byte-identical to the current output; `DocsReferenceSplit.Tests.ps1` covers each rule.
 - [ ] B5: `generate-reference -PathPrefix` and MCP `path_prefixes` restrict elements by ordinal path prefix without a filtered snapshot copy, and a non-relative prefix exits 2.
-- [ ] B6: `validate-profile` and `init` report `DOCS_PROFILE_SOURCE_ROOT_MISSING` for a source root that lists no files, and `init` selects `src`, else the `pyproject.toml` package directory, else `.`; tests cover each branch.
+- [ ] B6: `validate-profile` and `init` report `DOCS_PROFILE_SOURCE_ROOT_MISSING` for a source root that lists no files, and `init` selects `src`, else the `pyproject.toml` package directory, else retains `src` (which then reports `DOCS_PROFILE_SOURCE_ROOT_MISSING`); tests cover each branch.
 - [ ] B7: `check` on a page whose link target is not a repository-relative path exits 1 with `DOCS_PAGE_LINK_BROKEN` instead of exiting 3, and the starter profile documentation root defaults to `docs/guide`; tests cover both.
 - [ ] B8: inventory skips paths with a default-excluded segment or a `.pyc` or `.pyo` extension without reading them or emitting a diagnostic, and still includes a near-miss path; tests cover each list entry.
 - [ ] B9: the native recognizer and the scanner emit `cli-command` and `cli-option` elements for subcommands registered through a `subparsers` parameter in another module, emit identical elements for the shared fixture, and keep `CLI_UNBOUND_REGISTRATION` for an unresolvable caller.
 - [ ] B10: the refuted verdict is recorded, no production change is made for it, and a Pester parity test (text versus JSON diagnostic count including `DOCS_INPUT_NOT_UTF8`) and a Jest pass-through test pass.
 - [ ] B11: `Get-DocsTextSha256Hex` returns equal values for LF, CRLF and lone-CR forms of a text and the raw-byte value for LF content, every listed artifact-reference and conflict-check site uses it, and `update-ledger` over CRLF-encoded estate bytes reports no reference drift.
-- [ ] B12: every M-SKILL copy of `docs-plan-ia` and `docs-author-page` and every M-AGENT copy of `docs-author` document the runtime naming restriction and the root fallback; a skill-text test asserts it.
+- [x] B12: every M-SKILL copy of `docs-plan-ia` and `docs-author-page` and every M-AGENT copy of `docs-author` document the runtime naming restriction and the root fallback; a skill-text test asserts it.
 - [ ] B13: `init` emits a distinct `ci-workflow <path>` line and a `ci_workflow` result field in dry-run and write modes, and every M-SKILL copy of `docs-init` states in Steps and Result that init adds the CI workflow; tests cover the line, the field, the `null` case and the skill text.
 - [ ] Every new `.claude/lib/docs` module is listed in `core.json` and bundled byte-identically, and the mirror, push-down contract, pack-manifest and Codex generator parity checks pass.
 - [ ] Every item B1-B13 has at least one regression test that fails before the change and passes after it (for B10, the parity tests that prove the verdict).

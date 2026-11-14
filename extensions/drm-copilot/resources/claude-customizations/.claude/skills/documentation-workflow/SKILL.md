@@ -21,12 +21,13 @@ Run the skills in this order. Each step names the role that runs it; a root step
 runs in the root session.
 
 1. [docs-init](../docs-init/SKILL.md) (root): create and validate the docs profile.
-2. [docs-inventory-surface](../docs-inventory-surface/SKILL.md) ([docs-architect](../../../.claude/agents/docs-architect.md)): inventory the documented surface.
-3. [docs-plan-ia](../docs-plan-ia/SKILL.md) ([docs-architect](../../../.claude/agents/docs-architect.md)): plan the information architecture.
-4. [docs-author-page](../docs-author-page/SKILL.md) ([docs-author](../../../.claude/agents/docs-author.md)): write and revise pages.
-5. [docs-reconcile-behavior](../docs-reconcile-behavior/SKILL.md) ([docs-reconciler](../../../.claude/agents/docs-reconciler.md)): record dispositions, pins and dimensions.
-6. [docs-review-coverage](../docs-review-coverage/SKILL.md) ([docs-coverage-reviewer](../../../.claude/agents/docs-coverage-reviewer.md)): review coverage and accuracy.
-7. [docs-validate](../docs-validate/SKILL.md) ([docs-coverage-reviewer](../../../.claude/agents/docs-coverage-reviewer.md) or root): validate `docs-complete` for the head revision.
+2. Root `inventory -Write` step (root): run `Invoke-DocsCommand.ps1 -Command inventory -Profile docs/documentation-estate/docs-profile.json -Write`. The root persists the snapshot before delegating docs-architect, so the snapshot path that docs-architect reports exists on a first run.
+3. [docs-inventory-surface](../docs-inventory-surface/SKILL.md) ([docs-architect](../../../.claude/agents/docs-architect.md)): inventory the documented surface.
+4. [docs-plan-ia](../docs-plan-ia/SKILL.md) ([docs-architect](../../../.claude/agents/docs-architect.md)): plan the information architecture.
+5. [docs-author-page](../docs-author-page/SKILL.md) ([docs-author](../../../.claude/agents/docs-author.md)): write and revise pages.
+6. [docs-reconcile-behavior](../docs-reconcile-behavior/SKILL.md) ([docs-reconciler](../../../.claude/agents/docs-reconciler.md)): record dispositions, pins and dimensions.
+7. [docs-review-coverage](../docs-review-coverage/SKILL.md) ([docs-coverage-reviewer](../../../.claude/agents/docs-coverage-reviewer.md)): review coverage and accuracy.
+8. [docs-validate](../docs-validate/SKILL.md) ([docs-coverage-reviewer](../../../.claude/agents/docs-coverage-reviewer.md) or root): validate `docs-complete` for the head revision.
 
 ## Rules
 

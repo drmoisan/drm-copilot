@@ -14,6 +14,7 @@ import pytest
 
 from tests.scripts.dev_tools.claude_payload_scope_test_support import (
     LOCAL_ONLY_CLAUDE_FILES,
+    LOCAL_ONLY_CLAUDE_SEGMENTS,
     LOCAL_ONLY_CLAUDE_SUBDIRS,
     filter_distributable_claude_paths,
     is_local_runtime_path,
@@ -185,6 +186,37 @@ def test_bare_state_path_without_child_is_excluded() -> None:
 
     # Assert
     assert result is True, "Bare .claude/state path must be excluded"
+
+
+def test_bytecode_cache_paths_are_excluded() -> None:
+    """Gitignored `__pycache__` bytecode under `.claude` is excluded (issue #1173).
+
+    Any test run that imports the docs native recognizer writes bytecode beside it,
+    so a payload comparison that kept these paths would depend on test order.
+    """
+    # Arrange
+    bytecode = Path(
+        ".claude/lib/docs/python/docs_python_native/__pycache__/__init__.cpython-313.pyc"
+    )
+
+    # Act
+    result = is_local_runtime_path(bytecode)
+
+    # Assert
+    assert result is True, "Bytecode cache path must be excluded"
+    assert "__pycache__" in LOCAL_ONLY_CLAUDE_SEGMENTS
+
+
+def test_pycache_lookalike_segment_is_retained() -> None:
+    """A segment that only resembles `__pycache__` is retained (ordinal part match)."""
+    # Arrange
+    lookalike = Path(".claude/lib/docs/python/__pycache__x/module.py")
+
+    # Act
+    result = is_local_runtime_path(lookalike)
+
+    # Assert
+    assert result is False, "Lookalike segment must be retained"
 
 
 def test_empty_input_returns_empty_list() -> None:

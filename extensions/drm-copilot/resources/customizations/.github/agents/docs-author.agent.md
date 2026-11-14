@@ -51,6 +51,10 @@ prose around the generated-block markers; the generated content between the
 markers is written by the root step. Run no shell command. On Claude Code the
 write-scope hook enforces these rules.
 
+A subagent write of a Markdown page whose name contains the words `report`,
+`summary`, `findings` or `analysis` may be refused by the runtime. Report such a
+page as unwritten in `docs-pages-written`; the root writes it.
+
 ## Report
 
 End the final message with these tokens, one per line in the form `token: value`:

@@ -8,9 +8,10 @@
 .DESCRIPTION
     A documentation role that works in an item worktree reports repository-relative paths. The
     hook resolves the item worktree from the delegation prompt named by agent_transcript_path
-    (D8) and probes each docs-profile, docs-snapshot, and docs-pages-written value beneath it;
-    an unresolved present identity blocks before any probe; with no identity the
-    repository-relative probe is unchanged.
+    (D8) and probes each docs-profile and docs-pages-written value beneath it; the docs-snapshot
+    value is checked for relative form only and never probed (issue #1173); an unresolved
+    present identity blocks before any probe; with no identity the repository-relative probe is
+    unchanged.
 
     Argument builder: Get-DocsRoleTargetArgument adds -SessionRoot, -ReadTranscriptHead, and
     -WorktreeListInvoker only when Get-Command reports that Invoke-DocsRoleOutputValidation
@@ -59,8 +60,8 @@ Describe 'epic-state baseline isolation (issue #1163)' {
 
 Describe 'validate-docs-role-output target worktree (issue #1163)' {
     It 'probes the <Role> output paths beneath the item worktree named by the prompt branch' -ForEach @(
-        @{ Role = 'docs-architect'; Probes = @('/repo/.claude/worktrees/item/docs/documentation-estate/docs-profile.json', '/repo/.claude/worktrees/item/docs/documentation-estate/inventory.json') }
-        @{ Role = 'docs-author'; Probes = @('/repo/.claude/worktrees/item/docs/guide/index.md') }
+        @{ Role = 'docs-architect'; Probes = @('/repo/.claude/worktrees/item/docs/documentation-estate/docs-profile.json'); NotProbed = @('/repo/.claude/worktrees/item/docs/documentation-estate/inventory.json', 'docs/documentation-estate/inventory.json') }
+        @{ Role = 'docs-author'; Probes = @('/repo/.claude/worktrees/item/docs/guide/index.md'); NotProbed = @() }
     ) {
         # Arrange (fails before: the unmodified hook probes the repository-relative values)
         $itemRoot = $script:ItemRoot
@@ -75,6 +76,11 @@ Describe 'validate-docs-role-output target worktree (issue #1163)' {
         foreach ($probe in $Probes) {
             $expected = $probe
             Should -Invoke Test-DocsRoleOutputFile -Times 1 -Exactly -ParameterFilter { $Path -eq $expected }
+        }
+        # The docs-snapshot value is checked for relative form only, so no snapshot probe occurs (issue #1173).
+        foreach ($skipped in $NotProbed) {
+            $unexpected = $skipped
+            Should -Invoke Test-DocsRoleOutputFile -Times 0 -Exactly -ParameterFilter { $Path -eq $unexpected }
         }
     }
 

@@ -17,13 +17,16 @@ Root steps run the docs helper library at `.claude/lib/docs/` under PowerShell 7
 
 ## Steps
 
+Before this skill runs, the root persists the snapshot through the root inventory step of
+`documentation-workflow`, so the snapshot path exists on a first run.
+
 1. Call `run_docs_inventory` with `workspace_root`, `profile`, and optionally
    `analyzers` and `revision` (40 or 64 lowercase hexadecimal characters). The tool
    returns the snapshot in its result and never writes it.
 2. Compare the returned elements with the persisted snapshot: list added,
    removed and changed element ids.
-3. When the snapshot must be persisted, report that the root step below is
-   required; the role does not write the snapshot.
+3. When the surface changed after the root persisted the snapshot, report that
+   the root step below must run again; the role does not write the snapshot.
    Root step: `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command inventory -Profile docs/documentation-estate/docs-profile.json -Write`
 
 ## Result
