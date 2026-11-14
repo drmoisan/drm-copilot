@@ -28,7 +28,11 @@
       5. A pull request that is not an epic integration branch merging into main allows.
       6. The receipt path (RECEIPT_PATH_INVALID) and the receipt at that path are checked
          against headRefOid with Test-DocsCompleteGateReceipt; a failing reason denies. A receipt
-         that exists but cannot be read denies RECEIPT_UNREADABLE.
+         that exists but cannot be read denies RECEIPT_UNREADABLE. The revision step is the
+         receipt revision rule (issue #1169): Get-DocsCompleteGateRevisionInput reads the
+         inventory snapshot revision and surface_selection.source_roots beneath the receipt root
+         and, only when the receipt revision differs from headRefOid, supplies ancestry and the
+         changed paths through Invoke-DocsOnlyGitExe; a timeout or a non-zero exit supplies $null.
 
     Every deny reason reads DOCS_COMPLETE_GATE_BLOCKED: <REASON_CODE>: <reason and remediation>.
     The head revision is always the pull request headRefOid and never the local HEAD, because
@@ -89,6 +93,8 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Pure gate predicates: profile switch, receipt path, integration target, receipt check.
 try { Import-Module (Join-Path $PSScriptRoot '../lib/docs/DocsCompleteGate.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DocsCompleteGate.psm1' -ErrorRecord $_ }
+# The receipt root is the live worktree that has the pull request head branch checked out (issue #1163).
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/AgentTargetWorktree.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'AgentTargetWorktree.psm1' -ErrorRecord $_ }
 # Shared command-line parser and structural invocation matcher (issues #545 and #952).
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
@@ -238,6 +244,117 @@ function Get-DocsCompleteGatePullRequest {
     return @{ Reason = $null; Message = $null; BaseRefName = [string] $pr.baseRefName; HeadRefName = [string] $pr.headRefName; HeadRefOid = $head }
 }
 
+function Get-DocsCompleteGateReceiptRoot {
+    <#
+    .SYNOPSIS
+        Returns the root the validation receipt is read beneath (issue #1163).
+    .DESCRIPTION
+        The worktree that Resolve-AgentTargetWorktree -CommandBranch resolves for the pull request
+        head branch when exactly one live (non-prunable) registration has it checked out; the
+        repository root when no registration, several registrations, or only a prunable one has
+        it, when the branch is blank, or when resolution throws.
+    .PARAMETER HeadRefName
+        The pull request head branch from gh pr view.
+    .PARAMETER RepositoryRoot
+        The root the profile is read beneath; the fallback.
+    .PARAMETER WorktreeListInvoker
+        Optional worktree-list seam; the resolver's default runs git worktree list --porcelain.
+    .OUTPUTS
+        System.String
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [AllowNull()] [AllowEmptyString()] [string] $HeadRefName,
+        [Parameter(Mandatory)] [string] $RepositoryRoot,
+        [scriptblock] $WorktreeListInvoker
+    )
+
+    if ([string]::IsNullOrWhiteSpace($HeadRefName)) { return $RepositoryRoot }
+    $resolverArguments = @{ SessionRoot = $RepositoryRoot; CommandBranch = $HeadRefName; Policy = 'FailClosedOnIdentity' }
+    if ($null -ne $WorktreeListInvoker) { $resolverArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+    try { $resolved = Resolve-AgentTargetWorktree @resolverArguments } catch { Write-Verbose "receipt root resolution failed; the repository root applies: $($_.Exception.Message)"; return $RepositoryRoot }
+    if ($null -ne $resolved.ReasonCode -or [string]::IsNullOrWhiteSpace([string] $resolved.WorktreeRoot)) { return $RepositoryRoot }
+    return [string] $resolved.WorktreeRoot
+}
+
+function ConvertFrom-DocsCompleteGateJsonText {
+    <#
+    .SYNOPSIS
+        Parses JSON text into a hashtable, or returns $null for absent, unreadable, or non-object text.
+    .PARAMETER Text
+        The JSON text.
+    .OUTPUTS
+        System.Collections.Hashtable or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([AllowNull()] [object] $Text)
+
+    if ($Text -isnot [string] -or $Text.Length -eq 0) { return $null }
+    try { $value = ConvertFrom-Json -InputObject $Text -AsHashtable -ErrorAction Stop } catch { return $null }
+    if ($value -is [hashtable]) { return $value }
+    return $null
+}
+
+function Get-DocsCompleteGateRevisionInput {
+    <#
+    .SYNOPSIS
+        Collects the inputs of the receipt revision rule beneath the receipt root (issue #1169).
+    .DESCRIPTION
+        Reads surface_selection.source_roots and artifact_paths.inventory_snapshot from the profile
+        text, the snapshot revision from the snapshot file beneath ReceiptRoot, and the receipt
+        revision from the receipt text. Only when the receipt revision is a full lowercase object
+        id that differs from HeadRevision does it run git merge-base --is-ancestor and git diff
+        --name-only -z --no-renames --no-relative through the bounded Invoke-DocsOnlyGitExe seam.
+        Exit 0 and 1 of the ancestry call answer $true and $false; any other exit, including the
+        timeout code 124, answers $null. A diff that fails or is not NUL-terminated answers $null.
+        Never throws.
+    .PARAMETER ProfileText
+        The profile text beneath the receipt root.
+    .PARAMETER ReceiptText
+        The receipt text, or $null.
+    .PARAMETER ReceiptRoot
+        The root the receipt and snapshot are read beneath and git runs in.
+    .PARAMETER HeadRevision
+        The pull request head revision.
+    .OUTPUTS
+        System.Collections.Hashtable with SnapshotRevision, IsAncestor, ChangedPath, and SourceRoot.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [AllowNull()] [object] $ProfileText,
+        [AllowNull()] [object] $ReceiptText,
+        [Parameter(Mandatory)] [string] $ReceiptRoot,
+        [Parameter(Mandatory)] [AllowEmptyString()] [string] $HeadRevision
+    )
+
+    $result = @{ SnapshotRevision = $null; IsAncestor = $null; ChangedPath = $null; SourceRoot = [string[]]@() }
+    $profileValue = ConvertFrom-DocsCompleteGateJsonText -Text $ProfileText
+    if ($null -ne $profileValue) {
+        if ($profileValue['surface_selection'] -is [hashtable]) { $result.SourceRoot = [string[]]@(@($profileValue['surface_selection']['source_roots']) | Where-Object { $_ -is [string] }) }
+        $snapshotPath = if ($profileValue['artifact_paths'] -is [hashtable]) { $profileValue['artifact_paths']['inventory_snapshot'] } else { $null }
+        if ($snapshotPath -is [string] -and $snapshotPath.Length -gt 0) {
+            try { $snapshotText = Get-DocsCompleteGateFileText -Path (Join-Path -Path $ReceiptRoot -ChildPath $snapshotPath) } catch { $snapshotText = $null }
+            $snapshot = ConvertFrom-DocsCompleteGateJsonText -Text $snapshotText
+            if ($null -ne $snapshot -and $snapshot['revision'] -is [string]) { $result.SnapshotRevision = [string] $snapshot['revision'] }
+        }
+    }
+    $receipt = ConvertFrom-DocsCompleteGateJsonText -Text $ReceiptText
+    $receiptRevision = if ($null -ne $receipt -and $receipt['revision'] -is [string]) { [string] $receipt['revision'] } else { '' }
+    $fullRevision = '^(?:[0-9a-f]{40}|[0-9a-f]{64})$'
+    if ($receiptRevision -cnotmatch $fullRevision -or $HeadRevision -cnotmatch $fullRevision -or $receiptRevision -ceq $HeadRevision) { return $result }
+    $ancestry = Invoke-DocsOnlyGitExe -WorktreeRoot $ReceiptRoot -GitArgs @('merge-base', '--is-ancestor', $receiptRevision, $HeadRevision)
+    if ($null -ne $ancestry -and $ancestry.ExitCode -eq 0) { $result.IsAncestor = $true } elseif ($null -ne $ancestry -and $ancestry.ExitCode -eq 1) { $result.IsAncestor = $false }
+    $diff = Invoke-DocsOnlyGitExe -WorktreeRoot $ReceiptRoot -GitArgs @('diff', '--name-only', '-z', '--no-renames', '--no-relative', $receiptRevision, $HeadRevision)
+    if ($null -ne $diff -and $diff.ExitCode -eq 0) {
+        $text = [string] $diff.Output
+        if ($text.Length -eq 0 -or $text.EndsWith([char]0)) { $result.ChangedPath = [string[]]@(ConvertFrom-DocsOnlyNameList -Text $text) }
+    }
+    return $result
+}
+
 function Invoke-DocsCompleteGateDecision {
     <#
     .SYNOPSIS
@@ -248,6 +365,8 @@ function Invoke-DocsCompleteGateDecision {
         for the full decision order.
     .PARAMETER ToolInputRaw
         The raw JSON hook payload acquired by Read-ClaudeHookRawPayload.
+    .PARAMETER WorktreeListInvoker
+        Optional worktree-list seam forwarded to Get-DocsCompleteGateReceiptRoot (issue #1163).
     .OUTPUTS
         System.Collections.Specialized.OrderedDictionary
     #>
@@ -256,7 +375,9 @@ function Invoke-DocsCompleteGateDecision {
     param(
         [AllowNull()]
         [AllowEmptyString()]
-        [string] $ToolInputRaw
+        [string] $ToolInputRaw,
+
+        [scriptblock] $WorktreeListInvoker = $null
     )
 
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'DOCS_COMPLETE_GATE_BLOCKED:'
@@ -289,12 +410,21 @@ function Invoke-DocsCompleteGateDecision {
 
     $receiptPath = Get-DocsCompleteGateReceiptPath -ProfileText $profileText
     if ($null -ne $receiptPath.Reason) { return Get-DocsCompleteGateBlockDecision -Code $receiptPath.Reason -Message $receiptPath.Message }
+    $receiptRootArguments = @{ HeadRefName = $pr.HeadRefName; RepositoryRoot = $root }
+    if ($PSBoundParameters.ContainsKey('WorktreeListInvoker')) { $receiptRootArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+    $receiptRoot = Get-DocsCompleteGateReceiptRoot @receiptRootArguments
     try {
-        $receiptText = Get-DocsCompleteGateFileText -Path (Join-Path -Path $root -ChildPath $receiptPath.Path)
+        $receiptText = Get-DocsCompleteGateFileText -Path (Join-Path -Path $receiptRoot -ChildPath $receiptPath.Path)
     } catch {
         return Get-DocsCompleteGateBlockDecision -Code 'RECEIPT_UNREADABLE' -Message "The validation receipt exists but could not be read ($($_.Exception.GetBaseException().GetType().Name)); the gate fails closed. Make the file readable and retry."
     }
-    $receipt = Test-DocsCompleteGateReceipt -ReceiptText $receiptText -HeadRevision $pr.HeadRefOid
+    # Issue #1169: the receipt revision rule reads the snapshot and source roots beneath the receipt root.
+    $receiptProfileText = $profileText
+    if (-not [string]::Equals($receiptRoot, $root, [System.StringComparison]::Ordinal)) {
+        try { $receiptProfileText = Get-DocsCompleteGateFileText -Path (Join-Path -Path $receiptRoot -ChildPath $script:DocsCompleteGateProfilePath) } catch { $receiptProfileText = $null }
+    }
+    $revisionInput = Get-DocsCompleteGateRevisionInput -ProfileText $receiptProfileText -ReceiptText $receiptText -ReceiptRoot $receiptRoot -HeadRevision $pr.HeadRefOid
+    $receipt = Test-DocsCompleteGateReceipt -ReceiptText $receiptText -HeadRevision $pr.HeadRefOid -SnapshotRevision $revisionInput.SnapshotRevision -IsAncestor $revisionInput.IsAncestor -ChangedPath $revisionInput.ChangedPath -SourceRoot $revisionInput.SourceRoot
     if (-not $receipt.Allow) { return Get-DocsCompleteGateBlockDecision -Code $receipt.Reason -Message $receipt.Message }
     return Get-DocsCompleteGateAllowDecision
 }

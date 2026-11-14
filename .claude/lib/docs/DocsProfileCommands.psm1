@@ -42,11 +42,11 @@ function Get-DocsInitTemplate {
 
     $rows = @(
         # --- 1021: page-check configuration ---
-        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/markdownlint.json'; Destination = '.markdownlint.json' }
-        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale.ini'; Destination = '.vale.ini' }
-        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/DocsBase/HeadingPunctuation.yml'; Destination = '.vale/styles/DocsBase/HeadingPunctuation.yml' }
-        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/DocsBase/Placeholders.yml'; Destination = '.vale/styles/DocsBase/Placeholders.yml' }
-        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/Project/accept.txt'; Destination = '.vale/styles/config/vocabularies/Project/accept.txt' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/markdownlint.json'; Destination = 'docs/documentation-estate/.markdownlint.json' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale.ini'; Destination = 'docs/documentation-estate/.vale.ini' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/DocsBase/HeadingPunctuation.yml'; Destination = 'docs/documentation-estate/.vale/styles/DocsBase/HeadingPunctuation.yml' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/DocsBase/Placeholders.yml'; Destination = 'docs/documentation-estate/.vale/styles/DocsBase/Placeholders.yml' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/Project/accept.txt'; Destination = 'docs/documentation-estate/.vale/styles/config/vocabularies/Project/accept.txt' }
         # --- 1034: docs workflow ---
         [pscustomobject]@{ Source = '.claude/lib/docs/templates/_docs-quality.yml'; Destination = '.github/workflows/_docs-quality.yml' }
     )

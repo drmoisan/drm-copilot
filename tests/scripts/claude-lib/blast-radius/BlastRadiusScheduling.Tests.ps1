@@ -27,7 +27,9 @@ $schedulingStem = @(
     'scheduling-452-directory-prefix-weighted',
     'scheduling-452-negative-controls',
     'scheduling-soft-pair-tolerated',
-    'scheduling-absent-key-strict'
+    'scheduling-absent-key-strict',
+    'scheduling-1164-committed-minutes',
+    'scheduling-1164-separable-fallthrough'
 )
 $schedulingCase = @($schedulingStem | ForEach-Object {
         @{ FixtureName = $_; FixturePath = (Join-Path $fixtureDirectory "scheduling/$_.json") }
@@ -274,7 +276,7 @@ Describe 'BlastRadiusScheduling' {
         foreach ($case in $schedulingCase) {
             It "reproduces the expected decisions for $($case['FixtureName'])" -ForEach @($case) {
                 $fixture = Read-TestFixture -Path $FixturePath
-                $item = @($fixture['items'] | ForEach-Object { @{ key = $_['key']; radius = $_['radius']; band = $_['band'] } })
+                $item = @($fixture['items'] | ForEach-Object { @{ key = $_['key']; radius = $_['radius']; band = $_['band']; read_paths = $_['read_paths']; separable_paths = $_['separable_paths'] } })
                 $index = 0
                 foreach ($fixtureCase in $fixture['cases']) {
                     $result = Get-BlastRadiusConflictEdge -Item $item -Config (Get-ConfigForCase -Config $fixture['config'] -TolerancePercent $fixtureCase['tolerance_percent']) -Relation $script:ConflictRelation

@@ -148,16 +148,28 @@ function Get-DocumentationEstateRevision2Edit {
 function New-DocumentationEstateFixtureContext {
     <#
     .SYNOPSIS
-        Returns @{ Context; Files; WriteLog; ProcessCallLog } for one stateful in-memory context.
+        Returns @{ Context; Files; WriteLog; ProcessCallLog; Revisions } for one stateful in-memory context.
     .PARAMETER Files
         The path-to-text map the context starts from.
+    .PARAMETER RevisionMap
+        Optional ref-to-revision map for ResolveRevision; Revisions in the result is that table, so a
+        scenario can move HEAD between steps (issue #1169).
+    .PARAMETER AncestorMap
+        Optional map for TestAncestor, keyed by the revision pair '<first>..<second>' (issue #1169).
+    .PARAMETER ChangedPathMap
+        Optional map for ListChangedPath, keyed by the revision pair '<first>..<second>' (issue #1169).
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Test fixture factory that builds in-memory objects only.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
-    param([Parameter(Mandatory = $true)] [System.Collections.IDictionary] $Files)
+    param(
+        [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $Files,
+        [AllowNull()] [System.Collections.IDictionary] $RevisionMap,
+        [AllowNull()] [System.Collections.IDictionary] $AncestorMap,
+        [AllowNull()] [System.Collections.IDictionary] $ChangedPathMap
+    )
 
-    return New-DocsTestContext -File $Files -UtcNow ([datetime]::new(2026, 3, 1, 12, 0, 0, [System.DateTimeKind]::Utc))
+    return New-DocsTestContext -File $Files -UtcNow ([datetime]::new(2026, 3, 1, 12, 0, 0, [System.DateTimeKind]::Utc)) -RevisionMap $RevisionMap -AncestorMap $AncestorMap -ChangedPathMap $ChangedPathMap
 }
 
 Export-ModuleMember -Function Get-DocumentationEstateFixtureFile, Get-DocumentationEstateRevision2Edit, New-DocumentationEstateFixtureContext -Variable DocumentationEstateRevision1, DocumentationEstateRevision2

@@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every PowerShell cha
 Use this skill when:
 
 - `powershell-typed-engineer` is about to declare a change complete.
-- An executor has finished applying a planned batch and must verify zero regressions in the single gate run against the baseline captured in Phase A (the `Phase 0 baseline`).
+- An executor has reached a phase gate or the final QA loop and must verify zero regressions in the single gate run against the baseline captured in Phase A (the `Phase 0 baseline`). Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 - A reviewer needs to confirm the toolchain was actually run and produced a clean pass.
 
 ## Required Inputs

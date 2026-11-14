@@ -12,6 +12,7 @@ import {
 } from "./epic-wave-computation";
 import { validateCodexModelRoutingReceipt } from "./orchestrator-state-codex-model-routing";
 import { validateCodexTopologyReceipt } from "./orchestrator-state-codex-topology";
+import { validatePlannerWorktrees } from "./epic-planner-state-planner-worktrees";
 import {
   validateEpicReadinessIntegrity,
   type EpicReadinessContext,
@@ -425,6 +426,9 @@ export function validateEpicPlannerStateText(
         "from 1 through 8.",
     );
   }
+  errors.push(
+    ...validatePlannerWorktrees(value, featureResult.indexedFeatures),
+  );
 
   if (
     worthiness.verdict === "non_epic" &&

@@ -60,16 +60,23 @@
     token and ends with a diagnostics clause naming each run kind's status, checkpoint
     path, and matched record; the allow-or-deny decision is unchanged.
 
+    Issue #1161: after the epic and parallel allows and before the manifest branch, a planner branch
+    (enforce-worktree-removal-gate-planner.ps1) allows the removal of a preparation worktree that an
+    epic-planner-state.json planner_worktrees record names by branch, when the record is eligible, the worktree
+    is not in use, is clean, and its HEAD is on a remote-tracking ref. A refusal does not stop the cascade; when
+    the final deny is reached it appends one sentence with a code: PLANNER_WORKTREE_NOT_ELIGIBLE,
+    PLANNER_WORKTREE_DIRTY, PLANNER_WORKTREE_NOT_PUSHED, PLANNER_WORKTREE_IN_USE, PLANNER_WORKTREE_AMBIGUOUS, or
+    PLANNER_WORKTREE_GIT_FAILED. The branch is a policy-level control, not a security control: any same-session
+    writer can author a record, and the git checks bound what a record can authorize.
+
 .NOTES
-    Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 through the
-    dot-sourced resolution sibling, whose import guard denies on a failed import.
-    Filesystem reads go through injectable wrapper functions so tests can mock the
-    boundary without writing temporary files.
+    Compatible with PowerShell 7+. Depends on WorktreeRunResolution.psm1 through the dot-sourced resolution
+    sibling, whose import guard denies on a failed import. Filesystem reads go through injectable wrapper
+    functions so tests can mock the boundary without writing temporary files.
 #>
 [CmdletBinding()]
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
-
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Sanctioned-removal manifest reader (issue #635), consumed by the manifest branch in
@@ -81,6 +88,7 @@ try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookD
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 # Checkpoint read seams, the import guard, and run-target resolution (issue #690).
 try { . (Join-Path $PSScriptRoot 'enforce-epic-worktree-removal-gate-resolution.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-worktree-removal-gate-resolution.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-worktree-removal-gate-planner.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-worktree-removal-gate-planner.ps1' -ErrorRecord $_ }
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
 # Sanctioned-removal manifest location. Recorded here so every hook-read document this
 # gate consults is named; the module owns the read itself.
@@ -135,7 +143,11 @@ function Find-EpicWorktreeFeatureRecord {
         [AllowNull()]
         [string] $WorktreePath,
 
-        [AllowNull()][AllowEmptyCollection()][string[]] $BaseRoot = @()
+        [AllowNull()][AllowEmptyCollection()][string[]] $BaseRoot = @(),
+
+        [AllowNull()][AllowEmptyCollection()][string[]] $LiveWorktreeRoot = @(),
+
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
 
     if ($null -eq $Checkpoint -or [string]::IsNullOrWhiteSpace($WorktreePath)) {
@@ -153,7 +165,8 @@ function Find-EpicWorktreeFeatureRecord {
         if ($featureProps -notcontains 'worktree_path') {
             continue
         }
-        if (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$feature.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot) {
+        $branch = if ($featureProps -contains 'branch_name') { [string]$feature.branch_name } else { '' }
+        if (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$feature.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot -RecordedBranch $branch -LiveWorktreeRoot $LiveWorktreeRoot -BranchWorktreeResolver $BranchWorktreeResolver) {
             return $feature
         }
     }
@@ -214,7 +227,11 @@ function Test-ParallelCheckpointAllowsWorktreeRemoval {
         [AllowNull()]
         [string] $WorktreePath,
 
-        [AllowNull()][AllowEmptyCollection()][string[]] $BaseRoot = @()
+        [AllowNull()][AllowEmptyCollection()][string[]] $BaseRoot = @(),
+
+        [AllowNull()][AllowEmptyCollection()][string[]] $LiveWorktreeRoot = @(),
+
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
 
     if ($null -eq $Checkpoint -or [string]::IsNullOrWhiteSpace($WorktreePath)) {
@@ -240,7 +257,8 @@ function Test-ParallelCheckpointAllowsWorktreeRemoval {
         if ($itemProps -notcontains 'worktree_path') {
             continue
         }
-        if (-not (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$item.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot)) {
+        $branch = if ($itemProps -contains 'branch_name') { [string]$item.branch_name } else { '' }
+        if (-not (Test-WorktreeRunRecordedPathMatchesTarget -RecordedPath ([string]$item.worktree_path) -TargetPath $WorktreePath -BaseRoot $BaseRoot -RecordedBranch $branch -LiveWorktreeRoot $LiveWorktreeRoot -BranchWorktreeResolver $BranchWorktreeResolver)) {
             continue
         }
         if ($itemProps -notcontains 'merge_status') {
@@ -288,18 +306,24 @@ function Invoke-EpicWorktreeRemovalGateDecision {
         Parses the PreToolUse envelope and returns an allow-or-block decision.
     .PARAMETER ToolInputRaw
         The raw JSON tool payload supplied by Claude Code.
+    .PARAMETER BranchWorktreeResolver
+        Optional branch resolver for a host-moved worktree_path record (issue #1163); defaults
+        to Resolve-AgentTargetWorktree -CommandBranch with Policy FailClosedOnIdentity.
     .OUTPUTS
         System.Collections.Specialized.OrderedDictionary
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
-        [string] $ToolInputRaw
+        [string] $ToolInputRaw,
+
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
 
     # A failed worktree-resolution import denies before any other logic (issue #690).
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_WORKTREE_REMOVAL_BLOCKED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
+    if ($null -eq $BranchWorktreeResolver) { $BranchWorktreeResolver = { param($Branch) Resolve-AgentTargetWorktree -SessionRoot (Get-Location).Path -CommandBranch $Branch -Policy FailClosedOnIdentity } }
 
     $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
     if (-not $payload.IsValid) {
@@ -332,7 +356,7 @@ function Invoke-EpicWorktreeRemovalGateDecision {
         return Get-EpicWorktreeGateBlockDecision -Reason 'EPIC_WORKTREE_REMOVAL_BLOCKED: TARGET_WORKTREE_NOT_DERIVABLE: the git worktree remove target cannot be derived from the command text. No checkpoint can authorize this removal.'
     }
     foreach ($target in @($resolution.Targets)) {
-        $denial = Get-EpicWorktreeRemovalTargetDenial -WorktreePath $target
+        $denial = Get-EpicWorktreeRemovalTargetDenial -WorktreePath $target -BranchWorktreeResolver $BranchWorktreeResolver
         if ($null -ne $denial) {
             return $denial
         }
@@ -356,13 +380,17 @@ function Get-EpicWorktreeRemovalTargetDenial {
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [Parameter(Mandatory)]
-        [string] $WorktreePath
+        [string] $WorktreePath,
+
+        [AllowNull()][scriptblock] $BranchWorktreeResolver = $null
     )
 
     # Each run checkpoint is read beneath the worktree that records this path (issue #690);
     # an ambiguous target denies before any allow or manifest evaluation.
-    $epicRead = Read-EpicWorktreeGateRunCheckpoint -Kind epic -WorktreePath $worktreePath
-    $parallelRead = Read-EpicWorktreeGateRunCheckpoint -Kind parallel -WorktreePath $worktreePath
+    $epicRead = Read-EpicWorktreeGateRunCheckpoint -Kind epic -WorktreePath $worktreePath -BranchWorktreeResolver $BranchWorktreeResolver
+    $parallelRead = Read-EpicWorktreeGateRunCheckpoint -Kind parallel -WorktreePath $worktreePath -BranchWorktreeResolver $BranchWorktreeResolver
+    $epicLive = [string[]] @($epicRead.Target.PSObject.Properties | Where-Object { $_.Name -eq 'LiveRoot' } | ForEach-Object { $_.Value })
+    $parallelLive = [string[]] @($parallelRead.Target.PSObject.Properties | Where-Object { $_.Name -eq 'LiveRoot' } | ForEach-Object { $_.Value })
     foreach ($read in @($epicRead, $parallelRead)) {
         if ($read.Target.Status -eq 'Ambiguous') {
             return Get-EpicWorktreeGateBlockDecision -Reason "EPIC_WORKTREE_REMOVAL_BLOCKED: $($read.Target.ReasonCode): $($read.Target.Detail)"
@@ -375,15 +403,18 @@ function Get-EpicWorktreeRemovalTargetDenial {
     $epicBaseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $mainRoot -Read $epicRead
     $parallelBaseRoot = Get-WorktreeRunRecordBaseRoot -MainRoot $mainRoot -Read $parallelRead
 
-    $featureRecord = Find-EpicWorktreeFeatureRecord -Checkpoint $checkpoint -WorktreePath $worktreePath -BaseRoot $epicBaseRoot
+    $featureRecord = Find-EpicWorktreeFeatureRecord -Checkpoint $checkpoint -WorktreePath $worktreePath -BaseRoot $epicBaseRoot -LiveWorktreeRoot $epicLive -BranchWorktreeResolver $BranchWorktreeResolver
     if (Test-EpicWorktreeRemovalAllowed -FeatureRecord $featureRecord) {
         return $null
     }
 
     $parallelCheckpoint = $parallelRead.Checkpoint
-    if (Test-ParallelCheckpointAllowsWorktreeRemoval -Checkpoint $parallelCheckpoint -WorktreePath $worktreePath -BaseRoot $parallelBaseRoot) {
+    if (Test-ParallelCheckpointAllowsWorktreeRemoval -Checkpoint $parallelCheckpoint -WorktreePath $worktreePath -BaseRoot $parallelBaseRoot -LiveWorktreeRoot $parallelLive -BranchWorktreeResolver $BranchWorktreeResolver) {
         return $null
     }
+    # Planner branch (issue #1161); a refusal falls through and closes the final deny.
+    $planner = Get-PlannerWorktreeRemovalTargetDecision -WorktreePath $worktreePath -SessionRoot (Get-Location).Path
+    if ($planner.Outcome -eq 'Allow') { return $null }
 
     # Sanctioned-removal manifest branch (issue #635). It runs last, so an
     # epic-checkpoint-authorized or parallel-checkpoint-authorized removal still allows
@@ -408,8 +439,8 @@ function Get-EpicWorktreeRemovalTargetDenial {
     if ($epicRead.Target.Status -eq 'NoTarget' -and $parallelRead.Target.Status -eq 'NoTarget') {
         $prefix = "$($epicRead.Target.ReasonCode): $($epicRead.Target.Detail). "
     }
-    $diagnostics = Get-EpicWorktreeGateDenyDiagnostics -EpicRead $epicRead -ParallelRead $parallelRead -WorktreePath $worktreePath -MainRoot $mainRoot
-    return Get-EpicWorktreeGateBlockDecision -Reason ('EPIC_WORKTREE_REMOVAL_BLOCKED: ' + $prefix + "git worktree remove for '$worktreePath' requires either an epic checkpoint features[] record with merge_status in {merged, worktree_removed}, or a parallel-orchestrator checkpoint with route_id == ""parallel"" whose matching items[] record (matched by worktree_path) has merge_status in {merged, worktree_removed}. No checkpoint authorized this removal. " + $diagnostics)
+    $diagnostics = Get-EpicWorktreeGateDenyDiagnostics -EpicRead $epicRead -ParallelRead $parallelRead -WorktreePath $worktreePath -MainRoot $mainRoot -BranchWorktreeResolver $BranchWorktreeResolver
+    return Get-EpicWorktreeGateBlockDecision -Reason ('EPIC_WORKTREE_REMOVAL_BLOCKED: ' + $prefix + "git worktree remove for '$worktreePath' requires either an epic checkpoint features[] record with merge_status in {merged, worktree_removed}, or a parallel-orchestrator checkpoint with route_id == ""parallel"" whose matching items[] record (matched by worktree_path) has merge_status in {merged, worktree_removed}. No checkpoint authorized this removal. " + $diagnostics + $planner.Suffix)
 }
 
 function Invoke-EpicWorktreeRemovalGateEntryPoint {

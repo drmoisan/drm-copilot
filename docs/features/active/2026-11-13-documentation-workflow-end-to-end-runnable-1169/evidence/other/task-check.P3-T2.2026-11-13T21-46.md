@@ -1,0 +1,11 @@
+# Task Check P3-T2
+
+Timestamp: 2026-11-13T21-46
+Command: sh SCRATCH/issue-1169-tc.sh P3-T2 <files> <tests> (pwsh 7: Invoke-Formatter and Invoke-ScriptAnalyzer with scripts/powershell/PoshQC/settings/pssa.settings.psd1, one retry on an analyzer exception; Invoke-Pester with Run.Path = the selection)
+EXIT_CODE: 0
+Output Summary:
+- Changed files: new enforce-orchestration-preimplementation-gate-docs.ps1 in four byte-identical copies (.claude/hooks, .codex/hooks, both bundles) exposing Get-OrchestrationDocsEstateContextResult with the seams Get-OrchestrationDocsEstateFileText and Test-OrchestrationDocsEstateCheckpointPresent; the Claude and Codex main gates (and their bundle copies) gain one guarded dot-source and one call after the cleanup call, appending $docs.DenySuffix after $cleanup.DenySuffix (two added lines each; the Codex main gate is 495 lines); new tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.DocsEstate.Tests.ps1 (41 rows: every A1 criterion, the seven chained-tool prefilter rows, the -C add and commit forms, relative and absolute receipt Writes, the cleanup-allowed row with no docs-leg seam call, the suffix order, and a throwing seam).
+- Format and lint (four files): 0 formatter differences, 0 analyzer findings.
+- Selection rule: every test file naming enforce-orchestration-preimplementation-gate (git grep over tests/, 57 suites), the new suite, and the hook-tree contract suites (hook-dependency-guard-completeness, enforcement-hooks-no-python-invocation).
+- First run: 3183 passed, 1 failed: the unchanged cleanup-suite row 'starts no listing process when every prefilter fails' observed one Get-OrchestrationGateWorktreeList call, because the docs leg read the listing to confirm R for 'git commit -m wip'. Fix (production, within the task's file set): a target equal to the session root is R without a listing read; the listing is read only for a -C root other than the session root or an absolute Write path. A fixture parameter typed [string] also bound $null as an empty string in the new suite; it is typed [object].
+- Final run: 3184 passed, 0 failed, 0 skipped; exit 0. The existing suites named by the plan (.Cleanup, .Tests, .CommandExemption, .Parity, .TriggerScoping, .TargetWorktree, and the Codex gate suites) pass unchanged.

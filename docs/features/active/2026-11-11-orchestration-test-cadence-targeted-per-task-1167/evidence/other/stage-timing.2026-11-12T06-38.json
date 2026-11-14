@@ -1,0 +1,13 @@
+{
+  "issue-num": "1167",
+  "stage_timing": [
+    { "stage": "S2_research", "attempt": 1, "started_at": "2026-11-12T00:25:48Z", "ended_at": "2026-11-12T00:43:22Z" },
+    { "stage": "S4_atomic_planning", "attempt": 1, "started_at": "2026-11-12T00:43:22Z", "ended_at": "2026-11-12T01:35:34Z" },
+    { "stage": "S4_atomic_planning", "attempt": 2, "started_at": "2026-11-12T02:50:56Z", "ended_at": "2026-11-12T03:10:09Z" },
+    { "stage": "S5_atomic_execution", "attempt": 1, "started_at": "2026-11-12T03:10:09Z", "ended_at": "2026-11-12T04:28:24Z" },
+    { "stage": "S6_pre_review_commit", "attempt": 1, "started_at": "2026-11-12T04:28:24Z", "ended_at": "2026-11-12T04:32:56Z" },
+    { "stage": "S8_create_pr", "attempt": 1, "started_at": "2026-11-12T04:32:56Z", "ended_at": "2026-11-12T04:38:10Z" },
+    { "stage": "S7_feature_review", "attempt": 1, "started_at": "2026-11-12T04:38:10Z", "ended_at": "2026-11-12T06:38:17Z" },
+    { "stage": "S9_ci_green", "attempt": 1, "started_at": "2026-11-12T06:38:17Z", "ended_at": null }
+  ]
+}

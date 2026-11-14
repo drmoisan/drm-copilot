@@ -227,7 +227,8 @@ Describe 'Resolve-SubagentStopTargetWorktree (issue #1105)' {
 
     It 'reports the session root with a failure detail when resolution throws' {
         # Arrange
-        Mock Resolve-HookTargetWorktree { throw 'resolver unavailable' }
+        # Issue #1163: the helper resolves through Resolve-AgentTargetWorktree, so the failing collaborator is mocked there; the asserted fallback is unchanged.
+        Mock Resolve-AgentTargetWorktree { throw 'resolver unavailable' }
 
         # Act
         $result = Resolve-SubagentStopTargetWorktree -Envelope $null -AdvertisedPath @("$script:ItemRoot/plan.md") -SessionRoot $script:SessionRoot -WorktreeListInvoker $script:ListInvoker
@@ -387,5 +388,83 @@ Describe 'moved transcript readers (issue #1105)' {
         $head = Read-TranscriptHead -Path '/synthetic-worktrees/main/present.jsonl'
         $head.Count | Should -Be 2
         Should -Invoke Get-Content -Times 1 -Exactly -ParameterFilter { $TotalCount -eq 50 }
+    }
+}
+
+# Issue #1163 rows. Argument builder: -Target is passed to Resolve-SubagentStopArtifactLocation only
+# when Get-Command reports that the function declares it, so each row runs unchanged against the
+# unmodified helper (fail-before) and the changed helper (pass-after).
+Describe 'subagentstop target worktree fail-closed resolution (issue #1163)' {
+    BeforeAll {
+        function Get-ArtifactLocationArgument {
+            param([string] $Path, [AllowNull()] [string] $WorktreeRoot, [AllowNull()] [object] $Target)
+            $arguments = @{ Path = $Path; WorktreeRoot = $WorktreeRoot; SessionRoot = $script:SessionRoot }
+            if ((Get-Command -Name Resolve-SubagentStopArtifactLocation).Parameters.ContainsKey('Target')) { $arguments['Target'] = $Target }
+            return $arguments
+        }
+    }
+
+    It 'rejects without a probe path when the target carries <ReasonCode>' -ForEach @(
+        @{ ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE' }
+        @{ ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS' }
+    ) {
+        # Arrange (fails before: the unmodified helper probes the session-root value)
+        $target = [pscustomobject]@{ WorktreeRoot = $null; Source = 'DelegationPrompt'; ReasonCode = $ReasonCode; Detail = 'synthetic detail' }
+        $arguments = Get-ArtifactLocationArgument -Path 'docs/features/active/sample/plan.md' -WorktreeRoot $null -Target $target
+
+        # Act
+        $location = Resolve-SubagentStopArtifactLocation @arguments
+
+        # Assert
+        $location.Rejected | Should -BeTrue
+        $location.ProbePath | Should -BeNullOrEmpty
+        $location.RejectionDetail | Should -BeLike "*$ReasonCode*"
+    }
+
+    It 'carries the target detail naming the stale root and git worktree repair into the rejection detail' {
+        # Arrange (fails before; D4 error handling: the remedy reaches the block message)
+        $detail = "branch 'bug/sample-1105' is registered only at the prunable path '/host-a/repo/.claude/worktrees/bug-1105'; run 'git worktree repair' to re-register the worktree at its current path"
+        $target = [pscustomobject]@{ WorktreeRoot = $null; Source = 'DelegationPrompt'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'; Detail = $detail }
+        $arguments = Get-ArtifactLocationArgument -Path 'docs/features/active/sample/plan.md' -WorktreeRoot $null -Target $target
+
+        # Act
+        $location = Resolve-SubagentStopArtifactLocation @arguments
+
+        # Assert
+        $location.RejectionDetail | Should -BeLike '*TARGET_WORKTREE_NOT_DERIVABLE*'
+        $location.RejectionDetail | Should -BeLike "*$detail*"
+    }
+
+    It 'resolves the live root for a prompt branch registered once as prunable and once live' {
+        # Arrange (fails before: the stale registration makes the branch ambiguous)
+        $porcelain = @(
+            'worktree /synthetic-worktrees/main', 'branch refs/heads/main', '',
+            'worktree /host-a/repo/.claude/worktrees/bug-1105', 'branch refs/heads/bug/sample-1105', 'prunable gitdir file points to non-existent location', '',
+            'worktree /synthetic-worktrees/main/.claude/worktrees/bug-1105', 'branch refs/heads/bug/sample-1105', ''
+        ) -join "`n"
+        $invoker = { param($SessionRoot) $null = $SessionRoot; $porcelain }.GetNewClosure()
+        $reader = Get-TranscriptReader -Prompt 'branch: bug/sample-1105'
+
+        # Act
+        $result = Resolve-SubagentStopTargetWorktree -Envelope $script:Envelope -AdvertisedPath @('docs/features/active/sample/plan.md') -SessionRoot $script:SessionRoot -ReadTranscriptHead $reader -WorktreeListInvoker $invoker
+
+        # Assert
+        $result.ReasonCode | Should -BeNullOrEmpty
+        $result.WorktreeRoot | Should -Be $script:ItemRoot
+        $result.Source | Should -Be 'DelegationPrompt'
+    }
+
+    It 'resolves the item root from the envelope cwd when the prompt carries no identity' {
+        # Arrange (fails before: the unmodified helper ignores cwd and returns the session root)
+        $envelope = [pscustomobject]@{ agent_transcript_path = 'transcripts/subagents/agent-1.jsonl'; cwd = "$script:ItemRoot/docs" }
+        $reader = Get-TranscriptReader -Prompt 'Execute the plan.'
+
+        # Act
+        $result = Resolve-SubagentStopTargetWorktree -Envelope $envelope -AdvertisedPath @('docs/features/active/sample/plan.md') -SessionRoot $script:SessionRoot -ReadTranscriptHead $reader -WorktreeListInvoker $script:ListInvoker
+
+        # Assert
+        $result.WorktreeRoot | Should -Be $script:ItemRoot
+        $result.Source | Should -Be 'AgentWorkingDirectory'
+        $result.ReasonCode | Should -BeNullOrEmpty
     }
 }

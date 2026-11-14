@@ -1,11 +1,12 @@
 /**
- * Validator tolerance for the scheduling layer's extra fields (issue #722).
+ * Validator acceptance of the scheduling layer's recorded fields (issue #722).
  *
- * The integration-cost scheduling layer records three tolerated-not-validated
- * fields on each conflict edge (`hard`, `cost`, `benefit`) and a
- * `tolerated_overlaps` list on the planner and orchestrator checkpoints. No
- * validator reads them, so a checkpoint carrying them must validate with zero
- * errors, while the four-member edge reason enum stays enforced. These cases
+ * The integration-cost scheduling layer records three fields on each conflict
+ * edge (`hard`, `cost`, `benefit`) and a `tolerated_overlaps` list on the
+ * planner and orchestrator checkpoints. Since issue #1164 the validators check
+ * these fields when present, so a checkpoint carrying valid values must
+ * validate with zero errors, while the four-member edge reason enum stays
+ * enforced. These cases
  * mirror `tests/scripts/dev_tools/test_validate_parallel_state_tolerated_edge_fields.py`
  * and assert the byte-identical error literal the Python validator emits.
  */
@@ -242,7 +243,8 @@ describe("issue #722: tolerated scheduling fields", () => {
   });
 
   it("still rejects an edge reason outside the four-member enum", () => {
-    // Arrange: extra fields must not relax the reason enum.
+    // Arrange: the estimate fields must not relax the reason enum. The overlap
+    // names the edge's own pair, so issue #1164 also reports both lists.
     const state = orchestratorStateWithEdges([
       { ...SCHEDULED_EDGE, reason: "same_file" },
     ]);
@@ -251,11 +253,13 @@ describe("issue #722: tolerated scheduling fields", () => {
     // Act
     const errors = validateState(state);
 
-    // Assert: exactly the existing reason-enum error is reported.
+    // Assert: the reason-enum error, then the both-lists error.
     expect(errors).toEqual([
       "Parallel checkpoint conflict_edges[0] reason must be one of " +
         "path_overlap, module_overlap, shared_surface_overlap, " +
         "contract_dependency; found: 'same_file'.",
+      "Parallel checkpoint pair (444, 445) is in both conflict_edges and " +
+        "tolerated_overlaps.",
     ]);
   });
 });

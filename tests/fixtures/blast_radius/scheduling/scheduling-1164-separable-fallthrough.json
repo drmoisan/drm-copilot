@@ -1,0 +1,132 @@
+{
+  "description": "Issue #1164 separable fall-through (spec B2.1, B2.3). The table carries no separable weight, so a path both items declare separable (items 1 and 2) falls through to same_file, 90 against 45, an edge. A path declared separable on one side only (item 3, not item 4) also falls through to same_file, an edge. The one-side case with a configured weight is covered by the unit cases of both runtimes.",
+  "tags": [
+    "#1164"
+  ],
+  "config": {
+    "version": 1,
+    "shared_surfaces": [],
+    "shared_surface_globs": [],
+    "mandate_reads": [],
+    "mergeable_paths": [],
+    "conflict_tolerance": {
+      "tolerance_percent": 100,
+      "weights": {
+        "same_file": 90,
+        "possible_overlap": 20,
+        "append_only": 10,
+        "module": 10,
+        "contract": 90
+      },
+      "band_durations": {
+        "C1": 30,
+        "C2": 45,
+        "C3": 90,
+        "C4": 180
+      },
+      "default_band": "C1",
+      "append_only_paths": [
+        "**/CHANGELOG.md",
+        "extensions/drm-copilot/resources/**"
+      ],
+      "combination_threshold_percent": 400
+    },
+    "modules": {
+      "config": [
+        "config/**"
+      ]
+    },
+    "over_breadth_fraction": 0.25
+  },
+  "items": [
+    {
+      "key": 1,
+      "band": "C2",
+      "radius": {
+        "paths": [
+          "src/both.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      },
+      "separable_paths": [
+        "src/both.py"
+      ]
+    },
+    {
+      "key": 2,
+      "band": "C2",
+      "radius": {
+        "paths": [
+          "src/both.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      },
+      "separable_paths": [
+        "src/both.py"
+      ]
+    },
+    {
+      "key": 3,
+      "band": "C2",
+      "radius": {
+        "paths": [
+          "src/one.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      },
+      "separable_paths": [
+        "src/one.py"
+      ]
+    },
+    {
+      "key": 4,
+      "band": "C2",
+      "radius": {
+        "paths": [
+          "src/one.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "tolerance_percent": null,
+      "expected_edges": [
+        {
+          "a": 1,
+          "b": 2,
+          "reason": "path_overlap",
+          "hard": false,
+          "cost": 90,
+          "benefit": 45
+        },
+        {
+          "a": 3,
+          "b": 4,
+          "reason": "path_overlap",
+          "hard": false,
+          "cost": 90,
+          "benefit": 45
+        }
+      ],
+      "expected_tolerated": []
+    }
+  ]
+}

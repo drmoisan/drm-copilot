@@ -42,7 +42,9 @@ BeforeAll {
         '.claude/lib/orchestrator-state/OrchestratorStateUnconditional.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateEpicWaveBarrier.psm1',
         '.claude/lib/orchestrator-state/OrchestratorStateEpicCrossDependency.psm1',
-        '.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1'
+        '.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1',
+        '.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectiveSelection.psm1',
+        '.claude/lib/orchestrator-state/OrchestratorStateOwnerDirectiveDecision.psm1'
     )
 }
 

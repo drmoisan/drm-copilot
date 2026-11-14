@@ -24,7 +24,10 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
         $script:Head = '0123456789abcdef0123456789abcdef01234567'
         $script:OtherHead = 'fedcba9876543210fedcba9876543210fedcba98'
         Mock Get-DocsCompleteGateRepositoryRoot { 'repo-root' }
+        # Issue #1163: the receipt root seam keeps these rows' receipt path and starts no process.
+        Mock Get-DocsCompleteGateReceiptRoot { 'repo-root' }
         Mock Invoke-DocsOnlyGhExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
+        Mock Invoke-DocsOnlyGitExe { [pscustomobject]@{ ExitCode = 128; Output = '' } } # Issue #1169: no row runs git.
 
         function ConvertTo-TestEnvelope {
             [CmdletBinding()]
@@ -39,7 +42,7 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
             [OutputType([string])]
             param([object] $Enabled = $true, [object] $ReceiptPath = 'docs/documentation-estate/docs-validation-receipt.json')
 
-            return ([ordered]@{ artifact_paths = [ordered]@{ validation_receipt = $ReceiptPath }; completion_gates = [ordered]@{ integration_pr_gate = [ordered]@{ enabled = $Enabled } } } | ConvertTo-Json -Depth 5 -Compress)
+            return ([ordered]@{ artifact_paths = [ordered]@{ validation_receipt = $ReceiptPath; inventory_snapshot = 'docs/documentation-estate/surface-inventory-snapshot.json' }; surface_selection = [ordered]@{ source_roots = @('src') }; completion_gates = [ordered]@{ integration_pr_gate = [ordered]@{ enabled = $Enabled } } } | ConvertTo-Json -Depth 5 -Compress)
         }
 
         function Get-TestReceiptText {
@@ -53,7 +56,7 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
         function Set-TestFileSeam {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
             [CmdletBinding()]
-            param([AllowNull()][object] $ProfileText, [AllowNull()][object] $ReceiptText)
+            param([AllowNull()][object] $ProfileText, [AllowNull()][object] $ReceiptText, [string] $SnapshotRevision = '0123456789abcdef0123456789abcdef01234567')
 
             $profileValue = $ProfileText
             $receiptValue = $ReceiptText
@@ -62,6 +65,8 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
             # on Windows and Linux.
             Mock Get-DocsCompleteGateFileText -ParameterFilter { $Path -ceq (Join-Path -Path 'repo-root' -ChildPath 'docs/documentation-estate/docs-profile.json') } -MockWith ({ $profileValue }.GetNewClosure())
             Mock Get-DocsCompleteGateFileText -ParameterFilter { $Path -ceq (Join-Path -Path 'repo-root' -ChildPath 'docs/documentation-estate/docs-validation-receipt.json') } -MockWith ({ $receiptValue }.GetNewClosure())
+            $snapshotValue = [ordered]@{ revision = $SnapshotRevision } | ConvertTo-Json -Compress # Issue #1169: the snapshot the receipt revision rule reads.
+            Mock Get-DocsCompleteGateFileText -ParameterFilter { $Path -ceq (Join-Path -Path 'repo-root' -ChildPath 'docs/documentation-estate/surface-inventory-snapshot.json') } -MockWith ({ $snapshotValue }.GetNewClosure())
         }
 
         function Set-TestPullRequestSeam {
@@ -128,7 +133,7 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
     }
 
     AfterAll {
-        Remove-Module -Name HookPayload, DocsCompleteGate, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding -Force -ErrorAction SilentlyContinue
+        Remove-Module -Name HookPayload, DocsCompleteGate, DocsReceiptRevision, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding -Force -ErrorAction SilentlyContinue
     }
 
     Context 'gate disabled' {
@@ -234,10 +239,11 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "DOCS_COMPLETE_GATE_BLOCKED: ${Code}: *"
         }
 
-        It 'denies RECEIPT_REVISION_MISMATCH and names both revisions' {
+        It 'denies RECEIPT_REVISION_NOT_ANCESTOR for a receipt revision that is not an ancestor of headRefOid and names both revisions (issue #1169)' {
             # Arrange
-            Set-TestFileSeam -ProfileText (Get-TestProfileText) -ReceiptText (Get-TestReceiptText -Revision $script:OtherHead)
+            Set-TestFileSeam -ProfileText (Get-TestProfileText) -ReceiptText (Get-TestReceiptText -Revision $script:OtherHead) -SnapshotRevision $script:OtherHead
             Set-TestPullRequestSeam
+            Mock Invoke-DocsOnlyGitExe -MockWith { [pscustomobject]@{ ExitCode = 1; Output = '' } }
 
             # Act
             $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command 'gh pr merge 7 --merge')
@@ -245,7 +251,7 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
             # Assert
             $reason = $decision.hookSpecificOutput.permissionDecisionReason
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $reason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: RECEIPT_REVISION_MISMATCH: *'
+            $reason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: RECEIPT_REVISION_NOT_ANCESTOR: *'
             $reason | Should -Match $script:OtherHead
             $reason | Should -Match $script:Head
         }
@@ -623,7 +629,7 @@ Describe 'enforce-docs-complete-gate seams (issue #1034)' {
     }
 
     AfterAll {
-        Remove-Module -Name HookPayload, DocsCompleteGate, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding -Force -ErrorAction SilentlyContinue
+        Remove-Module -Name HookPayload, DocsCompleteGate, DocsReceiptRevision, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding -Force -ErrorAction SilentlyContinue
     }
 
     It 'returns the repository root two levels above the hook directory' {
@@ -665,5 +671,87 @@ Describe 'enforce-docs-complete-gate seams (issue #1034)' {
 
         # Assert
         $text | Should -Match 'DOCS_COMPLETE_GATE_BLOCKED'
+    }
+}
+
+# Issue #1163 (D8): the receipt is read beneath the worktree that has the pull request head branch
+# checked out. Argument builder: -WorktreeListInvoker is passed to Invoke-DocsCompleteGateDecision only
+# when Get-Command reports that it declares the parameter, so the decision rows run unchanged against
+# the unmodified hook (fail-before) and the changed hook. Worktree lists are in-memory porcelain.
+Describe 'enforce-docs-complete-gate receipt root (issue #1163)' {
+    BeforeAll {
+        . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-docs-complete-gate.ps1").Path
+        $script:ReceiptHead = '0123456789abcdef0123456789abcdef01234567'
+        $profileKey = Join-Path -Path '/repo' -ChildPath 'docs/documentation-estate/docs-profile.json'
+        $itemRoot = '/repo/.claude/worktrees/item'
+        $script:ProfileKey = $profileKey
+        $files = @{
+            $profileKey                                                                                                          = ([ordered]@{ artifact_paths = [ordered]@{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json' }; completion_gates = [ordered]@{ integration_pr_gate = [ordered]@{ enabled = $true } } } | ConvertTo-Json -Depth 5 -Compress)
+            (Join-Path -Path $itemRoot -ChildPath 'docs/documentation-estate/docs-profile.json')                                 = ([ordered]@{ artifact_paths = [ordered]@{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json'; inventory_snapshot = 'docs/documentation-estate/surface-inventory-snapshot.json' } } | ConvertTo-Json -Depth 5 -Compress)
+            (Join-Path -Path $itemRoot -ChildPath 'docs/documentation-estate/surface-inventory-snapshot.json')                   = ([ordered]@{ revision = $script:ReceiptHead } | ConvertTo-Json -Compress)
+            (Join-Path -Path '/repo/.claude/worktrees/item' -ChildPath 'docs/documentation-estate/docs-validation-receipt.json') = ([ordered]@{ artifact_kind = 'docs-validation-receipt'; mode = 'docs-complete'; revision = $script:ReceiptHead; validation_result = 'pass' } | ConvertTo-Json -Compress)
+        }
+        Mock Get-DocsCompleteGateRepositoryRoot { '/repo' }
+        $prText = [ordered]@{ baseRefName = 'main'; headRefName = 'epic/x-integration'; headRefOid = $script:ReceiptHead } | ConvertTo-Json -Compress
+        Mock Invoke-DocsOnlyGhExe -MockWith ({ [pscustomobject]@{ ExitCode = 0; Output = $prText } }.GetNewClosure())
+        Mock Get-DocsCompleteGateFileText -MockWith ({ param([string] $Path) if ($files.ContainsKey($Path)) { $files[$Path] } else { $null } }.GetNewClosure())
+
+        function Get-ReceiptRootDecisionArgument {
+            param([string] $Listing)
+            $listText = $Listing
+            $arguments = @{ ToolInputRaw = (@{ session_id = 's-1163'; tool_name = 'Bash'; tool_input = @{ command = 'gh pr merge 12 --squash' } } | ConvertTo-Json -Depth 5 -Compress) }
+            if ((Get-Command -Name Invoke-DocsCompleteGateDecision).Parameters.ContainsKey('WorktreeListInvoker')) { $arguments['WorktreeListInvoker'] = { param($SessionRoot) $null = $SessionRoot; $listText }.GetNewClosure() }
+            return $arguments
+        }
+    }
+
+    AfterAll {
+        Remove-Module -Name HookPayload, DocsCompleteGate, DocsReceiptRevision, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding, AgentTargetWorktree, HookTargetWorktree -Force -ErrorAction SilentlyContinue
+    }
+
+    It 'decision: <Label>' -ForEach @(
+        @{ Label = 'allows when the head branch is checked out in one item worktree that holds the receipt'; Listing = "worktree /repo`nbranch refs/heads/main`n`nworktree /repo/.claude/worktrees/item`nbranch refs/heads/epic/x-integration`n"; ExpectedDecision = 'allow'; Reason = $null }
+        @{ Label = 'denies RECEIPT_ABSENT reading beneath the repository root when no registration has the head branch'; Listing = "worktree /repo`nbranch refs/heads/main`n`nworktree /repo/.claude/worktrees/other`nbranch refs/heads/feature/other`n"; ExpectedDecision = 'deny'; Reason = 'DOCS_COMPLETE_GATE_BLOCKED: RECEIPT_ABSENT: *' }
+    ) {
+        # Arrange (the allow row fails before: the unmodified hook reads the receipt beneath /repo)
+        $arguments = Get-ReceiptRootDecisionArgument -Listing $Listing
+
+        # Act
+        $decision = Invoke-DocsCompleteGateDecision @arguments
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be $ExpectedDecision
+        if ($null -ne $Reason) { $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike $Reason }
+        $profilePath = $script:ProfileKey
+        Should -Invoke Get-DocsCompleteGateFileText -Times 1 -Exactly -ParameterFilter { $Path -ceq $profilePath }
+    }
+
+    It 'Get-DocsCompleteGateReceiptRoot returns <Expected> when <Label>' -ForEach @(
+        @{ Label = 'one live registration has the branch checked out'; Listing = "worktree /repo`nbranch refs/heads/main`n`nworktree /repo/.claude/worktrees/item`nbranch refs/heads/epic/x-integration`n"; Expected = '/repo/.claude/worktrees/item' }
+        @{ Label = 'no registration has the branch checked out'; Listing = "worktree /repo`nbranch refs/heads/main`n"; Expected = '/repo' }
+        @{ Label = 'two registrations have the branch checked out'; Listing = "worktree /repo`nbranch refs/heads/main`n`nworktree /wt/a`nbranch refs/heads/epic/x-integration`n`nworktree /wt/b`nbranch refs/heads/epic/x-integration`n"; Expected = '/repo' }
+        @{ Label = 'only a prunable registration has the branch checked out'; Listing = "worktree /repo`nbranch refs/heads/main`n`nworktree /host-a/repo/item`nbranch refs/heads/epic/x-integration`nprunable gitdir file points to non-existent location`n"; Expected = '/repo' }
+    ) {
+        # Arrange
+        $listText = $Listing
+        $invoker = { param($SessionRoot) $null = $SessionRoot; $listText }.GetNewClosure()
+
+        # Act
+        $root = Get-DocsCompleteGateReceiptRoot -HeadRefName 'epic/x-integration' -RepositoryRoot '/repo' -WorktreeListInvoker $invoker
+
+        # Assert
+        $root | Should -BeExactly $Expected
+    }
+
+    It 'Get-DocsCompleteGateReceiptRoot returns the repository root and reports the failure when the resolver throws' {
+        # Arrange
+        Mock Resolve-AgentTargetWorktree { throw 'synthetic resolver failure' }
+
+        # Act
+        $records = @(Get-DocsCompleteGateReceiptRoot -HeadRefName 'epic/x-integration' -RepositoryRoot '/repo' -Verbose 4>&1)
+
+        # Assert
+        @($records | Where-Object { $_ -is [string] }) | Should -BeExactly @('/repo')
+        @($records | Where-Object { $_ -is [System.Management.Automation.VerboseRecord] } | ForEach-Object { $_.Message }) -join "`n" | Should -Match 'synthetic resolver failure'
     }
 }
