@@ -684,6 +684,19 @@ function Get-EpicCrossReadinessResult {
     return [pscustomobject]@{ Mode = 'feature'; Decision = $aggregate.Decision; Reason = $aggregate.Reason; Features = $decisions }
 }
 
+function ConvertTo-EpicCrossUsageResult {
+    <#
+    .SYNOPSIS
+        Return the exit-2 command result (ExitCode, Stdout, Stderr) for a usage error message.
+    .PARAMETER Message
+        The usage error text, written after the EPIC_CROSS_READINESS_USAGE: prefix.
+    #>
+    [CmdletBinding()] [OutputType([pscustomobject])]
+    param([Parameter(Mandatory = $true)] [string] $Message)
+
+    return [pscustomobject]@{ ExitCode = 2; Stdout = ''; Stderr = "EPIC_CROSS_READINESS_USAGE: $Message" }
+}
+
 function Invoke-EpicCrossReadinessCommand {
     <#
     .SYNOPSIS
@@ -714,15 +727,14 @@ function Invoke-EpicCrossReadinessCommand {
         [scriptblock] $ReadManifestText = { param([string] $Path) Get-Content -Raw -LiteralPath $Path }
     )
 
-    $usage = { param([string] $Message) [pscustomobject]@{ ExitCode = 2; Stdout = ''; Stderr = "EPIC_CROSS_READINESS_USAGE: $Message" } }
-    if (@('validate', 'feature', 'main') -cnotcontains $Mode) { return & $usage '-Mode must be validate, feature, or main.' }
-    if ([string]::IsNullOrWhiteSpace($ManifestPath)) { return & $usage '-ManifestPath is required.' }
-    if ($WaitSeconds -lt 0 -or $WaitSeconds -gt $script:MaxWaitSeconds) { return & $usage "-WaitSeconds must be between 0 and $($script:MaxWaitSeconds)." }
-    try { $text = [string] (& $ReadManifestText $ManifestPath) } catch { return & $usage "Manifest could not be read: $($_.Exception.Message)" }
+    if (@('validate', 'feature', 'main') -cnotcontains $Mode) { return ConvertTo-EpicCrossUsageResult -Message '-Mode must be validate, feature, or main.' }
+    if ([string]::IsNullOrWhiteSpace($ManifestPath)) { return ConvertTo-EpicCrossUsageResult -Message '-ManifestPath is required.' }
+    if ($WaitSeconds -lt 0 -or $WaitSeconds -gt $script:MaxWaitSeconds) { return ConvertTo-EpicCrossUsageResult -Message "-WaitSeconds must be between 0 and $($script:MaxWaitSeconds)." }
+    try { $text = [string] (& $ReadManifestText $ManifestPath) } catch { return ConvertTo-EpicCrossUsageResult -Message "Manifest could not be read: $($_.Exception.Message)" }
     $manifest = ConvertFrom-EpicCrossDependencyManifest -Text $text
-    if ($null -eq $manifest) { return & $usage 'Manifest has no YAML frontmatter.' }
+    if ($null -eq $manifest) { return ConvertTo-EpicCrossUsageResult -Message 'Manifest has no YAML frontmatter.' }
     if ($Mode -eq 'feature' -and $Issue -and @($manifest.Features | Where-Object { $_.IssueNum -ceq $Issue }).Count -eq 0) {
-        return & $usage "-Issue $Issue is not a feature of the manifest."
+        return ConvertTo-EpicCrossUsageResult -Message "-Issue $Issue is not a feature of the manifest."
     }
 
     # Validate mode also reads every referenced manifest so the cross-manifest rules run.

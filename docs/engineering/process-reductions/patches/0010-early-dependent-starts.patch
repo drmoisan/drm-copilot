@@ -1,8 +1,8 @@
 diff --git a/.agents/skills/epic-orchestrate/SKILL.md b/.agents/skills/epic-orchestrate/SKILL.md
-index ebb8e004d19960bc5c580eeda04567ec8982cc57..c4958714b809e49834b82022d2a4d6f3e4d2f35d 100644
+index 6558f34164546b38b86d72c70ab0d63a259fa2b0..f9ae6791d54ff747d2c19cb6986d5d89665a1c6a 100644
 --- a/.agents/skills/epic-orchestrate/SKILL.md
 +++ b/.agents/skills/epic-orchestrate/SKILL.md
-@@ -121,6 +121,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
+@@ -129,6 +129,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
  mutation hook is a per-child deterrent; the epic-state validator is the retrospective,
  authoritative backstop.
  
@@ -101,23 +101,26 @@ index ebb8e004d19960bc5c580eeda04567ec8982cc57..c4958714b809e49834b82022d2a4d6f3
 +  basename or issue number, so the hook fails closed for it; record the dependency's
 +  `issue_num`.
 +
- ## Fan-In and Conflict Handling
+ ## Cross-Epic Dependencies (cross_epic_depends_on)
  
- Each child owns its implementation, review, PR, CI-green gate, and merge into the integration
+ This section applies only when a feature of the manifest carries `cross_epic_depends_on` (issue
 diff --git a/.agents/skills/epic-run/SKILL.md b/.agents/skills/epic-run/SKILL.md
-index d6627bfd5a0c49b1a066723eb7548795ddcfeb53..54e7b84be87189ac026c48a67d448675d1c31c67 100644
+index 32deb7d78f2bb831d35cfa80f09d2e7d1259079b..53be1dd3366eb7381ecb5d797bcb2bdd559a1eda 100644
 --- a/.agents/skills/epic-run/SKILL.md
 +++ b/.agents/skills/epic-run/SKILL.md
-@@ -40,3 +40,7 @@ Wave scheduling, fan-in, worktree cleanup, `epic-status.md`, final PR creation,
- and completion are governed entirely by `epic-orchestrate`. A child merge into the integration
+@@ -41,7 +41,9 @@ and completion are governed entirely by `epic-orchestrate`. A child merge into t
  branch requires a green `CI` run on the child head SHA; see `Epic-child CI verification (issue
  #1130)` under `## Fan-In and Conflict Handling` in that skill.
-+
+ 
+-A cross-epic dependency (manifest key `cross_epic_depends_on`)
 +An early dependent start (manifest field `early_start_on`) is governed by
 +`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
-+field runs exactly as described above.
++field runs exactly as described above. A cross-epic dependency (manifest key `cross_epic_depends_on`)
+ is governed by `## Cross-Epic Dependencies (cross_epic_depends_on)` of the same skill, and a run
+ halted with `blocked_reason: "external_dependency"` resumes by running this skill again on the
+ same epic slug.
 diff --git a/.claude/agents/epic-orchestrator.md b/.claude/agents/epic-orchestrator.md
-index 13d551fa6b321b2842fb4e31bb9f2966d41dccef..b8bfd8c52bedcc32442bd25e4ca851892423507c 100644
+index 3ee5d6caff2ee83a250a0326585a49eb5d55a463..4cce11c9c7d518a25498c2ac96224820c126851e 100644
 --- a/.claude/agents/epic-orchestrator.md
 +++ b/.claude/agents/epic-orchestrator.md
 @@ -16,6 +16,7 @@ tools:
@@ -126,9 +129,9 @@ index 13d551fa6b321b2842fb4e31bb9f2966d41dccef..b8bfd8c52bedcc32442bd25e4ca85189
    - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
 +  - "Bash(poetry run python -m scripts.dev_tools.validate_orchestration_artifacts *)"
    - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
+   - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1*)"
    - "mcp__drm-copilot__collect_pr_context"
-   - "mcp__drm-copilot__validate_orchestration_artifacts"
-@@ -140,6 +141,14 @@ report it to the operator and halt. The `SubagentStop` transport and exit-code d
+@@ -141,6 +142,14 @@ report it to the operator and halt. The `SubagentStop` transport and exit-code d
  previously depended on was resolved by epic #904 and issue #928: a violation blocks the stop with
  exit 2 and a stderr reason.
  
@@ -140,9 +143,9 @@ index 13d551fa6b321b2842fb4e31bb9f2966d41dccef..b8bfd8c52bedcc32442bd25e4ca85189
 +subcommand, which the `Bash(poetry run ...)` grant above permits. Without the field, the barrier
 +above applies unchanged.
 +
- ## Checkpoint Persistence
- 
- Update `artifacts/orchestration/epic-orchestrator-state.json` after every completed step, per the
+ Cross-epic dependencies (issue #1162): when a feature's manifest entry carries
+ `cross_epic_depends_on`, validate the manifest at kickoff with
+ `pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1 -Mode validate`, and
 diff --git a/.claude/hooks/enforce-epic-wave-barrier.ps1 b/.claude/hooks/enforce-epic-wave-barrier.ps1
 index 3638b309b698230e20f553469a100b993313283a..64705b3e3bae9381379304a0a0749b7bc82b35dc 100644
 --- a/.claude/hooks/enforce-epic-wave-barrier.ps1
@@ -420,10 +423,10 @@ index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da14720868733
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/.claude/skills/epic-orchestrate/SKILL.md b/.claude/skills/epic-orchestrate/SKILL.md
-index c312f554b12b9b28ac1c6685542d1aba47d69e50..3ea75b39f8c4c40b1a33e5f93f20aa2305f30800 100644
+index 19b52aed10e7941deb7d53d5371a9fe7a38e5cf7..a13c2f7b97333afa13a0239de63559738895c34a 100644
 --- a/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/.claude/skills/epic-orchestrate/SKILL.md
-@@ -304,6 +304,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
+@@ -320,6 +320,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
  `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
  on resume, not from in-memory completion notifications alone.
  
@@ -514,26 +517,26 @@ index c312f554b12b9b28ac1c6685542d1aba47d69e50..3ea75b39f8c4c40b1a33e5f93f20aa23
 +`ci_green`, or `merge_conflict`, and its deny text is unchanged. Every other edge keeps the
 +checks of `## Wave Barrier (Two-Layer Design)`.
 +
- ## Worktree Cleanup
+ ## Cross-Epic Dependencies (cross_epic_depends_on)
  
- After a child feature's `epic_merge.merge_commit_sha` is recorded (S9 step 6 succeeds) and
+ This section applies only when a feature of the manifest carries `cross_epic_depends_on` (issue
 diff --git a/.claude/skills/epic-run/SKILL.md b/.claude/skills/epic-run/SKILL.md
-index 0cd1aceb6d929a9363fa81149fade5d6084bc489..f876adcf8b4c2e5bb507061cd05441113cd01f49 100644
+index 1c8101f9e98967f99c18fb43225764e3ad33c589..8968e6e97cdccfaf5643e8204438f51025aae62b 100644
 --- a/.claude/skills/epic-run/SKILL.md
 +++ b/.claude/skills/epic-run/SKILL.md
-@@ -57,6 +57,10 @@ the final integration-to-`main` PR are governed entirely by the `epic-orchestrat
+@@ -57,7 +57,9 @@ the final integration-to-`main` PR are governed entirely by the `epic-orchestrat
  merge into the integration branch requires a green `CI` run on the child head SHA; see
  `Epic-child CI verification (issue #1130)` under `## Merge-on-Green Kickoff Parameter` in that skill.
  
+-A cross-epic dependency (manifest key `cross_epic_depends_on`)
 +An early dependent start (manifest field `early_start_on`) is governed by
 +`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
-+field runs exactly as described above.
-+
- ## Nesting Depth
- 
- This chain runs three levels of subagents below the main session: the coordinator at depth 1, each per-feature `orchestrator` at depth 2, and the specialists that orchestrator delegates to at depth 3. Only the depth-2 orchestrator needs the `Agent` tool below the coordinator; specialists do not delegate.
++field runs exactly as described above. A cross-epic dependency (manifest key `cross_epic_depends_on`)
+ is governed by `## Cross-Epic Dependencies (cross_epic_depends_on)` of the same skill, and a run
+ halted with `blocked_reason: "external_dependency"` resumes by running this skill again on the
+ same epic slug.
 diff --git a/.codex/agents/epic-orchestrator.toml b/.codex/agents/epic-orchestrator.toml
-index 77ada2bb0abd30183d0cd61b9052de5cd77bb7e6..69f311311e3191867b8cae4ed530db2ec1ed439e 100644
+index 8ea781dba66bc2f98c8411978b52d454ad4482f7..fc3a31e0873f6141d460c110ebbefafafa697570 100644
 --- a/.codex/agents/epic-orchestrator.toml
 +++ b/.codex/agents/epic-orchestrator.toml
 @@ -63,6 +63,9 @@ begin the normal epic lifecycle without requiring planner output.
@@ -543,9 +546,9 @@ index 77ada2bb0abd30183d0cd61b9052de5cd77bb7e6..69f311311e3191867b8cae4ed530db2e
 +- Exception: a feature whose manifest entry carries `early_start_on` follows
 +  `## Early Dependent Starts (early_start)` of `epic-orchestrate`; that path stays unavailable
 +  until the installed MCP validator carries the early-start rule.
- - Treat merge conflicts through the child orchestrator remediation loop.
- - Remove a child worktree only after its merge state is safe.
- 
+ - Cross-epic dependencies (issue #1162): when a feature carries `cross_epic_depends_on`, validate
+   the manifest at kickoff with `.codex/lib/epic-wave/Invoke-EpicCrossReadiness.ps1 -Mode validate`
+   and run the same CLI with `-Mode feature -Issue <issue_num>` before launch; a held feature never
 diff --git a/.codex/hooks/enforce-epic-wave-barrier.ps1 b/.codex/hooks/enforce-epic-wave-barrier.ps1
 index a0ade041312a3b4e51911ffa9b93e67f5278e28b..ee550b2e3cc7529af2cb93ccf71ba52a4e9ebedf 100644
 --- a/.codex/hooks/enforce-epic-wave-barrier.ps1
@@ -724,7 +727,7 @@ index 3d8b784de6f9c6e36893c1a3ba715a170a24f10b..1e42901c63e114b5c692dc2fbed534b9
      "./src/lib/validate/orchestrator-state-remediation.ts": {
        lines: 85,
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md
-index 13d551fa6b321b2842fb4e31bb9f2966d41dccef..b8bfd8c52bedcc32442bd25e4ca851892423507c 100644
+index 3ee5d6caff2ee83a250a0326585a49eb5d55a463..4cce11c9c7d518a25498c2ac96224820c126851e 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/epic-orchestrator.md
 @@ -16,6 +16,7 @@ tools:
@@ -733,9 +736,9 @@ index 13d551fa6b321b2842fb4e31bb9f2966d41dccef..b8bfd8c52bedcc32442bd25e4ca85189
    - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
 +  - "Bash(poetry run python -m scripts.dev_tools.validate_orchestration_artifacts *)"
    - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
+   - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1*)"
    - "mcp__drm-copilot__collect_pr_context"
-   - "mcp__drm-copilot__validate_orchestration_artifacts"
-@@ -140,6 +141,14 @@ report it to the operator and halt. The `SubagentStop` transport and exit-code d
+@@ -141,6 +142,14 @@ report it to the operator and halt. The `SubagentStop` transport and exit-code d
  previously depended on was resolved by epic #904 and issue #928: a violation blocks the stop with
  exit 2 and a stderr reason.
  
@@ -747,9 +750,9 @@ index 13d551fa6b321b2842fb4e31bb9f2966d41dccef..b8bfd8c52bedcc32442bd25e4ca85189
 +subcommand, which the `Bash(poetry run ...)` grant above permits. Without the field, the barrier
 +above applies unchanged.
 +
- ## Checkpoint Persistence
- 
- Update `artifacts/orchestration/epic-orchestrator-state.json` after every completed step, per the
+ Cross-epic dependencies (issue #1162): when a feature's manifest entry carries
+ `cross_epic_depends_on`, validate the manifest at kickoff with
+ `pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1 -Mode validate`, and
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-wave-barrier.ps1 b/extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-wave-barrier.ps1
 index 3638b309b698230e20f553469a100b993313283a..64705b3e3bae9381379304a0a0749b7bc82b35dc 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-wave-barrier.ps1
@@ -1027,10 +1030,10 @@ index 13bb8990573317f3ffb01f58bdad91028d3bb175..5f06dfa91233a6b22f7da14720868733
                  $script:StatusViolationFormat -f $folder, $reference
                  continue
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-index c312f554b12b9b28ac1c6685542d1aba47d69e50..3ea75b39f8c4c40b1a33e5f93f20aa2305f30800 100644
+index 19b52aed10e7941deb7d53d5371a9fe7a38e5cf7..a13c2f7b97333afa13a0239de63559738895c34a 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md
-@@ -304,6 +304,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
+@@ -320,6 +320,93 @@ N+1 until every wave-N feature's dependency edges are durably confirmed merged,
  `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`
  on resume, not from in-memory completion notifications alone.
  
@@ -1121,24 +1124,24 @@ index c312f554b12b9b28ac1c6685542d1aba47d69e50..3ea75b39f8c4c40b1a33e5f93f20aa23
 +`ci_green`, or `merge_conflict`, and its deny text is unchanged. Every other edge keeps the
 +checks of `## Wave Barrier (Two-Layer Design)`.
 +
- ## Worktree Cleanup
+ ## Cross-Epic Dependencies (cross_epic_depends_on)
  
- After a child feature's `epic_merge.merge_commit_sha` is recorded (S9 step 6 succeeds) and
+ This section applies only when a feature of the manifest carries `cross_epic_depends_on` (issue
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md
-index 0cd1aceb6d929a9363fa81149fade5d6084bc489..f876adcf8b4c2e5bb507061cd05441113cd01f49 100644
+index 1c8101f9e98967f99c18fb43225764e3ad33c589..8968e6e97cdccfaf5643e8204438f51025aae62b 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md
-@@ -57,6 +57,10 @@ the final integration-to-`main` PR are governed entirely by the `epic-orchestrat
+@@ -57,7 +57,9 @@ the final integration-to-`main` PR are governed entirely by the `epic-orchestrat
  merge into the integration branch requires a green `CI` run on the child head SHA; see
  `Epic-child CI verification (issue #1130)` under `## Merge-on-Green Kickoff Parameter` in that skill.
  
+-A cross-epic dependency (manifest key `cross_epic_depends_on`)
 +An early dependent start (manifest field `early_start_on`) is governed by
 +`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
-+field runs exactly as described above.
-+
- ## Nesting Depth
- 
- This chain runs three levels of subagents below the main session: the coordinator at depth 1, each per-feature `orchestrator` at depth 2, and the specialists that orchestrator delegates to at depth 3. Only the depth-2 orchestrator needs the `Agent` tool below the coordinator; specialists do not delegate.
++field runs exactly as described above. A cross-epic dependency (manifest key `cross_epic_depends_on`)
+ is governed by `## Cross-Epic Dependencies (cross_epic_depends_on)` of the same skill, and a run
+ halted with `blocked_reason: "external_dependency"` resumes by running this skill again on the
+ same epic slug.
 diff --git a/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json b/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json
 index dcec79fbe7fcac3624c78729057c3726c95f5823..2be2c323b6c43215f8a621ff7e9757b89127fc4b 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json
@@ -1152,10 +1155,10 @@ index dcec79fbe7fcac3624c78729057c3726c95f5823..2be2c323b6c43215f8a621ff7e9757b8
      ".claude/hooks/enforce-epic-worktree-removal-gate-resolution.ps1",
      ".claude/hooks/enforce-evidence-locations.ps1",
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md
-index ebb8e004d19960bc5c580eeda04567ec8982cc57..c4958714b809e49834b82022d2a4d6f3e4d2f35d 100644
+index 6558f34164546b38b86d72c70ab0d63a259fa2b0..f9ae6791d54ff747d2c19cb6986d5d89665a1c6a 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md
-@@ -121,6 +121,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
+@@ -129,6 +129,101 @@ Reconcile this state using Git worktrees, branches, and live PR state on resume.
  mutation hook is a per-child deterrent; the epic-state validator is the retrospective,
  authoritative backstop.
  
@@ -1254,23 +1257,26 @@ index ebb8e004d19960bc5c580eeda04567ec8982cc57..c4958714b809e49834b82022d2a4d6f3
 +  basename or issue number, so the hook fails closed for it; record the dependency's
 +  `issue_num`.
 +
- ## Fan-In and Conflict Handling
+ ## Cross-Epic Dependencies (cross_epic_depends_on)
  
- Each child owns its implementation, review, PR, CI-green gate, and merge into the integration
+ This section applies only when a feature of the manifest carries `cross_epic_depends_on` (issue
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md
-index d6627bfd5a0c49b1a066723eb7548795ddcfeb53..54e7b84be87189ac026c48a67d448675d1c31c67 100644
+index 32deb7d78f2bb831d35cfa80f09d2e7d1259079b..53be1dd3366eb7381ecb5d797bcb2bdd559a1eda 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md
-@@ -40,3 +40,7 @@ Wave scheduling, fan-in, worktree cleanup, `epic-status.md`, final PR creation,
- and completion are governed entirely by `epic-orchestrate`. A child merge into the integration
+@@ -41,7 +41,9 @@ and completion are governed entirely by `epic-orchestrate`. A child merge into t
  branch requires a green `CI` run on the child head SHA; see `Epic-child CI verification (issue
  #1130)` under `## Fan-In and Conflict Handling` in that skill.
-+
+ 
+-A cross-epic dependency (manifest key `cross_epic_depends_on`)
 +An early dependent start (manifest field `early_start_on`) is governed by
 +`## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
-+field runs exactly as described above.
++field runs exactly as described above. A cross-epic dependency (manifest key `cross_epic_depends_on`)
+ is governed by `## Cross-Epic Dependencies (cross_epic_depends_on)` of the same skill, and a run
+ halted with `blocked_reason: "external_dependency"` resumes by running this skill again on the
+ same epic slug.
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml
-index 77ada2bb0abd30183d0cd61b9052de5cd77bb7e6..69f311311e3191867b8cae4ed530db2ec1ed439e 100644
+index 8ea781dba66bc2f98c8411978b52d454ad4482f7..fc3a31e0873f6141d460c110ebbefafafa697570 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/epic-orchestrator.toml
 @@ -63,6 +63,9 @@ begin the normal epic lifecycle without requiring planner output.
@@ -1280,9 +1286,9 @@ index 77ada2bb0abd30183d0cd61b9052de5cd77bb7e6..69f311311e3191867b8cae4ed530db2e
 +- Exception: a feature whose manifest entry carries `early_start_on` follows
 +  `## Early Dependent Starts (early_start)` of `epic-orchestrate`; that path stays unavailable
 +  until the installed MCP validator carries the early-start rule.
- - Treat merge conflicts through the child orchestrator remediation loop.
- - Remove a child worktree only after its merge state is safe.
- 
+ - Cross-epic dependencies (issue #1162): when a feature carries `cross_epic_depends_on`, validate
+   the manifest at kickoff with `.codex/lib/epic-wave/Invoke-EpicCrossReadiness.ps1 -Mode validate`
+   and run the same CLI with `-Mode feature -Issue <issue_num>` before launch; a held feature never
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-wave-barrier.ps1 b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-wave-barrier.ps1
 index a0ade041312a3b4e51911ffa9b93e67f5278e28b..ee550b2e3cc7529af2cb93ccf71ba52a4e9ebedf 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-wave-barrier.ps1
@@ -1587,10 +1593,10 @@ index 9db2f4d41023ba0d43bf27565b76039904d1b00f..742f6a4d6e2e35541eba3bcc52837406
   *
 diff --git a/extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-wave-barrier.ts b/extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-wave-barrier.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..2f75a60ae86f0d3b6a33cec45cbcc73da4d602a0
+index 0000000000000000000000000000000000000000..3eec222ae835b877a2079bb973ab7da2320baf79
 --- /dev/null
 +++ b/extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-wave-barrier.ts
-@@ -0,0 +1,273 @@
+@@ -0,0 +1,327 @@
 +/**
 + * Epic wave-barrier ordering check (TypeScript port).
 + *
@@ -1623,6 +1629,11 @@ index 0000000000000000000000000000000000000000..2f75a60ae86f0d3b6a33cec45cbcc73d
 +  resolveFeatureReference,
 +} from "./epic-orchestrator-state-resolution";
 +import type { FeatureReferenceIndex } from "./epic-orchestrator-state-resolution";
++import {
++  CROSS_EPIC_KEY,
++  isEpicSlug,
++  isPositiveInt,
++} from "./epic-orchestrator-state-resolution";
 +
 +/** The merge statuses that durably confirm a dependency edge. */
 +export const MERGED_STATUSES: ReadonlySet<string> = new Set([
@@ -1860,6 +1871,55 @@ index 0000000000000000000000000000000000000000..2f75a60ae86f0d3b6a33cec45cbcc73d
 +          `EPIC_WAVE_BARRIER_VIOLATION: ${folder} worktree_created_at precedes dependency ${String(dependency)} merge_confirmed_at`,
 +        );
 +      }
++    }
++  }
++  // Key-gated issue #1162 check: a feature without cross_epic_depends_on adds
++  // nothing, so the result above is unchanged for older checkpoints.
++  errors.push(...validateCrossEpicStartedWhileHeld(features));
++  return errors;
++}
++
++/**
++ * Report started features whose cross-epic dependency is not integrated.
++ *
++ * Mirrors Python `validate_cross_epic_started_while_held` (issue #1162): a feature
++ * that `hasStarted` treats as started must not carry a `cross_epic_depends_on`
++ * entry whose `status` is not `integrated` or `in_main`. Entries without a valid
++ * epic slug or a positive integer `issue_num` are left to the shape check.
++ *
++ * @param features Object-shaped `features[]` entries.
++ * @returns One `EPIC_CROSS_DEPENDENCY_VIOLATION` error per held entry.
++ */
++export function validateCrossEpicStartedWhileHeld(
++  features: Record<string, unknown>[],
++): string[] {
++  const errors: string[] = [];
++  for (const feature of features) {
++    const folder = feature["feature_folder"];
++    const entries = feature[CROSS_EPIC_KEY];
++    if (
++      typeof folder !== "string" ||
++      !Array.isArray(entries) ||
++      !hasStarted(feature)
++    ) {
++      continue;
++    }
++    for (const entry of entries as unknown[]) {
++      if (!isObject(entry)) {
++        continue;
++      }
++      const epic = entry["epic"];
++      const issueNum = entry["issue_num"];
++      if (!isEpicSlug(epic) || !isPositiveInt(issueNum)) {
++        continue;
++      }
++      const status = entry["status"];
++      if (status === "integrated" || status === "in_main") {
++        continue;
++      }
++      errors.push(
++        `EPIC_CROSS_DEPENDENCY_VIOLATION: ${folder} is treated as started while cross-epic dependency ${epic}#${String(issueNum)} is not integrated`,
++      );
 +    }
 +  }
 +  return errors;
@@ -2120,7 +2180,7 @@ index 0000000000000000000000000000000000000000..d223e77cd11387118b1e3a03965094c6
 +  });
 +});
 diff --git a/scripts/dev_tools/_epic_orchestrator_state_wave_barrier.py b/scripts/dev_tools/_epic_orchestrator_state_wave_barrier.py
-index 96d8e0c848e4c56f019e32653920196586ffc416..7ed11e755af90e3e99b3a71511fcfff0c88e9211 100644
+index 07db0fd7fe9f6e692fc90f0d1f0089a7c44a928a..672aa819a4aefaf5664a32c5067b0049ffb5b8b8 100644
 --- a/scripts/dev_tools/_epic_orchestrator_state_wave_barrier.py
 +++ b/scripts/dev_tools/_epic_orchestrator_state_wave_barrier.py
 @@ -3,8 +3,9 @@
@@ -2158,7 +2218,7 @@ index 96d8e0c848e4c56f019e32653920196586ffc416..7ed11e755af90e3e99b3a71511fcfff0
      - No function mutates its input; no filesystem or network I/O.
      - This module does not import ``validate_epic_orchestrator_state`` (the
        validator imports this module), so no circular import exists.
-@@ -33,6 +45,24 @@ from scripts.dev_tools._epic_orchestrator_state_resolution import (
+@@ -36,6 +48,23 @@ from scripts.dev_tools._epic_orchestrator_state_resolution import (
  NOT_STARTED_MERGE_STATUS = "not_started"
  MERGED_STATUSES = {"merged", "worktree_removed"}
  
@@ -2179,11 +2239,10 @@ index 96d8e0c848e4c56f019e32653920196586ffc416..7ed11e755af90e3e99b3a71511fcfff0
 +    "EPIC_WAVE_BARRIER_VIOLATION: {0} is at pr_open or later without a string "
 +    "synced_at for early_start dependency {1}"
 +)
-+
- 
- def feature_has_started(feature: dict[str, Any]) -> bool:
-     """Report whether a feature is treated as started for the wave barrier.
-@@ -75,6 +105,138 @@ def feature_has_started(feature: dict[str, Any]) -> bool:
+ # Issue #1162: a started feature whose cross-epic entry is not integrated.
+ CROSS_EPIC_INTEGRATED_STATUSES = ("integrated", "in_main")
+ CROSS_EPIC_VIOLATION_FORMAT = (
+@@ -85,6 +114,138 @@ def feature_has_started(feature: dict[str, Any]) -> bool:
      return feature.get("merge_status") != NOT_STARTED_MERGE_STATUS
  
  
@@ -2322,7 +2381,7 @@ index 96d8e0c848e4c56f019e32653920196586ffc416..7ed11e755af90e3e99b3a71511fcfff0
  def validate_wave_barrier_ordering(features: list[dict[str, Any]]) -> list[str]:
      """Validate the retrospective wave-barrier ordering invariant.
  
-@@ -91,6 +253,10 @@ def validate_wave_barrier_ordering(features: list[dict[str, Any]]) -> list[str]:
+@@ -101,6 +262,10 @@ def validate_wave_barrier_ordering(features: list[dict[str, Any]]) -> list[str]:
          - ``EPIC_WAVE_BARRIER_VIOLATION: <f> worktree_created_at precedes
            dependency <d> merge_confirmed_at``
  
@@ -2333,7 +2392,7 @@ index 96d8e0c848e4c56f019e32653920196586ffc416..7ed11e755af90e3e99b3a71511fcfff0
      Args:
          features (list[dict[str, Any]]): Object-shaped features[] entries.
  
-@@ -125,6 +291,7 @@ def validate_wave_barrier_ordering(features: list[dict[str, Any]]) -> list[str]:
+@@ -135,6 +300,7 @@ def validate_wave_barrier_ordering(features: list[dict[str, Any]]) -> list[str]:
          if not feature_has_started(feature):
              continue
          worktree_created_at = feature.get("worktree_created_at")
@@ -2341,7 +2400,7 @@ index 96d8e0c848e4c56f019e32653920196586ffc416..7ed11e755af90e3e99b3a71511fcfff0
  
          # Every dependency edge must be durably confirmed merged before this
          # feature is considered to have safely started its own wave.
-@@ -137,6 +304,15 @@ def validate_wave_barrier_ordering(features: list[dict[str, Any]]) -> list[str]:
+@@ -147,6 +313,15 @@ def validate_wave_barrier_ordering(features: list[dict[str, Any]]) -> list[str]:
              )
              if dependency_feature is None:
                  continue
@@ -3230,14 +3289,13 @@ index 0000000000000000000000000000000000000000..bdcde4f875b92f58c0aab776b490034e
 +    }
 +}
 diff --git a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-index 790b42488ec4a6b9ed0262a5bfc82c0d4329ec1a..968f49c566474da9679b401ee1ce9b5d1ba691e1 100644
+index bee4233b4a0a3f3244c187526ac240c8f82cee07..68b3177e7a8df0ae3f2917ee861e8ed74e14e2c8 100644
 --- a/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
 +++ b/tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py
-@@ -219,23 +219,32 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
- # stays live for both entries. The merge of origin/main after #1138 combined both
+@@ -220,6 +220,15 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
  # skill edits, so the skill digest below is the merged result of #1129, #1130,
  # #1136, #1138, and #1141.
-+#
+ #
 +# RE-BASELINED by issue #1097. That change added the opt-in
 +# `## Early Dependent Starts (early_start)` section to the epic skill, and to
 +# the epic agent one closing paragraph of `## Wave Scheduling` with the Bash
@@ -3246,25 +3304,21 @@ index 790b42488ec4a6b9ed0262a5bfc82c0d4329ec1a..968f49c566474da9679b401ee1ce9b5d
 +# #1141 and after #1146 (owner-directive relay sentence in the epic skill)
 +# combined the skill edits, so the skill digest below is the merged result of
 +# #1129, #1130, #1136, #1138, #1141, #1146, and #1097.
- #
++#
  # RE-BASELINED by issue #1157. That change extended the owner-directive paragraph
  # of the epic skill's `## Context Handoff to Dependent Features` section with
  # hook-level pass-down through the coordinator ledger, epic fan-out scope, and
- # the running-child check. Only the skill digest moved; the agent digest is
- # unchanged and the pin stays live for both entries. The digest was recomputed
- # after the merge of origin/main that brought in #1165, which did not edit the
- # epic skill, so the skill digest below is the merged result of #1129, #1130,
- # #1136, #1138, #1141, #1146, #1097, and #1157.
+@@ -240,11 +249,11 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
  PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
      (
          ".claude/agents/epic-orchestrator.md",
 -        "5ff9c66f58595fa91a1f568a18a0a5aae5d1736a9dd1b13a9bbbab459df7899c",
-+        "142e42d15a73fb595c2b60691d15b1808bc244a24fecd240b59c72558905a7c8",
++        "9ea1c87caf5781acb15942e6e3eaff5c0dcf9858550826f6a6d6ad081a5dc329",
      ),
      (
          ".claude/skills/epic-orchestrate/SKILL.md",
 -        "30b1500bec4840bec1e0f1a9765883c681c8d4e5d606a016126e2480473675c4",
-+        "ef59580f8306d5ae8f313d80cb7d25e3718828fcb2a1c116a8491d7b04921517",
++        "eefac39e879a755228ae92428c5930951f18462bef733aaa0b7ef36f5eeb6203",
      ),
  )
  

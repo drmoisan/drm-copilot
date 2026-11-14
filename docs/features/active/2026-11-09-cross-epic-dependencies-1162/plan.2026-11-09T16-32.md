@@ -136,17 +136,17 @@
 
 ### Phase 5 — Final Merge, Digests, and QA
 
-- [ ] [P5-T1] Commit the Phase 1 to 4 changes and evidence so the merge starts from a clean tree, then repeat the P0-T1 fetch, plain merge of `origin/main`, conflict resolution, and re-read of shared files. Keep both sides of every sibling edit. Write `FEATURE/evidence/other/main-sync.<timestamp>.md`.
+- [x] [P5-T1] Commit the Phase 1 to 4 changes and evidence so the merge starts from a clean tree, then repeat the P0-T1 fetch, plain merge of `origin/main`, conflict resolution, and re-read of shared files. Keep both sides of every sibling edit. Write `FEATURE/evidence/other/main-sync.<timestamp>.md`.
   - Acceptance: the merge commit exists, and `git status --porcelain` is empty.
-- [ ] [P5-T2] As the last edit to `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, recompute the SHA-256 of `.claude/agents/epic-orchestrator.md` and `.claude/skills/epic-orchestrate/SKILL.md` from the merged file bytes. Replace both digests in `PINNED_FROZEN_SURFACE_HASHES`, and add a `# RE-BASELINED by issue #1162.` paragraph that names the digests that moved and the merges combined. Record the digests in `FEATURE/evidence/other/frozen-digests.<timestamp>.md`. Repeat this task after any later merge of `origin/main` or any edit to either file.
+- [x] [P5-T2] As the last edit to `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, recompute the SHA-256 of `.claude/agents/epic-orchestrator.md` and `.claude/skills/epic-orchestrate/SKILL.md` from the merged file bytes. Replace both digests in `PINNED_FROZEN_SURFACE_HASHES`, and add a `# RE-BASELINED by issue #1162.` paragraph that names the digests that moved and the merges combined. Record the digests in `FEATURE/evidence/other/frozen-digests.<timestamp>.md`. Repeat this task after any later merge of `origin/main` or any edit to either file.
   - Acceptance: `test_frozen_epic_surface_matches_pinned_baseline_digest` in `test_parallel_orchestrator_surface_contracts.py` passes in the pytest gate.
-- [ ] [P5-T3] Run the PowerShell final QC (format, analyzer, `Invoke-PoshQCLeakScan`) into `FEATURE/evidence/qa-gates/powershell-static.<timestamp>.md`.
+- [x] [P5-T3] Run the PowerShell final QC (format, analyzer, `Invoke-PoshQCLeakScan`) into `FEATURE/evidence/qa-gates/powershell-static.<timestamp>.md`.
   - Acceptance: zero analyzer findings, a clean leak scan, and an unchanged `git status --porcelain` across the format step. A fix restarts the loop.
-- [ ] [P5-T4] Run the Python final QC (Black check, Ruff, Pyright) into `FEATURE/evidence/qa-gates/python-static.<timestamp>.md`.
+- [x] [P5-T4] Run the Python final QC (Black check, Ruff, Pyright) into `FEATURE/evidence/qa-gates/python-static.<timestamp>.md`.
   - Acceptance: every step exits 0 with zero findings.
-- [ ] [P5-T5] Run the TypeScript final QC (Prettier check, ESLint, type check) into `FEATURE/evidence/qa-gates/typescript-static.<timestamp>.md`.
+- [x] [P5-T5] Run the TypeScript final QC (Prettier check, ESLint, type check) into `FEATURE/evidence/qa-gates/typescript-static.<timestamp>.md`.
   - Acceptance: every step exits 0 with zero findings.
-- [ ] [P5-T6] Run the Pester gate: one `Invoke-PoshQCParallelTest`. Write `FEATURE/evidence/qa-gates/pester.<timestamp>.md` with the P0-T5 fields plus the four new PowerShell files.
+- [x] [P5-T6] Run the Pester gate: one `Invoke-PoshQCParallelTest`. Write `FEATURE/evidence/qa-gates/pester.<timestamp>.md` with the P0-T5 fields plus the four new PowerShell files.
   - Acceptance: zero failures, and each new or changed PowerShell file has at least 85% line coverage.
 - [ ] [P5-T7] Run the pytest gate: one `pytest -n auto` with the P0-T6 coverage arguments. Write `FEATURE/evidence/qa-gates/pytest.<timestamp>.md`.
   - Acceptance: zero failures, and each of the four Python files has at least 85% line and 75% branch coverage from the JSON report.

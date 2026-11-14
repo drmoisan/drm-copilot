@@ -237,14 +237,23 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # after the merge of origin/main that brought in #1165, which did not edit the
 # epic skill, so the skill digest below is the merged result of #1129, #1130,
 # #1136, #1138, #1141, #1146, #1097, and #1157.
+#
+# RE-BASELINED by issue #1162. That change added the
+# `## Cross-Epic Dependencies (cross_epic_depends_on)` section to the epic skill
+# with reference sentences in its manifest, lifecycle, checkpoint, and completion
+# sections, and added the `Invoke-EpicCrossReadiness.ps1` grant and two
+# paragraphs to the epic agent. Both digests moved. They were recomputed from
+# the bytes after the merge of origin/main that brought in #1157, #1160, #1161,
+# #1163, #1164, and #1167, so each digest below is the merged result of the
+# changes listed above plus #1162.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "142e42d15a73fb595c2b60691d15b1808bc244a24fecd240b59c72558905a7c8",
+        "9ea1c87caf5781acb15942e6e3eaff5c0dcf9858550826f6a6d6ad081a5dc329",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "ef59580f8306d5ae8f313d80cb7d25e3718828fcb2a1c116a8491d7b04921517",
+        "eefac39e879a755228ae92428c5930951f18462bef733aaa0b7ef36f5eeb6203",
     ),
 )
 
