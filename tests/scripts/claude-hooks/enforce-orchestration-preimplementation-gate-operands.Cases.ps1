@@ -65,6 +65,7 @@ $script:OperandGRows = @(
     @{ Name = 'V1 git -C shell variable'; Command = 'git -C $W add x'; Paths = @(); Unresolved = $true }
     @{ Name = 'V2 poetry -C braced variable'; Command = 'poetry -C ${W} run pytest'; Paths = @(); Unresolved = $true }
     @{ Name = 'V3 npm --prefix command substitution'; Command = 'npm --prefix $(pwd) run lint'; Paths = @(); Unresolved = $true }
+    @{ Name = 'V3 npm --prefix quoted command substitution'; Command = 'npm --prefix "$(pwd)" run lint'; Paths = @(); Unresolved = $true }
     @{ Name = 'V4 sh script operand shell variable'; Command = 'sh $W/run-test-suite.sh pytest'; Paths = @(); Unresolved = $true }
     @{ Name = 'V5 runner operand shell variable'; Command = 'pytest $W/tests'; Paths = @(); Unresolved = $true }
     @{ Name = 'poetry --directory inline shell variable'; Command = 'poetry --directory=$W run pytest'; Paths = @(); Unresolved = $true }
@@ -154,7 +155,10 @@ $script:OperandGateRows = @(
     # AC-6: unresolvable operands deny before any listing or checkpoint read, whatever the session root holds.
     @{ Id = 'V1'; Label = 'git -C shell variable'; Command = 'git -C $W add x'; ItemBody = 'Ready'; SessionBody = 'Ready'; ListingMode = 'Normal'; Decision = 'deny'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'; DetailPattern = 'unresolvable operand'; ItemReads = 0; SessionReads = 0; ListingCalls = 0 }
     @{ Id = 'V2'; Label = 'poetry -C braced variable'; Command = 'poetry -C ${W} run pytest'; ItemBody = 'Ready'; SessionBody = 'Ready'; ListingMode = 'Normal'; Decision = 'deny'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'; DetailPattern = 'unresolvable operand'; ItemReads = 0; SessionReads = 0; ListingCalls = 0 }
-    @{ Id = 'V3'; Label = 'npm --prefix substitution'; Command = 'npm --prefix $(pwd) run lint'; ItemBody = 'Ready'; SessionBody = 'Ready'; ListingMode = 'Normal'; Decision = 'deny'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'; DetailPattern = 'unresolvable operand'; ItemReads = 0; SessionReads = 0; ListingCalls = 0 }
+    # The unquoted $(pwd) form is not classified by stage 2 on either surface (classification is a
+    # non-goal), so it is allowed before target resolution; V3 uses the classified quoted form.
+    @{ Id = 'V3'; Label = 'npm --prefix quoted substitution'; Command = 'npm --prefix "$(pwd)" run lint'; ItemBody = 'Ready'; SessionBody = 'Ready'; ListingMode = 'Normal'; Decision = 'deny'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'; DetailPattern = 'unresolvable operand'; ItemReads = 0; SessionReads = 0; ListingCalls = 0 }
+    @{ Id = 'V3'; Label = 'npm --prefix unquoted substitution is unclassified control'; Command = 'npm --prefix $(pwd) run lint'; ItemBody = 'Ready'; SessionBody = 'Ready'; ListingMode = 'Normal'; Decision = 'allow'; ReasonCode = ''; DetailPattern = ''; ItemReads = 0; SessionReads = 0; ListingCalls = 0 }
     @{ Id = 'V4'; Label = 'sh script shell variable'; Command = 'sh $W/run-test-suite.sh pytest'; ItemBody = 'Ready'; SessionBody = 'Ready'; ListingMode = 'Normal'; Decision = 'deny'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'; DetailPattern = 'unresolvable operand'; ItemReads = 0; SessionReads = 0; ListingCalls = 0 }
     @{ Id = 'V5'; Label = 'runner operand shell variable'; Command = 'pytest $W/tests'; ItemBody = 'Ready'; SessionBody = 'Ready'; ListingMode = 'Normal'; Decision = 'deny'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'; DetailPattern = 'unresolvable operand'; ItemReads = 0; SessionReads = 0; ListingCalls = 0 }
     # AC-7: ambiguity.

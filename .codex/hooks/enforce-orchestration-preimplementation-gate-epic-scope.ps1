@@ -49,6 +49,7 @@
 try { . (Join-Path $PSScriptRoot 'hook-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'hook-target-worktree.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-epic-fan-in.ps1') } catch { Add-HookDependencyFailure -Name 'hook-epic-fan-in.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-epic-regeneration.ps1') } catch { Add-HookDependencyFailure -Name 'hook-epic-regeneration.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-operands.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-operands.ps1' -ErrorRecord $_ }
 
 # The target-resolution reason codes (issue #1010). Their source is
 # Get-WorktreeResolutionAmbiguityReasonCode and Get-WorktreeResolutionNoTargetReasonCode
@@ -228,7 +229,8 @@ function Resolve-OrchestrationGateTarget {
         Calls Resolve-HookTargetWorktree with the recording invoker: a file path is passed as
         -FilePath, the marker paths of an apply_patch body as -FilePath (markers in two
         worktrees resolve as ambiguous), and any other command's
-        Get-OrchestrationGateCommandOperandPath result as -CommandOperandPath. A failed or
+        Get-OrchestrationGateCommandTargetOperand Paths as -CommandOperandPath (issue #1188);
+        Unresolved operands give NoTarget before any listing call or checkpoint read. A failed or
         empty listing gives NoTarget instead of the session-root fallback; Ambiguous gives
         Ambiguous; a null root gives NoTarget; otherwise SessionRoot or OtherWorktree.
     .OUTPUTS
@@ -245,12 +247,16 @@ function Resolve-OrchestrationGateTarget {
     $script:OrchestrationGateWorktreeListFailed = $false
     $invoker = { param($SessionRoot) Invoke-OrchestrationGateWorktreeList -SessionRoot $SessionRoot }
     $markerPaths = if ($FilePath) { @() } else { @(Get-OrchestrationPatchMarkerPath -PatchText ([string]$Command)) }
+    $operand = if ($FilePath -or $markerPaths.Count -gt 0) { $null } else { Get-OrchestrationGateCommandTargetOperand -Command ([string]$Command) }
+    if ($null -ne $operand -and $operand.Unresolved) {
+        return [pscustomobject]@{ Status = 'NoTarget'; WorktreeRoot = $null; ReasonCode = $script:OrchestrationGateNotDerivableReasonCode; Detail = $operand.Detail }
+    }
     $resolved = if ($FilePath) {
         Resolve-HookTargetWorktree -SessionRoot $sessionRoot -FilePath @($FilePath) -WorktreeListInvoker $invoker
     } elseif ($markerPaths.Count -gt 0) {
         Resolve-HookTargetWorktree -SessionRoot $sessionRoot -FilePath $markerPaths -WorktreeListInvoker $invoker
     } else {
-        Resolve-HookTargetWorktree -SessionRoot $sessionRoot -CommandOperandPath @(Get-OrchestrationGateCommandOperandPath -Command ([string]$Command)) -WorktreeListInvoker $invoker
+        Resolve-HookTargetWorktree -SessionRoot $sessionRoot -CommandOperandPath @($operand.Paths) -WorktreeListInvoker $invoker
     }
     $detail = "resolver source $($resolved.Source): $($resolved.Detail)"
     if ($script:OrchestrationGateWorktreeListFailed) {

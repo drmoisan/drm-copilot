@@ -25,8 +25,11 @@
       integration_branch: value for an epic delegation, the parallel_slug: value for a
       parallel delegation, and the canonical issue-number line and branch: label for a
       single-feature delegation. The path and command legs resolve through
-      Resolve-HookTargetWorktree (issue #1010) from the file_path or from every git add
-      and git commit selector and absolute operand. Read-OrchestrationGateCheckpoint reads
+      Resolve-HookTargetWorktree (issue #1010) from the file_path or from the command
+      operands of Get-OrchestrationGateCommandTargetOperand (issue #1188, dot-sourced from
+      enforce-orchestration-preimplementation-gate-operands.ps1): every git add and git commit
+      selector and absolute operand and, for every other gated command, its directory
+      selector, script operand, and absolute operands. Read-OrchestrationGateCheckpoint reads
       the checkpoint beneath the resolved root, or returns the deny for an unresolved
       target.
     - The epic-scope decision for the command and path legs (issue #663). A staging
@@ -57,6 +60,7 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicSco
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/HookTargetWorktree.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookTargetWorktree.psm1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-epic-fan-in.ps1') } catch { Add-HookDependencyFailure -Name 'hook-epic-fan-in.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-epic-regeneration.ps1') } catch { Add-HookDependencyFailure -Name 'hook-epic-regeneration.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-operands.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-operands.ps1' -ErrorRecord $_ }
 # Per-segment target resolution for the epic-scope decision (issue #738).
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-targets.ps1')
 
@@ -241,8 +245,10 @@ function Resolve-OrchestrationGateTarget {
         cross-check), a parallel delegation on parallel_slug:, and a single-feature
         delegation on its canonical issue-number line and branch: label. The path and
         command legs use Resolve-HookTargetWorktree (issue #1010): a path leg passes its
-        file_path, a command leg the Get-OrchestrationGateCommandOperandPath result, and the
-        recording invoker supplies the worktree listing. A failed or empty listing denies as
+        file_path, a command leg the Paths of Get-OrchestrationGateCommandTargetOperand (issue
+        #1188), and the recording invoker supplies the worktree listing. A command whose
+        operands are Unresolved denies as not derivable before any listing call or checkpoint
+        read, whatever the session root's checkpoint holds. A failed or empty listing denies as
         not derivable instead of falling back to the session root; an ambiguous result
         denies as ambiguous; a null root denies as not derivable.
     .OUTPUTS
@@ -268,12 +274,16 @@ function Resolve-OrchestrationGateTarget {
     if (-not $FilePath -and -not $Command) {
         return Resolve-WorktreeItemTarget -Text $Prompt -SessionRoot $sessionRoot
     }
+    $operand = if ($FilePath) { $null } else { Get-OrchestrationGateCommandTargetOperand -Command $Command }
+    if ($null -ne $operand -and $operand.Unresolved) {
+        return [pscustomobject]@{ Status = 'NoTarget'; WorktreeRoot = $null; ReasonCode = (Get-WorktreeResolutionNoTargetReasonCode); Detail = $operand.Detail }
+    }
     $script:OrchestrationGateWorktreeListFailed = $false
     $invoker = { param($SessionRoot) Invoke-OrchestrationGateWorktreeList -SessionRoot $SessionRoot }
     $resolved = if ($FilePath) {
         Resolve-HookTargetWorktree -SessionRoot $sessionRoot -FilePath @($FilePath) -WorktreeListInvoker $invoker
     } else {
-        Resolve-HookTargetWorktree -SessionRoot $sessionRoot -CommandOperandPath @(Get-OrchestrationGateCommandOperandPath -Command $Command) -WorktreeListInvoker $invoker
+        Resolve-HookTargetWorktree -SessionRoot $sessionRoot -CommandOperandPath @($operand.Paths) -WorktreeListInvoker $invoker
     }
     $detail = "resolver source $($resolved.Source): $($resolved.Detail)"
     if ($script:OrchestrationGateWorktreeListFailed) {
