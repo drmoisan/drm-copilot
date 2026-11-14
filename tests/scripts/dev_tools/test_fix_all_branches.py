@@ -248,6 +248,7 @@ def test_typescript_commands_use_resolved_npm_path(
     # the Jest step starts the pwsh launcher instead (issue #1158).
     npm_calls = [call for call in typescript_calls if call[0] != "Jest: test"]
     assert len(npm_calls) == 3
+    # Check each npm step's executable token against the resolved npm path.
     for _step_name, command in npm_calls:
         assert command[0] == resolved
 
