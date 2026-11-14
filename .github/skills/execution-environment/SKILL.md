@@ -27,6 +27,7 @@ Python 3.11/3.12 compatibility jobs, consumer package engines, and independent r
 - `orchestrator` and the main session running the `orchestrate` skill have Bash, the PoshQC and validation MCP tools, and the `Agent` tool. Only they can delegate, so any step that needs a further agent run is orchestrator-owned.
 - PowerShell for the executor therefore runs through the `mcp__drm-copilot__run_poshqc_*` tools or through a `sh` launcher script stored under `SCRATCH` that invokes PowerShell 7 from inside the script file.
 - Nesting depth (#1138): the epic and parallel chains run the coordinator at depth 1, each per-feature `orchestrator` at depth 2, and its specialists at depth 3, so they need Claude Code 2.1.219 or later with `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` unset or at least 3, started from the main session. An agent that starts without the `Agent` tool records `blocked_reason: "spawn_agent_unavailable"` and returns a line beginning `AGENT_TOOL_UNAVAILABLE:`; `enforce-epic-invocation-origin.ps1` denies a chain delegation with `NESTING_DEPTH_INSUFFICIENT:` when the configured value is below 3, and the `## Nesting Depth` section of each coordinating skill states the main-session fallback.
+- Test suites (#1158): the executor runs every local test suite through the test-execution launcher, `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh <suite>`, and the pytest gate in an agent worktree as `env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest`; Codex and humans may use `pwsh -NoProfile -File .claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1 <suite>`. The suite name is the first argument, extra arguments follow it, and there is no `-Suite` parameter. The executor's tool list names the two `sh` forms in place of direct `pytest` and `jest` entries.
 
 ## Command-Text Restrictions
 
@@ -47,6 +48,7 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
 
 - A multi-line `poetry run python -c` program exits 0 without running. Put Python helpers in a file under `SCRATCH` and run the file.
 - Merge text under the concurrent-review key (#1097): when a checkpoint the merge gate reads records `review_mode: "concurrent"`, Bash text that could be a merge and cannot be bound to one pull request is denied with `REVIEW_GATE_HEAD_UNRESOLVED`. That includes prose holding `pr merge`, `pr (`, or `pr $`, and a merge followed by a line feed or `;`. Issue a merge as one plain `gh pr merge` of one number in its own Bash call, and pass commit messages through `git commit -F` with a file.
+- **Test-execution hook (#1158).** `.claude/hooks/enforce-test-execution-policy.ps1` (Codex twin `.codex/hooks/enforce-test-execution-policy.ps1`) denies with `TEST_EXECUTION_POLICY_BLOCKED:` a direct test runner, an npm `test` script, a script file whose text runs a suite, a lane selection, and a worker-reduction token, and names the launcher command. Prefixes such as `env`, `timeout`, and `nohup`, and launch commands such as `poetry run` and `npx`, do not hide a runner. A launcher command is allowed while the machine test-suite lock is busy. The `test-execution-policy` skill lists the rules.
 
 ## PowerShell Route and PoshQC MCP Limits
 
@@ -57,6 +59,7 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
 - `Invoke-Pester` without `-EnableExit` (or `Run.Exit`) exits 0 when tests fail; read the JUnit file rather than the exit code of such a run.
 - A task check runs Pester on the selected test files through `New-PesterConfiguration` with `Run.Path` set to those files and `Run.Exit` set to `$true`, so its exit status reflects failures; it is not a gate.
 - No MCP tool exposes `Invoke-PoshQCLeakScan`. The executor reaches it through the `sh` launcher route, importing the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and calling `Invoke-PoshQCLeakScan -Root`; the scan throws on any failure, so the launcher exits non-zero.
+- The Pester gate runs through the launcher: `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester` runs `Invoke-PoshQCParallelTest` under the machine test-suite lock with the integration and golden lanes excluded (#1158). The MCP Pester templates hold the lock and pass the lane exclusions only after the extension release that carries the template change is installed. Until then an MCP Pester run does not hold the lock, and the hook denies the two MCP Pester tools while the lock is busy. A template exit 75 is not visible in the MCP result and leaves earlier artifacts in place, so an MCP Pester run is not gate evidence.
 
 ## Batch Budget
 
@@ -141,6 +144,7 @@ Run these after editing any mirrored or bundled file; each is under `tests/scrip
 - `test_claude_rules_frontmatter.py`: rule `paths:` scopes and that every preloaded skill exists.
 - `parallel_orchestrator_surface_expectations.py` (`PINNED_FROZEN_SURFACE_HASHES`): byte hashes of frozen orchestration surfaces, including `.claude/skills/epic-orchestrate/SKILL.md` and `.claude/agents/epic-orchestrator.md`.
 - `test_quality_checks_workflow_contracts.py`: workflow step conditions.
+- `tests/scripts/claude-hooks/test-execution-policy.Registration.Tests.ps1`: the registration of `enforce-test-execution-policy.ps1` in `.claude/settings.json`, `.codex/config.toml`, and their bundle copies; `test-execution-policy.Tests.ps1`, `test-execution-lock-decision.Tests.ps1`, `test-execution-lock.Tests.ps1`, and `test-execution-command-form.Tests.ps1` in the same folder run every case against the byte-identical `.claude/hooks` and `.codex/hooks` twins (#1158).
 - `test_push_down_issue_824_follow_ups.py`: pushed rules and skills name no consuming product.
 - `test_typescript_toolchain_instruction_contracts.py`: no reference to another test framework, and every backticked npm script token in the pinned mirrors exists in the root `package.json`.
 - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
@@ -186,6 +190,7 @@ These pass every validator rule and are found only by reading the plan against t
 
 - A unit test runs in milliseconds. A full suite above about 15 minutes, or a single unit test above about 10 seconds, indicates repeated work in the code under test or its fixtures, not missing parallelism.
 - Diagnose before proposing sharding or parallel workers. First aggregate per-test and per-module time from the JUnit report that the full run already writes (`--junitxml`); a small fraction of tests usually holds most of the time. Then run the slowest test under a profiler (`python -m cProfile -o <file> -m pytest <node id>`) and read the profile with `pstats`.
+- Gates run through the test-execution launcher (#1158): one suite at a time per machine under the machine test-suite lock, with the suite's own parallel workers unchanged.
 - Fix repeated production work first. An immutable structure, such as a schema registry that is rebuilt and re-verified on every call, is built once per owning instance. This speeds up the runtime as well as the tests.
 - Second, build an expensive immutable fixture once per session and hand each test its own copy wherever a test could mutate it, so test independence is unchanged.
 - Parallel workers reduce wall-clock time only: they are capped by the slowest test and leave the cost in the product.
@@ -207,3 +212,12 @@ These pass every validator rule and are found only by reading the plan against t
 - A leak found by a gate is fixed on both sides: the suite that leaves state behind (globals, functions, environment variables, mocks, imported modules, script-scope state) and the suite that assumes prior state.
 - The parallel gates govern where a policy file names a toolchain test command.
 - `Invoke-PoshQCLeakScan` is the static check for state that leaks between test files. It parses the Pester test files and `.ps1` helpers under `tests/`, runs no test, and fails on an environment variable, global variable, global function, location, or process-directory change that no restore pairs with and that `config/poshqc-leak-allowlist.json` does not list with a reason.
+- The test gates run through the test-execution launcher (#1158). A launcher exit 75 is a queue timeout: the machine test-suite lock was busy, and the gate is re-run after the holder finishes and recorded as a queue timeout, not a failure. An exit 2 is a refusal only when the first output line starts with `TEST_EXECUTION_POLICY_BLOCKED:`; a pytest exit 2 with its own session output is a test failure.
+
+## Test Execution Policy
+
+The test-execution launcher governs where a policy file or its mirror names a direct test command: a local suite runs through `.claude/skills/test-execution-policy/scripts/run-test-suite.sh`, or `Invoke-TestSuite.ps1` through `pwsh -NoProfile -File`, even where a rule file or its skill mirror names a direct runner command (#1158). The `test-execution-policy` skill states the configuration, the exit codes, and the hook rules.
+
+- Exit 75 with a stderr line starting `TEST_EXECUTION_QUEUE_TIMEOUT:`: the machine test-suite lock was busy; re-run the gate after the holder finishes and record it as a queue timeout, not a failure.
+- Exit 2 with a first line starting `TEST_EXECUTION_POLICY_BLOCKED:`: the launcher refused the command (invalid configuration, unknown suite, lane selection, or worker-reduction token).
+- `config/test-execution-policy.json` holds the repository's settings; `requireLauncher`, `localLanes.exclude`, and `machineLock.enabled` switch the three behaviors off.

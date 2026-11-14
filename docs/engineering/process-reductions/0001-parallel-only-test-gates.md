@@ -21,6 +21,8 @@ Rebased over #1158 (preflight QC): the full-suite pytest step of `scripts/dev_to
 
 Rebased over #1158 (VS Code tasks): the parallel test tasks of `.vscode/tasks.json` now start `pwsh` with the test-execution launcher. The block that records the default-group change of `QC: 4 Pytest: run tests (parallel)` was regenerated so that both fences carry `"command": "pwsh",`; its `isDefault` lines still revert. The new `VsCodeQualityTasks.Tests.ps1` cases sit after the recorded block, so that block is unchanged.
 
+Rebased over #1158 (execution-environment brief): the brief gains a launcher bullet at the end of `## PowerShell Route and PoshQC MCP Limits`, a section the stored patch's first brief hunk (`@@ -39,8 +39,9 @@`) covers to its last line. That hunk was regenerated in the stored-patch sections of all six brief copies so that both images carry the new bullet as a context line after the `No MCP tool exposes` line (`@@ -39,9 +39,10 @@`); the lines the hunk reverts are unchanged. The brief's other additions sit outside every recorded block and hunk.
+
 ## Reason and Evidence
 
 The owner decided on 2026-11-06 that tests run in parallel only. The sequential run existed to detect and fix a leak that has since been fixed, and the overhead of multiple and sequential runs was judged unacceptable.

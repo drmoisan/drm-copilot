@@ -165,7 +165,7 @@ diff --git a/.agents/skills/execution-environment/SKILL.md b/.agents/skills/exec
 index 0fa8f1e0f..19796ee54 100644
 --- a/.agents/skills/execution-environment/SKILL.md
 +++ b/.agents/skills/execution-environment/SKILL.md
-@@ -39,8 +39,9 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
+@@ -39,9 +39,10 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
  
  - PoshQC MCP results carry no output. The summary string is composed from a fixed template before the child process runs (`runPoshQcWorkflow` in `extensions/drm-copilot/src/repo-automation-service.ts`), and `RepoAutomationExecutionResult` has no exit-code or output field. An `ok: true` result proves only that the tool was invoked.
  - Counts, percentages, and findings therefore come from files or direct runs: pass and fail counts from `artifacts/pester/pester-junit.xml`, line coverage from `artifacts/pester/powershell-coverage.xml`, and analyzer findings from a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
@@ -174,6 +174,7 @@ index 0fa8f1e0f..19796ee54 100644
 +- `Invoke-PoshQCParallelTest` returns an object whose `ExitCode` is read first, and the launcher exits with that value. Merged JUnit and coverage exist only after a fully green run, and a failed run can leave older merged files in place. Failure detail is under `artifacts/pester/parallel/shard-<i>/`.
  - `Invoke-Pester` without `-EnableExit` (or `Run.Exit`) exits 0 when tests fail; read the JUnit file rather than the exit code of such a run.
  - No MCP tool exposes `Invoke-PoshQCLeakScan`. The executor reaches it through the `sh` launcher route, importing the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and calling `Invoke-PoshQCLeakScan -Root`; the scan throws on any failure, so the launcher exits non-zero.
+ - The Pester gate runs through the launcher: `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester` runs `Invoke-PoshQCParallelTest` under the machine test-suite lock with the integration and golden lanes excluded (#1158). The MCP Pester templates hold the lock and pass the lane exclusions only after the extension release that carries the template change is installed. Until then an MCP Pester run does not hold the lock, and the hook denies the two MCP Pester tools while the lock is busy. A template exit 75 is not visible in the MCP result and leaves earlier artifacts in place, so an MCP Pester run is not gate evidence.
  
  ## Batch Budget
 @@ -90,8 +91,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
@@ -1008,7 +1009,7 @@ diff --git a/.claude/skills/execution-environment/SKILL.md b/.claude/skills/exec
 index 0fa8f1e0f..19796ee54 100644
 --- a/.claude/skills/execution-environment/SKILL.md
 +++ b/.claude/skills/execution-environment/SKILL.md
-@@ -39,8 +39,9 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
+@@ -39,9 +39,10 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
  
  - PoshQC MCP results carry no output. The summary string is composed from a fixed template before the child process runs (`runPoshQcWorkflow` in `extensions/drm-copilot/src/repo-automation-service.ts`), and `RepoAutomationExecutionResult` has no exit-code or output field. An `ok: true` result proves only that the tool was invoked.
  - Counts, percentages, and findings therefore come from files or direct runs: pass and fail counts from `artifacts/pester/pester-junit.xml`, line coverage from `artifacts/pester/powershell-coverage.xml`, and analyzer findings from a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
@@ -1017,6 +1018,7 @@ index 0fa8f1e0f..19796ee54 100644
 +- `Invoke-PoshQCParallelTest` returns an object whose `ExitCode` is read first, and the launcher exits with that value. Merged JUnit and coverage exist only after a fully green run, and a failed run can leave older merged files in place. Failure detail is under `artifacts/pester/parallel/shard-<i>/`.
  - `Invoke-Pester` without `-EnableExit` (or `Run.Exit`) exits 0 when tests fail; read the JUnit file rather than the exit code of such a run.
  - No MCP tool exposes `Invoke-PoshQCLeakScan`. The executor reaches it through the `sh` launcher route, importing the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and calling `Invoke-PoshQCLeakScan -Root`; the scan throws on any failure, so the launcher exits non-zero.
+ - The Pester gate runs through the launcher: `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester` runs `Invoke-PoshQCParallelTest` under the machine test-suite lock with the integration and golden lanes excluded (#1158). The MCP Pester templates hold the lock and pass the lane exclusions only after the extension release that carries the template change is installed. Until then an MCP Pester run does not hold the lock, and the hook denies the two MCP Pester tools while the lock is busy. A template exit 75 is not visible in the MCP result and leaves earlier artifacts in place, so an MCP Pester run is not gate evidence.
  
  ## Batch Budget
 @@ -90,8 +91,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
@@ -4074,7 +4076,7 @@ diff --git a/.github/skills/execution-environment/SKILL.md b/.github/skills/exec
 index 0fa8f1e0f..19796ee54 100644
 --- a/.github/skills/execution-environment/SKILL.md
 +++ b/.github/skills/execution-environment/SKILL.md
-@@ -39,8 +39,9 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
+@@ -39,9 +39,10 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
  
  - PoshQC MCP results carry no output. The summary string is composed from a fixed template before the child process runs (`runPoshQcWorkflow` in `extensions/drm-copilot/src/repo-automation-service.ts`), and `RepoAutomationExecutionResult` has no exit-code or output field. An `ok: true` result proves only that the tool was invoked.
  - Counts, percentages, and findings therefore come from files or direct runs: pass and fail counts from `artifacts/pester/pester-junit.xml`, line coverage from `artifacts/pester/powershell-coverage.xml`, and analyzer findings from a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
@@ -4083,6 +4085,7 @@ index 0fa8f1e0f..19796ee54 100644
 +- `Invoke-PoshQCParallelTest` returns an object whose `ExitCode` is read first, and the launcher exits with that value. Merged JUnit and coverage exist only after a fully green run, and a failed run can leave older merged files in place. Failure detail is under `artifacts/pester/parallel/shard-<i>/`.
  - `Invoke-Pester` without `-EnableExit` (or `Run.Exit`) exits 0 when tests fail; read the JUnit file rather than the exit code of such a run.
  - No MCP tool exposes `Invoke-PoshQCLeakScan`. The executor reaches it through the `sh` launcher route, importing the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and calling `Invoke-PoshQCLeakScan -Root`; the scan throws on any failure, so the launcher exits non-zero.
+ - The Pester gate runs through the launcher: `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester` runs `Invoke-PoshQCParallelTest` under the machine test-suite lock with the integration and golden lanes excluded (#1158). The MCP Pester templates hold the lock and pass the lane exclusions only after the extension release that carries the template change is installed. Until then an MCP Pester run does not hold the lock, and the hook denies the two MCP Pester tools while the lock is busy. A template exit 75 is not visible in the MCP result and leaves earlier artifacts in place, so an MCP Pester run is not gate evidence.
  
  ## Batch Budget
 @@ -90,8 +91,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
@@ -5019,7 +5022,7 @@ diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skil
 index 0fa8f1e0f..19796ee54 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md
-@@ -39,8 +39,9 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
+@@ -39,9 +39,10 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
  
  - PoshQC MCP results carry no output. The summary string is composed from a fixed template before the child process runs (`runPoshQcWorkflow` in `extensions/drm-copilot/src/repo-automation-service.ts`), and `RepoAutomationExecutionResult` has no exit-code or output field. An `ok: true` result proves only that the tool was invoked.
  - Counts, percentages, and findings therefore come from files or direct runs: pass and fail counts from `artifacts/pester/pester-junit.xml`, line coverage from `artifacts/pester/powershell-coverage.xml`, and analyzer findings from a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
@@ -5028,6 +5031,7 @@ index 0fa8f1e0f..19796ee54 100644
 +- `Invoke-PoshQCParallelTest` returns an object whose `ExitCode` is read first, and the launcher exits with that value. Merged JUnit and coverage exist only after a fully green run, and a failed run can leave older merged files in place. Failure detail is under `artifacts/pester/parallel/shard-<i>/`.
  - `Invoke-Pester` without `-EnableExit` (or `Run.Exit`) exits 0 when tests fail; read the JUnit file rather than the exit code of such a run.
  - No MCP tool exposes `Invoke-PoshQCLeakScan`. The executor reaches it through the `sh` launcher route, importing the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and calling `Invoke-PoshQCLeakScan -Root`; the scan throws on any failure, so the launcher exits non-zero.
+ - The Pester gate runs through the launcher: `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester` runs `Invoke-PoshQCParallelTest` under the machine test-suite lock with the integration and golden lanes excluded (#1158). The MCP Pester templates hold the lock and pass the lane exclusions only after the extension release that carries the template change is installed. Until then an MCP Pester run does not hold the lock, and the hook denies the two MCP Pester tools while the lock is busy. A template exit 75 is not visible in the MCP result and leaves earlier artifacts in place, so an MCP Pester run is not gate evidence.
  
  ## Batch Budget
 @@ -90,8 +91,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
@@ -5699,7 +5703,7 @@ diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.a
 index 0fa8f1e0f..19796ee54 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md
-@@ -39,8 +39,9 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
+@@ -39,9 +39,10 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
  
  - PoshQC MCP results carry no output. The summary string is composed from a fixed template before the child process runs (`runPoshQcWorkflow` in `extensions/drm-copilot/src/repo-automation-service.ts`), and `RepoAutomationExecutionResult` has no exit-code or output field. An `ok: true` result proves only that the tool was invoked.
  - Counts, percentages, and findings therefore come from files or direct runs: pass and fail counts from `artifacts/pester/pester-junit.xml`, line coverage from `artifacts/pester/powershell-coverage.xml`, and analyzer findings from a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
@@ -5708,6 +5712,7 @@ index 0fa8f1e0f..19796ee54 100644
 +- `Invoke-PoshQCParallelTest` returns an object whose `ExitCode` is read first, and the launcher exits with that value. Merged JUnit and coverage exist only after a fully green run, and a failed run can leave older merged files in place. Failure detail is under `artifacts/pester/parallel/shard-<i>/`.
  - `Invoke-Pester` without `-EnableExit` (or `Run.Exit`) exits 0 when tests fail; read the JUnit file rather than the exit code of such a run.
  - No MCP tool exposes `Invoke-PoshQCLeakScan`. The executor reaches it through the `sh` launcher route, importing the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and calling `Invoke-PoshQCLeakScan -Root`; the scan throws on any failure, so the launcher exits non-zero.
+ - The Pester gate runs through the launcher: `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester` runs `Invoke-PoshQCParallelTest` under the machine test-suite lock with the integration and golden lanes excluded (#1158). The MCP Pester templates hold the lock and pass the lane exclusions only after the extension release that carries the template change is installed. Until then an MCP Pester run does not hold the lock, and the hook denies the two MCP Pester tools while the lock is busy. A template exit 75 is not visible in the MCP result and leaves earlier artifacts in place, so an MCP Pester run is not gate evidence.
  
  ## Batch Budget
 @@ -90,8 +91,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
@@ -8824,7 +8829,7 @@ diff --git a/extensions/drm-copilot/resources/customizations/.github/skills/exec
 index 0fa8f1e0f..19796ee54 100644
 --- a/extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md
 +++ b/extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md
-@@ -39,8 +39,9 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
+@@ -39,9 +39,10 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
  
  - PoshQC MCP results carry no output. The summary string is composed from a fixed template before the child process runs (`runPoshQcWorkflow` in `extensions/drm-copilot/src/repo-automation-service.ts`), and `RepoAutomationExecutionResult` has no exit-code or output field. An `ok: true` result proves only that the tool was invoked.
  - Counts, percentages, and findings therefore come from files or direct runs: pass and fail counts from `artifacts/pester/pester-junit.xml`, line coverage from `artifacts/pester/powershell-coverage.xml`, and analyzer findings from a direct `Invoke-ScriptAnalyzer` run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
@@ -8833,6 +8838,7 @@ index 0fa8f1e0f..19796ee54 100644
 +- `Invoke-PoshQCParallelTest` returns an object whose `ExitCode` is read first, and the launcher exits with that value. Merged JUnit and coverage exist only after a fully green run, and a failed run can leave older merged files in place. Failure detail is under `artifacts/pester/parallel/shard-<i>/`.
  - `Invoke-Pester` without `-EnableExit` (or `Run.Exit`) exits 0 when tests fail; read the JUnit file rather than the exit code of such a run.
  - No MCP tool exposes `Invoke-PoshQCLeakScan`. The executor reaches it through the `sh` launcher route, importing the branch-current `scripts/powershell/PoshQC/PoshQC.psd1` and calling `Invoke-PoshQCLeakScan -Root`; the scan throws on any failure, so the launcher exits non-zero.
+ - The Pester gate runs through the launcher: `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester` runs `Invoke-PoshQCParallelTest` under the machine test-suite lock with the integration and golden lanes excluded (#1158). The MCP Pester templates hold the lock and pass the lane exclusions only after the extension release that carries the template change is installed. Until then an MCP Pester run does not hold the lock, and the hook denies the two MCP Pester tools while the lock is busy. A template exit 75 is not visible in the MCP result and leaves earlier artifacts in place, so an MCP Pester run is not gate evidence.
  
  ## Batch Budget
 @@ -90,8 +91,8 @@ Two separate mechanisms restrict Bash command text. They are kept apart here bec
