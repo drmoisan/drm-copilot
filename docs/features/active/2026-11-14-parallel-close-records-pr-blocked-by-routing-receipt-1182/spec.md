@@ -250,7 +250,7 @@ Documentation and mirrors:
 
 Quality gates:
 
-- [ ] AC-24: Line coverage is at least 85% for each of `.claude/hooks/hook-parallel-records-context.ps1`, `.claude/hooks/enforce-model-routing-receipt-parallel.ps1`, `.claude/hooks/enforce-orchestration-preimplementation-gate-parallel-records.ps1`, `.claude/hooks/enforce-model-routing-receipt.ps1`, and `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`, read from `artifacts/pester/powershell-coverage.xml` of the parallel gate run and recorded in `evidence/qa-gates/` of the feature folder.
+- [x] AC-24: Line coverage is at least 85% for each of `.claude/hooks/hook-parallel-records-context.ps1`, `.claude/hooks/enforce-model-routing-receipt-parallel.ps1`, `.claude/hooks/enforce-orchestration-preimplementation-gate-parallel-records.ps1`, `.claude/hooks/enforce-model-routing-receipt.ps1`, and `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`, read from `artifacts/pester/powershell-coverage.xml` of the parallel gate run and recorded in `evidence/qa-gates/` of the feature folder.
 - [ ] AC-25: The PowerShell toolchain (PoshQC format, analyze with zero findings, Pester through the parallel runner) passes in a single loop with no auto-fixed files, and CI on the PR head passes, including the Linux hook-suite job.
 
 ## Post-Merge Verification
