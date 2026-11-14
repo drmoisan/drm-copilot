@@ -3,6 +3,7 @@
 import {
   buildFeatureReferenceIndex,
   resolveFeatureReference,
+  validateCrossEpicDependencyShape,
 } from "./epic-orchestrator-state-resolution";
 import { validateEpicPlannerChildLaunchBindings } from "./epic-orchestrator-state-launch-binding";
 import {
@@ -412,6 +413,7 @@ export function validateEpicPlannerStateText(
   errors.push(...featureResult.errors);
 
   errors.push(...validateDependencyWaves(featureResult.indexedFeatures));
+  errors.push(...validateCrossEpicDependencyShape(value));
   const maxParallel = value["max_parallel_features"];
   if (
     typeof maxParallel !== "number" ||

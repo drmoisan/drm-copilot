@@ -243,3 +243,45 @@ Describe 'Five-line TL;DR, critical-path section and push text (issue #1153)' {
         $script:tldr[1] | Should -Not -BeLike '*excludes*'
     }
 }
+
+Describe 'Cross-epic line and chain label (issue #1162)' {
+    BeforeAll {
+        $script:crossDefaults = Resolve-EpicProgressStepDefault
+        $script:crossFeatures = @([pscustomobject]@{ Issue = '1201'; Wave = 1; Band = 'small'; Total = 4; Done = 1; State = 'Pending'; Phase = ''; Pr = ''; BlockedReason = ''; TasksDone = 0; TasksTotal = 2 })
+        $script:crossSummary = {
+            param([object[]] $CrossEpic, [string] $Chain = '#1201 -> tail')
+            $range = [pscustomobject]@{ FastSeconds = 600; SlowSeconds = 1200; NoUpperBound = $false; StandardDeviation = 1.0; SdSource = 'across-feature SD'; Reason = '' }
+            $pooled = [pscustomobject]@{ Median = 8.0; StandardDeviation = 1.0; Count = 2; Rate = @([pscustomobject]@{ Issue = '1201'; TasksPerHour = 8.0; Source = 'pooled' }) }
+            $tail = [pscustomobject]@{ TailSeconds = 0.0; PredictedSync = $false; Step = @() }
+            $path = [pscustomobject]@{
+                Feature = @(); Excluded = @(); Pooled = $pooled; DefaultRate = 12.0; Cap = 4; CapSource = 'config'; DependencySource = 'checkpoint'; GraphMessage = ''
+                Tail = $tail; FinishSeconds = 600; HeadlineSeconds = 600; Chain = $Chain; SerialSumSeconds = 600; Range = $range; CrossEpic = $CrossEpic
+            }
+            $estimate = Get-EpicProgressTypeEstimate -Step @(Get-EpicProgressStepRecord -Issue '1201' -Type 'merge') -Ledger @{} -Default $script:crossDefaults -NowUnixSeconds 0
+            Get-EpicProgressSummary -Feature $script:crossFeatures -EpicStep @() -Estimate $estimate -CriticalPath $path -Subject 'Epic' -StartUtc ([datetime]::new(2026, 1, 5, 9, 0, 0, [System.DateTimeKind]::Utc)) -NowUtc ([datetime]::new(2026, 1, 5, 10, 0, 0, [System.DateTimeKind]::Utc)) -WeeklyPct 1 -BaselineWeeklyPct 0 -EpicIssue '42'
+        }
+        $script:crossEdge = @([pscustomobject]@{ Issue = '1201'; Node = 'provider-epic#1188'; State = 'pending'; Label = 'external (default)' })
+    }
+
+    It 'prints one Cross-epic line in the bold-label form when an edge exists' {
+        $lines = @(Get-EpicProgressCriticalPathLine -Summary (& $script:crossSummary $script:crossEdge 'provider-epic#1188 -> #1201 -> tail'))
+
+        $cross = @($lines | Where-Object { $_.StartsWith('**Cross-epic:**') })
+        ($cross -join '|') | Should -BeExactly '**Cross-epic:** #1201 depends on provider-epic#1188 (pending, external (default)).'
+        @($lines | Where-Object { $_.StartsWith('**Critical path:** provider-epic#1188 -> #1201 -> tail.') }).Count | Should -Be 1
+    }
+
+    It 'prints no Cross-epic line without an edge' {
+        $lines = @(Get-EpicProgressCriticalPathLine -Summary (& $script:crossSummary @()))
+
+        @($lines | Where-Object { $_.StartsWith('**Cross-epic:**') }).Count | Should -Be 0
+    }
+
+    It 'keeps the five TL;DR prefixes with a cross-epic edge' {
+        $tldr = @(Get-EpicProgressTldrLine -Summary (& $script:crossSummary $script:crossEdge))
+        $prefixes = @('**TL;DR:**', '**Elapsed:**', '**Now:**', '**Velocity:**', '**Estimated time remaining:**')
+
+        $tldr.Count | Should -Be 5
+        for ($index = 0; $index -lt 5; $index++) { $tldr[$index].StartsWith($prefixes[$index]) | Should -BeTrue }
+    }
+}
