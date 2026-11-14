@@ -178,12 +178,41 @@ As each preparation finishes:
    `preflight_evidence_path`, and `preflight_status: "PREFLIGHT: ALL CLEAR"` in the planner
    checkpoint. `research_path` must be under `docs/features/<feature>/research/` inside the feature folder.
    Each child references its immutable receipt and the shared `wave.<wave_id>.status.json` path.
-5. Remove the worktree only after its preparation branch is merged.
+5. Remove the worktree only after its preparation branch is merged, following
+   `## Preparation Worktree Records`.
 
 Push the integration branch after final fan-in.
 
 There is no mid-planning approval pause. The planner completes promotion, research, feature
 documents, atomic planning, and preflight before stopping at the user execution boundary.
+
+## Preparation Worktree Records
+
+The worktree-removal gate allows a plain removal of a preparation worktree only when the
+repository-root `artifacts/orchestration/epic-planner-state.json` records it in
+`planner_worktrees`, keyed by branch:
+
+1. When a preparation child completes, read the branch its worktree has checked out (from the
+   completion notification or `git worktree list --porcelain`) and append a `planner_worktrees`
+   entry with `branch`, `purpose: "preparation"`, `preparation_status: "prepared"`, the feature's
+   `feature_folder`, and optionally `path` and `recorded_at`. `path` is repository-relative to the
+   main checkout; never record an absolute path.
+2. After the branch is merged into the integration branch and pushed, set
+   `preparation_status: "fanned_in"`.
+3. Remove the worktree with a plain `git worktree remove <path>` in its own shell command, without
+   `--force`. When the removal succeeds, set `preparation_status: "removed"`.
+4. When the removal gate denies, record the `PLANNER_WORKTREE_<CODE>` code from the deny text in the
+   checkpoint and leave the worktree in place. Never detach HEAD or use `--force` to free a branch.
+
+The gate allows the removal only when the record is eligible (`prepared` or `fanned_in`), the
+worktree is not in use (not the working directory or main checkout, not locked, and not claimed by
+its own orchestrator checkpoint or the repository-root epic checkpoint), clean, and its HEAD commit
+is on `refs/remotes/origin/<integration_branch>` or `refs/remotes/origin/<branch>`. `preparing` and
+`abandoned` are recordable and never eligible.
+
+This is a policy-level control, not a security control: any writer in the session can author a
+record, and the git checks bound what a record can authorize. `git worktree remove` deletes
+ignored files in the worktree, including the child's gitignored checkpoint; this is accepted.
 
 ## Execution-Readiness Gate
 
