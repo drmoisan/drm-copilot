@@ -1,0 +1,14 @@
+# Final QA: PowerShell format (NEW-PS)
+
+Timestamp: 2026-11-07T21-27
+Command: sh SCRATCH/issue-1038-debug.sh write "<NEW-PS list>" (PowerShell 7: for each NEW-PS file, Invoke-Formatter -ScriptDefinition <file text> -Settings scripts/powershell/PoshQC/settings/pssa.settings.psd1, writing the formatted text when it differs, with Get-FileHash SHA-256 before and after)
+EXIT_CODE: 0
+Output Summary: 5 files; FORMAT-CHANGED-FILES 0; every SHA-256 pair equal.
+
+CHANGED-FILES: 0
+
+- tests/scripts/claude-lib/docs/EpicManifest.TestSupport.psm1 | before B4EF5FCB15FADAE3C6A9FC0192499EAA126A37F7B50D6A921105BDA8FD8A69E3 | after B4EF5FCB15FADAE3C6A9FC0192499EAA126A37F7B50D6A921105BDA8FD8A69E3
+- tests/scripts/claude-lib/docs/DocumentationEstateEpicTemplate.Tests.ps1 | before 0478B4D5E1EB25BA1E120E77A0125B4ED9D9C96B02C193DB6BA818769B98ABCF | after 0478B4D5E1EB25BA1E120E77A0125B4ED9D9C96B02C193DB6BA818769B98ABCF
+- tests/scripts/claude-lib/docs/DocumentationEstateOnboarding.Tests.ps1 | before 707E711EF367AD12E430D97D114738C6DB194D77712FD1DC552A4B6FB4B71FB5 | after 707E711EF367AD12E430D97D114738C6DB194D77712FD1DC552A4B6FB4B71FB5
+- tests/scripts/claude-lib/docs/DocumentationEstateFixture.TestSupport.psm1 | before BFF72F14912CF1D96D2CE17A01A88096A1441975D15B6ACCEF40EFF5FBDA414F | after BFF72F14912CF1D96D2CE17A01A88096A1441975D15B6ACCEF40EFF5FBDA414F
+- tests/scripts/claude-lib/docs/EndToEndDocumentationEstate.Tests.ps1 | before 0B97D8647F0C27ABC543B22764177038B0336B16A9A017C85F237164CC8C94AB | after 0B97D8647F0C27ABC543B22764177038B0336B16A9A017C85F237164CC8C94AB

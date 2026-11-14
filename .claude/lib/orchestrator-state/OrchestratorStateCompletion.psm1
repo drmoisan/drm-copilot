@@ -23,6 +23,7 @@
       C5        mandatory route phases
       C6        the routing contract, from `OrchestratorStateRoutingContract.psm1`
       C7        the preparation terminal contract
+      C8        the review record under review_mode concurrent
       M1        model-routing receipt required once delegated
       M2        a complexity assessment for every matched receipt phase
       M3        per-entry re-validation of the U6.C and U6.M families
@@ -408,8 +409,8 @@ function Test-OrchestratorStateCompletionReadiness {
     $errors.AddRange([string[]]@(Get-OrchestratorStateUnconditionalError -State $state))
 
     # C family, in the reference's require_complete order: step statuses,
-    # blocked_reason, pr_gate, ci_gate, phase completeness, routing contract, and
-    # the preparation terminal contract.
+    # blocked_reason, pr_gate, ci_gate, phase completeness, routing contract, the
+    # preparation terminal contract, and the concurrent review record.
     $errors.AddRange([string[]]@(Get-OrchestratorStateCompletionStepStatusError -State $state))
     $errors.AddRange([string[]]@(Get-OrchestratorStateCompletionBlockedReasonError -State $state))
     $errors.AddRange([string[]]@(Get-OrchestratorStateCompletionPrGateError -State $state))
@@ -417,6 +418,7 @@ function Test-OrchestratorStateCompletionReadiness {
     $errors.AddRange([string[]]@(Get-OrchestratorStatePhaseCompletenessError -State $state))
     $errors.AddRange([string[]]@(Get-OrchestratorStateRoutingContractError -State $state))
     $errors.AddRange([string[]]@(Get-OrchestratorStatePreparationTerminalError -State $state))
+    $errors.AddRange([string[]]@(Get-OrchestratorStateCompletionConcurrentReviewError -State $state))
 
     # M family. The gate's M3 leg re-invokes the U6.C and U6.M validators, so its
     # output is merged under the PD-2 single-emission rule rather than appended

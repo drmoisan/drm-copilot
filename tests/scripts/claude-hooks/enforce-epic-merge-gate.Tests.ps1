@@ -55,6 +55,8 @@ Describe 'enforce-epic-merge-gate.ps1' {
 
     Context 'allow via child-feature checkpoint (epic_mode + step9_status passed)' {
         It 'allows gh pr merge --merge when the child checkpoint is epic_mode true and step9_status passed' {
+            # Branch 1 now requires a verified CI run (issue #1130); the child-CI decision is mocked to Verified.
+            Mock -CommandName Get-EpicMergeGateChildCiDecision -MockWith { [ordered]@{ Verified = $true; Reason = '' } }
             Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith {
                 '{"epic_mode":true,"step9_status":"passed"}'
             }
@@ -459,6 +461,8 @@ Describe 'enforce-epic-merge-gate.ps1' {
         }
 
         It 'allows the nested envelope when the child checkpoint authorizes the merge' {
+            # Branch 1 now requires a verified CI run (issue #1130); the child-CI decision is mocked to Verified.
+            Mock -CommandName Get-EpicMergeGateChildCiDecision -MockWith { [ordered]@{ Verified = $true; Reason = '' } }
             Mock -CommandName Get-ChildOrchestratorCheckpointContent -MockWith {
                 '{"epic_mode":true,"step9_status":"passed"}'
             }

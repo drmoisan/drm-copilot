@@ -1,0 +1,12 @@
+{
+  "issue": 1117,
+  "note": "Wall-clock UTC times derived after the fact from commit times, evidence filename stamps, and the PR creation time; the run did not keep a live stage_timing list. Times include queueing. The merge stage is not captured.",
+  "stage_timing": [
+    { "stage": "promotion_and_folder_commit", "attempt": 1, "started_at": null, "ended_at": "2026-11-07T20:26:40Z" },
+    { "stage": "planning_and_preflight", "attempt": 1, "started_at": "2026-11-07T20:26:40Z", "ended_at": "2026-11-07T20:34:00Z" },
+    { "stage": "execution_and_gates", "attempt": 1, "started_at": "2026-11-07T20:34:00Z", "ended_at": "2026-11-07T21:16:27Z" },
+    { "stage": "review", "attempt": 1, "started_at": "2026-11-07T21:16:27Z", "ended_at": "2026-11-07T21:22:34Z" },
+    { "stage": "pr_creation", "attempt": 1, "started_at": "2026-11-07T21:22:34Z", "ended_at": "2026-11-07T21:25:07Z" },
+    { "stage": "ci_full_run", "attempt": 1, "started_at": "2026-11-07T21:26:20Z", "ended_at": "2026-11-07T21:44:16Z" }
+  ]
+}

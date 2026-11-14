@@ -1,0 +1,14 @@
+{
+  "issue-num": "1145",
+  "stage_timing": [
+    { "stage": "S2_research", "attempt": 1, "started_at": "2026-11-08T20:54:53Z", "ended_at": "2026-11-08T20:58:03Z" },
+    { "stage": "S2b_spec", "attempt": 1, "started_at": "2026-11-08T20:58:03Z", "ended_at": "2026-11-08T20:59:36Z" },
+    { "stage": "S4_atomic_planning", "attempt": 1, "started_at": "2026-11-08T20:59:36Z", "ended_at": "2026-11-08T21:21:04Z" },
+    { "stage": "S5_atomic_execution", "attempt": 1, "started_at": "2026-11-08T21:21:04Z", "ended_at": "2026-11-08T22:51:39Z" },
+    { "stage": "S7_feature_review", "attempt": 1, "started_at": "2026-11-08T22:51:39Z", "ended_at": "2026-11-08T22:59:54Z" },
+    { "stage": "S7_feature_review", "attempt": 2, "started_at": "2026-11-08T22:59:54Z", "ended_at": "2026-11-08T23:06:26Z" },
+    { "stage": "S7_feature_review", "attempt": 3, "started_at": "2026-11-08T23:06:26Z", "ended_at": "2026-11-08T23:13:43Z" },
+    { "stage": "S8_pr_creation", "attempt": 1, "started_at": "2026-11-08T23:13:43Z", "ended_at": "2026-11-08T23:16:27Z" },
+    { "stage": "S9_ci_gate", "attempt": 1, "started_at": "2026-11-08T23:16:27Z", "ended_at": null }
+  ]
+}

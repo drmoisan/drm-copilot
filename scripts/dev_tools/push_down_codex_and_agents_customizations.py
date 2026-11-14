@@ -97,8 +97,10 @@ VIRTUAL_RESOURCE_PAIRS: tuple[tuple[Path, Path], ...] = (
 # directory publishes under the destination directory with the same name, so a
 # helper library added by a later task needs no per-file entry here.
 DISCOVERY_VALIDATION_LIB_RELATIVE_DIR = Path(".codex/lib/discovery-validation")
+EPIC_WAVE_LIB_RELATIVE_DIR = Path(".codex/lib/epic-wave")
 VIRTUAL_RESOURCE_DIRECTORIES: tuple[tuple[Path, Path], ...] = (
     (DISCOVERY_VALIDATION_LIB_RELATIVE_DIR, Path("lib/discovery-validation")),
+    (EPIC_WAVE_LIB_RELATIVE_DIR, Path("lib/epic-wave")),
 )
 VIRTUAL_ROOT_FOLDERS: tuple[Path, ...] = (
     ROUTING_CONFIG_RELATIVE_PATH.parent,

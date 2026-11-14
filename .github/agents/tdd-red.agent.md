@@ -41,9 +41,9 @@ Focus on writing clear, specific failing tests that describe the desired behavio
 
 ### C# Test Patterns
 
-- Use **xUnit** with **FluentAssertions** for readable assertions
+- Use **MSTest** with **FluentAssertions** for readable assertions
 - Apply **AutoFixture** for test data generation
-- Implement **Theory tests** for multiple input scenarios from issue examples
+- Implement **data-driven tests** (`[DataRow]`) for multiple input scenarios from issue examples
 - Create **custom assertions** for domain-specific validations outlined in issue
 
 ## Execution Guidelines
@@ -52,7 +52,7 @@ Focus on writing clear, specific failing tests that describe the desired behavio
 2. **Analyse requirements** - Break down issue into testable behaviours
 3. **Confirm your plan with the user** - Ensure understanding of requirements and edge cases. NEVER start making changes without user confirmation
 4. **Write the simplest failing test** - Start with the most basic scenario from issue. NEVER write multiple tests at once. You will iterate on RED, GREEN, REFACTOR cycle with one test at a time
-5. **Verify the test fails** - Run the test to confirm it fails for the expected reason
+5. **Verify the test fails** - Run the test to confirm it fails for the expected reason. A focused run of one test file to debug a specific failure is debugging only.
 6. **Link test to issue** - Reference issue number in test names and comments
 
 ## Red Phase Checklist

@@ -33,7 +33,7 @@ jobs:
         if: ${{ inputs.run-heavy }}
         uses: actions/setup-node@v7
         with:
-          node-version: "20"
+          node-version: "26.13.0"
           cache: npm
           cache-dependency-path: extensions/drm-copilot/package-lock.json
 

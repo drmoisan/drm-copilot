@@ -30,19 +30,24 @@ source "$SCRIPT_DIR/cleanup_worktrees_actions_lib.sh"
 # shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_detached_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_detached_lib.sh"
-# Neither of the three libraries below requires being sourced last, and neither claims to
-# be. Each library's source-time work is limited to function definitions plus constant and
+# None of the four libraries below requires being sourced last, and none claims to be.
+# Each library's source-time work is limited to function definitions plus constant and
 # environment-default variable assignments; none of them calls a function while being
 # sourced, and no function name is defined by more than one library, so no later source can
 # shadow an earlier definition. Bash resolves a function name when the call runs, not when
 # the caller is defined, so the cross-library calls resolve whatever the order: the
 # disposable-dirt classifier is called BY run_report and BY delete_candidate in the
 # libraries above, and the preserve library calls cleanup_wt_git from the enumeration
-# library and consolidation_worktree_path from the actions library. The order here is
-# therefore grouping for readability only.
+# library, consolidation_worktree_path from the actions library, and the staging decision
+# from the merge library. The order here is therefore grouping for readability only.
 # shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_dirt_lib.sh
 # shellcheck disable=SC1091
 source "$SCRIPT_DIR/cleanup_worktrees_dirt_lib.sh"
+# The merge library holds the preserve staging decision. It is sourced before the
+# line-ending library so that library stays immediately before the preserve library.
+# shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_merge_lib.sh
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/cleanup_worktrees_preserve_merge_lib.sh"
 # The line-ending and index group is placed immediately before the preserve library, whose
 # read-only planning phase calls the functions it defines.
 # shellcheck source=.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_eol_lib.sh
@@ -69,12 +74,20 @@ Commands:
   preserve | --preserve
                        Stage the manifest's preserved_files[] findings onto the
                        consolidation branch. Takes no operand; the manifest path comes
-                       from CLEANUP_WT_MANIFEST_PATH. Copies each named source file
-                       verbatim, carries its MEMORY.md index line across using the
-                       destination file's own re-derived line-ending convention, and
-                       refuses the whole pass when the incoming bytes carry a
-                       host-identifying token. Exit 0 clean, 1 something was skipped or
-                       an index was created, 3 host-token hard stop, 127 a required tool
+                       from CLEANUP_WT_MANIFEST_PATH. Staging depends on the target and
+                       change_class: a target absent from the consolidation branch is
+                       copied byte for byte; an existing target is copied only when
+                       none of its lines would be lost (untracked, or modified with no
+                       merge base), or receives a three-way union merge of the
+                       worktree's added lines (modified with a merge base). A record
+                       that would lose a line, fails a merge guard, or repeats an
+                       earlier target_path is refused with
+                       ACTION|preserve-stage|<target>|REFUSED-WOULD-REGRESS. The
+                       MEMORY.md index line is carried across using the destination
+                       file's own re-derived line-ending convention, and the whole pass
+                       is refused when the incoming bytes carry a host-identifying
+                       token. Exit 0 clean, 1 something was skipped or refused or an
+                       index was created, 3 host-token hard stop, 127 a required tool
                        could not be resolved.
   --help | -h | help   Print this help and exit 0.
 

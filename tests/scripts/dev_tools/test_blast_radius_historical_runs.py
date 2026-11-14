@@ -56,7 +56,13 @@ RUNS: tuple[str, ...] = (
 # strict configuration, beside the absent key.
 ZERO_TOLERANCE: dict[str, object] = {
     "tolerance_percent": 0,
-    "weights": {"same_file": 8, "possible_overlap": 2, "append_only": 1, "module": 2},
+    "weights": {
+        "same_file": 8,
+        "possible_overlap": 2,
+        "append_only": 1,
+        "module": 2,
+        "contract": 8,
+    },
     "band_durations": {"C1": 1, "C2": 2, "C3": 4, "C4": 8},
     "default_band": "C1",
     "append_only_paths": ["**/CHANGELOG.md"],

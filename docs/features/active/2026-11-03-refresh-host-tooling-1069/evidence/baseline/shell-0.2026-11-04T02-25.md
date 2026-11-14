@@ -1,0 +1,4 @@
+Timestamp: 2026-11-04T02-25
+Command: wsl -d Ubuntu -- bash -lc 'SHELL_QC_SHFMT_BIN=SCRATCH/issue-1069-shfmt bash scripts/bash/shell-qc.sh check'
+EXIT_CODE: 0
+Output Summary: WSL is finishing an upgrade...

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:docs:1.0.0:docs-coverage-ledger",
+  "title": "Docs v1 coverage ledger",
+  "description": "One disposition per inventoried surface element. Completeness against the snapshot is a semantic rule outside this schema.",
+  "type": "object", "additionalProperties": false,
+  "required": ["$schema", "schema_version", "artifact_kind", "id", "extensions", "repository", "snapshot_ref", "entries"],
+  "properties": {
+    "$schema": {"const": "urn:drm-copilot:docs:1.0.0:docs-coverage-ledger"},
+    "schema_version": {"const": "1.0.0"},
+    "artifact_kind": {"const": "docs-coverage-ledger"},
+    "id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+    "extensions": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/extensions"},
+    "repository": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+    "snapshot_ref": {
+      "$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/artifact-pin",
+      "properties": {"artifact_kind": {"const": "surface-inventory-snapshot"}}
+    },
+    "entries": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/entry"}}
+  },
+  "$defs": {
+    "entry": {
+      "type": "object", "additionalProperties": false,
+      "required": ["element_id", "kind", "analysis_method", "disposition", "page_bindings", "rationale", "owner", "target", "updated_by", "extensions"],
+      "properties": {
+        "element_id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-id"},
+        "kind": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-kind"},
+        "analysis_method": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/analysis-method"},
+        "disposition": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/disposition"},
+        "page_bindings": {"type": "array", "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/page-binding"}},
+        "rationale": {"anyOf": [{"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"}, {"type": "null"}]},
+        "owner": {"anyOf": [{"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"}, {"type": "null"}]},
+        "target": {"anyOf": [{"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"}, {"type": "null"}]},
+        "updated_by": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/actor"},
+        "extensions": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/extensions"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"disposition": {"const": "documented"}}, "required": ["disposition"]},
+          "then": {"properties": {"page_bindings": {"minItems": 1}, "rationale": {"type": "null"}, "owner": {"type": "null"}, "target": {"type": "null"}}}
+        },
+        {
+          "if": {"properties": {"disposition": {"const": "excluded"}}, "required": ["disposition"]},
+          "then": {"properties": {"page_bindings": {"maxItems": 0}, "rationale": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"}, "owner": {"type": "null"}, "target": {"type": "null"}}}
+        },
+        {
+          "if": {"properties": {"disposition": {"const": "deferred"}}, "required": ["disposition"]},
+          "then": {"properties": {"page_bindings": {"maxItems": 0}, "owner": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"}, "target": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"}}}
+        }
+      ]
+    }
+  }
+}

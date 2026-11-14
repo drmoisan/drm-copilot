@@ -17,7 +17,9 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW_PATH = ".github/workflows/_quality-checks.yml"
 FOREIGN_COVERAGE_TARGET = "lexile_corpus_tuner"
-PYTEST_STEP_NAME = "Run tests with Pytest"
+PYTEST_STEP_NAME = "Run tests with Pytest and coverage"
+PYTEST_COMPAT_STEP_NAME = "Run tests with Pytest (compatibility, no coverage)"
+COVERAGE_PYTHON_VERSION = "3.13"
 EQUALS_COVERAGE_FORM = "--cov="
 JSON_COVERAGE_REPORT_ARGUMENT = "--cov-report=json:artifacts/python/coverage.json"
 THRESHOLD_CHECKER_MODULE = "check_python_coverage_thresholds"
@@ -25,6 +27,13 @@ MIN_LINE_FLOOR = "85"
 MIN_BRANCH_FLOOR = "75"
 CODECOV_ACTION = "codecov/codecov-action"
 RUN_HEAVY_GATE = "${{ inputs.run-heavy }}"
+COVERAGE_LEG_GATE = "${{ inputs.run-heavy && matrix.python-version == '3.13' }}"
+COMPAT_LEG_GATE = "${{ inputs.run-heavy && matrix.python-version != '3.13' }}"
+XDIST_WORKER_FLAG = "-n"
+XDIST_WORKER_VALUES = ("auto", "4")
+XDIST_LONG_FLAG_PREFIXES = ("--numprocesses", "--dist")
+PYPROJECT_PATH = "pyproject.toml"
+PYTEST_INI_SECTION = "[tool.pytest.ini_options]"
 
 
 def read_repo_text(relative_path: str) -> str:
@@ -81,6 +90,53 @@ def run_tokens(step: dict[str, object]) -> tuple[str, ...]:
     return tuple(token for token in shlex.split(run_value) if token.strip())
 
 
+def extract_pytest_addopts(pyproject_text: str) -> str:
+    """Return the ``addopts`` value of the pytest section of a pyproject text.
+
+    The text is scanned line by line instead of parsed with ``tomllib``,
+    to keep the helper independent of the TOML parser. Only a single-line
+    quoted ``addopts`` string is recognized, which is the form the project
+    uses.
+
+    Args:
+        pyproject_text: Full text of a ``pyproject.toml`` document.
+
+    Returns:
+        The unquoted ``addopts`` string, or an empty string when the pytest
+        section carries no ``addopts`` key.
+    """
+    in_pytest_section = False
+    # Walk the lines, tracking whether the current table is the pytest section.
+    for line in pyproject_text.splitlines():
+        stripped = line.strip()
+        # A table header switches sections; only keys of the pytest table count.
+        if stripped.startswith("["):
+            in_pytest_section = stripped == PYTEST_INI_SECTION
+            continue
+        key, separator, value = stripped.partition("=")
+        if in_pytest_section and separator and key.strip() == "addopts":
+            return value.strip().strip("\"'")
+    return ""
+
+
+def xdist_flags_in(addopts: str) -> list[str]:
+    """Return every xdist worker or distribution token in an ``addopts`` value.
+
+    Args:
+        addopts: The ``addopts`` string to shell-split.
+
+    Returns:
+        The tokens equal to ``-n`` or starting with ``--numprocesses`` or
+        ``--dist``, in their original order; an empty list when there are none.
+    """
+    # Keep each token that would make every pytest invocation start xdist workers.
+    return [
+        token
+        for token in shlex.split(addopts)
+        if token == XDIST_WORKER_FLAG or token.startswith(XDIST_LONG_FLAG_PREFIXES)
+    ]
+
+
 def test_workflow_names_no_foreign_coverage_target() -> None:
     """The workflow must not name a coverage target package the repo lacks.
 
@@ -132,21 +188,22 @@ def test_threshold_step_invokes_the_checker_with_both_floors() -> None:
     assert tokens[tokens.index("--min-branch") + 1] == MIN_BRANCH_FLOOR
 
 
-def test_threshold_step_runs_on_every_matrix_leg() -> None:
-    """The enforcement step must not be conditioned onto one matrix leg.
+def test_coverage_steps_run_only_on_the_coverage_leg() -> None:
+    """Coverage measurement and its threshold gate must run on Python 3.13 only.
 
-    Scenario: the step running the threshold checker is inspected for its
-    condition, per decision D3 of the spec. The only permitted condition is the
-    issue #962 run-heavy gate, whose value is the same on every matrix leg.
-    Expected outcome: the step's ``if`` value equals the run-heavy gate exactly;
-    an absent key or any other condition fails.
+    Scenario: the coverage pytest step and the threshold step are inspected for
+    their conditions. Expected outcome: both carry exactly the run-heavy gate
+    combined with the 3.13 matrix leg, and the compatibility pytest step carries
+    the complementary condition so every leg runs the tests exactly once.
     """
-    step = step_running(THRESHOLD_CHECKER_MODULE)
+    coverage_step = step_named(PYTEST_STEP_NAME)
+    threshold_step = step_running(THRESHOLD_CHECKER_MODULE)
+    compat_step = step_named(PYTEST_COMPAT_STEP_NAME)
 
-    assert step.get("if") == RUN_HEAVY_GATE, (
-        "the threshold step must carry exactly the run-heavy gate, found "
-        f"{step.get('if')!r}"
-    )
+    assert coverage_step.get("if") == COVERAGE_LEG_GATE
+    assert threshold_step.get("if") == COVERAGE_LEG_GATE
+    assert compat_step.get("if") == COMPAT_LEG_GATE
+    assert "--cov" not in run_tokens(compat_step)
 
 
 def test_codecov_step_uses_the_declared_files_input() -> None:
@@ -161,3 +218,72 @@ def test_codecov_step_uses_the_declared_files_input() -> None:
 
     assert "files" in with_mapping
     assert "file" not in with_mapping
+
+
+def test_pytest_step_runs_xdist_workers() -> None:
+    """The CI pytest step must start xdist workers with a measured worker count.
+
+    Scenario: the pytest step's ``run`` value is shell-split. Expected outcome:
+    ``-n`` occurs exactly once and the token after it is ``auto`` or ``4``,
+    the two worker settings that issue #1048 measures on the CI runner.
+    """
+    # Arrange
+    for step_name in (PYTEST_STEP_NAME, PYTEST_COMPAT_STEP_NAME):
+        tokens = run_tokens(step_named(step_name))
+
+        # Act
+        flag_count = tokens.count(XDIST_WORKER_FLAG)
+
+        # Assert
+        assert (
+            flag_count == 1
+        ), f"{step_name}: expected one -n token, found {flag_count}"
+        worker_value = tokens[tokens.index(XDIST_WORKER_FLAG) + 1]
+        assert worker_value in XDIST_WORKER_VALUES, (
+            f"{step_name}: expected a worker count in {XDIST_WORKER_VALUES}, "
+            f"found {worker_value!r}"
+        )
+
+
+def test_pyproject_addopts_carries_no_xdist_flag() -> None:
+    """The project ``addopts`` must not start xdist workers on every run.
+
+    Scenario: the committed ``pyproject.toml`` is read as text and its pytest
+    ``addopts`` value is shell-split. Expected outcome: no ``-n``,
+    ``--numprocesses``, or ``--dist`` token is present, because the VS Code
+    Test Explorer keys results to the wrong file when ``addopts`` carries
+    ``-n``.
+    """
+    # Arrange
+    addopts = extract_pytest_addopts(read_repo_text(PYPROJECT_PATH))
+
+    # Act
+    flags = xdist_flags_in(addopts)
+
+    # Assert
+    assert addopts != "", "the pytest section carries no addopts value"
+    assert flags == [], f"addopts must not carry xdist flags, found {flags}"
+
+
+def test_addopts_xdist_check_rejects_injected_flag() -> None:
+    """The ``addopts`` check must report an injected xdist flag.
+
+    Scenario: an in-memory pyproject text whose pytest ``addopts`` carries
+    ``-n auto`` and a ``--dist`` option, preceded by another table that has
+    its own ``addopts`` key, is fed to the same extraction helper. Expected
+    outcome: only the pytest table is read and both xdist tokens are
+    reported, so the check can fail.
+    """
+    # Arrange
+    pyproject_text = (
+        "[tool.other]\n"
+        'addopts = "-q"\n'
+        f"{PYTEST_INI_SECTION}\n"
+        'addopts = "-ra -n auto --dist=loadfile"\n'
+    )
+
+    # Act
+    flags = xdist_flags_in(extract_pytest_addopts(pyproject_text))
+
+    # Assert
+    assert flags == ["-n", "--dist=loadfile"]

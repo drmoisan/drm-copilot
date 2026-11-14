@@ -8,6 +8,7 @@ import {
   deriveWorktreeGroupDirectory,
   formatWorktreeTimestamp,
   quoteForPwsh,
+  VENV_ACTIVATE_COMMAND,
 } from "../src/claude-worktree-session";
 
 describe("formatWorktreeTimestamp", () => {
@@ -213,7 +214,7 @@ describe("buildWorktreeSessionCommands", () => {
 
     // Assert
     expect(commands.setLocation).toBe(
-      "Set-Location '/parent/auth-wt/2026-04-20T09-59'",
+      "Set-Location '/parent/auth-wt/2026-04-20T09-59' -ErrorAction Stop",
     );
   });
 
@@ -226,7 +227,7 @@ describe("buildWorktreeSessionCommands", () => {
 
     // Assert
     expect(commands.ensureParentDirectory).toBe(
-      "New-Item -ItemType Directory -Force -Path '/parent/auth-wt' | Out-Null",
+      "New-Item -ItemType Directory -Force -Path '/parent/auth-wt' -ErrorAction Stop | Out-Null",
     );
   });
 
@@ -248,7 +249,7 @@ describe("buildWorktreeSessionCommands", () => {
 
     // Assert
     expect(commands.ensureParentDirectory).toBe(
-      `New-Item -ItemType Directory -Force -Path ${quoteForPwsh(group)} | Out-Null`,
+      `New-Item -ItemType Directory -Force -Path ${quoteForPwsh(group)} -ErrorAction Stop | Out-Null`,
     );
     expect(worktreePath.startsWith(`${group}/`)).toBe(true);
   });
@@ -278,7 +279,7 @@ describe("buildWorktreeSessionCommands", () => {
     expect(commands.poetryInstall).toBe("poetry install --with dev");
   });
 
-  it("emits a relative-path activate command for the worktree-local venv when usePoetry is true", () => {
+  it("emits the runtime venv activation probe for Windows and Linux layouts when usePoetry is true", () => {
     // Arrange / Act
     const commands = buildWorktreeSessionCommands({
       ...baseInput,
@@ -287,7 +288,24 @@ describe("buildWorktreeSessionCommands", () => {
     });
 
     // Assert
-    expect(commands.activate).toBe("& './.venv/Scripts/Activate.ps1'");
+    expect(commands.activate).toContain("./.venv/Scripts/Activate.ps1");
+    expect(commands.activate).toContain("./.venv/bin/Activate.ps1");
+    expect(commands.activate).toContain(
+      "No virtual environment activation script found under ./.venv",
+    );
+    expect(commands.activate).toContain("& $venvActivate");
+  });
+
+  it("exports VENV_ACTIVATE_COMMAND as the activate value when usePoetry is true", () => {
+    // Arrange / Act
+    const commands = buildWorktreeSessionCommands({
+      ...baseInput,
+      usePoetry: true,
+      objective: undefined,
+    });
+
+    // Assert
+    expect(commands.activate).toBe(VENV_ACTIVATE_COMMAND);
   });
 
   it("emits a claude command without a trailing objective when objective is undefined", () => {
@@ -357,7 +375,7 @@ describe("buildWorktreeSessionCommands", () => {
       "git -C '/parent dir/o''connor' worktree add '/parent dir/o''connor-wt' -b 'feature/o''connor'",
     );
     expect(commands.setLocation).toBe(
-      "Set-Location '/parent dir/o''connor-wt'",
+      "Set-Location '/parent dir/o''connor-wt' -ErrorAction Stop",
     );
   });
 

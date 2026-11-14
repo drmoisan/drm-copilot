@@ -153,6 +153,12 @@ Describe 'Codex enforce-epic-wave-barrier coverage (issue #786)' {
         }
 
         It 'reads the local checkpoint and exits 2 for an empty payload' {
+            # Bootstrap dependencies remain real; only checkpoint state is supplied by the fixture.
+            $originalTestPath = Get-Command Test-Path -CommandType Cmdlet
+            Mock Test-Path { & $originalTestPath @PesterBoundParameters } -ParameterFilter {
+                ([string]$LiteralPath).Replace('\', '/') -match '/\.codex/.*\.ps[dm]?1$' -or
+                ([string]$Path).Replace('\', '/') -match '/\.codex/.*\.ps[dm]?1$'
+            }
             Mock Test-Path { $true } -ParameterFilter { ([string]$LiteralPath).EndsWith('orchestrator-state.json') }
             Mock Get-Content { '{"epic_mode":false}' }
             $result = Invoke-WaveEntry -Stdin ''

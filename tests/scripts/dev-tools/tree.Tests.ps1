@@ -1,9 +1,10 @@
 Set-StrictMode -Version Latest
 
-$scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $PSCommandPath }
-. (Resolve-Path -Path (Join-Path -Path $scriptRoot -ChildPath "../powershell/Support/TestHelpers.ps1"))
-
 BeforeAll {
+    # TestHelpers.ps1 defines Import-ScriptFunction in the scope that dot-sources it (issue #1096), so it
+    # is loaded here, in the scope of the call, rather than at file scope during discovery.
+    $scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $PSCommandPath }
+    . (Resolve-Path -Path (Join-Path -Path $scriptRoot -ChildPath "../powershell/Support/TestHelpers.ps1"))
     $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\scripts\dev-tools\tree.ps1"
     . (Import-ScriptFunction -Path $script:scriptPath -Name "Show-Tree")
 }

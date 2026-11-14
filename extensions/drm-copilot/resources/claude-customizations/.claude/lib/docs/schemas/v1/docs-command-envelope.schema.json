@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:drm-copilot:docs:1.0.0:docs-command-envelope",
+  "title": "Invoke-DocsCommand.ps1 -Json output envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["command", "exit_code", "findings", "ok", "result"],
+  "properties": {
+    "command": {"type": ["string", "null"], "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$(?![\\s\\S])"},
+    "exit_code": {"type": "integer", "enum": [0, 1, 2, 3]},
+    "findings": {"type": "array", "maxItems": 101, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/finding"}},
+    "ok": {"type": "boolean"},
+    "result": {}
+  },
+  "allOf": [
+    {"if": {"properties": {"exit_code": {"const": 0}}},
+     "then": {"properties": {"ok": {"const": true}, "findings": {"items": {"properties": {"severity": {"enum": ["warning", "info"]}}}}}},
+     "else": {"properties": {"ok": {"const": false}}}},
+    {"if": {"properties": {"exit_code": {"const": 1}}},
+     "then": {"properties": {"findings": {"minItems": 1}}}},
+    {"if": {"properties": {"exit_code": {"enum": [2, 3]}}},
+     "then": {"properties": {"findings": {"minItems": 1, "maxItems": 1}, "result": {"type": "null"}}}}
+  ]
+}

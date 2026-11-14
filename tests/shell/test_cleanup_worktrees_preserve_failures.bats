@@ -25,6 +25,7 @@ setup() {
     ELIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh"
     ALIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh"
+    MLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_merge_lib.sh"
     EOLLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_eol_lib.sh"
     PLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh"
     STUB="${REPO_ROOT}/tests/fixtures/cleanup_worktrees/stub-bin/git"
@@ -39,6 +40,7 @@ setup() {
     source "${ELIB}"
     source "${LIB}"
     source "${ALIB}"
+    source "${MLIB}"
     source "${EOLLIB}"
     source "${PLIB}"
     return 0
@@ -120,7 +122,7 @@ preserve_valid_record() {
         CLEANUP_WT_STUB_SCENARIO="${PRES}/upstream-tokens" \
         CLEANUP_WT_MANIFEST_PATH="${PRES}/upstream-tokens/manifest.json" \
         CLEANUP_WT_CONSOLIDATION_PATH=/dev \
-        bash -c "cd '${REPO_ROOT}' && source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${EOLLIB}' && source '${PLIB}' && run_preserve"
+        bash -c "cd '${REPO_ROOT}' && source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${MLIB}' && source '${EOLLIB}' && source '${PLIB}' && run_preserve"
     [ "$status" -eq 3 ]
     [[ "$output" == *"ACTION|preserve-stage|null|HOST-TOKEN-BLOCKED"* ]]
     [[ "$output" == *"the manifest reports tokens_present for"* ]]
@@ -143,7 +145,7 @@ preserve_valid_record() {
         CLEANUP_WT_STUB_SCENARIO="${PRES}/bad-schema" \
         CLEANUP_WT_MANIFEST_PATH="${PRES}/bad-schema/manifest.json" \
         CLEANUP_WT_CONSOLIDATION_PATH=/dev \
-        bash -c "cd '${REPO_ROOT}' && source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${EOLLIB}' && source '${PLIB}' && run_preserve"
+        bash -c "cd '${REPO_ROOT}' && source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${MLIB}' && source '${EOLLIB}' && source '${PLIB}' && run_preserve"
     [ "$status" -eq 1 ]
     [[ "$output" == *"ACTION|preserve-manifest|${PRES}/bad-schema/manifest.json|REJECTED"* ]]
     # Nothing was staged: the writing phase was never entered.
@@ -154,9 +156,10 @@ preserve_valid_record() {
 # --- the five failure branches of the writing phase ---------------------------------
 # Each test builds a one-entry plan stream directly rather than driving a manifest, because
 # the branch under test is selected by the *result of a write*, which a manifest fixture
-# cannot express. The eight columns are the ones preserve_plan_one emits: target_path,
+# cannot express. This eight-column helper builds the copy-mode form of the entry: target_path,
 # source file, destination file, index action, index path, index line, terminator token,
-# and the leading-terminator flag.
+# and the leading-terminator flag, with columns 9 and 10 empty, which means `copy`. The
+# ten-column helper further below adds the staging mode and the merged blob id.
 
 preserve_commit_one() {
     PRESERVE_CWT=/dev
@@ -261,4 +264,48 @@ preserve_commit_one() {
     run preserve_scan_host_tokens "${SRC}" ""
     [ "$status" -eq 0 ]
     [ -z "$output" ]
+}
+
+# --- the merge-mode branch of the writing phase -------------------------------------
+# A ten-column entry carries the staging mode in column 9 and the merged blob id in column
+# 10, as preserve_plan_one emits for a merged record. The destination is the null device,
+# and the source path names a file that does not exist, so a copy-mode write would fail:
+# the OK result therefore proves the content came from the merged blob.
+
+preserve_commit_merge_one() {
+    PRESERVE_CWT=/dev
+    PRESERVE_EXIT=0
+    PRESERVE_PLAN_STREAM=()
+    local entry
+    printf -v entry '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' \
+        "${1-}" "${2-}" "${3-}" "${4-}" "${5-}" "${6-}" "${7-}" "${8-}" "${9-}" "${10-}"
+    PRESERVE_PLAN_STREAM=("$entry")
+    preserve_commit_plan
+}
+
+@test "a merge-mode plan entry writes the merged blob through cat-file" {
+    export CLEANUP_WT_GIT_BIN="${STUB}"
+    export CLEANUP_WT_STUB_SCENARIO="${CF}/merge-blob"
+    local absent="${CF}/wt/agent-memory/atomic-executor/absent-lesson.md"
+    [ ! -e "$absent" ]
+    run preserve_commit_merge_one null "$absent" /dev/null none "" "" lf no merge merged01
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"stub-git: -C /dev cat-file blob merged01"* ]]
+    [[ "$output" == *"stub-git: -C /dev add -- null"* ]]
+    [[ "$output" == *"ACTION|preserve-stage|null|OK"* ]]
+    preserve_commit_merge_one null "$absent" /dev/null none "" "" lf no merge merged01 >/dev/null 2>&1
+    [ "$PRESERVE_EXIT" -eq 0 ]
+}
+
+@test "a failed merged blob read is reported as FAILED" {
+    export CLEANUP_WT_GIT_BIN="${STUB}"
+    # The scenario answers cat-file blob merged01 with exit 128.
+    export CLEANUP_WT_STUB_SCENARIO="${CF}/merge-blob-fails"
+    run preserve_commit_merge_one null "${SRC}" /dev/null none "" "" lf no merge merged01
+    [[ "$output" == *"ACTION|preserve-stage|null|FAILED"* ]]
+    [[ "$output" == *"reading the merged blob failed: null"* ]]
+    local add_re='stub-git: .*[[:space:]]add[[:space:]]'
+    [[ ! "$output" =~ $add_re ]]
+    preserve_commit_merge_one null "${SRC}" /dev/null none "" "" lf no merge merged01 >/dev/null 2>&1
+    [ "$PRESERVE_EXIT" -eq 1 ]
 }

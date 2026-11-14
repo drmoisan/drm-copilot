@@ -1,0 +1,8 @@
+{
+  "name": "value-case-variant",
+  "notes": "The comparison is ordinal, so a case variant does not activate the rule.",
+  "checkpoint": {
+    "review_mode": "Concurrent"
+  },
+  "expected_errors": []
+}

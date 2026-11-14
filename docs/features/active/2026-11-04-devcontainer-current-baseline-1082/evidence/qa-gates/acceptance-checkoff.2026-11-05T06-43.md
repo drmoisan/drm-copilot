@@ -1,0 +1,31 @@
+Timestamp: 2026-11-05T06-43
+Command: python SCRATCH/issue-1082-delivery.py
+EXIT_CODE: 0
+Output Summary:
+
+Authoritative source: spec.md; Work mode: full-bug. Original criterion wording is preserved.
+
+| Criterion | Status | Evidence |
+|---|---|---|
+| AC1: Both configurations run the shared post-create command against their actual workspace; local Docker exposes host uncommitted source changes immediately without a seeded Git checkout, and neither setup nor migration deletes host source/data or the former workspace volume. | PASS | local full CLI builds/live-bind/source hashes and preservation; final interactive verification |
+| AC2: Local `.venv` and all three `node_modules` paths use independent Linux dependency volumes with `volume-nocopy`; fresh and interrupted initialization plus repeated setup succeed without deleting mount roots or changing host dependency contents. | PASS | fresh four dependency volumes/repeat setup/native binaries; workspace-helper Bats14cases; preserved host hashes |
+| AC3: Both full images select the exact base image and required versions in the selected baseline table, including its Python 3.13.18 runtime and Git minimum, and preserve the repository's additional tools; no unavailable artifact is replaced silently. | PASS | both complete feature-inclusive builds and all 20 native version/module checks; pinned base Python3.13.18/Git2.56.0 |
+| AC4: Automatic verification checks every selected runtime, CLI and PowerShell module, required supporting tools, operating system/configuration and Linux virtual environment; missing, unreadable, failed or unsupported probes produce a nonzero exit and prevent the setup completion banner. | PASS | 17 verifier Bats cases; all91verifier lines covered; full lifecycle stops on failure |
+| AC5: PoshQC installation/import boundaries, settings, CI and asserting tests support Pester 6.2.0, use supported coverage output and assertion APIs, and pass the applicable real test and coverage runs without weakening test selection, failure propagation, coverage population or thresholds. | PASS | final native6.2 three-shard14,298 cases; JaCoCo merge/completeness; current static gate44inputs; all37-file seeds |
+| AC6: Git commands in the local container trust only the intended workspace path and avoid the host file-monitor delay; the container-specific handling leaves host repository configuration unchanged. | PASS | container effective fsmonitor=false; host true; exact workspace safe.directory; scoped Git status probe |
+| AC7: Codex, Claude Code and claude-swap entrypoints are available to the container user at their selected versions; required state directories have that user's ownership, pinned CLI update handling is configured, and the image contains no user credential material or destructive state initialization. | PASS | native Codex/Claude/cswap probes, user-owned state directories, root Codex system config and absent auth.json |
+| AC8: Both complete devcontainer configurations build with their required features, finish post-create, and pass version/module verification; repeated setup succeeds, with the actual commands and results recorded as feature evidence. | PASS | both full CLI builds/postcreate/repeats and final interactive verification; Codespaces config exercised locally with isolated Linux workspace/CODESPACES=true |
+| AC9: Relevant host manifest/bootstrap and development CI contracts match the selected baseline, retain minimum-aware host handling for newer compliant installations, and preserve Python compatibility jobs and published consumer engine ranges. | PASS | host manifest/HostBootstrap typed contracts; four workflows actionlint; unchanged compatibility/consumer metadata |
+| AC10: Regression, contract and applicable format/lint/type/test loops pass for changed behavior, with numeric baseline/final coverage evidence where required and no regression in changed-code coverage or report compatibility. | PASS | all language loops, final cohort/singleprocess, coverage-comparison.2026-11-05T06-34.md, isolation-complete-summary.2026-11-05T06-40.md, purity and integrity |
+| AC11: Active container guides, relevant repository documentation, and all six execution-environment source/bundle mirrors describe the implemented baseline, workspace/dependency storage and recovery behavior consistently; mirror/contract validation passes. | PASS | six byte-identical execution-environment mirrors, contracts-reuse-and-current-parity.2026-11-05T06-34.md, current guides and retained-volume recovery docs |
+| AC12: Every GitHub check on the final pull-request head passes or is skipped according to repository rules, and CI-dependent acceptance evidence records that exact head. | PASS at checked head | Orchestrator-owned checkoff after all26 checks passed on184098c31a93bcac6e4473674e55e9713b57d734; ci-green-before-checkoff.2026-11-05T07-22.md. The metadata commit must receive renewed exact-head verification before DONE. |
+
+AC Status Summary (CI update 2026-11-05T07:22:42Z): spec.md has12 checked criteria and0 local FAIL. AC12 was checked only after all26 PR-head checks passed at184098c31. The ensuing metadata commit remains subject to renewed exact-head CI before overall completion.
+
+Representation normalized: 2026-11-05T06:45:23.265614+00:00; original command timestamps/results retained, raw logs unchanged.
+
+## Independent full-main scope disclosure
+
+Independent review against main merge base df65c30ccc98f89f9808e84ca393c8d75c805641 measures the entire branch's changed Bash lines as **122/123 covered (99.187%)**. The earlier **115/115** figure uses the executor's retained preimplementation snapshot and excludes earlier branch changes. That historical comparison is preserved with its original scope.
+
+The sole uncovered changed line is `.devcontainer/post-create.sh:175`, the missing-package-lock skip message. Complete post-create coverage is 101/118 (85.593%); its added npm block is 13/14 (92.857%). Governing thresholds pass. No production or test source changed for this disclosure. Independent review artifacts retain the recomputation and source/report binding; AC12 remains pending exact-head CI.

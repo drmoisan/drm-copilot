@@ -1,0 +1,18 @@
+{
+  "issue-num": "1114",
+  "stage_timing": [
+    { "stage": "S2_research", "attempt": 1, "started_at": "2026-11-07T18:16:32Z", "ended_at": "2026-11-07T18:26:00Z" },
+    { "stage": "S3_spec", "attempt": 1, "started_at": "2026-11-07T18:26:00Z", "ended_at": "2026-11-07T18:30:57Z" },
+    { "stage": "S4_atomic_planning", "attempt": 1, "started_at": "2026-11-07T18:30:57Z", "ended_at": "2026-11-07T18:37:05Z" },
+    { "stage": "S4_preflight", "attempt": 1, "started_at": "2026-11-07T18:37:05Z", "ended_at": "2026-11-07T18:44:57Z" },
+    { "stage": "S4_atomic_planning", "attempt": 2, "started_at": "2026-11-07T18:44:57Z", "ended_at": "2026-11-07T18:49:04Z" },
+    { "stage": "S4_preflight", "attempt": 2, "started_at": "2026-11-07T18:49:04Z", "ended_at": "2026-11-07T18:56:36Z" },
+    { "stage": "S5_atomic_execution", "attempt": 1, "started_at": "2026-11-07T18:56:36Z", "ended_at": "2026-11-07T19:54:40Z" },
+    { "stage": "S7_feature_review", "attempt": 1, "started_at": "2026-11-07T19:54:40Z", "ended_at": "2026-11-07T20:08:11Z" },
+    { "stage": "remediation.cycle_1", "attempt": 1, "started_at": "2026-11-07T20:08:11Z", "ended_at": "2026-11-07T20:49:35Z" },
+    { "stage": "remediation.cycle_2", "attempt": 1, "started_at": "2026-11-07T20:49:35Z", "ended_at": "2026-11-07T21:42:13Z" },
+    { "stage": "S8_create_pr", "attempt": 1, "started_at": "2026-11-07T21:42:13Z", "ended_at": "2026-11-07T21:45:02Z" },
+    { "stage": "S9_ci_green", "attempt": 1, "started_at": "2026-11-07T21:45:02Z", "ended_at": "2026-11-07T22:02:05Z" },
+    { "stage": "S9_ci_green", "attempt": 2, "started_at": "2026-11-07T22:02:05Z", "ended_at": null }
+  ]
+}

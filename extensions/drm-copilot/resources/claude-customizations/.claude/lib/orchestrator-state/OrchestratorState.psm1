@@ -297,7 +297,8 @@ function Get-OrchestratorStatePrCreationReadinessError {
     .DESCRIPTION
         Private readiness check mirroring validate_orchestrator_state_pr_creation_readiness in
         _orchestrator_state_pr_creation_readiness.py: steps 5-8 must not be pending, blocked, or
-        blocked_remediation_loop_limit; blocked_reason must be `none` or absent; and the
+        blocked_remediation_loop_limit, except a pending step 7 under review_mode concurrent;
+        blocked_reason must be `none` or absent; and the
         local_execution_overrides / delegation_bypasses lists must be empty when present. It does
         not enforce completion, CI, PR, or routing-contract gates.
     .PARAMETER State
@@ -313,11 +314,15 @@ function Get-OrchestratorStatePrCreationReadinessError {
     )
 
     $errors = [System.Collections.Generic.List[string]]::new()
+    $stateNames = @($State.PSObject.Properties | ForEach-Object { $_.Name })
+    $reviewMode = if ($stateNames -ccontains 'review_mode') { (Get-OrchestratorStateField -State $State -Name 'review_mode').Value } else { $null }
 
     # Reject an upstream step recorded as pending, blocked, or blocked_remediation_loop_limit; steps
     # 5-8 must have finished before the first PR of a branch is created.
     foreach ($key in $script:PR_CREATION_READY_STEP_KEYS) {
         $field = Get-OrchestratorStateField -State $State -Name $key
+        # Under review_mode concurrent the review runs beside CI and the merge guard holds the merge.
+        if ($key -ceq 'step7_status' -and $field.Value -ceq 'pending' -and $reviewMode -is [string] -and $reviewMode -ceq 'concurrent') { continue }
         if ($field.Present -and (@('pending', 'blocked', 'blocked_remediation_loop_limit') -contains $field.Value)) {
             $errors.Add("Checkpoint PR-creation readiness validation failed: $key is $($field.Value).")
         }

@@ -381,6 +381,8 @@ exit 0
 
         It 'allows a verified epic child merge' {
             $child = '{"epic_mode":true,"step9_status":"verified"}'
+            # The child branch now requires a verified CI run (issue #1130); the child-CI decision is mocked to Verified.
+            Mock -CommandName Get-EpicMergeGateChildCiDecision -MockWith { [ordered]@{ Verified = $true; Reason = '' } }
 
             Invoke-CodexEpicMergeDecision -PayloadRaw $script:MergePayload -ChildCheckpointRaw $child -EpicCheckpointRaw '' |
                 Should -BeNullOrEmpty

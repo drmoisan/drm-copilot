@@ -11,6 +11,8 @@
 
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../../.claude/hooks/validate-task-researcher-output.ps1')
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
 
     function ConvertTo-ResearcherInput {
         # Returns a SubagentStop envelope whose assistant text advertises the research path.
@@ -27,6 +29,10 @@ BeforeAll {
         }
         return ($lines -join "`n")
     }
+}
+
+Describe 'epic-state baseline isolation (issue #1105)' {
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 }
 
 Describe 'validate-task-researcher-output Pre-Mortem rule (issue #964)' {

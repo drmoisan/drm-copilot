@@ -31,10 +31,10 @@ Side Effects:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class TargetRole(str, Enum):
+class TargetRole(StrEnum):
     """Describe the Codex-native role targeted by a mapped artifact.
 
     Purpose:
@@ -66,7 +66,7 @@ class TargetRole(str, Enum):
     UNSUPPORTED = "unsupported"
 
 
-class SectionIntentKind(str, Enum):
+class SectionIntentKind(StrEnum):
     """Describe the semantic intent detected for one source section.
 
     Purpose:
@@ -99,7 +99,7 @@ class SectionIntentKind(str, Enum):
     UNSUPPORTED = "unsupported"
 
 
-class SemanticCueKind(str, Enum):
+class SemanticCueKind(StrEnum):
     """Describe one low-level semantic cue discovered in a source section."""
 
     HEADING = "heading"

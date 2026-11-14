@@ -63,6 +63,25 @@ begin the normal epic lifecycle without requiring planner output.
 - Include the exact `Epic mode: true` context line and explicit integration PR base.
 - Do not start a dependent feature until every dependency is durably merged or its worktree is
   removed.
+- Exception: a feature whose manifest entry carries `early_start_on` follows
+  `## Early Dependent Starts (early_start)` of `epic-orchestrate`; that path stays unavailable
+  until the installed MCP validator carries the early-start rule.
+- Cross-epic dependencies (issue #1162): when a feature carries `cross_epic_depends_on`, validate
+  the manifest at kickoff with `.codex/lib/epic-wave/Invoke-EpicCrossReadiness.ps1 -Mode validate`
+  and run the same CLI with `-Mode feature -Issue <issue_num>` before launch; a held feature never
+  receives a worktree. On `merge_required`, merge each listed other integration branch into the
+  integration branch with `git merge --no-ff`, never a rebase or fast-forward, push, re-fetch,
+  record the merge, and then launch. Before the integration-to-main PR, run the CLI with
+  `-Mode main` and open the PR only on `release` or `not_applicable`; re-run it immediately before
+  `gh pr merge`. When every runnable feature is held, wait with `-WaitSeconds 540` at most 40
+  times, then halt with `blocked_reason: "external_dependency"`. Follow
+  `## Cross-Epic Dependencies (cross_epic_depends_on)` of `epic-orchestrate`.
+- **Status mapping (D7).** A `hold` decision records `held`. `PREREQ_IN_MAIN` records `in_main`.
+  `PREREQ_ALREADY_INTEGRATED`, or a completed D4 merge, records `integrated` before the feature is
+  launched. `released` is recorded only between a `merge_required` decision and its completed D4
+  merge, so a feature is launched only when every entry is `integrated` or `in_main`, the two
+  statuses the started-while-held invariant accepts. A main-gate `release` records
+  `cross_epic_main_gate` status `released`, and a main-gate `hold` records `held`.
 - Treat merge conflicts through the child orchestrator remediation loop.
 - Remove a child worktree only after its merge state is safe.
 

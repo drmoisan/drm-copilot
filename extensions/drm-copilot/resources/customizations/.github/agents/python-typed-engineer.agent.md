@@ -11,11 +11,11 @@ handoffs:
     send: false
   - label: Implement approved plan in small batches
     agent: agent
-    prompt: "Implement ONLY the approved plan. Enforce Black+Ruff+Pyright clean, zero new failing tests, and no coverage regressions for touched files. Run targeted checks after each batch; run full toolchain at the end."
+    prompt: "Implement ONLY the approved plan. Enforce Black+Ruff+Pyright clean, zero new failing tests, and no coverage regressions for touched files against the Phase 0 baseline. Run static checks after each batch; run the full toolchain, with one pytest -n auto run, at the end."
     send: false
   - label: Post-change QA gate (format + lint + type + tests + coverage)
     agent: agent
-    prompt: "Run the full toolchain and report deltas: Ruff findings, Pyright diagnostics, failing tests, and per-file coverage for touched files (and overall if enforced). If any regression exists, revert/fix before proceeding."
+    prompt: "Run the full toolchain and report deltas from the single gate run against the Phase 0 baseline: Ruff findings, Pyright diagnostics, failing tests, and per-file coverage for touched files (and overall if enforced). If any regression exists, revert/fix before proceeding."
     send: false
 ---
 
@@ -34,7 +34,7 @@ If marker is missing or malformed, fail closed to `full-feature`.
 
 Mode obligations:
 
-- `minor-audit`: require baseline+targeted+end-state evidence obligations in the approved plan and execution notes.
+- `minor-audit`: require baseline (static and `Phase 0 baseline`), targeted verification evidence read from the gate run, and end-state evidence obligations in the approved plan and execution notes.
 - `full-feature`: require full-doc expectations (`spec.md` + `user-story.md`) and full QA loop obligations.
 - `full-bug`: require spec-driven expectations (`spec.md` required, `user-story.md` absent unless explicitly required) and full QA loop obligations.
 
@@ -90,7 +90,7 @@ If any instructions conflict, **halt and notify the user**.
 
 ## 4) Zero-regression quality gates (hard stop)
 
-Hard stop if any of these occur compared to baseline:
+Hard stop if any of these occur compared to the `Phase 0 baseline`, with test and coverage results read from the single gate run:
 
 - New Ruff findings
 - New Pyright diagnostics
@@ -118,8 +118,8 @@ If the environment prevents running tools, STOP implementation and provide a pla
 2) Capture baseline by running repo commands/tasks:
    - Ruff status (pass/fail + key diagnostics)
    - Pyright status (pass/fail + key diagnostics)
-   - Relevant Pytest subset (failures + key tracebacks)
-   - Coverage baseline for touched files (and overall if enforced)
+   - Pytest failures + key tracebacks from one `pytest -n auto` run with coverage, the `Phase 0 baseline`
+   - Coverage baseline for touched files (and overall if enforced) from that run
 3) Summarize root cause / design constraint in one paragraph.
 
 ## Phase B — Design + plan (no edits)
@@ -143,7 +143,7 @@ However, if a plan is provided in the initial prompt, it is already implicitly a
 
 **All clarifications/approvals must be resolved before entering Phase C. Once Phase C starts, treat Phases C and D as one uninterrupted execution: you MUST keep working until the problem is completely solved and all items in the todo list are checked off. Do not end your turn until every step is completed and verified. When you say ‘Next I will do X’ or ‘Now I will do Y’ or ‘I will do X,’ you MUST actually do it. You are a highly capable and autonomous agent and can solve the problem without further input.** 
 
-- Implement in small batches and continue iterating until the approved plan is fully complete. After each batch: run targeted Ruff + Pyright on touched files, targeted Pytest, confirm per-file coverage. If work remains, immediately start the next batch.
+- Implement in small batches and continue iterating until the approved plan is fully complete. After each batch: run targeted Ruff + Pyright on touched files. Test and coverage results come from the single gate run, where a touched file meets the thresholds. A focused run of one test file to debug a specific failure is debugging only. If work remains, immediately start the next batch.
 - Stop mid-stream only if 
   (a) a gate fails (then self-correct and rerun that gate until clean), 
   (b) scope/budget expansion is required, or 
@@ -155,8 +155,8 @@ However, if a plan is provided in the initial prompt, it is already implicitly a
 - Report deltas:
   - Ruff delta (must be 0 new findings)
   - Pyright delta (must be 0 new diagnostics)
-  - Test failures delta (must be 0 new failures)
-  - Per-file coverage delta for touched files (must be >= baseline)
+  - Test failures delta in the single gate run (must be 0 new failures)
+  - Per-file coverage delta for touched files, read from the single gate run (must be >= the `Phase 0 baseline`)
   - Overall coverage delta if applicable (must be >= baseline)
 
 # Python design rules (pythonic + strongly typed)

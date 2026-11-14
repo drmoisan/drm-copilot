@@ -92,6 +92,11 @@ $script:ReadinessCases = @(
     @{ Name = 'an empty checkpoint text'; Raw = ''; Expected = $false }
     @{ Name = 'a checkpoint whose feature folder is outside the active tree'; Raw = '{"issue-num":"737","feature-folder":"elsewhere/x","route_id":"small","lifecycle_ready":true}'; Expected = $false }
     @{ Name = 'an unparseable checkpoint'; Raw = '{not-json'; Expected = $false }
+    # Issue #1010: lifecycle_ready counts as ready only when it is the JSON boolean true.
+    @{ Name = 'a checkpoint whose lifecycle_ready is the string false'; Raw = '{"issue-num":"737","feature-folder":"docs/features/active/x","route_id":"small","lifecycle_ready":"false"}'; Expected = $false }
+    @{ Name = 'a checkpoint whose lifecycle_ready is the string true'; Raw = '{"issue-num":"737","feature-folder":"docs/features/active/x","route_id":"small","lifecycle_ready":"true"}'; Expected = $false }
+    @{ Name = 'a checkpoint whose lifecycle_ready is the number 1'; Raw = '{"issue-num":"737","feature-folder":"docs/features/active/x","route_id":"small","lifecycle_ready":1}'; Expected = $false }
+    @{ Name = 'a checkpoint whose lifecycle_ready is null'; Raw = '{"issue-num":"737","feature-folder":"docs/features/active/x","route_id":"small","lifecycle_ready":null}'; Expected = $false }
 )
 
 $script:DecisionCases = @(
@@ -173,6 +178,6 @@ $script:ClaudeOnlyGateFunction = @(
     'Invoke-OrchestrationPreimplementationGateEntryPoint'
 )
 $script:CodexOnlyGateFunction = @(
-    'Get-CheckpointContent'
+    # Get-CheckpointContent moved to the Codex -epic-scope file under issue #1010.
     'Get-OrchestrationModeDenyReason'
 )

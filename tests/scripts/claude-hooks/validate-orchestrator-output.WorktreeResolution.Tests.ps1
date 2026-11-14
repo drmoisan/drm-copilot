@@ -130,7 +130,9 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
 
         # Assert
         $result.Ok | Should -BeTrue -Because $result.Message
-        Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $path }
+        # A distinct name: inside the filter, $path resolves to the mock parameter $Path.
+        $expectedPath = $path
+        Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $expectedPath }
         Should -Invoke Get-OrchestratorStateCheckpoint -Times 1 -Exactly -ParameterFilter { $CheckpointPath -eq $path }
         Should -Invoke Get-OrchestratorStateEpicWaveBarrierError -Times 1 -Exactly -ParameterFilter { $CheckpointText -ceq $text }
     }
@@ -183,7 +185,9 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
 
         # Assert
         $result.Ok | Should -BeTrue -Because $result.Message
-        Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $path }
+        # A distinct name: inside the filter, $path resolves to the mock parameter $Path.
+        $expectedPath = $path
+        Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $expectedPath }
     }
 
     It 'R5 blocks as Ambiguous when two live epics record distinct branches and the output names none' {
@@ -270,7 +274,9 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
 
         # Assert
         $result.Ok | Should -BeTrue -Because $result.Message
-        Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $path }
+        # A distinct name: inside the filter, $path resolves to the mock parameter $Path.
+        $expectedPath = $path
+        Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $expectedPath }
         Should -Invoke Get-OrchestratorStateCheckpoint -Times 1 -Exactly -ParameterFilter { $CheckpointPath -eq $path }
         Should -Invoke Get-OrchestratorStateEpicWaveBarrierError -Times 0 -Exactly
     }
@@ -326,7 +332,9 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
 
         # Assert
         $result.Ok | Should -BeTrue -Because $result.Message
-        Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $path }
+        # A distinct name: inside the filter, $path resolves to the mock parameter $Path.
+        $expectedPath = $path
+        Should -Invoke Get-CheckpointFileContent -Times 1 -Exactly -ParameterFilter { $Path -eq $expectedPath }
         Should -Invoke Test-OrchestratorStateCompletionReadiness -Times 1 -Exactly -ParameterFilter { $CheckpointPath -eq $path }
         Should -Invoke Get-OrchestratorStateEpicWaveBarrierError -Times 0 -Exactly
     }

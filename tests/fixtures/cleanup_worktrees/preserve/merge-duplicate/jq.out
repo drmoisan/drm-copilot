@@ -1,0 +1,2 @@
+tests/fixtures/cleanup_worktrees/preserve/merge-duplicate/wt	notes/a.md	untracked	PRESERVE	GENUINELY_NEW	notes/n.md	true	true		lf	object	clean	cleanup-wt-host-tokens-v1	preserve/merge-duplicate fixture: the first record naming notes/n.md
+tests/fixtures/cleanup_worktrees/preserve/merge-duplicate/wt	notes/b.md	untracked	PRESERVE	GENUINELY_NEW	notes/n.md	true	true		lf	object	clean	cleanup-wt-host-tokens-v1	preserve/merge-duplicate fixture: a second record naming the same target

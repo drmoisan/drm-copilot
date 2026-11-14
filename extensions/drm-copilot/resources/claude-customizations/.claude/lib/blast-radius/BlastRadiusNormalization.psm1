@@ -120,10 +120,12 @@ function Get-ContractIdentifier {
         # Inside a qualifying section an inline-code token without a separator is
         # a contract identifier; a token with one is a path reference and is
         # recorded at the paths level instead. A token carrying no ASCII letter
-        # is notation, not an identifier, and is dropped (issue #489).
+        # is notation, not an identifier, and is dropped (issue #489), as is a
+        # default spreadsheet sheet-tab name such as Sheet1 (issue #1006).
         foreach ($token in @(Get-InlineCodeToken -Line $line)) {
             if ($token.IndexOf('/') -lt 0 -and
-                $script:ContractLetterPattern.IsMatch($token)) {
+                $script:ContractLetterPattern.IsMatch($token) -and
+                -not (Test-GenericContractToken -Token $token)) {
                 $identifier.Add($token)
             }
         }

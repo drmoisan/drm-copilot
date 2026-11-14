@@ -1,0 +1,480 @@
+{
+  "description": "Issue #1164 committed-minutes verdicts (spec B4). Disjoint pairs, one overlap per item: read-only on one side C1/C1 and C4/C4 (cost 0), append-only C2/C2 (10 against 45), separable on both sides C2/C2 (15 against 45), same file C2/C2 (90 against 45, edge), same file C3/C3 (90 against 90, a tie that runs in parallel), same file C1/C4 (90 against 30, edge), and the hard classes shared_surface_overlap and contract_dependency at C4/C4 (edges at every tolerance, both estimates recorded). Items 1, 4, 7, and 8 carry access lists beside their radius. At tolerance 0 every conflict is an edge with the same estimates.",
+  "tags": [
+    "#1164"
+  ],
+  "config": {
+    "version": 1,
+    "shared_surfaces": [],
+    "shared_surface_globs": [],
+    "mandate_reads": [],
+    "mergeable_paths": [],
+    "conflict_tolerance": {
+      "tolerance_percent": 100,
+      "weights": {
+        "same_file": 90,
+        "possible_overlap": 20,
+        "append_only": 10,
+        "module": 10,
+        "separable": 15,
+        "contract": 90
+      },
+      "band_durations": {
+        "C1": 30,
+        "C2": 45,
+        "C3": 90,
+        "C4": 180
+      },
+      "default_band": "C1",
+      "append_only_paths": [
+        "**/CHANGELOG.md",
+        "extensions/drm-copilot/resources/**"
+      ],
+      "combination_threshold_percent": 400
+    },
+    "modules": {
+      "config": [
+        "config/**"
+      ]
+    },
+    "over_breadth_fraction": 0.25
+  },
+  "items": [
+    {
+      "key": 1,
+      "band": "C1",
+      "radius": {
+        "paths": [
+          "docs/read-c1.md"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      },
+      "read_paths": [
+        "docs/read-c1.md"
+      ]
+    },
+    {
+      "key": 2,
+      "band": "C1",
+      "radius": {
+        "paths": [
+          "docs/read-c1.md"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 3,
+      "band": "C4",
+      "radius": {
+        "paths": [
+          "docs/read-c4.md"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 4,
+      "band": "C4",
+      "radius": {
+        "paths": [
+          "docs/read-c4.md"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      },
+      "read_paths": [
+        "docs/read-c4.md"
+      ]
+    },
+    {
+      "key": 5,
+      "band": "C2",
+      "radius": {
+        "paths": [
+          "CHANGELOG.md"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 6,
+      "band": "C2",
+      "radius": {
+        "paths": [
+          "CHANGELOG.md"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 7,
+      "band": "C2",
+      "radius": {
+        "paths": [
+          "src/separable.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      },
+      "separable_paths": [
+        "src/separable.py"
+      ]
+    },
+    {
+      "key": 8,
+      "band": "C2",
+      "radius": {
+        "paths": [
+          "src/separable.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      },
+      "separable_paths": [
+        "src/separable.py"
+      ]
+    },
+    {
+      "key": 9,
+      "band": "C2",
+      "radius": {
+        "paths": [
+          "src/same-c2.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 10,
+      "band": "C2",
+      "radius": {
+        "paths": [
+          "src/same-c2.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 11,
+      "band": "C3",
+      "radius": {
+        "paths": [
+          "src/same-c3.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 12,
+      "band": "C3",
+      "radius": {
+        "paths": [
+          "src/same-c3.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 13,
+      "band": "C1",
+      "radius": {
+        "paths": [
+          "src/same-c1-c4.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 14,
+      "band": "C4",
+      "radius": {
+        "paths": [
+          "src/same-c1-c4.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 15,
+      "band": "C4",
+      "radius": {
+        "paths": [
+          "src/surface-a.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [
+          "poetry.lock"
+        ],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 16,
+      "band": "C4",
+      "radius": {
+        "paths": [
+          "src/surface-b.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [
+          "poetry.lock"
+        ],
+        "contracts": [],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 17,
+      "band": "C4",
+      "radius": {
+        "paths": [
+          "src/contract-a.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [
+          "computeWidget"
+        ],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    },
+    {
+      "key": 18,
+      "band": "C4",
+      "radius": {
+        "paths": [
+          "src/contract-b.py"
+        ],
+        "modules": [],
+        "shared_surfaces": [],
+        "contracts": [
+          "computeWidget"
+        ],
+        "source": "declared",
+        "computed_at": "2026-11-09T00-00"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "tolerance_percent": null,
+      "expected_edges": [
+        {
+          "a": 9,
+          "b": 10,
+          "reason": "path_overlap",
+          "hard": false,
+          "cost": 90,
+          "benefit": 45
+        },
+        {
+          "a": 13,
+          "b": 14,
+          "reason": "path_overlap",
+          "hard": false,
+          "cost": 90,
+          "benefit": 30
+        },
+        {
+          "a": 15,
+          "b": 16,
+          "reason": "shared_surface_overlap",
+          "hard": true,
+          "cost": 0,
+          "benefit": 180
+        },
+        {
+          "a": 17,
+          "b": 18,
+          "reason": "contract_dependency",
+          "hard": true,
+          "cost": 90,
+          "benefit": 180
+        }
+      ],
+      "expected_tolerated": [
+        {
+          "a": 1,
+          "b": 2,
+          "reasons": [
+            "path_overlap"
+          ],
+          "cost": 0,
+          "benefit": 30
+        },
+        {
+          "a": 3,
+          "b": 4,
+          "reasons": [
+            "path_overlap"
+          ],
+          "cost": 0,
+          "benefit": 180
+        },
+        {
+          "a": 5,
+          "b": 6,
+          "reasons": [
+            "path_overlap"
+          ],
+          "cost": 10,
+          "benefit": 45
+        },
+        {
+          "a": 7,
+          "b": 8,
+          "reasons": [
+            "path_overlap"
+          ],
+          "cost": 15,
+          "benefit": 45
+        },
+        {
+          "a": 11,
+          "b": 12,
+          "reasons": [
+            "path_overlap"
+          ],
+          "cost": 90,
+          "benefit": 90
+        }
+      ]
+    },
+    {
+      "tolerance_percent": 0,
+      "expected_edges": [
+        {
+          "a": 1,
+          "b": 2,
+          "reason": "path_overlap",
+          "hard": false,
+          "cost": 0,
+          "benefit": 30
+        },
+        {
+          "a": 3,
+          "b": 4,
+          "reason": "path_overlap",
+          "hard": false,
+          "cost": 0,
+          "benefit": 180
+        },
+        {
+          "a": 5,
+          "b": 6,
+          "reason": "path_overlap",
+          "hard": false,
+          "cost": 10,
+          "benefit": 45
+        },
+        {
+          "a": 7,
+          "b": 8,
+          "reason": "path_overlap",
+          "hard": false,
+          "cost": 15,
+          "benefit": 45
+        },
+        {
+          "a": 9,
+          "b": 10,
+          "reason": "path_overlap",
+          "hard": false,
+          "cost": 90,
+          "benefit": 45
+        },
+        {
+          "a": 11,
+          "b": 12,
+          "reason": "path_overlap",
+          "hard": false,
+          "cost": 90,
+          "benefit": 90
+        },
+        {
+          "a": 13,
+          "b": 14,
+          "reason": "path_overlap",
+          "hard": false,
+          "cost": 90,
+          "benefit": 30
+        },
+        {
+          "a": 15,
+          "b": 16,
+          "reason": "shared_surface_overlap",
+          "hard": true,
+          "cost": 0,
+          "benefit": 180
+        },
+        {
+          "a": 17,
+          "b": 18,
+          "reason": "contract_dependency",
+          "hard": true,
+          "cost": 90,
+          "benefit": 180
+        }
+      ],
+      "expected_tolerated": []
+    }
+  ]
+}

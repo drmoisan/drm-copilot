@@ -109,7 +109,7 @@ def test_iter_governed_files_finds_scripts_json(mem_fs_path: Path) -> None:
 
 def test_iter_governed_files_finds_docs_json(mem_fs_path: Path) -> None:
     """Files matching docs/**/*.json should be found."""
-    docs_dir = mem_fs_path / "docs" / "features"
+    docs_dir = mem_fs_path / "docs" / "discovery"
     docs_dir.mkdir(parents=True)
     doc_json = docs_dir / "manifest.json"
     doc_json.write_text("{}")
@@ -167,3 +167,36 @@ def test_iter_governed_files_handles_non_file_matches(mem_fs_path: Path) -> None
 
     result = list(iter_governed_files(mem_fs_path))
     assert json_dir not in result
+
+
+def test_iter_governed_files_excludes_feature_records(mem_fs_path: Path) -> None:
+    """Finalized feature records are excluded at any depth; other docs JSON is not.
+
+    Scenario: evidence JSON sits in a nested evidence folder of an active
+    feature, a ruleset snapshot sits outside any evidence folder of an archived
+    feature, and a template sits elsewhere under docs. Expected outcome: neither
+    feature record is yielded, the template is.
+    """
+    # Arrange
+    evidence_dir = (
+        mem_fs_path / "docs" / "features" / "active" / "f-1" / "evidence" / "qa-gates"
+    )
+    evidence_dir.mkdir(parents=True)
+    evidence_json = evidence_dir / "coverage.json"
+    evidence_json.write_text("{}")
+    ruleset_dir = mem_fs_path / "docs" / "features" / "archive" / "f-2" / "ruleset"
+    ruleset_dir.mkdir(parents=True)
+    ruleset_json = ruleset_dir / "protect-main.json"
+    ruleset_json.write_text("{}")
+    template_dir = mem_fs_path / "docs" / "discovery" / "templates"
+    template_dir.mkdir(parents=True)
+    template_json = template_dir / "ledger.json"
+    template_json.write_text("{}")
+
+    # Act
+    result = list(iter_governed_files(mem_fs_path))
+
+    # Assert
+    assert evidence_json not in result
+    assert ruleset_json not in result
+    assert template_json in result

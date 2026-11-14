@@ -22,6 +22,7 @@ jest.mock(
 import { createRepoAutomationMcpServer } from "../src/mcp-server";
 import { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "../src/mcp-tools";
 import {
+  EXPECTED_REPO_AUTOMATION_TOOL_NAMES,
   PUSH_DOWN_CODEX_ARTIFACT_PATH,
   VIRTUAL_WORKSPACE_ROOT,
   createMockService,
@@ -76,51 +77,9 @@ describe("repo automation MCP server", () => {
   it("registers the semantic repo automation tools", async () => {
     const result = await client.listTools();
 
-    expect(result.tools.map((tool) => tool.name)).toEqual([
-      "collect_commit_context",
-      "collect_pr_context",
-      "run_codex_native_converter",
-      "push_down_copilot_customizations",
-      "push_down_codex_and_agents_customizations",
-      "push_down_claude_customizations",
-      "new_potential_bug_entry",
-      "new_potential_entry",
-      "link_parent_child",
-      "potential_to_issue",
-      "new_active_feature_folder",
-      "run_poshqc_format",
-      "run_poshqc_analyze",
-      "run_poshqc_test",
-      "run_poshqc_analyze_autofix",
-      "run_poshqc_suite",
-      "resolve_policy_audit_template_asset",
-      "resolve_execute_hard_lock_prompt",
-      "resolve_atomic_plan_prompt",
-      "validate_orchestration_artifacts",
-      "resolve_orchestration_topology",
-      "resolve_provider_routing",
-      "transition_prepared_orchestration",
-      "render_subagent_tree",
-      "validate_discovery_artifacts",
-      "run_discovery_init",
-      "run_discovery_repo_inventory",
-      "run_discovery_dotnet_analyzer",
-      "run_discovery_vsto_analyzer",
-      "run_discovery_scenario_generation",
-      "run_discovery_report",
-      "create_discovery_artifact",
-      "update_discovery_artifact",
-      "link_discovery_evidence",
-      "configure_discovery_workspace",
-      "transfer_discovery_snapshot",
-      "import_discovery_inventory",
-      "migrate_discovery_artifacts",
-      "run_discovery_doctor",
-      "read_discovery_source",
-      "prepare_discovery_agent",
-      "finalize_discovery_agent",
-      "discovery_capability_sentinel",
-    ]);
+    expect(result.tools.map((tool) => tool.name)).toEqual(
+      EXPECTED_REPO_AUTOMATION_TOOL_NAMES,
+    );
   });
 
   it("dispatches collect_pr_context through the shared service with an explicit base", async () => {

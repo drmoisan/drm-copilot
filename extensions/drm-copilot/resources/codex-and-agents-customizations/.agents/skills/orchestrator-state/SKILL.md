@@ -66,7 +66,7 @@ These invariants apply only when the checkpoint contains a top-level `remediatio
 
 1. **Non-empty `plan_path`.** Each cycle's `plan_path` must be a non-empty string. A missing value, a non-string value, or an empty/whitespace-only string is a malformed cycle.
 
-2. **Execution requires cleared preflight.** A cycle's `execution_status` may be in `{in_progress, complete, failed}` only when that cycle's `preflight.final_status` is exactly `'clear'`. Any other preflight status with one of those execution statuses is a malformed cycle (execution was recorded before preflight cleared).
+2. **Execution requires cleared preflight.** A cycle's `execution_status` may be in `{in_progress, complete, failed}` only when that cycle's `preflight.final_status` is exactly `'clear'`. Any other preflight status with one of those execution statuses is a malformed cycle (execution was recorded before preflight cleared). The invariant does not apply to a cycle whose `remediation_path` is exactly the string `light`, compared ordinally, because a light cycle runs no preflight; invariant 8 governs that cycle.
 
 3. **Exit gate requires zero blocking findings.** When a cycle's `exit_condition_met == true`, its `blocking_count` must be `0`. A non-zero `blocking_count` with `exit_condition_met == true` is a malformed cycle (the exit gate was marked satisfied while blocking findings remained).
 
@@ -77,6 +77,17 @@ These invariants apply only when the checkpoint contains a top-level `remediatio
 6. **`opened_by_review` references a remediation review (R11).** When a cycle object carries `opened_by_review`, its value must be a non-negative integer (not a boolean) that indexes an object entry of the `remediation_loop.review_outcomes` list whose `verdict` is `REMEDIATION_REQUIRED`, and a value that is not such an integer, is out of range, or references an outcome with any other verdict is a malformed cycle.
 
 7. **`completed_attempts` counts completed attempts (R7).** When `remediation_loop.completed_attempts` is present, it must be a non-negative integer (not a boolean) equal to the number of object cycles whose `candidate_applied` is `true` (zero when `cycles` is absent or not a list), and any other value is a malformed loop.
+
+8. **Light remediation (issue #1097).** When a cycle object carries `remediation_path`, the rules below run in the accounting stage, after the R7 checks, per cycle in order, with byte-identical messages in `scripts/dev_tools/_orchestrator_state_light_cycle.py`, `extensions/drm-copilot/src/lib/validate/orchestrator-state-light-cycle.ts`, and `Get-RemediationLightCycleError` in `.claude/lib/orchestrator-state/OrchestratorStateRemediationAccounting.psm1`, pinned by the corpus `tests/fixtures/orchestrator_state_remediation_loop/`. A cycle without the key reaches none of them, so every existing checkpoint validates as before. `scope` on a finding is read only by these rules.
+   1. A value other than exactly `light` or `full`, null included: `Checkpoint remediation cycle #N remediation_path must be light or full.` Nothing further runs for the cycle, and nothing further runs for `full`.
+   2. A `preflight` key, whatever its value: `Checkpoint remediation cycle #N remediation_path is light but the cycle carries preflight.`
+   3. `opened_by_review` absent, or not naming a `REMEDIATION_REQUIRED` outcome by the R11 predicate: `Checkpoint remediation cycle #N remediation_path is light but opened_by_review does not name its opening review.` Rules 4 to 6 are then skipped.
+   4. More than 3 findings in that outcome (a non-list `findings` value counts as empty): `Checkpoint remediation cycle #N remediation_path is light but its opening review has M findings; the limit is 3.`
+   5. Per finding K whose `remediability` is not exactly `autonomous`, a non-object finding included: `Checkpoint remediation cycle #N remediation_path is light but finding #K is not autonomous.`
+   6. Per finding K whose `scope` is not exactly `contained`, absent included: `Checkpoint remediation cycle #N remediation_path is light but finding #K scope is not contained.`
+   7. The immediately prior list element is an object whose `remediation_path` is exactly `light`: `Checkpoint remediation cycle #N remediation_path is light but the prior cycle is light.`
+
+   Route (D9): the installed MCP validator applies invariant 8 only after the extension release that carries it is installed. Until then, a Claude run validates a light checkpoint through the repository-local Python CLI, and on Codex, whose completion boundary is the installed MCP validator, the light path is unavailable.
 
 ## Invariants (remediation_loop.review_outcomes)
 
@@ -108,6 +119,10 @@ Derivation order. The verdict is a pure function of the findings' classes, evalu
 2. **Verdict and class membership (R9).** Each outcome's `verdict` must be a string among the four verdicts, its `findings` must be a list (a missing key is not a list), and each finding must be an object whose `remediability` is a string among the five classes. Comparisons are case-sensitive, so a case variant such as `Pass` or `Autonomous` is malformed.
 
 3. **Verdict matches its findings (R10).** When an outcome passes the membership checks, its `verdict` must equal the verdict that the derivation order yields for its findings' classes. A mismatch is a malformed outcome.
+
+## Concurrent-Review Key (review_mode)
+
+The top-level checkpoint key `review_mode` selects the concurrent run sequence. Only the exact string `concurrent`, compared ordinally, activates it; an absent key, `null`, `sequential`, a case variant, a number, and every other value mean sequential. Under the key, each `remediation_loop.review_outcomes[]` entry carries `head_sha`, the full lowercase head the review ran against. `## Concurrent Review and CI (review_mode)` in `.agents/skills/orchestrate/SKILL.md` defines the run sequence.
 
 ## Human-Interaction Scope and Backward Compatibility
 

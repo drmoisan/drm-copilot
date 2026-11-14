@@ -16,7 +16,7 @@
 
 Brief approach to reach the target structure while keeping behavior stable.
 
-Fail-closed evidence rule: include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+Fail-closed evidence rule: include explicit baseline artifact tasks (static baselines and one `Phase 0 baseline` run of each test gate), final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
 
 Evidence accounting rule: record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
 
@@ -30,6 +30,7 @@ Evidence accounting rule: record the expected artifact path or location in each 
 - [ ] Apply moves/renames to reach the target layout
 - [ ] Update imports/tooling/entry points
 - [ ] Remove or redirect legacy paths
+- [ ] [phase-gate] Run the full toolchain loop (stages 1 to 6) per `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill and record `<FEATURE>/evidence/qa-gates/phase-gate.P2.<timestamp>.md`
 
 ### Phase 3: Verification & Cleanup [0%]
 - [ ] Run tests/type checks; fix fallout
@@ -52,7 +53,7 @@ Evidence accounting rule: record the expected artifact path or location in each 
 - Unit/Integration: impacted modules and any regression tests for invariants
 - CLI/Workflow: end-to-end commands/tasks expected to remain stable
 - Tooling: lint/type checks after path updates
-- Coverage evidence: list baseline artifact paths, post-change artifact paths, and comparison artifact paths for each in-scope language
+- Coverage evidence: list baseline artifact paths (static and `Phase 0 baseline`), post-change artifact paths, and comparison artifact paths, with the per-file threshold results from the single gate run, for each in-scope language
 
 ## Rollback / Contingency
 
