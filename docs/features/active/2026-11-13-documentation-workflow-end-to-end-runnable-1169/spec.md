@@ -182,7 +182,7 @@ Each criterion names the Pester suite intended to prove it. Suite names under `t
 - [x] With a checkpoint present at R, ready or not, the docs leg does not allow, and the gate's existing checkpoint-governed behavior is unchanged. Same gate suites.
 - [x] Without a profile file at R, every gate deny reason is byte-identical to the reason produced before this change. Same gate suites.
 - [x] A Write to `artifacts/pr_body_<N>.receipt.json` with no checkpoint and a valid profile at R is allowed. The same Write denies with no profile, with an invalid profile, or with a checkpoint present, and a Write to any other `.json` path is not admitted by the docs leg. Same gate suites.
-- [x] The existing cleanup-leg suites (`claude-hooks/enforce-orchestration-preimplementation-gate.Cleanup.Tests.ps1`, `codex-hooks/enforce-orchestration-preimplementation-gate-cleanup.Tests.ps1`) pass unchanged.
+- [ ] The existing cleanup-leg suites (`claude-hooks/enforce-orchestration-preimplementation-gate.Cleanup.Tests.ps1`, `codex-hooks/enforce-orchestration-preimplementation-gate-cleanup.Tests.ps1`) pass unchanged.
 - [x] `hook-docs-estate-context.ps1` and `enforce-orchestration-preimplementation-gate-docs.ps1` are byte-identical across `.claude/hooks/`, `.codex/hooks/`, and both push-down bundles. Suite: `claude-hooks/hook-docs-estate-context.Parity.Tests.ps1`, together with the existing push-down contract tests.
 
 ### A2
