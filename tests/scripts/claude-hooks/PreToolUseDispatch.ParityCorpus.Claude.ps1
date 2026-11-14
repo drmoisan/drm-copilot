@@ -109,7 +109,9 @@
         }
     )
     NoEnvelope = @{
-        'enforce-docs-role-write-scope.ps1' = 'needs a filesystem mock: the deny path reads the documentation role from the subagent transcript named by transcript_path'
-        'enforce-model-routing-receipt.ps1' = 'needs a filesystem mock: the allow path resolves the item worktree and its routing receipt from the checkpoint files on disk'
+        'enforce-docs-role-write-scope.ps1'     = 'needs a filesystem mock: the deny path reads the documentation role from the subagent transcript named by transcript_path'
+        'enforce-model-routing-receipt.ps1'     = 'needs a filesystem mock: the allow path resolves the item worktree and its routing receipt from the checkpoint files on disk'
+        # Arrived from origin/main (issue #1157) at the [P7-T1] integration pass.
+        'enforce-owner-directive-pass-down.ps1' = 'needs a filesystem mock: the deny path reads an owner-directive ledger or checkpoint entry under artifacts/orchestration; a missing tool_input ends in a terminating error (exit 1), not a deny'
     }
 }

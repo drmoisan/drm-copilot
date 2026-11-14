@@ -34,7 +34,7 @@
 
 # Shared recorded-path matcher and main-checkout-root seam (issue #995).
 # Branch resolver for a host-moved worktree_path record (issue #1163).
-try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/AgentTargetWorktree.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'AgentTargetWorktree.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/AgentTargetWorktree.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'AgentTargetWorktree.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunRecordPath.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunRecordPath.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
 
