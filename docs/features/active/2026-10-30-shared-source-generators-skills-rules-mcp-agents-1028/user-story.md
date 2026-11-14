@@ -43,14 +43,14 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
   - Outcome: the Claude Markdown, the Codex base TOML, the Codex variants and the bundle copies agree, and both check modes pass.
 - Scenario: execution start
   - Trigger: the orchestrator delegates the plan.
-  - Steps: the Phase 0 gate checks owner decisions OQ-1 to OQ-9, the merge of child 1 and child 2 into the integration branch, the merge of the parallel run `bugs-1001-1002-1003-1006` to `main`, and every named file, symbol and heading against the merge base of `origin/main` and `HEAD`.
+  - Steps: the Phase 0 gate checks owner decisions OQ-1 to OQ-9, the merge of child 1 and child 2 into the integration branch, the selected targets and pinned frozen files, and every named file, symbol and heading against the merge base of `origin/main` and `HEAD`.
   - Outcome: execution proceeds only when every check passes; otherwise it stops and records the reason.
 
 ## Acceptance Criteria
 
 ### Phase 0 gate
 
-- [ ] Execution stops before any change, with the reason recorded in `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md`, when any owner decision OQ-1 to OQ-9 in the spec is pending or answered differently from its default, when child 1's or child 2's outputs are not merged into the integration branch, when the parallel run `bugs-1001-1002-1003-1006` has not merged to `main`, or when a named file, symbol or heading has moved relative to the merge base of `origin/main` and `HEAD`.
+- [ ] Execution stops before any change, with the reason recorded in `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md`, when an owner answer recorded in the spec differs from its default or the plan departs from a recorded decision (spec D-1), when child 1's or child 2's outputs are not merged into the integration branch, when an approved difference would change a pinned frozen file or a selected target does not exist, or when a named file, symbol or heading has moved relative to the merge base of `origin/main` and `HEAD`.
 
 ### Generation and drift reporting
 
@@ -81,14 +81,14 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 
 ### CI
 
-- [ ] Every check mode runs in the existing required `poshqc / PowerShell QC` check through one Pester repository gate, with no new CI job, and the check passes on the pull request head (CI-dependent; checked off at S9).
+- [ ] Every check mode runs in the existing `poshqc / PowerShell QC` shards through one Pester repository gate, with no new CI job, and the required `CI Required Gate` check passes on the pull request head (CI-dependent; checked off at S9).
 - [ ] The parity-matrix entries owned by this child record their single source in `generated_from` and their generator in `generator` once the source exists, and child 1's matrix gate passes.
 
 ### Quality and language
 
 - [ ] No new Python or TypeScript file is added; every new code file is PowerShell and is listed with its language in the spec's `## Language Classification`.
-- [ ] Each new PowerShell module has at least 85% line coverage, the isolation runs required by the execution-environment brief pass, and no added or changed file exceeds 800 lines.
-- [ ] No file in the parallel run's blast radius, in child 2's files, or in the spec's excluded paths is changed by this child.
+- [ ] Each new PowerShell module has at least 85% line coverage, the parallel test gates and the leak scan pass (spec D-6), and no added or changed file exceeds 800 lines.
+- [ ] No blast-radius tooling file, child 2 file, or file in the spec's excluded paths is changed by this child.
 
 ## Non-Goals
 
