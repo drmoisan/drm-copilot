@@ -136,4 +136,145 @@ Describe 'Claude preimplementation gate parallel records leg (issue #1182)' {
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow' -Because "reason: $($decision.hookSpecificOutput.permissionDecisionReason)"
         }
     }
+
+    Context 'AC-10 denials with a parallel records sub-code' {
+        It 'denies <SubCode> after the unchanged deny text' -ForEach @(
+            @{ SubCode = 'PARALLEL_RECORDS_CHECKPOINT_UNREADABLE'; Text = '[1]' }
+            @{ SubCode = 'PARALLEL_RECORDS_SLUG_MISMATCH'; Text = 'slug' }
+            @{ SubCode = 'PARALLEL_RECORDS_RUN_NOT_CLOSED'; Text = 'open' }
+            @{ SubCode = 'PARALLEL_RECORDS_RECEIPT_MISSING'; Text = 'missing' }
+            @{ SubCode = 'PARALLEL_RECORDS_RECEIPT_INVALID'; Text = 'invalid' }
+        ) {
+            # Arrange
+            $badReceipt = New-ParallelRecordsReceipt
+            $badReceipt['model'] = 'haiku-other'
+            $checkpointText = switch ($Text) {
+                'slug' { New-ParallelRecordsCheckpointText -Slug 'other-run' }
+                'open' { New-ParallelRecordsCheckpointText -Items @([ordered]@{ issue_num = 103; state = 'in_flight'; merge_status = 'pr_open' }) }
+                'missing' { New-ParallelRecordsCheckpointText -OmitReceipts }
+                'invalid' { New-ParallelRecordsCheckpointText -Receipts @($badReceipt) }
+                default { $Text }
+            }
+            Set-ParallelRecordsGateFixture -CheckpointText $checkpointText
+
+            # Act
+            $reason = [string](Get-ParallelRecordsGateDecision -Payload (ConvertTo-ParallelRecordsPayload -FilePath $script:RelativeReceipt)).hookSpecificOutput.permissionDecisionReason
+
+            # Assert
+            $reason.StartsWith("$($script:Blocked) Parallel records leg not applied: $($SubCode): ", [System.StringComparison]::Ordinal) | Should -BeTrue -Because "the reason '$reason' must carry $SubCode after the unchanged text and the empty cleanup, bookkeeping, and docs suffixes"
+        }
+    }
+
+    Context 'AC-11 unchanged behavior' {
+        It '(<Case>) keeps the deny text byte-identical with no parallel suffix' -ForEach @(
+            @{ Case = 'a an Edit of the receipt path'; Tool = 'Edit'; Path = 'artifacts/pr_body_77.receipt.json' }
+            @{ Case = 'b a Write of artifacts/other.json'; Tool = 'Write'; Path = 'artifacts/other.json' }
+            @{ Case = 'b a Write of scripts/x.ps1'; Tool = 'Write'; Path = 'scripts/x.ps1' }
+            @{ Case = 'b an absolute Write of another implementation path'; Tool = 'Write'; Path = '/synthetic-worktrees/coordinator/artifacts/other.json' }
+            @{ Case = 'c a Write whose path differs only in case'; Tool = 'Write'; Path = 'artifacts/PR_BODY_5.receipt.json' }
+            @{ Case = 'an absolute receipt Write outside every registered root'; Tool = 'Write'; Path = '/synthetic-worktrees/unlisted/artifacts/pr_body_77.receipt.json' }
+        ) {
+            # Act
+            $decision = Get-ParallelRecordsGateDecision -Payload (ConvertTo-ParallelRecordsPayload -Tool $Tool -FilePath $Path)
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:Blocked
+            Should -Invoke Get-WorktreeRunCheckpointText -Times 0 -Exactly -ParameterFilter { ([string]$Path -replace '\\', '/').EndsWith('/parallel-orchestrator-state.json', [System.StringComparison]::Ordinal) }
+        }
+
+        It '(d) keeps the deny text byte-identical when the HEAD branch of R is <Head>' -ForEach @(
+            @{ Head = 'main' }
+            @{ Head = 'parallel/demo-run' }
+        ) {
+            # Arrange
+            Set-ParallelRecordsGateFixture -HeadBranch $Head
+
+            # Act
+            $decision = Get-ParallelRecordsGateDecision -Payload (ConvertTo-ParallelRecordsPayload -FilePath $script:RelativeReceipt)
+
+            # Assert
+            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:Blocked
+        }
+
+        It '(e) keeps the deny text byte-identical when a per-feature checkpoint exists beneath R' {
+            # Arrange
+            Set-ParallelRecordsGateFixture -ItemCheckpointText '{"issue-num":"5"}'
+
+            # Act
+            $decision = Get-ParallelRecordsGateDecision -Payload (ConvertTo-ParallelRecordsPayload -FilePath $script:RelativeReceipt)
+
+            # Assert
+            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:Blocked
+            Should -Invoke Get-EpicScopeWorktreeHeadBranch -Times 0 -Exactly
+        }
+
+        It '(f) never reaches the parallel leg for a command payload' {
+            # Act
+            $decision = Get-ParallelRecordsGateDecision -Payload (ConvertTo-ParallelRecordsPayload -Tool 'Bash' -Command 'git add -- docs/features/parallel/demo-run/parallel-status.md')
+
+            # Assert
+            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -Not -BeLike '*Parallel records leg*'
+            Should -Invoke Get-WorktreeRunCheckpointText -Times 0 -Exactly -ParameterFilter { ([string]$Path -replace '\\', '/').EndsWith('/parallel-orchestrator-state.json', [System.StringComparison]::Ordinal) }
+        }
+
+        It '(g) allows the body Write artifacts/pr_body_77.md without reaching the parallel leg' {
+            # Act
+            $decision = Get-ParallelRecordsGateDecision -Payload (ConvertTo-ParallelRecordsPayload -FilePath 'artifacts/pr_body_77.md')
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+            Should -Invoke Get-WorktreeRunCheckpointText -Times 0 -Exactly -ParameterFilter { ([string]$Path -replace '\\', '/').EndsWith('/parallel-orchestrator-state.json', [System.StringComparison]::Ordinal) }
+            Should -Invoke Get-EpicScopeWorktreeHeadBranch -Times 0 -Exactly
+        }
+    }
+
+    Context 'AC-12 never throws' {
+        It 'declines with an empty suffix and keeps today''s deny text when <Seam> throws' -ForEach @(
+            @{ Seam = 'Get-EpicScopeWorktreeHeadBranch' }
+            @{ Seam = 'Get-WorktreeRunCheckpointText' }
+        ) {
+            # Arrange
+            Mock $Seam -ParameterFilter { $true } -MockWith { throw [System.IO.IOException]::new('locked') }
+            $toolInput = [pscustomobject]@{ file_path = $script:RelativeReceipt; content = '{}' }
+
+            # Act
+            $leg = Get-OrchestrationParallelRecordsResult -ToolInput $toolInput -FilePath $script:RelativeReceipt
+            $decision = Get-ParallelRecordsGateDecision -Payload (ConvertTo-ParallelRecordsPayload -FilePath $script:RelativeReceipt)
+
+            # Assert
+            $leg.Allowed | Should -BeFalse
+            $leg.DenySuffix | Should -BeExactly ''
+            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeExactly $script:Blocked
+        }
+
+        It 'declines with an empty suffix when the worktree listing throws, and the gate keeps its own target-resolution deny' {
+            # Arrange: the gate resolves an absolute path's target from the same listing before the
+            # deny tail, so today's decision for this payload is that resolver's deny, unchanged.
+            Mock Get-OrchestrationGateWorktreeList -ParameterFilter { $true } -MockWith { throw [System.IO.IOException]::new('locked') }
+            $toolInput = [pscustomobject]@{ file_path = $script:AbsoluteReceipt; content = '{}' }
+
+            # Act
+            $leg = Get-OrchestrationParallelRecordsResult -ToolInput $toolInput -FilePath $script:AbsoluteReceipt
+            $decision = Get-ParallelRecordsGateDecision -Payload (ConvertTo-ParallelRecordsPayload -FilePath $script:AbsoluteReceipt)
+
+            # Assert
+            $leg.Allowed | Should -BeFalse
+            $leg.DenySuffix | Should -BeExactly ''
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -Not -BeLike '*Parallel records leg*'
+        }
+
+        It 'declines with an empty suffix for <Case>' -ForEach @(
+            @{ Case = 'a null tool input'; ToolInput = $null; Path = 'artifacts/pr_body_77.receipt.json' }
+            @{ Case = 'an empty file path'; ToolInput = [pscustomobject]@{ content = '{}' }; Path = '' }
+        ) {
+            # Act
+            $leg = Get-OrchestrationParallelRecordsResult -ToolInput $ToolInput -FilePath $Path
+
+            # Assert
+            $leg.Allowed | Should -BeFalse
+            $leg.DenySuffix | Should -BeExactly ''
+        }
+    }
 }
