@@ -56,6 +56,7 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicSco
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeReadiness.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'EpicScopeReadiness.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/HookTargetWorktree.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookTargetWorktree.psm1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-epic-fan-in.ps1') } catch { Add-HookDependencyFailure -Name 'hook-epic-fan-in.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-epic-regeneration.ps1') } catch { Add-HookDependencyFailure -Name 'hook-epic-regeneration.ps1' -ErrorRecord $_ }
 # Per-segment target resolution for the epic-scope decision (issue #738).
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-targets.ps1')
 
@@ -351,7 +352,8 @@ function Get-OrchestrationEpicScopeDecision {
         target whose failure is exactly 'merge-in-progress' passes when Test-EpicFanInComplete
         holds and Get-EpicFanInAllowance reports Allowed. Merged-feature follow-up allowance
         (issue #1141): for that same failure, the target also passes when
-        Get-EpicMergedFeatureFollowUpAllowance reports Allowed.
+        Get-EpicMergedFeatureFollowUpAllowance reports Allowed. Regeneration allowance (issue #1156):
+        for that same failure, the target also passes when Get-EpicRegenerationAllowance reports Allowed.
     .PARAMETER Command
         The Bash command line; empty for a path leg.
     .PARAMETER FilePath
@@ -388,6 +390,10 @@ function Get-OrchestrationEpicScopeDecision {
         }
         if ($failure -ceq 'merge-in-progress' -and
             (Get-EpicMergedFeatureFollowUpAllowance -Scope $Scope -FilePath @($FilePath) -Command $epicScopeText -StagedIndexReader $reader).Allowed) {
+            return ''
+        }
+        if ($failure -ceq 'merge-in-progress' -and
+            (Get-EpicRegenerationAllowance -Scope $Scope -FilePath @($FilePath) -Command $epicScopeText -StagedIndexReader $reader -ConfigReader ${function:Read-EpicRegenerationConfig}).Allowed) {
             return ''
         }
         $failure

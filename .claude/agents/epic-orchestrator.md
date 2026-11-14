@@ -15,6 +15,7 @@ tools:
   - "Bash(git *)"
   - "Bash(gh *)"
   - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)"
+  - "Bash(pwsh -NoProfile -File .claude/lib/regeneration/Invoke-RegenerationPath.ps1*)"
   - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
   - "Bash(poetry run python -m scripts.dev_tools.validate_orchestration_artifacts *)"
   - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
