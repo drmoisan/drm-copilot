@@ -5,50 +5,48 @@
 - **Owner:** drmoisan
 - **Last Updated:** 2026-11-14T03-36
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 0.2
 
 **Fail-closed evidence rule:** Include explicit baseline artifact tasks (static baselines and one `Phase 0 baseline` run of each test gate), final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
 
 **Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
 
+**Terms.** FEATURE is `docs/features/active/2026-11-14-prettier-format-check-fails-on-docs-fixtures-1179`. SCRATCH resolves to `<session scratchpad>/issue-1179/`; every scratch file name starts with `issue-1179-`. The three fixtures are `config-surface-corpus.json`, `python-native-corpus.json`, and `python-surface-corpus.json` under `tests/scripts/claude-lib/docs/fixtures/`. Tool routes follow the `execution-environment` skill (sibling-worktree forms, sh launcher for PowerShell, PoshQC MCP carries no output). All evidence artifacts carry `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, with a clock-read UTC stamp in the file name, and are append-only (a re-run writes a new file).
+
+**Scope.** Fixture formatting with Prettier, one added CI step, nothing else. No new Python, no new CI job, no change to `.prettierignore`, Prettier configuration, `ci.yml`, or the `ci-required-gate` needs list. Acceptance Criteria source: `spec.md`.
+
 ## Pre-Mortem
 
-<!-- One bullet per label; state how the next review or CI run could fail on that dimension and the mitigation, or "not applicable" with the reason. -->
-- Review checklists:
-- Coverage:
-- Mirror parity:
-- File size:
-- Test isolation:
-- CI-only behavior:
-- Evidence:
+- Review checklists: the workflow change needs a green run on the branch head (rule `modified-workflow-needs-green-run`); P2-T4 lists that criterion and its companion contract-test criterion as pending-CI, to be closed at S9, and the self-review in P2-T6 walks the three audit templates.
+- Coverage: no production code changes (fixtures and workflow YAML only), so no coverage delta is claimed; the Pester baseline and final runs still record numeric headline coverage and the pytest runs record pass counts, and the comparison asserts no drop and no new failure.
+- Mirror parity: no mirrored or bundled file changes, and no fact the execution-environment brief states changes (no job renamed or added, no required context, tool route, or batch-budget rule changes; the new step is not named in the brief). No brief-update task is needed, and no `extensions/drm-copilot/resources/` copy exists for the fixtures.
+- File size: JSON is outside the file-size gate and none of the three fixtures is listed in `config/file-size-baseline.json`; the workflow gains one step. Not a failure risk.
+- Test isolation: gates are one `Invoke-PoshQCParallelTest` run (docs suites), one `pytest -n auto` run, and Jest through its normal parallel workers only if a TypeScript file is forced to change (otherwise not run); each is re-run only after a fix. Task checks are not gates. No temporary files are created by tests; the scratch hashing script lives under SCRATCH and is not committed. One suite runs at a time because five orchestrations share the machine.
+- CI-only behavior: the step first runs on `windows-latest` and `ubuntu-latest` in CI; line endings agree because of the `* text=auto eol=lf` attribute and Prettier's default end-of-line setting. A root file other than the fixtures could be unformatted and fail only in CI, so P1-T3 runs the full root check and formats any further flagged file. The step is skipped on docs-only runs, so only a full-run green CI is evidence.
+- Evidence: before and after `format:check` output, the decoded-value hashes, and the gate results are recorded under `FEATURE/evidence/<kind>/` with the fields above; CI-dependent criteria stay unchecked until S9.
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+### Phase 0 — Baseline Capture
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+- [ ] [P0-T1] Run the root `format:check` script (`package.json` script `format:check`) once with `npm --prefix` on the repository root and record `FEATURE/evidence/baseline/format-check.<timestamp>.md` with the exit code and the list of files Prettier reports. Acceptance: EXIT_CODE is non-zero and the listed files include the three fixtures; any other listed file is recorded by path in `Output Summary:`.
+- [ ] [P0-T2] Write the scratch node script `SCRATCH/issue-1179-json-hash.cjs` (not committed) that parses each fixture and prints a SHA-256 of `JSON.stringify` of the decoded value, run before any edit, and record `FEATURE/evidence/baseline/fixture-json-hash.<timestamp>.md` with one hash per fixture. Acceptance: three distinct hash values are recorded and the script exits 0.
+- [ ] [P0-T3] Run one `Invoke-PoshQCParallelTest` over `tests/scripts/claude-lib/docs` (Pester 6, sh-launcher route, `ExitCode` read first) and record `FEATURE/evidence/baseline/pester-docs.<timestamp>.md` with pass and fail counts read from `artifacts/pester/pester-junit.xml` and the repo-wide line coverage read from `artifacts/pester/powershell-coverage.xml`. Acceptance: EXIT_CODE is 0, fail count is 0, numeric coverage is recorded. This is the `Phase 0 baseline` of the Pester gate.
+- [ ] [P0-T4] Run one `pytest -n auto` over `tests/scripts/claude-lib/docs/python/test_docs_python_native_corpus.py` and record `FEATURE/evidence/baseline/pytest-docs-native-corpus.<timestamp>.md` with the pass and fail counts. Acceptance: EXIT_CODE is 0 and the fail count is 0. No coverage option is passed because no Python production file changes. This is the `Phase 0 baseline` of the pytest gate.
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#1179-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the parallel test gate to confirm the new regression test fails and captures the repro
+### Phase 1 — Fix
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+- [ ] [P1-T1] Format the fixtures by running the root `format` script (Prettier write over the same globs as `format:check`) with `npm --prefix` on the repository root, then confirm the change with `git status --porcelain` and a before-and-after tree observation: the three fixtures under `tests/scripts/claude-lib/docs/fixtures/` appear as modified, and no other tracked file outside the fixtures appears except a file listed in P0-T1. Acceptance: `git status --porcelain` lists the three fixtures; write the task check to `FEATURE/evidence/other/task-check.P1-T1.<timestamp>.md`.
+- [ ] [P1-T2] Re-run `SCRATCH/issue-1179-json-hash.cjs` and record `FEATURE/evidence/regression-testing/fixture-json-equality.<timestamp>.md` comparing each hash with the lexicographically greatest `FEATURE/evidence/baseline/fixture-json-hash.*.md`. Acceptance: all three hashes are equal to their baseline value (a differing hash fails the task and requires reverting that fixture).
+- [ ] [P1-T3] Run the root `format:check` script again with `npm --prefix` and record `FEATURE/evidence/regression-testing/format-check.<timestamp>.md`. Acceptance: EXIT_CODE is 0. If any file other than the three fixtures was recorded in P0-T1, it was formatted by the P1-T1 write run and its change is Prettier-only; record each such path in `Output Summary:`, or record that none was flagged.
+- [ ] [P1-T4] Edit `.github/workflows/_root-typescript-tests.yml`: insert, after the step "Install root dependencies" and before "Run root TypeScript toolchain and jest suite", a step named "Check root formatting" whose `run:` is `npm run format:check`, with no `if:` and no matrix condition so that both matrix legs run it. Acceptance: the step exists exactly once, in that position, and `.github/workflows/ci.yml` is unmodified (`git status --porcelain` lists `_root-typescript-tests.yml` as modified and not `ci.yml`); task check at `FEATURE/evidence/other/task-check.P1-T4.<timestamp>.md`.
+- [ ] [P1-T5] Task check for the changed workflow: run `tests/scripts/dev_tools/test_host_environment_contracts.py::test_development_node_workflow_matches_host_baseline` (reads the node-version of the workflow; disposition unchanged, unaffected) and `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` (pins brief contents and job names; disposition unchanged, unaffected because the brief states no step of this workflow). Acceptance: both pass; selection and results recorded in `FEATURE/evidence/other/task-check.P1-T5.<timestamp>.md`.
+- [ ] [P1-T6] Task check for the changed workflow, Pester side: run `tests/scripts/workflows/CiRequiredGateWorkflow.Tests.ps1` (pins the `needs:` set of `ci-required-gate`; unchanged, no job added), `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1` (reads job ids; unchanged), `tests/scripts/ci/Invoke-CiRequiredGate.Tests.ps1`, and `tests/scripts/ci/CiRequiredGate.Tests.ps1` (script behavior; unchanged) through `New-PesterConfiguration` with `Run.Exit` set to true. Acceptance: exit status 0 and zero failures; recorded in `FEATURE/evidence/other/task-check.P1-T6.<timestamp>.md`. This is not a gate.
+- [ ] [P1-T7] [phase-gate] Phase 1 gate: run stages 1 to 6 across the repository in order: the root `format:check` (exit 0), the root lint script (not required to change; run only if P1-T3 formatted a TypeScript file, otherwise recorded N/A with the reason), one `Invoke-PoshQCParallelTest` run over `tests/scripts/claude-lib/docs`, and one `pytest -n auto` run of `tests/scripts/claude-lib/docs/python/test_docs_python_native_corpus.py`. Architecture-boundary, contract, and integration stages: no change in scope, recorded N/A; integration and golden suites run in CI only. Acceptance: every stage that runs passes in one clean pass, restarting from stage 1 after any fix; evidence `FEATURE/evidence/qa-gates/phase-gate.P1.<timestamp>.md`.
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run the repro to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record the baseline (static and `Phase 0 baseline`), post-change, and comparison artifact paths and the per-file threshold results for each in-scope language where coverage is required
+### Phase 2 — Final QA and Verification
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
-
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
-
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+- [ ] [P2-T1] Record the one final-QC static artifact `FEATURE/evidence/qa-gates/final-qc-static.<timestamp>.md` with the root `format:check` result (command, exit code, finding count). Acceptance: the format step has EXIT_CODE 0 and zero findings; lint and type-check steps are recorded as N/A because no TypeScript file changed (or as run results if P1-T3 formatted one).
+- [ ] [P2-T2] Run one final `Invoke-PoshQCParallelTest` over `tests/scripts/claude-lib/docs` and record `FEATURE/evidence/qa-gates/final-pester-docs.<timestamp>.md`. Acceptance: EXIT_CODE 0, zero failures, pass count not below the baseline in the lexicographically greatest `FEATURE/evidence/baseline/pester-docs.*.md`, and repo-wide line coverage not below that baseline.
+- [ ] [P2-T3] Run one final `pytest -n auto` of `tests/scripts/claude-lib/docs/python/test_docs_python_native_corpus.py` and record `FEATURE/evidence/qa-gates/final-pytest-docs-native-corpus.<timestamp>.md`. Acceptance: EXIT_CODE 0, zero failures, pass count equal to the baseline in the lexicographically greatest `FEATURE/evidence/baseline/pytest-docs-native-corpus.*.md`.
+- [ ] [P2-T4] Write the acceptance verification artifact `FEATURE/evidence/qa-gates/ac-verification.<timestamp>.md` mapping each `## Acceptance Criteria` item of `spec.md` to its evidence file. Acceptance: all non-CI items map to an existing artifact (format baseline red and final green, equal hashes, additional-file record, Pester, pytest, workflow step, unchanged-files check); the two CI-dependent items are listed as `pending-CI` and stay unchecked.
+- [ ] [P2-T5] Verify scope against the merge-base derivation: record the output of `git diff --name-only` between the merge base of `origin/main` and `HEAD` and the worktree, together with `git status --porcelain`, in `FEATURE/evidence/qa-gates/scope-check.<timestamp>.md`. Acceptance: changed paths are limited to the three fixtures, `.github/workflows/_root-typescript-tests.yml`, any additional file recorded in P1-T3, and `FEATURE/`; `.prettierignore`, `.github/workflows/ci.yml`, `package.json`, and any Prettier configuration are absent from the list, and no `.py` file is added.
+- [ ] [P2-T6] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item. Acceptance: no FAIL row; a FAIL row is fixed and the Phase 2 QA tasks re-run before the self-review is rewritten as a new file.
