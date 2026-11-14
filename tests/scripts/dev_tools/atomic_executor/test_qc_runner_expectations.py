@@ -8,6 +8,8 @@ run_jest_with_expectations. subprocess.run is replaced through monkeypatch, so n
 process starts.
 """
 
+from __future__ import annotations
+
 from collections.abc import Callable
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -55,7 +57,7 @@ def _identity(argv: list[str]) -> list[str]:
 
 
 def _patch_run(
-    monkeypatch: "MonkeyPatch", returncode: int, stdout: str
+    monkeypatch: MonkeyPatch, returncode: int, stdout: str
 ) -> list[dict[str, object]]:
     """
     Replace subprocess.run with a fake that reports one fixed result.
@@ -76,7 +78,7 @@ def _patch_run(
 
     def fake_run(
         argv: list[str], **kwargs: object
-    ) -> "qre.subprocess.CompletedProcess[str]":
+    ) -> qre.subprocess.CompletedProcess[str]:
         """Record the call and report the fixed result."""
         calls.append(kwargs)
         if kwargs.get("check") and returncode != 0:
@@ -89,7 +91,7 @@ def _patch_run(
     return calls
 
 
-def _forbid_parsers(monkeypatch: "MonkeyPatch") -> None:
+def _forbid_parsers(monkeypatch: MonkeyPatch) -> None:
     """Replace both output parsers with functions that fail the test if called."""
 
     def no_pytest_parse(output: str) -> PytestFailureSummary:
@@ -169,7 +171,7 @@ class TestClassifyLauncherExit:
         self,
         returncode: int,
         output: str | None,
-        expected: "qre.LauncherOutcome | None",
+        expected: qre.LauncherOutcome | None,
     ) -> None:
         """Each exit code and first output line maps to its outcome."""
         assert qre.classify_launcher_exit(returncode, output) is expected
@@ -186,7 +188,7 @@ class TestLauncherRefusal:
         ],
     )
     def test_message_starts_with_prefix(
-        self, outcome: "qre.LauncherOutcome", prefix: str
+        self, outcome: qre.LauncherOutcome, prefix: str
     ) -> None:
         """The report line starts with the outcome's prefix and is one line."""
         message = qre.launcher_refusal_message(outcome)
@@ -215,7 +217,7 @@ class TestRunWithExpectationsLauncherOutcomes:
     """Launcher outcomes in run_pytest_with_expectations and the Jest twin."""
 
     def test_queue_timeout_raises_before_parsing(
-        self, run: RunFunction, monkeypatch: "MonkeyPatch"
+        self, run: RunFunction, monkeypatch: MonkeyPatch
     ) -> None:
         """With expectations, exit 75 raises LauncherRefusedError unparsed."""
         _patch_run(monkeypatch, 75, QUEUE_LINE)
@@ -229,7 +231,7 @@ class TestRunWithExpectationsLauncherOutcomes:
         assert info.value.outcome is qre.LauncherOutcome.QUEUE_TIMEOUT
 
     def test_policy_refusal_raises_before_parsing(
-        self, run: RunFunction, monkeypatch: "MonkeyPatch"
+        self, run: RunFunction, monkeypatch: MonkeyPatch
     ) -> None:
         """With expectations, exit 2 with the refusal line first raises unparsed."""
         _patch_run(monkeypatch, 2, REFUSAL_LINE + "\n")
@@ -242,7 +244,7 @@ class TestRunWithExpectationsLauncherOutcomes:
         assert info.value.outcome is qre.LauncherOutcome.POLICY_REFUSAL
 
     def test_without_expectations_exit_75_raises_launcher_error(
-        self, run: RunFunction, monkeypatch: "MonkeyPatch"
+        self, run: RunFunction, monkeypatch: MonkeyPatch
     ) -> None:
         """Without expectations (no capture), exit 75 still converts."""
         calls = _patch_run(monkeypatch, 75, "")
@@ -255,7 +257,7 @@ class TestRunWithExpectationsLauncherOutcomes:
         assert calls[0]["capture_output"] is False
 
     def test_without_expectations_exit_2_stays_plain(
-        self, run: RunFunction, monkeypatch: "MonkeyPatch"
+        self, run: RunFunction, monkeypatch: MonkeyPatch
     ) -> None:
         """Without expectations, exit 2 cannot be proven a refusal and re-raises."""
         _patch_run(monkeypatch, 2, "")
@@ -271,7 +273,7 @@ class TestPytestExpectationsKeepTodaysHandling:
     """Exits without a launcher outcome keep the existing pytest handling."""
 
     def test_exit_2_collection_error_reaches_parser(
-        self, monkeypatch: "MonkeyPatch"
+        self, monkeypatch: MonkeyPatch
     ) -> None:
         """A pytest exit 2 with session output is parsed and raises plainly."""
         _patch_run(monkeypatch, 2, PYTEST_SESSION)
@@ -292,7 +294,7 @@ class TestPytestExpectationsKeepTodaysHandling:
         assert not isinstance(info.value, qre.LauncherRefusedError)
 
     def test_exit_1_unexpected_failure_raises_plain(
-        self, monkeypatch: "MonkeyPatch"
+        self, monkeypatch: MonkeyPatch
     ) -> None:
         """An unexpected pytest failure keeps raising the plain error."""
         _patch_run(monkeypatch, 1, "FAILED tests/test_a.py::test_x - AssertionError")
@@ -303,7 +305,7 @@ class TestPytestExpectationsKeepTodaysHandling:
         assert not isinstance(info.value, qre.LauncherRefusedError)
 
     def test_exit_1_expected_failure_is_tolerated(
-        self, monkeypatch: "MonkeyPatch"
+        self, monkeypatch: MonkeyPatch
     ) -> None:
         """An expected-fail pytest failure is still tolerated."""
         _patch_run(monkeypatch, 1, "FAILED tests/test_a.py::test_x - AssertionError")
@@ -322,7 +324,7 @@ class TestJestExpectationsKeepTodaysHandling:
     """Exits without a launcher outcome keep the existing Jest handling."""
 
     def test_refusal_line_precedes_runtime_error_raise(
-        self, monkeypatch: "MonkeyPatch"
+        self, monkeypatch: MonkeyPatch
     ) -> None:
         """A refusal line first wins over output the parser reads as a crash."""
         _patch_run(monkeypatch, 2, REFUSAL_LINE + "\n" + JEST_RUNTIME_ERROR)
@@ -332,9 +334,7 @@ class TestJestExpectationsKeepTodaysHandling:
 
         assert info.value.outcome is qre.LauncherOutcome.POLICY_REFUSAL
 
-    def test_exit_2_runtime_error_raises_plain(
-        self, monkeypatch: "MonkeyPatch"
-    ) -> None:
+    def test_exit_2_runtime_error_raises_plain(self, monkeypatch: MonkeyPatch) -> None:
         """A Jest exit 2 without the prefix line keeps the runtime-error raise."""
         _patch_run(monkeypatch, 2, JEST_RUNTIME_ERROR)
 
@@ -344,7 +344,7 @@ class TestJestExpectationsKeepTodaysHandling:
         assert not isinstance(info.value, qre.LauncherRefusedError)
 
     def test_exit_1_unexpected_failure_raises_plain(
-        self, monkeypatch: "MonkeyPatch"
+        self, monkeypatch: MonkeyPatch
     ) -> None:
         """An unexpected Jest failure keeps raising the plain error."""
         _patch_run(monkeypatch, 1, "FAIL test/a.test.ts\n● suite > case\n")
@@ -353,3 +353,124 @@ class TestJestExpectationsKeepTodaysHandling:
             _run_jest(_expectations())
 
         assert not isinstance(info.value, qre.LauncherRefusedError)
+
+
+def _jest_expectations(
+    *, fail: set[str] | None = None, passing: set[str] | None = None
+) -> ResolvedTestExpectations:
+    """Return expectations carrying only Jest refs."""
+    return ResolvedTestExpectations(
+        expected_fail_refs=set(),
+        expected_pass_refs=set(),
+        expected_fail_jest_refs=fail or set(),
+        expected_pass_jest_refs=passing or set(),
+        missing_test_refs=[],
+    )
+
+
+class TestExpectationPathsUnchanged:
+    """Existing expectation handling around the launcher classification."""
+
+    def test_blank_output_does_not_classify(self) -> None:
+        """Output with only blank lines has no prefix line."""
+        assert qre.classify_launcher_exit(2, "  \n\n") is None
+
+    @pytest.mark.parametrize("run", [_run_pytest, _run_jest], ids=["pytest", "jest"])
+    def test_exit_0_returns(self, run: RunFunction, monkeypatch: MonkeyPatch) -> None:
+        """A passing captured run returns without raising."""
+        _patch_run(monkeypatch, 0, "")
+
+        run(_expectations())
+
+    @pytest.mark.parametrize("run", [_run_pytest, _run_jest], ids=["pytest", "jest"])
+    def test_missing_refs_raise_runtime_error(
+        self, run: RunFunction, monkeypatch: MonkeyPatch
+    ) -> None:
+        """Missing expectation refs stop the run before it starts."""
+        calls = _patch_run(monkeypatch, 0, "")
+        expectations = ResolvedTestExpectations(
+            expected_fail_refs=set(),
+            expected_pass_refs=set(),
+            expected_fail_jest_refs=set(),
+            expected_pass_jest_refs=set(),
+            missing_test_refs=["P1-T1"],
+        )
+
+        with pytest.raises(RuntimeError, match="P1-T1"):
+            run(expectations)
+        assert calls == []
+
+    def test_pytest_expected_pass_hit_raises(self, monkeypatch: MonkeyPatch) -> None:
+        """A failure of an expected-pass ref raises even when also expected-fail."""
+        _patch_run(monkeypatch, 1, "FAILED tests/test_a.py::test_x - AssertionError")
+        expectations = ResolvedTestExpectations(
+            expected_fail_refs={"tests/test_a.py::test_x"},
+            expected_pass_refs={"tests/test_a.py::test_x"},
+            expected_fail_jest_refs=set(),
+            expected_pass_jest_refs=set(),
+            missing_test_refs=[],
+        )
+
+        with pytest.raises(qre.subprocess.CalledProcessError):
+            _run_pytest(expectations)
+
+    def test_jest_unparsed_failure_raises(self, monkeypatch: MonkeyPatch) -> None:
+        """A Jest failure with no parsable test or file raises."""
+        _patch_run(monkeypatch, 1, "something went wrong\n")
+
+        with pytest.raises(qre.subprocess.CalledProcessError):
+            _run_jest(_expectations())
+
+    @pytest.mark.parametrize(
+        ("stdout", "expectations", "raises"),
+        [
+            (
+                "FAIL test/a.test.ts\n\u25cf suite > case\n",
+                _jest_expectations(fail={"test/a.test.ts::case"}),
+                False,
+            ),
+            (
+                "FAIL test/a.test.ts\n\u25cf suite > case\n",
+                _jest_expectations(passing={"test/a.test.ts::case"}),
+                True,
+            ),
+            (
+                "FAIL test/a.test.ts\n",
+                _jest_expectations(fail={"test/a.test.ts"}),
+                False,
+            ),
+            (
+                "FAIL test/a.test.ts\n",
+                _jest_expectations(passing={"test/a.test.ts"}),
+                True,
+            ),
+            (
+                "FAIL test/b.test.ts\n",
+                _jest_expectations(fail={"test/a.test.ts"}),
+                True,
+            ),
+        ],
+        ids=[
+            "test-expected-fail",
+            "test-expected-pass",
+            "file-expected-fail",
+            "file-expected-pass",
+            "file-unexpected",
+        ],
+    )
+    def test_jest_expectation_matching(
+        self,
+        monkeypatch: MonkeyPatch,
+        stdout: str,
+        expectations: ResolvedTestExpectations,
+        raises: bool,
+    ) -> None:
+        """Jest failures by test name or file honor the expectation refs."""
+        _patch_run(monkeypatch, 1, stdout)
+
+        # Route by the expected outcome: unexpected or expected-pass hits raise.
+        if raises:
+            with pytest.raises(qre.subprocess.CalledProcessError):
+                _run_jest(expectations)
+        else:
+            _run_jest(expectations)
