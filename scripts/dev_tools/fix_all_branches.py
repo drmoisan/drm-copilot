@@ -24,7 +24,10 @@ Usage:
 Key invariants/constraints:
     The json branch is the only branch that reads ``cancel_event`` and
     ``complete_all`` and must still call
-    ``cancel_event.wait(api.CANCEL_CHECK_DELAY_S)``.
+    ``cancel_event.wait(api.CANCEL_CHECK_DELAY_S)``. Every test step runs the
+    test-execution launcher (issue #1158) inside the optional ``suite_lock``, so
+    the four test suites of one run never overlap, and classifies the launcher
+    exit through ``classify_launcher_exit`` before any other failure handling.
 
 Important side effects:
     Spawns subprocesses via the supplied runner, writes per-step output to an
@@ -36,12 +39,140 @@ from __future__ import annotations
 from io import StringIO
 from typing import TYPE_CHECKING
 
+from .atomic_executor.qc_runner_expectations import (
+    TEST_SUITE_LAUNCHER_ARGV,
+    classify_launcher_exit,
+    launcher_refusal_message,
+)
+
 if TYPE_CHECKING:
     import threading
-    from collections.abc import Callable
+    from collections.abc import Callable, Sequence
+    from contextlib import AbstractContextManager
     from types import ModuleType
 
-    from .fix_all import BranchResult, CommandRunner, StepLogger
+    from .fix_all import BranchResult, CommandResult, CommandRunner, StepLogger
+
+
+def run_suite_command(
+    *,
+    suite: str,
+    extras: Sequence[str],
+    step_name: str,
+    runner: CommandRunner,
+    suite_lock: AbstractContextManager[object] | None,
+) -> CommandResult:
+    """Run one launcher suite, inside the suite lock when one is supplied.
+
+    Args:
+        suite: Launcher suite name, the first script argument (spec D18).
+        extras: Arguments passed after the suite name.
+        step_name: Runner step name used for the status board and logs.
+        runner: Command runner of the calling branch.
+        suite_lock: Context manager held for the whole run; ``None`` runs the
+            suite without serialization (direct branch callers).
+
+    Returns:
+        CommandResult: The runner's result, with the launcher output captured.
+
+    Side Effects:
+        Starts the launcher process through ``runner``.
+    """
+    command = [*TEST_SUITE_LAUNCHER_ARGV, suite, *extras]
+    # Direct callers pass no lock; run_fix_all passes one lock to all four test
+    # steps so only one suite runs at a time within a fix_all run.
+    if suite_lock is None:
+        return runner.run(command, step_name=step_name)
+    with suite_lock:
+        return runner.run(command, step_name=step_name)
+
+
+def report_suite_failure(
+    *,
+    result: CommandResult,
+    failure_message: str,
+    logger: StepLogger,
+    api: ModuleType,
+) -> None:
+    """Log a failed launcher run as a launcher outcome or as a test failure.
+
+    Args:
+        result: Non-zero result of a launcher run.
+        failure_message: The step's existing failure message.
+        logger: Branch logger.
+        api: ``fix_all`` module reference (``log_failure``).
+
+    Returns:
+        None.
+
+    Side Effects:
+        Writes failure lines to the branch logger.
+    """
+    outcome = classify_launcher_exit(result.returncode, result.output)
+    # A queue timeout or a policy refusal is reported by its prefix line, not as
+    # a test failure; every other code keeps the step's existing message.
+    if outcome is None:
+        api.log_failure(logger, failure_message, result)
+        return
+    logger.failure(launcher_refusal_message(outcome))
+    if result.output:
+        logger.failure("Command output:")
+        logger.command_output(result.output)
+
+
+def run_launcher_test_step(
+    *,
+    step_number: int,
+    description: str,
+    step_name: str,
+    success_message: str,
+    failure_message: str,
+    suite: str,
+    extras: Sequence[str],
+    runner: CommandRunner,
+    logger: StepLogger,
+    suite_lock: AbstractContextManager[object] | None,
+    api: ModuleType,
+) -> bool:
+    """Run a test step through the launcher with the log lines of run_simple_step.
+
+    ``run_simple_step`` returns only a boolean and discards the result, so test
+    steps use this helper to classify the captured launcher exit (spec D28).
+
+    Args:
+        step_number: Number shown in the ``Step N:`` log line.
+        description: Text of the ``Step N:`` log line.
+        step_name: Runner step name.
+        success_message: Message logged on exit 0.
+        failure_message: Message logged for a test failure.
+        suite: Launcher suite name.
+        extras: Arguments passed after the suite name.
+        runner: Command runner of the calling branch.
+        logger: Branch logger.
+        suite_lock: Optional suite lock (see ``run_suite_command``).
+        api: ``fix_all`` module reference.
+
+    Returns:
+        bool: True when the suite passed.
+
+    Side Effects:
+        Starts the launcher process and writes log lines.
+    """
+    logger.step(f"Step {step_number}: {description}")
+    result = run_suite_command(
+        suite=suite,
+        extras=extras,
+        step_name=step_name,
+        runner=runner,
+        suite_lock=suite_lock,
+    )
+    if result.returncode == 0:
+        logger.success(success_message)
+        return True
+    report_suite_failure(
+        result=result, failure_message=failure_message, logger=logger, api=api
+    )
+    return False
 
 
 def run_json_branch(
@@ -150,6 +281,7 @@ def run_shell_branch(
     factory: Callable[[str, StepLogger], CommandRunner],
     emit_status_transition: Callable[[str, str], None],
     api: ModuleType,
+    suite_lock: AbstractContextManager[object] | None = None,
 ) -> BranchResult:
     """Run the shell format, lint, and test branch; skipped tests count as pass.
 
@@ -158,6 +290,7 @@ def run_shell_branch(
         emit_status_transition: Records a status-board transition.
         api: ``fix_all`` module reference (StepLogger, BranchResult,
             run_simple_step, shell_test_was_skipped, log_failure).
+        suite_lock: Optional lock held while the launcher ``bats`` suite runs.
 
     Returns:
         BranchResult: Success when format/check pass and tests pass or skip,
@@ -215,13 +348,12 @@ def run_shell_branch(
 
     emit_status_transition("shell", "Shell: test")
     branch_logger.step("Step 3: Running shell tests (bats)...")
-    test_result = branch_runner.run(
-        [
-            "bash",
-            "scripts/bash/shell-qc.sh",
-            "test",
-        ],
+    test_result = run_suite_command(
+        suite="bats",
+        extras=[],
         step_name="Shell: test",
+        runner=branch_runner,
+        suite_lock=suite_lock,
     )
     # Success path: distinguish a genuine pass from an environment skip so the
     # status board reflects whether tests actually ran.
@@ -236,10 +368,11 @@ def run_shell_branch(
         emit_status_transition("shell", test_status)
         return api.BranchResult(name="shell", success=True, output=output)
 
-    api.log_failure(
-        branch_logger,
-        "Shell tests failed. Please review errors above.",
-        test_result,
+    report_suite_failure(
+        result=test_result,
+        failure_message="Shell tests failed. Please review errors above.",
+        logger=branch_logger,
+        api=api,
     )
     output = branch_stream.getvalue()
     emit_status_transition("shell", "FAIL")
@@ -253,6 +386,7 @@ def run_powershell_branch(
     factory: Callable[[str, StepLogger], CommandRunner],
     emit_status_transition: Callable[[str, str], None],
     api: ModuleType,
+    suite_lock: AbstractContextManager[object] | None = None,
 ) -> BranchResult:
     """Run the PowerShell PoshQC format, analyze, leak-scan, and test branch via pwsh.
 
@@ -263,6 +397,7 @@ def run_powershell_branch(
         emit_status_transition: Records a status-board transition.
         api: ``fix_all`` module reference (StepLogger, BranchResult,
             run_simple_step).
+        suite_lock: Optional lock held while the launcher ``pester`` suite runs.
 
     Returns:
         BranchResult: Success when all four steps pass, else failure tagged
@@ -366,26 +501,20 @@ def run_powershell_branch(
         )
 
     emit_status_transition("powershell", "PoshQC: test")
-    if not api.run_simple_step(
+    # The gate is one launcher ``pester`` suite run: Invoke-PoshQCParallelTest
+    # under the machine test-suite lock, exiting with its ExitCode (#1096, #1158).
+    if not run_launcher_test_step(
         step_number=4,
         description="Running PowerShell tests (Pester, parallel shards)...",
         step_name="PoshQC: test",
         success_message="PowerShell tests passed",
         failure_message="PowerShell tests failed. Please review errors above.",
-        # The gate is one Invoke-PoshQCParallelTest run; the process exits with
-        # the run's ExitCode so a failed shard fails the step (issue #1096).
-        command=[
-            "pwsh",
-            "-NoLogo",
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-Command",
-            "Import-Module './scripts/powershell/PoshQC'; "
-            "exit (Invoke-PoshQCParallelTest -Root '.').ExitCode",
-        ],
+        suite="pester",
+        extras=[],
         runner=branch_runner,
         logger=branch_logger,
+        suite_lock=suite_lock,
+        api=api,
     ):
         output = branch_stream.getvalue()
         emit_status_transition("powershell", "FAIL")

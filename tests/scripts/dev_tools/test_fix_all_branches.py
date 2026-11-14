@@ -4,6 +4,9 @@ from io import StringIO
 from typing import TYPE_CHECKING, TextIO, cast
 
 from scripts.dev_tools import fix_all, fix_all_branches_extra
+from scripts.dev_tools.atomic_executor.qc_runner_expectations import (
+    TEST_SUITE_LAUNCHER_ARGV,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable, Mapping, Sequence
@@ -196,7 +199,8 @@ def test_typescript_jest_step_name_switches_with_coverage() -> None:
     assert "Jest: test" in step_names
     assert "Jest: test with coverage" not in step_names
     jest_call = next(call for call in typescript_calls if call[0] == "Jest: test")
-    assert jest_call[1] == ["npm", "run", "test:unit"]
+    assert jest_call[1] == [*TEST_SUITE_LAUNCHER_ARGV, "jest"]
+    assert "-Suite" not in jest_call[1]
 
 
 def test_typescript_branch_fails_cleanly_when_npm_missing(
@@ -240,9 +244,11 @@ def test_typescript_commands_use_resolved_npm_path(
     )
     assert exit_code == 0
     typescript_calls = factory.runners["typescript"].calls
-    # Every npm-backed step must use the resolved path as the executable token.
-    assert typescript_calls
-    for _step_name, command in typescript_calls:
+    # Every npm-backed step must use the resolved path as the executable token;
+    # the Jest step starts the pwsh launcher instead (issue #1158).
+    npm_calls = [call for call in typescript_calls if call[0] != "Jest: test"]
+    assert len(npm_calls) == 3
+    for _step_name, command in npm_calls:
         assert command[0] == resolved
 
 
@@ -504,8 +510,23 @@ def test_powershell_leak_scan_failure_stops_before_pester() -> None:
     assert "PowerShell leak scan failed" in read_log(logger)
 
 
+def test_shell_test_step_runs_launcher_bats_suite() -> None:
+    """Shell: test runs the launcher bats suite with no extras."""
+    factory = FakeRunnerFactory(base_success_responses())
+
+    fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=True,
+        runner_factory=factory,
+        logger=build_logger(),
+    )
+
+    commands = dict(factory.runners["shell"].calls)
+    assert commands["Shell: test"] == [*TEST_SUITE_LAUNCHER_ARGV, "bats"]
+
+
 def test_powershell_test_step_runs_invoke_poshqc_parallel_test() -> None:
-    """PoshQC: test runs Invoke-PoshQCParallelTest and exits with its ExitCode."""
+    """PoshQC: test runs the launcher pester suite (Invoke-PoshQCParallelTest)."""
     # Arrange
     factory = FakeRunnerFactory(base_success_responses())
 
@@ -519,10 +540,8 @@ def test_powershell_test_step_runs_invoke_poshqc_parallel_test() -> None:
 
     # Assert
     commands = dict(factory.runners["powershell"].calls)
-    test_command = " ".join(commands["PoshQC: test"])
-    assert "Invoke-PoshQCParallelTest -Root '.'" in test_command
-    assert ".ExitCode" in test_command
-    assert "Invoke-PoshQCTest" not in test_command
+    assert commands["PoshQC: test"] == [*TEST_SUITE_LAUNCHER_ARGV, "pester"]
+    assert "-Suite" not in commands["PoshQC: test"]
 
 
 def _python_pytest_command(*, include_coverage: bool) -> list[str]:
@@ -541,13 +560,18 @@ def _python_pytest_command(*, include_coverage: bool) -> list[str]:
 
 
 def test_python_branch_pytest_runs_xdist_workers_with_coverage() -> None:
-    """run_python_branch passes -n auto when coverage is requested."""
+    """run_python_branch runs the launcher pytest suite (-n auto) with coverage."""
     command = _python_pytest_command(include_coverage=True)
-    assert command[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+    assert command == [
+        *TEST_SUITE_LAUNCHER_ARGV,
+        "pytest",
+        "--cov=scripts/dev_tools",
+        "--cov-report=term-missing",
+    ]
     assert "--cov=src/lexile_corpus_tuner" not in command
 
 
 def test_python_branch_pytest_runs_xdist_workers_without_coverage() -> None:
-    """run_python_branch passes -n auto when coverage is not requested."""
+    """run_python_branch runs the launcher pytest suite (-n auto) alone."""
     command = _python_pytest_command(include_coverage=False)
-    assert command == ["poetry", "run", "pytest", "-n", "auto"]
+    assert command == [*TEST_SUITE_LAUNCHER_ARGV, "pytest"]

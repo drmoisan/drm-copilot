@@ -15,6 +15,8 @@ Rebased over PR #1108 (issue #1106): after `main` merged PR #1108, which renamed
 
 Rebased over #1158: the full-suite pytest commands of `scripts/dev_tools/atomic_executor/qc_runner.py` (`FULL_TEST` and the `full_test` argument of `run_full_loop_with_artifacts`) now start with the test-execution launcher words `TEST_SUITE_LAUNCHER_ARGV` instead of `"poetry",` and `"run",`, and `tests/scripts/dev_tools/atomic_executor/test_qc_runner.py` asserts that argv. The two `qc_runner.py` blocks and the two `test_qc_runner.py` blocks under `### Later Landing: #1096` were regenerated so that their `Current` and `Prior` fences carry the launcher words; the `-n` and `auto` lines they revert are unchanged.
 
+Rebased over #1158 (`fix_all` test steps): the Pester, pytest, Jest, and bats steps of `scripts/dev_tools/fix_all_branches.py` and `scripts/dev_tools/fix_all_branches_extra.py` now run the test-execution launcher suites `pester`, `pytest`, `jest`, and `bats` instead of their direct commands. The Pester-step block of `fix_all_branches.py` was regenerated so that both fences carry the launcher call; its description line still reverts. Two blocks were removed because their text no longer exists in those files: the `Invoke-PoshQCParallelTest` `-Command` block of `fix_all_branches.py` and the `pytest_command` block of `fix_all_branches_extra.py`. Those commands now live in the launcher's `pester` and `pytest` suites (`Invoke-PesterSuite.ps1` calling `Invoke-PoshQCParallelTest`, and `poetry run pytest -n auto` in `Get-TestExecutionPolicyDefault`), so a revert of this entry restores the serial Pester and pytest commands in those suite definitions by hand. The `tests/scripts/dev_tools/test_fix_all_branches.py` block was regenerated to carry the launcher-argv assertions of its three tests.
+
 ## Reason and Evidence
 
 The owner decided on 2026-11-06 that tests run in parallel only. The sequential run existed to detect and fix a leak that has since been fixed, and the overhead of multiple and sequential runs was judged unacceptable.
@@ -277,8 +279,8 @@ Paths of the #1096 landing. The six `execution-environment` copies listed above 
 - `scripts/dev_tools/atomic_executor/prompt_builder.py`: canonical, with a Revert Block
 - `scripts/dev_tools/atomic_executor/qc_runner.py`: canonical, with Revert Blocks
 - `scripts/dev_tools/atomic_executor/qc_toolchain.py`: canonical, with a Revert Block
-- `scripts/dev_tools/fix_all_branches.py`: canonical, with Revert Blocks
-- `scripts/dev_tools/fix_all_branches_extra.py`: canonical, with a Revert Block
+- `scripts/dev_tools/fix_all_branches.py`: canonical, with a Revert Block (one block removed when #1158 moved its command into the launcher)
+- `scripts/dev_tools/fix_all_branches_extra.py`: canonical; its Revert Block was removed when #1158 moved its command into the launcher
 - `tests/scripts/dev_tools/atomic_executor/test_cli_part2_part2.py`: contract test, with a Revert Block
 - `tests/scripts/dev_tools/atomic_executor/test_cli_part3.py`: contract test, with Revert Blocks
 - `tests/scripts/dev_tools/atomic_executor/test_prompt_builder.py`: contract test, with a Revert Block
@@ -481,64 +483,23 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ### Revert Block: scripts/dev_tools/fix_all_branches.py
 
 ````Current
-    if not api.run_simple_step(
+    if not run_launcher_test_step(
         step_number=4,
         description="Running PowerShell tests (Pester, parallel shards)...",
         step_name="PoshQC: test",
         success_message="PowerShell tests passed",
         failure_message="PowerShell tests failed. Please review errors above.",
-        # The gate is one Invoke-PoshQCParallelTest run; the process exits with
-        # the run's ExitCode so a failed shard fails the step (issue #1096).
-        command=[
-            "pwsh",
+        suite="pester",
 ````
 
 ````Prior
-    if not api.run_simple_step(
+    if not run_launcher_test_step(
         step_number=4,
         description="Running PowerShell tests (Pester)...",
         step_name="PoshQC: test",
         success_message="PowerShell tests passed",
         failure_message="PowerShell tests failed. Please review errors above.",
-        command=[
-            "pwsh",
-````
-
-### Revert Block: scripts/dev_tools/fix_all_branches.py
-
-````Current
-            "-Command",
-            "Import-Module './scripts/powershell/PoshQC'; "
-            "exit (Invoke-PoshQCParallelTest -Root '.').ExitCode",
-        ],
-        runner=branch_runner,
-````
-
-````Prior
-            "-Command",
-            "Import-Module './scripts/powershell/PoshQC'; "
-            "Invoke-PoshQCTest -Root '.'",
-        ],
-        runner=branch_runner,
-````
-
-### Revert Block: scripts/dev_tools/fix_all_branches_extra.py
-
-````Current
-        )
-
-    # The suite runs on parallel workers with and without coverage (issue #1096).
-    pytest_command: list[str] = ["poetry", "run", "pytest", "-n", "auto"]
-    pytest_step_name = (
-        "Pytest: test with coverage" if include_coverage else "Pytest: test"
-````
-
-````Prior
-        )
-
-    pytest_command: list[str] = ["poetry", "run", "pytest"]
-    pytest_step_name = (
-        "Pytest: test with coverage" if include_coverage else "Pytest: test"
+        suite="pester",
 ````
 
 ### Revert Block: scripts/dev_tools/atomic_executor/cli_preflight.py
@@ -821,7 +782,7 @@ class TestPreflightParallelCommand:
 
 
 def test_powershell_test_step_runs_invoke_poshqc_parallel_test() -> None:
-    """PoshQC: test runs Invoke-PoshQCParallelTest and exits with its ExitCode."""
+    """PoshQC: test runs the launcher pester suite (Invoke-PoshQCParallelTest)."""
     # Arrange
     factory = FakeRunnerFactory(base_success_responses())
 
@@ -835,10 +796,8 @@ def test_powershell_test_step_runs_invoke_poshqc_parallel_test() -> None:
 
     # Assert
     commands = dict(factory.runners["powershell"].calls)
-    test_command = " ".join(commands["PoshQC: test"])
-    assert "Invoke-PoshQCParallelTest -Root '.'" in test_command
-    assert ".ExitCode" in test_command
-    assert "Invoke-PoshQCTest" not in test_command
+    assert commands["PoshQC: test"] == [*TEST_SUITE_LAUNCHER_ARGV, "pester"]
+    assert "-Suite" not in commands["PoshQC: test"]
 
 
 def _python_pytest_command(*, include_coverage: bool) -> list[str]:
@@ -857,16 +816,21 @@ def _python_pytest_command(*, include_coverage: bool) -> list[str]:
 
 
 def test_python_branch_pytest_runs_xdist_workers_with_coverage() -> None:
-    """run_python_branch passes -n auto when coverage is requested."""
+    """run_python_branch runs the launcher pytest suite (-n auto) with coverage."""
     command = _python_pytest_command(include_coverage=True)
-    assert command[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+    assert command == [
+        *TEST_SUITE_LAUNCHER_ARGV,
+        "pytest",
+        "--cov=scripts/dev_tools",
+        "--cov-report=term-missing",
+    ]
     assert "--cov=src/lexile_corpus_tuner" not in command
 
 
 def test_python_branch_pytest_runs_xdist_workers_without_coverage() -> None:
-    """run_python_branch passes -n auto when coverage is not requested."""
+    """run_python_branch runs the launcher pytest suite (-n auto) alone."""
     command = _python_pytest_command(include_coverage=False)
-    assert command == ["poetry", "run", "pytest", "-n", "auto"]
+    assert command == [*TEST_SUITE_LAUNCHER_ARGV, "pytest"]
 ````
 
 ````Prior
