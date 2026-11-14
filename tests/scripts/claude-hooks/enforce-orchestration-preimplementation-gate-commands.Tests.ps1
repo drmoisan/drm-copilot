@@ -22,6 +22,7 @@
         guard cases that must stay unclassified (all-host pipeline, ';' boundary, wrapper
         payload nesting, PowerShell payload end, accepted expression consumer). The two
         NotHost cases mock Get-OrchestrationGateMentionHostTable inside their own It.
+      - decision D19: four subcommand-position cases (an option value or option before the subcommand confirms; a subcommand directly after the command word or a wrapper clears).
 
     Two further Context blocks run each gate and pin spec AC-3: the stage-2 function is
     invoked only after a stage-1 hit. The outermost BeforeAll loads the Codex gate in the
@@ -305,6 +306,24 @@ Describe 'enforce-orchestration-preimplementation-gate-commands.ps1 (issue #1160
 
             It 'accepts a PowerShell expression consumer without :: or .Invoke' {
                 Test-OrchestrationGateInvocationConfirmed -CommandText 'pwsh -c "Get-Command pytest; $null"' -PatternIndex 1 | Should -BeFalse
+            }
+        }
+
+        Context 'subcommand position (decision D19)' {
+            It 'confirms a host subcommand word that is a global option value (decision D19)' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'npm -w search run lint' -PatternIndex 2 | Should -BeTrue
+            }
+
+            It 'confirms a global option before a host subcommand (decision D19)' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'git --no-pager log --grep pytest' -PatternIndex 1 | Should -BeTrue
+            }
+
+            It 'clears a host subcommand directly after the command word (decision D19)' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'git log --oneline --grep pytest' -PatternIndex 1 | Should -BeFalse
+            }
+
+            It 'clears a host subcommand directly after a transparent wrapper (decision D19)' {
+                Test-OrchestrationGateInvocationConfirmed -CommandText 'timeout 60 npm ls prettier' -PatternIndex 2 | Should -BeFalse
             }
         }
     }
