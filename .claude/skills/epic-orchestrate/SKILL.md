@@ -234,7 +234,15 @@ being expected to rediscover prior design decisions from the diff alone.
 
 A recorded `Owner directives:` block is passed verbatim to each child whose scope matches an
 entry, as defined in the `owner-directives` skill; `epic-orchestrator` never authors or edits
-entries.
+entries. Pass-down is hook-level: the coordinator records a directive for the epic in the
+ledger `artifacts/orchestration/owner-directives.jsonl` of the epic worktree, and on Claude Code
+the PreToolUse hook `enforce-owner-directive-pass-down.ps1` reads the epic checkpoint and that
+ledger for every child worker, so a directive reaches a running child without the epic
+orchestrator acting. An entry whose scope names the epic issue and the integration branch
+applies to every child (epic fan-out). The orchestrator stop hook reports
+`OWNER_DIRECTIVE_RELAY_MISSING` for a running child (`merge_status` `worktree_created`,
+`pr_open`, `ci_green`, or `merge_conflict`) whose checkpoint neither holds a selected entry nor
+links back to this epic.
 
 ## Merge-Conflict Handling (Fan-In)
 

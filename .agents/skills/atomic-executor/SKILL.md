@@ -52,7 +52,7 @@ For each task:
 
 1. Announce the exact task ID being executed.
 2. Perform only the micro-actions needed for that task.
-3. Verify the task acceptance criteria before marking it complete.
+3. Verify the task acceptance criteria and run the task check before marking it complete; a `[phase-gate]` task runs the full toolchain loop instead. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 4. Check off the plan file on disk immediately after verification passes.
 5. Check off satisfied acceptance criteria in the authoritative requirement source file per `acceptance-criteria-tracking`.
 

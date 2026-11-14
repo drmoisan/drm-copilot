@@ -30,7 +30,23 @@ BeforeAll {
     Import-Module (Join-Path $script:LibRoot 'WorktreeResolution.psm1')
     Import-Module (Join-Path $script:LibRoot 'WorktreeTargetResolution.psm1')
     Import-Module (Join-Path $script:LibRoot 'WorktreeRunRecordPath.psm1')
-
+    # Issue #1163: imported only when present, so this suite also loads before the module exists.
+    if (Test-Path -LiteralPath (Join-Path $script:LibRoot 'AgentTargetWorktree.psm1')) { Import-Module (Join-Path $script:LibRoot 'AgentTargetWorktree.psm1') }
+    # D9 resolver seam: a mapped branch gives its root and no reason code; any other branch gives ReasonCode.
+    function Get-BranchResolverSeam {
+        param([hashtable] $Map = @{}, [string] $ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE')
+        $branchMap = $Map; $code = $ReasonCode
+        return { param($Branch) if ($branchMap.ContainsKey([string] $Branch)) { [pscustomobject]@{ WorktreeRoot = $branchMap[[string] $Branch]; ReasonCode = $null } } else { [pscustomobject]@{ WorktreeRoot = $null; ReasonCode = $code } } }.GetNewClosure()
+    }
+    # Models a w-run checkpoint holding the host-moved record; the argument builder passes -BranchWorktreeResolver only when declared.
+    function Get-StaleRecordArgument {
+        param([string] $Kind, [scriptblock] $Resolver)
+        $map = @{ '/synthetic-worktrees/w-run' = (@{ route_id = $Kind; (@{ epic = 'features'; parallel = 'items' })[$Kind] = @(@{ worktree_path = '/host-a/repo/.claude/worktrees/item'; branch_name = 'feature/issue-1163-item' }) } | ConvertTo-Json -Compress -Depth 5) }
+        if ($Kind -eq 'epic') { Set-RecordTopology -Live @('/synthetic-worktrees/w-run', '/synthetic-worktrees/item-new') -Epic $map } else { Set-RecordTopology -Live @('/synthetic-worktrees/w-run', '/synthetic-worktrees/item-new') -Parallel $map }
+        $arguments = @{ Kind = $Kind; RecordField = 'worktree_path'; Value = '/synthetic-worktrees/item-new'; SessionRoot = $script:Session }
+        if ((Get-Command -Name Resolve-WorktreeRunTargetByRecord).Parameters.ContainsKey('BranchWorktreeResolver')) { $arguments['BranchWorktreeResolver'] = $Resolver }
+        return $arguments
+    }
     $script:NoTargetCode = Get-WorktreeResolutionNoTargetReasonCode
     $script:AmbiguityCode = Get-WorktreeResolutionAmbiguityReasonCode
     $script:Session = '/synthetic-worktrees/session'
@@ -89,7 +105,7 @@ BeforeAll {
     function Get-DisallowedCommandName {
         $own = @($script:ModuleAst.FindAll({ $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }, $true) |
                 ForEach-Object { $_.Name })
-        $siblings = foreach ($name in @('WorktreeResolution', 'WorktreeTargetResolution', 'WorktreeItemResolution', 'WorktreeRunRecordPath')) {
+        $siblings = foreach ($name in @('WorktreeResolution', 'WorktreeTargetResolution', 'WorktreeItemResolution', 'WorktreeRunRecordPath', 'AgentTargetWorktree')) {
             (Get-Module -Name $name | Select-Object -First 1).ExportedFunctions.Keys
         }
         $builtins = @('Set-StrictMode', 'Import-Module', 'Join-Path', 'Test-Path', 'ConvertFrom-Json', 'Where-Object', 'Export-ModuleMember')
@@ -261,6 +277,32 @@ Describe 'Resolve-WorktreeRunTargetByRecord' {
 
         # Assert
         $target.Status | Should -Be 'OtherWorktree'
+    }
+
+    It 'B15 resolves the live worktree whose <Kind> checkpoint records a stale absolute worktree_path through its branch_name' -ForEach @(@{ Kind = 'epic' }, @{ Kind = 'parallel' }) {
+        # Arrange (fails before: the host-moved record matches no live path and resolves NoTarget)
+        $arguments = Get-StaleRecordArgument -Kind $Kind -Resolver (Get-BranchResolverSeam -Map @{ 'feature/issue-1163-item' = '/synthetic-worktrees/item-new' })
+
+        # Act
+        $target = Resolve-WorktreeRunTargetByRecord @arguments
+
+        # Assert
+        $target.Status | Should -Be 'OtherWorktree'
+        $target.WorktreeRoot | Should -Be '/synthetic-worktrees/w-run'
+    }
+
+    It 'B16 resolves NoTarget for a stale <Kind> record whose branch resolves to <ReasonCode>' -ForEach @(
+        @{ Kind = 'epic'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE' }, @{ Kind = 'epic'; ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS' }
+        @{ Kind = 'parallel'; ReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE' }, @{ Kind = 'parallel'; ReasonCode = 'TARGET_WORKTREE_AMBIGUOUS' }
+    ) {
+        # Arrange
+        $arguments = Get-StaleRecordArgument -Kind $Kind -Resolver (Get-BranchResolverSeam -ReasonCode $ReasonCode)
+
+        # Act
+        $target = Resolve-WorktreeRunTargetByRecord @arguments
+
+        # Assert
+        $target.Status | Should -Be 'NoTarget'
     }
 }
 

@@ -99,6 +99,15 @@
             "command": "pwsh -NoProfile -File .claude/hooks/invoke-pretooluse-dispatch.ps1"
           }
         ]
+      },
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit|NotebookEdit|Agent|Task|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-owner-directive-pass-down.ps1"
+          }
+        ]
       }
     ],
     "SubagentStart": [

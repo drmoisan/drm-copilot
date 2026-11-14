@@ -57,6 +57,11 @@ function Register-EpicStateBaselineMock {
             Mock -CommandName $name -MockWith { $null }
         }
     }
+    # Issue #1161 (R1): the Claude removal gates dot-source the planner adapter, whose one read seam
+    # sits in script scope where the module-scoped mocks above do not reach, so it returns no read.
+    if ($Surface -eq 'Claude' -and $Seam -contains 'Get-WorktreeRunCheckpointText' -and (Get-Command -Name 'Get-PlannerWorktreeCheckpointText' -ErrorAction SilentlyContinue)) {
+        Mock -CommandName 'Get-PlannerWorktreeCheckpointText' -MockWith { @() }
+    }
     # Issue #1010: the gate's single-feature read resolves its target from the worktree
     # listing. A suite that requests the Get-CheckpointContent baseline also gets a
     # script-scope mock of the listing wrapper (a gate function on both surfaces) naming

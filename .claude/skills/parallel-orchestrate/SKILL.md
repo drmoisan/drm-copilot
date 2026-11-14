@@ -136,8 +136,14 @@ input declared in `## Prepared-Item Admission (issue #1047)` of
 the constraint, and a `blocked` predecessor holds its dependent. Layer 1 enforces this rule through
 `Test-ParallelCohortBarrierClear` in `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`,
 which denies a target whose predecessor is not released and fails closed on a missing predecessor
-record. Layer 2 does not check precedence: the Python orchestrator-state validator reads
-`conflict_edges[]` only.
+record. The `/parallel-add` skill runs the helper's `test-precedence` subcommand for each new
+ordering and rejects an unjustified flag with `precedence_not_justified` (issue #1164): a
+`kind: "cost"` entry must name a returned edge, and a `kind: "correctness"` entry needs a
+non-empty `reason`. A legacy entry without kind is held the same way: it is honoured unchanged by
+this rule and is not re-tested. A tolerated pair, whose merge time does not exceed its gain, runs
+without a barrier. Layer 2 does not check the precedence ordering: the Python orchestrator-state
+validator checks the shape of `precedence[]` entries (`kind`, `reason`) when present but not the
+ordering, and its retrospective invariant reads `conflict_edges[]` only.
 
 **`current_cohort` is a progress indicator, not a gate.** `current_cohort` is the LOWEST
 current-generation cohort index that still contains a non-terminal, non-withdrawn item. It is
@@ -298,7 +304,7 @@ Spawn parameters, passed on the `Agent` call and never written into the prompt t
 `isolation: "worktree"`, `run_in_background: true`, branch base `origin/main`, and `model` equal to
 that item's model routing receipt's resolved model.
 
-A recorded `Owner directives:` block is not a kickoff element: the parallel orchestrator passes it verbatim, in a later course-correction message, to each child whose item matches an entry's scope, and never authors or edits entries (pass-through rule of the `owner-directives` skill).
+A recorded `Owner directives:` block is not a kickoff element. The coordinator records a directive for an item in the ledger `artifacts/orchestration/owner-directives.jsonl` of that item's worktree, or of the parallel worktree, with the item's issue and branch as its scope; there is no run-wide fan-out, so each entry applies only to the item it names. Pass-down is hook-level: on Claude Code the PreToolUse hook `enforce-owner-directive-pass-down.ps1` reads the item's checkpoint and ledger and the parallel checkpoint and ledger for every worker of that item, so the directive reaches a running child without the parallel orchestrator acting. The parallel orchestrator never authors or edits entries (pass-through rule of the `owner-directives` skill).
 
 **Band and receipt source.** The parent reads each item's `complexity_band` and
 `model_routing_receipt` from the planner checkpoint `artifacts/orchestration/parallel-planner-state.json`.
@@ -1069,7 +1075,10 @@ denies with a reason prefixed `PARALLEL_WORKTREE_REMOVAL_BLOCKED`. Commands that
 `git worktree remove` always allow. This is the mechanical counterpart to `## Worktree Cleanup`.
 `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` fires on the same command and now carries a
 matching parallel allow-branch keyed on the same checkpoint, so both gates must allow for a removal
-to proceed.
+to proceed. Both gates also carry a planner allow branch (issue #1161), evaluated before the
+manifest branch, that allows removing an epic-planner preparation worktree recorded by branch in
+`planner_worktrees` of `artifacts/orchestration/epic-planner-state.json` when it is eligible, not
+in use, clean, and pushed; it reads no parallel-planner checkpoint.
 
 **Invocation-origin extension.** `.claude/hooks/enforce-epic-invocation-origin.ps1` was extended
 additively so `$script:GatedSubagentTypes` lists `epic-planner`, `epic-orchestrator`,

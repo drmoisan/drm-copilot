@@ -185,7 +185,7 @@ function Get-RequiredArtifactOutputBlockDecision {
             continue
         }
 
-        $location = Resolve-SubagentStopArtifactLocation -Path $path -WorktreeRoot $target.WorktreeRoot -SessionRoot $root
+        $location = Resolve-SubagentStopArtifactLocation -Path $path -WorktreeRoot $target.WorktreeRoot -SessionRoot $root -Target $target
         if ($location.Rejected) {
             $errors.Add("$($spec.Token) '$path' is rejected: $($location.RejectionDetail)")
             continue

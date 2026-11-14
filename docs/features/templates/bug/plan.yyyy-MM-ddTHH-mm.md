@@ -27,16 +27,17 @@
 - [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
 - [ ] [P0-T3] List required environment/fixtures/data: <notes>
 
-**Phase 1 — Preparation**
+**Phase 1 — Preparation** (no-change phase: it changes no tracked file, so it has no `[phase-gate]` task; the next gate covers it)
 - [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
 - [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
 
 **Phase 2 — Regression Test (must fail first)**
 - [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/<issue>-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the parallel test gate to confirm the new regression test fails and captures the repro
+- [ ] [P2-T2] [phase-gate] Run the full toolchain loop (stages 1 to 6) per `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill; the unit stage passes when its only failures are the expected failures of [P2-T1], each confirmed failing, and `<FEATURE>/evidence/qa-gates/phase-gate.P2.<timestamp>.md` lists them by name
 
 **Phase 3 — Minimal Fix**
 - [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+- [ ] [P3-T2] [phase-gate] Run the full toolchain loop (stages 1 to 6) per `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill and record `<FEATURE>/evidence/qa-gates/phase-gate.P3.<timestamp>.md`
 
 **Phase 4 — Verification Loop**
 - [ ] [P4-T1] Re-run the repro to confirm expected behavior

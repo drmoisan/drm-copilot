@@ -1,7 +1,7 @@
 ---
 name: parallel-plan
 description: Prepare a set of thematically unrelated items for concurrent execution before any execution begins - item intake over issue numbers and potential-entry paths, concurrent preparation-mode child orchestrator delegations, blast-radius computation and V1-V3 validation, cohort seeding with a recomputation-parity check, run-manifest and planner-checkpoint authoring, and the parallel-orchestrator kickoff artifact.
-argument-hint: "[items: issue numbers and/or potential-entry paths] [--after <later>:<earlier> ...]"
+argument-hint: "[items: issue numbers and/or potential-entry paths] [--after <later>:<earlier> [--reason <text>] ...]"
 context: fork
 agent: parallel-planner
 ---
@@ -73,10 +73,15 @@ identical forms.
   `preflight_status: PREFLIGHT: ALL CLEAR` from the branch, set `preparation_status: prepared`
   (the planner ready value that corresponds to the admission stage `cleared`), and record
   `topology_receipt` as not applicable, because no preparation child ran for it.
-- **Precedence input.** Record each `--after <later>:<earlier>` flag as one top-level
-  `precedence[]` entry `{before, after, source, recorded_at}` with `source` `operator`, as
-  declared in `## Prepared-Item Admission (issue #1047)` of `.claude/rules/parallel-orchestration.md`.
-  The flags are optional and are never requested.
+- **Precedence input.** Record each `--after <later>:<earlier> [--reason <text>]` flag as one
+  top-level `precedence[]` entry `{before, after, source, recorded_at, kind[, reason]}` with
+  `source: "operator"`, as declared in `## Prepared-Item Admission (issue #1047)` of
+  `.claude/rules/parallel-orchestration.md`. A `--reason` binds to the immediately preceding
+  `--after`. Without `--reason` the entry records `kind: "cost"` and no `reason`; with `--reason`
+  the entry records `kind: "correctness"` and the supplied text as `reason`. An ordering the
+  planner proposes itself is recorded the same way with `source: "planner"`. Every entry passes
+  the scheduling rule of `## Cohort Seeding` through `test-precedence`. The flags are optional and
+  are never requested.
 
 The operator is never asked for ordering edges, cohort assignments, or a worthiness verdict.
 Intake proceeds directly to preparation fan-out.
@@ -342,7 +347,16 @@ concurrently.
    `normalize_declared_radius(radius, config)` to re-apply the current extraction rules and the
    configured exclusions, append any excluded path the plan's diff will genuinely write, and record
    the result on the item. The `declared` radius is the authoritative input to scheduling.
-2. Validate the radius and record the findings under the item's `radius_validation` entry.
+2. Validate the radius and record the findings under the item's `radius_validation` entry. Then
+   derive read_paths with access-paths:
+   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 access-paths -Entry <json carrying items with issue_num, plan_path, and blast_radius>`
+   prints one `read_paths` list per `issue_num`: the radius paths that every naming task reads
+   (first title word Read, Verify, Confirm, Inspect, Review, Baseline, Run, or Execute, no write
+   verb in the title, and no Create task naming the path). Record the list on the item as
+   `read_paths`. Declare `separable_paths` for radius paths whose edits sit in separable sections
+   of a shared file, with a one-line rationale per path recorded in the planner checkpoint item's
+   `separable_rationale` map. Both lists stay members of `blast_radius.paths`: a declaration never
+   removes a path from the radius, and narrowing a radius to suppress an edge stays prohibited.
 3. **V1 (coverage) or V2 (shared-surface enumeration) Blocking failure.** The item does NOT
    transition to `prepared`. Record the findings in the checkpoint and issue a follow-up
    preparation-mode delegation for that item carrying the findings as plan-revision instructions —
@@ -432,6 +446,10 @@ reported, the same residual as risk 2 in `## Artifact Home`.
 
 ## Cohort Seeding
 
+Two items run sequentially if and only if the expected merge time exceeds the expected time gained by running them in parallel.
+
+Both estimates are integer minutes: merge time is the summed overlap-class weights, and a path that one side only reads costs 0; gain is the shorter of the two band durations. Hard classes are always edges. At `tolerance_percent` 100 the rule is exactly merge time greater than gain, and a tie runs in parallel. `--after` flags and planner-proposed orderings pass the same test and are rejected with `precedence_not_justified` unless marked as a correctness ordering with `--reason`.
+
 Reach cohort computation through the **destination-runtime bash entry point** under
 `.claude/lib/bash/`, which is published by push-down and needs no Python interpreter:
 
@@ -468,14 +486,22 @@ The library returns the partition; the planner supplies the record fields.
 1. Invoke `compute-cohorts.sh` exactly once per plan run, over the full conflict graph, after every
    item is `prepared` and radius-validated. Derive the conflict edge set with one call to the
    scheduling entry point over every item's `declared` radius and complexity band: Get-BlastRadiusConflictEdge
-   (`Get-BlastRadiusConflictEdge -Item <records carrying key, radius, band> -Config <parsed truth table> -Relation ${function:Test-BlastRadiusConflict}`)
+   (`Get-BlastRadiusConflictEdge -Item <records carrying key, radius, band, read_paths, separable_paths> -Config <parsed truth table> -Relation ${function:Test-BlastRadiusConflict}`)
    in PowerShell, or `schedule_conflict_edges(items, config)` (re-exported from
    `compute_blast_radius.py`, taking `SchedulingItem` records) in Python. Do not apply the
    detection relation to each pair by hand: the entry point applies it to every unordered pair and
    then applies the integration-cost edge rule of `.claude/rules/parallel-orchestration.md`
    (hard classes, integer cost, pairwise benefit, and the configured `conflict_tolerance`). It
    returns `edges` and `tolerated_overlaps`. The -Relation argument is required; pass the facade's
-   Test-BlastRadiusConflict function object as shown. Pass the returned `edges` pairs as
+   Test-BlastRadiusConflict function object as shown. Run test-precedence after the scheduling
+   entry point returns, over the recorded `precedence[]`, the returned `edges` and
+   `tolerated_overlaps`, and the items' `complexity_band`:
+   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 test-precedence -Entry <json carrying precedence, edges, tolerated_overlaps, and items>`.
+   A `kind: "cost"` entry passes only when its pair is a returned edge, a `kind: "correctness"`
+   entry passes only with a non-empty `reason`, and a legacy entry without `kind` is not
+   re-tested. A rejected flag stops the scheduling step with the helper's
+   `PARALLEL_ADMISSION_REJECTED: precedence_not_justified: ...` line; the operator removes the flag
+   or re-issues it with `--reason`. Pass the returned `edges` pairs as
    `--edges "<a>:<b> ..."` and the item keys as `--keys "<k1> <k2> ..."`. Add each recorded
    `precedence[]` pair to `--edges` as one more separating `<a>:<b>` edge with `a < b`, so the
    coloring always separates the pair. Then pass the coloring through the precedence lift:
@@ -510,11 +536,14 @@ The library returns the partition; the planner supplies the record fields.
    Recording the diagnostic's result in the planner checkpoint is a tolerated extra field, not a
    validated one; no validator changes for it.
 3. Record `cohorts[]` at `generation: 0`, each cohort's `item_keys[]` sorted ascending.
-4. Record `conflict_edges[]` as `{a, b, reason}` entries for auditability; each entry may also carry
-   the tolerated extra fields `hard`, `cost`, and `benefit` returned by the entry point. Record the
-   returned tolerated overlaps in a `tolerated_overlaps` list on the planner checkpoint, one
-   `{a, b, reasons, cost, benefit}` entry per detected, non-hard pair within tolerance. No reason
-   member is added and no validator reads these fields.
+4. Record `conflict_edges[]` as `{a, b, reason, hard, cost, benefit}` entries, the merge-time
+   (`cost`) and gain (`benefit`) estimates in integer minutes as the entry point returns them,
+   hard edges included. Record the returned tolerated overlaps in a `tolerated_overlaps` list on
+   the planner checkpoint, one `{a, b, reasons, cost, benefit}` entry per detected, non-hard pair
+   within tolerance. No reason member is added. The validators of
+   `.claude/rules/parallel-orchestration.md` check these fields when present; the verdict is list
+   membership. Write the same decisions to the manifest's `pair_decisions` (invariant M9, see
+   `## Manifest Authoring`).
    **Soft-overlap merge rule.** A tolerated pair is not an edge: its two items run in the same or
    adjacent cohorts without a barrier. The later-merging item of a tolerated pair merges
    `origin/main` under the existing per-item merge-conflict handling and re-passes CI before it
@@ -567,7 +596,7 @@ No production module is added for this check; it is a re-invocation of the lande
 ## Manifest Authoring
 
 Write `docs/features/parallel/<slug>/parallel.md` conforming to the F3-owned frontmatter schema
-recorded in `.claude/rules/parallel-orchestration.md` (manifest invariants M1-M8):
+recorded in `.claude/rules/parallel-orchestration.md` (manifest invariants M1-M9):
 
 - `parallel` — the run slug, a non-empty string.
 - `mode` — `closed` or `open`; defaults to `closed` when absent.
@@ -584,6 +613,12 @@ recorded in `.claude/rules/parallel-orchestration.md` (manifest invariants M1-M8
   subset and must not be authored. The field is an ASSERTION consumed by the advisory lane
   diagnostic in `### Seeding procedure`: it never overrides a derived edge, never feeds
   `compute_cohorts`, and never influences scheduling.
+- `pair_decisions[]` — OPTIONAL (invariant M9), written at seeding. A block sequence with one
+  `{a, b, reasons, hard, cost, benefit, verdict}` entry per detected pair returned by the
+  scheduling entry point: `a < b`, both resolving to manifest items; `reasons` the pair's reason
+  kinds; `hard` a boolean; `cost` and `benefit` the integer-minute estimates; and `verdict` `edge`
+  for a returned edge or `tolerated` for a tolerated overlap, with `hard: true` requiring
+  `verdict: edge`.
 
 The manifest carries no `depends_on` field at any level and no top-level `integration_branch`
 field; both are prohibited-key rejections in the schema. Commit it to `parallel/<slug>-plan` in
@@ -631,7 +666,12 @@ Per item: `issue_num`, `feature_folder`, `kind`, `state`, `complexity_band`, `co
 `preparation_status`,
 `research_path`, `plan_path`, `plan_hash`, `base_commit`, `preflight_status`, `branch_name`, `worktree_path`, `blast_radius`
 (with `source: "declared"`), `radius_validation` (the `v1`, `v2`, and `v3` results with their
-severities), `model_routing_receipt`, and `topology_receipt`.
+severities), `model_routing_receipt`, and `topology_receipt`, plus the optional access lists
+`read_paths` and `separable_paths` (issue #1164) and the `separable_rationale` map that holds the
+one-line rationale of each separable path. `conflict_edges[]` entries carry the estimates
+`{a, b, reason, hard, cost, benefit}` and `tolerated_overlaps[]` entries carry
+`{a, b, reasons, cost, benefit}`; the validators check these fields and the access lists when
+present.
 
 **Deliberately absent:** any `epic_worthiness` analogue, any `depends_on` field, and any `wave`
 field. The parallel surface renders no worthiness verdict and expresses ordering only as
