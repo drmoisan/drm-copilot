@@ -132,7 +132,7 @@ function Get-OrchestrationDocsEstateSegmentShape {
         $index = 3
     }
     $subcommand = $Token[$index]
-    $rest = if ($Token.Count -gt $index + 1) { @($Token[($index + 1)..($Token.Count - 1)]) } else { @() }
+    $rest = @(if ($Token.Count -gt $index + 1) { $Token[($index + 1)..($Token.Count - 1)] })
     if ($subcommand -ceq 'add') {
         if ($rest.Count -lt 2 -or $rest[0] -cne '--') {
             return $null

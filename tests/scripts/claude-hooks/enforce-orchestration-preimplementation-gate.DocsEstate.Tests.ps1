@@ -91,6 +91,11 @@ Describe 'Claude preimplementation gate docs-estate leg (issue #1169)' {
             @{ Label = 'a relative git commit -F with no pathspec'; Command = 'git commit -F artifacts/commit-message.txt' }
             @{ Label = 'a git -C <absolute root> commit -m'; Command = 'git -C /synthetic-worktrees/docs-run commit -m "docs: refresh"' }
             @{ Label = 'a chained add and commit'; Command = 'git add -- docs/a.md && git commit -F artifacts/commit-message.txt' }
+            @{ Label = 'a git commit with a single --file= option'; Command = 'git commit --file=artifacts/commit-message.txt' }
+            @{ Label = 'a git commit with a single --message= option'; Command = 'git commit --message=docs' }
+            @{ Label = 'a git commit with a single --trailer= option'; Command = 'git commit --trailer=Refs:1169' }
+            @{ Label = 'a git -C <absolute root> commit with a single --file= option'; Command = 'git -C /synthetic-worktrees/docs-run commit --file=artifacts/commit-message.txt' }
+            @{ Label = 'a git commit with two =-form options'; Command = 'git commit --file=artifacts/commit-message.txt --trailer=Refs:1169' }
         ) {
             # Act
             $decision = Get-DocsEstateDecision -Payload (ConvertTo-DocsEstatePayload -Tool 'Bash' -Command $Command)
@@ -108,6 +113,18 @@ Describe 'Claude preimplementation gate docs-estate leg (issue #1169)' {
 
             # Assert
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow' -Because "reason: $($decision.hookSpecificOutput.permissionDecisionReason)"
+        }
+    }
+
+    Context 'command shape prefilter' {
+        It 'returns one commit shape for a single =-form option' {
+            # Act
+            $shapes = Get-OrchestrationDocsEstateCommandShape -Command 'git commit --file=msg.txt'
+
+            # Assert
+            $null -eq $shapes | Should -BeFalse -Because 'a single --file= option is an admitted commit option'
+            $shapes.Count | Should -Be 1
+            $shapes[0].Kind | Should -BeExactly 'commit'
         }
     }
 

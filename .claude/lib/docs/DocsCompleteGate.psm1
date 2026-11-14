@@ -184,7 +184,7 @@ function Test-DocsCompleteGateReceipt {
         [AllowNull()] [AllowEmptyCollection()] [string[]] $SourceRoot
     )
 
-    if ($null -eq $ReceiptText) { return @{ Allow = $false; Reason = 'RECEIPT_ABSENT'; Message = 'No validation receipt exists; run Invoke-DocsCommand.ps1 -Command validate -Mode docs-complete with -Revision and -WriteReceipt for the pull request head.' } }
+    if ($null -eq $ReceiptText) { return @{ Allow = $false; Reason = 'RECEIPT_ABSENT'; Message = 'No validation receipt exists; run Invoke-DocsCommand.ps1 -Command validate -Mode docs-complete -WriteReceipt (the revision defaults to the inventory snapshot revision), as described under Refresh After Rebase or Source Change in the documentation-workflow skill.' } }
     $receipt = ConvertFrom-DocsCompleteGateText -Text $ReceiptText
     if ($null -eq $receipt -or -not [string]::Equals([string] (Get-DocsCompleteGateMember -Value $receipt -Name @('artifact_kind')), 'docs-validation-receipt', [System.StringComparison]::Ordinal)) {
         return @{ Allow = $false; Reason = 'RECEIPT_UNREADABLE'; Message = 'The validation receipt is not a readable docs-validation-receipt document; regenerate it with validate -WriteReceipt.' }

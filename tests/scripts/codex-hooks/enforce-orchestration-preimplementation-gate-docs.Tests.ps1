@@ -88,6 +88,11 @@ Describe 'Codex preimplementation gate docs-estate leg (issue #1169)' {
         @{ Label = 'a relative git add of docs paths'; Command = 'git add -- docs/a.md .github/workflows/_docs-quality.yml'; Path = '' }
         @{ Label = 'a git -C <absolute root> add'; Command = 'git -C /synthetic-worktrees/docs-run add -- guide/start.md'; Path = '' }
         @{ Label = 'a git commit -F with no pathspec'; Command = 'git commit -F artifacts/commit-message.txt'; Path = '' }
+        @{ Label = 'a git commit with a single --file= option'; Command = 'git commit --file=artifacts/commit-message.txt'; Path = '' }
+        @{ Label = 'a git commit with a single --message= option'; Command = 'git commit --message=docs'; Path = '' }
+        @{ Label = 'a git commit with a single --trailer= option'; Command = 'git commit --trailer=Refs:1169'; Path = '' }
+        @{ Label = 'a git -C <absolute root> commit with a single --file= option'; Command = 'git -C /synthetic-worktrees/docs-run commit --file=artifacts/commit-message.txt'; Path = '' }
+        @{ Label = 'a git commit with two =-form options'; Command = 'git commit --file=artifacts/commit-message.txt --trailer=Refs:1169'; Path = '' }
         @{ Label = 'the mapped relative receipt Write'; Command = ''; Path = 'artifacts/pr_body_12.receipt.json' }
         @{ Label = 'the mapped absolute receipt Write'; Command = ''; Path = '/synthetic-worktrees/docs-run/artifacts/pr_body_12.receipt.json' }
     ) {

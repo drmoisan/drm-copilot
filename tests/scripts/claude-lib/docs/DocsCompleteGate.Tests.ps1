@@ -134,6 +134,10 @@ Describe 'Test-DocsCompleteGateReceipt' {
         # Assert
         $result.Allow | Should -BeFalse
         $result.Reason | Should -BeExactly 'RECEIPT_ABSENT'
+        $result.Message | Should -BeLikeExactly '*-WriteReceipt*'
+        $result.Message | Should -BeLikeExactly '*snapshot revision*'
+        $result.Message | Should -BeLikeExactly '*Refresh After Rebase or Source Change*'
+        $result.Message | Should -Not -BeLikeExactly '*for the pull request head*'
     }
 
     It 'returns RECEIPT_UNREADABLE for <Case>' -ForEach @(
