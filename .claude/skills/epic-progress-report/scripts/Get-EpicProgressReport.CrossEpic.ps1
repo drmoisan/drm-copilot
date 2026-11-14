@@ -92,6 +92,7 @@ function New-EpicProgressExternalNode {
     .PARAMETER NowUnixSeconds
         The current epoch second.
     #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory factory that changes no system state; the name is fixed by the issue #1162 plan.')]
     [CmdletBinding()]
     [OutputType([pscustomobject])]
     param(

@@ -235,7 +235,7 @@ Full report contents:
 - Critical-path section: `<dependency-source>` is `checkpoint`, `manifest`, `checkpoint+manifest`, or `waves`;
   `<cap-source>` is `checkpoint`, `config`, or `built-in`. The `**Dependency graph:**` line appears only for a
   self-loop, an unresolved reference, or a cycle, and `**Excluded (blocked):**` only when a feature is excluded.
-  In item mode it reads `**Critical path:** #<issue>. Headline <h>: the item finishes in <h>; no dependency,
+  `**Cross-epic:**` appears only when a cross-epic edge exists; `<label>` is `external` or `external (default)`. In item mode it reads `**Critical path:** #<issue>. Headline <h>: the item finishes in <h>; no dependency,
   cap, or tail.` with no Schedule inputs line.
 - One per-type row per type that has a step, in catalog order. `<median>` is `H h MM min`, followed by
   `(default)` for a type without samples and `(approx)` when an approximate sample is retained.
