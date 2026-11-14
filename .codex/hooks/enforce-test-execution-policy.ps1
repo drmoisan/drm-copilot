@@ -36,7 +36,7 @@ try { . (Join-Path $PSScriptRoot 'test-execution-lock-decision.ps1') } catch { A
 try { . (Join-Path $PSScriptRoot 'test-execution-lock.ps1') } catch { Add-HookDependencyFailure -Name 'test-execution-lock.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'test-execution-command-form.ps1') } catch { Add-HookDependencyFailure -Name 'test-execution-command-form.ps1' -ErrorRecord $_ }
 
-$script:TestExecutionHookRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$script:TestExecutionHookRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $script:TestExecutionLauncherCommand = 'sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh'
 $script:TestExecutionMcpToolName = @('mcp__drm-copilot__run_poshqc_test', 'mcp__drm-copilot__run_poshqc_suite')
 $script:TestExecutionScriptReadLimit = 262144

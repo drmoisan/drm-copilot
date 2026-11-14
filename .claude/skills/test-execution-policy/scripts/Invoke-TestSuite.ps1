@@ -124,8 +124,8 @@ function Invoke-TestSuiteLauncher {
     [OutputType([int])]
     param(
         [AllowEmptyCollection()][AllowEmptyString()][string[]] $ArgumentList = @(),
-        [string] $RepositoryRoot = (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)))),
-        [string] $LauncherDirectory = $PSScriptRoot,
+        [string] $RepositoryRoot = (Split-Path (Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent) -Parent),
+        [string] $LauncherDirectory = (Split-Path -Parent $PSCommandPath),
         [scriptblock] $StartSuiteProcess = {
             param([string] $FilePath, [string[]] $ArgumentList, [string] $WorkingDirectory)
             $process = [System.Diagnostics.Process]::Start((New-TestSuiteProcessStartInfo -FilePath $FilePath -ArgumentList $ArgumentList -WorkingDirectory $WorkingDirectory))
