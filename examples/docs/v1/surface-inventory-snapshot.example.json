@@ -1,0 +1,90 @@
+{
+  "$schema": "urn:drm-copilot:docs:1.0.0:surface-inventory-snapshot",
+  "schema_version": "1.0.0",
+  "artifact_kind": "surface-inventory-snapshot",
+  "id": "example-repo.surface-inventory-snapshot",
+  "extensions": {},
+  "repository": "example-repo",
+  "revision": "0123456789abcdef0123456789abcdef01234567",
+  "profile_sha256": "1dc4c27d1f7f57420dfcc1784cbb6bcc390e0fc9b92c4ef9ec3f77daf260799b",
+  "analyzers": [
+    {"id": "example-cli", "version": "1.0.0", "analysis_method": "native"},
+    {"id": "example-scanner", "version": "1.0.0", "analysis_method": "scanner"}
+  ],
+  "inputs": [
+    {"path": "config/settings.json", "sha256": "d2b4cd9b3b2ffb6ba1137471b2e7ead398b6e03661a0b9265c3ae24a4271355c", "size": 48},
+    {"path": "src/example_pkg/cli.py", "sha256": "f7b289340b81bb5d928a78d13f714c4be415556a0f3f3cbcf2bd060f96f8eac3", "size": 512},
+    {"path": "src/example_pkg/routes.py", "sha256": "581c38a18a5d5da75fed78bbd20d89518ca375e6f68ccad0399f2dda09b43dc8", "size": 256}
+  ],
+  "elements": [
+    {
+      "element_id": "cli-command-b9cda1283b765831a04bf07223320d70c1f07de9da312b21731f40e8790cf00a",
+      "kind": "cli-command",
+      "path": "src/example_pkg/cli.py",
+      "declaration": "tool docs inventory",
+      "name": "inventory",
+      "parent_id": null,
+      "analyzer_id": "example-cli",
+      "analysis_method": "native",
+      "source_sha256": "8b304e96e932f1c57d546e313d43adda522406b14e8803b07d6ab9f6824ae2f7",
+      "line_range": {"start": 12, "end": 12},
+      "properties": [{"name": "hidden", "value": false}],
+      "extensions": {}
+    },
+    {
+      "element_id": "cli-option-4dac82ff130bd249bc5405947e1c0d29de1b7374d2aba5fb490213d36cd1ba85",
+      "kind": "cli-option",
+      "path": "src/example_pkg/cli.py",
+      "declaration": "tool docs inventory --analyzer",
+      "name": "--analyzer",
+      "parent_id": "cli-command-b9cda1283b765831a04bf07223320d70c1f07de9da312b21731f40e8790cf00a",
+      "analyzer_id": "example-cli",
+      "analysis_method": "native",
+      "source_sha256": "1f97434955fc6aa365c34d7613682e04664efa44462364b9a9242289a7181e27",
+      "line_range": {"start": 13, "end": 13},
+      "properties": [{"name": "repeatable", "value": true}],
+      "extensions": {}
+    },
+    {
+      "element_id": "config-key-c861a7d842f18ab03e7ad64dbca3ac7283e51566286b3810ae6163f096fcc69b",
+      "kind": "config-key",
+      "path": "config/settings.json",
+      "declaration": "tool.settings.timeout",
+      "name": "timeout",
+      "parent_id": null,
+      "analyzer_id": "example-scanner",
+      "analysis_method": "scanner",
+      "source_sha256": "aca4bb7739bfdd58bc1de629f1fa71cb3325237c4754b35d496d92a85d5de422",
+      "line_range": {"start": 3, "end": 3},
+      "properties": [{"name": "value_type", "value": "integer"}],
+      "extensions": {}
+    },
+    {
+      "element_id": "http-route-953dac18dfc986f87330003d45e387536b6fa02b8b34b64b49245a2482d5136f",
+      "kind": "http-route",
+      "path": "src/example_pkg/routes.py",
+      "declaration": "GET /items/{id}",
+      "name": "get_item",
+      "parent_id": null,
+      "analyzer_id": "example-scanner",
+      "analysis_method": "scanner",
+      "source_sha256": "2bd43bf5677a03ed13b32f08cce4606134c882fdc255adb27d0cd76338a3c628",
+      "line_range": {"start": 8, "end": 8},
+      "properties": [],
+      "extensions": {}
+    }
+  ],
+  "diagnostics": [
+    {
+      "id": "diagnostic-a2e8cd3ba6dc343e900b6bfac71ac0b54a396bd7ddf36ba387f119093f48e1cc",
+      "code": "DOCS_EXAMPLE_NOTICE",
+      "severity": "information",
+      "path": "config/settings.json",
+      "message": "The scanner recorded one configuration key without a documented default.",
+      "analyzer_id": "example-scanner",
+      "blocking": false,
+      "extensions": {}
+    }
+  ],
+  "captured_at": "2026-10-30T12:00:00Z"
+}

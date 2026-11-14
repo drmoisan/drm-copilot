@@ -363,7 +363,10 @@ def _evaluate_literal_rules(
 
 
 def evaluate_plan_gates(
-    text: str, *, context: PlanGateContext | None = None
+    text: str,
+    *,
+    context: PlanGateContext | None = None,
+    plan_path: str | None = None,
 ) -> PlanGateReport:
     """Evaluate the plan acceptance-gate rule set against plan text.
 
@@ -372,6 +375,9 @@ def evaluate_plan_gates(
         context (PlanGateContext | None): Repository seam. When `None` only the
             context-free rules G1, G4, G7, G8, G8b, and G10 to G13 run. G10 to
             G13 are document-level and can add Blocking findings without a
+            context.
+        plan_path (str | None): Plan-file path, passed to G13 by its own
+            parameter so the stamp selects the guideline with or without a
             context.
 
     Returns:
@@ -407,5 +413,5 @@ def evaluate_plan_gates(
     # G10 to G13 are document-level and context-free, so they run on every
     # invocation, G11 to G13 after G10.
     evaluate_scratch_gate(report, text)
-    evaluate_document_gates(report, text)
+    evaluate_document_gates(report, text, plan_path=plan_path)
     return report

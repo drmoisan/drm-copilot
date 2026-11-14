@@ -1,0 +1,457 @@
+# Pester tests/scripts Baseline - Issue 1034
+
+Timestamp: 2026-11-04T15-46
+Command: sh SCRATCH/issue-1034-run.sh SCRATCH/issue-1034-pester.ps1 -ScanFolders tests/scripts -DisableJUnit -NoCoverage -IsolatedOutputDir SCRATCH/p0t9-out (new PowerShell 7 process; imports the branch scripts/powershell/PoshQC/PoshQC.psd1 and calls Invoke-PoshQCTest -Root <worktree> -ScanFolders tests/scripts with an -InvokePester seam that sets Run.PassThru true, Run.Exit false and TestResult.Enabled false, and keeps the returned result object)
+EXIT_CODE: 0
+Output Summary: Count source: Pester result object of the run (JUnit export disabled through the seam, because on this host a 0x1B character in a tests/scripts/dev-tools failure message truncates pester-junit.xml). Passed 14619, failed 409, skipped 10, errored (failed blocks) 6, failed containers 0, 555 test files, 1070.53 s. The failures are pre-existing host-only failures (Linux Codespace: no C: drive, Windows path and prompt expectations, and the run-actionlint PATH leak into later suites); this run precedes every Phase 1 edit. EXIT_CODE 0 is the launcher exit with Run.Exit disabled; the run itself has failures. Coverage was not collected (P0-T5 holds the coverage baseline).
+
+## Per-File Failure Profile
+
+| File | Tests | Failed | Errored (failed blocks) | Failed container |
+|---|---|---|---|---|
+| tests/scripts/claude-hooks/enforce-parallel-drift-gate-helpers.Tests.ps1 | 26 | 1 | 0 | 0 |
+| tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1 | 3 | 3 | 1 | 0 |
+| tests/scripts/codex-hooks/codex-detached-head-transport.Tests.ps1 | 12 | 1 | 0 | 0 |
+| tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 | 11 | 11 | 1 | 0 |
+| tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 | 51 | 51 | 1 | 0 |
+| tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 | 50 | 50 | 1 | 0 |
+| tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 | 43 | 43 | 1 | 0 |
+| tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 | 160 | 160 | 1 | 0 |
+| tests/scripts/dev-tools/activate.Tests.ps1 | 53 | 13 | 0 | 0 |
+| tests/scripts/dev-tools/Enter-DrmCopilotShell.Tests.ps1 | 5 | 4 | 0 | 0 |
+| tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 | 23 | 16 | 0 | 0 |
+| tests/scripts/dev-tools/HostBootstrap.Tests.ps1 | 28 | 1 | 0 | 0 |
+| tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1 | 32 | 8 | 0 | 0 |
+| tests/scripts/dev-tools/HostTooling.Tests.ps1 | 22 | 1 | 0 | 0 |
+| tests/scripts/dev-tools/new-potential-entry.TemplateRoot.Tests.ps1 | 2 | 2 | 0 | 0 |
+| tests/scripts/dev-tools/post-codex-worktree-session.Tests.ps1 | 13 | 1 | 0 | 0 |
+| tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 | 18 | 16 | 0 | 0 |
+| tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 | 13 | 12 | 0 | 0 |
+| tests/scripts/dev-tools/SideloadedExtensionPublish.Tests.ps1 | 27 | 4 | 0 | 0 |
+| tests/scripts/dev-tools/sync-agents-from-instructions.Tests.ps1 | 20 | 3 | 0 | 0 |
+| tests/scripts/dev-tools/Test-DiscoveryHostCapability.Entry.Tests.ps1 | 4 | 4 | 0 | 0 |
+| tests/scripts/dev-tools/Test-DiscoveryHostCapability.Tests.ps1 | 6 | 1 | 0 | 0 |
+| tests/scripts/powershell/PoshQC/PoshQC.ScanConfig.Tests.ps1 | 12 | 1 | 0 | 0 |
+| tests/scripts/powershell/PoshQC/PoshQC.ScanFolders.Tests.ps1 | 17 | 1 | 0 | 0 |
+| tests/scripts/powershell/PoshQC/PoshQC.TestingCommands.Tests.ps1 | 13 | 1 | 0 | 0 |
+
+## Errored Blocks
+
+- tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1 :: Bundled Codex PreToolUse hooks run from the bundle location (issue #697)
+- tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697)
+
+## Failed Tests
+
+- tests/scripts/claude-hooks/enforce-parallel-drift-gate-helpers.Tests.ps1 :: enforce-parallel-drift-gate-helpers.ps1.cross-runtime binding of the unresolved-drift derivation.binds the PowerShell unresolved-drift decision to the Python unresolved_drift_item_keys derivation
+- tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1 :: Bundled Codex PreToolUse hooks run from the bundle location (issue #697).derives 20 PreToolUse hooks and excludes 5 non-PreToolUse registrations from the bundle config
+- tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1 :: Bundled Codex PreToolUse hooks run from the bundle location (issue #697).leaves no batch-budget state in the bundle
+- tests/scripts/codex-hooks/codex-bundle-hook-probe.Tests.ps1 :: Bundled Codex PreToolUse hooks run from the bundle location (issue #697).returns exit 0 and empty or hookSpecificOutput stdout for every PreToolUse hook and admitted payload from the bundle location
+- tests/scripts/codex-hooks/codex-detached-head-transport.Tests.ps1 :: enforce-epic-child-worktree-binding.ps1 resolves the live branch on a detached HEAD (issue #415 C1).exits 0 with no stdout for a benign Bash payload when the attestation is dormant
+- tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits.AC-20 one registration returns an array of count one
+- tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits.AC-20 zero registrations return an empty array that is not null
+- tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits.AC-21 registration count assertion rejects a null result
+- tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits.AC-21 registration count assertion rejects an empty array
+- tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits.allows every registered handler for every tool name its own matcher admits
+- tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits.DEV-2 wave barrier allows a benign payload for every admitted tool name when no local checkpoint text is supplied
+- tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits.fails closed with exit 2 for <Label> on every registered handler
+- tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits.fails closed with exit 2 for <Label> on every registered handler
+- tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits.leaves no Codex batch-budget state behind
+- tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits.parses at least three matcher groups and every registered handler from config.toml
+- tests/scripts/codex-hooks/codex-pretooluse-integration.Tests.ps1 :: Every registered Codex PreToolUse handler accepts every tool name its matcher admits.reports enforce-completion-consistency in its own stderr rather than its neighbour
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.allows a safe <ToolName> payload on every group handler
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.allows a safe <ToolName> payload on every group handler
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.allows a safe <ToolName> payload on every group handler
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.allows a well-formed apply_patch payload whose tool_input maps to no file edit (<Label>)
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.allows a well-formed apply_patch payload whose tool_input maps to no file edit (<Label>)
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.allows an apply_patch update that touches only ungoverned files with a missing source
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.denies a preimplementation-gate implementation path mapped from <ToolName>
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.denies a preimplementation-gate implementation path mapped from <ToolName>
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.denies a preimplementation-gate implementation path mapped from <ToolName>
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.emits only the native deny envelope for <HookName> on a forbidden <ToolName> payload
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).allows a checkpoint write that does not assert completion
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).allows a file path that is not the governed checkpoint
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).allows an unrelated mapped write through its own entrypoint
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).allows mapped tool_input that carries no file_path
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).allows when no mapped tool_input is supplied
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).denies a checkpoint edit whose patch cannot be resolved
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).denies a completion-asserting checkpoint write through its own entrypoint
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).detects completion asserted by <Label>
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).detects completion asserted by <Label>
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).detects completion asserted by <Label>
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).detects completion asserted by <Label>
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).detects completion asserted by <Label>
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).detects no completion assertion for <Label>
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).detects no completion assertion for <Label>
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).detects no completion assertion for <Label>
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).detects no completion assertion for <Label>
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).fails closed with exit 2 when its entrypoint receives empty stdin
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).reads issue-num and feature-folder from variables and reports ci_gate gaps
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).returns an empty string for a null checkpoint payload property lookup
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).returns an empty string when the checkpoint property value is null
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).returns null checkpoint content when the path is not a file
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).returns the file text when the checkpoint path resolves to a file
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).throws a hook-named error for malformed mapped tool_input JSON
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.enforce-completion-consistency in-process behaviour (issue #415 R1).treats a null payload as asserting no completion
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.fails closed with exit 2 for <Label> on every group handler
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.fails closed with exit 2 for <Label> on every group handler
+- tests/scripts/codex-hooks/codex-pretooluse-transport.Tests.ps1 :: Codex PreToolUse hooks honour the native stdin transport contract.fails closed with exit 2 when a batch-budget payload omits session_id
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.fails closed on malformed Codex stdin JSON
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.merge gate.allows a verified epic child merge
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.merge gate.allows the matching final epic PR after a successful CI gate
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.merge gate.denies a mismatched final PR number
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.allows both registered MCP server spellings identically for <Operation>
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.allows both registered MCP server spellings identically for <Operation>
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.allows both registered MCP server spellings identically for <Operation>
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.allows both registered MCP server spellings identically for <Operation>
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.allows explicit planning-artifact staging and an ordinary commit
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.allows explicit planning-artifact staging and an ordinary commit
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.allows explicit planning-artifact staging and an ordinary commit
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.allows feature planning document edits
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.allows only preparation lifecycle MCP operations
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies <Label> exactly without changing checkpoint bytes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies <Label> exactly without changing checkpoint bytes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies <Label> exactly without changing checkpoint bytes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies <Label> exactly without changing checkpoint bytes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies <Label> exactly without changing checkpoint bytes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies <Label> exactly without changing checkpoint bytes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies a preparation commit when staged paths include production code
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies commit pathspecs and broad push modes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies commit pathspecs and broad push modes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies commit pathspecs and broad push modes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies commit pathspecs and broad push modes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies commit pathspecs and broad push modes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies commit pathspecs and broad push modes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies deletion or route mutation of the canonical preparation checkpoint
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies deletion or route mutation of the canonical preparation checkpoint
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies deletion or route mutation of the canonical preparation checkpoint
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies deletion or route mutation of the canonical preparation checkpoint
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies deletion or route mutation of the canonical preparation checkpoint
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies non-repository MCP tools during preparation
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies path traversal, move destinations, and security receipt writes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies path traversal, move destinations, and security receipt writes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies path traversal, move destinations, and security receipt writes
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies PR creation and CI execution commands
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies PR creation and CI execution commands
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies PR creation and CI execution commands
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies PR creation and CI execution commands
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies PR creation and CI execution commands
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies PR creation and CI execution commands
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.denies production edits
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.fails closed for an attested preparation child before its checkpoint exists
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.fails closed when an attested preparation child changes its checkpoint route
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.preparation route.requires explicit matching MCP workspace_root for an attested preparation child
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.wave barrier.allows a child after every dependency is merged
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.wave barrier.denies a child before an upstream merge
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.wave barrier.does not apply the execution barrier to preparation children
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.worktree removal gate.allows removal after merge
+- tests/scripts/codex-hooks/epic-execution-gates.Tests.ps1 :: Codex epic preparation, wave, merge, and worktree gates.worktree removal gate.denies removal while the PR is open
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.allows exempt checkpoint writes and preparation-mode delegations (issue #535)
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.contains no legacy Claude environment-variable dependency in hooks or shared modules
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.denies preimplementation and batch-budget violations through their pure decisions
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.emits the current PreToolUse deny envelope for shell and patch violations
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).allows a documentation file path without consulting the checkpoint
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).allows a mapped Write of feature documentation through its own entrypoint
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).allows an implementation path when the checkpoint is ready
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).allows when no mapped tool_input is supplied
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).classifies <Label> as implementation command <Expected>
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).classifies <Label> as implementation command <Expected>
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).classifies <Label> as implementation command <Expected>
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).classifies <Label> as implementation command <Expected>
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).classifies <Label> as implementation command <Expected>
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).classifies <Label> as implementation command <Expected>
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).classifies <Label> as implementation command <Expected>
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).classifies <Label> as implementation path <Expected>
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).classifies <Label> as implementation path <Expected>
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).classifies <Label> as implementation path <Expected>
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).classifies <Label> as implementation path <Expected>
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).denies a mapped Edit implementation through its own entrypoint
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).denies an apply_patch implementation through its own entrypoint
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).denies an implementation command when the checkpoint is not ready
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).denies an implementation delegation when the checkpoint is not ready
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).detects an implementation delegation inside a serialized tool_input
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).fails closed with exit 2 when its entrypoint receives empty stdin
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).reads the checkpoint from disk when no checkpoint text is supplied
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).returns empty checkpoint content when the checkpoint file is absent
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).returns the checkpoint file content when the checkpoint file is present
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).throws a hook-named error for malformed mapped tool_input JSON
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).treats a checkpoint missing lifecycle readiness as not ready
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).treats a complete checkpoint as ready
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).treats a null checkpoint payload as not ready
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).treats a null tool_input as no implementation delegation
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.enforce-orchestration-preimplementation-gate in-process behaviour (issue #415 R1).treats an unrelated serialized tool_input as no delegation
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.fails closed when the canonical checkpoint is deleted or becomes invalid JSON
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.fails closed with exit 2 and stderr for malformed stdin on every hook
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.ignores poisoned Claude variables when safe Codex stdin payloads are supplied
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.keeps the canonical hooks byte-identical to their bundled copies
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.lists every shared hook module in the core pack manifest
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.parse-checks each root and bundled hook and keeps every file within 500 lines
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.reads stdin in every hook entrypoint
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.reconstructs update patches in memory and includes move destinations
+- tests/scripts/codex-hooks/legacy-codex-hook-contracts.Tests.ps1 :: Legacy Codex hooks use native lifecycle contracts.uses one SubagentStop continuation and stops repeated continuation loops
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).includes each frozen discovery row in both wrapper populations
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for deployment case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the corpus in process for topology case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for deployment case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).matches the Python CLI for topology case <id> through pwsh -File
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).resolves modules through the .claude/lib fallback inside drm-copilot
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).runs the Resolve-CodexDeployment entry block in process for case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).runs the Resolve-CodexDeployment entry block in process for case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).runs the Resolve-CodexDeployment entry block in process for case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).runs the Resolve-CodexTopology entry block in process for case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).runs the Resolve-CodexTopology entry block in process for case <id>
+- tests/scripts/codex-scripts/Resolve-CodexRouting.Parity.Tests.ps1 :: Codex routing PowerShell wrappers match the Python CLI corpus (issue #697).runs the Resolve-CodexTopology entry block in process for case <id>
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Get-VenvAwarePrompt (prompt decision used by the shim).derives the repo root from the venv parent and renders the at-root prompt (light background)
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Get-VenvAwarePrompt (prompt decision used by the shim).renders a descendant prompt from the venv parent (light background)
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Get-VenvAwarePrompt (prompt decision used by the shim).renders the prompt uncolored when the host background is null (Test Explorer host parity)
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Get-VenvAwarePrompt (prompt decision used by the shim).wraps the venv-active form in green when the background is dark
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Invoke-VenvActivation (orchestration; seams mocked).activates the venv and installs the prompt when a .venv ancestor exists
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Invoke-VenvActivation (orchestration; seams mocked).installs a prompt that delegates to the venv-aware builder
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Invoke-VenvActivation (orchestration; seams mocked).throws guidance when no .venv ancestor is found
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Invoke-VenvActivation (orchestration; seams mocked).throws when the resolved Activate.ps1 is missing
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Resolve-RepoRoot (depth-robust ancestor walk).returns an empty string when no ancestor contains .venv
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Resolve-RepoRoot (depth-robust ancestor walk).returns the nearest qualifying ancestor when multiple ancestors contain .venv
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Resolve-RepoRoot (depth-robust ancestor walk).returns the start directory when it directly contains .venv
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Resolve-RepoRoot (depth-robust ancestor walk).walks up from a deeper start regardless of depth
+- tests/scripts/dev-tools/activate.Tests.ps1 :: Resolve-RepoRoot (depth-robust ancestor walk).walks up from a two-level-deep start to the ancestor containing .venv
+- tests/scripts/dev-tools/Enter-DrmCopilotShell.Tests.ps1 :: DrmCopilotPromptSupport.ps1.Get-DrmCopilotPromptPath.falls back to the absolute path when the location is outside the repo root
+- tests/scripts/dev-tools/Enter-DrmCopilotShell.Tests.ps1 :: DrmCopilotPromptSupport.ps1.Get-DrmCopilotPromptPath.returns a repo-relative path with a leading backslash for nested folders
+- tests/scripts/dev-tools/Enter-DrmCopilotShell.Tests.ps1 :: DrmCopilotPromptSupport.ps1.Set-DrmCopilotPrompt.renders the requested prompt name with the repo-relative folder
+- tests/scripts/dev-tools/Enter-DrmCopilotShell.Tests.ps1 :: DrmCopilotPromptSupport.ps1.Start-DrmCopilotPromptSession.activates the virtual environment with the requested prompt name and installs the custom prompt
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.apply.AC06-POETRY-PROJECT-INSTALL-WARNS reports a poetry project-install failure as a warning
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.apply.AC06-VERIFY-SCRIPT-EXITCODE-IGNORED invokes the sibling verify script by path and ignores its result
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.apply.installs packages, modules, Graphite CLI, and clones projects
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.apply.skips the project poetry install by request
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.apply.warns and skips Graphite CLI when npm is missing
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.apply.warns and skips verification when verify-host.ps1 is absent
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.apply.warns when pyproject.toml is absent
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.dry run.AC06-BOOTSTRAP-DRYRUN-NOSIDEEFFECTS performs no installs, registry writes, or clones and prints Would lines
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.dry run.AC06-RUNONCE-NOT-SET-WITHOUT-BOTH does not register RunOnce with only -EnableAutoResumeAfterReboot
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.failure paths.propagates a terminating error raised by the verify script
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.poetry tool install.AC930-APPLY-INVOKES-POETRY-INSTALL installs the poetry tool in apply mode
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.poetry tool install.AC930-DRYRUN-INVOKES-POETRY-INSTALL routes the poetry tool install in dry-run mode
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.poetry tool install.AC930-POETRY-INSTALL-ORDER installs poetry after the PATH refresh and before the project install
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.poetry tool install.AC930-SKIP-PROJECT-INSTALL-KEEPS-POETRY-TOOL-INSTALL still installs the poetry tool when the project install is skipped
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.RunOnce resume.AC06-RUNONCE-CLEARED-AFTER-APPLY clears RunOnce after a successful apply
+- tests/scripts/dev-tools/HostBootstrap.Invoke.Tests.ps1 :: Invoke-BootstrapHost.RunOnce resume.AC06-RUNONCE-NOT-SET-WITHOUT-BOTH does not register RunOnce with only -Apply
+- tests/scripts/dev-tools/HostBootstrap.Tests.ps1 :: Install-PoetryWithPip.AC11-PIP-STREAMS installs poetry with -StreamToHost, emits no pip output, adds the poetry directory, and refreshes the session Path
+- tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1 :: Resolve-ProjectRepoRoot.falls back to the drm-copilot folder name when the project target path is empty
+- tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1 :: Resolve-ProjectRepoRoot.returns the drm-copilot project target path under the workspace
+- tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1 :: Resolve-ProjectRepoRoot.returns the full form of an explicit repo root
+- tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1 :: Resolve-WorkspaceRoot.returns the full form of an explicit path
+- tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1 :: Sync-ProjectsFromManifest.clones the project through the git wrapper in apply mode
+- tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1 :: Sync-ProjectsFromManifest.derives the target path from the url in dry run
+- tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1 :: Sync-ProjectsFromManifest.reports the planned clone with an explicit target path in dry run
+- tests/scripts/dev-tools/HostBootstrapWorkspace.Tests.ps1 :: Sync-ProjectsFromManifest.skips a project that is already present
+- tests/scripts/dev-tools/HostTooling.Tests.ps1 :: Read-HostToolsManifest.returns the parsed manifest object when the file exists
+- tests/scripts/dev-tools/new-potential-entry.TemplateRoot.Tests.ps1 :: new-potential-entry.ps1 - template root resolution.falls back to the workspace template when the supplied template root lacks the potential template
+- tests/scripts/dev-tools/new-potential-entry.TemplateRoot.Tests.ps1 :: new-potential-entry.ps1 - template root resolution.uses the supplied template root when the bundled potential template exists
+- tests/scripts/dev-tools/post-codex-worktree-session.Tests.ps1 :: post-codex-worktree-session.ps1 - Resolve-CodexCustomizationSourceRoot.falls back deterministically to the repository root implied by the script path
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.AC05-PUBLISH-CODECOMMAND-BOUNDEMPTY forwards an explicitly bound empty -CodeCommand
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.AC05-PUBLISH-CODECOMMAND-UNBOUND forwards no CodeCommand key when -CodeCommand is not supplied
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.AC05-PUBLISH-CONFIRM-FORWARDED forwards -Confirm:$false
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.AC13-BOUND-DEBUG-INFO-PROGRESS forwards bound -Debug, -InformationAction, and -ProgressAction
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.AC13-CONFIRM-HIGH adds no Confirm key for an inherited ConfirmPreference of High
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.AC13-CONFIRM-LOW forwards Confirm true for an inherited ConfirmPreference of Low
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.AC13-CONFIRM-NONE forwards Confirm false for an inherited ConfirmPreference of None
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.AC13-DEBUG-INHERITED forwards Debug true for an inherited DebugPreference of Continue
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.AC13-DEFAULT-NO-WHATIF adds no WhatIf key under default preferences
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.AC13-VERBOSE-INHERITED forwards Verbose true for an inherited VerbosePreference of Continue
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.AC13-WHATIF-BOUND-FALSE-WINS forwards WhatIf false when -WhatIf:$false is bound under an inherited true preference
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.AC13-WHATIF-INHERITED forwards WhatIf true when WhatIfPreference is inherited and -WhatIf is unbound
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.forwards -Verbose and -WarningAction and does not forward -ErrorAction
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - parameter forwarding.forwards the switch parameters as passed
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - real orchestrator.AC05-PUBLISH-WHATIF-NOSEAMS makes no state-changing seam call under -WhatIf
+- tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1 :: publish-sideloaded-extension.ps1 entry point - real orchestrator.AC15-PUBLISH-INHERITED-WHATIF-NOSEAMS makes no state-changing seam call under an inherited WhatIfPreference
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 :: Invoke-SideloadedExtensionPublish.VS Code CLI resolution failures.AC06-PUBLISH-CODECOMMAND-NOTFOUND-THROWS throws when an explicit -CodeCommand is not on PATH
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 :: Invoke-SideloadedExtensionPublish.VS Code CLI resolution failures.throws when no VS Code CLI command is found on PATH
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 :: Invoke-SideloadedExtensionPublish.with a resolved VS Code CLI.AC06-PUBLISH-SKIP-SWITCHES suppresses CLI resolution and install with -SkipInstall
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 :: Invoke-SideloadedExtensionPublish.with a resolved VS Code CLI.AC06-PUBLISH-SKIP-SWITCHES suppresses compile with -SkipCompile
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 :: Invoke-SideloadedExtensionPublish.with a resolved VS Code CLI.AC06-PUBLISH-SKIP-SWITCHES suppresses npm ci with -SkipNpmCi
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 :: Invoke-SideloadedExtensionPublish.with a resolved VS Code CLI.AC06-PUBLISH-STEP-ORDER runs npm ci, compile, vsce package, and install in that order
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 :: Invoke-SideloadedExtensionPublish.with a resolved VS Code CLI.AC06-PUBLISH-VSIX-MISSING-THROWS throws when vsce did not create the VSIX
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 :: Invoke-SideloadedExtensionPublish.with a resolved VS Code CLI.adds --force to the install arguments and requests npm cleanup with -Force
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 :: Invoke-SideloadedExtensionPublish.with a resolved VS Code CLI.creates the output directory through New-Item when it is absent
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 :: Invoke-SideloadedExtensionPublish.with a resolved VS Code CLI.passes an explicit -CodeCommand to the CLI resolver
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 :: Invoke-SideloadedExtensionPublish.with a resolved VS Code CLI.returns the VSIX path named from the -Now clock as its only output
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Invoke.Tests.ps1 :: Invoke-SideloadedExtensionPublish.with a resolved VS Code CLI.throws when the extension package.json is missing
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Tests.ps1 :: Invoke-NpmCiWithRetry.AC06-PUBLISH-FORCE-CLEANUP stops node, removes node_modules, and cleans the npm cache
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Tests.ps1 :: Invoke-ProjectCompile.runs the npm compile script when package.json defines one
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Tests.ps1 :: Invoke-ProjectCompile.runs tsc when only tsconfig.json exists
+- tests/scripts/dev-tools/SideloadedExtensionPublish.Tests.ps1 :: Invoke-ProjectCompile.skips compilation when neither a compile script nor tsconfig.json exists
+- tests/scripts/dev-tools/sync-agents-from-instructions.Tests.ps1 :: sync-agents-from-instructions.ps1.Get-AgentContent ordering.emits general instruction files before language-specific instruction files in generated AGENTS.md output
+- tests/scripts/dev-tools/sync-agents-from-instructions.Tests.ps1 :: sync-agents-from-instructions.ps1.Get-DiscoveredInstructionFile.Get-DiscoveredInstructionFile preserves deterministic ordering within the general and language-specific groups
+- tests/scripts/dev-tools/sync-agents-from-instructions.Tests.ps1 :: sync-agents-from-instructions.ps1.Get-DiscoveredInstructionFile.Get-DiscoveredInstructionFile sorts normalized relative paths ordinally
+- tests/scripts/dev-tools/Test-DiscoveryHostCapability.Entry.Tests.ps1 :: Test-DiscoveryHostCapability.ps1 entry point.dot-sources the claude-code probe through the default seam and reports a session without observations unsupported
+- tests/scripts/dev-tools/Test-DiscoveryHostCapability.Entry.Tests.ps1 :: Test-DiscoveryHostCapability.ps1 entry point.dot-sources the codex probe through the default seam and reports a session without observations unsupported
+- tests/scripts/dev-tools/Test-DiscoveryHostCapability.Entry.Tests.ps1 :: Test-DiscoveryHostCapability.ps1 entry point.dot-sources the github-copilot probe through the default seam and reports a session without observations unsupported
+- tests/scripts/dev-tools/Test-DiscoveryHostCapability.Entry.Tests.ps1 :: Test-DiscoveryHostCapability.ps1 entry point.exits 2 and writes the unsupported document when the workspace has no installed probe
+- tests/scripts/dev-tools/Test-DiscoveryHostCapability.Tests.ps1 :: Test-DiscoveryHostCapability.ps1.exits 2 with an unsupported document when the host has no installed probe
+- tests/scripts/powershell/PoshQC/PoshQC.ScanConfig.Tests.ps1 :: Get-PoshQCScanConfigFolder.throws an error naming the file for an absolute-path entry
+- tests/scripts/powershell/PoshQC/PoshQC.ScanFolders.Tests.ps1 :: Invoke-PoshQCTest scan-folder support.overrides run paths and preserves configured coverage paths when scan folders are supplied
+- tests/scripts/powershell/PoshQC/PoshQC.TestingCommands.Tests.ps1 :: Invoke-PoshQCTest.preserves a custom KoverageOutputPath when ScanFolders narrow Run.Path and preserve coverage paths

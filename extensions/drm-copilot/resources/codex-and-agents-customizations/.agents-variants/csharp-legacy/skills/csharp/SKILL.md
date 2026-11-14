@@ -19,7 +19,7 @@ This rule file summarizes the C#-specific policies for this repository.
 3. **Type Checking — Nullable Analysis**: Compiler and nullable-flow diagnostics must pass with warnings as errors. Command: `msbuild <solution>.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`. `/t:Rebuild` is required locally so compiler and nullable-flow diagnostics actually run. Projects opt into nullable per file with `#nullable enable`; do not pass `/p:Nullable=enable`, which opts every unannotated file in at once.
 4. **Testing — MSTest + Moq + FluentAssertions**: Run tests with: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
 
-Run the toolchain in order: format → lint → type-check → test. Restart from step 1 if any step fails or changes files.
+Run the toolchain in order: format → lint → type-check → test. Restart from step 1 if any step fails or changes files. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
 ## Coding Standards
 

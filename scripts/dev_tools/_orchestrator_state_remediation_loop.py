@@ -14,8 +14,10 @@ Invariants / Constraints:
     The per-cycle message text, ordering, and logic are identical to the
     pre-extraction implementation. Issue #484 adds the review-outcome and
     accounting invariants R5-R11 (source: `.claude/rules/orchestrator-state.md`),
-    which run after the per-cycle checks and also when `cycles` is absent. The
-    validators never modify their input.
+    which run after the per-cycle checks and also when `cycles` is absent. Issue
+    #1097 adds invariant 8 (light remediation), which runs last in the accounting
+    stage and exempts an exact `light` cycle from invariant 2. The validators
+    never modify their input.
 
 Side Effects:
     None. Every function is pure and returns a list of error strings.
@@ -24,6 +26,12 @@ Side Effects:
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, cast
+
+from scripts.dev_tools._orchestrator_state_light_cycle import (
+    LIGHT_REMEDIATION_PATH,
+    REMEDIATION_PATH_KEY,
+    validate_light_cycles,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -137,8 +145,13 @@ def _validate_remediation_cycle(index: int, cycle: dict[str, Any]) -> list[str]:
             "non-empty string."
         )
 
+    # Invariant 2 does not apply to an exact light cycle, which runs no preflight;
+    # invariant 8 checks that cycle instead.
     execution_status = cycle.get("execution_status")
-    if execution_status in EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT:
+    if (
+        execution_status in EXECUTION_STATUSES_REQUIRING_CLEAR_PREFLIGHT
+        and cycle.get(REMEDIATION_PATH_KEY) != LIGHT_REMEDIATION_PATH
+    ):
         preflight = cycle.get("preflight")
         preflight_status: object = (
             cast("dict[str, Any]", preflight).get("final_status")
@@ -246,7 +259,7 @@ def _opens_remediation_review(opened_by_review: object, outcomes: object) -> boo
 def _validate_remediation_accounting(
     loop_map: dict[str, Any], cycle_list: list[object] | None
 ) -> list[str]:
-    """Return the per-cycle R5, R6, R11 errors, then R7a or R7b."""
+    """Return the per-cycle R5, R6, R11 errors, then R7a or R7b, then invariant 8."""
 
     errors: list[str] = []
     outcomes = loop_map.get(REVIEW_OUTCOMES_KEY)
@@ -290,6 +303,9 @@ def _validate_remediation_accounting(
                 "candidate_applied true."
             )
 
+    errors.extend(
+        validate_light_cycles(cycle_list, outcomes, _opens_remediation_review)
+    )
     return errors
 
 

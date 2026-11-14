@@ -44,7 +44,6 @@ env/
 
 # VS Code
 .vscode/settings.json.bak
-.vscode/settings.json
 
 # Testing
 .pytest_cache/

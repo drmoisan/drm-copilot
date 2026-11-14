@@ -30,6 +30,7 @@ Describe 'enforce-pr-author-skill.ps1 docs-only exemption decision (issue #901)'
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
 
         $script:Create = 'gh pr create --base main --title "Docs" --body-file artifacts/pr_body_1.md'
 

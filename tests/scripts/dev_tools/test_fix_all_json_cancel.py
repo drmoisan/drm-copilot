@@ -189,6 +189,7 @@ def make_passing_branch_responses() -> (
         "powershell": {
             "PoshQC: format": [make_command_result(0)],
             "PoshQC: analyze": [make_command_result(0)],
+            "PoshQC: leak scan": [make_command_result(0)],
             "PoshQC: test": [make_command_result(0)],
         },
         "typescript": {

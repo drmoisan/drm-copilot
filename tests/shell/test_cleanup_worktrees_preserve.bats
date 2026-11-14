@@ -15,6 +15,7 @@ setup() {
     ELIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_enumerate_lib.sh"
     LIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_lib.sh"
     ALIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_actions_lib.sh"
+    MLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_merge_lib.sh"
     EOLLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_eol_lib.sh"
     PLIB="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup_worktrees_preserve_lib.sh"
     WRAP="${REPO_ROOT}/.claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh"
@@ -28,13 +29,14 @@ setup() {
     # directory has to be the repository root for the tests to be independent of where
     # bats was invoked from.
     cd "${REPO_ROOT}" || return 1
-    # The five libraries are sourced here so the tests can call the production functions
+    # The six libraries are sourced here so the tests can call the production functions
     # directly instead of rebuilding a source chain in every test body. The source-guard
     # test deliberately does not rely on this: it sources the chain again in a fresh
     # subshell, which is the only place the no-work-at-source-time property is observable.
     source "${ELIB}"
     source "${LIB}"
     source "${ALIB}"
+    source "${MLIB}"
     source "${EOLLIB}"
     source "${PLIB}"
     return 0
@@ -76,7 +78,7 @@ setup() {
         CLEANUP_WT_STUB_SCENARIO="${PRES}/untracked" \
         CLEANUP_WT_MANIFEST_PATH="${PRES}/untracked/manifest.json" \
         CLEANUP_WT_CONSOLIDATION_PATH=/dev \
-        bash -c "cd '${REPO_ROOT}' && source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${EOLLIB}' && source '${PLIB}' && run_preserve"
+        bash -c "cd '${REPO_ROOT}' && source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${MLIB}' && source '${EOLLIB}' && source '${PLIB}' && run_preserve"
     [ "$status" -eq 0 ]
     [[ "$output" == *"PRESERVE|tests/fixtures/cleanup_worktrees/preserve/untracked/wt|agent-memory/atomic-executor/lesson.md|GENUINELY_NEW"* ]]
     [[ "$output" == *"ACTION|preserve-stage|null|OK"* ]]
@@ -89,7 +91,7 @@ setup() {
         CLEANUP_WT_STUB_SCENARIO="${PRES}/host-token" \
         CLEANUP_WT_MANIFEST_PATH="${PRES}/host-token/manifest.json" \
         CLEANUP_WT_CONSOLIDATION_PATH=/dev \
-        bash -c "cd '${REPO_ROOT}' && source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${EOLLIB}' && source '${PLIB}' && run_preserve"
+        bash -c "cd '${REPO_ROOT}' && source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${MLIB}' && source '${EOLLIB}' && source '${PLIB}' && run_preserve"
     [ "$status" -eq 3 ]
     # The record's own host_token_scan.result is `clean`, so a pass that trusted the
     # advisory value instead of scanning the source bytes would have staged it.
@@ -120,6 +122,10 @@ setup() {
     [ -z "$output" ]
     # Case two: the full chain including the preserve library itself.
     run bash -c "source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${EOLLIB}' && source '${PLIB}'"
+    [ "$status" -eq 0 ]
+    [ -z "$output" ]
+    # Case three: the wrapper's chain, which adds the merge library before the others.
+    run bash -c "source '${ELIB}' && source '${LIB}' && source '${ALIB}' && source '${MLIB}' && source '${EOLLIB}' && source '${PLIB}'"
     [ "$status" -eq 0 ]
     [ -z "$output" ]
 }
@@ -258,7 +264,8 @@ setup() {
     [ "$status" -eq 0 ]
     [[ "$output" == *"|agent-memory/atomic-executor/modified-lesson.md|STILL_RELEVANT"* ]]
     [[ "$output" == *"ACTION|preserve-stage|null|OK"* ]]
-    # change_class `modified` takes the identical staging path as `untracked`.
+    # The target (/dev/null) is not a regular file, so the staging decision takes the
+    # absent-target copy path for this modified record, as it does for an untracked one.
     [[ "$output" == *"add -- null"* ]]
 }
 

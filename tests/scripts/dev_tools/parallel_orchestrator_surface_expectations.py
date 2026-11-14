@@ -174,14 +174,100 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # confirmed by polling and ancestry check, and granted the epic agent the two
 # parser invocations its skill prescribes. Both digests moved, and the pin
 # stays live for both entries.
+#
+# RE-BASELINED by issue #1117. That change replaced step 3 of the epic skill's
+# `## Epic Integration Branch Lifecycle` section, which ran the main-sync as a
+# dedicated sync child item, with a plain merge of `origin/main` into the
+# integration branch performed by `epic-orchestrator`. Only the skill digest
+# moved; the agent digest is unchanged and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #1129. That change replaced the wave-layering sentence in
+# the epic skill's `## Wave Assignment` section and in the agent's
+# `## Wave Scheduling` paragraph so that they cite the shipped PowerShell wave
+# CLI instead of the unshipped Python reference, and it added the matching
+# `Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)` grant
+# to the agent's `tools:` list. Both digests moved, and the pin stays live for
+# both entries.
+#
+# RE-BASELINED by issue #1130. That change added the epic-child CI verification
+# paragraph to the epic skill's `## Merge-on-Green Kickoff Parameter` section
+# and a step 6 to its `## Merge-Conflict Handling (Fan-In)` section. Only the
+# skill digest moved; the skill digest below is the merged result of #1129 and
+# #1130, the agent digest is unchanged, and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #1136. That change added a post-fan-in allowance paragraph
+# after the integration-PR checkpoint shape paragraph of the epic skill. Only the
+# skill digest moved; the skill digest below is the merged result of #1129, #1130,
+# and #1136, the agent digest is unchanged, and the pin stays live for both entries.
+#
+# RE-BASELINED by issue #1138. That change added the Agent-tool preflight as the
+# unnumbered lead paragraph of the agent's `## Startup Protocol`, which moved the
+# agent digest, and appended a `## Nesting Depth` section to the epic skill, which
+# moved the skill digest. Both digests moved, and the pin stays live for both
+# entries. Remediation cycle 1 of #1138 then appended to that lead paragraph the
+# instruction to halt when an `Agent(orchestrator)` call is denied with a reason
+# beginning `NESTING_DEPTH_INSUFFICIENT:`, which moved the agent digest again; the
+# skill digest is unchanged. The merge of origin/main after #1136 combined both
+# skill edits, so the skill digest below is the merged result of #1129, #1130,
+# #1136, and #1138.
+#
+# RE-BASELINED by issue #1141. That change added a merged-feature follow-up
+# allowance paragraph after the post-fan-in allowance paragraph of the epic skill
+# and extended its `## Worktree Cleanup` mirror sentence to state that the child's
+# `pr_number` and `merge_commit_sha` are recorded in the matching `features[]`
+# entry. Only the skill digest moved; the agent digest is unchanged and the pin
+# stays live for both entries. The merge of origin/main after #1138 combined both
+# skill edits, so the skill digest below is the merged result of #1129, #1130,
+# #1136, #1138, and #1141.
+#
+# RE-BASELINED by issue #1097. That change added the opt-in
+# `## Early Dependent Starts (early_start)` section to the epic skill, and to
+# the epic agent one closing paragraph of `## Wave Scheduling` with the Bash
+# grant for the repository validator CLI that section names. Both digests
+# moved, and the pin stays live for both entries. The merges of origin/main after
+# #1141 and after #1146 (owner-directive relay sentence in the epic skill)
+# combined the skill edits, so the skill digest below is the merged result of
+# #1129, #1130, #1136, #1138, #1141, #1146, and #1097.
+#
+# RE-BASELINED by issue #1157. That change extended the owner-directive paragraph
+# of the epic skill's `## Context Handoff to Dependent Features` section with
+# hook-level pass-down through the coordinator ledger, epic fan-out scope, and
+# the running-child check. Only the skill digest moved; the agent digest is
+# unchanged and the pin stays live for both entries. The digest was recomputed
+# after the merge of origin/main that brought in #1165, which did not edit the
+# epic skill, so the skill digest below is the merged result of #1129, #1130,
+# #1136, #1138, #1141, #1146, #1097, and #1157.
+#
+# RE-BASELINED by issue #1156 on 2026-11-14. That change added to the epic agent
+# `tools:` list the Bash grant for
+# `.claude/lib/regeneration/Invoke-RegenerationPath.ps1`, and to the epic skill
+# the new `## Integration-Tip Regeneration` section, the main-sync regenerate
+# path in item 3 of `## Epic Integration Branch Lifecycle`, and the child-side
+# check sentences in `## Merge-Conflict Handling (Fan-In)` and item 7 of
+# `## Early Dependent Starts (early_start)`. Both digests moved, and the pin stays
+# live for both entries. The digests were recomputed after the merge of origin/main
+# that brought in #1157, #1161, #1163, #1164, and #1167, so both digests below are
+# the merged result of the entries above and #1156.
+#
+# RE-BASELINED by issue #1162. That change added the
+# `## Cross-Epic Dependencies (cross_epic_depends_on)` section to the epic skill
+# with reference sentences in its manifest, lifecycle, checkpoint, and completion
+# sections, and added the `Invoke-EpicCrossReadiness.ps1` grant and two
+# paragraphs to the epic agent. Both digests moved. They were recomputed from
+# the bytes after the merge of origin/main that brought in #1157, #1160, #1161,
+# #1163, #1164, and #1167, so each digest below is the merged result of the
+# changes listed above plus #1162. Remediation cycle 1 of #1162 then added the
+# status-mapping (D7) paragraph to both surfaces, and both digests moved again;
+# they were recomputed after the merge of origin/main that brought in #1156, so
+# each digest below is the merged result of #1156 and #1162.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "e0691d2a05dfd97b886694262eb900293f38d9927fc2803f7e4574af856ce740",
+        "5561f79d2942aef31b168027564256f80bdfe501b7c19fc80c962abcece4af03",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "84b0555d0db146274fc5bfb9f06909c0b892a1f59522cc9feb0312d08721cf30",
+        "e334237b27c2188d2aafd0dc6d4f97c6493ba3f59a0b72772d86f74830e77e80",
     ),
 )
 
@@ -220,6 +306,14 @@ KICKOFF_RESUME_FRAGMENTS: tuple[str, ...] = (
     "promotion, research, or planning",
 )
 
+# Issue #1047: kickoff element 4 carries the admitted plan hash, and the child
+# verifies it before any other step.
+KICKOFF_PLAN_HASH_FRAGMENTS: tuple[str, ...] = (
+    "`plan-hash: <hex>`",
+    "before any other step, to run `git rev-parse HEAD:<plan-path>`",
+    "`blocked_reason: premise_falsified`",
+)
+
 COHORT_BARRIER_FRAGMENTS: tuple[str, ...] = (
     "An item may start only when every conflicting neighbour "
     "(`conflict_edges[]`) that sits in a strictly prior current-generation "
@@ -235,6 +329,15 @@ MERGE_ON_GREEN_FRAGMENTS: tuple[str, ...] = (
     "Execute `gh pr merge --merge <PR>`",
     "`.claude/skills/orchestrate/SKILL.md` is **not modified by this feature**",
     "Issue #997 amends `.claude/skills/orchestrate/SKILL.md` for standalone runs only",
+)
+
+# Issue #1047: the parent treats "PR open, step 9 pending" as not done and
+# re-delegates the child once to resume at the CI green gate.
+MERGE_ON_GREEN_TURN_GAP_FRAGMENTS: tuple[str, ...] = (
+    "keep `merge_status: pr_open` and treat the item as not done",
+    "re-delegate the child once to resume at the CI green gate",
+    "`step9_status`",
+    "`awaiting_ci`",
 )
 
 MERGE_CONFLICT_FRAGMENTS: tuple[str, ...] = (
@@ -311,6 +414,11 @@ SECTION_OBLIGATION_CASES: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     ),
     ("kickoff-resume-at-plan-path", KICKOFF_HEADING, KICKOFF_RESUME_FRAGMENTS),
     (
+        "kickoff-plan-hash-verification",
+        KICKOFF_HEADING,
+        KICKOFF_PLAN_HASH_FRAGMENTS,
+    ),
+    (
         "cohort-barrier-and-slot-filling-order",
         COHORT_BARRIER_HEADING,
         COHORT_BARRIER_FRAGMENTS,
@@ -319,6 +427,11 @@ SECTION_OBLIGATION_CASES: tuple[tuple[str, str, tuple[str, ...]], ...] = (
         "merge-on-green-parent-executes-merge",
         MERGE_ON_GREEN_HEADING,
         MERGE_ON_GREEN_FRAGMENTS,
+    ),
+    (
+        "merge-on-green-turn-gap-redelegation",
+        MERGE_ON_GREEN_HEADING,
+        MERGE_ON_GREEN_TURN_GAP_FRAGMENTS,
     ),
     (
         "merge-conflict-exhaustion-and-f8-handoff",

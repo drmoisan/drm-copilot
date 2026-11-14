@@ -1,0 +1,65 @@
+# Documentation quality workflow, written by `Invoke-DocsCommand.ps1 -Command init -Write`.
+# PowerShell 7 is the only runtime this workflow uses. Every documentation command runs through
+# .claude/lib/docs/Invoke-DocsCommand.ps1. The validated revision reaches each step through env:
+# and never through an inline expression inside run:.
+name: Documentation quality
+
+on:
+  workflow_call:
+    inputs:
+      base-ref:
+        description: Base revision or branch for surface-delta. The surface-delta step is skipped when empty.
+        required: false
+        type: string
+        default: ''
+  workflow_dispatch:
+    inputs:
+      base-ref:
+        description: Base revision or branch for surface-delta. The surface-delta step is skipped when empty.
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  docs-quality:
+    name: Documentation quality
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      DOCS_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+      DOCS_BASE_REF: ${{ inputs.base-ref }}
+    steps:
+      - name: Check out the head revision with full history
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Write the documentation inventory snapshot
+        shell: pwsh
+        run: pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command inventory -Revision "$env:DOCS_REVISION" -Write
+
+      - name: Check documentation pages
+        shell: pwsh
+        run: pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command check -Json
+
+      - name: Validate the documentation estate for docs-complete
+        shell: pwsh
+        run: pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command validate -Mode docs-complete -Revision "$env:DOCS_REVISION" -WriteReceipt
+
+      - name: Report surface changes against the base revision
+        if: ${{ inputs.base-ref != '' }}
+        shell: pwsh
+        run: pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command surface-delta -Base "$env:DOCS_BASE_REF"
+
+      - name: Upload the validation receipt
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: docs-validation-receipt
+          path: docs/documentation-estate/docs-validation-receipt.json
+          if-no-files-found: ignore

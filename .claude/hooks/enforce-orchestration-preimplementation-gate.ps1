@@ -1,13 +1,20 @@
 <#
 .SYNOPSIS
     Blocks implementation operations before orchestration readiness exists.
+.DESCRIPTION
+    Issue #1160: a regex hit of Test-ImplementationCommand is confirmed by the stage-2
+    mention-host model of the -commands sibling, so a runner or staging word that is only a
+    search, process, lookup, or output operand is not classified. In the single-feature branch
+    the bookkeeping staging leg of the -bookkeeping sibling (configuration key bookkeeping_roots)
+    runs after the cleanup leg and before the final deny; an invalid configuration adds its deny
+    suffix after the cleanup suffix.
 #>
 [CmdletBinding()]
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 
 # Pure pathspec classifier for the issue #539 orchestration-bookkeeping staging exemption.
 # Extracted to a dot-sourced sibling so this file stays inside the 500-line cap, following
@@ -24,10 +31,14 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-m
 # seams, the mode deny reason, and the target resolution with its import guard (issue
 # #690), all relocated to this sibling to keep the gate inside the 500-line cap.
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-epic-scope.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-cleanup.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-cleanup.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-docs.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-docs.ps1' -ErrorRecord $_ }
 
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-commands.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-commands.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-bookkeeping.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-bookkeeping.ps1' -ErrorRecord $_ }
 
 # Every orchestration checkpoint a planner or orchestrator surface writes. Writing one
 # of these is orchestration bookkeeping, not implementation, so the gate must not
@@ -143,9 +154,10 @@ function Test-ImplementationCommand {
     $isStaging = @('add', 'commit').Where({ Test-CommandLineInvocation -CommandText $normalizedCommand -CommandWord 'git' -SubcommandPath @($_) }).Count -gt 0
 
     for ($index = 0; $index -lt $implementationCommandPatterns.Count; $index++) {
-        if (-not (($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }) -or ($index -eq 0 -and $isStaging))) {
-            continue
-        }
+        $structural = ($index -eq 0 -and $isStaging)
+        if (-not ($structural -or ($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }))) { continue }
+        # Stage 2 (issue #1160): a regex-only hit is dropped when every governed word is a mention-host operand.
+        if (-not $structural -and -not (Test-OrchestrationGateInvocationConfirmed -CommandText $normalizedCommand -PatternIndex $index)) { continue }
         # Allow-side only (issue #539). Index 0 is the git staging trigger, whose pattern
         # text is unchanged. It is the sole leg the orchestration-bookkeeping exemption may
         # clear, and only when no other implementation pattern matches the same line: the
@@ -397,10 +409,11 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     }
 
     # Truthiness fall-through is kept: an empty -CheckpointRaw resolves like an unbound one.
+    $checkpointPath = ''
     if (-not $CheckpointRaw) {
         $read = Read-OrchestrationGateCheckpoint -Mode 'single-feature' -Prompt $prompt -FilePath $filePath -Command $command
         if (-not $read.Resolved) { return Get-OrchestrationPreimplementationGateBlockDecision -Reason $read.DenyReason }
-        $CheckpointRaw = $read.Raw
+        $CheckpointRaw = $read.Raw; $checkpointPath = [string]$read.Path
     }
     try {
         $checkpoint = ConvertFrom-CheckpointJson -Json $CheckpointRaw
@@ -411,7 +424,10 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     if (Test-OrchestrationReady -Payload $checkpoint) {
         return Get-OrchestrationPreimplementationGateAllowDecision
     }
-    return Get-OrchestrationPreimplementationGateBlockDecision -Reason 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
+    if (($cleanup = Get-OrchestrationCleanupContextResult -FilePath $filePath -Content (Get-ClaudeHookToolInputString -ToolInput $toolInput -Name 'content') -Command $command).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Cleanup-context legs (issue #1026).
+    if (($bookkeeping = Get-OrchestrationBookkeepingStagingResult -Command $command -CheckpointPath $checkpointPath).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Bookkeeping staging leg (issue #1160).
+    if (($docs = Get-OrchestrationDocsEstateContextResult -FilePath $filePath -Command $command).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Docs-estate leg (issue #1169).
+    return Get-OrchestrationPreimplementationGateBlockDecision -Reason ('PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.' + $cleanup.DenySuffix + $bookkeeping.DenySuffix + $docs.DenySuffix)
 }
 
 function Invoke-OrchestrationPreimplementationGateEntryPoint {

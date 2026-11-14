@@ -50,6 +50,12 @@ $ARGUMENTS
 
 ## Scope
 
+Two items run sequentially if and only if the expected merge time exceeds the expected time gained by running them in parallel.
+
+Both estimates are integer minutes: merge time is the summed overlap-class weights, and a path that one side only reads costs 0; gain is the shorter of the two band durations. Hard classes are always edges. At `tolerance_percent` 100 the rule is exactly merge time greater than gain, and a tie runs in parallel. `--after` flags and planner-proposed orderings pass the same test and are rejected with `precedence_not_justified` unless marked as a correctness ordering with `--reason`.
+
+The planner applies this rule when it seeds the cohorts this run consumes (`### Integration-cost scheduling (issue #722)` of `.claude/rules/parallel-orchestration.md`).
+
 This skill adds no procedure of its own beyond kickoff-artifact resolution. Cohort consumption and
 ordering, the cohort barrier, `max_concurrency` slot filling, the per-item branch and worktree
 lifecycle, the child kickoff parameter, model selection, per-item merge to `main` on green,
@@ -60,3 +66,13 @@ skill (`.claude/skills/parallel-orchestrate/SKILL.md`).
 There is no final integration pull request on this surface, and no fan-in step follows the items:
 each item's pull request targets `main` directly and is merged individually by
 `parallel-orchestrator` after its checks are durably confirmed green.
+
+## Nesting Depth
+
+This chain runs three levels of subagents below the main session: the coordinator at depth 1, each per-feature `orchestrator` at depth 2, and the specialists that orchestrator delegates to at depth 3. Only the depth-2 orchestrator needs the `Agent` tool below the coordinator; specialists do not delegate.
+
+Requirement: Claude Code 2.1.219 or later, `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` unset or at least 3, and the skill invoked from the main session. A run started inside a subagent or fork adds one layer, and a lower limit withholds the `Agent` tool from the per-feature orchestrators.
+
+Outcome when the depth is insufficient: an agent that starts without the `Agent` tool records `blocked_reason: "spawn_agent_unavailable"`, does no specialist work, and returns a line beginning `AGENT_TOOL_UNAVAILABLE`; a coordinator that receives that line from a child halts with the same reason instead of doing the child's work. The `enforce-epic-invocation-origin.ps1` hook also denies a chain delegation with `NESTING_DEPTH_INSUFFICIENT:` when the configured limit is below 3.
+
+Fallback: when the depth cannot be raised, the main session itself launches each per-feature `Agent(orchestrator)` with the same delegation prompt the coordinator would have sent, including `Preparation mode: true` on the preparation path, so each orchestrator runs at depth 1 and its specialists at depth 2.

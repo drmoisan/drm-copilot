@@ -81,6 +81,8 @@ Describe 'enforce-epic-merge-gate strict epic_mode (issue #1001)' {
         ) {
             # Arrange
             $checkpointText = '{"epic_mode":' + $Value + ',"step9_status":"passed","pr_gate":{"pr_number":42}}'
+            # Branch 1 now requires a verified CI run (issue #1130); the child-CI decision is mocked to Verified.
+            Mock -CommandName Get-EpicMergeGateChildCiDecision -MockWith { [ordered]@{ Verified = $true; Reason = '' } }
             Mock Get-ChildOrchestratorCheckpointContent -MockWith ({ $checkpointText }.GetNewClosure())
 
             # Act

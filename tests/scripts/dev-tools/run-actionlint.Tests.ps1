@@ -1,10 +1,13 @@
 Set-StrictMode -Version Latest
 
-$scriptRoot = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $PSCommandPath }
-. (Resolve-Path -Path (Join-Path -Path $scriptRoot -ChildPath "../powershell/Support/TestHelpers.ps1"))
-
 Describe "run-actionlint.ps1" {
     BeforeAll {
+        # Record whether the Microsoft.PowerShell.Archive module (auto-loaded by the Expand-Archive mock) is
+        # loaded before this file runs, so the Describe AfterAll removes it only when this file added it
+        # (issue #1066).
+        $script:describeHadArchiveModule = $null -ne (Get-Module -Name Microsoft.PowerShell.Archive)
+        . ([System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, '..', 'powershell', 'Support', 'TestHelpers.ps1')))
+
         $script:scriptPath = Join-Path $PSScriptRoot '..\..\..\scripts\dev-tools\run-actionlint.ps1' -Resolve
 
         # Import all functions from the script for testing
@@ -14,6 +17,38 @@ Describe "run-actionlint.ps1" {
         . (Import-ScriptFunction -Path $script:scriptPath -Name 'Add-DirectoryToPath')
         . (Import-ScriptFunction -Path $script:scriptPath -Name 'Invoke-ActionlintExe')
         . (Import-ScriptFunction -Path $script:scriptPath -Name 'Invoke-ActionlintCommand')
+    }
+
+    # Save and restore process-global state around every test in every Context (issue #1066): $env:PATH
+    # (value and existence) and $global:LASTEXITCODE (existence and value). Only assignments and
+    # Remove-Variable are used, because the Install-Actionlint Context mocks Test-Path, Join-Path,
+    # Remove-Item, New-Item, and Write-Information while this AfterEach runs.
+    BeforeEach {
+        $script:describeHadPath = $null -ne [System.Environment]::GetEnvironmentVariable('PATH')
+        $script:describeSavedPath = $env:PATH
+        $script:describeHadLastExitCode = $null -ne (Get-Variable -Name LASTEXITCODE -Scope Global -ErrorAction SilentlyContinue)
+        $script:describeSavedLastExitCode = if ($script:describeHadLastExitCode) { $global:LASTEXITCODE } else { $null }
+    }
+
+    AfterEach {
+        if ($script:describeHadPath) {
+            $env:PATH = $script:describeSavedPath
+        } else {
+            [System.Environment]::SetEnvironmentVariable('PATH', $null)
+        }
+        if ($script:describeHadLastExitCode) {
+            $global:LASTEXITCODE = $script:describeSavedLastExitCode
+        } else {
+            Remove-Variable -Name LASTEXITCODE -Scope Global -ErrorAction SilentlyContinue
+        }
+    }
+
+    # Remove the Archive module only when it was absent before this file ran. No command mocked in a Context is
+    # called here.
+    AfterAll {
+        if (-not $script:describeHadArchiveModule -and $null -ne (Get-Module -Name Microsoft.PowerShell.Archive)) {
+            Remove-Module -Name Microsoft.PowerShell.Archive
+        }
     }
 
     Context "Resolve-ActionlintPath" {
@@ -222,16 +257,6 @@ Describe "run-actionlint.ps1" {
     }
 
     Context "Add-DirectoryToPath" {
-        BeforeEach {
-            # Save original PATH
-            $script:originalPath = $env:PATH
-        }
-
-        AfterEach {
-            # Restore original PATH
-            $env:PATH = $script:originalPath
-        }
-
         It "adds directory to PATH when not present" {
             # Arrange
             $separator = [IO.Path]::PathSeparator

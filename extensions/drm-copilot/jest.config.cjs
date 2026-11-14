@@ -3,6 +3,8 @@
 // below the 700-line advisory tier of the tiered file-size policy; the map is
 // merged below and carries no `global` key.
 const discoveryCoverageThresholds = require("./jest.discovery-coverage.json");
+// Issue #1036: the five docs MCP modules keep their thresholds in jest.docs-coverage.json.
+const docsCoverageThresholds = require("./jest.docs-coverage.json");
 
 /** @type {import('jest').Config} */
 module.exports = {
@@ -30,6 +32,21 @@ module.exports = {
   // by convention and therefore satisfy the branch gate.
   coverageThreshold: {
     ...discoveryCoverageThresholds,
+    ...docsCoverageThresholds,
+    // Issue #1162: the three epic validator modules extended with the key-gated
+    // cross-epic dependency invariants.
+    "./src/lib/validate/epic-orchestrator-state-resolution.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/epic-orchestrator-state-core.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/epic-planner-state-core.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #574: the three pr-context modules changed by the collect-pr-context
     // path-identity and freshness fix. The map carried no entry for any
     // src/lib/pr-context/ file before this change.
@@ -102,6 +119,11 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1097: the completion rule under review_mode concurrent.
+    "./src/lib/validate/orchestrator-state-concurrent-review.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #980: the fixed discovery-routing helper beside the topology resolver.
     "./src/lib/validate/codex-discovery-routing.ts": {
       lines: 90,
@@ -136,6 +158,12 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1097: the epic wave-barrier check moved out of the epic core, with
+    // the early-start exemption. Per-file entry only; the map has no `global` key.
+    "./src/lib/validate/epic-orchestrator-state-wave-barrier.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #484: gate the remediation-loop validator (R5-R11 accounting).
     "./src/lib/validate/orchestrator-state-remediation.ts": {
       lines: 85,
@@ -143,6 +171,10 @@ module.exports = {
     },
     // Issue #484: gate the review-outcome module split from the validator above.
     "./src/lib/validate/orchestrator-state-remediation-accounting.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/validate/orchestrator-state-light-cycle.ts": {
       lines: 85,
       branches: 75,
     },
@@ -529,6 +561,11 @@ module.exports = {
       branches: 75,
     },
     "./src/lib/validate/orchestrator-state-codex-model-routing.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #1161: the planner_worktrees validator module.
+    "./src/lib/validate/epic-planner-state-planner-worktrees.ts": {
       lines: 85,
       branches: 75,
     },

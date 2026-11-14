@@ -180,6 +180,8 @@ Required tools:
 - `run_poshqc_analyze_autofix`
 - `run_poshqc_test`
 
+`run_poshqc_test` is not a validation gate. The Pester gate is one `Invoke-PoshQCParallelTest` run, through the route in the `execution-environment` skill.
+
 When a workflow requires PoshQC execution through MCP, use only these tools. If the required tool is unavailable or fails, stop.
 
 ## Output Requirements

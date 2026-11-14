@@ -28,6 +28,7 @@ Invariants / Constraints:
 
 from __future__ import annotations
 
+import re
 from typing import Any, cast
 
 # Lifecycle path prefixes a feature_folder hint may carry. A hint may point into
@@ -42,6 +43,26 @@ _LIFECYCLE_PREFIXES = (
 )
 
 _VALID_EPIC_TYPES = {"business", "enabler"}
+
+# Issue #1162 cross-epic dependency key and its key-gated invariants. Every message
+# is byte-identical to the TypeScript port and pinned by the shared corpus
+# tests/fixtures/epic_cross_dependency/cross-dependency-cases.json.
+CROSS_EPIC_KEY = "cross_epic_depends_on"
+CROSS_EPIC_MAIN_GATE_KEY = "cross_epic_main_gate"
+CROSS_EPIC_MALFORMED_PREFIX = "EPIC_CROSS_DEPENDENCY_MALFORMED: "
+CROSS_EPIC_MAIN_GATE_PREFIX = (
+    "EPIC_CROSS_DEPENDENCY_MAIN_GATE_INCOMPLETE: cross_epic_main_gate must be "
+    "released with a verified entry for: "
+)
+CROSS_EPIC_STATUSES = ("held", "released", "integrated", "in_main")
+_CROSS_EPIC_STRING_FIELDS = (
+    "reason",
+    "prerequisite_merge_commit_sha",
+    "verified_at",
+    "integration_merge_commit_sha",
+    "integrated_at",
+)
+_EPIC_SLUG_PATTERN = re.compile(r"[A-Za-z0-9._-]+")
 
 
 def _normalize_folder_hint(value: str) -> str:
@@ -286,3 +307,256 @@ def validate_intent_block(state: dict[str, Any]) -> list[str]:
                 f"Epic checkpoint intent.{field_name} must be a list of strings."
             )
     return errors
+
+
+def is_positive_int(value: object) -> bool:
+    """Report whether a JSON value is an integer above zero.
+
+    Args:
+        value (object): Any JSON value.
+
+    Returns:
+        bool: True for an int above zero; a boolean is not an integer here,
+        because the TypeScript port does not treat true as 1.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+
+def is_epic_slug(value: object) -> bool:
+    """Report whether a JSON value is one plain epic slug segment.
+
+    Args:
+        value (object): Any JSON value.
+
+    Returns:
+        bool: True for a string of the characters A-Z, a-z, 0-9, ``.``, ``_``,
+        and ``-`` that is not ``.`` or ``..``.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    return (
+        isinstance(value, str)
+        and _EPIC_SLUG_PATTERN.fullmatch(value) is not None
+        and value not in (".", "..")
+    )
+
+
+def _cross_epic_entry_errors(entry: dict[str, Any], prefix: str) -> list[str]:
+    """Return the shape errors of one ``cross_epic_depends_on`` entry.
+
+    Args:
+        entry (dict[str, Any]): One object entry of the list.
+        prefix (str): The ``features[i].cross_epic_depends_on[j]`` locator.
+
+    Returns:
+        list[str]: Errors in field order: epic, integration_branch, issue_num,
+        status, the optional string fields, and prerequisite_pr_number.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    errors: list[str] = []
+    epic = entry.get("epic")
+    if not is_epic_slug(epic):
+        errors.append(
+            f"{CROSS_EPIC_MALFORMED_PREFIX}{prefix}.epic must be a string of one "
+            "plain segment (A-Z, a-z, 0-9, ., _, -)."
+        )
+    branch = entry.get("integration_branch")
+    # A missing or non-string branch is reported on its own; the derived-name
+    # comparison runs only when both the branch and the epic are usable.
+    if not isinstance(branch, str) or not branch:
+        errors.append(
+            f"{CROSS_EPIC_MALFORMED_PREFIX}{prefix}.integration_branch must be a "
+            "non-empty string."
+        )
+    elif is_epic_slug(epic) and branch != f"epic/{epic}-integration":
+        errors.append(
+            f"{CROSS_EPIC_MALFORMED_PREFIX}{prefix}.integration_branch must equal "
+            f"epic/{epic}-integration."
+        )
+    if not is_positive_int(entry.get("issue_num")):
+        errors.append(
+            f"{CROSS_EPIC_MALFORMED_PREFIX}{prefix}.issue_num must be a positive "
+            "integer."
+        )
+    # The hold-record fields are optional; each is checked only when present.
+    if "status" in entry:
+        status = entry.get("status")
+        if not isinstance(status, str) or status not in CROSS_EPIC_STATUSES:
+            errors.append(
+                f"{CROSS_EPIC_MALFORMED_PREFIX}{prefix}.status must be one of "
+                "held, released, integrated, in_main."
+            )
+    # Each optional evidence field, when present, must hold a string.
+    for name in _CROSS_EPIC_STRING_FIELDS:
+        if name in entry and not isinstance(entry.get(name), str):
+            errors.append(
+                f"{CROSS_EPIC_MALFORMED_PREFIX}{prefix}.{name} must be a string."
+            )
+    if "prerequisite_pr_number" in entry and not is_positive_int(
+        entry.get("prerequisite_pr_number")
+    ):
+        errors.append(
+            f"{CROSS_EPIC_MALFORMED_PREFIX}{prefix}.prerequisite_pr_number must be "
+            "a positive integer."
+        )
+    return errors
+
+
+def validate_cross_epic_dependency_shape(state: dict[str, Any]) -> list[str]:
+    """Validate ``features[].cross_epic_depends_on`` shape, only where present.
+
+    Key-gated (issue #1162): a feature without the key, and a checkpoint whose
+    features carry no key, produce no error, so existing checkpoints validate
+    byte-identically. Used by both the epic-orchestrator and the epic-planner
+    validators. Entries are located by their raw ``features`` index, so a
+    non-object feature entry still advances the index.
+
+    Args:
+        state (dict[str, Any]): Parsed checkpoint JSON object.
+
+    Returns:
+        list[str]: One ``EPIC_CROSS_DEPENDENCY_MALFORMED:`` error per violated
+        rule, in feature, entry, and field order.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    raw_features = state.get("features")
+    if not isinstance(raw_features, list):
+        return []
+    errors: list[str] = []
+    # Walk every object feature that carries the key; the value must be a list
+    # and each of its entries an object before the field rules apply.
+    for index, feature in enumerate(cast("list[Any]", raw_features)):
+        if not isinstance(feature, dict) or CROSS_EPIC_KEY not in feature:
+            continue
+        locator = f"features[{index}].{CROSS_EPIC_KEY}"
+        entries = cast("dict[str, Any]", feature).get(CROSS_EPIC_KEY)
+        if not isinstance(entries, list):
+            errors.append(f"{CROSS_EPIC_MALFORMED_PREFIX}{locator} must be a list.")
+            continue
+        # Each entry is judged on its own so every malformed entry is reported.
+        for position, entry in enumerate(cast("list[Any]", entries)):
+            prefix = f"{locator}[{position}]"
+            if not isinstance(entry, dict):
+                errors.append(
+                    f"{CROSS_EPIC_MALFORMED_PREFIX}{prefix} must be an object."
+                )
+                continue
+            errors.extend(
+                _cross_epic_entry_errors(cast("dict[str, Any]", entry), prefix)
+            )
+    return errors
+
+
+def _verified_main_gate_epics(state: dict[str, Any]) -> set[str]:
+    """Return the epics a released ``cross_epic_main_gate`` records as verified.
+
+    Args:
+        state (dict[str, Any]): Parsed checkpoint JSON object.
+
+    Returns:
+        set[str]: Epic slugs of the prerequisite entries that carry a positive
+        integer ``pr_number`` and non-empty ``merge_commit_sha`` and
+        ``verified_at`` strings; empty unless the gate status is ``released``.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    gate = state.get(CROSS_EPIC_MAIN_GATE_KEY)
+    if not isinstance(gate, dict):
+        return set()
+    gate_map = cast("dict[str, Any]", gate)
+    prerequisites = gate_map.get("prerequisites")
+    if gate_map.get("status") != "released" or not isinstance(prerequisites, list):
+        return set()
+    verified: set[str] = set()
+    # Keep only fully evidenced entries; a partial entry verifies nothing.
+    for item in cast("list[Any]", prerequisites):
+        if not isinstance(item, dict):
+            continue
+        record = cast("dict[str, Any]", item)
+        epic = record.get("epic")
+        sha = record.get("merge_commit_sha")
+        verified_at = record.get("verified_at")
+        if (
+            isinstance(epic, str)
+            and is_positive_int(record.get("pr_number"))
+            and isinstance(sha, str)
+            and bool(sha)
+            and isinstance(verified_at, str)
+            and bool(verified_at)
+        ):
+            verified.add(epic)
+    return verified
+
+
+def validate_cross_epic_main_gate(
+    features: list[dict[str, Any]], state: dict[str, Any]
+) -> list[str]:
+    """Validate the completion backstop of the integration-to-main hold (D5).
+
+    Key-gated: only a checkpoint whose features carry at least one entry with a
+    valid epic slug needs a released ``cross_epic_main_gate`` with one verified
+    entry per distinct prerequisite epic.
+
+    Args:
+        features (list[dict[str, Any]]): Object-shaped features[] entries.
+        state (dict[str, Any]): Parsed checkpoint JSON object.
+
+    Returns:
+        list[str]: One ``EPIC_CROSS_DEPENDENCY_MAIN_GATE_INCOMPLETE:`` error
+        naming the missing epics in first-seen order, or an empty list.
+
+    Raises:
+        None.
+
+    Side Effects:
+        None.
+    """
+
+    epics: list[str] = []
+    # Collect the distinct prerequisite epics in feature and entry order.
+    for feature in features:
+        entries = feature.get(CROSS_EPIC_KEY)
+        if not isinstance(entries, list):
+            continue
+        for entry in cast("list[Any]", entries):
+            if not isinstance(entry, dict):
+                continue
+            epic = cast("dict[str, Any]", entry).get("epic")
+            if is_epic_slug(epic) and epic not in epics:
+                epics.append(cast("str", epic))
+    if not epics:
+        return []
+    verified = _verified_main_gate_epics(state)
+    missing = [epic for epic in epics if epic not in verified]
+    if not missing:
+        return []
+    return [CROSS_EPIC_MAIN_GATE_PREFIX + ", ".join(missing)]

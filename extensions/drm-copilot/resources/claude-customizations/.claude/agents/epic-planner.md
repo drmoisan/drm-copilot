@@ -14,6 +14,7 @@ tools:
   - "Edit(artifacts/orchestration/**)"
   - "Bash(git *)"
   - "Bash(gh *)"
+  - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
   - "mcp__drm-copilot__potential_to_issue"
 skills:
@@ -55,6 +56,8 @@ its own delegation chain; the PreToolUse hook
 (`EPIC_INVOCATION_ORIGIN_BLOCKED`).
 
 ## Startup Protocol
+
+Agent-tool preflight, before step 1: confirm that `Agent` is in the available tool list before any other work. When it is absent, record `blocked_reason: "spawn_agent_unavailable"` in the planning checkpoint, do no specialist work, and return a line beginning `AGENT_TOOL_UNAVAILABLE:` that names the three causes and both remedies. The causes are `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` set below 3 (the configured limit), a run started inside a subagent or fork (one extra nesting layer), and a Claude Code version older than 2.1.219. The remedies are to raise or unset `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`, or to use the main-session fallback in `## Nesting Depth` of the `epic-plan` skill, in which the main session launches each per-feature `Agent(orchestrator)` itself. When a child returns a line beginning `AGENT_TOOL_UNAVAILABLE:`, halt with the same reason and record `spawn_agent_unavailable`; do not do the child's work in its place. When an `Agent(orchestrator)` call is denied with a reason beginning `NESTING_DEPTH_INSUFFICIENT:`, halt with that reason and record `spawn_agent_unavailable` in the same way; do not do the child's work in its place.
 
 On every invocation:
 
@@ -109,6 +112,14 @@ Update `artifacts/orchestration/epic-planner-state.json` after every completed s
 `features[]` (per-feature `issue_num`, `feature_folder`, `depends_on`, `wave`, `complexity_band`,
 `preparation_status`, `research_path`, `plan_path`, `preflight_status`), `kickoff_prompt_path`,
 `completed_steps`, `next_step`, and `last_updated`.
+Once a preparation worktree exists, also maintain `planner_worktrees[]` (issue #1161; see
+`## Preparation Worktree Records` in the `epic-plan` skill), one entry per preparation worktree:
+`branch` (required; the branch identity of the worktree), `path` (optional; repository-relative to
+the main checkout), `purpose` (`preparation`), `preparation_status` (`preparing`, `prepared`,
+`fanned_in`, `removed`, or `abandoned`), `feature_folder` (a `features[]` folder), and
+`recorded_at` (optional). Never record an absolute path.
+When a manifest feature carries `cross_epic_depends_on` (issue #1162), copy that value into the
+same `features[]` entry as `cross_epic_depends_on`; the validator checks its shape only.
 `epic_issue_num` is the epic-level issue `epic-planner` promotes at planning time through `mcp__drm-copilot__potential_to_issue` with `promotion_type: epic` (issue #663; see `## Epic-Level Issue Promotion` in the `epic-plan` skill).
 
 ## Completion Requirements

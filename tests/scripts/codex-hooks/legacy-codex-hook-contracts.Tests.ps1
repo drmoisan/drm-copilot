@@ -28,7 +28,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         # excluded from the stdin-read assertion and from every process-level
         # invocation loop, because they define functions only and are never
         # executed as a hook process.
-        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1', 'enforce-orchestration-preimplementation-gate-helpers.ps1', 'hook-command-scanner.ps1', 'hook-command-invocation.ps1', 'enforce-batch-budget-route.ps1', 'feature-folder-resolution.ps1', 'hook-command-heredoc.ps1', 'hook-command-payload.ps1', 'hook-command-payload-powershell.ps1', 'hook-command-invocation-operands.ps1', 'enforce-orchestration-preimplementation-gate-targets.ps1', 'hook-dependency-guard.ps1', 'feature-review-coverage-thresholds.ps1', 'file-size-policy.ps1', 'hook-target-worktree.ps1')
+        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1', 'enforce-orchestration-preimplementation-gate-helpers.ps1', 'hook-command-scanner.ps1', 'hook-command-invocation.ps1', 'enforce-batch-budget-route.ps1', 'feature-folder-resolution.ps1', 'hook-command-heredoc.ps1', 'hook-command-payload.ps1', 'hook-command-payload-powershell.ps1', 'hook-command-invocation-operands.ps1', 'enforce-orchestration-preimplementation-gate-targets.ps1', 'hook-dependency-guard.ps1', 'feature-review-coverage-thresholds.ps1', 'file-size-policy.ps1', 'hook-target-worktree.ps1', 'hook-cleanup-context.ps1', 'enforce-orchestration-preimplementation-gate-cleanup.ps1', 'validate-feature-review-coverage-freshness.ps1', 'feature-review-coverage-target.ps1', 'hook-epic-fan-in.ps1', 'hook-planner-worktree-removal.ps1', 'enforce-epic-worktree-removal-gate-planner.ps1', 'hook-docs-estate-context.ps1', 'enforce-orchestration-preimplementation-gate-docs.ps1')
         $script:StaticCheckNames = @($script:AllHookNames) + @($script:SharedModuleNames)
         $script:CorePackManifestPath = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json'
         # Issue #707 (D10): load the gate so its epic-scope read is mocked for every in-process row.
@@ -118,6 +118,17 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
             $bundleHash = (Get-FileHash -LiteralPath (Join-Path $script:BundleHookRoot $name)).Hash
             $bundleHash | Should -Be $rootHash -Because "$name must publish without drift"
         }
+    }
+
+    It 'keeps hook-planner-worktree-removal.ps1 byte-identical across the four copies (issue #1161)' {
+        $copies = @(
+            '.claude/hooks/hook-planner-worktree-removal.ps1'
+            '.codex/hooks/hook-planner-worktree-removal.ps1'
+            'extensions/drm-copilot/resources/claude-customizations/.claude/hooks/hook-planner-worktree-removal.ps1'
+            'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/hook-planner-worktree-removal.ps1'
+        )
+        $hashes = @($copies | ForEach-Object { (Get-FileHash -LiteralPath (Join-Path $script:RepoRoot $_)).Hash })
+        @($hashes | Select-Object -Unique).Count | Should -Be 1 -Because 'the pure planner helper must stay one implementation on both surfaces'
     }
 
     It 'reads stdin in every hook entrypoint' {

@@ -32,8 +32,10 @@ import pytest
 from scripts.dev_tools import _blast_radius_scheduling as scheduling
 from scripts.dev_tools._blast_radius_conflicts import conflicts
 from scripts.dev_tools._blast_radius_scheduling import (
+    NO_ACCESS,
     STRICT_CONFLICT_TOLERANCE,
     ConflictTolerance,
+    ItemAccess,
     SchedulingItem,
     SchedulingResult,
     config_conflict_tolerance,
@@ -64,6 +66,16 @@ COMMITTED_WEIGHTS: dict[str, int] = {
     "append_only": 1,
     "module": 2,
     "contract": 8,
+}
+# The weights the committed tables carry: integer minutes and the optional
+# separable weight since issue #1164, with contract still the last name.
+COMMITTED_FILE_WEIGHTS: dict[str, int] = {
+    "same_file": 90,
+    "possible_overlap": 20,
+    "append_only": 10,
+    "module": 10,
+    "separable": 15,
+    "contract": 90,
 }
 WEIGHTS_LABEL = r'config\["conflict_tolerance"\]\["weights"\]'
 CONTRACT_LABEL = r'config\["conflict_tolerance"\]\["weights"\]\["contract"\]'
@@ -297,10 +309,20 @@ def without_contract_term(
     right: BlastRadius,
     config: Mapping[str, object],
     tolerance: ConflictTolerance,
+    *,
+    access_a: ItemAccess = NO_ACCESS,
+    access_b: ItemAccess = NO_ACCESS,
 ) -> int:
-    """Return the pair cost with the contract term subtracted."""
+    """Return the pair cost with the contract term subtracted.
+
+    The keyword-only access arguments match the ``pair_cost`` signature (issue
+    #1164), so the stub can replace it inside ``decide_pair``.
+    """
     term = tolerance.weights["contract"] * shared_count(left, right)
-    return pair_cost(left, right, config, tolerance) - term
+    cost = pair_cost(
+        left, right, config, tolerance, access_a=access_a, access_b=access_b
+    )
+    return cost - term
 
 
 def pair_sets(result: SchedulingResult) -> tuple[set[tuple[int, int]], ...]:
@@ -368,10 +390,10 @@ def test_invariant_domain_carries_shared_contracts() -> None:
 
 @pytest.mark.parametrize("path", COMMITTED_COPIES, ids=COPY_IDS)
 def test_committed_tables_carry_the_contract_weight(path: Path) -> None:
-    """Both committed weights maps equal the five-name map, contract last."""
+    """Both committed weights maps equal the six-name minute map, contract last."""
     config = cast("dict[str, object]", json.loads(path.read_text(encoding="utf-8")))
     member = cast("dict[str, object]", config["conflict_tolerance"])
     weights = cast("dict[str, int]", member["weights"])
 
-    assert weights == COMMITTED_WEIGHTS, path.name
+    assert weights == COMMITTED_FILE_WEIGHTS, path.name
     assert list(weights)[-1] == "contract", path.name

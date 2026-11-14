@@ -299,7 +299,7 @@ Loading known model artifacts from hardcoded trusted local paths.
 **Required pattern:**
 ```python
 # Model path is hardcoded, not from user input
-MODEL_PATH = Path(__file__).parent / "artifacts" / "lexile_model.pkl"
+MODEL_PATH = Path(__file__).parent / "artifacts" / "model.pkl"
 
 def load_model() -> Model:
     """Load pre-trained model from trusted artifact."""
@@ -383,10 +383,10 @@ Parent-relative imports (`from ..module import`) reduce code clarity and create 
 **Recommended alternative pattern:**
 ```python
 # Instead of:
-from ..gutenberg_query_core import QueryGroupModel  # noqa: TID252
+from ..query_core import QueryGroupModel  # noqa: TID252
 
 # Use absolute imports:
-from lexile_corpus_tuner.lexile_scoring_model.pipeline_scripts.gutenberg_query_core import (
+from my_package.pipeline.query_core import (
     QueryGroupModel,
 )
 ```

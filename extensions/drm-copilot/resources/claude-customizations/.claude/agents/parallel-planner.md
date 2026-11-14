@@ -18,6 +18,7 @@ tools:
   - "Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"
   - "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"
   - "Bash(bash .claude/lib/bash/report-lane-assertion.sh*)"
+  - "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1*)"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
   - policy-compliance-order
@@ -75,6 +76,8 @@ rather than as a guarantee supplied by the runtime.
 
 ## Startup Protocol
 
+Agent-tool preflight, before step 1: confirm that `Agent` is in the available tool list before any other work. When it is absent, record `blocked_reason: "spawn_agent_unavailable"` in the planning checkpoint, do no specialist work, and return a line beginning `AGENT_TOOL_UNAVAILABLE:` that names the three causes and both remedies. The causes are `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH` set below 3 (the configured limit), a run started inside a subagent or fork (one extra nesting layer), and a Claude Code version older than 2.1.219. The remedies are to raise or unset `CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`, or to use the main-session fallback in `## Nesting Depth` of the `parallel-plan` skill, in which the main session launches each per-item `Agent(orchestrator)` itself. When a child returns a line beginning `AGENT_TOOL_UNAVAILABLE:`, halt with the same reason and record `spawn_agent_unavailable`; do not do the child's work in its place. When an `Agent(orchestrator)` call is denied with a reason beginning `NESTING_DEPTH_INSUFFICIENT:`, halt with that reason and record `spawn_agent_unavailable` in the same way; do not do the child's work in its place.
+
 On every invocation:
 
 1. Read `CLAUDE.md` for repository tone policy and architecture context.
@@ -127,12 +130,19 @@ Update `artifacts/orchestration/parallel-planner-state.json` after every complet
 `objective`, `parallel_slug`, `parallel_manifest_path`, `mode`, `max_concurrency`,
 `plan_home_branch`, `items[]`, `cohorts[]`, `conflict_edges[]`, `recolor_generation`,
 `kickoff_prompt_path`, `completed_steps`, `next_step`, and `last_updated`. Also record the
-`tolerated_overlaps` list returned by Get-BlastRadiusConflictEdge (tolerated-not-validated).
+`tolerated_overlaps` list returned by Get-BlastRadiusConflictEdge and the top-level `precedence[]`
+list of operator and planner precedence entries (declared in
+`## Prepared-Item Admission (issue #1047)` of `.claude/rules/parallel-orchestration.md`). The
+`conflict_edges[]` estimates `hard`, `cost`, and `benefit`, the `tolerated_overlaps` entries, each
+item's `read_paths` and `separable_paths`, and `precedence[].kind` and `reason` are checked when
+present by the validators (issue #1164).
 
 Each `items[]` entry carries `issue_num`, `feature_folder`, `kind`, `state`, `complexity_band`,
-`complexity_assessment`, `preparation_status`, `research_path`, `plan_path`, `preflight_status`, `branch_name`,
+`complexity_assessment`, `preparation_status`, `research_path`, `plan_path`, `plan_hash`,
+`base_commit`, `preflight_status`, `branch_name`,
 `worktree_path`, `blast_radius`, `radius_validation`, `model_routing_receipt`, and
-`topology_receipt`. No `epic_worthiness` analogue, no `depends_on` field, and no `wave` field is
+`topology_receipt`, plus the optional `read_paths`, `separable_paths`, and `separable_rationale`
+(issue #1164). No `epic_worthiness` analogue, no `depends_on` field, and no `wave` field is
 written at any level.
 
 ## Completion Requirements
@@ -187,19 +197,31 @@ The facade exports `Get-PlanPaths`, `Get-BlastRadius`, `Get-BlastRadiusFromObser
 `Test-BlastRadiusConflict` reads that table's optional `mergeable_paths` list and contributes no
 `path_overlap` edge for a path matching it, while the path stays in the declared radius.
 
+Two items run sequentially if and only if the expected merge time exceeds the expected time gained by running them in parallel.
+
+Both estimates are integer minutes: merge time is the summed overlap-class weights, and a path that one side only reads costs 0; gain is the shorter of the two band durations. Hard classes are always edges. At `tolerance_percent` 100 the rule is exactly merge time greater than gain, and a tie runs in parallel. `--after` flags and planner-proposed orderings pass the same test and are rejected with `precedence_not_justified` unless marked as a correctness ordering with `--reason`.
+
 The facade also exports the scheduling entry point Get-BlastRadiusConflictEdge (with its per-pair
 helper `Get-BlastRadiusPairDecision`), the PowerShell port of `schedule_conflict_edges` in
 `scripts/dev_tools/_blast_radius_scheduling.py`. Build the conflict edges with one call,
-`Get-BlastRadiusConflictEdge -Item <records carrying key, radius, band> -Config <parsed truth table> -Relation ${function:Test-BlastRadiusConflict}`,
+`Get-BlastRadiusConflictEdge -Item <records carrying key, radius, band, read_paths, separable_paths> -Config <parsed truth table> -Relation ${function:Test-BlastRadiusConflict}`,
 rather than applying `Test-BlastRadiusConflict` to each pair by hand. The -Relation argument is
 required: the scheduling module does not resolve the relation itself, and an omitted relation fails
 fast. It applies the detection
 relation to every unordered pair and then the integration-cost edge rule of
 `.claude/rules/parallel-orchestration.md` under the table's configured `conflict_tolerance`, and
-returns `edges` and `tolerated_overlaps`. Record the edges in `conflict_edges[]` (each entry may
-carry the tolerated extra fields `hard`, `cost`, and `benefit`) and record every returned tolerated
+returns `edges` and `tolerated_overlaps`. Before the call, derive read_paths with access-paths
+(`pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 access-paths -Entry <json>`)
+and declare each item's `separable_paths` with a one-line rationale per path, recorded in the item's
+`separable_rationale` map; neither list removes a path from `blast_radius.paths`. Record every
+ordering you propose yourself as a `precedence[]` entry with `source: "planner"` and `kind` set as
+for an operator flag. Run test-precedence after the scheduling entry point returns
+(`pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 test-precedence -Entry <json>`);
+a `precedence_not_justified` rejection stops the scheduling step. Record the edges in
+`conflict_edges[]` as `{a, b, reason, hard, cost, benefit}` entries and every returned tolerated
 overlap in a `tolerated_overlaps` list on the planner checkpoint; tolerated overlaps are required
-checkpoint content, never discarded. A tolerated pair runs in the same or adjacent cohorts without a
+checkpoint content, never discarded. At seeding, also write each detected pair to the manifest's
+`pair_decisions` (invariant M9) with its `verdict`. A tolerated pair runs in the same or adjacent cohorts without a
 barrier, and the later-merging item merges `origin/main` and re-passes CI. The configured tolerance
 is the only sanctioned relaxation: never hand-narrow a radius to suppress an edge.
 

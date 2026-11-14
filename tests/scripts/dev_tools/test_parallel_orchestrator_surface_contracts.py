@@ -216,15 +216,19 @@ def test_orchestrate_skill_intro_heading_precedes_prerequisites() -> None:
 
 
 def test_orchestrate_skill_first_thirteen_headings_match_required_layout() -> None:
-    """Require the R2.1 section layout and a total of sixteen ``##`` headings."""
+    """Require the R2.1 section layout and a total of seventeen ``##`` headings.
+
+    Issue #1138 added the seventeenth heading, ``## Nesting Depth``, directly
+    before the three reserved wave-four sections.
+    """
 
     # Arrange / Act
     _, body = split_frontmatter(read_repo_text(ORCHESTRATE_SKILL_RELATIVE))
     headings = top_level_headings(body)
 
     # Assert
-    assert len(headings) == 16, (
-        "parallel-orchestrate/SKILL.md must carry exactly sixteen '##' headings, "
+    assert len(headings) == 17, (
+        "parallel-orchestrate/SKILL.md must carry exactly seventeen '##' headings, "
         f"found {len(headings)}: {headings}"
     )
     assert headings[:13] == pinned.SKILL_HEADINGS, (

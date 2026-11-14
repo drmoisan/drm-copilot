@@ -35,8 +35,9 @@
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
-try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
-try { Import-Module (Join-Path $PSScriptRoot '../lib/file-size-policy/FileSizePolicy.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'FileSizePolicy.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/file-size-policy/FileSizePolicy.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'FileSizePolicy.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/AgentTargetWorktree.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'AgentTargetWorktree.psm1' -ErrorRecord $_ }
 
 function Get-FileSizeLimitBlockDecision {
     <#
@@ -113,6 +114,8 @@ function Invoke-FileSizeLimitDecision {
     .PARAMETER ReadFileContent
         Seam that returns the text of a file, $null when the file does not exist, and
         throws when it cannot be read. Tests supply in-memory content.
+    .PARAMETER WorktreeListInvoker
+        Optional worktree-list seam passed to Resolve-AgentTargetWorktree (issue #1163).
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -127,7 +130,9 @@ function Invoke-FileSizeLimitDecision {
             param([string] $Path)
             if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }
             return [System.IO.File]::ReadAllText($Path)
-        }
+        },
+
+        [scriptblock] $WorktreeListInvoker
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'FILE_SIZE_LIMIT_BLOCKED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
@@ -142,6 +147,20 @@ function Invoke-FileSizeLimitDecision {
     $toolInput = $payload.Value
     $filePath = Get-ClaudeHookToolInputString -ToolInput $toolInput -Name 'file_path'
     $relativePath = ConvertTo-FileSizeRelativePath -Path $filePath -RepositoryRoot $RepositoryRoot
+    # Issue #1163 (D7): an absolute path outside the root, or in an agent worktree beneath it, is
+    # measured against its enclosing live registered worktree; a failure keeps today's path.
+    if ($filePath -match '^([\\/]|[A-Za-z]:[\\/])' -and ($null -eq $relativePath -or $relativePath.StartsWith('.claude/worktrees/'))) {
+        try {
+            $resolverArguments = @{ SessionRoot = $RepositoryRoot; FilePath = @($filePath); Policy = 'SessionFallback' }
+            if ($null -ne $WorktreeListInvoker) { $resolverArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+            $resolvedRoot = [string](Resolve-AgentTargetWorktree @resolverArguments).WorktreeRoot
+            if ($resolvedRoot -and -not [string]::Equals($resolvedRoot.TrimEnd('/'), ($RepositoryRoot -replace '\\', '/').TrimEnd('/'), [System.StringComparison]::OrdinalIgnoreCase)) {
+                $relativePath = ConvertTo-FileSizeRelativePath -Path $filePath -RepositoryRoot $resolvedRoot
+            }
+        } catch {
+            Write-Verbose "target worktree resolution failed; the repository root applies: $($_.Exception.Message)"
+        }
+    }
     if (-not (Test-FileSizeCoveredPath -RelativePath $relativePath)) {
         return Get-FileSizeLimitAllowDecision
     }

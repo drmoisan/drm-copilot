@@ -7,8 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Docs MCP tools (issue #1036): `run_docs_check`, `run_docs_inventory`, `run_docs_coverage`,
+  `update_docs_ledger`, `generate_docs_reference`, and `validate_docs_artifacts` run the
+  workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1 -Json` with `pwsh` 7.4 or later and
+  return its envelope unchanged in the `docs` result field. Inputs are validated before launch,
+  `update_docs_ledger` is the only tool that can write (only with `write: true`), and the tools
+  carry read-only or destructive MCP annotations. Host failures return a code-prefixed `summary`
+  such as `DOCS_ENTRY_SCRIPT_MISSING` or `DOCS_PWSH_UNAVAILABLE`.
+- Claude core pack skill `/epic-progress-report` (issue #1093): the core pack now carries
+  `.claude/skills/epic-progress-report/SKILL.md` and its five bundled PowerShell scripts under
+  `.claude/skills/epic-progress-report/scripts/` (the report entry script and its Logic, State,
+  Metrics, and Render files). The skill schedules the coordinator's TL;DR and hourly epic
+  progress reports, and the script keeps its baseline and samples in
+  `.claude/state/epic-progress-<epic-folder>.json`. A destination repository receives the skill
+  through the push-down only after the extension is rebuilt and reinstalled.
+
 ### Changed
 
+- Claude core pack skill `/epic-progress-report` (issue #1118): the report measures progress
+  in typed steps (research, spec, plan, preflight, one execution step per plan task, review,
+  pr, ci, merge, main-sync, and integration-pr) instead of checked plan tasks, counts the steps
+  each opened remediation cycle adds, and estimates the time remaining as the sum over step
+  types of remaining steps times the median measured duration, with stated default durations
+  for types that have no sample (`-StepDefaultMinutes` overrides them). Blocked items are
+  excluded by recorded checkpoint state. The TL;DR keeps four lines; the velocity, standard
+  deviation, and range lines are replaced by a Now line and a per-type table. A new `Item`
+  parameter set (`-Issue <n>`) reports a standalone item. The state file is version 2 with a
+  duration ledger and per-item tick anchors; version 1 files are migrated. The core pack adds
+  four scripts under `.claude/skills/epic-progress-report/scripts/` (Stages, Steps, Durations,
+  and Gather). The live stage names the orchestrator records (for example `feature_review`,
+  `atomic_execution`, and `S8_create_pr`) map to their step types, a running execution task is
+  timed from the later of the stage start and the last plan tick, and item-mode and
+  single-feature reports use item and singular wording. A running step without a recorded
+  start reads `start not recorded` on the Now line, the `S2_feature_documents` stage maps to
+  `spec`, and a merged item's tick anchors are removed from the state file.
 - PoshQC code-coverage population (issue #527): `Invoke-PoshQCTest` derives the measured
   file set from the workspace. Declare coverage roots in `config/poshqc-coverage.json` at
   the workspace root (`{"version": 1, "roots": [...]}`). A `CodeCoverage.Path` list in the

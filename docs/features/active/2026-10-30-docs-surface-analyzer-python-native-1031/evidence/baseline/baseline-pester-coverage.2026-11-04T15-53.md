@@ -1,0 +1,7 @@
+# Baseline: Pester with coverage ([P0-T8])
+
+Timestamp: 2026-11-04T15-53
+Command: sh SCRATCH/issue-1031-run.sh issue-1031-poshqc-gate.ps1 issue-1031-base-pester.out -Paths tests/scripts (branch-current Invoke-PoshQCTest from scripts/powershell/PoshQC/PoshQC.psd1, single process, coverage enabled from config/poshqc-coverage.json)
+EXIT_CODE: 255
+Output Summary: Tests Passed: 14619, Failed: 409, Skipped: 10, Inconclusive: 0, NotRun: 0 (console summary line; 2367.8 s). The run exits 255 because the Pester JUnit export fails on a 0x1B character in a failure message, so artifacts/pester/pester-junit.xml is truncated and the counts come from the console line. The 409 failures are pre-existing failures of this Linux host, taken before any 1031 file exists (failure lines by directory: dev-tools 86, codex-hooks 15, powershell/PoshQC 7, claude-hooks 3, codex-scripts 1; causes include Windows path expectations and the run-actionlint PATH leak that breaks later suites in the same process); none is under tests/scripts/claude-lib/docs or tests/scripts/claude-runtime. The sorted failure lines are kept in SCRATCH/issue-1031-base-failset.txt (97 [-] lines) for comparison with the final run.
+Coverage (artifacts/pester/powershell-coverage.xml): overall line coverage 93.77% (26417 of 28171 lines); .claude/lib/docs/DocsAnalyzerRegistry.psm1 100.00% (124 of 124); .claude/lib/docs/DocsInventory.psm1 100.00% (100 of 100); .claude/lib/docs/Invoke-DocsCommand.ps1 87.74% (136 of 155).

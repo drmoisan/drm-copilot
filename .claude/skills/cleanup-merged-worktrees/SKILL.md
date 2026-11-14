@@ -162,7 +162,9 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
 2. **Editorial triage of the cherry-pick candidates.** Review each
    `COMMIT|...|UNIQUE|...` record — this is the LLM-judgment boundary. Confirm
    editorially that the unique commits are genuinely documentation/agent-memory
-   content (for example paths under `docs/**`, `.claude/agent-memory/**`, or `**/*.md`).
+   content: paths under the repository-relative prefixes `docs/` and `.claude/agent-memory/`,
+   compared case-sensitively. A Markdown file outside those two prefixes (for example
+   `CLAUDE.md` or `.claude/rules/*.md`) is not consolidation content.
    The script only reports the deterministic facts (SHA, paths, author, date); deciding
    what counts as documentation is this skill's responsibility.
 
@@ -174,21 +176,42 @@ The script emits pipe-delimited, `LC_ALL=C`-ordered records, one per line:
    reuse it silently. Conflicts are aborted and surfaced as `CONFLICT` for editorial
    resolution, never auto-resolved.
 
+   **Cleanup context.** A cleanup run writes no orchestration checkpoint, so the enforcement
+   hooks recognize its operations by the cleanup context instead: the sanctioned-removal
+   manifest at the session root (`artifacts/orchestration/cleanup-worktrees-manifest.json` in
+   the main checkout where this skill runs, written whole with Write; see Sanctioned Removal
+   Manifest) and the consolidation worktree, identified by its branch
+   `documentationandmemories`. Any staging in that worktree beyond what the script performs
+   uses `git -C <consolidation root> add -- <path>` with paths under `docs/` or
+   `.claude/agent-memory/` only, and the commit uses
+   `git -C <consolidation root> commit -F <message file>` with no pathspec. The preimplementation
+   gate admits that commit only when every staged path is under those two prefixes.
+
 4. **Push and hand off PR creation to `Agent(pr-author)`.** Push the consolidation
-   branch (`git push`). Refresh the PR-context bundle with
-   `mcp__drm-copilot__collect_pr_context` using base branch `main` (producing
-   `artifacts/pr_context.summary.txt` and `artifacts/pr_context.appendix.txt`).
-   Validate the orchestrator-state checkpoint
-   (`artifacts/orchestration/orchestrator-state.json`) with `--require-pr-creation-ready`
-   and record the `pr_author_preflight` result; delegation is prohibited when that
-   validation fails. Then delegate PR creation to `Agent(pr-author)` per
-   `.claude/skills/pr-author/SKILL.md`, which owns the body-file and receipt contract;
-   defer to that skill for it rather than restating any value from it here. For `<N>`,
+   branch (`git -C <consolidation root> push -u origin documentationandmemories`).
+   The push precedes `gh pr create`: the PR-author gate requires
+   `refs/remotes/origin/documentationandmemories` to resolve to the same commit as the
+   consolidation worktree `HEAD`, so push again after any later commit in that worktree. Refresh the
+   PR-context bundle with `mcp__drm-copilot__collect_pr_context` using base branch `main` and
+   `workspace_root` set to the consolidation worktree, so that
+   `artifacts/pr_context.summary.txt` and `artifacts/pr_context.appendix.txt` exist beneath the
+   consolidation worktree. A consolidation pull request has no orchestrator-state checkpoint and
+   is not validated against one; the hooks perform the cleanup readiness check instead.
+   `enforce-model-routing-receipt.ps1` admits the `Agent(pr-author)` delegation, and
+   `enforce-pr-author-skill.ps1` admits `gh pr create`, only while a fresh, valid manifest exists
+   at the session root; the PR-author gate also requires an explicit
+   `--head documentationandmemories --base main` and a branch diff limited to `docs/` and
+   `.claude/agent-memory/`, and its receipt checks still apply. Then delegate PR creation to
+   `Agent(pr-author)` per `.claude/skills/pr-author/SKILL.md`, which owns the body-file and
+   receipt contract; defer to that skill for it rather than restating any value from it here.
+   The delegation is non-isolated and passes the absolute body path beneath the consolidation
+   worktree, as that skill's coordinator-session topology requires. For `<N>`,
    use the GitHub issue number the run executes under when the run has one. When the run
    has none, `<N>` is an arbitrary run-scoped identifier chosen by the pr-author agent.
-   The delegation prompt MUST carry a `branch: <name>` label naming the consolidation branch,
-   and the canonical issue number line when the run has an issue number.
-   `enforce-model-routing-receipt.ps1` identifies the item from those two lines and denies a
+   The delegation prompt MUST carry exactly one `branch: documentationandmemories` label, on
+   its own line, and no `--head` or `--branch` text, plus the canonical issue number line when
+   the run has an issue number.
+   `enforce-model-routing-receipt.ps1` identifies the item from those lines and denies a
    gated delegation it cannot identify. A cleanup run with no issue number is therefore
    identified by the branch label alone, which is why the label is required and the issue line
    is not.
@@ -397,6 +420,15 @@ specific files or commit SHAs, before step 9 acts on any finding.
 `git worktree remove <path>` command only when a record in it covers that exact path. A removal
 issued with no covering record is denied with each gate's existing, unchanged reason code.
 
+The manifest lives at the session root: the main checkout where this skill runs. Both removal
+gates, the PR-author gate, and the model-routing gate read the relative path
+`artifacts/orchestration/cleanup-worktrees-manifest.json` against the hook process location,
+which is the session root, so a manifest written in any other worktree is never read. Write the
+whole document with Write; the preimplementation gate admits that Write without a checkpoint
+only at the session-root spelling and only when the content carries the expected `tool` and
+`schema_version`. An Edit of the manifest is not supported without a checkpoint, and neither is a
+Codex `apply_patch` Update, Delete, or Move of it; rewrite the document with Write instead.
+
 The document is UTF-8 JSON with `snake_case` keys. It carries six top-level fields. Its `removals`
 and `preserved_files` entries are sibling arrays and are never nested: removal records are keyed by
 worktree path, preserve records by the pair of worktree path and file path, and the gates must
@@ -445,7 +477,8 @@ These records serve the consolidation consumer and are never read by either gate
   consumer reads that worktree's `MEMORY.md`.
 - `source_path` — string, required, repo-relative within that worktree. The file to preserve.
 - `change_class` — string, required, either `untracked` or `modified`, recording whether staging
-  adds a new file or carries a working-tree modification.
+  adds a new file or carries a working-tree modification. How each class is staged is described
+  under `### Preserve staging outcomes`.
 - `disposition` — string, required, exactly `PRESERVE`.
 - `verdict` — string, required, a member of the step-5 verdict vocabulary listed above.
 - `target_path` — string, required, repo-relative on the consolidation branch. Required because the
@@ -498,6 +531,52 @@ These records serve the consolidation consumer and are never read by either gate
   ]
 }
 ```
+
+### Preserve staging outcomes
+
+`cleanup-worktrees.sh --preserve` reports each record's outcome as
+`ACTION|preserve-stage|<target_path>|<result>`. The result vocabulary is:
+
+- `OK` — the record was written and staged.
+- `FAILED` — a write or staging operation failed; the remaining records continue.
+- `SKIPPED-INVALID` — a record field failed validation.
+- `MISSING-SOURCE` — the source file does not exist in the named worktree.
+- `HOST-TOKEN-BLOCKED` — the incoming bytes carry a host-identifying token; the whole pass stops
+  with exit 3 and nothing is staged.
+- `IGNORED-TARGET` — the target path is ignored on the consolidation branch and is not forced.
+- `MISSING-WORKTREE` — the consolidation worktree does not exist.
+- `REFUSED-WOULD-REGRESS` — staging the record would lose a line that the consolidation branch
+  already carries, or the record repeats an earlier record's `target_path`.
+
+Staging depends on whether `<consolidation-worktree>/<target_path>` is an existing regular file:
+
+- Absent target, either `change_class`: the source is copied byte for byte.
+- Existing target, `untracked` record: the source is copied only when every line of the target is
+  present in the source in the same order; otherwise the record is refused.
+- Existing target, `modified` record with a merge base (the source path equals the target path, and
+  the file exists at the merge base of the worktree `HEAD` and the consolidation `HEAD`): the
+  worktree change must only add lines to the base (G1); a `git merge-file --union --object-id`
+  merge of the target, the base, and the source then runs; the merged result must keep every target
+  line (G2) and must add no line beyond the worktree's own additions (G3). The merged blob is
+  staged.
+- Existing target, `modified` record without a merge base: treated as an existing `untracked`
+  target.
+- A record whose `target_path` repeats an earlier record's in the same pass is refused; the first
+  record keeps the target.
+
+A refused record still emits its `PRESERVE|` record, writes a `cleanup-worktrees: refused` line to
+stderr naming the failed guard, appends no `MEMORY.md` index line, and makes the pass exit 1.
+
+Residuals:
+
+- A resurrected line textually identical to a line the worktree added cannot be distinguished by G3.
+- The merge path requires Git 2.43 or later for `merge-file --object-id`; an older Git fails the
+  merge and the record is refused.
+- The order in which `--union` places two insertions at the same position is not specified by Git;
+  G2 and G3 bound the result whatever the order.
+- The planning phase writes unreferenced blob objects (`hash-object -w`, `merge-file --object-id`)
+  to the object store; it writes no index, ref, or working-tree file.
+- A refused record is not consolidated; the operator consolidates it manually.
 
 ### Accepted residual
 

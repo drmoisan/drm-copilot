@@ -1,0 +1,293 @@
+{
+  "schema_version": 1,
+  "envelope": {
+    "objective": "pin the epic wave-barrier early_start edge cases",
+    "route_id": "epic",
+    "epic_feature_folder": "2026-11-08-early-start-epic-1097",
+    "integration_branch": "epic/early-start-1097-integration",
+    "max_parallel_features": 4,
+    "completed_steps": [],
+    "next_step": "wave_1_launch",
+    "last_updated": "2026-11-08T00-00",
+    "waves": []
+  },
+  "cases": [
+    {
+      "name": "valid-upstream-unmerged-before-pr",
+      "notes": "A valid record exempts the named edge while the dependent is worktree_created and the upstream is unmerged.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "valid-upstream-merged-later-before-pr",
+      "notes": "A valid record exempts the timing check: the upstream merged after the dependent started.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-11-08T12-00"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "valid-pr-open-merged-synced",
+      "notes": "A dependent at pr_open with a merged upstream and a string synced_at reports nothing.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-11-08T12-00"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "pr_open", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md", "synced_at": "2026-11-08T12-30"}}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "valid-merged-dependent-worktree-removed-upstream",
+      "notes": "A merged dependent with a worktree_removed upstream and a string synced_at reports nothing.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "worktree_removed", "merge_confirmed_at": "2026-11-08T12-00"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "merged", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md", "synced_at": "2026-11-08T12-30"}}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "valid-folder-hint-names-issue-edge",
+      "notes": "A lifecycle-prefixed folder hint in the record and an issue_num edge resolve to the same feature.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": {"dependency": "docs/features/active/2026-11-08-upstream-901", "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "valid-not-started-dependent",
+      "notes": "A not_started dependent with a string worktree_created_at is started for the guard but reports nothing on the exempt edge.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "not_started", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": []
+    },
+    {
+      "name": "pr-open-upstream-unmerged",
+      "notes": "A dependent at pr_open while the upstream is unmerged reports message A even with a synced_at.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "ci_green"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": ["2026-11-08-upstream-901"], "worktree_created_at": "2026-11-08T10-00", "merge_status": "pr_open", "early_start": {"dependency": "2026-11-08-upstream-901", "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md", "synced_at": "2026-11-08T12-30"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is at pr_open or later while early_start dependency 2026-11-08-upstream-901 is not merged"
+      ]
+    },
+    {
+      "name": "pr-open-upstream-unmerged-no-sync",
+      "notes": "Message A alone is reported when the upstream is unmerged and synced_at is absent.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": ["2026-11-08-upstream-901"], "worktree_created_at": "2026-11-08T10-00", "merge_status": "pr_open", "early_start": {"dependency": "2026-11-08-upstream-901", "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is at pr_open or later while early_start dependency 2026-11-08-upstream-901 is not merged"
+      ]
+    },
+    {
+      "name": "ci-green-integer-edge-renders-raw",
+      "notes": "An integer edge renders its raw reference in message A.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "ci_green", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is at pr_open or later while early_start dependency 901 is not merged"
+      ]
+    },
+    {
+      "name": "pr-open-null-sync",
+      "notes": "A null synced_at with a merged upstream reports message B.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-11-08T12-00"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "pr_open", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md", "synced_at": null}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is at pr_open or later without a string synced_at for early_start dependency 901"
+      ]
+    },
+    {
+      "name": "pr-open-absent-sync",
+      "notes": "An absent synced_at with a merged upstream reports message B.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-11-08T12-00"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "pr_open", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is at pr_open or later without a string synced_at for early_start dependency 901"
+      ]
+    },
+    {
+      "name": "pr-open-empty-sync",
+      "notes": "An empty synced_at with a merged upstream reports message B.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-11-08T12-00"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "pr_open", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md", "synced_at": ""}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is at pr_open or later without a string synced_at for early_start dependency 901"
+      ]
+    },
+    {
+      "name": "pr-open-numeric-sync",
+      "notes": "A numeric synced_at with a merged upstream reports message B.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-11-08T12-00"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "pr_open", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md", "synced_at": 5}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is at pr_open or later without a string synced_at for early_start dependency 901"
+      ]
+    },
+    {
+      "name": "absent-status-fails-closed",
+      "notes": "An absent dependent merge_status counts as pr_open or later.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-11-08T12-00"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is at pr_open or later without a string synced_at for early_start dependency 901"
+      ]
+    },
+    {
+      "name": "blocked-status-fails-closed",
+      "notes": "A blocked dependent status counts as pr_open or later.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-11-08T12-00"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "blocked_conflict_loop_limit", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is at pr_open or later without a string synced_at for early_start dependency 901"
+      ]
+    },
+    {
+      "name": "other-dependency-unmerged",
+      "notes": "The record exempts only its own edge; the other unmerged dependency reports today's status message.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-other-903", "issue_num": 903, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901, 903], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is treated as started while dependency 903 is not merged"
+      ]
+    },
+    {
+      "name": "other-dependency-late-merge",
+      "notes": "The record exempts only its own edge; the other dependency's late merge reports today's timing message.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-other-903", "issue_num": 903, "depends_on": [], "merge_status": "merged", "merge_confirmed_at": "2026-11-08T12-00"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901, 903], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 worktree_created_at precedes dependency 903 merge_confirmed_at"
+      ]
+    },
+    {
+      "name": "key-names-non-dependency",
+      "notes": "A record naming a feature outside depends_on exempts no edge.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-other-903", "issue_num": 903, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": {"dependency": 903, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is treated as started while dependency 901 is not merged"
+      ]
+    },
+    {
+      "name": "null-value",
+      "notes": "A null early_start is no record.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": null}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is treated as started while dependency 901 is not merged"
+      ]
+    },
+    {
+      "name": "string-value",
+      "notes": "A string early_start is no record.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": "901"}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is treated as started while dependency 901 is not merged"
+      ]
+    },
+    {
+      "name": "empty-upstream-branch",
+      "notes": "An empty upstream_branch makes the record invalid.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": {"dependency": 901, "upstream_branch": "", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is treated as started while dependency 901 is not merged"
+      ]
+    },
+    {
+      "name": "missing-interface-evidence",
+      "notes": "An absent interface_evidence makes the record invalid.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is treated as started while dependency 901 is not merged"
+      ]
+    },
+    {
+      "name": "missing-interface-settled-at",
+      "notes": "An absent interface_settled_at makes the record invalid.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is treated as started while dependency 901 is not merged"
+      ]
+    },
+    {
+      "name": "case-variant-key",
+      "notes": "The key is exact: Early_Start is not early_start.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "Early_Start": {"dependency": 901, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is treated as started while dependency 901 is not merged"
+      ]
+    },
+    {
+      "name": "boolean-dependency",
+      "notes": "A boolean dependency is invalid even where it would resolve: the upstream issue_num is true.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": true, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": ["2026-11-08-upstream-901"], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": {"dependency": true, "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is treated as started while dependency 2026-11-08-upstream-901 is not merged"
+      ]
+    },
+    {
+      "name": "empty-string-dependency",
+      "notes": "An empty string dependency makes the record invalid.",
+      "features": [
+        {"feature_folder": "2026-11-08-upstream-901", "issue_num": 901, "depends_on": [], "merge_status": "pr_open"},
+        {"feature_folder": "2026-11-08-dependent-902", "issue_num": 902, "depends_on": [901], "worktree_created_at": "2026-11-08T10-00", "merge_status": "worktree_created", "early_start": {"dependency": "", "upstream_branch": "feature/upstream-901", "interface_settled_at": "2026-11-08T09-30", "interface_evidence": "docs/features/active/2026-11-08-upstream-901/evidence/other/interface-settled.2026-11-08T09-30.md"}}
+      ],
+      "expected_barrier_errors": [
+        "EPIC_WAVE_BARRIER_VIOLATION: 2026-11-08-dependent-902 is treated as started while dependency 901 is not merged"
+      ]
+    }
+  ]
+}

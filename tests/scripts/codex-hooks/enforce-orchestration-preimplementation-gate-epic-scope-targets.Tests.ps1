@@ -192,6 +192,11 @@ Describe 'Codex preimplementation gate epic-scope targets (issue #738)' {
     It 'denies an ambiguous epic target' {
         # Arrange
         Set-CodexTargetSeam -CheckpointText $script:ReadyEpicJson
+        # Resolve the session root normally; only the explicit child selector is ambiguous.
+        $sessionResolver = (Get-Command Resolve-EpicScopeCheckpoint -CommandType Function).ScriptBlock
+        Mock Resolve-EpicScopeCheckpoint -ParameterFilter { [string]::IsNullOrEmpty($WorktreeSelector) } -MockWith {
+            & $sessionResolver @PesterBoundParameters
+        }
         Mock Resolve-EpicScopeCheckpoint -ParameterFilter { $WorktreeSelector -eq '/synthetic-worktrees/epic-child' } {
             [pscustomobject]@{ IsEpicScope = $false; CheckpointPath = ''; Checkpoint = $null; WorktreeRoot = '/synthetic-worktrees/epic-child'; Branch = ''; MergeInProgress = $false; Reason = 'target-worktree-ambiguous' }
         }

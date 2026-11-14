@@ -65,8 +65,9 @@ Whenever the user asks you to plan or break down work, you must output:
 
 The plan must be executable by the `csharp-atomic-executor` agent without replanning. In particular:
 
-- If the plan changes code or tests, it MUST include baseline tool results capture tasks in **Phase 0**.
+- If the plan changes code or tests, it MUST include baseline tool results capture tasks in **Phase 0**: static baselines and one `Phase 0 baseline` run of each test gate.
 - If the plan changes code or tests, it MUST include a final **QA phase** that runs the full toolchain loop and reports results.
+- If the plan changes code or tests, every phase between Phase 0 and the final QA phase MUST end with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop. A phase that ends with `[expect-fail]` tests keeps its `[phase-gate]` task, whose unit stage accepts only those named expected failures; a no-change phase, one that changes no tracked file, needs no gate task.
 
 ### 2.1 Phase structure
 
@@ -76,7 +77,7 @@ Follow the canonical phase heading and structure rules in the `atomic-plan-contr
 
 Follow the canonical task formatting rules in the `atomic-plan-contract` skill.
 
-### 2.3 Phase 0 — Context & Inputs (Mandatory Policy & Research)
+### 2.3 Phase 0 — Context & Inputs
 
 Phase 0 content, baseline capture schema, and toolchain mapping are defined in the `atomic-plan-contract` skill.
 
@@ -99,7 +100,7 @@ If marker is missing or malformed, fail closed to `full-feature`.
 
 Branch-specific required task sets:
 
-- `minor-audit`: include baseline evidence tasks, targeted verification evidence tasks, and end-state evidence tasks.
+- `minor-audit`: include baseline evidence tasks (static baselines and the `Phase 0 baseline` test-suite run), targeted verification evidence tasks read from the gate run, and end-state evidence tasks.
 - `full-feature`: retain full-document expectations and full QA obligations.
 - `full-bug`: require spec-driven expectations and full QA obligations.
 
@@ -343,6 +344,7 @@ Verify:
 - machine-verifiable acceptance,
 - Phase 0 baseline capture,
 - final QA loop for affected toolchains,
+- a `[phase-gate]` task ending every phase between Phase 0 and the final QA phase (an `[expect-fail]` phase keeps its gate; a no-change phase needs none),
 - REQ-ID closure when applicable.
 
 If any check fails, fix plan before replying.

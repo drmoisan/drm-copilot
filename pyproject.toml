@@ -14,7 +14,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<4.0"
+python = ">=3.11,<4.0"
 drm-copilot-discovery = { path = "packages/discovery-runtime", develop = true }
 typer = ">=0.9.0"
 PyYAML = ">=6.0"
@@ -98,11 +98,11 @@ codex-native-converter = "scripts.dev_tools.codex_native_converter.cli:main"
 
 [tool.black]
 line-length = 88
-target-version = ["py310"]
+target-version = ["py311"]
 
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py311"
 show-fixes = true
 
 [tool.ruff.lint]
@@ -119,7 +119,6 @@ select = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*" = ["S101"]
-"src/lexile_corpus_tuner/cli.py" = ["B008"]
 # Seeded `random.Random` generation is mandated by `.claude/rules/general-unit-test.md` section Determinism Infrastructure and by `docs/features/active/2026-08-07-parallel-mutation-protocol-442/spec.md` section Constraints & Risks item 2.
 "tests/scripts/dev_tools/test_parallel_mutation_protocol_properties.py" = ["S311"]
 "tests/scripts/dev_tools/test_parallel_mutation_contention_properties.py" = ["S311"]
@@ -131,9 +130,10 @@ minversion = "7.0"
 addopts = "-ra --cov-report=lcov:artifacts/python/lcov.info --strict-markers --strict-config"
 testpaths = ["tests"]
 xfail_strict = true
+pythonpath = [".claude/lib/docs/python"]
 
 [tool.coverage.run]
-source = ["src", "scripts/dev_tools", "packages/discovery-runtime/src"]
+source = ["src", "scripts/dev_tools", "packages/discovery-runtime/src", ".claude/lib/docs/python"]
 data_file = "artifacts/.coverage"
 omit = [
     "tests/*",
@@ -166,8 +166,10 @@ include = [
     "scripts",
     "src",
     "packages/discovery-runtime/src",
-    "tests"
+    "tests",
+    ".claude/lib/docs/python"
 ]
+extraPaths = [".claude/lib/docs/python"]
 exclude = [
   "**/__pycache__",
   ".idea",

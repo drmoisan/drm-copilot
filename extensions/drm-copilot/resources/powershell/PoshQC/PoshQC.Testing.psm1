@@ -183,10 +183,11 @@ function Invoke-PoshQCTest {
         [scriptblock] $EnsureModule = {
             param([string] $Name, [string] $ErrorMessage, [string] $MinimumVersion, [string] $MaximumVersion)
             # Issue #953 (CR-1): only an installed version inside the supported range counts as present, so a host
-            # whose only Pester is 6.x or the inbox 3.4.0 receives the actionable message instead of an import error.
+            # whose only Pester is 7.x or the inbox 3.4.0 receives the actionable message instead of an import error.
             if (-not (Get-Module -ListAvailable -FullyQualifiedName @{ ModuleName = $Name; ModuleVersion = $MinimumVersion; MaximumVersion = $MaximumVersion })) { throw $ErrorMessage }
-            # Import globally so Pester's Describe/It/Mock resolve in test containers that the
-            # default $InvokePester trampoline now hosts in the global session state (issue #392).
+            # Import globally so Pester's Describe/It/Mock resolve in test containers. Under the default
+            # $InvokePester trampoline, test code runs in this module's session state, not the global
+            # session state (issue #392; see the $InvokePester comment for the Mock consequence).
             # Issue #953 (D8, CR-2): -MinimumVersion and -MaximumVersion keep the import inside the supported range.
             Import-Module $Name -Global -MinimumVersion $MinimumVersion -MaximumVersion $MaximumVersion -ErrorAction Stop
         },
@@ -286,14 +287,15 @@ function Invoke-PoshQCTest {
         },
         [scriptblock] $InvokePester = {
             param($Config)
-            # Host the Pester run in the global session state so discovered test containers do
-            # not execute inside this module's session state. This makes the bundled entry path
-            # (module pre-imported, then Invoke-PoshQCTest -> Invoke-Pester) match the passing
-            # direct run, and lets BeforeAll module guards in test files safely remove/re-import
-            # same-named modules mid-run without orphaning the run's hosting session state
-            # (issue #392). [scriptblock]::Create builds an unbound scriptblock so the installed
-            # global function is not bound to this module's session state; the try/finally pair
-            # removes the temporary global function so no state leaks between suite invocations.
+            # Run Invoke-Pester through a temporary global function built with [scriptblock]::Create,
+            # so the function itself is not bound to this module's session state (issue #392). The
+            # discovered test code nevertheless runs in this module's session state: a test reports
+            # $ExecutionContext.SessionState.Module as PoshQC here, and $null under a plain
+            # Invoke-Pester run. Consequence: after a test re-imports PoshQC, Mock -ModuleName PoshQC
+            # from test code does not reach the re-imported instance; such a test runs its body in
+            # InModuleScope PoshQC and mocks without -ModuleName (observed in issue #1067). The
+            # try/finally pair removes the temporary global function so no state leaks between suite
+            # invocations.
             $trampoline = [scriptblock]::Create('param($c) Invoke-Pester -Configuration $c')
             $null = New-Item -Path 'function:global:Invoke-PoshQCPesterRun' -Value $trampoline -Force
             try {
@@ -325,7 +327,7 @@ function Invoke-PoshQCTest {
         $Root = [IO.Path]::GetFullPath([IO.Path]::Combine($PWD.ProviderPath, $Root))
     }
 
-    & $EnsureModule 'Pester' "Pester is not installed in the supported range (5.9.0 to 5.99.99). Run Install-PoshQCTool (alias Install-PoshQCTools) first." '5.9.0' '5.99.99'
+    & $EnsureModule 'Pester' "Pester is not installed in the supported range (6.2.0 to 6.99.99). Run Install-PoshQCTool (alias Install-PoshQCTools) first." '6.2.0' '6.99.99'
 
     if (-not (& $TestPathExists $SettingsPath)) {
         throw "Settings not found: $SettingsPath"

@@ -17,7 +17,9 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW_PATH = ".github/workflows/_quality-checks.yml"
 FOREIGN_COVERAGE_TARGET = "lexile_corpus_tuner"
-PYTEST_STEP_NAME = "Run tests with Pytest"
+PYTEST_STEP_NAME = "Run tests with Pytest and coverage"
+PYTEST_COMPAT_STEP_NAME = "Run tests with Pytest (compatibility, no coverage)"
+COVERAGE_PYTHON_VERSION = "3.13"
 EQUALS_COVERAGE_FORM = "--cov="
 JSON_COVERAGE_REPORT_ARGUMENT = "--cov-report=json:artifacts/python/coverage.json"
 THRESHOLD_CHECKER_MODULE = "check_python_coverage_thresholds"
@@ -25,6 +27,8 @@ MIN_LINE_FLOOR = "85"
 MIN_BRANCH_FLOOR = "75"
 CODECOV_ACTION = "codecov/codecov-action"
 RUN_HEAVY_GATE = "${{ inputs.run-heavy }}"
+COVERAGE_LEG_GATE = "${{ inputs.run-heavy && matrix.python-version == '3.13' }}"
+COMPAT_LEG_GATE = "${{ inputs.run-heavy && matrix.python-version != '3.13' }}"
 XDIST_WORKER_FLAG = "-n"
 XDIST_WORKER_VALUES = ("auto", "4")
 XDIST_LONG_FLAG_PREFIXES = ("--numprocesses", "--dist")
@@ -90,7 +94,7 @@ def extract_pytest_addopts(pyproject_text: str) -> str:
     """Return the ``addopts`` value of the pytest section of a pyproject text.
 
     The text is scanned line by line instead of parsed with ``tomllib``,
-    because the Python 3.10 matrix leg has no ``tomllib``. Only a single-line
+    to keep the helper independent of the TOML parser. Only a single-line
     quoted ``addopts`` string is recognized, which is the form the project
     uses.
 
@@ -184,21 +188,22 @@ def test_threshold_step_invokes_the_checker_with_both_floors() -> None:
     assert tokens[tokens.index("--min-branch") + 1] == MIN_BRANCH_FLOOR
 
 
-def test_threshold_step_runs_on_every_matrix_leg() -> None:
-    """The enforcement step must not be conditioned onto one matrix leg.
+def test_coverage_steps_run_only_on_the_coverage_leg() -> None:
+    """Coverage measurement and its threshold gate must run on Python 3.13 only.
 
-    Scenario: the step running the threshold checker is inspected for its
-    condition, per decision D3 of the spec. The only permitted condition is the
-    issue #962 run-heavy gate, whose value is the same on every matrix leg.
-    Expected outcome: the step's ``if`` value equals the run-heavy gate exactly;
-    an absent key or any other condition fails.
+    Scenario: the coverage pytest step and the threshold step are inspected for
+    their conditions. Expected outcome: both carry exactly the run-heavy gate
+    combined with the 3.13 matrix leg, and the compatibility pytest step carries
+    the complementary condition so every leg runs the tests exactly once.
     """
-    step = step_running(THRESHOLD_CHECKER_MODULE)
+    coverage_step = step_named(PYTEST_STEP_NAME)
+    threshold_step = step_running(THRESHOLD_CHECKER_MODULE)
+    compat_step = step_named(PYTEST_COMPAT_STEP_NAME)
 
-    assert step.get("if") == RUN_HEAVY_GATE, (
-        "the threshold step must carry exactly the run-heavy gate, found "
-        f"{step.get('if')!r}"
-    )
+    assert coverage_step.get("if") == COVERAGE_LEG_GATE
+    assert threshold_step.get("if") == COVERAGE_LEG_GATE
+    assert compat_step.get("if") == COMPAT_LEG_GATE
+    assert "--cov" not in run_tokens(compat_step)
 
 
 def test_codecov_step_uses_the_declared_files_input() -> None:
@@ -223,17 +228,21 @@ def test_pytest_step_runs_xdist_workers() -> None:
     the two worker settings that issue #1048 measures on the CI runner.
     """
     # Arrange
-    tokens = run_tokens(step_named(PYTEST_STEP_NAME))
+    for step_name in (PYTEST_STEP_NAME, PYTEST_COMPAT_STEP_NAME):
+        tokens = run_tokens(step_named(step_name))
 
-    # Act
-    flag_count = tokens.count(XDIST_WORKER_FLAG)
+        # Act
+        flag_count = tokens.count(XDIST_WORKER_FLAG)
 
-    # Assert
-    assert flag_count == 1, f"expected one -n token, found {flag_count}"
-    worker_value = tokens[tokens.index(XDIST_WORKER_FLAG) + 1]
-    assert (
-        worker_value in XDIST_WORKER_VALUES
-    ), f"expected a worker count in {XDIST_WORKER_VALUES}, found {worker_value!r}"
+        # Assert
+        assert (
+            flag_count == 1
+        ), f"{step_name}: expected one -n token, found {flag_count}"
+        worker_value = tokens[tokens.index(XDIST_WORKER_FLAG) + 1]
+        assert worker_value in XDIST_WORKER_VALUES, (
+            f"{step_name}: expected a worker count in {XDIST_WORKER_VALUES}, "
+            f"found {worker_value!r}"
+        )
 
 
 def test_pyproject_addopts_carries_no_xdist_flag() -> None:
