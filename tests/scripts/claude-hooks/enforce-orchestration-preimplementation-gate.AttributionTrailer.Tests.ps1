@@ -11,8 +11,8 @@
 # child process, and no network access.
 
 Describe 'preimplementation gate attribution trailers (<Runtime>)' -ForEach @(
-    @{ Runtime = 'claude'; GateRelativePath = '.claude/hooks/enforce-orchestration-preimplementation-gate.ps1'; PayloadKind = 'envelope'; Surface = 'Claude'; Seam = @('Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-EpicScopeCheckpointText'); ExtraSeam = @('Get-OrchestrationDocsEstateFileText', 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent') }
-    @{ Runtime = 'codex'; GateRelativePath = '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'; PayloadKind = 'mapped'; Surface = 'Codex'; Seam = @('Get-EpicScopeCheckpointText'); ExtraSeam = @('Get-OrchestrationDocsEstateFileText', 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText') }
+    @{ Runtime = 'claude'; GateRelativePath = '.claude/hooks/enforce-orchestration-preimplementation-gate.ps1'; PayloadKind = 'envelope'; Surface = 'Claude'; Seam = @('Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-EpicScopeCheckpointText'); ExtraSeam = @('Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent') }
+    @{ Runtime = 'codex'; GateRelativePath = '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1'; PayloadKind = 'mapped'; Surface = 'Codex'; Seam = @('Get-EpicScopeCheckpointText'); ExtraSeam = @('Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText') }
 ) {
     BeforeAll {
         $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path

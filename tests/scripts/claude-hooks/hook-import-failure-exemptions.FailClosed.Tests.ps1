@@ -22,7 +22,6 @@ Describe 'feature-folder-order handler proof' {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-feature-folder-order.ps1").Path
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
-        if (Get-Command Get-OrchestrationDocsEstateFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText' -Surface 'Codex' }
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-CheckpointFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex' }
         if (Get-Command Get-EpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicCheckpointContent' -Surface 'Codex' }
@@ -144,7 +143,6 @@ Describe 'preimplementation gate modes handler proof on the claude surface' {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-orchestration-preimplementation-gate.ps1").Path
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
-        if (Get-Command Get-OrchestrationDocsEstateFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText' -Surface 'Codex' }
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-CheckpointFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex' }
         if (Get-Command Get-EpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicCheckpointContent' -Surface 'Codex' }
@@ -227,7 +225,6 @@ Describe 'prd-feature planner handler proof' {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-prd-feature-before-planner.ps1").Path
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
-        if (Get-Command Get-OrchestrationDocsEstateFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText' -Surface 'Codex' }
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-CheckpointFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex' }
         if (Get-Command Get-EpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicCheckpointContent' -Surface 'Codex' }
@@ -282,7 +279,6 @@ Describe 'epic wave barrier handler proof' {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-epic-wave-barrier.ps1").Path
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
-        if (Get-Command Get-OrchestrationDocsEstateFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText' -Surface 'Codex' }
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-CheckpointFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex' }
         if (Get-Command Get-EpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicCheckpointContent' -Surface 'Codex' }
@@ -337,7 +333,6 @@ Describe 'parallel drift gate handler proof' {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-drift-gate.ps1").Path
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
-        if (Get-Command Get-OrchestrationDocsEstateFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText' -Surface 'Codex' }
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-CheckpointFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex' }
         if (Get-Command Get-EpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicCheckpointContent' -Surface 'Codex' }
@@ -393,7 +388,6 @@ Describe 'parallel cohort barrier handler proof' {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-parallel-cohort-barrier.ps1").Path
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
-        if (Get-Command Get-OrchestrationDocsEstateFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText' -Surface 'Codex' }
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-CheckpointFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex' }
         if (Get-Command Get-EpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicCheckpointContent' -Surface 'Codex' }
@@ -449,7 +443,6 @@ Describe 'orchestrator output validator handler proof' {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/validate-orchestrator-output.ps1").Path
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
         Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
-        if (Get-Command Get-OrchestrationDocsEstateFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText' -Surface 'Codex' }
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-CheckpointFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex' }
         if (Get-Command Get-EpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicCheckpointContent' -Surface 'Codex' }

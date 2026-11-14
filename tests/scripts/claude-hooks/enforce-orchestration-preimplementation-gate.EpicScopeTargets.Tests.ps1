@@ -21,7 +21,7 @@ BeforeAll {
     $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude").Path
     . (Join-Path $script:HookRoot 'hooks/enforce-orchestration-preimplementation-gate.ps1')
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
-    Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText', 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
+    Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
     # Issue #953 (CR-21): the Codex-surface registration below mocks Get-WorktreeResolutionGitFileText at script
     # scope; importing its module here keeps the suite independent of the suites that ran earlier in the process.
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeResolution.psm1')

@@ -29,7 +29,6 @@ Describe 'preimplementation gate modes handler proof on the codex surface' {
         . (Join-Path (Resolve-Path "$PSScriptRoot/../../..").Path '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1')
         . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
         Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
-        if (Get-Command Get-OrchestrationDocsEstateFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText' -Surface 'Codex' }
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-EpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicCheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-EpicScopeCheckpointText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText' -Surface 'Codex' }

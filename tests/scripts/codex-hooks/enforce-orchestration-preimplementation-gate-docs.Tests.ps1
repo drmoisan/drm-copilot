@@ -14,7 +14,8 @@
 
     Seams: the worktree listing returns an in-memory porcelain text (the session root on main and
     /synthetic-worktrees/docs-run on a docs branch); the staged-index seam returns NUL-terminated
-    names; Get-OrchestrationDocsEstateFileText returns the profile text; and
+    names; Get-WorktreeResolutionGitFileText returns the profile text for the docs-profile path
+    and the baseline $null for any other path; and
     Test-OrchestrationDocsEstateCheckpointPresent returns a per-row answer. No row creates a file,
     starts a process, reads a clock, or sets an environment variable.
 #>
@@ -24,7 +25,7 @@ Describe 'Codex preimplementation gate docs-estate leg (issue #1169)' {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $script:RepoRoot '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1')
         . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
-        Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText', 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
         Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-EpicScopeCheckpointText', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
 
         $script:Blocked = 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
@@ -56,7 +57,7 @@ Describe 'Codex preimplementation gate docs-estate leg (issue #1169)' {
             Mock Find-WorktreeResolutionRoot { $session }.GetNewClosure()
             Mock Get-OrchestrationGateStagedIndex { $stagedResult }.GetNewClosure()
             Mock Test-OrchestrationDocsEstateCheckpointPresent { $present }.GetNewClosure()
-            Mock Get-OrchestrationDocsEstateFileText { $profileValue }.GetNewClosure()
+            Mock Get-WorktreeResolutionGitFileText { $profileValue }.GetNewClosure() -ParameterFilter { ($Path -replace '\\', '/').EndsWith('docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
         }
 
         function Get-CodexDocsEstateDecision {
@@ -143,6 +144,16 @@ Describe 'Codex preimplementation gate docs-estate leg (issue #1169)' {
 
         # Assert
         Assert-CodexDocsEstateUnchangedDeny -Decision $decision
+    }
+
+    It 'reads the docs profile once beneath the resolved root (codex)' {
+        # Act
+        $decision = Get-CodexDocsEstateDecision -MappedInput (ConvertTo-CodexDocsMappedInput -Command 'git -C /synthetic-worktrees/docs-run add -- docs/a.md')
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow' -Because "reason: $($decision.hookSpecificOutput.permissionDecisionReason)"
+        Should -Invoke Get-WorktreeResolutionGitFileText -Times 1 -Exactly -ParameterFilter { ($Path -replace '\\', '/').EndsWith('/synthetic-worktrees/docs-run/docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
+        Should -Invoke Get-WorktreeResolutionGitFileText -Times 1 -Exactly -ParameterFilter { ($Path -replace '\\', '/').EndsWith('docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
     }
 
     It 'keeps the no-profile deny text identical to the text with the docs leg withheld (codex)' {

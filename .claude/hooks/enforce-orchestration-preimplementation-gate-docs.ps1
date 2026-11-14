@@ -42,7 +42,11 @@
     and Get-OrchestrationCleanupListingRecord (cleanup sibling); ConvertTo-CleanupContextPath and
     Test-CleanupConsolidationRelativePath (hook-cleanup-context.ps1); and
     Get-HookTargetWorktreeEnclosingRoot and Get-HookTargetWorktreeRelativePath
-    (HookTargetWorktree.psm1 on Claude, hook-target-worktree.ps1 on Codex).
+    (HookTargetWorktree.psm1 on Claude, hook-target-worktree.ps1 on Codex); and
+    Get-WorktreeResolutionGitFileText, which reads the docs profile and answers $null when the
+    file is absent or unreadable (WorktreeResolution.psm1 on Claude,
+    enforce-orchestration-preimplementation-gate-epic-resolution.ps1 on Codex). An absent, empty,
+    or unreadable profile declines with an empty DenySuffix.
 #>
 
 try { . (Join-Path $PSScriptRoot 'hook-docs-estate-context.ps1') } catch { Add-HookDependencyFailure -Name 'hook-docs-estate-context.ps1' -ErrorRecord $_ }
@@ -58,33 +62,6 @@ $script:DocsEstateCheckpointPaths = @(
     'artifacts/orchestration/powershell-orchestrator-state.json'
     'artifacts/orchestration/csharp-orchestrator-state.json'
 )
-
-function Get-OrchestrationDocsEstateFileText {
-    <#
-    .SYNOPSIS
-        Return the UTF-8 text of a file, or $null when it does not exist (test seam).
-    .DESCRIPTION
-        A missing file or parent directory is absent; any other read failure propagates, so the
-        never-throwing caller declines rather than treating an unreadable file as absent.
-    .PARAMETER Path
-        The full path of the file.
-    .OUTPUTS
-        System.String or $null
-    #>
-    [CmdletBinding()]
-    [OutputType([string])]
-    param([Parameter(Mandatory)][string] $Path)
-
-    try {
-        return [System.IO.File]::ReadAllText($Path, [System.Text.UTF8Encoding]::new($false))
-    }
-    catch [System.IO.FileNotFoundException] {
-        return $null
-    }
-    catch [System.IO.DirectoryNotFoundException] {
-        return $null
-    }
-}
 
 function Test-OrchestrationDocsEstateCheckpointPresent {
     <#
@@ -339,8 +316,8 @@ function Get-OrchestrationDocsEstateContextResult {
         if ($null -eq $root -or (Test-OrchestrationDocsEstateCheckpointPresent -WorktreeRoot $root)) {
             return $denied
         }
-        $profileText = Get-OrchestrationDocsEstateFileText -Path (Join-Path -Path $root -ChildPath $script:DocsEstateProfileRelativePath)
-        if ($null -eq $profileText) {
+        $profileText = Get-WorktreeResolutionGitFileText -Path (Join-Path -Path $root -ChildPath $script:DocsEstateProfileRelativePath)
+        if ([string]::IsNullOrEmpty($profileText)) {
             return $denied
         }
         $prefix = ' Docs-estate leg not applied: '

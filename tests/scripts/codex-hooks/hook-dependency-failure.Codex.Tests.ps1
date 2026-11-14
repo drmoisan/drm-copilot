@@ -41,7 +41,6 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
         # a sibling module; unloading the family first makes the registration below build one coherent set (#737 probe harness).
         Remove-Module -Name 'EpicScopeResolution', 'WorktreeRunResolution', 'WorktreeItemResolution', 'WorktreeResolution', 'WorktreeTargetResolution', 'EpicScopeReadiness' -Force -ErrorAction SilentlyContinue
         Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
-        if (Get-Command Get-OrchestrationDocsEstateFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText' -Surface 'Codex' }
         if (Get-Command Get-ArtifactFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ArtifactFileContent' -Surface 'Codex' }
         if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChangedLanguageSet' -Surface 'Codex' }
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent' -Surface 'Codex' }

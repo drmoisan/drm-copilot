@@ -33,7 +33,7 @@ Describe 'Codex preimplementation gate epic scope (issue #707)' {
         $script:RealGetEpicCheckpointContent = ${function:Get-EpicCheckpointContent}
         $script:RealGetParallelCheckpointContent = ${function:Get-ParallelCheckpointContent}
         . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
-        Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText', 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+        Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
         Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-EpicScopeCheckpointText', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
         . (Join-Path $script:RepoRoot 'tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1')
 

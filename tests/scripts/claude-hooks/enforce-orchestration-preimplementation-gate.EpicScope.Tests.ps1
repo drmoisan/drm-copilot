@@ -27,7 +27,7 @@ BeforeAll {
     $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude").Path
     . (Join-Path $script:HookRoot 'hooks/enforce-orchestration-preimplementation-gate.ps1')
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
-    Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText', 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
+    Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' -Surface 'Claude'
     if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Mock Get-WorktreeResolutionGitFileText { $null } }
     # Capture the committed-fixture reader while retaining the null isolation baseline.
     $script:FixtureReader_74080f51_GetCheckpointContent = (Get-Command -Name Get-CheckpointContent -CommandType Function).ScriptBlock

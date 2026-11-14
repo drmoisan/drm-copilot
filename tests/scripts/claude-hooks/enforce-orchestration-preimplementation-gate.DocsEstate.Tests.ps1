@@ -12,8 +12,9 @@
 
     Seams: the worktree listing Get-OrchestrationGateWorktreeList returns an in-memory porcelain
     text (the session root on main and /synthetic-worktrees/docs-run on a docs branch); the
-    staged-index seam returns NUL-terminated names; Get-OrchestrationDocsEstateFileText returns
-    the profile text from an in-memory map; Test-OrchestrationDocsEstateCheckpointPresent returns a
+    staged-index seam returns NUL-terminated names; Get-WorktreeResolutionGitFileText returns the
+    profile text for the docs-profile path and the baseline $null for any other path;
+    Test-OrchestrationDocsEstateCheckpointPresent returns a
     per-row answer. No row creates a file, starts a process, reads a clock, or sets an environment
     variable.
 #>
@@ -22,7 +23,7 @@ BeforeAll {
     . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-orchestration-preimplementation-gate.ps1").Path
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
     if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Mock Get-WorktreeResolutionGitFileText { $null } }
-    Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText', 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+    Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
     Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent' -Surface 'Codex'
 
     $script:Blocked = 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
@@ -53,7 +54,7 @@ BeforeAll {
         Mock Get-OrchestrationGateWorktreeList { $listingText }.GetNewClosure()
         Mock Get-OrchestrationGateStagedIndex { $stagedResult }.GetNewClosure()
         Mock Test-OrchestrationDocsEstateCheckpointPresent { $present }.GetNewClosure()
-        Mock Get-OrchestrationDocsEstateFileText { $profileValue }.GetNewClosure()
+        Mock Get-WorktreeResolutionGitFileText { $profileValue }.GetNewClosure() -ParameterFilter { ($Path -replace '\\', '/').EndsWith('docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
     }
 
     function Get-DocsEstateDecision {
@@ -187,7 +188,7 @@ Describe 'Claude preimplementation gate docs-estate leg (issue #1169)' {
 
             # Assert
             Assert-DocsEstateUnchangedDeny -Decision $decision
-            Should -Invoke Get-OrchestrationDocsEstateFileText -Times 0 -Exactly
+            Should -Invoke Get-WorktreeResolutionGitFileText -Times 0 -Exactly -ParameterFilter { ($Path -replace '\\', '/').EndsWith('docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
         }
 
         It 'denies <Label> with an empty docs suffix' -ForEach @(
@@ -216,7 +217,7 @@ Describe 'Claude preimplementation gate docs-estate leg (issue #1169)' {
 
             # Assert
             Assert-DocsEstateUnchangedDeny -Decision $decision
-            Should -Invoke Get-OrchestrationDocsEstateFileText -Times 0 -Exactly
+            Should -Invoke Get-WorktreeResolutionGitFileText -Times 0 -Exactly -ParameterFilter { ($Path -replace '\\', '/').EndsWith('docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
         }
 
         It 'keeps the deny text byte-identical without a profile file (<Label>)' -ForEach @(
@@ -244,7 +245,7 @@ Describe 'Claude preimplementation gate docs-estate leg (issue #1169)' {
 
             # Assert
             Assert-DocsEstateUnchangedDeny -Decision $decision
-            Should -Invoke Get-OrchestrationDocsEstateFileText -Times 0 -Exactly
+            Should -Invoke Get-WorktreeResolutionGitFileText -Times 0 -Exactly -ParameterFilter { ($Path -replace '\\', '/').EndsWith('docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
         }
 
         It 'does not apply the docs leg to an absolute Write outside every registered worktree' {
@@ -253,7 +254,7 @@ Describe 'Claude preimplementation gate docs-estate leg (issue #1169)' {
 
             # Assert
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            Should -Invoke Get-OrchestrationDocsEstateFileText -Times 0 -Exactly
+            Should -Invoke Get-WorktreeResolutionGitFileText -Times 0 -Exactly -ParameterFilter { ($Path -replace '\\', '/').EndsWith('docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
         }
     }
 
@@ -268,7 +269,7 @@ Describe 'Claude preimplementation gate docs-estate leg (issue #1169)' {
             # Assert
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
             Should -Invoke Test-OrchestrationDocsEstateCheckpointPresent -Times 0 -Exactly
-            Should -Invoke Get-OrchestrationDocsEstateFileText -Times 0 -Exactly
+            Should -Invoke Get-WorktreeResolutionGitFileText -Times 0 -Exactly -ParameterFilter { ($Path -replace '\\', '/').EndsWith('docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
         }
 
         It 'appends the docs suffix after the cleanup suffix' {
@@ -283,9 +284,19 @@ Describe 'Claude preimplementation gate docs-estate leg (issue #1169)' {
             $reason.StartsWith("$($script:Blocked) Cleanup leg not applied: X: y. Docs-estate leg not applied: DOCS_LEG_PATH_NOT_ALLOWED: ", [System.StringComparison]::Ordinal) | Should -BeTrue -Because $reason
         }
 
+        It 'reads the docs profile once beneath the resolved root' {
+            # Act
+            $decision = Get-DocsEstateDecision -Payload (ConvertTo-DocsEstatePayload -Tool 'Bash' -Command 'git -C /synthetic-worktrees/docs-run add -- docs/a.md')
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow' -Because "reason: $($decision.hookSpecificOutput.permissionDecisionReason)"
+            Should -Invoke Get-WorktreeResolutionGitFileText -Times 1 -Exactly -ParameterFilter { ($Path -replace '\\', '/').EndsWith('/synthetic-worktrees/docs-run/docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
+            Should -Invoke Get-WorktreeResolutionGitFileText -Times 1 -Exactly -ParameterFilter { ($Path -replace '\\', '/').EndsWith('docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
+        }
+
         It 'declines without throwing when a seam throws' {
             # Arrange
-            Mock Get-OrchestrationDocsEstateFileText { throw [System.IO.IOException]::new('locked') }
+            Mock Get-WorktreeResolutionGitFileText { throw [System.IO.IOException]::new('locked') } -ParameterFilter { ($Path -replace '\\', '/').EndsWith('docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
 
             # Act
             $decision = Get-DocsEstateDecision -Payload (ConvertTo-DocsEstatePayload -Tool 'Bash' -Command 'git add -- docs/a.md')

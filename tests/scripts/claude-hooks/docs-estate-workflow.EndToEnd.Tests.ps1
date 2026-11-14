@@ -30,7 +30,7 @@ BeforeAll {
     . (Join-Path $hookRoot 'enforce-docs-complete-gate.ps1')
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
     if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Mock Get-WorktreeResolutionGitFileText { $null } }
-    Register-EpicStateBaselineMock -Seam 'Get-OrchestrationDocsEstateFileText', 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
+    Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
     Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent' -Surface 'Codex'
     Mock Find-WorktreeResolutionRoot -ModuleName EpicScopeResolution { '/synthetic-worktrees/main' }
 
@@ -80,7 +80,7 @@ BeforeAll {
         Mock Get-OrchestrationGateWorktreeList { $listing }.GetNewClosure()
         Mock Get-OrchestrationGateStagedIndex { $stagedResult }.GetNewClosure()
         Mock Test-OrchestrationDocsEstateCheckpointPresent { $false }
-        Mock Get-OrchestrationDocsEstateFileText { $profileText }.GetNewClosure()
+        Mock Get-WorktreeResolutionGitFileText { $profileText }.GetNewClosure() -ParameterFilter { ($Path -replace '\\', '/').EndsWith('docs/documentation-estate/docs-profile.json', [System.StringComparison]::Ordinal) }
         # A2: the resolved root, no checkpoint, the profile, receipt, and snapshot texts.
         Mock Resolve-ModelRoutingWorktreeTarget ({ [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = $root; ReasonCode = $null; Detail = 'synthetic docs run' } }.GetNewClosure())
         Mock Get-ModelRoutingCheckpoint { $null }
