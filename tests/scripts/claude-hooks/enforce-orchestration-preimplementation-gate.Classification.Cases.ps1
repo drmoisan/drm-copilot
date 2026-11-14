@@ -11,8 +11,9 @@
     function, and no I/O.
 
     Tables:
-      - ExistingDenial: research section 6.2 and spec AC-2 (as amended by decisions D15 and
-        D16; rows ED-43 to ED-50 are the D16 pipeline-consumer and sort rows).
+      - ExistingDenial: research section 6.2 and spec AC-2 (as amended by decisions D15,
+        D16, and D17; rows ED-43 to ED-50 are the D16 pipeline-consumer and sort rows, and
+        rows ED-51 to ED-96 are the D17 unmodelled-construct and executing-option rows).
         Each row is classified as implementation today and must stay classified, with the
         generic final deny text unchanged.
       - FalsePositive: research section 6.3 and spec AC-1. Each row is classified today
@@ -79,6 +80,52 @@ $script:ClassificationExistingDenialCase = @(
     @{ Id = 'ED-48'; Command = 'pwsh -NoProfile -Command "Get-Command Invoke-Pester | ForEach-Object { & $_ }"'; Expected = $true }
     @{ Id = 'ED-49'; Command = 'echo pytest | xargs env'; Expected = $true }
     @{ Id = 'ED-50'; Command = 'sort --compress-program pytest big.txt'; Expected = $true }
+    @{ Id = 'ED-51'; Command = '(echo pytest) | xargs env'; Expected = $true }
+    @{ Id = 'ED-52'; Command = '{ echo pytest; } | xargs env'; Expected = $true }
+    @{ Id = 'ED-53'; Command = 'echo pytest | (cat) | xargs env'; Expected = $true }
+    @{ Id = 'ED-54'; Command = 'cat <(echo pytest) | xargs env'; Expected = $true }
+    @{ Id = 'ED-55'; Command = 'cat < <(echo pytest) | xargs env'; Expected = $true }
+    @{ Id = 'ED-56'; Command = 'xargs env < <(echo pytest)'; Expected = $true }
+    @{ Id = 'ED-57'; Command = 'xargs env 0< <(echo pytest)'; Expected = $true }
+    @{ Id = 'ED-58'; Command = 'xargs -n1 env < <(echo pytest)'; Expected = $true }
+    @{ Id = 'ED-59'; Command = 'xargs env < <(printf pytest)'; Expected = $true }
+    @{ Id = 'ED-60'; Command = 'xargs env < <(grep -o pytest x)'; Expected = $true }
+    @{ Id = 'ED-61'; Command = 'env < <(echo pytest) xargs env'; Expected = $true }
+    @{ Id = 'ED-62'; Command = 'while read c; do $c; done < <(echo pytest)'; Expected = $true }
+    @{ Id = 'ED-63'; Command = 'echo pytest > >(xargs env)'; Expected = $true }
+    @{ Id = 'ED-64'; Command = 'echo pytest 1> >(xargs env)'; Expected = $true }
+    @{ Id = 'ED-65'; Command = 'echo pytest >> >(xargs env)'; Expected = $true }
+    @{ Id = 'ED-66'; Command = 'grep -o pytest x > >(xargs env)'; Expected = $true }
+    @{ Id = 'ED-67'; Command = 'xargs env <<< $(grep -o pytest x)'; Expected = $true }
+    @{ Id = 'ED-68'; Command = "grep pytest x <<'EOF'`nhello`nEOF"; Expected = $true }
+    @{ Id = 'ED-69'; Command = 'env $(grep -o pytest x)'; Expected = $true }
+    @{ Id = 'ED-70'; Command = 'env `grep -o pytest x`'; Expected = $true }
+    @{ Id = 'ED-71'; Command = 'eval grep pytest x'; Expected = $true }
+    @{ Id = 'ED-72'; Command = 'pwsh -c "function Select-String { & $args[0] }; Select-String pytest"'; Expected = $true }
+    @{ Id = 'ED-73'; Command = 'pwsh -c "@(''pytest'') | Select-String pytest"'; Expected = $true }
+    @{ Id = 'ED-74'; Command = 'pwsh -c "Get-Command pytest > out.txt"'; Expected = $true }
+    @{ Id = 'ED-75'; Command = 'grep pytest x > out.txt'; Expected = $true }
+    @{ Id = 'ED-76'; Command = 'grep pytest x & xargs env'; Expected = $true }
+    @{ Id = 'ED-77'; Command = 'sh -c ''grep pytest x; "$0"'' pytest'; Expected = $true }
+    @{ Id = 'ED-78'; Command = 'f() { grep pytest x; }'; Expected = $true }
+    @{ Id = 'ED-79'; Command = 'a=(x) && grep pytest x'; Expected = $true }
+    @{ Id = 'ED-80'; Command = 'grep pytest x # note'; Expected = $true }
+    @{ Id = 'ED-81'; Command = 'grep pytest x; if true; then echo y; fi'; Expected = $true }
+    @{ Id = 'ED-82'; Command = 'pwsh -c "(Get-Command pytest).ToString()"'; Expected = $true }
+    @{ Id = 'ED-83'; Command = 'make test | grep pytest'; Expected = $true }
+    @{ Id = 'ED-84'; Command = 'PATH=./bin grep pytest x'; Expected = $true }
+    @{ Id = 'ED-85'; Command = 'alias grep=xargs; grep pytest x'; Expected = $true }
+    @{ Id = 'ED-86'; Command = 'echo pytest | $''xargs\0/grep'' env'; Expected = $true }
+    @{ Id = 'ED-87'; Command = 'sh -c ''echo x''$''\n'''' pytest'''; Expected = $true }
+    @{ Id = 'ED-88'; Command = 'sh -c ''echo pytest''$''\x7c''''xargs env'''; Expected = $true }
+    @{ Id = 'ED-89'; Command = 'echo pytest; env $_'; Expected = $true }
+    @{ Id = 'ED-90'; Command = 'echo pytest; pwsh -c $_'; Expected = $true }
+    @{ Id = 'ED-91'; Command = 'printf -v c pytest; env $c'; Expected = $true }
+    @{ Id = 'ED-92'; Command = 'sh -c ''echo x\\' + "`n" + 'pytest'''; Expected = $true }
+    @{ Id = 'ED-93'; Command = 'echo pytest | env -S''xargs -I{} env {}'' grep'; Expected = $true }
+    @{ Id = 'ED-94'; Command = 'bash -c ''echo pytest; env $_'''; Expected = $true }
+    @{ Id = 'ED-95'; Command = 'git grep -iOpytest pytest'; Expected = $true }
+    @{ Id = 'ED-96'; Command = 'rg --hostname-bin pytest x'; Expected = $true }
 )
 
 $script:ClassificationFalsePositiveCase = @(
