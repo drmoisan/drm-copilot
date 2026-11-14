@@ -274,10 +274,11 @@ Describe 'enforce-parallel-drift-gate.ps1' {
 
     Context 'registration binding to .claude/settings.json' {
         It 'asserts the registered hook path resolves to an existing file' {
-            # Arrange: read the live settings file so a registration typo fails here.
-            $settingsPath = (Resolve-Path "$script:RepoRoot/.claude/settings.json").Path
-            $settings = [System.IO.File]::ReadAllText($settingsPath) | ConvertFrom-Json
-            $agentGroup = @($settings.hooks.PreToolUse | Where-Object { $_.matcher -ceq 'Agent' })
+            # Arrange: read the live PreToolUse registry (issue #1159: .claude/settings.json registers
+            # only the dispatcher, whose groups live in .claude/hooks/pretooluse-dispatch.json).
+            $registryPath = (Resolve-Path "$script:RepoRoot/.claude/hooks/pretooluse-dispatch.json").Path
+            $registry = [System.IO.File]::ReadAllText($registryPath) | ConvertFrom-Json
+            $agentGroup = @($registry.hooks.PreToolUse | Where-Object { $_.matcher -ceq 'Agent' })
             $agentGroup.Count | Should -Be 1
 
             # Act: isolate the registration entries naming this hook file.

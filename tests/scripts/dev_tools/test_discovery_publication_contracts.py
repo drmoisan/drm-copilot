@@ -225,8 +225,22 @@ def test_role_tools_resolve_to_registered_mcp_tools(role: str) -> None:
 def test_roles_carry_stop_and_tool_controls_on_every_host() -> None:
     """Each role name and handler is registered by the three host configurations."""
 
-    settings = (REPO_ROOT / ".claude" / "settings.json").read_text("utf-8")
-    config = (REPO_ROOT / ".codex" / "config.toml").read_text("utf-8")
+    # Issue #1159: the PreToolUse hook names live in each runtime's dispatcher
+    # registry, so the registry text joins the registration text it is read with.
+    claude_registry = REPO_ROOT / ".claude" / "hooks" / "pretooluse-dispatch.json"
+    codex_registry = REPO_ROOT / ".codex" / "hooks" / "pretooluse-dispatch.json"
+    settings = "\n".join(
+        (
+            (REPO_ROOT / ".claude" / "settings.json").read_text("utf-8"),
+            claude_registry.read_text("utf-8"),
+        )
+    )
+    config = "\n".join(
+        (
+            (REPO_ROOT / ".codex" / "config.toml").read_text("utf-8"),
+            codex_registry.read_text("utf-8"),
+        )
+    )
     discovery = (REPO_ROOT / ".github" / "hooks" / "discovery.json").read_text("utf-8")
     # Every role must appear in the Claude and Codex matchers, and every event handler
     # must be registered; the capability probe is an operator entry point, not a hook,

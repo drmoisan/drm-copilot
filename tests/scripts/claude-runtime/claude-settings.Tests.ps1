@@ -131,9 +131,7 @@ Describe "claude-settings" {
     }
 
     It "requires the Bash PreToolUse hook chain to include validate-bash and enforce-promotion-mcp-only" {
-        $settingsPath = Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'settings.json'
-        $settings = Get-Content -Path $settingsPath -Raw | ConvertFrom-Json
-
+        # Issue #1159: the Bash chain is registered in the dispatcher registry read in BeforeAll.
         $bashHookCoverage = @(
             $script:ClaudeRegistry.hooks.PreToolUse |
                 Where-Object { $_.matcher -eq 'Bash' } |

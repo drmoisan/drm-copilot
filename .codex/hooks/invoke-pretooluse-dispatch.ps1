@@ -31,27 +31,30 @@ $script:CodexPreToolUseDispatchRegistryPath = Join-Path $PSScriptRoot 'pretoolus
 function Invoke-CodexPreToolUseDispatchDecision {
     <#
     .SYNOPSIS
-        Returns the combined decision object (or $null) and the per-hook results for one payload.
+        Returns the combined decision object (or $null) for one payload; the per-hook results are
+        added to ResultSink when one is supplied.
     #>
     [CmdletBinding()]
-    [OutputType([pscustomobject])]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
         [AllowNull()] [AllowEmptyString()] [string] $PayloadText,
-        [AllowNull()] [AllowEmptyString()] [string] $RegistryText
+        [AllowNull()] [AllowEmptyString()] [string] $RegistryText,
+        [AllowNull()] [System.Collections.Generic.List[object]] $ResultSink
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'HOOK_DISPATCH_BLOCKED:'
-    if ($null -ne $dependencyDecision) { return [pscustomobject]@{ Decision = $dependencyDecision; Results = @() } }
+    if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $registry = Read-CodexHookDispatchRegistry -RegistryText $RegistryText -HooksDirectory $PSScriptRoot
-    if (-not $registry.IsValid) { return [pscustomobject]@{ Decision = $registry.Reason; Results = @() } }
+    if (-not $registry.IsValid) { return $registry.Reason }
 
     $toolName = Get-CodexHookDispatchToolName -PayloadText $PayloadText
     if ([string]::IsNullOrEmpty($toolName)) {
-        return [pscustomobject]@{ Decision = (Get-CodexHookDispatchBlockDecision -Detail 'the PreToolUse payload carries no tool_name, so no hook group can be selected'); Results = @() }
+        return (Get-CodexHookDispatchBlockDecision -Detail 'the PreToolUse payload carries no tool_name, so no hook group can be selected')
     }
 
     $results = @(Invoke-CodexHookDispatchRunner -PayloadText $PayloadText -Registry $registry -ToolName $toolName)
-    return [pscustomobject]@{ Decision = (Join-CodexHookDispatchDecision -Result $results); Results = $results }
+    if ($null -ne $ResultSink) { foreach ($item in $results) { $ResultSink.Add($item) } }
+    return (Join-CodexHookDispatchDecision -Result $results)
 }
 
 function Invoke-CodexPreToolUseDispatchEntryPoint {
@@ -77,14 +80,15 @@ function Invoke-CodexPreToolUseDispatchEntryPoint {
     $payloadText = [string](& $ReadPayload)
     $registryText = $null
     try { $registryText = & $ReadRegistry } catch { $registryText = $null }
-    $outcome = Invoke-CodexPreToolUseDispatchDecision -PayloadText $payloadText -RegistryText $registryText
+    $results = [System.Collections.Generic.List[object]]::new()
+    $decision = Invoke-CodexPreToolUseDispatchDecision -PayloadText $payloadText -RegistryText $registryText -ResultSink $results
     if ($PerHookTrace) {
-        foreach ($item in @($outcome.Results)) {
+        foreach ($item in $results) {
             $trace = [ordered]@{ hook = $item.Hook; exitCode = $item.ExitCode; stdout = $item.Stdout; stderr = $item.Stderr; decision = $item.Decision; reason = $item.Reason; additionalContext = $item.AdditionalContext; error = $item.Error; modulesLoaded = @($item.ModulesLoaded) }
             & $WriteTrace ($trace | ConvertTo-Json -Compress -Depth 5)
         }
     }
-    if ($null -ne $outcome.Decision) { $outcome.Decision | ConvertTo-Json -Compress -Depth 5 }
+    if ($null -ne $decision) { $decision | ConvertTo-Json -Compress -Depth 5 }
     return 0
 }
 

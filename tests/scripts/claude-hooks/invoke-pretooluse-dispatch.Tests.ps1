@@ -102,8 +102,9 @@ Describe 'Invoke-PreToolUseDispatchDecision' {
     It 'returns the dependency-failure deny before reading the registry' {
         Mock Get-HookDependencyFailureDecision { [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'deny'; permissionDecisionReason = 'HOOK_DISPATCH_BLOCKED: dep' } } }
         Mock Read-HookDispatchRegistry { throw 'must not be read' }
-        $outcome = Invoke-PreToolUseDispatchDecision -PayloadText $script:Payload -RegistryText $script:Registry
-        $outcome.Decision.hookSpecificOutput.permissionDecisionReason | Should -Be 'HOOK_DISPATCH_BLOCKED: dep'
-        @($outcome.Results).Count | Should -Be 0
+        $sink = [System.Collections.Generic.List[object]]::new()
+        $decision = Invoke-PreToolUseDispatchDecision -PayloadText $script:Payload -RegistryText $script:Registry -ResultSink $sink
+        $decision.hookSpecificOutput.permissionDecisionReason | Should -Be 'HOOK_DISPATCH_BLOCKED: dep'
+        $sink.Count | Should -Be 0
     }
 }

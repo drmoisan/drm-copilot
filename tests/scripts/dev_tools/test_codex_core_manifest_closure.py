@@ -1,10 +1,12 @@
 """Closure guard for the Codex `core.json` pack manifest (issue #697).
 
 The `core` pack is always published, so every hook registered by the bundled
-`.codex/config.toml`, every file those hooks dot-source (transitively), and the
-routing wrappers with their module imports must be listed in `core.json` alone.
-A missing entry means a pack-mode push-down installs a hook whose dependency is
-absent, and the hook fails at run time in the destination.
+`.codex/config.toml` or by its PreToolUse dispatcher registry
+`.codex/hooks/pretooluse-dispatch.json` (issue #1159), every file those hooks
+dot-source (transitively), and the routing wrappers with their module imports
+must be listed in `core.json` alone. A missing entry means a pack-mode push-down
+installs a hook whose dependency is absent, and the hook fails at run time in
+the destination.
 """
 
 from __future__ import annotations
@@ -155,8 +157,34 @@ def registered_hook_paths(config_text: str) -> set[str]:
     return paths
 
 
+def registry_hook_paths(registry_text: str) -> set[str]:
+    """Return every `.codex/hooks` path named by a PreToolUse dispatcher registry.
+
+    The registry (issue #1159) holds the PreToolUse hook groups in the settings
+    shape `{"hooks": {"PreToolUse": [{"matcher", "hooks": [{"command"}]}]}}`.
+
+    Args:
+        registry_text: Text of a Codex `pretooluse-dispatch.json` registry.
+
+    Returns:
+        set[str]: Bundle-relative hook script paths named by a `command` value.
+    """
+    registry = json.loads(registry_text)
+    paths: set[str] = set()
+    # Visit each PreToolUse group and each hook command it lists.
+    for group in registry.get("hooks", {}).get("PreToolUse", []):
+        for hook in group.get("hooks", []):
+            match = _HOOK_COMMAND_PATH.search(str(hook.get("command", "")))
+            if match:
+                paths.add(match["path"])
+    return paths
+
+
 def find_missing_manifest_paths(
-    config_text: str, manifest_paths: Iterable[str], read_text: ReadText
+    config_text: str,
+    manifest_paths: Iterable[str],
+    read_text: ReadText,
+    registry_text: str | None = None,
 ) -> list[str]:
     """Return registered hooks and their closure that a manifest omits.
 
@@ -164,11 +192,17 @@ def find_missing_manifest_paths(
         config_text: Text of a Codex `config.toml`.
         manifest_paths: The manifest `paths` entries.
         read_text: Returns a script's text, or None when the file is absent.
+        registry_text: Text of the PreToolUse dispatcher registry, or None when
+            there is none; its hooks join the closure roots.
 
     Returns:
         list[str]: Sorted closure paths absent from the manifest.
     """
-    closure = compute_dot_source_closure(registered_hook_paths(config_text), read_text)
+    roots = registered_hook_paths(config_text)
+    # A registry names the dispatched PreToolUse hooks that config.toml no longer lists.
+    if registry_text is not None:
+        roots |= registry_hook_paths(registry_text)
+    closure = compute_dot_source_closure(roots, read_text)
     return sorted(closure - set(manifest_paths))
 
 
@@ -270,10 +304,60 @@ def test_guard_reports_hook_absent_from_manifest() -> None:
     assert missing == [".codex/hooks/unlisted.ps1"]
 
 
+def test_guard_reports_registry_hook_absent_from_manifest() -> None:
+    """A hook named only by the dispatcher registry is reported (issue #1159)."""
+    # Arrange
+    config_text = (
+        "[[hooks.PreToolUse]]\n"
+        'matcher = "^Bash$"\n'
+        "[[hooks.PreToolUse.hooks]]\n"
+        'type = "command"\n'
+        "command = 'pwsh -NoProfile -File \"$(git rev-parse --show-toplevel)"
+        "/.codex/hooks/invoke-pretooluse-dispatch.ps1\"'\n"
+    )
+    registry_text = json.dumps(
+        {
+            "isolation": "in-process",
+            "hooks": {
+                "PreToolUse": [
+                    {
+                        "matcher": "^Bash$",
+                        "hooks": [
+                            {
+                                "type": "command",
+                                "command": 'pwsh -NoProfile -File "$(git rev-parse'
+                                ' --show-toplevel)/.codex/hooks/registry-only.ps1"',
+                            }
+                        ],
+                    }
+                ]
+            },
+        }
+    )
+    files = {
+        ".codex/hooks/invoke-pretooluse-dispatch.ps1": "Write-Output 'd'\n",
+        ".codex/hooks/registry-only.ps1": "Write-Output 'r'\n",
+    }
+
+    # Act
+    missing = find_missing_manifest_paths(
+        config_text,
+        [".codex/hooks/invoke-pretooluse-dispatch.ps1"],
+        _memory_reader(files),
+        registry_text=registry_text,
+    )
+
+    # Assert
+    assert missing == [".codex/hooks/registry-only.ps1"]
+
+
 def test_core_manifest_contains_registered_hook_closure_and_resolver_paths() -> None:
     """`core.json` alone lists every hook, its closure, and the resolvers (AC-5.2)."""
     # Arrange
     config_text = (BUNDLE_ROOT / ".codex" / "config.toml").read_text(encoding="utf-8")
+    registry_text = (
+        BUNDLE_ROOT / ".codex" / "hooks" / "pretooluse-dispatch.json"
+    ).read_text(encoding="utf-8")
     manifest = json.loads(CORE_MANIFEST.read_text(encoding="utf-8"))
     core_paths = set(manifest["paths"])
     virtual_destinations = {
@@ -282,7 +366,12 @@ def test_core_manifest_contains_registered_hook_closure_and_resolver_paths() -> 
 
     # Act
     required = compute_dot_source_closure(
-        [*registered_hook_paths(config_text), *WRAPPER_PATHS], _bundle_reader
+        [
+            *registered_hook_paths(config_text),
+            *registry_hook_paths(registry_text),
+            *WRAPPER_PATHS,
+        ],
+        _bundle_reader,
     )
     required.update(MODULE_DESTINATIONS)
     missing = sorted(required - core_paths)

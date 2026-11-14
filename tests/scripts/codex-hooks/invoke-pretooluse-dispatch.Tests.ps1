@@ -93,6 +93,6 @@ Describe 'Invoke-CodexPreToolUseDispatchDecision' {
     It 'returns the dependency-failure deny before reading the registry' {
         Mock Get-HookDependencyFailureDecision { [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'deny'; permissionDecisionReason = 'HOOK_DISPATCH_BLOCKED: dep' } } }
         Mock Read-CodexHookDispatchRegistry { throw 'must not be read' }
-        (Invoke-CodexPreToolUseDispatchDecision -PayloadText $script:Payload -RegistryText $script:Registry).Decision.hookSpecificOutput.permissionDecisionReason | Should -Be 'HOOK_DISPATCH_BLOCKED: dep'
+        (Invoke-CodexPreToolUseDispatchDecision -PayloadText $script:Payload -RegistryText $script:Registry).hookSpecificOutput.permissionDecisionReason | Should -Be 'HOOK_DISPATCH_BLOCKED: dep'
     }
 }

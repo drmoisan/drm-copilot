@@ -202,11 +202,11 @@ Describe 'enforce-worktree-poetry-venv registration (issue #1127)' {
     }
 
     It 'registers the Claude hook in the Bash matcher group of .claude/settings.json' {
-        # Arrange
-        $settings = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.claude/settings.json') | ConvertFrom-Json
+        # Arrange: issue #1159 moved the PreToolUse groups of .claude/settings.json into the dispatcher registry.
+        $registry = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.claude/hooks/pretooluse-dispatch.json') | ConvertFrom-Json
 
         # Act
-        $bashGroups = @($settings.hooks.PreToolUse | Where-Object { $_.matcher -ceq 'Bash' })
+        $bashGroups = @($registry.hooks.PreToolUse | Where-Object { $_.matcher -ceq 'Bash' })
         $commands = @($bashGroups | ForEach-Object { $_.hooks } | ForEach-Object { $_.command })
 
         # Assert
@@ -215,16 +215,16 @@ Describe 'enforce-worktree-poetry-venv registration (issue #1127)' {
     }
 
     It 'registers the Codex hook in the ^Bash$ group of .codex/config.toml' {
-        # Arrange
-        $config = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.codex/config.toml')
+        # Arrange: issue #1159 moved the [[hooks.PreToolUse]] tables of .codex/config.toml into the dispatcher registry.
+        $registry = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.codex/hooks/pretooluse-dispatch.json') | ConvertFrom-Json
 
         # Act
-        $groups = @($config -split '\[\[hooks\.PreToolUse\]\]' | Where-Object { $_ -match '^\s*matcher = "\^Bash\$"' })
-        $lines = @($groups | ForEach-Object { $_ -split "`n" } | Where-Object { $_ -like '*.codex/hooks/enforce-worktree-poetry-venv.ps1*' })
+        $groups = @($registry.hooks.PreToolUse | Where-Object { $_.matcher -ceq '^Bash$' })
+        $hooks = @($groups | ForEach-Object { $_.hooks } | Where-Object { ([string]$_.command) -like '*.codex/hooks/enforce-worktree-poetry-venv.ps1*' })
 
         # Assert
         $groups.Count | Should -Be 1
-        @($lines | Where-Object { $_ -like 'command = *' }).Count | Should -Be 1
-        @($lines | Where-Object { $_ -like 'command_windows = *' }).Count | Should -Be 1
+        $hooks.Count | Should -Be 1
+        [string]$hooks[0].command_windows | Should -BeLike '*.codex/hooks/enforce-worktree-poetry-venv.ps1*'
     }
 }
