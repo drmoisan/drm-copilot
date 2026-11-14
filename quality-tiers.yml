@@ -88,6 +88,9 @@ projects:
   - path: ".claude/lib/project-file-merge"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/regeneration"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle: the regenerate-path config, classifier, and staged-delta modules and their entry point Invoke-RegenerationPath.ps1"
   - path: ".claude/lib/requirements"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
