@@ -1,63 +1,150 @@
 # 2026-10-31-push-down-integration-mcp-tools-and-skill - Plan
 
 - **Issue:** #1051
-- **Parent (optional):** none
+- **Parent (optional):** epic #1018 (`shared-agent-harness-layer`), child 10
 - **Owner:** drmoisan
 - **Last Updated:** 2026-11-14T10-43
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 0.2
+- **Work Mode:** full-feature (AC sources: `spec.md` AC1 to AC8 and `user-story.md` AC1 to AC8)
+
+## Terms and Execution Rules
+
+- `FEATURE` is `docs/features/active/2026-10-31-push-down-integration-mcp-tools-and-skill-1051`; `EXT` is `extensions/drm-copilot`; `PDI` is `EXT/src/lib/push-down-integration`; `PDIT` is `EXT/test/lib/push-down-integration`; `PD` is `EXT/src/lib/push-down`.
+- `SCRATCH` is `<session scratchpad>/issue-1051/`; artifacts record the token `SCRATCH`, never a host path.
+- Upstream symbols are cited "per #1029 spec", "per #1049 spec" or "per #1050 spec"; they are absent on this branch until those items merge into `epic/shared-agent-harness-layer-integration`. [P0-T1] confirms each by name and shape before any edit.
+- Tool routes, launchers, command-text restrictions and the batch budget are owned by the `execution-environment` skill and are not restated here.
+- Test cadence follows `## Test Cadence (Mandatory)` of the `atomic-plan-contract` skill: after each task a task check writes `FEATURE/evidence/other/task-check.P<N>-T<M>.<timestamp>.md`; each `[phase-gate]` task runs stages 1 to 6 (format, lint, type check, architecture boundary, one Jest run through its normal parallel workers, one `pytest -n auto` run, one `Invoke-PoshQCParallelTest` run, contract checks including the Codex generator `--check`) and writes `FEATURE/evidence/qa-gates/phase-gate.P<N>.<timestamp>.md`.
+- Tests are parallel-only: no serial, single-process, shuffled or reversed runs, including scoped single-process Pester; one suite at a time; no local integration or golden suite. Test-order dependence is a defect to fix on both sides. Tests create no temporary files and use in-memory fakes with POSIX roots such as `/dest`; CR LF text is built in code.
+- No new Python file, no helper script (C1, C2); hooks never invoke Python. The one Python file edited is `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`, in place.
+- Evidence is append-only under `FEATURE/evidence/<kind>/`, named `<name>.<timestamp>.md` with the UTC write time read from the clock; a consumer selects the lexicographically greatest match. No artifact records an absolute path. Nothing under `docs/engineering/process-reductions/` is edited.
+- Jest case naming (rule traceability): every new Jest case that proves spec rule `S<n>` begins with `S<n> positive:` (rule holds on a conforming fixture) or `S<n> negative:` (a fixture that violates the rule is detected, or the case fails if the rule is removed). A task's rule acceptance is that its test file contains both tokens for each listed rule and the file passes.
+- Success-case observations used below: Jest prints `Tests:` followed by `N passed, N total` with no `failed` count; Prettier check prints `All matched files use Prettier code style!`; Black check prints `All done!`; Ruff prints `All checks passed!`; Pyright prints `0 errors`; `tsc` and ESLint print no finding and exit 0; `Invoke-PoshQCParallelTest` returns an object whose `ExitCode` is 0, with counts read from the merged JUnit file.
+- Run a pre-mortem and a self-review before every push.
 
 ## Required References
 
-- General Coding Standards: [`.github/instructions/general-code-change.instructions.md`](../../../../.github/instructions/general-code-change.instructions.md)
-- General Unit Test Policy: [`.github/instructions/general-unit-test.instructions.md`](../../../../.github/instructions/general-unit-test.instructions.md)
-- (Add language-specific policies as needed, e.g. `python-code-change.instructions.md`)
-
-**All work must comply with these policies; do not duplicate their content here.**
+- `.github/instructions/general-code-change.instructions.md`, `.github/instructions/general-unit-test.instructions.md`
+- `.github/instructions/typescript-code-change.instructions.md`, `.github/instructions/typescript-unit-test.instructions.md`
+- `.github/instructions/python-unit-test.instructions.md` (one existing test file edited in place)
 
 ## Implementation Plan (Atomic Tasks)
 
-> **Instructions for this section:**
-> - Break work into **Phases** (broad buckets) and **Atomic Tasks** (binary, 5-30 min units).
-> - Use `- [ ] [P#-T#]` for every task.
-> - Start every task with a **strong verb** (Implement, Create, Update, Verify).
-> - No "bucket" tasks like "Refactor module" or "Write tests"; split them into specific, verifiable steps.
-> - **Self-Validating Phases:** Include necessary test creation/update tasks *within* the phase that implements the code. Do not defer verification to a final "Testing" phase.
-> - Include explicit baseline artifact tasks (static baselines and one `Phase 0 baseline` run of each test gate), final-QA artifact tasks, and coverage-comparison tasks for every language in scope when policy requires coverage.
-> - Name the expected artifact path or location in each evidence-producing task's acceptance criteria.
-> - If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+### Phase 0 — Upstream Confirmation and Baselines
 
-### Phase 0: Context & Inputs
-- [ ] [P0-T1] <Atomic task>
+- [ ] [P0-T1] Read and confirm the upstream contracts in `EXT/src/lib/push-down/` and `config/harness-parity-matrix.json` by name and shape before any edit: per #1029 spec `pushDownHarness`, `PushDownReport` (`files[].action` values `conflict`, `unmanaged-conflict`, `deleted-locally`), `payload_version`, `WriteIfChangedFileSystem`, the root-level path assertion in `PD/push-down-ecosystem-registry.ts`, and its MCP-result compatibility tests; per #1049 spec `DESTINATION_MANIFEST_RELATIVE_PATH`, `parseDestinationManifest`, `hashPayloadText`; per #1050 spec `findCiWorkflowNameCollisions`, the caller renderer (reference and copy modes), the data file `.github/drm-copilot/ci-required-checks.json` fields, the bundled `harness-<stem>.yml` workflows and the pack-to-stem mapping; the #1025 parity matrix. Record as PRESENT or ABSENT (both allowed): #1029 `shared.json`, the #1028 shared-source generator.
+  - Acceptance: `FEATURE/evidence/other/upstream-contracts.<timestamp>.md` lists each required symbol with its defining file and exported signature and ends `Result: CONFIRMED`. If any required symbol is missing or differs in shape, the artifact ends `Result: STOP` naming it, no tracked file is edited, and the run stops before [P0-T2].
+- [ ] [P0-T2] Read the ledger entries and stored patches under `docs/engineering/process-reductions/` and confirm that each insertion anchor lies outside every patch hunk with its context and every quoted `Current` region: (a) `EXT/jest.config.cjs` after the final `coverageThreshold` entry (record its key); (b) `EXT/resources/claude-customizations/pack-manifests/core.json` between the `pr-context-artifacts` and `quota-throttling` skill entries; (c) `EXT/resources/codex-and-agents-customizations/pack-manifests/core.json` between the `policy-compliance-order` and `reconcile-parity-matrix` skill entries; (d) each brief copy after the docs-tools bullet, which must still be the last bullet of `## MCP Surfaces Run the Installed Extension`; (e) `## Published MCP Tool Surface` of the adapter skill after `transition_prepared_orchestration`; (f) `.codex/config.toml` `enabled_tools` after `validate_orchestration_artifacts`; (g) `REPO_AUTOMATION_TOOLS` after `validate_docs_artifacts`. Also record the physical line counts of `EXT/src/mcp-tools.ts`, `EXT/src/repo-automation-service.ts`, `EXT/src/repo-automation-service-contract.ts`, both definition modules and `EXT/jest.config.cjs`; the current `REPO_AUTOMATION_TOOLS` length; and, from a search of `EXT/test/` for `push_down_report`, `pushDownHarness` and the root-level path list, every upstream test that deep-equals `push_down_report`, counts harness writes, or pins the root-level path list.
+  - Acceptance: `FEATURE/evidence/other/insertion-anchors.<timestamp>.md` marks anchors (a) to (g) `OUTSIDE`, lists the counts and the named tests. Any anchor `INSIDE`, or a projected `EXT/jest.config.cjs` count above 800 after eleven appended entries, ends the artifact `Result: STOP`.
+- [ ] [P0-T3] Capture static baselines into `FEATURE/evidence/baseline/` for `EXT/src` and `EXT/test` (Prettier check, ESLint, `tsc`) and for the Python tree (Black check, Ruff, Pyright), one artifact per step.
+  - Acceptance: six files `FEATURE/evidence/baseline/<step>.<timestamp>.md` (steps `prettier`, `eslint`, `tsc`, `black`, `ruff`, `pyright`), each with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:` holding the finding count or the success literal; no write-mode formatter runs before this task.
+- [ ] [P0-T4] Capture the `Phase 0 baseline` of each test gate into `FEATURE/evidence/baseline/`: one Jest coverage run of `EXT/jest.config.cjs`, one `pytest -n auto` run with coverage, one `Invoke-PoshQCParallelTest` run.
+  - Acceptance: `FEATURE/evidence/baseline/jest-coverage.<timestamp>.md`, `pytest.<timestamp>.md` and `pester.<timestamp>.md` each carry the four fields; `Output Summary:` holds pass and fail counts, the repo-wide coverage, and (Jest) the per-file line and branch coverage of every C6 file read from `EXT/coverage/lcov.info`. Pre-existing failures are listed by name.
 
-### Phase 1: <Phase Name>
-- [ ] [P1-T1] <Atomic task with strong verb>
-- [ ] [P1-T2] <Atomic task>
-  - Preconditions: <optional>
-  - Acceptance: <optional>
+### Phase 1 — Shared Integration Core
 
-### Phase 2: <Phase Name>
-- [ ] [P2-T1] <Atomic task>
-- [ ] [P2-T2] <Atomic task>
+- [ ] [P1-T1] Create `PDI/workflow-yaml-reader.ts` exporting `readWorkflowText(text)`, a pure subset reader returning status `ok` with `name`, sorted `triggers` and sorted `jobs` (`id`, `name`, `uses`, `needs`, `if`, `matrix`, `with_versions`), status `unsupported` with the first `{ line, construct }`, or status `error` with a 1-based `line` and message; `${{ ... }}` stays opaque; no I/O, no module-level mutable state; LF and CR LF give equal results. Create `PDIT/workflow-yaml-reader.test.ts` (S15 to S19) and `PDIT/workflow-yaml-reader-templates.test.ts` (S20), which renders the #1050 caller at test time in both modes and reads each bundled `harness-<stem>.yml`; it asserts no `job.workflow_*` value and runs no actionlint.
+  - Acceptance: both files pass in the task check and contain both case tokens for S15, S16, S17, S18, S19 and S20.
+- [ ] [P1-T2] Create `PDI/integration-items.ts` exporting `INTEGRATION_NEEDED_RELATIVE_PATH`, `INTEGRATION_NEEDED_SCHEMA_VERSION`, `INTEGRATION_ITEM_KINDS`, `RESOLUTION_OPTIONS_BY_KIND`, `DETAIL_KEYS_BY_KIND` (the S4 table), `formatIntegrationItemId`, `mergeIntegrationItems` (code-point sort by `id` with `compareCodePoint`, one item per id) and `renderIntegrationNeeded` (`stringifySorted`, two-space indent, LF, one trailing LF). Create `PDIT/integration-items.test.ts`, including a root `/dest/user-x` fixture searched for `/dest` and `user-x` (S9).
+  - Acceptance: the test file passes and contains both case tokens for S2, S3, S4, S5, S6, S8 and S9.
+- [ ] [P1-T3] Create `PDI/integration-ecosystems.ts` (`detectIntegrationEcosystems`, S21, S22) and `PDI/integration-detect.ts` (`IntegrationReadFileSystem` as the `listFiles`/`isFile`/`readTextFile` subset of `PushDownFileSystem`; `evaluateDestinationConflicts`, the shared conflict core for S25 to S30; `detectPushDownIntegration` for S24 and S31; S29 references read from the bundled harness workflows of the selected packs under the injected `extensionRoot`). Create `PDIT/integration-test-helpers.ts` (in-memory fake with write recording and a reverse-order `listFiles` option), `PDIT/integration-ecosystems.test.ts` and `PDIT/integration-detect.test.ts`.
+  - Acceptance: both test files pass and contain both case tokens for S21, S22, S24, S25, S26, S27, S28, S29, S30, S31, S32 (zero recorded writes) and S33 (deep-equal results, including reverse-order listing).
+- [ ] [P1-T4] [phase-gate] Create `PDI/integration-validate.ts` (`validatePushDownIntegration`, `VALIDATE_NOT_CHECKED` in the S41 order, rule entries V1 to V3, verdict assembly) and `PDI/integration-validate-artifacts.ts` (V4 with transitive local `uses:` following, each file once; V5 with `parseDestinationManifest`, `hashPayloadText`, `parseExclusionManifest`, `matchesExclusionEntry` and sorted `destination_owned`). Create `PDIT/integration-validate.test.ts` and `PDIT/integration-validate-artifacts.test.ts`; the S39 contract case reads `.claude/hooks/validate-feature-review-coverage-metrics.ps1` and the bundled harness workflows from the tracked tree. Then run the Phase 1 gate.
+  - Acceptance: both files contain both case tokens for S35, S36, S37, S38, S39, S40, S41 and S43 and pass; `FEATURE/evidence/qa-gates/phase-gate.P1.<timestamp>.md` records stages 1 to 6 in one clean pass, with the Jest, pytest and Pester counts showing no failure beyond the [P0-T4] list.
+
+### Phase 2 — Push-Down Writer and MCP Tools
+
+- [ ] [P2-T1] Create `PD/push-down-integration-needed.ts` (post-run overlay view for dry runs, item collection from report actions, `findCiWorkflowNameCollisions` and `evaluateDestinationConflicts`, write through `WriteIfChangedFileSystem` per S12, result `{ path, items, written }` per S14); add one call site in `PD/push-down-harness.ts` and add `INTEGRATION_NEEDED_RELATIVE_PATH` to the root-level assertion in `PD/push-down-ecosystem-registry.ts`; `PD/push-down-apply.ts` is not edited. Create `EXT/test/lib/push-down/push-down-integration-needed.test.ts`. Existing tests from [P0-T2]: tests that deep-equal `push_down_report` and tests that count harness writes are unchanged, because a run with no item and no file adds no key and writes nothing (S12, S14); a test that pins the root-level path list is updated to include the new path, because S1 adds it.
+  - Acceptance: the new file contains both case tokens for S1, S7, S10, S11, S12, S13 and S14 and passes, and every [P0-T2] named test passes in the task check.
+- [ ] [P2-T2] Create `EXT/src/mcp-push-down-integration-tool-definitions.ts` (`PUSH_DOWN_INTEGRATION_TOOL_DEFINITIONS`: both tools with `workspace_root: workspaceRootProperty`, `required: ["workspace_root"]`, `additionalProperties: false`, `annotations: { readOnlyHint: true, openWorldHint: false }`) and `EXT/src/mcp-tool-inputs-push-down-integration.ts` (`resolvePushDownIntegrationToolInput` with `asToolArgumentObject` and `normalizeWorkspaceRoot`). Create `EXT/test/mcp-push-down-integration-tool-definitions.test.ts` and `EXT/test/mcp-tool-inputs-push-down-integration.test.ts`.
+  - Acceptance: both files pass and contain both case tokens for S23, S34 and S46, and the input file covers the missing, non-string, empty and extra-property inputs of S42.
+- [ ] [P2-T3] Register both tools in `EXT/src/repo-automation-tool-names.ts` (after `validate_docs_artifacts`), spread `PUSH_DOWN_INTEGRATION_TOOL_DEFINITIONS` after `...DOCS_TOOL_DEFINITIONS` in `EXT/src/mcp-repo-automation-tool-definitions.ts` and `EXT/src/mcp-tool-definitions.ts`, add two `case` lines and the optional `integration` field in `EXT/src/mcp-tools.ts`, add optional `detectPushDownIntegration?` and `validatePushDownIntegration?` to `RepoAutomationService` in `EXT/src/repo-automation-service-contract.ts` with delegations in `EXT/src/repo-automation-service.ts` (registration lines only, C6). Create `EXT/src/mcp-handlers/push-down-integration-handlers.ts` (docs-handler pattern: JSON text, `structuredContent`, `isError` equal to `!ok`; input and host errors thrown to the existing failure path) and `EXT/src/repo-automation-service-push-down-integration.ts` (directory check of the root, then the read-only seam over the real file system). Create `EXT/test/mcp-handlers/push-down-integration-handlers.test.ts` and `EXT/test/repo-automation-service-push-down-integration.test.ts`. Existing tests: `defines one schema entry for every advertised repo automation tool` and `declares the same input-schema properties and required arrays on both tool-definition surfaces` (`EXT/test/mcp-repo-automation-tool-definitions.test.ts`) unchanged and passing with the new names; `advertises all nineteen discovery tools in union order` (`EXT/test/mcp-discovery-authority-tool-definitions.test.ts`) updated: its `REPO_AUTOMATION_TOOLS` length pin becomes the [P0-T2] length plus two, because two names are inserted before the discovery block; `EXT/test/mcp-discovery-tool-definitions.test.ts` (trailing discovery slice), `EXT/test/mcp-docs-tool-definitions.test.ts` (contiguous docs slice) and `exposes one shared tool set to the standalone server and the extension provider` (`EXT/test/packaging/discovery-resources.test.ts`, one `case` per name) unchanged; the stub `EXT/test/mcp-server-test-service.ts` unchanged because both methods are optional.
+  - Acceptance: the two new files contain both case tokens for S42, S45, S47 and S48 and pass, and every existing test named in this task passes in the task check.
+- [ ] [P2-T4] [phase-gate] Create `EXT/test/push-down-integration-no-model-call.test.ts` (S49 over every new production module, with a negative case that injects each forbidden token into a synthetic text), `EXT/test/mcp-server.push-down-integration.test.ts` (S50: exactly the `tools` capability; an in-memory client with `capabilities: {}` calls both tools; no server-to-client request) and `PDIT/integration-end-to-end.test.ts` (S44 main case and the `items: []` companion case). Then run the Phase 2 gate.
+  - Acceptance: the three files contain both case tokens for S44, S49 and S50 and pass; `FEATURE/evidence/qa-gates/phase-gate.P2.<timestamp>.md` records one clean pass of stages 1 to 6 with no failure beyond the [P0-T4] list.
+
+### Phase 3 — Skill, Host Exposure and Brief
+
+- [ ] [P3-T1] Author `.agents/skills/push-down-integration/SKILL.md` (both tool names, the file name, the S52 ordered loop, a per-kind table naming every kind and option of the S4 constants, `## What Validate Does Not Check` with one bullet per `VALIDATE_NOT_CHECKED` entry) and place byte-identical copies at `.claude/skills/push-down-integration/SKILL.md`, `.github/skills/push-down-integration/SKILL.md` and the three bundle trees under `EXT/resources/` (through the #1028 generator when [P0-T1] recorded it PRESENT). List the skill in `shared.json` when PRESENT, otherwise at anchors (b) and (c) of both `pack-manifests/core.json` files, and add a `shared` entry to `config/harness-parity-matrix.json`. Create `EXT/test/packaging/push-down-integration-skill.test.ts` (S51 byte identity of the six copies, S52, S53 with the kind-removal negative case, S54). Existing tests, all unchanged and expected to pass with the new files: `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, `test_push_down_issue_824_follow_ups.py`, `test_push_down_copilot_customizations.py`, `EXT/test/lib/push-down/claude-pack-manifest-completeness.test.ts`, the Codex generator `--check`, and the Pester sweeps `parallel-gate-wording.Tests.ps1` (`PGW-SWEEP-SURFACES`), `test-cadence-wording.Tests.ps1` (`TCW-SWEEP-SURFACES`) and `policy-toolchain-naming.Tests.ps1`, whose forbidden tokens the skill text avoids.
+  - Acceptance: the Jest file contains both case tokens for S51, S52, S53 and S54 and passes; the named pytest files and the generator `--check` exit 0 in the task check.
+- [ ] [P3-T2] Add both names after `validate_orchestration_artifacts` in `enabled_tools` of `.codex/config.toml` and of its bundle copy under `EXT/resources/codex-and-agents-customizations/` (through the #1028 generator source when PRESENT), with no `tools` approval table; append both names to `EXPECTED_DRM_COPILOT_TOOLS` and to the exclusion set of `APPROVED_DRM_COPILOT_TOOLS` in `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py` (in place); list both names after `transition_prepared_orchestration` in `.agents/skills/repo-automation-adapter/SKILL.md` and its bundle copy; add tool entries to `EXT/README.md` and `EXT/CHANGELOG.md`. Create `EXT/test/packaging/push-down-integration-exposure.test.ts` (S55 over the bundled config and adapter copies). Existing tests: `test_codex_config_files_retain_full_drm_copilot_transport` updated through the two constants because `enabled_tools` gains two names; `test_codex_only_orchestration_skills_match_published_bundle`, `test_orchestration_skills_state_non_interpretable_guardrails` (`test_orchestration_guardrail_contracts.py`) and the `ADAPTER-AGENTS` rows of `parallel-gate-wording.Tests.ps1` unchanged. `.claude/settings.json` is not edited.
+  - Acceptance: the Jest file contains both case tokens for S55 and passes; `test_push_down_codex_and_agents_resource_contracts.py` and `test_orchestration_guardrail_contracts.py` pass in the task check.
+- [ ] [P3-T3] [phase-gate] Add one bullet immediately after the docs-tools bullet of `## MCP Surfaces Run the Installed Extension` in all six brief copies listed in `_BRIEF_COPIES` (`tests/scripts/dev_tools/test_execution_environment_brief_contracts.py`), through the #1028 generator source when PRESENT; the bullet names `detect_push_down_integration` and `validate_push_down_integration` and states that a destination receives both tools and their validate rules only after an extension and MCP package release is installed. Create `EXT/test/packaging/push-down-integration-brief.test.ts` (S56: bullet position after the docs-tools bullet in the bundled Claude copy, both names). Existing tests unchanged and passing: `test_brief_copies_are_byte_identical`, `test_brief_has_required_headings`, `test_brief_has_no_consuming_names`, `test_brief_has_no_g11_or_g12_findings`, `test_brief_npm_run_tokens_exist_in_package_json`, the `LIGHT-ROUTE` row and the brief rows of `planning-contract-wording.Tests.ps1` and `test-cadence-wording.Tests.ps1`, the `PGW-SWEEP-SURFACES` sweep of `parallel-gate-wording.Tests.ps1` (the bullet carries none of its forbidden tokens), and `ProcessReductionChain.Ledger.Tests.ps1` (`PRC-LEDGER-CHAIN-HOLDS`, `PRC-LEDGER-SUBCHAIN-HOLDS`, `PRC-LEDGER-NO-EXCEPTIONS`), because the bullet lies outside every quoted region. Then run the Phase 3 gate.
+  - Acceptance: the Jest file contains both case tokens for S56 and passes; `FEATURE/evidence/qa-gates/phase-gate.P3.<timestamp>.md` records one clean pass of stages 1 to 6, with the four ledger rows passing in the Pester run and the generator `--check` exiting 0.
+
+### Phase 4 — Final QA Loop, Coverage and Self-Review
+
+- [ ] [P4-T1] Append eleven `coverageThreshold` entries `{ lines: 85, branches: 75 }` after the final map entry recorded at anchor (a) of `EXT/jest.config.cjs`, one per new production file: the six `PDI/` modules, `PD/push-down-integration-needed.ts`, and the four new `EXT/src/` modules of [P2-T2] and [P2-T3] (C3).
+  - Acceptance: the file holds exactly one entry for each of the eleven paths, no `global` key, and no change above the appended block; no coverage run is part of this task.
+- [ ] [P4-T2] Run the final QA static loop for `EXT/src` and `EXT/test` (Prettier check, ESLint, `tsc`) and Python (Black check, Ruff, Pyright), restarting from the first step after any fix.
+  - Acceptance: `FEATURE/evidence/qa-gates/typescript-static.<timestamp>.md` and `FEATURE/evidence/qa-gates/python-static.<timestamp>.md` record each step's command, exit code 0 and the success literal; the architecture-boundary stage is recorded as `dependency-cruiser` result or `not configured for EXT`.
+- [ ] [P4-T3] Run the final QA test gates once each (one Jest coverage run of `EXT/jest.config.cjs`, one `pytest -n auto` with coverage, one `Invoke-PoshQCParallelTest`), restarting the QA loop at [P4-T2] after any fix, and compare with the `Phase 0 baseline`.
+  - Acceptance: `FEATURE/evidence/qa-gates/jest-coverage.<timestamp>.md`, `pytest.<timestamp>.md` and `pester.<timestamp>.md` carry the four fields with zero failures beyond the [P0-T4] list; `FEATURE/evidence/qa-gates/coverage-comparison.<timestamp>.md` lists, from `EXT/coverage/lcov.info`, each of the eleven new files at or above 85 percent line and 75 percent branch, each C6 TypeScript file and the repo-wide totals at or above their [P0-T4] values, and states `Result: PASS`.
+- [ ] [P4-T4] Write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md`, walking the three templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base of `origin/epic/shared-agent-harness-layer-integration` and `HEAD`, plus porcelain status, with one PASS, FAIL or N/A row per checklist item and one row each for C1 (no added `.py` path), C2 (no added script), C4 (no dependency change in `EXT/package.json` or `packages/mcp-server/package.json`), C5 (no `contributes.commands` change), C6 (registration-only edits), no `.claude/settings.json` change, and every AC of `spec.md` and `user-story.md` checked off with its evidence.
+  - Acceptance: the artifact has no FAIL row; a FAIL row is fixed, the loop re-run from [P4-T2], and a new self-review artifact written.
+
+## Rule and Constraint Traceability
+
+Test paths are relative to `EXT/test/`; each rule's failing test is the `S<n> negative:` case in the named file.
+
+| Rules | Implementing task | Test file (cases `S<n> positive:` and `S<n> negative:`) |
+|---|---|---|
+| S1 | P1-T2 constant, P2-T1 registry guard | `lib/push-down/push-down-integration-needed.test.ts` |
+| S2, S3, S4, S5, S6, S8, S9 | P1-T2 | `lib/push-down-integration/integration-items.test.ts` |
+| S7, S10, S11, S12, S13, S14 | P2-T1 | `lib/push-down/push-down-integration-needed.test.ts` |
+| S15, S16, S17, S18, S19 | P1-T1 | `lib/push-down-integration/workflow-yaml-reader.test.ts` |
+| S20 | P1-T1 | `lib/push-down-integration/workflow-yaml-reader-templates.test.ts` |
+| S21, S22 | P1-T3 | `lib/push-down-integration/integration-ecosystems.test.ts` |
+| S24 to S33 | P1-T3 | `lib/push-down-integration/integration-detect.test.ts` |
+| S35, S36, S37, S38, S41, S43 | P1-T4 | `lib/push-down-integration/integration-validate.test.ts` |
+| S39, S40 | P1-T4 | `lib/push-down-integration/integration-validate-artifacts.test.ts` |
+| S23, S34, S46 | P2-T2 | `mcp-push-down-integration-tool-definitions.test.ts` |
+| S42 | P2-T2 inputs, P2-T3 host errors | `mcp-tool-inputs-push-down-integration.test.ts`, `mcp-handlers/push-down-integration-handlers.test.ts` |
+| S45, S47 | P2-T3 | `mcp-handlers/push-down-integration-handlers.test.ts`; existing `mcp-repo-automation-tool-definitions.test.ts` cases |
+| S48 | P2-T3 | `repo-automation-service-push-down-integration.test.ts` |
+| S44, S49, S50 | P2-T4 | `lib/push-down-integration/integration-end-to-end.test.ts`, `push-down-integration-no-model-call.test.ts`, `mcp-server.push-down-integration.test.ts` |
+| S51, S52, S53, S54 | P3-T1 | `packaging/push-down-integration-skill.test.ts`; the pytest contract tests named in P3-T1 |
+| S55 | P3-T2 | `packaging/push-down-integration-exposure.test.ts`; `test_codex_config_files_retain_full_drm_copilot_transport` |
+| S56 | P3-T3 | `packaging/push-down-integration-brief.test.ts`; `test_brief_copies_are_byte_identical` |
+| C1, C2, C4, C5, C6 | P4-T4 (C6 counts from P0-T2) | self-review rows over the branch diff |
+| C3 | P4-T1, P4-T3 | Jest coverage thresholds and `coverage-comparison` artifact |
+
+## Acceptance Criteria Traceability
+
+`spec.md` and `user-story.md` carry the same AC1 to AC8 text; each row covers both.
+
+| AC | Implementing tasks | Tests and evidence |
+|---|---|---|
+| AC1 | P1-T2, P2-T1 | S1 to S14 cases; S49 case for `PD/push-down-integration-needed.ts` |
+| AC2 | P1-T1, P1-T3 | S15 to S33 cases |
+| AC3 | P1-T4, P2-T4 | S35 to S41, S43, S44 cases |
+| AC4 | P3-T1 | S51 to S54 cases |
+| AC5 | P2-T2, P2-T3 | S23, S34, S42, S45 to S48 cases |
+| AC6 | P4-T4 | C1 and C2 self-review rows |
+| AC7 | P2-T4 | S49 and S50 cases |
+| AC8 | P3-T2, P3-T3 | S55 and S56 cases; `test_brief_copies_are_byte_identical` |
+
+## Artifact Language Classification
+
+- TypeScript: the six `PDI/` modules, `PD/push-down-integration-needed.ts`, the four new `EXT/src/` modules, registration edits in `EXT/src/repo-automation-tool-names.ts`, both definition modules, `EXT/src/mcp-tools.ts`, the two service modules, `PD/push-down-harness.ts`, `PD/push-down-ecosystem-registry.ts`, and every new Jest file under `EXT/test/`.
+- JavaScript configuration: `EXT/jest.config.cjs` threshold entries.
+- Markdown: the six skill copies, the adapter skill and its bundle copy, six brief copies, `EXT/README.md`, `EXT/CHANGELOG.md`.
+- JSON: pack manifests (`core.json` or `shared.json`), `config/harness-parity-matrix.json`.
+- TOML: `.codex/config.toml` and its bundle copy.
+- Python (existing file, edited in place only): `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`.
 
 ## Pre-Mortem
 
-<!-- One bullet per label; state how the next review or CI run could fail on that dimension and the mitigation, or "not applicable" with the reason. -->
-- Review checklists:
-- Coverage:
-- Mirror parity:
-- File size:
-- Test isolation:
-- CI-only behavior:
-- Evidence:
+- Review checklists: a reviewer could find a rule without a failing test or an existing test broken by a registration change. Every S rule maps to a named file with an `S<n> negative:` case, and P2-T1, P2-T3, P3-T1, P3-T2 and P3-T3 name each existing asserting test with its disposition; P4-T4 walks all three templates.
+- Coverage: the threshold map has no `global` key, so each of the eleven new files gets its own entry in P4-T1, registered before the only coverage run that checks it (P4-T3); tests use in-memory fakes, not module mocks, so per-file figures measure real code; P4-T3 compares with the `Phase 0 baseline`.
+- Mirror parity: the six skill copies and manifests move together in P3-T1, the Codex config and adapter copies in P3-T2, and the six byte-identical brief copies in the brief-update task P3-T3; the Codex generator `--check` and the pinned contract tests run at each phase gate.
+- File size: P0-T2 records the C6 file counts and stops if `EXT/jest.config.cjs` would pass 800; new logic lives in new modules, and the validator is split into two modules to stay near the 500 guidance tier.
+- Test isolation: pure modules with no module-level mutable state and a fresh fake per test; gates are one Jest run through its normal parallel workers, one `pytest -n auto` run and one `Invoke-PoshQCParallelTest` run, each re-run only after a fix.
+- CI-only behavior: POSIX fixture roots only, CR LF built in code (the `eol=lf` rule normalizes committed fixtures), real-tree reads limited to tracked files resolved from the test directory, and no actionlint over destination fixtures.
+- Evidence: counts and coverage come from the Jest output, `lcov.info`, the pytest summary and the merged Pester JUnit file, never from MCP summaries; stamps are read from the clock; artifacts are append-only and record no absolute path.
 
 ## Test Plan
 
-- Unit: ...
-- Integration: ...
-- Manual/CLI: ...
-- Coverage evidence: list baseline artifact paths (static and `Phase 0 baseline`), post-change artifact paths, and comparison artifact paths, with the per-file threshold results from the single gate run, for each in-scope language
-
-## Open Questions / Notes
-
-- ...
+- Unit and contract: the Jest files in `## Rule and Constraint Traceability`; existing pytest and Pester contract suites named in P3-T1 to P3-T3.
+- Integration: the seeded scratch-destination scenario is CI-dependent or orchestrator-owned; locally it is represented by the S44 case.
+- Coverage evidence: `FEATURE/evidence/baseline/jest-coverage.<timestamp>.md`, `FEATURE/evidence/qa-gates/jest-coverage.<timestamp>.md` and `FEATURE/evidence/qa-gates/coverage-comparison.<timestamp>.md`.
