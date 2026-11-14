@@ -86,6 +86,8 @@
     ".codex/hooks/enforce-orchestration-preimplementation-gate-cleanup.ps1",
     ".codex/hooks/hook-cleanup-context.ps1",
     ".codex/hooks/hook-epic-fan-in.ps1",
+    ".codex/hooks/hook-epic-regeneration.ps1",
+    ".codex/hooks/enforce-epic-merge-gate-regeneration.ps1",
     ".codex/hooks/hook-planner-worktree-removal.ps1",
     ".codex/hooks/enforce-epic-worktree-removal-gate-planner.ps1",
     ".codex/hooks/enforce-orchestration-preimplementation-gate-epic-resolution.ps1",

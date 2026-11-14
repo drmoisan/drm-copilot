@@ -107,6 +107,7 @@ try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-green-ci.ps1') } catch
 # Review guard under review_mode concurrent, byte-identical to the Codex copy (issue #1097).
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-review.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-review.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-child-ci.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-child-ci.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-regeneration.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-regeneration.ps1' -ErrorRecord $_ }
 
 function ConvertFrom-EpicMergeGateJson {
     <#
@@ -380,6 +381,7 @@ function Invoke-EpicMergeGateDecision {
     # Review guard (issue #1097): inert without review_mode concurrent, so it precedes every allow branch.
     $reviewDecision = Get-EpicMergeGateReviewShapeDecision -CommandText $commandText -KnownCheckpoint $childCheckpoint -KnownPrNumber $commandPrNumber -ReadCheckpoint ${function:Read-EpicMergeGateReviewItemCheckpoint}
     if (-not $reviewDecision.Denied) { $reviewDecision = Get-EpicMergeGateReviewDecision -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber -GhRoot $sessionRoot -GitRoot $childRoot }
+    if (-not $reviewDecision.Denied) { $reviewDecision = Get-EpicMergeGateRegenerationDecision -Checkpoint $childCheckpoint }
     if ($reviewDecision.Denied) { return Get-EpicMergeGateBlockDecision -Reason $reviewDecision.Reason }
 
     if ((Test-ChildCheckpointAllowsEpicMerge -Checkpoint $childCheckpoint) -and
@@ -471,9 +473,7 @@ function Invoke-EpicMergeGateEntryPoint {
         [scriptblock] $ReadPayload = { Read-ClaudeHookRawPayload }
     )
 
-    if (-not $PSBoundParameters.ContainsKey('ToolInputRaw')) {
-        $ToolInputRaw = [string](& $ReadPayload)
-    }
+    if (-not $PSBoundParameters.ContainsKey('ToolInputRaw')) { $ToolInputRaw = [string](& $ReadPayload) }
 
     $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $ToolInputRaw
     $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
@@ -482,9 +482,7 @@ function Invoke-EpicMergeGateEntryPoint {
 }
 
 # Guard allows dot-sourcing in tests without executing the entrypoint.
-if ($MyInvocation.InvocationName -eq '.') {
-    return
-}
+if ($MyInvocation.InvocationName -eq '.') { return }
 if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('EPIC_MERGE_GATE_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'EPIC_MERGE_GATE_BLOCKED:'
 if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
@@ -493,8 +491,6 @@ if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compr
 # decision JSON before it. `exit (<call>)` would capture BOTH into the exit
 # expression and emit nothing, so the decision is written explicitly here first.
 $entryPointResult = @(Invoke-EpicMergeGateEntryPoint)
-if ($entryPointResult.Count -gt 1) {
-    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
-}
+if ($entryPointResult.Count -gt 1) { $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output }
 
 exit ([int]$entryPointResult[-1])
