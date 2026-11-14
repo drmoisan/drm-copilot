@@ -245,15 +245,16 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # paragraphs to the epic agent. Both digests moved. They were recomputed from
 # the bytes after the merge of origin/main that brought in #1157, #1160, #1161,
 # #1163, #1164, and #1167, so each digest below is the merged result of the
-# changes listed above plus #1162.
+# changes listed above plus #1162. Remediation cycle 1 of #1162 then added the
+# status-mapping (D7) paragraph to both surfaces, and both digests moved again.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "9ea1c87caf5781acb15942e6e3eaff5c0dcf9858550826f6a6d6ad081a5dc329",
+        "8ba9e581ffacc89e049eb0f5c20731e7be1ffbf7473d7787c674636dd3ac2683",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "eefac39e879a755228ae92428c5930951f18462bef733aaa0b7ef36f5eeb6203",
+        "7eb85f0bf7abf3942872708a34c438a1e05ca2d337eedb8a123dcf9a0525afbe",
     ),
 )
 

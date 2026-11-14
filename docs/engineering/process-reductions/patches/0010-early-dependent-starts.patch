@@ -3308,17 +3308,17 @@ index bee4233b4a0a3f3244c187526ac240c8f82cee07..68b3177e7a8df0ae3f2917ee861e8ed7
  # RE-BASELINED by issue #1157. That change extended the owner-directive paragraph
  # of the epic skill's `## Context Handoff to Dependent Features` section with
  # hook-level pass-down through the coordinator ledger, epic fan-out scope, and
-@@ -240,11 +249,11 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
+@@ -240,11 +251,11 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
  PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
      (
          ".claude/agents/epic-orchestrator.md",
 -        "5ff9c66f58595fa91a1f568a18a0a5aae5d1736a9dd1b13a9bbbab459df7899c",
-+        "9ea1c87caf5781acb15942e6e3eaff5c0dcf9858550826f6a6d6ad081a5dc329",
++        "8ba9e581ffacc89e049eb0f5c20731e7be1ffbf7473d7787c674636dd3ac2683",
      ),
      (
          ".claude/skills/epic-orchestrate/SKILL.md",
 -        "30b1500bec4840bec1e0f1a9765883c681c8d4e5d606a016126e2480473675c4",
-+        "eefac39e879a755228ae92428c5930951f18462bef733aaa0b7ef36f5eeb6203",
++        "7eb85f0bf7abf3942872708a34c438a1e05ca2d337eedb8a123dcf9a0525afbe",
      ),
  )
  

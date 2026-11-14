@@ -76,6 +76,12 @@ begin the normal epic lifecycle without requiring planner output.
   `gh pr merge`. When every runnable feature is held, wait with `-WaitSeconds 540` at most 40
   times, then halt with `blocked_reason: "external_dependency"`. Follow
   `## Cross-Epic Dependencies (cross_epic_depends_on)` of `epic-orchestrate`.
+- **Status mapping (D7).** A `hold` decision records `held`. `PREREQ_IN_MAIN` records `in_main`.
+  `PREREQ_ALREADY_INTEGRATED`, or a completed D4 merge, records `integrated` before the feature is
+  launched. `released` is recorded only between a `merge_required` decision and its completed D4
+  merge, so a feature is launched only when every entry is `integrated` or `in_main`, the two
+  statuses the started-while-held invariant accepts. A main-gate `release` records
+  `cross_epic_main_gate` status `released`, and a main-gate `hold` records `held`.
 - Treat merge conflicts through the child orchestrator remediation loop.
 - Remove a child worktree only after its merge state is safe.
 

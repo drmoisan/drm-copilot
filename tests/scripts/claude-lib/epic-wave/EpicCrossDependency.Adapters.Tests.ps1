@@ -33,7 +33,7 @@ BeforeAll {
 
     # Responses of a merged prerequisite that is not yet integrated (merge_required).
     $script:BaseGit = @{
-        'fetch -q origin'                                                      = @{ ExitCode = 0; Output = '' }
+        'fetch -q --prune origin'                                              = @{ ExitCode = 0; Output = '' }
         $script:ShowBranch                                                     = @{ ExitCode = 0; Output = $script:ProviderText }
         'merge-base --is-ancestor sha41 origin/epic/provider-epic-integration' = @{ ExitCode = 0; Output = '' }
         'merge-base --is-ancestor sha41 origin/epic/consumer-integration'      = @{ ExitCode = 1; Output = '' }
@@ -120,7 +120,7 @@ Describe 'Feature readiness through the wrappers' {
         @{ Name = 'a gh failure'; Git = @{}; Gh = @{ 'FEATURELIST' = @{ ExitCode = 1; Output = '' } }; Decision = 'hold'; Reason = 'PREREQ_UNVERIFIABLE' }
         @{ Name = 'invalid snapshot JSON'; Git = @{}; Gh = @{ 'FEATURELIST' = @{ ExitCode = 0; Output = '{not json' } }; Decision = 'hold'; Reason = 'PREREQ_UNVERIFIABLE' }
         @{ Name = 'an ancestry exit of 2'; Git = @{ 'merge-base --is-ancestor sha41 origin/epic/provider-epic-integration' = @{ ExitCode = 2; Output = '' } }; Gh = @{}; Decision = 'hold'; Reason = 'PREREQ_UNVERIFIABLE' }
-        @{ Name = 'a failed fetch'; Git = @{ 'fetch -q origin' = @{ ExitCode = 1; Output = '' } }; Gh = @{}; Decision = 'hold'; Reason = 'PREREQ_UNVERIFIABLE' }
+        @{ Name = 'a failed fetch'; Git = @{ 'fetch -q --prune origin' = @{ ExitCode = 1; Output = '' } }; Gh = @{}; Decision = 'hold'; Reason = 'PREREQ_UNVERIFIABLE' }
         @{ Name = 'an unreadable other manifest'; Git = @{ 'SHOWBRANCH' = $null }; Gh = @{}; Decision = 'hold'; Reason = 'PREREQ_UNVERIFIABLE' }
         @{ Name = 'a prerequisite missing from the other manifest'; Git = @{ 'SHOWBRANCH' = @{ ExitCode = 0; Output = "---`nepic: provider-epic`nfeatures:`n  - issue_num: 7`n---" } }; Gh = @{}; Decision = 'hold'; Reason = 'PREREQ_UNVERIFIABLE' }
         @{ Name = 'no matching PR'; Git = @{}; Gh = @{ 'FEATURELIST' = @{ ExitCode = 0; Output = '[]' } }; Decision = 'hold'; Reason = 'PREREQ_PR_NOT_FOUND' }
@@ -175,6 +175,43 @@ Describe 'Feature readiness through the wrappers' {
 
             "$($json.Decision)|$($json.Reason)" | Should -BeExactly 'hold|MAIN_PREREQ_UNVERIFIABLE'
             Should -Invoke Invoke-EpicCrossGhExe -Times 0 -Exactly
+        }
+    }
+
+    It 'releases with PREREQ_IN_MAIN when the remote integration branch was deleted but its tracking ref is stale' {
+        $git = & $script:Table $script:BaseGit @{ 'fetch -q --prune origin' = $null; $script:ShowBranch = $null; $script:ShowMain = @{ ExitCode = 0; Output = $script:ProviderText }; 'merge-base --is-ancestor sha41 origin/main' = @{ ExitCode = 0; Output = '' } }
+
+        InModuleScope EpicCrossDependency -Parameters @{ GitTable = $git; GhTable = $script:BaseGh; Text = $script:Consumer; ShowBranch = $script:ShowBranch; Provider = $script:ProviderText } {
+            param($GitTable, $GhTable, $Text, $ShowBranch, $Provider)
+            $null = @($GitTable, $GhTable, $Text, $ShowBranch, $Provider)
+            # One clone: the branch was deleted on the remote, so only a pruning fetch drops its stale tracking ref.
+            $script:TestStale = @{ Git = $GitTable; Gh = $GhTable; ShowBranch = $ShowBranch; Provider = $Provider; Pruned = $false }
+            Mock Invoke-EpicCrossGitExe {
+                param([string[]] $GitArgs)
+                $key = $GitArgs -join ' '
+                if ($GitArgs[0] -ceq 'fetch') {
+                    if ($GitArgs -ccontains '--prune') { $script:TestStale.Pruned = $true }
+                    return [pscustomobject]@{ ExitCode = 0; Output = '' }
+                }
+                if ($key -ceq $script:TestStale.ShowBranch) {
+                    if ($script:TestStale.Pruned) { return [pscustomobject]@{ ExitCode = 128; Output = '' } }
+                    return [pscustomobject]@{ ExitCode = 0; Output = $script:TestStale.Provider }
+                }
+                $r = $script:TestStale.Git[$key]
+                if ($null -eq $r) { $r = @{ ExitCode = 128; Output = '' } }
+                [pscustomobject] $r
+            }
+            Mock Invoke-EpicCrossGhExe { param([string[]] $GhArgs) $r = $script:TestStale.Gh[($GhArgs -join ' ')]; if ($null -eq $r) { $r = @{ ExitCode = 1; Output = '' } }; [pscustomobject] $r }
+            Mock Get-EpicCrossUtcNow { [datetime]::new(2026, 11, 10, 12, 0, 0, [DateTimeKind]::Utc) }
+
+            try {
+                $json = (Invoke-EpicCrossReadinessCommand -Mode feature -ManifestPath 'epic.md' -Issue '1201' -ReadManifestText { $Text }.GetNewClosure()).Stdout | ConvertFrom-Json
+            } finally {
+                $script:TestStale = $null
+            }
+
+            "$($json.Decision)|$($json.Reason)" | Should -BeExactly 'release|PREREQ_IN_MAIN'
+            Should -Invoke Invoke-EpicCrossGitExe -Times 1 -Exactly -ParameterFilter { ($GitArgs -join '|') -ceq 'fetch|-q|--prune|origin' }
         }
     }
 }

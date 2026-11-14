@@ -306,6 +306,13 @@ repository CLI `scripts.dev_tools.validate_orchestration_artifacts` with its
 `epic-orchestrator-state` subcommand applies these rules; the installed MCP validator applies them
 only after the extension release that carries them is installed.
 
+**Status mapping (D7).** A `hold` decision records `held`. `PREREQ_IN_MAIN` records `in_main`.
+`PREREQ_ALREADY_INTEGRATED`, or a completed D4 merge, records `integrated` before the feature is
+launched. `released` is recorded only between a `merge_required` decision and its completed D4
+merge, so a feature is launched only when every entry is `integrated` or `in_main`, the two
+statuses the started-while-held invariant accepts. A main-gate `release` records
+`cross_epic_main_gate` status `released`, and a main-gate `hold` records `held`.
+
 **Disclosure (D5).** The merge-gate hook `enforce-epic-merge-gate.ps1` does not read
 `cross_epic_main_gate`. The integration-to-main hold is a skill-level policy control enforced by
 `epic-orchestrator`, with the completion invariant of the validators as a retrospective backstop,

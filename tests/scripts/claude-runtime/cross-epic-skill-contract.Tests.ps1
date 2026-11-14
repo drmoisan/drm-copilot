@@ -50,6 +50,21 @@ BeforeDiscovery {
         @{ Path = '.codex/agents/epic-planner.toml'; Token = @('cross_epic_depends_on') }
         @{ Path = '.codex/agents/epic-orchestrator.toml'; Token = @('Invoke-EpicCrossReadiness.ps1', 'git merge --no-ff', '-Mode main', '-WaitSeconds 540') }
     )
+    # The decision-to-status mapping of the hold records (D7), quoted verbatim in each description surface.
+    $mappingToken = @(
+        'Status mapping (D7).'
+        'A `hold` decision records `held`.'
+        '`PREREQ_IN_MAIN` records `in_main`.'
+        '`PREREQ_ALREADY_INTEGRATED`, or a completed D4 merge, records `integrated` before the feature is launched.'
+        '`released` is recorded only between a `merge_required` decision and its completed D4 merge, so a feature is launched only when every entry is `integrated` or `in_main`, the two statuses the started-while-held invariant accepts.'
+        'A main-gate `release` records `cross_epic_main_gate` status `released`, and a main-gate `hold` records `held`.'
+    )
+    $script:MappingRow = @(
+        @{ Path = '.claude/skills/epic-orchestrate/SKILL.md'; Heading = $sectionHeading; Token = $mappingToken }
+        @{ Path = '.agents/skills/epic-orchestrate/SKILL.md'; Heading = $sectionHeading; Token = $mappingToken }
+        @{ Path = '.claude/agents/epic-orchestrator.md'; Heading = '## Wave Scheduling'; Token = $mappingToken }
+        @{ Path = '.codex/agents/epic-orchestrator.toml'; Heading = ''; Token = $mappingToken }
+    )
 }
 
 Describe 'cross-epic skill contract (issue #1162)' {
@@ -103,6 +118,17 @@ Describe 'cross-epic skill contract (issue #1162)' {
         $text = Get-CrossEpicCollapsedText -Text (Get-CrossEpicFileText -RelativePath $Path)
 
         @(Get-CrossEpicMissingToken -Text $text -Token $Token) | Should -BeNullOrEmpty -Because "$Path must state every token"
+    }
+
+    It 'CES-STATUS-MAPPING <Path>' -ForEach $script:MappingRow {
+        # A row without a heading reads the whole file.
+        $text = Get-CrossEpicFileText -RelativePath $Path
+        if ($Heading) {
+            $text = Get-CrossEpicSection -Text $text -Heading $Heading
+            $text | Should -Not -BeNullOrEmpty -Because "$Path must contain the heading $Heading"
+        }
+
+        @(Get-CrossEpicMissingToken -Text (Get-CrossEpicCollapsedText -Text $text) -Token $Token) | Should -BeNullOrEmpty -Because "$Path must state the decision-to-status mapping"
     }
 
     It 'CES-TEMPLATES-BYTE-IDENTICAL' {

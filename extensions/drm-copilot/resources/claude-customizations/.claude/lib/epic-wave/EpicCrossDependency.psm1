@@ -650,7 +650,7 @@ function Get-EpicCrossReadinessResult {
 
     $fetchFailed = $false
     if ($Manifest.HasCrossEdge) {
-        try { $fetchFailed = (Invoke-EpicCrossGitExe -GitArgs @('fetch', '-q', 'origin')).ExitCode -ne 0 } catch { $fetchFailed = $true }
+        try { $fetchFailed = (Invoke-EpicCrossGitExe -GitArgs @('fetch', '-q', '--prune', 'origin')).ExitCode -ne 0 } catch { $fetchFailed = $true }
     }
     $evaluatedAt = (Get-EpicCrossUtcNow).ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", [Globalization.CultureInfo]::InvariantCulture)
     $allEdges = @($Manifest.Features | ForEach-Object { $_.CrossEdges })
