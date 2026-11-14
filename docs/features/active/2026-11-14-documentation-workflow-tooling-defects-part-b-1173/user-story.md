@@ -57,12 +57,12 @@ The first consumer run of `/documentation-workflow` (issue #1169, Part B) comple
 ## Acceptance Criteria
 
 - [x] Consumer (B1): a docs-architect report on a first run (profile present, snapshot not yet persisted, relative snapshot path, `PASS`) is accepted by the stop hook on the first attempt, and the documentation-workflow skill directs the root to run `inventory -Write` before delegating the inventory role.
-- [ ] Consumer (B6): `validate-profile` and `init` report `DOCS_PROFILE_SOURCE_ROOT_MISSING` for a source root with no files, and `init` selects `src`, else the `pyproject.toml` package directory, else retains `src` (which then reports `DOCS_PROFILE_SOURCE_ROOT_MISSING`).
-- [ ] Consumer (B7): `check` reports a malformed link target as `DOCS_PAGE_LINK_BROKEN` with exit 1 instead of exiting 3, and a starter profile uses `docs/guide` as its documentation root.
-- [ ] Consumer (B8): inventory does not read or report bytecode caches, VCS directories, or the other default-excluded tool directories.
+- [x] Consumer (B6): `validate-profile` and `init` report `DOCS_PROFILE_SOURCE_ROOT_MISSING` for a source root with no files, and `init` selects `src`, else the `pyproject.toml` package directory, else retains `src` (which then reports `DOCS_PROFILE_SOURCE_ROOT_MISSING`).
+- [x] Consumer (B7): `check` reports a malformed link target as `DOCS_PAGE_LINK_BROKEN` with exit 1 instead of exiting 3, and a starter profile uses `docs/guide` as its documentation root.
+- [x] Consumer (B8): inventory does not read or report bytecode caches, VCS directories, or the other default-excluded tool directories.
 - [ ] Consumer (B10): a Pester parity test shows the CLI text and JSON outputs report the same diagnostic count including `DOCS_INPUT_NOT_UTF8`, and a Jest test shows the MCP handler returns those diagnostics unchanged.
 - [ ] Consumer (B11): estate artifact hashes are equal for LF and CRLF forms of the same content, LF estates keep their stored hashes, and `update-ledger` over CRLF-encoded estate bytes reports no reference drift.
-- [ ] Consumer (B13): `init` reports the CI workflow on a distinct `ci-workflow <path>` line and in a `ci_workflow` result field, and the docs-init skill states in Steps and Result that init adds it.
+- [x] Consumer (B13): `init` reports the CI workflow on a distinct `ci-workflow <path>` line and in a `ci_workflow` result field, and the docs-init skill states in Steps and Result that init adds it.
 - [ ] Reconciler (B2): `update-ledger -Operations` (file or standard input) and MCP `update_docs_ledger.operations` apply a batch with one load and one write, produce output byte-identical to sequential application, and write nothing when any item is invalid.
 - [ ] Reconciler (B2): `bind-page-refs` binds every snapshot element referenced in page `surface_refs` as `documented` with the union of its pages, without removing bindings, and is idempotent.
 - [ ] Reconciler (B2): a measured CLI batch run on an estate of at least 3,000 elements with at least 15,000 operations completes in at most 10 minutes and is recorded as feature evidence.

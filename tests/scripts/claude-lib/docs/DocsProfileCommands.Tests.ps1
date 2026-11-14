@@ -32,6 +32,16 @@ BeforeAll {
     $script:DefaultTemplateFiles = @{}
     $defaultRows = Get-DocsInitTemplate
     foreach ($row in $defaultRows) { $script:DefaultTemplateFiles[[string] $row.Source] = [System.IO.File]::ReadAllText((Join-Path -Path $script:RepositoryRoot -ChildPath $row.Source)) }
+    # Issue #1173 B6: an exit-0 init or validate-profile needs a listed file under every source root.
+    $script:SourceFile = @{ 'src/app.py' = "value = 1`n" }
+
+    function Join-TestFile {
+        # Returns a new map holding every entry of the given maps; a later map wins on a repeated key.
+        param([hashtable[]] $Map)
+        $joined = @{}
+        foreach ($item in $Map) { foreach ($key in $item.Keys) { $joined[$key] = $item[$key] } }
+        return $joined
+    }
 
     function New-TestProfileText {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory fixture factory in a test file; it changes no system state.')]
@@ -43,7 +53,8 @@ BeforeAll {
 }
 
 AfterAll {
-    Remove-Module -Name DocsProfileCommands, DocsProfile, DocsAnalyzerRegistry, DocsSurface, DocsSchema, DocsSchemaWalk, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path Function:\Join-TestFile -ErrorAction SilentlyContinue
+    Remove-Module -Name DocsProfileCommands, DocsProfileSourceRoot, DocsTomlKeys, DocsSourceText, DocsProfile, DocsAnalyzerRegistry, DocsSurface, DocsSchema, DocsSchemaWalk, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
 }
 
 Describe 'Get-DocsInitTemplate' {
@@ -75,7 +86,7 @@ Describe 'Invoke-DocsInitCommand' {
     BeforeAll {
         $script:EmptyTemplate = [pscustomobject]@{ Source = '.claude/lib/docs/templates/accept.txt'; Destination = 'docs-config/accept.txt' }
         $script:TextTemplate = [pscustomobject]@{ Source = '.claude/lib/docs/templates/x.txt'; Destination = 'docs-config/x.txt' }
-        $script:TemplateFiles = @{ '.claude/lib/docs/templates/accept.txt' = ''; '.claude/lib/docs/templates/x.txt' = 'x' }
+        $script:TemplateFiles = @{ '.claude/lib/docs/templates/accept.txt' = ''; '.claude/lib/docs/templates/x.txt' = 'x'; 'src/app.py' = "value = 1`n" }
     }
 
     It 'lists a template destination with action create and writes nothing without -Write' {
@@ -120,7 +131,7 @@ Describe 'Invoke-DocsInitCommand' {
 
     It 'returns a starter profile accepted by ConvertFrom-DocsProfileText for <_> and writes nothing without -Write' -ForEach @('repository', 'example-repo', 'a', 'docs.site_2') {
         # Arrange
-        $test = New-DocsTestContext
+        $test = New-DocsTestContext -File $script:SourceFile
 
         # Act
         $result = Invoke-DocsInitCommand -Argument @{ RepositoryId = $_ } -Context $test.Context
@@ -135,7 +146,7 @@ Describe 'Invoke-DocsInitCommand' {
 
     It 'creates the profile with mode create under -Write' {
         # Arrange (the default template rows read their sources, so the context supplies them)
-        $test = New-DocsTestContext -File $script:DefaultTemplateFiles
+        $test = New-DocsTestContext -File (Join-TestFile -Map @($script:DefaultTemplateFiles, $script:SourceFile))
 
         # Act
         $result = Invoke-DocsInitCommand -Argument @{ Write = $true } -Context $test.Context
@@ -149,7 +160,7 @@ Describe 'Invoke-DocsInitCommand' {
 
     It 'exits 1 with DOCS_INIT_TARGET_EXISTS and writes nothing when the target exists' {
         # Arrange
-        $test = New-DocsTestContext -File @{ $script:ProfilePath = '{}' }
+        $test = New-DocsTestContext -File @{ $script:ProfilePath = '{}'; 'src/app.py' = "value = 1`n" }
 
         # Act
         $result = Invoke-DocsInitCommand -Argument @{ Write = $true } -Context $test.Context
@@ -164,8 +175,7 @@ Describe 'Invoke-DocsInitCommand' {
 
     It 'overwrites the profile with mode overwrite under -Write -Force' {
         # Arrange
-        $files = @{ $script:ProfilePath = '{}' }
-        foreach ($key in $script:DefaultTemplateFiles.Keys) { $files[$key] = $script:DefaultTemplateFiles[$key] }
+        $files = Join-TestFile -Map @(@{ $script:ProfilePath = '{}' }, $script:DefaultTemplateFiles, $script:SourceFile)
         $test = New-DocsTestContext -File $files
 
         # Act
@@ -202,12 +212,46 @@ Describe 'Invoke-DocsInitCommand' {
         $result.ExitCode | Should -Be 3
         $result.Findings[0].code | Should -BeExactly 'DOCS_CLI_RUNTIME'
     }
+
+    It 'exits 1 with DOCS_PROFILE_SOURCE_ROOT_MISSING for the retained src root and still writes under -Write (issue #1173 B6)' {
+        # Arrange (no src file, no pyproject.toml)
+        $dry = New-DocsTestContext -File $script:DefaultTemplateFiles
+        $written = New-DocsTestContext -File $script:DefaultTemplateFiles
+
+        # Act
+        $dryResult = Invoke-DocsInitCommand -Argument @{} -Context $dry.Context
+        $writeResult = Invoke-DocsInitCommand -Argument @{ Write = $true } -Context $written.Context
+
+        # Assert
+        foreach ($result in @($dryResult, $writeResult)) {
+            $result.ExitCode | Should -Be 1
+            @($result.Findings | ForEach-Object { "$($_.code) $($_.pointer) $($_.artifact_path)" }) | Should -Be @("DOCS_PROFILE_SOURCE_ROOT_MISSING /surface_selection/source_roots/0 $($script:ProfilePath)")
+            @($result.Result.profile['surface_selection']['source_roots']) | Should -Be @('src')
+        }
+        $dry.WriteLog.Count | Should -Be 0
+        $written.WriteLog.Count | Should -Be (1 + $script:DefaultTemplateFiles.Count)
+        $written.Files[$script:ProfilePath] | Should -Match '"src"'
+    }
+
+    It 'selects the pyproject.toml package directory when src lists no file and exits 0 (issue #1173 B6)' {
+        # Arrange
+        $test = New-DocsTestContext -File @{ 'pyproject.toml' = "[project]`nname = `"my-app`"`n"; 'my_app/__init__.py' = '' }
+
+        # Act
+        $result = Invoke-DocsInitCommand -Argument @{} -Context $test.Context
+
+        # Assert
+        $result.ExitCode | Should -Be 0
+        @($result.Findings).Count | Should -Be 0
+        @($result.Result.profile['surface_selection']['source_roots']) | Should -Be @('my_app')
+        $result.Result.profile['documentation_roots'][0]['path'] | Should -BeExactly 'docs/guide'
+    }
 }
 
 Describe 'Invoke-DocsValidateProfileCommand' {
     It 'exits 0 with no error finding for the example profile' {
-        # Arrange
-        $test = New-DocsTestContext -File @{ $script:ProfilePath = $script:ExampleProfile }
+        # Arrange (the example profile names the source roots src and config)
+        $test = New-DocsTestContext -File @{ $script:ProfilePath = $script:ExampleProfile; 'src/example_pkg/a.py' = ''; 'config/settings.yaml' = '' }
 
         # Act
         $result = Invoke-DocsValidateProfileCommand -Argument @{} -Context $test.Context
@@ -268,6 +312,19 @@ Describe 'Invoke-DocsValidateProfileCommand' {
         # Assert
         $result.ExitCode | Should -Be 1
         @($result.Findings | Where-Object { $_.code -eq 'DOCS_PROFILE_AUDIENCE_UNKNOWN' }).Count | Should -Be 1
+        $result.Result.repository_id | Should -BeExactly 'example-repo'
+    }
+
+    It 'exits 1 with DOCS_PROFILE_SOURCE_ROOT_MISSING at the pointer of the source root that lists no file (issue #1173 B6)' {
+        # Arrange (src lists a file; config lists none)
+        $test = New-DocsTestContext -File @{ $script:ProfilePath = $script:ExampleProfile; 'src/example_pkg/a.py' = '' }
+
+        # Act
+        $result = Invoke-DocsValidateProfileCommand -Argument @{} -Context $test.Context
+
+        # Assert
+        $result.ExitCode | Should -Be 1
+        @($result.Findings | Where-Object { $_.severity -eq 'error' } | ForEach-Object { "$($_.code) $($_.pointer)" }) | Should -Be @('DOCS_PROFILE_SOURCE_ROOT_MISSING /surface_selection/source_roots/1')
         $result.Result.repository_id | Should -BeExactly 'example-repo'
     }
 

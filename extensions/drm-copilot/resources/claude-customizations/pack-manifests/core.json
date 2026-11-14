@@ -368,6 +368,7 @@
     ".claude/lib/docs/DocsAnalyzerRegistry.psm1",
     ".claude/lib/docs/DocsProfile.psm1",
     ".claude/lib/docs/DocsProfileCommands.psm1",
+    ".claude/lib/docs/DocsProfileSourceRoot.psm1",
     ".claude/lib/docs/Invoke-DocsCommand.ps1",
     ".claude/lib/docs/schemas/v1/common.schema.json",
     ".claude/lib/docs/schemas/v1/docs-profile.schema.json",

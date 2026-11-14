@@ -20,6 +20,11 @@ Root steps run `Invoke-DocsCommand.ps1` from the docs helper library that the Cl
 Before this skill runs, the root persists the snapshot through the root inventory step of
 `documentation-workflow`, so the snapshot path exists on a first run.
 
+The inventory skips, without reading or reporting them, every path with a segment named
+`__pycache__`, `.git`, `node_modules`, `.venv`, `venv`, `.mypy_cache`, `.pytest_cache`,
+`.ruff_cache`, `.tox`, `dist` or `build`, and every `.pyc` or `.pyo` file. These default
+exclusions apply before the profile `exclusions`.
+
 1. Call `run_docs_inventory` with `workspace_root`, `profile`, and optionally
    `analyzers` and `revision` (40 or 64 lowercase hexadecimal characters). The tool
    returns the snapshot in its result and never writes it.

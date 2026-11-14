@@ -35,6 +35,8 @@ BeforeAll {
     foreach ($source in $script:Expected.Keys) { $script:SourceText[$source] = [System.IO.File]::ReadAllText((Join-Path -Path $script:RepositoryRoot -ChildPath $source)) }
     # The 1034 docs workflow row makes init -Write read its template source too.
     $script:SourceText['.claude/lib/docs/templates/_docs-quality.yml'] = [System.IO.File]::ReadAllText((Join-Path -Path $script:RepositoryRoot -ChildPath '.claude/lib/docs/templates/_docs-quality.yml'))
+    # Issue #1173 B6: init exits 0 only when the starter source root lists a file.
+    $script:SourceText['src/app.py'] = "value = 1`n"
 
     function Get-TestAnchorRowSource {
         # Returns the Source literals of the row lines between the 1021 and 1034 anchors of the module text.

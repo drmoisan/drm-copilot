@@ -4,8 +4,10 @@
     and the surface-inventory-snapshot builder.
 
 .DESCRIPTION
-    Get-DocsInventorySelection applies the profile source roots, the exclusions (through
-    Find-DocsPathOrGlobMatch) and the env withholding rule to a list of repository-relative paths:
+    Get-DocsInventorySelection applies the profile source roots, the default exclusion constant
+    returned by Get-DocsInventoryDefaultExclusion (issue #1173 B8: bytecode caches, tool and build
+    directories, .pyc and .pyo files; applied before the profile exclusions), the profile
+    exclusions (through Find-DocsPathOrGlobMatch) and the env withholding rule to a list of repository-relative paths:
     a non-template env-family file (.env, .env.<other>, <name>.env) is withheld without being read
     and yields ENV_FILE_NOT_CAPTURED (non-blocking warning, analyzer docs-inventory). The four
     template names accepted by Test-DocsEnvTemplatePath are selected. Get-DocsInventoryBoundFinding
@@ -40,6 +42,43 @@ $script:DocsInventoryAnalyzerId = 'docs-inventory'
 $script:DocsInventoryMaxInputCount = 50000
 $script:DocsInventoryMaxTotalBytes = 268435456L
 $script:DocsInventorySchema = 'urn:drm-copilot:docs:1.0.0:surface-inventory-snapshot'
+$script:DocsInventoryDefaultExcludedSegment = [string[]]@('__pycache__', '.git', 'node_modules', '.venv', 'venv', '.mypy_cache', '.pytest_cache', '.ruff_cache', '.tox', 'dist', 'build')
+$script:DocsInventoryDefaultExcludedSuffix = [string[]]@('.pyc', '.pyo')
+
+function Get-DocsInventoryDefaultExclusion {
+    <#
+    .SYNOPSIS
+        Returns the default inventory exclusion constant as @{ segments; suffixes } (issue #1173 B8).
+    .DESCRIPTION
+        segments lists the path segments that exclude a path when any segment equals one of them
+        (ordinal): __pycache__, .git, node_modules, .venv, venv, .mypy_cache, .pytest_cache,
+        .ruff_cache, .tox, dist and build. suffixes lists the file-name endings that exclude a path
+        (ordinal): .pyc and .pyo. Each call returns new arrays, so a caller cannot change the constant.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param()
+
+    return @{ segments = [string[]] $script:DocsInventoryDefaultExcludedSegment.Clone(); suffixes = [string[]] $script:DocsInventoryDefaultExcludedSuffix.Clone() }
+}
+
+function Test-DocsInventoryDefaultExcludedPath {
+    <#
+    .SYNOPSIS
+        Returns $true when Path has a default-excluded segment or ends in a default-excluded suffix (private helper).
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $Path)
+
+    foreach ($suffix in $script:DocsInventoryDefaultExcludedSuffix) {
+        if ($Path.EndsWith($suffix, [System.StringComparison]::Ordinal)) { return $true }
+    }
+    foreach ($segment in $Path.Split('/')) {
+        if ([System.Array]::IndexOf($script:DocsInventoryDefaultExcludedSegment, $segment) -ge 0) { return $true }
+    }
+    return $false
+}
 
 function Test-DocsInventoryEnvFamilyPath {
     <#
@@ -81,7 +120,10 @@ function Get-DocsInventorySelection {
         Selects the inventory inputs from listed paths; returns @{ Paths; Withheld; Diagnostics }.
     .DESCRIPTION
         Paths holds the distinct selected paths sorted ordinally: those under a source root, not
-        matched by an exclusion entry, and not a non-template env-family file. Withheld lists the
+        matched by the default exclusion constant of Get-DocsInventoryDefaultExclusion (applied
+        first, ordinal segment and suffix match; such a path is never read and yields no
+        diagnostic), not matched by a profile exclusion entry, and not a non-template env-family
+        file. Withheld lists the
         env-family paths that were not selected, each with one ENV_FILE_NOT_CAPTURED diagnostic in
         Diagnostics (warning, non-blocking, analyzer docs-inventory). The result does not depend on
         the order of Path.
@@ -99,6 +141,7 @@ function Get-DocsInventorySelection {
     foreach ($candidate in @($Path)) {
         if ([string]::IsNullOrEmpty($candidate)) { continue }
         if (-not (Test-DocsInventoryUnderRoot -Path $candidate -SourceRoot $SourceRoot)) { continue }
+        if (Test-DocsInventoryDefaultExcludedPath -Path $candidate) { continue }
         if ($null -ne (Find-DocsPathOrGlobMatch -Path $candidate -Entry $Exclusion)) { continue }
         if ((Test-DocsInventoryEnvFamilyPath -Path $candidate) -and -not (Test-DocsEnvTemplatePath -Path $candidate)) { [void] $withheld.Add($candidate); continue }
         [void] $selected.Add($candidate)
@@ -252,4 +295,4 @@ function New-DocsInventorySnapshot {
     }
 }
 
-Export-ModuleMember -Function Get-DocsInventorySelection, Get-DocsInventoryBoundFinding, New-DocsInventorySnapshot
+Export-ModuleMember -Function Get-DocsInventoryDefaultExclusion, Get-DocsInventorySelection, Get-DocsInventoryBoundFinding, New-DocsInventorySnapshot

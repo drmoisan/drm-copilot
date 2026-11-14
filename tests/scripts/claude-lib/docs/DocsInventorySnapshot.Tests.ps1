@@ -285,6 +285,58 @@ Describe 'Get-DocsInventorySelection' {
     }
 }
 
+Describe 'Get-DocsInventorySelection default exclusions (issue #1173 B8)' {
+    It 'holds exactly the default excluded segments and suffixes in one constant' {
+        $default = Get-DocsInventoryDefaultExclusion
+        ($default['segments'] -join ',') | Should -BeExactly '__pycache__,.git,node_modules,.venv,venv,.mypy_cache,.pytest_cache,.ruff_cache,.tox,dist,build'
+        ($default['suffixes'] -join ',') | Should -BeExactly '.pyc,.pyo'
+    }
+
+    It 'excludes a path with the default segment <_> at any depth and records no diagnostic' -ForEach @('__pycache__', '.git', 'node_modules', '.venv', 'venv', '.mypy_cache', '.pytest_cache', '.ruff_cache', '.tox', 'dist', 'build') {
+        $paths = @("src/$_/x.py", "src/pkg/$_/deep/y.txt", 'src/keep.py')
+        $result = Get-DocsInventorySelection -Path $paths -SourceRoot @('src') -Exclusion $null
+        $result.Paths | Should -Be @('src/keep.py')
+        $result.Withheld.Count | Should -Be 0
+        $result.Diagnostics.Count | Should -Be 0
+        $rootLevel = Get-DocsInventorySelection -Path @("$_/z.py", 'a.py') -SourceRoot @('.') -Exclusion $null
+        $rootLevel.Paths | Should -Be @('a.py')
+    }
+
+    It 'excludes a file ending in the default suffix <_> and records no diagnostic' -ForEach @('.pyc', '.pyo') {
+        $result = Get-DocsInventorySelection -Path @("src/pkg/m.cpython-313$_", 'src/pkg/m.py') -SourceRoot @('src') -Exclusion $null
+        $result.Paths | Should -Be @('src/pkg/m.py')
+        $result.Diagnostics.Count | Should -Be 0
+    }
+
+    It 'keeps near-miss paths whose segments or suffixes only resemble a default entry' {
+        $paths = @('src/builds/a.py', 'src/distribution/b.py', 'src/my_venv/c.py', 'src/Build/d.py', 'src/e.pycx', 'src/build.py', 'src/pyc/f.py')
+        $result = Get-DocsInventorySelection -Path $paths -SourceRoot @('src') -Exclusion $null
+        $result.Paths | Should -Be @('src/Build/d.py', 'src/build.py', 'src/builds/a.py', 'src/distribution/b.py', 'src/e.pycx', 'src/my_venv/c.py', 'src/pyc/f.py')
+    }
+
+    It 'still applies profile exclusions to a path the defaults keep' {
+        $result = Get-DocsInventorySelection -Path @('src/keep.py', 'src/drop.py', 'src/dist/x.py') -SourceRoot @('src') -Exclusion @('src/drop.py')
+        $result.Paths | Should -Be @('src/keep.py')
+    }
+
+    It 'never captures an excluded undecodable .pyc input, so the snapshot holds no DOCS_INPUT_NOT_UTF8' {
+        $testProfile = Get-TestProfile -SourceRoot @('src') -ElementKind @('public-symbol')
+        $bytesByPath = @{
+            'src/pkg/__pycache__/m.cpython-313.pyc' = [byte[]]@(0x55, 0x0D, 0x0D, 0x0A, 0xFF, 0xFE, 0x00)
+            'src/pkg/m.pyc'                         = [byte[]]@(0xFF, 0xFE, 0x00, 0x80)
+            'src/pkg/m.py'                          = [System.Text.UTF8Encoding]::new($false).GetBytes("value = 1`n")
+        }
+        $selection = Get-DocsInventorySelection -Path ([string[]] @($bytesByPath.Keys)) -SourceRoot @('src') -Exclusion $null
+        $selection.Paths | Should -Be @('src/pkg/m.py')
+        $captured = @($selection.Paths | ForEach-Object { New-DocsCapturedInput -Path $_ -Bytes $bytesByPath[$_] -MaxBytes 1048576 })
+        $row = Get-TestRegistryRow -Id 'python-public-api'
+        $outputs = Invoke-TestAnalyzerSet -Captured $captured -TestProfile $testProfile -Registration $row
+        $snapshot = New-DocsInventorySnapshot -Profile $testProfile -Revision $null -Registration $row -CapturedInput $captured -AnalyzerOutput $outputs -Diagnostic $selection.Diagnostics -CapturedAt $script:Clock
+        @($snapshot['diagnostics'] | Where-Object { $_['code'] -ceq 'DOCS_INPUT_NOT_UTF8' }).Count | Should -Be 0
+        @($snapshot['inputs'] | ForEach-Object { $_['path'] }) | Should -Be @('src/pkg/m.py')
+    }
+}
+
 Describe 'Get-DocsInventoryBoundFinding' {
     It 'returns null within both bounds and one DOCS_CLI_RUNTIME error finding above either bound, naming no path' {
         Get-DocsInventoryBoundFinding -InputCount 50000 -TotalBytes 268435456 | Should -BeNullOrEmpty
