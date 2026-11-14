@@ -23,6 +23,8 @@ Rebased over #1158 (VS Code tasks): the parallel test tasks of `.vscode/tasks.js
 
 Rebased over #1158 (execution-environment brief): the brief gains a launcher bullet at the end of `## PowerShell Route and PoshQC MCP Limits`, a section the stored patch's first brief hunk (`@@ -39,8 +39,9 @@`) covers to its last line. That hunk was regenerated in the stored-patch sections of all six brief copies so that both images carry the new bullet as a context line after the `No MCP tool exposes` line (`@@ -39,9 +39,10 @@`); the lines the hunk reverts are unchanged. The brief's other additions sit outside every recorded block and hunk.
 
+Rebased over #1158 (feature-review-workflow coverage step): the TypeScript, Python, and PowerShell coverage commands of `.claude/skills/feature-review-workflow/SKILL.md` and `.agents/skills/feature-review-workflow/SKILL.md` now name the test-execution launcher suites `jest`, `pytest`, and `pester`, and the `If coverage artifacts already exist` line states the queue re-run rule. Every stored-patch hunk line of this entry that carried one of those four lines, in the feature-review-workflow sections of the sources and their bundle copies, was regenerated with the new text in both images; line counts and the lines the hunks revert are unchanged.
+
 ## Reason and Evidence
 
 The owner decided on 2026-11-06 that tests run in parallel only. The sequential run existed to detect and fix a leak that has since been fixed, and the overhead of multiple and sequential runs was judged unacceptable.

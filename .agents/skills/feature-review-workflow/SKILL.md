@@ -114,13 +114,13 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
      3. type check, read from the same static artifact and not re-run
      4. tests
      5. coverage (mandatory for every language that has changed files)
-        - TypeScript: `npm run test:unit:coverage` → artifact: `coverage/lcov.info`
-        - Python: `poetry run pytest -n auto --cov-report=term-missing --cov` → artifact: `artifacts/python/lcov.info`
-        - PowerShell: one `Invoke-PoshQCParallelTest` run → artifact: `artifacts/pester/powershell-coverage.xml`
+        - TypeScript: `sh .agents/skills/test-execution-policy/scripts/run-test-suite.sh jest --coverage` (the launcher `jest` suite) → artifact: `coverage/lcov.info`
+        - Python: `env -u VIRTUAL_ENV sh .agents/skills/test-execution-policy/scripts/run-test-suite.sh pytest --cov-report=term-missing --cov` (the launcher runs `poetry run pytest -n auto`) → artifact: `artifacts/python/lcov.info`
+        - PowerShell: one `Invoke-PoshQCParallelTest` run through the launcher `pester` suite (`sh .agents/skills/test-execution-policy/scripts/run-test-suite.sh pester`) → artifact: `artifacts/pester/powershell-coverage.xml`
         - C#: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` → artifact: `artifacts/csharp/coverage.xml`
         - Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured), read from the single gate run, and new behavior is tested; modified files must also show no regression on changed lines against the `Phase 0 baseline`. Repo-wide coverage per language must meet the governing thresholds. Flag as FAIL otherwise.
         - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a local artifact that shows the Python total below a threshold is still FAIL.
-        - If coverage artifacts already exist from the executor run, inspect them instead of re-running.
+        - If coverage artifacts already exist from the executor run, inspect them instead of re-running. A launcher exit 75 means the machine test-suite lock was busy: re-run after the holder finishes and record a queue timeout, not a failure.
         - If no coverage artifact exists beneath the item worktree for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
    - A focused run of one test file to debug a specific failure is debugging only; a review check does not rest on it.
    - If a tool cannot run in the environment, mark the affected section unverified or partial with a concrete reason.

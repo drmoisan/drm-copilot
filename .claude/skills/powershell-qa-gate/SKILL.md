@@ -75,3 +75,7 @@ The evidence paths must be referenced in the agent's completion message to satis
 - Do not add PSScriptAnalyzer rule suppressions (`[Diagnostics.CodeAnalysis.SuppressMessageAttribute]` or `PSScriptAnalyzer` suppression comments) or Pester `-Skip` / `-Pending` to mask new findings introduced by the change.
 - Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
 - Do not mock `git`, `gh`, `actionlint`, or other executables directly; mock the wrapper function (for example `Invoke-GitExe`) per `.claude/rules/powershell.md`.
+
+## Test-Execution Launcher
+
+The Pester gate runs through the test-execution launcher (issue #1158): `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester` runs one `Invoke-PoshQCParallelTest` run with the integration and golden lanes excluded. A launcher exit 75 means the machine test-suite lock was busy: re-run the gate after the holder finishes and record it as a queue timeout, not a failure. The `test-execution-policy` skill states the rules.

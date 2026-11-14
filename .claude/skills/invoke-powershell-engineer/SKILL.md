@@ -66,3 +66,7 @@ The worker operates under the following preloaded skills and rules:
 - `.claude/rules/general-code-change.md`
 - `.claude/rules/general-unit-test.md`
 - `.claude/rules/tonality.md`
+
+## Test-Execution Launcher
+
+The Pester gate runs through the test-execution launcher (issue #1158): `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester` runs one `Invoke-PoshQCParallelTest` run with the integration and golden lanes excluded. A launcher exit 75 means the machine test-suite lock was busy: re-run the gate after the holder finishes and record it as a queue timeout, not a failure. The `test-execution-policy` skill states the rules.

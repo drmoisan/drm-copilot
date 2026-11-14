@@ -75,3 +75,7 @@ The evidence paths must be referenced in the agent's completion message to satis
 - Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
 - Do not add Ruff `noqa`, Pyright `# type: ignore`, or test skips to suppress new findings introduced by the change.
 - Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
+
+## Test-Execution Launcher
+
+The pytest gate runs through the test-execution launcher (issue #1158): `env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest` followed by the coverage arguments runs `poetry run pytest -n auto` with the integration and golden lanes excluded. A launcher exit 75 means the machine test-suite lock was busy: re-run the gate after the holder finishes and record it as a queue timeout, not a failure. The `test-execution-policy` skill states the rules.

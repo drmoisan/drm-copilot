@@ -61,3 +61,7 @@ The worker operates under the following preloaded skills and rules:
 - `AGENTS.md`
 - `AGENTS.md`
 - `AGENTS.md`
+
+## Test-Execution Launcher
+
+The pytest gate runs through the test-execution launcher (issue #1158): `env -u VIRTUAL_ENV sh .agents/skills/test-execution-policy/scripts/run-test-suite.sh pytest` followed by the coverage arguments runs `poetry run pytest -n auto` with the integration and golden lanes excluded. A launcher exit 75 means the machine test-suite lock was busy: re-run the gate after the holder finishes and record it as a queue timeout, not a failure. The `test-execution-policy` skill states the rules.
