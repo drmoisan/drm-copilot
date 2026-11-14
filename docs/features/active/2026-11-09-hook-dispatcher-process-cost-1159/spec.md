@@ -167,28 +167,28 @@ Issue AC 1 — repeatable measurement, before and after:
 
 - [x] `scripts/dev-tools/Measure-HookProcessCost.ps1` with `scripts/dev-tools/HookProcessCost.psm1` measures, for each runtime (Claude and Codex) and each representative payload (`Bash`, a write-class call, an `Agent` spawn call, an `mcp__` call), the hook process count per call, the summed CPU seconds of those processes, and the wall time from first start to last exit, and reports median, mean and max per scenario; the report states that grandchild processes (`git`, `gh`) are excluded.
 - [x] `tests/scripts/dev-tools/HookProcessCost.Tests.ps1` covers scenario derivation from both `-Source Registration` and `-Source Dispatcher`, sampling through the injected process-starter and timestamp seams, summary statistics, and report formatting, with no process start, temporary file or wall-clock wait.
-- [ ] A before report taken with `-Source Registration` after merging `origin/main` and before any registration edit exists under the feature folder's `evidence/baseline/`, and an after report taken with `-Source Dispatcher` on identical payloads exists under `evidence/regression-testing/`; each carries `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:` and neither is edited after creation.
-- [ ] In the before report, the process count per call for each scenario equals the number of PreToolUse hook commands whose group matcher admits that tool name in the registrations derived at execution time; in the after report it equals one dispatcher process for every scenario.
+- [x] A before report taken with `-Source Registration` after merging `origin/main` and before any registration edit exists under the feature folder's `evidence/baseline/`, and an after report taken with `-Source Dispatcher` on identical payloads exists under `evidence/regression-testing/`; each carries `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:` and neither is edited after creation.
+- [x] In the before report, the process count per call for each scenario equals the number of PreToolUse hook commands whose group matcher admits that tool name in the registrations derived at execution time; in the after report it equals one dispatcher process for every scenario.
 
 Issue AC 2 — one dispatcher process per call that loads shared modules once:
 
-- [ ] `.claude/settings.json` contains exactly one PreToolUse entry, invoking `.claude/hooks/invoke-pretooluse-dispatch.ps1`, whose matcher admits every tool name admitted by any group in `.claude/hooks/pretooluse-dispatch.json`; a test derives the union from the registry at test time.
-- [ ] `.codex/config.toml` contains exactly one `[[hooks.PreToolUse]]` table, invoking `.codex/hooks/invoke-pretooluse-dispatch.ps1` in both `command` and `command_windows`, whose matcher admits every tool name admitted by any group in `.codex/hooks/pretooluse-dispatch.json`, and whose `timeout` equals the sum of the member timeouts derived at execution time.
-- [ ] Each registry reproduces the PreToolUse groups of the merged `origin/main` registrations at execution time, in the same group order and hook order, in the settings shape `{matcher, hooks: [{type, command}]}`; every registry hook command resolves to an existing hooks-folder `.ps1` file.
+- [x] `.claude/settings.json` contains exactly one PreToolUse entry, invoking `.claude/hooks/invoke-pretooluse-dispatch.ps1`, whose matcher admits every tool name admitted by any group in `.claude/hooks/pretooluse-dispatch.json`; a test derives the union from the registry at test time.
+- [x] `.codex/config.toml` contains exactly one `[[hooks.PreToolUse]]` table, invoking `.codex/hooks/invoke-pretooluse-dispatch.ps1` in both `command` and `command_windows`, whose matcher admits every tool name admitted by any group in `.codex/hooks/pretooluse-dispatch.json`, and whose `timeout` equals the sum of the member timeouts derived at execution time.
+- [x] Each registry reproduces the PreToolUse groups of the merged `origin/main` registrations at execution time, in the same group order and hook order, in the settings shape `{matcher, hooks: [{type, command}]}`; every registry hook command resolves to an existing hooks-folder `.ps1` file.
 - [x] Each dispatcher evaluates group matchers with its runtime's semantics (Claude exact string or exact list versus unanchored regex; Codex regex including the `apply_patch` to `Edit`/`Write` alias), proven by unit tests in `tests/scripts/claude-lib/hook-dispatch/HookDispatch.Tests.ps1` and `tests/scripts/codex-hooks/hook-dispatch.Tests.ps1`.
 - [x] With `isolation` set to `in-process`, each selected hook runs in the dispatcher process in its own script scope after payload replay; the payload is read once (Claude through `Read-ClaudeHookRawPayload`, Codex through `[Console]::In.ReadToEnd()`) and no environment variable is written.
-- [ ] The dispatched Claude hooks import each shared module without `-Force`, so a module imported by several selected hooks loads once per call, except for modules that the D6 audit records as holding mutable module-scope state; those exceptions are listed in the registry notes with the reason.
+- [x] The dispatched Claude hooks import each shared module without `-Force`, so a module imported by several selected hooks loads once per call, except for modules that the D6 audit records as holding mutable module-scope state; those exceptions are listed in the registry notes with the reason.
 - [x] Every selected hook runs on every call even when an earlier hook denies (no short-circuit), proven by a unit test in which the first hook denies and every later hook's invocation is recorded.
 
 Issue AC 3 — decision logic and deny codes unchanged, proven by a parity suite:
 
-- [ ] No hook decision function, deny code or reason text is edited; the only hook-file edits are the D6 `-Force` removals, and the existing per-hook suites in `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks` pass unchanged in the single parallel Pester gate.
-- [ ] `tests/scripts/claude-hooks/PreToolUseDispatch.Parity.Tests.ps1` enumerates hooks from the registries and the settings and config registrations at test time (no frozen hook list), and for each corpus envelope and tool name on each runtime runs (i) every selected hook as its own `pwsh -NoProfile -File` process and (ii) the dispatcher as one process with `-PerHookTrace`, then asserts per-hook equality of exit code, parsed decision and reason text, and equality of the combined outcome: decision, ordered deny reasons, deny code tokens and ordered `additionalContext` values.
-- [ ] The parity corpus contains at least one allow envelope and at least one deny envelope for every hook in each registry that can be exercised without filesystem mocks, and the suite reports each registry hook that has no corpus envelope by name.
+- [x] No hook decision function, deny code or reason text is edited; the only hook-file edits are the D6 `-Force` removals, and the existing per-hook suites in `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks` pass unchanged in the single parallel Pester gate.
+- [x] `tests/scripts/claude-hooks/PreToolUseDispatch.Parity.Tests.ps1` enumerates hooks from the registries and the settings and config registrations at test time (no frozen hook list), and for each corpus envelope and tool name on each runtime runs (i) every selected hook as its own `pwsh -NoProfile -File` process and (ii) the dispatcher as one process with `-PerHookTrace`, then asserts per-hook equality of exit code, parsed decision and reason text, and equality of the combined outcome: decision, ordered deny reasons, deny code tokens and ordered `additionalContext` values.
+- [x] The parity corpus contains at least one allow envelope and at least one deny envelope for every hook in each registry that can be exercised without filesystem mocks, and the suite reports each registry hook that has no corpus envelope by name.
 - [x] Combination follows D4: unit tests prove precedence `deny` > `defer` > `ask` > `allow` > none, deny reasons joined in registry order by a line feed, `additionalContext` concatenation, `allow` emitted when it is the strongest decision, exit 2 mapped to deny with the stderr reason, and any other exit code, invalid JSON or terminating error in a hook mapped to no decision.
-- [ ] With the registry `isolation` field absent, the dispatcher runs each selected hook as its own `pwsh -NoProfile -File` child with the payload on stdin (today's per-process behavior), proven by a unit test through the process seam; the shipped registries set `isolation` to `in-process`.
-- [ ] Dispatcher self-failure is fail-closed per D8: a missing, unreadable or schema-invalid registry, or a registry hook path that does not resolve, yields a deny whose reason starts with `HOOK_DISPATCH_BLOCKED:`, and a failure to load `hook-dependency-guard.ps1` yields exit 2 with the reason on stderr; the dispatcher entry scripts satisfy `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`.
-- [ ] The Phase 0 baseline records the real process output of the hooks whose tail is `exit (Invoke-...EntryPoint)` (D13); any fail-open finding is reported to the orchestrator and is not altered within this feature's parity claim.
+- [x] With the registry `isolation` field absent, the dispatcher runs each selected hook as its own `pwsh -NoProfile -File` child with the payload on stdin (today's per-process behavior), proven by a unit test through the process seam; the shipped registries set `isolation` to `in-process`.
+- [x] Dispatcher self-failure is fail-closed per D8: a missing, unreadable or schema-invalid registry, or a registry hook path that does not resolve, yields a deny whose reason starts with `HOOK_DISPATCH_BLOCKED:`, and a failure to load `hook-dependency-guard.ps1` yields exit 2 with the reason on stderr; the dispatcher entry scripts satisfy `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`.
+- [x] The Phase 0 baseline records the real process output of the hooks whose tail is `exit (Invoke-...EntryPoint)` (D13); any fail-open finding is reported to the orchestrator and is not altered within this feature's parity claim.
 - [x] `tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1` admits only the dispatcher runner's single `&` call whose target is resolved through the registry to a hooks-folder `.ps1` sibling, adds no allowlist entry, and fixtures in `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` prove that every other dynamic `&` call is still reported as `DynamicInvocation`.
 
 Issue AC 4 — the PR reports before and after cost:
@@ -197,22 +197,22 @@ Issue AC 4 — the PR reports before and after cost:
 
 Issue AC 5 — registration, documentation and push-down payload consistent:
 
-- [ ] The bundle copies `extensions/drm-copilot/resources/claude-customizations/.claude/settings.json` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml` carry the same single dispatcher registration as their repository sources, and every new dispatcher file and registry has a byte-identical bundle mirror, as do the D6-edited hooks.
-- [ ] Both `pack-manifests/core.json` files list every new dispatcher file and registry, and the push-down resource contract, pack-manifest completeness and dependency-closure tests pass, with the registries scanned as hook-command sources.
-- [ ] `README.md`, `docs/engineering/claude-code-architecture.md`, and every copy of the execution-environment brief that carries `## Hook Execution Context` describe the dispatcher registration and the registry; the brief copies remain byte-identical and the `## Batch Budget` statement refers to the registry group matcher.
-- [ ] Every existing test that pinned the per-hook registration shape is updated to read the registry, and `tests/scripts/claude-runtime/HookDependencyGraph.Helpers.ps1` enumerates registry hooks so the dependency-guard, dependency-failure and imported-module stdout suites still cover every dispatched hook.
-- [ ] The `pr-author` agent-frontmatter PreToolUse hook and all non-PreToolUse registrations (SessionStart, SubagentStart, SubagentStop, UserPromptSubmit, Codex non-PreToolUse events) are unchanged.
+- [x] The bundle copies `extensions/drm-copilot/resources/claude-customizations/.claude/settings.json` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml` carry the same single dispatcher registration as their repository sources, and every new dispatcher file and registry has a byte-identical bundle mirror, as do the D6-edited hooks.
+- [x] Both `pack-manifests/core.json` files list every new dispatcher file and registry, and the push-down resource contract, pack-manifest completeness and dependency-closure tests pass, with the registries scanned as hook-command sources.
+- [x] `README.md`, `docs/engineering/claude-code-architecture.md`, and every copy of the execution-environment brief that carries `## Hook Execution Context` describe the dispatcher registration and the registry; the brief copies remain byte-identical and the `## Batch Budget` statement refers to the registry group matcher.
+- [x] Every existing test that pinned the per-hook registration shape is updated to read the registry, and `tests/scripts/claude-runtime/HookDependencyGraph.Helpers.ps1` enumerates registry hooks so the dependency-guard, dependency-failure and imported-module stdout suites still cover every dispatched hook.
+- [x] The `pr-author` agent-frontmatter PreToolUse hook and all non-PreToolUse registrations (SessionStart, SubagentStart, SubagentStop, UserPromptSubmit, Codex non-PreToolUse events) are unchanged.
 
 Quality gates:
 
-- [ ] One `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run and `Invoke-PoshQCLeakScan` pass, with no new leak allowlist entry; every new or changed PowerShell file has at least 85% line coverage in that run; no file reaches 801 lines.
+- [x] One `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run and `Invoke-PoshQCLeakScan` pass, with no new leak allowlist entry; every new or changed PowerShell file has at least 85% line coverage in that run; no file reaches 801 lines.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or evidence
+- [x] Acceptance criteria documented and mapped to tests or evidence
 - [ ] Behavior matches acceptance criteria on Windows and on the Linux hook-suite CI job
-- [ ] Tests updated/added (unit and process-level parity)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (README, architecture doc, execution-environment brief copies)
-- [ ] Cost evidence recorded before and after
-- [ ] Toolchain pass completed (format, lint, type-check where applicable, tests)
+- [x] Tests updated/added (unit and process-level parity)
+- [x] Edge cases and error handling covered by tests
+- [x] Docs updated (README, architecture doc, execution-environment brief copies)
+- [x] Cost evidence recorded before and after
+- [x] Toolchain pass completed (format, lint, type-check where applicable, tests)

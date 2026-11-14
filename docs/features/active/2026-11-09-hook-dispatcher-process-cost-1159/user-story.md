@@ -50,17 +50,17 @@ Every PreToolUse tool call starts one `pwsh -NoProfile -File` process per matchi
 
 ## Acceptance Criteria
 
-- [ ] A repeatable measurement tool reports, per runtime and per representative payload, the hook process count per call, summed CPU seconds and wall time, and before and after reports are stored append-only under the feature folder's `evidence/baseline/` and `evidence/regression-testing/`.
-- [ ] The before report's process count per call equals the number of hooks registered for that tool name in the registrations derived after merging `origin/main`; the after report shows one dispatcher process per call for every scenario.
-- [ ] Claude Code (`.claude/settings.json`) and Codex (`.codex/config.toml`) each register a single PreToolUse dispatcher entry whose matcher admits every tool name admitted by the groups in that runtime's registry, and the registry reproduces the derived groups in their original order.
-- [ ] The dispatcher reads the payload once, runs every selected hook in the same process in its own script scope without stopping at the first deny, and the dispatched Claude hooks load each shared module once per call except for modules recorded as stateful.
-- [ ] A parity suite that enumerates hooks from settings, config and registry data at test time shows identical per-hook exit codes, decisions and reason text, and identical combined decisions, deny codes and `additionalContext`, between per-hook processes and the dispatcher on both runtimes; the existing per-hook suites pass unchanged.
+- [x] A repeatable measurement tool reports, per runtime and per representative payload, the hook process count per call, summed CPU seconds and wall time, and before and after reports are stored append-only under the feature folder's `evidence/baseline/` and `evidence/regression-testing/`.
+- [x] The before report's process count per call equals the number of hooks registered for that tool name in the registrations derived after merging `origin/main`; the after report shows one dispatcher process per call for every scenario.
+- [x] Claude Code (`.claude/settings.json`) and Codex (`.codex/config.toml`) each register a single PreToolUse dispatcher entry whose matcher admits every tool name admitted by the groups in that runtime's registry, and the registry reproduces the derived groups in their original order.
+- [x] The dispatcher reads the payload once, runs every selected hook in the same process in its own script scope without stopping at the first deny, and the dispatched Claude hooks load each shared module once per call except for modules recorded as stateful.
+- [x] A parity suite that enumerates hooks from settings, config and registry data at test time shows identical per-hook exit codes, decisions and reason text, and identical combined decisions, deny codes and `additionalContext`, between per-hook processes and the dispatcher on both runtimes; the existing per-hook suites pass unchanged.
 - [x] Combined decisions follow the precedence `deny` > `defer` > `ask` > `allow` > none, with every deny reason preserved in registry order.
-- [ ] When the registry `isolation` field is absent, each hook runs as its own process as it does today; the shipped registries set `in-process`.
-- [ ] A dispatcher self-failure denies the call with a `HOOK_DISPATCH_BLOCKED:` reason (or exits 2 with stderr when its own guard cannot load) instead of failing open.
+- [x] When the registry `isolation` field is absent, each hook runs as its own process as it does today; the shipped registries set `in-process`.
+- [x] A dispatcher self-failure denies the call with a `HOOK_DISPATCH_BLOCKED:` reason (or exits 2 with stderr when its own guard cannot load) instead of failing open.
 - [x] The Python-invocation guard admits only the dispatcher runner's single registry-resolved `&` call, with fixtures proving every other dynamic `&` call is still reported.
 - [ ] The pull request reports before and after process count, CPU seconds and wall time, and states any scenario whose wall time increased.
-- [ ] Bundle settings and config, bundle mirrors of every new or edited hook file, both pack manifests, `README.md`, `docs/engineering/claude-code-architecture.md` and every copy of the execution-environment brief are updated consistently, and the push-down contract tests pass.
+- [x] Bundle settings and config, bundle mirrors of every new or edited hook file, both pack manifests, `README.md`, `docs/engineering/claude-code-architecture.md` and every copy of the execution-environment brief are updated consistently, and the push-down contract tests pass.
 
 ## Non-Goals
 
