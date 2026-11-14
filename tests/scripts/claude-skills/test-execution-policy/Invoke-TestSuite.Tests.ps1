@@ -8,7 +8,9 @@
 .DESCRIPTION
     The launcher is dot-sourced, so its script-file entry does not run. Every case injects the helper
     discovery, configuration, lock, clock, sleep, process, and stderr seams with in-memory values: no case
-    starts a process, reads a lock or holder file, writes a file, or waits. The ImportHelper seam
+    starts a process, reads a lock or holder file, writes a file, or waits. One case keeps the default
+    configuration, clock, and classifier-input seams; under the injected root they find no file and only
+    read the time. The ImportHelper seam
     dot-sources the committed helper files of this repository and records each requested path in the
     variable $caseState of the running It block (set through Set-Variable).
 #>
@@ -219,6 +221,25 @@ Describe 'Invoke-TestSuiteLauncher lock (issue #1158)' {
         # Assert
         $code | Should -Be 2
         $case.State.Errors.Count | Should -Be 0
+    }
+
+    It 'runs a free-lock suite with the default configuration, clock, and classifier-input seams' {
+        # Arrange: the default configuration seam tests a path under the injected root '/repo', which holds no
+        # file, so the built-in defaults apply; the default clock only reads the time.
+        $case = Get-LauncherCase
+        $case.Arguments.Remove('ReadConfigText')
+        $case.Arguments.Remove('Clock')
+        $case.Arguments.Remove('RecordClassifierInput')
+
+        # Act
+        $code = Invoke-LauncherCase -Case $case -Word @('pytest', '-q')
+
+        # Assert
+        $code | Should -Be 0
+        ($case.State.Events -join ',') | Should -BeExactly 'open,write,start,remove,dispose'
+        $record = $case.State.Written[0] | ConvertFrom-Json -AsHashtable
+        $record['suite'] | Should -BeExactly 'pytest'
+        $case.State.Starts[0].ArgumentList | Should -Contain '-q'
     }
 }
 

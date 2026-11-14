@@ -7,8 +7,9 @@
 .DESCRIPTION
     Every case runs against both byte-identical copies under .claude/hooks and .codex/hooks.
     Directory values are injected, and every lock-stream, holder-record, and process call is
-    replaced by a recording seam, so no case touches the filesystem, reads the environment,
-    or starts a process.
+    replaced by a recording seam, so no case touches the filesystem or starts a process. Two
+    default-seam rows read values only: the start time of the current process, and the platform
+    folder and environment values that resolve the current lock directory.
 #>
 
 BeforeDiscovery {
@@ -197,6 +198,28 @@ Describe 'test-execution-lock adapter <Copy> (issue #1158)' -ForEach $script:Loc
             # Assert
             $result | Should -Be $start
             $result.Kind | Should -Be ([System.DateTimeKind]::Utc)
+        }
+
+        It 'reads the start time of the current process through the default seam' {
+            # Arrange: the current process is read, never started or stopped.
+            $expected = (Get-Process -Id $PID).StartTime.ToUniversalTime()
+
+            # Act
+            $result = Get-TestExecutionProcessStartTime -ProcessId $PID
+
+            # Assert
+            $result | Should -Be $expected
+        }
+    }
+
+    Context 'current lock directory' {
+        It 'resolves the per-user lock directory from the current platform values' {
+            # Act: the default reads the platform flag and the folder and environment values, and writes nothing.
+            $directory = (Get-TestExecutionCurrentLockDirectory) -replace '\\', '/'
+
+            # Assert
+            $directory | Should -BeLike '*/drm-copilot/test-execution'
+            [System.IO.Path]::IsPathRooted($directory) | Should -BeTrue
         }
     }
 }

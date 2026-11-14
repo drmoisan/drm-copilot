@@ -9,7 +9,9 @@
     The hook is dot-sourced, so its entry point does not run. Every case calls
     Invoke-TestExecutionPolicyDecision with an in-memory payload and injected seams for the
     configuration text, the lock probe, the holder record, the process start time, and the script
-    file length and text; no case reads a lock, a holder record, or a script file.
+    file length and text; no case reads a lock, a holder record, or a script file. The entry-point
+    cases mock Invoke-TestExecutionPolicyDecision, and one case keeps the default configuration
+    seam, which reads the committed config/test-execution-policy.json.
 #>
 
 BeforeAll {
@@ -396,5 +398,40 @@ Describe 'enforce-test-execution-policy seam override and edge flows (issue #115
 
         # Assert
         $result.Reason | Should -BeLike "TEST_EXECUTION_POLICY_BLOCKED: the dependency '$Name' failed to load*"
+    }
+}
+
+Describe 'enforce-test-execution-policy entry point and committed configuration (issue #1158)' {
+    It 'returns the decision as compact JSON when the decision denies' {
+        # Arrange: the decision is replaced, so the entry point reads no lock, holder record, or script.
+        Mock Invoke-TestExecutionPolicyDecision { [ordered]@{ hookSpecificOutput = [ordered]@{ permissionDecision = 'deny'; permissionDecisionReason = 'TEST_EXECUTION_POLICY_BLOCKED: probe' } } }
+
+        # Act
+        $json = Invoke-TestExecutionPolicyEntryPoint -ReadPayload { '{"tool_name":"Bash"}' }
+
+        # Assert
+        $json | Should -BeExactly '{"hookSpecificOutput":{"permissionDecision":"deny","permissionDecisionReason":"TEST_EXECUTION_POLICY_BLOCKED: probe"}}'
+        Should -Invoke Invoke-TestExecutionPolicyDecision -Times 1 -Exactly -ParameterFilter { $ToolInputRaw -ceq '{"tool_name":"Bash"}' }
+    }
+
+    It 'returns $null when the decision allows' {
+        # Arrange
+        Mock Invoke-TestExecutionPolicyDecision { $null }
+
+        # Act / Assert
+        Invoke-TestExecutionPolicyEntryPoint -ReadPayload { '{"tool_name":"Bash"}' } | Should -BeNullOrEmpty
+    }
+
+    It 'reads the committed configuration through the default seam and denies a direct runner' {
+        # Arrange: only the configuration read keeps its default; it reads the committed config/test-execution-policy.json.
+        $payload = [ordered]@{ tool_name = 'Bash'; tool_input = [ordered]@{ command = 'pytest -q' }; cwd = '/repo/wt' } | ConvertTo-Json -Compress
+
+        # Act
+        $decision = Invoke-TestExecutionPolicyDecision -ToolInputRaw $payload -ProbeLock { 'Free' } -ReadHolderText { $null } `
+            -GetProcessStartUtc { param([int] $Id) [void] $Id; $null } -GetScriptFileLength { param([string] $Path) [void] $Path; $null } `
+            -ReadScriptText { param([string] $Path) [void] $Path; '' }
+
+        # Assert
+        [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "TEST_EXECUTION_POLICY_BLOCKED:*$script:Launcher pytest*"
     }
 }

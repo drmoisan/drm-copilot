@@ -3,6 +3,7 @@
 # (issue #1158, spec D7, D21, D32). Every probe, load, lock, clock, and sleep call goes through a template
 # seam with in-memory values; the seams and the mocked command resolve the variable $scenario of the running It
 # block (set through Set-Variable), which the template's scope chain reaches, so no lock file, holder record, or workspace file is touched and no real wait occurs.
+# One case keeps the default path and configuration seams with the repository as the workspace; they only test and read committed files.
 
 BeforeDiscovery {
     $script:Templates = @(
@@ -49,7 +50,7 @@ BeforeAll {
                 param([string] $Path)
                 $normalized = $Path.Replace('\', '/')
                 $scenario.Imported.Add($normalized)
-                $relative = $normalized.Substring($normalized.IndexOf('/.') + 1)
+                $relative = $normalized.Substring($normalized.LastIndexOf('/.') + 1)
                 # Not a closure: the template dot-invokes this seam, so the helper functions must land in its scope.
                 . (Join-Path $scenario.Repo $relative)
             }
@@ -206,5 +207,23 @@ Describe 'MCP template lock branch (<Script>)' -ForEach $script:Templates {
         $built.Scenario.Calls[0].HasTag | Should -BeFalse
         $built.Scenario.Calls[0].HasSuffix | Should -BeFalse
         ($built.Scenario.Events -join ',') | Should -BeExactly 'command'
+    }
+
+    It 'finds the helper and reads the committed configuration through the default path and config seams' {
+        # Arrange: the workspace is the repository, so the default seams only test and read committed files.
+        $built = & $script:NewScenario 'both' $null $false
+        Set-Variable -Name scenario -Value $built.Scenario
+        $arguments = $built.Arguments
+        $arguments.WorkspaceRoot = $script:RepoRoot
+        $arguments.Remove('TestPath')
+        $arguments.Remove('ReadConfigText')
+
+        # Act
+        & $script:TemplatePath @arguments
+
+        # Assert
+        @($built.Scenario.Imported | Where-Object { $_ -like '*/.claude/hooks/*' }).Count | Should -Be 3
+        ($built.Scenario.Events -join ',') | Should -BeExactly 'open,write,command,remove,dispose'
+        ($built.Scenario.Calls[0].Tags -join ',') | Should -BeExactly 'Integration,Golden'
     }
 }
