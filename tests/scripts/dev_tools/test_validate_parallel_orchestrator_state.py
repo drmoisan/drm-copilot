@@ -484,3 +484,44 @@ def test_invariant_19_accepts_a_present_receipt_list() -> None:
     state["delegation_receipts"] = [{"anything": "tolerated"}]
 
     assert validate(state) == []
+
+
+def test_closed_checkpoint_with_pr_author_routing_keys_validates_cleanly() -> None:
+    """Tolerate the issue #1182 routing keys on a closed checkpoint.
+
+    The Claude parallel records legs read ``model_routing_receipts`` and
+    ``complexity_assessments`` from the parallel checkpoint at Run Closing.
+    The validator declares neither key, so a closed checkpoint carrying both
+    must validate with zero errors plain and under ``require_complete``.
+    """
+
+    state = build_valid_parallel_state()
+    # Mark every item terminal so the closed-mode completion gate is satisfied.
+    for index in range(2):
+        item = item_at(state, index)
+        item["state"] = "merged"
+        item["merge_status"] = "merged"
+    state["complexity_assessments"] = [
+        {
+            "phase": "run_closing_records",
+            "band": "C2",
+            "floor": "C1",
+            "signals_present": [],
+            "rationale": "Records pull request of generated run documents.",
+            "assessed_at": "2026-11-14T12:00:00Z",
+        }
+    ]
+    state["model_routing_receipts"] = [
+        {
+            "agent": "pr-author",
+            "phase": "run_closing_records",
+            "complexity_band": "C2",
+            "fable_policy": "disabled",
+            "table_model": "sonnet",
+            "clamped_from": None,
+            "model": "sonnet",
+        }
+    ]
+
+    assert validate(state) == []
+    assert validate(state, require_complete=True) == []
