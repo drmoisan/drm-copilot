@@ -27,6 +27,7 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
         # Issue #1163: the receipt root seam keeps these rows' receipt path and starts no process.
         Mock Get-DocsCompleteGateReceiptRoot { 'repo-root' }
         Mock Invoke-DocsOnlyGhExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
+        Mock Invoke-DocsOnlyGitExe { [pscustomobject]@{ ExitCode = 128; Output = '' } } # Issue #1169: no row runs git.
 
         function ConvertTo-TestEnvelope {
             [CmdletBinding()]
@@ -41,7 +42,7 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
             [OutputType([string])]
             param([object] $Enabled = $true, [object] $ReceiptPath = 'docs/documentation-estate/docs-validation-receipt.json')
 
-            return ([ordered]@{ artifact_paths = [ordered]@{ validation_receipt = $ReceiptPath }; completion_gates = [ordered]@{ integration_pr_gate = [ordered]@{ enabled = $Enabled } } } | ConvertTo-Json -Depth 5 -Compress)
+            return ([ordered]@{ artifact_paths = [ordered]@{ validation_receipt = $ReceiptPath; inventory_snapshot = 'docs/documentation-estate/surface-inventory-snapshot.json' }; surface_selection = [ordered]@{ source_roots = @('src') }; completion_gates = [ordered]@{ integration_pr_gate = [ordered]@{ enabled = $Enabled } } } | ConvertTo-Json -Depth 5 -Compress)
         }
 
         function Get-TestReceiptText {
@@ -55,7 +56,7 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
         function Set-TestFileSeam {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Registers Pester mocks for one test only; it changes no system state.')]
             [CmdletBinding()]
-            param([AllowNull()][object] $ProfileText, [AllowNull()][object] $ReceiptText)
+            param([AllowNull()][object] $ProfileText, [AllowNull()][object] $ReceiptText, [string] $SnapshotRevision = '0123456789abcdef0123456789abcdef01234567')
 
             $profileValue = $ProfileText
             $receiptValue = $ReceiptText
@@ -64,6 +65,8 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
             # on Windows and Linux.
             Mock Get-DocsCompleteGateFileText -ParameterFilter { $Path -ceq (Join-Path -Path 'repo-root' -ChildPath 'docs/documentation-estate/docs-profile.json') } -MockWith ({ $profileValue }.GetNewClosure())
             Mock Get-DocsCompleteGateFileText -ParameterFilter { $Path -ceq (Join-Path -Path 'repo-root' -ChildPath 'docs/documentation-estate/docs-validation-receipt.json') } -MockWith ({ $receiptValue }.GetNewClosure())
+            $snapshotValue = [ordered]@{ revision = $SnapshotRevision } | ConvertTo-Json -Compress # Issue #1169: the snapshot the receipt revision rule reads.
+            Mock Get-DocsCompleteGateFileText -ParameterFilter { $Path -ceq (Join-Path -Path 'repo-root' -ChildPath 'docs/documentation-estate/surface-inventory-snapshot.json') } -MockWith ({ $snapshotValue }.GetNewClosure())
         }
 
         function Set-TestPullRequestSeam {
@@ -130,7 +133,7 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
     }
 
     AfterAll {
-        Remove-Module -Name HookPayload, DocsCompleteGate, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding -Force -ErrorAction SilentlyContinue
+        Remove-Module -Name HookPayload, DocsCompleteGate, DocsReceiptRevision, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding -Force -ErrorAction SilentlyContinue
     }
 
     Context 'gate disabled' {
@@ -236,10 +239,11 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "DOCS_COMPLETE_GATE_BLOCKED: ${Code}: *"
         }
 
-        It 'denies RECEIPT_REVISION_MISMATCH and names both revisions' {
+        It 'denies RECEIPT_REVISION_NOT_ANCESTOR for a receipt revision that is not an ancestor of headRefOid and names both revisions (issue #1169)' {
             # Arrange
-            Set-TestFileSeam -ProfileText (Get-TestProfileText) -ReceiptText (Get-TestReceiptText -Revision $script:OtherHead)
+            Set-TestFileSeam -ProfileText (Get-TestProfileText) -ReceiptText (Get-TestReceiptText -Revision $script:OtherHead) -SnapshotRevision $script:OtherHead
             Set-TestPullRequestSeam
+            Mock Invoke-DocsOnlyGitExe -MockWith { [pscustomobject]@{ ExitCode = 1; Output = '' } }
 
             # Act
             $decision = Invoke-DocsCompleteGateDecision -ToolInputRaw (ConvertTo-TestEnvelope -Command 'gh pr merge 7 --merge')
@@ -247,7 +251,7 @@ Describe 'enforce-docs-complete-gate (issue #1034)' {
             # Assert
             $reason = $decision.hookSpecificOutput.permissionDecisionReason
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
-            $reason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: RECEIPT_REVISION_MISMATCH: *'
+            $reason | Should -BeLike 'DOCS_COMPLETE_GATE_BLOCKED: RECEIPT_REVISION_NOT_ANCESTOR: *'
             $reason | Should -Match $script:OtherHead
             $reason | Should -Match $script:Head
         }
@@ -625,7 +629,7 @@ Describe 'enforce-docs-complete-gate seams (issue #1034)' {
     }
 
     AfterAll {
-        Remove-Module -Name HookPayload, DocsCompleteGate, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding -Force -ErrorAction SilentlyContinue
+        Remove-Module -Name HookPayload, DocsCompleteGate, DocsReceiptRevision, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding -Force -ErrorAction SilentlyContinue
     }
 
     It 'returns the repository root two levels above the hook directory' {
@@ -679,9 +683,12 @@ Describe 'enforce-docs-complete-gate receipt root (issue #1163)' {
         . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-docs-complete-gate.ps1").Path
         $script:ReceiptHead = '0123456789abcdef0123456789abcdef01234567'
         $profileKey = Join-Path -Path '/repo' -ChildPath 'docs/documentation-estate/docs-profile.json'
+        $itemRoot = '/repo/.claude/worktrees/item'
         $script:ProfileKey = $profileKey
         $files = @{
             $profileKey                                                                                                          = ([ordered]@{ artifact_paths = [ordered]@{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json' }; completion_gates = [ordered]@{ integration_pr_gate = [ordered]@{ enabled = $true } } } | ConvertTo-Json -Depth 5 -Compress)
+            (Join-Path -Path $itemRoot -ChildPath 'docs/documentation-estate/docs-profile.json')                                 = ([ordered]@{ artifact_paths = [ordered]@{ validation_receipt = 'docs/documentation-estate/docs-validation-receipt.json'; inventory_snapshot = 'docs/documentation-estate/surface-inventory-snapshot.json' } } | ConvertTo-Json -Depth 5 -Compress)
+            (Join-Path -Path $itemRoot -ChildPath 'docs/documentation-estate/surface-inventory-snapshot.json')                   = ([ordered]@{ revision = $script:ReceiptHead } | ConvertTo-Json -Compress)
             (Join-Path -Path '/repo/.claude/worktrees/item' -ChildPath 'docs/documentation-estate/docs-validation-receipt.json') = ([ordered]@{ artifact_kind = 'docs-validation-receipt'; mode = 'docs-complete'; revision = $script:ReceiptHead; validation_result = 'pass' } | ConvertTo-Json -Compress)
         }
         Mock Get-DocsCompleteGateRepositoryRoot { '/repo' }
@@ -699,7 +706,7 @@ Describe 'enforce-docs-complete-gate receipt root (issue #1163)' {
     }
 
     AfterAll {
-        Remove-Module -Name HookPayload, DocsCompleteGate, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding, AgentTargetWorktree, HookTargetWorktree -Force -ErrorAction SilentlyContinue
+        Remove-Module -Name HookPayload, DocsCompleteGate, DocsReceiptRevision, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding, AgentTargetWorktree, HookTargetWorktree -Force -ErrorAction SilentlyContinue
     }
 
     It 'decision: <Label>' -ForEach @(

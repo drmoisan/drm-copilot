@@ -107,6 +107,11 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
         @{ Name = 'a path outside docs'; Text = "src/a.ps1`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
         @{ Name = 'the bare docs directory'; Text = "docs`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
         @{ Name = 'docs-only paths'; Text = "docs/a.md`0docs/b.md`0"; Expected = 'NONE' }
+        @{ Name = 'docs paths plus the docs-init workflow path (issue #1169)'; Text = "docs/a.md`0.github/workflows/_docs-quality.yml`0"; Expected = 'NONE' }
+        @{ Name = 'the workflow path plus one further non-docs path (issue #1169)'; Text = "docs/a.md`0.github/workflows/_docs-quality.yml`0src/b.ps1`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
+        @{ Name = 'a case variant of the workflow path (issue #1169)'; Text = "docs/a.md`0.github/workflows/_Docs-quality.yml`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
+        @{ Name = 'a prefixed workflow path (issue #1169)'; Text = "docs/a.md`0x/.github/workflows/_docs-quality.yml`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
+        @{ Name = 'a suffixed workflow path (issue #1169)'; Text = "docs/a.md`0.github/workflows/_docs-quality.yml.bak`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
     ) {
         # Arrange: the row supplies the diff text and the expected result.
 

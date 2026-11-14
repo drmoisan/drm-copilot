@@ -83,11 +83,52 @@ function Get-DocsTestExampleText {
     return Get-DocsTestFileTextMap -RelativeDirectory 'examples/docs/v1' -Suffix '.example.json'
 }
 
+function New-DocsTestRevisionPairMember {
+    <#
+    .SYNOPSIS
+        Returns @{ TestAncestor; ListChangedPath } in-memory members backed by maps keyed by the
+        revision pair '<first>..<second>' (private helper, issue #1169).
+    .DESCRIPTION
+        TestAncestor returns the mapped value as a boolean; ListChangedPath returns the mapped
+        paths as one string array (an empty array for an empty entry). An unmapped pair returns
+        $null from either member. No process starts.
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Test fixture factory that builds in-memory closures only.')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseLiteralInitializerForHashtable', '', Justification = 'Revision pairs are case-sensitive; an ordinal-comparer hashtable is required.')]
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [AllowNull()] [System.Collections.IDictionary] $AncestorMap,
+        [AllowNull()] [System.Collections.IDictionary] $ChangedPathMap
+    )
+
+    $ancestors = [hashtable]::new([System.StringComparer]::Ordinal)
+    if ($null -ne $AncestorMap) { foreach ($key in $AncestorMap.Keys) { $ancestors[[string] $key] = [bool] $AncestorMap[$key] } }
+    $changes = [hashtable]::new([System.StringComparer]::Ordinal)
+    if ($null -ne $ChangedPathMap) { foreach ($key in $ChangedPathMap.Keys) { $changes[[string] $key] = [string[]] @($ChangedPathMap[$key]) } }
+    $testAncestor = {
+        param($Ancestor, $Descendant)
+        $key = "$Ancestor..$Descendant"
+        if ($ancestors.ContainsKey($key)) { return $ancestors[$key] }
+        return $null
+    }.GetNewClosure()
+    $listChangedPath = {
+        param($FromRevision, $ToRevision)
+        $key = "$FromRevision..$ToRevision"
+        if ($changes.ContainsKey($key)) { return , ([string[]] $changes[$key].Clone()) }
+        return $null
+    }.GetNewClosure()
+    return @{ TestAncestor = $testAncestor; ListChangedPath = $listChangedPath }
+}
+
 function New-DocsTestContext {
     <#
     .SYNOPSIS
-        Returns @{ Context; Files; WriteLog; ProcessCallLog } for one in-memory command context.
+        Returns @{ Context; Files; WriteLog; ProcessCallLog; Revisions } for one in-memory command context.
     .DESCRIPTION
+        The context carries the twelve members of New-DocsCommandContext in its order:
+        RepositoryRoot, ReadText, ReadBytes, TestFile, ListFile, WriteText, UtcNow, InvokeProcess,
+        ResolveRevision, ReadRevisionText, TestAncestor, ListChangedPath.
         File is a map of repository-relative path to text; a $null or empty text is an empty file,
         for which ReadText returns the empty string. ReadText of an absent path throws an
         item-not-found error, as the real member does. WriteText with Mode 'create' on an existing
@@ -95,7 +136,11 @@ function New-DocsTestContext {
         streams, TimedOut false). RevisionMap maps a ref to a full revision: ResolveRevision returns
         the mapped revision, or $null for an unmapped ref. RevisionFile maps a full revision to a
         map of repository-relative path to text: ReadRevisionText returns the mapped text, or $null
-        when the revision or the path is absent. Neither member starts a process.
+        when the revision or the path is absent. AncestorMap and ChangedPathMap (issue #1169) are
+        keyed by the revision pair '<first>..<second>': TestAncestor returns the mapped boolean and
+        ListChangedPath the mapped path array, and each returns $null for an unmapped pair. No member
+        starts a process. Revisions is the ordinal revision table that ResolveRevision reads, so a
+        scenario can move HEAD between steps.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Test fixture factory that builds in-memory objects only.')]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseLiteralInitializerForHashtable', '', Justification = 'Repository paths are case-sensitive; an ordinal-comparer hashtable is required.')]
@@ -107,7 +152,9 @@ function New-DocsTestContext {
         [AllowNull()] [System.Collections.IDictionary] $ProcessResult,
         [string] $RepositoryRoot = 'in-memory-repository',
         [AllowNull()] [System.Collections.IDictionary] $RevisionMap,
-        [AllowNull()] [System.Collections.IDictionary] $RevisionFile
+        [AllowNull()] [System.Collections.IDictionary] $RevisionFile,
+        [AllowNull()] [System.Collections.IDictionary] $AncestorMap,
+        [AllowNull()] [System.Collections.IDictionary] $ChangedPathMap
     )
 
     $files = [hashtable]::new([System.StringComparer]::Ordinal)
@@ -188,6 +235,7 @@ function New-DocsTestContext {
         if ($revisionFiles.ContainsKey($revisionKey) -and $revisionFiles[$revisionKey].ContainsKey($pathKey)) { return $revisionFiles[$revisionKey][$pathKey] }
         return $null
     }.GetNewClosure()
+    $pairMaps = New-DocsTestRevisionPairMember -AncestorMap $AncestorMap -ChangedPathMap $ChangedPathMap
 
     $context = [pscustomobject]@{
         RepositoryRoot   = $RepositoryRoot
@@ -200,8 +248,10 @@ function New-DocsTestContext {
         InvokeProcess    = $invokeProcess
         ResolveRevision  = $resolveRevision
         ReadRevisionText = $readRevisionText
+        TestAncestor     = $pairMaps.TestAncestor
+        ListChangedPath  = $pairMaps.ListChangedPath
     }
-    return @{ Context = $context; Files = $files; WriteLog = $writeLog; ProcessCallLog = $processCallLog }
+    return @{ Context = $context; Files = $files; WriteLog = $writeLog; ProcessCallLog = $processCallLog; Revisions = $revisions }
 }
 
 Export-ModuleMember -Function `

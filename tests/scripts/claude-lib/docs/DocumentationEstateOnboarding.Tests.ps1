@@ -207,6 +207,60 @@ Describe 'documentation-estate onboarding pages' {
     }
 }
 
+Describe 'documentation-estate onboarding statements of issue #1169' {
+    BeforeAll {
+        function Get-PageSectionText {
+            # Pure: the normalized text of one section, from its heading line to the next heading of the
+            # same or a higher level, or '' when the heading is absent.
+            param([Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $PageText, [Parameter(Mandatory = $true)] [string] $Heading)
+            $level = ($Heading -replace '^(#+).*$', '$1').Length
+            $pattern = '(?ms)^' + [regex]::Escape($Heading) + '[ \t]*\n(?<body>.*?)(?=^#{1,' + $level + '} |\z)'
+            $match = [regex]::Match(($PageText -replace "`r`n", "`n"), $pattern)
+            if (-not $match.Success) { return '' }
+            return (Get-NormalizedText -Text $match.Groups['body'].Value)
+        }
+
+        $script:StatementCase = @(
+            @{ Page = 'consumer-onboarding.md'; Heading = '## Linting'; Token = @('--config docs/documentation-estate/.vale.ini', 'VALE_CONFIG_PATH', 'docs/documentation-estate/.markdownlint.json', 'No workflow step runs Vale or markdownlint', 'policy-level control') }
+            @{ Page = 'command-reference.md'; Heading = '### `validate`'; Token = @('defaults to the snapshot revision') }
+            @{ Page = 'workflow.md'; Heading = '## Sequence'; Token = @('Commit, Receipt and Pull Request') }
+            @{ Page = 'workflow.md'; Heading = '## Integration-PR Gate'; Token = @('RECEIPT_REVISION_NOT_ANCESTOR', 'RECEIPT_SOURCE_DRIFT') }
+        )
+    }
+
+    AfterAll {
+        Remove-Item -LiteralPath 'function:Get-PageSectionText' -ErrorAction SilentlyContinue
+    }
+
+    It 'states every issue #1169 token in its named section' {
+        foreach ($case in $script:StatementCase) {
+            # Arrange
+            $section = Get-PageSectionText -PageText $script:PageText[$case.Page] -Heading $case.Heading
+
+            # Assert
+            $section.Length | Should -BeGreaterThan 0 -Because "$($case.Page) has the section $($case.Heading)"
+            foreach ($token in $case.Token) { $section.Contains($token, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "$($case.Heading) of $($case.Page) states '$token'" }
+        }
+    }
+
+    It 'fails the statement check for an in-memory <Page> with its first token removed' -ForEach @(
+        @{ Page = 'consumer-onboarding.md'; Heading = '## Linting'; Token = '--config docs/documentation-estate/.vale.ini' }
+        @{ Page = 'command-reference.md'; Heading = '### `validate`'; Token = 'defaults to the snapshot revision' }
+        @{ Page = 'workflow.md'; Heading = '## Integration-PR Gate'; Token = 'RECEIPT_SOURCE_DRIFT' }
+    ) {
+        # Arrange: drop every occurrence of the token, allowing any whitespace between its words.
+        $wordPattern = (($Token -split ' ') | ForEach-Object { [regex]::Escape($_) }) -join '\s+'
+        $page = [regex]::Replace($script:PageText[$Page], $wordPattern, '')
+
+        # Act
+        $section = Get-PageSectionText -PageText $page -Heading $Heading
+
+        # Assert
+        $section.Length | Should -BeGreaterThan 0
+        $section.Contains($Token, [System.StringComparison]::Ordinal) | Should -BeFalse -Because 'the check reads the in-memory page and fails without the token'
+    }
+}
+
 Describe 'documentation-estate onboarding neutrality' {
     Context 'neutrality' {
         BeforeAll {

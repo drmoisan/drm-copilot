@@ -17,6 +17,11 @@ BeforeDiscovery {
     $script:ReviewForbidden = @('smallest relevant subset')
     $script:ReviewCommandForbidden = $script:ReviewForbidden + @('run_poshqc_test')
     $script:ExecutorListForbidden = @('`mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`')
+    $script:D13Required = @('CI integration and golden lanes are evidence', 'non-blocking deviation', 'machine test-suite lock')
+    # Finding F1 of the #1158 review: the direct pytest toolchain commands that the launcher pytest suite replaces.
+    $script:DirectPytestForbidden = @('`poetry run pyright`, `poetry run pytest ', '4. `poetry run pytest ', 'Test (`poetry run pytest ')
+    $script:ExecutorRouteForbidden = $script:ExecutorListForbidden + @('Bash(poetry run pytest', 'Bash(npx jest')
+    $script:ReviewLauncherForbidden = $script:ReviewCommandForbidden + @('npm run test:unit:coverage')
     $script:CopilotPesterForbidden = @('mcp_drmcopilotext_run_poshqc_test')
     $script:CopilotFocusedForbidden = @('-k slug_extraction')
     $script:AuditRequired = @('N/A - no pre-change run', 'poetry run pytest -n auto', 'Invoke-PoshQCParallelTest', 'Phase 0 baseline')
@@ -76,31 +81,31 @@ Describe 'Parallel gate wording' {
     }
 
     It 'PGW-<Id> carries the required wording and no forbidden wording' -ForEach @(
-        @{ Id = 'PLAN-CLAUDE'; Path = '.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline'); Forbidden = $script:ContractForbidden }
-        @{ Id = 'PLAN-AGENTS'; Path = '.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline'); Forbidden = $script:ContractForbidden }
-        @{ Id = 'PLAN-GITHUB'; Path = '.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline'); Forbidden = $script:ContractForbidden }
-        @{ Id = 'PLAN-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline'); Forbidden = $script:ContractForbidden }
-        @{ Id = 'PLAN-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline'); Forbidden = $script:ContractForbidden }
-        @{ Id = 'PLAN-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline'); Forbidden = $script:ContractForbidden }
-        @{ Id = 'QA-PS-CLAUDE'; Path = '.claude/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PowerShellQaGateForbidden }
-        @{ Id = 'QA-PS-AGENTS'; Path = '.agents/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PowerShellQaGateForbidden }
-        @{ Id = 'QA-PS-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PowerShellQaGateForbidden }
-        @{ Id = 'QA-PS-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PowerShellQaGateForbidden }
-        @{ Id = 'QA-PY-CLAUDE'; Path = '.claude/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PythonQaGateForbidden }
-        @{ Id = 'QA-PY-AGENTS'; Path = '.agents/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PythonQaGateForbidden }
-        @{ Id = 'QA-PY-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PythonQaGateForbidden }
-        @{ Id = 'QA-PY-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline'); Forbidden = $script:PythonQaGateForbidden }
-        @{ Id = 'REVIEW-CLAUDE'; Path = '.claude/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewCommandForbidden }
-        @{ Id = 'REVIEW-AGENTS'; Path = '.agents/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewCommandForbidden }
+        @{ Id = 'PLAN-CLAUDE'; Path = '.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-AGENTS'; Path = '.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-GITHUB'; Path = '.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:ContractForbidden }
+        @{ Id = 'PLAN-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:ContractForbidden }
+        @{ Id = 'QA-PS-CLAUDE'; Path = '.claude/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:PowerShellQaGateForbidden }
+        @{ Id = 'QA-PS-AGENTS'; Path = '.agents/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:PowerShellQaGateForbidden }
+        @{ Id = 'QA-PS-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:PowerShellQaGateForbidden }
+        @{ Id = 'QA-PS-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:PowerShellQaGateForbidden }
+        @{ Id = 'QA-PY-CLAUDE'; Path = '.claude/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:PythonQaGateForbidden }
+        @{ Id = 'QA-PY-AGENTS'; Path = '.agents/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:PythonQaGateForbidden }
+        @{ Id = 'QA-PY-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:PythonQaGateForbidden }
+        @{ Id = 'QA-PY-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:PythonQaGateForbidden }
+        @{ Id = 'REVIEW-CLAUDE'; Path = '.claude/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired + $script:D13Required + @('run-test-suite.sh'); Forbidden = $script:ReviewLauncherForbidden }
+        @{ Id = 'REVIEW-AGENTS'; Path = '.agents/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired + $script:D13Required + @('run-test-suite.sh'); Forbidden = $script:ReviewLauncherForbidden }
         @{ Id = 'REVIEW-GITHUB'; Path = '.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
-        @{ Id = 'REVIEW-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewCommandForbidden }
-        @{ Id = 'REVIEW-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewCommandForbidden }
+        @{ Id = 'REVIEW-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired + $script:D13Required + @('run-test-suite.sh'); Forbidden = $script:ReviewLauncherForbidden }
+        @{ Id = 'REVIEW-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired + $script:D13Required + @('run-test-suite.sh'); Forbidden = $script:ReviewLauncherForbidden }
         @{ Id = 'REVIEW-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
         @{ Id = 'ADAPTER-AGENTS'; Path = '.agents/skills/repo-automation-adapter/SKILL.md'; Required = @('not a validation gate', 'Invoke-PoshQCParallelTest'); Forbidden = @() }
         @{ Id = 'ADAPTER-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/repo-automation-adapter/SKILL.md'; Required = @('not a validation gate', 'Invoke-PoshQCParallelTest'); Forbidden = @() }
-        @{ Id = 'EXEC-CLAUDE'; Path = '.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto', 'Phase 0 baseline'); Forbidden = $script:ExecutorListForbidden }
-        @{ Id = 'EXEC-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto', 'Phase 0 baseline'); Forbidden = $script:ExecutorListForbidden }
-        @{ Id = 'EXEC-CODEX'; Path = '.codex/agents/atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto', 'Phase 0 baseline'); Forbidden = $script:ExecutorListForbidden }
+        @{ Id = 'EXEC-CLAUDE'; Path = '.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto', 'Phase 0 baseline') + @('run-test-suite.sh'); Forbidden = $script:ExecutorRouteForbidden }
+        @{ Id = 'EXEC-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto', 'Phase 0 baseline') + @('run-test-suite.sh'); Forbidden = $script:ExecutorRouteForbidden }
+        @{ Id = 'EXEC-CODEX'; Path = '.codex/agents/atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto', 'Phase 0 baseline') + @('run-test-suite.sh'); Forbidden = $script:ExecutorRouteForbidden }
         @{ Id = 'EXEC-CODEX-POWERSHELL'; Path = '.codex/agents/powershell-atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = @('run_poshqc_test') }
         @{ Id = 'COPILOT-EXEC'; Path = '.github/agents/atomic_executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
         @{ Id = 'COPILOT-EXEC-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/atomic_executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
@@ -130,6 +135,38 @@ Describe 'Parallel gate wording' {
         @{ Id = 'AUDIT-TEMPLATE-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
         @{ Id = 'AUDIT-AGENTS'; Path = 'docs/features/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest', 'Phase 0 baseline'); Forbidden = @() }
         @{ Id = 'AUDIT-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest', 'Phase 0 baseline'); Forbidden = @() }
+        @{ Id = 'BRIEF-CLAUDE'; Path = '.claude/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
+        @{ Id = 'BRIEF-AGENTS'; Path = '.agents/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
+        @{ Id = 'BRIEF-GITHUB'; Path = '.github/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
+        @{ Id = 'BRIEF-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
+        @{ Id = 'BRIEF-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
+        @{ Id = 'BRIEF-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
+        @{ Id = 'QA-CS-CLAUDE'; Path = '.claude/skills/csharp-qa-gate/SKILL.md'; Required = $script:D13Required; Forbidden = $script:QaGateForbidden }
+        @{ Id = 'QA-CS-AGENTS'; Path = '.agents/skills/csharp-qa-gate/SKILL.md'; Required = $script:D13Required; Forbidden = $script:QaGateForbidden }
+        @{ Id = 'QA-CS-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/csharp-qa-gate/SKILL.md'; Required = $script:D13Required; Forbidden = $script:QaGateForbidden }
+        @{ Id = 'QA-CS-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp-qa-gate/SKILL.md'; Required = $script:D13Required; Forbidden = $script:QaGateForbidden }
+        @{ Id = 'QA-CS-CLAUDE-LEGACY'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md'; Required = $script:D13Required; Forbidden = $script:QaGateForbidden }
+        @{ Id = 'QA-CS-AGENTS-LEGACY'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md'; Required = $script:D13Required; Forbidden = $script:QaGateForbidden }
+        @{ Id = 'INVOKE-PY-CLAUDE'; Path = '.claude/skills/invoke-python-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-PY-AGENTS'; Path = '.agents/skills/invoke-python-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-PY-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/invoke-python-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-PY-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/invoke-python-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-PS-CLAUDE'; Path = '.claude/skills/invoke-powershell-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-PS-AGENTS'; Path = '.agents/skills/invoke-powershell-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-PS-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/invoke-powershell-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-PS-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/invoke-powershell-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-CS-CLAUDE'; Path = '.claude/skills/invoke-csharp-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-CS-AGENTS'; Path = '.agents/skills/invoke-csharp-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-CS-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/invoke-csharp-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-CS-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/invoke-csharp-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-CS-CLAUDE-LEGACY'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/skills/invoke-csharp-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'INVOKE-CS-AGENTS-LEGACY'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/invoke-csharp-engineer/SKILL.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'TS-AGENT-CLAUDE'; Path = '.claude/agents/typescript-engineer.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'TS-AGENT-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/typescript-engineer.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'TS-AGENT-CODEX'; Path = '.codex/agents/typescript-engineer.toml'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'TS-AGENT-CODEX-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/typescript-engineer.toml'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'TS-AGENT-COPILOT'; Path = '.github/agents/typescript-engineer.agent.md'; Required = $script:D13Required; Forbidden = @() }
+        @{ Id = 'TS-AGENT-COPILOT-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/typescript-engineer.agent.md'; Required = $script:D13Required; Forbidden = @() }
     ) {
         # Arrange
         $text = Get-PgwSurfaceText -RelativePath $Path
@@ -253,5 +290,51 @@ Describe 'Parallel gate wording' {
             $tokens.Count | Should -Be 12 -Because 'the plan names 12 run-class sweep tokens'
             $missed | Should -BeNullOrEmpty -Because 'a reintroduced token must fail the sweep'
         }
+    }
+
+    It 'PGW-LAUNCHER-<Id> names the launcher and no direct pytest toolchain command' -ForEach @(
+        @{ Id = 'EXEC-CLAUDE'; Path = '.claude/agents/atomic-executor.md'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CODEX'; Path = '.codex/agents/atomic-executor.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CODEX-C1'; Path = '.codex/agents/atomic-executor-c1.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CODEX-C2'; Path = '.codex/agents/atomic-executor-c2.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CODEX-C3'; Path = '.codex/agents/atomic-executor-c3.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CODEX-C3-ELEVATED'; Path = '.codex/agents/atomic-executor-c3-elevated.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'EXEC-CODEX-C4'; Path = '.codex/agents/atomic-executor-c4.toml'; Required = @('run-test-suite.sh pytest', 'run-test-suite.sh pester'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'QA-PY-CLAUDE'; Path = '.claude/skills/python-qa-gate/SKILL.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'QA-PY-AGENTS'; Path = '.agents/skills/python-qa-gate/SKILL.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'QA-PY-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'QA-PY-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'COPILOT-PY-EXEC'; Path = '.github/agents/python-atomic-executor.agent.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
+        @{ Id = 'COPILOT-PY-EXEC-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/python-atomic-executor.agent.md'; Required = @('run-test-suite.sh pytest'); Forbidden = $script:DirectPytestForbidden }
+    ) {
+        # Arrange
+        $text = Get-PgwSurfaceText -RelativePath $Path
+
+        # Act
+        $missing = @($Required | Where-Object { -not $text.Contains($_) })
+        $held = @(Get-PgwTokenHit -Content $text -SearchToken $Forbidden)
+
+        # Assert
+        $missing | Should -BeNullOrEmpty -Because "$Path must name the launcher suites"
+        $held | Should -BeNullOrEmpty -Because "$Path must not name a direct pytest toolchain command"
+    }
+
+    It 'PGW-SCOPED-<Id> names the scoped Pester route' -ForEach @(
+        @{ Id = 'CLAUDE'; Path = '.claude/skills/test-execution-policy/SKILL.md' }
+        @{ Id = 'AGENTS'; Path = '.agents/skills/test-execution-policy/SKILL.md' }
+        @{ Id = 'GITHUB'; Path = '.github/skills/test-execution-policy/SKILL.md' }
+        @{ Id = 'CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/test-execution-policy/SKILL.md' }
+        @{ Id = 'AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/test-execution-policy/SKILL.md' }
+        @{ Id = 'GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/test-execution-policy/SKILL.md' }
+    ) {
+        # Arrange
+        $text = Get-PgwSurfaceText -RelativePath $Path
+
+        # Act
+        $missing = @(@('-TestPath', 'fail-before proof') | Where-Object { -not $text.Contains($_) })
+
+        # Assert
+        $missing | Should -BeNullOrEmpty -Because "$Path must state the scoped Pester route (C1)"
     }
 }

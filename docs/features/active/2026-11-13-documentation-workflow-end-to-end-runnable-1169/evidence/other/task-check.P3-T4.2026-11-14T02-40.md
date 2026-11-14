@@ -1,0 +1,10 @@
+# Task Check P3-T4 (Remediation Cycle 1)
+
+Timestamp: 2026-11-14T02-40
+Command: sh SCRATCH/issue-1169-tc.sh R1-P3-T4 "<four edited suites>" "<the same eight suites as the P3-T2 task check>"; git -C <item worktree> grep -c AfterAll -- <four suites>; sh SCRATCH/issue-1169-list.sh <suite> (per-suite row results)
+EXIT_CODE: 0
+Output Summary:
+- Changed files: enforce-orchestration-preimplementation-gate.DocsEstate.Tests.ps1, codex-hooks/enforce-orchestration-preimplementation-gate-docs.Tests.ps1 (AfterAll placed in its Describe block, where it dot-sources), enforce-model-routing-receipt.DocsEstate.Tests.ps1, docs-estate-workflow.EndToEnd.Tests.ps1. Each AfterAll parses the files the suite dot-sources directly and the docs-leg files they load, and removes their top-level functions with Remove-Item Function:\<name> (the parse-and-remove form of hook-docs-estate-context.Tests.ps1). Files covered: Claude gate suite: the gate, the docs leg, hook-docs-estate-context.ps1; Codex suite: the same three under .codex/hooks/; model-routing suite: enforce-model-routing-receipt.ps1, enforce-model-routing-receipt-docs.ps1, the docs leg, hook-docs-estate-context.ps1; EndToEnd: its four dot-sourced hooks, the docs leg, enforce-model-routing-receipt-docs.ps1, and hook-docs-estate-context.ps1 (decision: the EndToEnd suite also loads the model-routing docs leg through its dot-sourced gate, so it is included; removing an absent function is a no-op). No row changed.
+- `git grep -c AfterAll` reports 1 for each of the four files.
+- Format 0 findings, lint 0 findings (4 files); type check not applicable.
+- Pester over the P3-T2 selection: 287 passed, 0 failed (P3-T2: 281). The difference of 6 is the six `limits the docs path set to paths under docs/ in <Path>` rows that P3-T3 added to documentation-workflow.CommitStage.Tests.ps1 (42 passed now). Per suite now: Claude gate 52 passed, Codex gate 51 passed, model-routing 33 passed, EndToEnd 11 passed, all with 0 failed; P3-T4 added and removed no row, so the four suites keep the P3-T2 passed counts.

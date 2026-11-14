@@ -1,0 +1,12 @@
+[
+  { "stage": "S2_research", "attempt": 1, "started_at": "2026-11-14T08:38:14Z", "ended_at": "2026-11-14T08:41:17Z" },
+  { "stage": "S3b_spec", "attempt": 1, "started_at": "2026-11-14T08:41:36Z", "ended_at": "2026-11-14T08:43:36Z" },
+  { "stage": "S4_atomic_planning", "attempt": 1, "started_at": "2026-11-14T08:43:44Z", "ended_at": "2026-11-14T08:46:43Z" },
+  { "stage": "S4_preflight", "attempt": 1, "started_at": "2026-11-14T08:47:30Z", "ended_at": "2026-11-14T08:49:33Z" },
+  { "stage": "S4_plan_revision", "attempt": 1, "started_at": "2026-11-14T08:49:33Z", "ended_at": "2026-11-14T08:51:54Z" },
+  { "stage": "S4_preflight", "attempt": 2, "started_at": "2026-11-14T08:51:54Z", "ended_at": "2026-11-14T08:53:30Z" },
+  { "stage": "S5_atomic_execution", "attempt": 1, "started_at": "2026-11-14T08:53:30Z", "ended_at": "2026-11-14T09:41:20Z" },
+  { "stage": "S8_create_pr", "attempt": 1, "started_at": "2026-11-14T09:41:20Z", "ended_at": "2026-11-14T09:43:26Z" },
+  { "stage": "S7_feature_review", "attempt": 1, "started_at": "2026-11-14T09:43:26Z", "ended_at": "2026-11-14T09:48:30Z" },
+  { "stage": "S9_ci_green", "attempt": 1, "started_at": "2026-11-14T09:43:26Z", "ended_at": "2026-11-14T10:07:29Z" }
+]

@@ -1,0 +1,6 @@
+# Task check — cycle 2 [P1-T11] (acceptance-criteria check-off)
+
+Timestamp: 2026-11-14T09-08
+Command: git -C <worktree root> diff --word-diff=porcelain <cycle-start head> -- FEATURE/spec.md FEATURE/user-story.md
+EXIT_CODE: 0
+Output Summary: Three boxes checked, each change `[ ]` to `[x]` only (word diff shows three -[ ] / +[x] pairs and nothing else): spec.md Issue AC 5 item beginning "Both `pack-manifests/core.json` files list", spec.md Issue AC 5 item beginning "Every existing test that pinned the per-hook registration shape", and user-story.md `## Acceptance Criteria` item beginning "Bundle settings and config". Evidence cited: qa-gates/jest-root.2026-11-14T09-01.md (5574 passed, 0 failed, including the bundle publish closure test), qa-gates/jest-extension.2026-11-14T09-01.md (5557 passed, 0 failed, all thresholds met), qa-gates/pytest.2026-11-14T09-07.md (16723 passed, 0 failed, including the push-down contract, pack-manifest completeness and dependency-closure tests). The Definition of Done item "Behavior matches acceptance criteria on Windows and on the Linux hook-suite CI job" stays unchecked as pending-CI. Selection: none (Markdown checkbox state only; no contract test reads these files).

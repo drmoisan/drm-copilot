@@ -48,6 +48,7 @@
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-targets.ps1')
 try { . (Join-Path $PSScriptRoot 'hook-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'hook-target-worktree.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-epic-fan-in.ps1') } catch { Add-HookDependencyFailure -Name 'hook-epic-fan-in.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-epic-regeneration.ps1') } catch { Add-HookDependencyFailure -Name 'hook-epic-regeneration.ps1' -ErrorRecord $_ }
 
 # The target-resolution reason codes (issue #1010). Their source is
 # Get-WorktreeResolutionAmbiguityReasonCode and Get-WorktreeResolutionNoTargetReasonCode
@@ -405,7 +406,8 @@ function Get-OrchestrationEpicScopeDecision {
         'merge-in-progress' passes when Test-EpicFanInComplete holds and
         Get-EpicFanInAllowance reports Allowed over the leg paths or the leg command.
         Merged-feature follow-up allowance (issue #1141): for that same failure, the target
-        also passes when Get-EpicMergedFeatureFollowUpAllowance reports Allowed.
+        also passes when Get-EpicMergedFeatureFollowUpAllowance reports Allowed. Regeneration
+        allowance (issue #1156): it also passes when Get-EpicRegenerationAllowance reports Allowed.
     .PARAMETER Command
         The command line of a command or apply_patch leg; empty for a path leg.
     .PARAMETER FilePath
@@ -448,6 +450,10 @@ function Get-OrchestrationEpicScopeDecision {
         }
         if ($failure -ceq 'merge-in-progress' -and
             (Get-EpicMergedFeatureFollowUpAllowance -Scope $Scope -FilePath $legPaths -Command $legCommand -StagedIndexReader $reader).Allowed) {
+            return ''
+        }
+        if ($failure -ceq 'merge-in-progress' -and
+            (Get-EpicRegenerationAllowance -Scope $Scope -FilePath $legPaths -Command $legCommand -StagedIndexReader $reader -ConfigReader ${function:Read-EpicRegenerationConfig}).Allowed) {
             return ''
         }
         $failure

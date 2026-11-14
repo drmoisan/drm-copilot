@@ -367,13 +367,18 @@ substeps, in order:
    `git add .`, and never stage a
    `docs/features/active/<item>/` folder. Require that `git diff --name-only origin/main...HEAD`
    lists only `docs/` paths, otherwise stop and report without forcing or splitting the branch.
-   Push, delegate the pull request to `Agent(pr-author)` with a `branch:` label, merge it with
+   Push. Before the delegation, record one `complexity_assessments[]` entry and one pr-author
+   `model_routing_receipts[]` entry (`model` from `Resolve-DelegationModel -Agent pr-author`) in the
+   parallel checkpoint, as the skill's substep 3 states (issue #1182). Delegate the pull request to
+   `Agent(pr-author)` non-isolated with exactly one `branch: parallel/<slug>-plan` line, no canonical
+   issue-number line, and the receipt's `model`; never record its number in `items[]`. Merge it with
    `gh pr merge <PR> --merge`, and confirm the merge by the skill's merge-confirmation procedure.
 4. **Scratch worktrees.** After the records merge is confirmed, run the `cleanup-merged-worktrees`
    report with `bash .claude/skills/cleanup-merged-worktrees/scripts/cleanup-worktrees.sh`, and run
    it with `--apply` only when every delete-eligible row is a worktree this run created; otherwise
    apply nothing and report each scratch worktree as a deferral. Add no hook allow.
 5. **Report.** Report every deferral, with LV1 (removal refused after unlock), LV2 (records pull
-   request still open in the merge queue or `origin/main` absent at merge-gate time), and LV3
-   (records pull request needs manual authoring because `Agent(pr-author)` failed its routing
-   receipt check) as the named deferral cases.
+   request still open in the merge queue or `origin/main` absent at merge-gate time), and LV3 (a
+   residual deferral: the records delegation or its receipt Write is still denied after the receipt
+   is recorded; report the `PARALLEL_RECORDS_*` sub-code and author the pull request manually) as
+   the named deferral cases.

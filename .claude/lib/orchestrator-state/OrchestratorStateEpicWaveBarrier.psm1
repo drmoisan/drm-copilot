@@ -38,6 +38,11 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+# Issue #1162: the cross-epic started-while-held check, appended by
+# Get-OrchestratorStateEpicWaveBarrierError. A load failure stops this import, so the stop
+# hook's guarded import of this module fails closed.
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateEpicCrossDependency.psm1') -Force -ErrorAction Stop
+
 # Lifecycle prefixes a folder hint may carry, tested in this order; the first match is stripped.
 $script:LifecyclePrefixes = @('docs/features/active/', 'docs/features/completed/', 'active/', 'completed/')
 
@@ -382,7 +387,7 @@ function Get-EpicWaveBarrierViolation {
 function Get-OrchestratorStateEpicWaveBarrierError {
     <#
     .SYNOPSIS
-        Return the EPIC_WAVE_BARRIER_VIOLATION lines for an epic checkpoint's text.
+        Return the EPIC_WAVE_BARRIER_VIOLATION lines, then the EPIC_CROSS_DEPENDENCY_VIOLATION lines (issue #1162), for an epic checkpoint's text.
     .DESCRIPTION
         Parses the text with System.Text.Json default options and applies the Layer 2
         ordering check. Returns an empty array when there is no violation, when the root is
@@ -411,7 +416,10 @@ function Get-OrchestratorStateEpicWaveBarrierError {
     }
     try {
         $entries = Get-EpicWaveBarrierFeatureEntry -Root $document.RootElement
-        return , [string[]] @(Get-EpicWaveBarrierViolation -Entry $entries)
+        $violations = [string[]] @(Get-EpicWaveBarrierViolation -Entry $entries)
+        # Key-gated: a checkpoint without cross_epic_depends_on adds no line.
+        $cross = [string[]] (Get-OrchestratorStateEpicCrossDependencyError -CheckpointText $CheckpointText)
+        return , [string[]] @($violations + $cross)
     }
     finally {
         $document.Dispose()

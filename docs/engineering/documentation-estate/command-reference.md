@@ -96,13 +96,18 @@ Other options: `-Limit` names a precision-limit diagnostic instead of `-Element`
 ### `validate`
 
 Validates the artifacts in one `-Mode`: `profile`, `ledger`, `matrix` or `docs-complete`.
-`-Revision` is required. `-WriteReceipt` persists the validation receipt and applies only to
-`docs-complete`. For profile-only checks use `validate-profile`; `validate -Mode profile` overlaps
+`-Revision` is required unless `-WriteReceipt` is given: with `-WriteReceipt` in `docs-complete`,
+`-Revision` defaults to the snapshot revision of the inventory, and a null or absent snapshot
+revision is a usage error that names `inventory -Revision`. `-WriteReceipt` persists the
+validation receipt and applies only to `docs-complete`. In `docs-complete` mode a passing result is
+also checked with the receipt revision rule against the repository `HEAD`; a denial is reported as
+the error finding `DOCS_RECEIPT_REVISION_REJECTED` and no receipt is written. For profile-only checks use `validate-profile`; `validate -Mode profile` overlaps
 with it.
 
 ```powershell
 & ./.claude/lib/docs/Invoke-DocsCommand.ps1 -Command validate -Mode docs-complete -Revision 0123456789abcdef0123456789abcdef01234567 -Json
 & ./.claude/lib/docs/Invoke-DocsCommand.ps1 -Command validate -Mode docs-complete -Revision 0123456789abcdef0123456789abcdef01234567 -WriteReceipt
+& ./.claude/lib/docs/Invoke-DocsCommand.ps1 -Command validate -Mode docs-complete -WriteReceipt
 ```
 
 ### `generate-reference`

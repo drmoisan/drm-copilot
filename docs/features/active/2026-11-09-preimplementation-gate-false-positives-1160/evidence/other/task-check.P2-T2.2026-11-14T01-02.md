@@ -1,0 +1,9 @@
+# Task Check — [P2-T2] (cycle 3)
+
+Timestamp: 2026-11-14T01-02
+Command: sh SCRATCH/issue-1160-c3r3-pyt-brief.sh (pytest over six contract files that read the brief or the bundle copies); sh SCRATCH/issue-1160-r4-tc.sh with Run.Path set to the six Pester suites that read the brief; sha256sum over the six brief copies; git diff --numstat c4a26619489c1e8a8ab67d00b2187dbee6b07da7 -- .claude/skills/execution-environment/SKILL.md
+EXIT_CODE: 0
+Output Summary: pytest 96 passed, 0 failed; Pester 332 passed, 0 failed. The six brief copies share SHA256 4dd9db4baf9abbf7a3f7e15503d7997059c92e068b607fb51ba3535e3957b490, and each contains `decision D17` once and `decision D18` once. The diff against the remediation start ref is 1 line added and 1 line removed, the #1160 bullet of `## Hook Execution Context`.
+
+- Changed files: `.claude/skills/execution-environment/SKILL.md`, `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, and the bundle copies under `extensions/drm-copilot/resources/claude-customizations/.claude`, `codex-and-agents-customizations/.agents`, and `customizations/.github`
+- Selection (rule: the contract tests that read a changed Markdown path): `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py`, `test_discovery_documentation_contracts.py`, `test_bash_command_shape_surfaces.py`, `test_single_pass_preflight_contracts.py`, `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`; `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`, `parallel-gate-wording.Tests.ps1`, `planning-contract-wording.Tests.ps1`, `NestingDepthContract.Tests.ps1`, `tests/scripts/claude-hooks/cleanup-merged-worktrees.SkillText.Tests.ps1`, `tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1`

@@ -1,0 +1,12 @@
+# Final QC: Pester Gate (P6-T2)
+
+Timestamp: 2026-11-13T23-38
+Command: sh SCRATCH/issue-1169-pester.sh final3 (pwsh 7: Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; Invoke-PoshQCParallelTest -Root <worktree root>; exit with the returned ExitCode; then SCRATCH/issue-1169-summ.ps1 reads artifacts/pester/pester-junit.xml and artifacts/pester/powershell-coverage.xml)
+EXIT_CODE: 0
+Output Summary:
+- Gate: one Invoke-PoshQCParallelTest run in the restarted final loop, 8 shard processes, every shard exit 0, wall-clock 571.83 s; merged reports written.
+- JUnit (artifacts/pester/pester-junit.xml): 22006 tests, 21996 passed, 0 failed, 0 errors, 10 skipped. Among the passes: enforcement-hooks-no-python-invocation.Tests.ps1 (35 tests, 0 failures), hook-dependency-guard-completeness.Tests.ps1 (731, 0), ClaudeLibModuleConvention.Tests.ps1 (6, 0), FileSizePolicy.RepoGate.Tests.ps1 (5, 0).
+- Repo-wide line coverage (artifacts/pester/powershell-coverage.xml): 95.83% (38425/40095); Phase 0 baseline 95.83% (37807/39454).
+- Per-file line coverage, new files: .claude/lib/docs/DocsReceiptRevision.psm1 100.00% (40/40); .claude/lib/docs/DocsValidateCommands.psm1 100.00% (102/102); .claude/hooks/hook-docs-estate-context.ps1 100.00% (58/58); .codex/hooks/hook-docs-estate-context.ps1 96.55% (56/58); .claude/hooks/enforce-orchestration-preimplementation-gate-docs.ps1 94.20% (130/138); .codex/hooks/enforce-orchestration-preimplementation-gate-docs.ps1 91.30% (126/138); .claude/hooks/enforce-model-routing-receipt-docs.ps1 95.06% (77/81).
+- Per-file line coverage, changed files: .claude/hooks/hook-docs-only-diff.ps1 98.46% (128/130); .codex/hooks/hook-docs-only-diff.ps1 97.69% (127/130); .claude/hooks/enforce-orchestration-preimplementation-gate.ps1 96.36% (159/165); .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 100.00% (175/175); .claude/hooks/enforce-model-routing-receipt.ps1 96.00% (96/100); .claude/hooks/enforce-docs-complete-gate.ps1 95.00% (114/120); .claude/lib/docs/DocsCompleteGate.psm1 100.00% (39/39); .claude/lib/docs/DocsLedgerCommands.psm1 99.67% (302/303); .claude/lib/docs/DocsProfileCommands.psm1 97.33% (73/75); .claude/lib/docs/Invoke-DocsCommand.ps1 90.82% (188/207).
+- Earlier final run (2026-11-13T23-20, superseded): 22002 tests, 0 failures, but DocsLedgerCommands.psm1 at 99.01% (300/303) was below its baseline; two unit rows for exported helpers were added and the loop restarted.

@@ -1,0 +1,20 @@
+{
+  "issue": 1161,
+  "written_at": "2026-11-14T01:35:41Z",
+  "note": "Wall-clock times including queueing. The ci stage is open at write time (ended_at null). The merge stage is not captured.",
+  "stage_timing": [
+    { "stage": "preparation", "attempt": 1, "started_at": "2026-11-09T21:33:48Z", "ended_at": "2026-11-09T22:53:02Z" },
+    { "stage": "research", "attempt": 1, "started_at": "2026-11-09T21:33:48Z", "ended_at": "2026-11-09T21:46:06Z" },
+    { "stage": "feature_documents", "attempt": 1, "started_at": "2026-11-09T21:46:06Z", "ended_at": "2026-11-09T21:54:05Z" },
+    { "stage": "atomic_planning", "attempt": 1, "started_at": "2026-11-09T21:54:05Z", "ended_at": "2026-11-09T22:07:32Z" },
+    { "stage": "preflight", "attempt": 1, "started_at": "2026-11-09T22:07:32Z", "ended_at": "2026-11-09T22:22:45Z" },
+    { "stage": "atomic_planning", "attempt": 2, "started_at": "2026-11-09T22:22:45Z", "ended_at": "2026-11-09T22:37:40Z" },
+    { "stage": "preflight", "attempt": 2, "started_at": "2026-11-09T22:37:40Z", "ended_at": "2026-11-09T22:53:02Z" },
+    { "stage": "atomic_execution", "attempt": 1, "started_at": "2026-11-10T03:09:12Z", "ended_at": "2026-11-14T00:23:17Z" },
+    { "stage": "pr_creation", "attempt": 1, "started_at": "2026-11-14T00:23:17Z", "ended_at": "2026-11-14T00:26:49Z" },
+    { "stage": "feature_review", "attempt": 1, "started_at": "2026-11-14T00:26:49Z", "ended_at": "2026-11-14T00:41:36Z" },
+    { "stage": "remediation_cycle_1", "attempt": 1, "started_at": "2026-11-14T00:41:36Z", "ended_at": "2026-11-14T01:35:41Z" },
+    { "stage": "feature_review", "attempt": 2, "started_at": "2026-11-14T01:24:09Z", "ended_at": "2026-11-14T01:35:41Z" },
+    { "stage": "ci", "attempt": 1, "started_at": "2026-11-14T00:26:49Z", "ended_at": null }
+  ]
+}

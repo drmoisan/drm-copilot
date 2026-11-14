@@ -3,6 +3,7 @@
 import {
   buildFeatureReferenceIndex,
   resolveFeatureReference,
+  validateCrossEpicDependencyShape,
 } from "./epic-orchestrator-state-resolution";
 import { validateEpicPlannerChildLaunchBindings } from "./epic-orchestrator-state-launch-binding";
 import {
@@ -11,6 +12,7 @@ import {
 } from "./epic-wave-computation";
 import { validateCodexModelRoutingReceipt } from "./orchestrator-state-codex-model-routing";
 import { validateCodexTopologyReceipt } from "./orchestrator-state-codex-topology";
+import { validatePlannerWorktrees } from "./epic-planner-state-planner-worktrees";
 import {
   validateEpicReadinessIntegrity,
   type EpicReadinessContext,
@@ -411,6 +413,7 @@ export function validateEpicPlannerStateText(
   errors.push(...featureResult.errors);
 
   errors.push(...validateDependencyWaves(featureResult.indexedFeatures));
+  errors.push(...validateCrossEpicDependencyShape(value));
   const maxParallel = value["max_parallel_features"];
   if (
     typeof maxParallel !== "number" ||
@@ -423,6 +426,9 @@ export function validateEpicPlannerStateText(
         "from 1 through 8.",
     );
   }
+  errors.push(
+    ...validatePlannerWorktrees(value, featureResult.indexedFeatures),
+  );
 
   if (
     worthiness.verdict === "non_epic" &&

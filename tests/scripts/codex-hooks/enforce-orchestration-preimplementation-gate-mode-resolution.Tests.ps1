@@ -26,7 +26,8 @@
     Determinism. Every fixture is a literal string; the suite makes no temporary
     file, performs no filesystem write, reads no wall clock, opens no network
     connection, and starts no external process. The single sanctioned disk read is
-    the tracked `.codex/config.toml`, permitted by the spec's test strategy because
+    the tracked `.codex/hooks/pretooluse-dispatch.json` (the PreToolUse registry that
+    `.codex/config.toml` dispatches to since issue #1159), permitted by the spec's test strategy because
     the fact that case records is a property of that committed file and cannot be
     expressed any other way. It is resolved through a `$PSScriptRoot`-relative
     `Resolve-Path`, so the suite carries no working-directory assumption.
@@ -313,24 +314,15 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode resolution (is
             # The discovery adapters registered by issue #980 carry their own PreToolUse
             # block whose matcher admits the Agent transport (nested-specialist denial);
             # that block never names this hook, so only the blocks that register this
-            # hook are read here.
-            $configPath = (Resolve-Path "$PSScriptRoot/../../../.codex/config.toml").Path
-            $lines = Get-Content -LiteralPath $configPath
+            # hook are read here. Issue #1159: config.toml registers only the PreToolUse
+            # dispatcher, whose union matcher admits Agent for other hooks; the groups that
+            # list this hook are read from the dispatcher registry .codex/hooks/pretooluse-dispatch.json.
+            $registryPath = (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/pretooluse-dispatch.json").Path
+            $registry = Get-Content -LiteralPath $registryPath -Raw | ConvertFrom-Json
             $hookToken = 'enforce-orchestration-preimplementation-gate.ps1'
 
-            $toolMatchers = @()
-            for ($index = 0; $index -lt $lines.Count; $index++) {
-                if ($lines[$index].Trim() -ne '[[hooks.PreToolUse]]') { continue }
-                $matcher = $null
-                $registersHook = $false
-                for ($scan = $index + 1; $scan -lt $lines.Count; $scan++) {
-                    if ($lines[$scan].Trim() -eq '[[hooks.PreToolUse]]' -or $lines[$scan].Trim() -match '^\[\[hooks\.(?!PreToolUse)') { break }
-                    $candidate = [regex]::Match($lines[$scan], '^\s*matcher\s*=\s*"(?<value>.*)"\s*$')
-                    if ($candidate.Success -and $null -eq $matcher) { $matcher = $candidate.Groups['value'].Value }
-                    if ($lines[$scan].Contains($hookToken)) { $registersHook = $true }
-                }
-                if ($registersHook -and $null -ne $matcher) { $toolMatchers += $matcher }
-            }
+            $listingGroups = @($registry.hooks.PreToolUse | Where-Object { @($_.hooks | Where-Object { ([string]$_.command).Contains($hookToken) }).Count -gt 0 })
+            $toolMatchers = @($listingGroups | ForEach-Object { [string]$_.matcher })
 
             $toolMatchers.Count | Should -BeGreaterThan 0 -Because 'the parse must find the PreToolUse blocks that register this hook'
             foreach ($matcher in $toolMatchers) {

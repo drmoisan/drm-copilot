@@ -1,0 +1,6 @@
+# Contract Tests (post-merge verification)
+
+Timestamp: 2026-11-13T19-28
+Command: sh SCRATCH/issue-1160-r4-contract.sh (env -u VIRTUAL_ENV poetry run pytest -n auto -q --no-cov tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py tests/scripts/dev_tools/test_execution_environment_brief_contracts.py; then env -u VIRTUAL_ENV poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check)
+EXIT_CODE: 0
+Output Summary: one pytest -n auto run on the merge head `ef082f4fa` (origin/main `eb73f1dff` merged into the cycle 2 head `0613920d6`): `130 passed in 6.43s`, 0 failed, pytest exit 0. Generator `--check`: exit 0, no output. The seven files are the same set that cycle 2's [P3-T5] ran (`contract-tests.2026-11-13T19-19.md`, also 130 passed); the merged six-copy execution-environment brief passes `test_execution_environment_brief_contracts.py` and the push-down resource contracts.

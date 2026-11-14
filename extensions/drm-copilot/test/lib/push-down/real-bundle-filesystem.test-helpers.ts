@@ -154,8 +154,73 @@ function dotSourceTargets(scriptPath: string, text: string): string[] {
 }
 
 /**
- * Return every hook registered by a bundle's `.codex/config.toml` plus the
- * transitive dot-source closure of those hooks, as bundle-relative paths.
+ * Narrow an unknown value to a plain object with string keys.
+ *
+ * @param value Any parsed JSON value.
+ * @returns True when the value is a non-null, non-array object.
+ */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Return the array stored under one key of a parsed JSON object.
+ *
+ * @param value Any parsed JSON value.
+ * @param key Property name to read.
+ * @returns The array, or an empty array when the shape does not match.
+ */
+function arrayProperty(value: unknown, key: string): unknown[] {
+  if (!isRecord(value)) {
+    return [];
+  }
+  const property = value[key];
+  if (!Array.isArray(property)) {
+    return [];
+  }
+  const items: unknown[] = property;
+  return items;
+}
+
+/**
+ * Return every `.codex/hooks` path named by a PreToolUse dispatcher registry.
+ *
+ * TypeScript twin of `registry_hook_paths` in
+ * `tests/scripts/dev_tools/test_codex_core_manifest_closure.py`. The registry
+ * (issue #1159) holds the PreToolUse hook groups in the settings shape
+ * `{"hooks": {"PreToolUse": [{"matcher", "hooks": [{"command"}]}]}}`; entries
+ * of another shape are skipped.
+ *
+ * @param registryText Text of a Codex `pretooluse-dispatch.json` registry.
+ * @returns Bundle-relative hook script paths, in registry order, without
+ *     duplicates.
+ */
+export function registryHookPaths(registryText: string): string[] {
+  const registry: unknown = JSON.parse(registryText);
+  const hooksBlock = isRecord(registry) ? registry["hooks"] : undefined;
+  const paths = new Set<string>();
+  // Visit each PreToolUse group and each hook command it lists.
+  for (const group of arrayProperty(hooksBlock, "PreToolUse")) {
+    for (const hook of arrayProperty(group, "hooks")) {
+      const command = isRecord(hook) ? hook["command"] : undefined;
+      const match =
+        typeof command === "string" ? HOOK_COMMAND_PATH.exec(command) : null;
+      if (match?.[1] !== undefined) {
+        paths.add(match[1]);
+      }
+    }
+  }
+  return [...paths];
+}
+
+/**
+ * Return every hook registered for the bundle plus the transitive dot-source
+ * closure of those hooks, as bundle-relative paths.
+ *
+ * The closure roots come from two sources: the hook scripts named by a
+ * `command` line of any event in `.codex/config.toml`, and the PreToolUse hooks
+ * the dispatcher registry `.codex/hooks/pretooluse-dispatch.json` lists
+ * (issue #1159). A missing registry throws, so the helper fails closed.
  *
  * @param bundleRoot Absolute path of the Codex bundle root.
  * @returns Sorted bundle-relative paths.
@@ -165,7 +230,11 @@ export function collectRegisteredHookClosure(bundleRoot: string): string[] {
     nodePath.join(bundleRoot, ".codex", "config.toml"),
     "utf8",
   );
-  const pending: string[] = [];
+  const registryText = fs.readFileSync(
+    nodePath.join(bundleRoot, ".codex", "hooks", "pretooluse-dispatch.json"),
+    "utf8",
+  );
+  const pending: string[] = [...registryHookPaths(registryText)];
   // Collect every hook script named by a `command` line of any event.
   for (const line of configText.split(/\r?\n/)) {
     const match = /^command\s*=/.test(line)

@@ -45,3 +45,32 @@ Use these sections in this order:
 - Do not treat PR numbers as issues.
 - Auto-close bullets must use exactly `- Closes #NNN` format, sourced only from "Issues to autoclose" or "Author-asserted autoclose issues."
 - If GitHub validation is unavailable or unverified, do not emit `Closes`; use the `None` bullet.
+
+## Checkpoint-Free Docs-Estate Delegation (issue #1169)
+
+A documentation run (`/documentation-workflow`) writes no orchestration checkpoint. Its root session
+delegates pr-author through the docs-estate delegation leg of the model-routing gate, which stands
+in for the routing receipt. The delegation prompt carries each of these lines exactly once:
+
+- `branch: <branch>`: the docs branch.
+- `base: <base>`: the explicit base branch, which may be an epic integration branch.
+- `Canonical issue number for this feature is <N>.`: the tracking issue of the run.
+- `Author-asserted autoclose issues: #<N>`.
+
+The pull request is created with this command form:
+
+```text
+gh pr create --head <branch> --base <base>
+```
+
+Preconditions, each checked by the leg before it allows the delegation:
+
+1. The docs profile `docs/documentation-estate/docs-profile.json` beneath the worktree is
+   structurally valid.
+2. The diff against the explicit base (`origin/<base>`) is non-empty and lists only docs path set
+   changes.
+3. The receipt at `artifact_paths.validation_receipt` is a passing `docs-complete` receipt that
+   satisfies the receipt revision rule against `HEAD`.
+
+When the worktree holds a checkpoint, this leg does not apply and the routing receipt in that
+checkpoint governs.

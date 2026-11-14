@@ -1,0 +1,36 @@
+{
+  "issue": 1160,
+  "note": "Wall-clock times including queueing; merge stage not captured; S9 attempt 1 open at commit time and closed in the gitignored checkpoint.",
+  "stage_timing": [
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 1,
+      "started_at": "2026-11-10T03:19:02Z",
+      "ended_at": "2026-11-13T17:34:16Z"
+    },
+    {
+      "stage": "S8_create_pr",
+      "attempt": 1,
+      "started_at": "2026-11-13T17:34:16Z",
+      "ended_at": "2026-11-13T17:37:09Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 1,
+      "started_at": "2026-11-13T17:37:09Z",
+      "ended_at": "2026-11-13T17:50:24Z"
+    },
+    {
+      "stage": "S9_remediation_loop",
+      "attempt": 1,
+      "started_at": "2026-11-13T17:50:24Z",
+      "ended_at": "2026-11-14T03:30:09Z"
+    },
+    {
+      "stage": "S9_ci_gate",
+      "attempt": 1,
+      "started_at": "2026-11-14T03:30:09Z",
+      "ended_at": null
+    }
+  ]
+}

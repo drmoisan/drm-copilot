@@ -140,3 +140,32 @@ wrong checkout. In that topology, use this procedure instead of the relative for
 
 In this topology pr-author is delegated without worktree isolation, because an isolated agent
 worktree refuses command text that names another worktree.
+
+## Checkpoint-Free Docs-Estate Delegation (issue #1169)
+
+A documentation run (`/documentation-workflow`) writes no orchestration checkpoint. Its root session
+delegates pr-author through the docs-estate delegation leg of the model-routing gate, which stands
+in for the routing receipt. The delegation prompt carries each of these lines exactly once:
+
+- `branch: <branch>`: the docs branch.
+- `base: <base>`: the explicit base branch, which may be an epic integration branch.
+- `Canonical issue number for this feature is <N>.`: the tracking issue of the run.
+- `Author-asserted autoclose issues: #<N>`.
+
+The pull request is created with this command form:
+
+```text
+gh pr create --head <branch> --base <base>
+```
+
+Preconditions, each checked by the leg before it allows the delegation:
+
+1. The docs profile `docs/documentation-estate/docs-profile.json` beneath the worktree is
+   structurally valid.
+2. The diff against the explicit base (`origin/<base>`) is non-empty and lists only docs path set
+   changes.
+3. The receipt at `artifact_paths.validation_receipt` is a passing `docs-complete` receipt that
+   satisfies the receipt revision rule against `HEAD`.
+
+When the worktree holds a checkpoint, this leg does not apply and the routing receipt in that
+checkpoint governs.

@@ -40,12 +40,16 @@ The skills are under `.claude/skills/`.
 5. Review: `docs-coverage-reviewer` runs `docs-review-coverage`.
 6. Validate: `docs-coverage-reviewer` runs `docs-validate` with `validate -Mode docs-complete` at the
    head revision.
+7. Commit, receipt and pull request: the root session runs the `Commit, Receipt and Pull Request`
+   stage of `documentation-workflow`: it commits the estate, writes and commits the receipt, pushes,
+   and delegates `pr-author` with the checkpoint-free delegation-prompt contract.
 
 ## Receipt Persistence
 
 The roles validate without persisting a receipt, and `validate_docs_artifacts` never persists one.
 The `docs-complete` receipt is persisted only from the root session or CI, with
-`validate -Mode docs-complete -Revision <head revision> -WriteReceipt`.
+`validate -Mode docs-complete -WriteReceipt`, whose revision defaults to the snapshot revision of the
+inventory.
 
 ## Integration-PR Gate
 
@@ -54,6 +58,13 @@ The gate is opt-in. When the docs profile sets `completion_gates.integration_pr_
 integration branch into `main` unless the persisted `docs-complete` receipt passes at the pull
 request head revision. Its deny reasons start with `DOCS_COMPLETE_GATE_BLOCKED:`. Without the key
 the hook allows every command.
+
+The receipt passes at the head under the receipt revision rule: its revision equals the snapshot
+revision, and it is either the head revision or an ancestor of it with no changed path under
+`surface_selection.source_roots`. A rebase denies with `RECEIPT_REVISION_NOT_ANCESTOR`, a changed
+source path denies with `RECEIPT_SOURCE_DRIFT`, and an undecidable ancestry or diff denies with
+`RECEIPT_REVISION_UNRESOLVED`; the remedy is the `Refresh After Rebase or Source Change` section of
+`documentation-workflow`.
 
 ## Surface-Delta Review Step
 

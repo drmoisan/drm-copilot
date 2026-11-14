@@ -447,9 +447,10 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
         }
 
         It 'registers the preimplementation gate in active and tracked Claude settings' {
+            # Issue #1159: the PreToolUse groups live in the dispatcher registry beside the hooks, in both copies.
             $settingsPaths = @(
-                Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'settings.json'
-                Join-Path -Path $script:RepoRoot -ChildPath 'extensions', 'drm-copilot', 'resources', 'claude-customizations', '.claude', 'settings.json'
+                Join-Path -Path $script:RepoRoot -ChildPath '.claude' -AdditionalChildPath 'hooks', 'pretooluse-dispatch.json'
+                Join-Path -Path $script:RepoRoot -ChildPath 'extensions', 'drm-copilot', 'resources', 'claude-customizations', '.claude', 'hooks', 'pretooluse-dispatch.json'
             )
             $requiredMatchers = @('Bash', 'Write|Edit', 'Agent')
             $expectedCommand = 'pwsh -NoProfile -File .claude/hooks/enforce-orchestration-preimplementation-gate.ps1'

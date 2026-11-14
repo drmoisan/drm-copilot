@@ -30,12 +30,26 @@ nothing for a repository that has no Python.
 
 ## Linting
 
-Linting is optional. `init -Write` writes linter configuration as data: `.markdownlint.json`,
-`.vale.ini`, `.vale/styles/DocsBase/HeadingPunctuation.yml`,
-`.vale/styles/DocsBase/Placeholders.yml` and an empty
-`.vale/styles/config/vocabularies/Project/accept.txt`. No Node.js or Python linter is required to
-adopt the tooling. `check` is the required page gate: it checks page structure, metadata and links
-without any external linter.
+Linting is optional. `init -Write` writes linter configuration as data under
+`docs/documentation-estate/`: `docs/documentation-estate/.markdownlint.json`,
+`docs/documentation-estate/.vale.ini`,
+`docs/documentation-estate/.vale/styles/DocsBase/HeadingPunctuation.yml`,
+`docs/documentation-estate/.vale/styles/DocsBase/Placeholders.yml` and an empty
+`docs/documentation-estate/.vale/styles/config/vocabularies/Project/accept.txt`. No Node.js or
+Python linter is required to adopt the tooling. `check` is the required page gate: it checks page
+structure, metadata and links without any external linter.
+
+No workflow step runs Vale or markdownlint. To lint, pass
+`--config docs/documentation-estate/.vale.ini` to Vale, or set `VALE_CONFIG_PATH` to that path,
+and pass `docs/documentation-estate/.markdownlint.json` to markdownlint as its configuration file.
+Vale resolves `StylesPath = .vale/styles` relative to the `.vale.ini` that sets it. An estate
+initialized earlier keeps its root-level linter files; they are not migrated.
+
+The docs-only exemptions of the pull-request and merge gates admit
+`.github/workflows/_docs-quality.yml` as their one path outside `docs/`. The admission applies to
+every pull request: a pull request that edits only that workflow passes the docs-only exemptions,
+while CI still runs in full for it and the required CI gate still applies. It is a policy-level
+control.
 
 ## Steps
 

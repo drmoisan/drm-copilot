@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import asdict, replace
 from typing import cast
 
@@ -440,3 +441,25 @@ def test_taskmaster_469_legacy_migration_never_infers_missing_portable_facts(
                 scheduler_context=incomplete["scheduler_context"],
             )
         assert fixture_bytes(case, fixture) == (source_before, plan_before)
+
+
+@pytest.mark.parametrize("case", CASES, ids=lambda case: case.name)
+def test_destination_projection_omits_regeneration_keys(case: FixtureCase) -> None:
+    """The destination projection drops the regenerate-path keys (issue #1156).
+
+    Args:
+        case (FixtureCase): The handoff direction under test.
+
+    Returns:
+        None: The test passes when the projection text names no regeneration key.
+    """
+    # Arrange: the projection input is the envelope and its facts only.
+    envelope = build_envelope(case)
+
+    # Act
+    projection = case.adapter.project(envelope, projection_facts(envelope))
+    text = json.dumps(projection.checkpoint)
+
+    # Assert: none of the tolerated regeneration keys reaches the destination.
+    for key in ("regeneration_events", "integration_regenerations", "review_kind"):
+        assert key not in text, f"projection carries {key}"

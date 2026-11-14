@@ -1,0 +1,56 @@
+{
+  "name": "recorded-at-byte-order-mark",
+  "notes": "A recorded_at that holds only U+FEFF is accepted: U+FEFF is outside the shared blank set of six ASCII characters.",
+  "checkpoint": {
+    "objective": "Synthetic epic used by the planner_worktrees corpus.",
+    "epic_feature_folder": "2026-11-09-synthetic-epic",
+    "epic_manifest_path": "docs/features/epics/2026-11-09-synthetic-epic/epic-manifest.md",
+    "integration_branch": "epic/synthetic-integration",
+    "max_parallel_features": 2,
+    "epic_worthiness": {
+      "verdict": "epic",
+      "rationale": "Two independent synthetic features."
+    },
+    "features": [
+      {
+        "issue_num": 1,
+        "feature_folder": "docs/features/active/2026-11-09-alpha-1",
+        "depends_on": [],
+        "wave": 0,
+        "complexity_band": "C3",
+        "preparation_status": "prepared",
+        "research_path": "docs/features/active/2026-11-09-alpha-1/research/research.md",
+        "plan_path": "docs/features/active/2026-11-09-alpha-1/plan.md",
+        "preflight_status": "PREFLIGHT: ALL CLEAR"
+      },
+      {
+        "issue_num": 2,
+        "feature_folder": "docs/features/active/2026-11-09-beta-2",
+        "depends_on": [],
+        "wave": 0,
+        "complexity_band": "C3",
+        "preparation_status": "prepared",
+        "research_path": "docs/features/active/2026-11-09-beta-2/research/research.md",
+        "plan_path": "docs/features/active/2026-11-09-beta-2/plan.md",
+        "preflight_status": "PREFLIGHT: ALL CLEAR"
+      }
+    ],
+    "kickoff_prompt_path": "artifacts/orchestration/epic-kickoff-2026-11-09-synthetic-epic.md",
+    "completed_steps": [
+      "E1"
+    ],
+    "next_step": "E2",
+    "last_updated": "2026-11-09T22:00:00Z",
+    "planner_worktrees": [
+      {
+        "branch": "feature/alpha-1",
+        "path": ".claude/worktrees/agent-alpha-1",
+        "purpose": "preparation",
+        "preparation_status": "prepared",
+        "feature_folder": "docs/features/active/2026-11-09-alpha-1",
+        "recorded_at": "\ufeff"
+      }
+    ]
+  },
+  "expected_errors": []
+}

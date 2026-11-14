@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "stage": "plan",
+  "research_path": "docs/features/active/regenerate-after-integration-merge-1156/research/research.2026-11-09T21-35.md",
+  "spec_path": "docs/features/active/regenerate-after-integration-merge-1156/spec.md",
+  "plan_path": "docs/features/active/regenerate-after-integration-merge-1156/plan.2026-11-09T16-31.md",
+  "plan_hash": "0fbe13d06f91203ee265b0a20030545810be8aee",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "REVISIONS REQUIRED",
+  "preflight_defects": [
+    "[P1-T3], [P2-T1], [P2-T2], [P4-T1] spec value with no implementing task: evidence_path inside the event and review_outcome results and the Command:/EXIT_CODE: source of evidence_text are not fixed; state builder parameter lists and the exact entry-point value (for example null, set by the orchestrator from Get-RegenerationEvidencePath) and align R72/R73 and the P4-T1 prose",
+    "[P2-T3] design gap: Tip restore path-set derivation for rows R34, R35, R39, R41, R42 is unstated; state the derivation and the exact restore argv per row R34-R42",
+    "[P3-T3] design gap against spec Preimplementation allowance rule 2: operand predicate must reject any token starting with '-', deny cases run with a config whose paths include '*'",
+    "[P2-T2], [P2-T3] spec rule with no failing test: C1/C2 union of unstaged and untracked; add a Merge untracked-only run-2 case reaching R66 and a Tip untracked-only out-of-pattern run-1 case reaching R36",
+    "[P2-T1] spec rules with no failing test (D17 resolutions 1 and 2): usage rows assert zero -UtcNow invocations; R02 alternatives merge and tip, R05 alternative Main_Sync",
+    "[P4-T1] existing-test disposition omission: add less-evidence-contract.Tests.ps1, test_completion_gate_documentation_contracts.py, test_orchestrator_state_required_keys_docs.py as unchanged",
+    "[P4-T5] existing-test disposition omission: add test_orchestrator_state_required_keys_docs.py, test_orchestrator_state_blocked_reason.py, test_parallel_issue_adoption_skill_contracts.py as unchanged"
+  ],
+  "preflight_fix_record": null,
+  "recorded_at": "2026-11-10T00:39:54Z"
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "stage": "plan",
+  "research_path": "docs/features/active/regenerate-after-integration-merge-1156/research/research.2026-11-09T21-35.md",
+  "spec_path": "docs/features/active/regenerate-after-integration-merge-1156/spec.md",
+  "plan_path": "docs/features/active/regenerate-after-integration-merge-1156/plan.2026-11-09T16-31.md",
+  "plan_hash": "f0b6702399f1f9d20244831fa5dfe4dfd638a4b8",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "REVISIONS REQUIRED",
+  "preflight_defects": [
+    "[P4-T2]/[P4-T6] default-off boundary: no literal and no section-scoped assertion that the integration-tip flow and the main-sync branch run only when the integration worktree holds a valid config/orchestration-regeneration.json",
+    "[P2-T2] Tip-mode handling of absent, key-absent, null, and invalid config is unspecified and untested (exit 3, no git call, no process call, config_errors populated, twenty-key result set)"
+  ],
+  "preflight_fix_record": "docs/features/active/regenerate-after-integration-merge-1156/evidence/other/preflight-fixes.2026-11-09T23-30.md",
+  "recorded_at": "2026-11-09T23:32:00Z"
+}

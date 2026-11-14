@@ -89,6 +89,32 @@ Describe 'Codex enforce-epic-merge-gate docs-only branch (issue #927)' {
         $reason.Contains(' (docs-only exemption not applied: DOCS_ONLY_EXEMPTION_NON_DOCS_PATH') | Should -BeTrue
     }
 
+    It 'allows a merge whose diff is docs paths plus the docs-init workflow path (codex, issue #1169)' {
+        # Arrange
+        Set-CodexGateDocsOnlySeam -DiffOutput "docs/a.md`0.github/workflows/_docs-quality.yml`0"
+        $payload = ConvertTo-CodexDocsOnlyPayload -Command 'gh pr merge 5 --merge'
+
+        # Act
+        $decision = Invoke-CodexEpicMergeDecision -PayloadRaw $payload -ChildCheckpointRaw '' -EpicCheckpointRaw '' -RepositoryRoot $PSScriptRoot
+
+        # Assert
+        $decision | Should -BeNullOrEmpty -Because "reason: $($decision.hookSpecificOutput.permissionDecisionReason)"
+    }
+
+    It 'denies the docs-plus-workflow diff with one extra non-docs path (codex, issue #1169)' {
+        # Arrange
+        Set-CodexGateDocsOnlySeam -DiffOutput "docs/a.md`0.github/workflows/_docs-quality.yml`0src/a.ps1`0"
+        $payload = ConvertTo-CodexDocsOnlyPayload -Command 'gh pr merge 5 --merge'
+
+        # Act
+        $decision = Invoke-CodexEpicMergeDecision -PayloadRaw $payload -ChildCheckpointRaw '' -EpicCheckpointRaw '' -RepositoryRoot $PSScriptRoot
+        $reason = [string]$decision.hookSpecificOutput.permissionDecisionReason
+
+        # Assert
+        $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        $reason.Contains(" (docs-only exemption not applied: DOCS_ONLY_EXEMPTION_NON_DOCS_PATH: 'src/a.ps1'") | Should -BeTrue
+    }
+
     It 'makes no docs-only call when the <Name> checkpoint is present (codex, issue #927)' -ForEach @(
         @{ Name = 'child'; Child = '{"note":"present"}'; Epic = '' }
         @{ Name = 'epic'; Child = ''; Epic = '{"note":"present"}' }

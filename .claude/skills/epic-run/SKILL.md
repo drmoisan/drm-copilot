@@ -59,7 +59,10 @@ merge into the integration branch requires a green `CI` run on the child head SH
 
 An early dependent start (manifest field `early_start_on`) is governed by
 `## Early Dependent Starts (early_start)` of the `epic-orchestrate` skill; a manifest without that
-field runs exactly as described above.
+field runs exactly as described above. A cross-epic dependency (manifest key `cross_epic_depends_on`)
+is governed by `## Cross-Epic Dependencies (cross_epic_depends_on)` of the same skill, and a run
+halted with `blocked_reason: "external_dependency"` resumes by running this skill again on the
+same epic slug.
 
 ## Nesting Depth
 

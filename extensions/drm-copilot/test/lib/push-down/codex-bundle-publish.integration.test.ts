@@ -17,6 +17,7 @@ import { buildInMemoryFileSystem, fixedClock } from "./push-down.test-helpers";
 import {
   collectRegisteredHookClosure,
   ReadThroughPushDownFileSystem,
+  registryHookPaths,
 } from "./real-bundle-filesystem.test-helpers";
 
 const EXTENSION_ROOT = toPosixPath(path.resolve(__dirname, "..", "..", ".."));
@@ -86,6 +87,12 @@ describe("Codex bundle publish (real bundle, in-memory destination)", () => {
     // Arrange
     const fsDouble = newFileSystem();
     const required = collectRegisteredHookClosure(BUNDLE_ROOT);
+    const registryHooks = registryHookPaths(
+      fs.readFileSync(
+        path.join(BUNDLE_ROOT, ".codex", "hooks", "pretooluse-dispatch.json"),
+        "utf8",
+      ),
+    );
 
     // Act
     pushDownCodexAndAgentsCustomizationsServiceCall({
@@ -98,6 +105,10 @@ describe("Codex bundle publish (real bundle, in-memory destination)", () => {
 
     // Assert
     expect(required.length).toBeGreaterThan(21);
+    // Every dispatched PreToolUse hook is a closure root, so a registry hook
+    // absent from the published payload appears in `missing` (issue #1159).
+    expect(registryHooks).toContain(".codex/hooks/validate-bash.ps1");
+    expect(required).toEqual(expect.arrayContaining(registryHooks));
     const missing = required.filter(
       (relative) => !fsDouble.isFile(`/dest/${relative}`),
     );

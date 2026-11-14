@@ -48,6 +48,11 @@
     The epic-scope path is not subject to this rule. Only the JSON boolean true waives the line;
     a string or number such as "true" or 1 does not (issue #1001).
 
+    Parallel records leg (issue #1182): a checkpoint-free Agent(pr-author) whose prompt carries one
+    'branch: parallel/<slug>-plan' line is checked against the pr-author entry of
+    model_routing_receipts in the parallel checkpoint beneath the resolved root
+    (Get-ModelRoutingParallelRecordsDecision), after the cleanup leg and before the docs-estate leg.
+
 .NOTES
     Compatible with PowerShell 7+. Read-only presence-gating deterrent.
 #>
@@ -56,15 +61,23 @@ param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
 
-try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
 # Portable-identity resolution (issue #673). Unguarded and fail-closed on purpose: a gate
 # that cannot load its resolver must not degrade into the cwd-relative read it replaces.
-try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
 # Epic scope (issue #663): a delegation for the epic integration branch is gated against the epic checkpoint.
-try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeResolution.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'EpicScopeResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicScopeResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'EpicScopeResolution.psm1' -ErrorRecord $_ }
 # Cleanup consolidation delegation (issue #1026): the session-root manifest and the shared predicates.
-try { Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -Force -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'CleanupWorktreeManifest.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'CleanupWorktreeManifest.psm1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-cleanup-context.ps1') } catch { Add-HookDependencyFailure -Name 'hook-cleanup-context.ps1' -ErrorRecord $_ }
+# Docs-estate delegation leg (issue #1169): the checkpoint-free Agent(pr-author) of a documentation run.
+try { . (Join-Path $PSScriptRoot 'enforce-model-routing-receipt-docs.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-model-routing-receipt-docs.ps1' -ErrorRecord $_ }
+# Parallel records delegation leg (issue #1182): the Run Closing Agent(pr-author) of a closed parallel run.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeTargetResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeTargetResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateModelReceipts.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateModelReceipts.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'hook-parallel-records-context.ps1') } catch { Add-HookDependencyFailure -Name 'hook-parallel-records-context.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-model-routing-receipt-parallel.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-model-routing-receipt-parallel.ps1' -ErrorRecord $_ }
 function Get-ModelRoutingCheckpoint {
     <#
     .SYNOPSIS
@@ -200,11 +213,11 @@ function Get-ModelRoutingTargetCheckpointResolution {
 
     switch ($target.Status) {
         { $_ -in @('SessionRoot', 'OtherWorktree') } {
-            return [ordered]@{ CheckpointPath = (Get-WorktreeItemCheckpointPath -WorktreeRoot $target.WorktreeRoot); Reason = $null }
+            return [ordered]@{ CheckpointPath = (Get-WorktreeItemCheckpointPath -WorktreeRoot $target.WorktreeRoot); Reason = $null; WorktreeRoot = [string]$target.WorktreeRoot }
         }
         default {
             $reason = "$($target.ReasonCode): $($target.Detail) The model-routing gate will not check this delegation against a checkpoint that may belong to a different item. Put the line 'Canonical issue number for this feature is <N>.' and a 'branch: <item branch>' label in the delegation prompt so the gate can identify the item."
-            return [ordered]@{ CheckpointPath = $null; Reason = $reason }
+            return [ordered]@{ CheckpointPath = $null; Reason = $reason; WorktreeRoot = $null }
         }
     }
 }
@@ -369,11 +382,30 @@ function Invoke-ModelRoutingReceiptDecision {
         return $allow
     }
 
+    # Issue #1169: a checkpoint-free documentation run delegates pr-author through the docs-estate
+    # leg; without a docs profile beneath the resolved root its suffix is empty.
+    $parallelSuffix = ''
+    $docsSuffix = ''
+    if ($subagent -eq 'pr-author' -and $null -eq $checkpoint) {
+        # Issue #1182: the Run Closing records delegation of a closed parallel run reads its receipt
+        # from the parallel checkpoint; any other prompt declines with an empty suffix.
+        $parallel = Get-ModelRoutingParallelRecordsDecision -PromptText $prompt -WorktreeRoot $resolution.WorktreeRoot
+        if ($parallel.Allowed) {
+            return $allow
+        }
+        $parallelSuffix = [string]$parallel.DenySuffix
+        $docs = Get-ModelRoutingDocsEstateDecision -PromptText $prompt -WorktreeRoot $resolution.WorktreeRoot
+        if ($docs.Allowed) {
+            return $allow
+        }
+        $docsSuffix = [string]$docs.DenySuffix
+    }
+
     return [ordered]@{
         hookSpecificOutput = [ordered]@{
             hookEventName            = 'PreToolUse'
             permissionDecision       = 'deny'
-            permissionDecisionReason = "MODEL_ROUTING_RECEIPT_BLOCKED: cannot delegate to '$subagent' before a model_routing_receipts entry for it is recorded in the orchestrator checkpoint. Perform Model Selection (record the complexity assessment and routing receipt) before delegating."
+            permissionDecisionReason = "MODEL_ROUTING_RECEIPT_BLOCKED: cannot delegate to '$subagent' before a model_routing_receipts entry for it is recorded in the orchestrator checkpoint. Perform Model Selection (record the complexity assessment and routing receipt) before delegating." + $parallelSuffix + $docsSuffix
         }
     }
 }

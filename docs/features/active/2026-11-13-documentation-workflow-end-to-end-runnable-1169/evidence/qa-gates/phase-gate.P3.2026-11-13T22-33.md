@@ -1,0 +1,16 @@
+# Phase Gate P3
+
+Timestamp: 2026-11-13T22-18
+Command: stages 1 to 6 of the toolchain loop over the worktree root: sh SCRATCH/issue-1169-static.sh p3b (check-only Invoke-PoshQCFormat with a no-op WriteFile seam, then Invoke-ScriptAnalyzer with scripts/powershell/PoshQC/settings/pssa.settings.psd1 on every PoshQC file, one retry per file on an analyzer exception); sh SCRATCH/issue-1169-pytest.sh p3b (env -u VIRTUAL_ENV poetry run pytest -n auto --cov --cov-branch --cov-report=json:artifacts/python/coverage.json --cov-report=term-missing); sh SCRATCH/issue-1169-pester.sh p3b (one Invoke-PoshQCParallelTest); sh SCRATCH/issue-1169-leak.sh (Invoke-PoshQCLeakScan -Root)
+EXIT_CODE: 0
+Output Summary:
+- First pass (started 2026-11-13T21-48): static clean (one analyzer retry that succeeded), pytest clean, Pester failed with 38 failures, all in enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1 (AC-4): the new seam Get-OrchestrationDocsEstateFileText reads a file inside a closure file that holds 'artifacts/' literals, so the guard requires every suite that loads the preimplementation-gate closure to null-mock it in each outermost BeforeAll. The Codex copy of hook-docs-estate-context.ps1 also measured 63.79% line coverage.
+- Fixes: 'Get-OrchestrationDocsEstateFileText' added to the existing first literal Register-EpicStateBaselineMock -Seam list of 32 gate suites (one token each), to the ExtraSeam arrays of enforce-orchestration-preimplementation-gate.AttributionTrailer.Tests.ps1 and .Parity.Tests.ps1, and as the conditional 'if (Get-Command ... ) { Register-EpicStateBaselineMock ... }' form (the form those suites already use for hook-local seams) to hook-dependency-failure.Claude/.Codex.Tests.ps1 and to every outermost BeforeAll of hook-import-failure-exemptions.FailClosed.Tests.ps1 (Claude, 7 blocks; Codex). No assertion of any suite changed. The Codex suite enforce-orchestration-preimplementation-gate-docs.Tests.ps1 gained a predicate Context that drives the Codex copy of hook-docs-estate-context.ps1. The loop restarted from step 1.
+- Clean pass (started 2026-11-13T22-18):
+  - Stage 1 format (PowerShell, 1566 files, check-only): 0 files would change; exit 0.
+  - Stage 2 lint (PSScriptAnalyzer 1.25.0, 1566 files): 0 findings, 0 retries; exit 0.
+  - Stage 3 type check: not applicable to PowerShell; no Python or TypeScript file changed.
+  - Stages 4 and 6: architecture and contract checks in the pytest gate (push-down resource, pack-manifest, dependency-closure, brief contracts) and the Pester gate (claude-runtime contract suites, legacy-codex-hook-contracts, the ledger chain test); all passed.
+  - Stage 5 Pester: one Invoke-PoshQCParallelTest run, 8 shards all exit 0, wall-clock 613.71 s; 21898 tests, 21888 passed, 0 failed, 10 skipped; repo-wide line coverage 95.83% (38339/40007). New files: .claude/hooks/hook-docs-estate-context.ps1 100.00% (58/58), .codex/hooks/hook-docs-estate-context.ps1 96.55% (56/58), .claude/hooks/enforce-orchestration-preimplementation-gate-docs.ps1 94.20% (130/138), .codex/hooks/enforce-orchestration-preimplementation-gate-docs.ps1 91.30% (126/138). Changed main gates: .claude 96.36% (159/165), .codex 100.00% (175/175).
+  - Stage 5 pytest: one pytest -n auto run; 16598 passed, 0 failed, 6 skipped.
+  - Leak scan: 758 files, 75 findings, 73 exempt, 2 allowlisted, 0 failures; exit 0.

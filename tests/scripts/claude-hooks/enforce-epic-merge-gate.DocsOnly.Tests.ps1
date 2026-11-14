@@ -95,6 +95,32 @@ Describe 'enforce-epic-merge-gate docs-only branch (issue #927)' {
             $reason | Should -Match 'TARGET_WORKTREE_NOT_DERIVABLE.*STANDALONE_MERGE_AUTHORIZATION_ABSENT.*docs-only exemption not applied: DOCS_ONLY_EXEMPTION_NON_DOCS_PATH'
         }
 
+        It 'allows a merge whose diff is docs paths plus the docs-init workflow path (issue #1169)' {
+            # Arrange
+            Set-DocsOnlyMergeSeam -DiffOutput "docs/a.md`0.github/workflows/_docs-quality.yml`0"
+            $envelope = ConvertTo-DocsOnlyMergeEnvelope -Command 'gh pr merge 5 --merge'
+
+            # Act
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $envelope
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow' -Because "reason: $($decision.hookSpecificOutput.permissionDecisionReason)"
+        }
+
+        It 'denies the docs-plus-workflow diff with one extra non-docs path (issue #1169)' {
+            # Arrange
+            Set-DocsOnlyMergeSeam -DiffOutput "docs/a.md`0.github/workflows/_docs-quality.yml`0src/a.ps1`0"
+            $envelope = ConvertTo-DocsOnlyMergeEnvelope -Command 'gh pr merge 5 --merge'
+
+            # Act
+            $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $envelope
+            $reason = [string]$decision.hookSpecificOutput.permissionDecisionReason
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $reason | Should -Match "docs-only exemption not applied: DOCS_ONLY_EXEMPTION_NON_DOCS_PATH: 'src/a\.ps1'"
+        }
+
         It 'denies a failed gh lookup with the PR_UNRESOLVED docs-only reason (issue #927)' {
             # Arrange: the BeforeAll seam mocks report a failed lookup.
             $envelope = ConvertTo-DocsOnlyMergeEnvelope -Command 'gh pr merge 5 --merge'

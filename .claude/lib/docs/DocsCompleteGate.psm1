@@ -12,11 +12,14 @@
     PROFILE_UNREADABLE. Get-DocsCompleteGateReceiptPath returns @{ Path; Reason; Message }: Reason
     is $null or RECEIPT_PATH_INVALID. Test-DocsCompleteGateIntegrationTarget returns a boolean.
     Test-DocsCompleteGateReceipt returns @{ Allow; Reason; Message } with the first failing reason
-    in the order RECEIPT_ABSENT, RECEIPT_UNREADABLE, RECEIPT_MODE, RECEIPT_FAILING,
-    RECEIPT_REVISION_MISMATCH, or Allow $true with Reason 'pass'.
+    in the order RECEIPT_ABSENT, RECEIPT_UNREADABLE, RECEIPT_MODE, RECEIPT_FAILING, then the
+    receipt revision rule of Get-DocsReceiptRevisionDecision (RECEIPT_REVISION_SNAPSHOT_MISMATCH,
+    RECEIPT_REVISION_UNRESOLVED, RECEIPT_REVISION_NOT_ANCESTOR, RECEIPT_SOURCE_DRIFT; issue
+    #1169), or Allow $true with Reason 'pass'.
 
-    The module imports only DocsJson.psm1 and DocsSurface.psm1, whose closure holds no runtime
-    import, so the hook that imports it satisfies the hook dependency-guard rules.
+    The module imports only DocsJson.psm1, DocsSurface.psm1, and DocsReceiptRevision.psm1, whose
+    closure holds no runtime import, so the hook that imports it satisfies the hook
+    dependency-guard rules.
 
 .NOTES
     Issue #1034. Requires PowerShell 7.4 or later. No external module dependencies.
@@ -29,6 +32,7 @@ $ErrorActionPreference = 'Stop'
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsJson.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSurface.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsReceiptRevision.psm1') -ErrorAction Stop
 
 function Get-DocsCompleteGateMember {
     <#
@@ -150,12 +154,22 @@ function Test-DocsCompleteGateReceipt {
         Returns the first failing reason: RECEIPT_ABSENT ($null text), RECEIPT_UNREADABLE (text
         that does not parse as an object, or artifact_kind other than docs-validation-receipt),
         RECEIPT_MODE (mode other than docs-complete), RECEIPT_FAILING (validation_result other
-        than pass), RECEIPT_REVISION_MISMATCH (revision not ordinally equal to HeadRevision; the
-        message names both revisions). Otherwise Allow is $true and Reason is 'pass'.
+        than pass). The revision step is delegated to Get-DocsReceiptRevisionDecision (issue
+        #1169): the receipt revision must equal SnapshotRevision and either equal HeadRevision or
+        be its ancestor with no changed path under a source root; a denial returns that
+        function's reason and message. Otherwise Allow is $true and Reason is 'pass'.
     .PARAMETER ReceiptText
         The receipt text, or $null when no file exists at the receipt path.
     .PARAMETER HeadRevision
         The pull request head revision (headRefOid).
+    .PARAMETER SnapshotRevision
+        The revision of the inventory snapshot beneath the receipt root, or $null.
+    .PARAMETER IsAncestor
+        Whether the receipt revision is an ancestor of HeadRevision; $null when undecided.
+    .PARAMETER ChangedPath
+        The paths changed between the receipt revision and HeadRevision; $null when unread.
+    .PARAMETER SourceRoot
+        The surface_selection.source_roots entries of the profile.
     .OUTPUTS
         System.Collections.Hashtable with Allow, Reason and Message.
     #>
@@ -163,10 +177,14 @@ function Test-DocsCompleteGateReceipt {
     [OutputType([hashtable])]
     param(
         [AllowNull()] [object] $ReceiptText,
-        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $HeadRevision
+        [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $HeadRevision,
+        [AllowNull()] [AllowEmptyString()] [string] $SnapshotRevision,
+        [AllowNull()] [Nullable[bool]] $IsAncestor,
+        [AllowNull()] [AllowEmptyCollection()] [string[]] $ChangedPath,
+        [AllowNull()] [AllowEmptyCollection()] [string[]] $SourceRoot
     )
 
-    if ($null -eq $ReceiptText) { return @{ Allow = $false; Reason = 'RECEIPT_ABSENT'; Message = 'No validation receipt exists; run Invoke-DocsCommand.ps1 -Command validate -Mode docs-complete with -Revision and -WriteReceipt for the pull request head.' } }
+    if ($null -eq $ReceiptText) { return @{ Allow = $false; Reason = 'RECEIPT_ABSENT'; Message = 'No validation receipt exists; run Invoke-DocsCommand.ps1 -Command validate -Mode docs-complete -WriteReceipt (the revision defaults to the inventory snapshot revision), as described under Refresh After Rebase or Source Change in the documentation-workflow skill.' } }
     $receipt = ConvertFrom-DocsCompleteGateText -Text $ReceiptText
     if ($null -eq $receipt -or -not [string]::Equals([string] (Get-DocsCompleteGateMember -Value $receipt -Name @('artifact_kind')), 'docs-validation-receipt', [System.StringComparison]::Ordinal)) {
         return @{ Allow = $false; Reason = 'RECEIPT_UNREADABLE'; Message = 'The validation receipt is not a readable docs-validation-receipt document; regenerate it with validate -WriteReceipt.' }
@@ -178,9 +196,8 @@ function Test-DocsCompleteGateReceipt {
         return @{ Allow = $false; Reason = 'RECEIPT_FAILING'; Message = 'The validation receipt records a failing validation; resolve its findings and regenerate the receipt.' }
     }
     $revision = [string] (Get-DocsCompleteGateMember -Value $receipt -Name @('revision'))
-    if (-not [string]::Equals($revision, $HeadRevision, [System.StringComparison]::Ordinal)) {
-        return @{ Allow = $false; Reason = 'RECEIPT_REVISION_MISMATCH'; Message = "The validation receipt revision '$revision' differs from the pull request head revision '$HeadRevision'; regenerate the receipt for the pull request head." }
-    }
+    $decision = Get-DocsReceiptRevisionDecision -ReceiptRevision $revision -SnapshotRevision $SnapshotRevision -HeadRevision $HeadRevision -IsAncestor $IsAncestor -ChangedPath $ChangedPath -SourceRoot $SourceRoot
+    if (-not $decision.Allow) { return @{ Allow = $false; Reason = $decision.Reason; Message = $decision.Message } }
     return @{ Allow = $true; Reason = 'pass'; Message = 'The validation receipt passes for the pull request head.' }
 }
 

@@ -99,6 +99,54 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
             # Assert
             $result | Should -BeLike 'DOCS_ONLY_EXEMPTION_EMPTY_DIFF*'
         }
+
+        It 'holds the docs-init workflow path as its one admitted non-docs path (issue #1169)' {
+            # Act
+            $value = $script:DocsOnlyInitWorkflowPath
+
+            # Assert
+            $value | Should -BeExactly '.github/workflows/_docs-quality.yml'
+        }
+
+        It 'returns null for docs paths plus the docs-init workflow path (issue #1169)' {
+            # Arrange
+            $paths = @('docs/a.md', '.github/workflows/_docs-quality.yml', 'docs/documentation-estate/.vale.ini')
+
+            # Act
+            $result = Get-DocsOnlyPathViolation -Path $paths
+
+            # Assert
+            $result | Should -BeNullOrEmpty -Because 'the workflow path is admitted by one ordinal equality'
+        }
+
+        It 'returns NON_DOCS_PATH when one further non-docs path joins the workflow path (issue #1169)' {
+            # Arrange
+            $paths = @('docs/a.md', '.github/workflows/_docs-quality.yml', 'src/b.ps1')
+
+            # Act
+            $result = Get-DocsOnlyPathViolation -Path $paths
+
+            # Assert
+            $result | Should -BeLike 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*'
+            $result.Contains('src/b.ps1') | Should -BeTrue -Because 'the further path is still outside docs/'
+        }
+
+        It 'returns NON_DOCS_PATH for the workflow path with <Label> (issue #1169)' -ForEach @(
+            @{ Label = 'a case variant'; Path = '.github/workflows/_Docs-quality.yml' }
+            @{ Label = 'a prefix'; Path = 'x/.github/workflows/_docs-quality.yml' }
+            @{ Label = 'a suffix'; Path = '.github/workflows/_docs-quality.yml.bak' }
+            @{ Label = 'a leading slash'; Path = '/.github/workflows/_docs-quality.yml' }
+        ) {
+            # Arrange
+            $paths = @('docs/a.md', $Path)
+
+            # Act
+            $result = Get-DocsOnlyPathViolation -Path $paths
+
+            # Assert
+            $result | Should -BeLike 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*'
+            $result.Contains($Path) | Should -BeTrue -Because 'only the exact constant is admitted'
+        }
     }
 
     Context 'ConvertFrom-DocsOnlyNameList' {

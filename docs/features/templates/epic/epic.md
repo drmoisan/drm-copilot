@@ -26,6 +26,10 @@ intent:
 
 # Manifest DAG. Primary key is `issue_num`. `depends_on` lists the `issue_num`
 # values of upstream siblings (each must be another entry in `features[]`).
+# Optional per feature: `cross_epic_depends_on` names prerequisites in other epics,
+# written on one line, for example:
+#     cross_epic_depends_on: [{ epic: <other-epic-slug>, integration_branch: epic/<other-epic-slug>-integration, issue_num: <int> }]
+# Omit the key when the feature has no cross-epic prerequisite; it moves no wave.
 features:
   - issue_num: <int>
     feature_folder: <resolvable-hint-basename>

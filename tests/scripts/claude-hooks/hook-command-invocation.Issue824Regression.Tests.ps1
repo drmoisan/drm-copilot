@@ -39,6 +39,8 @@ Describe 'Issue #824 regression: promotion gate (<Runtime>)' -ForEach $script:Ru
         $repoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         . (Join-Path $repoRoot "$HookRoot/enforce-promotion-mcp-only.ps1")
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        # A prior suite's hook can leave a scope module bound to a replaced run module; discard it.
+        Reset-EpicStateProbeModuleBinding
         Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
         if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateCheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicWorktreeGateParallelCheckpointContent' -Surface 'Codex' }

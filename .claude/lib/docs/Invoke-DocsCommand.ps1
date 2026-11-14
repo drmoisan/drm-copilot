@@ -62,7 +62,7 @@ function Get-DocsCommandTable {
         # --- 1023: coverage, update-ledger, validate ---
         [pscustomobject]@{ Name = 'coverage'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerCommands.psm1'); Function = 'Invoke-DocsCoverageCommand'; Option = @{ Profile = 'value' } }
         [pscustomobject]@{ Name = 'update-ledger'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerCommands.psm1'); Function = 'Invoke-DocsUpdateLedgerCommand'; Option = @{ Profile = 'value'; Operation = 'value'; Element = 'value'; Limit = 'value'; Disposition = 'value'; Page = 'multi'; Rationale = 'value'; Owner = 'value'; Target = 'value'; Dimension = 'value'; State = 'value'; Claim = 'value'; ActorKind = 'value'; ActorId = 'value'; Write = 'switch' } }
-        [pscustomobject]@{ Name = 'validate'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerCommands.psm1'); Function = 'Invoke-DocsValidateCommand'; Option = @{ Profile = 'value'; Mode = 'value'; Revision = 'value'; WriteReceipt = 'switch' } }
+        [pscustomobject]@{ Name = 'validate'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsValidateCommands.psm1'); Function = 'Invoke-DocsValidateCommand'; Option = @{ Profile = 'value'; Mode = 'value'; Revision = 'value'; WriteReceipt = 'switch' }; Note = 'With -WriteReceipt in docs-complete mode, -Revision defaults to the snapshot revision of the inventory; otherwise -Revision is required.' }
         # --- 1024: generate-reference ---
         [pscustomobject]@{ Name = 'generate-reference'; Module = (Join-Path -Path $PSScriptRoot -ChildPath 'DocsReferenceWriter.psm1'); Function = 'Invoke-DocsGenerateReferenceCommand'; Option = @{ Profile = 'value'; Snapshot = 'value'; OutputDirectory = 'value'; Write = 'switch' } }
         # --- 1034: surface-delta ---
@@ -405,13 +405,66 @@ function Read-DocsContextRevisionText {
     return $text
 }
 
+function Test-DocsContextAncestor {
+    <#
+    .SYNOPSIS
+        TestAncestor operation: returns whether one full revision is an ancestor of another through git (private helper).
+    .DESCRIPTION
+        A revision that Test-DocsFullRevision rejects throws DOCS_CONTEXT_REVISION_INVALID with no
+        process call. Otherwise makes one call InvokeProcess 'git' (-C Root merge-base
+        --is-ancestor <Ancestor> <Descendant>) with empty stdin and a 30-second bounded wait. Exit 0
+        returns $true, exit 1 (git's not-ancestor status) returns $false, and any other exit or a
+        timeout returns $null (issue #1169).
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([string] $Root, [AllowNull()] [AllowEmptyString()] [string] $Ancestor, [AllowNull()] [AllowEmptyString()] [string] $Descendant, [scriptblock] $InvokeProcess)
+
+    foreach ($revision in @($Ancestor, $Descendant)) {
+        if (-not (Test-DocsFullRevision -Revision $revision)) { throw "DOCS_CONTEXT_REVISION_INVALID: '$revision' is not a full revision." }
+    }
+    $argv = [string[]]@('-C', $Root, 'merge-base', '--is-ancestor', $Ancestor, $Descendant)
+    $result = & $InvokeProcess 'git' $argv '' 30
+    if ($result.TimedOut) { return $null }
+    if ($result.ExitCode -eq 0) { return $true }
+    if ($result.ExitCode -eq 1) { return $false }
+    return $null
+}
+
+function Get-DocsContextChangedPath {
+    <#
+    .SYNOPSIS
+        ListChangedPath operation: returns the paths changed between two full revisions through git (private helper).
+    .DESCRIPTION
+        A revision that Test-DocsFullRevision rejects throws DOCS_CONTEXT_REVISION_INVALID with no
+        process call. Otherwise makes one call InvokeProcess 'git' (-C Root diff --name-only -z
+        --no-renames --no-relative <FromRevision> <ToRevision>) with empty stdin and a 30-second
+        bounded wait. Exit 0 returns the NUL-split path array (empty for empty output); a non-zero
+        exit, a timeout, or non-empty output that does not end in NUL returns $null (issue #1169).
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]], [object[]])]
+    param([string] $Root, [AllowNull()] [AllowEmptyString()] [string] $FromRevision, [AllowNull()] [AllowEmptyString()] [string] $ToRevision, [scriptblock] $InvokeProcess)
+
+    foreach ($revision in @($FromRevision, $ToRevision)) {
+        if (-not (Test-DocsFullRevision -Revision $revision)) { throw "DOCS_CONTEXT_REVISION_INVALID: '$revision' is not a full revision." }
+    }
+    $argv = [string[]]@('-C', $Root, 'diff', '--name-only', '-z', '--no-renames', '--no-relative', $FromRevision, $ToRevision)
+    $result = & $InvokeProcess 'git' $argv '' 30
+    if ($result.TimedOut -or $result.ExitCode -ne 0) { return $null }
+    $text = [string] $result.Stdout
+    if ($text.Length -gt 0 -and -not $text.EndsWith([char]0)) { return $null }
+    [string[]] $paths = @($text.Split([char]0) | Where-Object { $_.Length -gt 0 })
+    return , $paths
+}
+
 function New-DocsCommandContext {
     <#
     .SYNOPSIS
         Returns the real command context for RepositoryRoot.
     .DESCRIPTION
         Members: RepositoryRoot, ReadText, ReadBytes, TestFile, ListFile, WriteText, UtcNow,
-        InvokeProcess. Relative paths are checked with Test-DocsRelativePath before any access.
+        InvokeProcess, ResolveRevision, ReadRevisionText, TestAncestor, ListChangedPath. Relative paths are checked with Test-DocsRelativePath before any access.
         ReadText decodes through ConvertFrom-DocsUtf8Bytes and throws an item-not-found error for
         an absent file. WriteText forwards the full path, text and mode to Write-DocsFileText;
         InvokeProcess forwards its four arguments to Invoke-DocsProcess with the repository root
@@ -420,6 +473,11 @@ function New-DocsCommandContext {
         30-second bounded wait: ResolveRevision returns the full commit revision of a ref, or $null
         when the ref does not resolve; ReadRevisionText returns the text of a repository-relative
         path at a full revision (one leading BOM removed), or $null when the path is absent there.
+        TestAncestor and ListChangedPath (issue #1169) are built the same way: TestAncestor
+        -Ancestor -Descendant returns $true, $false, or $null (git merge-base --is-ancestor; any
+        exit other than 0 or 1, or a timeout, is $null); ListChangedPath -FromRevision -ToRevision
+        returns the changed repository-relative paths (git diff --name-only -z --no-renames
+        --no-relative), or $null when git fails, times out, or prints output not ending in NUL.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds an in-memory context object; the members, not this factory, perform I/O.')]
     [CmdletBinding()]
@@ -450,6 +508,11 @@ function New-DocsCommandContext {
     $readRevisionTextOperation = ${function:Read-DocsContextRevisionText}
     $resolveRevision = { param($Ref, [scriptblock] $Operation = $resolveRevisionOperation, [scriptblock] $InvokeProcess = $invokeProcess) & $Operation $root $Ref $InvokeProcess }.GetNewClosure()
     $readRevisionText = { param($Revision, $RelativePath, [scriptblock] $Operation = $readRevisionTextOperation, [scriptblock] $InvokeProcess = $invokeProcess) & $Operation $root $Revision $RelativePath $InvokeProcess }.GetNewClosure()
+    # Receipt revision members (issue #1169), built like ReadRevisionText.
+    $testAncestorOperation = ${function:Test-DocsContextAncestor}
+    $listChangedPathOperation = ${function:Get-DocsContextChangedPath}
+    $testAncestor = { param($Ancestor, $Descendant, [scriptblock] $Operation = $testAncestorOperation, [scriptblock] $InvokeProcess = $invokeProcess) & $Operation $root $Ancestor $Descendant $InvokeProcess }.GetNewClosure()
+    $listChangedPath = { param($FromRevision, $ToRevision, [scriptblock] $Operation = $listChangedPathOperation, [scriptblock] $InvokeProcess = $invokeProcess) & $Operation $root $FromRevision $ToRevision $InvokeProcess }.GetNewClosure()
 
     return [pscustomobject]@{
         RepositoryRoot   = $root
@@ -462,13 +525,16 @@ function New-DocsCommandContext {
         InvokeProcess    = $invokeProcess
         ResolveRevision  = $resolveRevision
         ReadRevisionText = $readRevisionText
+        TestAncestor     = $testAncestor
+        ListChangedPath  = $listChangedPath
     }
 }
 
 function Get-DocsCommandUsage {
     <#
     .SYNOPSIS
-        Returns the usage lines listing every dispatch table row (private helper).
+        Returns the usage lines listing every dispatch table row, each followed by its Note line
+        when the row carries a Note (private helper).
     #>
     [CmdletBinding()]
     [OutputType([string[]], [object[]])]
@@ -481,6 +547,9 @@ function Get-DocsCommandUsage {
         [Array]::Sort($options, [System.StringComparer]::Ordinal)
         $parts = @($options | ForEach-Object { if ($row.Option[$_] -ceq 'switch') { "[-$_]" } else { "[-$_ <$($row.Option[$_])>]" } })
         $lines.Add(("  $($row.Name) " + ($parts -join ' ')).TrimEnd())
+        # A row may carry a Note (issue #1169); rows without one print nothing more.
+        $note = $row.PSObject.Properties['Note']
+        if ($null -ne $note -and -not [string]::IsNullOrWhiteSpace([string] $note.Value)) { $lines.Add("    Note: $($note.Value)") }
     }
     return , $lines.ToArray()
 }

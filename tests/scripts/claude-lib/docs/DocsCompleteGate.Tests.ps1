@@ -29,7 +29,7 @@ BeforeAll {
 }
 
 AfterAll {
-    Remove-Module -Name DocsCompleteGate, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding -Force -ErrorAction SilentlyContinue
+    Remove-Module -Name DocsCompleteGate, DocsReceiptRevision, DocsSurface, DocsFinding, DocsJson, DiscoveryEncoding -Force -ErrorAction SilentlyContinue
 }
 
 Describe 'Get-DocsCompleteGateEnabled' {
@@ -134,6 +134,10 @@ Describe 'Test-DocsCompleteGateReceipt' {
         # Assert
         $result.Allow | Should -BeFalse
         $result.Reason | Should -BeExactly 'RECEIPT_ABSENT'
+        $result.Message | Should -BeLikeExactly '*-WriteReceipt*'
+        $result.Message | Should -BeLikeExactly '*snapshot revision*'
+        $result.Message | Should -BeLikeExactly '*Refresh After Rebase or Source Change*'
+        $result.Message | Should -Not -BeLikeExactly '*for the pull request head*'
     }
 
     It 'returns RECEIPT_UNREADABLE for <Case>' -ForEach @(
@@ -173,27 +177,64 @@ Describe 'Test-DocsCompleteGateReceipt' {
         $result.Reason | Should -BeExactly 'RECEIPT_MODE'
     }
 
-    It 'returns RECEIPT_REVISION_MISMATCH naming both revisions for a <Case> mismatch' -ForEach @(
-        @{ Case = 'different-revision'; Revision = 'fedcba9876543210fedcba9876543210fedcba98' }
-        @{ Case = 'case'; Revision = '0123456789ABCDEF0123456789abcdef01234567' }
-        @{ Case = 'length'; Revision = '0123456789abcdef0123456789abcdef0123456' }
+    It 'returns RECEIPT_REVISION_SNAPSHOT_MISMATCH when the receipt revision differs from the snapshot revision (<Case>)' -ForEach @(
+        @{ Case = 'different-revision'; Snapshot = 'fedcba9876543210fedcba9876543210fedcba98' }
+        @{ Case = 'case'; Snapshot = '0123456789ABCDEF0123456789abcdef01234567' }
+        @{ Case = 'absent snapshot'; Snapshot = $null }
     ) {
         # Act
-        $result = Test-DocsCompleteGateReceipt -ReceiptText (Get-TestReceiptText -Revision $Revision) -HeadRevision $script:HeadRevision
+        $result = Test-DocsCompleteGateReceipt -ReceiptText (Get-TestReceiptText) -HeadRevision $script:HeadRevision -SnapshotRevision $Snapshot
 
         # Assert
         $result.Allow | Should -BeFalse
-        $result.Reason | Should -BeExactly 'RECEIPT_REVISION_MISMATCH'
-        $result.Message | Should -Match ([regex]::Escape($Revision))
+        $result.Reason | Should -BeExactly 'RECEIPT_REVISION_SNAPSHOT_MISMATCH'
         $result.Message | Should -Match ([regex]::Escape($script:HeadRevision))
     }
 
-    It 'allows a passing docs-complete receipt for the head revision' {
+    It 'allows a passing docs-complete receipt for the head revision without ancestry or diff input' {
         # Act
-        $result = Test-DocsCompleteGateReceipt -ReceiptText (Get-TestReceiptText) -HeadRevision $script:HeadRevision
+        $result = Test-DocsCompleteGateReceipt -ReceiptText (Get-TestReceiptText) -HeadRevision $script:HeadRevision -SnapshotRevision $script:HeadRevision
 
         # Assert
         $result.Allow | Should -BeTrue
         $result.Reason | Should -BeExactly 'pass'
+    }
+
+    It 'allows a receipt whose revision is an ancestor of the head with no source drift (issue #1169)' {
+        # Arrange
+        $head = 'fedcba9876543210fedcba9876543210fedcba98'
+
+        # Act
+        $result = Test-DocsCompleteGateReceipt -ReceiptText (Get-TestReceiptText) -HeadRevision $head -SnapshotRevision $script:HeadRevision -IsAncestor $true -ChangedPath @('docs/a.md') -SourceRoot @('src')
+
+        # Assert
+        $result.Allow | Should -BeTrue
+        $result.Reason | Should -BeExactly 'pass'
+    }
+
+    It 'denies <Reason> for an ancestor receipt with <Case> (issue #1169)' -ForEach @(
+        @{ Reason = 'RECEIPT_SOURCE_DRIFT'; Case = 'a changed source path'; IsAncestor = $true; Changed = @('src/a.py') }
+        @{ Reason = 'RECEIPT_REVISION_NOT_ANCESTOR'; Case = 'a rebased head'; IsAncestor = $false; Changed = @() }
+        @{ Reason = 'RECEIPT_REVISION_UNRESOLVED'; Case = 'an undecided ancestry'; IsAncestor = $null; Changed = @() }
+        @{ Reason = 'RECEIPT_REVISION_UNRESOLVED'; Case = 'an unread diff'; IsAncestor = $true; Changed = $null }
+    ) {
+        # Arrange
+        $head = 'fedcba9876543210fedcba9876543210fedcba98'
+
+        # Act
+        $result = Test-DocsCompleteGateReceipt -ReceiptText (Get-TestReceiptText) -HeadRevision $head -SnapshotRevision $script:HeadRevision -IsAncestor $IsAncestor -ChangedPath $Changed -SourceRoot @('src')
+
+        # Assert
+        $result.Allow | Should -BeFalse
+        $result.Reason | Should -BeExactly $Reason
+        $result.Message | Should -BeLike '*Refresh After Rebase or Source Change*'
+    }
+
+    It 'checks the mode and result before the revision rule' {
+        # Act
+        $result = Test-DocsCompleteGateReceipt -ReceiptText (Get-TestReceiptText -Result 'fail') -HeadRevision ('f' * 40) -SnapshotRevision $null
+
+        # Assert
+        $result.Reason | Should -BeExactly 'RECEIPT_FAILING'
     }
 }
