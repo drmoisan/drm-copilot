@@ -10,6 +10,7 @@ from . import fix_all_branches_extra as branches_extra
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from contextlib import AbstractContextManager
 
     from .fix_all import BranchResult, CommandRunner, StepLogger
 
@@ -22,10 +23,33 @@ def run_fix_all(
     runner_factory: Callable[[str, StepLogger], CommandRunner] | None = None,
     logger: StepLogger | None = None,
     complete_all: bool = False,
+    suite_lock: AbstractContextManager[object] | None = None,
 ) -> int:
-    """Run the fix-all pipeline in parallel branches."""
+    """Run the fix-all pipeline in parallel branches.
+
+    The five branches start together; their json, format, lint, and type-check
+    steps run concurrently, while the four test steps each run the
+    test-execution launcher inside one shared ``suite_lock`` (issue #1158, spec
+    D10), so at most one suite of this run executes at a time.
+
+    Args:
+        max_ruff_retries: Maximum Ruff auto-fix attempts.
+        max_black_retries: Maximum Black formatting attempts.
+        include_coverage: When True, run the pytest and Jest suites with coverage.
+        runner_factory: Optional factory for per-branch command runners.
+        logger: Optional step logger; defaults to stdout.
+        complete_all: When True, run every branch to completion despite failures.
+        suite_lock: Context manager held around each test step; defaults to a
+            new ``threading.Lock()`` per call.
+
+    Returns:
+        int: 0 when every branch passed, else 1.
+    """
     from . import fix_all as api
 
+    test_suite_lock: AbstractContextManager[object] = (
+        suite_lock if suite_lock is not None else threading.Lock()
+    )
     step_logger = logger or api.StepLogger()
     cancel_event = threading.Event()
     stream_isatty = api.stream_isatty(step_logger.stream)
@@ -100,6 +124,7 @@ def run_fix_all(
             factory=factory,
             emit_status_transition=emit_status_transition,
             api=api,
+            suite_lock=test_suite_lock,
         )
 
     def run_python_branch() -> BranchResult:
@@ -110,6 +135,7 @@ def run_fix_all(
             max_black_retries=max_black_retries,
             max_ruff_retries=max_ruff_retries,
             api=api,
+            suite_lock=test_suite_lock,
         )
 
     def run_powershell_branch() -> BranchResult:
@@ -117,6 +143,7 @@ def run_fix_all(
             factory=factory,
             emit_status_transition=emit_status_transition,
             api=api,
+            suite_lock=test_suite_lock,
         )
 
     def run_typescript_branch() -> BranchResult:
@@ -125,6 +152,7 @@ def run_fix_all(
             emit_status_transition=emit_status_transition,
             include_coverage=include_coverage,
             api=api,
+            suite_lock=test_suite_lock,
         )
 
     branch_functions = [

@@ -13,14 +13,55 @@ function Invoke-PoshQCSuite {
         [string] $PesterSettingsPath = $script:PesterSettings,
         [string[]] $ExcludeDirs = $script:DefaultExcludedDirs,
         [switch] $DisableKoverageCopy,
-        [string] $KoverageOutputPath
+        [string] $KoverageOutputPath,
+        [string[]] $ExcludeTag = @(),
+        [string[]] $ExcludeTestFileSuffix = @()
     )
 
     $ErrorActionPreference = 'Stop'
 
     Invoke-PoshQCFormat -Root $Root -ScanFolders $ScanFolders -SettingsPath $PssaSettingsPath -ExcludeDirs $ExcludeDirs
     Invoke-PoshQCAnalyze -Root $Root -ScanFolders $ScanFolders -SettingsPath $PssaSettingsPath -ExcludeDirs $ExcludeDirs
-    Invoke-PoshQCTest -Root $Root -ScanFolders $ScanFolders -SettingsPath $PesterSettingsPath -ExcludeDirs $ExcludeDirs -DisableKoverageCopy:$DisableKoverageCopy -KoverageOutputPath $KoverageOutputPath
+    # Issue #1158: lane parameters are passed only when non-empty, so an omitted value keeps today's call.
+    $laneArguments = @{}
+    if (@($ExcludeTag).Count -gt 0) { $laneArguments['ExcludeTag'] = [string[]]$ExcludeTag }
+    if (@($ExcludeTestFileSuffix).Count -gt 0) { $laneArguments['ExcludeTestFileSuffix'] = [string[]]$ExcludeTestFileSuffix }
+    Invoke-PoshQCTest -Root $Root -ScanFolders $ScanFolders -SettingsPath $PesterSettingsPath -ExcludeDirs $ExcludeDirs -DisableKoverageCopy:$DisableKoverageCopy -KoverageOutputPath $KoverageOutputPath @laneArguments
+}
+
+<#
+.SYNOPSIS
+Returns the path of one enumerated test file: its FullName when it has one, otherwise its string form (issue #1158).
+#>
+function ConvertTo-PoshQCLaneTestPath {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][object] $TestFile)
+
+    if ($null -ne $TestFile.PSObject.Properties['FullName']) { return [string]$TestFile.FullName }
+    return [string]$TestFile
+}
+
+<#
+.SYNOPSIS
+Removes test files whose file name ends with an excluded lane suffix (issue #1158).
+.DESCRIPTION
+Compares each file name with every suffix by case-insensitive ordinal comparison and returns the kept files in their input order.
+#>
+function Select-PoshQCLaneTestFile {
+    [CmdletBinding()]
+    [OutputType([object[]])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]] $TestFile,
+        [Parameter(Mandatory)][AllowEmptyCollection()][string[]] $ExcludeTestFileSuffix
+    )
+
+    $kept = foreach ($file in $TestFile) {
+        $name = [System.IO.Path]::GetFileName((ConvertTo-PoshQCLaneTestPath -TestFile $file))
+        $excluded = @($ExcludeTestFileSuffix | Where-Object { $name.EndsWith($_, [System.StringComparison]::OrdinalIgnoreCase) }).Count -gt 0
+        if (-not $excluded) { $file }
+    }
+    return @($kept)
 }
 
 <#
@@ -164,6 +205,11 @@ shards write distinct files (issue #1048). A relative path is resolved against R
 .PARAMETER CoverageOutputPath
 Optional coverage output path that replaces the settings CodeCoverage.OutputPath for this invocation (issue #1048).
 A relative path is resolved against Root. Omitted or blank keeps the settings value.
+.PARAMETER ExcludeTag
+Pester tags appended to Filter.ExcludeTag for this invocation (issue #1158). Empty keeps the settings filter.
+.PARAMETER ExcludeTestFileSuffix
+Test file-name suffixes (case-insensitive) removed from the enumerated test files before sharding (issue #1158).
+When a file is removed and ShardCount is 0, Run.Path becomes the kept file list. Empty keeps today's enumeration.
 #>
 function Invoke-PoshQCTest {
     [CmdletBinding()]
@@ -179,6 +225,8 @@ function Invoke-PoshQCTest {
         [string] $ShardFileListPath,
         [string] $TestResultPath,
         [string] $CoverageOutputPath,
+        [string[]] $ExcludeTag = @(),
+        [string[]] $ExcludeTestFileSuffix = @(),
         [scriptblock] $WriteShardFileList = { param([string] $Path, [string] $Json) Set-Content -LiteralPath $Path -Value $Json -Encoding utf8 },
         [scriptblock] $EnsureModule = {
             param([string] $Name, [string] $ErrorMessage, [string] $MinimumVersion, [string] $MaximumVersion)
@@ -366,6 +414,10 @@ function Invoke-PoshQCTest {
         $config.Run.PassThru = $true
     }
 
+    if (@($ExcludeTag).Count -gt 0) {
+        $config.Filter.ExcludeTag = [string[]]@(@($config.Filter.ExcludeTag.Value | Where-Object { $_ }) + @($ExcludeTag))
+    }
+
     $coverageEnabled = $false
     if ($config.CodeCoverage) {
         if ($config.CodeCoverage.Enabled -is [bool]) {
@@ -418,6 +470,15 @@ function Invoke-PoshQCTest {
 
     $runPaths = if ($config.Run.Path -is [System.Array]) { [string[]]$config.Run.Path } elseif ($config.Run.Path -and $config.Run.Path.Value) { [string[]]$config.Run.Path.Value } else { @() }
     $testFiles = & $EnumerateTests $runPaths $ExcludeDirs $TestPathExists
+    if (@($ExcludeTestFileSuffix).Count -gt 0 -and $testFiles) {
+        $keptFiles = @(Select-PoshQCLaneTestFile -TestFile @($testFiles) -ExcludeTestFileSuffix $ExcludeTestFileSuffix)
+        if ($keptFiles.Count -lt @($testFiles).Count) {
+            $testFiles = $keptFiles
+            if ($ShardCount -eq 0 -and $keptFiles.Count -gt 0) {
+                $config.Run.Path = [string[]]@($keptFiles | ForEach-Object { ConvertTo-PoshQCLaneTestPath -TestFile $_ })
+            }
+        }
+    }
     if (-not $testFiles) {
         & $Logger "No Pester test files found under configured paths for root $Root"
         return

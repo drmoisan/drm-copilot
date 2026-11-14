@@ -156,6 +156,19 @@ def run_preflight_qc_fix_loop(
         qc_output = preflight_check.output
         failed_toolchain = preflight_check.toolchain
 
+        # A launcher queue timeout or policy refusal (issue #1158, spec D12) is
+        # not a defect Copilot can fix, so the loop stops with exit 5 before the
+        # missing-executable check and before any fix prompt. The field decides,
+        # not a text scan, because the joined output also carries other steps.
+        if preflight_check.launcher_outcome is not None:
+            print(qc_output, file=sys.stderr)
+            log_msg(
+                log_file,
+                "ERROR: Pre-flight QC stopped on a launcher outcome "
+                f"({preflight_check.launcher_outcome.value}).",
+            )
+            return 5
+
         if MISSING_EXECUTABLE_PREFIX in qc_output:
             missing_line = next(
                 (

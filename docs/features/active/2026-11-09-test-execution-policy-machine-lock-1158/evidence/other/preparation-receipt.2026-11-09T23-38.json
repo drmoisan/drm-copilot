@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "stage": "plan",
+  "research_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/research/research.2026-11-09T21-35.md",
+  "spec_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/spec.md",
+  "plan_path": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/plan.2026-11-09T16-31.md",
+  "plan_hash": "e5871be008d88a84e86252c0e713f37779324720",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "REVISIONS REQUIRED",
+  "preflight_open_defects": [
+    "[P5-T1] (spec D10) fix_all runs its test branches as concurrent threads; under the machine lock every later launcher step waits, exits 75, and fail-fast cancels the run. Serialize the four launcher test steps inside fix_all (in-process lock shared by the branch modules), add that file to P5-T1 and spec D10, and add a test proving no two launcher steps run at the same time.",
+    "[P5-T2] (spec D16, AC2) run_pytest_with_expectations in scripts/dev_tools/atomic_executor/qc_runner_expectations.py parses launcher output and reports exit 75 or 2 as a pass when expectations are set. Add that file to P5-T2 and spec D16, raise for return codes 75 and 2 before parsing, add a test with expectations set asserting exit 75 is reported as TEST_EXECUTION_QUEUE_TIMEOUT, and update the Execution Constraints Python production-file count."
+  ],
+  "preflight_fix_record": "docs/features/active/2026-11-09-test-execution-policy-machine-lock-1158/evidence/other/preflight-fixes.2026-11-09T23-37.md",
+  "recorded_at": "2026-11-09T23:38:00Z"
+}

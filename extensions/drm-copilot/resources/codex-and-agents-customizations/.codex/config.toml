@@ -123,7 +123,7 @@ matcher = "^(Bash|shell_command|apply_patch|Edit|Write|mcp__.*|Agent|Task|spawn_
 type = "command"
 command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/invoke-pretooluse-dispatch.ps1"'
 command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/invoke-pretooluse-dispatch.ps1"'
-timeout = 690
+timeout = 720
 
 [[hooks.SubagentStop]]
 matcher = "epic-planner|epic-orchestrator|orchestrator|atomic-planner|atomic-executor|feature-review|feature-reviewer|task-researcher|prd-feature|pr-author|typed-engineer|-c|legacy-parity-analyst|runtime-characterization-analyst|requirements-reconciler|migration-coverage-reviewer"

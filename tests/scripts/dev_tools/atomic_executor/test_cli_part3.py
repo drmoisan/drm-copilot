@@ -23,10 +23,10 @@ from scripts.dev_tools.atomic_executor.pytest_expectations import (
     PytestFailureSummary,
     ResolvedTestExpectations,
 )
-from scripts.dev_tools.atomic_executor.qc_toolchain import (
-    TOOLCHAIN_COMMANDS,
-    QCToolchain,
+from scripts.dev_tools.atomic_executor.qc_runner_expectations import (
+    TEST_SUITE_LAUNCHER_ARGV,
 )
+from scripts.dev_tools.atomic_executor.qc_toolchain import QCToolchain
 
 if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
@@ -119,6 +119,7 @@ class TestPreflightQC:
             )
 
         monkeypatch.setattr("subprocess.run", mock_run)
+        monkeypatch.setattr(cli_preflight.shutil, "which", lambda name: name)
 
         result = _run_preflight_qc_with_capture(mem_fs_path)
 
@@ -313,6 +314,7 @@ class TestPhaseEndQC:
             )
 
         monkeypatch.setattr("subprocess.run", mock_run)
+        monkeypatch.setattr(cli_preflight.shutil, "which", lambda name: name)
 
         result = _run_preflight_qc_with_capture(Path.cwd(), expectations=expectations)
 
@@ -352,9 +354,9 @@ class TestPhaseEndQC:
         def mock_run(
             *args: object, **kwargs: object
         ) -> subprocess.CompletedProcess[str]:
-            """Return a failing npm test run for the expected-fail ref."""
+            """Return a failing launcher jest run for the expected-fail ref."""
             cmd = args[0]
-            if isinstance(cmd, list) and cmd[:3] == ["npm", "run", "test:unit"]:
+            if isinstance(cmd, list) and cmd == [*TEST_SUITE_LAUNCHER_ARGV, "jest"]:
                 output = "\n".join(
                     [
                         "FAIL tests/unit/task-execution-spec.test.ts",
@@ -431,6 +433,7 @@ class TestPhaseEndQC:
             )
 
         monkeypatch.setattr("subprocess.run", mock_run)
+        monkeypatch.setattr(cli_preflight.shutil, "which", lambda name: name)
 
         result = _run_preflight_qc_with_capture(Path.cwd(), expectations=expectations)
 
@@ -540,8 +543,7 @@ def _patch_qc_run(
 
 
 _PYTEST_STEP = [
-    "poetry",
-    "run",
+    *TEST_SUITE_LAUNCHER_ARGV,
     "pytest",
     "-n",
     "auto",
@@ -549,7 +551,7 @@ _PYTEST_STEP = [
     "--cov=scripts/dev_tools",
     "--cov-report=term-missing",
 ]
-_JEST_STEP = TOOLCHAIN_COMMANDS[QCToolchain.TYPESCRIPT]["test-unit"]
+_JEST_STEP = [*TEST_SUITE_LAUNCHER_ARGV, "jest"]
 
 
 class TestPreflightQCBranches:

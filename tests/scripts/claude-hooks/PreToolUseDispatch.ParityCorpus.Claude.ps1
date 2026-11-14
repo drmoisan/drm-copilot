@@ -57,6 +57,11 @@
             Deny = @('enforce-worktree-poetry-venv.ps1'); Except = @()
         }
         @{
+            Key = 'bash-direct-test-runner'; ToolName = 'Bash'; Kind = 'deny'; Environment = @{}
+            ToolInput = @{ command = 'pytest -q tests/parity-probe' }
+            Deny = @('enforce-test-execution-policy.ps1'); Except = @()
+        }
+        @{
             Key = 'write-allow'; ToolName = 'Write'; Kind = 'allow'; Environment = @{}
             ToolInput = @{ file_path = 'tests/scripts/parity-probe/ParityProbe.Tests.ps1'; content = "Describe 'p' { It 'q' { 1 | Should -Be 1 } }`n" }
             Deny = @(); Except = @()
