@@ -543,6 +543,7 @@ Recorded by the planner refresh of this child; each keeps Phase 1 scope and re-o
 - A-6. `development_docs_root` is stated to be distinct from the docs-profile `documentation_roots`.
 - A-7. Coverage evidence is recorded under `evidence/qa-gates/`, the canonical evidence kind; `evidence/coverage/` is not a canonical kind.
 - A-8. No acceptance criterion in this file or in `user-story.md` requires shuffled, reversed or single-process test runs, so the parallel-only test rule needs no criterion change.
+- A-9. The criterion that limits changed expectations in existing tests to folder-naming and status-line expectations excludes the expectation changes that other criteria of this spec mandate. These are the `CiDocsOnlyPathsConfig.Tests.ps1` rows required by the CI docs-only criterion (`starts every include prefix with docs/ (AC-15)`, `configures exactly the D3 include prefixes and extensions (AC-15)`, and the `.dev` rows added to its `-ForEach` cases); the `Write(/.dev/active/**)` entry of the feature-review agent tuple in `test_completion_gate_documentation_contracts.py`, required by the literal-set criterion; and the `.claude/agents/epic-orchestrator.md` digest in `PINNED_FROZEN_SURFACE_HASHES` with its dated comment, required by the re-baseline criterion. The criterion's text is unchanged; the plan's self-review records the enumeration against the branch diff.
 
 ## Definition of Done
 

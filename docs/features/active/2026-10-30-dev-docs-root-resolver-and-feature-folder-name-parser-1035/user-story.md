@@ -2,7 +2,7 @@
 
 - Issue: #1035 (epic #1018, child 2: Phase 1 of #1016 only; references #1016 and does not close it)
 - Owner: drmoisan
-- Status: Ready for planning (refreshed 2026-11-14; spec "Refresh Amendments" A-1 and A-3 change two criteria below)
+- Status: Ready for planning (refreshed 2026-11-14; spec "Refresh Amendments" A-1 and A-3 change two criteria below, and A-9 qualifies the changed-expectations criterion)
 - Last Updated: 2026-11-14
 - Spec: `spec.md` in this folder (full #1016 design; Phases 2 and 3 are delivered by epic child 7)
 
