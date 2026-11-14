@@ -347,7 +347,7 @@ New test files:
 - [x] AC-21 No Python in the hook path: the PR adds no `.py` file, and neither gate file nor either new sibling invokes `python`, `python3`, `py`, or `poetry run python`, verified by a search of those files recorded in the QA evidence.
 - [x] AC-22 Coverage: per-file line coverage is at least 90% for each of `.claude/hooks/enforce-orchestration-preimplementation-gate-commands.ps1`, `.claude/hooks/enforce-orchestration-preimplementation-gate-bookkeeping.ps1`, `.codex/hooks/enforce-orchestration-preimplementation-gate-commands.ps1`, and `.codex/hooks/enforce-orchestration-preimplementation-gate-bookkeeping.ps1`, and line coverage of the changed lines in both gate files does not fall below the Phase 0 baseline, read from `artifacts/pester/powershell-coverage.xml` and recorded under `docs/features/active/2026-11-09-preimplementation-gate-false-positives-1160/evidence/coverage/`.
 - [x] AC-23 Test hygiene: the new suites mock `Get-OrchestrationGateStagedIndex` and `Get-OrchestrationGateBookkeepingConfigText` wherever the leg is reached, create no temporary files, and leave `Invoke-PoshQCLeakScan` clean, recorded in the QA evidence.
-- [ ] AC-24 CI is green on the PR head (CI-dependent criterion; checked off at S9 by the item's own orchestrator run after `ci_gate.conclusion` is `success`).
+- [x] AC-24 CI is green on the PR head (CI-dependent criterion; checked off at S9 by the item's own orchestrator run after `ci_gate.conclusion` is `success`).
 
 ## Risks & Mitigations
 
