@@ -79,7 +79,8 @@ the `epic-plan` skill), one entry per preparation worktree: `branch` (required; 
 identity), `path` (optional; repository-relative to the main checkout), `purpose`
 (`preparation`), `preparation_status` (`preparing`, `prepared`, `fanned_in`, `removed`, or
 `abandoned`), `feature_folder` (a `features[]` folder), and `recorded_at` (optional). Never record
-an absolute path.
+an absolute path. When a manifest feature carries `cross_epic_depends_on` (issue #1162), copy that
+value into the same feature record as `cross_epic_depends_on`; the validator checks its shape only.
 
 ## Completion
 

@@ -500,7 +500,11 @@ function Invoke-EpicProgressReport {
     $startUnixSeconds = [DateTimeOffset]::new($baseline.StartUtc).ToUnixTimeSeconds()
     # Migrated version-2 samples carry no 'tasks' value and are passed unchanged, so they form no interval.
     $aggregate = Get-EpicProgressAggregateVelocity -Sample $currentSamples -PauseSpan $pauseSpans -StartUnixSeconds $startUnixSeconds -NowUnixSeconds $nowUnixSeconds -DoneTasks $report.DoneTasks -BaselineDoneTasks $baselineDoneTasksValue
-    $criticalPath = Get-EpicProgressCriticalPathReport -Feature $report.Feature -EpicStep $report.EpicStep -Ledger $report.Ledger -Default $defaults -NowUnixSeconds $nowUnixSeconds -BlockedSince $report.BlockedSince -CheckpointRow $report.DependencyRow -ManifestRow $manifestRows -CheckpointCap $report.CheckpointCap -ConfigCap $configCap -Aggregate $aggregate -ItemMode:$itemMode
+    # Cross-epic prerequisites become external nodes (issue #1162); item mode has none.
+    $crossEdges = @()
+    if (-not $itemMode) { $crossEdges = @(Get-EpicProgressCrossEpicEdge -CheckpointRow @($report.DependencyRow) -ManifestRow $manifestRows) }
+    $externalNodes = @($crossEdges | Group-Object -Property Node | ForEach-Object { New-EpicProgressExternalNode -Edge $_.Group[0] -PlanText (Read-EpicProgressCrossEpicPlanText -Edge $_.Group[0]) -Ledger $report.Ledger -Default $defaults -NowUnixSeconds $nowUnixSeconds })
+    $criticalPath = Get-EpicProgressCriticalPathReport -Feature $report.Feature -EpicStep $report.EpicStep -Ledger $report.Ledger -Default $defaults -NowUnixSeconds $nowUnixSeconds -BlockedSince $report.BlockedSince -CheckpointRow $report.DependencyRow -ManifestRow $manifestRows -CheckpointCap $report.CheckpointCap -ConfigCap $configCap -Aggregate $aggregate -ExternalNode $externalNodes -CrossEdge $crossEdges -ItemMode:$itemMode
     if ($selection.Changed -or $report.LedgerChanged -or $report.ItemsChanged -or $ResetBaseline -or $PairSamples -or $newPause.Count -gt 0) {
         $stateJson = ConvertTo-EpicProgressStateJson -StartUnixSeconds $startUnixSeconds -BaselineDone $baselineDoneValue -BaselineWeeklyPct $baseline.BaselineWeeklyPct -Sample $currentSamples -Duration $report.Ledger -Item $report.Items -BaselineDoneTasks $baselineDoneTasksValue -PauseSpan $pauseSpans
         Write-EpicProgressState -Path $setting.StatePath -Content $stateJson

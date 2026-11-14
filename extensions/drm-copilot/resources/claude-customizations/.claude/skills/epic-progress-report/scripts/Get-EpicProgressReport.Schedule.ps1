@@ -18,8 +18,9 @@ function Compare-EpicProgressIssue {
     .SYNOPSIS
         Return a negative, zero, or positive number ordering two issue numbers ascending.
     .DESCRIPTION
-        Numbers that both parse as integers compare numerically; any other pair compares by
-        ordinal text.
+        Numbers that both parse as integers compare numerically; a number orders before any
+        other value, such as an external node '<epic>#<issue>' (issue #1162); any other pair
+        compares by ordinal text.
     .PARAMETER Left
         The first issue number.
     .PARAMETER Right
@@ -36,9 +37,11 @@ function Compare-EpicProgressIssue {
     $rightNumber = 0L
     $culture = [cultureinfo]::InvariantCulture
     $style = [System.Globalization.NumberStyles]::None
-    if ([long]::TryParse($Left, $style, $culture, [ref] $leftNumber) -and [long]::TryParse($Right, $style, $culture, [ref] $rightNumber)) {
-        return $leftNumber.CompareTo($rightNumber)
-    }
+    $leftIsNumber = [long]::TryParse($Left, $style, $culture, [ref] $leftNumber)
+    $rightIsNumber = [long]::TryParse($Right, $style, $culture, [ref] $rightNumber)
+    if ($leftIsNumber -and $rightIsNumber) { return $leftNumber.CompareTo($rightNumber) }
+    if ($leftIsNumber) { return -1 }
+    if ($rightIsNumber) { return 1 }
     return [string]::CompareOrdinal($Left, $Right)
 }
 
@@ -395,9 +398,11 @@ function Invoke-EpicProgressListSchedule {
         number); null for a start at 0 without a dependency. FinishSeconds is the latest finish,
         LastIssue the node that reaches it (ties by ascending issue number), and
         HeadlineSeconds is FinishSeconds plus TailSeconds. A node that can never start, which
-        only a cycle causes, has a NaN finish.
+        only a cycle causes, has a NaN finish. A node whose External property is true (a
+        cross-epic prerequisite, issue #1162) never occupies a slot and starts when ready.
     .PARAMETER Node
-        The nodes (Issue, State 'done', 'running', or 'pending', DurationSeconds, DependsOn).
+        The nodes (Issue, State 'done', 'running', or 'pending', DurationSeconds, DependsOn, and
+        optionally External).
     .PARAMETER Cap
         The parallel cap; 0 for no cap.
     .PARAMETER TailSeconds
@@ -413,7 +418,11 @@ function Invoke-EpicProgressListSchedule {
 
     $issues = [string[]] @($Node | ForEach-Object { [string] $_.Issue })
     $byIssue = @{}
-    foreach ($entry in $Node) { $byIssue[[string] $entry.Issue] = $entry }
+    $external = @{}
+    foreach ($entry in $Node) {
+        $byIssue[[string] $entry.Issue] = $entry
+        $external[[string] $entry.Issue] = ($entry.PSObject.Properties.Name -contains 'External') -and [bool] $entry.External
+    }
     $paths = Get-EpicProgressLongestPath -Node $Node
     $start = @{}
     $finish = @{}
@@ -444,7 +453,9 @@ function Invoke-EpicProgressListSchedule {
             })
         $started = $false
         foreach ($issue in (Get-EpicProgressPriorityOrder -Issue $ready -Path $paths)) {
-            if ($Cap -gt 0 -and $running.Count -ge $Cap) { break }
+            # External nodes hold no slot, so a full cap skips only this epic's nodes.
+            $slotsUsed = @($running | Where-Object { -not $external[$_] }).Count
+            if ($Cap -gt 0 -and -not $external[$issue] -and $slotsUsed -ge $Cap) { continue }
             [string[]] $dependencies = @($byIssue[$issue].DependsOn | Where-Object { $byIssue.ContainsKey([string] $_) } | ForEach-Object { [string] $_ })
             $readyAt = 0.0
             $lastDependency = $null

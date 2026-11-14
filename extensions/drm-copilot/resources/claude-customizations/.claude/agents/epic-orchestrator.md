@@ -18,6 +18,7 @@ tools:
   - "Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)"
   - "Bash(poetry run python -m scripts.dev_tools.validate_orchestration_artifacts *)"
   - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)"
+  - "Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1*)"
   - "mcp__drm-copilot__collect_pr_context"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
@@ -149,6 +150,17 @@ feature, and validates the epic checkpoint through the repository CLI
 subcommand, which the `Bash(poetry run ...)` grant above permits. Without the field, the barrier
 above applies unchanged.
 
+Cross-epic dependencies (issue #1162): when a feature's manifest entry carries
+`cross_epic_depends_on`, validate the manifest at kickoff with
+`pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1 -Mode validate`, and
+run the same CLI with `-Mode feature -Issue <issue_num>` at launch time. A held feature never
+receives a worktree and stays `not_started`. On `merge_required`, merge each listed other
+integration branch into the own integration branch with `git merge --no-ff`, never a rebase or
+fast-forward, push, re-fetch, record the merge, and then launch the feature. Follow
+`## Cross-Epic Dependencies (cross_epic_depends_on)` of the `epic-orchestrate` skill for the
+decision tables, the bounded `-WaitSeconds 540` wait, and the upstream-context line. Without the
+key, wave scheduling is unchanged.
+
 ## Checkpoint Persistence
 
 Update `artifacts/orchestration/epic-orchestrator-state.json` after every completed step, per the
@@ -184,3 +196,8 @@ Do not report completion until:
    `require_complete=True` (no wave-barrier violations, all features merged/removed).
 5. Acceptance criteria in AC source files have been checked off per the
    `acceptance-criteria-tracking` skill.
+
+When a feature carries `cross_epic_depends_on`, run `Invoke-EpicCrossReadiness.ps1` with
+`-Mode main` before opening the integration-to-main PR and open it only on `release` or
+`not_applicable`; the check is re-run immediately before `gh pr merge`, and completion requires a
+released `cross_epic_main_gate`.

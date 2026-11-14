@@ -129,6 +129,18 @@ A preparation-mode `orchestrator` run:
   `blocked_reason: "none"`. The route's `requires_ci_gate: false` means the completion validator
   demands no `ci_gate`/`pr_gate` evidence; the run must NOT assert `next_step: "complete"`.
 
+## Cross-Epic Dependencies in Preparation (cross_epic_depends_on)
+
+A manifest feature may carry the optional one-line key `cross_epic_depends_on`, which names
+prerequisite features in other epics (issue #1162; syntax and runtime holds in
+`## Cross-Epic Dependencies (cross_epic_depends_on)` of the `epic-orchestrate` skill). Cross-epic
+edges move no wave and never enter `depends_on`. `epic-planner` copies the value into
+`features[].cross_epic_depends_on` of the planner checkpoint, where it is shape-validated only;
+preparation is not held, because no prerequisite merge is needed to write a spec or a plan. The
+preparation prompt of such a feature carries one line per cross-epic dependency, with `not merged`
+in place of the merge facts:
+`Upstream context for {issue_num}: cross-epic depends on {epic}#{dep_issue_num} (spec: {dep_spec_path}; plan: {dep_plan_path}; not merged).`
+
 ## Fan-In to the Integration Branch
 
 As each child preparation completes:

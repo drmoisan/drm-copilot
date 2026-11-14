@@ -118,6 +118,8 @@ Once a preparation worktree exists, also maintain `planner_worktrees[]` (issue #
 the main checkout), `purpose` (`preparation`), `preparation_status` (`preparing`, `prepared`,
 `fanned_in`, `removed`, or `abandoned`), `feature_folder` (a `features[]` folder), and
 `recorded_at` (optional). Never record an absolute path.
+When a manifest feature carries `cross_epic_depends_on` (issue #1162), copy that value into the
+same `features[]` entry as `cross_epic_depends_on`; the validator checks its shape only.
 `epic_issue_num` is the epic-level issue `epic-planner` promotes at planning time through `mcp__drm-copilot__potential_to_issue` with `promotion_type: epic` (issue #663; see `## Epic-Level Issue Promotion` in the `epic-plan` skill).
 
 ## Completion Requirements
