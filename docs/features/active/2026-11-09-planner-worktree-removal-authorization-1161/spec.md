@@ -127,7 +127,7 @@ Git runs only after a record names the target. Under the existing gate suites' b
 | `purpose` | yes | Exactly `preparation`. |
 | `preparation_status` | yes | One of `preparing`, `prepared`, `fanned_in`, `removed`, `abandoned`. |
 | `feature_folder` | yes | A string equal to some `features[].feature_folder` of the same checkpoint. |
-| `recorded_at` | no | When present: a string with at least one non-whitespace character (ISO-8601 UTC by convention; not parsed). |
+| `recorded_at` | no | When present: a string holding at least one character outside the blank set U+0020, U+0009, U+000A, U+000B, U+000C, U+000D (ISO-8601 UTC by convention; not parsed). |
 
 ### Validator error strings (byte-identical in Python and TypeScript)
 

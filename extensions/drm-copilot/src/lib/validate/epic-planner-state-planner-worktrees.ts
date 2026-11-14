@@ -21,6 +21,13 @@ const PLANNER_WORKTREE_STATUSES: readonly string[] = [
 const PLANNER_BRANCH = /^[A-Za-z0-9][A-Za-z0-9._/-]*$/;
 
 /**
+ * A blank `recorded_at`: only space, tab, LF, CR, VT, and FF, or empty. The
+ * Python twin `_RECORDED_AT_BLANK_CHARS` uses the same six characters;
+ * `trim()` is not used because its whitespace set differs from Python's.
+ */
+const RECORDED_AT_BLANK = /^[ \t\n\r\v\f]*$/;
+
+/**
  * Narrow a value to a plain JSON object.
  *
  * @param value Any parsed JSON value.
@@ -112,7 +119,7 @@ function validateEntryFields(
   const recordedAt = entry["recorded_at"];
   if (
     "recorded_at" in entry &&
-    !(typeof recordedAt === "string" && recordedAt.trim() !== "")
+    !(typeof recordedAt === "string" && !RECORDED_AT_BLANK.test(recordedAt))
   ) {
     errors.push(
       `${prefix}.recorded_at must be a non-empty string when present.`,

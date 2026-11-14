@@ -33,7 +33,7 @@ const CORPUS_DIR = path.join(
 );
 
 /** The planned corpus size; a smaller enumeration would pass vacuously. */
-const EXPECTED_CORPUS_COUNT = 17;
+const EXPECTED_CORPUS_COUNT = 21;
 
 /** The existing parallelism error, used to pin the planner errors' position. */
 const MAX_PARALLEL_ERROR =

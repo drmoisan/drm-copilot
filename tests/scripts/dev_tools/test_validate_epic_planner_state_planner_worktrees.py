@@ -5,7 +5,9 @@ file and assert that ``validate_epic_planner_state_text`` returns exactly the
 ordered ``expected_errors`` the file records (issue #1161). The TypeScript suite
 ``extensions/drm-copilot/test/lib/validate/epic-planner-state-planner-worktrees.test.ts``
 asserts the same files, so the corpus binds the two runtimes to byte-identical
-error strings.
+error strings. The ``recorded-at-*`` and ``blank-recorded-at-ascii-controls``
+rows pin the shared blank set of ``recorded_at`` (six ASCII characters), so a
+one-sided change to that set fails the parity suite of the changed runtime.
 
 The corpus files are committed and only read here. No temporary file is created
 and no other process is started.
@@ -28,9 +30,10 @@ from scripts.dev_tools.validate_epic_planner_state import (
 # parents above its resolved directory.
 REPO_ROOT = Path(__file__).resolve().parents[3]
 CORPUS_DIR = REPO_ROOT / "tests" / "fixtures" / "epic_planner_state_planner_worktrees"
-# The plan fixes the corpus at seventeen files; a smaller glob would make the
-# parametrized rows below pass vacuously.
-EXPECTED_CORPUS_COUNT = 17
+# The plan fixes the corpus at twenty-one files (seventeen plus the four
+# recorded_at blank-set rows of remediation cycle 1); a smaller glob would make
+# the parametrized rows below pass vacuously.
+EXPECTED_CORPUS_COUNT = 21
 MAX_PARALLEL_ERROR = (
     "Epic planner checkpoint max_parallel_features must be an integer "
     "from 1 through 8."
@@ -63,7 +66,7 @@ CORPUS = [_load_case(path) for path in CORPUS_FILES]
 
 
 def test_corpus_holds_the_planned_file_count() -> None:
-    """The corpus directory holds exactly the planned seventeen fixtures."""
+    """The corpus directory holds exactly the planned twenty-one fixtures."""
 
     # Arrange and act: the module-level glob above.
     count = len(CORPUS)

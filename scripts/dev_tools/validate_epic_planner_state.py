@@ -307,6 +307,9 @@ def _validate_ready_features(
 PLANNER_WORKTREE_STATUSES = "preparing prepared fanned_in removed abandoned".split()
 _PLANNER_PREFIX = "Epic planner checkpoint planner_worktrees"
 _PLANNER_BRANCH = re.compile(r"[A-Za-z0-9][A-Za-z0-9._/-]*")
+# The recorded_at blank set: space, tab, LF, CR, VT, FF and nothing else. The
+# TypeScript twin RECORDED_AT_BLANK uses the same six characters (not str.strip).
+_RECORDED_AT_BLANK_CHARS = " \t\n\r\x0b\x0c"
 
 
 def _is_planner_branch(value: object) -> bool:
@@ -340,7 +343,9 @@ def _validate_planner_worktrees(
 
     Returns:
         Errors in entry order; within an entry: branch or uniqueness, path,
-        purpose, preparation_status, feature_folder, recorded_at.
+        purpose, preparation_status, feature_folder, recorded_at. A present
+        ``recorded_at`` is blank when every character is in
+        ``_RECORDED_AT_BLANK_CHARS``.
     """
 
     if "planner_worktrees" not in state:
@@ -385,7 +390,7 @@ def _validate_planner_worktrees(
         if not isinstance(folder, str) or folder not in folders:
             add(f"{prefix}.feature_folder must name a features[] feature_folder.")
         recorded = entry.get("recorded_at", "absent")
-        if not (isinstance(recorded, str) and recorded.strip()):
+        if not (isinstance(recorded, str) and recorded.strip(_RECORDED_AT_BLANK_CHARS)):
             add(f"{prefix}.recorded_at must be a non-empty string when present.")
     return errors
 
