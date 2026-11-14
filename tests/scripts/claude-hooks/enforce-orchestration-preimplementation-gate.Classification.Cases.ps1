@@ -12,8 +12,9 @@
 
     Tables:
       - ExistingDenial: research section 6.2 and spec AC-2 (as amended by decisions D15,
-        D16, and D17; rows ED-43 to ED-50 are the D16 pipeline-consumer and sort rows, and
-        rows ED-51 to ED-96 are the D17 unmodelled-construct and executing-option rows).
+        D16, D17, and D19; rows ED-43 to ED-50 are the D16 pipeline-consumer and sort rows,
+        rows ED-51 to ED-96 are the D17 unmodelled-construct and executing-option rows, and
+        rows ED-97 to ED-120 are the D19 subcommand-position rows).
         Each row is classified as implementation today and must stay classified, with the
         generic final deny text unchanged.
       - FalsePositive: research section 6.3 and spec AC-1. Each row is classified today
@@ -126,6 +127,30 @@ $script:ClassificationExistingDenialCase = @(
     @{ Id = 'ED-94'; Command = 'bash -c ''echo pytest; env $_'''; Expected = $true }
     @{ Id = 'ED-95'; Command = 'git grep -iOpytest pytest'; Expected = $true }
     @{ Id = 'ED-96'; Command = 'rg --hostname-bin pytest x'; Expected = $true }
+    @{ Id = 'ED-97'; Command = 'npm -w search run lint'; Expected = $true }
+    @{ Id = 'ED-98'; Command = 'npm --workspace search run lint'; Expected = $true }
+    @{ Id = 'ED-99'; Command = 'npm --prefix search run lint'; Expected = $true }
+    @{ Id = 'ED-100'; Command = 'npm --prefix help run lint'; Expected = $true }
+    @{ Id = 'ED-101'; Command = 'npm -w view run test:unit'; Expected = $true }
+    @{ Id = 'ED-102'; Command = 'npm -w help run typecheck'; Expected = $true }
+    @{ Id = 'ED-103'; Command = 'npm --prefix info exec prettier'; Expected = $true }
+    @{ Id = 'ED-104'; Command = 'npm --loglevel info run lint'; Expected = $true }
+    @{ Id = 'ED-105'; Command = 'poetry -C search run pytest'; Expected = $true }
+    @{ Id = 'ED-106'; Command = 'poetry --directory search run pytest'; Expected = $true }
+    @{ Id = 'ED-107'; Command = 'poetry --directory show run pytest'; Expected = $true }
+    @{ Id = 'ED-108'; Command = 'poetry -P show run pytest'; Expected = $true }
+    @{ Id = 'ED-109'; Command = 'poetry --project search run pytest'; Expected = $true }
+    @{ Id = 'ED-110'; Command = 'pip --cache-dir list install black'; Expected = $true }
+    @{ Id = 'ED-111'; Command = 'pip --log show install ruff'; Expected = $true }
+    @{ Id = 'ED-112'; Command = 'pip3 --cache-dir freeze install pytest'; Expected = $true }
+    @{ Id = 'ED-113'; Command = 'pip3 --log list install pyright'; Expected = $true }
+    @{ Id = 'ED-114'; Command = 'git -C log bisect run pytest'; Expected = $true }
+    @{ Id = 'ED-115'; Command = 'git --git-dir show bisect run pytest'; Expected = $true }
+    @{ Id = 'ED-116'; Command = 'git --work-tree diff bisect run pytest'; Expected = $true }
+    @{ Id = 'ED-117'; Command = 'npm --workspace=search run lint'; Expected = $true }
+    @{ Id = 'ED-118'; Command = 'poetry --directory=show run pytest'; Expected = $true }
+    @{ Id = 'ED-119'; Command = 'pip --cache-dir=list install black'; Expected = $true }
+    @{ Id = 'ED-120'; Command = 'git --work-tree=log bisect run pytest'; Expected = $true }
 )
 
 $script:ClassificationFalsePositiveCase = @(
