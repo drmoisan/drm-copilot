@@ -66,21 +66,21 @@ Found by searching the test tree for `recorded_at`, `recordedAt`, the two symbol
 
 ### Phase 2 — Final QA, verification, and self-review
 
-- [ ] [P2-T1] Final-QC Python static artifact: Black check, Ruff, and Pyright over the two Python files of P0-T1. Write `FEATURE/evidence/qa-gates/python-static.<timestamp>.md`.
+- [x] [P2-T1] Final-QC Python static artifact: Black check, Ruff, and Pyright over the two Python files of P0-T1. Write `FEATURE/evidence/qa-gates/python-static.<timestamp>.md`.
   - Acceptance: each step exit 0 with zero findings; Black prints its "would be left unchanged" summary; a change or failure restarts the loop.
-- [ ] [P2-T2] Final-QC TypeScript static artifact: Prettier check, ESLint, and the type check over the two TypeScript files of P0-T2. Write `FEATURE/evidence/qa-gates/typescript-static.<timestamp>.md`.
+- [x] [P2-T2] Final-QC TypeScript static artifact: Prettier check, ESLint, and the type check over the two TypeScript files of P0-T2. Write `FEATURE/evidence/qa-gates/typescript-static.<timestamp>.md`.
   - Acceptance: each step exit 0 with zero findings.
-- [ ] [P2-T3] Final pytest gate: one `pytest -n auto --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-1161-pytest-final.json --cov` run. Write `FEATURE/evidence/qa-gates/pytest-gate.<timestamp>.md`.
+- [x] [P2-T3] Final pytest gate: one `pytest -n auto --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-1161-pytest-final.json --cov` run. Write `FEATURE/evidence/qa-gates/pytest-gate.<timestamp>.md`.
   - Acceptance: zero failures; no new failing test against the P0-T3 artifact; `scripts/dev_tools/validate_epic_planner_state.py` line coverage 100% and branch coverage not below the `Phase 0 baseline`, with no missing branch inside `_validate_planner_worktrees`.
-- [ ] [P2-T4] Final Jest gate: one coverage run in `extensions/drm-copilot` through its normal workers. Write `FEATURE/evidence/qa-gates/jest-gate.<timestamp>.md`.
+- [x] [P2-T4] Final Jest gate: one coverage run in `extensions/drm-copilot` through its normal workers. Write `FEATURE/evidence/qa-gates/jest-gate.<timestamp>.md`.
   - Acceptance: zero failures; `src/lib/validate/epic-planner-state-planner-worktrees.ts` at 100% lines and 100% branches from `lcov.info`; its `coverageThreshold` entry in `extensions/drm-copilot/jest.config.cjs` is unchanged.
-- [ ] [P2-T5] Coverage delta verification. Write `FEATURE/evidence/qa-gates/coverage-delta.<timestamp>.md` comparing P0-T3 with P2-T3 and P0-T4 with P2-T4.
+- [x] [P2-T5] Coverage delta verification. Write `FEATURE/evidence/qa-gates/coverage-delta.<timestamp>.md` comparing P0-T3 with P2-T3 and P0-T4 with P2-T4.
   - Acceptance: records baseline, post-change, and changed-line coverage for both files and repo-wide figures for each gate; every changed line is covered; no per-file or repo-wide drop.
-- [ ] [P2-T6] Scope check. Write `FEATURE/evidence/qa-gates/scope-check.<timestamp>.md` listing the paths changed since `CycleStartHead` (from P0-T1) with `git diff --name-only` against that commit and `git status --porcelain`.
+- [x] [P2-T6] Scope check. Write `FEATURE/evidence/qa-gates/scope-check.<timestamp>.md` listing the paths changed since `CycleStartHead` (from P0-T1) with `git diff --name-only` against that commit and `git status --porcelain`.
   - Acceptance: every path is one of the two validators, the two corpus test files, the four new fixtures, `FEATURE/spec.md`, `FEATURE/user-story.md`, this plan, or a file under `FEATURE/evidence/`; no PowerShell file, mirror, manifest, or `jest.config.cjs` change.
-- [ ] [P2-T7] Re-check user-story criterion 1 (operator story, `planner_worktrees` accepted and malformed entries rejected with byte-identical strings) against P1-T2, P2-T3, and P2-T4, and check its box in `FEATURE/user-story.md` when that evidence passes. Write `FEATURE/evidence/other/user-story-recheck.<timestamp>.md` naming the evidence files.
+- [x] [P2-T7] Re-check user-story criterion 1 (operator story, `planner_worktrees` accepted and malformed entries rejected with byte-identical strings) against P1-T2, P2-T3, and P2-T4, and check its box in `FEATURE/user-story.md` when that evidence passes. Write `FEATURE/evidence/other/user-story-recheck.<timestamp>.md` naming the evidence files.
   - Acceptance: the criterion's checkbox is checked only if P2-T3 and P2-T4 both show zero failures over the 21-file corpus; no other criterion text changes.
-- [ ] [P2-T8] Self-review: walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base of `origin/main` and `HEAD`, and confirm PA-1 is closed. Write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
+- [x] [P2-T8] Self-review: walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base of `origin/main` and `HEAD`, and confirm PA-1 is closed. Write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
   - Acceptance: no FAIL row; a FAIL is fixed, the QA loop re-run, and a new self-review file written.
 
 ## Pre-Mortem
