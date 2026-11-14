@@ -96,6 +96,44 @@ Describe 'Invoke-PreToolUseDispatchEntryPoint' {
         $null = @(Invoke-PreToolUseDispatchEntryPoint -ReadPayload { $script:Payload } -ReadRegistry $script:ReadRegistry -WriteTrace $writer)
         $lines.Count | Should -Be 0
     }
+
+    It 'writes each trace line to the console error writer by default' {
+        # Arrange: capture [Console]::Error, restored in finally.
+        $priorError = [Console]::Error
+        $errorWriter = [System.IO.StringWriter]::new()
+        try {
+            # Act
+            [Console]::SetError($errorWriter)
+            $null = @(Invoke-PreToolUseDispatchEntryPoint -ReadPayload { $script:Payload } -ReadRegistry $script:ReadRegistry -PerHookTrace)
+        } finally {
+            [Console]::SetError($priorError)
+        }
+
+        # Assert
+        $lines = @($errorWriter.ToString().Trim() -split "`r?`n")
+        $lines.Count | Should -Be 2
+        ($lines[1] | ConvertFrom-Json).hook | Should -Be 'enforce-promotion-mcp-only.ps1'
+    }
+}
+
+Describe 'invoke-pretooluse-dispatch.ps1 script tail' {
+    It 'denies a payload without a tool name through the registry beside the script when run in process' {
+        # Arrange: the default payload and registry readers run; a payload without tool_name selects no hook.
+        $priorIn = [Console]::In
+        try {
+            # Act: run the script through the & route so the statements after the dot-source guard execute.
+            [Console]::SetIn([System.IO.StringReader]::new('{"session_id":"dispatch-tail","hook_event_name":"PreToolUse"}'))
+            $emitted = @(& $script:EntryPath)
+            $exitCode = $LASTEXITCODE
+        } finally {
+            [Console]::SetIn($priorIn)
+        }
+
+        # Assert
+        $exitCode | Should -Be 0
+        $emitted.Count | Should -Be 1
+        ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason | Should -BeLike 'HOOK_DISPATCH_BLOCKED: *tool_name*'
+    }
 }
 
 Describe 'Invoke-PreToolUseDispatchDecision' {

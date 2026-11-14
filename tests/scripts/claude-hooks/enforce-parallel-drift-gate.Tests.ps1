@@ -447,4 +447,25 @@ Describe 'enforce-parallel-drift-gate.ps1' {
             ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
     }
+
+    Context 'script tail (issue #1159, D13)' {
+        It 'emits the deny JSON and exits 0 when the whole script runs in process' {
+            # Arrange: a PreToolUse payload without tool_input, which the shared payload reader denies as an anomaly.
+            $payload = '{"session_id":"d13-tail","hook_event_name":"PreToolUse","tool_name":"Agent"}'
+            $priorIn = [Console]::In
+            try {
+                # Act: run the script through the & route so the statements after the dot-source guard execute.
+                [Console]::SetIn([System.IO.StringReader]::new($payload))
+                $emitted = @(& $script:UnderTest)
+                $exitCode = $LASTEXITCODE
+            } finally {
+                [Console]::SetIn($priorIn)
+            }
+
+            # Assert: the tail writes the decision JSON to the pipeline and exits with the entry-point code.
+            $exitCode | Should -Be 0
+            $emitted.Count | Should -Be 1
+            ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'deny'
+        }
+    }
 }

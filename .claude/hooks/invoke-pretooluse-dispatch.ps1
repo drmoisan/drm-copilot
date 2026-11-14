@@ -115,8 +115,6 @@ if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compr
 # The entry point returns its [int] exit code as the last pipeline element and the
 # decision JSON before it, so the decision is written explicitly before the exit.
 $entryPointResult = @(Invoke-PreToolUseDispatchEntryPoint -PerHookTrace:$PerHookTrace)
-if ($entryPointResult.Count -gt 1) {
-    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
-}
+$entryPointResult | Select-Object -SkipLast 1 | Write-Output
 
 exit ([int]$entryPointResult[-1])

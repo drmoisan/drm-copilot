@@ -347,8 +347,6 @@ if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compr
 # decision JSON before it. `exit (<call>)` would capture BOTH into the exit
 # expression and emit nothing, so the decision is written explicitly here first.
 $entryPointResult = @(Invoke-ParallelCohortBarrierEntryPoint)
-if ($entryPointResult.Count -gt 1) {
-    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
-}
+$entryPointResult | Select-Object -SkipLast 1 | Write-Output
 
 exit ([int]$entryPointResult[-1])
