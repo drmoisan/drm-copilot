@@ -25,6 +25,8 @@ Rebased over #1158 (execution-environment brief): the brief gains a launcher bul
 
 Rebased over #1158 (feature-review-workflow coverage step): the TypeScript, Python, and PowerShell coverage commands of `.claude/skills/feature-review-workflow/SKILL.md` and `.agents/skills/feature-review-workflow/SKILL.md` now name the test-execution launcher suites `jest`, `pytest`, and `pester`, and the `If coverage artifacts already exist` line states the queue re-run rule. Every stored-patch hunk line of this entry that carried one of those four lines, in the feature-review-workflow sections of the sources and their bundle copies, was regenerated with the new text in both images; line counts and the lines the hunks revert are unchanged.
 
+Rebased over #1158 (atomic-executor agents): the `Bash(poetry run pytest *)` and `Bash(npx jest *)` tool entries of the executor agents became the two test-execution launcher entries, and the `## Toolchain Commands` TypeScript line names the launcher `jest` suite. The stored-patch hunk lines of the `.claude/agents/atomic-executor.md` and `.codex/agents/atomic-executor.toml` sections (and their bundle and generated-variant sections) that carried those lines were regenerated in both images; the `poetry run pytest -n auto` and `Invoke-PoshQCParallelTest` lines they revert are unchanged.
+
 ## Reason and Evidence
 
 The owner decided on 2026-11-06 that tests run in parallel only. The sequential run existed to detect and fix a leak that has since been fixed, and the overhead of multiple and sequential runs was judged unacceptable.

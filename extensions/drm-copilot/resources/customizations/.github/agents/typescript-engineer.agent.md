@@ -108,7 +108,7 @@ Run the TypeScript toolchain in this exact order and repeat from step 1 if any s
 1. `npm run format`
 2. `npm run lint`
 3. `npm run typecheck`
-4. `npm run test:unit`
+4. `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest` (the launcher `jest` suite)
 
 Do not claim completion without a clean final pass.
 
@@ -165,3 +165,7 @@ When reporting work, always include:
 ## Unit test boundary
 
 Unit tests MUST NOT launch the VS Code extension host.
+
+## Test-Execution Launcher
+
+Local test suites run through the test-execution launcher (issue #1158): `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh <suite>` with the suite name first (`pytest`, `pester`, `jest`, or a configured suite), or the `.agents/skills/test-execution-policy/scripts/` copy where `.claude` is absent. A launcher exit 75 means the machine test-suite lock was busy: re-run the gate after the holder finishes and record it as a queue timeout, not a failure. The `test-execution-policy` skill states the rules.

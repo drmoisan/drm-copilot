@@ -11,11 +11,11 @@ tools:
   - "Bash(poetry run black *)"
   - "Bash(poetry run ruff *)"
   - "Bash(poetry run pyright *)"
-  - "Bash(poetry run pytest *)"
+  - "Bash(sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh *)"
   - "Bash(npx prettier *)"
   - "Bash(npx eslint *)"
   - "Bash(npx tsc *)"
-  - "Bash(npx jest *)"
+  - "Bash(env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh *)"
   - "Bash(pwsh *)"
   - "Bash(git *)"
   - "mcp__drm-copilot__run_poshqc_format"
@@ -79,7 +79,7 @@ For each task:
 Use the scoped tool patterns for quality gates:
 
 - **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
-- **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+- **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 - **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
 - **Git**: `git diff`, `git status`, `git log`
 

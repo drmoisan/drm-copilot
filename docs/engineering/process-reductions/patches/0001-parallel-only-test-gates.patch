@@ -590,7 +590,7 @@ index 867c9004b..b376e183c 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -1419,7 +1419,7 @@ index f80112d1f..c1a039de4 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -1435,7 +1435,7 @@ index 4464c31f9..d105a767a 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -1451,7 +1451,7 @@ index f1bb06a14..b4908bb79 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -1467,7 +1467,7 @@ index 092b0c85d..0b57102cc 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -1483,7 +1483,7 @@ index f634c47d3..7aa91892e 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -1499,7 +1499,7 @@ index 5ccea44fc..7d32673e0 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -4603,7 +4603,7 @@ index 867c9004b..b376e183c 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -6165,7 +6165,7 @@ index f80112d1f..c1a039de4 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -6181,7 +6181,7 @@ index 4464c31f9..d105a767a 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -6197,7 +6197,7 @@ index f1bb06a14..b4908bb79 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -6213,7 +6213,7 @@ index 092b0c85d..0b57102cc 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -6229,7 +6229,7 @@ index f634c47d3..7aa91892e 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
@@ -6245,7 +6245,7 @@ index 5ccea44fc..7d32673e0 100644
  
 -- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest`
 +- **Python**: `poetry run black`, `poetry run ruff`, `poetry run pyright`, `poetry run pytest -n auto`
- - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, `npx jest`
+ - **TypeScript**: `npx prettier`, `npx eslint`, `npx tsc`, and the launcher `jest` suite (`sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest`)
 -- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_test`, `mcp__drm-copilot__run_poshqc_analyze_autofix`)
 +- **PowerShell**: MCP server functions (`mcp__drm-copilot__run_poshqc_format`, `mcp__drm-copilot__run_poshqc_analyze`, `mcp__drm-copilot__run_poshqc_analyze_autofix`), and one `Invoke-PoshQCParallelTest` run as the Pester gate through the `sh` launcher route
  - **Git**: `git diff`, `git status`, `git log`
