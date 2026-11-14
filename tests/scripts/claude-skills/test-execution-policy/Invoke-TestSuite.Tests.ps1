@@ -456,3 +456,38 @@ Describe 'New-TestSuiteProcessStartInfo (issue #1158, D27)' {
         $info.WorkingDirectory | Should -BeExactly '/work'
     }
 }
+
+Describe 'Get-TestSuiteScriptArgument (issue #1158, D18)' {
+    # Through pwsh -File, PowerShell splits a word that starts with '-' and contains ':' into two $args
+    # elements; the launcher therefore reads its arguments from the process command line.
+    It 'returns the words after the script operand of <Form> unchanged' -ForEach @(
+        @{ Form = '-File'; HostWords = @('pwsh.dll', '-NoProfile', '-File', '/repo/.claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1') }
+        @{ Form = '-f with a backslash path'; HostWords = @('pwsh.dll', '-NoProfile', '-f', 'C:\short\DANMOI~1\Invoke-TestSuite.ps1') }
+        @{ Form = 'the first positional'; HostWords = @('pwsh.dll', '.agents/skills/test-execution-policy/scripts/invoke-testsuite.ps1') }
+    ) {
+        # Arrange
+        $words = @('pytest', '--cov-report=json:C:/r/report.json', '--cov-report=lcov:artifacts/python/lcov.info', '-m:x', '-v')
+
+        # Act
+        $result = Get-TestSuiteScriptArgument -BoundArgument @('pytest', '--cov-report=json', 'C:/r/report.json') -CommandLineArgument ($HostWords + $words) -ScriptLeaf 'Invoke-TestSuite.ps1'
+
+        # Assert
+        ($result -join '|') | Should -BeExactly ($words -join '|')
+    }
+
+    It 'returns an empty list when the script operand is the last word' {
+        $result = Get-TestSuiteScriptArgument -BoundArgument @('ignored') -CommandLineArgument @('pwsh.dll', '-File', 'x/Invoke-TestSuite.ps1') -ScriptLeaf 'Invoke-TestSuite.ps1'
+
+        @($result).Count | Should -Be 0
+    }
+
+    It 'falls back to the bound arguments when <Case>' -ForEach @(
+        @{ Case = 'the host ran a -Command payload'; Line = @('pwsh.dll', '-NoProfile', '-Command', '& ./x.ps1') }
+        @{ Case = 'the leaf follows an option other than -File'; Line = @('pwsh.dll', '-Command', 'x/Invoke-TestSuite.ps1', 'pytest') }
+        @{ Case = 'the command line is empty'; Line = @() }
+    ) {
+        $result = Get-TestSuiteScriptArgument -BoundArgument @('pytest', '-v', 7) -CommandLineArgument $Line -ScriptLeaf 'Invoke-TestSuite.ps1'
+
+        ($result -join '|') | Should -BeExactly 'pytest|-v|7'
+    }
+}

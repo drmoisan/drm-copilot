@@ -15,7 +15,49 @@
 
     The script-file entry runs only when the script is not dot-sourced; it reads the optional hashtable
     variable TestSuiteLauncherSeams from the caller's scope and splats it onto Invoke-TestSuiteLauncher.
+    Through pwsh -File, PowerShell splits a word that starts with '-' and contains ':' into two $args
+    elements and drops the colon, so the entry takes the words after this script's path on the process
+    command line (Get-TestSuiteScriptArgument) and falls back to $args when the process was not started
+    for this script.
 #>
+
+function Get-TestSuiteScriptArgument {
+    <#
+    .SYNOPSIS
+        Return the launcher's script arguments as the process received them (D18).
+    .DESCRIPTION
+        Finds this script on the process command line: an element whose leaf name equals ScriptLeaf and
+        that follows a -File form (-File, -f, -fi, -fil, case-insensitive) or is the host's first argument.
+        Returns the elements after it unchanged, so --cov-report=json:C:/r.json stays one word. Returns the
+        bound arguments, as strings, when no such element exists (a call through & or from another host).
+    .PARAMETER BoundArgument
+        The script's $args.
+    .PARAMETER CommandLineArgument
+        The process command line, element 0 being the host.
+    .PARAMETER ScriptLeaf
+        The leaf file name of this script.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Object[]])]
+    param(
+        [AllowEmptyCollection()][AllowNull()][object[]] $BoundArgument = @(),
+        [AllowEmptyCollection()][AllowNull()][string[]] $CommandLineArgument = @(),
+        [Parameter(Mandatory)][string] $ScriptLeaf
+    )
+
+    $commandLine = @($CommandLineArgument)
+    # Walk the host's arguments for the first script operand that names this script; the words after it
+    # are this script's arguments exactly as the caller passed them.
+    for ($index = 1; $index -lt $commandLine.Count; $index++) {
+        $leaf = ([string] $commandLine[$index] -split '[\\/]')[-1]
+        if (-not [string]::Equals($leaf, $ScriptLeaf, [System.StringComparison]::OrdinalIgnoreCase)) { continue }
+        $follows = ($index -eq 1) -or ([string] $commandLine[$index - 1] -match '^-(f|fi|fil|file)$')
+        if ($follows) {
+            return , [string[]] @($commandLine | Select-Object -Skip ($index + 1))
+        }
+    }
+    return , [string[]] @(@($BoundArgument) | Where-Object { $null -ne $_ } | ForEach-Object { [string] $_ })
+}
 
 function New-TestSuiteProcessStartInfo {
     <#
@@ -214,5 +256,6 @@ function Invoke-TestSuiteLauncher {
 if ($MyInvocation.InvocationName -ne '.') {
     $launcherSeamTable = Get-Variable -Name TestSuiteLauncherSeams -ValueOnly -ErrorAction Ignore
     if ($launcherSeamTable -isnot [hashtable]) { $launcherSeamTable = @{} }
-    exit (Invoke-TestSuiteLauncher -ArgumentList $args @launcherSeamTable)
+    $scriptArgument = Get-TestSuiteScriptArgument -BoundArgument $args -CommandLineArgument ([Environment]::GetCommandLineArgs()) -ScriptLeaf ([System.IO.Path]::GetFileName($PSCommandPath))
+    exit (Invoke-TestSuiteLauncher -ArgumentList $scriptArgument @launcherSeamTable)
 }
