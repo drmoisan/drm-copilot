@@ -29,6 +29,8 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-dispatch/HookDispatch.
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-dispatch/HookDispatchRunner.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookDispatchRunner.psm1' -ErrorRecord $_ }
 
 $script:PreToolUseDispatchRegistryPath = Join-Path $PSScriptRoot 'pretooluse-dispatch.json'
+# The hooks directory the registry commands resolve against (beside this script).
+$ScriptRoot = $PSScriptRoot
 
 function Invoke-PreToolUseDispatchDecision {
     <#
@@ -52,7 +54,7 @@ function Invoke-PreToolUseDispatchDecision {
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'HOOK_DISPATCH_BLOCKED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
-    $registry = Read-HookDispatchRegistry -RegistryText $RegistryText -HooksDirectory $PSScriptRoot
+    $registry = Read-HookDispatchRegistry -RegistryText $RegistryText -HooksDirectory $ScriptRoot
     if (-not $registry.IsValid) { return $registry.Reason }
 
     $toolName = Get-HookDispatchToolName -PayloadText $PayloadText

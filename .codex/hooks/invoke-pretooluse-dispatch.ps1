@@ -27,6 +27,8 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 try { . (Join-Path $PSScriptRoot 'hook-dispatch.ps1') } catch { Add-HookDependencyFailure -Name 'hook-dispatch.ps1' -ErrorRecord $_ }
 
 $script:CodexPreToolUseDispatchRegistryPath = Join-Path $PSScriptRoot 'pretooluse-dispatch.json'
+# The hooks directory the registry commands resolve against (beside this script).
+$ScriptRoot = $PSScriptRoot
 
 function Invoke-CodexPreToolUseDispatchDecision {
     <#
@@ -44,7 +46,7 @@ function Invoke-CodexPreToolUseDispatchDecision {
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'HOOK_DISPATCH_BLOCKED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
-    $registry = Read-CodexHookDispatchRegistry -RegistryText $RegistryText -HooksDirectory $PSScriptRoot
+    $registry = Read-CodexHookDispatchRegistry -RegistryText $RegistryText -HooksDirectory $ScriptRoot
     if (-not $registry.IsValid) { return $registry.Reason }
 
     $toolName = Get-CodexHookDispatchToolName -PayloadText $PayloadText
