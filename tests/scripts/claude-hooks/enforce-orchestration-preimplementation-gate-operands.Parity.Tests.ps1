@@ -50,4 +50,27 @@ Describe 'enforce-orchestration-preimplementation-gate-operands.ps1 surface pari
                 Should -BeLessOrEqual 500 -Because "$path must stay within its pinned per-file bound of 500 lines"
         }
     }
+
+    It 'states the issue #1188 command-operand resolution in the Hook Execution Context section of <Copy>' -ForEach @(
+        @{ Copy = '.claude/skills/execution-environment/SKILL.md' }
+        @{ Copy = '.agents/skills/execution-environment/SKILL.md' }
+        @{ Copy = '.github/skills/execution-environment/SKILL.md' }
+        @{ Copy = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md' }
+        @{ Copy = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md' }
+        @{ Copy = 'extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md' }
+    ) {
+        # Arrange
+        $text = [System.IO.File]::ReadAllText((Join-Path $script:RepoRoot $Copy))
+        $start = $text.IndexOf("`n## Hook Execution Context", [System.StringComparison]::Ordinal)
+        $end = if ($start -ge 0) { $text.IndexOf("`n## ", $start + 1, [System.StringComparison]::Ordinal) } else { -1 }
+
+        # Act
+        $section = if ($start -ge 0 -and $end -gt $start) { $text.Substring($start, $end - $start) } else { '' }
+
+        # Assert
+        $section | Should -Not -BeNullOrEmpty -Because "$Copy must carry a bounded ## Hook Execution Context section"
+        foreach ($token in @('enforce-orchestration-preimplementation-gate-operands.ps1', 'TARGET_WORKTREE_NOT_DERIVABLE', '--directory', '--chdir', '-WorkingDirectory', 'run-test-suite.sh')) {
+            $section.Contains($token) | Should -BeTrue -Because "the Hook Execution Context section of $Copy must name $token"
+        }
+    }
 }
