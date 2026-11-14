@@ -27,6 +27,8 @@ Rebased over #1158 (feature-review-workflow coverage step): the TypeScript, Pyth
 
 Rebased over #1158 (atomic-executor agents): the `Bash(poetry run pytest *)` and `Bash(npx jest *)` tool entries of the executor agents became the two test-execution launcher entries, and the `## Toolchain Commands` TypeScript line names the launcher `jest` suite. The stored-patch hunk lines of the `.claude/agents/atomic-executor.md` and `.codex/agents/atomic-executor.toml` sections (and their bundle and generated-variant sections) that carried those lines were regenerated in both images; the `poetry run pytest -n auto` and `Invoke-PoshQCParallelTest` lines they revert are unchanged.
 
+Rebased over #1158 (`tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`): the file gains the D13 token set `$script:D13Required`, the forbidden sets `$script:ExecutorRouteForbidden` and `$script:ReviewLauncherForbidden`, the D13 tokens in its `PLAN-`, `QA-PS-`, `QA-PY-`, and four `REVIEW-` rows, the launcher route in its `EXEC-` rows, and 32 new rows. The same structural edit was applied to both images: the `0006` hunks on this file were regenerated as the difference between the edited pre-`0006` text and the edited live text, and the `0001` creation hunk now carries the edited pre-`0006` text, so reversing the `0006` hunks yields exactly the `0001` creation text.
+
 ## Reason and Evidence
 
 The owner decided on 2026-11-06 that tests run in parallel only. The sequential run existed to detect and fix a leak that has since been fixed, and the overhead of multiple and sequential runs was judged unacceptable.
