@@ -175,6 +175,52 @@ Describe 'Invoke-RegenerationPathCommand config path forwarding' {
         $null = Invoke-RegenerationPathCommand @arguments -ConfigPath 'config/alt.json' -UtcNow $context.UtcNow
         @($context.State.ConfigReads) | Should -BeExactly @('config/alt.json')
     }
+
+    It 'treats an empty -ConfigPath as omitted, reading the default path with the same exit code, in <Id>' -ForEach @(
+        @{ Id = 'R19' }, @{ Id = 'R43' }
+    ) {
+        # Arrange
+        $row = @($script:Rows | Where-Object { $_.Id -ceq $Id })[0]
+        $arguments = Get-RegenerationScenarioArgument -Row $row
+        $context = Register-RegenerationScenarioMock -Row $row
+        $omitted = Invoke-RegenerationPathCommand @arguments -UtcNow $context.UtcNow
+
+        # Act
+        $context = Register-RegenerationScenarioMock -Row $row
+        $empty = Invoke-RegenerationPathCommand @arguments -ConfigPath '' -UtcNow $context.UtcNow
+
+        # Assert
+        @($context.State.ConfigReads) | Should -BeExactly @('config/orchestration-regeneration.json')
+        $empty.ExitCode | Should -Be $omitted.ExitCode
+        (ConvertTo-CanonicalJson -Value $empty.Result) | Should -BeExactly (ConvertTo-CanonicalJson -Value $omitted.Result)
+    }
+}
+
+Describe 'Invoke-RegenerationGitStep' {
+    It 'returns the wrapper result unchanged when the wrapper succeeds' {
+        # Arrange
+        Mock Invoke-RegenerationGitExe { [pscustomobject]@{ ExitCode = 128; Output = 'fatal' } }
+
+        # Act
+        $step = Invoke-RegenerationGitStep -GitArgs @('rev-parse', 'HEAD')
+
+        # Assert
+        $step.ExitCode | Should -Be 128
+        $step.Output | Should -BeExactly 'fatal'
+    }
+
+    It 'reports a throwing wrapper as exit code -1 with empty output' {
+        # Arrange
+        Mock Invoke-RegenerationGitExe { throw 'git missing' }
+
+        # Act
+        $step = Invoke-RegenerationGitStep -GitArgs @('status', '--porcelain')
+
+        # Assert
+        $step.ExitCode | Should -Be -1
+        $step.Output | Should -BeExactly ''
+        Should -Invoke Invoke-RegenerationGitExe -Times 1 -Exactly
+    }
 }
 
 Describe 'ConvertTo-RegenerationResultJson' {
@@ -493,6 +539,14 @@ Describe 'Invoke-RegenerationGitExe seam' {
 
     It 'throws for an invoker returning two objects' {
         { Invoke-RegenerationGitExe -GitArgs @('x') -Invoker { param($GitArgs) [pscustomobject]@{ ExitCode = 0; Lines = @() }; 'extra' } } | Should -Throw
+    }
+
+    It 'throws for an invoker result without <Missing>' -ForEach @(
+        @{ Missing = 'Lines'; Result = [pscustomobject]@{ ExitCode = 0 } }
+        @{ Missing = 'ExitCode'; Result = [pscustomobject]@{ Lines = @('a') } }
+    ) {
+        $invoker = { param($GitArgs) $Result }.GetNewClosure()
+        { Invoke-RegenerationGitExe -GitArgs @('x') -Invoker $invoker } | Should -Throw -ExpectedMessage 'git invoker result lacks ExitCode or Lines'
     }
 
     It 'propagates an invoker exception' {

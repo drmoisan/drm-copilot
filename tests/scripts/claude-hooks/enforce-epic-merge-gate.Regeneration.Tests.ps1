@@ -10,7 +10,9 @@
     guard fixtures and mocked target resolvers, checkpoint read seams, and process seams, and checks
     the entry file's dot-source and call wiring by AST. The suite does not dot-source
     enforce-epic-merge-gate-regeneration.ps1 itself, so Get-EpicMergeGateRegenerationDecision exists
-    only through the entry file. No case starts a process, runs git or gh, or writes a file.
+    only through the entry file. A direct-decision context calls that function on in-memory
+    checkpoints, including hashtable-parsed ones, so the Claude copy's own branches are exercised.
+    No case starts a process, runs git or gh, or writes a file.
 #>
 
 Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
@@ -162,6 +164,63 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
         # Assert
         $result.Decision | Should -Be 'deny'
         $result.Reason.StartsWith($script:DenyPrefix, [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Reason
+    }
+
+    Context 'direct decision cases on the Claude copy of the helper' {
+        It 'allows a checkpoint parsed as a hashtable with a matching complete event' {
+            # Arrange
+            $text = (Get-DeltaOverride -EventList @(Get-GateRegenerationEvent)) | ConvertTo-Json -Depth 10
+            $checkpoint = ConvertFrom-Json -InputObject $text -AsHashtable
+
+            # Act
+            $decision = Get-EpicMergeGateRegenerationDecision -Checkpoint $checkpoint
+
+            # Assert
+            $decision.Denied | Should -BeFalse -Because $decision.Reason
+        }
+
+        It 'denies a checkpoint parsed as a hashtable that has no regeneration_events key' {
+            # Arrange
+            $override = Get-DeltaOverride -EventList @()
+            $override.Remove('regeneration_events')
+            $checkpoint = ConvertFrom-Json -InputObject ($override | ConvertTo-Json -Depth 10) -AsHashtable
+
+            # Act
+            $decision = Get-EpicMergeGateRegenerationDecision -Checkpoint $checkpoint
+
+            # Assert
+            $decision.Denied | Should -BeTrue
+            $decision.Reason | Should -BeLikeExactly '*no regeneration_events list*'
+        }
+
+        It 'denies a delta outcome without a head_sha' {
+            # Arrange
+            $override = Get-DeltaOverride -EventList @(Get-GateRegenerationEvent)
+            $override.remediation_loop.review_outcomes[0]['head_sha'] = $null
+            $checkpoint = $override | ConvertTo-Json -Depth 10 | ConvertFrom-Json
+
+            # Act
+            $decision = Get-EpicMergeGateRegenerationDecision -Checkpoint $checkpoint
+
+            # Assert
+            $decision.Denied | Should -BeTrue
+            $decision.Reason.StartsWith($script:DenyPrefix, [System.StringComparison]::Ordinal) | Should -BeTrue -Because $decision.Reason
+            $decision.Reason | Should -BeLikeExactly '*carries no head_sha*'
+        }
+
+        It 'denies a delta outcome when regeneration_events is not a list' {
+            # Arrange
+            $override = Get-DeltaOverride -EventList @()
+            $override['regeneration_events'] = 'not-a-list'
+            $checkpoint = $override | ConvertTo-Json -Depth 10 | ConvertFrom-Json
+
+            # Act
+            $decision = Get-EpicMergeGateRegenerationDecision -Checkpoint $checkpoint
+
+            # Assert
+            $decision.Denied | Should -BeTrue
+            $decision.Reason | Should -BeLikeExactly '*no regeneration_events list*'
+        }
     }
 
     It 'denies with EPIC_MERGE_GATE_BLOCKED naming the file when enforce-epic-merge-gate-regeneration.ps1 fails to load' {
