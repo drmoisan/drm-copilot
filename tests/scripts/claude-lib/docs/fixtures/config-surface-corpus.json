@@ -1155,7 +1155,5 @@
     "config/tagged.yml": "x: !!str MARKER_TAG\n"
   },
   "marker_prefix": "MARKER_",
-  "source_roots": [
-    "config"
-  ]
+  "source_roots": ["config"]
 }

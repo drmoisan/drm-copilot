@@ -3563,7 +3563,5 @@
     "src/pkg/util.py": "\"\"\"Utilities.\"\"\"\r\n\r\ndef helper(value):\r\n    return value\r\n\r\nclass Helper:\r\n    pass\r\n\r\nCONSTANT = 1\r\n_private = 2\r\n",
     "src/toplevel.py": "from . import sibling\n\nVALUE = 1\n"
   },
-  "source_roots": [
-    "src"
-  ]
+  "source_roots": ["src"]
 }
