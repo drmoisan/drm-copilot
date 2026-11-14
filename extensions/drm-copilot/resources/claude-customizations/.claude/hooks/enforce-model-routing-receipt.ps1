@@ -65,6 +65,8 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/EpicSco
 # Cleanup consolidation delegation (issue #1026): the session-root manifest and the shared predicates.
 try { Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'CleanupWorktreeManifest.psm1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-cleanup-context.ps1') } catch { Add-HookDependencyFailure -Name 'hook-cleanup-context.ps1' -ErrorRecord $_ }
+# Docs-estate delegation leg (issue #1169): the checkpoint-free Agent(pr-author) of a documentation run.
+try { . (Join-Path $PSScriptRoot 'enforce-model-routing-receipt-docs.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-model-routing-receipt-docs.ps1' -ErrorRecord $_ }
 function Get-ModelRoutingCheckpoint {
     <#
     .SYNOPSIS
@@ -200,11 +202,11 @@ function Get-ModelRoutingTargetCheckpointResolution {
 
     switch ($target.Status) {
         { $_ -in @('SessionRoot', 'OtherWorktree') } {
-            return [ordered]@{ CheckpointPath = (Get-WorktreeItemCheckpointPath -WorktreeRoot $target.WorktreeRoot); Reason = $null }
+            return [ordered]@{ CheckpointPath = (Get-WorktreeItemCheckpointPath -WorktreeRoot $target.WorktreeRoot); Reason = $null; WorktreeRoot = [string]$target.WorktreeRoot }
         }
         default {
             $reason = "$($target.ReasonCode): $($target.Detail) The model-routing gate will not check this delegation against a checkpoint that may belong to a different item. Put the line 'Canonical issue number for this feature is <N>.' and a 'branch: <item branch>' label in the delegation prompt so the gate can identify the item."
-            return [ordered]@{ CheckpointPath = $null; Reason = $reason }
+            return [ordered]@{ CheckpointPath = $null; Reason = $reason; WorktreeRoot = $null }
         }
     }
 }
@@ -369,11 +371,22 @@ function Invoke-ModelRoutingReceiptDecision {
         return $allow
     }
 
+    # Issue #1169: a checkpoint-free documentation run delegates pr-author through the docs-estate
+    # leg; without a docs profile beneath the resolved root its suffix is empty.
+    $docsSuffix = ''
+    if ($subagent -eq 'pr-author' -and $null -eq $checkpoint) {
+        $docs = Get-ModelRoutingDocsEstateDecision -PromptText $prompt -WorktreeRoot $resolution.WorktreeRoot
+        if ($docs.Allowed) {
+            return $allow
+        }
+        $docsSuffix = [string]$docs.DenySuffix
+    }
+
     return [ordered]@{
         hookSpecificOutput = [ordered]@{
             hookEventName            = 'PreToolUse'
             permissionDecision       = 'deny'
-            permissionDecisionReason = "MODEL_ROUTING_RECEIPT_BLOCKED: cannot delegate to '$subagent' before a model_routing_receipts entry for it is recorded in the orchestrator checkpoint. Perform Model Selection (record the complexity assessment and routing receipt) before delegating."
+            permissionDecisionReason = "MODEL_ROUTING_RECEIPT_BLOCKED: cannot delegate to '$subagent' before a model_routing_receipts entry for it is recorded in the orchestrator checkpoint. Perform Model Selection (record the complexity assessment and routing receipt) before delegating." + $docsSuffix
         }
     }
 }

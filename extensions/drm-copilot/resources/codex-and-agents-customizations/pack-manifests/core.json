@@ -100,6 +100,8 @@
     ".codex/hooks/invoke-pretooluse-dispatch.ps1",
     ".codex/hooks/pretooluse-dispatch.json",
     ".codex/hooks/hook-docs-only-diff.ps1",
+    ".codex/hooks/hook-docs-estate-context.ps1",
+    ".codex/hooks/enforce-orchestration-preimplementation-gate-docs.ps1",
     ".codex/hooks/hook-command-heredoc.ps1",
     ".codex/hooks/hook-command-invocation-operands.ps1",
     ".codex/hooks/hook-command-payload.ps1",

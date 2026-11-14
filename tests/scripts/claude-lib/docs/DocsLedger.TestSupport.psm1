@@ -90,12 +90,17 @@ function Get-DocsLedgerTestSchemaSet {
 function New-DocsLedgerTestContext {
     <#
     .SYNOPSIS
-        Returns @{ Context; Files; CallLog; WriteLog } for one recording in-memory command context.
+        Returns @{ Context; Files; CallLog; WriteLog; Revisions } for one recording in-memory command context.
     .DESCRIPTION
         File maps a repository-relative path to text or bytes. ReadBytesFailure and
         WriteTextFailure map a path to the message thrown when that path is read or written.
         ReadText and ReadBytes of an absent path throw an item-not-found error; WriteText with
         Mode 'create' on an existing path throws, as the real member does. InvokeProcess throws.
+        The context carries the twelve members of New-DocsCommandContext (issue #1169):
+        ResolveRevision returns the RevisionMap entry for a ref or $null; ReadRevisionText returns
+        $null; TestAncestor and ListChangedPath return the AncestorMap and ChangedPathMap entries
+        for the revision pair '<first>..<second>', or $null for an unmapped pair. Revisions is the
+        ordinal revision table ResolveRevision reads, so a scenario can move HEAD between steps.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Test fixture factory that builds in-memory objects only.')]
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseLiteralInitializerForHashtable', '', Justification = 'Repository paths are case-sensitive; an ordinal-comparer hashtable is required.')]
@@ -106,7 +111,10 @@ function New-DocsLedgerTestContext {
         [datetime] $UtcNow = [datetime]::new(2026, 3, 1, 12, 0, 0, [System.DateTimeKind]::Utc),
         [AllowNull()] [System.Collections.IDictionary] $ReadBytesFailure,
         [AllowNull()] [System.Collections.IDictionary] $WriteTextFailure,
-        [string] $RepositoryRoot = 'in-memory-repository'
+        [string] $RepositoryRoot = 'in-memory-repository',
+        [AllowNull()] [System.Collections.IDictionary] $RevisionMap,
+        [AllowNull()] [System.Collections.IDictionary] $AncestorMap,
+        [AllowNull()] [System.Collections.IDictionary] $ChangedPathMap
     )
 
     $utf8 = [System.Text.UTF8Encoding]::new($false, $true)
@@ -177,18 +185,53 @@ function New-DocsLedgerTestContext {
         param($FilePath, $ArgumentList, $StdinText, $TimeoutSeconds)
         throw "InvokeProcess is not available in the ledger test context (FilePath '$FilePath', ArgumentList '$ArgumentList', StdinText '$StdinText', TimeoutSeconds '$TimeoutSeconds')."
     }
+    # Revision members (issue #1169): in-memory maps only; no member starts a process.
+    $revisions = [hashtable]::new([System.StringComparer]::Ordinal)
+    if ($null -ne $RevisionMap) { foreach ($key in $RevisionMap.Keys) { $revisions[[string] $key] = [string] $RevisionMap[$key] } }
+    $ancestors = [hashtable]::new([System.StringComparer]::Ordinal)
+    if ($null -ne $AncestorMap) { foreach ($key in $AncestorMap.Keys) { $ancestors[[string] $key] = [bool] $AncestorMap[$key] } }
+    $changes = [hashtable]::new([System.StringComparer]::Ordinal)
+    if ($null -ne $ChangedPathMap) { foreach ($key in $ChangedPathMap.Keys) { $changes[[string] $key] = [string[]] @($ChangedPathMap[$key]) } }
+    $resolveRevision = {
+        param($Ref)
+        $key = [string] $Ref
+        if ($revisions.ContainsKey($key)) { return $revisions[$key] }
+        return $null
+    }.GetNewClosure()
+    $readRevisionText = {
+        param($Revision, $RelativePath)
+        # The ledger context holds no revision text; the arguments are read only to state that.
+        [void] @($Revision, $RelativePath)
+        return $null
+    }
+    $testAncestor = {
+        param($Ancestor, $Descendant)
+        $key = "$Ancestor..$Descendant"
+        if ($ancestors.ContainsKey($key)) { return $ancestors[$key] }
+        return $null
+    }.GetNewClosure()
+    $listChangedPath = {
+        param($FromRevision, $ToRevision)
+        $key = "$FromRevision..$ToRevision"
+        if ($changes.ContainsKey($key)) { return , ([string[]] $changes[$key].Clone()) }
+        return $null
+    }.GetNewClosure()
 
     $context = [pscustomobject]@{
-        RepositoryRoot = $RepositoryRoot
-        ReadText       = $readText
-        ReadBytes      = $readBytes
-        TestFile       = $testFile
-        ListFile       = $listFile
-        WriteText      = $writeText
-        UtcNow         = $utcNowMember
-        InvokeProcess  = $invokeProcess
+        RepositoryRoot   = $RepositoryRoot
+        ReadText         = $readText
+        ReadBytes        = $readBytes
+        TestFile         = $testFile
+        ListFile         = $listFile
+        WriteText        = $writeText
+        UtcNow           = $utcNowMember
+        InvokeProcess    = $invokeProcess
+        ResolveRevision  = $resolveRevision
+        ReadRevisionText = $readRevisionText
+        TestAncestor     = $testAncestor
+        ListChangedPath  = $listChangedPath
     }
-    return @{ Context = $context; Files = $files; CallLog = $callLog; WriteLog = $writeLog }
+    return @{ Context = $context; Files = $files; CallLog = $callLog; WriteLog = $writeLog; Revisions = $revisions }
 }
 
 function Get-DocsLedgerTestElementSpec {

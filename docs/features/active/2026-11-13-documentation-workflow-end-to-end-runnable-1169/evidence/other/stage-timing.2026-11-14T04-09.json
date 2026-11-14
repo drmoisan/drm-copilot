@@ -1,0 +1,14 @@
+{
+  "issue-num": "1169",
+  "stage_timing": [
+    { "stage": "S2_research", "attempt": 1, "started_at": "2026-11-13T17:11:26Z", "ended_at": "2026-11-13T18:30:10Z" },
+    { "stage": "S2_feature_documents", "attempt": 1, "started_at": "2026-11-13T18:30:10Z", "ended_at": "2026-11-13T18:36:38Z" },
+    { "stage": "S4_atomic_planning", "attempt": 1, "started_at": "2026-11-13T18:36:38Z", "ended_at": "2026-11-13T19:25:41Z" },
+    { "stage": "S5_atomic_execution", "attempt": 1, "started_at": "2026-11-13T19:25:41Z", "ended_at": "2026-11-13T23:53:51Z" },
+    { "stage": "S8_create_pr", "attempt": 1, "started_at": "2026-11-13T23:53:51Z", "ended_at": "2026-11-14T00:10:00Z" },
+    { "stage": "S7_feature_review", "attempt": 1, "started_at": "2026-11-14T00:10:00Z", "ended_at": "2026-11-14T00:32:30Z" },
+    { "stage": "remediation.cycle_1", "attempt": 1, "started_at": "2026-11-14T00:32:30Z", "ended_at": "2026-11-14T03:34:05Z" },
+    { "stage": "S7_feature_review", "attempt": 2, "started_at": "2026-11-14T03:34:05Z", "ended_at": "2026-11-14T04:09:36Z" },
+    { "stage": "S9_ci_green", "attempt": 1, "started_at": "2026-11-14T04:09:36Z", "ended_at": null }
+  ]
+}
