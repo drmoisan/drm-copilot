@@ -16,9 +16,28 @@
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'subagentstop-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-target-worktree.ps1' -ErrorRecord $_ }
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+function Test-PrdFeatureArtifactFile {
+    # File seam: returns $true when a file exists at the probed artifact path.
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([Parameter(Mandatory = $true)] [string] $Path)
+
+    return [bool](Test-Path -LiteralPath $Path -PathType Leaf)
+}
+
+function Get-PrdFeatureArtifactContent {
+    # File seam: returns the text of the probed artifact path; a read failure throws.
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [string] $Path)
+
+    return Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
+}
 
 function Get-ArtifactPathFromOutput {
     [CmdletBinding()]
@@ -91,9 +110,23 @@ function Test-SpecNumericCriterion {
 }
 
 function Invoke-PrdFeatureOutputValidation {
+    <#
+    .SYNOPSIS
+        Reads the SubagentStop envelope and validates the advertised spec and research artifacts.
+    .DESCRIPTION
+        spec-path and research-path are resolved once against the item worktree that produced them
+        (Resolve-SubagentStopTargetWorktree, issue #1105), and only the item copy is probed and read.
+        SessionRoot, ReadTranscriptHead, and WorktreeListInvoker are test seams; SessionRoot defaults
+        to the hook process directory.
+    #>
     [CmdletBinding()]
     [OutputType([hashtable])]
-    param([AllowNull()] [AllowEmptyString()] [string] $InputText)
+    param(
+        [AllowNull()] [AllowEmptyString()] [string] $InputText,
+        [AllowNull()] [AllowEmptyString()] [string] $SessionRoot,
+        [scriptblock] $ReadTranscriptHead,
+        [scriptblock] $WorktreeListInvoker
+    )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent SubagentStop -ReasonPrefix 'validate-prd-feature-output:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
     $envelope = if ($PSBoundParameters.ContainsKey('InputText')) { Read-SubagentStopEnvelope -InputText $InputText } else { Read-SubagentStopEnvelope }
@@ -101,12 +134,23 @@ function Invoke-PrdFeatureOutputValidation {
     $assistantMessage = [string]$envelope.AssistantText
     if ([string]::IsNullOrWhiteSpace($assistantMessage)) { return @{ Ok = $false; Message = 'prd-feature hook: last assistant message is empty.' } }
     $specPath = Get-ArtifactPathFromOutput -Output $assistantMessage -Label 'spec-path'
-    if ([string]::IsNullOrWhiteSpace($specPath) -or -not (Test-Path -LiteralPath $specPath -PathType Leaf)) { return @{ Ok = $false; Message = 'prd-feature hook: spec-path is required and must exist.' } }
-    try { $specContent = Get-Content -LiteralPath $specPath -Raw -ErrorAction Stop } catch { return @{ Ok = $false; Message = "prd-feature hook: failed to read spec-path '$specPath': $($_.Exception.Message)" } }
-    if (-not (Test-SpecNumericCriterion -SpecContent $specContent)) { return @{ Ok = $true; Message = $null } }
     $researchPath = Get-ArtifactPathFromOutput -Output $assistantMessage -Label 'research-path'
-    if ([string]::IsNullOrWhiteSpace($researchPath) -or -not (Test-Path -LiteralPath $researchPath -PathType Leaf)) { return @{ Ok = $false; Message = 'prd-feature hook: numeric acceptance criterion requires an existing research-path.' } }
-    try { $researchContent = Get-Content -LiteralPath $researchPath -Raw -ErrorAction Stop } catch { return @{ Ok = $false; Message = "prd-feature hook: failed to read research-path '$researchPath': $($_.Exception.Message)" } }
+    $root = if ([string]::IsNullOrWhiteSpace($SessionRoot)) { (Get-Location).Path } else { $SessionRoot }
+    $targetArguments = @{ Envelope = $envelope.Envelope; AdvertisedPath = [string[]]@(@($specPath, $researchPath) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }); SessionRoot = $root }
+    if ($null -ne $ReadTranscriptHead) { $targetArguments['ReadTranscriptHead'] = $ReadTranscriptHead }
+    if ($null -ne $WorktreeListInvoker) { $targetArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+    $target = Resolve-SubagentStopTargetWorktree @targetArguments
+    $specLocation = if ([string]::IsNullOrWhiteSpace($specPath)) { $null } else { Resolve-SubagentStopArtifactLocation -Path $specPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root -Target $target }
+    if ($null -ne $specLocation -and $specLocation.Rejected) { return @{ Ok = $false; Message = "prd-feature hook: spec-path '$specPath' is rejected: $($specLocation.RejectionDetail)." } }
+    $specProbe = if ($null -eq $specLocation) { $null } else { $specLocation.ProbePath }
+    if ($null -eq $specProbe -or -not (Test-PrdFeatureArtifactFile -Path $specProbe)) { return @{ Ok = $false; Message = "prd-feature hook: spec-path is required and must exist.$(Get-SubagentStopTargetNote -Target $target -ProbePath $specProbe -SessionRoot $root)" } }
+    try { $specContent = Get-PrdFeatureArtifactContent -Path $specProbe } catch { return @{ Ok = $false; Message = "prd-feature hook: failed to read spec-path '$specPath': $($_.Exception.Message)" } }
+    if (-not (Test-SpecNumericCriterion -SpecContent $specContent)) { return @{ Ok = $true; Message = $null } }
+    $researchLocation = if ([string]::IsNullOrWhiteSpace($researchPath)) { $null } else { Resolve-SubagentStopArtifactLocation -Path $researchPath -WorktreeRoot $target.WorktreeRoot -SessionRoot $root -Target $target }
+    if ($null -ne $researchLocation -and $researchLocation.Rejected) { return @{ Ok = $false; Message = "prd-feature hook: research-path '$researchPath' is rejected: $($researchLocation.RejectionDetail)." } }
+    $researchProbe = if ($null -eq $researchLocation) { $null } else { $researchLocation.ProbePath }
+    if ($null -eq $researchProbe -or -not (Test-PrdFeatureArtifactFile -Path $researchProbe)) { return @{ Ok = $false; Message = "prd-feature hook: numeric acceptance criterion requires an existing research-path.$(Get-SubagentStopTargetNote -Target $target -ProbePath $researchProbe -SessionRoot $root)" } }
+    try { $researchContent = Get-PrdFeatureArtifactContent -Path $researchProbe } catch { return @{ Ok = $false; Message = "prd-feature hook: failed to read research-path '$researchPath': $($_.Exception.Message)" } }
     return Test-NumericDerivationEvidence -Content $researchContent
 }
 

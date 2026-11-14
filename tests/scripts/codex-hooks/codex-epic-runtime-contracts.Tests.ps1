@@ -38,7 +38,10 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
             '.codex/hooks/enforce-codex-model-routing.ps1',
             '.codex/hooks/enforce-epic-child-worktree-binding.ps1',
             '.codex/hooks/enforce-epic-wave-barrier.ps1',
+            '.codex/hooks/epic-wave-barrier-early-start.ps1',
             '.codex/hooks/enforce-epic-merge-gate.ps1',
+            '.codex/hooks/enforce-epic-merge-gate-review.ps1',
+            '.codex/hooks/enforce-epic-merge-gate-child-ci.ps1',
             '.codex/hooks/enforce-epic-worktree-removal-gate.ps1',
             '.codex/hooks/validate-codex-subagent-routing.ps1',
             '.codex/scripts/epic-child-launch-contract.ps1',
@@ -76,18 +79,26 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
 
     It 'registers root provenance, attestation, planning, wave, merge, worktree, and stop gates' {
         $content = Get-Content -Raw -LiteralPath $script:ConfigPath
+        # UserPromptSubmit, SubagentStart and SubagentStop gates stay registered in config.toml.
         foreach ($name in @(
                 'authorize-root-epic-invocation.ps1',
                 'record-subagent-routing-attestation.ps1',
+                'validate-codex-subagent-routing.ps1'
+            )) {
+            $content | Should -Match ([regex]::Escape($name))
+        }
+        # Issue #1159: the PreToolUse gates are registered in the dispatcher registry.
+        $registryPath = Join-Path $script:RepoRoot '.codex/hooks/pretooluse-dispatch.json'
+        $registered = @((Get-Content -Raw -LiteralPath $registryPath | ConvertFrom-Json).hooks.PreToolUse | ForEach-Object { $_.hooks } | ForEach-Object { [string]$_.command })
+        foreach ($name in @(
                 'enforce-epic-root-invocation.ps1',
                 'enforce-epic-planning-only.ps1',
                 'enforce-codex-model-routing.ps1',
                 'enforce-epic-wave-barrier.ps1',
                 'enforce-epic-merge-gate.ps1',
-                'enforce-epic-worktree-removal-gate.ps1',
-                'validate-codex-subagent-routing.ps1'
+                'enforce-epic-worktree-removal-gate.ps1'
             )) {
-            $content | Should -Match ([regex]::Escape($name))
+            @($registered | Where-Object { $_.Contains("/.codex/hooks/$name") }).Count | Should -BeGreaterThan 0 -Because "$name must be registered in the PreToolUse registry"
         }
         $content | Should -Match '(?m)^max_depth = 3$'
         $content | Should -Match '(?m)^max_threads = 12$'
@@ -173,6 +184,8 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
                 '.codex/hooks/enforce-epic-child-worktree-binding.ps1',
                 '.codex/hooks/enforce-epic-wave-barrier.ps1',
                 '.codex/hooks/enforce-epic-merge-gate.ps1',
+                '.codex/hooks/enforce-epic-merge-gate-review.ps1',
+                '.codex/hooks/enforce-epic-merge-gate-child-ci.ps1',
                 '.codex/hooks/enforce-epic-worktree-removal-gate.ps1',
                 '.codex/hooks/validate-codex-subagent-routing.ps1',
                 '.codex/scripts/epic-child-launch-contract.ps1',

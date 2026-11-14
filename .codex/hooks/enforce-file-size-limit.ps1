@@ -38,6 +38,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 # mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
 try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'file-size-policy.ps1') } catch { Add-HookDependencyFailure -Name 'file-size-policy.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'agent-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'agent-target-worktree.ps1' -ErrorRecord $_ }
 
 function Get-FileSizeLimitBlockDecision {
     <#
@@ -150,6 +151,8 @@ function Invoke-CodexFileSizeLimitDecision {
     .PARAMETER ReadFileContent
         Seam that returns the text of a file, $null when the file does not exist, and
         throws when it cannot be read. Tests supply in-memory content.
+    .PARAMETER WorktreeListInvoker
+        Optional worktree-list seam passed to Resolve-AgentTargetWorktree (issue #1163).
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -166,14 +169,32 @@ function Invoke-CodexFileSizeLimitDecision {
             param([string] $Path)
             if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { return $null }
             return [System.IO.File]::ReadAllText($Path)
-        }
+        },
+
+        [scriptblock] $WorktreeListInvoker
     )
     $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'FILE_SIZE_LIMIT_BLOCKED:'
     if ($null -ne $dependencyDecision) { return $dependencyDecision }
 
     $operation = [string](Get-CodexFileSizeRecordValue -Record $Record -Name 'operation')
     $sourcePath = [string](Get-CodexFileSizeRecordValue -Record $Record -Name 'source_path')
-    $relativePath = ConvertTo-FileSizeRelativePath -Path ([string]$Record.file_path) -RepositoryRoot $RepositoryRoot
+    $targetPath = [string]$Record.file_path
+    $relativePath = ConvertTo-FileSizeRelativePath -Path $targetPath -RepositoryRoot $RepositoryRoot
+    # Issue #1163 (D7): an absolute path outside the root, or in an agent worktree beneath it, is
+    # measured against its enclosing live registered worktree; a failure keeps today's path.
+    if ($targetPath -match '^([\\/]|[A-Za-z]:[\\/])' -and ($null -eq $relativePath -or $relativePath.StartsWith('.claude/worktrees/'))) {
+        try {
+            $resolverArguments = @{ SessionRoot = $RepositoryRoot; FilePath = @($targetPath); Policy = 'SessionFallback' }
+            if ($null -ne $WorktreeListInvoker) { $resolverArguments['WorktreeListInvoker'] = $WorktreeListInvoker }
+            $resolvedRoot = [string](Resolve-AgentTargetWorktree @resolverArguments).WorktreeRoot
+            if ($resolvedRoot -and -not [string]::Equals($resolvedRoot.TrimEnd('/'), ($RepositoryRoot -replace '\\', '/').TrimEnd('/'), [System.StringComparison]::OrdinalIgnoreCase)) {
+                $RepositoryRoot = $resolvedRoot
+                $relativePath = ConvertTo-FileSizeRelativePath -Path $targetPath -RepositoryRoot $RepositoryRoot
+            }
+        } catch {
+            Write-Verbose "target worktree resolution failed; the repository root applies: $($_.Exception.Message)"
+        }
+    }
     if ($operation -eq 'Delete' -or -not (Test-FileSizeCoveredPath -RelativePath $relativePath)) {
         return $null
     }
@@ -240,6 +261,8 @@ function Invoke-CodexFileSizeLimitEntryPoint {
         The repository root passed to the per-record decision.
     .PARAMETER ReadFileContent
         Optional file-reader seam passed to the per-record decision.
+    .PARAMETER WorktreeListInvoker
+        Optional worktree-list seam passed to the per-record decision (issue #1163).
     #>
     [CmdletBinding()]
     [OutputType([int])]
@@ -250,7 +273,9 @@ function Invoke-CodexFileSizeLimitEntryPoint {
 
         [string] $RepositoryRoot = (Get-Location).ProviderPath,
 
-        [scriptblock] $ReadFileContent
+        [scriptblock] $ReadFileContent,
+
+        [scriptblock] $WorktreeListInvoker
     )
 
     try {
@@ -258,6 +283,7 @@ function Invoke-CodexFileSizeLimitEntryPoint {
         foreach ($record in @(ConvertTo-CodexFileEditInput -Payload $payload)) {
             $decisionArgs = @{ Record = $record; Payload = $payload; RepositoryRoot = $RepositoryRoot }
             if ($PSBoundParameters.ContainsKey('ReadFileContent')) { $decisionArgs['ReadFileContent'] = $ReadFileContent }
+            if ($PSBoundParameters.ContainsKey('WorktreeListInvoker')) { $decisionArgs['WorktreeListInvoker'] = $WorktreeListInvoker }
             $decision = Invoke-CodexFileSizeLimitDecision @decisionArgs
             if ($null -ne $decision) {
                 [Console]::Out.WriteLine(($decision | ConvertTo-Json -Compress -Depth 5))
@@ -279,4 +305,10 @@ if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('FILE_SI
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'FILE_SIZE_LIMIT_BLOCKED:'
 if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
-exit (Invoke-CodexFileSizeLimitEntryPoint -PayloadRaw ([Console]::In.ReadToEnd()))
+# The entry point returns its [int] exit code as the last pipeline element and the
+# decision JSON before it. `exit (<call>)` would capture BOTH into the exit
+# expression and emit nothing, so the decision is written explicitly here first.
+$entryPointResult = @(Invoke-CodexFileSizeLimitEntryPoint -PayloadRaw ([Console]::In.ReadToEnd()))
+$entryPointResult | Select-Object -SkipLast 1 | Write-Output
+
+exit ([int]$entryPointResult[-1])

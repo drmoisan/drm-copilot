@@ -33,6 +33,63 @@ export const PUSH_DOWN_CODEX_ARTIFACT_PATH = workspacePath(
 );
 
 /**
+ * The 49 repo-automation tool names in union order, written out literally so
+ * the server registration test fails on any added, removed or reordered name.
+ * It lives here because `mcp-server.test.ts` has little line headroom.
+ */
+export const EXPECTED_REPO_AUTOMATION_TOOL_NAMES: ReadonlyArray<string> = [
+  "collect_commit_context",
+  "collect_pr_context",
+  "run_codex_native_converter",
+  "push_down_copilot_customizations",
+  "push_down_codex_and_agents_customizations",
+  "push_down_claude_customizations",
+  "new_potential_bug_entry",
+  "new_potential_entry",
+  "link_parent_child",
+  "potential_to_issue",
+  "new_active_feature_folder",
+  "run_poshqc_format",
+  "run_poshqc_analyze",
+  "run_poshqc_test",
+  "run_poshqc_analyze_autofix",
+  "run_poshqc_suite",
+  "resolve_policy_audit_template_asset",
+  "resolve_execute_hard_lock_prompt",
+  "resolve_atomic_plan_prompt",
+  "validate_orchestration_artifacts",
+  "resolve_orchestration_topology",
+  "resolve_provider_routing",
+  "transition_prepared_orchestration",
+  "render_subagent_tree",
+  "run_docs_check",
+  "run_docs_inventory",
+  "run_docs_coverage",
+  "update_docs_ledger",
+  "generate_docs_reference",
+  "validate_docs_artifacts",
+  "validate_discovery_artifacts",
+  "run_discovery_init",
+  "run_discovery_repo_inventory",
+  "run_discovery_dotnet_analyzer",
+  "run_discovery_vsto_analyzer",
+  "run_discovery_scenario_generation",
+  "run_discovery_report",
+  "create_discovery_artifact",
+  "update_discovery_artifact",
+  "link_discovery_evidence",
+  "configure_discovery_workspace",
+  "transfer_discovery_snapshot",
+  "import_discovery_inventory",
+  "migrate_discovery_artifacts",
+  "run_discovery_doctor",
+  "read_discovery_source",
+  "prepare_discovery_agent",
+  "finalize_discovery_agent",
+  "discovery_capability_sentinel",
+];
+
+/**
  * MCP service mock. The optional `transitionPreparedOrchestration` seam is
  * narrowed to a typed mock so a test can program its resolved value.
  */
@@ -48,6 +105,9 @@ export type MockService = jest.Mocked<RepoAutomationService> & {
   >;
   discoveryCapabilitySentinel?: jest.MockedFunction<
     NonNullable<RepoAutomationService["discoveryCapabilitySentinel"]>
+  >;
+  runDocsCommand?: jest.MockedFunction<
+    NonNullable<RepoAutomationService["runDocsCommand"]>
   >;
 };
 
@@ -112,6 +172,8 @@ export function createMockService(): MockService {
       jest.fn<
         NonNullable<RepoAutomationService["discoveryCapabilitySentinel"]>
       >(),
+    runDocsCommand:
+      jest.fn<NonNullable<RepoAutomationService["runDocsCommand"]>>(),
   };
 }
 

@@ -3,8 +3,8 @@
   "resources": [
     {
       "path": "docs/discovery/templates/v2/coverage-ledger.json",
-      "sha256": "21b7d9d211d0d943062e3802703e3c1a63dd4ceb0117e5292a3391cf1564071a",
-      "size": 364
+      "sha256": "479c100db97fa4f1cdca7a3d777d1ad896b95f99f83b2e1b22555b01cc9f90a3",
+      "size": 376
     },
     {
       "path": "docs/discovery/templates/v2/domain-profile.yaml",
@@ -13,7 +13,7 @@
     },
     {
       "path": "docs/discovery/templates/v2/parity-matrix.json",
-      "sha256": "e40f3c72fa288331cf3775ab17d1306ad2832db7e4581116525ca889d67d0b99",
+      "sha256": "d7ad5795c4cf748f93cdba50f1a4fdb6f8850a45164c8a91857436dc3022c849",
       "size": 296
     },
     {

@@ -1,5 +1,5 @@
 name = "python-execution-only-typed"
-description = "Implement small, highly testable, pythonic modules and classes with strong typing (Pyright), repo-standard formatting/linting (Black+Ruff), and deterministic Pytest coverage—while enforcing strict scope and zero-regression gates."
+description = "Implement small, highly testable, pythonic modules and classes with strong typing (Pyright), repo-standard formatting/linting (Black+Ruff), and deterministic Pytest coverage—while enforcing strict scope and zero-regression gates on the parallel test gates against the `Phase 0 baseline`."
 
 developer_instructions = """
 You are the Codex migration wrapper for the legacy GitHub Copilot agent python-execution-only-typed.agent.md.

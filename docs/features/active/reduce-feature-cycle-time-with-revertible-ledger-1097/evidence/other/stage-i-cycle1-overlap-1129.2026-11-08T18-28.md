@@ -1,0 +1,13 @@
+# Stage I Cycle 1 Overlap Check: #1129 (Epic Wave Computation)
+
+Timestamp: 2026-11-08T18-28
+Command: read tests/scripts/dev_tools/test_epic_wave_corpus_parity.py, tests/scripts/claude-lib/epic-wave/EpicWave.Tests.ps1, tests/scripts/claude-lib/epic-wave/EpicWave.Parity.Tests.ps1, extensions/drm-copilot/test/lib/push-down/codex-agents-epic-wave-directory.test.ts, and ConvertTo-EpicWaveManifest and Invoke-EpicWaveCommand in .claude/lib/epic-wave/EpicWave.psm1; git grep of tests/ for epic_wave_barrier and early-start-edge-cases; sh SCRATCH/issue-1097-c1i-wave.sh running pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1 -ManifestPath on three SCRATCH manifests
+EXIT_CODE: 0
+Output Summary:
+  (a) No collision. Every #1129 test reads only tests/fixtures/epic_wave/: test_epic_wave_corpus_parity.py reads CORPUS_PATH = fixtures/epic_wave/wave-computation-cases.json; EpicWave.Parity.Tests.ps1 reads the same file; EpicWave.Tests.ps1 reads named files under $script:FixtureRoot = tests/fixtures/epic_wave (cli-valid-manifest.json, cli-case-variant-manifest.json, cli-cycle-manifest.json, cli-not-an-object.json); codex-agents-epic-wave-directory.test.ts maps the lib/epic-wave resource directory and reads no fixture. The only readers of tests/fixtures/epic_wave_barrier/ are stage I's own suites and the pre-existing wave-barrier suites (OrchestratorStateEpicWaveBarrier.Parity.Tests.ps1, OrchestratorStateEpicWaveBarrier.Tests.ps1, validate-orchestrator-output.WaveBarrier.Tests.ps1, test_epic_wave_barrier_parity_corpus.py, test_validate_epic_orchestrator_state_wave_barrier.py, test_epic_wave_barrier_early_start.py), none from #1129. No count or result of a #1129 test changes.
+  (b) No contradiction. The wave CLI input is a JSON object of feature name to an array of dependency names (ConvertTo-EpicWaveManifest returns null, and Invoke-EpicWaveCommand exits 2 with EPIC_WAVE_USAGE, for any non-array value). The orchestrator derives that map from each manifest entry's depends_on, so early_start_on, a separate per-feature field, never enters the CLI input; this matches "the wave computation reads only depends_on, so the field moves no wave" in `## Early Dependent Starts (early_start)` of the epic-orchestrate skill.
+  CLI runs (SCRATCH manifests; features 101 to 104, 102 opting in to an early start on 101):
+    map derived without the opt-in: exit 0, {"101":0,"102":1,"103":2,"104":0}
+    map derived from the manifest with early_start_on on 102: identical input, exit 0, {"101":0,"102":1,"103":2,"104":0}
+    an object-valued entry carrying early_start_on (not the CLI's input shape): exit 2, EPIC_WAVE_USAGE (expected boundary of the CLI, not a defect)
+  No fix needed; no path added to 0010 `## Files Changed`.

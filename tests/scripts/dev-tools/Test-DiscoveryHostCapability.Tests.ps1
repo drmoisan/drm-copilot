@@ -27,10 +27,18 @@ Describe 'Test-DiscoveryHostCapability.ps1' {
     }
 
     It 'exits 2 with an unsupported document when the host has no installed probe' {
-        $result = Invoke-DiscoveryHostCapabilityTest -HostName 'codex' -WorkspaceRoot 'C:/Users/Example/Repos/NoHooks' -SessionId 's'
+        # A portable workspace root (fully qualified on every host, never created); the probe
+        # existence check is mocked to $false for paths under that root only.
+        $noProbeRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'test-discoveryhostcapability-root'
+        # The escape keeps the single-quoted literal valid for any path, including one with a quote.
+        $escapedNoProbeRoot = [System.Management.Automation.Language.CodeGeneration]::EscapeSingleQuotedStringContent($noProbeRoot)
+        $underNoProbeRoot = [scriptblock]::Create("([string]`$LiteralPath).StartsWith('$escapedNoProbeRoot', [System.StringComparison]::OrdinalIgnoreCase)")
+        Mock Test-Path { $false } -ParameterFilter $underNoProbeRoot
+        $result = Invoke-DiscoveryHostCapabilityTest -HostName 'codex' -WorkspaceRoot $noProbeRoot -SessionId 's'
         $result.ExitCode | Should -Be 2
         $result.Document['status'] | Should -Be 'unsupported'
         $result.Document['findings'][0]['message'] | Should -BeLike "*No capability probe is installed for host 'codex'*"
+        Should -Invoke Test-Path -Times 1 -Exactly -ParameterFilter $underNoProbeRoot
     }
 
     It 'returns the probe verdict as the exit code and forwards the workspace, session, trust and runtime' {

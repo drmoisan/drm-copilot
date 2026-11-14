@@ -56,6 +56,7 @@ import {
   validateMutations,
   validateReceiptArrays,
 } from "./parallel-state-structures";
+import { validateSchedulingDecisions } from "./parallel-state-records";
 
 /** Literal context prefix for every error this module and its helpers emit. */
 const CONTEXT = "Parallel checkpoint";
@@ -196,6 +197,9 @@ function validateCollections(state: Record<string, unknown>): string[] {
       ...validateConflictEdges(state["conflict_edges"], issueNums, CONTEXT),
     );
   }
+  // The recorded scheduling estimates and verdicts are checked when present
+  // (issue #1164); a checkpoint without them gains no error.
+  errors.push(...validateSchedulingDecisions(state, issueNums, CONTEXT));
   if ("mutations" in state) {
     errors.push(
       ...validateMutations(state["mutations"], issueNums, generation, CONTEXT),

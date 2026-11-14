@@ -1,0 +1,6 @@
+# Baseline — Python Tests and Coverage
+
+Timestamp: 2026-10-31T15-06
+Command: poetry run pytest tests/scripts/dev_tools/test_blast_radius_scheduling.py tests/scripts/dev_tools/test_blast_radius_scheduling_properties.py tests/scripts/dev_tools/test_blast_radius_historical_runs.py tests/scripts/dev_tools/test_blast_radius_write_intent.py tests/scripts/dev_tools/test_parallel_drift_scheduling.py tests/scripts/dev_tools/test_parallel_drift_parity.py tests/scripts/dev_tools/test_blast_radius_config_tolerance_keys.py tests/scripts/dev_tools/test_blast_radius_config_parity.py tests/scripts/dev_tools/test_push_down_claude_overlay_parity.py tests/scripts/dev_tools/test_parallel_manifest_bash_parity.py tests/scripts/dev_tools/test_validate_parallel_state_tolerated_edge_fields.py tests/scripts/dev_tools/test_blast_radius_generic_contracts.py -q -p no:randomly --cov=scripts.dev_tools._blast_radius_scheduling --cov-branch --cov-report=term-missing --cov-report=json:SCRATCH/issue-1013-baseline-cov.json
+EXIT_CODE: 0
+Output Summary: 292 passed, 5 skipped (the five manifest_m1 accessor-expectation skips), 0 failed. `scripts/dev_tools/_blast_radius_scheduling.py` (from the JSON report): line 100.00% (143/143), branch 100.00% (32/32).

@@ -1,0 +1,19 @@
+{
+  "issue": 1139,
+  "recorded_at": "2026-11-08T20:55:00Z",
+  "note": "Wall-clock times including queueing. S2_research and S2_spec start/end values before 17:43Z were estimated, not clock-read (S2_spec ended_at precedes its started_at for that reason); see the checkpoint timestamp_corrections. The S9 CI stage was open when this record was written and the merge stage is not captured.",
+  "stage_timing": [
+    {"stage": "S2_research", "attempt": 1, "started_at": "2026-11-08T17:45:00Z", "ended_at": "2026-11-08T17:51:00Z"},
+    {"stage": "S2_spec", "attempt": 1, "started_at": "2026-11-08T17:52:00Z", "ended_at": "2026-11-08T17:42:17Z"},
+    {"stage": "S4_atomic_planning", "attempt": 1, "started_at": "2026-11-08T17:43:00Z", "ended_at": "2026-11-08T18:09:30Z"},
+    {"stage": "S4_atomic_planning", "attempt": 2, "started_at": "2026-11-08T18:10:30Z", "ended_at": "2026-11-08T18:17:10Z"},
+    {"stage": "S4_atomic_planning", "attempt": 3, "started_at": "2026-11-08T18:17:40Z", "ended_at": "2026-11-08T18:21:00Z"},
+    {"stage": "S4_atomic_planning", "attempt": 4, "started_at": "2026-11-08T18:21:30Z", "ended_at": "2026-11-08T18:31:40Z"},
+    {"stage": "S4_atomic_planning", "attempt": 5, "started_at": "2026-11-08T18:32:10Z", "ended_at": "2026-11-08T18:37:00Z"},
+    {"stage": "S5_atomic_execution", "attempt": 1, "started_at": "2026-11-08T18:37:00Z", "ended_at": "2026-11-08T19:59:00Z"},
+    {"stage": "S7_feature_review", "attempt": 1, "started_at": "2026-11-08T20:00:30Z", "ended_at": "2026-11-08T20:10:00Z"},
+    {"stage": "remediation_cycle_1", "attempt": 1, "started_at": "2026-11-08T20:11:00Z", "ended_at": "2026-11-08T20:51:08Z"},
+    {"stage": "S8_create_pr", "attempt": 1, "started_at": "2026-11-08T20:51:30Z", "ended_at": "2026-11-08T20:53:00Z"},
+    {"stage": "S9_ci_gate", "attempt": 1, "started_at": "2026-11-08T20:55:00Z", "ended_at": null}
+  ]
+}

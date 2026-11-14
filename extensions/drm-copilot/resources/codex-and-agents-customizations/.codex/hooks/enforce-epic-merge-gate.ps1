@@ -20,6 +20,17 @@
     visible in the command text; gh and git run in the repository root, so a cd made by an
     earlier shell call is not visible either; a push after the lookup can change the head
     unless --match-head-commit is passed; and the control is policy-level, not cryptographic.
+
+    Review guard (issue #1097): under review_mode concurrent, enforce-epic-merge-gate-review.ps1
+    runs before every allow branch, with gh and git in the repository root, and denies a merge with
+    no passing review at a current head. Its shape check precedes the out-of-scope allow and denies
+    text that could be a merge and cannot be bound. Without the key it is inert and starts no process.
+
+    Epic-child CI verification (issue #1130): when Test-CodexChildMergeReady holds, the child merge is
+    allowed only when Get-EpicMergeGateChildCiDecision (enforce-epic-merge-gate-child-ci.ps1,
+    byte-identical to the Claude copy) verifies a green CI run on the live PR head, with gh in the
+    repository root. Any stage failure denies with EPIC_CHILD_CI_NOT_VERIFIED and never falls
+    through to the epic, standalone, or docs-only branches.
 #>
 [CmdletBinding()]
 param()
@@ -35,6 +46,11 @@ try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-Ho
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-command.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-command.ps1' -ErrorRecord $_ }
 # Shared docs-only diff classification and the merge-side docs-only exemption (issue #927).
 try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDependencyFailure -Name 'hook-docs-only-diff.ps1' -ErrorRecord $_ }
+# Review guard under review_mode concurrent, byte-identical to the Claude copy (issue #1097).
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-review.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-review.ps1' -ErrorRecord $_ }
+# Epic-child CI verification, byte-identical to the Claude copy (issue #1130).
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-child-ci.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-child-ci.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-regeneration.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-regeneration.ps1' -ErrorRecord $_ }
 
 # Reason codes for the standalone-merge authorization branch (issue #670), spelled
 # byte-identically to the Claude helpers file. Each of the four assignments below is the only
@@ -148,16 +164,48 @@ function Invoke-CodexEpicMergeDecision {
     $command = [string]$payload.tool_input.command
     # Scope (issue #952): every gh pr merge invocation except a pure --disable-auto, and every gh api
     # merge or enqueue mutation, is gated; Test-EpicMergeGateCommandInScope holds the predicate.
-    if (-not (Test-EpicMergeGateCommandInScope -CommandText $command)) {
+    $inScope = Test-EpicMergeGateCommandInScope -CommandText $command
+    if (-not $inScope -and -not (Test-EpicMergeGateReviewMergeText -CommandText $command)) {
         return $null
     }
 
+    $prNumber = Get-CodexMergeCommandPrNumber -Command $command
     $child = ConvertFrom-CodexMergeJson -Raw $ChildCheckpointRaw -Name 'child checkpoint' -Optional
+
+    # Review guard (issue #1097): inert without review_mode concurrent, so it precedes every allow branch.
+    $reviewDecision = Get-EpicMergeGateReviewShapeDecision -CommandText $command -KnownCheckpoint $child -KnownPrNumber $prNumber
+    if (-not $reviewDecision.Denied) {
+        if (-not $inScope) {
+            return $null
+        }
+        $reviewDecision = Get-EpicMergeGateReviewDecision -Checkpoint $child -CommandPrNumber $prNumber -GhRoot $RepositoryRoot -GitRoot $RepositoryRoot
+        if (-not $reviewDecision.Denied) { $reviewDecision = Get-EpicMergeGateRegenerationDecision -Checkpoint $child }
+    }
+    if ($reviewDecision.Denied) {
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = $reviewDecision.Reason
+            }
+        }
+    }
+
     if (Test-CodexChildMergeReady -Checkpoint $child) {
-        return $null
+        # Issue #1130: an epic child merges only on a verified CI run; a failure denies without fall-through.
+        $childCi = Get-EpicMergeGateChildCiDecision -Checkpoint $child -CommandPrNumber $prNumber -GhRoot $RepositoryRoot
+        if ($childCi.Verified) {
+            return $null
+        }
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = $childCi.Reason
+            }
+        }
     }
     $epic = ConvertFrom-CodexMergeJson -Raw $EpicCheckpointRaw -Name 'epic checkpoint' -Optional
-    $prNumber = Get-CodexMergeCommandPrNumber -Command $command
     if (Test-CodexEpicMergeReady -Checkpoint $epic -CommandPrNumber $prNumber) {
         return $null
     }

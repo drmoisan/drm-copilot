@@ -62,6 +62,7 @@ Describe 'enforce-pr-author-skill issue #824 decisions' {
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
         $script:R733714 = @(
             'git commit -m "$(cat <<''EOF'''
             'fix(hooks): route the matcher through the process that created the payload'

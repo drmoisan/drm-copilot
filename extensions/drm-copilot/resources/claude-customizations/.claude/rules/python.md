@@ -15,7 +15,7 @@ This rule file summarizes the Python-specific policies for this repository.
 3. **Type Checking — Pyright**: All Python code must be fully type-annotated and pass Pyright. Avoid `Any` unless unavoidable and commented. Command: `poetry run pyright`
 4. **Testing — Pytest**: All tests use Pytest. Coverage thresholds are uniform across tiers per `.claude/rules/quality-tiers.md` (>= 85% line, >= 75% branch). Command: `poetry run pytest --cov --cov-branch --cov-report=term-missing`
 
-Run the toolchain in order: format → lint → type-check → test. Restart from step 1 if any step fails or changes files. Do not stop the loop until all four steps complete without errors in a single pass.
+Run the toolchain in order: format → lint → type-check → test. Restart from step 1 if any step fails or changes files. Do not stop the loop until all four steps complete without errors in a single pass. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
 If the environment prevents running tools, stop implementation and provide a plan and proposed diffs only, clearly marked **unverified**.
 

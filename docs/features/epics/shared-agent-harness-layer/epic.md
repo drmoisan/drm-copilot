@@ -19,26 +19,35 @@ intent:
     - Line coverage >= 85% and branch coverage >= 75% (where measured) for changed code.
 features:
   - issue_num: 1025
-    feature_folder: harness-survey-gold-standard-contracts-parity-matrix
+    feature_folder: 2026-10-30-harness-survey-gold-standard-contracts-parity-matrix-1025
     depends_on: []
   - issue_num: 1035
     feature_folder: 2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035
     depends_on: []
-  - issue_num: null
-    feature_folder: shared-source-generators-skills-rules-mcp-agents
+  - issue_num: 1028
+    feature_folder: 2026-10-30-shared-source-generators-skills-rules-mcp-agents-1028
     depends_on: [1025, 1035]
-  - issue_num: null
-    feature_folder: push-down-consolidation-and-ecosystem-packs
-    depends_on: [shared-source-generators-skills-rules-mcp-agents]
-  - issue_num: null
-    feature_folder: hook-parity-across-claude-codex-copilot
-    depends_on: [shared-source-generators-skills-rules-mcp-agents]
-  - issue_num: null
-    feature_folder: retire-github-skills-and-thin-copilot-layer
-    depends_on: [push-down-consolidation-and-ecosystem-packs, hook-parity-across-claude-codex-copilot]
+  - issue_num: 1029
+    feature_folder: 2026-10-30-push-down-consolidation-and-ecosystem-packs-1029
+    depends_on: [1028]
+  - issue_num: 1030
+    feature_folder: 2026-10-30-hook-parity-across-claude-codex-copilot-1030
+    depends_on: [1028]
+  - issue_num: 1032
+    feature_folder: 2026-10-30-retire-github-skills-and-thin-copilot-layer-1032
+    depends_on: [1029, 1030]
+  - issue_num: 1049
+    feature_folder: pushed-down-vendored-code-coverage-carve-out
+    depends_on: [1029]
+  - issue_num: 1050
+    feature_folder: push-down-ci-workflows-per-ecosystem-pack
+    depends_on: [1049, 1028, 1029]
+  - issue_num: 1051
+    feature_folder: push-down-integration-mcp-tools-and-skill
+    depends_on: [1049, 1050]
   - issue_num: 1016
-    feature_folder: dev-docs-root-migration-and-feature-folder-rename
-    depends_on: [1035, retire-github-skills-and-thin-copilot-layer]
+    feature_folder: 2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production-1016
+    depends_on: [1035, 1032, 1051]
 ---
 
 # Epic: Shared Agent-Harness Layer Across Claude Code, Codex and GitHub Copilot
@@ -70,7 +79,10 @@ and are not re-opened here.
 | 4 Push-down consolidation and per-ecosystem pack selection | push-down-consolidation-and-ecosystem-packs | new | 2 | C3 |
 | 5 Hook parity | hook-parity-across-claude-codex-copilot | new | 2 | C3 |
 | 6 Retirements and the thin Copilot layer | retire-github-skills-and-thin-copilot-layer | new | 3 | C3 |
-| 7 #1016 Phases 2 and 3: migration command, move to .dev, feature-folder rename, default flip | dev-docs-root-migration-and-feature-folder-rename | #1016 (adopted) | 4 | C3 |
+| 8 Vendored-code coverage carve-out for pushed-down files | pushed-down-vendored-code-coverage-carve-out | #1049 | 3 | C3 |
+| 9 Push down CI workflows per ecosystem pack | push-down-ci-workflows-per-ecosystem-pack | #1050 | 4 | C3 |
+| 10 Push-down integration MCP tools and skill | push-down-integration-mcp-tools-and-skill | #1051 | 5 | C3 |
+| 7 #1016 Phases 2 and 3: migration command, move to .dev, feature-folder rename, default flip | dev-docs-root-migration-and-feature-folder-rename | #1016 (adopted) | 6 | C3 |
 
 Waves are 0-indexed (longest-path layering).
 
@@ -138,6 +150,19 @@ is superseded by the integration branch.
   `@danmoisan/drm-copilot-mcp` with a thin `npx` entry point, no Python, idempotent), the move of
   this repository to `.dev`, the rename of existing feature folders to `<NNNN>-<feature>` with the
   owner-decision stop for non-matching folders and issue-number collisions, and the default flip.
+- **Child 8 (#1049).** A vendored-code exception in the pushed-down coverage rules: exact paths
+  only, hash-verified; the push-down writes a content-hash manifest; a destination check fails
+  closed (a changed or unlisted file returns to the coverage denominator); the destination's
+  exclusion list is derived from the manifest; the feature-review Blocking rule recognizes
+  manifest-derived entries and still blocks hand-written ones. This repository keeps its own tests.
+- **Child 9 (#1050).** One CI template per ecosystem pack, written as thin callers to this
+  repository's reusable workflows at a pinned ref (copy mode with hashes in #1049's manifest when
+  the source is unreachable); the required-check list emitted as data and read by the merge gate
+  and the execution-environment brief; never overwrite an existing workflow; branch protection by
+  explicit opt-in only.
+- **Child 10 (#1051).** The push-down stays mechanical and writes an `integration-needed` file;
+  two deterministic, read-only-or-verdict MCP tools (detect, validate) with no model call and no
+  MCP sampling; one skill describing the read, resolve, validate loop.
 
 ## Non-Goals
 
@@ -163,14 +188,30 @@ creates or changes.
 - **Child 6 depends on child 4 and child 5.** Retiring `.github/skills` and `.github/agents`
   changes pack contents (child 4), and the thin Copilot layer keeps the Copilot hooks whose
   dispositions child 5 settles.
-- **Child 7 depends on child 2 and child 6.** The migration consumes child 2's resolver, parser
-  and configured key, and the owner requires it to run last because the mass move rewrites paths
-  that every other child edits; child 6 is the last of those children, so the edge orders child 7
-  after all of them transitively.
+- **Child 8 (#1049) depends on child 4 (#1029).** Child 4's consolidated push-down already writes
+  the destination `.push-down-manifest.json` used for no-overwrite detection; #1049 extends that
+  manifest with content hashes and edits the same push-down pipeline, so it follows child 4 rather
+  than preceding it (the owner's "#1049 first" orders it first among children 8 to 10). This keeps
+  child 4's cleared plan unchanged.
+- **Child 9 (#1050) depends on child 8, child 3 and child 4.** Copy mode records hashes in #1049's
+  manifest; the CI templates are per ecosystem pack (child 4) and generated surfaces follow child
+  3's generators.
+- **Child 10 (#1051) depends on child 8 and child 9.** The detect and validate tools read the
+  manifest (#1049) and the required-check data and templates (#1050).
+- **Child 7 depends on child 2, child 6 and child 10.** The migration consumes child 2's resolver,
+  parser and configured key, and the owner requires it to run last because the mass move rewrites
+  paths that every other child edits; children 6 and 10 end the two longest chains, so the edges
+  order child 7 after all of them transitively.
 
 Wave computation (longest-path layering, 0-indexed): wave 0 = {child 1, child 2}; wave 1 =
-{child 3}; wave 2 = {child 4, child 5}; wave 3 = {child 6}; wave 4 = {child 7}. No cycles; every
-reference resolves.
+{child 3}; wave 2 = {child 4, child 5}; wave 3 = {child 6, child 8}; wave 4 = {child 9};
+wave 5 = {child 10}; wave 6 = {child 7}. No cycles; every reference resolves.
+
+Children 8 to 10 were added on 2026-10-31 by owner decision. They do not force a revision of
+children 3 or 4: no path that the cleared plans of #1028 or #1029 cite is changed by adding them,
+because the new children edit after those children merge and re-check the merged files in their own
+Phase 0 gates. Child 7's Phase 0 gate names "epic children 1-6"; the epic wave barrier orders it
+after children 8 to 10, and no cited path changed, so child 7 is not revised.
 
 ## Shared Design
 
@@ -203,6 +244,22 @@ reference resolves.
 - Feature-folder names: `^\d{4}-\d{2}-\d{2}-` is the old date-first format; any other name starting
   with four digits and a dash is the new format; both are accepted until child 7 migrates.
 
+## Owner Decisions H1 to H3 (2026-10-31)
+
+- **H1.** Child 1 (#1025) receives one plan-A revision beyond the one-revision limit: a
+  `quality-tiers.yml` entry for `scripts/harness` (QT008), a deterministic parity-matrix `id`
+  encoding covering hook matchers with special characters, the `$schema` key and duplicate
+  registrations (children 3 to 6 consume it), and confirmation that the matrix schema accepts
+  `decision_status: provisional`.
+- **H2.** Child 7 (#1016) stage B takes option (b): the moves-then-rewrites case, where the
+  second apply call refuses its own decision file after the moves, is a documented halt branch that
+  stops with a clear message telling the user to re-run the dry run. Stage A is not reopened. One
+  more stage B revision is authorized for P2-T4, P1-T3/P1-T4 and P7-T1.
+- **H3.** Child 6 (#1032) owns retiring or redirecting
+  `scripts/dev-tools/sync-agents-from-instructions.ps1`; child 3 (#1028) owns redirecting the Codex
+  native converter to the new generators. Child 3's OQ-6 default is resolved accordingly, and both
+  plans receive the scope revision this requires.
+
 ## Execution Preconditions
 
 - Execution starts only after the parallel run `bugs-1001-1002-1003-1006` has merged to `main`.
@@ -225,3 +282,9 @@ reference resolves.
   C3.
 - Child 7: cross_module_contract_change plus a repository-wide mechanical move with an owner stop;
   C3.
+- Child 8 (#1049): cross_module_contract_change (push-down manifest schema consumed by a destination
+  check and by the coverage rules' review gate) and policy edits to pushed-down rules; C3.
+- Child 9 (#1050): cross_module_contract_change (required-check data consumed by the merge gate and
+  the brief; per-pack CI templates); C3.
+- Child 10 (#1051): two new deterministic MCP tools and one skill over contracts from children 8
+  and 9; C3.

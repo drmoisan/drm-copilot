@@ -9,6 +9,10 @@ import {
 } from "./claude-worktree-session";
 import { buildCodexWorktreeSessionCommands } from "./codex-worktree-session";
 import {
+  buildClaudeSessionShellArgs,
+  buildCodexSessionShellArgs,
+} from "./worktree-session-launch";
+import {
   createOutputChannel,
   detectRuntime,
   executeBundledScript,
@@ -40,16 +44,6 @@ import { resolveRunPoshQCSuiteInvocation } from "./workflow-command-arguments";
 // Re-export runtime helpers so existing test imports from this module keep working.
 export { detectRuntime, resolveCodexExecutable };
 
-/**
- * Grace period (milliseconds) between sending the pre-claude commands
- * (`git worktree add`, `Set-Location`, optional venv activate) and the final
- * `claude` invocation. VS Code's Python extension auto-injects venv
- * activation via terminal.sendText after a short asynchronous delay; this
- * constant must be long enough that any such injection lands while the host
- * shell is still at its prompt and is consumed normally, otherwise the
- * injected text gets buffered into claude's TUI input.
- */
-const TERMINAL_AUTO_ACTIVATION_GRACE_MS = 5000;
 const INSTALLED_CODEX_EXTENSION_IDS = ["openai.chatgpt", "openai.codex"];
 
 function getInstalledCodexExtensionCandidateRoots(): string[] {
@@ -188,51 +182,22 @@ export function activate(context: vscode.ExtensionContext): void {
         preClaudeScriptPath: configuredPreClaudeScriptPath,
       });
 
-      // The terminal must start inside the source repository so that
-      // `git worktree add` can locate `.git`. The new worktree itself is
-      // created at worktreePath (which lives under workspaceParent) by the
-      // command sent to the terminal.
+      // Compose the whole session into one script delivered at process start
+      // through -EncodedCommand; nothing is written to the terminal input
+      // stream. The length guard throws here, before any terminal exists.
+      const shellArgs = buildClaudeSessionShellArgs(commands);
+
+      // The terminal starts inside the source repository so `git worktree add`
+      // can locate `.git`. hideFromUser keeps the Python extension from
+      // injecting activation text; show() then reveals the terminal.
       const terminal = vscode.window.createTerminal({
         name: `Claude: ${branchName}`,
         cwd: workspaceRoot,
         shellPath: runtime.executable,
-        shellArgs: ["-NoLogo"],
+        shellArgs,
+        hideFromUser: true,
       });
       terminal.show();
-
-      // Send the pre-claude commands as separate sendText calls so each is
-      // processed at its own PowerShell prompt: ensure the <repoName>-wt
-      // grouping directory exists, then git worktree add, then Set-Location
-      // into the new worktree, then (when the workspace uses poetry) install
-      // dependencies and activate the resulting venv. PowerShell's stdin is
-      // line-buffered, so queued lines are read one at a time once each prior
-      // command finishes.
-      terminal.sendText(commands.ensureParentDirectory, true);
-      terminal.sendText(commands.git, true);
-      terminal.sendText(commands.setLocation, true);
-      if (commands.poetryInstall !== undefined) {
-        terminal.sendText(commands.poetryInstall, true);
-      }
-      if (commands.activate !== undefined) {
-        terminal.sendText(commands.activate, true);
-      }
-
-      // Run the configured pre-`claude` script (guarded by a runtime
-      // Test-Path) after the poetry activation step and before the deferred
-      // claude send, so repo-local setup runs immediately before claude.
-      if (commands.preClaude !== undefined) {
-        terminal.sendText(commands.preClaude, true);
-      }
-
-      // Defer the final claude command. VS Code's Python extension auto-
-      // injects its own venv activation via a deferred terminal.sendText.
-      // If we start claude before that injection arrives, claude takes over
-      // stdin and the injected text is buffered into claude's TUI prompt.
-      // The grace window lets any such injection land at the host shell's
-      // prompt and be consumed normally before claude takes over.
-      setTimeout(() => {
-        terminal.sendText(commands.claude, true);
-      }, TERMINAL_AUTO_ACTIVATION_GRACE_MS);
 
       // Log only the objective length so the channel record is useful for
       // diagnostics without recording potentially sensitive prompt text.
@@ -245,7 +210,7 @@ export function activate(context: vscode.ExtensionContext): void {
           ? "pre-claude script: emitted"
           : "pre-claude script: none";
       output.appendLine(
-        `[${commandId}] opened terminal for branch ${branchName} at ${worktreePath} (objective length: ${objectiveLength}, ${poetryNote}, ${preClaudeNote}); claude send deferred by ${TERMINAL_AUTO_ACTIVATION_GRACE_MS}ms`,
+        `[${commandId}] opened terminal for branch ${branchName} at ${worktreePath} (objective length: ${objectiveLength}, ${poetryNote}, ${preClaudeNote}); session script delivered through -EncodedCommand`,
       );
     },
   );
@@ -302,31 +267,18 @@ export function activate(context: vscode.ExtensionContext): void {
         ),
       });
 
+      // Same delivery as the Claude session: one encoded script at process
+      // start, length-guarded before the terminal is created.
+      const shellArgs = buildCodexSessionShellArgs(commands);
+
       const terminal = vscode.window.createTerminal({
         name: `Codex: ${branchName}`,
         cwd: workspaceRoot,
         shellPath: runtime.executable,
-        shellArgs: ["-NoLogo"],
+        shellArgs,
+        hideFromUser: true,
       });
       terminal.show();
-
-      terminal.sendText(commands.ensureParentDirectory, true);
-      terminal.sendText(commands.git, true);
-      terminal.sendText(commands.setLocation, true);
-      terminal.sendText(commands.trustCodexProject, true);
-      if (commands.poetryInstall !== undefined) {
-        terminal.sendText(commands.poetryInstall, true);
-      }
-      if (commands.activate !== undefined) {
-        terminal.sendText(commands.activate, true);
-      }
-      if (commands.postCodex !== undefined) {
-        terminal.sendText(commands.postCodex, true);
-      }
-
-      setTimeout(() => {
-        terminal.sendText(commands.codex, true);
-      }, TERMINAL_AUTO_ACTIVATION_GRACE_MS);
 
       const objectiveLength = objective.trim().length;
       const poetryNote = usePoetry
@@ -337,7 +289,7 @@ export function activate(context: vscode.ExtensionContext): void {
           ? "post-codex script: emitted"
           : "post-codex script: none";
       output.appendLine(
-        `[${commandId}] opened terminal for branch ${branchName} at ${worktreePath} (objective length: ${objectiveLength}, ${poetryNote}, trust command: emitted, ${postCodexNote}); codex send deferred by ${TERMINAL_AUTO_ACTIVATION_GRACE_MS}ms`,
+        `[${commandId}] opened terminal for branch ${branchName} at ${worktreePath} (objective length: ${objectiveLength}, ${poetryNote}, trust command: emitted, ${postCodexNote}); session script delivered through -EncodedCommand`,
       );
     },
   );

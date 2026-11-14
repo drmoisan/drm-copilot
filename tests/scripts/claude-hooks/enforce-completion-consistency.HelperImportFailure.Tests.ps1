@@ -95,7 +95,12 @@ Describe 'enforce-completion-consistency.ps1 helper import failure on the <Root>
     ) {
         # Arrange: re-dot-source the hook with the helper dot-source forced to fail.
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: enforce-completion-helpers.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-completion-helpers.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-completion-helpers.ps1') { throw 'simulated load failure: enforce-completion-helpers.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $hookPath
             $script:CompletionHelpersImportFailure | Should -Be $script:Ch984HelperLeaf -Because 'E-CONSTRUCTION'
@@ -120,7 +125,12 @@ Describe 'enforce-completion-consistency.ps1 helper import failure on the <Root>
         # Arrange: the backslash form is built from [char]92 so no backslash literal is written.
         $filePath = if ($Target) { $Target } else { $script:Ch984CheckpointRelative.Replace('/', [string][char]92) }
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: enforce-completion-helpers.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-completion-helpers.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-completion-helpers.ps1') { throw 'simulated load failure: enforce-completion-helpers.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $hookPath
             $script:CompletionHelpersImportFailure | Should -Be $script:Ch984HelperLeaf -Because 'E-CONSTRUCTION'
@@ -170,7 +180,12 @@ Describe 'enforce-completion-consistency.ps1 helper import failure on the <Root>
         # Arrange: the payload reader returns the in-memory envelope so the row does not depend on the host console.
         $envelope = ConvertTo-Ch984Envelope -ToolName 'Edit' -FilePath 'src/App/App.csproj'
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: enforce-completion-helpers.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-completion-helpers.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-completion-helpers.ps1') { throw 'simulated load failure: enforce-completion-helpers.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         Mock Read-ClaudeHookRawPayload { $envelope }
 
         # Act
@@ -186,7 +201,12 @@ Describe 'enforce-completion-consistency.ps1 helper import failure on the <Root>
         # Arrange: the payload reader returns the in-memory envelope so the row does not depend on the host console.
         $envelope = ConvertTo-Ch984Envelope -ToolName 'Edit' -FilePath $script:Ch984CheckpointRelative
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: enforce-completion-helpers.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-completion-helpers.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-completion-helpers.ps1') { throw 'simulated load failure: enforce-completion-helpers.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         Mock Read-ClaudeHookRawPayload { $envelope }
 
         # Act
@@ -204,7 +224,12 @@ Describe 'enforce-completion-consistency.ps1 helper import failure on the <Root>
     It 'CH6 denies an envelope anomaly and allows a payload without file_path when the helpers fail to load (#984)' {
         # Arrange
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: enforce-completion-helpers.ps1' } -ParameterFilter { $ChildPath -eq 'enforce-completion-helpers.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'enforce-completion-helpers.ps1') { throw 'simulated load failure: enforce-completion-helpers.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try {
             . $hookPath
             $script:CompletionHelpersImportFailure | Should -Be $script:Ch984HelperLeaf -Because 'E-CONSTRUCTION'

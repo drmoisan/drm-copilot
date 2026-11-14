@@ -1,0 +1,18 @@
+# Preflight fixes: remediation plan, cycle 1 (R2 preflight)
+
+Timestamp: 2026-11-09T17-28
+Plan: docs/features/active/2026-11-09-progress-report-critical-path-velocity-1153/remediation-plan.2026-11-09T17-13.md
+Issue: #1153
+
+All fixes edit task text or plan preamble only. No task was added, removed, or reordered, and no acceptance assertion changed meaning.
+
+1. `## Execution Terms` (Batch budget) | stale route label and file count | The worktree checkpoint `artifacts/orchestration/orchestrator-state.json` records `route_id` `large`, not `remediation`; the line now names the route exemption of the execution-environment brief with the `large` route and lists the seven production PowerShell files that change (after fix 2).
+2. `[P1-T1]` | stale inventory references the split creates | `Get-EpicProgressReport.ps1` `.DESCRIPTION` lists the files the Logic hub dot-sources ("Stages, Steps, Durations, State, Metrics, Velocity, Schedule, Render, and Gather"), and the `Get-EpicProgressReport.Metrics.ps1` header says the critical-path functions live "in the Velocity and Schedule files". Both become incomplete once CriticalPath exists, the same class as review row CR5. The task already updates the hub's file list; it now names these two sentences of the same kind, with bundle copies, and the Schedule entry of the hub list is narrowed. Help text only: the entry help test asserts only the synopsis, a non-empty description, and parameter help.
+3. `[P1-T4]` | unstated precondition | The 599/600/601 s case asserts an average of exactly 6 at 600 s, which holds only with `StartUnixSeconds` 0; the start value is now stated.
+4. `[P1-T5]` | vacuous comparison | The CriticalPath neutrality case compares the `**Velocity:**` line with and without the pruned span. After CR2 a fixture with 0 intervals prints `n/a` in both runs, so the comparison could not fail; the fixture's samples must now form at least one interval so the compared average is finite. The written-span assertion is unchanged.
+5. `[P1-T6]` | documentation consistency within the task's own edited file | `## Resetting the Baseline After a Pause` states "the stored pause spans are kept", which pruning (under the inputs' rule or the plan's rule) makes incomplete. The task now qualifies that sentence with a reference to the new `## State File` rule, reflowed within the bullet's existing lines (the bullet's last line has about 70 characters free), so the two-line growth limit and the `stays under 500 lines` pin still hold.
+
+Verified without change:
+- CR4 deviation: `writes version 3 with the task baseline, task samples, and pauses` stores a span (1767603000 to 1767607000) that ends after the start (1767600000) and before the anchor (1767611200), and `Get-EpicProgressAggregateVelocity` subtracts it from the elapsed time through `Get-EpicProgressExcludedSecond`. Anchor-only pruning would fail that test and change the printed average; the minimum of start, oldest sample `ts`, and oldest `lastTickUnixSeconds` never exceeds the oldest anchor, so it prunes a subset of what the spec permits, and no dropped span can overlap the elapsed window or an interval (the interval overlap test is strict).
+- Pins: core.json and bundle counts 12 (to 13), `productionPaths` 11 (to 12), `scanPaths` 13 (to 14), the AC-50 purity file list, and all five `0 tasks / hr average` goldens are named with dispositions; every pause-writing test is named.
+- Line budgets: Schedule.ps1 is about 488 lines after the move plus at most six CR3 lines; `Get-EpicProgressReport.Tests.ps1` is 698 and gains one `productionPaths` line; SKILL.md is 497 with a `BeLessThan 500` pin.

@@ -13,6 +13,7 @@ tools:
 skills:
   - policy-compliance-order
   - acceptance-criteria-tracking
+  - owner-directives
 memory: project
 hooks:
   SubagentStop:
@@ -37,6 +38,9 @@ When the active review scope is a selected version folder such as `docs/features
    - one line `Review-Verdict: <VERDICT>`, where the verdict is `PASS`, `REMEDIATION_REQUIRED`, `HALT_NON_REMEDIABLE`, or `AWAITING_CI`,
    - inside each blocking finding block, one line `Remediability: <class>`, where the class is `autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required` (`autonomous` when the line is absent),
    - inside each blocking finding block, one line `Remediability-Evidence: <text>` stating why the class applies.
+   - one line `Remediation-Path: light` or `Remediation-Path: full` (`full` when the line is absent). `light` is allowed only when there are at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`, the fix changes no spec acceptance criterion, public interface, validator contract, or hook decision, no file inventory beyond the branch diff plus tests and mirrors, and no production logic beyond the finding's named location, the cycle is opened by a review, and the prior cycle was not light.
+   - inside each blocking finding block, one line `Finding-Scope: contained` or `Finding-Scope: design` (`design` when the line is absent).
+   - with `Remediation-Path: light`, a `## Light Fix Tasks` section holding one canonical `- [ ] [P0-T1] ...` line per fix, numbered in order and naming the file and the finding, and no checkbox line anywhere else in the file. A light review creates no remediation plan target.
 
    These lines, including the evidence text, never contain the substrings the orchestrator counts when it counts blocking findings, so their presence does not change the blocking count. The verdict follows from the classes: no blocking finding is `PASS`; any `autonomous` finding is `REMEDIATION_REQUIRED`; otherwise any `external_dependency`, `policy_hold`, or `human_decision_required` finding is `HALT_NON_REMEDIABLE`; otherwise `AWAITING_CI`.
 
@@ -119,7 +123,7 @@ Coverage metrics are mandatory for every language that has changed files in the 
 Coverage thresholds follow the threshold precedence defined in `.claude/rules/quality-tiers.md` and `.claude/rules/general-unit-test.md`: when the repository's root `CLAUDE.md` states line or branch coverage thresholds, those thresholds govern; otherwise the default thresholds below govern. Each metric falls back independently: when the root `CLAUDE.md` states only a line threshold or only a branch threshold, the stated threshold governs that metric and the default below governs the other. The thresholds that govern under this precedence are the governing thresholds referred to in the Verification Procedure below. The defaults are:
 
 - **New code files** (files added in this feature, not previously existing): line coverage >= 85%, branch coverage >= 75% for branch-capable languages.
-- **Modified files** (files that existed before and were changed): line coverage >= 85%, branch coverage >= 75% for branch-capable languages, and no regression on changed lines relative to baseline.
+- **Modified files** (files that existed before and were changed): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages, read from the single gate run, new behavior is tested, and no regression on changed lines relative to the `Phase 0 baseline`.
 - **Repo-wide per language**: line coverage >= 85%, branch coverage >= 75% for branch-capable languages.
 
 Tier-specific lower thresholds are not used.
@@ -137,9 +141,11 @@ For each language that has changed files in the feature branch:
 3. If the artifact exists:
    - Parse the repo-wide coverage percentage and report it in the policy audit.
    - If repo-wide line or branch coverage is below the governing repo-wide thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a local artifact that shows the Python total below a threshold is still FAIL.
    - For each new file: if line or branch coverage is below the governing new-file thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
-   - For each modified file: if coverage on changed lines has regressed from baseline, or line or branch coverage is below the governing modified-file thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+   - For each modified file: if coverage on changed lines has regressed from the `Phase 0 baseline`, or line or branch coverage, read from the single gate run, is below the governing modified-file thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
 4. If no coverage artifact is found for a language that has changed files, flag as **FAIL** with reason: "coverage artifact absent for [language]; coverage verification is mandatory for all languages with changed files." Add to remediation triggers.
+5. Write `## CI Cross-check` into the policy audit after `## 7. Code Quality Checks`: one row per CI check whose result the review relies on, with the columns `Check | Claimed outcome | Claimed figure | Head | Source`, the outcome `pass` or `fail` from local evidence, and the head from `git log` of the reviewed branch.
 
 The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
 
@@ -151,6 +157,16 @@ The tiered file-size policy (`## File Size Limit` in `.claude/rules/general-code
 - Report a covered file above 800 lines that has no entry in `config/file-size-baseline.json`, and any added or increased entry in `config/file-size-baseline.json`, as a blocking policy finding.
 - Produce no finding for the 500-line guidance tier.
 
+## Documentation Surface Check
+
+This check turns a documented-surface change without a matching coverage-ledger change into a blocking finding. It uses the evidence model: inspect the existing artifacts and do not rerun any documentation tooling.
+
+1. When `docs/documentation-estate/docs-profile.json` is absent on the branch head, the check is not applicable and produces no finding.
+2. List the changed paths with `git diff --name-only <merge-base>..HEAD`. When no changed path lies under an entry of the profile's `surface_selection.source_roots`, the check produces no finding.
+3. When at least one changed path lies under such an entry, require the newest `<FEATURE>/evidence/qa-gates/docs-surface-delta.<timestamp>.md` (the lexicographically greatest matching file), carrying the fields `Timestamp`, `Command`, `EXIT_CODE`, and `Output Summary`.
+4. When that artifact is absent, or records `EXIT_CODE: 1`, report the blocking finding `surface-change-without-ledger-change` with the line `Remediability: autonomous` and a `Remediability-Evidence:` line stating that the coverage ledger can be updated on the branch and the `surface-delta` evidence regenerated without an external dependency. Name the changed source paths in the finding.
+5. When the artifact records `EXIT_CODE: 0`, the check passes.
+
 ## Evidence Location Invariant
 
 All evidence artifacts this agent produces (baselines, QA gates, regression results, coverage) MUST be written to `<FEATURE>/evidence/<kind>/` as defined in `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`.
@@ -160,3 +176,5 @@ Writing to `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, or an
 If a delegation prompt, plan, or caller instruction specifies a non-canonical evidence path (e.g., `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, `artifacts/evidence/`), this agent ignores that instruction, writes to the canonical `<FEATURE>/evidence/<kind>/` path, and records the override as `EVIDENCE_LOCATION_OVERRIDE_REJECTED: <supplied path> replaced with <canonical path>`.
 
 The reviewer MUST scan the branch diff for files written under `artifacts/baselines/`, `artifacts/qa/`, `artifacts/evidence/`, or `artifacts/coverage/`. Each such file is a FAIL-level finding. Record each occurrence under the heading `## Evidence Location Compliance` in `policy-audit.<timestamp>.md`, listing the file path and its canonical replacement. Use `validate_evidence_locations.py --root .` to scan for violations; if the script exits non-zero, add all reported paths as FAIL findings.
+
+Owner directives: when a delegation carries an `Owner directives:` block, or the owner-directive pass-down hook holds a tool call with one, record one `OWNER-DIRECTIVE-DECISION:` line per directive in a decision file under `artifacts/orchestration/owner-directive-decisions/` and repeat it in the final message, as defined in the `owner-directives` skill.

@@ -46,6 +46,9 @@ projects:
   - path: ".claude/lib/ci-gate"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/review-verdict"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle: review/verdict eligibility rules and their command entry"
   - path: ".claude/lib/cleanup-manifest"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
@@ -55,10 +58,19 @@ projects:
   - path: ".claude/lib/discovery-validation"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/docs"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle for the documentation profile, schemas, and command entry"
+  - path: ".claude/lib/epic-wave"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle; pure epic wave-layering computation and its command entry"
   - path: ".claude/lib/file-size-policy"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle; pure tiered file-size policy functions used by the PreToolUse hook and the repository gate"
   - path: ".claude/lib/hook-payload"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/hook-dispatch"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
   - path: ".claude/lib/mermaid"
@@ -73,10 +85,19 @@ projects:
   - path: ".claude/lib/parallel-drift"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/parallel-admission"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
   - path: ".claude/lib/project-file-merge"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/regeneration"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle: the regenerate-path config, classifier, and staged-delta modules and their entry point Invoke-RegenerationPath.ps1"
   - path: ".claude/lib/requirements"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/runbook"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
   - path: ".claude/lib/worktree-resolution"

@@ -59,7 +59,9 @@ function Test-EpicBaseBranchOverride {
         with reason EPIC_BASE_BRANCH_MISMATCH. When epic_mode is absent or false, when the
         checkpoint is unreadable, or when the command is not gh pr create (the base branch is
         set at create time, not edit time), this check is a no-op and standalone behavior is
-        unchanged.
+        unchanged. Only the JSON boolean true counts as epic mode: a string or number such as
+        "false", "true", or 1 is not epic mode, so the --base requirement does not apply
+        (issue #1001).
     .PARAMETER CommandText
         The Bash command text under evaluation.
     .PARAMETER CheckpointPath
@@ -116,7 +118,7 @@ function Test-EpicBaseBranchOverride {
     }
 
     $checkpointProps = @($checkpoint.PSObject.Properties.Name)
-    if ($checkpointProps -notcontains 'epic_mode' -or -not [bool]$checkpoint.epic_mode) {
+    if ($checkpointProps -notcontains 'epic_mode' -or -not (($checkpoint.epic_mode -is [bool]) -and $checkpoint.epic_mode)) {
         return $null
     }
 

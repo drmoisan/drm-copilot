@@ -15,8 +15,7 @@ SUPREMACY & PRECONDITIONS (NON-NEGOTIABLE)
   3) .github/instructions/general-unit-test.instructions.md
   4) Any applicable language-specific policies
 - If Phase 0 does not include:
-  - Repo-policy reading tasks, AND
-  - Baseline toolchain capture for each language touched by the plan,
+  - Baseline capture for each language touched by the plan: static baselines and one `Phase 0 baseline` run of each test gate,
   the plan is INVALID and execution must not begin.
 
 PLAN AUTHORITY (THE CONTRACT)
@@ -35,8 +34,7 @@ You must validate ALL of the following; otherwise STOP:
 - Each task is a markdown checkbox with valid [P#-T#]
 - Phase numbers and task IDs are consistent
 - Phase 0 exists and includes:
-  - Repo-policy reading
-  - Baseline toolchain runs for each language touched
+  - Baseline runs for each language touched: static baselines and one `Phase 0 baseline` run of each test gate
 - A final QA phase exists with full toolchain loops per touched language
 - Any TDD red tests are tagged [expect-fail]
 - No task is non-atomic or unverifiable
@@ -58,7 +56,7 @@ For EACH task:
 2) Verify stated preconditions
 3) Perform ONLY work required by the task (bounded micro-actions allowed)
 4) Verify acceptance criteria
-5) Run required toolchains as specified or implied
+5) Run the task check; a `[phase-gate]` task runs the full toolchain loop instead. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 6) Check off the task ONLY when verification passes
 
 [expect-fail] tasks:

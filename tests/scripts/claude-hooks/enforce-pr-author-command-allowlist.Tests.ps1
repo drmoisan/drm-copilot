@@ -2,16 +2,19 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 <#
 .SYNOPSIS
-    Pester tests for the enforce-pr-author-command-allowlist.ps1 PreToolUse hook (T-ALLOW, AL-01 to AL-49).
+    Pester tests for the enforce-pr-author-command-allowlist.ps1 PreToolUse hook (T-ALLOW, AL-01 to AL-67).
 
 .DESCRIPTION
     The hook limits the pr-author subagent's Bash calls to git log, git rev-parse,
     gh pr create, gh pr edit, the exact closing-reference verification form
-    gh pr view <N> --json closingIssuesReferences,body (issue #989), and, each as the whole
-    command, sha256sum of a canonical body file and date -u. AL-39 to AL-49 pin the
-    gh pr view form: only the exact six-token shape is allowed. AL-33 to AL-35 are static checks over .claude/agents/pr-author.md
-    and .claude/skills/pr-author/SKILL.md: the frontmatter registers the hook, and every
-    command form the receipt procedure names is allowed by it.
+    gh pr view <N> --json closingIssuesReferences,body (issue #989), the exact form
+    git worktree list --porcelain (issue #1011), and, each as the whole command, sha256sum of a
+    canonical body file (relative, or absolute beneath an item worktree, issue #1011) and
+    date -u. AL-39 to AL-49 pin the gh pr view form: only the exact six-token shape is allowed.
+    AL-50 to AL-67 pin the two issue #1011 forms and their deny cases. AL-33 to AL-35 are
+    static checks over .claude/agents/pr-author.md and .claude/skills/pr-author/SKILL.md: the
+    frontmatter registers the hook, and every command form the receipt procedure names is
+    allowed by it once the <N>, <branch>, and <item worktree> placeholders are substituted.
 
     Determinism: every decision row is a pure string decision. The static rows read two
     tracked repository documents. AL-37 runs the hook script in process with stdin and the
@@ -31,6 +34,9 @@ BeforeDiscovery {
         @{ Id = 'AL-09'; Command = 'date -u' }
         @{ Id = 'AL-10'; Command = 'git rev-parse HEAD && git log -1 --format=%H' }
         @{ Id = 'AL-39'; Command = 'gh pr view 5 --json closingIssuesReferences,body' }
+        @{ Id = 'AL-50'; Command = 'git worktree list --porcelain' }
+        @{ Id = 'AL-51'; Command = 'sha256sum /repo/item/artifacts/pr_body_5.md' }
+        @{ Id = 'AL-52'; Command = 'sha256sum C:/repo/item/artifacts/pr_body_5.md' }
     )
     $script:DenyRows = @(
         @{ Id = 'AL-11'; Command = 'git log -1 --format=%H && sha256sum artifacts/pr_body_5.md && date -u +%Y-%m-%dT%H:%M:%SZ' }
@@ -63,6 +69,20 @@ BeforeDiscovery {
         @{ Id = 'AL-46'; Command = 'gh -R owner/repo pr view 5 --json closingIssuesReferences,body' }
         @{ Id = 'AL-47'; Command = 'gh pr view 5 --json closingIssuesReferences,body > out.json' }
         @{ Id = 'AL-48'; Command = 'gh pr view 5 --json body,closingIssuesReferences' }
+        @{ Id = 'AL-53'; Command = 'sha256sum /repo/../item/artifacts/pr_body_5.md' }
+        @{ Id = 'AL-54'; Command = 'sha256sum /repo/./item/artifacts/pr_body_5.md' }
+        @{ Id = 'AL-55'; Command = 'sha256sum /repo//item/artifacts/pr_body_5.md' }
+        @{ Id = 'AL-56'; Command = 'sha256sum C:\repo\item\artifacts\pr_body_5.md' }
+        @{ Id = 'AL-57'; Command = 'sha256sum repo/item/artifacts/pr_body_5.md' }
+        @{ Id = 'AL-58'; Command = 'sha256sum /repo/item/artifacts/other.md' }
+        @{ Id = 'AL-59'; Command = 'sha256sum /repo/item/Artifacts/pr_body_5.md' }
+        @{ Id = 'AL-60'; Command = 'sha256sum /repo/item/artifacts/pr_body_5.md /repo/other/artifacts/pr_body_5.md' }
+        @{ Id = 'AL-61'; Command = 'sha256sum -b /repo/item/artifacts/pr_body_5.md' }
+        @{ Id = 'AL-62'; Command = 'git log -1 && sha256sum /repo/item/artifacts/pr_body_5.md' }
+        @{ Id = 'AL-63'; Command = 'git worktree list' }
+        @{ Id = 'AL-64'; Command = 'git worktree list --porcelain -v' }
+        @{ Id = 'AL-65'; Command = 'git worktree add ../x' }
+        @{ Id = 'AL-66'; Command = 'git worktree remove ../x' }
     )
 }
 
@@ -135,7 +155,7 @@ Describe 'enforce-pr-author-command-allowlist.ps1 (issue #824)' {
     It 'AL-34 allows every command form the receipt procedure names' -Tag 'Issue824' {
         $spans = foreach ($path in @($script:AgentPath, $script:SkillPath)) {
             Get-ProcedureCodeSpan -Path $path | Where-Object { $_ -match '^(git|gh|sha256sum|date) ' } |
-                ForEach-Object { $_.Replace('<N>', '5').Replace('<branch>', 'bug/example-5') }
+                ForEach-Object { $_.Replace('<N>', '5').Replace('<branch>', 'bug/example-5').Replace('<item worktree>', '/repo/item') }
         }
         $spans = @($spans | Sort-Object -Unique)
 
@@ -198,5 +218,19 @@ Describe 'enforce-pr-author-command-allowlist.ps1 (issue #824)' {
 
         $reason | Should -BeLike 'PR_AUTHOR_COMMAND_NOT_ALLOWED: *'
         $reason.Contains('gh pr view <N> --json closingIssuesReferences,body') | Should -BeTrue -Because $reason
+    }
+
+    It 'AL-67 names both new forms in the allowed-forms sentence and allows each after substitution' -Tag 'Issue1011' {
+        # Arrange
+        $forms = @('git worktree list --porcelain', 'sha256sum <item worktree>/artifacts/pr_body_<N>.md')
+
+        foreach ($form in $forms) {
+            # Act
+            $substituted = $form.Replace('<item worktree>', '/repo/item').Replace('<N>', '5')
+
+            # Assert
+            $script:PrAuthorAllowlistFormText.Contains($form) | Should -BeTrue -Because "the allowed-forms sentence must name '$form'"
+            Get-PrAuthorCommandAllowlistReason -CommandText $substituted | Should -BeNullOrEmpty -Because "'$substituted' is an allowed form"
+        }
     }
 }

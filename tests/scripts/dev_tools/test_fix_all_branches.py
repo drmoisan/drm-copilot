@@ -88,6 +88,7 @@ def base_success_responses(
         "powershell": {
             "PoshQC: format": [make_result(0)],
             "PoshQC: analyze": [make_result(0)],
+            "PoshQC: leak scan": [make_result(0)],
             "PoshQC: test": [make_result(0)],
         },
         "typescript": {
@@ -453,3 +454,100 @@ def test_subprocess_runner_runs_normally_with_cancel_event_not_set(
 
     assert result.returncode == 0
     assert "success output" in result.output
+
+
+def test_powershell_leak_scan_step_calls_invoke_poshqc_leak_scan() -> None:
+    """The PoshQC leak-scan step runs Invoke-PoshQCLeakScan on the repository root."""
+    # Arrange
+    factory = FakeRunnerFactory(base_success_responses())
+
+    # Act
+    exit_code = fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=True,
+        runner_factory=factory,
+        logger=build_logger(),
+    )
+
+    # Assert
+    assert exit_code == 0
+    commands = dict(factory.runners["powershell"].calls)
+    leak_scan_command = " ".join(commands["PoshQC: leak scan"])
+    assert "Invoke-PoshQCLeakScan -Root '.'" in leak_scan_command
+
+
+def test_powershell_leak_scan_failure_stops_before_pester() -> None:
+    """A failing leak scan stops the powershell branch before PoshQC: test runs."""
+    # Arrange
+    responses = base_success_responses()
+    responses["powershell"]["PoshQC: leak scan"] = [make_result(1, "leak finding")]
+    factory = FakeRunnerFactory(responses)
+    logger = build_logger()
+
+    # Act
+    exit_code = fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=True,
+        runner_factory=factory,
+        logger=logger,
+        complete_all=True,
+    )
+
+    # Assert
+    assert exit_code == 1
+    powershell_calls = [call[0] for call in factory.runners["powershell"].calls]
+    assert powershell_calls == [
+        "PoshQC: format",
+        "PoshQC: analyze",
+        "PoshQC: leak scan",
+    ]
+    assert "PowerShell leak scan failed" in read_log(logger)
+
+
+def test_powershell_test_step_runs_invoke_poshqc_parallel_test() -> None:
+    """PoshQC: test runs Invoke-PoshQCParallelTest and exits with its ExitCode."""
+    # Arrange
+    factory = FakeRunnerFactory(base_success_responses())
+
+    # Act
+    fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=True,
+        runner_factory=factory,
+        logger=build_logger(),
+    )
+
+    # Assert
+    commands = dict(factory.runners["powershell"].calls)
+    test_command = " ".join(commands["PoshQC: test"])
+    assert "Invoke-PoshQCParallelTest -Root '.'" in test_command
+    assert ".ExitCode" in test_command
+    assert "Invoke-PoshQCTest" not in test_command
+
+
+def _python_pytest_command(*, include_coverage: bool) -> list[str]:
+    """Run the pipeline and return the argv of the python branch pytest step."""
+    factory = FakeRunnerFactory(
+        base_success_responses(include_coverage=include_coverage)
+    )
+    fix_all.run_fix_all(
+        max_ruff_retries=1,
+        include_coverage=include_coverage,
+        runner_factory=factory,
+        logger=build_logger(),
+    )
+    step_name = "Pytest: test with coverage" if include_coverage else "Pytest: test"
+    return dict(factory.runners["python"].calls)[step_name]
+
+
+def test_python_branch_pytest_runs_xdist_workers_with_coverage() -> None:
+    """run_python_branch passes -n auto when coverage is requested."""
+    command = _python_pytest_command(include_coverage=True)
+    assert command[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+    assert "--cov=src/lexile_corpus_tuner" not in command
+
+
+def test_python_branch_pytest_runs_xdist_workers_without_coverage() -> None:
+    """run_python_branch passes -n auto when coverage is not requested."""
+    command = _python_pytest_command(include_coverage=False)
+    assert command == ["poetry", "run", "pytest", "-n", "auto"]

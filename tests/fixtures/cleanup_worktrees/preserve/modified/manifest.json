@@ -16,7 +16,7 @@
         "result": "clean",
         "pattern_set_id": "cleanup-wt-host-tokens-v1"
       },
-      "evidence": "preserve/modified fixture: a modified lesson staged by the same path as an untracked one"
+      "evidence": "preserve/modified fixture: a modified lesson whose target is absent, so it is copied"
     }
   ]
 }
