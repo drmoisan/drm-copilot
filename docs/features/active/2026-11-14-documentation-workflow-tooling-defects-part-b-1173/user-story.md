@@ -68,7 +68,7 @@ The first consumer run of `/documentation-workflow` (issue #1169, Part B) comple
 - [x] Reconciler (B2): a measured CLI batch run on an estate of at least 3,000 elements with at least 15,000 operations completes in at most 10 minutes and is recorded as feature evidence.
 - [x] Reconciler (B3): the reconcile skill and reconciler agent state that `pin` precedes `set-dimension accurate pass`, and a batch `accurate pass` item with a `claim` is applied without `DOCS_MATRIX_ACCURACY_UNPINNED`.
 - [x] Author (B4): every page template declares `audience` as a list and passes the page front-matter checker after placeholder substitution.
-- [ ] Author (B5): generated reference families above the split budget are emitted as an index page plus group pages that each pass the page size bound, and `-PathPrefix` (CLI) and `path_prefixes` (MCP) filter elements without a snapshot copy.
+- [x] Author (B5): generated reference families above the split budget are emitted as an index page plus group pages that each pass the page size bound, and `-PathPrefix` (CLI) and `path_prefixes` (MCP) filter elements without a snapshot copy.
 - [ ] Author (B9): subcommands and options registered through a `subparsers` parameter in another module appear as `cli-command` and `cli-option` elements in both analyzer paths.
 - [x] Author (B12): the docs-plan-ia and docs-author-page skills and the docs-author agent document the runtime naming restriction and the root fallback.
 - [ ] Every item B1-B13 has a regression test, mirror and bundle copies stay in parity, the full toolchain loop passes, and CI is green on the final pull request head.

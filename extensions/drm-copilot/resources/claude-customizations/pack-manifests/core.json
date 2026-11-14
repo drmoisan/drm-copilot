@@ -403,6 +403,7 @@
     ".claude/lib/docs/DocsReferenceRender.psm1",
     ".claude/lib/docs/DocsReferenceMarkers.psm1",
     ".claude/lib/docs/DocsReferenceFrontMatter.psm1",
+    ".claude/lib/docs/DocsReferenceSplit.psm1",
     ".claude/lib/docs/DocsReferenceWriter.psm1",
     ".claude/lib/docs/DocsReferenceReport.psm1",
     ".claude/lib/docs/schemas/v1/page-metadata.schema.json",

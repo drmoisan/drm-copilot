@@ -183,6 +183,7 @@ export const DOCS_TOOL_INPUT_TABLES = {
       PROFILE_ROW,
       row("snapshot", "Snapshot", PATH),
       row("output_directory", "OutputDirectory", PATH),
+      row("path_prefixes", "PathPrefix", listOf("relative-path")),
     ],
   },
   validate_docs_artifacts: {

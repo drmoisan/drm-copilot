@@ -226,14 +226,33 @@ function Resolve-DocsReferenceOutputDirectory {
 function Get-DocsReferenceCandidatePagePath {
     <#
     .SYNOPSIS
-        Returns the four family page paths under OutputDirectory in ordinal order.
+        Returns the four family page paths under OutputDirectory and the listed split pages, in ordinal order.
+    .DESCRIPTION
+        ListedPath (default empty) holds paths listed under OutputDirectory. Each listed path of
+        the form <OutputDirectory>/<family-stem>/<name>.md, one segment beneath a family stem, is
+        added, so that existing split pages are read (issue #1173 B5). The result has no duplicate.
     #>
     [CmdletBinding()]
     [OutputType([string[]], [object[]])]
-    param([Parameter(Mandatory = $true)] [string] $OutputDirectory)
+    param(
+        [Parameter(Mandatory = $true)] [string] $OutputDirectory,
+        [AllowEmptyCollection()] [string[]] $ListedPath = @()
+    )
 
-    [string[]] $paths = @((Get-DocsReferenceFamily) | ForEach-Object { $OutputDirectory + '/' + $_['FileName'] })
-    [Array]::Sort($paths, [System.StringComparer]::Ordinal)
+    $set = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::Ordinal)
+    $stems = [System.Collections.Generic.List[string]]::new()
+    foreach ($family in (Get-DocsReferenceFamily)) {
+        [void] $set.Add($OutputDirectory + '/' + $family['FileName'])
+        $stems.Add($OutputDirectory + '/' + [System.IO.Path]::GetFileNameWithoutExtension([string] $family['FileName']) + '/')
+    }
+    foreach ($path in $ListedPath) {
+        foreach ($stem in $stems) {
+            if (-not $path.StartsWith($stem, [System.StringComparison]::Ordinal)) { continue }
+            $leaf = $path.Substring($stem.Length)
+            if ($leaf.Length -gt 3 -and $leaf.EndsWith('.md', [System.StringComparison]::Ordinal) -and -not $leaf.Contains('/')) { [void] $set.Add($path) }
+        }
+    }
+    [string[]] $paths = @($set)
     return , $paths
 }
 

@@ -51,6 +51,8 @@ const FIELD_DESCRIPTIONS: Readonly<Record<string, string>> = {
   write: "Commit the ledger change; the default false is a dry run.",
   snapshot: "Workspace-relative inventory snapshot path.",
   output_directory: "Workspace-relative output directory for the dry run.",
+  path_prefixes:
+    "Workspace-relative path prefixes (issue #1173); only snapshot elements whose path starts with one of them are generated. All elements when omitted.",
   mode: "Validation mode.",
 };
 

@@ -35,7 +35,9 @@ The root session supplies:
 ## MCP Tool Inputs
 
 - `generate_docs_reference`: `workspace_root`, `profile`, optional `snapshot`,
-  optional `output_directory`. The tool plans generated reference pages as a dry
+  optional `output_directory`, optional `path_prefixes` (repository-relative path
+  prefixes that select the elements to generate). The tool plans generated
+  reference pages as a dry
   run and never writes pages; the root step `generate-reference -Write` writes
   them. Use it for the reference families only.
 - `run_docs_check`: `workspace_root`, `profile`, and `paths` set to the pages

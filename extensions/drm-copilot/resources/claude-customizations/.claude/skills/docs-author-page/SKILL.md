@@ -42,6 +42,17 @@ documentation root, so `run_docs_check` does not scan them.
    generated blocks as a dry run and never writes pages. When the generated blocks
    must be written, report that the root step below is required.
    Root step: `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command generate-reference -Profile docs/documentation-estate/docs-profile.json -Write`
+   To narrow a run to part of the source tree, pass `path_prefixes` (MCP) or
+   `-PathPrefix <prefix>` (CLI, repeatable): only the snapshot elements whose
+   `path` starts with one of the repository-relative prefixes (ordinal match) are
+   generated; with no prefix every element is generated.
+   A family page whose rendered size exceeds 921,600 UTF-8 bytes is split. The
+   family path then holds an index page that links one page per group,
+   `<output_directory>/<family-stem>/<group>.md`, where the group is the first
+   path segment beneath the longest matching `surface_selection.source_roots`
+   entry (`_root` otherwise); an oversize group continues in `<group>-<n>.md`.
+   Existing split pages are updated in place. A split page whose group no longer
+   exists is reported as `REFERENCE_SPLIT_GROUP_STALE` and is never deleted.
 3. Write the prose around the generated-block markers. Do not edit the content
    between a `docs:generated:start` marker and its `docs:generated:end` marker.
 4. Link every new page from its root entry page (`README.md` or `index.md` of its

@@ -91,6 +91,24 @@ Describe 'Get-DocsReferenceCandidatePagePath' {
         $paths | Should -Be @('docs/reference/api-reference.md', 'docs/reference/cli-reference.md', 'docs/reference/config-reference.md', 'docs/reference/http-reference.md')
         @($paths | Where-Object { $_ -match '/(?:index|README)\.md$' }).Count | Should -Be 0
     }
+
+    It 'adds the listed split pages one level beneath a family stem and no other listed path (issue #1173 B5)' {
+        # Arrange (split directories are now listed, so their pages are candidates)
+        $listed = @(
+            'docs/reference/cli-reference/beta.md', 'docs/reference/api-reference/alpha.md', 'docs/reference/api-reference.md',
+            'docs/reference/api-reference/deep/x.md', 'docs/reference/api-reference/notes.txt', 'docs/reference/other/y.md',
+            'docs/reference/guide.md', 'docs/reference/api-reference/.md'
+        )
+
+        # Act
+        $paths = Get-DocsReferenceCandidatePagePath -OutputDirectory 'docs/reference' -ListedPath $listed
+
+        # Assert
+        $paths | Should -Be @(
+            'docs/reference/api-reference.md', 'docs/reference/api-reference/alpha.md', 'docs/reference/cli-reference.md',
+            'docs/reference/cli-reference/beta.md', 'docs/reference/config-reference.md', 'docs/reference/http-reference.md'
+        )
+    }
 }
 
 Describe 'Get-DocsReferencePagePlan' {
