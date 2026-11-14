@@ -64,19 +64,19 @@
 
 - [x] [P2-T1] Fetch `origin`. When `origin/main` advanced since P0-T1, merge it as in P0-T1 and repeat P1-T5 from the merged bytes. Write `FEATURE/evidence/other/main-sync.<timestamp>.md`.
   - Acceptance: the artifact names the result, and `git status --porcelain` is empty.
-- [ ] [P2-T2] Run the PowerShell final QC (format, analyzer, `Invoke-PoshQCLeakScan`) into `FEATURE/evidence/qa-gates/powershell-static.<timestamp>.md`.
+- [x] [P2-T2] Run the PowerShell final QC (format, analyzer, `Invoke-PoshQCLeakScan`) into `FEATURE/evidence/qa-gates/powershell-static.<timestamp>.md`.
   - Acceptance: zero analyzer findings, a clean leak scan, and an unchanged `git status --porcelain` across the format step.
-- [ ] [P2-T3] Run the Python final QC (Black check, Ruff, Pyright, Codex generator `--check`) into `FEATURE/evidence/qa-gates/python-static.<timestamp>.md`.
+- [x] [P2-T3] Run the Python final QC (Black check, Ruff, Pyright, Codex generator `--check`) into `FEATURE/evidence/qa-gates/python-static.<timestamp>.md`.
   - Acceptance: every step exits 0 with zero findings.
-- [ ] [P2-T4] Run the Pester gate: one `Invoke-PoshQCParallelTest` after the last code commit. Write `FEATURE/evidence/qa-gates/pester.<timestamp>.md` with the P0-T4 fields.
+- [x] [P2-T4] Run the Pester gate: one `Invoke-PoshQCParallelTest` after the last code commit. Write `FEATURE/evidence/qa-gates/pester.<timestamp>.md` with the P0-T4 fields.
   - Acceptance: zero failures; `EpicCrossDependency.psm1` at or above 85% line coverage and not below its P0-T4 figure; `artifacts/pester/powershell-coverage.xml` is written by this run.
-- [ ] [P2-T5] Run the pytest gate: one `pytest -n auto` with the P0-T5 coverage arguments. Write `FEATURE/evidence/qa-gates/pytest.<timestamp>.md`.
+- [x] [P2-T5] Run the pytest gate: one `pytest -n auto` with the P0-T5 coverage arguments. Write `FEATURE/evidence/qa-gates/pytest.<timestamp>.md`.
   - Acceptance: zero failures, including `test_frozen_epic_surface_matches_pinned_baseline_digest` and the push-down resource and pack-manifest contract tests; `artifacts/python/lcov.info` is written by this run.
-- [ ] [P2-T6] Run the Jest gate for both configurations, in sequence. Write `FEATURE/evidence/qa-gates/jest.<timestamp>.md` and `FEATURE/evidence/qa-gates/jest-root.<timestamp>.md`.
+- [x] [P2-T6] Run the Jest gate for both configurations, in sequence. Write `FEATURE/evidence/qa-gates/jest.<timestamp>.md` and `FEATURE/evidence/qa-gates/jest-root.<timestamp>.md`.
   - Acceptance: zero failures in both runs; the worktree-root `coverage/lcov.info` is written by the root run.
-- [ ] [P2-T7] Write `FEATURE/evidence/qa-gates/coverage-comparison.<timestamp>.md`: for each gate, the `Phase 0 baseline` counts and totals beside the final figures, and for `EpicCrossDependency.psm1` the baseline, post-change, and changed-line figures, plus the blob-id parity of the three module copies.
+- [x] [P2-T7] Write `FEATURE/evidence/qa-gates/coverage-comparison.<timestamp>.md`: for each gate, the `Phase 0 baseline` counts and totals beside the final figures, and for `EpicCrossDependency.psm1` the baseline, post-change, and changed-line figures, plus the blob-id parity of the three module copies.
   - Acceptance: no new failing test, no repository-wide or per-file drop, and every threshold met; a missing value makes the result remediation-required.
-- [ ] [P2-T8] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base of `origin/main` and `HEAD`, and confirm that F1 and F2 are closed and no hook file or registration changed. Write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
+- [x] [P2-T8] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base of `origin/main` and `HEAD`, and confirm that F1 and F2 are closed and no hook file or registration changed. Write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item.
   - Acceptance: no FAIL row. A FAIL row is fixed, the QA loop re-runs, and a new self-review file is written.
 
 ## Finding Traceability
