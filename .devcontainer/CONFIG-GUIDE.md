@@ -11,7 +11,7 @@ This repository uses **separate dev container configurations** for Codespaces an
 1. **Codespaces** (`.devcontainer/codespaces/devcontainer.json`) - Manual selection required
 2. **Local Docker** (`.devcontainer/local/devcontainer.json`) - Manual selection required
 
-Both provide identical tooling (Debian Bookworm, Python 3.13, PowerShell 7.6+, etc.)
+Both provide Debian 12, Python 3.13.18, Node.js 26.13.0/npm 11.20.0, PowerShell 7.6.9, Poetry 2.5.1, shfmt 3.14.1, ShellCheck 0.11.0, and actionlint 1.7.12.
 
 ## Quick Start
 
@@ -38,9 +38,9 @@ Both provide identical tooling (Debian Bookworm, Python 3.13, PowerShell 7.6+, e
 Both configurations provide:
 
 ### Base Environment
-- Debian Bookworm (latest stable)
-- Python 3.13 with Poetry 2.2.1
-- PowerShell 7.6+ with PSScriptAnalyzer and Pester
+- Debian 12 (Bookworm)
+- Python 3.13.18 with Poetry 2.5.1
+- PowerShell 7.6.9 with PSScriptAnalyzer and Pester
 - Git, GitHub CLI, actionlint, bashdb
 
 ### Python Tooling
@@ -59,9 +59,9 @@ After container starts, check which config was used:
 ```bash
 # Check environment
 cat /etc/os-release  # Should show Debian Bookworm
-python --version     # Should show 3.13.x
-pwsh --version       # Should show PowerShell 7.6+
-poetry --version     # Should show 2.2.1
+python --version     # Should show 3.13.18
+pwsh --version       # Should show PowerShell 7.6.9
+poetry --version     # Should show 2.5.1
 
 # Check if running in Codespaces
 echo $CODESPACES     # "true" if in Codespaces, empty if local
@@ -84,13 +84,11 @@ Codespace menu → Rebuild Container
 
 | File | Purpose | Used By |
 |------|---------|---------|
-| `.devcontainer/devcontainer.json` | Codespaces configuration | GitHub Codespaces |
-| `.devcontainer/codespaces/devcontainer.json` | Original Codespaces config (reference) | (archived) |
-| `.devcontainer/codespaces/Dockerfile` | Codespaces Dockerfile | Both configs |
+| `.devcontainer/codespaces/devcontainer.json` | Codespaces configuration | GitHub Codespaces |
+| `.devcontainer/codespaces/Dockerfile` | Codespaces Dockerfile | Codespaces config |
 | `.devcontainer/local/devcontainer.json` | Local Docker configuration | VS Code local |
 | `.devcontainer/local/Dockerfile` | Local Dockerfile | Local config |
 | `.devcontainer/post-create.sh` | Post-create setup script | Both configs |
-| `.devcontainer/devcontainer.json.disabled` | Previous single config (disabled) | (archived) |
 
 ## Troubleshooting
 
@@ -100,7 +98,7 @@ Codespace menu → Rebuild Container
 
 **For Codespaces**:
 - Delete and recreate the Codespace
-- The `.devcontainer/devcontainer.json` should be used automatically
+- Select `.devcontainer/codespaces/devcontainer.json` explicitly
 
 **For Local**:
 - Close container: `F1` → **Dev Containers: Close Remote Connection**

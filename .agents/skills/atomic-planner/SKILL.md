@@ -25,7 +25,7 @@ Always apply:
 Use `atomic-plan-contract` as the source of truth for:
 - phase and task formatting,
 - Phase 0 requirements,
-- baseline evidence tasks,
+- baseline evidence tasks (static baselines and the `Phase 0 baseline` test-suite run),
 - final QA requirements,
 - the design-level plan contract and the `## Pre-Mortem` section,
 - single-pass preflight behavior.
@@ -35,6 +35,8 @@ Each task must be:
 - binary in completion,
 - independently verifiable,
 - free of placeholder text.
+
+In every plan, every phase between Phase 0 and the final QA phase ends with a `[phase-gate]` task, placed after the task ID. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop. A phase that ends with `[expect-fail]` tests keeps its `[phase-gate]` task, whose unit stage accepts only those named expected failures; a no-change phase, one that changes no tracked file, needs no gate task.
 
 In a workspace with an active discovery activation, the planner launch itself is admitted
 only after the native planning gate verifies the receipt named by the profile's

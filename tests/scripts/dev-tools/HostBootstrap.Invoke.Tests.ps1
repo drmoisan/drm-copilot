@@ -18,6 +18,13 @@ BeforeAll {
     $script:ModulePath = (Resolve-Path "$PSScriptRoot/../../../scripts/dev-tools/HostBootstrap.psm1").Path
     Import-Module $script:ModulePath -Force
 
+    # Portable fixture root: fully qualified on every host (the checkout drive on Windows,
+    # '/' elsewhere) and never created; every fixture path and expectation is joined from it.
+    $script:FixtureRoot = Join-Path ([System.IO.Path]::GetPathRoot($PSScriptRoot)) 'hostbootstrap-invoke-root'
+    $script:Ws = Join-Path $script:FixtureRoot 'ws'
+    $script:Repo = Join-Path $script:FixtureRoot 'repo'
+    $script:ManifestPath = Join-Path $script:FixtureRoot 'host-tools.manifest.json'
+
     Mock -CommandName Invoke-HostNativeCommand -ModuleName HostBootstrap -MockWith { throw 'unmocked host seam: Invoke-HostNativeCommand' }
     Mock -CommandName Set-HostEnvironmentVariable -ModuleName HostBootstrap -MockWith { throw 'unmocked host seam: Set-HostEnvironmentVariable' }
     Mock -CommandName Get-HostEnvironmentVariable -ModuleName HostBootstrap -MockWith { throw 'unmocked host seam: Get-HostEnvironmentVariable' }
@@ -43,10 +50,10 @@ Describe 'Invoke-BootstrapHost' {
             param([string[]]$Name)
             $commandName = @($Name)[0]
             if ($commandName -in @('winget', 'npm')) {
-                [pscustomobject]@{ Source = "C:\fixture\$commandName.exe" }
+                [pscustomobject]@{ Source = (Join-Path $script:FixtureRoot "$commandName.exe") }
             }
         }
-        Mock -CommandName Get-HostToolsManifestPath -ModuleName HostBootstrap -MockWith { 'C:\fixture\host-tools.manifest.json' }
+        Mock -CommandName Get-HostToolsManifestPath -ModuleName HostBootstrap -MockWith { $script:ManifestPath }
         Mock -CommandName Read-HostToolsManifest -ModuleName HostBootstrap -MockWith {
             [pscustomobject]@{
                 installPackages     = [pscustomobject]@{
@@ -77,7 +84,7 @@ Describe 'Invoke-BootstrapHost' {
         Mock -CommandName Invoke-HostBootstrapVerifyScript -ModuleName HostBootstrap -MockWith { 'verify fixture output' }
 
         # HostBootstrapWorkspace seams: the workspace and clone targets are absent.
-        Mock -CommandName Get-Location -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Path = 'C:\fixture\ws' } }
+        Mock -CommandName Get-Location -ModuleName HostBootstrapWorkspace -MockWith { [pscustomobject]@{ Path = $script:Ws } }
         Mock -CommandName Test-Path -ModuleName HostBootstrapWorkspace -MockWith { $false }
         Mock -CommandName New-Item -ModuleName HostBootstrapWorkspace -MockWith { }
         Mock -CommandName Invoke-HostBootstrapGit -ModuleName HostBootstrapWorkspace -MockWith { }
@@ -86,15 +93,15 @@ Describe 'Invoke-BootstrapHost' {
     Context 'dry run' {
         It 'AC06-BOOTSTRAP-DRYRUN-NOSIDEEFFECTS performs no installs, registry writes, or clones and prints Would lines' {
             # Act
-            $actual = @(Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $actual = @(Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot $script:Repo)
 
             # Assert: the planned actions are reported.
-            $actual | Should -Contain '- Would create workspace root: C:\fixture\ws'
+            $actual | Should -Contain "- Would create workspace root: $($script:Ws)"
             $actual | Should -Contain '- Would install WSL (requires elevation and may require reboot)'
             $actual | Should -Contain "- Would install git using winget id 'Git.Git'"
             $actual | Should -Contain '- Would install Graphite CLI: npm install -g @withgraphite/graphite-cli@1.7.14'
             $actual | Should -Contain '- Would install PowerShell modules: Pester 5.9.0'
-            $actual | Should -Contain '- Would clone https://example.invalid/org/sample-a.git to C:\fixture\ws\sample-a'
+            $actual | Should -Contain "- Would clone https://example.invalid/org/sample-a.git to $(Join-Path $script:Ws 'sample-a')"
             $actual | Should -Contain '- Would install Python project dependencies via poetry'
             $actual[-1] | Should -BeExactly 'Dry run complete. Re-run with -Apply to install tools.'
 
@@ -107,7 +114,7 @@ Describe 'Invoke-BootstrapHost' {
         }
 
         It 'AC06-RUNONCE-NOT-SET-WITHOUT-BOTH does not register RunOnce with only -EnableAutoResumeAfterReboot' {
-            $null = @(Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot 'C:\fixture\repo' -EnableAutoResumeAfterReboot)
+            $null = @(Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot $script:Repo -EnableAutoResumeAfterReboot)
 
             Should -Invoke -CommandName Set-BootstrapResumeRunOnce -ModuleName HostBootstrap -Times 0 -Exactly
         }
@@ -123,23 +130,59 @@ Describe 'Invoke-BootstrapHost' {
             Mock -CommandName Read-HostToolsManifest -ModuleName HostBootstrap -MockWith { $script:CommittedManifest }
 
             # Act
-            $actual = @(Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $actual = @(Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot $script:Repo)
 
             # Assert: every committed winget entry is previewed, and nothing else is.
             foreach ($pkg in @($script:CommittedManifest.installPackages.windows.winget)) {
                 $actual | Should -Contain "- Would install $($pkg.name) using winget id '$($pkg.id)'"
             }
             @($actual | Where-Object { $_ -like '- Would install * using winget id *' }).Count | Should -Be @($script:CommittedManifest.installPackages.windows.winget).Count
-            $actual | Should -Contain '- Would install PowerShell modules: Pester 5.9.0, PSScriptAnalyzer 1.22.0'
+            $actual | Should -Contain '- Would install PowerShell modules: Pester 6.2.0, PSScriptAnalyzer 1.25.0'
             $actual[-1] | Should -BeExactly 'Dry run complete. Re-run with -Apply to install tools.'
         }
+
+        It 'forwards the committed managed minimum to each install helper' {
+            Mock Read-HostToolsManifest -ModuleName HostBootstrap { $script:CommittedManifest }
+            Mock Install-WithWinget -ModuleName HostBootstrap {
+                param([string]$Id, [string]$Name, [switch]$ApplyMode, [string]$MinimumVersion)
+                "fixture $Id $Name apply=$ApplyMode minimum=$MinimumVersion"
+            }
+
+            $null = Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot 'fixture-repo'
+
+            # Each package uses its own minimum; unmanaged entries keep the empty default.
+            foreach ($package in $script:CommittedManifest.installPackages.windows.winget) {
+                $expectedMinimum = ''
+                if ($script:CommittedManifest.minimumVersions.PSObject.Properties.Name -contains $package.name) {
+                    $expectedMinimum = [string]$script:CommittedManifest.minimumVersions.($package.name)
+                }
+                Should -Invoke Install-WithWinget -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter {
+                    $Id -eq $package.id -and $Name -eq $package.name -and $MinimumVersion -eq $expectedMinimum -and -not $ApplyMode
+                }
+            }
+            Should -Invoke Install-PoetryWithPip -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter {
+                $MinimumVersion -eq '2.5.1' -and -not $ApplyMode
+            }
+        }
+    }
+
+    It 'accepts legacy manifests without minimumVersions under StrictMode' {
+        Mock Install-WithWinget -ModuleName HostBootstrap {
+            param([string]$Id, [string]$Name, [switch]$ApplyMode, [string]$MinimumVersion)
+            "fixture $Id $Name apply=$ApplyMode minimum=$MinimumVersion"
+        }
+
+        $null = Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot 'fixture-repo'
+
+        Should -Invoke Install-WithWinget -ModuleName HostBootstrap -Times 2 -Exactly -ParameterFilter { $MinimumVersion -eq '' }
+        Should -Invoke Install-PoetryWithPip -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $MinimumVersion -eq '' }
     }
 
     Context 'failure paths' {
         It 'AC06-BOOTSTRAP-NOMANIFEST-THROWS throws when the host tools manifest is missing' {
             Mock -CommandName Read-HostToolsManifest -ModuleName HostBootstrap -MockWith { }
 
-            { Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot 'C:\fixture\repo' } | Should -Throw -ExpectedMessage 'Host tools manifest not found at C:\fixture\host-tools.manifest.json'
+            { Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot $script:Repo } | Should -Throw -ExpectedMessage "Host tools manifest not found at $($script:ManifestPath)"
         }
 
         It 'AC06-BOOTSTRAP-PRECONDITION-ERRORS raises terminating errors for a non-Windows host and a missing winget' {
@@ -159,22 +202,22 @@ Describe 'Invoke-BootstrapHost' {
         It 'propagates a terminating error raised by the verify script' {
             Mock -CommandName Invoke-HostBootstrapVerifyScript -ModuleName HostBootstrap -MockWith { throw 'verify fixture failure' }
 
-            { Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo' } | Should -Throw -ExpectedMessage 'verify fixture failure'
+            { Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot $script:Repo } | Should -Throw -ExpectedMessage 'verify fixture failure'
         }
     }
 
     Context 'RunOnce resume' {
         It 'AC06-RUNONCE-SET-APPLY-AND-RESUME registers RunOnce with -Apply and -EnableAutoResumeAfterReboot' {
-            $actual = @(Invoke-BootstrapHost -Apply -EnableAutoResumeAfterReboot -IsWindowsHost $true -WorkspaceRoot 'C:\fixture\ws' -RepoRoot 'C:\fixture\repo')
+            $actual = @(Invoke-BootstrapHost -Apply -EnableAutoResumeAfterReboot -IsWindowsHost $true -WorkspaceRoot $script:Ws -RepoRoot $script:Repo)
 
             $actual | Should -Contain '[INFO] Registered one-time bootstrap resume after reboot.'
             Should -Invoke -CommandName Set-BootstrapResumeRunOnce -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter {
-                $ResumeArguments -eq '-WorkspaceRoot "C:\fixture\ws" -RepoRoot "C:\fixture\repo"'
+                $ResumeArguments -eq "-WorkspaceRoot `"$($script:Ws)`" -RepoRoot `"$($script:Repo)`""
             }
         }
 
         It 'AC06-RUNONCE-NOT-SET-WITHOUT-BOTH does not register RunOnce with only -Apply' {
-            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot $script:Repo)
 
             $actual | Should -Not -Contain '[INFO] Registered one-time bootstrap resume after reboot.'
             Should -Invoke -CommandName Set-BootstrapResumeRunOnce -ModuleName HostBootstrap -Times 0 -Exactly
@@ -182,7 +225,7 @@ Describe 'Invoke-BootstrapHost' {
         }
 
         It 'AC06-RUNONCE-CLEARED-AFTER-APPLY clears RunOnce after a successful apply' {
-            $actual = @(Invoke-BootstrapHost -Apply -EnableAutoResumeAfterReboot -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $actual = @(Invoke-BootstrapHost -Apply -EnableAutoResumeAfterReboot -IsWindowsHost $true -RepoRoot $script:Repo)
 
             $actual[-1] | Should -BeExactly '[INFO] Cleared one-time bootstrap resume entry.'
             Should -Invoke -CommandName Remove-BootstrapResumeRunOnce -ModuleName HostBootstrap -Times 1 -Exactly
@@ -205,13 +248,13 @@ Describe 'Invoke-BootstrapHost' {
             }
 
             # Act / Assert
-            { $script:applyOutput = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo') } | Should -Not -Throw
+            { $script:applyOutput = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot $script:Repo) } | Should -Not -Throw
             Should -Invoke -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -Times 1 -Exactly
             Should -Invoke -CommandName Invoke-HostBootstrapGit -ModuleName HostBootstrapWorkspace -Times 0 -Exactly
         }
 
         It 'installs packages, modules, Graphite CLI, and clones projects' {
-            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot $script:Repo)
 
             $actual | Should -Contain 'Installing Graphite CLI via npm'
             Should -Invoke -CommandName Invoke-HostBootstrapNpm -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { ($NpmArgs -join ' ') -eq 'install -g @withgraphite/graphite-cli@1.7.14' }
@@ -225,10 +268,10 @@ Describe 'Invoke-BootstrapHost' {
         }
 
         It 'warns and skips Graphite CLI when npm is missing' {
-            Mock -CommandName Get-Command -ModuleName HostBootstrap -MockWith { [pscustomobject]@{ Source = 'C:\fixture\winget.exe' } } -ParameterFilter { $Name -eq 'winget' }
+            Mock -CommandName Get-Command -ModuleName HostBootstrap -MockWith { [pscustomobject]@{ Source = (Join-Path $script:FixtureRoot 'winget.exe') } } -ParameterFilter { $Name -eq 'winget' }
             Mock -CommandName Get-Command -ModuleName HostBootstrap -MockWith { } -ParameterFilter { $Name -ne 'winget' }
 
-            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot $script:Repo)
 
             $actual | Should -Contain '[WARN] npm not found; Graphite CLI install skipped'
             Should -Invoke -CommandName Invoke-HostBootstrapNpm -ModuleName HostBootstrap -Times 0 -Exactly
@@ -237,25 +280,25 @@ Describe 'Invoke-BootstrapHost' {
         It 'AC06-POETRY-PROJECT-INSTALL-WARNS reports a poetry project-install failure as a warning' {
             Mock -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -MockWith { throw 'poetry command failed with exit code 1' }
 
-            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot $script:Repo)
 
-            $actual | Should -Contain 'Installing Python project dependencies via poetry in C:\fixture\repo'
+            $actual | Should -Contain "Installing Python project dependencies via poetry in $($script:Repo)"
             $actual | Should -Contain '[WARN] Poetry dependency install failed; python quality tools may be unavailable'
-            Should -Invoke -CommandName Push-Location -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $Path -eq 'C:\fixture\repo' }
+            Should -Invoke -CommandName Push-Location -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $Path -eq $script:Repo }
             Should -Invoke -CommandName Pop-Location -ModuleName HostBootstrap -Times 1 -Exactly
         }
 
         It 'warns when pyproject.toml is absent' {
             Mock -CommandName Test-Path -ModuleName HostBootstrap -MockWith { -not (@($Path)[0] -like '*pyproject.toml') }
 
-            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot $script:Repo)
 
             $actual | Should -Contain '[WARN] pyproject.toml not found; skipping poetry project install'
             Should -Invoke -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -Times 0 -Exactly
         }
 
         It 'skips the project poetry install by request' {
-            $actual = @(Invoke-BootstrapHost -Apply -SkipProjectPoetryInstall -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $actual = @(Invoke-BootstrapHost -Apply -SkipProjectPoetryInstall -IsWindowsHost $true -RepoRoot $script:Repo)
 
             $actual | Should -Contain '[INFO] Skipping project poetry install by request'
             Should -Invoke -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -Times 0 -Exactly
@@ -264,7 +307,7 @@ Describe 'Invoke-BootstrapHost' {
         It 'warns and skips verification when verify-host.ps1 is absent' {
             Mock -CommandName Test-Path -ModuleName HostBootstrap -MockWith { -not (@($Path)[0] -like '*verify-host.ps1') }
 
-            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot $script:Repo)
 
             $actual | Should -Contain '[WARN] verify-host.ps1 not found beside bootstrap-host.ps1; verification skipped'
             Should -Invoke -CommandName Invoke-HostBootstrapVerifyScript -ModuleName HostBootstrap -Times 0 -Exactly
@@ -278,7 +321,7 @@ Describe 'Invoke-BootstrapHost' {
             }
 
             # Act
-            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $actual = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot $script:Repo)
             Set-Variable -Name LASTEXITCODE -Value 0 -Scope Global
 
             # Assert: bootstrap completed and reported the verify output.
@@ -293,7 +336,7 @@ Describe 'Invoke-BootstrapHost' {
     Context 'poetry tool install' {
         It 'AC930-APPLY-INVOKES-POETRY-INSTALL installs the poetry tool in apply mode' {
             # Act
-            $null = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $null = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot $script:Repo)
 
             # Assert
             Should -Invoke -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $ApplyMode }
@@ -301,7 +344,7 @@ Describe 'Invoke-BootstrapHost' {
 
         It 'AC930-DRYRUN-INVOKES-POETRY-INSTALL routes the poetry tool install in dry-run mode' {
             # Act
-            $null = @(Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $null = @(Invoke-BootstrapHost -IsWindowsHost $true -RepoRoot $script:Repo)
 
             # Assert
             Should -Invoke -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { -not $ApplyMode }
@@ -314,14 +357,14 @@ Describe 'Invoke-BootstrapHost' {
                 if ($Target -eq 'Process') { $script:calls.Add('PathRefresh') }
             }
             Mock -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -MockWith {
-                param([switch]$ApplyMode)
-                $null = $ApplyMode
+                param([switch]$ApplyMode, [string]$MinimumVersion)
+                $null = @($ApplyMode, $MinimumVersion)
                 $script:calls.Add('PoetryInstall')
             }
             Mock -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -MockWith { $script:calls.Add('ProjectPoetry') }
 
             # Act
-            $null = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $null = @(Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot $script:Repo)
 
             # Assert
             ($script:calls -join ',') | Should -BeExactly 'PathRefresh,PoetryInstall,ProjectPoetry'
@@ -332,13 +375,13 @@ Describe 'Invoke-BootstrapHost' {
             Mock -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -MockWith { throw 'poetry install fixture failure' }
 
             # Act and Assert
-            { Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot 'C:\fixture\repo' } | Should -Throw -ExpectedMessage 'poetry install fixture failure'
+            { Invoke-BootstrapHost -Apply -IsWindowsHost $true -RepoRoot $script:Repo } | Should -Throw -ExpectedMessage 'poetry install fixture failure'
             Should -Invoke -CommandName Invoke-HostBootstrapPoetry -ModuleName HostBootstrap -Times 0 -Exactly
         }
 
         It 'AC930-SKIP-PROJECT-INSTALL-KEEPS-POETRY-TOOL-INSTALL still installs the poetry tool when the project install is skipped' {
             # Act
-            $null = @(Invoke-BootstrapHost -Apply -SkipProjectPoetryInstall -IsWindowsHost $true -RepoRoot 'C:\fixture\repo')
+            $null = @(Invoke-BootstrapHost -Apply -SkipProjectPoetryInstall -IsWindowsHost $true -RepoRoot $script:Repo)
 
             # Assert
             Should -Invoke -CommandName Install-PoetryWithPip -ModuleName HostBootstrap -Times 1 -Exactly -ParameterFilter { $ApplyMode }

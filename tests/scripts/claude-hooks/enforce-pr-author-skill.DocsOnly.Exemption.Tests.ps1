@@ -29,6 +29,7 @@ Describe 'Get-PrAuthorDocsOnlyExemption (issue #901)' {
         Mock Get-WorktreeItemCheckpointText -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution { $null }
         Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
+        Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
 
         $script:Create = 'gh pr create --base main --title "Docs" --body-file artifacts/pr_body_1.md'
         $script:CreateWithoutBase = 'gh pr create --title "Docs" --body-file artifacts/pr_body_1.md'
@@ -172,6 +173,31 @@ Describe 'Get-PrAuthorDocsOnlyExemption (issue #901)' {
 
             # Assert
             $result.Reason | Should -BeLike 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*'
+        }
+
+        It 'exempts a create whose diff is docs paths plus the docs-init workflow path (issue #1169)' {
+            # Arrange
+            Mock Invoke-PrAuthorDocsOnlyGitExe -ParameterFilter { $GitArgs[0] -eq 'diff' } -MockWith { [pscustomobject]@{ ExitCode = 0; Output = "docs/a.md`0.github/workflows/_docs-quality.yml`0" } }
+
+            # Act
+            $result = Invoke-DocsOnlyExemptionRow -Command $script:Create
+
+            # Assert
+            $result.Exempt | Should -BeTrue -Because "reason: $($result.Reason)"
+            $result.Reason | Should -BeNullOrEmpty
+        }
+
+        It 'denies the docs-plus-workflow diff with one extra non-docs path (issue #1169)' {
+            # Arrange
+            Mock Invoke-PrAuthorDocsOnlyGitExe -ParameterFilter { $GitArgs[0] -eq 'diff' } -MockWith { [pscustomobject]@{ ExitCode = 0; Output = "docs/a.md`0.github/workflows/_docs-quality.yml`0src/a.ps1`0" } }
+
+            # Act
+            $result = Invoke-DocsOnlyExemptionRow -Command $script:Create
+
+            # Assert
+            $result.Exempt | Should -BeFalse
+            $result.Reason | Should -BeLike 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*'
+            $result.Reason.Contains('src/a.ps1') | Should -BeTrue -Because 'the extra path is reported'
         }
 
         It 'denies a rename from outside docs reported as delete plus add' {

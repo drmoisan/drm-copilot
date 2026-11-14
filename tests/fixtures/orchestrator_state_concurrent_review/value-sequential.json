@@ -1,0 +1,8 @@
+{
+  "name": "value-sequential",
+  "notes": "The value sequential does not activate the rule.",
+  "checkpoint": {
+    "review_mode": "sequential"
+  },
+  "expected_errors": []
+}

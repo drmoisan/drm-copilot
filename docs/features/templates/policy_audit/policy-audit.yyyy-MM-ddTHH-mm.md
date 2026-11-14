@@ -24,7 +24,7 @@
 ---
 
 **Audit Date:** [YYYY-MM-DD]  
-**Code Under Test:** [List all files modified across all languages]
+**Code Under Test:** merge base `[merge-base SHA]` of the base branch and reviewed head `[head SHA]`; the diff between them lists the changed files
 
 **Coverage Metrics by Language:**
 
@@ -45,11 +45,15 @@
 - PowerShell post-change coverage artifact: [path or `N/A - out of scope`]
 - Per-language comparison summary: [section reference or artifact path]
 
-**Non-negotiable verdict rule:** No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope, plus changed/new-code coverage when required.
+Baseline coverage is read from the plan's `Phase 0 baseline` artifact, one run of the language's gate. A baseline cell or field records `N/A - no pre-change run` only for a new file or for a plan written before the `Phase 0 baseline` rule that captured static baselines only.
+
+**Non-negotiable verdict rule:** No policy audit may report PASS unless it includes numeric baseline and post-change coverage metrics for every language in scope (or `N/A - no pre-change run` where that record applies), plus changed/new-code coverage when required.
 
 **Fail-closed rule:** If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the verdict must be BLOCKED or INCOMPLETE, never PASS.
 
 **Evidence rule:** Do not synthesize or backfill missing audit evidence from memory or inference. If evidence is missing, stop and list the exact missing artifact paths.
+
+**CI-proven checks:** Format, lint, and type-check results are read from the final-QC static artifact of each language and are not re-run during the review. Each CI check the review relies on is recorded in `## CI Cross-check`, which the orchestrator compares with CI at the reviewed head.
 
 ---
 
@@ -94,8 +98,9 @@
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Baseline Coverage Documented** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Baseline (pre-development):** [N]% lines, [N]% functions<br>**Command:** `[coverage command]`<br>**Timestamp:** [YYYY-MM-DD HH:MM]<br>**Note:** Document baseline BEFORE making changes to avoid re-computation during audit. |
-| **No Coverage Regression** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Post-change coverage:** [N]% lines, [N]% functions<br>**Change:** [+/-N]% lines, [+/-N]% functions<br>**Status:** [No regression / Regression detected: justification]<br>**Example:** "Baseline: 85.2% → Post-change: 87.1% (+1.9%) ✅ PASS" |
+| **Baseline Coverage Documented** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Baseline:** [N]% lines, [N]% functions, read from the `Phase 0 baseline` artifact (or `N/A - no pre-change run`)<br>**Command:** `Invoke-PoshQCParallelTest` or `poetry run pytest -n auto` (one run of the gate)<br>**Artifact:** [path]<br>**Timestamp:** [YYYY-MM-DD HH:MM] |
+| **No Coverage Regression** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Post-change coverage:** [N]% lines, [N]% functions, read from the single gate run<br>**Change:** [+/-N]% lines, [+/-N]% functions against the `Phase 0 baseline`<br>**Status:** [No regression / Regression detected: justification]<br>**Example:** "Baseline: 85.2% → Post-change: 87.1% (+1.9%) ✅ PASS" |
+| **Changed Files Meet Thresholds** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Post-change coverage:** [N]% lines, [N]% functions, read from the single gate run<br>**Thresholds:** [line and branch thresholds that apply]<br>**Status:** [All changed files meet the thresholds / Files below a threshold: list]<br>**Example:** "Post-change: 87.1% against the 85% line threshold ✅ PASS" |
 | **New Code Coverage ≥90%** | [✅/❌/N/A] [PASS/FAIL/N/A] | **New/modified files:** [list files]<br>**New code coverage:** [N]% (must be ≥90%)<br>**Calculation method:** [describe how new code was isolated for measurement]<br>**Example:** "New module `foo.py`: 127/135 lines covered = 94.1% ✅ PASS" |
 | **Comprehensive Coverage** | [✅/❌/N/A] [PASS/FAIL/N/A] | **All functions/classes tested:**<br>- `function_name()` (lines X-Y): [N] tests<br>- `ClassName` (lines A-B): [N] tests<br>**Untested code:** [list with justification]<br>**Example:**<br>- `parse_config()` (lines 45-67): 3 tests<br>- `ConfigLoader` (lines 100-150): 5 tests<br>- Untested: `__repr__()` (trivial representation, no business logic) |
 | **Positive Flows** - Valid inputs | [✅/❌/N/A] [PASS/FAIL/N/A] | **All positive scenarios tested:**<br>- `test_function_with_valid_string`: Tests normal string input → returns expected output<br>- `test_function_with_valid_number`: Tests numeric input in valid range → performs calculation<br>- `test_function_with_default_params`: Tests function with default parameters → uses correct defaults<br>**Total positive tests:** [N] |
@@ -109,7 +114,7 @@
 
 Repeat one bullet per in-scope language that has coverage requirements. Keep the checklist above even when a language is out of scope, but use `N/A - out of scope` for the artifact path.
 
-- [Language]: Baseline: [N]% [unit] -> Post-change: [N]% [unit]. Change: [+/-N]% [unit delta]. New/changed-code coverage: [N]% or `N/A - out of scope`. Disposition: [PASS/FAIL/N/A]. Evidence: [artifact path(s)].
+- [Language]: Baseline: [N]% [unit] (from the `Phase 0 baseline` artifact, or `N/A - no pre-change run`) -> Post-change: [N]% [unit]. Change: [+/-N]% [unit delta] (or N/A). New/changed-code coverage: [N]% or `N/A - out of scope`. Disposition: [PASS/FAIL/N/A]. Evidence: [artifact path(s)].
 
 ### 1.3 Test Structure and Diagnostics
 
@@ -208,7 +213,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 | **Formatting with Black** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run black .`<br>**Result:** [Describe result] |
 | **Linting with Ruff** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run ruff check`<br>**Result:** [Describe result] |
 | **Type checking with Pyright** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run pyright`<br>**Result:** [Describe result] |
-| **Testing with Pytest** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run pytest`<br>**Result:** [Describe result] |
+| **Testing with Pytest** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run pytest -n auto`<br>**Result:** [Describe result] |
 
 #### 3A.2 Python Design & Typing
 
@@ -321,7 +326,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 | Requirement | Status | Evidence |
 |------------|--------|----------|
 | **Use Pytest** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe use of Pytest. Note any fixtures or plugins used.] |
-| **Coverage expectation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report coverage metrics. Confirm new code has >= 90% coverage and repo-wide >= 80%.] |
+| **Coverage expectation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report coverage metrics. Confirm new code has >= 90% coverage and repo-wide >= 80%. For the Python repo-wide total, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing it; a local artifact that shows the total below a threshold is still FAIL.] |
 
 #### 4A.2 Test Style and Structure
 
@@ -342,7 +347,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Use Pytest** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run pytest`<br>**Result:** [Describe test results] |
+| **Use Pytest** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `poetry run pytest -n auto`<br>**Result:** [Describe test results] |
 | **No Alternative Test Runners** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm only Pytest is used.] |
 
 ---
@@ -353,8 +358,8 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Use Pester v5.x** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe Pester v5 features used (BeforeAll, BeforeEach, Describe/Context/It, modern Should syntax).] |
-| **Use PoshQC Configuration** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCTest -Root .`<br>**Config:** `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`<br>[Describe configuration updates if any.] |
+| **Use Pester v6.x** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe Pester v6 features used (BeforeAll, BeforeEach, Describe/Context/It, modern Should syntax).] |
+| **Use PoshQC Configuration** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCParallelTest -Root .`<br>**Config:** `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`<br>[Describe configuration updates if any.] |
 | **PowerShell 5.1 & 7.6+ Compatible** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe compatibility testing. Note any version-specific features.] |
 
 #### 4B.2 Test Style and Structure
@@ -379,7 +384,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 
 | Requirement | Status | Evidence |
 |------------|--------|----------|
-| **Use PoshQCTest Command** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCTest -Root .`<br>**Result:** [Describe test results] |
+| **Use PoshQCTest Command** | [✅/❌/N/A] [PASS/FAIL/N/A] | **Command:** `Invoke-PoshQCParallelTest -Root .`<br>**Result:** [Describe test results] |
 | **No Alternative Test Runners** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Confirm only Pester is used through PoshQC.] |
 
 ---
@@ -438,7 +443,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 | Black Formatting | `poetry run black .` | [result] | [✅/❌] |
 | Ruff Linting | `poetry run ruff check` | [result] | [✅/❌] |
 | Pyright Type Checking | `poetry run pyright` | [result] | [✅/❌] |
-| Pytest Tests | `poetry run pytest` | [result] | [✅/❌] |
+| Pytest Tests | `poetry run pytest -n auto` | [result] | [✅/❌] |
 
 **For PowerShell:**
 
@@ -446,10 +451,20 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 |-------|---------|--------|--------|
 | Invoke-Formatter | `Invoke-PoshQCFormat -Root .` | [result] | [✅/❌] |
 | PSScriptAnalyzer | `Invoke-PoshQCAnalyze -Root .` | [result] | [✅/❌] |
-| Pester Tests | `Invoke-PoshQCTest -Root .` | [result] | [✅/❌] |
+| Pester Tests | `Invoke-PoshQCParallelTest -Root .` | [result] | [✅/❌] |
 
 **Notes:**
 [Document any pre-existing failures unrelated to this work. Explain any deviations from clean runs.]
+
+---
+
+## CI Cross-check
+
+[One row per CI check whose result this review relies on: the format, lint, type, and test checks of each changed language, and `quality-checks7 / Code Quality & Tests (3.13)` for the Python total. Claimed outcome is `pass` or `fail` from local evidence; Head is the reviewed head read from `git log` of the branch. An absent or empty section is a reviewer contract error.]
+
+| Check | Claimed outcome | Claimed figure | Head | Source |
+|-------|-----------------|----------------|------|--------|
+| [CI check name] | [pass/fail] | [figure or N/A] | [reviewed head] | [evidence artifact] |
 
 ---
 
@@ -480,32 +495,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 
 ## 9. Summary of Changes
 
-### Commits in This PR/Branch
-
-[List all commits with hashes and brief descriptions]
-
-**Example:**
-1. **[hash]** - [commit message]
-2. **[hash]** - [commit message]
-3. **[hash]** - [commit message]
-
-### Files Modified
-
-[List all files that were created, modified, or deleted]
-
-**Example:**
-
-1. **[path/to/file]** (NEW/MODIFIED/DELETED)
-   - [Description of changes]
-   - [Key points]
-
-2. **[path/to/file]** (NEW/MODIFIED/DELETED)
-   - [Description of changes]
-   - [Key points]
-
-3. **[path/to/file]** (NEW/MODIFIED/DELETED)
-   - [Description of changes]
-   - [Key points]
+[State in one or two sentences what the change does. Do not list commits or files here: the branch log and the diff from the merge base to the reviewed head, named under **Code Under Test**, carry them.]
 
 ---
 
@@ -626,8 +616,8 @@ poetry run ruff check --fix  # auto-fix
 poetry run pyright
 
 # Testing
-poetry run pytest
-poetry run pytest --cov=src/[package] --cov-report=term-missing
+poetry run pytest -n auto
+poetry run pytest -n auto --cov=src/[package] --cov-report=term-missing
 ```
 
 **For PowerShell:**
@@ -639,7 +629,7 @@ Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCFormat -Root .
 Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCAnalyze -Root .
 
 # Testing
-Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCTest -Root .
+Import-Module ./scripts/powershell/PoshQC; Invoke-PoshQCParallelTest -Root .
 ```
 
 ---

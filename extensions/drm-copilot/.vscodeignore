@@ -16,4 +16,5 @@ PUBLISHING.md
 **/*.pyc
 **/*.pyo
 **/*.py
+!resources/claude-customizations/.claude/lib/docs/python/**/*.py
 resources/scripts/**

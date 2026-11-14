@@ -22,36 +22,41 @@ BeforeAll {
 Describe 'Invoke-PoshQCTest pre-run config and path resolution branches (issue #392)' {
     It 'defaults $Root to $PWD.ProviderPath when -Root is not supplied (line 291)' {
         # Arrange: capture the $RootPath argument the default-$Root fallback flows into via the
-        # $ResolveScanConfig seam (reached when -ScanFolders is not supplied).
-        $expectedRoot = $PWD.ProviderPath
-        $capturedRootForScanConfig = $null
+        # $ResolveScanConfig seam (reached when -ScanFolders is not supplied). The location is pinned
+        # and restored in try/finally, as in PR10-OMITTED-ROOT-USES-CURRENT-LOCATION, so the test does
+        # not depend on where the process started (issue #1096).
+        $captured = @{ RootForScanConfig = $null }
 
         # Act
-        Invoke-PoshQCTest -SettingsPath '/config-paths-settings.psd1' -EnsureModule { } -TestPathExists { $true } `
-            -LoadSettings { @{ Run = @{ Path = @('tests') }; Output = @{ Verbosity = 'Detailed' }; TestResult = @{ Enabled = $false }; CodeCoverage = $null } } `
-            -BuildConfiguration {
-            param($Table)
-            [pscustomobject]@{
-                Run          = @{ Path = @{ Value = $Table.Run.Path }; ExcludePath = @{ Value = @() } }
-                TestResult   = @{ Enabled = @{ Value = $false }; OutputPath = @{ Value = $null } }
-                CodeCoverage = $null
-                Output       = @{ Verbosity = 'Normal' }
-            }
-        } -ResolveScanConfig {
-            param([string] $RootPath)
-            Set-Variable -Scope 1 -Name 'capturedRootForScanConfig' -Value $RootPath
-            @()
-        } -EnumerateTests { @() } -Logger { param([string] $Message) [void] $Message } | Out-Null
+        Push-Location -LiteralPath $PSScriptRoot
+        try {
+            $expectedRoot = (Get-Location).ProviderPath
+            Invoke-PoshQCTest -SettingsPath '/config-paths-settings.psd1' -EnsureModule { } -TestPathExists { $true } `
+                -LoadSettings { @{ Run = @{ Path = @('tests') }; Output = @{ Verbosity = 'Detailed' }; TestResult = @{ Enabled = $false }; CodeCoverage = $null } } `
+                -BuildConfiguration {
+                param($Table)
+                [pscustomobject]@{
+                    Run          = @{ Path = @{ Value = $Table.Run.Path }; ExcludePath = @{ Value = @() } }
+                    TestResult   = @{ Enabled = @{ Value = $false }; OutputPath = @{ Value = $null } }
+                    CodeCoverage = $null
+                    Output       = @{ Verbosity = 'Normal' }
+                }
+            } -ResolveScanConfig {
+                param([string] $RootPath)
+                $captured.RootForScanConfig = $RootPath
+                @()
+            } -EnumerateTests { @() } -Logger { param([string] $Message) [void] $Message } | Out-Null
+        } finally {
+            Pop-Location
+        }
 
         # Assert
-        $capturedRootForScanConfig | Should -Be $expectedRoot
+        $captured.RootForScanConfig | Should -Be $expectedRoot
     }
 
     It 'uses supplied -ScanFolders directly and applies the resolved folders to Run.Path (lines 309, 314-316)' {
         # Arrange
-        $capturedResolveRoot = $null
-        $capturedResolveFolders = $null
-        $capturedRunPaths = $null
+        $captured = @{ ResolveRoot = $null; ResolveFolders = $null; RunPaths = $null }
         $resolvedFolders = @('/config-paths-root/src', '/config-paths-root/tests')
 
         # Act
@@ -67,27 +72,27 @@ Describe 'Invoke-PoshQCTest pre-run config and path resolution branches (issue #
             }
         } -ResolveScanFolders {
             param([string] $RootPath, [string[]] $Folders)
-            Set-Variable -Scope 1 -Name 'capturedResolveRoot' -Value $RootPath
-            Set-Variable -Scope 1 -Name 'capturedResolveFolders' -Value $Folders
+            $captured.ResolveRoot = $RootPath
+            $captured.ResolveFolders = $Folders
             $resolvedFolders
         } -EnumerateTests {
             param([string[]] $Paths, [string[]] $Excluded, [scriptblock] $TestPathFn)
             [void] $Excluded
             [void] $TestPathFn
-            Set-Variable -Scope 1 -Name 'capturedRunPaths' -Value $Paths
+            $captured.RunPaths = $Paths
             @()
         } -Logger { param([string] $Message) [void] $Message } | Out-Null
 
         # Assert: -ScanFolders was used directly (no fallback to $ResolveScanConfig), the resolver
         # was invoked with the supplied folders, and the resolved folders replaced Run.Path.
-        $capturedResolveRoot | Should -Be '/config-paths-root'
-        $capturedResolveFolders | Should -Be @('src', 'tests')
-        $capturedRunPaths | Should -Be $resolvedFolders
+        $captured.ResolveRoot | Should -Be '/config-paths-root'
+        $captured.ResolveFolders | Should -Be @('src', 'tests')
+        $captured.RunPaths | Should -Be $resolvedFolders
     }
 
     It 'normalizes a truthy Output.Verbosity setting to Normal (line 322)' {
         # Arrange
-        $capturedVerbosity = $null
+        $captured = @{ Verbosity = $null }
 
         # Act
         Invoke-PoshQCTest -Root '/config-paths-root' -SettingsPath '/config-paths-settings.psd1' -EnsureModule { } -TestPathExists { $true } `
@@ -104,12 +109,12 @@ Describe 'Invoke-PoshQCTest pre-run config and path resolution branches (issue #
             @([pscustomobject]@{ FullName = '/config-paths-root/tests/sample.Tests.ps1' })
         } -InvokePester {
             param($Config)
-            Set-Variable -Scope 1 -Name 'capturedVerbosity' -Value $Config.Output.Verbosity
+            $captured.Verbosity = $Config.Output.Verbosity
             [pscustomobject]@{ Duration = [timespan]::Zero; PassedCount = 1; FailedCount = 0; SkippedCount = 0; InconclusiveCount = 0; NotRunCount = 0; CodeCoverage = $null }
         } -Logger { param([string] $Message) [void] $Message } | Out-Null
 
         # Assert
-        $capturedVerbosity | Should -Be 'Normal'
+        $captured.Verbosity | Should -Be 'Normal'
     }
 
     It 'resolves CodeCoverage.Path entries and creates/relativizes a relative CodeCoverage.OutputPath when coverage is enabled via a raw boolean flag (lines 332, 340-342, 346, 350-354, 356-357, 359)' {

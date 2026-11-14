@@ -3,19 +3,13 @@
 from __future__ import annotations
 
 import json
-import sys
+import tomllib
 from itertools import permutations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
 from drm_copilot_discovery import cli
-
-# tomllib is stdlib only from Python 3.11; the supported floor 3.10 uses tomli.
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 from scripts.dev_tools import build_discovery_runtime as build
 
@@ -54,7 +48,7 @@ class MemoryFileSystem:
             f"{build.SOURCE_ROOT}/py.typed": b"",
             f"{build.PACKAGE_ROOT}/pyproject.toml": (
                 b'[tool.poetry]\nname="drm-copilot-discovery"\nversion="2.0.0"\n'
-                b'[tool.poetry.dependencies]\npython=">=3.10,<4.0"\n'
+                b'[tool.poetry.dependencies]\npython=">=3.11,<4.0"\n'
                 b'PyYAML=">=6.0"\njsonschema="^4.25.1"\n'
                 b'referencing=">=0.37,<0.38"\nlxml=">=5.3.0"\n'
             ),
@@ -139,7 +133,7 @@ def test_project_metadata_matches_runtime_contract() -> None:
     )
     assert targets == main_functions
     dependencies = dict(poetry["dependencies"])
-    assert dependencies.pop("python") == ">=3.10,<4.0"
+    assert dependencies.pop("python") == ">=3.11,<4.0"
     assert sorted(dependencies) == sorted(build.DEPENDENCY_IMPORTS.values())
     includes = [
         entry if isinstance(entry, str) else entry["path"]

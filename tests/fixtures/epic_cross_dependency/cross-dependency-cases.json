@@ -1,0 +1,1066 @@
+{
+  "description": "Issue #1162 cross-epic dependency invariants. Each case builds a checkpoint from the envelope of each listed checkpoint type, its features, and its extra top-level keys, validates it (with require_complete when set), and compares, in order, the errors that begin with EPIC_CROSS_DEPENDENCY_ with expected. Python and TypeScript read every case; PowerShell reads the epic-orchestrator-state cases without require_complete and compares their EPIC_CROSS_DEPENDENCY_VIOLATION errors.",
+  "envelopes": {
+    "epic-orchestrator-state": {
+      "objective": "cross-epic corpus",
+      "route_id": "epic"
+    },
+    "epic-planner-state": {
+      "objective": "cross-epic corpus",
+      "epic_feature_folder": "consumer"
+    }
+  },
+  "cases": [
+    {
+      "name": "absent key",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started"
+        }
+      ],
+      "extra": {},
+      "expected": []
+    },
+    {
+      "name": "empty list",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": []
+        }
+      ],
+      "extra": {},
+      "expected": []
+    },
+    {
+      "name": "valid edge",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": []
+    },
+    {
+      "name": "valid hold record with every field",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "held",
+              "reason": "PREREQ_PR_NOT_FOUND",
+              "prerequisite_pr_number": 41,
+              "prerequisite_merge_commit_sha": "abc",
+              "verified_at": "2026-11-10T00:00:00Z",
+              "integration_merge_commit_sha": "def",
+              "integrated_at": "2026-11-10T00:01:00Z"
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": []
+    },
+    {
+      "name": "value is not a list",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": "provider-epic#1188"
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on must be a list."
+      ]
+    },
+    {
+      "name": "entry is not an object",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            5
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0] must be an object."
+      ]
+    },
+    {
+      "name": "epic is not one plain segment",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "a/b",
+              "integration_branch": "epic/a/b-integration",
+              "issue_num": 1188
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].epic must be a string of one plain segment (A-Z, a-z, 0-9, ., _, -)."
+      ]
+    },
+    {
+      "name": "epic is a dot segment",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "..",
+              "integration_branch": "epic/..-integration",
+              "issue_num": 1188
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].epic must be a string of one plain segment (A-Z, a-z, 0-9, ., _, -)."
+      ]
+    },
+    {
+      "name": "epic is missing",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].epic must be a string of one plain segment (A-Z, a-z, 0-9, ., _, -)."
+      ]
+    },
+    {
+      "name": "integration_branch does not match the epic",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/other-integration",
+              "issue_num": 1188
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].integration_branch must equal epic/provider-epic-integration."
+      ]
+    },
+    {
+      "name": "integration_branch is not a string",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": 5,
+              "issue_num": 1188
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].integration_branch must be a non-empty string."
+      ]
+    },
+    {
+      "name": "integration_branch is empty",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "",
+              "issue_num": 1188
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].integration_branch must be a non-empty string."
+      ]
+    },
+    {
+      "name": "issue_num is not a positive integer",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 0
+            },
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": "1188"
+            },
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": true
+            },
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration"
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].issue_num must be a positive integer.",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[1].issue_num must be a positive integer.",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[2].issue_num must be a positive integer.",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[3].issue_num must be a positive integer."
+      ]
+    },
+    {
+      "name": "status is outside the enum",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "done"
+            },
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": null
+            },
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "Held"
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].status must be one of held, released, integrated, in_main.",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[1].status must be one of held, released, integrated, in_main.",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[2].status must be one of held, released, integrated, in_main."
+      ]
+    },
+    {
+      "name": "hold-record string fields have the wrong type",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "reason": 5,
+              "verified_at": null,
+              "prerequisite_merge_commit_sha": [],
+              "integration_merge_commit_sha": {},
+              "integrated_at": 1
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].reason must be a string.",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].prerequisite_merge_commit_sha must be a string.",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].verified_at must be a string.",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].integration_merge_commit_sha must be a string.",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].integrated_at must be a string."
+      ]
+    },
+    {
+      "name": "prerequisite_pr_number is not a positive integer",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "prerequisite_pr_number": 0
+            },
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "prerequisite_pr_number": "41"
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].prerequisite_pr_number must be a positive integer.",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[1].prerequisite_pr_number must be a positive integer."
+      ]
+    },
+    {
+      "name": "errors are indexed by the raw features position",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        "not-a-feature",
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188
+            }
+          ]
+        },
+        {
+          "issue_num": 1202,
+          "feature_folder": "f-1202",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            5
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[2].cross_epic_depends_on[0] must be an object."
+      ]
+    },
+    {
+      "name": "several errors on one entry keep the field order",
+      "checkpoint_types": [
+        "epic-orchestrator-state",
+        "epic-planner-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": 7,
+              "integration_branch": null,
+              "issue_num": -1,
+              "status": "x"
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].epic must be a string of one plain segment (A-Z, a-z, 0-9, ., _, -).",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].integration_branch must be a non-empty string.",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].issue_num must be a positive integer.",
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].status must be one of held, released, integrated, in_main."
+      ]
+    },
+    {
+      "name": "started feature with a held entry",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "worktree_created",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "held"
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_VIOLATION: 2026-11-10-consumer-1201 is treated as started while cross-epic dependency provider-epic#1188 is not integrated"
+      ]
+    },
+    {
+      "name": "started feature with integrated and in_main entries",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "merged",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "integrated"
+            },
+            {
+              "epic": "other-epic",
+              "integration_branch": "epic/other-epic-integration",
+              "issue_num": 7,
+              "status": "in_main"
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": []
+    },
+    {
+      "name": "unstarted feature with a held entry",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "held"
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": []
+    },
+    {
+      "name": "feature started by worktree_created_at with an entry without status",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "not_started",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188
+            }
+          ],
+          "worktree_created_at": "2026-11-10T00:00:00Z"
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_VIOLATION: 2026-11-10-consumer-1201 is treated as started while cross-epic dependency provider-epic#1188 is not integrated"
+      ]
+    },
+    {
+      "name": "feature without merge_status counts as started",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "c-1201",
+          "depends_on": [],
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "released"
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_VIOLATION: c-1201 is treated as started while cross-epic dependency provider-epic#1188 is not integrated"
+      ]
+    },
+    {
+      "name": "only the unintegrated entry of a started feature is reported",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "pr_open",
+          "cross_epic_depends_on": [
+            {
+              "epic": "other-epic",
+              "integration_branch": "epic/other-epic-integration",
+              "issue_num": 7,
+              "status": "integrated"
+            },
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "released"
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_VIOLATION: 2026-11-10-consumer-1201 is treated as started while cross-epic dependency provider-epic#1188 is not integrated"
+      ]
+    },
+    {
+      "name": "a malformed entry of a started feature gives the shape error only",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "pr_open",
+          "cross_epic_depends_on": [
+            {
+              "epic": 5,
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MALFORMED: features[0].cross_epic_depends_on[0].epic must be a string of one plain segment (A-Z, a-z, 0-9, ., _, -)."
+      ]
+    },
+    {
+      "name": "completion without cross_epic_main_gate",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": true,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "merged",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "in_main"
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MAIN_GATE_INCOMPLETE: cross_epic_main_gate must be released with a verified entry for: provider-epic"
+      ]
+    },
+    {
+      "name": "completion with a held cross_epic_main_gate",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": true,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "merged",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "in_main"
+            }
+          ]
+        }
+      ],
+      "extra": {
+        "cross_epic_main_gate": {
+          "status": "held",
+          "prerequisites": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "pr_number": 90,
+              "merge_commit_sha": "m90",
+              "verified_at": "2026-11-10T00:00:00Z"
+            }
+          ]
+        }
+      },
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MAIN_GATE_INCOMPLETE: cross_epic_main_gate must be released with a verified entry for: provider-epic"
+      ]
+    },
+    {
+      "name": "completion with a released gate missing one epic",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": true,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "merged",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "in_main"
+            }
+          ]
+        },
+        {
+          "issue_num": 1202,
+          "feature_folder": "c-1202",
+          "depends_on": [],
+          "merge_status": "merged",
+          "cross_epic_depends_on": [
+            {
+              "epic": "other-epic",
+              "integration_branch": "epic/other-epic-integration",
+              "issue_num": 7,
+              "status": "in_main"
+            }
+          ]
+        }
+      ],
+      "extra": {
+        "cross_epic_main_gate": {
+          "status": "released",
+          "prerequisites": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "pr_number": 90,
+              "merge_commit_sha": "m90",
+              "verified_at": "2026-11-10T00:00:00Z"
+            }
+          ]
+        }
+      },
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MAIN_GATE_INCOMPLETE: cross_epic_main_gate must be released with a verified entry for: other-epic"
+      ]
+    },
+    {
+      "name": "completion with an unverified gate entry",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": true,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "merged",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "in_main"
+            }
+          ]
+        }
+      ],
+      "extra": {
+        "cross_epic_main_gate": {
+          "status": "released",
+          "prerequisites": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "pr_number": 0,
+              "merge_commit_sha": "m90",
+              "verified_at": "2026-11-10T00:00:00Z"
+            }
+          ]
+        }
+      },
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MAIN_GATE_INCOMPLETE: cross_epic_main_gate must be released with a verified entry for: provider-epic"
+      ]
+    },
+    {
+      "name": "completion with a non-list prerequisites value",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": true,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "merged",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "in_main"
+            }
+          ]
+        }
+      ],
+      "extra": {
+        "cross_epic_main_gate": {
+          "status": "released",
+          "prerequisites": "provider-epic"
+        }
+      },
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MAIN_GATE_INCOMPLETE: cross_epic_main_gate must be released with a verified entry for: provider-epic"
+      ]
+    },
+    {
+      "name": "completion lists every missing epic in first-seen order",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": true,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "merged",
+          "cross_epic_depends_on": [
+            {
+              "epic": "other-epic",
+              "integration_branch": "epic/other-epic-integration",
+              "issue_num": 7,
+              "status": "in_main"
+            },
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "in_main"
+            }
+          ]
+        }
+      ],
+      "extra": {
+        "cross_epic_main_gate": "released"
+      },
+      "expected": [
+        "EPIC_CROSS_DEPENDENCY_MAIN_GATE_INCOMPLETE: cross_epic_main_gate must be released with a verified entry for: other-epic, provider-epic"
+      ]
+    },
+    {
+      "name": "completion with a released gate covering every epic",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": true,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "merged",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "in_main"
+            },
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1189,
+              "status": "in_main"
+            }
+          ]
+        }
+      ],
+      "extra": {
+        "cross_epic_main_gate": {
+          "status": "released",
+          "prerequisites": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "pr_number": 90,
+              "merge_commit_sha": "m90",
+              "verified_at": "2026-11-10T00:00:00Z"
+            }
+          ]
+        }
+      },
+      "expected": []
+    },
+    {
+      "name": "completion without the key needs no gate",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": true,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "merged"
+        }
+      ],
+      "extra": {},
+      "expected": []
+    },
+    {
+      "name": "completion with an empty list needs no gate",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": true,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "merged",
+          "cross_epic_depends_on": []
+        }
+      ],
+      "extra": {},
+      "expected": []
+    },
+    {
+      "name": "plain validation ignores an absent gate",
+      "checkpoint_types": [
+        "epic-orchestrator-state"
+      ],
+      "require_complete": false,
+      "features": [
+        {
+          "issue_num": 1201,
+          "feature_folder": "2026-11-10-consumer-1201",
+          "depends_on": [],
+          "merge_status": "merged",
+          "cross_epic_depends_on": [
+            {
+              "epic": "provider-epic",
+              "integration_branch": "epic/provider-epic-integration",
+              "issue_num": 1188,
+              "status": "in_main"
+            }
+          ]
+        }
+      ],
+      "extra": {},
+      "expected": []
+    }
+  ]
+}

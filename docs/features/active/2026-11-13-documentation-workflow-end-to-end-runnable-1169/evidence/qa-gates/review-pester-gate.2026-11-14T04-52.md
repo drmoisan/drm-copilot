@@ -1,0 +1,15 @@
+# Reviewer Pester Gate at the Reviewed Head (Re-audit After the Second Main Sync)
+
+Timestamp: 2026-11-14T04-52
+Command: sh SCRATCH/issue-1169-pester.sh review2 (cd <worktree root>; pwsh 7: Import-Module ./scripts/powershell/PoshQC/PoshQC.psd1 -Force; $r = Invoke-PoshQCParallelTest -Root <worktree root>; exit $r.ExitCode); then reviewer parse of artifacts/pester/pester-junit.xml and artifacts/pester/powershell-coverage.xml
+EXIT_CODE: 0
+Output Summary:
+- Head: e94b2c38dd0d270a1043c98b9cd5888605721ce7. Merge base: 063504dc4b2ea08a2c5bd39b57d70ce5963815ed (origin/main at review time). The worktree was clean before the run.
+- Reason for the run: the executor's post-merge Pester run (post-main-sync-gates.2026-11-14T04-34.md) wrote the coverage report at 04:30:21Z, before the merge commit 0f0db27cb (committed 04:34:24Z), which is the newest commit touching PowerShell files. This run refreshes the report at the reviewed head.
+- Gate: one Invoke-PoshQCParallelTest run, 8 shard processes, every shard exit 0, wall-clock 805.43 s; merged reports written at 04:51:38Z.
+- JUnit: 24065 tests, 24055 passed, 0 failures, 0 errors, 10 skipped.
+- Named suites (tests, 0 failures each): claude-hooks enforce-orchestration-preimplementation-gate.DocsEstate 52; codex-hooks enforce-orchestration-preimplementation-gate-docs 55; claude-hooks enforce-orchestration-preimplementation-gate.Cleanup 41; codex-hooks enforce-orchestration-preimplementation-gate-cleanup 36; enforce-model-routing-receipt.Cleanup 9; enforce-model-routing-receipt.DocsEstate 33; claude-hooks enforce-orchestration-preimplementation-gate.BookkeepingLeg 46; codex-hooks enforce-orchestration-preimplementation-gate-bookkeeping-leg 47; docs-estate-workflow.EndToEnd 11; hook-docs-estate-context 52; hook-docs-estate-context.Parity 3; hook-dependency-guard-completeness 743; enforcement-hooks-no-python-invocation 35; legacy-codex-hook-contracts 44; enforce-gate-suites.EpicStateIsolation.Discovery 573; enforce-docs-complete-gate 156; documentation-workflow.CommitStage 42.
+- Repo-wide line coverage: 95.94% (40128 of 41827).
+- Per-file line coverage of the branch's production files: enforce-docs-complete-gate.ps1 95.00%; enforce-model-routing-receipt-docs.ps1 95.06%; enforce-model-routing-receipt.ps1 96.00%; Claude enforce-orchestration-preimplementation-gate-docs.ps1 97.04%; Codex copy 93.33%; Claude enforce-orchestration-preimplementation-gate.ps1 96.47%; Codex copy 100.00%; hook-docs-estate-context.ps1 100.00% (both); Claude hook-docs-only-diff.ps1 98.46%; Codex copy 97.69%; DocsCompleteGate.psm1 100.00%; DocsLedgerCommands.psm1 99.67%; DocsProfileCommands.psm1 97.33%; DocsReceiptRevision.psm1 100.00%; DocsValidateCommands.psm1 100.00%; Invoke-DocsCommand.ps1 90.82%.
+- Changed-line coverage against the merge base 063504dc4 (instrumented added lines of the 17 production files): 97.41% (677 of 695).
+- The repo-wide and per-file figures equal those recorded by the executor in post-main-sync-gates.2026-11-14T04-34.md.

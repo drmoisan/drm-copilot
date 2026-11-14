@@ -17,9 +17,19 @@ param()
 #>
 
 Describe 'enforce-completion-consistency.ps1 default reader against committed fixtures (issue #736)' {
+
+    BeforeEach {
+        # Restore only committed-fixture reads for this test; other paths retain the null baseline.
+        Mock Get-CheckpointFileContent -MockWith {
+            if ($Path -notlike "$($script:FixturesRoot)*") { throw 'Unexpected real-reader call outside fixture paths' }
+            & $script:FixtureReader_36023d51_GetCheckpointFileContent @PesterBoundParameters
+        }
+    }
     BeforeAll {
         $script:UnderTest = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-completion-consistency.ps1").Path
         . $script:UnderTest
+        # Capture the committed-fixture reader while retaining the null isolation baseline.
+        $script:FixtureReader_36023d51_GetCheckpointFileContent = (Get-Command -Name Get-CheckpointFileContent -CommandType Function).ScriptBlock
         Mock Get-CheckpointFileContent -ParameterFilter { $Path -notlike "$($script:FixturesRoot)*" } -MockWith { $null }
 
         $script:FixturesRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../fixtures/worktree-resolution')).Path
@@ -56,7 +66,7 @@ Describe 'enforce-completion-consistency.ps1 default reader against committed fi
                 [Parameter(Mandatory)]
                 [string] $Json
             )
-            return Invoke-CompletionConsistencyDecision -ToolInputRaw $Json -FolderExistsCheck { param($p) $true } -RoutingMatrixReader { $null }
+            return Invoke-CompletionConsistencyDecision -ToolInputRaw $Json -FolderExistsCheck { param($p) $true } -RoutingMatrixReader { $null } -WorktreeListInvoker { param($SessionRoot) $null = $SessionRoot; '' }
         }
     }
 

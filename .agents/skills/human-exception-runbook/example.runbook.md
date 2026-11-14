@@ -27,7 +27,12 @@ Act on this runbook when the orchestrator records an `exception` response for th
 
 - After step 7, each affected permission row shows the status **Granted for <tenant>** with a green check mark.
 - Re-open **API permissions** and confirm no permission remains in the "Not granted" state.
-- Optionally, confirm programmatically that the consent exists by querying the service principal's OAuth2 permission grants with the Microsoft Graph CLI or `az ad`.
+- Optionally, confirm programmatically that the consent exists by querying the service principal's OAuth2 permission grants with the Microsoft Graph CLI or `az ad`:
+
+```sh
+az ad app permission list-grants --id <application-client-id>
+```
+Version check: az not pinned in this repository
 
 ## Source and Citation
 

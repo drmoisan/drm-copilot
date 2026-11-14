@@ -8,7 +8,12 @@ Copilot `.github`, and their bundled copies).
 
 from __future__ import annotations
 
+import datetime as dt
+import re
 from pathlib import Path
+from zoneinfo import ZoneInfo
+
+from scripts.dev_tools.plan_gate_document import PLAN_GUIDELINE_CUTOFF
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 _RESOURCES = _REPO_ROOT / "extensions" / "drm-copilot" / "resources"
@@ -62,8 +67,29 @@ _RULE_TOKENS = (
     "| **G13** |",
     "G1 through G13 are the complete shipped set.",
     "`scripts/dev_tools/plan_gate_document.py` evaluates G11, G12, and G13",
-    "`PLAN_TASK_GUIDELINE` (40)",
-    "`PLAN_LINE_GUIDELINE` (400)",
+    "`PLAN_TASK_GUIDELINE` (20)",
+    "`PLAN_LINE_GUIDELINE` (250)",
+    "`LEGACY_PLAN_TASK_GUIDELINE` (40)",
+    "`LEGACY_PLAN_LINE_GUIDELINE` (400)",
+    "`PLAN_STAMP_ZONES`",
+    "`PLAN_GUIDELINE_CUTOFF`",
+)
+_STAMP_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}")
+_TS_DOCUMENT_MODULE = (
+    _REPO_ROOT
+    / "extensions"
+    / "drm-copilot"
+    / "src"
+    / "lib"
+    / "validate"
+    / "plan-gate-document.ts"
+)
+_RULE_CUTOFF_RE = re.compile(
+    r"`PLAN_GUIDELINE_CUTOFF` \(America/New_York `([^`]+)`, UTC `([^`]+)`\)"
+)
+_TS_CUTOFF_RE = re.compile(
+    r"export const PLAN_GUIDELINE_CUTOFF[^{]*\{"
+    r'\s*"America/New_York": "([^"]+)",\s*"?UTC"?: "([^"]+)"'
 )
 _CORPUS_NOTE = (
     "The corpus measurement informed the false-positive class list and did not "
@@ -128,6 +154,39 @@ def test_rule_file_bundle_copy_is_byte_identical_for_g13() -> None:
     # Assert
     assert bundled == repository, "bundled plan-acceptance-gates.md differs"
     assert b"| **G13** |" in bundled
+
+
+def test_cutoff_value_is_identical_in_rule_file_and_both_validators() -> None:
+    """The committed cutoff pair is one instant, stated identically three times.
+
+    The pair is read from the Python module, the TypeScript module, and the
+    rule file's cutoff token. Its UTC entry, read as a UTC minute and
+    converted to America/New_York, formats to its New York entry; no clock is
+    read.
+    """
+
+    # Arrange
+    rule_match = _RULE_CUTOFF_RE.search(_RULE_FILE.read_text(encoding="utf-8"))
+    ts_match = _TS_CUTOFF_RE.search(_TS_DOCUMENT_MODULE.read_text(encoding="utf-8"))
+    assert rule_match is not None, "rule file lacks the cutoff token"
+    assert ts_match is not None, "plan-gate-document.ts lacks the cutoff literal"
+    python_pair = (
+        PLAN_GUIDELINE_CUTOFF["America/New_York"],
+        PLAN_GUIDELINE_CUTOFF["UTC"],
+    )
+
+    # Act
+    utc_minute = dt.datetime.strptime(python_pair[1], "%Y-%m-%dT%H-%M").replace(
+        tzinfo=dt.UTC
+    )
+    new_york = utc_minute.astimezone(ZoneInfo("America/New_York"))
+
+    # Assert
+    assert set(PLAN_GUIDELINE_CUTOFF) == {"America/New_York", "UTC"}
+    assert rule_match.groups() == python_pair, f"rule file pair {rule_match.groups()}"
+    assert ts_match.groups() == python_pair, f"TypeScript pair {ts_match.groups()}"
+    assert all(_STAMP_RE.fullmatch(entry) for entry in python_pair), python_pair
+    assert new_york.strftime("%Y-%m-%dT%H-%M") == python_pair[0], python_pair
 
 
 def test_plan_contract_copies_carry_design_level_section() -> None:

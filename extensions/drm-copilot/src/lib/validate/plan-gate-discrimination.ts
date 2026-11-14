@@ -3,7 +3,6 @@ import { extractPlanCommands, type PlanCommand } from "./plan-gate-commands";
 import { evaluateDocumentGates } from "./plan-gate-document";
 import { evaluateObservabilityGates } from "./plan-gate-observability";
 import {
-  BLOCKING_CHANNEL,
   covValues,
   emptyPlanGateReport,
   evaluateCovValue,
@@ -220,9 +219,7 @@ function evaluateLiteral(
     "tracked tree and is not quoted in the plan; the search returns zero " +
     "matches whatever the executor does. Quote the exact literal the task " +
     "will create, or assert a literal that exists.";
-  const channel =
-    G5_SEVERITY === BLOCKING_CHANNEL ? report.blocking : report.warnings;
-  channel.push(finding);
+  report.warnings.push(finding);
 }
 
 /**
@@ -268,12 +265,15 @@ function evaluateLiteralRules(
  * @param context Repository seam. When omitted only the context-free rules G1,
  *     G4, G7, G8, G8b, and G10 to G13 run. G10 to G13 are document-level and
  *     can add Blocking findings without a context.
+ * @param planPath Plan-file path, passed to G13 by its own parameter so the
+ *     stamp selects the guideline with or without a context.
  * @returns Blocking and Warning findings in source order. A failing repository
  *     seam degrades to zero literal findings rather than propagating.
  */
 export function evaluatePlanGates(
   text: string,
   context?: PlanGateContext,
+  planPath?: string,
 ): PlanGateReport {
   const report = emptyPlanGateReport();
   const commands = extractPlanCommands(text);
@@ -297,6 +297,6 @@ export function evaluatePlanGates(
   // G10 to G13 are document-level and context-free, so they run on every
   // invocation, G11 to G13 after G10.
   evaluateScratchGate(report, text);
-  evaluateDocumentGates(report, text);
+  evaluateDocumentGates(report, text, planPath);
   return report;
 }

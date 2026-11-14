@@ -5,7 +5,7 @@ Set-StrictMode -Version Latest
 <#
 .SYNOPSIS
     Regression tests for the shipped PoshQC Pester runsettings, the installer Pester minimum, and
-    the Pester major-version ceiling below 6.0 (issue #953, decision D8).
+    the selected Pester 6 range and supported JaCoCo output (issue #1082).
 
 .DESCRIPTION
     Reads the checked-in runsettings and workflow files and builds a Pester configuration in
@@ -41,7 +41,7 @@ Describe 'PoshQC shipped Pester runsettings (issue #953)' {
         ($coverage.UseBreakpoints -is [bool]) | Should -BeTrue
         $coverage.UseBreakpoints | Should -Be $false
         $coverage.Enabled | Should -Be $true
-        $coverage.OutputFormat | Should -BeExactly 'CoverageGutters'
+        $coverage.OutputFormat | Should -BeExactly 'JaCoCo'
         $coverage.OutputPath | Should -BeExactly 'artifacts/pester/powershell-coverage.xml'
         $coverage.CoveragePercentTarget | Should -Be 0
     }
@@ -66,12 +66,12 @@ Describe 'PoshQC shipped Pester runsettings (issue #953)' {
         $coverage.ContainsKey('UseBreakpoints') | Should -BeTrue -Because 'the bundled copy must match the repository copy'
         $coverage.UseBreakpoints | Should -Be $false
         $coverage.Enabled | Should -Be $true
-        $coverage.OutputFormat | Should -BeExactly 'CoverageGutters'
+        $coverage.OutputFormat | Should -BeExactly 'JaCoCo'
     }
 }
 
 Describe 'Install-PoshQCTool Pester minimum (issue #953)' {
-    It 'RS03-INSTALLER-PESTER-590 passes Pester version 5.9.0 to the injected install seam' {
+    It 'RS03-INSTALLER-PESTER-620 passes Pester version 6.2.0 to the injected install seam' {
         # Arrange: no module is present until the install seam records it.
         $installed = @{}
         $installCalls = [System.Collections.Generic.List[object]]::new()
@@ -92,12 +92,12 @@ Describe 'Install-PoshQCTool Pester minimum (issue #953)' {
         # Assert
         $pesterCalls = @($installCalls | Where-Object { $_.Name -eq 'Pester' })
         $pesterCalls.Count | Should -Be 1
-        $pesterCalls[0].Version | Should -BeExactly '5.9.0'
+        $pesterCalls[0].Version | Should -BeExactly '6.2.0'
     }
 
-    It 'RS05-INSTALLER-PESTER-CEILING-BELOW-6 installs Pester 5.9.0 when only Pester 6.0.0 is present' {
-        # Arrange: an installed Pester 6.0.0 must not satisfy the requirement (decision D8).
-        $installed = @{ 'Pester' = @([version]'6.0.0'); 'PSScriptAnalyzer' = @([version]'1.22.0') }
+    It 'RS05-INSTALLER-PESTER-CEILING-BELOW-7 installs Pester 6.2.0 when only Pester 7.0.0 is present' {
+        # Arrange: a future Pester major must not bypass separate compatibility validation.
+        $installed = @{ 'Pester' = @([version]'7.0.0'); 'PSScriptAnalyzer' = @([version]'1.25.0') }
         $installCalls = [System.Collections.Generic.List[object]]::new()
         $findModule = {
             param([string] $Name)
@@ -117,33 +117,33 @@ Describe 'Install-PoshQCTool Pester minimum (issue #953)' {
 
         # Assert
         $pesterCalls = @($installCalls | Where-Object { $_.Name -eq 'Pester' })
-        $pesterCalls.Count | Should -Be 1 -Because 'an installed Pester 6.0.0 is above the ceiling'
-        $pesterCalls[0].Version | Should -BeExactly '5.9.0'
+        $pesterCalls.Count | Should -Be 1 -Because 'an installed Pester 7.0.0 is above the ceiling'
+        $pesterCalls[0].Version | Should -BeExactly '6.2.0'
         @($installCalls | Where-Object { $_.Name -eq 'PSScriptAnalyzer' }).Count | Should -Be 0
     }
 }
 
 Describe 'Invoke-PoshQCTest Pester import ceiling (issue #953)' {
-    It 'RS06-TEST-IMPORT-PESTER-MAXIMUM imports Pester with MaximumVersion 5.99.99 through the default EnsureModule seam' {
+    It 'RS06-TEST-IMPORT-PESTER-MAXIMUM imports Pester with MaximumVersion 6.99.99 through the default EnsureModule seam' {
         InModuleScope PoshQC {
             # Arrange: intercept the import; a nonexistent settings path stops the run right after the seam.
             Mock -CommandName Import-Module -MockWith { }
             # Report a supported Pester so the result does not depend on the modules installed on the host (issue #953, CR-1).
-            Mock -CommandName Get-Module -MockWith { [pscustomobject]@{ Name = 'Pester'; Version = [version]'5.9.5' } }
+            Mock -CommandName Get-Module -MockWith { [pscustomobject]@{ Name = 'Pester'; Version = [version]'6.2.5' } }
 
             # Act
             { Invoke-PoshQCTest -Root '/rs06-root' -SettingsPath '/rs06-missing-settings.psd1' } | Should -Throw '*Settings not found*'
 
             # Assert
             Should -Invoke -CommandName Import-Module -Times 1 -Exactly -ParameterFilter {
-                $Name -eq 'Pester' -and $Global -eq $true -and $MaximumVersion -eq '5.99.99'
+                $Name -eq 'Pester' -and $Global -eq $true -and $MaximumVersion -eq '6.99.99'
             }
         }
     }
 }
 
 Describe 'PoshQC Linux hook job Pester import (issue #953)' {
-    It 'RS07-WORKFLOW-LINUX-PESTER-RANGE imports Pester at minimum 5.9.0 and maximum 5.99.99' {
+    It 'RS07-WORKFLOW-LINUX-PESTER-RANGE imports Pester at minimum 6.2.0 and maximum 6.99.99' {
         # Arrange: collect the body lines of the poshqc-linux-hooks job only.
         $inJob = $false
         $jobLines = foreach ($line in Get-Content -LiteralPath $script:WorkflowPath) {
@@ -159,22 +159,22 @@ Describe 'PoshQC Linux hook job Pester import (issue #953)' {
 
         # Assert
         $imports.Count | Should -Be 1 -Because 'the Linux hook job imports Pester once'
-        $imports[0] | Should -Match '-MinimumVersion 5\.9\.0(\s|$)'
-        $imports[0] | Should -Match '-MaximumVersion 5\.99\.99(\s|$)'
+        $imports[0] | Should -Match '-MinimumVersion 6\.2\.0(\s|$)'
+        $imports[0] | Should -Match '-MaximumVersion 6\.99\.99(\s|$)'
     }
 }
 
 Describe 'Invoke-PoshQCTest Pester presence check and import range (issue #953, CR-1, CR-2)' {
-    It 'RS08-TEST-IMPORT-PESTER-RANGE-BOUNDS queries and imports Pester with minimum 5.9.0 and maximum 5.99.99' {
+    It 'RS08-TEST-IMPORT-PESTER-RANGE-BOUNDS queries and imports Pester with minimum 6.2.0 and maximum 6.99.99' {
         InModuleScope PoshQC {
             # Arrange: one installed Pester is below, one inside, and one above the supported range. The
             # unqualified lookup returns all three; the range-qualified lookup applies the requested bounds.
             Mock -CommandName Get-Module -MockWith {
-                foreach ($version in '3.4.0', '5.9.5', '6.0.0') { [pscustomobject]@{ Name = 'Pester'; Version = [version]$version } }
+                foreach ($version in '3.4.0', '6.2.5', '7.0.0') { [pscustomobject]@{ Name = 'Pester'; Version = [version]$version } }
             }
             Mock -CommandName Get-Module -ParameterFilter { $null -ne $FullyQualifiedName } -MockWith {
                 $range = $FullyQualifiedName[0]
-                foreach ($version in '3.4.0', '5.9.5', '6.0.0') {
+                foreach ($version in '3.4.0', '6.2.5', '7.0.0') {
                     if ([version]$version -ge $range.Version -and [version]$version -le [version]$range.MaximumVersion) {
                         [pscustomobject]@{ Name = 'Pester'; Version = [version]$version }
                     }
@@ -187,22 +187,22 @@ Describe 'Invoke-PoshQCTest Pester presence check and import range (issue #953, 
 
             # Assert: the import carries both bounds, and the presence query carries the same range.
             Should -Invoke -CommandName Import-Module -Times 1 -Exactly -ParameterFilter {
-                $Name -eq 'Pester' -and $Global -eq $true -and $MinimumVersion -eq [version]'5.9.0' -and $MaximumVersion -eq '5.99.99'
+                $Name -eq 'Pester' -and $Global -eq $true -and $MinimumVersion -eq [version]'6.2.0' -and $MaximumVersion -eq '6.99.99'
             }
             Should -Invoke -CommandName Get-Module -Times 1 -Exactly -ParameterFilter {
-                $ListAvailable -and $null -ne $FullyQualifiedName -and $FullyQualifiedName[0].Name -eq 'Pester' -and $FullyQualifiedName[0].Version -eq [version]'5.9.0' -and $FullyQualifiedName[0].MaximumVersion -eq '5.99.99'
+                $ListAvailable -and $null -ne $FullyQualifiedName -and $FullyQualifiedName[0].Name -eq 'Pester' -and $FullyQualifiedName[0].Version -eq [version]'6.2.0' -and $FullyQualifiedName[0].MaximumVersion -eq '6.99.99'
             }
         }
     }
 
-    It 'RS09-TEST-PESTER-6-ONLY-ACTIONABLE-ERROR throws the install message without importing when only Pester 6.0.0 is installed' {
+    It 'RS09-TEST-PESTER-7-ONLY-ACTIONABLE-ERROR throws the install message without importing when only Pester 7.0.0 is installed' {
         InModuleScope PoshQC {
             # Arrange: the only installed Pester is above the ceiling, so the range-qualified lookup returns nothing.
-            Mock -CommandName Get-Module -MockWith { [pscustomobject]@{ Name = 'Pester'; Version = [version]'6.0.0' } }
+            Mock -CommandName Get-Module -MockWith { [pscustomobject]@{ Name = 'Pester'; Version = [version]'7.0.0' } }
             Mock -CommandName Get-Module -ParameterFilter { $null -ne $FullyQualifiedName } -MockWith {
                 $range = $FullyQualifiedName[0]
-                if ([version]'6.0.0' -ge $range.Version -and [version]'6.0.0' -le [version]$range.MaximumVersion) {
-                    [pscustomobject]@{ Name = 'Pester'; Version = [version]'6.0.0' }
+                if ([version]'7.0.0' -ge $range.Version -and [version]'7.0.0' -le [version]$range.MaximumVersion) {
+                    [pscustomobject]@{ Name = 'Pester'; Version = [version]'7.0.0' }
                 }
             }
             Mock -CommandName Import-Module -MockWith { }

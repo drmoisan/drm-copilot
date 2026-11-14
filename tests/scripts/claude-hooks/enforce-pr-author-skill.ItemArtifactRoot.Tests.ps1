@@ -54,6 +54,7 @@ BeforeAll {
 
     Mock Invoke-OrchestratorStatePreflight { @{ HasErrors = $false; ErrorText = '' } }
     Mock Get-PrAuthorCheckpointContent { $null }
+    Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
 
     # Return a Bash PreToolUse payload carrying one command string.
     function New-BashPayload {

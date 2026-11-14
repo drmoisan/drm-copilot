@@ -1,0 +1,39 @@
+{
+  "$schema": "urn:drm-copilot:docs:1.0.0:docs-validation-receipt",
+  "schema_version": "1.0.0",
+  "artifact_kind": "docs-validation-receipt",
+  "id": "example-repo.docs-validation-receipt",
+  "extensions": {},
+  "mode": "docs-complete",
+  "repository": "example-repo",
+  "revision": "0123456789abcdef0123456789abcdef01234567",
+  "inputs": [
+    {"artifact_kind": "docs-profile", "path": "docs/documentation-estate/docs-profile.json", "sha256": "1dc4c27d1f7f57420dfcc1784cbb6bcc390e0fc9b92c4ef9ec3f77daf260799b"},
+    {"artifact_kind": "surface-inventory-snapshot", "path": "docs/documentation-estate/surface-inventory-snapshot.json", "sha256": "7f62a6c9f6f380f34b7ca7b2b05d7d5f2a86a3108209a459fbb3f8b91fa18557"},
+    {"artifact_kind": "docs-coverage-ledger", "path": "docs/documentation-estate/docs-coverage-ledger.json", "sha256": "51d99999e75e67b798fb820a6b6737ffe183335c83665b2c53203bdf437150ce"},
+    {"artifact_kind": "docs-parity-matrix", "path": "docs/documentation-estate/docs-parity-matrix.json", "sha256": "c6cc7f1d05ad5d1dd844802d7b0fdc5a255c2477fb63b258d65b2216543bbec8"},
+    {"artifact_kind": "docs-evidence-pin", "path": "docs/documentation-estate/docs-evidence-pins.json", "sha256": "44aa06f745832a073d28395350b7dced451a270f5dadf12b4825369d68fc7bd9"}
+  ],
+  "counts": {
+    "elements_total": 4,
+    "undocumented": 0,
+    "stale_pages": 0,
+    "by_disposition": {"documented": 2, "excluded": 1, "deferred": 1},
+    "by_kind": {"cli-command": 1, "cli-option": 1, "http-route": 1, "config-key": 1, "public-symbol": 0, "architecture-component": 0}
+  },
+  "validation_result": "pass",
+  "findings": [
+    {
+      "code": "DOCS_EXAMPLE_DEFERRED",
+      "severity": "warning",
+      "artifact_path": "docs/documentation-estate/docs-coverage-ledger.json",
+      "pointer": "/entries/3/disposition",
+      "related_ids": ["http-route-953dac18dfc986f87330003d45e387536b6fa02b8b34b64b49245a2482d5136f"],
+      "related_paths": ["src/example_pkg/routes.py"],
+      "message": "One element is deferred with an owner and a target.",
+      "next_action": "Document the element before its target."
+    }
+  ],
+  "issued_at": "2026-10-30T12:10:00Z",
+  "writer": {"tool": "drm-copilot-docs", "version": "1.0.0"}
+}

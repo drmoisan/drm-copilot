@@ -48,6 +48,14 @@ jobs:
           Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
           Invoke-PoshQCAnalyze -Root "${{ github.workspace }}"
 
+      # Issue #1096: static scan of the Pester tests for state that leaks between test files. It runs no
+      # test; an unallowlisted finding, a stale allowlist entry, or a parse error throws and fails the job.
+      - name: Scan Pester tests for leaked state
+        shell: pwsh
+        run: |
+          Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
+          Invoke-PoshQCLeakScan -Root "${{ github.workspace }}"
+
   # Issue #953 (FR-09, CR-10, CR-11): the Pester suite runs in size-balanced shards. The matrix below is the
   # only place the shard count is written; the poshqc job verifies shard completeness and merges coverage.
   poshqc-shard:
@@ -127,7 +135,7 @@ jobs:
         shell: pwsh
         run: |
           Import-Module "${{ github.workspace }}/scripts/powershell/PoshQC/PoshQC.psm1"
-          Import-Module Pester -MinimumVersion 5.9.0 -MaximumVersion 5.99.99
+          Import-Module Pester -MinimumVersion 6.2.0 -MaximumVersion 6.99.99
           $manifests = @(Get-ChildItem -LiteralPath artifacts/shards -Recurse -Filter shard-files.json | ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName | ConvertFrom-Json })
           Test-PoshQCShardCompleteness -ShardManifest $manifests | Out-Null
           $discovery = New-PesterConfiguration
@@ -188,7 +196,7 @@ jobs:
       - name: Test PowerShell hook suites
         shell: pwsh
         run: |
-          Import-Module Pester -MinimumVersion 5.9.0 -MaximumVersion 5.99.99
+          Import-Module Pester -MinimumVersion 6.2.0 -MaximumVersion 6.99.99
           New-Item -ItemType Directory -Force -Path artifacts/pester | Out-Null
           $config = New-PesterConfiguration
           $config.Run.Path = @('tests/scripts/claude-hooks', 'tests/scripts/codex-hooks')

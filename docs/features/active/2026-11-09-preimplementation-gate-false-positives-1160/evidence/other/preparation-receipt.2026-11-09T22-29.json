@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "stage": "preparation",
+  "issue_num": "1160",
+  "parallel_slug": "harness-learnings-2026-11-09",
+  "branch": "bug/preimplementation-gate-false-positives-1160",
+  "research_path": "docs/features/active/2026-11-09-preimplementation-gate-false-positives-1160/research/research.2026-11-09T21-40.md",
+  "spec_path": "docs/features/active/2026-11-09-preimplementation-gate-false-positives-1160/spec.md",
+  "plan_path": "docs/features/active/2026-11-09-preimplementation-gate-false-positives-1160/plan.2026-11-09T16-36.md",
+  "plan_hash": "67c60ee34c491ed4220b8e0620700669ef85d749",
+  "plan_hash_kind": "git blob object id of the plan file as committed (git hash-object)",
+  "base_commit": "ff9d8afc0a61ac723cd449b0c0658ea42680cd2e",
+  "preflight_status": "PREFLIGHT: ALL CLEAR",
+  "preflight_rounds": 2,
+  "preflight_fix_records": [
+    "docs/features/active/2026-11-09-preimplementation-gate-false-positives-1160/evidence/other/preflight-fixes.2026-11-09T22-14.md",
+    "docs/features/active/2026-11-09-preimplementation-gate-false-positives-1160/evidence/other/preflight-fixes.2026-11-09T22-27.md"
+  ],
+  "recorded_at": "2026-11-09T22:29:52Z"
+}

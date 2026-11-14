@@ -74,7 +74,7 @@ Clean up code, apply security best practices, and enhance design whilst keeping 
 1. **Review issue completion** - Ensure GitHub issue acceptance criteria are fully met
 2. **Ensure green tests** - All tests must pass before refactoring
 3. **Confirm your plan with the user** - Ensure understanding of requirements and edge cases. NEVER start making changes without user confirmation
-4. **Small incremental changes** - Refactor in tiny steps, running tests frequently
+4. **Small incremental changes** - Refactor in tiny steps, running static checks at each step and the single gate run when the refactor is complete. A focused run of one test file to debug a specific failure is debugging only.
 5. **Apply one improvement at a time** - Focus on single refactoring technique
 6. **Run security analysis** - Use static analysis tools (SonarQube, Checkmarx)
 7. **Document security decisions** - Add comments for security-critical code
@@ -89,6 +89,6 @@ Clean up code, apply security best practices, and enhance design whilst keeping 
 - [ ] Security vulnerabilities addressed per issue requirements
 - [ ] Performance considerations applied
 - [ ] All tests remain green
-- [ ] Code coverage maintained or improved
+- [ ] Code coverage meets the thresholds, read from the single gate run
 - [ ] Issue marked as complete or follow-up issues created
 - [ ] Documentation updated as specified in issue

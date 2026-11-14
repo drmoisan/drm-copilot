@@ -1,6 +1,6 @@
 ---
 name: invoke-python-engineer
-description: Invoke the python-typed-engineer worker to design, implement, and verify Python changes within typed repository boundaries. Applies Black -> Ruff -> Pyright -> Pytest toolchain, the 1-3 production-file direct-mode budget with routing to the orchestrated large path above it, and zero-regression quality gates.
+description: Invoke the python-typed-engineer worker to design, implement, and verify Python changes within typed repository boundaries. Applies Black -> Ruff -> Pyright -> Pytest toolchain, the 1-3 production-file direct-mode budget with routing to the orchestrated large path above it, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`.
 ---
 
 # Implement Python Skill
@@ -27,7 +27,7 @@ If the estimated scope is more than 3 production files, this skill defers to the
 ## Output Paths
 
 - Python source and test files within the approved scope.
-- Baseline evidence under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
+- Baseline evidence (static and `Phase 0 baseline` test-suite) under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` per `evidence-and-timestamp-conventions`.
 - This location is canonical per evidence-and-timestamp-conventions and is not overridable. See `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` for the canonical evidence path authority.
 - Plan artifacts under the active feature folder when the task is feature-scoped.
 
@@ -39,7 +39,7 @@ The worker must return the `python-qa-gate` reporting block:
 2. Baseline (Ruff, Pyright, Pytest, coverage status).
 3. Plan (design and test strategy).
 4. Diffs (patch-style or full-file replacements).
-5. QA Gate Results (Ruff, Pyright, Pytest, and coverage deltas, or clearly marked **unverified**).
+5. QA Gate Results (Ruff, Pyright, Pytest, and coverage deltas against the baseline, with failures and per-file coverage read from the single gate run, or clearly marked **unverified**).
 
 ## Delegation Identity Lines
 

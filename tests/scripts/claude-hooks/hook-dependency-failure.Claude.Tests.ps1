@@ -37,11 +37,13 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path -replace '\\', '/'
         . (Join-Path $PSScriptRoot '../claude-runtime/HookDependencyGraph.Helpers.ps1')
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        Reset-EpicStateProbeModuleBinding
         Register-EpicStateBaselineMock -Seam 'Get-CleanupWorktreeManifestContent', 'Get-EpicScopeCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
         if (Get-Command Get-ArtifactFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ArtifactFileContent' -Surface 'Codex' }
         if (Get-Command Get-ChangedLanguageSet -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChangedLanguageSet' -Surface 'Codex' }
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-CheckpointFileContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-CheckpointFileContent' -Surface 'Codex' }
+        if (Get-Command Read-OwnerDirectiveFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Read-OwnerDirectiveFileText' -Surface 'Codex' }
         if (Get-Command Get-ChildOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ChildOrchestratorCheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-EpicCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicCheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-EpicOrchestratorCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicOrchestratorCheckpointContent' -Surface 'Codex' }
@@ -75,6 +77,8 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
             '.claude/hooks/enforce-completion-consistency.ps1'               = 'COMPLETION_CONSISTENCY_BLOCKED:'
             '.claude/hooks/enforce-discovery-artifact-gate.ps1'              = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
             '.claude/hooks/enforce-discovery-planning-gate.ps1'              = 'DISCOVERY_PLANNING_GATE_BLOCKED:'
+            '.claude/hooks/enforce-docs-complete-gate.ps1'                   = 'DOCS_COMPLETE_GATE_BLOCKED:'
+            '.claude/hooks/enforce-docs-role-write-scope.ps1'                = 'DOCS_ROLE_WRITE_SCOPE_BLOCKED:'
             '.claude/hooks/enforce-epic-invocation-origin.ps1'               = 'EPIC_INVOCATION_ORIGIN_BLOCKED:'
             '.claude/hooks/enforce-epic-merge-gate.ps1'                      = 'EPIC_MERGE_GATE_BLOCKED:'
             '.claude/hooks/enforce-epic-wave-barrier.ps1'                    = 'EPIC_WAVE_BARRIER_BLOCKED:'
@@ -85,6 +89,7 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
             '.claude/hooks/enforce-mermaid-validation.ps1'                   = 'MERMAID_VALIDATION_BLOCKED:'
             '.claude/hooks/enforce-model-routing-receipt.ps1'                = 'MODEL_ROUTING_RECEIPT_BLOCKED:'
             '.claude/hooks/enforce-orchestration-preimplementation-gate.ps1' = 'PREIMPLEMENTATION_GATE_BLOCKED:'
+            '.claude/hooks/enforce-owner-directive-pass-down.ps1'            = 'OWNER_DIRECTIVE_PASS_DOWN_BLOCKED:'
             '.claude/hooks/enforce-parallel-abandon-gate.ps1'                = 'enforce-parallel-abandon-gate:'
             '.claude/hooks/enforce-parallel-cohort-barrier.ps1'              = 'PARALLEL_COHORT_BARRIER_BLOCKED:'
             '.claude/hooks/enforce-parallel-drift-gate.ps1'                  = 'PARALLEL_DRIFT_GATE_BLOCKED:'
@@ -94,8 +99,11 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
             '.claude/hooks/enforce-prd-feature-before-planner.ps1'           = 'PRD_FEATURE_BLOCKED:'
             '.claude/hooks/enforce-promotion-mcp-only.ps1'                   = 'PROMOTION_MCP_ONLY_BLOCKED:'
             '.claude/hooks/enforce-python-batch-budget.ps1'                  = 'PYTHON_LARGE_PATH_REQUIRED:'
+            '.claude/hooks/enforce-worktree-poetry-venv.ps1'                 = 'WORKTREE_VENV_BLOCKED:'
+            '.claude/hooks/invoke-pretooluse-dispatch.ps1'                   = 'HOOK_DISPATCH_BLOCKED:'
             '.claude/hooks/validate-bash.ps1'                                = 'HOOK_DEPENDENCY_LOAD_FAILED:'
             '.claude/hooks/validate-discovery-artifact-gate.ps1'             = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
+            '.claude/hooks/validate-docs-role-output.ps1'                    = 'DOCS_ROLE_OUTPUT_BLOCKED:'
             '.claude/hooks/validate-feature-review-coverage.ps1'             = 'validate-feature-review-coverage:'
             '.claude/hooks/validate-orchestrator-output.ps1'                 = 'ORCHESTRATOR_CHECKPOINT_UNRESOLVED:'
             '.claude/hooks/validate-planner-output.ps1'                      = 'validate-planner-output:'
@@ -141,7 +149,12 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
         $failedDependency = $Dependency
         $failedChildPath = $ChildPath
         if ($Kind -eq 'Module') { Mock Import-Module { throw "simulated load failure: $failedDependency" } -ParameterFilter { $Name -like "*$failedDependency" } }
-        else { Mock Join-Path { throw "simulated load failure: $failedDependency" } -ParameterFilter { $ChildPath -eq $failedChildPath } }
+        else { $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+            Mock Join-Path {
+                # Only the selected dependency fails; other path joins retain native semantics.
+                if ($ChildPath -eq $failedChildPath) { throw "simulated load failure: $failedDependency"; return }
+                & $originalJoinPath @PesterBoundParameters
+            } }
         Mock Read-ClaudeHookRawPayload { '' }
         Mock Resolve-ClaudeHookToolInput { [pscustomobject]@{ IsValid = $false; Anomaly = 'Empty'; Value = $null } }
         $prefix = $script:ReasonPrefix[$Hook]
@@ -169,7 +182,12 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
         # Arrange: no helper function is defined in the test scope, and the helper dot-source fails.
         foreach ($name in 'Add-HookDependencyFailure', 'Test-HookDependencyFailure', 'Get-HookDependencyFailureReason', 'Get-HookDependencyFailureDecision') { Remove-Item -LiteralPath "function:$name" -ErrorAction SilentlyContinue }
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: hook-dependency-guard.ps1' } -ParameterFilter { $ChildPath -eq 'hook-dependency-guard.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'hook-dependency-guard.ps1') { throw 'simulated load failure: hook-dependency-guard.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         # Act
         try {
             . (Get-HookInvocationPath -Left $script:RepoRoot -Right $Hook)
@@ -184,7 +202,12 @@ Describe 'Claude hook dependency-failure behaviour (issue #786)' {
 
     It 'B3: <Event> <Hook> exits 2 with the bootstrap reason when hook-dependency-guard.ps1 fails to load' -ForEach $script:HookRows {
         Mock Import-Module { }
-        Mock Join-Path { throw 'simulated load failure: hook-dependency-guard.ps1' } -ParameterFilter { $ChildPath -eq 'hook-dependency-guard.ps1' }
+        $originalJoinPath = Get-Command Join-Path -CommandType Cmdlet
+        Mock Join-Path {
+            # Only the selected dependency fails; other path joins retain native semantics.
+            if ($ChildPath -eq 'hook-dependency-guard.ps1') { throw 'simulated load failure: hook-dependency-guard.ps1'; return }
+            & $originalJoinPath @PesterBoundParameters
+        }
         try { $result = Invoke-HookProcess -Hook $Hook -HookEvent $Event }
         finally { Initialize-HookDependencyState }
         $result.ExitCode | Should -Be 2

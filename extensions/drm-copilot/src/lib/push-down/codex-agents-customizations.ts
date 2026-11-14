@@ -81,7 +81,10 @@ export const VIRTUAL_RESOURCE_PAIRS: ReadonlyArray<readonly [string, string]> =
  */
 export const VIRTUAL_RESOURCE_DIRECTORIES: ReadonlyArray<
   readonly [string, string]
-> = [[".codex/lib/discovery-validation", "lib/discovery-validation"]];
+> = [
+  [".codex/lib/discovery-validation", "lib/discovery-validation"],
+  [".codex/lib/epic-wave", "lib/epic-wave"],
+];
 
 /**
  * Destination roots answered from {@link VIRTUAL_RESOURCE_PAIRS} and

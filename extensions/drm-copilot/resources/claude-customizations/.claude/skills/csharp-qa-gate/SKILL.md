@@ -1,6 +1,6 @@
 ---
 name: csharp-qa-gate
-description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> xUnit toolchain (with architecture tests), compares against a captured baseline, enforces zero-regression deltas, and produces the required reporting block before the agent declares the change complete.
+description: Final QA gate for C# changes. Executes the full CSharpier -> .NET Analyzers -> Nullable Analysis -> MSTest toolchain (with architecture tests), compares static tool results and the test and coverage results of the single gate run against the Phase A baseline (the `Phase 0 baseline` of the plan), enforces zero-regression deltas, and produces the required reporting block before the agent declares the change complete.
 ---
 
 # C# QA Gate
@@ -12,14 +12,14 @@ Canonical procedure for the Phase D final quality gate that every C# change must
 Use this skill when:
 
 - `csharp-typed-engineer` is about to declare a change complete.
-- An executor has finished applying a planned batch and must verify zero regressions against the baseline captured in Phase A.
+- An executor has reached a phase gate or the final QA loop and must verify zero regressions in the single gate run against the baseline captured in Phase A (the `Phase 0 baseline`). Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 - A reviewer needs to confirm the toolchain was actually run and produced a clean pass.
 
 ## Required Inputs
 
 Before invoking this gate, the agent must have:
 
-- a baseline record produced in Phase A, containing analyzer findings, compiler/nullable diagnostics, xUnit pass/fail status, and per-file coverage status for the in-scope files,
+- a baseline record produced in Phase A (the plan's `Phase 0 baseline`), containing analyzer findings and compiler/nullable diagnostics for the in-scope files and the MSTest pass/fail status and per-file coverage status of one test run,
 - the exact list of touched production and test files,
 - a clean working tree (all planned edits committed to the working copy).
 
@@ -50,13 +50,13 @@ If the environment prevents running any tool, stop and report the change as **un
 
 ## Delta Requirements (Zero-Regression Hard Gate)
 
-Compare the final results to the Phase A baseline. All of the following must hold:
+Compare the final results to the Phase A baseline (the `Phase 0 baseline`), reading test and coverage results from the single gate run. All of the following must hold:
 
 - **Analyzer delta**: 0 new findings across the repository.
 - **Compiler / nullable delta**: 0 new diagnostics across the repository.
-- **xUnit delta**: 0 new failing tests.
-- **Architecture-test delta**: 0 new failing facts in the `*.ArchitectureTests` project.
-- **Per-file coverage delta**: coverage for every touched file is greater than or equal to the baseline for that file.
+- **MSTest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+- **Architecture-test delta**: zero failures and 0 new failing facts in the `*.ArchitectureTests` project.
+- **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
 - **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
 - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
 
@@ -67,16 +67,16 @@ If any delta check fails, the agent must revert or fix immediately and rerun the
 Every completion response must include the following sections:
 
 1. **Scope** — exact file list touched in this change.
-2. **Baseline** — analyzer, compiler/nullable, xUnit, and coverage status recorded in Phase A.
+2. **Baseline** — analyzer, compiler/nullable, MSTest, and coverage status recorded in Phase A.
 3. **Plan** — design and test-strategy summary, referencing the approved plan.
 4. **Diffs** — patch-style or full-file replacements for scoped files only.
-5. **QA Gate Results** — analyzer, compiler/nullable, xUnit, architecture-test, and coverage deltas. If any step could not be run, mark the corresponding line **unverified** and state why.
+5. **QA Gate Results** — analyzer and compiler/nullable deltas, failing-tests deltas from the single gate run and the architecture tests, per-file coverage delta against the baseline and the thresholds, and overall coverage delta when applicable. If any step could not be run, mark the corresponding line **unverified** and state why.
 
 ## Evidence Storage
 
 Persist toolchain output according to `evidence-and-timestamp-conventions`:
 
-- store baseline outputs under `<FEATURE>/evidence/baseline/<timestamp>/`,
+- store baseline outputs (static and `Phase 0 baseline` test-suite) under `<FEATURE>/evidence/baseline/<timestamp>/`,
 - store post-change outputs under `<FEATURE>/evidence/qa-gates/<timestamp>/`,
 - use ISO-8601 UTC timestamps in folder names.
 
@@ -89,4 +89,4 @@ The evidence paths must be referenced in the agent's completion message to satis
 
 - Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
 - Do not add analyzer suppressions, `#pragma warning disable`, `#nullable disable`, or test `[Ignore]` attributes to suppress new findings introduced by the change.
-- Do not report success based on partial or targeted runs alone. Targeted runs are allowed mid-batch, but the final gate requires a full-solution pass.
+- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.

@@ -21,6 +21,14 @@ _CONTRACTS = (
     ".agents/skills/atomic-plan-contract/SKILL.md",
     ".github/skills/atomic-plan-contract/SKILL.md",
 )
+_RESOURCES = "extensions/drm-copilot/resources"
+_CONTRACT_COPIES = (
+    *_CONTRACTS,
+    f"{_RESOURCES}/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md",
+    f"{_RESOURCES}/codex-and-agents-customizations/.agents/skills/"
+    "atomic-plan-contract/SKILL.md",
+    f"{_RESOURCES}/customizations/.github/skills/atomic-plan-contract/SKILL.md",
+)
 _PREFLIGHT_SURFACES = (
     *_CONTRACTS,
     ".claude/agents/atomic-executor.md",
@@ -360,22 +368,37 @@ def test_contract_requires_tests_asserting_changed_existing_behavior() -> None:
     assert lacking == {}, f"changed-behavior rule missing from section: {lacking}"
 
 
-def test_contract_premortem_test_isolation_requires_seeded_pester_shuffle() -> None:
-    """The contract's Test isolation label requires seeded Pester shuffles."""
+def test_contract_premortem_test_isolation_states_parallel_gates() -> None:
+    """Every contract copy states the parallel gates and names no removed run."""
 
-    # Arrange / Act
+    # Arrange
+    removed = (
+        "seeded shuffled",
+        "reversed-order run",
+        "at least three seeds",
+        "file-order run",
+        "isolation runs",
+    )
+
+    # Act
     lacking = _lacking(
-        _CONTRACTS,
+        _CONTRACT_COPIES,
         (
-            "seeded shuffled Jest run with the seed recorded",
-            "reversed-order run of the new or changed Python test modules",
-            "seeded shuffled file-order run of the touched Pester suites with at "
-            "least three seeds",
+            "one `Invoke-PoshQCParallelTest` run",
+            "one `pytest -n auto` run",
+            "Jest through its normal parallel workers",
+            "re-run only after a fix",
         ),
     )
+    # Fold case per copy, so a reintroduced token fails in the copy that holds it.
+    offending = {
+        path: [token for token in removed if token in _read(path).casefold()]
+        for path in _CONTRACT_COPIES
+    }
 
     # Assert
     assert lacking == {}, f"Test isolation definition missing: {lacking}"
+    assert not any(offending.values()), f"contract names removed runs: {offending}"
 
 
 def test_contract_premortem_mirror_parity_requires_brief_update_task() -> None:

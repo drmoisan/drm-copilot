@@ -30,10 +30,14 @@ jobs:
         if: ${{ inputs.run-heavy }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y shellcheck bats
-          # shfmt is not available in apt; install via go or from binary
-          SHFMT_VERSION="3.8.0"
-          curl -sL "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_linux_amd64" -o /tmp/shfmt
+          sudo apt-get install -y bats xz-utils
+          # Match the host and both containers rather than a distro-dependent package.
+          SHELLCHECK_VERSION="0.11.0"
+          curl -fsSL "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" -o /tmp/shellcheck.tar.xz
+          tar -xJf /tmp/shellcheck.tar.xz -C /tmp
+          sudo install -m 755 "/tmp/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck
+          SHFMT_VERSION="3.14.1"
+          curl -fsSL "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_linux_amd64" -o /tmp/shfmt
           chmod +x /tmp/shfmt
           sudo mv /tmp/shfmt /usr/local/bin/shfmt
 

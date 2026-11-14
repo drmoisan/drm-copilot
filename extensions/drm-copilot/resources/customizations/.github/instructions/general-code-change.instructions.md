@@ -38,7 +38,7 @@ rather than this bugfix sequence.
 
 3. **Verify locally before review**
    - Re-run the original repro and the new regression test.
-   - Run the full toolchain in order (format → lint → type-check → test) using the repo-standard commands or tasks; rerun from the start if any step changes files or fails.
+   - Run the full toolchain in order (format → lint → type-check → test) using the repo-standard commands or tasks; rerun from the start if any step changes files or fails. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
 ---
 
@@ -141,7 +141,7 @@ Rules for functions:
 
 1. Keep modules **cohesive**:
 
-   - A module/file should have a clear purpose (e.g. “QIF parsing,” “Lexile model,” “corpus download”).
+   - A module/file should have a clear purpose (e.g. “QIF parsing,” “scoring model,” “corpus download”).
    - Avoid dumping unrelated classes/functions into the same file.
    - File size follows a tiered policy that applies to production code, test code, and reusable scripts:
      - **500 lines (guidance):** look for logical ways to divide the file into multiple files, provided the parts can be separated logically. No gate fails at this tier.
@@ -232,7 +232,7 @@ You **must** run the full toolchain in this exact order and repeat it until ever
 3. **Type checking**
 4. **Testing**
 
-Treat these four steps as one **toolchain pass**.
+Treat these four steps as one **toolchain pass**. The toolchain pass is the phase-gate and final-QA requirement; integration tests run in CI for phase gates and the final QA loop. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
 
 1. Run the formatter on the relevant files (e.g. Black).
 
