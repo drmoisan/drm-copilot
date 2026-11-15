@@ -18,6 +18,7 @@ import re
 from pathlib import Path
 from typing import cast
 
+import pytest
 import yaml
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -30,6 +31,24 @@ _COPILOT_INSTRUCTION_BUNDLE = (
     "bash-command-shape.instructions.md"
 )
 _BRIEF = ".claude/skills/execution-environment/SKILL.md"
+_BRIEF_COPIES = (
+    _BRIEF,
+    f"{_RESOURCES}/claude-customizations/.claude/skills/execution-environment/SKILL.md",
+    ".agents/skills/execution-environment/SKILL.md",
+    f"{_RESOURCES}/codex-and-agents-customizations/.agents/skills/"
+    "execution-environment/SKILL.md",
+    ".github/skills/execution-environment/SKILL.md",
+    f"{_RESOURCES}/customizations/.github/skills/execution-environment/SKILL.md",
+)
+_CODEX_SKILL_BUNDLE = (
+    f"{_RESOURCES}/codex-and-agents-customizations/.agents/skills/"
+    "bash-command-shape/SKILL.md"
+)
+# Single-line tokens of the literal-path rule of issue #1188.
+_LITERAL_PATH_TOKENS = (
+    "shell variables do not persist between Bash calls",
+    "literal absolute path",
+)
 _PARALLEL_ORCHESTRATE_COPIES = (
     ".claude/skills/parallel-orchestrate/SKILL.md",
     f"{_RESOURCES}/claude-customizations/.claude/skills/parallel-orchestrate/SKILL.md",
@@ -289,3 +308,33 @@ def test_parallel_orchestrate_step_c_uses_keep_and_references_brief_table() -> N
 
     # Assert
     assert defects == [], "parallel-orchestrate step (c) defects: " + "; ".join(defects)
+
+
+@pytest.mark.parametrize("brief_path", _BRIEF_COPIES)
+def test_brief_command_text_restrictions_forbids_shell_variable_paths(
+    brief_path: str,
+) -> None:
+    """Each brief copy tells agents to write literal paths, never shell variables."""
+
+    # Arrange
+    section = _section("## Command-Text Restrictions", brief_path)
+
+    # Act
+    missing = [token for token in _LITERAL_PATH_TOKENS if token not in section]
+
+    # Assert
+    assert missing == [], f"{brief_path} Command-Text Restrictions lacks {missing}"
+
+
+@pytest.mark.parametrize("skill_path", (_CODEX_SKILL, _CODEX_SKILL_BUNDLE))
+def test_codex_skill_states_literal_path_rule(skill_path: str) -> None:
+    """The Codex skill and its bundle copy state the literal-path rule."""
+
+    # Arrange
+    body = _body(skill_path)
+
+    # Act
+    missing = [token for token in _LITERAL_PATH_TOKENS if token not in body]
+
+    # Assert
+    assert missing == [], f"{skill_path} lacks {missing}"
