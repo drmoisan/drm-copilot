@@ -179,5 +179,5 @@ $script:ClaudeOnlyGateFunction = @(
 )
 $script:CodexOnlyGateFunction = @(
     # Get-CheckpointContent moved to the Codex -epic-scope file under issue #1010.
-    'Get-OrchestrationModeDenyReason'
+    # Get-OrchestrationModeDenyReason moved to the Codex -epic-scope file under issue #1188.
 )
