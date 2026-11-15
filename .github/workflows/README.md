@@ -139,7 +139,7 @@ The 20 contexts below are the `required_status_checks` of ruleset 15241672 read 
 | 6 | `security-scan / Security Scanning` | job runs; every step skipped | `success` |
 | 7 | `quality-checks7 / Code Quality & Tests (3.11)` | matrix expands; every step skipped | `success` |
 | 8 | `quality-checks7 / Code Quality & Tests (3.12)` | same as row 7 | `success` |
-| 9 | `quality-checks7 / Code Quality & Tests (3.13)` | same as row 7 | `success` |
+| 9 | `quality-checks7 / Code Quality & Tests (3.13)` | the `python-coverage-combine` job (issue #1190) runs under `if: always()` with every step gated by `inputs.run-heavy`; the jobs it needs are skipped at job level (rows 25 to 27) | `success` |
 | 10 | `build-check / Build Package` | job runs; every step skipped | `success` |
 | 11 | `poshqc / PowerShell QC shard 1` | the `poshqc-shard` matrix job is skipped at job level, so its matrix name is never expanded | never reports |
 | 12 | `poshqc / PowerShell QC shard 2` | same as row 11 | never reports |
@@ -152,6 +152,14 @@ The 20 contexts below are the `required_status_checks` of ruleset 15241672 read 
 | 19 | `poshqc / PowerShell QC static` | skipped at job level (not a matrix job) | `skipped`, which counts as passing |
 | 20 | `poshqc / PowerShell hook suites (Linux)` | skipped at job level (not a matrix job) | `skipped`, which counts as passing |
 | 21 | `CI Required Gate` (not yet required; the single required context after the post-merge ruleset edit) | runs under `if: always()`; accepts `skipped` for the three skipped callers | `success` |
+| 22 | `poshqc / PowerShell QC shard 4` (issue #1190; not in the ruleset, not required) | same as row 11 | never reports |
+| 23 | `poshqc / PowerShell QC shard 5` (issue #1190; not in the ruleset, not required) | same as row 11 | never reports |
+| 24 | `poshqc / PowerShell QC shard 6` (issue #1190; not in the ruleset, not required) | same as row 11 | never reports |
+| 25 | `quality-checks7 / Python 3.13 static` (issue #1190; not in the ruleset, not required) | skipped at job level (not a matrix job) | `skipped`, which counts as passing |
+| 26 | `quality-checks7 / Python 3.13 coverage shard 1` (issue #1190; not in the ruleset, not required) | the `python-coverage-shard` matrix job is skipped at job level, so its matrix name is never expanded | never reports |
+| 27 | `quality-checks7 / Python 3.13 coverage shard 2` (issue #1190; not in the ruleset, not required) | same as row 26 | never reports |
+
+Issue #1190 restructure of `_quality-checks.yml` and `_poshqc.yml`: `_poshqc.yml` runs the `poshqc-shard` matrix as six shards. In `_quality-checks.yml`, `quality-checks7` keeps Python 3.11 and 3.12 as the compatibility matrix (static checks and tests without coverage). The Python 3.13 leg is three jobs: `python-static-313` (check name `Python 3.13 static`), the `python-coverage-shard` matrix of two shards (check names `Python 3.13 coverage shard <n>`; `scripts/ci/Select-PythonTestShard.ps1` assigns the pytest files by LF-normalized size, and each shard uploads `python-coverage-shard-<n>` with its coverage data, JUnit report, and manifest), and `python-coverage-combine` (check name `Code Quality & Tests (3.13)`, which keeps the former required context). The combine job needs the static and shard jobs, runs under `if: always()`, fails in its first step unless both succeeded, verifies shard completeness and the JUnit test count, combines the shard coverage, enforces the unchanged 85 line and 75 branch thresholds on the JSON report, and uploads to Codecov. A failure in any shard fails the combine context and therefore `CI Required Gate`.
 
 Non-required jobs under `code=false`: `Change scope` reports `success`, `CI full run` is `skipped`, and the `root-typescript-tests` and `npm-audit-gate` callers are `skipped`.
 

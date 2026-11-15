@@ -1,0 +1,6 @@
+# Task check P3-T1
+
+Timestamp: 2026-11-15T00-42
+Command: launcher pytest suite on tests/scripts/dev_tools/test_execution_environment_brief_contracts.py, test_push_down_claude_resource_contracts.py, test_push_down_codex_and_agents_resource_contracts.py, and test_push_down_claude_pack_manifest_completeness.py; black --check, ruff check, and pyright on the changed test file (task selection: the brief contract test, the two byte-parity contract tests, and the manifest completeness test that reads the same bundled files)
+EXIT_CODE: 0
+Output Summary: The execution-environment brief CI Shape section was updated in all six byte-identical copies by one scripted literal replacement that required exactly one match per phrase per copy: PowerShell shards 1 to 6, the Python 3.13 static, shard, and combine jobs with the helper, the docs-only sentences for the new jobs, and the note that the added contexts are not in ruleset 15241672 and are not required. Test updated: a new _ADDED_CONTEXTS tuple (shards 4 to 6, Python 3.13 static, Python 3.13 coverage shards 1 and 2) and three phrase checks join the checked list; _REQUIRED_CONTEXTS is unchanged because the 2026-11-04 ruleset list is historical. Selection run: 54 passed. Ruff reported one over-long comment line on the first check, fixed; Black and Pyright clean.
