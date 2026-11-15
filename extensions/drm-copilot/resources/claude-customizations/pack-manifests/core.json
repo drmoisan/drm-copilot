@@ -64,6 +64,7 @@
     ".claude/hooks/enforce-orchestration-preimplementation-gate-cleanup.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate-commands.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate-operands.ps1",
+    ".claude/hooks/enforce-orchestration-preimplementation-gate-classify.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate-modes.ps1",

@@ -472,3 +472,20 @@ function Get-OrchestrationEpicScopeDecision {
     }
     return Get-OrchestrationPreimplementationGateAllowDecision
 }
+
+# Builds a mode-specific deny reason naming the checkpoint actually consulted and the
+# predicate that failed, behind the unchanged PREIMPLEMENTATION_GATE_BLOCKED prefix
+# that downstream reason-matching reads.
+function Get-OrchestrationModeDenyReason {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $Mode,
+        [Parameter(Mandatory)][string] $Failure
+    )
+
+    $path = Get-OrchestrationDelegationCheckpointPath -Mode $Mode
+    return ("PREIMPLEMENTATION_GATE_BLOCKED: this $Mode-mode delegation was evaluated against " +
+        "$path, and the failed readiness predicate is '$Failure'. Implementation operations " +
+        'require that checkpoint to satisfy every readiness predicate before implementation begins.')
+}

@@ -36,6 +36,7 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-d
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-commands.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-commands.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-classify.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-classify.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-bookkeeping.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-bookkeeping.ps1' -ErrorRecord $_ }
 
 # Every orchestration checkpoint a planner or orchestrator surface writes. Writing one
@@ -168,9 +169,10 @@ function Test-ImplementationCommand {
     $scanText = @(Read-CommandLineSegment -CommandText $normalizedCommand).ScanText
     $isStaging = @('add', 'commit').Where({ Test-CommandLineInvocation -CommandText $normalizedCommand -CommandWord 'git' -SubcommandPath @($_) }).Count -gt 0
 
+    $supplementalIndex = @(Get-OrchestrationGateSupplementalPatternIndex -CommandText $normalizedCommand)
     for ($index = 0; $index -lt $implementationCommandPatterns.Count; $index++) {
         $structural = ($index -eq 0 -and $isStaging)
-        if (-not ($structural -or ($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }))) { continue }
+        if (-not ($structural -or $supplementalIndex -contains $index -or ($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }))) { continue }
         # Stage 2 (issue #1160): a regex-only hit is dropped when every governed word is a mention-host operand.
         if (-not $structural -and -not (Test-OrchestrationGateInvocationConfirmed -CommandText $normalizedCommand -PatternIndex $index)) { continue }
         # Allow-side only (issue #539). Index 0 is the git staging trigger, whose pattern
@@ -315,23 +317,6 @@ function Get-OrchestrationPreimplementationGateBlockDecision {
             permissionDecisionReason = $Reason
         }
     }
-}
-
-# Builds a mode-specific deny reason naming the checkpoint actually consulted and the
-# predicate that failed, behind the unchanged PREIMPLEMENTATION_GATE_BLOCKED prefix
-# that downstream reason-matching reads.
-function Get-OrchestrationModeDenyReason {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory)][string] $Mode,
-        [Parameter(Mandatory)][string] $Failure
-    )
-
-    $path = Get-OrchestrationDelegationCheckpointPath -Mode $Mode
-    return ("PREIMPLEMENTATION_GATE_BLOCKED: this $Mode-mode delegation was evaluated against " +
-        "$path, and the failed readiness predicate is '$Failure'. Implementation operations " +
-        'require that checkpoint to satisfy every readiness predicate before implementation begins.')
 }
 
 function Invoke-OrchestrationPreimplementationGateDecision {

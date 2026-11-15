@@ -123,7 +123,8 @@ function Get-OrchestrationGateHostOperand {
         Records one host's selectors and script operand and returns its operand tokens: git -C only (git
         operands come from rule 1); poetry options, then tokens after the subcommand; npm/npx --prefix/-C;
         pwsh -wd and -File/-f or a positional script (a payload flag ends the scan); a POSIX shell's
-        first non-option token unless a -c cluster is present; any other host, every token.
+        first non-option token unless a -c cluster is present (the values of -o, +o, --rcfile, and
+        --init-file are skipped); any other host, every token.
     #>
     [CmdletBinding()]
     [OutputType([string[]])]
@@ -176,7 +177,7 @@ function Get-OrchestrationGateHostOperand {
         }
         if ($script:OrchestrationGatePosixShells -contains $HostWord) {
             if ($current -cmatch '^-[A-Za-z]*c[A-Za-z]*$') { break }
-            if ($current -ceq '-o' -or $current -ceq '+o') { $position++; continue }
+            if ($current -ceq '-o' -or $current -ceq '+o' -or $current -ceq '--rcfile' -or $current -ceq '--init-file') { $position++; continue }
             if ($current.StartsWith('-') -or $current.StartsWith('+')) { continue }
             Add-OrchestrationGateOperandFinding -State $State -SelectorName 'script operand' -Value $current
             foreach ($argument in @($Token | Select-Object -Skip ($position + 1))) { $operands.Add($argument) }
