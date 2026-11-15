@@ -144,7 +144,7 @@ Ecosystem selection: under the O-2 default each wrapper selects exactly its own 
 
 - Existing per-bundle `pack-manifests/` directories under `extensions/drm-copilot/resources/claude-customizations/` and `extensions/drm-copilot/resources/codex-and-agents-customizations/` keep their location and format (`{ "name", "label", "paths", "source_prefix"? }`), because the Pester `*.Manifest.Tests.ps1` suites and `scripts/dev_tools/generate_codex_agent_variants.py` read them.
 - New Copilot manifests under `extensions/drm-copilot/resources/customizations/pack-manifests/`, same format.
-- One new shared-layer manifest named `shared`, same format, loaded on every run; its bundle location is fixed in the plan.
+- One new shared-layer manifest named `shared`, same format, loaded on every run; its bundle location is fixed in the plan. Its `paths` are exactly the shared-layer set of Behavior 2 (`AGENTS.md`, the shared `.agents/skills/<name>/**` files, and the three shared configuration paths), and the Phase 0 gate, the manifest, the shared-layer tests and the completeness test use that one set.
 - Partitioning `.agents/skills` entries between the shared manifest and the Codex `core.json` keeps every required agent path that the Codex generator `--check` demands.
 
 ## Language Classification
