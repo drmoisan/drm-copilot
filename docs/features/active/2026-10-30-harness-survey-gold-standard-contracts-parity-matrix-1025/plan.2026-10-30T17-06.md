@@ -7,7 +7,7 @@
 - **Status:** Draft
 - **Version:** 3.0 (refresh: spec 0.5 decisions D-R1 to D-R3, Test Cadence and phase gates, parallel-only gates, Pester 6, refreshed skill sets and batch assignment, consolidated tasks). 2.1 (H1) and 2.0 (plan A and plan B split) precede it.
 - **Work Mode:** full-feature
-- **Requirements sources:** `spec.md` (`## Acceptance Criteria`, authoritative, version 0.5), `user-story.md`, `research/research.2026-10-30T21-08.md`, `docs/features/epics/shared-agent-harness-layer/epic.md`
+- **Requirements sources:** `spec.md` (`## Acceptance Criteria`, authoritative, version 0.7, which adds decision D-R6 in `### Owner Decisions`), `user-story.md`, `research/research.2026-10-30T21-08.md`, `docs/features/epics/shared-agent-harness-layer/epic.md`
 - **Companion plan:** `owner-decision-plan.md` in this folder (plan B), delegated by the orchestrator after the owner stop in `## Owner Stop (Orchestrator-Owned, After Plan A)`. This file is the canonical plan path.
 
 ## Required References
