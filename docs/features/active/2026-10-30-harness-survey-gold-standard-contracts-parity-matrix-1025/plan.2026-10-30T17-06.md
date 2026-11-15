@@ -66,7 +66,7 @@ Batch budget (spec decision D-R3): the execution checkpoint selects the `large` 
 
 ## Gate Shape
 
-- Task check (after every task, not a gate): format and PSSA scoped to the PowerShell files the task changed, then the task's test selection per `## Test Cadence (Mandatory)`: the Pester selection runs through the brief's `New-PesterConfiguration` route; a changed Markdown or configuration path selects the contract tests that read it. Evidence `<FEATURE>/evidence/other/task-check.P<N>-T<M>.<timestamp>.md` with the changed files, the selection and its rule, and each command with its exit code. For a contract file under `.agents/skills/**` or its bundle copy, the selection is the Python contract set below plus `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1` and `tests/scripts/claude-runtime/policy-toolchain-naming.Tests.ps1`, which sweep every `.md` file under `.agents/skills` and the Codex bundle.
+- Task check (after every task, not a gate): format and PSSA scoped to the PowerShell files the task changed, then the task's test selection per `## Test Cadence (Mandatory)`: the Pester selection runs through the task-check Pester route that the brief's `## PowerShell Route and PoshQC MCP Limits` states at execution time; a changed Markdown or configuration path selects the contract tests that read it. Evidence `<FEATURE>/evidence/other/task-check.P<N>-T<M>.<timestamp>.md` with the changed files, the selection and its rule, and each command with its exit code. For a contract file under `.agents/skills/**` or its bundle copy, the selection is the Python contract set below plus `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1` and `tests/scripts/claude-runtime/policy-toolchain-naming.Tests.ps1`, which sweep every `.md` file under `.agents/skills` and the Codex bundle.
 - Phase gate (`[phase-gate]` task): stages 1 to 6 across the repository: check-only format (no file rewritten; `git status --porcelain` identical before and after) and PSSA over `scripts` and `tests/scripts`; type check and architecture-boundary stage not applicable (PowerShell, no boundary tool for these modules); unit stage one parallel Pester gate run (`EXIT_CODE:` is the returned `ExitCode` property; pass and fail counts from the merged JUnit file, or from the per-shard files when a shard fails); contract stage the Python contract set and the tier check. A failure or auto-fix is fixed and the loop restarts at stage 1. Evidence `<FEATURE>/evidence/qa-gates/phase-gate.P<N>.<timestamp>.md`; the gate passes when no test fails that did not fail in `pester-baseline` (compared per test file), PSSA reports no finding beyond `pssa-baseline`, and every contract command exits 0.
 - Python contract set (run only; no Python or TypeScript file is added or changed, so neither a `pytest -n auto` nor a Jest gate is in scope; these are the modules found by searching the test tree for `quality-tiers.yml` and `.agents/skills` that read paths this plan adds or edits): `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`, `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py`, `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`, `tests/scripts/dev_tools/test_codex_full_migration_inventory.py`, `tests/scripts/dev_tools/test_quality_tiers_contract_classification.py`; plus `scripts/dev_tools/generate_codex_agent_variants.py` with `--check` and the tier check `scripts/dev_tools/check_quality_tiers.py` in module form.
 - Coverage source (P0-T3, P2-T6, P4-T2): line coverage is read from `artifacts/pester/powershell-coverage.xml` only when the run's returned `ExitCode` is 0; otherwise it is read from the per-shard `powershell-coverage.xml` files under `artifacts/pester/parallel/` merged with `Merge-PoshQCCoverageReport`, because a failed parallel run writes no merged coverage and can leave an older merged file in place. The artifact records which source was used.
@@ -243,31 +243,31 @@ Resume conditions checked by the orchestrator before delegating plan B (it write
 | SPEC-AC-03 Identity evidence | P1-T1 | — |
 | SPEC-AC-04 Per-skill records | P1-T3 to P1-T9, P3-T9 | B P1-T1 (re-run) |
 | SPEC-AC-05 Classification and approval artifact | P3-T8, P3-T9 | B P1-T1 |
-| SPEC-AC-06 Owner decision recorded | — | orchestrator R1; B P0-T2, B P1-T1 |
+| SPEC-AC-06 Owner decision recorded | — | orchestrator R1; B P0-T1, B P1-T1 |
 | SPEC-AC-07 Schema | P2-T1, P3-T10 | — |
-| SPEC-AC-08 Matrix | P3-T1, P3-T10 | B P1-T2, B P1-T3, B P1-T6 |
-| SPEC-AC-09 Contracts | P3-T2 to P3-T7, P3-T10 | B P1-T4, B P1-T6 |
-| SPEC-AC-10 Bundle copies | P3-T2 to P3-T7, P4-T4 | B P1-T5, B P2-T4 |
+| SPEC-AC-08 Matrix | P3-T1, P3-T10 | B P1-T2, B P1-T3, B P1-T5 |
+| SPEC-AC-09 Contracts | P3-T2 to P3-T7, P3-T10 | B P1-T4, B P1-T5 |
+| SPEC-AC-10 Bundle copies | P3-T2 to P3-T7, P4-T4 | B P1-T4, B P2-T4 |
 | SPEC-AC-11 Failure-case unit tests | P2-T3, P2-T6 | — |
-| SPEC-AC-12 Pass case | P2-T3, P3-T10 | B P1-T6 |
+| SPEC-AC-12 Pass case | P2-T3, P3-T10 | B P1-T5, B P2-T2 |
 | SPEC-AC-13 Contract unit tests | P2-T4, P2-T6 | — |
 | SPEC-AC-14 Inventory unit tests | P2-T2, P2-T6 | — |
 | SPEC-AC-15 Required CI check | local gates P3-T11, P4-T2 | orchestrator S9 on `poshqc / PowerShell QC` after plan B |
-| SPEC-AC-16 Coverage | P2-T6, P4-T2, P4-T3 | B P2-T3 |
+| SPEC-AC-16 Coverage | P2-T6, P4-T2, P4-T3 | B P2-T2, B P2-T3 |
 | SPEC-AC-17 Schema validation fallback | P3-T10 | — |
 | SPEC-AC-18 Test isolation (D-R2) | P0-T3, P1-T12, P2-T6, P3-T11, P4-T2 | — |
 | SPEC-AC-19 E5 result | P1-T10 | — |
 | SPEC-AC-20 Runbooks | P1-T11 | — |
-| SPEC-AC-21 Runbook results | — | orchestrator R2; B P1-T3 |
-| SPEC-AC-22 Owner stop recorded | — | orchestrator `## Owner Stop`; B P0-T2 |
-| SPEC-AC-23 No new Python | P4-T6 | B P2-T6 |
-| SPEC-AC-24 File size | P4-T5 | B P2-T5 |
-| SPEC-AC-25 Excluded paths untouched | P4-T6 | B P2-T8 |
-| SPEC-AC-26 Tier classification | P0-T4, P2-T5, P4-T4 | B P2-T4 (re-run) |
+| SPEC-AC-21 Runbook results | — | orchestrator R2; B P0-T1, B P1-T3 |
+| SPEC-AC-22 Owner stop recorded | — | orchestrator `## Owner Stop`; B P0-T1 |
+| SPEC-AC-23 No new Python | P4-T6 | B P2-T5 |
+| SPEC-AC-24 File size | P4-T5 | B P2-T2 |
+| SPEC-AC-25 Excluded paths untouched | P4-T6 | B P2-T5 |
+| SPEC-AC-26 Tier classification | P0-T4, P2-T5, P4-T4 | B P0-T4, B P2-T4 (re-run) |
 | US-AC-PG parity_group on hook, permission, subagent field entries (user-story) | P2-T3, P3-T10 | — |
-| US-AC-CP Copilot entries approved or provisional with issue-keyed `decision_ref` (user-story) | — | B P1-T3, B P1-T6 |
+| US-AC-CP Copilot entries approved or provisional with issue-keyed `decision_ref` (user-story) | — | B P1-T3, B P1-T5 |
 
-Plan-A-only rows (checked off at P4-T8): SPEC-AC-01, 02, 03, 07, 11, 13, 14, 17, 18, 19, 20, 26 and US-AC-PG. Every other row is checked off by plan B, except SPEC-AC-15, which the orchestrator checks off at S9. User-story criteria not in the table restate spec rows and are checked off by plan B P2-T7; the criterion beginning `The completeness gate fails on` is CI-dependent and checked off by the orchestrator at S9. Plan B cites plan A artifacts by name; its own revision is separate and follows this one.
+Plan-A-only rows (checked off at P4-T8): SPEC-AC-01, 02, 03, 07, 11, 13, 14, 17, 18, 19, 20, 26 and US-AC-PG. Every other row is checked off by plan B, except SPEC-AC-15, which the orchestrator checks off at S9. User-story criteria not in the table restate spec rows and are checked off by plan B P2-T6; the criterion beginning `The completeness gate fails on` is CI-dependent and checked off by the orchestrator at S9. Plan B cites plan A artifacts by name; its own revision is separate and follows this one.
 
 ## Citations Re-Checked at Phase 0
 
