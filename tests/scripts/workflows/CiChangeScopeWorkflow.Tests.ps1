@@ -222,6 +222,9 @@ Describe 'issue #962 change-scope workflow gating' {
 
         It 'gates every step of <Job> on inputs.run-heavy in <File> (AC-20)' -ForEach @(
             @{ File = '_quality-checks.yml'; Job = 'quality-checks7' }
+            @{ File = '_quality-checks.yml'; Job = 'python-static-313' }
+            @{ File = '_quality-checks.yml'; Job = 'python-coverage-shard' }
+            @{ File = '_quality-checks.yml'; Job = 'python-coverage-combine' }
             @{ File = '_security-scan.yml'; Job = 'security-scan' }
             @{ File = '_build-check.yml'; Job = 'build-check' }
             @{ File = '_shell-coverage.yml'; Job = 'shell-coverage' }
@@ -246,12 +249,12 @@ Describe 'issue #962 change-scope workflow gating' {
             ([string[]]@($step[0])) -ccontains '        if: ${{ inputs.run-heavy && steps.cached-poetry-dependencies.outputs.cache-hit != ''true'' }}' | Should -BeTrue -Because 'the cache-miss condition is kept inside the run-heavy gate'
         }
 
-        It 'combines run-heavy with the 3.13-only condition in _quality-checks.yml (AC-20)' {
-            $steps = Get-TestStepBlock -JobLines (Get-TestJobLine -FileName '_quality-checks.yml' -JobId 'quality-checks7')
+        It 'gates the Codecov upload of python-coverage-combine on run-heavy only in _quality-checks.yml (AC-20, issue #1190)' {
+            $steps = Get-TestStepBlock -JobLines (Get-TestJobLine -FileName '_quality-checks.yml' -JobId 'python-coverage-combine')
             $step = @($steps | Where-Object { (Get-TestStepName -Step $_) -ceq 'Upload coverage to Codecov' })
 
             $step.Count | Should -Be 1
-            ([string[]]@($step[0])) -ccontains '        if: ${{ inputs.run-heavy && matrix.python-version == ''3.13'' }}' | Should -BeTrue -Because 'the single-leg upload condition is kept inside the run-heavy gate'
+            ([string[]]@($step[0])) -ccontains '        if: ${{ inputs.run-heavy }}' | Should -BeTrue -Because 'the single upload runs in the combine job, whose 3.13 identity replaces the matrix leg condition'
         }
 
         It 'combines run-heavy with the kcov cache-miss condition in _shell-coverage.yml (AC-20)' {

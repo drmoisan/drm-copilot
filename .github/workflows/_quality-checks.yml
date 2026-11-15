@@ -17,12 +17,14 @@ on:
         default: true
 
 jobs:
+  # Python 3.11 and 3.12 run the full static checks and the tests without coverage as a compatibility check.
+  # Coverage is measured and gated on Python 3.13 only, by the three jobs below (issue #1190).
   quality-checks7:
     name: Code Quality & Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12"]
 
     steps:
       - name: Check out repository
@@ -99,28 +101,244 @@ jobs:
           poetry run python -m scripts.dev_tools.check_quality_tiers
         continue-on-error: false
 
-      # Coverage is measured and gated on Python 3.13 only; the other versions run the
-      # same tests without coverage instrumentation as a compatibility check.
       - name: Run tests with Pytest (compatibility, no coverage)
         if: ${{ inputs.run-heavy && matrix.python-version != '3.13' }}
         run: |
           poetry run pytest -n auto
         continue-on-error: false
 
-      - name: Run tests with Pytest and coverage
-        if: ${{ inputs.run-heavy && matrix.python-version == '3.13' }}
+  # The static checks of the Python 3.13 leg run in their own job so that the test shards start in parallel.
+  python-static-313:
+    name: Python 3.13 static
+    if: ${{ inputs.run-heavy }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        if: ${{ inputs.run-heavy }}
+        uses: actions/checkout@v7
+
+      - name: Set up Python 3.13
+        if: ${{ inputs.run-heavy }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        if: ${{ inputs.run-heavy }}
+        uses: snok/install-poetry@v1
+        with:
+          version: 2.5.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        if: ${{ inputs.run-heavy }}
+        id: cached-poetry-dependencies
+        uses: actions/cache@v6
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-3.13-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: ${{ inputs.run-heavy && steps.cached-poetry-dependencies.outputs.cache-hit != 'true' }}
+        run: poetry install --no-interaction --no-root
+
+      - name: Install project
+        if: ${{ inputs.run-heavy }}
+        run: poetry install --no-interaction
+
+      - name: Verify poetry.lock is in sync
+        if: ${{ inputs.run-heavy }}
         run: |
-          poetry run pytest -n auto --cov --cov-branch             --cov-report=xml             --cov-report=json:artifacts/python/coverage.json             --cov-report=term-missing
+          poetry check --lock
+          if ! git diff --exit-code poetry.lock; then
+            echo "ERROR: poetry.lock is out of sync with pyproject.toml"
+            echo "Run 'poetry lock --no-update' locally and commit the changes"
+            exit 1
+          fi
+
+      - name: Check formatting with Black
+        if: ${{ inputs.run-heavy }}
+        run: |
+          poetry run black --check .
+
+      - name: Lint with Ruff
+        if: ${{ inputs.run-heavy }}
+        run: |
+          poetry run ruff check
+
+      - name: Type check with Pyright
+        if: ${{ inputs.run-heavy }}
+        run: |
+          poetry run pyright
+
+      - name: Verify Codex agent deployment profiles
+        if: ${{ inputs.run-heavy }}
+        run: |
+          poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check
+
+      - name: tier-classification
+        if: ${{ inputs.run-heavy }}
+        run: |
+          poetry run python -m scripts.dev_tools.check_quality_tiers
+
+  # Issue #1190: the Python 3.13 tests run in two size-balanced shards. The matrix below is the only place
+  # the shard count is written; the combine job verifies shard completeness and merges coverage.
+  python-coverage-shard:
+    name: Python 3.13 coverage shard ${{ matrix.shard }}
+    if: ${{ inputs.run-heavy }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+
+    steps:
+      - name: Check out repository
+        if: ${{ inputs.run-heavy }}
+        uses: actions/checkout@v7
+
+      - name: Set up Python 3.13
+        if: ${{ inputs.run-heavy }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        if: ${{ inputs.run-heavy }}
+        uses: snok/install-poetry@v1
+        with:
+          version: 2.5.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        if: ${{ inputs.run-heavy }}
+        id: cached-poetry-dependencies
+        uses: actions/cache@v6
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-3.13-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: ${{ inputs.run-heavy && steps.cached-poetry-dependencies.outputs.cache-hit != 'true' }}
+        run: poetry install --no-interaction --no-root
+
+      - name: Install project
+        if: ${{ inputs.run-heavy }}
+        run: poetry install --no-interaction
+
+      - name: Select the test files of this shard
+        if: ${{ inputs.run-heavy }}
+        shell: pwsh
+        run: |
+          ./scripts/ci/Select-PythonTestShard.ps1 -Mode Select -RootPath "${{ github.workspace }}" -ShardIndex ${{ matrix.shard }} -ShardCount ${{ strategy.job-total }}
+
+      # The coverage data file has a non-dot name because upload-artifact skips hidden files.
+      - name: Run tests with Pytest and coverage
+        if: ${{ inputs.run-heavy }}
+        env:
+          COVERAGE_FILE: artifacts/python/coverage-shard-${{ matrix.shard }}.dat
+        run: |
+          mapfile -t shard_files < artifacts/python/shard-files.txt
+          poetry run pytest -n auto --cov --cov-branch --cov-report= --junitxml=artifacts/python/junit-shard-${{ matrix.shard }}.xml "${shard_files[@]}"
         continue-on-error: false
 
+      - name: Upload Python shard coverage artifacts
+        if: ${{ inputs.run-heavy && always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-coverage-shard-${{ matrix.shard }}
+          path: |
+            artifacts/python/coverage-shard-${{ matrix.shard }}.dat
+            artifacts/python/junit-shard-${{ matrix.shard }}.xml
+            artifacts/python/shard-files.json
+          if-no-files-found: error
+
+  # The combine job keeps the required context name of the former Python 3.13 matrix leg. It always starts, and
+  # its first step fails unless the static and shard jobs succeeded.
+  python-coverage-combine:
+    name: Code Quality & Tests (3.13)
+    needs: [python-static-313, python-coverage-shard]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Require the static and shard jobs to succeed
+        if: ${{ inputs.run-heavy }}
+        run: |
+          static_result='${{ needs.python-static-313.result }}'
+          shard_result='${{ needs.python-coverage-shard.result }}'
+          echo "python-static-313: ${static_result}; python-coverage-shard: ${shard_result}"
+          if [ "${static_result}" != "success" ] || [ "${shard_result}" != "success" ]; then
+            exit 1
+          fi
+
+      - name: Check out repository
+        if: ${{ inputs.run-heavy }}
+        uses: actions/checkout@v7
+
+      - name: Set up Python 3.13
+        if: ${{ inputs.run-heavy }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        if: ${{ inputs.run-heavy }}
+        uses: snok/install-poetry@v1
+        with:
+          version: 2.5.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        if: ${{ inputs.run-heavy }}
+        id: cached-poetry-dependencies
+        uses: actions/cache@v6
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-3.13-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: ${{ inputs.run-heavy && steps.cached-poetry-dependencies.outputs.cache-hit != 'true' }}
+        run: poetry install --no-interaction --no-root
+
+      - name: Install project
+        if: ${{ inputs.run-heavy }}
+        run: poetry install --no-interaction
+
+      - name: Download Python shard coverage artifacts
+        if: ${{ inputs.run-heavy }}
+        uses: actions/download-artifact@v8
+        with:
+          pattern: python-coverage-shard-*
+          path: artifacts/shards
+
+      - name: Verify Python shard completeness
+        if: ${{ inputs.run-heavy }}
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts/python | Out-Null
+          poetry run pytest --collect-only -q | Set-Content -LiteralPath artifacts/python/collect.txt
+          ./scripts/ci/Select-PythonTestShard.ps1 -Mode Verify -RootPath "${{ github.workspace }}" -ShardRoot artifacts/shards -CollectCountText ((Get-Content -LiteralPath artifacts/python/collect.txt | Select-Object -Last 3) -join "`n")
+
+      - name: Combine Python shard coverage
+        if: ${{ inputs.run-heavy }}
+        run: |
+          poetry run coverage combine artifacts/shards/python-coverage-shard-*/coverage-shard-*.dat
+          poetry run coverage xml -o coverage.xml
+          poetry run coverage json -o artifacts/python/coverage.json
+
       - name: Enforce Python coverage thresholds
-        if: ${{ inputs.run-heavy && matrix.python-version == '3.13' }}
+        if: ${{ inputs.run-heavy }}
         run: |
           poetry run python -m scripts.dev_tools.check_python_coverage_thresholds             --report artifacts/python/coverage.json             --min-line 85 --min-branch 75
         continue-on-error: false
 
       - name: Upload coverage to Codecov
-        if: ${{ inputs.run-heavy && matrix.python-version == '3.13' }}
+        if: ${{ inputs.run-heavy }}
         uses: codecov/codecov-action@v7
         with:
           files: ./coverage.xml
