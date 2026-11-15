@@ -175,7 +175,8 @@ $script:ClassificationFalsePositiveCase = @(
 
 $script:ClassificationNonGoalCase = @(
     @{ Id = 'NG-01'; Command = '.venv/bin/pytest'; Expected = $false }
-    @{ Id = 'NG-02'; Command = 'npx --yes jest'; Expected = $false }
+    # NG-02 (npx --yes jest) is removed: issue #1188 classifies npx options before the tool word, and the
+    # command is now a positive row of enforce-orchestration-preimplementation-gate-classify.Cases.ps1.
     @{ Id = 'NG-03'; Command = 'node run-jest.cjs'; Expected = $false }
     @{ Id = 'NG-04'; Command = 'npm test'; Expected = $false }
     @{ Id = 'NG-05'; Command = 'Invoke-PoshQCParallelTest'; Expected = $false }

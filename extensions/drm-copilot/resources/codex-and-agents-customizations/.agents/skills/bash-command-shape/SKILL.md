@@ -37,3 +37,7 @@ The Bash working directory of an agent-isolated worktree is already the worktree
 A non-isolated agent working in a sibling worktree has its Bash working directory reset to the session root on each call, so a `cd` does not carry over to the next call. Use the `-C`, `--prefix`, or absolute-path forms in the table, or write the steps to a script under `<SCRATCH>` and run it as `sh <SCRATCH>/<file>.sh`. Do not pass a test path relative to the worktree to `poetry -C <abs> run`; use an absolute path or the `sh` route.
 
 The complete set of command-text restrictions is in `## Command-Text Restrictions` of the `execution-environment` skill.
+
+## Literal Paths
+
+Because shell variables do not persist between Bash calls and hooks read command text literally, write every worktree path, file path, and feature-folder path as a literal absolute path in each command, never as `$W` or `$F`. Put multi-step work in a `sh <SCRATCH>/<file>.sh` script that holds the literal paths.
