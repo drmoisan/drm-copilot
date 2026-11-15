@@ -56,28 +56,28 @@ On PR runs, shards also waited for runners when several PRs ran CI at once, so P
 ## Acceptance Criteria
 
 - [ ] `_poshqc.yml` declares the owner-specified PowerShell shard count stated in Behavior; the completeness check, coverage merge, and Pester discovery count comparison pass in a CI run.
-- [ ] Primary-version Python coverage runs in the owner-specified shard count stated in Behavior using `Select-PythonTestShard.ps1`, which is deterministic (identical output across repeated calls) and balanced (no new Python, no new dependency).
-- [ ] Each Python shard uploads its coverage data, JUnit, and manifest as a per-shard artifact.
-- [ ] A combine job that keeps the existing required context name given in Behavior combines coverage, then runs the unchanged line and branch threshold step and the Codecov upload on the combined data; no threshold is lowered.
-- [ ] A completeness check fails when a test file is missing or duplicated across shards and when the shard JUnit total differs from the collect-only count.
-- [ ] The Python compatibility runs other than the primary version are unchanged and keep their contexts.
+- [x] Primary-version Python coverage runs in the owner-specified shard count stated in Behavior using `Select-PythonTestShard.ps1`, which is deterministic (identical output across repeated calls) and balanced (no new Python, no new dependency).
+- [x] Each Python shard uploads its coverage data, JUnit, and manifest as a per-shard artifact.
+- [x] A combine job that keeps the existing required context name given in Behavior combines coverage, then runs the unchanged line and branch threshold step and the Codecov upload on the combined data; no threshold is lowered.
+- [x] A completeness check fails when a test file is missing or duplicated across shards and when the shard JUnit total differs from the collect-only count.
+- [x] The Python compatibility runs other than the primary version are unchanged and keep their contexts.
 - [ ] `CI Required Gate` still blocks when any PowerShell or Python shard fails, and the combine job reports success on a docs-only run.
-- [ ] actionlint passes on `_poshqc.yml` and `_quality-checks.yml`.
-- [ ] Pester tests for the helper cover balanced assignment, deterministic order, a missing file detected, and a duplicate detected; the helper meets the coverage thresholds.
-- [ ] Workflow-pinning tests are updated and pass.
-- [ ] The `execution-environment` brief (every byte-identical copy), `_REQUIRED_CONTEXTS`, and `.github/workflows/README.md` list the new shards and job contexts.
+- [x] actionlint passes on `_poshqc.yml` and `_quality-checks.yml`.
+- [x] Pester tests for the helper cover balanced assignment, deterministic order, a missing file detected, and a duplicate detected; the helper meets the coverage thresholds.
+- [x] Workflow-pinning tests are updated and pass.
+- [x] The `execution-environment` brief (every byte-identical copy), `_REQUIRED_CONTEXTS`, and `.github/workflows/README.md` list the new shards and job contexts.
 - [ ] A measured CI run after the change shows the PowerShell and primary-version Python legs each at or below the duration target stated in the issue, recorded under `evidence/` with run URL, per-job durations, and the runner-queue trade-off.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
+- [x] Acceptance criteria documented and mapped to tests or demos
 - [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (README, docs/features/active/... links)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Tests updated/added (unit/integration as applicable)
+- [x] Edge cases and error handling covered by tests
+- [x] Docs updated (README, docs/features/active/... links)
+- [x] Toolchain pass completed (format → lint → type-check → test)
 
 ## Seeded Test Conditions (from potential)
-- [ ] Pester or bats tests for any new split or completeness helper: balanced assignment, deterministic order, a missing file detected, a duplicate detected
-- [ ] actionlint passes on the changed workflows
+- [x] Pester or bats tests for any new split or completeness helper: balanced assignment, deterministic order, a missing file detected, a duplicate detected
+- [x] actionlint passes on the changed workflows
 - [ ] One real CI run on the PR proves the timings
