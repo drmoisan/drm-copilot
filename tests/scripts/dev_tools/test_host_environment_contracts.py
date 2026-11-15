@@ -198,9 +198,10 @@ def test_consumer_engines_remain_independent_of_development_runtime(
 def test_python_compatibility_matrix_is_preserved() -> None:
     """The new Python development patch does not remove older compatibility jobs."""
     assert 'python = ">=3.11,<4.0"' in _text("pyproject.toml")
-    assert 'python-version: ["3.11", "3.12", "3.13"]' in _text(
-        ".github/workflows/_quality-checks.yml"
-    )
+    workflow = _text(".github/workflows/_quality-checks.yml")
+    # Issue #1190: 3.13 runs in the shard jobs, not in the compatibility matrix.
+    assert 'python-version: ["3.11", "3.12"]' in workflow
+    assert 'python-version: "3.13"' in workflow
 
 
 @pytest.mark.parametrize(

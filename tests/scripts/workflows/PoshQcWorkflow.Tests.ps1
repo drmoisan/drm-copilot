@@ -144,10 +144,10 @@ Describe '_poshqc.yml workflow invariants' {
         $job | Should -Not -Match '(?m)^ +name:[ \t]*poshqc-test-results[ \t]*$'
     }
 
-    It 'runs the poshqc-shard job as a three-shard matrix that does not cancel sibling shards (issue #953)' {
+    It 'runs the poshqc-shard job as a six-shard matrix that does not cancel sibling shards (issues #953 and #1190)' {
         $job = $script:JobText['poshqc-shard']
         $job | Should -Match '(?m)^ {6}fail-fast:[ \t]*false[ \t]*$'
-        $job | Should -Match '(?m)^ {8}shard:[ \t]*\[1, 2, 3\][ \t]*$'
+        $job | Should -Match '(?m)^ {8}shard:[ \t]*\[1, 2, 3, 4, 5, 6\][ \t]*$'
         $job | Should -Match '(?m)^ {4}runs-on:[ \t]*windows-latest[ \t]*$'
     }
 

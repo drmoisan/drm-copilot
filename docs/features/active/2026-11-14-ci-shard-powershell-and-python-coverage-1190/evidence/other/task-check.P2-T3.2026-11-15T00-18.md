@@ -1,0 +1,6 @@
+# Task check P2-T3
+
+Timestamp: 2026-11-15T00-18
+Command: black --check, ruff check, and pyright on tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py; launcher pytest suite on tests/scripts/dev_tools/test_quality_checks_workflow_contracts.py and tests/scripts/dev_tools/test_ruff_config_alignment.py (task selection: the changed test file and the sibling test that reads the same workflow file; test_ruff_config_alignment.py is unchanged because the Ruff step stays in _quality-checks.yml)
+EXIT_CODE: 0
+Output Summary: Black clean (the file was reformatted once by the formatter before the check), Ruff 0 findings, Pyright 0 errors. Selection run: 21 passed. Eight new tests added (compat matrix, shard matrix wiring, non-dot COVERAGE_FILE, shard upload, combine name/needs/always, first step, step order, verify step). Updated: the JSON report test (renamed test_combine_job_emits_the_json_coverage_report_the_threshold_gate_reads) and test_coverage_steps_run_only_on_the_coverage_leg; COVERAGE_LEG_GATE now equals the run-heavy gate. A first run failed the upload-path assertion (split on whitespace instead of lines); fixed in the test. File length is 532 lines (guidance tier of 500, below the 700 advisory tier).
