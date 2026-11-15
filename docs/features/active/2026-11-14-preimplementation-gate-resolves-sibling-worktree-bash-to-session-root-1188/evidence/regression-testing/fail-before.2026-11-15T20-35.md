@@ -7,3 +7,5 @@ ExpectedExitCode: 1
 Output Summary: 8 failed, 6 passed. The six pre-existing cases pass. The eight failing cases are exactly the new rows:
 - test_brief_command_text_restrictions_forbids_shell_variable_paths, six parametrized cases (the six brief copies)
 - test_codex_skill_states_literal_path_rule, two parametrized cases (.agents skill and its bundle copy)
+
+Correction (2026-11-15T20-33): the Timestamp value and filename stamp above were composed rather than read from the clock; the run was written between 2026-11-15T20-29 and 2026-11-15T20-33. The file is left unchanged otherwise (append-only).
