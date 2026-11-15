@@ -282,11 +282,71 @@ Describe 'test-execution-policy helper <Copy> (issue #1158)' -ForEach $script:Po
             $words = @(New-TestExecutionSuiteCommand -Policy (Get-TestPolicy -Text $null) -SuiteName 'jest' -ExtraArgument @('tests/unit/a.test.ts'))
 
             # Assert
-            $words[0..3] -join ' ' | Should -BeExactly 'node run-jest.cjs --testPathIgnorePatterns=/node_modules/ --testPathIgnorePatterns=/out/'
+            # The positional precedes the exclusion words: Jest parses testPathIgnorePatterns as an array
+            # option, so a positional placed after it would be consumed as another ignore pattern.
+            $words[0..3] -join ' ' | Should -BeExactly 'node run-jest.cjs tests/unit/a.test.ts --testPathIgnorePatterns=/node_modules/'
             $words | Should -Contain '--testPathIgnorePatterns=\.integration\.test\.ts$'
             @($words | Where-Object { $_ -like '--testPathIgnorePatterns=*' }).Count | Should -Be 10
-            $words[-1] | Should -BeExactly 'tests/unit/a.test.ts'
+            $words[2] | Should -BeExactly 'tests/unit/a.test.ts'
             $words.Count | Should -Be 13
+        }
+
+        It 'places a single jest positional before the first --testPathIgnorePatterns word' {
+            # Act
+            $words = @(New-TestExecutionSuiteCommand -Policy (Get-TestPolicy -Text $null) -SuiteName 'jest' -ExtraArgument @('test/jest-config-resolution.test.ts'))
+
+            # Assert
+            $firstIgnore = [array]::FindIndex([string[]]$words, [Predicate[string]] { param($word) $word -like '--testPathIgnorePatterns=*' })
+            [array]::IndexOf([string[]]$words, 'test/jest-config-resolution.test.ts') | Should -Be 2
+            $firstIgnore | Should -Be 3
+        }
+
+        It 'places a jest positional and a flag extra before every --testPathIgnorePatterns word' {
+            # Act
+            $words = @(New-TestExecutionSuiteCommand -Policy (Get-TestPolicy -Text $null) -SuiteName 'jest' -ExtraArgument @('test/a.test.ts', '--silent'))
+
+            # Assert
+            ($words[0..3] -join ' ') | Should -BeExactly 'node run-jest.cjs test/a.test.ts --silent'
+            $ignoreIndexes = @(0..($words.Count - 1) | Where-Object { $words[$_] -like '--testPathIgnorePatterns=*' })
+            $ignoreIndexes.Count | Should -Be 10
+            $ignoreIndexes[0] | Should -Be 4
+            $words.Count | Should -Be 14
+        }
+
+        It 'leaves the <Suite> command unchanged when no extras are supplied' -ForEach @(
+            @{ Suite = 'jest'; Expected = 'node run-jest.cjs --testPathIgnorePatterns=/node_modules/ --testPathIgnorePatterns=/out/ --testPathIgnorePatterns=\.integration\.test\.ts$ --testPathIgnorePatterns=\.integration\.test\.js$ --testPathIgnorePatterns=_integration\.py$ --testPathIgnorePatterns=\.integration\.tests\.ps1$ --testPathIgnorePatterns=\.golden\.test\.ts$ --testPathIgnorePatterns=\.golden\.test\.js$ --testPathIgnorePatterns=_golden\.py$ --testPathIgnorePatterns=\.golden\.tests\.ps1$' }
+            @{ Suite = 'pester'; Expected = 'pwsh -NoProfile -NonInteractive -File .claude/skills/test-execution-policy/scripts/Invoke-PesterSuite.ps1 -ExcludeTag Integration Golden -ExcludeTestFileSuffix .integration.test.ts .integration.test.js _integration.py .integration.tests.ps1 .golden.test.ts .golden.test.js _golden.py .golden.tests.ps1' }
+        ) {
+            # Act
+            $words = @(New-TestExecutionSuiteCommand -Policy (Get-TestPolicy -Text $null) -SuiteName $Suite)
+
+            # Assert
+            ($words -join ' ') | Should -BeExactly $Expected
+        }
+
+        It 'places a pester -TestPath extra before -ExcludeTag and keeps both exclusion groups intact' {
+            # Act
+            $words = @(New-TestExecutionSuiteCommand -Policy (Get-TestPolicy -Text $null) -SuiteName 'pester' -ExtraArgument @('-TestPath', 'tests/a.Tests.ps1'))
+
+            # Assert
+            ($words[0..6] -join ' ') | Should -BeExactly 'pwsh -NoProfile -NonInteractive -File .claude/skills/test-execution-policy/scripts/Invoke-PesterSuite.ps1 -TestPath tests/a.Tests.ps1'
+            $words[7] | Should -BeExactly '-ExcludeTag'
+            ($words[8..9] -join ' ') | Should -BeExactly 'Integration Golden'
+            $words[10] | Should -BeExactly '-ExcludeTestFileSuffix'
+            ($words[11..($words.Count - 1)] -join ' ') | Should -BeExactly '.integration.test.ts .integration.test.js _integration.py .integration.tests.ps1 .golden.test.ts .golden.test.js _golden.py .golden.tests.ps1'
+        }
+
+        It 'keeps suite words, exclusions, then extras for <Suite>' -ForEach @(
+            @{ Suite = 'pytest'; Config = $null; Extra = @('-v'); ExpectedHead = 'poetry run pytest -n auto -m not integration and not golden'; ExpectedLast = '-v' }
+            @{ Suite = 'dotnet-test'; Config = $null; Extra = @('--no-build'); ExpectedHead = 'dotnet test --filter=TestCategory!=Integration&TestCategory!=Golden'; ExpectedLast = '--no-build' }
+            @{ Suite = 'bats'; Config = '{"suites":{"bats":{"command":["bash","scripts/bash/shell-qc.sh","test"],"runner":"bats"}}}'; Extra = @('--coverage'); ExpectedHead = 'bash scripts/bash/shell-qc.sh test'; ExpectedLast = '--coverage' }
+        ) {
+            # Act
+            $words = @(New-TestExecutionSuiteCommand -Policy (Get-TestPolicy -Text $Config) -SuiteName $Suite -ExtraArgument $Extra)
+
+            # Assert
+            ($words -join ' ') | Should -BeLike "$ExpectedHead*"
+            $words[-1] | Should -BeExactly $ExpectedLast
         }
 
         It 'builds the dotnet-test suite with one --filter word negating each category' {
