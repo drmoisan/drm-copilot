@@ -3,7 +3,7 @@
 // below the 700-line advisory tier of the tiered file-size policy; the map is
 // merged below and carries no `global` key.
 const discoveryCoverageThresholds = require("./jest.discovery-coverage.json");
-// Issue #1036: the five docs MCP modules keep their thresholds in jest.docs-coverage.json.
+// Issue #1036: the seven docs MCP modules keep their thresholds in jest.docs-coverage.json.
 const docsCoverageThresholds = require("./jest.docs-coverage.json");
 
 /** @type {import('jest').Config} */

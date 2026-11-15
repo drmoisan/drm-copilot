@@ -296,9 +296,13 @@ function Get-TestExecutionLaneExclusionArgument {
 function New-TestExecutionSuiteCommand {
     <#
     .SYNOPSIS
-        Return the suite's command words, then its lane exclusions, then the caller's extras.
+        Return the suite's command words, then the lane exclusions and the caller's extras in the order the runner needs.
     .DESCRIPTION
-        Never adds a worker option (D9). Throws when the suite is not defined.
+        For the jest and pester runners the caller's extras precede the lane-exclusion words, because
+        Jest parses testPathIgnorePatterns as an array option that would consume a later positional path,
+        and the pester launcher binds a value to the key before it. For every other runner the order is
+        suite words, exclusions, then extras. Never adds a worker option (D9). Throws when the suite is
+        not defined.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory builder that returns command words and changes no system state.')]
     [CmdletBinding()]
@@ -313,8 +317,11 @@ function New-TestExecutionSuiteCommand {
     $suite = $Policy['suites'][$SuiteName]
     $words = [System.Collections.Generic.List[string]]::new()
     foreach ($word in @($suite['command'])) { $words.Add([string] $word) }
-    foreach ($word in (Get-TestExecutionLaneExclusionArgument -Policy $Policy -Runner ([string] $suite['runner']))) { $words.Add($word) }
-    foreach ($word in @($ExtraArgument)) { $words.Add($word) }
+    $runner = [string] $suite['runner']
+    $extrasFirst = $runner -ceq 'jest' -or $runner -ceq 'pester'
+    if ($extrasFirst) { foreach ($word in @($ExtraArgument)) { $words.Add($word) } }
+    foreach ($word in (Get-TestExecutionLaneExclusionArgument -Policy $Policy -Runner $runner)) { $words.Add($word) }
+    if (-not $extrasFirst) { foreach ($word in @($ExtraArgument)) { $words.Add($word) } }
     return $words.ToArray()
 }
 
