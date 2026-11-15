@@ -94,3 +94,16 @@ plans. The planning checkpoint `next_step` is `AWAITING_EXTRA_PLANNER_REVISIONS`
    recorded defects, then one confirming preflight. Use at most two child orchestrators at a time.
 3. Fan in, set `next_step` to `EPIC_EXECUTION_READY`, update the kickoff status table, and run the
    epic-planner-state validator with `require_ready_for_execution`.
+
+---
+
+## Current state (appended 2026-11-15T18-53 UTC)
+
+The OD-2 extra-revision round is complete. All seven halted plans (#1025 plan A, #1035, #1028,
+#1029, #1049, #1050, #1016 stage B) are PREFLIGHT: ALL CLEAR, so every child of the epic is
+prepared. Planning checkpoint `next_step` is `EPIC_EXECUTION_READY`, and the kickoff is marked ready.
+Scope changes and the one known execution-time gap are recorded in `epic.md` under
+`### Extra-revision round 2026-11-15 (OD-2)`.
+
+Next step: the owner runs `/epic-run shared-agent-harness-layer` from the main session, or replays
+the prompt in `epic-kickoff.md`.

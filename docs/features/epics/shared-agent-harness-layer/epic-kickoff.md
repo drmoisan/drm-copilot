@@ -1,15 +1,8 @@
 # Epic Kickoff: shared-agent-harness-layer
 
-Planned by epic-planner, refreshed on 2026-11-14T20-58 (UTC). Epic issue: #1018. Integration
-branch: epic/shared-agent-harness-layer-integration. Planning state:
-artifacts/orchestration/epic-planner-state.json (epic-planner worktree of that branch).
+Planned by epic-planner on 2026-10-30, refreshed on 2026-11-14 and completed on 2026-11-15 (UTC). All child features are prepared: issues promoted or adopted, active folders created, research complete, spec/user-story written, atomic plans approved, preflight ALL CLEAR. Epic issue: #1018. Planning state: artifacts/orchestration/epic-planner-state.json (branch: epic/shared-agent-harness-layer-integration).
 
-**Readiness status: NOT YET READY.** Every child has an issue, an active folder, research, spec,
-user story and a plan that passes the plan validator. Seven plans are halted at the one-revision
-preflight limit. Each needs an owner-recorded `extra_planner_revision` directive, one planner
-revision and one confirming preflight before this prompt is replayed. See the Feature Summary and
-`resume-note.md`. Do not replay the invocation prompt until the epic planner has set `next_step`
-to `EPIC_EXECUTION_READY`.
+**Readiness status: READY.** `next_step` is `EPIC_EXECUTION_READY`.
 
 ## Invocation Prompt
 
@@ -27,17 +20,18 @@ then branch A or B per #1025's verification result) run in that order.
 
 ## Preflight Status
 
-- #1025: plan A (plan.2026-10-30T17-06.md) halted; plan B (owner-decision-plan.md) ALL CLEAR.
-- #1035: halted.
-- #1028: halted.
-- #1029: halted.
-- #1030: ALL CLEAR.
-- #1032: all four plans ALL CLEAR (main plan, plan-h3-sync-writer-retirement.md,
-  plan-agents-branch-a.md, plan-agents-branch-b.md).
-- #1049: halted.
-- #1050: halted.
-- #1051: ALL CLEAR.
-- #1016: stage A (plan.2026-10-30T18-59.md) ALL CLEAR; stage B (plan.2026-10-30T23-35.md) halted.
+Every plan is PREFLIGHT: ALL CLEAR:
+
+- #1025: plan.2026-10-30T17-06.md (plan A) and owner-decision-plan.md (plan B).
+- #1035: plan.2026-10-30T17-11.md.
+- #1028: plan.2026-10-30T18-30.md.
+- #1029: plan.2026-10-30T18-37.md.
+- #1030: plan.2026-10-30T18-37.md.
+- #1032: plan.2026-10-30T18-39.md, plan-h3-sync-writer-retirement.md, plan-agents-branch-a.md, plan-agents-branch-b.md.
+- #1049: plan.2026-10-31T14-03.md.
+- #1050: plan.2026-11-14T09-31.md.
+- #1051: plan.2026-11-14T10-43.md.
+- #1016: plan.2026-10-30T18-59.md (stage A) and plan.2026-10-30T23-35.md (stage B).
 
 The plan-path column names each child's first plan; additional plans are listed above and in
 the planning checkpoint `additional_plan_paths`.

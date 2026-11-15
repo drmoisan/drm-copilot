@@ -54,7 +54,7 @@ features:
 
 Epic issue: #1018.
 
-> **Manifest status.** Planning in progress. `issue_num: null` entries are placeholders and
+> **Manifest status.** Planning complete (2026-11-15); every child is prepared and PREFLIGHT: ALL CLEAR. Historical note follows. `issue_num: null` entries are placeholders and
 > `feature_folder` values are short-name hints; both are back-filled from each prepared child's
 > promotion receipt and active folder at fan-in. Child 7 adopts the existing issue #1016 and is
 > not promoted again (owner decision E1, 2026-10-30). Child 1 is keyed to its promoted issue
@@ -339,6 +339,28 @@ folder's preflight evidence and in its child checkpoint. A halted plan needs one
 revision and one confirming preflight. Under the atomic-plan-contract one-return rule, that needs an
 `extra_planner_revision` owner directive recorded by the main session in the child's ledger. The
 planner subagent cannot record one, and OD-1 is not a recorded directive.
+
+### Extra-revision round 2026-11-15 (OD-2)
+
+The coordinator recorded OD-2 (`extra_planner_revision`, step `S4`) in the ledger of each of the
+seven halted children. Each child received one planner revision that applied its recorded defects
+and one confirming preflight. A session crash at 2026-11-15T17:18Z interrupted the round; it
+resumed without repeating completed work. All seven are now PREFLIGHT: ALL CLEAR.
+
+| Issue | Final head | Scope change (autonomous mode) |
+| --- | --- | --- |
+| 1025 plan A | ede12549f | S1 (spec D-R6): no per-field JSON type checks; schema compared on property names, enums, required fields, conditional rules and the `id` pattern; "`## Objective` is prose" is advisory. Spec rule 6 for contracts has no lint test; manual tasks and the final self-review cover it |
+| 1035 | 183a60630 | OD-P4: `Get-BlastRadius` and `derive_blast_radius` do not call the new resolver; each takes an optional root defaulting to `docs/features`; resolver wiring is deferred |
+| 1028 | f2a940541 | none ([P5-T3] uses the three-condition write-mode check) |
+| 1029 | 29576fc6b | none (decision D15 defines one shared path set) |
+| 1049 | 97b815af1 | none |
+| 1050 | fe5775848 | none (the rendered caller passes `harness_repository` and `harness_ref` inputs) |
+| 1016 stage B | 09bc4995a | none ([P1-T3] keeps the blast-radius tests on the `docs/features` default) |
+
+Known gap carried to execution: after #1016 moves this repository to `.dev`, the two blast-radius
+functions still return `docs/features/...` paths when given only a folder name, because #1035
+deferred their resolver wiring (OD-P4) and no #1016 rule covers it. Close it inside #1016's
+execution through a remediation cycle, or file a follow-up item.
 
 ### Waves after the refresh
 
