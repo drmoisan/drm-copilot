@@ -101,7 +101,7 @@ Caller `.github/workflows/drm-copilot-ci.yml`:
 
 - `name: CI`.
 - Triggers: `pull_request` on `main` and `"epic/**"`; `push` on `main`; `workflow_dispatch`; `merge_group`.
-- Reference mode: `uses: drmoisan/drm-copilot/.github/workflows/harness-<pack>.yml@v<payload_version>`, where `payload_version` is #1029 D6. Copy mode: `uses: ./.github/workflows/drm-copilot-<pack>.yml`.
+- Reference mode: `uses: drmoisan/drm-copilot/.github/workflows/harness-<pack>.yml@v<payload_version>`, where `payload_version` is #1029 D6; the PowerShell job also passes the `workflow_call` inputs `harness_repository: drmoisan/drm-copilot` and `harness_ref: v<payload_version>` and no `poshqc` input. Copy mode: `uses: ./.github/workflows/drm-copilot-<pack>.yml`; the PowerShell job passes `poshqc: false` and neither `harness_repository` nor `harness_ref`.
 - Gate job id `ci-required-gate`, name `CI Required Gate`, `needs` every rendered pack job, `if: always()`, fails when any needed result is not `success`. It does not use `Invoke-CiRequiredGate.ps1`.
 
 Reusable workflows (`harness-<pack>.yml` and their copies) use only destination-generic steps, contain no `NPM_TOKEN` text, pin Node `26.13.0` and Poetry `2.5.1` where used, and write:
@@ -109,7 +109,7 @@ Reusable workflows (`harness-<pack>.yml` and their copies) use only destination-
 | Pack | Artifact paths | Notes |
 |---|---|---|
 | Python | `artifacts/python/coverage.json`, `artifacts/python/lcov.info` | `--cov-report=lcov:artifacts/python/lcov.info` passed explicitly; threshold step is inline `pwsh` over `coverage.json` totals (line 85, branch 75 by default inputs), not `scripts.dev_tools.*` |
-| PowerShell | `artifacts/pester/powershell-coverage.xml` (JaCoCo), `artifacts/pester/pester-junit.xml` | Reference mode loads PoshQC from a checkout of `job.workflow_repository` at `job.workflow_sha`; copy mode runs Pester 6 directly |
+| PowerShell | `artifacts/pester/powershell-coverage.xml` (JaCoCo), `artifacts/pester/pester-junit.xml` | Inputs `poshqc` (boolean, default true), `harness_repository` and `harness_ref` (strings, default empty). With `poshqc` true the workflow fails when either string input is empty, then loads PoshQC from a checkout of `inputs.harness_repository` at `inputs.harness_ref` into `.drm-copilot-harness`; with `poshqc` false (copy mode) it runs Pester 6 directly. No harness workflow uses a `job.workflow_*` or `github.job_workflow_sha` context, which the pinned actionlint 1.7.12 rejects |
 | TypeScript | `coverage/lcov.info` | Runs the npm scripts named in the TypeScript rule (`format`, `lint`, `typecheck`, `test:unit:coverage`) |
 | .NET | `artifacts/csharp/coverage.xml` | JaCoCo form with `counter type="LINE"` and `counter type="BRANCH"`, the format read by `Get-JacocoRepoCoverage` and `Get-JacocoBranchCoverage` in `validate-feature-review-coverage-metrics.ps1`; an inline `pwsh` step converts the collected Cobertura totals. `modern` runs on `ubuntu-latest`; `legacy` (msbuild, vstest) on `windows-latest` |
 
