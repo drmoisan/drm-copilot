@@ -55,13 +55,13 @@ On PR runs, shards also waited for runners when several PRs ran CI at once, so P
 
 ## Acceptance Criteria
 
-- [ ] `_poshqc.yml` declares the owner-specified PowerShell shard count stated in Behavior; the completeness check, coverage merge, and Pester discovery count comparison pass in a CI run.
+- [x] `_poshqc.yml` declares the owner-specified PowerShell shard count stated in Behavior; the completeness check, coverage merge, and Pester discovery count comparison pass in a CI run.
 - [x] Primary-version Python coverage runs in the owner-specified shard count stated in Behavior using `Select-PythonTestShard.ps1`, which is deterministic (identical output across repeated calls) and balanced (no new Python, no new dependency).
 - [x] Each Python shard uploads its coverage data, JUnit, and manifest as a per-shard artifact.
 - [x] A combine job that keeps the existing required context name given in Behavior combines coverage, then runs the unchanged line and branch threshold step and the Codecov upload on the combined data; no threshold is lowered.
 - [x] A completeness check fails when a test file is missing or duplicated across shards and when the shard JUnit total differs from the collect-only count.
 - [x] The Python compatibility runs other than the primary version are unchanged and keep their contexts.
-- [ ] `CI Required Gate` still blocks when any PowerShell or Python shard fails, and the combine job reports success on a docs-only run.
+- [x] `CI Required Gate` still blocks when any PowerShell or Python shard fails, and the combine job reports success on a docs-only run.
 - [x] actionlint passes on `_poshqc.yml` and `_quality-checks.yml`.
 - [x] Pester tests for the helper cover balanced assignment, deterministic order, a missing file detected, and a duplicate detected; the helper meets the coverage thresholds.
 - [x] Workflow-pinning tests are updated and pass.

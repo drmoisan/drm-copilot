@@ -27,10 +27,10 @@ CI wall-clock time is dominated by the PowerShell QC shards (13.3 to 16.9 minute
 
 ## Acceptance Criteria
 
-- [ ] PowerShell QC runs the owner-specified number of size-balanced shards; the completeness check and coverage merge pass, and the total test count equals discovery.
+- [x] PowerShell QC runs the owner-specified number of size-balanced shards; the completeness check and coverage merge pass, and the total test count equals discovery.
 - [x] Primary-version Python coverage runs in the owner-specified number of shards whose union is the whole suite, verified by a completeness check, with coverage combined before thresholds are enforced.
 - [x] Coverage thresholds and the Codecov upload behave as before on the combined data; no threshold is lowered.
-- [ ] The required CI gate still reports correctly and still blocks on any shard failure.
+- [x] The required CI gate still reports correctly and still blocks on any shard failure.
 - [ ] A measured CI run after the change shows the PowerShell and primary-version Python legs each at or below the duration target stated in the issue, recorded as evidence.
 
 ## Non-Goals
