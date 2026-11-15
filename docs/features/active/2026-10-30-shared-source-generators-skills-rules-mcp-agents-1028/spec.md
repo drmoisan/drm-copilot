@@ -300,7 +300,7 @@ No artifact of this child requires a language outside the rule; the D-16 consump
 ### Agents
 
 - [ ] For every matrix entry selected for agents, `.claude/agents/<name>.md` and base `.codex/agents/<name>.toml` with their bundle copies equal the rendered output of the agent source, and `-Surface agents -Check` exits 0 on the committed tree.
-- [ ] After the PowerShell agent generator runs, running `poetry run python -m scripts.dev_tools.generate_codex_agent_variants` in write mode changes no file, its `--check` exits 0, and `scripts/dev_tools/generate_codex_agent_variants.py` is unchanged relative to the merge base.
+- [ ] After the PowerShell agent generator runs, the first write-mode run of `poetry run python -m scripts.dev_tools.generate_codex_agent_variants` changes no base `.codex/agents/<family>.toml`, no bundle base copy and no pack manifest, and the variant paths it rewrites are recorded; a second write-mode run changes no file; its `--check` exits 0; and `scripts/dev_tools/generate_codex_agent_variants.py` is unchanged relative to the merge base.
 - [ ] A unit test shows that each agent's `Write(`/`Edit(` literals in the generated Claude and Codex files equal the source literals exactly, including leading-slash spelling, and child 2's write-scope checker suite passes on the generated files.
 - [ ] `tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py`, `tests/scripts/dev_tools/test_codex_agent_wrapper_contracts.py`, `tests/scripts/dev_tools/test_codex_handoff_contract_parity.py` and `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` pass after agent generation.
 
