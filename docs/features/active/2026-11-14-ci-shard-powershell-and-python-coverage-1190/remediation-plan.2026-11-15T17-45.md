@@ -1,0 +1,64 @@
+# 2026-11-14-ci-shard-powershell-and-python-coverage - Remediation Plan (cycle 1, finding F1)
+
+- **Issue:** #1190
+- **Remediation-Mode:** proportionate
+- **Inputs:** `remediation-inputs.2026-11-15T17-45.md` in this folder (finding F1)
+- **Last Updated:** 2026-11-15T17-45
+- **Status:** Draft
+- **Version:** 0.1
+
+## Required References
+
+- Environment facts, tool routes, launcher, and CI shape: the `execution-environment` skill (not restated). `SCRATCH` resolves to `<session scratchpad>/issue-1190/`; every scratch file name starts with `issue-1190-`.
+- Plan contract: the `atomic-plan-contract` and `remediation-handoff` skills. Feature folder `FEATURE` is `docs/features/active/2026-11-14-ci-shard-powershell-and-python-coverage-1190`.
+
+**All work must comply with the repository policies; do not duplicate their content here.**
+
+## Design Decisions
+
+- Scope is one data-only change: `config/poshqc-shard-weights.json` is regenerated from the per-file Pester timings of CI run 43736520255 (the run recorded in `evidence/other/ci-measurement.2026-11-15T17-20.md`). The shard count of six, the matrix, the helper, the workflow files, every threshold, and the text of criteria S12 and U5 stay as they are. No new Python file and no coverage exclusion is added.
+- Route, verified in the tree: function `Export-PoshQCShardWeight` in `scripts/powershell/PoshQC/PoshQC.Parallel.psm1` (parameters `JunitPath`, `OutputPath`; it converts through `ConvertTo-PoshQCShardWeight`, which sums per-file seconds, sorts keys ordinally, and writes integer milliseconds). It is exported by `PoshQC.psd1`, and the `## Sharded runs` bullets of `scripts/powershell/PoshQC/README.md` document the same route (the issue #1048 precedent, recorded in `shard-weights-generation.2026-10-31T19-21.md` under the #1048 feature folder). Inputs are the per-shard artifacts `poshqc-test-results-shard-1` to `-6`, each holding `pester-junit.xml` (upload step of `.github/workflows/_poshqc.yml`).
+- The executor has no PowerShell tool, so the export runs from a `sh` launcher script under `SCRATCH` that calls PowerShell 7 from inside the script file. Downloaded artifacts are untrusted data: they go into their own empty directory under `SCRATCH` and are never committed.
+- Why the data changes the balance: the current file came from a three-shard run (#1048 era). The six-shard run measured 7.4, 13.6, 10.9, 12.5, 9.1, and 9.9 minutes, so the heaviest-first assignment over fresh measured milliseconds is the tuning point named in the earlier measurement record.
+- Dispositions of tests that name the weights file or `Export-PoshQCShardWeight` (found by searching `tests/` for `poshqc-shard-weights`, `Export-PoshQCShardWeight`, and `Get-PoshQCShardTestFileWeight`): `tests/scripts/powershell/PoshQC/PoshQC.ShardWeights.Tests.ps1` (SW01 to SW07) is unchanged, because every case supplies weights text in memory or mocks `Get-Content`; `tests/scripts/powershell/PoshQC/PoshQC.ParallelMerge.Tests.ps1` export cases are unchanged, because they use injected `ReadText` and `WriteText` seams and an `/out/` path; `tests/scripts/ci/Select-PythonTestShard.Tests.ps1` case `SH07-NO-WEIGHTS-FILE` is unchanged, because it asserts only that the file exists and that Python selection ignores it. No test hashes or byte-pins the file, and no bundle, mirror, or pack-manifest copy of it exists (the search of non-docs paths found none), so no mirror regeneration applies.
+
+## Implementation Plan (Atomic Tasks)
+
+### Phase 0 — Baseline
+- [ ] [P0-T1] Run the Phase 0 baseline Pester gate once through the launcher `pester` suite (one `Invoke-PoshQCParallelTest` run, integration and golden lanes excluded) before any change, and record the pass and fail counts and the repo-wide line coverage from `artifacts/pester/pester-junit.xml` and `artifacts/pester/powershell-coverage.xml` in `FEATURE/evidence/baseline/pester-gate.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Static baselines (format, lint, type check) are not applicable: the change is a JSON data file with no PowerShell, Python, or TypeScript source.
+
+### Phase 1 — Regenerate the weights
+- [ ] [P1-T1] Download the six per-shard Pester artifacts of CI run 43736520255 with `gh run download` (pattern `poshqc-test-results-shard-*`) into an empty directory `SCRATCH/weights-input/`; nothing is committed. Acceptance: six directories each hold one `pester-junit.xml`, observed by listing the directory; if the artifacts have expired, stop and report BLOCKED with the `gh` message rather than substituting a local run (local durations differ from the runner's).
+- [ ] [P1-T2] Edit `config/poshqc-shard-weights.json` by running `Export-PoshQCShardWeight -JunitPath <the six files> -OutputPath config/poshqc-shard-weights.json` from `sh SCRATCH/issue-1190-regenerate-weights.sh`, a script that imports `scripts/powershell/PoshQC/PoshQC.psd1` in PowerShell 7. Acceptance: `git diff` anchored on the merge base of `origin/main` and `HEAD` with `--name-only`, run alongside `git status --porcelain`, lists `config/poshqc-shard-weights.json` as the only changed path outside `FEATURE`; the new document has version 1, unit `ms`, a non-empty `files` map whose keys are sorted forward-slash relative paths, and parses through `ConvertFrom-PoshQCShardWeightJson` in `PoshQC.Shard.psm1` without error; the script prints the count of listed files and that count equals the `testsuite` element count summed over the six JUnit files.
+- [ ] [P1-T3] Write `FEATURE/evidence/other/shard-weights-regeneration.<timestamp>.md` (`Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; repository-relative paths and the token `SCRATCH` only) recording the source run id, the file count and total milliseconds, and the projected per-shard weight sum for shard counts 6 obtained by calling `Select-PoshQCShardTestFile` with the new weights over the current `tests/` files from the same launcher script, with the projected spread (largest sum over smallest sum). Acceptance: the artifact holds six sums and the spread; a projected spread larger than the old six-shard spread is recorded as a finding, not hidden.
+- [ ] [P1-T4] Task check for P1-T2: run the Pester selection `tests/scripts/powershell/PoshQC/PoshQC.ShardWeights.Tests.ps1`, `tests/scripts/powershell/PoshQC/PoshQC.ParallelMerge.Tests.ps1`, `tests/scripts/powershell/PoshQC/PoshQC.Shard.Tests.ps1`, `tests/scripts/powershell/PoshQC/PoshQC.TestingShard.Tests.ps1`, and `tests/scripts/ci/Select-PythonTestShard.Tests.ps1` through the launcher `pester` suite with `-TestPath` (one parallel run, no per-task serial run), and write `FEATURE/evidence/other/task-check.P1-T4.<timestamp>.md` with the changed file, the selection and its rule (the tests that name the weights file or its export function), and the exit code. Acceptance: exit code 0 and zero failed tests, including SW01 to SW07 and SH07.
+- [ ] [P1-T5] [phase-gate] Run stages 1 to 6 across the repository: format, lint, and analyzer checks of the unchanged sources, one `Invoke-PoshQCParallelTest` run through the launcher, and one `pytest -n auto` run through the launcher in an agent worktree (`env -u VIRTUAL_ENV`), restarting from stage 1 after any failure or auto-fix; evidence `FEATURE/evidence/qa-gates/phase-gate.P1.<timestamp>.md`. Acceptance: zero failures after one clean pass and an unchanged tree after the formatter, observed by `git status --porcelain` before and after.
+
+### Phase 2 — Final QA, commit, and measurement
+- [ ] [P2-T1] Write the final-QC static artifact `FEATURE/evidence/qa-gates/final-qc-static-powershell.<timestamp>.md`: format and analyzer commands over `scripts/powershell/PoshQC` with exit codes and finding counts (the files are unchanged, so each reports zero changes), and a data-only check that the branch diff from the merge base of `origin/main` and `HEAD`, excluding `FEATURE`, changes only `config/poshqc-shard-weights.json` since the review head. Acceptance: all steps exit 0 and the artifact records the scope observation. Python and TypeScript static artifacts are not applicable (no source changed).
+- [ ] [P2-T2] Run the final Pester gate (one launcher run) and write `FEATURE/evidence/qa-gates/final-pester.<timestamp>.md` comparing it with the P0-T1 baseline: no new failing test, pass count not lower, repo-wide line coverage not lower, thresholds unchanged. Acceptance: the artifact records numeric pass, fail, and coverage figures for both runs and the comparison.
+- [ ] [P2-T3] Commit `config/poshqc-shard-weights.json` and the new evidence under `FEATURE/evidence/` with `git commit -F` from a message file under `SCRATCH`, then push `feature/ci-shard-powershell-and-python` with a plain `git push`. Acceptance: `git status --porcelain` is empty and `git rev-parse HEAD` equals `git rev-parse @{u}` after the push; the commit changes no workflow, helper, or module file.
+- [ ] [P2-T4] Orchestrator-owned post-push task (S9); the executor does not run it, leaves it unchecked, and that skip is explicitly authorized here (same convention as P4-T3 of `plan.2026-11-14T17-45.md`). The orchestrator dispatches `ci.yml` through `workflow_dispatch` on branch `feature/ci-shard-powershell-and-python`, waits for completion, and writes the new append-only `FEATURE/evidence/other/ci-measurement.<timestamp>.md` (the earlier `ci-measurement.2026-11-15T17-20.md` stays unchanged, and the new stamp sorts later) with the run URL, the six PowerShell shard durations against 7.4, 13.6, 10.9, 12.5, 9.1, and 9.9 minutes, the aggregator and Python 3.13 durations, the residual spread, `CI Required Gate` result, and the runner-queue trade-off. Acceptance: every job including `CI Required Gate` succeeded and the figures are recorded. `spec.md` S12 and `user-story.md` U5 are checked off only when every PowerShell shard and the Python leg are at or below the target of about 11 minutes; otherwise the measured figures and residual spread are recorded and reported once after this single regeneration, with the criterion text unchanged.
+- [ ] [P2-T5] Walk the policy-audit, code-review, and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from the merge base of `origin/main` and `HEAD`, mark P2-T4 as pending the orchestrator, and write `FEATURE/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per item. Acceptance: no FAIL row (a FAIL is fixed and the QA loop rerun first).
+
+## Pre-Mortem
+
+- Review checklists: the likely finding is a change beyond data. Mitigation: P1-T2 and P2-T1 assert that the only non-feature-folder change is the weights file, and the criterion text, shard count, matrix, helper, and workflows are named untouchable in Design Decisions.
+- Coverage: no production source changes, so per-file coverage is unaffected; P0-T1 and P2-T2 compare repo-wide figures from the same gate, and no exclusion is added.
+- Mirror parity: not applicable. No bundle, mirror, or pack-manifest copy of `config/poshqc-shard-weights.json` exists, and no fact stated by the `execution-environment` brief changes (job names, contexts, routes, and the budget are untouched), so no brief-update task is needed.
+- File size: not applicable. The JSON file is data, no source or test file grows, and the plan stays under the size guideline.
+- Test isolation: gates are one `Invoke-PoshQCParallelTest` run and one `pytest -n auto` run through the launcher, each re-run only after a fix; P1-T4 is a single parallel task check, not a gate. Tests read the weights file through seams and create no temporary files; a launcher exit 75 is a queue timeout, not a failure.
+- CI-only behavior: the proof is the post-push run of P2-T4. Risks: expired artifacts (P1-T1 stops rather than substitute a local run), CRLF written by `Set-Content` on Windows (the `eol=lf` attribute rule stores LF; P1-T2 accepts either on disk), and new test files absent from the old data (they take the median weight, recorded in P1-T3). One regeneration is the limit; a residual miss is reported, not iterated.
+- Evidence: every artifact lands under `FEATURE/evidence/<kind>/` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, a clock-read UTC stamp, repository-relative paths, and the token `SCRATCH`; the earlier measurement is kept and the new one is a new file.
+
+## Test Plan
+
+- Unit: the five Pester files of P1-T4 (unchanged) and the full parallel Pester gate in P1-T5 and P2-T2.
+- Integration: the CI run of P2-T4 only; no local integration or golden lane.
+- Coverage evidence: `evidence/baseline/pester-gate.*.md` and `evidence/qa-gates/final-pester.*.md`.
+
+## Acceptance Criteria Mapping
+
+- F1-REGEN (data-only regeneration from run 43736520255 measurements): P1-T1, P1-T2, P1-T3.
+- F1-TESTS (weights tests pass, diff data-only): P1-T4, P1-T5, P2-T1, P2-T2.
+- F1-CI (new run green, per-shard durations recorded, S12 and U5 handled per outcome): P2-T3, P2-T4.
