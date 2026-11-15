@@ -22,3 +22,4 @@ Commands: git diff --name-only origin/main...HEAD filtered for .claude/rules/ an
 | Feature-audit: scope limited to F2 | PASS | No production code, hook, or policy edit. |
 
 FAIL rows: none.
+Correction (recorded 2026-11-15T21:15:17Z): the 2026-11-15T20-38 stamp in this file name and Timestamp value was composed, not read from the clock; the file was written no later than 2026-11-15T20:37:51Z.

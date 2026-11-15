@@ -13,8 +13,9 @@
        substitution opener and continues while the text between two records consists only of
        substitution openers and closers ($(, {, ), }, backtick); its joined text is the members'
        ScanText with that text between them. A run whose openers are not all closed is discarded.
-       Index 2 (or 3) is returned when the joined text matches the unchanged npm (or npx) pattern
-       and the run's first record carries npm (or npx) as a whole word.
+       Index 2 (or 3) is returned when, for some record of the run that carries npm (or npx) as a
+       whole word, the joined text from that record to the run end matches the unchanged npm (or
+       npx) pattern.
     2. npx options. Index 3 is returned when a record's ScanText or a joined text matches npx
        followed by one or more of --prefix <v>, --prefix=<v>, -C <v>, --yes, -y, --no, -q, or
        --quiet, then prettier, eslint, tsc, or jest. Any other option keeps the current
@@ -41,8 +42,11 @@ $script:OrchestrationGateSupplementJoinPattern = '^(\$\(|\{|\)|\}|`)+$'
 function Get-OrchestrationGateJoinedWordText {
     <#
     .SYNOPSIS
-        Returns one object per joined-word run (Form 1): Text (the joined ScanText) and First (the
-        RawText of the run's first record). Records are located in CommandText in order.
+        Returns one object per joined-word run (Form 1): Text (the joined ScanText), First (the
+        RawText of the run's first record), and Member (one object per run record: Raw, its RawText,
+        and Tail, the joined text from that record to the run end), limited to the records that lie
+        outside every unclosed substitution. Records are located in
+        CommandText in order.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject[]])]
@@ -65,9 +69,11 @@ function Get-OrchestrationGateJoinedWordText {
         $opens = $gap.StartsWith('$(') -or $gap.StartsWith('`') -or ($gap.StartsWith('{') -and $raw.EndsWith('$'))
         if (-not $opens -or $gap -notmatch $script:OrchestrationGateSupplementJoinPattern) { $index++; continue }
         $text = [System.Text.StringBuilder]::new()
+        $memberOffset = [System.Collections.Generic.List[int]]::new()
         $member = $index
         while ($true) {
             $memberRaw = [string]$Record[$member].RawText
+            $memberOffset.Add($text.Length)
             [void]$text.Append([string]$Record[$member].ScanText)
             if ($member -ge $count - 1) { break }
             $between = $CommandText.Substring($start[$member] + $memberRaw.Length, $start[$member + 1] - $start[$member] - $memberRaw.Length)
@@ -80,7 +86,16 @@ function Get-OrchestrationGateJoinedWordText {
         $closers = ([regex]::Matches($joined, '\)|\}')).Count
         $backticks = ([regex]::Matches($joined, '`')).Count
         if ($closers -ge $openers -and $backticks % 2 -eq 0) {
-            $runs.Add([pscustomobject]@{ Text = $joined; First = $raw })
+            $members = for ($offsetIndex = 0; $offsetIndex -lt $memberOffset.Count; $offsetIndex++) {
+                # A record inside an unclosed substitution is not at the top level of the word.
+                $before = $joined.Substring(0, $memberOffset[$offsetIndex])
+                $beforeOpeners = ([regex]::Matches($before, '\$\(|\$\{')).Count
+                $beforeClosers = ([regex]::Matches($before, '\)|\}')).Count
+                $beforeBackticks = ([regex]::Matches($before, '`')).Count
+                if ($beforeClosers -lt $beforeOpeners -or $beforeBackticks % 2 -ne 0) { continue }
+                [pscustomobject]@{ Raw = [string]$Record[$index + $offsetIndex].RawText; Tail = $joined.Substring($memberOffset[$offsetIndex]) }
+            }
+            $runs.Add([pscustomobject]@{ Text = $joined; First = $raw; Member = [pscustomobject[]]@($members) })
         }
         $index = $member + 1
     }
@@ -106,9 +121,11 @@ function Get-OrchestrationGateSupplementalPatternIndex {
     }
     $npm = $false
     foreach ($run in @(Get-OrchestrationGateJoinedWordText -CommandText $CommandText -Record $records)) {
-        if ($run.Text -match $script:OrchestrationGateSupplementNpmPattern -and (Test-CommandLineWordPresent -RawText $run.First -Word 'npm')) { $npm = $true }
-        $npxText = $run.Text -match $script:OrchestrationGateSupplementNpxPattern -or $run.Text -match $script:OrchestrationGateSupplementNpxOptionPattern
-        if ($npxText -and (Test-CommandLineWordPresent -RawText $run.First -Word 'npx')) { $npx = $true }
+        foreach ($member in $run.Member) {
+            if ($member.Tail -match $script:OrchestrationGateSupplementNpmPattern -and (Test-CommandLineWordPresent -RawText $member.Raw -Word 'npm')) { $npm = $true }
+            $npxText = $member.Tail -match $script:OrchestrationGateSupplementNpxPattern -or $member.Tail -match $script:OrchestrationGateSupplementNpxOptionPattern
+            if ($npxText -and (Test-CommandLineWordPresent -RawText $member.Raw -Word 'npx')) { $npx = $true }
+        }
     }
     if ($npm) { $indexes.Add(2) }
     if ($npx) { $indexes.Add(3) }

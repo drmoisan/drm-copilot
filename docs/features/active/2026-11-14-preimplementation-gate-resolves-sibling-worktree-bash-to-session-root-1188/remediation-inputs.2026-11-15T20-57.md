@@ -43,8 +43,8 @@ Finding-Scope: contained
 
 ## Light Fix Tasks
 
-- [ ] [P0-T1] Fix R2 in `.claude/hooks/enforce-orchestration-preimplementation-gate-classify.ps1` and its three byte-identical copies: evaluate every run member that carries `npm` or `npx` as a whole word, and add the leading-assignment Positive rows to `enforce-orchestration-preimplementation-gate-classify.Cases.ps1` and one V-style row to `enforce-orchestration-preimplementation-gate-operands.Cases.ps1` (fail-before, then pass on both surfaces).
-- [ ] [P0-T2] Fix E1 in `evidence/qa-gates/self-review.2026-11-15T20-38.md`: append one clock-stamped correction line for the composed stamp, leaving existing lines unchanged.
+- [x] [P0-T1] Fix R2 in `.claude/hooks/enforce-orchestration-preimplementation-gate-classify.ps1` and its three byte-identical copies: evaluate every run member that carries `npm` or `npx` as a whole word, and add the leading-assignment Positive rows to `enforce-orchestration-preimplementation-gate-classify.Cases.ps1` and one V-style row to `enforce-orchestration-preimplementation-gate-operands.Cases.ps1` (fail-before, then pass on both surfaces).
+- [x] [P0-T2] Fix E1 in `evidence/qa-gates/self-review.2026-11-15T20-38.md`: append one clock-stamped correction line for the composed stamp, leaving existing lines unchanged.
 
 ## Non-remediation notes
 

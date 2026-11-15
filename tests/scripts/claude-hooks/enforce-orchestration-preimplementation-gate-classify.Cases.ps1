@@ -21,6 +21,11 @@ $script:ClassifyFunctionRows = @(
     @{ Name = 'env prefix before a joined npm word'; Command = 'env -u VIRTUAL_ENV npm --prefix $(pwd) run lint'; Indexes = @(2) }
     @{ Name = 'nested substitution'; Command = 'npm --prefix $(dirname $(pwd)) run lint'; Indexes = @(2) }
     @{ Name = 'chained substitutions'; Command = 'npm --prefix $(pwd)/$(echo x) run lint'; Indexes = @(2) }
+    # Form 1 with a leading assignment: the npm or npx word is a later member of the run.
+    @{ Name = 'leading assignment before npm'; Command = 'FOO=$(pwd) npm --prefix $(pwd) run lint'; Indexes = @(2) }
+    @{ Name = 'env assignment before npm'; Command = 'env FOO=$(pwd) npm --prefix $(pwd) run lint'; Indexes = @(2) }
+    @{ Name = 'leading assignment before npx'; Command = 'FOO=$(pwd) npx --prefix $(pwd) jest'; Indexes = @(3) }
+    @{ Name = 'env assignment before npx'; Command = 'env FOO=$(pwd) npx --prefix $(pwd) jest'; Indexes = @(3) }
     # Form 2: npx options before the tool word.
     @{ Name = 'npx --prefix separate value'; Command = 'npx --prefix /synthetic-worktrees/w-item jest'; Indexes = @(3) }
     @{ Name = 'npx --prefix inline value'; Command = 'npx --prefix=/synthetic-worktrees/w-item tsc'; Indexes = @(3) }
@@ -64,6 +69,10 @@ $script:ClassifyGateRows = @(
     @{ Kind = 'Positive'; Command = 'npx --prefix $(pwd) jest'; Expected = $true }
     @{ Kind = 'Positive'; Command = 'npm --prefix $(dirname $(pwd)) run lint'; Expected = $true }
     @{ Kind = 'Positive'; Command = 'npm --prefix $(pwd)/$(echo x) run lint'; Expected = $true }
+    @{ Kind = 'Positive'; Command = 'FOO=$(pwd) npm --prefix $(pwd) run lint'; Expected = $true }
+    @{ Kind = 'Positive'; Command = 'env FOO=$(pwd) npm --prefix $(pwd) run lint'; Expected = $true }
+    @{ Kind = 'Positive'; Command = 'FOO=$(pwd) npx --prefix $(pwd) jest'; Expected = $true }
+    @{ Kind = 'Positive'; Command = 'env FOO=$(pwd) npx --prefix $(pwd) jest'; Expected = $true }
     # Negative: false before and after.
     @{ Kind = 'Negative'; Command = 'npm --version; echo $(pwd) lint'; Expected = $false }
     @{ Kind = 'Negative'; Command = 'echo $(npm --version) lint'; Expected = $false }
