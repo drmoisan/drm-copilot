@@ -338,6 +338,37 @@ Describe 'Invoke-TestSuiteLauncher argument and field reach (issue #1158, D26, D
         $start.ArgumentList[0] | Should -BeExactly 'run-jest.cjs'
     }
 
+    It 'places a jest-extension positional before the first --testPathIgnorePatterns word in ArgumentList' {
+        # Arrange
+        $case = Get-LauncherCase -ConfigText $script:RepoConfigText
+
+        # Act
+        $code = Invoke-LauncherCase -Case $case -Word @('jest-extension', 'test/jest-config-resolution.test.ts')
+
+        # Assert
+        $start = $case.State.Starts[0]
+        $code | Should -Be 0
+        $start.WorkingDirectory | Should -BeExactly (Join-Path '/repo' 'extensions/drm-copilot')
+        ($start.ArgumentList[0..2] -join '|') | Should -BeExactly 'run-jest.cjs|test/jest-config-resolution.test.ts|--testPathIgnorePatterns=/node_modules/'
+    }
+
+    It 'refuses a jest-extension integration operand with exit 2 and starts nothing, beside a valid positional run' {
+        # Arrange
+        $validCase = Get-LauncherCase -ConfigText $script:RepoConfigText
+        $refusedCase = Get-LauncherCase -ConfigText $script:RepoConfigText
+
+        # Act
+        $validCode = Invoke-LauncherCase -Case $validCase -Word @('jest-extension', 'test/a.test.ts')
+        $refusedCode = Invoke-LauncherCase -Case $refusedCase -Word @('jest-extension', 'test/a.integration.test.ts')
+
+        # Assert
+        $validCode | Should -Be 0
+        $validCase.State.Starts.Count | Should -Be 1
+        $refusedCode | Should -Be 2
+        $refusedCase.State.Errors[0] | Should -BeLike 'TEST_EXECUTION_POLICY_BLOCKED:*'
+        $refusedCase.State.Starts.Count | Should -Be 0
+    }
+
     It 'starts the built-in <Suite> suite in the repository root' -ForEach @(
         @{ Suite = 'pytest' }
         @{ Suite = 'pester' }
