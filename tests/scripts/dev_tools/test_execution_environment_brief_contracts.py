@@ -65,6 +65,14 @@ _REQUIRED_CONTEXTS = (
     "build-check / Build Package",
     "CI Required Gate",
 )
+# Issue #1190 contexts: shards 4 to 6 and the Python 3.13 static and shard jobs.
+# They are not in the ruleset, so they stay out of _REQUIRED_CONTEXTS, which
+# records the 2026-11-04 list.
+_ADDED_CONTEXTS = (
+    *(f"poshqc / PowerShell QC shard {n}" for n in (4, 5, 6)),
+    "quality-checks7 / Python 3.13 static",
+    *(f"quality-checks7 / Python 3.13 coverage shard {n}" for n in (1, 2)),
+)
 _REMOVED_DOCS_ONLY_CLAIM = (
     "every required context reports `success` without running its suite"
 )
@@ -324,7 +332,11 @@ def test_brief_ci_section_names_jobs_and_required_contexts() -> None:
             "2026-11-04",
             "single required context",
             "reports no expanded context",
+            "`shard 6` (six shards since issue #1190",
+            "`scripts/ci/Select-PythonTestShard.ps1`",
+            "`python-coverage-combine`",
             *(f"`{context}`" for context in _REQUIRED_CONTEXTS),
+            *(f"`{context}`" for context in _ADDED_CONTEXTS),
         ),
     )
 
