@@ -3,11 +3,11 @@
 - **Issue:** #1025
 - **Parent (optional):** epic #1018, child 1
 - **Owner:** drmoisan
-- **Last Updated:** 2026-11-14 (planning refresh against the tree that contains `origin/main` of 2026-11-14)
+- **Last Updated:** 2026-11-15 (scope change S2 after the X2 entry-check stop: `test-execution-policy` assigned to batch B, spec decision D-R7)
 - **Status:** Draft
-- **Version:** 3.0 (refresh: spec 0.5 decisions D-R1 to D-R3, Test Cadence and phase gates, parallel-only gates, Pester 6, refreshed skill sets and batch assignment, consolidated tasks). 2.1 (H1) and 2.0 (plan A and plan B split) precede it.
+- **Version:** 3.1 (S2: expected skill sets 102 names, 65 shared, 37 single-ecosystem; batch B 9; `## Size Justification` figures; traceability confirmed against plan B 2.2). 3.0 (refresh: spec 0.5 decisions D-R1 to D-R3, Test Cadence and phase gates, parallel-only gates, Pester 6, refreshed skill sets and batch assignment, consolidated tasks). 2.1 (H1) and 2.0 (plan A and plan B split) precede it.
 - **Work Mode:** full-feature
-- **Requirements sources:** `spec.md` (`## Acceptance Criteria`, authoritative, version 0.7, which adds decision D-R6 in `### Owner Decisions`), `user-story.md`, `research/research.2026-10-30T21-08.md`, `docs/features/epics/shared-agent-harness-layer/epic.md`
+- **Requirements sources:** `spec.md` (`## Acceptance Criteria`, authoritative, version 0.8, whose `### Owner Decisions` holds decisions D-R6 and D-R7), `user-story.md`, `research/research.2026-10-30T21-08.md`, `docs/features/epics/shared-agent-harness-layer/epic.md`
 - **Companion plan:** `owner-decision-plan.md` in this folder (plan B), delegated by the orchestrator after the owner stop in `## Owner Stop (Orchestrator-Owned, After Plan A)`. This file is the canonical plan path.
 
 ## Required References
@@ -21,8 +21,8 @@
 - `<FEATURE>` is `docs/features/active/2026-10-30-harness-survey-gold-standard-contracts-parity-matrix-1025`.
 - `SCRATCH` is `<session scratchpad>/issue-1025/`. Every helper script, staged copy and intermediate report lives under it with a name starting `issue-1025-`. Evidence records the token `SCRATCH`, never a host path. Scratch helpers are throwaway PowerShell and are never committed.
 - `MB` is the merge base of `origin/main` and `HEAD`, derived after fetching `origin/main` when the task runs. Every scope comparison uses `MB`.
-- Skill sets: the names of folders holding `SKILL.md` directly under `.claude/skills`, `.agents/skills` and `.github/skills`. The expected sets are research `### N2` plus the additions listed in spec `### Inventory context (informational, not an acceptance threshold)` (101 names; 64 shared, that is present in both `.claude/skills` and `.agents/skills`; 37 single-ecosystem).
-- Batch assignment (each shared name gets exactly one batch): a name listed in research `### 1.4 Recommended execution of the full survey` keeps that batch; otherwise a name starting `discovery-` goes to A; a name starting `docs-`, and `documentation-workflow`, go to F (documentation authoring and review); `owner-directives` goes to E (orchestration). Any other shared name is unassigned, which fails X2. Resulting sizes: A 16, B 8, C 5, D 11, E 7, F 17.
+- Skill sets: the names of folders holding `SKILL.md` directly under `.claude/skills`, `.agents/skills` and `.github/skills`. The expected sets are research `### N2` plus the additions listed in spec `### Inventory context (informational, not an acceptance threshold)` (102 names; 65 shared, that is present in both `.claude/skills` and `.agents/skills`; 37 single-ecosystem). The spec addition for scope change S2 (decision D-R7) is `test-execution-policy`, present in all three trees.
+- Batch assignment (each shared name gets exactly one batch): a name listed in research `### 1.4 Recommended execution of the full survey` keeps that batch; otherwise a name starting `discovery-` goes to A; a name starting `docs-`, and `documentation-workflow`, go to F (documentation authoring and review); `owner-directives` goes to E (orchestration); `test-execution-policy` goes to B (foundation and policy), as a cross-cutting policy skill like `execution-environment` (D-R7). Any other shared name is unassigned, which fails X2. Resulting sizes: A 16, B 9, C 5, D 11, E 7, F 17.
 - `BranchBaseline`: the paths in the latest `<FEATURE>/evidence/baseline/phase0-branch-snapshot.*.md`, written by X4.
 
 ## Edit Set (complete)
@@ -135,7 +135,7 @@ Batch records follow spec `### Survey Records`: each member read in every copy; 
   - Acceptance: every `Identity` and `Batch` value is in its enum; `<FEATURE>/evidence/baseline/survey-completeness.<timestamp>.md` has the four fields, `EXIT_CODE: 0`, `Missing: 0`, `Extra: 0` and `Duplicated: 0`.
 - [ ] [P1-T3] Create `<FEATURE>/survey/batch-a-discovery.md` with the 16 batch A records.
   - Acceptance: one `### ` record per batch A name and no other; each has `Presence:`, `Identity:`, `Proposed disposition:` and `Objective (draft):`.
-- [ ] [P1-T4] Create `<FEATURE>/survey/batch-b-foundation-and-policy.md` with the 8 batch B records.
+- [ ] [P1-T4] Create `<FEATURE>/survey/batch-b-foundation-and-policy.md` with the 9 batch B records.
   - Acceptance: as P1-T3, for batch B.
 - [ ] [P1-T5] Create `<FEATURE>/survey/batch-c-integration.md` with the 5 batch C records, recording the `feature-promotion-lifecycle` MCP-only versus fallback conflict as a difference row.
   - Acceptance: as P1-T3, for batch C; the `feature-promotion-lifecycle` record has one or more rows referencing `## MCP-First Execution Rule`.
@@ -179,8 +179,8 @@ Each contract task writes `.agents/skills/<name>/references/standard.md` for eve
   - Acceptance: `<FEATURE>/evidence/other/matrix-bootstrap.<timestamp>.md` has the four fields, `EXIT_CODE: 0`, counts per `kind` and per `disposition`, the `pending-source:` count, the count of ids carrying `~` with the base id of each duplicate group, the count of entries whose `source_path` is a dispatch registry, `Unmatched: 0`, `Violations: 0`, `Approved: 0`, and a count of `codex:skill` entries with disposition `shared` equal to the `skill-survey.md` rows with `Claude` and `Codex` both `yes`.
 - [ ] [P3-T2] Create the 16 batch A contracts `.agents/skills/<name>/references/standard.md` and their bundle copies under `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/`.
   - Acceptance: `<FEATURE>/evidence/other/contracts-a.<timestamp>.md` records 16 files and `Violations: 0`; the task check records 0 failed for the Python contract set and the three sweep suites.
-- [ ] [P3-T3] Create the 8 batch B contracts `.agents/skills/<name>/references/standard.md` and their bundle copies under `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/`.
-  - Acceptance: as P3-T2, with `contracts-b` and 8 files.
+- [ ] [P3-T3] Create the 9 batch B contracts `.agents/skills/<name>/references/standard.md` and their bundle copies under `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/`.
+  - Acceptance: as P3-T2, with `contracts-b` and 9 files.
 - [ ] [P3-T4] Create the 5 batch C contracts `.agents/skills/<name>/references/standard.md` and their bundle copies under `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/`.
   - Acceptance: as P3-T2, with `contracts-c` and 5 files.
 - [ ] [P3-T5] Create the 11 batch D contracts `.agents/skills/<name>/references/standard.md` and their bundle copies under `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/`.
@@ -267,7 +267,7 @@ Resume conditions checked by the orchestrator before delegating plan B (it write
 | US-AC-PG parity_group on hook, permission, subagent field entries (user-story) | P2-T3, P3-T10 | — |
 | US-AC-CP Copilot entries approved or provisional with issue-keyed `decision_ref` (user-story) | — | B P1-T3, B P1-T5 |
 
-Plan-A-only rows (checked off at P4-T8): SPEC-AC-01, 02, 03, 07, 11, 13, 14, 17, 18, 19, 20, 26 and US-AC-PG. Every other row is checked off by plan B, except SPEC-AC-15, which the orchestrator checks off at S9. User-story criteria not in the table restate spec rows and are checked off by plan B P2-T6; the criterion beginning `The completeness gate fails on` is CI-dependent and checked off by the orchestrator at S9. Plan B cites plan A artifacts by name; its own revision is separate and follows this one.
+Plan-A-only rows (checked off at P4-T8): SPEC-AC-01, 02, 03, 07, 11, 13, 14, 17, 18, 19, 20, 26 and US-AC-PG. Every other row is checked off by plan B, except SPEC-AC-15, which the orchestrator checks off at S9. User-story criteria not in the table restate spec rows and are checked off by plan B P2-T6; the criterion beginning `The completeness gate fails on` is CI-dependent and checked off by the orchestrator at S9. Plan B cites plan A artifacts by name. The plan B column cites the task identifiers of plan B version 2.2 (Phase 0 `P0-T1` to `P0-T4`, Phase 1 `P1-T1` to `P1-T5`, Phase 2 `P2-T1` to `P2-T7`), re-checked against that file in plan A version 3.1; each cited task's subject matches its row.
 
 ## Citations Re-Checked at Phase 0
 
@@ -311,7 +311,7 @@ Plan-A-only rows (checked off at P4-T8): SPEC-AC-01, 02, 03, 07, 11, 13, 14, 17,
 
 ## Size Justification
 
-Plan A has 43 tasks, above the 40-task guideline that applies to this plan file's stamp. The feature combines a 101-name content survey (six batch files of 64 shared records plus 37 single-ecosystem records), five runbooks and an E5 record, three modules with four test files, the tier classification of the new project, 64 contracts in six batch tasks each paired with its bundle copy, three phase gates, and a final QA loop with stop readiness. This revision merged module and test creation, contract and bundle-copy pairs, the five runbook tasks, and the bootstrap and violation check, and removed the policy-read and serial-run tasks; merging the batch tasks further would join unrelated skill families into one acceptance condition. The post-decision work is in plan B.
+Plan A has 43 tasks, above the 40-task guideline that applies to this plan file's stamp. The feature combines a 102-name content survey (six batch files of 65 shared records plus 37 single-ecosystem records), five runbooks and an E5 record, three modules with four test files, the tier classification of the new project, 65 contracts in six batch tasks each paired with its bundle copy, three phase gates, and a final QA loop with stop readiness. This revision merged module and test creation, contract and bundle-copy pairs, the five runbook tasks, and the bootstrap and violation check, and removed the policy-read and serial-run tasks; merging the batch tasks further would join unrelated skill families into one acceptance condition. The post-decision work is in plan B.
 
 ## Open Questions / Notes
 
@@ -321,4 +321,5 @@ Plan A has 43 tasks, above the 40-task guideline that applies to this plan file'
 - F5: `scripts/harness` is T4 because the modules are repository-internal CI tooling; a later child that publishes them re-classifies the entry.
 - F6: seven `SubagentStop` registrations are still declared both in `.claude/settings.json` and in agent frontmatter (`atomic-planner`, `feature-review`, `prd-feature`, `pr-author`, `orchestrator`, `epic-orchestrator`, `parallel-orchestrator`), so fourteen entries carry the disambiguator; P3-T1 records the count observed at execution. The dispatch registries hold no same-identity duplicate at planning.
 - F7: `decision_status` stays the enum `approved`, `provisional`; the child 6 risk R4 is accepted with no schema change.
-- R-1 (refresh decisions): spec 0.5 records D-R1 to D-R3; plan B (`owner-decision-plan.md`) is revised separately and must re-map plan A task identifiers it cites.
+- R-1 (refresh decisions): spec 0.5 records D-R1 to D-R3; plan B (`owner-decision-plan.md`) re-mapped the plan A task identifiers it cites in its version 2.0, and plan A version 3.1 confirms both directions of the cross-reference (`## Acceptance Criteria Traceability`).
+- S2 (scope change, orchestrator, autonomous mode, spec decision D-R7): the X2 entry check of 2026-11-16 (UTC) observed one shared name added on `main` after the 2026-11-14 refresh, `test-execution-policy` (#1158); it is assigned to batch B. No task is added, removed or reordered; the figures in `## Definitions`, P1-T4, P3-T3 and `## Size Justification` carry the change. The X3 entry check observed that `.claude/settings.local.json` and `.vscode/settings.json` are both tracked; both stay excluded from the inventory, and P3-T8 records the observation under Q5.

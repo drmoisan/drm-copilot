@@ -3,9 +3,9 @@
 - **Issue:** #1025
 - **Parent (optional):** epic #1018, child 1
 - **Owner:** drmoisan
-- **Last Updated:** 2026-11-14 (refresh against the tree that contains `origin/main` of 2026-11-14)
+- **Last Updated:** 2026-11-15 (scope change S2, spec decision D-R7: `test-execution-policy` joins plan A batch B)
 - **Status:** Draft
-- **Version:** 2.1 (spec 0.6 D-R4 and D-R5 in rules 1, 3 and 9; P1-T3 counters for rules 4 to 8 and `dropped` overrides). 2.0 (refresh: plan A 3.0 task identifiers, spec 0.5 D-R2 parallel-only gates and leak scan, Pester 6, Test Cadence and phase gate, write-time evidence stamps, deferral rows and autonomous approval, consolidated tasks). 1.3 (H2), 1.2 and 1.1 (H1) precede it.
+- **Version:** 2.2 (S2 review against plan A 3.1: no plan B figure, task identifier or citation depends on the skill-set counts or batch sizes, because plan B derives its contract set from the matrix and its survey edits from the plan A records; plan A `## Acceptance Criteria Traceability` cites the current plan B task identifiers). 2.1 (spec 0.6 D-R4 and D-R5 in rules 1, 3 and 9; P1-T3 counters for rules 4 to 8 and `dropped` overrides). 2.0 (refresh: plan A 3.0 task identifiers, spec 0.5 D-R2 parallel-only gates and leak scan, Pester 6, Test Cadence and phase gate, write-time evidence stamps, deferral rows and autonomous approval, consolidated tasks). 1.3 (H2), 1.2 and 1.1 (H1) precede it.
 - **Work Mode:** full-feature
 - **Requirements sources:** `spec.md` (`## Acceptance Criteria`, `## Owner Stop`), `user-story.md`, `plan.2026-10-30T17-06.md` (plan A: `## Gate Shape`, `## Matrix Bootstrap Rules`, `## Owner Stop (Orchestrator-Owned, After Plan A)`, `## Acceptance Criteria Traceability`)
 - **Delegation:** the orchestrator delegates this plan only after plan A is complete and the resume conditions R1 to R4 of plan A `## Owner Stop (Orchestrator-Owned, After Plan A)` hold. Plan A remains the canonical plan path.
