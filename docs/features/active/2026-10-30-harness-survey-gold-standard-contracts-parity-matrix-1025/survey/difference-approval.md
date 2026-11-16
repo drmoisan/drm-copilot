@@ -1,8 +1,8 @@
 # Difference Classification Approval (Issue #1025)
 
-- Approval-Status: pending
-- Approved-By:
-- Approved-At:
+- Approval-Status: approved-with-overrides
+- Approved-By: orchestrator-autonomous-mode (decision record under the owner's standing autonomous-mode instruction; see evidence/other/owner-stop-decision.2026-11-16T03-51.md)
+- Approved-At: 2026-11-16T03-51
 
 Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as a block under `## Disputed Cases` when a disputed-case rule of spec `### Owner Approval Artifact` applies (an enforcement behavior differs, two copies assert conflicting authority, the classification depends on information the survey could not verify, or the proposal drops a native feature).
 
@@ -378,27 +378,24 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 
 | Question | Recommended default | Owner answer |
 | --- | --- | --- |
-| Q | 1 | |
-| D | e | |
-| Q | 2 | |
-| U | n | |
-| Q | 3 | |
-| T | h | |
-| Q | 4 | |
-| C | h | |
-| Q | 5 | |
-| D | e | |
-| Q | 6 | |
-| R | e | |
-| Q | 7 | |
-| Y | e | |
-| Q | 8 | |
-| Y | e | |
+| Q1: Should `references/standard.md` files reach destination repositories through pack-manifest entries, or stay repository-local? | Decide in child 4; child 1 adds bundle copies only and no manifest entries. | Default accepted (orchestrator, autonomous mode). |
+| Q2: Should a shared `SKILL.md` link to its contract, or should the contract stay an unlinked judging standard? | Unlinked in child 1; child 3 decides when it authors the neutral bodies. | Default accepted (orchestrator, autonomous mode). |
+| Q3: Should the survey propose `shared` or `native` for each single-ecosystem skill, with contracts for every skill approved as `shared`, or are contracts limited to names already in both Claude and Codex? | The former: proposals for every single-ecosystem skill, contracts for every approved `shared` skill. F2 constraint: a Claude-only name approved `shared` gets its contract from child 3, because `.agents/skills/<name>/` may not exist without a bundled `SKILL.md`. | Default accepted (orchestrator, autonomous mode). |
+| Q4: Does porting of approved positives happen in child 3 rather than child 1? | Child 3; child 1 records class and port direction and edits no `SKILL.md`. | Default accepted (orchestrator, autonomous mode). |
+| Q5: If E4 shows workspace scope works, should the repository commit `.vscode/settings.json` or deliver the settings another way? | Decision belongs to child 6; child 1 reports the fact and the E4 result. X3 observation: `.vscode/settings.json` and `.claude/settings.local.json` are both tracked. | Default accepted (orchestrator, autonomous mode); E4 is deferred. |
+| Q6: Is one matrix entry per hook registration sufficient, or is an entry wanted for every hook script and library file? | Registrations only; library and helper files are excluded as implementation. | Default accepted (orchestrator, autonomous mode). |
+| Q7: Is E6 (default double loading by Copilot) in scope for child 1? | Yes, run in the same scratch repository as E4. | Default accepted (orchestrator, autonomous mode); E6 is deferred with E4. |
+| Q8: Is `decision_ref` keyed by issue number and relative to the feature folder (`#1025:survey/difference-approval.md#...`)? | Yes, issue-keyed form as specified in `### Decision Reference Format`. | Default accepted (orchestrator, autonomous mode). |
 
 ## Owner Overrides
 
 | Diff ID or feature id | Owner decision | Note |
 | --- | --- | --- |
+| E1 | deferred: owner-run runbook not executed in the autonomous run | Requires interactive Copilot in VS Code and the Copilot CLI against a scratch repository; dependent entries stay provisional with decision_ref naming the runbook. |
+| E2 | deferred: owner-run runbook not executed in the autonomous run | Requires an interactive Codex session in a scratch repository to observe skill listing and frontmatter warnings; skill-frontmatter-field entries stay provisional. |
+| E3 | deferred: owner-run runbook not executed in the autonomous run | Requires the Copilot CLI and the Copilot cloud agent on a scratch repository; copilot:agent entries keep their plan A disposition and stay provisional. |
+| E4 | deferred: owner-run runbook not executed in the autonomous run | Requires the VS Code settings UI and Copilot chat in a scratch workspace; dependent entries stay provisional. |
+| E6 | deferred: owner-run runbook not executed in the autonomous run | Requires Copilot in VS Code and the Copilot CLI in the E4 scratch workspace; dependent consumers stay as plan A wrote them. |
 
 ## Disputed Cases
 
@@ -408,7 +405,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `codex->claude`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-feature-promotion-lifecycle-08
 
@@ -416,7 +413,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Classify as negative: the shared body omits this section, so agent sessions keep the MCP-only rule with no fallback branch.
 - Option B: Classify as positive: port the fallback section into the shared body, so agent sessions may use the non-MCP fallback.
 - Recommendation: A, because the MCP-only rule is the later hardening and the fallback text predates it.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-feature-promotion-lifecycle-09
 
@@ -424,7 +421,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Classify as negative: the shared body omits this section, so agent sessions keep the MCP-only rule with no fallback branch.
 - Option B: Classify as positive: port the fallback section into the shared body, so agent sessions may use the non-MCP fallback.
 - Recommendation: A, because the MCP-only rule is the later hardening and the fallback text predates it.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-feature-promotion-lifecycle-10
 
@@ -432,7 +429,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Classify as negative: the shared body omits this section, so agent sessions keep the MCP-only rule with no fallback branch.
 - Option B: Classify as positive: port the fallback section into the shared body, so agent sessions may use the non-MCP fallback.
 - Recommendation: A, because the MCP-only rule is the later hardening and the fallback text predates it.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-feature-promotion-lifecycle-11
 
@@ -440,7 +437,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Classify as negative: the shared body omits this section, so agent sessions keep the MCP-only rule with no fallback branch.
 - Option B: Classify as positive: port the fallback section into the shared body, so agent sessions may use the non-MCP fallback.
 - Recommendation: A, because the MCP-only rule is the later hardening and the fallback text predates it.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-feature-promotion-lifecycle-12
 
@@ -448,7 +445,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Classify as negative: the shared body omits this section, so agent sessions keep the MCP-only rule with no fallback branch.
 - Option B: Classify as positive: port the fallback section into the shared body, so agent sessions may use the non-MCP fallback.
 - Recommendation: A, because the MCP-only rule is the later hardening and the fallback text predates it.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-feature-promotion-lifecycle-13
 
@@ -456,7 +453,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Classify as negative: the shared body omits this section, so agent sessions keep the MCP-only rule with no fallback branch.
 - Option B: Classify as positive: port the fallback section into the shared body, so agent sessions may use the non-MCP fallback.
 - Recommendation: A, because the MCP-only rule is the later hardening and the fallback text predates it.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-orchestrate-09
 
@@ -464,7 +461,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `codex->claude`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-orchestrate-12
 
@@ -472,7 +469,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `codex->claude`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-orchestrate-13
 
@@ -480,7 +477,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `codex->claude`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-orchestrate-15
 
@@ -488,7 +485,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `codex->claude`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-orchestrate-24
 
@@ -496,7 +493,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `codex->claude`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-orchestrate-34
 
@@ -504,7 +501,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `claude->codex`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-orchestrate-42
 
@@ -512,7 +509,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `claude->codex`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-orchestrate-43
 
@@ -520,7 +517,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `claude->codex`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-remediation-handoff-atomic-planner-17
 
@@ -528,7 +525,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `claude->codex`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-remediation-handoff-atomic-planner-21
 
@@ -536,7 +533,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `claude->codex`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-translate-copilot-to-claude-03
 
@@ -544,7 +541,7 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `codex->claude`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
 
 ### D-translate-copilot-to-claude-14
 
@@ -552,4 +549,4 @@ Each Diff ID of the batch records appears once: in `## Bulk Approval Set`, or as
 - Option A: Accept `positive` with port `claude->codex`: child 3 ports the section into the shared body.
 - Option B: Classify as mechanism-only or neutral: the section stays where it is and the shared body does not carry it.
 - Recommendation: A, because the section states an enforcement behavior that the copy lacking it does not express elsewhere.
-- Owner-Decision:
+- Owner-Decision: A
