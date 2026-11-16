@@ -29,10 +29,13 @@ $ErrorActionPreference = 'Stop'
 # Import the shared checkpoint-value primitives, resolved relative to this
 # module's directory so the import travels with the pushed-down pack.
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path (Split-Path -Parent $PSScriptRoot) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 $script:FEATURE_FOLDER_TOOL = 'new_active_feature_folder'
 $script:FEATURE_FOLDER_RECORD_KEY = 'feature_folder_record'
-$script:FEATURE_FOLDER_PATH_PATTERN = '\Adocs/features/active/[A-Za-z0-9][A-Za-z0-9._-]*(/[A-Za-z0-9][A-Za-z0-9._-]*)*\z'
+# The record path may name the active area of either known development-docs root;
+# the error text keeps naming docs/features/active (D-P11).
+$script:FEATURE_FOLDER_PATH_PATTERN = '\A(?:' + (@(Get-DevelopmentDocsKnownRoot | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')/active/[A-Za-z0-9][A-Za-z0-9._-]*(/[A-Za-z0-9][A-Za-z0-9._-]*)*\z'
 $script:FEATURE_FOLDER_VERIFIED_VIA = [string[]]@('git_cat_file_head', 'git_ls_tree_head')
 
 $script:ERROR_RECORD_NOT_OBJECT = 'Checkpoint issue_adoption.feature_folder_record must be an object when waiving new_active_feature_folder.'

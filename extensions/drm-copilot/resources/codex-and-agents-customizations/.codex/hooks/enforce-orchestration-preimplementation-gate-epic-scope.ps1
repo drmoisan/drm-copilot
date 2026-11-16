@@ -58,9 +58,10 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-o
 $script:OrchestrationGateAmbiguousReasonCode = 'TARGET_WORKTREE_AMBIGUOUS'
 $script:OrchestrationGateNotDerivableReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'
 
-# An epic manifest lives under the epics tree; the pattern is tested after backslash
-# normalisation so either separator spelling is accepted.
-$script:EpicScopeManifestPattern = '(^|/)docs/features/epics/'
+# An epic manifest lives under the epics area of either known development-docs root;
+# the pattern is tested after backslash normalisation so either separator spelling is
+# accepted.
+$script:EpicScopeManifestPattern = '(^|/)(?:' + (@(Get-DevelopmentDocsKnownRootPrefix -Area 'epics' | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
 
 # The two per-mode read seams (issue #554). Each takes its path from the fixed mode
 # table and never from a delegation's own text; an absent file returns an empty

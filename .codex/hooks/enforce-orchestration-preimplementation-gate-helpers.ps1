@@ -22,13 +22,12 @@
     precedent set by enforce-pr-author-skill.ps1.
 #>
 
-# The five exempt orchestration-bookkeeping trees (D2). Directory prefixes, repo-relative,
-# forward-slash spelled. No glob, no absolute entry, no literal-file entry.
+# The exempt orchestration-bookkeeping trees (D2): the epics, parallel, active, and
+# potential areas of every known development-docs root (issue #1035), then the
+# orchestration artifacts tree. Directory prefixes, repo-relative, forward-slash
+# spelled. No glob, no absolute entry, no literal-file entry.
 $script:OrchestrationBookkeepingTrees = @(
-    'docs/features/epics/'
-    'docs/features/parallel/'
-    'docs/features/active/'
-    'docs/features/potential/'
+    @('epics', 'parallel', 'active', 'potential') | ForEach-Object { Get-DevelopmentDocsKnownRootPrefix -Area $_ }
     'artifacts/orchestration/'
 )
 

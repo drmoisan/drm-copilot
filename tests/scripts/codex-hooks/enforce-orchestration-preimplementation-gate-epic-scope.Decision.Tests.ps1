@@ -29,6 +29,8 @@
 Describe 'Codex epic-scope decision tail (issue #903)' {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
+        # The dot-sourced file reads the development-docs root module that its gate imports (D-P16).
+        Import-Module (Join-Path $script:RepoRoot '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -Force
         . (Join-Path $script:RepoRoot '.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1')
         . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
         if (Get-Command Get-CheckpointContent -ErrorAction SilentlyContinue) { Mock Get-CheckpointContent { $null } }

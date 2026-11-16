@@ -30,6 +30,7 @@ $ErrorActionPreference = 'Stop'
 # module's directory so the import travels with the pushed-down pack.
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateFeatureFolderRecord.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path (Split-Path -Parent $PSScriptRoot) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 $script:ISSUE_ADOPTION_KEY = 'issue_adoption'
 $script:POTENTIAL_TO_ISSUE_TOOL = 'potential_to_issue'
@@ -44,7 +45,8 @@ $script:VERIFIED_VIA_VALUES = [string[]]@('gh_issue_view', 'gh_api_get', 'github
 # tool, which also requires a valid feature_folder_record (rules 10 and 11).
 $script:WAIVABLE_TOOLS = [string[]]@($script:POTENTIAL_TO_ISSUE_TOOL, $script:FEATURE_PROMOTION_ENTRY_TOOL, $script:BUG_PROMOTION_ENTRY_TOOL, $script:FEATURE_FOLDER_TOOL)
 $script:PROMOTION_ENTRY_TOOLS = [string[]]@($script:FEATURE_PROMOTION_ENTRY_TOOL, $script:BUG_PROMOTION_ENTRY_TOOL)
-$script:POTENTIAL_RECORD_PREFIX = 'docs/features/potential/'
+# A potential record may live under either known development-docs root.
+$script:POTENTIAL_RECORD_PREFIXES = @(Get-DevelopmentDocsKnownRootPrefix -Area 'potential')
 $script:POTENTIAL_RECORD_SUFFIX = '.md'
 # Origins whose promotion-entry waiver may omit the potential_record key (rule 9).
 $script:RECORD_OPTIONAL_ORIGINS = [string[]]@('transferred', 'filed_before_orchestration')
@@ -304,7 +306,7 @@ function Get-AdoptionPotentialRecordError {
     $recordIsValid = $false
     if ($PotentialRecord -is [string]) {
         $record = [string]$PotentialRecord
-        $recordIsValid = $record.StartsWith($script:POTENTIAL_RECORD_PREFIX, [System.StringComparison]::Ordinal) -and $record.EndsWith($script:POTENTIAL_RECORD_SUFFIX, [System.StringComparison]::Ordinal)
+        $recordIsValid = (@($script:POTENTIAL_RECORD_PREFIXES | Where-Object { $record.StartsWith($_, [System.StringComparison]::Ordinal) }).Count -gt 0) -and $record.EndsWith($script:POTENTIAL_RECORD_SUFFIX, [System.StringComparison]::Ordinal)
     }
     if ($recordIsValid) { return [string[]]@() }
 

@@ -147,6 +147,31 @@ Describe 'validate-task-researcher-output.ps1' {
             $result.Message | Should -BeNullOrEmpty
         }
 
+        It 'accepts a <Label> research path under the .dev root' -ForEach @(
+            @{ Label = 'feature-folder'; Path = '.dev/active/some-feature-227/research/2026-06-24T13-02-some-feature-research.md' }
+            @{ Label = 'one-off'; Path = '.dev/research/2026-06-24T13-02-some-topic-research.md' }
+        ) {
+            # Arrange - research under either research root of the .dev development-docs root (issue #1035)
+            Mock -CommandName Test-ResearchFile -MockWith { $true }
+
+            # Act
+            $result = Invoke-TaskResearcherOutputValidation -InputText (ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage "research-path: $Path")
+
+            # Assert
+            $result.Ok | Should -BeTrue
+            $result.Message | Should -BeNullOrEmpty
+        }
+
+        It 'classifies <Path> as feature research <Expected>' -ForEach @(
+            @{ Path = '.dev/active/some-feature-227/research/x.md'; Expected = $true }
+            @{ Path = '.dev/research/x.md'; Expected = $false }
+            @{ Path = '.devx/active/some-feature-227/research/x.md'; Expected = $false }
+            @{ Path = 'docs/features/active/some-feature-227/research/x.md'; Expected = $true }
+        ) {
+            # Act / Assert - only the feature-folder form under a known root counts as feature research
+            (Test-IsFeatureDocsRootPath -Path $Path) | Should -Be $Expected
+        }
+
         It 'rejects the retired artifacts/research/ path with a message naming the new roots' {
             # Arrange - the old artifacts/research/ root is no longer accepted
             Mock -CommandName Test-ResearchFile -MockWith { $true }

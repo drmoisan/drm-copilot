@@ -498,7 +498,7 @@ All such tests use in-memory fakes; no temporary files are created.
 ### Dot-folder handling
 
 - [x] The include-dot behavior of `compileGlob`/`RealFileSystem.glob` in `src/lib/file-system.ts` is stated by a named constant or documented comment, and a test shows the matching seam matches `.dev/active/x/spec.md` for the patterns `**` and `**/*.md`.
-- [ ] Each of `iterGovernedFiles` (`json-config.ts`), `json-validator.ts`, `evidence-locations.ts`, `verification-evidence.ts` and `feature-docs-parsers.ts` has a Jest test, using in-memory fakes, that finds a file under `.dev`.
+- [x] Each of `iterGovernedFiles` (`json-config.ts`), `json-validator.ts`, `evidence-locations.ts`, `verification-evidence.ts` and `feature-docs-parsers.ts` has a Jest test, using in-memory fakes, that finds a file under `.dev`.
 - [x] A Jest test asserts `isExcludedDirectoryName(".dev")` returns `true`.
 
 ### Feature-folder name parser and folder creation

@@ -21,6 +21,8 @@ Describe 'hook-epic-fan-in.ps1 <Surface> copy (issue #1136)' -ForEach @(
 ) {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
+        # The dot-sourced file reads the development-docs root module that its gate imports (D-P16).
+        Import-Module (Join-Path $script:RepoRoot '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -Force
         . (Join-Path $script:RepoRoot "$HookDirectory/enforce-orchestration-preimplementation-gate-helpers.ps1")
         if ($Surface -eq 'Claude') {
             Import-Module (Join-Path $script:RepoRoot '.claude/lib/worktree-resolution/HookTargetWorktree.psm1')

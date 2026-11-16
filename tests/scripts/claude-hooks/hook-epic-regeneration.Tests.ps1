@@ -25,6 +25,8 @@ Describe 'hook-epic-regeneration.ps1 <Surface> copy (issue #1156)' -ForEach @(
     BeforeAll {
         $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
         $script:HookPath = Join-Path $script:RepoRoot "$HookDirectory/hook-epic-regeneration.ps1"
+        # The dot-sourced file reads the development-docs root module that its gate imports (D-P16).
+        Import-Module (Join-Path $script:RepoRoot '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -Force
         . (Join-Path $script:RepoRoot "$HookDirectory/enforce-orchestration-preimplementation-gate-helpers.ps1")
         if ($Surface -eq 'Claude') {
             Import-Module (Join-Path $script:RepoRoot '.claude/lib/worktree-resolution/HookTargetWorktree.psm1')

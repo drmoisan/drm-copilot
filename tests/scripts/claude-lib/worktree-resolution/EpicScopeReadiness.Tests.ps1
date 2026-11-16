@@ -90,3 +90,17 @@ Describe 'Get-EpicCommandLegReadinessFailure' {
         $failure | Should -Be $Conjunct -Because "the single change ($Label) fails exactly that conjunct"
     }
 }
+
+Describe 'EpicScopeReadiness development-docs root union' {
+    It 'command-leg readiness accepts an epic_manifest_path under .dev/epics/' {
+        # Arrange: the manifest lives under the .dev epics area.
+        $checkpoint = New-ReadyEpicCheckpoint
+        $checkpoint.epic_manifest_path = '.dev/epics/sample-epic/epic.md'
+
+        # Act
+        $failure = Get-EpicCommandLegReadinessFailure -Checkpoint $checkpoint -MergeInProgress $true
+
+        # Assert
+        $failure | Should -Be '' -Because 'the manifest matcher accepts the epics area of either known root'
+    }
+}

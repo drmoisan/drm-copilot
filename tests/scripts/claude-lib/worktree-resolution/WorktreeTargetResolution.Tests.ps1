@@ -182,6 +182,17 @@ Describe 'WorktreeTargetResolution' {
             $actual | Should -BeExactly $Expected
         }
 
+        It 'returns the .dev feature-folder token for <Label>' -ForEach @(
+            @{ Label = 'a repo-relative .dev path'; Text = 'see .dev/active/2026-09-13-item-700/spec.md'; Expected = '.dev/active/2026-09-13-item-700' }
+            @{ Label = 'an absolute .dev path'; Text = 'Plan C:\repo-wt\session\.dev\active\2026-09-13-item-700\spec.md now.'; Expected = 'C:\repo-wt\session\.dev\active\2026-09-13-item-700' }
+        ) {
+            # Arrange / Act: extract a token under the .dev development-docs root.
+            $actual = Find-WorktreeResolutionFeatureFolderSignal -Text $Text
+
+            # Assert: the matcher accepts the active area of either known root.
+            $actual | Should -BeExactly $Expected
+        }
+
         It 'reads a branch from <Label>' -ForEach @(
             @{ Label = 'a --head option'; Text = 'gh pr create --head feature/item-700 --base main'; Expected = 'feature/item-700' }
             @{ Label = 'a --branch= option'; Text = 'run --branch=feature/sibling-701.'; Expected = 'feature/sibling-701' }

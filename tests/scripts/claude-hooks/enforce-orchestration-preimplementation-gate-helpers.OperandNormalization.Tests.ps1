@@ -15,6 +15,8 @@ Describe 'preimplementation gate helpers operand normalization (<Surface>)' -For
 ) {
     BeforeAll {
         $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
+        # The dot-sourced file reads the development-docs root module that its gate imports (D-P16).
+        Import-Module (Join-Path $repoRoot '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -Force
         $helpersPath = Join-Path (Join-Path $repoRoot $Surface) 'enforce-orchestration-preimplementation-gate-helpers.ps1'
         . $helpersPath
     }

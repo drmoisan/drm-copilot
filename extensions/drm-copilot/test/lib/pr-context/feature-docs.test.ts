@@ -4,9 +4,11 @@ import { TreeFileSystem } from "./tree-file-system";
 import {
   completedPlanTasks,
   extractIssueReferences,
+  latestGlobPath,
   parseSection,
   relativeToPosix,
   resolveFeatureDir,
+  resolveReadinessSignal,
 } from "../../../src/lib/pr-context/feature-docs-parsers";
 import { gatherFeatureExcerpts } from "../../../src/lib/pr-context/feature-docs";
 
@@ -393,5 +395,35 @@ describe("gatherFeatureExcerpts development-docs root", () => {
 
     // Assert
     expect(excerpts.map((excerpt) => excerpt.feature)).toEqual(["1016-foo"]);
+  });
+});
+
+describe("feature-docs-parsers glob under the .dev root", () => {
+  it("latestGlobPath finds the newest plan file under a .dev feature folder", () => {
+    // Arrange: the in-memory glob is the production compileGlob matcher.
+    const fs = new TreeFileSystem();
+    const dir = `${ROOT}/.dev/active/1016-foo`;
+    fs.addFile(`${dir}/plan.2026-11-01T10-00.md`, "# Plan A");
+    fs.addFile(`${dir}/plan.2026-11-02T10-00.md`, "# Plan B");
+
+    // Act
+    const latest = latestGlobPath(fs, dir, "plan.*.md");
+
+    // Assert
+    expect(latest).toBe(`${dir}/plan.2026-11-02T10-00.md`);
+  });
+
+  it("resolveReadinessSignal reads a feature audit under a .dev feature folder", () => {
+    // Arrange
+    const fs = new TreeFileSystem();
+    const dir = `${ROOT}/.dev/active/1016-foo`;
+    fs.addFile(`${dir}/feature-audit.2026-11-02T10-00.md`, "Readiness: PASS\n");
+
+    // Act
+    const [readiness, source] = resolveReadinessSignal(fs, dir);
+
+    // Assert
+    expect(readiness).toBe("PASS");
+    expect(source).toBe(`${dir}/feature-audit.2026-11-02T10-00.md`);
   });
 });
