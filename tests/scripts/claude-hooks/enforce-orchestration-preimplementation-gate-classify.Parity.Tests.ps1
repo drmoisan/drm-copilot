@@ -2,6 +2,7 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 
 # Issue #1188 - surface parity for the preimplementation gate classification supplement.
+# Issue #1195 adds the #1195 wording token and the help and Cases-header row for the wrapped-payload form.
 #
 # enforce-orchestration-preimplementation-gate-classify.ps1 ships on four surfaces: the Claude
 # and Codex canonical hook trees and their two bundled push-down payloads. These cases compare
@@ -70,8 +71,28 @@ Describe 'enforce-orchestration-preimplementation-gate-classify.ps1 surface pari
 
         # Assert
         $section | Should -Not -BeNullOrEmpty -Because "$Copy must carry a bounded ## Hook Execution Context section"
-        foreach ($token in @('enforce-orchestration-preimplementation-gate-classify.ps1', 'npx --yes', 'inline option value')) {
+        foreach ($token in @('enforce-orchestration-preimplementation-gate-classify.ps1', 'npx --yes', 'inline option value', '#1195')) {
             $section.Contains($token) | Should -BeTrue -Because "the Hook Execution Context section of $Copy must name $token"
+        }
+    }
+
+    It 'states the issue #1195 wrapped-payload form in the classify help and the wrapped tables in the Cases header' {
+        # Arrange
+        $classifyTokens = $null
+        $null = [System.Management.Automation.Language.Parser]::ParseFile($script:ClassifyPaths[0], [ref]$classifyTokens, [ref]$null)
+        $casesTokens = $null
+        $null = [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $script:RepoRoot 'tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-classify.Cases.ps1'), [ref]$casesTokens, [ref]$null)
+
+        # Act
+        $help = [string](@($classifyTokens | Where-Object { $_.Kind -eq 'Comment' })[0].Text)
+        $header = [string](@($casesTokens | Where-Object { $_.Kind -eq 'Comment' })[0].Text)
+
+        # Assert
+        foreach ($token in @('Get-OrchestrationGateWrappedPatternIndex', 'EncodedCommand', 'D18')) {
+            $help.Contains($token) | Should -BeTrue -Because "the comment-based help of the classify sibling must name $token"
+        }
+        foreach ($token in @('ClassifyWrappedFunctionRows', 'ClassifyWrappedGateRows')) {
+            $header.Contains($token) | Should -BeTrue -Because "the header comment of the Cases file must define $token"
         }
     }
 }

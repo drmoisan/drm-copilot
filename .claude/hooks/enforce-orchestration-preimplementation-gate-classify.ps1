@@ -24,9 +24,23 @@
     Each returned index still passes stage 2 (Test-OrchestrationGateInvocationConfirmed) and the
     index-0 bookkeeping rule in the gate. This narrows the spec non-goal "no command is newly
     classified" to: no command other than these two forms is newly classified.
+
+    Get-OrchestrationGateWrappedPatternIndex (issue #1195) returns the stage-1 indexes 1 to 4 that
+    a literal wrapper payload matches, so 'sh -c "pytest -q"' is classified as the bare command. The
+    wrappers are the sh family with -c or a bundle containing c, pwsh and powershell with -c, a
+    -Command prefix, -CommandWithArgs, or -cwa, and eval, after assignments, env with its value
+    options, timeout, time, command, nohup, or xargs injected words; literal nested wrappers are
+    followed to depth 4. Each payload is scanned as a bare command line (every ScanText against the
+    gate's patterns 1 to 4, plus the supplement above). Index 0 is never returned, and every index
+    still passes stage 2 against the whole command, so a payload mention stays unclassified.
+    Out of scope under decision D18 of issue #1160: a variable-held payload, an EncodedCommand
+    payload (-e, -ec, or a prefix of -EncodedCommand), a payload built at run time, an env -S split
+    string, and an unbalanced payload quote.
 .NOTES
     PowerShell 7+. Pure string logic (no file system, process, clock, or environment access; no
-    dot-source); Read-CommandLineSegment and Test-CommandLineWordPresent are loaded by the gate.
+    dot-source); Read-CommandLineSegment, Test-CommandLineWordPresent, ConvertTo-CommandLineNormalizedText,
+    Split-CommandLinePosixWord, ConvertTo-CommandLineLeafWord, Skip-CommandLineTransparentWrapper, and
+    Get-CommandLineWrapperPayload are loaded by the gate.
     Byte-identical in .claude/hooks, .codex/hooks, and both bundles
     (enforce-orchestration-preimplementation-gate-classify.Parity.Tests.ps1).
 #>
@@ -130,4 +144,80 @@ function Get-OrchestrationGateSupplementalPatternIndex {
     if ($npm) { $indexes.Add(2) }
     if ($npx) { $indexes.Add(3) }
     return [int[]]$indexes.ToArray()
+}
+
+function Get-OrchestrationGateWrapperPayloadText {
+    <#
+    .SYNOPSIS
+        Returns the literal payload of a segment's words when they lead, after assignments and env
+        with its value options, with a sh-family -c, pwsh or powershell -c/-Command/-CommandWithArgs,
+        or eval wrapper, following xargs injected words. Returns nothing for any other segment, for an
+        env split string (-S, --split-string), an Opaque PowerShell payload, or an encoded command.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][AllowEmptyCollection()][AllowEmptyString()][string[]] $Word)
+
+    $position = 0
+    while ($position -lt $Word.Count) {
+        if ($Word[$position] -match '^[A-Za-z_][A-Za-z0-9_]*=') { $position++; continue }
+        if ((ConvertTo-CommandLineLeafWord -Word $Word[$position]).ToLowerInvariant() -cne 'env') { break }
+        $position++
+        # env value options (decision D-2): -u and -C (and their long forms) take a separate value.
+        while ($position -lt $Word.Count -and ($Word[$position].StartsWith('-') -or $Word[$position] -match '^[A-Za-z_][A-Za-z0-9_]*=')) {
+            $option = $Word[$position]
+            if ($option -ceq '-S' -or $option -ceq '--split-string' -or $option.StartsWith('--split-string=', [System.StringComparison]::Ordinal)) { return }
+            $position += $(if (@('-u', '--unset', '-C', '--chdir') -ccontains $option) { 2 } else { 1 })
+        }
+    }
+    $remaining = [string[]]@($Word | Select-Object -Skip $position)
+    $hops = 0
+    while ($remaining.Count -gt 0 -and $hops -lt 8) {
+        $hops++
+        $wrapper = Get-CommandLineWrapperPayload -Word $remaining
+        if ($wrapper.Kind -ceq 'Words') { $remaining = [string[]]@($wrapper.Words); continue }
+        if ($wrapper.Kind -ceq 'Posix') { return [string]$wrapper.Payload }
+        if ($wrapper.Kind -cne 'PowerShell' -or $wrapper.Opaque) { return }
+        # The payload result decodes an encoded command, so the host flags are read from the words.
+        foreach ($word in @($remaining | Select-Object -Skip ((Skip-CommandLineTransparentWrapper -Token $remaining).Index + 1))) {
+            $flag = $word.ToLowerInvariant()
+            if ($flag -eq '-c' -or $flag -in @('-cwa', '-commandwithargs') -or ($flag.Length -ge 4 -and '-command'.StartsWith($flag, [System.StringComparison]::Ordinal))) { break }
+            if ($flag -in @('-e', '-ec') -or ($flag.Length -ge 3 -and '-encodedcommand'.StartsWith($flag, [System.StringComparison]::Ordinal))) { return }
+        }
+        return [string]$wrapper.Payload
+    }
+}
+
+function Get-OrchestrationGateWrappedPatternIndex {
+    <#
+    .SYNOPSIS
+        Returns the subset of the stage-1 indexes 1 to 4 that a literal wrapper payload of CommandText
+        matches at nesting depth 1 to 4, in ascending order and without duplicates. Pattern is the
+        gate's stage-1 pattern array; index 0 is never returned.
+    #>
+    [CmdletBinding()]
+    [OutputType([int[]])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $CommandText,
+        [Parameter(Mandatory)][string[]] $Pattern
+    )
+
+    $found = [System.Collections.Generic.SortedSet[int]]::new()
+    $pending = [System.Collections.Generic.Queue[pscustomobject]]::new()
+    $pending.Enqueue([pscustomobject]@{ Text = $CommandText; Depth = 0 })
+    while ($pending.Count -gt 0) {
+        $item = $pending.Dequeue()
+        foreach ($segment in @(Read-CommandLineSegment -CommandText (ConvertTo-CommandLineNormalizedText -CommandText $item.Text))) {
+            # An unbalanced segment yields no payload.
+            if ($segment.Unbalanced) { continue }
+            foreach ($payload in @(Get-OrchestrationGateWrapperPayloadText -Word ([string[]]@(Split-CommandLinePosixWord -Text ([string]$segment.TokenText))))) {
+                foreach ($record in @(Read-CommandLineSegment -CommandText (ConvertTo-CommandLineNormalizedText -CommandText $payload))) {
+                    for ($index = 1; $index -le 4; $index++) { if ([string]$record.ScanText -match $Pattern[$index]) { [void]$found.Add($index) } }
+                }
+                foreach ($index in @(Get-OrchestrationGateSupplementalPatternIndex -CommandText $payload)) { [void]$found.Add($index) }
+                if ($item.Depth + 1 -lt 4) { $pending.Enqueue([pscustomobject]@{ Text = $payload; Depth = $item.Depth + 1 }) }
+            }
+        }
+    }
+    return [int[]]@($found)
 }
