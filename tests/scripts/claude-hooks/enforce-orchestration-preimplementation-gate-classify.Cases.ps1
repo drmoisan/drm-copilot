@@ -137,6 +137,11 @@ $script:ClassifyWrappedFunctionRows = @(
     @{ Name = 'repeated index is returned once'; Command = 'sh -c "pytest; pytest -q"'; Indexes = @(1) }
     @{ Name = 'index 0 is never returned'; Command = 'sh -c "git add ."'; Indexes = @() }
     @{ Name = 'hit that stage 2 later drops'; Command = 'sh -c "grep pytest docs"'; Indexes = @(1) }
+    # Remediation cycle 1 (finding F1): env with value options after another transparent prefix.
+    @{ Name = 'env value option after timeout'; Command = 'timeout 60 env -u X sh -c "pytest"'; Indexes = @(1) }
+    @{ Name = 'env long value option after nohup'; Command = 'nohup env --unset X bash -c "ruff check ."'; Indexes = @(1) }
+    @{ Name = 'env -S after timeout is declined'; Command = 'timeout 60 env -S sh -c "pytest"'; Indexes = @() }
+    @{ Name = 'env value option after xargs injected words'; Command = 'echo x | xargs env -u X sh -c ''pytest'''; Indexes = @(1) }
 )
 
 $script:ClassifyWrappedGateRows = @(
@@ -157,6 +162,7 @@ $script:ClassifyWrappedGateRows = @(
     @{ Kind = 'Positive'; Command = 'bash -c "bash -c ''pytest''"'; Expected = $true }
     @{ Kind = 'Positive'; Command = 'bash -c "pwsh -File tests/scripts/x.Tests.ps1"'; Expected = $true }
     @{ Kind = 'Positive'; Command = 'sh -c "npm --prefix $(pwd) run lint"'; Expected = $true }
+    @{ Kind = 'Positive'; Command = 'timeout 60 env -u X sh -c "pytest"'; Expected = $true }
     # Negative: false before and after (mentions, D18 exclusions, recorded non-goals).
     @{ Kind = 'Negative'; Command = 'sh -c "echo ''pytest''"'; Expected = $false }
     @{ Kind = 'Negative'; Command = 'bash -c "grep -rn ''ruff'' docs/"'; Expected = $false }

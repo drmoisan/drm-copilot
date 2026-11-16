@@ -149,31 +149,40 @@ function Get-OrchestrationGateSupplementalPatternIndex {
 function Get-OrchestrationGateWrapperPayloadText {
     <#
     .SYNOPSIS
-        Returns the literal payload of a segment's words when they lead, after assignments and env
-        with its value options, with a sh-family -c, pwsh or powershell -c/-Command/-CommandWithArgs,
-        or eval wrapper, following xargs injected words. Returns nothing for any other segment, for an
-        env split string (-S, --split-string), an Opaque PowerShell payload, or an encoded command.
+        Returns the literal payload of a segment's words when they lead, after prefixes, with a
+        sh-family -c, pwsh or powershell -c/-Command/-CommandWithArgs, or eval wrapper, following
+        xargs injected words. The prefixes (assignments, env with its value options, timeout, time,
+        command, and nohup) may appear in any order and repeat, before and after xargs injected
+        words. Returns nothing for any other segment, for an env split string (-S, --split-string),
+        an Opaque PowerShell payload, or an encoded command.
     #>
     [CmdletBinding()]
     [OutputType([string])]
     param([Parameter(Mandatory)][AllowEmptyCollection()][AllowEmptyString()][string[]] $Word)
 
-    $position = 0
-    while ($position -lt $Word.Count) {
-        if ($Word[$position] -match '^[A-Za-z_][A-Za-z0-9_]*=') { $position++; continue }
-        if ((ConvertTo-CommandLineLeafWord -Word $Word[$position]).ToLowerInvariant() -cne 'env') { break }
-        $position++
-        # env value options (decision D-2): -u and -C (and their long forms) take a separate value.
-        while ($position -lt $Word.Count -and ($Word[$position].StartsWith('-') -or $Word[$position] -match '^[A-Za-z_][A-Za-z0-9_]*=')) {
-            $option = $Word[$position]
-            if ($option -ceq '-S' -or $option -ceq '--split-string' -or $option.StartsWith('--split-string=', [System.StringComparison]::Ordinal)) { return }
-            $position += $(if (@('-u', '--unset', '-C', '--chdir') -ccontains $option) { 2 } else { 1 })
-        }
-    }
-    $remaining = [string[]]@($Word | Select-Object -Skip $position)
+    $remaining = [string[]]@($Word)
     $hops = 0
     while ($remaining.Count -gt 0 -and $hops -lt 8) {
         $hops++
+        $position = 0
+        while ($position -lt $remaining.Count) {
+            if ($remaining[$position] -match '^[A-Za-z_][A-Za-z0-9_]*=') { $position++; continue }
+            if ((ConvertTo-CommandLineLeafWord -Word $remaining[$position]).ToLowerInvariant() -ceq 'env') {
+                $position++
+                # env value options (decision D-2): -u and -C (and their long forms) take a separate value.
+                while ($position -lt $remaining.Count -and ($remaining[$position].StartsWith('-') -or $remaining[$position] -match '^[A-Za-z_][A-Za-z0-9_]*=')) {
+                    $option = $remaining[$position]
+                    if ($option -ceq '-S' -or $option -ceq '--split-string' -or $option.StartsWith('--split-string=', [System.StringComparison]::Ordinal)) { return }
+                    $position += $(if (@('-u', '--unset', '-C', '--chdir') -ccontains $option) { 2 } else { 1 })
+                }
+                continue
+            }
+            # Other transparent prefixes; the shared skip stops at the next env, which the branch above handles.
+            $skip = Skip-CommandLineTransparentWrapper -Token ([string[]]@($remaining | Select-Object -Skip $position)) -Except 'env'
+            if (-not $skip.SkippedWrapper) { break }
+            $position += $skip.Index
+        }
+        $remaining = [string[]]@($remaining | Select-Object -Skip $position)
         $wrapper = Get-CommandLineWrapperPayload -Word $remaining
         if ($wrapper.Kind -ceq 'Words') { $remaining = [string[]]@($wrapper.Words); continue }
         if ($wrapper.Kind -ceq 'Posix') { return [string]$wrapper.Payload }
