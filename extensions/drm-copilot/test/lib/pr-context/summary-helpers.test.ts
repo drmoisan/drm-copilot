@@ -292,3 +292,16 @@ describe("appendGenerationTimestamp", () => {
     expect(result).toContain("Head SHA: (unknown)");
   });
 });
+
+describe("isScopingDoc development-docs root", () => {
+  it.each([
+    [".dev/active/1016-foo/spec.md", true],
+    [".dev/active/1016-foo/plan.md", true],
+    ["docs/features/active/1016-foo/user-story.md", true],
+    [".devx/active/1016-foo/spec.md", false],
+    ["docs/research/spec.md", false],
+  ])("classifies %s as %s", (path, expected) => {
+    // Act / Assert
+    expect(isScopingDoc(path)).toBe(expected);
+  });
+});

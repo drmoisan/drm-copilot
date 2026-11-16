@@ -133,25 +133,25 @@
 
 ### Phase 3 — TypeScript Consumers
 
-- [ ] [P3-T1] Replace `ACTIVE_FEATURE_DOCS_DIRECTORY` and `POTENTIAL_DOCS_DIRECTORY` in `src/extension-command-helpers.ts` with resolver calls, and route the potential and template joins in `src/lib/new-potential-bug-entry.ts`.
+- [x] [P3-T1] Replace `ACTIVE_FEATURE_DOCS_DIRECTORY` and `POTENTIAL_DOCS_DIRECTORY` in `src/extension-command-helpers.ts` with resolver calls, and route the potential and template joins in `src/lib/new-potential-bug-entry.ts`.
   - Tests: `test/extension-command-helpers.test.ts` and `test/lib/new-potential-bug-entry*.test.ts` existing cases unchanged (the `InMemoryFileSystem` fakes of `new-potential-bug-entry.test.ts` and `new-potential-bug-entry-service-call.test.ts` gain map-backed `exists` and `isDirectory`, D-P5); two `createBugEntry` cases: `.dev` present writes under `<workspace>/.dev/potential/`, absent under `<workspace>/docs/features/potential/`.
   - Acceptance: suites pass.
-- [ ] [P3-T2] Make `RepoAutomationService.newPotentialEntry` in `src/repo-automation-service.ts` resolve the root through its injected `fileSystem` and pass `-DevelopmentDocsRoot` per D-P4.
+- [x] [P3-T2] Make `RepoAutomationService.newPotentialEntry` in `src/repo-automation-service.ts` resolve the root through its injected `fileSystem` and pass `-DevelopmentDocsRoot` per D-P4.
   - Tests: `test/repo-automation-dispatch.test.ts`, `newPotentialEntry passes the bundled script path and short-name args` in `test/extension.workflow-commands.test.ts` and the `newPotentialEntry` case of `test/extension.integration.test.ts` unchanged (default argv); new `test/repo-automation-service.new-potential-entry-root.test.ts` asserts `.dev` is passed when configured and present, and not passed by default.
   - Acceptance: the four suites pass.
-- [ ] [P3-T3] Route `src/lib/pr-context/feature-docs.ts` and `render-feature-excerpts.ts` (part-index matchers to the union, base and promoted directories through the resolver), `verification-evidence.ts` (resolver), `summary-helpers.ts` `isScopingDoc` (union) and the `collector-core.ts` docs bucket (add `.dev/`).
+- [x] [P3-T3] Route `src/lib/pr-context/feature-docs.ts` and `render-feature-excerpts.ts` (part-index matchers to the union, base and promoted directories through the resolver), `verification-evidence.ts` (resolver), `summary-helpers.ts` `isScopingDoc` (union) and the `collector-core.ts` docs bucket (add `.dev/`).
   - Tests: existing pr-context suites unchanged; `.dev` cases in `collector-core.test.ts`, `verification-evidence.test.ts` and `feature-docs.test.ts`.
   - Acceptance: pr-context suites pass.
-- [ ] [P3-T4] Route to the union `src/lib/validate/epic-orchestrator-state-resolution.ts`, `parallel-orchestrator-state-cohort-barrier.ts`, `epic-planner-readiness-integrity.ts` (prefixes; manifest and kickoff paths through the resolver), `MANIFEST_RE` in `epic-kickoff-artifact.ts` and `parallel-kickoff-artifact.ts`, and `POTENTIAL_RECORD_PREFIX` in `orchestrator-state-issue-adoption.ts`; the `evidence-locations.ts` hint comes from the resolver. Messages unchanged.
+- [x] [P3-T4] Route to the union `src/lib/validate/epic-orchestrator-state-resolution.ts`, `parallel-orchestrator-state-cohort-barrier.ts`, `epic-planner-readiness-integrity.ts` (prefixes; manifest and kickoff paths through the resolver), `MANIFEST_RE` in `epic-kickoff-artifact.ts` and `parallel-kickoff-artifact.ts`, and `POTENTIAL_RECORD_PREFIX` in `orchestrator-state-issue-adoption.ts`; the `evidence-locations.ts` hint comes from the resolver. Messages unchanged.
   - Tests: existing validate suites unchanged; new `test/lib/validate/development-docs-matchers.test.ts` holds one `.dev` case per routed file.
   - Acceptance: validate suites pass.
-- [ ] [P3-T5] Make `FEATURE_FOLDER_PATH_PATTERN` in `src/lib/validate/orchestrator-state-feature-folder-record.ts` accept `docs/features/active/<folder>` and `.dev/active/<folder>`; `ERROR_FEATURE_FOLDER_PATH_FORMAT` unchanged; no corpus fixture here (D-P11).
+- [x] [P3-T5] Make `FEATURE_FOLDER_PATH_PATTERN` in `src/lib/validate/orchestrator-state-feature-folder-record.ts` accept `docs/features/active/<folder>` and `.dev/active/<folder>`; `ERROR_FEATURE_FOLDER_PATH_FORMAT` unchanged; no corpus fixture here (D-P11).
   - Tests: existing cases of `orchestrator-state-issue-adoption-feature-folder.test.ts` unchanged; new in-memory case: record and checkpoint `feature-folder` `.dev/active/2026-09-29-sample-feature-509` yield no error. `orchestrator-state-issue-adoption-parity.test.ts` unchanged.
   - Acceptance: both suites pass.
-- [ ] [P3-T6] Add `.dev/**/*.json` to `GOVERNED_GLOBS` in `src/lib/json-config.ts`; in `src/lib/file-system.ts` export `compileGlob` and add the named constant `GLOB_MATCHES_DOT_ENTRIES` with a comment stating dot entries match.
+- [x] [P3-T6] Add `.dev/**/*.json` to `GOVERNED_GLOBS` in `src/lib/json-config.ts`; in `src/lib/file-system.ts` export `compileGlob` and add the named constant `GLOB_MATCHES_DOT_ENTRIES` with a comment stating dot entries match.
   - Tests: `test/lib/file-system.test.ts` asserts `compileGlob` matches `.dev/active/x/spec.md` for `**` and `**/*.md`; `.dev` discovery cases in `json-config.test.ts` (`iterGovernedFiles`), `validate/json-validator.test.ts`, `validate/evidence-locations.test.ts`, `pr-context/verification-evidence.test.ts`, `pr-context/feature-docs.test.ts` (the `feature-docs-parsers.ts` glob); `push-down/claude-blast-radius-derive.test.ts` asserts `isExcludedDirectoryName(".dev")` is `true`.
   - Acceptance: suites pass with in-memory fakes only.
-- [ ] [P3-T7] [phase-gate] Run stages 1 to 6 per `## Test Cadence (Mandatory)` over `scripts/`, `.claude/`, `.codex/`, `extensions/drm-copilot/` and `tests/`.
+- [x] [P3-T7] [phase-gate] Run stages 1 to 6 per `## Test Cadence (Mandatory)` over `scripts/`, `.claude/`, `.codex/`, `extensions/drm-copilot/` and `tests/`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/phase-gate.P3.<timestamp>.md` records one clean pass.
 
 ### Phase 4 — Python Consumers

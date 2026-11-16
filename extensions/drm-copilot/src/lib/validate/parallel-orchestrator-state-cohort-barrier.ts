@@ -61,6 +61,7 @@ import {
   isObject,
   isPositiveInteger,
 } from "./parallel-state-shared";
+import { knownRootPrefixes } from "../development-docs/root";
 
 /**
  * Literal token of the Layer 2 invariant (design section 9). The message form is
@@ -96,8 +97,8 @@ const GATING_KEYS: readonly string[] = ["conflict_edges", "cohorts"];
  * repository-rooted form is stripped before the bare lifecycle form.
  */
 const FOLDER_HINT_PREFIXES: readonly string[] = [
-  "docs/features/active/",
-  "docs/features/completed/",
+  ...knownRootPrefixes("active"),
+  ...knownRootPrefixes("completed"),
   "active/",
   "completed/",
 ];

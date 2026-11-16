@@ -40,12 +40,13 @@ class InMemoryFileSystem implements FileSystem {
     return this.files.has(path);
   }
 
-  exists(): boolean {
-    throw new Error("not used");
+  exists(path: string): boolean {
+    return this.files.has(path) || this.isDirectory(path);
   }
 
-  isDirectory(): boolean {
-    throw new Error("not used");
+  isDirectory(path: string): boolean {
+    // A directory exists when a seeded file lies beneath it (D-P5).
+    return [...this.files.keys()].some((file) => file.startsWith(`${path}/`));
   }
 
   listDirectory(): string[] {
@@ -422,5 +423,51 @@ describe("createBugEntry", () => {
     // Validation runs before any filesystem work, so nothing was written.
     expect(fs.files.size).toBe(0);
     expect(fs.ensuredDirs).toHaveLength(0);
+  });
+});
+
+describe("createBugEntry development-docs root", () => {
+  const template = "<bug-name> on YYYY-MM-DD by - Author: name";
+
+  /**
+   * Create an entry in `/workspace` with the routing file selecting `.dev`.
+   *
+   * @param devPresent Whether a file under `/workspace/.dev` exists.
+   * @returns The created path.
+   */
+  function createWithDevConfigured(devPresent: boolean): string {
+    const fs = new InMemoryFileSystem();
+    fs.files.set(`/ext/feature-templates/bug/potential_bug.md`, template);
+    fs.files.set(
+      "/workspace/config/orchestration-routing.json",
+      '{"development_docs_root": ".dev"}',
+    );
+    fs.files.set("/workspace/docs/features/README.md", "x");
+    if (devPresent) {
+      fs.files.set("/workspace/.dev/README.md", "x");
+    }
+    return createBugEntry({
+      shortName: "api-timeout",
+      workspace: "/workspace",
+      fs,
+      templateRoot: "/ext/feature-templates",
+      authorProvider: () => "Jane",
+      codeLauncher: () => true,
+      entryDate: "2025-12-15",
+    });
+  }
+
+  it("writes under <workspace>/.dev/potential when .dev is present", () => {
+    // Act / Assert
+    expect(createWithDevConfigured(true)).toBe(
+      "/workspace/.dev/potential/2025-12-15-api-timeout.md",
+    );
+  });
+
+  it("writes under <workspace>/docs/features/potential when .dev is absent", () => {
+    // Act / Assert
+    expect(createWithDevConfigured(false)).toBe(
+      "/workspace/docs/features/potential/2025-12-15-api-timeout.md",
+    );
   });
 });

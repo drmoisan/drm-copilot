@@ -451,3 +451,24 @@ describe("parseVerificationEvidenceFile", () => {
     ).toThrow("ENOENT");
   });
 });
+
+describe("discoverCanonicalEvidenceFiles development-docs root", () => {
+  it("globs the .dev active feature root when .dev is configured and present", () => {
+    // Arrange
+    const fs = new SeededFileSystem();
+    fs.files.set(
+      `${ROOT}/config/orchestration-routing.json`,
+      '{"development_docs_root": ".dev"}',
+    );
+    fs.dirs.add(`${ROOT}/.dev`);
+    const featureRoot = `${ROOT}/.dev/active/${FEATURE}`;
+    fs.dirs.add(featureRoot);
+    fs.files.set(`${featureRoot}/evidence/other/o.md`, "x");
+
+    // Act
+    const found = discoverCanonicalEvidenceFiles(fs, ROOT, FEATURE);
+
+    // Assert
+    expect(found).toEqual([`.dev/active/${FEATURE}/evidence/other/o.md`]);
+  });
+});

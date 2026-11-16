@@ -1,5 +1,12 @@
 import * as vscode from "vscode";
 import {
+  type DevelopmentDocsReader,
+  developmentDocsPath,
+  knownRootPrefixes,
+  resolveDevelopmentDocsRoot,
+} from "./lib/development-docs/root";
+import { RealFileSystem } from "./lib/file-system";
+import {
   getFeatureNameValidationMessage,
   getRequiredIssueNumberValidationMessage,
   getShortNameValidationMessage,
@@ -11,11 +18,42 @@ import {
 } from "./workflow-command-arguments";
 
 /**
- * Directory paths for features in the repository, used to detect context from
- * the active editor when the user has an appropriate file open.
+ * Return whether a lower-cased forward-slash path lies under an area of any
+ * known development-docs root (matchers accept the union, spec
+ * "Writer/matcher split").
+ *
+ * @param normalizedWorkspaceRoot Lower-cased forward-slash workspace root.
+ * @param normalizedPath Lower-cased forward-slash candidate path.
+ * @param area Area of the area map.
+ * @returns True when the path is under the area of either known root.
  */
-export const ACTIVE_FEATURE_DOCS_DIRECTORY = "docs/features/active";
-export const POTENTIAL_DOCS_DIRECTORY = "docs/features/potential";
+function isUnderKnownArea(
+  normalizedWorkspaceRoot: string,
+  normalizedPath: string,
+  area: "active" | "potential",
+): boolean {
+  return knownRootPrefixes(area).some((prefix) =>
+    normalizedPath.startsWith(`${normalizedWorkspaceRoot}/${prefix}`),
+  );
+}
+
+/**
+ * Return the workspace path of an area under the resolved development-docs
+ * root, used as the default location of a file picker.
+ *
+ * @param workspaceRoot Workspace root.
+ * @param area Area of the area map.
+ * @param reader Reader for the routing file and directory probes.
+ * @returns The workspace-joined area path.
+ */
+function resolvedAreaPath(
+  workspaceRoot: string,
+  area: "active" | "potential",
+  reader: DevelopmentDocsReader,
+): string {
+  const root = resolveDevelopmentDocsRoot(reader, workspaceRoot);
+  return `${workspaceRoot}/${developmentDocsPath(root, area)}`;
+}
 
 /**
  * Normalize a file path to use forward slashes for cross-platform comparison.
@@ -33,13 +71,14 @@ function isEligibleActiveFeaturePlanPath(
 ): boolean {
   const normalizedWorkspaceRoot = normalizePath(workspaceRoot).toLowerCase();
   const normalizedFilePath = normalizePath(filePath).toLowerCase();
-  const normalizedActiveFeatureRoot = `${normalizedWorkspaceRoot}/${ACTIVE_FEATURE_DOCS_DIRECTORY}`;
 
   if (!normalizedFilePath.endsWith(".md")) {
     return false;
   }
 
-  if (!normalizedFilePath.startsWith(`${normalizedActiveFeatureRoot}/`)) {
+  if (
+    !isUnderKnownArea(normalizedWorkspaceRoot, normalizedFilePath, "active")
+  ) {
     return false;
   }
 
@@ -69,13 +108,18 @@ export function getActivePotentialPath(
   const normalizedWorkspaceRoot = normalizePath(workspaceRoot).toLowerCase();
   const normalizedActiveEditorPath =
     normalizePath(activeEditorPath).toLowerCase();
-  const normalizedPotentialRoot = `${normalizedWorkspaceRoot}/${POTENTIAL_DOCS_DIRECTORY}`;
 
   if (!normalizedActiveEditorPath.endsWith(".md")) {
     return undefined;
   }
 
-  if (!normalizedActiveEditorPath.startsWith(`${normalizedPotentialRoot}/`)) {
+  if (
+    !isUnderKnownArea(
+      normalizedWorkspaceRoot,
+      normalizedActiveEditorPath,
+      "potential",
+    )
+  ) {
     return undefined;
   }
 
@@ -249,10 +293,13 @@ export async function promptForRequiredIssueNumber(
  * otherwise opens a file-picker dialog starting in the potential folder.
  *
  * @param workspaceRoot The root of the current workspace.
+ * @param reader Reader that resolves the development-docs root; defaults to
+ *   the real file system.
  * @returns The selected file path, or `undefined` if the user cancelled.
  */
 export async function promptForPotentialPath(
   workspaceRoot: string,
+  reader: DevelopmentDocsReader = new RealFileSystem(),
 ): Promise<string | undefined> {
   const activePotentialPath = getActivePotentialPath(workspaceRoot);
   if (activePotentialPath) {
@@ -262,7 +309,9 @@ export async function promptForPotentialPath(
   const selectedFile = await vscode.window.showOpenDialog({
     canSelectMany: false,
     openLabel: "Select potential file",
-    defaultUri: vscode.Uri.file(`${workspaceRoot}/${POTENTIAL_DOCS_DIRECTORY}`),
+    defaultUri: vscode.Uri.file(
+      resolvedAreaPath(workspaceRoot, "potential", reader),
+    ),
     filters: {
       Markdown: ["md"],
     },
@@ -278,10 +327,13 @@ export async function promptForPotentialPath(
  * opens a file-picker dialog starting in the active features folder.
  *
  * @param workspaceRoot The root of the current workspace.
+ * @param reader Reader that resolves the development-docs root; defaults to
+ *   the real file system.
  * @returns The selected file path, or `undefined` if the user cancelled.
  */
 export async function promptForActiveFeaturePlan(
   workspaceRoot: string,
+  reader: DevelopmentDocsReader = new RealFileSystem(),
 ): Promise<string | undefined> {
   const activePlanPath = getActiveFeaturePlanPath(workspaceRoot);
   if (activePlanPath) {
@@ -292,7 +344,7 @@ export async function promptForActiveFeaturePlan(
     canSelectMany: false,
     openLabel: "Select feature plan",
     defaultUri: vscode.Uri.file(
-      `${workspaceRoot}/${ACTIVE_FEATURE_DOCS_DIRECTORY}`,
+      resolvedAreaPath(workspaceRoot, "active", reader),
     ),
     filters: {
       Markdown: ["md"],

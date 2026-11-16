@@ -16,15 +16,18 @@
  *     - Pure; no filesystem or network I/O and no input mutation.
  */
 
+import { knownRootPrefixes } from "../development-docs/root";
+
 // Lifecycle path prefixes a feature_folder hint may carry. Stripping the prefix
 // yields the stable basename used as the canonical resolution key, which lets a
 // dependency expressed with either lifecycle location resolve to the same feature.
-const LIFECYCLE_PREFIXES = [
-  "docs/features/active/",
-  "docs/features/completed/",
+// Both known development-docs roots are accepted (matchers take the union).
+const LIFECYCLE_PREFIXES: readonly string[] = [
+  ...knownRootPrefixes("active"),
+  ...knownRootPrefixes("completed"),
   "active/",
   "completed/",
-] as const;
+];
 
 const VALID_EPIC_TYPES: ReadonlySet<string> = new Set(["business", "enabler"]);
 

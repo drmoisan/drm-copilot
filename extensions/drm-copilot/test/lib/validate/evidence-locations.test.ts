@@ -37,12 +37,13 @@ class VirtualFileSystem implements FileSystem {
     return this.files.has(relative);
   }
 
-  exists(): boolean {
-    throw new Error("not used");
+  exists(path: string): boolean {
+    // The development-docs resolver probes the routing file (D-P5).
+    return this.isFile(path);
   }
 
   isDirectory(): boolean {
-    throw new Error("not used");
+    return false;
   }
 
   listDirectory(): string[] {
@@ -135,12 +136,9 @@ describe("findForbiddenPaths", () => {
     const fs: FileSystem = {
       glob: () => [`${ROOT}/artifacts/baselines`],
       isFile: () => false,
-      exists: () => {
-        throw new Error("not used");
-      },
-      isDirectory: () => {
-        throw new Error("not used");
-      },
+      // The development-docs resolver probes the routing file (D-P5).
+      exists: () => false,
+      isDirectory: () => false,
       listDirectory: () => {
         throw new Error("not used");
       },
@@ -167,12 +165,9 @@ describe("findForbiddenPaths", () => {
     const fs: FileSystem = {
       glob: () => ["/other/artifacts/baselines/x.md"],
       isFile: () => true,
-      exists: () => {
-        throw new Error("not used");
-      },
-      isDirectory: () => {
-        throw new Error("not used");
-      },
+      // The development-docs resolver probes the routing file (D-P5).
+      exists: () => false,
+      isDirectory: () => false,
       listDirectory: () => {
         throw new Error("not used");
       },
@@ -207,5 +202,23 @@ describe("formatViolation", () => {
     expect(line).toBe(
       "VIOLATION: /repo/artifacts/qa/x.md — use <FEATURE>/evidence/qa-gates/ instead",
     );
+  });
+});
+
+describe("findForbiddenPaths development-docs root", () => {
+  it("scans files under .dev and reports none there", () => {
+    // Arrange
+    const fs = new VirtualFileSystem(
+      [".dev/active/x/evidence/qa-gates/a.md", "artifacts/qa/b.md"],
+      ROOT,
+    );
+
+    // Act
+    const violations = findForbiddenPaths(fs, ROOT);
+
+    // Assert: the .dev file is enumerated and is not a forbidden location.
+    expect(violations.map((violation) => violation.path)).toEqual([
+      `${ROOT}/artifacts/qa/b.md`,
+    ]);
   });
 });

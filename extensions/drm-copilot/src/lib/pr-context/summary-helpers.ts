@@ -34,6 +34,7 @@ export {
   prAppendix,
   prDigest,
 } from "./summary-digests";
+import { KNOWN_DEVELOPMENT_DOCS_ROOTS } from "../development-docs/root";
 
 /** Scoping-doc heading prefixes that mark a material key-section change. */
 const KEY_SECTION_PREFIXES = [
@@ -125,7 +126,9 @@ export function parseNameStatusMap(
 export function isScopingDoc(path: string): boolean {
   const lowered = path.toLowerCase();
   return (
-    lowered.startsWith("docs/features/") &&
+    KNOWN_DEVELOPMENT_DOCS_ROOTS.some((root) =>
+      lowered.startsWith(`${root}/`),
+    ) &&
     (lowered.endsWith("/spec.md") ||
       lowered.endsWith("/plan.md") ||
       lowered.endsWith("/bug-remediation-plan.md") ||

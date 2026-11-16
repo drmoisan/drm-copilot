@@ -352,3 +352,46 @@ describe("relativeToPosix", () => {
     expect(result).toBe("repository/x.md");
   });
 });
+
+describe("gatherFeatureExcerpts development-docs root", () => {
+  it("reads a .dev active feature when .dev is configured and present", () => {
+    // Arrange
+    const fs = new TreeFileSystem();
+    fs.addFile(
+      `${ROOT}/config/orchestration-routing.json`,
+      '{"development_docs_root": ".dev"}',
+    );
+    const dir = `${ROOT}/.dev/active/1016-foo`;
+    fs.addDir(`${ROOT}/.dev`);
+    fs.addDir(dir);
+    fs.addDir(`${ROOT}/.dev/potential/promoted`);
+    fs.addFile(`${dir}/spec.md`, "## Overview\nDev spec.");
+
+    // Act
+    const excerpts = gatherFeatureExcerpts(fs, ROOT, [
+      ".dev/active/1016-foo/spec.md",
+    ]);
+
+    // Assert
+    expect(excerpts).toHaveLength(1);
+    expect(excerpts[0]!.feature).toBe("1016-foo");
+    expect(excerpts[0]!.excerpt).toContain("Dev spec.");
+  });
+
+  it("recognizes a .dev active path under the default root", () => {
+    // Arrange: the matcher accepts both roots; the reader uses docs/features.
+    const fs = new TreeFileSystem();
+    const dir = `${ROOT}/docs/features/active/1016-foo`;
+    fs.addDir(dir);
+    fs.addDir(`${ROOT}/docs/features/potential/promoted`);
+    fs.addFile(`${dir}/spec.md`, "## Overview\nDefault spec.");
+
+    // Act
+    const excerpts = gatherFeatureExcerpts(fs, ROOT, [
+      ".dev/active/1016-foo/spec.md",
+    ]);
+
+    // Assert
+    expect(excerpts.map((excerpt) => excerpt.feature)).toEqual(["1016-foo"]);
+  });
+});

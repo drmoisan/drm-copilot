@@ -28,12 +28,13 @@ class InMemoryFileSystem implements FileSystem {
     return this.files.has(path);
   }
 
-  exists(): boolean {
-    throw new Error("not used");
+  exists(path: string): boolean {
+    return this.files.has(path) || this.isDirectory(path);
   }
 
-  isDirectory(): boolean {
-    throw new Error("not used");
+  isDirectory(path: string): boolean {
+    // A directory exists when a seeded file lies beneath it (D-P5).
+    return [...this.files.keys()].some((file) => file.startsWith(`${path}/`));
   }
 
   listDirectory(): string[] {

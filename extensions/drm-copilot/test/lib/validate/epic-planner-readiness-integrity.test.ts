@@ -493,3 +493,47 @@ describe("repository readiness failure boundaries", () => {
     ).toContain("epic_feature_folder must be a slug");
   });
 });
+
+describe("repository readiness development-docs root", () => {
+  it("expects the manifest under .dev/epics when .dev is configured and present", () => {
+    // Arrange: the routing file selects .dev and a .dev folder exists.
+    const value = fixture();
+    value.fs.files.set(
+      "C:/workspace/config/orchestration-routing.json",
+      '{"development_docs_root": ".dev"}',
+    );
+    value.fs.files.set("C:/workspace/.dev/README.md", "x");
+    (value.fs as unknown as { directories: Set<string> }).directories.add(
+      "C:/workspace/.dev",
+    );
+
+    // Act
+    const errors = validateEpicReadinessIntegrity(
+      value.state,
+      value.text,
+      context(value),
+    );
+
+    // Assert: the writer-side manifest path follows the resolved root.
+    expect(errors).toContain(
+      "Execution-ready epic_manifest_path must be '.dev/epics/sample-epic/epic.md'.",
+    );
+  });
+
+  it("accepts a .dev/active feature folder under the union prefixes", () => {
+    // Arrange
+    const value = fixture();
+    const features = value.state["features"] as Record<string, unknown>[];
+    features[0]!["feature_folder"] = ".dev/active/feature-101";
+
+    // Act
+    const errors = validateEpicReadinessIntegrity(
+      value.state,
+      JSON.stringify(value.state),
+      context(value),
+    );
+
+    // Assert
+    expect(errors.join("\n")).not.toContain("feature_folder must be under");
+  });
+});

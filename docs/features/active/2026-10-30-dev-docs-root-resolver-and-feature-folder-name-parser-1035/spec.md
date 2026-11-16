@@ -480,7 +480,7 @@ All such tests use in-memory fakes; no temporary files are created.
 
 - [ ] With the default key, the full Python, PowerShell and TypeScript test suites pass, and the only changed expectations in existing tests are the folder-naming and status-line expectations for supplied issue numbers.
 - [ ] A recorded repository search over the production roots `.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts` and `extensions/drm-copilot/src` for `docs/features` and its separator-variant regex forms returns only the resolver constant definitions and entries on a recorded allowlist of Stay rows from the research inventory; the search command, output and allowlist are stored under the feature folder's `evidence/` directory.
-- [ ] TypeScript tests show that, with the routing configuration set to `.dev` and a `.dev` directory present in the in-memory fake, `createActiveFolder`, the new potential bug entry flow and the potential-to-issue promotion write under `.dev/<area>`, and with `.dev` absent they write under `docs/features/<area>`.
+- [x] TypeScript tests show that, with the routing configuration set to `.dev` and a `.dev` directory present in the in-memory fake, `createActiveFolder`, the new potential bug entry flow and the potential-to-issue promotion write under `.dev/<area>`, and with `.dev` absent they write under `docs/features/<area>`.
 - [ ] Matcher tests in each runtime show that the feature-folder record validators (`orchestrator-state-feature-folder-record.ts`, `_orchestrator_state_feature_folder_record.py`, `OrchestratorStateFeatureFolderRecord.psm1`) accept both `docs/features/active/<folder>` and `.dev/active/<folder>` independent of the configured value.
 - [ ] Pester tests for `enforce-orchestration-preimplementation-gate.ps1` (Claude and Codex) and `validate-task-researcher-output.ps1` show that paths under `.dev/active/`, `.dev/epics/` and `.dev/research/` are recognized alongside their `docs/features` and `docs/research` forms.
 - [ ] `new-potential-entry.ps1` in `scripts/dev-tools/` and in `extensions/drm-copilot/resources/templates/` accepts `-DevelopmentDocsRoot` with the default `docs/features`, the two copies have equal text, and a test shows `RepoAutomationService.newPotentialEntry` passes the resolved root.
@@ -497,9 +497,9 @@ All such tests use in-memory fakes; no temporary files are created.
 
 ### Dot-folder handling
 
-- [ ] The include-dot behavior of `compileGlob`/`RealFileSystem.glob` in `src/lib/file-system.ts` is stated by a named constant or documented comment, and a test shows the matching seam matches `.dev/active/x/spec.md` for the patterns `**` and `**/*.md`.
+- [x] The include-dot behavior of `compileGlob`/`RealFileSystem.glob` in `src/lib/file-system.ts` is stated by a named constant or documented comment, and a test shows the matching seam matches `.dev/active/x/spec.md` for the patterns `**` and `**/*.md`.
 - [ ] Each of `iterGovernedFiles` (`json-config.ts`), `json-validator.ts`, `evidence-locations.ts`, `verification-evidence.ts` and `feature-docs-parsers.ts` has a Jest test, using in-memory fakes, that finds a file under `.dev`.
-- [ ] A Jest test asserts `isExcludedDirectoryName(".dev")` returns `true`.
+- [x] A Jest test asserts `isExcludedDirectoryName(".dev")` returns `true`.
 
 ### Feature-folder name parser and folder creation
 

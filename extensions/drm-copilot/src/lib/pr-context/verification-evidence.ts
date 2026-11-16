@@ -22,6 +22,10 @@ import { type FileSystem, toPosixPath } from "../file-system";
 import { compareCodePoint } from "../string-ordering";
 import { relativeToPosix } from "./feature-docs-parsers";
 import { splitLines } from "./models";
+import {
+  developmentDocsPath,
+  resolveDevelopmentDocsRoot,
+} from "../development-docs/root";
 
 /** Required schema fields parsed from an evidence markdown file. */
 export const REQUIRED_FIELDS = ["Timestamp", "Command", "EXIT_CODE"] as const;
@@ -80,7 +84,7 @@ export function normalizeResult(
  *
  * @param fs Injected filesystem.
  * @param root Repository root path.
- * @param feature Active feature directory name under `docs/features/active`.
+ * @param feature Active feature directory name under the active area.
  * @returns Sorted, deduplicated repo-relative POSIX evidence paths.
  */
 export function discoverCanonicalEvidenceFiles(
@@ -89,7 +93,8 @@ export function discoverCanonicalEvidenceFiles(
   feature: string,
 ): string[] {
   const normalizedRoot = toPosixPath(root).replace(/\/+$/u, "");
-  const featureRoot = `${normalizedRoot}/docs/features/active/${feature}`;
+  const docsRoot = resolveDevelopmentDocsRoot(fs, normalizedRoot);
+  const featureRoot = `${normalizedRoot}/${developmentDocsPath(docsRoot, "active")}/${feature}`;
   if (!fs.exists(featureRoot) || !fs.isDirectory(featureRoot)) {
     return [];
   }

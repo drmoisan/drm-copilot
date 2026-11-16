@@ -35,8 +35,10 @@ const CHECKPOINT_FEATURE_FOLDER_KEY = "feature-folder";
  * A repository-relative folder under `docs/features/active/`. Applied without
  * the multiline flag, so the anchors match only at the ends of the value.
  */
+// The record path may name the active area of either known development-docs
+// root; the error text keeps naming docs/features/active (D-P11).
 export const FEATURE_FOLDER_PATH_PATTERN =
-  /^docs\/features\/active\/[A-Za-z0-9][A-Za-z0-9._-]*(\/[A-Za-z0-9][A-Za-z0-9._-]*)*$/;
+  /^(?:docs\/features|\.dev)\/active\/[A-Za-z0-9][A-Za-z0-9._-]*(\/[A-Za-z0-9][A-Za-z0-9._-]*)*$/;
 
 /** Accepted values of `feature_folder_record.verified_via`. */
 export const FEATURE_FOLDER_VERIFIED_VIA: readonly string[] = [

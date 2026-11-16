@@ -28,6 +28,7 @@ import {
   BUG_PROMOTION_ENTRY_TOOL,
   FEATURE_PROMOTION_ENTRY_TOOL,
 } from "./orchestrator-state-promotion-tools";
+import { knownRootPrefixes } from "../development-docs/root";
 
 /** The checkpoint key that carries the adoption record. */
 export const ISSUE_ADOPTION_KEY = "issue_adoption";
@@ -65,7 +66,9 @@ const PROMOTION_ENTRY_TOOLS: ReadonlySet<string> = new Set([
   FEATURE_PROMOTION_ENTRY_TOOL,
   BUG_PROMOTION_ENTRY_TOOL,
 ]);
-const POTENTIAL_RECORD_PREFIX = "docs/features/potential/";
+// A potential record may live under either known development-docs root.
+const POTENTIAL_RECORD_PREFIXES: ReadonlyArray<string> =
+  knownRootPrefixes("potential");
 const POTENTIAL_RECORD_SUFFIX = ".md";
 // Origins whose promotion-entry waiver may omit the potential_record key (rule 9).
 const RECORD_OPTIONAL_ORIGINS: ReadonlySet<string> = new Set([
@@ -257,7 +260,9 @@ function potentialRecordErrors(
 
   if (
     typeof potentialRecord === "string" &&
-    potentialRecord.startsWith(POTENTIAL_RECORD_PREFIX) &&
+    POTENTIAL_RECORD_PREFIXES.some((prefix) =>
+      potentialRecord.startsWith(prefix),
+    ) &&
     potentialRecord.endsWith(POTENTIAL_RECORD_SUFFIX)
   ) {
     return [];

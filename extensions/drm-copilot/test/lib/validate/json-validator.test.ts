@@ -335,3 +335,16 @@ describe("collectTargets", () => {
     expect(targets).not.toContain("/repo/data/corpus.json");
   });
 });
+
+describe("collectTargets development-docs root", () => {
+  it("collects a governed JSON file under .dev when no paths are given", () => {
+    // Arrange
+    const fs = new VirtualFileSystem({ "/repo/.dev/active/x/data.json": "{}" });
+
+    // Act
+    const targets = collectTargets(fs, "/repo", []);
+
+    // Assert
+    expect(targets).toContain("/repo/.dev/active/x/data.json");
+  });
+});

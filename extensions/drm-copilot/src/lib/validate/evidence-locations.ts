@@ -1,5 +1,10 @@
 import type { FileSystem } from "../file-system";
 import { toPosixPath } from "../file-system";
+import {
+  type DevelopmentDocsRoot,
+  developmentDocsPath,
+  resolveDevelopmentDocsRoot,
+} from "../development-docs/root";
 
 /**
  * Forbidden-evidence-location scanner.
@@ -39,11 +44,26 @@ const FORBIDDEN_PREFIX_TO_CANONICAL: ReadonlyArray<readonly [string, string]> =
     ["artifacts/evidence/", "<FEATURE>/evidence/<kind>/"],
     ["artifacts/regression-testing/", "<FEATURE>/evidence/qa-gates/"],
     ["artifacts/post-change/", "<FEATURE>/evidence/qa-gates/"],
+  ];
+
+/**
+ * Return the forbidden-prefix table with the research hint named from the
+ * resolved development-docs root.
+ *
+ * @param root Resolved development-docs root.
+ * @returns The table, research row last.
+ */
+function forbiddenPrefixTable(
+  root: DevelopmentDocsRoot,
+): ReadonlyArray<readonly [string, string]> {
+  return [
+    ...FORBIDDEN_PREFIX_TO_CANONICAL,
     [
       "artifacts/research/",
-      "docs/features/active/<feature>/research/ or docs/research/",
+      `${developmentDocsPath(root, "active")}/<feature>/research/ or ${developmentDocsPath(root, "research")}/`,
     ],
   ];
+}
 
 /** A single forbidden-location violation. */
 export interface EvidenceLocationViolation {
@@ -71,6 +91,9 @@ export function findForbiddenPaths(
 ): EvidenceLocationViolation[] {
   const normalizedRoot = toPosixPath(root).replace(/\/+$/, "");
   const violations: EvidenceLocationViolation[] = [];
+  const table = forbiddenPrefixTable(
+    resolveDevelopmentDocsRoot(fs, normalizedRoot),
+  );
 
   // Enumerate every reachable path, then keep only regular files (mirroring the
   // Python `candidate.is_file()` guard) before prefix matching.
@@ -90,7 +113,7 @@ export function findForbiddenPaths(
 
     // Report the first matching forbidden prefix and stop, matching the Python
     // `break` so each file produces at most one violation.
-    for (const [forbiddenPrefix, canonical] of FORBIDDEN_PREFIX_TO_CANONICAL) {
+    for (const [forbiddenPrefix, canonical] of table) {
       if (relativePosix.startsWith(forbiddenPrefix)) {
         violations.push({ path: candidate, canonical });
         break;

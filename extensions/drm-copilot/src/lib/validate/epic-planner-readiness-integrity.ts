@@ -14,6 +14,11 @@ import {
   validatePlanningGitIntegrity,
 } from "./epic-planner-git-integrity";
 import { validateEpicPlannerLaunchEvidence } from "./epic-planner-launch-evidence";
+import {
+  developmentDocsPath,
+  knownRootPrefixes,
+  resolveDevelopmentDocsRoot,
+} from "../development-docs/root";
 
 const ALL_CLEAR = "PREFLIGHT: ALL CLEAR";
 const SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
@@ -111,8 +116,9 @@ function validateFeatureFiles(
     return { ...(plan === undefined ? {} : { plan }), errors };
   }
   if (
-    !folder.startsWith("docs/features/active/") &&
-    !folder.startsWith("docs/features/completed/")
+    ![...knownRootPrefixes("active"), ...knownRootPrefixes("completed")].some(
+      (prefix) => folder.startsWith(prefix),
+    )
   ) {
     errors.push(
       `${prefix}.feature_folder must be under docs/features/active or completed.`,
@@ -261,7 +267,11 @@ export function validateEpicReadinessIntegrity(
       "Epic planner checkpoint epic_feature_folder must be a slug.",
     ];
   }
-  const manifestPath = `docs/features/epics/${slug}/epic.md`;
+  const epicsArea = developmentDocsPath(
+    resolveDevelopmentDocsRoot(context.fileSystem, context.workspaceRoot),
+    "epics",
+  );
+  const manifestPath = `${epicsArea}/${slug}/epic.md`;
   if (state["epic_manifest_path"] !== manifestPath) {
     errors.push(
       `Execution-ready epic_manifest_path must be '${manifestPath}'.`,
@@ -278,7 +288,7 @@ export function validateEpicReadinessIntegrity(
     "Epic planner checkpoint kickoff_prompt_path",
   );
   errors.push(...ignoredResult.errors);
-  const durablePath = `docs/features/epics/${slug}/epic-kickoff.md`;
+  const durablePath = `${epicsArea}/${slug}/epic-kickoff.md`;
   const durable = readRequired(
     context,
     durablePath,

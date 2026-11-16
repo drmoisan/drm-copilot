@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, it, jest } from "@jest/globals";
 import * as fs from "node:fs";
 
-import { RealFileSystem } from "../../src/lib/file-system";
+import {
+  compileGlob,
+  GLOB_MATCHES_DOT_ENTRIES,
+  RealFileSystem,
+} from "../../src/lib/file-system";
 
 jest.mock("node:fs", () => ({
   readdirSync: jest.fn(),
@@ -180,5 +184,20 @@ describe("RealFileSystem", () => {
       // Assert: data/** matches the nested file under data.
       expect(matches).toContain("/repo/data/corpus.json");
     });
+  });
+});
+
+describe("compileGlob dot entries (spec D-13)", () => {
+  it.each(["**", "**/*.md"])(
+    "matches .dev/active/x/spec.md for %s",
+    (pattern) => {
+      // Act / Assert
+      expect(compileGlob(pattern).test(".dev/active/x/spec.md")).toBe(true);
+    },
+  );
+
+  it("states that dot entries match", () => {
+    // Act / Assert
+    expect(GLOB_MATCHES_DOT_ENTRIES).toBe(true);
   });
 });

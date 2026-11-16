@@ -290,3 +290,33 @@ describe("feature_folder_record rules 11c to 11e", () => {
     expect(errors).not.toContain(E10);
   });
 });
+
+describe("feature_folder_record development-docs root", () => {
+  const DEV_FOLDER = ".dev/active/2026-09-29-sample-feature-509";
+
+  it("accepts a .dev/active record whose path equals the checkpoint feature-folder", () => {
+    // Arrange
+    const state = folderState(
+      folderAdoption(
+        folderRecord({
+          path: DEV_FOLDER,
+          evidence: `git cat-file -t HEAD:${DEV_FOLDER} printed tree`,
+        }),
+      ),
+      DEV_FOLDER,
+    );
+
+    // Act
+    const result = resolve(state);
+
+    // Assert
+    expect(result.errors).toEqual([]);
+    expect(isFeatureFolderPath(DEV_FOLDER)).toBe(true);
+  });
+
+  it("still rejects a .dev path outside the active area", () => {
+    // Arrange / Act / Assert
+    expect(isFeatureFolderPath(".dev/completed/2026-09-29-sample")).toBe(false);
+    expect(isFeatureFolderPath(".devx/active/2026-09-29-sample")).toBe(false);
+  });
+});
