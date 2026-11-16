@@ -152,10 +152,10 @@ def test_set_header_placeholder_does_not_prepend_plain_issue_line() -> None:
 
 
 def test_build_folder_slug_uses_potential_and_issue_number() -> None:
-    """Verify slug generation prefers potential stem and appends issue number."""
+    """Verify the potential stem and issue number form the issue-first name."""
     potential = Path("/w/docs/features/potential/promoted/2025-12-23-json-quality.md")
     slug = mod.build_folder_slug("json-quality", potential, "63")
-    assert slug == "2025-12-23-json-quality-63"
+    assert slug == "0063-json-quality"
 
 
 class FakeIssueFetcher:
@@ -325,9 +325,7 @@ def test_create_feature_folder_retains_promoted_potential_and_updates_files() ->
         now_provider=lambda: fixed_now,
     )
 
-    expected_folder = (
-        workspace / "docs" / "features" / "active" / "2025-12-23-json-quality-63"
-    )
+    expected_folder = workspace / "docs" / "features" / "active" / "0063-json-quality"
     assert result.target == expected_folder
     assert result.potential_issue_path == expected_folder / "issue.md"
     assert potential_path in fs.files
@@ -397,7 +395,7 @@ def test_create_bug_folder_uses_issue_metadata_and_sections() -> None:
         now_provider=lambda: fixed_now,
     )
 
-    expected_folder = workspace / "docs" / "features" / "active" / "bug-case-77"
+    expected_folder = workspace / "docs" / "features" / "active" / "0077-bug-case"
     assert result.target == expected_folder
     spec_content = fs.read_text(expected_folder / "spec.md")
     assert "bug summary" in spec_content
@@ -531,3 +529,158 @@ def test_default_code_launcher_returns_false_when_no_cli_is_available(
 
     assert mod.default_code_launcher([Path("file.md")]) is False
     assert looked_up == ["code", "code-insiders"]
+
+
+def _create_with_root(
+    fs: FakeFileSystem,
+    feature_name: str,
+    issue_number: str | None,
+    *,
+    feature_type: str = "feature",
+) -> Path:
+    """Create a folder in ``/workspace`` with bundled templates; return the target.
+
+    Args:
+        fs: Seeded in-memory filesystem.
+        feature_name: Feature name to create.
+        issue_number: Issue number, or ``None``.
+        feature_type: Folder type.
+
+    Returns:
+        The created target directory.
+    """
+    workspace = Path("/workspace")
+    result = mod.create_active_folder(
+        feature_name=feature_name,
+        feature_type=feature_type,
+        issue_number=issue_number,
+        workspace=workspace,
+        fs=fs,
+        issue_fetcher=FakeIssueFetcher(None),
+        code_launcher=FakeCodeLauncher(),
+        now_provider=lambda: datetime(2024, 2, 3, 4, 5, tzinfo=ZoneInfo("UTC")),
+        template_root=workspace / "docs" / "features" / "templates",
+    )
+    return result.target
+
+
+def _seed_dev_root(fs: FakeFileSystem, *, dev_present: bool) -> None:
+    """Configure ``.dev`` in the routing file and optionally create ``.dev``.
+
+    Args:
+        fs: In-memory filesystem.
+        dev_present: Whether the ``.dev`` directory exists.
+    """
+    workspace = Path("/workspace")
+    fs.write_text(
+        workspace / "config" / "orchestration-routing.json",
+        '{"development_docs_root": ".dev"}',
+    )
+    fs.ensure_dir(workspace / "docs" / "features")
+    if dev_present:
+        fs.ensure_dir(workspace / ".dev")
+
+
+def test_create_folder_names_issue_first_from_date_first_potential_stem() -> None:
+    """Verify issue 1016 and potential stem ``2026-10-30-foo`` give ``1016-foo``."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    _seed_feature_template(fs, workspace)
+    fs.write_text(
+        workspace / "docs" / "features" / "potential" / "2026-10-30-foo.md", "# foo\n"
+    )
+
+    target = _create_with_root(fs, "foo", "1016")
+
+    assert target == workspace / "docs" / "features" / "active" / "1016-foo"
+
+
+def test_create_folder_pads_issue_42_to_four_digits() -> None:
+    """Verify issue 42 gives ``0042-<feature>``."""
+    fs = FakeFileSystem()
+    _seed_feature_template(fs, Path("/workspace"))
+
+    target = _create_with_root(fs, "notes-feature", "42")
+
+    assert target.name == "0042-notes-feature"
+
+
+def test_create_folder_keeps_slug_without_issue_number() -> None:
+    """Verify a folder without an issue number keeps today's slug (OQ-4)."""
+    fs = FakeFileSystem()
+    _seed_feature_template(fs, Path("/workspace"))
+
+    target = _create_with_root(fs, "notes-feature", None)
+
+    assert target == Path("/workspace/docs/features/active/notes-feature")
+
+
+def test_create_folder_writes_under_dev_active_when_dev_present() -> None:
+    """Verify a configured and present ``.dev`` root receives the folder."""
+    fs = FakeFileSystem()
+    _seed_feature_template(fs, Path("/workspace"))
+    _seed_dev_root(fs, dev_present=True)
+
+    target = _create_with_root(fs, "notes-feature", "42")
+
+    assert target == Path("/workspace/.dev/active/0042-notes-feature")
+
+
+def test_create_folder_writes_under_docs_features_when_dev_absent() -> None:
+    """Verify a configured but absent ``.dev`` falls back to ``docs/features``."""
+    fs = FakeFileSystem()
+    _seed_feature_template(fs, Path("/workspace"))
+    _seed_dev_root(fs, dev_present=False)
+
+    target = _create_with_root(fs, "notes-feature", "42")
+
+    assert target == Path("/workspace/docs/features/active/0042-notes-feature")
+
+
+def test_create_epic_under_dev_epics_when_dev_present() -> None:
+    """Verify an epic home is created under ``.dev/epics`` when ``.dev`` exists."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    fs.write_text(
+        workspace / "docs" / "features" / "templates" / "epic" / "epic.md", "# e\n"
+    )
+    _seed_dev_root(fs, dev_present=True)
+
+    target = _create_with_root(fs, "store-lockup", None, feature_type="epic")
+
+    assert target == workspace / ".dev" / "epics" / "store-lockup"
+
+
+def test_create_folder_resolves_workspace_templates_under_dev() -> None:
+    """Verify the workspace template area follows the resolved ``.dev`` root."""
+    fs = FakeFileSystem()
+    _seed_dev_root(fs, dev_present=True)
+
+    with pytest.raises(FileNotFoundError, match="dev"):
+        mod.create_active_folder(
+            feature_name="notes-feature",
+            workspace=Path("/workspace"),
+            fs=fs,
+            issue_fetcher=FakeIssueFetcher(None),
+            code_launcher=FakeCodeLauncher(),
+        )
+
+
+def test_find_potential_file_searches_the_dev_potential_area() -> None:
+    """Verify the ``.dev`` root routes the potential lookup to ``.dev/potential``."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    fs.write_text(workspace / ".dev" / "potential" / "notes-feature.md", "x")
+    fs.write_text(
+        workspace / "docs" / "features" / "potential" / "notes-feature.md", "x"
+    )
+
+    found = io_mod.find_potential_file("notes-feature", workspace, fs, ".dev")
+
+    assert found == workspace / ".dev" / "potential" / "notes-feature.md"
+
+
+def test_build_folder_slug_rejects_a_non_numeric_issue_number() -> None:
+    """Verify a non-numeric issue number is an explicit error."""
+    with pytest.raises(ValueError, match="positive integer"):
+        mod.build_folder_slug("notes", None, "abc")

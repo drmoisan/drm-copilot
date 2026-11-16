@@ -187,7 +187,7 @@ describe("drm-copilot newActiveFeatureFolder command", () => {
     expect(pythonScriptSpawned(childProcessMock)).toBe(false);
     expect(
       tree.files.has(
-        "C:/workspace/docs/features/active/blank-pr-context-104/spec.md",
+        "C:/workspace/docs/features/active/0104-blank-pr-context/spec.md",
       ),
     ).toBe(true);
   });

@@ -376,9 +376,9 @@ describe("createActiveFolder issue-number handling", () => {
       issueFetcher: () => null,
     });
 
-    // Assert: the slug from the potential stem gains the parsed issue suffix.
+    // Assert: the potential stem and the parsed issue form <NNNN>-<feature>.
     expect(result.target).toBe(
-      `${WORKSPACE}/docs/features/active/notes-feature-240`,
+      `${WORKSPACE}/docs/features/active/0240-notes-feature`,
     );
   });
 
@@ -496,5 +496,137 @@ describe("createActiveFolder launcher fallback", () => {
     );
     const target = `${WORKSPACE}/docs/features/active/notes-feature`;
     expect(emitted).toContain(`  ${target}/user-story.md`);
+  });
+});
+
+describe("createActiveFolder development-docs root and issue-first naming", () => {
+  const ROUTING = `${WORKSPACE}/config/orchestration-routing.json`;
+
+  /**
+   * Run `createActiveFolder` for a feature with the shared hermetic seams.
+   *
+   * @param fs Filesystem fake.
+   * @param featureName Feature name.
+   * @param issueNumber Issue number, or null.
+   * @param featureType Feature type.
+   * @returns The created target directory.
+   */
+  function create(
+    fs: FakeFolderFileSystem,
+    featureName: string,
+    issueNumber: string | null,
+    featureType = "feature",
+  ): string {
+    return createActiveFolder({
+      featureName,
+      featureType,
+      issueNumber,
+      workMode: "full-feature",
+      templateRoot: TEMPLATE_ROOT,
+      fs,
+      workspace: WORKSPACE,
+      nowProvider: () => FIXED_INSTANT,
+      codeLauncher: () => true,
+      issueFetcher: () => null,
+    }).target;
+  }
+
+  it("names the folder 1016-foo for issue 1016 and a date-first potential stem", () => {
+    // Arrange
+    const fs = new FakeFolderFileSystem();
+    seedFeatureTemplate(fs, "feature");
+    fs.seed(
+      `${WORKSPACE}/docs/features/potential/2026-10-30-foo.md`,
+      "# foo\n",
+    );
+
+    // Act
+    const target = create(fs, "foo", "1016");
+
+    // Assert
+    expect(target).toBe(`${WORKSPACE}/docs/features/active/1016-foo`);
+  });
+
+  it("pads issue 42 to 0042-<feature>", () => {
+    // Arrange
+    const fs = new FakeFolderFileSystem();
+    seedFeatureTemplate(fs, "feature");
+
+    // Act
+    const target = create(fs, "notes-feature", "42");
+
+    // Assert
+    expect(target).toBe(`${WORKSPACE}/docs/features/active/0042-notes-feature`);
+  });
+
+  it("keeps the slug when no issue number is supplied", () => {
+    // Arrange
+    const fs = new FakeFolderFileSystem();
+    seedFeatureTemplate(fs, "feature");
+
+    // Act
+    const target = create(fs, "notes-feature", null);
+
+    // Assert
+    expect(target).toBe(`${WORKSPACE}/docs/features/active/notes-feature`);
+  });
+
+  it("writes under .dev/active when .dev is configured and present", () => {
+    // Arrange
+    const fs = new FakeFolderFileSystem();
+    seedFeatureTemplate(fs, "feature");
+    fs.seed(ROUTING, '{"development_docs_root": ".dev"}');
+    fs.seed(`${WORKSPACE}/.dev/README.md`, "x");
+
+    // Act
+    const target = create(fs, "notes-feature", "42");
+
+    // Assert
+    expect(target).toBe(`${WORKSPACE}/.dev/active/0042-notes-feature`);
+  });
+
+  it("writes under docs/features/active when .dev is configured but absent", () => {
+    // Arrange
+    const fs = new FakeFolderFileSystem();
+    seedFeatureTemplate(fs, "feature");
+    fs.seed(ROUTING, '{"development_docs_root": ".dev"}');
+    fs.seed(`${WORKSPACE}/docs/features/README.md`, "x");
+
+    // Act
+    const target = create(fs, "notes-feature", "42");
+
+    // Assert
+    expect(target).toBe(`${WORKSPACE}/docs/features/active/0042-notes-feature`);
+  });
+
+  it("creates an epic under .dev/epics when .dev is configured and present", () => {
+    // Arrange
+    const fs = new FakeFolderFileSystem();
+    fs.seed(`${TEMPLATE_ROOT}/epic/epic.md`, "# <epic-name> - Epic\n");
+    fs.seed(ROUTING, '{"development_docs_root": ".dev"}');
+    fs.seed(`${WORKSPACE}/.dev/README.md`, "x");
+
+    // Act
+    const target = create(fs, "store-lockup", null, "epic");
+
+    // Assert
+    expect(target).toBe(`${WORKSPACE}/.dev/epics/store-lockup`);
+  });
+
+  it("finds the potential file under the .dev potential area", () => {
+    // Arrange
+    const fs = new FakeFolderFileSystem();
+    seedFeatureTemplate(fs, "feature");
+    fs.seed(ROUTING, '{"development_docs_root": ".dev"}');
+    fs.seed(
+      `${WORKSPACE}/.dev/potential/2026-10-30-foo.md`,
+      "- Issue: #1016\n",
+    );
+
+    // Act
+    const target = create(fs, "foo", null);
+
+    // Assert: the issue line of the .dev potential file names the folder.
+    expect(target).toBe(`${WORKSPACE}/.dev/active/1016-foo`);
   });
 });

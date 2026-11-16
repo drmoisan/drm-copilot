@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from scripts.dev_tools import potential_to_issue_content as mod
 
 
@@ -293,3 +295,41 @@ def test_get_section_variants() -> None:
 
     windows_endings = "## Problem / Why\r\nabc\r\n## Proposed Behavior\r\ndef"
     assert mod.get_section(windows_endings, "Problem / Why") == "abc"
+
+
+def test_get_status_folder_token_formats_issue_first_name() -> None:
+    """Verify issue 1016 and stem ``2026-10-30-foo`` give ``1016-foo``."""
+    assert mod.get_status_folder_token("1016", "2026-10-30-foo", "Foo") == "1016-foo"
+
+
+def test_get_status_folder_token_removes_trailing_issue_suffix() -> None:
+    """Verify a trailing ``-<issue>`` is removed from the stem."""
+    assert mod.get_status_folder_token("1016", "foo-1016", "Foo") == "1016-foo"
+
+
+@pytest.mark.parametrize(
+    ("issue_number", "stem"),
+    [("123", "Bad Stem"), ("10000", "foo"), ("0", "foo")],
+)
+def test_get_status_folder_token_falls_back_when_formatter_rejects(
+    issue_number: str, stem: str
+) -> None:
+    """Verify the sanitized token is kept when the formatter rejects (N-3 to N-5)."""
+    assert mod.get_status_folder_token(issue_number, stem, "Feature_Title") == (
+        "Feature_Title"
+    )
+
+
+def test_update_metadata_lines_names_the_passed_active_area() -> None:
+    """Verify the status line names the active area that is passed."""
+    updated = mod.update_metadata_lines(
+        ["# Foo", "## Problem / Why"],
+        "Foo",
+        "1016",
+        "https://example.com/issues/1016",
+        None,
+        "1016-foo",
+        ".dev/active",
+    )
+
+    assert "- Status: Promoted -> .dev/active/1016-foo/ (Issue #1016)" in updated

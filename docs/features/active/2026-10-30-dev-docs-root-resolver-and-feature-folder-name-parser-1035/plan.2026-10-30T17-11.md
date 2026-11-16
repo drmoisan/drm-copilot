@@ -108,27 +108,27 @@
 
 ### Phase 2 — Folder Creation, Status Line and Parser Delegation
 
-- [ ] [P2-T1] In `extensions/drm-copilot/src/lib/new-active-feature-folder/io.ts` (`buildFolderSlug`, `findPotentialFile`) and `flow.ts` (`createActiveFolder`), route promoted, templates, epics and active paths through `developmentDocsPath` and name issue folders with `formatFeatureFolderName` (no issue: today's slug; epics: `<epics area>/<slug>`).
+- [x] [P2-T1] In `extensions/drm-copilot/src/lib/new-active-feature-folder/io.ts` (`buildFolderSlug`, `findPotentialFile`) and `flow.ts` (`createActiveFolder`), route promoted, templates, epics and active paths through `developmentDocsPath` and name issue folders with `formatFeatureFolderName` (no issue: today's slug; epics: `<epics area>/<slug>`).
   - Changed behavior, asserting tests: `io.test.ts` `describe("buildFolderSlug")` (`notes-240` becomes `0240-notes`), `flow.test.ts` and `new-active-feature-folder-service-call.test.ts` (`notes-feature-240` becomes `0240-notes-feature`) are updated; in `test/extension.new-active-feature-folder.test.ts`, `direct invocation forwards the issue number without prompts` is updated (`blank-pr-context-104` becomes `0104-blank-pr-context`) and its other cases are unchanged (no issue number); `extension.new-active-feature-folder-inprocess.test.ts`, `flow.promoted-disposition.test.ts` and `promotion-lifecycle-sequence.test.ts` are unchanged (no issue-suffixed name; they read `result.target`); `findPotentialFile` cases and `createActiveFolder epic creation (single home)` are unchanged.
   - New cases: issue 1016 with stem `2026-10-30-foo` gives `1016-foo`; issue 42 gives `0042-<feature>`; no issue keeps the slug; `.dev` configured and present writes under `.dev/active`, absent under `docs/features/active`; an epic under `.dev/epics` when `.dev` is present.
   - Acceptance: the five suites pass.
-- [ ] [P2-T2] In `scripts/dev_tools/new_active_feature_folder_io.py` (`build_folder_slug`, `find_potential_file`) and `new_active_feature_folder_flow.py`, apply the P2-T1 routing and naming; argparse help is unchanged under the default.
+- [x] [P2-T2] In `scripts/dev_tools/new_active_feature_folder_io.py` (`build_folder_slug`, `find_potential_file`) and `new_active_feature_folder_flow.py`, apply the P2-T1 routing and naming; argparse help is unchanged under the default.
   - Changed behavior, asserting tests: `test_build_folder_slug_uses_potential_and_issue_number` and the `2025-12-23-json-quality-63` and `bug-case-77` expectations in `test_new_active_feature_folder.py`, `refactor-test-88` and `auto-test-42` in `_part2.py`, and `2026-02-22-testing-missing-mock-injections-42` in `_part4.py` are updated; `_part3.py`, `_part5.py`, `_launcher.py`, `_markdown_escape.py`, `_models_coverage.py` and `_bug_template_preserved.py` are unchanged (no issue-suffixed folder expectation; `_bug_template_preserved.py` reads `result.target`). New cases mirror P2-T1 in `test_new_active_feature_folder.py`.
   - Acceptance: every `test_new_active_feature_folder*.py` module passes.
-- [ ] [P2-T3] Add the D-P6 status-folder helper to `extensions/drm-copilot/src/lib/potential-to-issue/content.ts`, give `updateMetadataLines` the active-area text, and in `promotion.ts` resolve the root per D-P10, route the promoted directory through `developmentDocsPath(root, "potential/promoted")` and pass the helper's token.
+- [x] [P2-T3] Add the D-P6 status-folder helper to `extensions/drm-copilot/src/lib/potential-to-issue/content.ts`, give `updateMetadataLines` the active-area text, and in `promotion.ts` resolve the root per D-P10, route the promoted directory through `developmentDocsPath(root, "potential/promoted")` and pass the helper's token.
   - Changed behavior, asserting tests: `promotion.test.ts` status expectation `Feature_Title` becomes `0123-sample` (potential stem `sample`); `content.test.ts` `updateMetadataLines` cases are unchanged (they pass the token); `promotion.matrix.test.ts` and `promotion.move-verification.test.ts` are unchanged.
   - New cases: helper `1016-foo` and N-5 fallback in `content.test.ts`; in `promotion.test.ts`, `.dev` present gives a destination under `<workspace>/.dev/potential/promoted/` and `Promoted -> .dev/active/1016-foo/`, `.dev` absent gives `docs/features` forms.
   - Acceptance: the potential-to-issue suites pass.
-- [ ] [P2-T4] Apply P2-T3 in `scripts/dev_tools/potential_to_issue_content.py` and `potential_to_issue.py`.
+- [x] [P2-T4] Apply P2-T3 in `scripts/dev_tools/potential_to_issue_content.py` and `potential_to_issue.py`.
   - Changed behavior, asserting tests: the status assertion in `test_potential_to_issue.py` becomes `0123-sample`; `test_potential_to_issue_content.py` direct `update_metadata_lines` cases are unchanged; new helper, fallback and `1016-foo` cases go into those two modules.
   - Acceptance: every `test_potential_to_issue*.py` module passes; the TypeScript and Python status strings for the same input are equal.
-- [ ] [P2-T5] Make `resolveNameFromFeatureFoldername` in `src/lib/resolve/file-prompt-variables.ts` delegate to `parseFeatureFolderName` per D-P14.
+- [x] [P2-T5] Make `resolveNameFromFeatureFoldername` in `src/lib/resolve/file-prompt-variables.ts` delegate to `parseFeatureFolderName` per D-P14.
   - Tests: existing cases in `test/lib/resolve/file-prompt-variables.test.ts` unchanged (including the dated, `feature-123` and versioned `v2` cases); new issue-first case `1016-foo-bar` resolves `foo-bar`.
   - Acceptance: suite passes.
-- [ ] [P2-T6] Make `_resolve_name_from_feature_foldername` in `scripts/dev_tools/resolve_execute_plan_prompt.py` and `resolve_file_prompt.py` (D-P14), and the issue extraction behind `_TRAILING_ISSUE_IN_FEATURE_DIR_PATTERN` in `plan_progress_report.py`, delegate to `parse_feature_folder_name`; the `--active-root` default comes from `development_docs_path`.
+- [x] [P2-T6] Make `_resolve_name_from_feature_foldername` in `scripts/dev_tools/resolve_execute_plan_prompt.py` and `resolve_file_prompt.py` (D-P14), and the issue extraction behind `_TRAILING_ISSUE_IN_FEATURE_DIR_PATTERN` in `plan_progress_report.py`, delegate to `parse_feature_folder_name`; the `--active-root` default comes from `development_docs_path`.
   - Tests: existing cases in `test_resolve_execute_plan_prompt.py`, `test_resolve_file_prompt.py` and `test_plan_progress_report.py` unchanged; each gains an issue-first case.
   - Acceptance: the three modules pass.
-- [ ] [P2-T7] [phase-gate] Run stages 1 to 6 per `## Test Cadence (Mandatory)` over `scripts/`, `.claude/`, `.codex/`, `extensions/drm-copilot/` and `tests/`.
+- [x] [P2-T7] [phase-gate] Run stages 1 to 6 per `## Test Cadence (Mandatory)` over `scripts/`, `.claude/`, `.codex/`, `extensions/drm-copilot/` and `tests/`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/phase-gate.P2.<timestamp>.md` records one clean pass.
 
 ### Phase 3 — TypeScript Consumers

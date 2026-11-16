@@ -174,7 +174,7 @@ describe("newActiveFeatureFolderServiceCall", () => {
 
     // Assert: success implies templateRoot was forwarded to createActiveFolder.
     expect(result.destinationPath).toBe(
-      "/ws/docs/features/active/notes-feature-240",
+      "/ws/docs/features/active/0240-notes-feature",
     );
   });
 

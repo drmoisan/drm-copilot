@@ -505,10 +505,10 @@ All such tests use in-memory fakes; no temporary files are created.
 
 - [x] `extensions/drm-copilot/test/lib/development-docs/feature-folder-name.test.ts` asserts parser cases F-1 to F-6 and formatter cases N-1 to N-5 from this spec, and passes.
 - [x] Python tests for `parse_feature_folder_name` and `format_feature_folder_name` and Pester tests for `ConvertFrom-FeatureFolderName` and `ConvertTo-FeatureFolderName` assert the same cases F-1 to F-6 and N-1 to N-5, and pass.
-- [ ] `resolveNameFromFeatureFoldername` (`file-prompt-variables.ts`), `_resolve_name_from_feature_foldername` in `resolve_execute_plan_prompt.py` and in `resolve_file_prompt.py`, and the trailing-issue extraction in `plan_progress_report.py` delegate to the shared parser, and their test suites include an issue-first folder-name case that passes.
-- [ ] Folder-creation tests in TypeScript (`io.test.ts`, `flow.test.ts`, `new-active-feature-folder-service-call.test.ts`) and Python (`test_new_active_feature_folder.py`) show that issue 1016 with potential stem `2026-10-30-foo` creates `<active area>/1016-foo`, issue 42 creates `<active area>/0042-<feature>`, and a request without an issue number keeps the current slug.
-- [ ] Epic folder creation still produces `<epics area>/<slug>` with no date or issue prefix, asserted by an existing or new test.
-- [ ] Potential-to-issue status-line tests in TypeScript (`content.test.ts`, `promotion.test.ts`) and Python (`test_potential_to_issue_content.py`, `test_potential_to_issue.py`) assert `Promoted -> docs/features/active/<NNNN>-<feature>/` under the default root.
+- [x] `resolveNameFromFeatureFoldername` (`file-prompt-variables.ts`), `_resolve_name_from_feature_foldername` in `resolve_execute_plan_prompt.py` and in `resolve_file_prompt.py`, and the trailing-issue extraction in `plan_progress_report.py` delegate to the shared parser, and their test suites include an issue-first folder-name case that passes.
+- [x] Folder-creation tests in TypeScript (`io.test.ts`, `flow.test.ts`, `new-active-feature-folder-service-call.test.ts`) and Python (`test_new_active_feature_folder.py`) show that issue 1016 with potential stem `2026-10-30-foo` creates `<active area>/1016-foo`, issue 42 creates `<active area>/0042-<feature>`, and a request without an issue number keeps the current slug.
+- [x] Epic folder creation still produces `<epics area>/<slug>` with no date or issue prefix, asserted by an existing or new test.
+- [x] Potential-to-issue status-line tests in TypeScript (`content.test.ts`, `promotion.test.ts`) and Python (`test_potential_to_issue_content.py`, `test_potential_to_issue.py`) assert `Promoted -> docs/features/active/<NNNN>-<feature>/` under the default root.
 
 ### Write-scope literal contract (D-16)
 

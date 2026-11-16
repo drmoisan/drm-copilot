@@ -24,6 +24,19 @@ import { PLAN_TIMESTAMP_TEMPLATE_NAME } from "../../../src/lib/new-active-featur
 import { FakeCommandRunner, FakeFolderFileSystem } from "./fakes";
 
 describe("findPotentialFile", () => {
+  it("searches the .dev potential area when the .dev root is passed", () => {
+    // Arrange
+    const fs = new FakeFolderFileSystem();
+    fs.seed("/ws/.dev/potential/notes-feature.md", "x");
+    fs.seed("/ws/docs/features/potential/notes-feature.md", "x");
+
+    // Act
+    const result = findPotentialFile("notes-feature", "/ws", fs, ".dev");
+
+    // Assert
+    expect(result).toBe("/ws/.dev/potential/notes-feature.md");
+  });
+
   it("matches by normalized name in potential, excluding template/README and non-md", () => {
     // Arrange
     const fs = new FakeFolderFileSystem();
@@ -108,10 +121,31 @@ describe("buildFolderSlug", () => {
     ).toBe("notes-240");
   });
 
-  it("appends the issue number when not already a suffix", () => {
+  it("formats the issue-first name when an issue number is supplied", () => {
+    // Arrange / Act / Assert (spec D-18: <NNNN>-<feature>)
+    expect(buildFolderSlug("notes", null, "240")).toBe("0240-notes");
+    expect(buildFolderSlug("notes-240", null, "240")).toBe("0240-notes");
+  });
+
+  it("strips the date-first prefix of the potential stem for an issue folder", () => {
     // Arrange / Act / Assert
-    expect(buildFolderSlug("notes", null, "240")).toBe("notes-240");
-    expect(buildFolderSlug("notes-240", null, "240")).toBe("notes-240");
+    expect(
+      buildFolderSlug(
+        "ignored",
+        "/ws/docs/features/potential/2026-10-30-foo.md",
+        "1016",
+      ),
+    ).toBe("1016-foo");
+  });
+
+  it("pads a two-digit issue number to four digits", () => {
+    // Arrange / Act / Assert
+    expect(buildFolderSlug("my-feature", null, "42")).toBe("0042-my-feature");
+  });
+
+  it("keeps the slug without an issue prefix when no issue is supplied", () => {
+    // Arrange / Act / Assert (OQ-4)
+    expect(buildFolderSlug("my-feature", null, null)).toBe("my-feature");
   });
 
   it("throws the byte-identical message for an invalid slug", () => {

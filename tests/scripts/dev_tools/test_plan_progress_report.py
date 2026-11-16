@@ -9,11 +9,13 @@ from pathlib import Path
 
 import pytest  # noqa: TCH002 - pytest required at runtime for fixtures
 
+from scripts.dev_tools import plan_progress_report as plan_progress_report_module
 from scripts.dev_tools.plan_progress_report import (
     PlanProgressRow,
     build_report_rows,
     count_checkboxes,
     discover_plan_files,
+    fallback_issue_from_feature_dir,
     parse_primary_issue,
     render_markdown_table,
     resolve_feature_and_type,
@@ -188,3 +190,30 @@ class TestDiscoverPlanFiles:
 
         discovered = discover_plan_files(active_root)
         assert discovered == sorted([plan, plan_dot, plan_dash])
+
+
+class TestFallbackIssueFromFeatureDir:
+    @pytest.mark.parametrize(
+        ("feature", "expected"),
+        [
+            ("2026-01-07-atomic-executor-77", "#77"),
+            ("1016-foo-bar", "#1016"),
+            ("0042-foo", "#42"),
+            ("2026-01-07-atomic-executor", ""),
+            ("notes-feature", ""),
+        ],
+    )
+    def test_delegates_issue_extraction_to_the_parser(
+        self, feature: str, expected: str
+    ) -> None:
+        """Issue-first and trailing-issue names yield the issue; others none."""
+        assert fallback_issue_from_feature_dir(feature) == expected
+
+
+class TestParseArgs:
+    def test_active_root_default_is_the_default_active_area(self) -> None:
+        """The --active-root default is the default root's active area."""
+        args = plan_progress_report_module._parse_args(  # type: ignore[reportPrivateUsage]
+            []
+        )
+        assert args.active_root == Path("docs/features/active")

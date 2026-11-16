@@ -9,6 +9,11 @@ import shutil
 import subprocess
 from typing import TYPE_CHECKING
 
+from scripts.dev_tools.json_config import (
+    DEFAULT_DEVELOPMENT_DOCS_ROOT,
+    development_docs_path,
+    format_feature_folder_name,
+)
 from scripts.dev_tools.new_active_feature_folder_markdown import set_header_placeholder
 from scripts.dev_tools.new_active_feature_folder_models import (
     EXCLUDED_POTENTIAL_NAMES,
@@ -33,13 +38,27 @@ _INSIDERS_SIGNAL_NAMES = (
 
 
 def find_potential_file(
-    feature_name: str, workspace: Path, fs: FileSystem
+    feature_name: str,
+    workspace: Path,
+    fs: FileSystem,
+    root: str = DEFAULT_DEVELOPMENT_DOCS_ROOT,
 ) -> Path | None:
-    """Find the best matching potential file for a feature name."""
+    """Find the best matching potential file for a feature name.
+
+    Args:
+        feature_name: Feature name to match; underscores match dashes.
+        workspace: Workspace root.
+        fs: Filesystem seam.
+        root: Resolved development-docs root; defaults to ``docs/features``.
+
+    Returns:
+        The name-descending winner of the ``potential`` area, else of the
+        ``potential/promoted`` area, or ``None`` when neither has a match.
+    """
     normalized = feature_name.replace("_", "-")
     potential_dirs = [
-        workspace / "docs" / "features" / "potential",
-        workspace / "docs" / "features" / "potential" / "promoted",
+        development_docs_path(workspace, "potential", root=root),
+        development_docs_path(workspace, "potential/promoted", root=root),
     ]
 
     for directory in potential_dirs:
@@ -68,17 +87,44 @@ def build_folder_slug(
     potential_file: Path | None,
     issue_number: str | None,
 ) -> str:
-    """Build canonical active-folder slug."""
+    """Build the canonical active-folder name.
+
+    The slug is the potential-file stem when one is matched, otherwise the
+    underscore-normalized feature name, and it must match ``NAME_PATTERN``.
+    With an issue number the folder is the issue-first name
+    ``<NNNN>-<feature>`` (spec D-18); without one the slug is kept (OQ-4).
+
+    Args:
+        feature_name: Feature name.
+        potential_file: Matched potential file, or ``None``.
+        issue_number: Resolved issue number, or ``None``.
+
+    Returns:
+        The validated folder name.
+
+    Raises:
+        ValueError: When the slug is invalid or the issue-first name cannot be
+            formatted.
+    """
     slug = feature_name.replace("_", "-")
     if potential_file:
         slug = potential_file.stem
-    if issue_number and not slug.endswith(str(issue_number)):
-        slug = f"{slug}-{issue_number}"
     if not NAME_PATTERN.fullmatch(slug):
         raise ValueError(
             f"Aborted: '{slug}' is invalid. Use kebab/underscore-case letters/numbers "
             "(e.g., notes-feature or notes_feature)."
         )
+    # An issue number selects the issue-first name; a non-numeric value is
+    # rejected by the formatter rather than silently appended.
+    if issue_number:
+        try:
+            number = int(issue_number)
+        except ValueError as error:
+            raise ValueError(
+                "Feature folder issue number must be a positive integer: "
+                f"{issue_number}"
+            ) from error
+        return format_feature_folder_name(number, slug)
     return slug
 
 

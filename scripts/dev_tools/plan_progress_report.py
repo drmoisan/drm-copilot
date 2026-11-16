@@ -28,6 +28,11 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from scripts.dev_tools.json_config import (
+    development_docs_path,
+    parse_feature_folder_name,
+)
+
 
 @dataclass(frozen=True, slots=True)
 class PlanProgressRow:
@@ -55,7 +60,6 @@ _ISSUE_LINE_PATTERN = re.compile(
     r"^[ \t]*-\s*(?:\*\*Issue:\*\*|Issue:)\s*#(?P<num>\d+)\b",
     re.IGNORECASE | re.MULTILINE,
 )
-_TRAILING_ISSUE_IN_FEATURE_DIR_PATTERN = re.compile(r"-(?P<num>\d+)$")
 
 
 def discover_plan_files(active_root: Path) -> list[Path]:
@@ -173,10 +177,12 @@ def fallback_issue_from_feature_dir(feature: str) -> str:
         The issue reference (e.g., "#77") or an empty string.
     """
 
-    match = _TRAILING_ISSUE_IN_FEATURE_DIR_PATTERN.search(feature)
-    if not match:
+    # Issue extraction is delegated to the feature-folder parser (D-P14): a
+    # date-first name without a trailing issue yields no fallback.
+    parsed = parse_feature_folder_name(feature)
+    if parsed.issue_number is None:
         return ""
-    return f"#{match.group('num')}"
+    return f"#{parsed.issue_number}"
 
 
 def build_report_rows(
@@ -350,11 +356,12 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "by older remediation plans)."
         ),
     )
+    default_active_root = development_docs_path(Path(), "active")
     parser.add_argument(
         "--active-root",
         type=Path,
-        default=Path("docs/features/active"),
-        help="Root folder to scan (default: docs/features/active)",
+        default=default_active_root,
+        help=f"Root folder to scan (default: {default_active_root.as_posix()})",
     )
     parser.add_argument(
         "--out",

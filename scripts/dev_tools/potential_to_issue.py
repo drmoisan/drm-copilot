@@ -9,6 +9,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from scripts.dev_tools.json_config import (
+    development_docs_path,
+    development_docs_relative_path,
+    resolve_development_docs_root,
+)
 from scripts.dev_tools.potential_to_issue_adapters import (
     FEATURE_LABEL_COLOR,
     FEATURE_LABEL_DESCRIPTION,
@@ -26,6 +31,7 @@ from scripts.dev_tools.potential_to_issue_content import (
     get_feature_name,
     get_feature_path,
     get_section,
+    get_status_folder_token,
     normalize_smart_punctuation,
     parse_issue_reference,
     update_metadata_lines,
@@ -153,6 +159,34 @@ def _is_missing_label_failure(output: list[str], label: str) -> bool:
     return any(expected_fragment in line.lower() for line in output)
 
 
+def _resolve_promotion_docs_root(filesystem: FileSystem, workspace_path: Path) -> str:
+    """Resolve the development-docs root through the promotion filesystem seam.
+
+    The seam has no directory probe, so ``exists`` serves both probes (D-P10),
+    and an absent routing file reads as ``FileNotFoundError`` (rule R-1).
+
+    Args:
+        filesystem: Promotion filesystem seam.
+        workspace_path: Workspace root.
+
+    Returns:
+        The resolved root, ``docs/features`` or ``.dev``.
+
+    Raises:
+        ValueError: When the routing file is malformed or names an unknown root.
+    """
+
+    def read_text(path: Path) -> str:
+        """Read the routing file, raising ``FileNotFoundError`` when absent."""
+        if not filesystem.exists(path):
+            raise FileNotFoundError(str(path))
+        return filesystem.read_text(path)
+
+    return resolve_development_docs_root(
+        workspace_path, read_text=read_text, is_dir=filesystem.exists
+    )
+
+
 def promote_potential(
     potential_path: str,
     promotion_type: str = "feature",
@@ -212,6 +246,9 @@ def promote_potential(
     if not content.strip():
         raise PromotionError(f"Potential file is empty: {resolved}")
 
+    # Resolve the development-docs root before creating the issue, so a
+    # malformed routing file fails fast without side effects.
+    docs_root = _resolve_promotion_docs_root(filesystem, workspace_path)
     feature_name = get_feature_name(content, resolved)
     feature_path = get_feature_path(feature_name)
     prefix = TITLE_PREFIXES.get(promotion_type, "Feature")
@@ -338,12 +375,15 @@ def promote_potential(
             issue_number,
             issue_url,
             last_updated,
-            feature_path,
+            get_status_folder_token(issue_number, resolved.stem, feature_path),
+            development_docs_relative_path(docs_root, "active"),
         )
         filesystem.write_lines(resolved, updated_lines)
         _emit(f"Updated potential file with issue metadata: {resolved}")
 
-    promoted_dir = workspace_path / "docs" / "features" / "potential" / "promoted"
+    promoted_dir = development_docs_path(
+        workspace_path, "potential/promoted", root=docs_root
+    )
     filesystem.ensure_dir(promoted_dir)
     dest_path = promoted_dir / resolved.name
     filesystem.move(resolved, dest_path)

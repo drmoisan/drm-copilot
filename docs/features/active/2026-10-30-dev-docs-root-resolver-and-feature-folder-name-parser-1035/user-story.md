@@ -74,7 +74,7 @@ Today no shared constant exists: TypeScript has `ACTIVE_FEATURE_DOCS_DIRECTORY` 
 
 - [x] With the routing file absent, or present without the key, every resolver returns `docs/features` (cases R-1 and R-2), asserted in TypeScript, Python and PowerShell.
 - [ ] A malformed routing file or an out-of-set value produces an explicit error, and a hook that reads the key fails closed with a reason naming the configuration file and key, asserted by a Pester test.
-- [ ] Folder-creation tests in TypeScript and Python show that issue 1016 with potential stem `2026-10-30-foo` creates `<active area>/1016-foo`, issue 42 creates `<active area>/0042-<feature>`, and a request without an issue number keeps the current slug.
+- [x] Folder-creation tests in TypeScript and Python show that issue 1016 with potential stem `2026-10-30-foo` creates `<active area>/1016-foo`, issue 42 creates `<active area>/0042-<feature>`, and a request without an issue number keeps the current slug.
 - [x] Parser tests in TypeScript, Python and PowerShell assert cases F-1 to F-6 and N-1 to N-5 in `spec.md`, so existing date-first folders keep parsing alongside the new `<NNNN>-<feature>` format.
 - [ ] After this child, the repository contains no `.dev/` directory, `development_docs_root` is `docs/features`, no existing feature folder is renamed, and no migration command is added.
 

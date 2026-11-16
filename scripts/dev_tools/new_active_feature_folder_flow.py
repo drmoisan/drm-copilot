@@ -6,6 +6,11 @@ import argparse
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from scripts.dev_tools.json_config import (
+    development_docs_path,
+    development_docs_relative_path,
+    resolve_development_docs_root,
+)
 from scripts.dev_tools.new_active_feature_folder_docs import (
     should_use_minor_audit_mode,
     update_feature_docs,
@@ -40,10 +45,40 @@ if TYPE_CHECKING:
     from datetime import datetime
 
 
-def _is_promoted_potential_source(potential_file: Path, workspace_path: Path) -> bool:
+def _resolve_folder_docs_root(filesystem: FileSystem, workspace_path: Path) -> str:
+    """Resolve the development-docs root through the folder filesystem seam.
+
+    The seam has no directory probe, so ``exists`` serves both probes (D-P10),
+    and an absent routing file reads as ``FileNotFoundError`` (rule R-1).
+
+    Args:
+        filesystem: Folder filesystem seam.
+        workspace_path: Workspace root.
+
+    Returns:
+        The resolved root, ``docs/features`` or ``.dev``.
+
+    Raises:
+        ValueError: When the routing file is malformed or names an unknown root.
+    """
+
+    def read_text(path: Path) -> str:
+        """Read the routing file, raising ``FileNotFoundError`` when absent."""
+        if not filesystem.exists(path):
+            raise FileNotFoundError(str(path))
+        return filesystem.read_text(path)
+
+    return resolve_development_docs_root(
+        workspace_path, read_text=read_text, is_dir=filesystem.exists
+    )
+
+
+def _is_promoted_potential_source(
+    potential_file: Path, workspace_path: Path, root: str
+) -> bool:
     """Return whether a resolved potential file is a promoted record.
 
-    A promoted record lives under ``docs/features/potential/promoted`` and is the
+    A promoted record lives under the ``potential/promoted`` area and is the
     durable history of the promotion, so it is copied rather than moved. The
     decision is taken from the RESOLVED source path, never from the requested
     feature name.
@@ -51,11 +86,14 @@ def _is_promoted_potential_source(potential_file: Path, workspace_path: Path) ->
     Args:
         potential_file: Resolved potential file path.
         workspace_path: Workspace root.
+        root: Resolved development-docs root.
 
     Returns:
         True when the source lies under the promoted root.
     """
-    promoted_root = workspace_path / "docs" / "features" / "potential" / "promoted"
+    promoted_root = development_docs_path(
+        workspace_path, "potential/promoted", root=root
+    )
     try:
         potential_file.relative_to(promoted_root)
     except ValueError:
@@ -84,19 +122,21 @@ def create_active_folder(
 
     workspace_path = workspace or resolve_workspace()
     filesystem = fs or RealFileSystem()
+    docs_root = _resolve_folder_docs_root(filesystem, workspace_path)
+    promoted_area = development_docs_relative_path(docs_root, "potential/promoted")
 
     resolved_feature_name = feature_name
     feature_name_source = "manual"
     if active_file_for_feature_name is not None:
         auto_resolve_error = (
             "Select a promoted issue markdown file under "
-            "docs/features/potential/promoted or supply --feature-name directly."
+            f"{promoted_area} or supply --feature-name directly."
         )
         active_file_path = Path(active_file_for_feature_name)
         if not active_file_path.is_absolute():
             active_file_path = workspace_path / active_file_path
 
-        promoted_root = workspace_path / "docs" / "features" / "potential" / "promoted"
+        promoted_root = workspace_path / promoted_area
         try:
             active_file_path.relative_to(promoted_root)
             is_in_promoted = True
@@ -123,23 +163,26 @@ def create_active_folder(
     print(f"Feature name source: {feature_name_source}")
 
     # Resolve template directory from the bundled template root when provided,
-    # otherwise fall back to the workspace's docs/features/templates/ tree.
+    # otherwise fall back to the workspace's templates area.
     if template_root is not None:
         template_dir = template_root / feature_type
     else:
-        template_dir = workspace_path / "docs" / "features" / "templates" / feature_type
+        template_dir = (
+            development_docs_path(workspace_path, "templates", root=docs_root)
+            / feature_type
+        )
     if not filesystem.exists(template_dir):
         raise FileNotFoundError(f"Template folder not found: {template_dir}")
 
     potential_file = find_potential_file(
-        resolved_feature_name, workspace_path, filesystem
+        resolved_feature_name, workspace_path, filesystem, docs_root
     )
     potential_content = filesystem.read_text(potential_file) if potential_file else ""
     # Decide the disposition ONCE from the resolved source path so both placement
     # sites and both emission sites agree: a promoted record is copied
     # (retained), any other source is moved.
     retains_potential_source = potential_file is not None and (
-        _is_promoted_potential_source(potential_file, workspace_path)
+        _is_promoted_potential_source(potential_file, workspace_path, docs_root)
     )
     selected_work_mode = normalize_requested_work_mode(work_mode, feature_type)
     use_minor_audit, fallback_reason = should_use_minor_audit_mode(
@@ -154,19 +197,24 @@ def create_active_folder(
     if not normalized_issue_number:
         normalized_issue_number = parse_issue_number(potential_content)
 
-    # Epic scaffolding uses a single stable home under docs/features/epics/ keyed
+    # Epic scaffolding uses a single stable home under the epics area keyed
     # by the bare epic slug, not the date/issue-stamped active-folder basename;
     # this is the single-home layout. All other types keep active/<folder-slug>.
     if feature_type == "epic":
         epic_slug = build_folder_slug(resolved_feature_name, None, None)
-        target_dir = workspace_path / "docs" / "features" / "epics" / epic_slug
+        target_dir = (
+            development_docs_path(workspace_path, "epics", root=docs_root) / epic_slug
+        )
     else:
         folder_slug = build_folder_slug(
             resolved_feature_name,
             potential_file,
             normalized_issue_number,
         )
-        target_dir = workspace_path / "docs" / "features" / "active" / folder_slug
+        target_dir = (
+            development_docs_path(workspace_path, "active", root=docs_root)
+            / folder_slug
+        )
 
     if filesystem.exists(target_dir) and not force:
         raise FileExistsError(

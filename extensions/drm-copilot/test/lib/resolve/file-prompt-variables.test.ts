@@ -179,6 +179,29 @@ describe("file-prompt-variables feature foldername and name", () => {
     // Assert
     expect(name).toBe("feature-123");
   });
+
+  it("extracts ${name} from an issue-first feature foldername", () => {
+    // Arrange
+    const featureFoldername = "1016-foo-bar";
+
+    // Act
+    const name = resolveNameFromFeatureFoldername(featureFoldername);
+
+    // Assert
+    expect(name).toBe("foo-bar");
+  });
+
+  it("returns the whole foldername for a bare date", () => {
+    // Arrange / Act / Assert
+    expect(resolveNameFromFeatureFoldername("2025-12-18")).toBe("2025-12-18");
+  });
+
+  it("returns the whole foldername for a date-first name without an issue", () => {
+    // Arrange / Act / Assert
+    expect(resolveNameFromFeatureFoldername("2026-01-02-port-cmd")).toBe(
+      "2026-01-02-port-cmd",
+    );
+  });
 });
 
 describe("file-prompt-variables spec/user-story/research resolution", () => {

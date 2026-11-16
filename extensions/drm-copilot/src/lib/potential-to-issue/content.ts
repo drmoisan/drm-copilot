@@ -20,6 +20,14 @@
 
 import * as nodePath from "node:path";
 
+import {
+  formatFeatureFolderName,
+  stripDateFirstPrefix,
+} from "../development-docs/feature-folder-name";
+
+/** Active-area text of the default development-docs root. */
+export const DEFAULT_ACTIVE_AREA = "docs/features/active";
+
 /** Placeholder inserted when a potential file omits a required section body. */
 export const PLACEHOLDER = "(not provided in potential file)";
 
@@ -132,6 +140,35 @@ export function getFeatureName(content: string, filePath: string): string {
 export function getFeaturePath(featureName: string): string {
   const replaced = featureName.replace(/\s+/g, "_");
   return replaced.replace(/[^A-Za-z0-9_-]/g, "");
+}
+
+/**
+ * Return the folder token that the promotion `Status` line names (D-P6).
+ *
+ * The token is the issue-first folder name that folder creation will make:
+ * `formatFeatureFolderName(issue, stripDateFirstPrefix(stem))`. When the
+ * formatter rejects the stem or the issue number (rule N-3 to N-5), the
+ * sanitized feature-path token is returned instead, as before.
+ *
+ * @param issueNumber Created issue number (decimal text).
+ * @param potentialStem Potential file stem.
+ * @param fallbackToken Sanitized feature-path token from {@link getFeaturePath}.
+ * @returns The status folder token.
+ */
+export function getStatusFolderToken(
+  issueNumber: string,
+  potentialStem: string,
+  fallbackToken: string,
+): string {
+  try {
+    return formatFeatureFolderName(
+      Number(issueNumber),
+      stripDateFirstPrefix(potentialStem),
+    );
+  } catch {
+    // N-3 to N-5: an unformattable stem keeps the sanitized token.
+    return fallbackToken;
+  }
 }
 
 /**
@@ -434,7 +471,9 @@ export function setLineValue(
  * @param issueNumber Created issue number.
  * @param issueUrl Created issue URL.
  * @param lastUpdated Issue updated date, or null to omit the `Last Updated` line.
- * @param featurePath Sanitized feature-path token for the `Status` line.
+ * @param featurePath Folder token for the `Status` line.
+ * @param activeArea Active-area text of the resolved root; defaults to
+ *   `docs/features/active`.
  * @returns The mutated `lines` array.
  */
 export function updateMetadataLines(
@@ -444,6 +483,7 @@ export function updateMetadataLines(
   issueUrl: string,
   lastUpdated: string | null,
   featurePath: string,
+  activeArea: string = DEFAULT_ACTIVE_AREA,
 ): string[] {
   // Rewrite the title line when the document has at least one line.
   if (lines.length > 0) {
@@ -457,7 +497,7 @@ export function updateMetadataLines(
   if (lastUpdated) {
     metaEnd = setLineValue(lines, "Last Updated", lastUpdated, metaEnd);
   }
-  const statusValue = `Promoted -> docs/features/active/${featurePath}/ (Issue #${issueNumber})`;
+  const statusValue = `Promoted -> ${activeArea}/${featurePath}/ (Issue #${issueNumber})`;
   setLineValue(lines, "Status", statusValue, metaEnd);
   return lines;
 }

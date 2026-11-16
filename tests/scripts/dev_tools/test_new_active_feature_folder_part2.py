@@ -280,7 +280,7 @@ def test_create_refactor_folder_seeds_refactor_docs() -> None:
         code_launcher=code_launcher,
     )
 
-    expected_folder = workspace / "docs" / "features" / "active" / "refactor-test-88"
+    expected_folder = workspace / "docs" / "features" / "active" / "0088-refactor-test"
     assert result.target == expected_folder
     spec_content = fs.read_text(expected_folder / "spec.md")
     assert "intent text" in spec_content
@@ -459,7 +459,7 @@ def test_create_active_folder_with_auto_issue_detection() -> None:
         code_launcher=code_launcher,
     )
 
-    expected_folder = workspace / "docs" / "features" / "active" / "auto-test-42"
+    expected_folder = workspace / "docs" / "features" / "active" / "0042-auto-test"
     assert result.target == expected_folder
 
 

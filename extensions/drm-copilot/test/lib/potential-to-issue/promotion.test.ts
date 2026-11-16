@@ -160,7 +160,7 @@ describe("promotePotential — feature promotion success", () => {
     expect(lines).toContain("- Issue URL: https://example.com/issues/123");
     expect(lines).toContain("- Last Updated: 2024-01-02");
     expect(lines).toContain(
-      "- Status: Promoted -> docs/features/active/Feature_Title/ (Issue #123)",
+      "- Status: Promoted -> docs/features/active/0123-sample/ (Issue #123)",
     );
     expect(messages.some((m) => m.startsWith("Moved potential file"))).toBe(
       true,
@@ -464,5 +464,114 @@ describe("promotePotential — work-mode normalization", () => {
         workMode: "full-feature",
       }),
     ).toThrow(new PromotionError("full-feature may not be used with bug work"));
+  });
+});
+
+/**
+ * Fake filesystem whose `exists` also answers for the `docs/features` and
+ * `.dev` directories, which
+ * the shared fake (files only) cannot represent.
+ */
+class DevRootPotentialFileSystem extends FakePotentialFileSystem {
+  /**
+   * @param devPresent Whether `/workspace/.dev` exists.
+   */
+  constructor(private readonly devPresent: boolean) {
+    super();
+  }
+
+  /**
+   * @param path Path to probe.
+   * @returns True for a seeded file, for `/workspace/docs/features`, or for
+   *   `/workspace/.dev` when present.
+   */
+  override exists(path: string): boolean {
+    return (
+      super.exists(path) ||
+      path === "/workspace/docs/features" ||
+      (this.devPresent && path === "/workspace/.dev")
+    );
+  }
+}
+
+/**
+ * Promote `2026-10-30-foo.md` as issue 1016 with `.dev` configured.
+ *
+ * @param devPresent Whether the `.dev` directory exists.
+ * @returns The outcome and the promoted file lines.
+ */
+function promoteFooWithDevRoot(devPresent: boolean): {
+  destination: string | undefined;
+  lines: string[];
+} {
+  const fs = new DevRootPotentialFileSystem(devPresent);
+  fs.files.set(
+    "/workspace/config/orchestration-routing.json",
+    '{"development_docs_root": ".dev"}',
+  );
+  const potential = "/workspace/.dev/potential/2026-10-30-foo.md";
+  fs.files.set(potential, "# Foo\n## Problem / Why\nwhy");
+  const gh = new FakeGhClient(
+    { output: ["Created: https://example.com/issues/1016"], exitCode: 0 },
+    { output: [], exitCode: 1 },
+  );
+  const outcome = promotePotential({
+    potentialPath: potential,
+    fs,
+    gh,
+    workspace: WORKSPACE,
+  });
+  const destination = outcome.destination;
+  return {
+    destination,
+    lines: (fs.files.get(destination ?? "") ?? "").split("\n"),
+  };
+}
+
+describe("promotePotential — development-docs root", () => {
+  it("promotes under .dev when .dev is configured and present", () => {
+    // Act
+    const result = promoteFooWithDevRoot(true);
+
+    // Assert
+    expect(result.destination).toBe(
+      "/workspace/.dev/potential/promoted/2026-10-30-foo.md",
+    );
+    expect(result.lines).toContain(
+      "- Status: Promoted -> .dev/active/1016-foo/ (Issue #1016)",
+    );
+  });
+
+  it("promotes under docs/features when .dev is configured but absent", () => {
+    // Act
+    const result = promoteFooWithDevRoot(false);
+
+    // Assert
+    expect(result.destination).toBe(
+      "/workspace/docs/features/potential/promoted/2026-10-30-foo.md",
+    );
+    expect(result.lines).toContain(
+      "- Status: Promoted -> docs/features/active/1016-foo/ (Issue #1016)",
+    );
+  });
+
+  it("throws before creating the issue when the routing file is malformed", () => {
+    // Arrange
+    const fs = new FakePotentialFileSystem();
+    fs.files.set("/workspace/config/orchestration-routing.json", "{");
+    const potential = "/workspace/docs/features/potential/sample.md";
+    fs.files.set(potential, "# Sample\n## Problem / Why\nwhy");
+    const gh = new FakeGhClient({ output: [], exitCode: 0 });
+
+    // Act / Assert
+    expect(() =>
+      promotePotential({
+        potentialPath: potential,
+        fs,
+        gh,
+        workspace: WORKSPACE,
+      }),
+    ).toThrow("development_docs_root");
+    expect(gh.calls).toHaveLength(0);
   });
 });
