@@ -1,0 +1,6 @@
+# Task Check P1-T5
+
+Timestamp: 2026-11-16T01-49
+Command: env -u VIRTUAL_ENV poetry run black scripts/dev_tools/json_config.py tests/scripts/dev_tools/test_json_config.py; env -u VIRTUAL_ENV poetry run ruff check <same>; env -u VIRTUAL_ENV poetry run pyright <same>; env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest tests/scripts/dev_tools/test_json_config.py -q
+EXIT_CODE: 0
+Output Summary: Changed files: scripts/dev_tools/json_config.py (module docstring; DEVELOPMENT_DOCS_ROOT_KEY, DEFAULT_DEVELOPMENT_DOCS_ROOT, KNOWN_DEVELOPMENT_DOCS_ROOTS, resolve_development_docs_root with injected read_text and is_dir, development_docs_path, development_docs_relative_path, known_root_prefixes), tests/scripts/dev_tools/test_json_config.py (R-1 to R-8 cases, every R-4 input, area map, unknown area and root, prefixes, test_json_config_imports_no_dev_tools_module). Selection rule: the mirrored test module of the changed production module. Black: reformatted once, then unchanged. Ruff: three E501 findings in the test module fixed; then "All checks passed!". Pyright: one reportUnnecessaryIsInstance finding fixed; then 0 errors. pytest: 82 passed, exit 0. Existing tests unchanged.

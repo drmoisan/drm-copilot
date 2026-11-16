@@ -84,6 +84,7 @@ export const VIRTUAL_RESOURCE_DIRECTORIES: ReadonlyArray<
 > = [
   [".codex/lib/discovery-validation", "lib/discovery-validation"],
   [".codex/lib/epic-wave", "lib/epic-wave"],
+  [".codex/lib/development-docs", "lib/development-docs"],
 ];
 
 /**

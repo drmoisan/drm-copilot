@@ -1,0 +1,6 @@
+# Task Check P1-T2
+
+Timestamp: 2026-11-16T01-49
+Command: npx --prefix extensions/drm-copilot prettier --check <files>; npx --prefix extensions/drm-copilot eslint -c extensions/drm-copilot/eslint.config.mjs <files>; npm --prefix extensions/drm-copilot run typecheck; sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest-extension test/lib/development-docs/root.test.ts; measurement run: sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest-extension test/lib/development-docs/root.test.ts test/lib/development-docs/feature-folder-name.test.ts --coverage --collectCoverageFrom=src/lib/development-docs/*.ts --coverageThreshold={} --coverageReporters=text
+EXIT_CODE: 0
+Output Summary: Changed files: extensions/drm-copilot/src/lib/development-docs/root.ts (new), extensions/drm-copilot/test/lib/development-docs/root.test.ts (new), extensions/drm-copilot/jest.config.cjs (coverageThreshold entry placed per D-P21). Selection rule: the mirrored test file of the new module. Prettier: clean after one --write pass on the new files. ESLint: one finding (preserve-caught-error) fixed by attaching the cause; then 0 findings. Typecheck: exit 0. Jest: 1 suite, 47 tests passed, exit 0. Measurement run (not a gate): root.ts line 100%, branch 94.73%, meeting the 85/75 thresholds.

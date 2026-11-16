@@ -330,6 +330,7 @@
     ".claude/lib/epic-wave/Invoke-EpicWave.ps1",
     ".claude/lib/epic-wave/EpicCrossDependency.psm1",
     ".claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1",
+    ".claude/lib/development-docs/DevelopmentDocsRoot.psm1",
     ".claude/lib/parallel-drift/ParallelDriftHalt.psm1",
     ".claude/lib/parallel-drift/ParallelDrift.psm1",
     ".claude/lib/parallel-drift/ParallelDriftAccess.psm1",
