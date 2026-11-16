@@ -7,7 +7,7 @@ Repository policy compliance order and hard constraints. Use when an agent must 
 ## Observable Behaviors
 
 - **OB-1** Required Policy Reading Order (Baseline): Python: `.agents/skills/python/SKILL.md`, `.agents/skills/python-suppressions/SKILL.md`.
-- **OB-2** Hard Constraints (Baseline): Do NOT modify policy documents under `.agents/skills/` or `.agents/skills/`.
+- **OB-2** Hard Constraints (Baseline): Do NOT modify the repository's canonical policy documents or the rule files that mirror them.
 
 ## Acceptance Checks
 

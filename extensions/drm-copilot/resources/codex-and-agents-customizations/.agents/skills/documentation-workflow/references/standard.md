@@ -6,8 +6,8 @@ Run the documentation estate workflow from initialization to docs-complete valid
 
 ## Observable Behaviors
 
-- **OB-1** Prerequisites: Without that library every root step in this skill is unavailable;.
-- **OB-2** Dispatch Order: Run the skills in this order.
+- **OB-1** Prerequisites: Root steps run the docs command entry point of the docs helper library under PowerShell 7.4 or later; without that library every root step in this skill is unavailable, and the docs MCP tools stay available.
+- **OB-2** Dispatch Order: The skills run in a fixed order, each by its named role: docs-init (root), the root `inventory -Write` step, docs-inventory-surface, docs-plan-ia, docs-author-page, docs-reconcile-behavior, docs-review-coverage, and docs-validate.
 - **OB-3** Rules: Pass each role its prepared inputs: `workspace_root`, the profile path and the outputs of the earlier steps.
 - **OB-4** Commit, Receipt and Pull Request: The root session runs this stage itself after the dispatch order.
 - **OB-5** Refresh After Rebase or Source Change: After a rebase, or after a source path under `surface_selection.source_roots` changes, the receipt revision rule denies the existing receipt.

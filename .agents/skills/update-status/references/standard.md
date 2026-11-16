@@ -8,7 +8,7 @@ Invoke the status-updater worker to reconcile status artifacts and synchronized 
 
 - **OB-1** Inputs: Epic or feature folder path.
 - **OB-2** Output Paths: `artifacts/status/status-sync.<timestamp>.md`.
-- **OB-3** Worker Routing: The skill defines its worker routing and applies it on every run.
+- **OB-3** Worker Routing: The status update is routed to the `status-updater` worker.
 
 ## Acceptance Checks
 

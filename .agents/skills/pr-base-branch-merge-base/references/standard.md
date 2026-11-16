@@ -2,15 +2,15 @@
 
 ## Objective
 
-Produce the outcome that the pr-base-branch-merge-base skill exists for, with the same observable result in every tool that runs it. This standard states the behavior that every expression of the skill must show, independent of the tool that runs it; where a tool uses a different mechanism, only the mechanism differs.
+Resolve PRBaseBranch for PR context collection using merge-base ancestry. This standard states the behavior that every expression of the skill must show, independent of the tool that runs it; where a tool uses a different mechanism, only the mechanism differs.
 
 ## Observable Behaviors
 
 - **OB-1** Selection Contract: `PRBaseBranch` MUST be resolved from git ancestry, not guessed.
 - **OB-2** Deterministic Procedure: Enumerate candidate branches from local and remotes, excluding `HEAD` and detached refs.
 - **OB-3** Guardrails: Do not default to `main` unless merge-base resolution fails for all candidates.
-- **OB-4** Collector Invocation Rule: The skill defines its collector invocation rule and applies it on every run.
-- **OB-5** Evidence Recommendation: Selected merge-base timestamp,.
+- **OB-4** Collector Invocation Rule: PR context collection is invoked with the resolved base passed explicitly as its `base` argument.
+- **OB-5** Evidence Recommendation: The logs or checkpoint record the selected branch name, the selected merge-base SHA and its timestamp, and the top competing candidates with their timestamps when available.
 
 ## Acceptance Checks
 

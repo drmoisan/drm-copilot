@@ -6,7 +6,7 @@ Inventory the documented surface of a repository (commands, options, routes, con
 
 ## Observable Behaviors
 
-- **OB-1** Prerequisites: Without that library every root step in this skill is unavailable;.
+- **OB-1** Prerequisites: Root steps run the docs command entry point of the docs helper library under PowerShell 7.4 or later; without that library every root step in this skill is unavailable, and the docs MCP tools stay available.
 - **OB-2** Steps: Before this skill runs, the root persists the snapshot through the root inventory step of `documentation-workflow`, so the snapshot path exists on a first run.
 - **OB-3** Result: Report the snapshot path, the element counts by kind and the element ids that changed.
 

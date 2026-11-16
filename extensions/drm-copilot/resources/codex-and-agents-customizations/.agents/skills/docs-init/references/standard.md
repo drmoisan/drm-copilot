@@ -6,7 +6,7 @@ Create the documentation estate profile for a repository and validate it. Use fr
 
 ## Observable Behaviors
 
-- **OB-1** Prerequisites: Without that library every root step in this skill is unavailable;.
+- **OB-1** Prerequisites: Root steps run the docs command entry point of the docs helper library under PowerShell 7.4 or later; without that library every root step in this skill is unavailable, and the docs MCP tools stay available.
 - **OB-2** Steps: Preview the initialization as a dry run.
 - **OB-3** Linter Configuration: `init -Write` writes the Vale configuration to `docs/documentation-estate/.vale.ini`, the Vale styles and vocabulary under `docs/documentation-estate/.vale/styles/`, and the markdownlint configuration to `docs/documentation-estate/.markdownlint.json`.
 - **OB-4** Result: Report the profile path, the CI workflow `.github/workflows/_docs-quality.yml` that init adds (its `ci-workflow` line), the exit code of each step and, on failure, the findings the command returned.

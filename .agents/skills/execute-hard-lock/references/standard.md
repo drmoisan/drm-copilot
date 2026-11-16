@@ -2,14 +2,14 @@
 
 ## Objective
 
-Produce the outcome that the execute-hard-lock skill exists for, with the same observable result in every tool that runs it. This standard states the behavior that every expression of the skill must show, independent of the tool that runs it; where a tool uses a different mechanism, only the mechanism differs.
+Place the session in atomic execution mode bound to a specific plan-of-record. This standard states the behavior that every expression of the skill must show, independent of the tool that runs it; where a tool uses a different mechanism, only the mechanism differs.
 
 ## Observable Behaviors
 
 - **OB-1** Inputs: `plan-path` — absolute or repo-relative path to the plan-of-record markdown file.
 - **OB-2** Invocation Flow: `target` (required): the plan-of-record path (`${plan-path}`).
-- **OB-3** Abort Conditions: Stop immediately and report `BLOCKED: execute-hard-lock <cause>` in any of these cases.
-- **OB-4** Equivalent Entry Points (Reference): The three entry points below all produce the same resolved hard-lock prompt for a given plan path.
+- **OB-3** Abort Conditions: The skill stops immediately and reports `BLOCKED: execute-hard-lock <cause>` when the prompt-resolution tool is unavailable or not permitted, when its response is not ok, is malformed, or omits the artifact path, or when reading the artifact fails, and it never reconstructs the hard-lock prompt from another source.
+- **OB-4** Equivalent Entry Points (Reference): Every entry point to the hard-lock prompt resolver produces the same resolved hard-lock prompt for a given plan path, and this skill uses the form that writes the prompt to a file artifact.
 - **OB-5** Delegation Contract: `policy-compliance-order` — mandatory policy reading order.
 
 ## Acceptance Checks

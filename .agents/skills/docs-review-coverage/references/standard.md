@@ -6,7 +6,7 @@ Review documentation coverage, page accuracy and the surface delta of a branch, 
 
 ## Observable Behaviors
 
-- **OB-1** Prerequisites: Without that library every root step in this skill is unavailable;.
+- **OB-1** Prerequisites: Root steps run the docs command entry point of the docs helper library under PowerShell 7.4 or later; without that library every root step in this skill is unavailable, and the docs MCP tools stay available.
 - **OB-2** Steps: For a branch change, the root session first runs the surface delta against the base branch and records it.
 - **OB-3** Result: Report the coverage findings, the page findings and each `accurate` judgment so that `docs-reconciler` can record it with `set-dimension`.
 

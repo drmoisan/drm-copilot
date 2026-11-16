@@ -6,7 +6,7 @@ Validate the documentation estate artifacts for one mode and the head revision, 
 
 ## Observable Behaviors
 
-- **OB-1** Prerequisites: Without that library every root step in this skill is unavailable;.
+- **OB-1** Prerequisites: Root steps run the docs command entry point of the docs helper library under PowerShell 7.4 or later; without that library every root step in this skill is unavailable, and the docs MCP tools stay available.
 - **OB-2** Steps: Call `validate_docs_artifacts` with `workspace_root`, `profile`, `mode` set to `docs-complete` and `revision` set to the head revision (40 or 64 lowercase hexadecimal characters).
 - **OB-3** Result: Report the validated mode, the revision, the exit code of `validate_docs_artifacts` and the receipt id supplied by the root, or `none`.
 

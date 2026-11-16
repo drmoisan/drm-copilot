@@ -7,7 +7,7 @@ Execute a manually authored multi-feature epic through deterministic waves, isol
 ## Observable Behaviors
 
 - **OB-1** Early Dependent Starts (early_start): This section applies only to a feature whose manifest entry carries `early_start_on`.
-- **OB-2** Cross-Epic Dependencies (cross_epic_depends_on): This section applies only when a feature of the manifest carries `cross_epic_depends_on` (issue.
+- **OB-2** Cross-Epic Dependencies (cross_epic_depends_on): This section applies only when a feature of the manifest carries `cross_epic_depends_on`; without the key every other section of the skill governs unchanged.
 - **OB-3** Worktree Cleanup: After the child merge SHA is recorded and the epic checkpoint mirrors `merge_status: "merged"`, with the child's `pr_number` and `merge_commit_sha` recorded in the matching `features[]` entry, remove its worktree.
 
 ## Acceptance Checks

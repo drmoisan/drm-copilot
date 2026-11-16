@@ -8,7 +8,7 @@ Owner-directive relay for coordinators and delegated agents. Use when the reposi
 
 - **OB-1** Framing (normative): The directive block conveys owner intent that the coordinator recorded.
 - **OB-2** Checkpoint Schemas: Both keys are optional top-level keys of an `orchestrator-state`, `epic-orchestrator-state`, or `parallel-orchestrator-state` checkpoint.
-- **OB-3** Directive Classes: Each directive carries exactly one class from this closed set.
+- **OB-3** Directive Classes: Each directive carries exactly one class from a closed set, in which `scheduling`, `merge_timing`, `extra_planner_revision`, `scope_narrowing`, and `accept_nonblocking_deviation` are honorable and `gate_bypass`, `force_push`, `tag_or_publish`, `policy_or_settings_edit`, `evidence_alteration`, and `unclassified` are always refused.
 - **OB-4** Coordinator Procedure (Record Before Relay): Record a directive only from the owner's own turns in the coordinator session.
 - **OB-5** Coordinator Ledger: The ledger holds one directive object per line, in the same shape as an `owner_directives` entry.
 

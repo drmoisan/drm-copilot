@@ -6,7 +6,7 @@ Write or revise one documentation page from the template for its Diataxis mode, 
 
 ## Observable Behaviors
 
-- **OB-1** Prerequisites: Without that library every root step in this skill is unavailable;.
+- **OB-1** Prerequisites: Root steps run the docs command entry point of the docs helper library under PowerShell 7.4 or later; without that library every root step in this skill is unavailable, and the docs MCP tools stay available.
 - **OB-2** Templates: The templates live in the `templates/` folder of this skill, outside every documentation root, so `run_docs_check` does not scan them.
 - **OB-3** Steps: Copy the template for the page's mode to the planned page path.
 - **OB-4** Result: Report the pages written and the exit code of the last `run_docs_check` call.

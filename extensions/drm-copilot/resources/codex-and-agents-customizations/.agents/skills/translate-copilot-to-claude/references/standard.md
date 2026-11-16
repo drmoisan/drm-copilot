@@ -2,13 +2,13 @@
 
 ## Objective
 
-Produce the outcome that the translate-copilot-to-claude skill exists for, with the same observable result in every tool that runs it. This standard states the behavior that every expression of the skill must show, independent of the tool that runs it; where a tool uses a different mechanism, only the mechanism differs.
+Translate GitHub Copilot native files, including instructions, agents, prompts, and skills, into the native Claude runtime. This standard states the behavior that every expression of the skill must show, independent of the tool that runs it; where a tool uses a different mechanism, only the mechanism differs.
 
 ## Observable Behaviors
 
 - **OB-1** Inputs: One or more source paths under `.github/`.
 - **OB-2** Phase 1 — Intake and Section Extraction: Read the full file with `Read`.
-- **OB-3** Phase 2 — Classification Taxonomy: Apply these decision rules in order.
+- **OB-3** Phase 2 — Classification Taxonomy: Each section is classified by the first matching decision rule, applied in order: enforceable, declarative standard, reusable procedure, identity and preload manifest, handoff and delegation, repository-wide tone or policy precedence, and out-of-scope content.
 - **OB-4** Phase 3 — Target Resolution: Rule: `.agents/skills/<topic>.md` where topic is the language (`python.md`, `csharp.md`, `powershell.md`, `typescript.md`) or cross-cutting concern (`tonality.md`, `general-code-change.md`, `general-unit-test.md`).
 - **OB-5** Phase 4 — Existing State Diff: `Read` the existing file when it exists.
 

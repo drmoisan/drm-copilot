@@ -8,7 +8,7 @@ Invoke the staged-review worker to produce staged-review artifacts from the stag
 
 - **OB-1** Inputs: Repository context needed to review staged changes.
 - **OB-2** Output Paths: `artifacts/reviews/staged-review.<timestamp>.md`.
-- **OB-3** Worker Routing: The skill defines its worker routing and applies it on every run.
+- **OB-3** Worker Routing: The review is routed to the `staged-review` worker.
 
 ## Acceptance Checks
 

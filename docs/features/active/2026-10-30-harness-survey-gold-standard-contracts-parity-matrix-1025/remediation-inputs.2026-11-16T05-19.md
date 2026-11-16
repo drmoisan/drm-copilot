@@ -43,8 +43,8 @@ Finding-Scope: contained
 
 ## Light Fix Tasks
 
-- [ ] [P0-T1] Fix finding R1 in the 21 contracts named under Finding R1 (`.agents/skills/<name>/references/standard.md`, 25 Observable Behavior items) and copy each byte for byte to `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/<name>/references/standard.md`.
-- [ ] [P0-T2] Fix finding R2 in the 7 contracts named under Finding R2 (`.agents/skills/<name>/references/standard.md`, `## Objective`) and copy each byte for byte to the bundle mirror; then run the parallel Pester gate (including `tests/scripts/harness/HarnessParityMatrix.RepoGate.Tests.ps1`) and the Python bundle-parity contract set, and record the results under `evidence/qa-gates/`.
+- [x] [P0-T1] Fix finding R1 in the 21 contracts named under Finding R1 (`.agents/skills/<name>/references/standard.md`, 25 Observable Behavior items) and copy each byte for byte to `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/<name>/references/standard.md`.
+- [x] [P0-T2] Fix finding R2 in the 7 contracts named under Finding R2 (`.agents/skills/<name>/references/standard.md`, `## Objective`) and copy each byte for byte to the bundle mirror; then run the parallel Pester gate (including `tests/scripts/harness/HarnessParityMatrix.RepoGate.Tests.ps1`) and the Python bundle-parity contract set, and record the results under `evidence/qa-gates/`.
 
 ## Non-remediation notes
 

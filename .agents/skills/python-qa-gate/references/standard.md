@@ -6,11 +6,11 @@ Final QA gate for Python changes. Runs Black, Ruff, Pyright, and Pytest; compare
 
 ## Observable Behaviors
 
-- **OB-1** Required Inputs: A baseline record produced in Phase A (the plan's `Phase 0 baseline`), containing Ruff and Pyright findings for the in-scope files and the Pytest pass/fail status and per-file coverage status of one `poetry run pytest -n auto` run with coverage,.
-- **OB-2** Toolchain Execution Sequence: Run the full toolchain in this exact order.
+- **OB-1** Required Inputs: Before the gate runs, a `Phase 0 baseline` record exists that holds the Ruff and Pyright findings for the in-scope files and the Pytest pass and fail status and per-file coverage status of one parallel `pytest -n auto` run with coverage, together with the exact list of touched production and test files and a clean working tree.
+- **OB-2** Toolchain Execution Sequence: The toolchain runs in a fixed order of Black, Ruff, Pyright, and one parallel `pytest -n auto` run with branch coverage through the test-execution launcher; when any step fails or modifies files, the issue is fixed and the loop restarts from step 1 until all four steps complete without errors in a single pass.
 - **OB-3** Delta Requirements (Zero-Regression Hard Gate): Compare the final results to the Phase A baseline (the `Phase 0 baseline`), reading test and coverage results from the single gate run.
 - **OB-4** Required Reporting Block: Scope — exact file list touched in this change.
-- **OB-5** Evidence Storage: Store baseline outputs (static and `Phase 0 baseline` test-suite) under `<FEATURE>/evidence/baseline/<timestamp>/`,.
+- **OB-5** Evidence Storage: Baseline outputs (static and `Phase 0 baseline` test-suite) are stored under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change outputs under `<FEATURE>/evidence/qa-gates/<timestamp>/`, with ISO-8601 UTC timestamps in the folder names.
 
 ## Acceptance Checks
 

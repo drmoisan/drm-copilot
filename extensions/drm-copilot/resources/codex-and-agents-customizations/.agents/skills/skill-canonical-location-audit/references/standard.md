@@ -6,7 +6,7 @@ Audit skills for canonical-location duplication. Use when ensuring a canonical l
 
 ## Observable Behaviors
 
-- **OB-1** Scope: Applies to all skills under `.agents/skills//SKILL.md`.
+- **OB-1** Scope: Applies to every `SKILL.md` file at any depth under the repository's skill folder.
 - **OB-2** Audit Workflow: 1) Inventory canonical-location statements.
 - **OB-3** Output Template (Suggested): Item: <canonical item name>.
 

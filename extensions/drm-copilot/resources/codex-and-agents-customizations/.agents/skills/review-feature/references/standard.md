@@ -8,7 +8,7 @@ Invoke the feature-review worker to produce feature-audit artifacts for an activ
 
 - **OB-1** Inputs: Active feature folder path.
 - **OB-2** Output Paths: When the active review scope is a selected version folder such as `docs/features/active/<feature>/v2/`, write the review artifacts into that selected version folder rather than the parent feature root.
-- **OB-3** Worker Routing: The skill defines its worker routing and applies it on every run.
+- **OB-3** Worker Routing: The review is routed to the `feature-review` worker.
 
 ## Acceptance Checks
 

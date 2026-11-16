@@ -6,7 +6,7 @@ Plan the documentation information architecture: pages, Diataxis modes, audience
 
 ## Observable Behaviors
 
-- **OB-1** Prerequisites: Without that library every root step in this skill is unavailable;.
+- **OB-1** Prerequisites: Root steps run the docs command entry point of the docs helper library under PowerShell 7.4 or later; without that library every root step in this skill is unavailable, and the docs MCP tools stay available.
 - **OB-2** Steps: Call `run_docs_coverage` with `workspace_root` and `profile` to list the elements without a documented, excluded or deferred disposition.
 - **OB-3** Result: Write a `## Information Architecture` section into the report with one line per planned page: its repository-relative path, Diataxis mode, audience, owner and the element ids it covers.
 

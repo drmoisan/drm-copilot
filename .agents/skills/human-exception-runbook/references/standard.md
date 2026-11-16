@@ -10,7 +10,7 @@ Contract for runbooks that document permitted human exceptions recorded in orche
 - **OB-2** Required Sections: The event or state that triggers the runbook (for example, "the orchestrator recorded an `exception` for Global-Administrator admin consent").
 - **OB-3** Sourcing Rule (MCP-first / web-second): Prefer an MCP documentation source (for example a Microsoft Learn MCP query) as the primary source.
 - **OB-4** Tool Command Version Rule: Every tool command in a runbook is either checked against the version pinned in the repository's lockfile or marked as not verified, with the pinned version stated.
-- **OB-5** Conformance: It lives at `<FEATURE>/runbooks/<name>.runbook.md`,.
+- **OB-5** Conformance: A runbook is contract-conformant when it lives at `<FEATURE>/runbooks/<name>.runbook.md`, contains all five required sections, records at least one source URL and a capture date in its Source and Citation section, sources third-party UI steps MCP-first and web-second, and carries `Version check:` marker lines in every counted shell block.
 
 ## Acceptance Checks
 

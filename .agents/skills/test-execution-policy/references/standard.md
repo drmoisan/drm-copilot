@@ -6,11 +6,11 @@ Test-execution policy and launcher. Use before running any local test suite so i
 
 ## Observable Behaviors
 
-- **OB-1** Commands: The suite name is the first argument;.
+- **OB-1** Commands: The suite name is the first argument, and extra arguments follow it and reach the suite unchanged; there is no `-Suite` or `-ExtraArgument` parameter.
 - **OB-2** Exit Codes and Messages: Classification by consumers: a result is a queue timeout when its exit code is 75, or when it is non-zero and the first non-blank line of its captured output starts with `TEST_EXECUTION_QUEUE_TIMEOUT:`.
 - **OB-3** Configuration: `config/test-execution-policy.json` is optional and repository-owned (it is not pushed down).
 - **OB-4** Machine Test-Suite Lock: `XDG_RUNTIME_DIR` is not used.
-- **OB-5** Hook: A runner word followed only by `--version`, `--help`, or `-h` is allowed;.
+- **OB-5** Hook: The hook denies a direct test runner with `TEST_EXECUTION_POLICY_BLOCKED:` and the launcher command, and allows a runner word followed only by `--version`, `--help`, or `-h`.
 
 ## Acceptance Checks
 

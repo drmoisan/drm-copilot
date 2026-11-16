@@ -2,12 +2,12 @@
 
 ## Objective
 
-Produce the outcome that the feature-promotion-lifecycle skill exists for, with the same observable result in every tool that runs it. This standard states the behavior that every expression of the skill must show, independent of the tool that runs it; where a tool uses a different mechanism, only the mechanism differs.
+Deterministic promotion workflow from potential feature/bug entry to issue, branch, active feature folder, and downstream spec/research handoffs. This standard states the behavior that every expression of the skill must show, independent of the tool that runs it; where a tool uses a different mechanism, only the mechanism differs.
 
 ## Observable Behaviors
 
 - **OB-1** MCP Tool Availability Preflight: If the required MCP tools are unavailable, stop before potential-entry creation, issue promotion, or active-folder creation begins.
-- **OB-2** Agent-Session Promotion Execution Rule: Execute MCP-backed lifecycle operations only through the MCP tool forms listed above.
+- **OB-2** Agent-Session Promotion Execution Rule: Potential-entry creation, issue promotion, and active feature folder creation run only through the repository automation promotion tools, which are the sole authoritative execution path for them in agent sessions.
 - **OB-3** Canonical Variables: `${promotion-type}`: `feature` or `bug`.
 - **OB-4** Required Outputs for Downstream Handoffs: `${feature-folder}/issue.md`.
 

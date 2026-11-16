@@ -6,7 +6,7 @@ Record coverage dispositions, evidence pins and parity dimensions through update
 
 ## Observable Behaviors
 
-- **OB-1** Prerequisites: Without that library every root step in this skill is unavailable;.
+- **OB-1** Prerequisites: Root steps run the docs command entry point of the docs helper library under PowerShell 7.4 or later; without that library every root step in this skill is unavailable, and the docs MCP tools stay available.
 - **OB-2** Steps: Call `run_docs_coverage` with `workspace_root` and `profile` to list the uncovered elements.
 - **OB-3** Result: Report the number of applied operations, the exit code of the last `update_docs_ledger` call and the element ids changed.
 

@@ -6,7 +6,7 @@ Execute a previously planned epic by replaying the committed epic-kickoff artifa
 
 ## Observable Behaviors
 
-- **OB-1** Procedure: Resolve a bare slug to `docs/features/epics/<epic-slug>/`;.
+- **OB-1** Procedure: A bare slug resolves to `docs/features/epics/<epic-slug>/` and a supplied path resolves to its containing epic home; when `epic-kickoff.md` is absent from that home, the skill stops before delegation and directs the user to run `epic-plan` first.
 
 ## Acceptance Checks
 

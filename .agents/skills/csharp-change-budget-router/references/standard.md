@@ -2,12 +2,12 @@
 
 ## Objective
 
-Produce the outcome that the csharp-change-budget-router skill exists for, with the same observable result in every tool that runs it. This standard states the behavior that every expression of the skill must show, independent of the tool that runs it; where a tool uses a different mechanism, only the mechanism differs.
+Budget-first routing contract for C# work: estimate production-file scope, choose small vs large path, enforce orchestration-first routing for larger changes, and use the repository automation tools for promotion lifecycle steps when available. This standard states the behavior that every expression of the skill must show, independent of the tool that runs it; where a tool uses a different mechanism, only the mechanism differs.
 
 ## Observable Behaviors
 
 - **OB-1** Canonical Routing Rules: `1-3` production files (+ corresponding tests) → small path (`csharp-typed-engineer` direct mode).
-- **OB-2** Orchestrated Small-Path Requirements: If the MCP server or required tool is unavailable, stop before promotion,.
+- **OB-2** Orchestrated Small-Path Requirements: Promotion and folder lifecycle steps run through the repository automation tools, and when the required tool is unavailable the skill stops before promotion begins.
 - **OB-3** Direct-Mode Rejection Rule: Stop before implementation.
 - **OB-4** Invocation Mode: Direct mode (default): no handoff directive present.
 - **OB-5** Per-Batch Cap: In all modes, per-batch budget remains: at most 3 production files and 3 test files unless an explicit override is approved by the user.

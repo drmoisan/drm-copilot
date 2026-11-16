@@ -6,7 +6,7 @@ Reusable remediation trigger and atomic_planner handoff steps. Use when audits r
 
 ## Observable Behaviors
 
-- **OB-1** Required Remediation Inputs: Create `remediation/<timestamp>/remediation-inputs.md` (one timestamped `remediation/` folder per cycle;.
+- **OB-1** Required Remediation Inputs: Each cycle creates `remediation/<timestamp>/remediation-inputs.md` in its own timestamped `remediation/` folder, holding an enumerated fix list with file paths, expected behavior, and verification commands, a do-not-do list that excludes scope creep, policy weakening, and silent skips, and exactly one mode line.
 - **OB-2** Context Package (When Required): If the calling agent requires a context package, inline the specified audit artifacts, PR context artifacts, and any relevant plan files in the delegated prompt.
 
 ## Acceptance Checks

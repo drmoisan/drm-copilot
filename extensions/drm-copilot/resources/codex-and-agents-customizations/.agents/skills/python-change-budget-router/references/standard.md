@@ -9,7 +9,7 @@ Budget-first routing contract for Python work. Estimate production-file scope, c
 - **OB-1** Canonical Routing Rules: Estimate rough change budget first based on likely production Python files touched.
 - **OB-2** Direct-Mode Rejection Rule: Stop before editing the 4th production file.
 - **OB-3** Orchestrated Small-Path Requirements: If the MCP server or required tool is unavailable, stop before promotion.
-- **OB-4** Documentation Expectations: Estimated production file count,.
+- **OB-4** Documentation Expectations: The response or logs record the estimated production file count, the chosen path (`small` or `large`), and a rationale summary of one to three bullets.
 
 ## Acceptance Checks
 
