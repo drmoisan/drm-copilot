@@ -467,14 +467,14 @@ All such tests use in-memory fakes; no temporary files are created.
 
 ### Configuration key and resolvers
 
-- [ ] `config/orchestration-routing.json`, `extensions/drm-copilot/resources/config/orchestration-routing.json` and `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json` each contain the flat top-level entry `"development_docs_root": "docs/features"`, and `tests/scripts/dev_tools/test_orchestration_routing_config_parity.py` passes.
-- [ ] The TypeScript resolver suite `extensions/drm-copilot/test/lib/development-docs/root.test.ts` covers resolution cases R-1 to R-8 from this spec using the in-memory `FileSystem` fake, and passes.
-- [ ] Python tests for `resolve_development_docs_root` in `scripts/dev_tools/json_config.py` cover cases R-1 to R-8 with injected readers and directory probes, and pass.
-- [ ] The Pester suite `tests/scripts/claude-lib/development-docs/DevelopmentDocsRoot.Tests.ps1` covers cases R-1 to R-8 for `Resolve-DevelopmentDocsRoot` with injected script blocks, and passes.
-- [ ] In each runtime, the area-path function returns the area-map value for every listed area under both `docs/features` and `.dev`, and an unknown area name raises an explicit error; each case is asserted by a unit test.
-- [ ] In each runtime, the known-root prefix function returns both the `docs/features` form and the `.dev` form for each area, and the PowerShell pattern function matches sample paths with forward and back slashes under both roots; each case is asserted by a unit test.
-- [ ] No module under `extensions/drm-copilot/src/lib/development-docs/` imports `vscode`, asserted by a test or a dependency-cruiser rule that fails on such an import.
-- [ ] The resolver and parser in Python are added to `scripts/dev_tools/json_config.py`; the change adds no new Python file under `scripts/`, no new `pyproject.toml` script entry, and no Python invocation in any enforcement hook (`tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes).
+- [x] `config/orchestration-routing.json`, `extensions/drm-copilot/resources/config/orchestration-routing.json` and `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json` each contain the flat top-level entry `"development_docs_root": "docs/features"`, and `tests/scripts/dev_tools/test_orchestration_routing_config_parity.py` passes.
+- [x] The TypeScript resolver suite `extensions/drm-copilot/test/lib/development-docs/root.test.ts` covers resolution cases R-1 to R-8 from this spec using the in-memory `FileSystem` fake, and passes.
+- [x] Python tests for `resolve_development_docs_root` in `scripts/dev_tools/json_config.py` cover cases R-1 to R-8 with injected readers and directory probes, and pass.
+- [x] The Pester suite `tests/scripts/claude-lib/development-docs/DevelopmentDocsRoot.Tests.ps1` covers cases R-1 to R-8 for `Resolve-DevelopmentDocsRoot` with injected script blocks, and passes.
+- [x] In each runtime, the area-path function returns the area-map value for every listed area under both `docs/features` and `.dev`, and an unknown area name raises an explicit error; each case is asserted by a unit test.
+- [x] In each runtime, the known-root prefix function returns both the `docs/features` form and the `.dev` form for each area, and the PowerShell pattern function matches sample paths with forward and back slashes under both roots; each case is asserted by a unit test.
+- [x] No module under `extensions/drm-copilot/src/lib/development-docs/` imports `vscode`, asserted by a test or a dependency-cruiser rule that fails on such an import.
+- [x] The resolver and parser in Python are added to `scripts/dev_tools/json_config.py`; the change adds no new Python file under `scripts/`, no new `pyproject.toml` script entry, and no Python invocation in any enforcement hook (`tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes).
 
 ### Consumer routing and behavior
 
@@ -503,8 +503,8 @@ All such tests use in-memory fakes; no temporary files are created.
 
 ### Feature-folder name parser and folder creation
 
-- [ ] `extensions/drm-copilot/test/lib/development-docs/feature-folder-name.test.ts` asserts parser cases F-1 to F-6 and formatter cases N-1 to N-5 from this spec, and passes.
-- [ ] Python tests for `parse_feature_folder_name` and `format_feature_folder_name` and Pester tests for `ConvertFrom-FeatureFolderName` and `ConvertTo-FeatureFolderName` assert the same cases F-1 to F-6 and N-1 to N-5, and pass.
+- [x] `extensions/drm-copilot/test/lib/development-docs/feature-folder-name.test.ts` asserts parser cases F-1 to F-6 and formatter cases N-1 to N-5 from this spec, and passes.
+- [x] Python tests for `parse_feature_folder_name` and `format_feature_folder_name` and Pester tests for `ConvertFrom-FeatureFolderName` and `ConvertTo-FeatureFolderName` assert the same cases F-1 to F-6 and N-1 to N-5, and pass.
 - [ ] `resolveNameFromFeatureFoldername` (`file-prompt-variables.ts`), `_resolve_name_from_feature_foldername` in `resolve_execute_plan_prompt.py` and in `resolve_file_prompt.py`, and the trailing-issue extraction in `plan_progress_report.py` delegate to the shared parser, and their test suites include an issue-first folder-name case that passes.
 - [ ] Folder-creation tests in TypeScript (`io.test.ts`, `flow.test.ts`, `new-active-feature-folder-service-call.test.ts`) and Python (`test_new_active_feature_folder.py`) show that issue 1016 with potential stem `2026-10-30-foo` creates `<active area>/1016-foo`, issue 42 creates `<active area>/0042-<feature>`, and a request without an issue number keeps the current slug.
 - [ ] Epic folder creation still produces `<epics area>/<slug>` with no date or issue prefix, asserted by an existing or new test.
@@ -520,9 +520,9 @@ All such tests use in-memory fakes; no temporary files are created.
 
 ### Mirrors, manifests and Codex counterparts
 
-- [ ] `DevelopmentDocsRoot.psm1` exists with equal text at `.claude/lib/development-docs/`, `extensions/drm-copilot/resources/claude-customizations/.claude/lib/development-docs/` and `extensions/drm-copilot/resources/lib/development-docs/`, and `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes.
-- [ ] The Codex `VIRTUAL_RESOURCE_DIRECTORIES` entry publishing `.codex/lib/development-docs/` exists in `codex-agents-customizations.ts` and in `push_down_codex_and_agents_customizations.py`, and `test_push_down_codex_and_agents_virtual_paths.py` passes.
-- [ ] `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` and `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json` list the new module, and `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py` and `test_push_down_pack_manifest_dependency_closure.py` pass.
+- [x] `DevelopmentDocsRoot.psm1` exists with equal text at `.claude/lib/development-docs/`, `extensions/drm-copilot/resources/claude-customizations/.claude/lib/development-docs/` and `extensions/drm-copilot/resources/lib/development-docs/`, and `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes.
+- [x] The Codex `VIRTUAL_RESOURCE_DIRECTORIES` entry publishing `.codex/lib/development-docs/` exists in `codex-agents-customizations.ts` and in `push_down_codex_and_agents_customizations.py`, and `test_push_down_codex_and_agents_virtual_paths.py` passes.
+- [x] `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` and `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json` list the new module, and `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py` and `test_push_down_pack_manifest_dependency_closure.py` pass.
 - [ ] Every edited file under `.claude/` and `.codex/` has equal text in its bundle copy, and `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_codex_handoff_contract_parity.py`, `test_claude_rules_frontmatter.py`, `test_push_down_issue_824_follow_ups.py`, `test_typescript_toolchain_instruction_contracts.py`, `claude-architecture-doc.Tests.ps1` and `hook-dependency-guard-completeness.Tests.ps1` pass.
 
 ### Scope boundary, quality and evidence
