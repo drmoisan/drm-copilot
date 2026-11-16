@@ -114,15 +114,15 @@ P3-T1 applies the rows in order; the first match wins. All entries are `decision
 
 ### Phase 0 — Gate Record and Baselines
 
-- [ ] [P0-T1] Write `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md` from the latest `phase0-parallel-run.*.md`, `phase0-preconditions.*.md`, `phase0-citations.*.md`, `phase0-edit-set.*.md` and `phase0-branch-snapshot.*.md`.
+- [x] [P0-T1] Write `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md` from the latest `phase0-parallel-run.*.md`, `phase0-preconditions.*.md`, `phase0-citations.*.md`, `phase0-edit-set.*.md` and `phase0-branch-snapshot.*.md`.
   - Acceptance: `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md` names the five artifacts, quotes `ParallelRun: MERGED`, `Preconditions: PASS`, `Citations: PASS` and `EditSet: PASS`, records the `MB` derivation, and ends `Gate: PASS`.
-- [ ] [P0-T2] Capture the PowerShell static baseline over `scripts` and `tests/scripts`: a check-only format run and a PSSA run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
+- [x] [P0-T2] Capture the PowerShell static baseline over `scripts` and `tests/scripts`: a check-only format run and a PSSA run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`.
   - Acceptance: `<FEATURE>/evidence/baseline/pwsh-format-baseline.<timestamp>.md` and `<FEATURE>/evidence/baseline/pssa-baseline.<timestamp>.md` each carry `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`; the format artifact records the would-change file count and that `git status --porcelain` was identical before and after; the PSSA artifact records the numeric finding count.
-- [ ] [P0-T3] Capture the `Phase 0 baseline` of the Pester gate over `tests/scripts` (coverage read per the `## Gate Shape` coverage source): one parallel Pester gate run with coverage and one `Invoke-PoshQCLeakScan` run.
+- [x] [P0-T3] Capture the `Phase 0 baseline` of the Pester gate over `tests/scripts` (coverage read per the `## Gate Shape` coverage source): one parallel Pester gate run with coverage and one `Invoke-PoshQCLeakScan` run.
   - Acceptance: `<FEATURE>/evidence/baseline/pester-baseline.<timestamp>.md` carries the four fields, `EXIT_CODE:` from the returned `ExitCode`, numeric passed and failed counts with the names of any failing test files, repo-wide line coverage from the `## Gate Shape` coverage source (and which source was used), and `scripts/harness: absent (0 files)`; `<FEATURE>/evidence/baseline/leak-scan-baseline.<timestamp>.md` carries the four fields and the finding count.
-- [ ] [P0-T4] Capture the contract-check baseline: the Python contract set, `scripts/dev_tools/generate_codex_agent_variants.py` with `--check` and the tier check `scripts/dev_tools/check_quality_tiers.py` (`## Gate Shape`).
+- [x] [P0-T4] Capture the contract-check baseline: the Python contract set, `scripts/dev_tools/generate_codex_agent_variants.py` with `--check` and the tier check `scripts/dev_tools/check_quality_tiers.py` (`## Gate Shape`).
   - Acceptance: `<FEATURE>/evidence/baseline/contract-checks-baseline.<timestamp>.md` carries the four fields per command, numeric passed and failed counts per module, and for the tier check `EXIT_CODE: 0`, its line beginning `quality-tiers: OK (`, and the two numbers of that line as `TierEntries:` and `TierProjects:`.
-- [ ] [P0-T5] Capture the file-size and host baseline: read the result of the It `reports zero ratchet violations against config/file-size-baseline.json` (`tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1`) from the JUnit record of the P0-T3 run, and record the host `$PSVersionTable.PSVersion` and whether `Test-Json` accepts `-SchemaFile`.
+- [x] [P0-T5] Capture the file-size and host baseline: read the result of the It `reports zero ratchet violations against config/file-size-baseline.json` (`tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1`) from the JUnit record of the P0-T3 run, and record the host `$PSVersionTable.PSVersion` and whether `Test-Json` accepts `-SchemaFile`.
   - Acceptance: `<FEATURE>/evidence/baseline/file-size-and-host.<timestamp>.md` carries the four fields, that It result, and the host version.
 
 ### Phase 1 — Survey and Experiments
