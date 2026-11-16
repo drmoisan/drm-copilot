@@ -595,8 +595,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-epic-invocation-origin",
@@ -611,8 +610,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-epic-wave-barrier",
@@ -627,8 +625,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-model-routing-receipt",
@@ -643,8 +640,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-orchestration-preimplementation-gate",
@@ -659,8 +655,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-parallel-cohort-barrier",
@@ -675,8 +670,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-parallel-drift-gate",
@@ -691,8 +685,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-prd-feature-before-planner",
@@ -707,8 +700,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash%7CWrite%7CEdit%7CMultiEdit%7CNotebookEdit%7CAgent%7CTask%7CWebFetch%7CWebSearch%7Cmcp__.%2A/enforce-discovery-artifact-gate",
@@ -723,8 +715,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash%7CWrite%7CEdit%7CMultiEdit%7CNotebookEdit%7CAgent%7CTask%7CWebFetch%7CWebSearch%7Cmcp__.%2A/invoke-pretooluse-dispatch",
@@ -739,8 +730,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash%7CWrite%7CEdit%7CMultiEdit%7CNotebookEdit%7CAgent%7CTask%7Cmcp__.%2A/enforce-owner-directive-pass-down",
@@ -755,8 +745,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash%7Cmcp__drm-copilot__run_poshqc_test%7Cmcp__drm-copilot__run_poshqc_suite/enforce-test-execution-policy",
@@ -771,8 +760,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-docs-complete-gate",
@@ -787,8 +775,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-epic-merge-gate",
@@ -803,8 +790,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-epic-worktree-removal-gate",
@@ -819,8 +805,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-orchestration-preimplementation-gate",
@@ -835,8 +820,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-parallel-abandon-gate",
@@ -851,8 +835,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-parallel-worktree-removal-gate",
@@ -867,8 +850,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-pr-author-command-allowlist",
@@ -882,8 +864,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-pr-author-skill",
@@ -898,8 +879,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-promotion-mcp-only",
@@ -914,8 +894,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-worktree-poetry-venv",
@@ -930,8 +909,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/validate-bash",
@@ -946,8 +924,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit%7CMultiEdit%7CNotebookEdit%7CBash/enforce-docs-role-write-scope",
@@ -962,8 +939,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/check-powershell-test-purity",
@@ -978,8 +954,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/check-python-test-purity",
@@ -994,8 +969,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-checkpoint-monotonic",
@@ -1010,8 +984,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-completion-consistency",
@@ -1026,8 +999,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-evidence-locations",
@@ -1042,8 +1014,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-feature-folder-order",
@@ -1058,8 +1029,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-file-size-limit",
@@ -1074,8 +1044,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-mermaid-validation",
@@ -1090,8 +1059,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-orchestration-preimplementation-gate",
@@ -1106,8 +1074,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-powershell-batch-budget",
@@ -1122,8 +1089,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-python-batch-budget",
@@ -1138,8 +1104,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SessionStart//persist-session-id",
@@ -1154,8 +1119,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStart/legacy-parity-analyst%7Cruntime-characterization-analyst%7Crequirements-reconciler%7Cmigration-coverage-reviewer/record-discovery-agent-start",
@@ -1170,8 +1134,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/atomic-executor/validate-executor-output",
@@ -1185,8 +1148,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/atomic-planner%7Catomic-executor%7Cfeature-review%7Ctask-researcher%7Cprd-feature%7Cstaged-review%7Cepic-review%7Cstatus-updater%7Cpython-typed-engineer%7Cpowershell-typed-engineer%7Ccsharp-typed-engineer%7Ctypescript-engineer%7Corchestrator%7Cepic-orchestrator%7Cepic-planner/validate-discovery-artifact-gate",
@@ -1201,8 +1163,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/atomic-planner/validate-planner-output~.claude%2Fagents%2Fatomic-planner.md",
@@ -1216,8 +1177,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/atomic-planner/validate-planner-output~.claude%2Fsettings.json",
@@ -1232,8 +1192,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/docs-architect%7Cdocs-author%7Cdocs-reconciler%7Cdocs-coverage-reviewer/validate-docs-role-output",
@@ -1248,8 +1207,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/epic-orchestrator/validate-orchestrator-output~.claude%2Fagents%2Fepic-orchestrator.md",
@@ -1263,8 +1221,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/epic-orchestrator/validate-orchestrator-output~.claude%2Fsettings.json",
@@ -1279,8 +1236,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/epic-review/validate-required-artifact-output",
@@ -1294,8 +1250,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/feature-review/validate-feature-review-coverage~.claude%2Fagents%2Ffeature-review.md",
@@ -1309,8 +1264,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/feature-review/validate-feature-review-coverage~.claude%2Fsettings.json",
@@ -1325,8 +1279,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/human-exception-runbook/validate-human-exception-runbook-output",
@@ -1340,8 +1293,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/legacy-parity-analyst%7Cruntime-characterization-analyst%7Crequirements-reconciler%7Cmigration-coverage-reviewer/validate-discovery-artifact-gate",
@@ -1356,8 +1308,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/orchestrator/validate-orchestrator-output~.claude%2Fagents%2Forchestrator.md",
@@ -1371,8 +1322,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/orchestrator/validate-orchestrator-output~.claude%2Fsettings.json",
@@ -1387,8 +1337,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/parallel-orchestrator/validate-orchestrator-output~.claude%2Fagents%2Fparallel-orchestrator.md",
@@ -1402,8 +1351,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/parallel-orchestrator/validate-orchestrator-output~.claude%2Fsettings.json",
@@ -1418,8 +1366,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/pr-author/validate-pr-author-output~.claude%2Fagents%2Fpr-author.md",
@@ -1433,8 +1380,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/pr-author/validate-pr-author-output~.claude%2Fsettings.json",
@@ -1449,8 +1395,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/prd-feature/validate-prd-feature-output~.claude%2Fagents%2Fprd-feature.md",
@@ -1464,8 +1409,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/prd-feature/validate-prd-feature-output~.claude%2Fsettings.json",
@@ -1480,8 +1424,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/prd-feature/validate-required-artifact-output",
@@ -1495,8 +1438,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/staged-review/validate-required-artifact-output",
@@ -1510,8 +1452,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/status-updater/validate-required-artifact-output",
@@ -1525,8 +1466,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:hook-registration:SubagentStop/task-researcher/validate-task-researcher-output",
@@ -1540,8 +1480,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:instructions:CLAUDE.md",
@@ -1993,8 +1932,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:permission:allow",
@@ -2009,8 +1947,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:permission:deny",
@@ -2025,8 +1962,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:setting:defaultPermissionMode",
@@ -2041,8 +1977,7 @@
         "claude-code"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:setting:enabledPlugins",
@@ -2057,8 +1992,7 @@
         "claude-code"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:skill-frontmatter-field:agent",
@@ -2246,7 +2180,10 @@
       "kind": "skill",
       "name": "cleanup-merged-worktrees",
       "source_path": ".claude/skills/cleanup-merged-worktrees/SKILL.md",
-      "disposition": "native",
+      "disposition": "shared",
+      "target_paths": [
+        ".agents/skills/cleanup-merged-worktrees/SKILL.md"
+      ],
       "parity_group": "skill:cleanup-merged-worktrees",
       "consumers": [
         "claude-code",
@@ -2254,9 +2191,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: shared"
+      "decision_status": "approved",
+      "notes": "approved: shared"
     },
     {
       "id": "claude:skill:commit-message",
@@ -2705,7 +2641,10 @@
       "kind": "skill",
       "name": "epic-progress-report",
       "source_path": ".claude/skills/epic-progress-report/SKILL.md",
-      "disposition": "native",
+      "disposition": "shared",
+      "target_paths": [
+        ".agents/skills/epic-progress-report/SKILL.md"
+      ],
       "parity_group": "skill:epic-progress-report",
       "consumers": [
         "claude-code",
@@ -2713,9 +2652,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: shared"
+      "decision_status": "approved",
+      "notes": "approved: shared"
     },
     {
       "id": "claude:skill:epic-run",
@@ -2941,9 +2879,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "claude:skill:initialize-discovery-workspace",
@@ -3077,7 +3014,10 @@
       "kind": "skill",
       "name": "mermaid-diagram",
       "source_path": ".claude/skills/mermaid-diagram/SKILL.md",
-      "disposition": "native",
+      "disposition": "shared",
+      "target_paths": [
+        ".agents/skills/mermaid-diagram/SKILL.md"
+      ],
       "parity_group": "skill:mermaid-diagram",
       "consumers": [
         "claude-code",
@@ -3085,9 +3025,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: shared"
+      "decision_status": "approved",
+      "notes": "approved: shared"
     },
     {
       "id": "claude:skill:orchestrate",
@@ -3137,7 +3076,10 @@
       "kind": "skill",
       "name": "parallel-add",
       "source_path": ".claude/skills/parallel-add/SKILL.md",
-      "disposition": "native",
+      "disposition": "shared",
+      "target_paths": [
+        ".agents/skills/parallel-add/SKILL.md"
+      ],
       "parity_group": "skill:parallel-add",
       "consumers": [
         "claude-code",
@@ -3145,9 +3087,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: shared"
+      "decision_status": "approved",
+      "notes": "approved: shared"
     },
     {
       "id": "claude:skill:parallel-close",
@@ -3155,7 +3096,10 @@
       "kind": "skill",
       "name": "parallel-close",
       "source_path": ".claude/skills/parallel-close/SKILL.md",
-      "disposition": "native",
+      "disposition": "shared",
+      "target_paths": [
+        ".agents/skills/parallel-close/SKILL.md"
+      ],
       "parity_group": "skill:parallel-close",
       "consumers": [
         "claude-code",
@@ -3163,9 +3107,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: shared"
+      "decision_status": "approved",
+      "notes": "approved: shared"
     },
     {
       "id": "claude:skill:parallel-orchestrate",
@@ -3173,7 +3116,10 @@
       "kind": "skill",
       "name": "parallel-orchestrate",
       "source_path": ".claude/skills/parallel-orchestrate/SKILL.md",
-      "disposition": "native",
+      "disposition": "shared",
+      "target_paths": [
+        ".agents/skills/parallel-orchestrate/SKILL.md"
+      ],
       "parity_group": "skill:parallel-orchestrate",
       "consumers": [
         "claude-code",
@@ -3181,9 +3127,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: shared"
+      "decision_status": "approved",
+      "notes": "approved: shared"
     },
     {
       "id": "claude:skill:parallel-plan",
@@ -3191,7 +3136,10 @@
       "kind": "skill",
       "name": "parallel-plan",
       "source_path": ".claude/skills/parallel-plan/SKILL.md",
-      "disposition": "native",
+      "disposition": "shared",
+      "target_paths": [
+        ".agents/skills/parallel-plan/SKILL.md"
+      ],
       "parity_group": "skill:parallel-plan",
       "consumers": [
         "claude-code",
@@ -3199,9 +3147,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: shared"
+      "decision_status": "approved",
+      "notes": "approved: shared"
     },
     {
       "id": "claude:skill:parallel-remove",
@@ -3209,7 +3156,10 @@
       "kind": "skill",
       "name": "parallel-remove",
       "source_path": ".claude/skills/parallel-remove/SKILL.md",
-      "disposition": "native",
+      "disposition": "shared",
+      "target_paths": [
+        ".agents/skills/parallel-remove/SKILL.md"
+      ],
       "parity_group": "skill:parallel-remove",
       "consumers": [
         "claude-code",
@@ -3217,9 +3167,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: shared"
+      "decision_status": "approved",
+      "notes": "approved: shared"
     },
     {
       "id": "claude:skill:parallel-run",
@@ -3227,7 +3176,10 @@
       "kind": "skill",
       "name": "parallel-run",
       "source_path": ".claude/skills/parallel-run/SKILL.md",
-      "disposition": "native",
+      "disposition": "shared",
+      "target_paths": [
+        ".agents/skills/parallel-run/SKILL.md"
+      ],
       "parity_group": "skill:parallel-run",
       "consumers": [
         "claude-code",
@@ -3235,9 +3187,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: shared"
+      "decision_status": "approved",
+      "notes": "approved: shared"
     },
     {
       "id": "claude:skill:policy-audit-template-usage",
@@ -3463,9 +3414,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "claude:skill:reconcile-parity-matrix",
@@ -3628,9 +3578,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "claude:skill:skill-canonical-location-audit",
@@ -3750,8 +3699,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:subagent-frontmatter-field:hooks",
@@ -3766,8 +3714,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:subagent-frontmatter-field:memory",
@@ -3782,8 +3729,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:subagent-frontmatter-field:model",
@@ -3798,8 +3744,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:subagent-frontmatter-field:name",
@@ -3814,8 +3759,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:subagent-frontmatter-field:skills",
@@ -3830,8 +3774,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "claude:subagent-frontmatter-field:tools",
@@ -3846,8 +3789,7 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:5.1-beast-adjusted",
@@ -3941,8 +3883,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:atomic-executor-c2",
@@ -3960,8 +3901,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:atomic-executor-c3",
@@ -3979,8 +3919,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:atomic-executor-c3-elevated",
@@ -3998,8 +3937,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:atomic-executor-c4",
@@ -4017,8 +3955,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:atomic-planner",
@@ -4055,8 +3992,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:atomic-planner-c2",
@@ -4074,8 +4010,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:atomic-planner-c3",
@@ -4093,8 +4028,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:atomic-planner-c3-elevated",
@@ -4112,8 +4046,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:atomic-planner-c4",
@@ -4131,8 +4064,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:atomic-planning",
@@ -4207,8 +4139,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:commit-steward-c2",
@@ -4226,8 +4157,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:commit-steward-c3",
@@ -4245,8 +4175,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:commit-steward-c3-elevated",
@@ -4264,8 +4193,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:commit-steward-c4",
@@ -4283,8 +4211,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:csharp-atomic-executor",
@@ -4378,8 +4305,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:csharp-typed-engineer-c2",
@@ -4397,8 +4323,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:csharp-typed-engineer-c3",
@@ -4416,8 +4341,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:csharp-typed-engineer-c3-elevated",
@@ -4435,8 +4359,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:csharp-typed-engineer-c4",
@@ -4454,8 +4377,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:discovery-capability-sentinel",
@@ -4701,8 +4623,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:feature-reviewer-c2",
@@ -4720,8 +4641,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:feature-reviewer-c3",
@@ -4739,8 +4659,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:feature-reviewer-c3-elevated",
@@ -4758,8 +4677,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:feature-reviewer-c4",
@@ -4777,8 +4695,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:gpt-5-beast-mode",
@@ -4853,8 +4770,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:legacy-parity-analyst-c2",
@@ -4872,8 +4788,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:legacy-parity-analyst-c3",
@@ -4891,8 +4806,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:legacy-parity-analyst-c3-elevated",
@@ -4910,8 +4824,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:legacy-parity-analyst-c4",
@@ -4929,8 +4842,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:mentor",
@@ -4986,8 +4898,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:migration-coverage-reviewer-c2",
@@ -5005,8 +4916,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:migration-coverage-reviewer-c3",
@@ -5024,8 +4934,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:migration-coverage-reviewer-c3-elevated",
@@ -5043,8 +4952,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:migration-coverage-reviewer-c4",
@@ -5062,8 +4970,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:orchestrator",
@@ -5100,8 +5007,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:orchestrator-c2",
@@ -5119,8 +5025,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:orchestrator-c3",
@@ -5138,8 +5043,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:orchestrator-c3-elevated",
@@ -5157,8 +5061,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:orchestrator-c4",
@@ -5176,8 +5079,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:powershell-atomic-executor",
@@ -5290,8 +5192,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:powershell-typed-engineer-c2",
@@ -5309,8 +5210,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:powershell-typed-engineer-c3",
@@ -5328,8 +5228,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:powershell-typed-engineer-c3-elevated",
@@ -5347,8 +5246,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:powershell-typed-engineer-c4",
@@ -5366,8 +5264,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:pr-author",
@@ -5404,8 +5301,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:pr-author-c2",
@@ -5423,8 +5319,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:pr-author-c3",
@@ -5442,8 +5337,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:pr-author-c3-elevated",
@@ -5461,8 +5355,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:pr-author-c4",
@@ -5480,8 +5373,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:prd",
@@ -5537,8 +5429,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:prd-feature-c2",
@@ -5556,8 +5447,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:prd-feature-c3",
@@ -5575,8 +5465,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:prd-feature-c3-elevated",
@@ -5594,8 +5483,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:prd-feature-c4",
@@ -5613,8 +5501,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:pytest-unit-test-coding",
@@ -5746,8 +5633,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:python-typed-engineer-c2",
@@ -5765,8 +5651,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:python-typed-engineer-c3",
@@ -5784,8 +5669,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:python-typed-engineer-c3-elevated",
@@ -5803,8 +5687,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:python-typed-engineer-c4",
@@ -5822,8 +5705,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:requirements-reconciler",
@@ -5860,8 +5742,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:requirements-reconciler-c2",
@@ -5879,8 +5760,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:requirements-reconciler-c3",
@@ -5898,8 +5778,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:requirements-reconciler-c3-elevated",
@@ -5917,8 +5796,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:requirements-reconciler-c4",
@@ -5936,8 +5814,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:runtime-characterization-analyst",
@@ -5974,8 +5851,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:runtime-characterization-analyst-c2",
@@ -5993,8 +5869,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:runtime-characterization-analyst-c3",
@@ -6012,8 +5887,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:runtime-characterization-analyst-c3-elevated",
@@ -6031,8 +5905,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:runtime-characterization-analyst-c4",
@@ -6050,8 +5923,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:staged-review",
@@ -6126,8 +5998,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:task-researcher-c2",
@@ -6145,8 +6016,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:task-researcher-c3",
@@ -6164,8 +6034,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:task-researcher-c3-elevated",
@@ -6183,8 +6052,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:task-researcher-c4",
@@ -6202,8 +6070,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:tdd-green",
@@ -6297,8 +6164,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:typescript-engineer-c2",
@@ -6316,8 +6182,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:typescript-engineer-c3",
@@ -6335,8 +6200,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:typescript-engineer-c3-elevated",
@@ -6354,8 +6218,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:typescript-engineer-c4",
@@ -6373,8 +6236,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:agent:voidbeast-gpt41enhanced",
@@ -6408,8 +6270,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Agent%7CTask%7Cspawn_agent%7Crun_subagent%7Cdelegate%29%24/enforce-discovery-planning-gate",
@@ -6424,8 +6285,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cmcp__drm-copilot__run_poshqc_test%7Cmcp__drm-copilot__run_poshqc_suite%29%24/enforce-test-execution-policy",
@@ -6440,8 +6300,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%29%24/enforce-codex-model-routing",
@@ -6456,8 +6315,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%29%24/enforce-discovery-artifact-gate",
@@ -6472,8 +6330,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%29%24/enforce-epic-child-worktree-binding",
@@ -6488,8 +6345,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%29%24/enforce-epic-planning-only",
@@ -6504,8 +6360,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%29%24/enforce-epic-root-invocation",
@@ -6520,8 +6375,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%29%24/enforce-epic-wave-barrier",
@@ -6536,8 +6390,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%7CAgent%7CTask%7Cspawn_agent%7Crun_subagent%7Cdelegate%29%24/invoke-pretooluse-dispatch",
@@ -6552,8 +6405,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/check-powershell-test-purity",
@@ -6568,8 +6420,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/check-python-test-purity",
@@ -6584,8 +6435,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-checkpoint-monotonic",
@@ -6600,8 +6450,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-completion-consistency",
@@ -6616,8 +6465,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-evidence-locations",
@@ -6632,8 +6480,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-file-size-limit",
@@ -6648,8 +6495,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-orchestration-preimplementation-gate",
@@ -6664,8 +6510,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-powershell-batch-budget",
@@ -6680,8 +6525,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-python-batch-budget",
@@ -6696,8 +6540,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5EBash%24/enforce-epic-merge-gate",
@@ -6712,8 +6555,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5EBash%24/enforce-epic-worktree-removal-gate",
@@ -6728,8 +6570,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5EBash%24/enforce-orchestration-preimplementation-gate",
@@ -6744,8 +6585,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5EBash%24/enforce-promotion-mcp-only",
@@ -6760,8 +6600,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5EBash%24/enforce-worktree-poetry-venv",
@@ -6776,8 +6615,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5EBash%24/validate-bash",
@@ -6792,8 +6630,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:SubagentStart/epic-planner%7Cepic-orchestrator%7Corchestrator%7Catomic-planner%7Catomic-executor%7Cfeature-review%7Cfeature-reviewer%7Ctask-researcher%7Cprd-feature%7Cpr-author%7Ctyped-engineer%7C-c%7Clegacy-parity-analyst%7Cruntime-characterization-analyst%7Crequirements-reconciler%7Cmigration-coverage-reviewer/record-subagent-routing-attestation",
@@ -6808,8 +6645,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:SubagentStop/epic-planner%7Cepic-orchestrator%7Corchestrator%7Catomic-planner%7Catomic-executor%7Cfeature-review%7Cfeature-reviewer%7Ctask-researcher%7Cprd-feature%7Cpr-author%7Ctyped-engineer%7C-c%7Clegacy-parity-analyst%7Cruntime-characterization-analyst%7Crequirements-reconciler%7Cmigration-coverage-reviewer/validate-codex-subagent-routing",
@@ -6824,8 +6660,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:SubagentStop/feature-review%7Cfeature-reviewer/validate-feature-review-coverage",
@@ -6840,8 +6675,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:SubagentStop/legacy-parity-analyst%7Cruntime-characterization-analyst%7Crequirements-reconciler%7Cmigration-coverage-reviewer/validate-discovery-agent-output",
@@ -6856,8 +6690,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:hook-registration:UserPromptSubmit//authorize-root-epic-invocation",
@@ -6872,8 +6705,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:mcp-server:drm-copilot",
@@ -6908,8 +6740,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:prompt:feature-review-remediate",
@@ -6923,8 +6754,7 @@
         "codex"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:prompt:generate-commit-message-repo",
@@ -6938,8 +6768,7 @@
         "codex"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:prompt:generate-pr",
@@ -6953,8 +6782,7 @@
         "codex"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:prompt:orchestrate-work",
@@ -6968,8 +6796,7 @@
         "codex"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:setting:agents",
@@ -6984,8 +6811,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:setting:default_permissions",
@@ -7000,8 +6826,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:setting:features",
@@ -7016,8 +6841,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:skill-frontmatter-field:description",
@@ -7063,8 +6887,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:skill-metadata-file:repo-automation-adapter",
@@ -7078,8 +6901,7 @@
         "codex"
       ],
       "owner_child": null,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:skill:acceptance-criteria-tracking",
@@ -7135,9 +6957,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:atomic-executor",
@@ -7153,9 +6974,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:atomic-plan-contract",
@@ -7191,9 +7011,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:bash-command-shape",
@@ -7209,9 +7028,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:benchmark-baselines",
@@ -7227,9 +7045,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:characterize-runtime-behavior",
@@ -7265,9 +7082,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:codex-model-routing",
@@ -7283,9 +7099,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:commit-message",
@@ -7321,9 +7136,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:csharp",
@@ -7339,9 +7153,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:csharp-change-budget-router",
@@ -7877,9 +7690,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:feature-review-workflow",
@@ -7935,9 +7747,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:general-unit-test",
@@ -7953,9 +7764,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:generate-acceptance-scenarios",
@@ -8151,9 +7961,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:orchestrator-workflow",
@@ -8169,9 +7978,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:owner-directives",
@@ -8247,9 +8055,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:powershell-change-budget-router",
@@ -8345,9 +8152,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:pr-base-branch-merge-base",
@@ -8403,9 +8209,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:python-change-budget-router",
@@ -8461,9 +8266,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:quality-tiers",
@@ -8479,9 +8283,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:reconcile-parity-matrix",
@@ -8537,9 +8340,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:research-issue",
@@ -8655,9 +8457,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:skill-canonical-location-audit",
@@ -8713,9 +8514,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:translate-claude-to-codex",
@@ -8731,9 +8531,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:translate-copilot-to-claude",
@@ -8769,9 +8568,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:typescript-suppressions",
@@ -8787,9 +8585,8 @@
         "copilot-cli"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals",
-      "notes": "proposed: native"
+      "decision_status": "approved",
+      "notes": "approved: native"
     },
     {
       "id": "codex:skill:update-status",
@@ -8844,8 +8641,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:subagent-frontmatter-field:description",
@@ -8860,8 +8656,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:subagent-frontmatter-field:developer_instructions",
@@ -8876,8 +8671,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:subagent-frontmatter-field:model",
@@ -8892,8 +8686,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:subagent-frontmatter-field:model_reasoning_effort",
@@ -8908,8 +8701,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "codex:subagent-frontmatter-field:name",
@@ -8924,8 +8716,7 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:agent:5.1-Beast-adjusted",
@@ -10040,8 +9831,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:atomic_planning",
@@ -10056,8 +9846,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:csharp-atomic-planning",
@@ -10072,8 +9861,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:csharp-orchestrator",
@@ -10088,8 +9876,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:csharp-typed-engineer",
@@ -10104,8 +9891,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:epic-review",
@@ -10120,8 +9906,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:feature-review",
@@ -10136,8 +9921,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:orchestrator",
@@ -10152,8 +9936,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:powershell-atomic-planning",
@@ -10168,8 +9951,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:powershell-orchestrator",
@@ -10184,8 +9966,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:powershell-typed-engineer",
@@ -10200,8 +9981,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:prd-feature",
@@ -10216,8 +9996,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:pytest-unit-test-coding",
@@ -10232,8 +10011,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:python-atomic-planning",
@@ -10248,8 +10026,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:python-execution-only-typed",
@@ -10264,8 +10041,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:python-orchestrator",
@@ -10280,8 +10056,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:python-typed-engineer",
@@ -10296,8 +10071,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:staged-review",
@@ -10312,8 +10086,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:status_updater",
@@ -10328,8 +10101,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:handoff:typescript-engineer",
@@ -10344,8 +10116,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:hook-registration:PreToolUse//discovery-planning",
@@ -10360,8 +10131,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:hook-registration:PreToolUse//discovery-pre-tool",
@@ -10376,8 +10146,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:hook-registration:SubagentStart//discovery-agent-start",
@@ -10392,8 +10161,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:hook-registration:SubagentStop//discovery-agent-stop",
@@ -10408,8 +10176,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:instructions:copilot-instructions.md",
@@ -10780,8 +10547,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:breakdown-bug-prd",
@@ -10795,8 +10561,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:breakdown-epic-arch",
@@ -10810,8 +10575,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:breakdown-epic-pm",
@@ -10825,8 +10589,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:breakdown-feature-implementation",
@@ -10840,8 +10603,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:breakdown-feature-prd",
@@ -10855,8 +10617,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:code-exemplars-blueprint-generator",
@@ -10870,8 +10631,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:create-github-issues-feature-from-implementation-plan",
@@ -10885,8 +10645,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:create-implementation-plan",
@@ -10900,8 +10659,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:create-technical-spike",
@@ -10915,8 +10673,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:execute-hard-lock",
@@ -10930,8 +10687,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:export-chat",
@@ -10945,8 +10701,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:fillout-prd-feature",
@@ -10960,8 +10715,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:generate-atomic-plan",
@@ -10975,8 +10729,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:generate-commit-message-repo",
@@ -10990,8 +10743,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:generate-pr",
@@ -11005,8 +10757,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:javascript-typescript-jest",
@@ -11020,8 +10771,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:orchestrate-csharp-work",
@@ -11035,8 +10785,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:orchestrate-powershell-work",
@@ -11050,8 +10799,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:orchestrate-python-work",
@@ -11065,8 +10813,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:orchestrate-work",
@@ -11080,8 +10827,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:potential-feature-prd",
@@ -11095,8 +10841,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:remediate-comments",
@@ -11110,8 +10855,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:research-issue",
@@ -11125,8 +10869,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:review-epic",
@@ -11140,8 +10883,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:review-feature",
@@ -11155,8 +10897,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:review-staged",
@@ -11170,8 +10911,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:update-implementation-plan",
@@ -11185,8 +10925,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:prompt:update_status",
@@ -11200,8 +10939,7 @@
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:skill-frontmatter-field:description",
@@ -11249,7 +10987,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11266,7 +11004,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11283,7 +11021,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11300,7 +11038,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11317,7 +11055,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11334,7 +11072,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11351,7 +11089,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11368,7 +11106,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11385,7 +11123,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11402,7 +11140,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11419,7 +11157,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11436,7 +11174,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11453,7 +11191,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11470,7 +11208,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11487,7 +11225,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11504,7 +11242,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11521,7 +11259,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11538,7 +11276,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11555,7 +11293,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11572,7 +11310,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11589,7 +11327,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11606,7 +11344,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11623,7 +11361,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11640,7 +11378,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11657,7 +11395,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11674,7 +11412,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11691,7 +11429,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11708,7 +11446,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11725,7 +11463,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11742,7 +11480,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11759,7 +11497,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11776,7 +11514,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11793,7 +11531,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11810,7 +11548,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11827,7 +11565,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11844,7 +11582,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11861,7 +11599,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11878,7 +11616,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11895,7 +11633,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11912,7 +11650,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11929,7 +11667,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11946,7 +11684,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11963,7 +11701,7 @@
         "copilot-cli"
       ],
       "owner_child": 6,
-      "decision_status": "provisional",
+      "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
     },
     {
@@ -11979,8 +11717,7 @@
         "copilot-vscode"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:subagent-frontmatter-field:description",
@@ -11995,8 +11732,7 @@
         "copilot-vscode"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:subagent-frontmatter-field:handoffs",
@@ -12011,8 +11747,7 @@
         "copilot-vscode"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:subagent-frontmatter-field:memory",
@@ -12027,8 +11762,7 @@
         "copilot-vscode"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:subagent-frontmatter-field:model",
@@ -12043,8 +11777,7 @@
         "copilot-vscode"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:subagent-frontmatter-field:name",
@@ -12059,8 +11792,7 @@
         "copilot-vscode"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "copilot:subagent-frontmatter-field:tools",
@@ -12075,8 +11807,7 @@
         "copilot-vscode"
       ],
       "owner_child": 5,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:survey/difference-approval.md"
+      "decision_status": "approved"
     },
     {
       "id": "cross-tool:instructions:AGENTS.md",
