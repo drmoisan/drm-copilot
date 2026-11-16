@@ -39,6 +39,9 @@ BeforeAll {
     if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Mock Get-WorktreeResolutionGitFileText { $null } }
     Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText', 'Get-OrchestratorStateCheckpoint', 'Get-CleanupWorktreeManifestContent' -Surface 'Claude'
     Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent' -Surface 'Codex'
+    # Issue #1182: the parallel records leg calls these from hook scope, where the module-scoped baseline mocks do not reach.
+    Mock Get-EpicScopeWorktreeHeadBranch { $null }
+    Mock Get-WorktreeRunCheckpointText { $null }
     if (Get-Command Get-EpicWorktreeGateCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-EpicWorktreeGateCheckpointContent { $null } }
     if (Get-Command Get-EpicWorktreeGateParallelCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-EpicWorktreeGateParallelCheckpointContent { $null } }
     if (Get-Command Get-ParallelWorktreeRemovalGateCheckpointContent -ErrorAction SilentlyContinue) { Mock Get-ParallelWorktreeRemovalGateCheckpointContent { $null } }
@@ -94,6 +97,7 @@ BeforeAll {
         'enforce-parallel-drift-gate.ps1'        = 'gates parallel delegations; the workflow is not a parallel run'
         'enforce-docs-role-write-scope.ps1'      = 'acts only for the four documentation roles; the workflow runs in the main session, which carries no agent_type'
         'enforce-worktree-poetry-venv.ps1'       = 'denies mutating Poetry commands aimed at an outside VIRTUAL_ENV; the workflow runs no Poetry command'
+        'enforce-test-execution-policy.ps1'      = 'denies test-suite runs outside the test-execution launcher; the workflow starts no test suite'
         'enforce-owner-directive-pass-down.ps1'  = 'acts only for worker agent types and for delegations to workers or orchestrator; the workflow delegates only pr-author from the main session'
     }
 

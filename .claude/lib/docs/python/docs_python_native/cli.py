@@ -12,6 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
+from docs_python_native.call_sites import UNBOUND
 from docs_python_native.cli_argparse import recognize_argparse
 from docs_python_native.cli_click import recognize_click
 from docs_python_native.cli_typer import recognize_typer
@@ -19,7 +20,7 @@ from docs_python_native.facts import AnalyzerOutput
 from docs_python_native.module_names import module_dotted_name
 
 if TYPE_CHECKING:
-    from docs_python_native.call_sites import CliSite
+    from docs_python_native.call_sites import CliSite, ProvisionalRole, RoleHandoff
     from docs_python_native.imports import AnalyzedFile
 
 ANALYZER_ID = "python-cli"
@@ -72,6 +73,8 @@ class _FileSites:
         sites: Every site with framework-prefixed identifiers.
         by_id: The sites by prefixed identifier.
         attached: Root site identifier to the console script that attaches it.
+        provisional: The argparse provisional subparsers parameters (issue 1173 B9).
+        handoffs: The argparse calls that pass a subparsers receiver on.
     """
 
     analyzed: AnalyzedFile
@@ -79,6 +82,8 @@ class _FileSites:
     sites: list[CliSite] = field(default_factory=lambda: [])
     by_id: dict[str, CliSite] = field(default_factory=lambda: {})
     attached: dict[str, ConsoleScript] = field(default_factory=lambda: {})
+    provisional: list[ProvisionalRole] = field(default_factory=lambda: [])
+    handoffs: list[RoleHandoff] = field(default_factory=lambda: [])
 
 
 def root_name(
@@ -179,6 +184,8 @@ def _collect(
         # Report every recognizer diagnostic under the python-cli analyzer.
         for diagnostic in result.diagnostics:
             output.add_diagnostic(analyzed.path, diagnostic.code, diagnostic.line)
+        entry.provisional.extend(result.provisional)
+        entry.handoffs.extend(result.handoffs)
         # Prefix site and parent identifiers with the framework, then index the site.
         for site in result.sites:
             site.site_id = site.framework + ":" + site.site_id
@@ -225,6 +232,84 @@ def _attach(entries: list[_FileSites], scripts: list[ConsoleScript]) -> None:
                 break
 
 
+def _under(site: CliSite, placeholder: str, entry: _FileSites) -> bool:
+    """Report whether a site's parent chain reaches a placeholder parser identifier.
+
+    Args:
+        site: The site.
+        placeholder: The prefixed placeholder identifier of a provisional role.
+        entry: The file's merged sites.
+
+    Returns:
+        True when the placeholder is the site's parent or an ancestor's parent.
+    """
+    seen: set[str] = set()
+    parent = site.parent_id
+    # Climb the parent chain until the placeholder, a root, an unknown id or a cycle.
+    while parent is not None and parent not in seen:
+        if parent == placeholder:
+            return True
+        seen.add(parent)
+        known = entry.by_id.get(parent)
+        parent = None if known is None else known.parent_id
+    return False
+
+
+def _bind(
+    entries: list[_FileSites],
+    memos: list[dict[str, _Resolved | None]],
+    output: AnalyzerOutput,
+) -> None:
+    """Bind every provisional subparsers parameter to a caller (issue 1173 B9).
+
+    A role of function f in module m binds to the first handoff, in path order, whose
+    callee is "m.f" and whose position or keyword names the parameter; the placeholder
+    then resolves to the caller parser's declaration. A role with no such handoff
+    reports CLI_UNBOUND_REGISTRATION at every site registered beneath it.
+
+    Args:
+        entries: The merged sites of every file, in path order.
+        memos: The per-file resolution memos; the placeholders are written into them.
+        output: Receives the CLI_UNBOUND_REGISTRATION diagnostics.
+
+    Returns:
+        None.
+    """
+    callers: dict[str, list[tuple[int, RoleHandoff]]] = {}
+    # Index every handoff by its qualified callee, keeping the file order.
+    for index, entry in enumerate(entries):
+        for handoff in entry.handoffs:
+            callers.setdefault(handoff.callee, []).append((index, handoff))
+    # Resolve each role of each file to the caller parser or to unbound diagnostics.
+    for index, entry in enumerate(entries):
+        for role in entry.provisional:
+            placeholder = "argparse:" + role.site_id
+            key = None if entry.module is None else entry.module + "." + role.function
+            match = next(
+                (
+                    (caller, handoff)
+                    for caller, handoff in callers.get(key or "", [])
+                    if handoff.position == role.position
+                    or handoff.keyword == role.parameter
+                ),
+                None,
+            )
+            # A bound role takes the caller parser's resolution; an unbound role
+            # leaves its placeholder unresolved and reports every site beneath it.
+            if match is not None:
+                caller, handoff = match
+                parser = "argparse:" + handoff.parser_id
+                memos[index][placeholder] = _resolve(
+                    parser, entries[caller], memos[caller], set()
+                )
+                continue
+            memos[index][placeholder] = None
+            # Report each registration whose parent chain reaches the placeholder.
+            for site in entry.sites:
+                if _under(site, placeholder, entry):
+                    output.add_diagnostic(entry.analyzed.path, UNBOUND, site.span[0])
+
+
 def analyze_cli(
     files: list[AnalyzedFile], source_roots: list[str], scripts: list[ConsoleScript]
 ) -> AnalyzerOutput:
@@ -244,9 +329,10 @@ def analyze_cli(
         _collect(f, source_roots, output) for f in sorted(files, key=lambda f: f.path)
     ]
     _attach(entries, scripts)
+    memos: list[dict[str, _Resolved | None]] = [{} for _ in entries]
+    _bind(entries, memos, output)
     # Emit each file's sites; resolution is memoized per file.
-    for entry in entries:
-        memo: dict[str, _Resolved | None] = {}
+    for entry, memo in zip(entries, memos, strict=True):
         # Emit one fact per site that resolves and is not an attached root.
         for site in entry.sites:
             resolved = _resolve(site.site_id, entry, memo, set())

@@ -92,6 +92,21 @@ Describe 'Test-DocsExtensionManifest' {
             $result['ResultDocument'][0]['id'] | Should -Be 'ruby-adapter-inventory'
         }
 
+        It 'accepts a manifest whose CRLF source and result inputs carry raw-byte digests (issue #1173 B11)' {
+            # Arrange (the CRLF bytes are built in memory; the manifest declares raw-byte digests, as discovery manifests do)
+            $fixture = New-DocsTestExtensionManifest -SourceLineEnding 'CRLF'
+            $source = $fixture['SourceInput']
+
+            # Act
+            $result = Test-DocsExtensionManifest -ManifestText $fixture['ManifestText'] -ManifestPath $fixture['ManifestPath'] -CapturedInput $fixture['CapturedInput'] -Selection $script:Selection -RegisteredAnalyzerId @('typescript-cli')
+
+            # Assert
+            $source['raw_sha256'] | Should -Not -BeExactly $source['sha256'] -Because 'the source input holds CRLF bytes'
+            $result['Ok'] | Should -BeTrue
+            @($result['Diagnostics'] | ForEach-Object { $_['code'] }) | Should -Not -Contain 'EXTENSION_INPUT_DIGEST_MISMATCH'
+            @($result['Diagnostics'] | ForEach-Object { $_['code'] }) | Should -Not -Contain 'EXTENSION_RESULT_DIGEST_MISMATCH'
+        }
+
         It 'accepts a valid manifest against a selection object with properties' {
             # Arrange
             $fixture = New-DocsTestExtensionManifest

@@ -33,11 +33,15 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-m
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-scope.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-epic-scope.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-cleanup.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-cleanup.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-docs.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-docs.ps1' -ErrorRecord $_ }
+# Parallel records leg (issue #1182): the pr-author receipt Write at a closed parallel coordinator root.
+try { . (Join-Path $PSScriptRoot 'hook-parallel-records-context.ps1') } catch { Add-HookDependencyFailure -Name 'hook-parallel-records-context.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-parallel-records.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-parallel-records.ps1' -ErrorRecord $_ }
 
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-command-invocation.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-invocation.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-commands.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-commands.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-classify.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-classify.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-bookkeeping.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-bookkeeping.ps1' -ErrorRecord $_ }
 
 # Every orchestration checkpoint a planner or orchestrator surface writes. Writing one
@@ -153,9 +157,10 @@ function Test-ImplementationCommand {
     $scanText = @(Read-CommandLineSegment -CommandText $normalizedCommand).ScanText
     $isStaging = @('add', 'commit').Where({ Test-CommandLineInvocation -CommandText $normalizedCommand -CommandWord 'git' -SubcommandPath @($_) }).Count -gt 0
 
+    $supplementalIndex = @(Get-OrchestrationGateSupplementalPatternIndex -CommandText $normalizedCommand)
     for ($index = 0; $index -lt $implementationCommandPatterns.Count; $index++) {
         $structural = ($index -eq 0 -and $isStaging)
-        if (-not ($structural -or ($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }))) { continue }
+        if (-not ($structural -or $supplementalIndex -contains $index -or ($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }))) { continue }
         # Stage 2 (issue #1160): a regex-only hit is dropped when every governed word is a mention-host operand.
         if (-not $structural -and -not (Test-OrchestrationGateInvocationConfirmed -CommandText $normalizedCommand -PatternIndex $index)) { continue }
         # Allow-side only (issue #539). Index 0 is the git staging trigger, whose pattern
@@ -427,7 +432,8 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     if (($cleanup = Get-OrchestrationCleanupContextResult -FilePath $filePath -Content (Get-ClaudeHookToolInputString -ToolInput $toolInput -Name 'content') -Command $command).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Cleanup-context legs (issue #1026).
     if (($bookkeeping = Get-OrchestrationBookkeepingStagingResult -Command $command -CheckpointPath $checkpointPath).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Bookkeeping staging leg (issue #1160).
     if (($docs = Get-OrchestrationDocsEstateContextResult -FilePath $filePath -Command $command).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Docs-estate leg (issue #1169).
-    return Get-OrchestrationPreimplementationGateBlockDecision -Reason ('PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.' + $cleanup.DenySuffix + $bookkeeping.DenySuffix + $docs.DenySuffix)
+    if (($parallel = Get-OrchestrationParallelRecordsResult -ToolInput $toolInput -FilePath $filePath).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Parallel records leg (issue #1182).
+    return Get-OrchestrationPreimplementationGateBlockDecision -Reason ('PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.' + $cleanup.DenySuffix + $bookkeeping.DenySuffix + $docs.DenySuffix + $parallel.DenySuffix)
 }
 
 function Invoke-OrchestrationPreimplementationGateEntryPoint {

@@ -1,0 +1,6 @@
+# Task check P2-T4
+
+Timestamp: 2026-11-15T00-21
+Command: launcher pester suite with -TestPath tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1; launcher pytest suite on tests/scripts/dev_tools/test_host_environment_contracts.py; formatter check and analyzer over scripts/ci, tests/scripts/ci, and tests/scripts/workflows; black --check, ruff check, and pyright on test_host_environment_contracts.py
+EXIT_CODE: 0
+Output Summary: Changed files tests/scripts/dev_tools/test_host_environment_contracts.py (the matrix literal assertion now expects ["3.11", "3.12"] and asserts the 3.13 setup in the shard jobs; the Poetry-version parametrized test is unchanged because 2.5.1 is retained in every job) and tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1 (the gates-every-step ForEach gains python-static-313, python-coverage-shard, python-coverage-combine; the 3.13-only condition test now targets the Codecov step of python-coverage-combine and the plain run-heavy condition; cache-miss, caller-wiring, and bare-always() tests unchanged). Pester selection: tests=43, failures=0. pytest selection: 36 passed. Formatter: 24 files, 0 would change. Analyzer: 24 files, 0 findings. Black, Ruff, Pyright clean.

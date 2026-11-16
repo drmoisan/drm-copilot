@@ -21,6 +21,12 @@ Root steps run the docs helper library at `.claude/lib/docs/` under PowerShell 7
    Root step: `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command init -RepositoryId <repository-id> -Profile docs/documentation-estate/docs-profile.json`
 2. Review the planned files, then apply the initialization.
    Root step: `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command init -RepositoryId <repository-id> -Profile docs/documentation-estate/docs-profile.json -Write`
+   Init adds the CI workflow `.github/workflows/_docs-quality.yml` and reports it on a
+   `ci-workflow <path>` line and in the `ci_workflow` result field. The starter profile sets
+   the documentation root to `docs/guide` (root id `guide`) and detects the source root:
+   `src` when it holds files, else the package directory named by `pyproject.toml`, else
+   `src`. A source root that lists no file is reported as `DOCS_PROFILE_SOURCE_ROOT_MISSING`
+   with exit code 1; the files are still written, so edit the profile and validate it again.
 3. Replace existing estate files only when the operator asks for it explicitly; add
    `-Force` to the step 2 command in that case and in no other.
 4. Validate the profile.
@@ -46,5 +52,6 @@ policy-level control.
 
 ## Result
 
-Report the profile path, the exit code of each step and, on failure, the findings
-the command returned. Use `-Help` with any subcommand to list its options.
+Report the profile path, the CI workflow `.github/workflows/_docs-quality.yml` that init adds
+(its `ci-workflow` line), the exit code of each step and, on failure, the findings the command
+returned. Use `-Help` with any subcommand to list its options.

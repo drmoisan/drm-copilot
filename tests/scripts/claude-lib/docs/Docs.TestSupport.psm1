@@ -126,9 +126,10 @@ function New-DocsTestContext {
     .SYNOPSIS
         Returns @{ Context; Files; WriteLog; ProcessCallLog; Revisions } for one in-memory command context.
     .DESCRIPTION
-        The context carries the twelve members of New-DocsCommandContext in its order:
+        The context carries the thirteen members of New-DocsCommandContext in its order:
         RepositoryRoot, ReadText, ReadBytes, TestFile, ListFile, WriteText, UtcNow, InvokeProcess,
-        ResolveRevision, ReadRevisionText, TestAncestor, ListChangedPath.
+        ReadStdin, ResolveRevision, ReadRevisionText, TestAncestor, ListChangedPath. ReadStdin
+        returns Stdin (issue #1173), or the empty string when Stdin is not given.
         File is a map of repository-relative path to text; a $null or empty text is an empty file,
         for which ReadText returns the empty string. ReadText of an absent path throws an
         item-not-found error, as the real member does. WriteText with Mode 'create' on an existing
@@ -154,7 +155,8 @@ function New-DocsTestContext {
         [AllowNull()] [System.Collections.IDictionary] $RevisionMap,
         [AllowNull()] [System.Collections.IDictionary] $RevisionFile,
         [AllowNull()] [System.Collections.IDictionary] $AncestorMap,
-        [AllowNull()] [System.Collections.IDictionary] $ChangedPathMap
+        [AllowNull()] [System.Collections.IDictionary] $ChangedPathMap,
+        [AllowNull()] [string] $Stdin
     )
 
     $files = [hashtable]::new([System.StringComparer]::Ordinal)
@@ -222,6 +224,8 @@ function New-DocsTestContext {
         $processCallLog.Add([pscustomobject]@{ FilePath = $FilePath; ArgumentList = $ArgumentList; StdinText = $StdinText; TimeoutSeconds = $TimeoutSeconds })
         return @{ ExitCode = $result['ExitCode']; Stdout = $result['Stdout']; Stderr = $result['Stderr']; TimedOut = $result['TimedOut'] }
     }.GetNewClosure()
+    $stdinText = if ($null -eq $Stdin) { '' } else { $Stdin }
+    $readStdin = { return $stdinText }.GetNewClosure()
     $resolveRevision = {
         param($Ref)
         $key = [string] $Ref
@@ -246,6 +250,7 @@ function New-DocsTestContext {
         WriteText        = $writeText
         UtcNow           = $utcNowMember
         InvokeProcess    = $invokeProcess
+        ReadStdin        = $readStdin
         ResolveRevision  = $resolveRevision
         ReadRevisionText = $readRevisionText
         TestAncestor     = $pairMaps.TestAncestor

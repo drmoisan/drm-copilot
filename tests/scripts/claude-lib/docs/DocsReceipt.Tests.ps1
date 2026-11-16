@@ -78,7 +78,7 @@ Describe 'ConvertTo-DocsTimestampText and Get-DocsWriterVersion' {
 }
 
 Describe 'Get-DocsArtifactPin and receipt inputs' {
-    It 'pins raw bytes with Get-DocsBytesSha256Hex and pins nothing for absent bytes' {
+    It 'pins the line-ending-normalized bytes with Get-DocsTextSha256Hex and pins nothing for absent bytes (issue #1173)' {
         # Arrange
         $bytes = [byte[]]@(0xEF, 0xBB, 0xBF, 0x7B, 0x7D, 0x0A)
 
@@ -88,10 +88,10 @@ Describe 'Get-DocsArtifactPin and receipt inputs' {
 
         # Assert
         @($pin.Keys) | Should -Be @('artifact_kind', 'path', 'sha256')
-        $pin['sha256'] | Should -BeExactly (Get-DocsBytesSha256Hex -Bytes $bytes)
-        $pin['sha256'] | Should -Not -BeExactly (Get-DocsSha256Hex -Text ('{}' + "`n")) -Because 'the raw bytes including the BOM are pinned'
+        $pin['sha256'] | Should -BeExactly (Get-DocsTextSha256Hex -Bytes $bytes)
+        $pin['sha256'] | Should -Not -BeExactly (Get-DocsSha256Hex -Text ('{}' + "`n")) -Because 'the bytes including the BOM are pinned'
         $null -eq $absent | Should -BeTrue
-        (Get-DocsArtifactPin -ArtifactKind 'docs-profile' -Path 'p.json' -Bytes ([byte[]]@()))['sha256'] | Should -BeExactly (Get-DocsBytesSha256Hex -Bytes ([byte[]]@()))
+        (Get-DocsArtifactPin -ArtifactKind 'docs-profile' -Path 'p.json' -Bytes ([byte[]]@()))['sha256'] | Should -BeExactly (Get-DocsTextSha256Hex -Bytes ([byte[]]@()))
     }
 
     It 'sorts inputs by artifact_kind then path' {

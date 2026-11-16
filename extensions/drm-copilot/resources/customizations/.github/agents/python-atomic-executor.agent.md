@@ -266,7 +266,7 @@ Phase-gate and final-QA toolchain for Python (each task runs a task check instea
 1) Format (`poetry run black .` or repo task equivalent)
 2) Lint (`poetry run ruff check` or repo task equivalent)
 3) Type-check (`poetry run pyright` or repo task equivalent)
-4) Test (`poetry run pytest -n auto --cov-branch --cov-report=term-missing --cov`)
+4) Test (`env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest --cov-branch --cov-report=term-missing --cov`, which runs `poetry run pytest -n auto`)
 
 If any step fails in final QA, fix and restart from format.
 
@@ -294,3 +294,9 @@ At completion, report:
 ---
 
 End of agent instructions.
+
+## Test-Execution Launcher
+
+Local test suites run through the test-execution launcher (issue #1158): `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh <suite>` with the suite name first (`pytest`, `pester`, `jest`, or a configured suite), or the `.agents/skills/test-execution-policy/scripts/` copy where `.claude` is absent. A launcher exit 75 means the machine test-suite lock was busy: re-run the gate after the holder finishes and record it as a queue timeout, not a failure. The `test-execution-policy` skill states the rules.
+
+Local test gates exclude the integration and golden lanes: CI integration and golden lanes are evidence, and a step that would run a lane locally records a non-blocking deviation under evidence/other/.

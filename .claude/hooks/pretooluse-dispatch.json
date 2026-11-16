@@ -53,6 +53,15 @@
         ]
       },
       {
+        "matcher": "Bash|mcp__drm-copilot__run_poshqc_test|mcp__drm-copilot__run_poshqc_suite",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-test-execution-policy.ps1"
+          }
+        ]
+      },
+      {
         "matcher": "Write|Edit",
         "hooks": [
           {

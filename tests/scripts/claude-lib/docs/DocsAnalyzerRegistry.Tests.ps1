@@ -249,6 +249,23 @@ Describe 'New-DocsCapturedInput' {
         $captured.diagnostic | Should -BeNullOrEmpty
     }
 
+    It 'records a line-ending-normalized sha256 and a raw-byte raw_sha256, with size the raw byte count (issue #1173 B11)' {
+        # Arrange (CRLF bytes built in memory)
+        $lfBytes = [System.Text.UTF8Encoding]::new($false).GetBytes("a = 1`nb = 2`n")
+        $crlfBytes = [System.Text.UTF8Encoding]::new($false).GetBytes("a = 1`r`nb = 2`r`n")
+
+        # Act
+        $lf = New-DocsCapturedInput -Path 'src/a.py' -Bytes $lfBytes
+        $crlf = New-DocsCapturedInput -Path 'src/a.py' -Bytes $crlfBytes
+
+        # Assert
+        $crlf.sha256 | Should -BeExactly $lf.sha256
+        $lf.sha256 | Should -BeExactly ([System.Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData($lfBytes)).ToLowerInvariant()) -Because 'LF content keeps its raw-byte hash'
+        $crlf.raw_sha256 | Should -BeExactly ([System.Convert]::ToHexString([System.Security.Cryptography.SHA256]::HashData($crlfBytes)).ToLowerInvariant())
+        $crlf.raw_sha256 | Should -Not -BeExactly $lf.raw_sha256
+        $crlf.size | Should -Be $crlfBytes.Length
+    }
+
     It 'carries a diagnostic and text null for an input above MaxBytes' {
         # Act
         $captured = New-DocsCapturedInput -Path 'a/b.txt' -Bytes ([byte[]](0x61, 0x62, 0x63)) -MaxBytes 2

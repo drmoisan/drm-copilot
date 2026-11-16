@@ -1,0 +1,15 @@
+# Task Check: [P2-T4] (debug only, not a gate)
+
+Timestamp: 2026-11-14T13-00
+Command: sh SCRATCH/issue-1182-tc-p2t4.sh (Invoke-Formatter and Invoke-ScriptAnalyzer per changed PowerShell file, then Invoke-Pester with Run.Path set to the 44-file selection)
+EXIT_CODE: 0
+Output Summary:
+- Changed files: .claude/hooks/enforce-orchestration-preimplementation-gate-parallel-records.ps1 (new, 130 lines; guarded import of OrchestratorStateModelReceipts.psm1); .claude/hooks/enforce-orchestration-preimplementation-gate.ps1 (guarded dot-sources of hook-parallel-records-context.ps1 and the sibling, and the deny-tail call after the docs-estate leg with its suffix appended after the docs suffix; 491 logical lines); their bundle copies (byte-identical by cmp); pack-manifests/core.json (sibling entry); tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.ParallelRecords.Tests.ps1 (AC-10 to AC-12 rows); hook-scope mocks of Get-EpicScopeWorktreeHeadBranch and Get-WorktreeRunCheckpointText ($null) added to enforce-orchestration-preimplementation-gate.Cleanup.Tests.ps1, .DocsEstate.Tests.ps1, .EpicFanIn.Tests.ps1, cleanup-merged-worktrees-workflow.EndToEnd.Tests.ps1, and docs-estate-workflow.EndToEnd.Tests.ps1; tests/scripts/claude-runtime/enforcement-hooks-checkpoint-path-explicit.Tests.ps1 (three new hook files added to the in-scope list); tests/scripts/claude-hooks/hook-parallel-records-context.Tests.ps1 (two AC-13 AST rows).
+- Selection rule: every enforce-orchestration-preimplementation-gate*.Tests.ps1 suite under tests/scripts/claude-hooks, the two end-to-end suites, hook-import-failure-exemptions.FailClosed.Tests.ps1, PreToolUseSchema.Contract.Tests.ps1, hook-dependency-failure.Claude.Tests.ps1, tests/scripts/claude-runtime/owner-directive-pass-down.Registration.Tests.ps1, enforcement-hooks-checkpoint-path-explicit.Tests.ps1, hook-parallel-records-context.Tests.ps1, and enforce-gate-suites.EpicStateIsolation.Discovery.Tests.ps1 (44 files).
+- Format findings 0; analyzer findings 0.
+- Pester: passed 2739, failed 0, skipped 0.
+- Earlier attempt in this task (same selection) failed two rows, both fixed before this run:
+  - enforce-gate-suites.EpicStateIsolation.Discovery AC-4 for enforce-orchestration-preimplementation-gate.EpicFanIn.Tests.ps1 ("Mock lacks -ModuleName WorktreeRunResolution"): that suite mocked the seam in direct form only, so its Register-EpicStateBaselineMock call now also names Get-WorktreeRunCheckpointText (helper form); the hook-scope mock stays as the plan states.
+  - The AC-12 row that throws from Get-OrchestrationGateWorktreeList asserted the generic deny text, but the gate resolves an absolute path's target from that listing before the deny tail and denies with its own target-resolution reason, which is today's behaviour. The row now asserts that the leg declines with an empty suffix and that the gate's deny carries no parallel suffix; the other two seam rows still assert the exact generic text.
+- Both AC-9 rows and both AC-13 AST rows pass; the EpicStateIsolation Discovery suite passes.
+- Existing suites with unchanged assertions: all pass.

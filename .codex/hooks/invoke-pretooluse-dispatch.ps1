@@ -4,8 +4,10 @@
     emits one combined decision (issue #1159).
 
 .DESCRIPTION
-    Registered once in .codex/config.toml. The payload is read once with [Console]::In.ReadToEnd()
-    and no fallback, and no environment variable is written. The registry pretooluse-dispatch.json
+    Registered once in .codex/config.toml. The payload is read once by
+    Read-CodexPreToolUseDispatchStandardInput, which reads the bytes of standard input and decodes
+    them as UTF-8 with no fallback, so the payload text does not depend on the console input code
+    page (issue #1187); no environment variable is written. The registry pretooluse-dispatch.json
     beside this script lists the hook groups; the groups whose matcher admits the tool name (regex as
     written, with the apply_patch alias for Edit and Write) run in registry order through
     Invoke-CodexHookDispatchRunner, every one of them even after a deny, and their results combine by
@@ -14,6 +16,10 @@
     A missing, unreadable or invalid registry, a payload without a tool name, or a failed helper load
     is a deny whose reason starts with HOOK_DISPATCH_BLOCKED:. A failure to load
     hook-dependency-guard.ps1 writes the reason to stderr and exits 2.
+
+    Every JSON line the script writes (the combined decision, the dependency-failure deny, and the
+    -PerHookTrace lines) uses ConvertTo-Json -EscapeHandling EscapeNonAscii, so the output is ASCII
+    and does not depend on the console output encoding.
 
 .PARAMETER PerHookTrace
     Test aid: writes one JSON line per dispatched hook to stderr (hook, exit code, stdout, stderr,
@@ -29,6 +35,36 @@ try { . (Join-Path $PSScriptRoot 'hook-dispatch.ps1') } catch { Add-HookDependen
 $script:CodexPreToolUseDispatchRegistryPath = Join-Path $PSScriptRoot 'pretooluse-dispatch.json'
 # The hooks directory the registry commands resolve against (beside this script).
 $ScriptRoot = $PSScriptRoot
+
+function Read-CodexPreToolUseDispatchStandardInput {
+    <#
+    .SYNOPSIS
+        Reads standard input to its end as UTF-8 bytes and returns the decoded text (issue #1187).
+    .DESCRIPTION
+        The bytes are decoded with a UTF-8 decoder that removes a leading byte order mark and maps
+        an invalid byte sequence to U+FFFD instead of throwing, so the text does not depend on the
+        console input code page. The reader is disposed, which also disposes the stream. Codex
+        hooks do not dot-source .claude files, so the Claude and Codex dispatchers each define this
+        reader with an equal body.
+    .PARAMETER OpenStream
+        Stream seam; the default opens the process standard input.
+    .OUTPUTS
+        System.String
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [scriptblock] $OpenStream = { [Console]::OpenStandardInput() }
+    )
+
+    $stream = & $OpenStream
+    $reader = [System.IO.StreamReader]::new($stream, [System.Text.UTF8Encoding]::new($false, $false), $true)
+    try {
+        return $reader.ReadToEnd()
+    } finally {
+        $reader.Dispose()
+    }
+}
 
 function Invoke-CodexPreToolUseDispatchDecision {
     <#
@@ -64,7 +100,8 @@ function Invoke-CodexPreToolUseDispatchEntryPoint {
     .SYNOPSIS
         Reads the payload once, dispatches, and returns the decision JSON lines followed by the exit code.
     .PARAMETER ReadPayload
-        Payload seam; the default is one [Console]::In.ReadToEnd() call with no fallback.
+        Payload seam; the default is one Read-CodexPreToolUseDispatchStandardInput call (UTF-8) with
+        no fallback.
     .PARAMETER ReadRegistry
         Registry reader seam; returns the registry text or $null.
     .PARAMETER WriteTrace
@@ -73,7 +110,7 @@ function Invoke-CodexPreToolUseDispatchEntryPoint {
     [CmdletBinding()]
     [OutputType([string], [int])]
     param(
-        [scriptblock] $ReadPayload = { [Console]::In.ReadToEnd() },
+        [scriptblock] $ReadPayload = { Read-CodexPreToolUseDispatchStandardInput },
         [scriptblock] $ReadRegistry = { if (Test-Path -LiteralPath $script:CodexPreToolUseDispatchRegistryPath -PathType Leaf) { Get-Content -LiteralPath $script:CodexPreToolUseDispatchRegistryPath -Raw } else { $null } },
         [switch] $PerHookTrace,
         [scriptblock] $WriteTrace = { param([string] $Line) [Console]::Error.WriteLine($Line) }
@@ -87,10 +124,10 @@ function Invoke-CodexPreToolUseDispatchEntryPoint {
     if ($PerHookTrace) {
         foreach ($item in $results) {
             $trace = [ordered]@{ hook = $item.Hook; exitCode = $item.ExitCode; stdout = $item.Stdout; stderr = $item.Stderr; decision = $item.Decision; reason = $item.Reason; additionalContext = $item.AdditionalContext; error = $item.Error; modulesLoaded = @($item.ModulesLoaded) }
-            & $WriteTrace ($trace | ConvertTo-Json -Compress -Depth 5)
+            & $WriteTrace ($trace | ConvertTo-Json -Compress -Depth 5 -EscapeHandling EscapeNonAscii)
         }
     }
-    if ($null -ne $decision) { $decision | ConvertTo-Json -Compress -Depth 5 }
+    if ($null -ne $decision) { $decision | ConvertTo-Json -Compress -Depth 5 -EscapeHandling EscapeNonAscii }
     return 0
 }
 
@@ -100,7 +137,7 @@ if ($MyInvocation.InvocationName -eq '.') {
 }
 if ($script:HookDependencyGuardLoadFailed) { [Console]::Error.WriteLine('HOOK_DISPATCH_BLOCKED: hook-dependency-guard.ps1 failed to load; the gate fails closed.'); exit 2 }
 $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -ReasonPrefix 'HOOK_DISPATCH_BLOCKED:'
-if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
+if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 -EscapeHandling EscapeNonAscii | Write-Output; exit 0 }
 
 # The entry point returns its [int] exit code as the last pipeline element and the
 # decision JSON before it, so the decision is written explicitly before the exit.

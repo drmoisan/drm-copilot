@@ -1,0 +1,6 @@
+# Phase gate P1 (remediation cycle 1, P1-T5)
+
+Timestamp: 2026-11-15T18-21
+Command: stages 1 to 6 over the unchanged sources, then the two unit gates through the launcher: PowerShell format and analyze over scripts/powershell/PoshQC and tests/scripts/powershell/PoshQC; black --check, ruff check, pyright over tests/scripts/dev_tools; env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest (pytest -n auto); sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester (one Invoke-PoshQCParallelTest run, 8 workers)
+EXIT_CODE: 0
+Output Summary: one clean pass, no restart. Format exit 0 (no change), analyze exit 0 (0 findings), black exit 0, ruff exit 0, pyright exit 0. Tree check: git status --porcelain identical before and after the static steps (only config/poshqc-shard-weights.json and plan and evidence files modified or added). pytest: 16949 passed, 6 skipped, 0 failed. Pester: tests="26885" errors="0" failures="0" disabled="22" (merged pester-junit.xml), wall-clock 773.82 s; line coverage <counter type="LINE" missed="1846" covered="44337" />. Architecture-boundary and contract stages are covered by the two unit gates (no separate runner for this data-only change). Integration and golden lanes excluded.

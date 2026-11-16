@@ -47,6 +47,11 @@
             Deny = @('enforce-worktree-poetry-venv.ps1'); Except = @()
         }
         @{
+            Key = 'bash-direct-test-runner'; ToolName = 'Bash'; Kind = 'deny'; Environment = @{}
+            ToolInput = @{ command = 'pytest -q tests/parity-probe' }
+            Deny = @('enforce-test-execution-policy.ps1'); Except = @()
+        }
+        @{
             Key = 'bash-unknown-launcher-context'; ToolName = 'Bash'; Kind = 'deny'
             Environment = @{ CODEX_EPIC_CHILD_LAUNCH_ID = 'parity-probe'; CODEX_EPIC_CHILD_EXECUTION_CONTEXT = 'other' }
             ToolInput   = @{ command = 'git status --short' }

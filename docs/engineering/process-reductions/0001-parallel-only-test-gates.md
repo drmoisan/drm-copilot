@@ -13,6 +13,24 @@ The reduction landed across this branch's commits, before the ledger rule reache
 
 Rebased over PR #1108 (issue #1106): after `main` merged PR #1108, which renamed the C# test framework to MSTest and the Pester version to Pester v6 and removed another project's example word from the policy-audit instructions, the stored patch sections of the sixteen paths whose reverse check that merge broke were regenerated so that they carry PR #1108's wording; their hunks are unchanged apart from that wording, and every other section is unchanged.
 
+Rebased over #1158: the full-suite pytest commands of `scripts/dev_tools/atomic_executor/qc_runner.py` (`FULL_TEST` and the `full_test` argument of `run_full_loop_with_artifacts`) now start with the test-execution launcher words `TEST_SUITE_LAUNCHER_ARGV` instead of `"poetry",` and `"run",`, and `tests/scripts/dev_tools/atomic_executor/test_qc_runner.py` asserts that argv. The two `qc_runner.py` blocks and the two `test_qc_runner.py` blocks under `### Later Landing: #1096` were regenerated so that their `Current` and `Prior` fences carry the launcher words; the `-n` and `auto` lines they revert are unchanged.
+
+Rebased over #1158 (`fix_all` test steps): the Pester, pytest, Jest, and bats steps of `scripts/dev_tools/fix_all_branches.py` and `scripts/dev_tools/fix_all_branches_extra.py` now run the test-execution launcher suites `pester`, `pytest`, `jest`, and `bats` instead of their direct commands. The Pester-step block of `fix_all_branches.py` was regenerated so that both fences carry the launcher call; its description line still reverts. Two blocks were removed because their text no longer exists in those files: the `Invoke-PoshQCParallelTest` `-Command` block of `fix_all_branches.py` and the `pytest_command` block of `fix_all_branches_extra.py`. Those commands now live in the launcher's `pester` and `pytest` suites (`Invoke-PesterSuite.ps1` calling `Invoke-PoshQCParallelTest`, and `poetry run pytest -n auto` in `Get-TestExecutionPolicyDefault`), so a revert of this entry restores the serial Pester and pytest commands in those suite definitions by hand. The `tests/scripts/dev_tools/test_fix_all_branches.py` block was regenerated to carry the launcher-argv assertions of its three tests.
+
+Rebased over #1158 (preflight QC): the full-suite pytest step of `scripts/dev_tools/atomic_executor/cli_preflight.py` and the `_PYTEST_STEP` constant of `tests/scripts/dev_tools/atomic_executor/test_cli_part3.py` now start with `TEST_SUITE_LAUNCHER_ARGV` instead of `"poetry",` and `"run",`, and `test_preflight_pytest_step_runs_xdist_workers` in `tests/scripts/dev_tools/atomic_executor/test_cli_part2_part2.py` patches the PATH lookup. Those three blocks were regenerated so that both fences carry the new text; the `-n` and `auto` lines and the removed test they revert are unchanged.
+
+Rebased over #1158 (VS Code tasks): the parallel test tasks of `.vscode/tasks.json` now start `pwsh` with the test-execution launcher. The block that records the default-group change of `QC: 4 Pytest: run tests (parallel)` was regenerated so that both fences carry `"command": "pwsh",`; its `isDefault` lines still revert. The new `VsCodeQualityTasks.Tests.ps1` cases sit after the recorded block, so that block is unchanged.
+
+Rebased over #1158 (execution-environment brief): the brief gains a launcher bullet at the end of `## PowerShell Route and PoshQC MCP Limits`, a section the stored patch's first brief hunk (`@@ -39,8 +39,9 @@`) covers to its last line. That hunk was regenerated in the stored-patch sections of all six brief copies so that both images carry the new bullet as a context line after the `No MCP tool exposes` line (`@@ -39,9 +39,10 @@`); the lines the hunk reverts are unchanged. The brief's other additions sit outside every recorded block and hunk.
+
+Rebased over #1158 (feature-review-workflow coverage step): the TypeScript, Python, and PowerShell coverage commands of `.claude/skills/feature-review-workflow/SKILL.md` and `.agents/skills/feature-review-workflow/SKILL.md` now name the test-execution launcher suites `jest`, `pytest`, and `pester`, and the `If coverage artifacts already exist` line states the queue re-run rule. Every stored-patch hunk line of this entry that carried one of those four lines, in the feature-review-workflow sections of the sources and their bundle copies, was regenerated with the new text in both images; line counts and the lines the hunks revert are unchanged.
+
+Rebased over #1158 (atomic-executor agents): the `Bash(poetry run pytest *)` and `Bash(npx jest *)` tool entries of the executor agents became the two test-execution launcher entries, and the `## Toolchain Commands` TypeScript line names the launcher `jest` suite. The stored-patch hunk lines of the `.claude/agents/atomic-executor.md` and `.codex/agents/atomic-executor.toml` sections (and their bundle and generated-variant sections) that carried those lines were regenerated in both images; the `poetry run pytest -n auto` and `Invoke-PoshQCParallelTest` lines they revert are unchanged.
+
+Rebased over #1158 (`tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`): the file gains the D13 token set `$script:D13Required`, the forbidden sets `$script:ExecutorRouteForbidden` and `$script:ReviewLauncherForbidden`, the D13 tokens in its `PLAN-`, `QA-PS-`, `QA-PY-`, and four `REVIEW-` rows, the launcher route in its `EXEC-` rows, and 32 new rows. The same structural edit was applied to both images: the `0006` hunks on this file were regenerated as the difference between the edited pre-`0006` text and the edited live text, and the `0001` creation hunk now carries the edited pre-`0006` text, so reversing the `0006` hunks yields exactly the `0001` creation text.
+
+Rebased over #1158 (remediation cycle 1, launcher toolchain lines): the `## Toolchain Commands` Python line of `.claude/agents/atomic-executor.md` and `.codex/agents/atomic-executor.toml` names the launcher `pytest` suite, which runs `poetry run pytest -n auto`, and the PowerShell line names the launcher `pester` suite as the route of the `Invoke-PoshQCParallelTest` gate. In the stored-patch hunks `@@ -77,9 +77,9 @@` of the `.claude` agent and `@@ -89,9 +89,9 @@` of the Codex agent, their bundle copies, and the five generated variants, the two `+` lines carry the new text; the `-` lines they revert are unchanged. Step 4 of `## Toolchain Execution Sequence` in `.claude/skills/python-qa-gate/SKILL.md` and `.agents/skills/python-qa-gate/SKILL.md`, and the step 4 test command of `### 7.1 Python policy and toolchain gates` in `.github/agents/python-atomic-executor.agent.md`, name the launcher `pytest` suite followed by the coverage arguments; the `+` line of each in hunks `@@ -30,39 +30,38 @@` and `@@ -263,7 +263,7 @@`, and in their bundle-copy sections, carries the new text, and the `-` lines are unchanged. `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` gains `$script:DirectPytestForbidden`, the `PGW-LAUNCHER-` rows, and the `PGW-SCOPED-` rows, and its `0006` hunks and `0001` creation hunk were regenerated by the same structural-edit rule as the paragraph above.
+
 ## Reason and Evidence
 
 The owner decided on 2026-11-06 that tests run in parallel only. The sequential run existed to detect and fix a leak that has since been fixed, and the overhead of multiple and sequential runs was judged unacceptable.
@@ -275,8 +293,8 @@ Paths of the #1096 landing. The six `execution-environment` copies listed above 
 - `scripts/dev_tools/atomic_executor/prompt_builder.py`: canonical, with a Revert Block
 - `scripts/dev_tools/atomic_executor/qc_runner.py`: canonical, with Revert Blocks
 - `scripts/dev_tools/atomic_executor/qc_toolchain.py`: canonical, with a Revert Block
-- `scripts/dev_tools/fix_all_branches.py`: canonical, with Revert Blocks
-- `scripts/dev_tools/fix_all_branches_extra.py`: canonical, with a Revert Block
+- `scripts/dev_tools/fix_all_branches.py`: canonical, with a Revert Block (one block removed when #1158 moved its command into the launcher)
+- `scripts/dev_tools/fix_all_branches_extra.py`: canonical; its Revert Block was removed when #1158 moved its command into the launcher
 - `tests/scripts/dev_tools/atomic_executor/test_cli_part2_part2.py`: contract test, with a Revert Block
 - `tests/scripts/dev_tools/atomic_executor/test_cli_part3.py`: contract test, with Revert Blocks
 - `tests/scripts/dev_tools/atomic_executor/test_prompt_builder.py`: contract test, with a Revert Block
@@ -403,7 +421,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ### Revert Block: .vscode/tasks.json
 
 ````Current
-			"command": "poetry",
+			"command": "pwsh",
 			"detail": "Runs the pytest suite in pytest-xdist workers (-n auto on the command line, never in addopts).",
 			"group": {
 				"isDefault": true,
@@ -413,7 +431,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ````
 
 ````Prior
-			"command": "poetry",
+			"command": "pwsh",
 			"detail": "Runs the pytest suite in pytest-xdist workers (-n auto on the command line, never in addopts).",
 			"group": {
 				"isDefault": false,
@@ -479,70 +497,29 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ### Revert Block: scripts/dev_tools/fix_all_branches.py
 
 ````Current
-    if not api.run_simple_step(
+    if not run_launcher_test_step(
         step_number=4,
         description="Running PowerShell tests (Pester, parallel shards)...",
         step_name="PoshQC: test",
         success_message="PowerShell tests passed",
         failure_message="PowerShell tests failed. Please review errors above.",
-        # The gate is one Invoke-PoshQCParallelTest run; the process exits with
-        # the run's ExitCode so a failed shard fails the step (issue #1096).
-        command=[
-            "pwsh",
+        suite="pester",
 ````
 
 ````Prior
-    if not api.run_simple_step(
+    if not run_launcher_test_step(
         step_number=4,
         description="Running PowerShell tests (Pester)...",
         step_name="PoshQC: test",
         success_message="PowerShell tests passed",
         failure_message="PowerShell tests failed. Please review errors above.",
-        command=[
-            "pwsh",
-````
-
-### Revert Block: scripts/dev_tools/fix_all_branches.py
-
-````Current
-            "-Command",
-            "Import-Module './scripts/powershell/PoshQC'; "
-            "exit (Invoke-PoshQCParallelTest -Root '.').ExitCode",
-        ],
-        runner=branch_runner,
-````
-
-````Prior
-            "-Command",
-            "Import-Module './scripts/powershell/PoshQC'; "
-            "Invoke-PoshQCTest -Root '.'",
-        ],
-        runner=branch_runner,
-````
-
-### Revert Block: scripts/dev_tools/fix_all_branches_extra.py
-
-````Current
-        )
-
-    # The suite runs on parallel workers with and without coverage (issue #1096).
-    pytest_command: list[str] = ["poetry", "run", "pytest", "-n", "auto"]
-    pytest_step_name = (
-        "Pytest: test with coverage" if include_coverage else "Pytest: test"
-````
-
-````Prior
-        )
-
-    pytest_command: list[str] = ["poetry", "run", "pytest"]
-    pytest_step_name = (
-        "Pytest: test with coverage" if include_coverage else "Pytest: test"
+        suite="pester",
 ````
 
 ### Revert Block: scripts/dev_tools/atomic_executor/cli_preflight.py
 
 ````Current
-                    "run",
+                    *TEST_SUITE_LAUNCHER_ARGV,
                     "pytest",
                     "-n",
                     "auto",
@@ -552,7 +529,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ````
 
 ````Prior
-                    "run",
+                    *TEST_SUITE_LAUNCHER_ARGV,
                     "pytest",
                     "--color=no",
                     "--cov=scripts/dev_tools",
@@ -600,7 +577,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ### Revert Block: scripts/dev_tools/atomic_executor/qc_runner.py
 
 ````Current
-        "run",
+        *TEST_SUITE_LAUNCHER_ARGV,
         "pytest",
         "-n",
         "auto",
@@ -611,7 +588,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ````
 
 ````Prior
-        "run",
+        *TEST_SUITE_LAUNCHER_ARGV,
         "pytest",
         "--color=no",
         "--cov=scripts/dev_tools",
@@ -622,7 +599,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ### Revert Block: scripts/dev_tools/atomic_executor/qc_runner.py
 
 ````Current
-                "run",
+                *TEST_SUITE_LAUNCHER_ARGV,
                 "pytest",
                 "-n",
                 "auto",
@@ -631,7 +608,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 ````
 
 ````Prior
-                "run",
+                *TEST_SUITE_LAUNCHER_ARGV,
                 "pytest",
                 "--cov=scripts/dev_tools",
                 "--cov-report=term-missing",
@@ -670,8 +647,7 @@ The #1096 landing adds the blocks that follow those four. `Get-ProcessReductionR
 
 ````Current
 _PYTEST_STEP = [
-    "poetry",
-    "run",
+    *TEST_SUITE_LAUNCHER_ARGV,
     "pytest",
     "-n",
     "auto",
@@ -680,8 +656,7 @@ _PYTEST_STEP = [
 
 ````Prior
 _PYTEST_STEP = [
-    "poetry",
-    "run",
+    *TEST_SUITE_LAUNCHER_ARGV,
     "pytest",
     "--color=no",
 ````
@@ -715,6 +690,11 @@ class TestPreflightParallelCommand:
             )
 
         monkeypatch.setattr("subprocess.run", mock_run)
+        # Keep argv[0] bare so no case depends on pwsh being on PATH (#1158).
+        monkeypatch.setattr(
+            "scripts.dev_tools.atomic_executor.cli_preflight.shutil.which",
+            lambda name: name,
+        )
 
         _run_preflight_qc_with_capture(mem_fs_path)
 
@@ -773,7 +753,7 @@ class TestPreflightParallelCommand:
             max_loops=1,
         )
 
-        assert pytest_argv[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+        assert pytest_argv[:8] == [*TEST_SUITE_LAUNCHER_ARGV, "pytest", "-n", "auto"]
         assert "--cov=src/lexile_corpus_tuner" not in pytest_argv
 
     def test_python_toolchain_pytest_command_runs_xdist_workers(self) -> None:
@@ -794,7 +774,7 @@ class TestPreflightParallelCommand:
 ### Revert Block: tests/scripts/dev_tools/atomic_executor/test_qc_runner.py
 
 ````Current
-            "run",
+            *TEST_SUITE_LAUNCHER_ARGV,
             "pytest",
             "-n",
             "auto",
@@ -805,7 +785,7 @@ class TestPreflightParallelCommand:
 ````
 
 ````Prior
-            "run",
+            *TEST_SUITE_LAUNCHER_ARGV,
             "pytest",
             "--color=no",
             "--cov=scripts/dev_tools",
@@ -819,7 +799,7 @@ class TestPreflightParallelCommand:
 
 
 def test_powershell_test_step_runs_invoke_poshqc_parallel_test() -> None:
-    """PoshQC: test runs Invoke-PoshQCParallelTest and exits with its ExitCode."""
+    """PoshQC: test runs the launcher pester suite (Invoke-PoshQCParallelTest)."""
     # Arrange
     factory = FakeRunnerFactory(base_success_responses())
 
@@ -833,10 +813,8 @@ def test_powershell_test_step_runs_invoke_poshqc_parallel_test() -> None:
 
     # Assert
     commands = dict(factory.runners["powershell"].calls)
-    test_command = " ".join(commands["PoshQC: test"])
-    assert "Invoke-PoshQCParallelTest -Root '.'" in test_command
-    assert ".ExitCode" in test_command
-    assert "Invoke-PoshQCTest" not in test_command
+    assert commands["PoshQC: test"] == [*TEST_SUITE_LAUNCHER_ARGV, "pester"]
+    assert "-Suite" not in commands["PoshQC: test"]
 
 
 def _python_pytest_command(*, include_coverage: bool) -> list[str]:
@@ -855,16 +833,21 @@ def _python_pytest_command(*, include_coverage: bool) -> list[str]:
 
 
 def test_python_branch_pytest_runs_xdist_workers_with_coverage() -> None:
-    """run_python_branch passes -n auto when coverage is requested."""
+    """run_python_branch runs the launcher pytest suite (-n auto) with coverage."""
     command = _python_pytest_command(include_coverage=True)
-    assert command[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+    assert command == [
+        *TEST_SUITE_LAUNCHER_ARGV,
+        "pytest",
+        "--cov=scripts/dev_tools",
+        "--cov-report=term-missing",
+    ]
     assert "--cov=src/lexile_corpus_tuner" not in command
 
 
 def test_python_branch_pytest_runs_xdist_workers_without_coverage() -> None:
-    """run_python_branch passes -n auto when coverage is not requested."""
+    """run_python_branch runs the launcher pytest suite (-n auto) alone."""
     command = _python_pytest_command(include_coverage=False)
-    assert command == ["poetry", "run", "pytest", "-n", "auto"]
+    assert command == [*TEST_SUITE_LAUNCHER_ARGV, "pytest"]
 ````
 
 ````Prior

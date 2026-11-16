@@ -123,7 +123,7 @@ function Get-DocsValidationInputKind {
 function Read-DocsValidationArtifact {
     <#
     .SYNOPSIS
-        Decodes, schema-checks and parses one artifact of the Artifact map; returns @{ Path; Bytes; Value; Sha256; Findings } (private helper).
+        Decodes, schema-checks and parses one artifact of the Artifact map; returns @{ Path; Bytes; Value; Sha256; Findings }, Sha256 from Get-DocsTextSha256Hex (private helper).
     .DESCRIPTION
         Artifact maps a kind to @{ Path; Bytes } or $null. An absent artifact yields one
         DOCS_INPUT_UNREADABLE error at ExpectedPath and a null Value; a parse or schema finding
@@ -151,7 +151,7 @@ function Read-DocsValidationArtifact {
     $findings = Test-DocsArtifactText -ArtifactKind $ArtifactKind -JsonText $text -ComposedSchemaSet $ComposedSchemaSet -ArtifactPath $path
     $value = $null
     if (@($findings).Count -eq 0) { $value = (ConvertFrom-DocsJsonText -Text $text -ArtifactPath $path).Value }
-    return @{ Path = $path; Bytes = $raw; Value = $value; Sha256 = (Get-DocsBytesSha256Hex -Bytes $raw); Findings = [object[]]@($findings) }
+    return @{ Path = $path; Bytes = $raw; Value = $value; Sha256 = (Get-DocsTextSha256Hex -Bytes $raw); Findings = [object[]]@($findings) }
 }
 
 function Get-DocsValidationArtifactPath {

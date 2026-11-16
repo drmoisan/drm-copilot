@@ -43,9 +43,10 @@ function Invoke-DocsRoleOutputValidation {
     .SYNOPSIS
         Reads the SubagentStop envelope, validates a documentation role's output and applies the re-entry policy.
     .DESCRIPTION
-        Each docs-profile, docs-snapshot, and docs-pages-written value is probed beneath the item
-        worktree that Resolve-SubagentStopTargetWorktree resolves from the envelope (issue #1163);
-        an unresolved present identity blocks repairably before any probe, and with no identity
+        Each docs-profile and docs-pages-written value is probed beneath the item worktree that
+        Resolve-SubagentStopTargetWorktree resolves from the envelope (issue #1163); the
+        docs-snapshot value is checked for relative form only and is not probed (issue #1173).
+        An unresolved present identity blocks repairably before any probe, and with no identity
         the repository-relative probe is unchanged.
     .PARAMETER InputText
         The envelope text; omit to read standard input.

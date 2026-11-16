@@ -55,4 +55,38 @@ Describe '.vscode/tasks.json quality task invariants' {
             $script:TaskByLabel.ContainsKey($serial) | Should -BeTrue -Because "'$serial' stays for debugging one failure"
         }
     }
+
+    # Issue #1158 (spec D18, D27): the parallel test tasks start the test-execution launcher with the
+    # suite name as the first script argument, and every argument survives the shell task's word joining.
+    It 'VT-TEST-TASKS-USE-LAUNCHER runs <Label> through Invoke-TestSuite.ps1 with suite <Suite>' -ForEach @(
+        @{ Label = 'QC: 4 Pytest: run tests (parallel)'; Suite = 'pytest'; Coverage = $false }
+        @{ Label = 'QC: 4 Pytest: run tests with coverage (parallel)'; Suite = 'pytest'; Coverage = $false }
+        @{ Label = 'PoshQC: 4 test (Pester, parallel)'; Suite = 'pester'; Coverage = $false }
+        @{ Label = 'Shell QC: 4 bats: run tests'; Suite = 'bats'; Coverage = $false }
+        @{ Label = 'TS: 4 Jest: unit tests'; Suite = 'jest'; Coverage = $false }
+        @{ Label = 'TS: 4 Jest: unit tests with coverage'; Suite = 'jest'; Coverage = $true }
+    ) {
+        $task = $script:TaskByLabel[$Label]
+        $taskArgs = @($task.args | ForEach-Object { [string] $_ })
+        $commandText = (@([string] $task.command) + $taskArgs) -join ' '
+
+        $task.command | Should -Be 'pwsh'
+        $taskArgs | Should -Contain '-File'
+        $commandText | Should -Match ('Invoke-TestSuite\.ps1 ' + [regex]::Escape($Suite) + '(\s|$)')
+        $taskArgs | Should -Not -Contain '-Suite'
+        ($taskArgs -contains '--coverage') | Should -Be $Coverage -Because 'only the Jest coverage task passes --coverage'
+        foreach ($argument in $taskArgs) {
+            $argument | Should -Not -Match '[\s"''`;&|$]' -Because "'$argument' must reach pwsh as one word"
+        }
+    }
+
+    It 'VT-SERIAL-TASKS-DIRECT keeps <Label> off the launcher' -ForEach @(
+        @{ Label = 'QC: 4 Pytest: run tests' }
+        @{ Label = 'QC: 4 Pytest: run tests with coverage' }
+        @{ Label = 'PoshQC: 4 test (Pester)' }
+    ) {
+        $task = $script:TaskByLabel[$Label]
+        $commandText = (@([string] $task.command) + @($task.args | ForEach-Object { [string] $_ })) -join ' '
+        $commandText | Should -Not -Match 'Invoke-TestSuite\.ps1' -Because 'the launcher rejects worker reduction (D9)'
+    }
 }

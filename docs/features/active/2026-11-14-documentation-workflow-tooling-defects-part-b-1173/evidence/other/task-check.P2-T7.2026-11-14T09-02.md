@@ -1,0 +1,11 @@
+# Task Check P2-T7
+
+Timestamp: 2026-11-14T09-02
+Command: sh SCRATCH/issue-1173-p2t7.sh (one-shot edit of the twelve skill copies, guarded against re-application); sh SCRATCH/issue-1173-taskcheck.sh issue-1173-sel-p2t7.txt p2t7-before / p2t7-after (New-PesterConfiguration, Run.Path = selection, Run.Exit = $true); sh SCRATCH/issue-1173-pymirror.sh (test_push_down_claude_resource_contracts.py and test_push_down_codex_and_agents_resource_contracts.py, pytest -n auto); cmp of each source and bundle pair
+EXIT_CODE: 0
+Output Summary:
+- Changed files: the six copies of docs-init/SKILL.md (## Steps, inside step 2: init adds the CI workflow .github/workflows/_docs-quality.yml and reports it on a ci-workflow <path> line and in the ci_workflow field; the starter documentation root docs/guide with id guide; the source-root detection src, else the pyproject.toml package directory, else src; DOCS_PROFILE_SOURCE_ROOT_MISSING with exit 1 while the files are still written. ## Result names the CI workflow and its ci-workflow line), the six copies of docs-inventory-surface/SKILL.md (## Steps: the default excluded segments and the .pyc and .pyo suffixes, applied before the profile exclusions), tests/scripts/claude-runtime/docs-authoring-roles.WorkflowText.Tests.ps1 (18 section-scoped rows and .DESCRIPTION). Host copies carry no .claude/ text. The Linter Configuration section and the issue #1169 docs-init token row are unchanged.
+- Selection rule: the contract tests that read the changed Markdown paths (grep of tests/ for docs-init/SKILL, docs-inventory-surface/SKILL and the skill names): docs-authoring-roles.WorkflowText, Skills, Mirrors and Registration suites and DocumentationEstateOnboarding.Tests.ps1; plus the resource-contract pytest pair.
+- Parity: cmp shows each source equals its bundle copy for both skills; the .agents and .github docs-init copies are identical; the .agents and .github docs-inventory-surface copies differ only in the agent link on line 10, as at HEAD.
+- Fail-before (rows written first, skills unchanged): exit 18; 18 failed, the new rows of all six copies of the three sections.
+- Pass-after: exit 0; 251 passed, 0 failed, 0 skipped. Resource contracts: 23 passed.

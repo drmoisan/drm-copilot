@@ -30,7 +30,10 @@ const FIELD_DESCRIPTIONS: Readonly<Record<string, string>> = {
   analyzers:
     "Analyzer identifiers to run; all configured analyzers when omitted.",
   revision: "Full 40- or 64-character lowercase hexadecimal revision.",
-  operation: "Ledger operation.",
+  operation:
+    "Ledger operation; exactly one of operation and operations is given.",
+  operations:
+    "Batch of ledger operations (issue #1173), each an object with the operation fields of this tool; sync-refs is not a batch item. Sent to update-ledger -Operations - on standard input and applied all-or-nothing: one load, one rule comparison, one write.",
   element: "Element id (<kind>-<sha256>).",
   limit:
     "Diagnostic identifier with the diagnostic- prefix; the alternative to element for set-disposition and remove-entry.",
@@ -48,6 +51,8 @@ const FIELD_DESCRIPTIONS: Readonly<Record<string, string>> = {
   write: "Commit the ledger change; the default false is a dry run.",
   snapshot: "Workspace-relative inventory snapshot path.",
   output_directory: "Workspace-relative output directory for the dry run.",
+  path_prefixes:
+    "Workspace-relative path prefixes (issue #1173); only snapshot elements whose path starts with one of them are generated. All elements when omitted.",
   mode: "Validation mode.",
 };
 
@@ -65,6 +70,13 @@ function fieldSchema(row: DocsInputRow): object {
         type: "array",
         items: { type: "string", minLength: 1 },
         ...(row.spec.unique ? { uniqueItems: true } : {}),
+        description,
+      };
+    case "object-array":
+      return {
+        type: "array",
+        items: { type: "object" },
+        minItems: 1,
         description,
       };
   }

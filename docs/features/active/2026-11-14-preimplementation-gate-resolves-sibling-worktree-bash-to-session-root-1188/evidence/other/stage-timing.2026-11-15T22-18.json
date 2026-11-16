@@ -1,0 +1,113 @@
+{
+  "issue-num": "1188",
+  "stage_timing": [
+    {
+      "stage": "S2_research",
+      "attempt": 1,
+      "started_at": "2026-11-14T18:14:51Z",
+      "ended_at": "2026-11-14T18:26:19Z"
+    },
+    {
+      "stage": "S3_feature_documents",
+      "attempt": 1,
+      "started_at": "2026-11-14T18:26:19Z",
+      "ended_at": "2026-11-14T18:30:53Z"
+    },
+    {
+      "stage": "S4_atomic_planning",
+      "attempt": 1,
+      "started_at": "2026-11-14T18:30:53Z",
+      "ended_at": "2026-11-14T23:57:04Z"
+    },
+    {
+      "stage": "S4_preflight",
+      "attempt": 1,
+      "started_at": "2026-11-14T18:40:13Z",
+      "ended_at": "2026-11-14T20:22:49Z"
+    },
+    {
+      "stage": "S4_preflight",
+      "attempt": 2,
+      "started_at": "2026-11-14T20:22:49Z",
+      "ended_at": "2026-11-14T20:32:05Z"
+    },
+    {
+      "stage": "S4_planner_revision",
+      "attempt": 1,
+      "started_at": "2026-11-14T20:32:05Z",
+      "ended_at": "2026-11-14T20:38:46Z"
+    },
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 1,
+      "started_at": "2026-11-14T20:38:46Z",
+      "ended_at": "2026-11-14T23:20:30Z"
+    },
+    {
+      "stage": "S8_create_pr",
+      "attempt": 1,
+      "started_at": "2026-11-14T23:20:30Z",
+      "ended_at": "2026-11-14T23:25:57Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 1,
+      "started_at": "2026-11-14T23:25:57Z",
+      "ended_at": "2026-11-14T23:56:33Z"
+    },
+    {
+      "stage": "remediation.cycle_1",
+      "attempt": 1,
+      "started_at": "2026-11-14T23:56:33Z",
+      "ended_at": "2026-11-14T23:57:04Z"
+    },
+    {
+      "stage": "remediation.cycle_1",
+      "attempt": 2,
+      "started_at": "2026-11-15T16:38:13Z",
+      "ended_at": "2026-11-15T17:20:22Z"
+    },
+    {
+      "stage": "remediation.cycle_1",
+      "attempt": 3,
+      "started_at": "2026-11-15T17:20:22Z",
+      "ended_at": "2026-11-15T20:12:47Z"
+    },
+    {
+      "stage": "remediation.cycle_2",
+      "attempt": 1,
+      "started_at": "2026-11-15T20:12:47Z",
+      "ended_at": "2026-11-15T20:39:29Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 2,
+      "started_at": "2026-11-15T20:39:29Z",
+      "ended_at": "2026-11-15T21:05:08Z"
+    },
+    {
+      "stage": "remediation.cycle_3",
+      "attempt": 1,
+      "started_at": "2026-11-15T21:05:08Z",
+      "ended_at": "2026-11-15T21:31:03Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 3,
+      "started_at": "2026-11-15T21:31:03Z",
+      "ended_at": "2026-11-15T21:54:32Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 4,
+      "started_at": "2026-11-15T22:04:25Z",
+      "ended_at": "2026-11-15T22:18:21Z"
+    },
+    {
+      "stage": "S9_ci_green",
+      "attempt": 1,
+      "started_at": "2026-11-15T22:18:21Z",
+      "ended_at": null
+    }
+  ]
+}

@@ -15,6 +15,9 @@ from unittest.mock import Mock
 import pytest
 
 from scripts.dev_tools.atomic_executor.qc_runner import QCRunner, QCToolResult
+from scripts.dev_tools.atomic_executor.qc_runner_expectations import (
+    TEST_SUITE_LAUNCHER_ARGV,
+)
 
 if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
@@ -251,7 +254,7 @@ class TestQCRunnerFullLoop:
             max_loops=1,
         )
 
-        assert pytest_argv[:5] == ["poetry", "run", "pytest", "-n", "auto"]
+        assert pytest_argv[:8] == [*TEST_SUITE_LAUNCHER_ARGV, "pytest", "-n", "auto"]
         assert "--cov=src/lexile_corpus_tuner" not in pytest_argv
 
     def test_python_toolchain_pytest_command_runs_xdist_workers(self) -> None:
@@ -433,8 +436,7 @@ class TestQCRunnerRunFull:
         assert calls[1] == ["poetry", "run", "ruff", "check"]
         assert calls[2] == ["poetry", "run", "pyright"]
         assert calls[3] == [
-            "poetry",
-            "run",
+            *TEST_SUITE_LAUNCHER_ARGV,
             "pytest",
             "-n",
             "auto",
@@ -474,7 +476,7 @@ class TestQCRunnerRunFull:
             ["npm", "run", "format"],
             ["npm", "run", "lint"],
             ["npm", "run", "typecheck"],
-            ["npm", "run", "test:unit"],
+            [*TEST_SUITE_LAUNCHER_ARGV, "jest"],
         ]
 
     def test_run_full_raises_on_tool_failure(

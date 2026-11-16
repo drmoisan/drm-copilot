@@ -409,12 +409,13 @@
 		},
 		{
 			"args": [
-				"run",
-				"pytest",
-				"-n",
-				"auto"
+				"-NoProfile",
+				"-NonInteractive",
+				"-File",
+				".claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1",
+				"pytest"
 			],
-			"command": "poetry",
+			"command": "pwsh",
 			"detail": "Runs the pytest suite in pytest-xdist workers (-n auto on the command line, never in addopts).",
 			"group": {
 				"isDefault": true,
@@ -432,17 +433,18 @@
 		},
 		{
 			"args": [
-				"run",
+				"-NoProfile",
+				"-NonInteractive",
+				"-File",
+				".claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1",
 				"pytest",
-				"-n",
-				"auto",
 				"--cov-branch",
 				"--cov-report=term-missing",
 				"--cov-report=lcov:artifacts/python/lcov.info",
 				"--cov"
 			],
-			"command": "poetry",
-			"detail": "Runs the pytest suite in pytest-xdist workers with branch coverage and the lcov report.",
+			"command": "pwsh",
+			"detail": "Runs the pytest suite in pytest-xdist workers with branch coverage and the lcov report through the test-execution launcher.",
 			"group": {
 				"isDefault": false,
 				"kind": "test"
@@ -545,11 +547,14 @@
 		},
 		{
 			"args": [
-				"scripts/bash/shell-qc.sh",
-				"test"
+				"-NoProfile",
+				"-NonInteractive",
+				"-File",
+				".claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1",
+				"bats"
 			],
-			"command": "bash",
-			"detail": "Runs bats tests under tests/shell or tests/bash when present.",
+			"command": "pwsh",
+			"detail": "Runs bats tests under tests/shell or tests/bash when present, through the test-execution launcher.",
 			"group": {
 				"isDefault": false,
 				"kind": "test"
@@ -691,12 +696,11 @@
 		},
 		{
 			"args": [
-				"-NoLogo",
 				"-NoProfile",
-				"-ExecutionPolicy",
-				"Bypass",
-				"-Command",
-				"& { Import-Module '${workspaceFolder}/scripts/powershell/PoshQC'; exit (Invoke-PoshQCParallelTest -Root '${workspaceFolder}').ExitCode }"
+				"-NonInteractive",
+				"-File",
+				".claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1",
+				"pester"
 			],
 			"command": "pwsh",
 			"detail": "Runs the Pester suite as concurrent shard processes and merges the JUnit and coverage output.",
@@ -1353,10 +1357,13 @@
 		},
 		{
 			"args": [
-				"run",
-				"test:unit"
+				"-NoProfile",
+				"-NonInteractive",
+				"-File",
+				".claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1",
+				"jest"
 			],
-			"command": "npm",
+			"command": "pwsh",
 			"group": {
 				"isDefault": false,
 				"kind": "test"
@@ -1373,11 +1380,15 @@
 		},
 		{
 			"args": [
-				"run",
-				"test:unit:coverage"
+				"-NoProfile",
+				"-NonInteractive",
+				"-File",
+				".claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1",
+				"jest",
+				"--coverage"
 			],
-			"command": "npm",
-			"detail": "Runs Jest unit tests with coverage and writes coverage/lcov.info.",
+			"command": "pwsh",
+			"detail": "Runs Jest unit tests with coverage through the test-execution launcher and writes coverage/lcov.info.",
 			"group": {
 				"isDefault": false,
 				"kind": "test"

@@ -155,6 +155,8 @@ Describe 'generate-reference write mode' {
         Get-TestPageField -Envelope $run.Envelope -Field 'status' | Should -Be @("$($script:Api)=created", "$($script:Cli)=updated", "$($script:Config)=created", "$($script:Http)=created")
         $run.Envelope['result']['mode'] | Should -BeExactly 'write'
         @($run.Envelope['result']['pages'] | Where-Object { $null -ne $_['diff'] }).Count | Should -Be 0
+        # Issue #1173 B5: the output directory is listed once so that existing split pages are candidates.
+        @($run.Memory.CallLog | Where-Object { $_ -ceq 'ListFile docs/reference' }).Count | Should -Be 1
     }
 
     It 'prints one DOCS_PAGE_ORPHAN note per created page and the wrote line' {
@@ -306,8 +308,8 @@ Describe 'generate-reference dispatch row' {
         $row[0].Function | Should -BeExactly 'Invoke-DocsGenerateReferenceCommand'
         [string[]] $optionName = @($row[0].Option.Keys | ForEach-Object { [string] $_ })
         [Array]::Sort($optionName, [System.StringComparer]::Ordinal)
-        $optionName | Should -Be @('OutputDirectory', 'Profile', 'Snapshot', 'Write')
-        @('OutputDirectory', 'Profile', 'Snapshot', 'Write' | ForEach-Object { $row[0].Option[$_] }) | Should -Be @('value', 'value', 'value', 'switch')
+        $optionName | Should -Be @('OutputDirectory', 'PathPrefix', 'Profile', 'Snapshot', 'Write')
+        @('OutputDirectory', 'PathPrefix', 'Profile', 'Snapshot', 'Write' | ForEach-Object { $row[0].Option[$_] }) | Should -Be @('value', 'multi', 'value', 'value', 'switch')
         [object[]] $tableFinding = Test-DocsCommandTable -Table $table
         $tableFinding.Count | Should -Be 0
     }

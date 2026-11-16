@@ -234,6 +234,28 @@ Describe 'Get-DocsReferenceCandidatePagePath' {
             ($second -join ',') | Should -BeExactly ($first -join ',') -Because "seed $Seed"
         }
     }
+
+    It 'adds exactly the listed one-level split pages of the family stems, ordinal and duplicate-free (seed <Seed>)' -ForEach @(@{ Seed = 11 }, @{ Seed = 23 }, @{ Seed = 47 }) {
+        # Arrange (issue #1173 B5: split directories are now listed)
+        $random = [System.Random]::new($Seed)
+        $stems = @('api-reference', 'cli-reference', 'config-reference', 'http-reference', 'other')
+        $listed = [System.Collections.Generic.List[string]]::new()
+        for ($draw = 0; $draw -lt 30; $draw++) {
+            $stem = $stems[$random.Next($stems.Count)]
+            $leaf = @("g$($random.Next(5)).md", "g$($random.Next(5)).txt", "d/g$($random.Next(5)).md")[$random.Next(3)]
+            $listed.Add("docs/reference/$stem/$leaf")
+        }
+        [string[]] $expectedSplit = @($listed | Where-Object { $_ -cmatch '^docs/reference/(?:api|cli|config|http)-reference/[^/]+\.md$' } | Select-Object -Unique)
+
+        # Act
+        $paths = Get-DocsReferenceCandidatePagePath -OutputDirectory 'docs/reference' -ListedPath $listed.ToArray()
+
+        # Assert
+        # The candidate function returns with the unary comma; the assignment unwraps it.
+        [string[]] $family = Get-DocsReferenceCandidatePagePath -OutputDirectory 'docs/reference'
+        [string[]] $expected = @($family) + @($expectedSplit)
+        ($paths -join ',') | Should -BeExactly ((Get-TestOrdinalSorted -Item $expected) -join ',') -Because "seed $Seed"
+    }
 }
 
 Describe 'Get-DocsReferencePagePlan' {

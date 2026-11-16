@@ -1,0 +1,50 @@
+[
+  {
+    "stage": "research",
+    "attempt": 1,
+    "started_at": "2026-11-14T10:34:14Z",
+    "ended_at": "2026-11-14T10:47:47Z"
+  },
+  {
+    "stage": "spec",
+    "attempt": 1,
+    "started_at": "2026-11-14T10:47:47Z",
+    "ended_at": "2026-11-14T10:55:54Z"
+  },
+  {
+    "stage": "plan",
+    "attempt": 1,
+    "started_at": "2026-11-14T10:55:54Z",
+    "ended_at": "2026-11-14T11:30:11Z"
+  },
+  {
+    "stage": "execute",
+    "attempt": 1,
+    "started_at": "2026-11-14T11:30:11Z",
+    "ended_at": "2026-11-14T15:13:50Z"
+  },
+  {
+    "stage": "pr",
+    "attempt": 1,
+    "started_at": "2026-11-14T15:15:30Z",
+    "ended_at": "2026-11-14T15:18:25Z"
+  },
+  {
+    "stage": "review",
+    "attempt": 1,
+    "started_at": "2026-11-14T15:18:25Z",
+    "ended_at": "2026-11-14T15:31:49Z"
+  },
+  {
+    "stage": "remediation",
+    "attempt": 1,
+    "started_at": "2026-11-14T15:33:30Z",
+    "ended_at": "2026-11-14T17:49:19Z"
+  },
+  {
+    "stage": "ci",
+    "attempt": 1,
+    "started_at": "2026-11-14T16:59:32Z",
+    "ended_at": "2026-11-14T17:30:39Z"
+  }
+]
