@@ -1,0 +1,111 @@
+# Phase Gate P1 (P1-T5)
+
+Timestamp: 2026-11-16T00-08
+Command: (1) sh SCRATCH/issue-1195-static.sh repo: Invoke-PoshQCFormat over the repository with a no-op -WriteFile seam (the formatter has no check mode; Formatted: log lines are the drift count) and Invoke-ScriptAnalyzer -Settings scripts/powershell/PoshQC/settings/pssa.settings.psd1 -Severity Error, Warning, Information over every .ps1 and .psm1 from Get-PoshQCFileList, with git status --porcelain captured before and after; (2) sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester (one Invoke-PoshQCParallelTest; stage 4 architecture and stage 6 contract checks, including the classify, commands, and gate Parity.Tests.ps1 files, run inside it); (3) env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh with the python suite (one -n auto run)
+EXIT_CODE: 1
+ExpectedExitCode: 1
+Output Summary:
+- Stage 1 format: 1793 files checked, would change 0; git status --porcelain identical before and after.
+- Stage 2 PSScriptAnalyzer: 1783 files, 0 findings.
+- Stage 3 type check: not applicable to PowerShell; no Python or TypeScript source changed.
+- Stages 4 to 6 Pester gate: Invoke-PoshQCParallelTest workers=8, wall-clock 583.46 s, exit code 1 (shards 4 and 8 exit 47; no merged artifact written, as expected for a run with failures). Per-shard JUnit (artifacts/pester/parallel/shard-1..8, all written by this run): 27483 tests, 27371 passed, 94 failed, 0 errors, 18 skipped (the same 18 skips as the Phase 0 baseline; 27483 = 27341 baseline + 142 new cases).
+- The 94 failures are exactly the expected [expect-fail] set made to pass by Phase 2: the 16 Positive rows of ClassifyWrappedGateRows and the 31 rows of ClassifyWrappedFunctionRows, on each of the claude-hooks and codex-hooks classify suites (listed below). Every other Pester test passes.
+- python suite gate: 16957 passed, 6 skipped, 0 failed; equal to the P0-T3 list (no failures).
+- The phase closes on this pass: no stage auto-fixed a file.
+
+## Expected failures by name (surface: test name)
+
+- claude: classifies wrapped Positive row bash -c "bash -c 'pytest'" as $true
+- claude: classifies wrapped Positive row bash -c "npx jest" as $true
+- claude: classifies wrapped Positive row bash -c "pwsh -File tests/scripts/x.Tests.ps1" as $true
+- claude: classifies wrapped Positive row bash -c 'ruff check .' as $true
+- claude: classifies wrapped Positive row bash -lc "pyright" as $true
+- claude: classifies wrapped Positive row echo x | xargs sh -c 'pytest' as $true
+- claude: classifies wrapped Positive row env -u VIRTUAL_ENV bash -c "pytest" as $true
+- claude: classifies wrapped Positive row eval "pytest" as $true
+- claude: classifies wrapped Positive row powershell -Command "npx eslint ." as $true
+- claude: classifies wrapped Positive row pwsh -Command "npm run lint" as $true
+- claude: classifies wrapped Positive row pwsh -CommandWithArgs "pytest" as $true
+- claude: classifies wrapped Positive row pwsh -NoProfile -c "pytest" as $true
+- claude: classifies wrapped Positive row sh -c "npm --prefix $(pwd) run lint" as $true
+- claude: classifies wrapped Positive row sh -c "npm run lint" as $true
+- claude: classifies wrapped Positive row sh -c "pytest -q" as $true
+- claude: classifies wrapped Positive row timeout 600 sh -c 'npx jest' as $true
+- claude: W ascending distinct union of two indexes
+- claude: W command prefix
+- claude: W empty command
+- claude: W env -C DIR
+- claude: W env --chdir DIR separate value
+- claude: W env -S split string is declined
+- claude: W env -u NAME
+- claude: W env --unset NAME separate value
+- claude: W env --unset=NAME
+- claude: W eval payload
+- claude: W hit that stage 2 later drops
+- claude: W index 0 is never returned
+- claude: W masked mention in a payload
+- claude: W nested payload at depth 4
+- claude: W nested payload at depth 5
+- claude: W nohup prefix
+- claude: W option bundle -lc
+- claude: W payload matched through the supplement only
+- claude: W plain sh -c payload
+- claude: W pwsh -Command prefix
+- claude: W pwsh -CommandWithArgs
+- claude: W pwsh -cwa
+- claude: W pwsh -e encoded command is declined
+- claude: W pwsh -ec encoded command is declined
+- claude: W repeated index is returned once
+- claude: W segment with no wrapper
+- claude: W time -p prefix
+- claude: W timeout prefix
+- claude: W unbalanced payload quote yields no payload
+- claude: W variable payload
+- claude: W xargs injected words
+- codex: classifies wrapped Positive row bash -c "bash -c 'pytest'" as $true
+- codex: classifies wrapped Positive row bash -c "npx jest" as $true
+- codex: classifies wrapped Positive row bash -c "pwsh -File tests/scripts/x.Tests.ps1" as $true
+- codex: classifies wrapped Positive row bash -c 'ruff check .' as $true
+- codex: classifies wrapped Positive row bash -lc "pyright" as $true
+- codex: classifies wrapped Positive row echo x | xargs sh -c 'pytest' as $true
+- codex: classifies wrapped Positive row env -u VIRTUAL_ENV bash -c "pytest" as $true
+- codex: classifies wrapped Positive row eval "pytest" as $true
+- codex: classifies wrapped Positive row powershell -Command "npx eslint ." as $true
+- codex: classifies wrapped Positive row pwsh -Command "npm run lint" as $true
+- codex: classifies wrapped Positive row pwsh -CommandWithArgs "pytest" as $true
+- codex: classifies wrapped Positive row pwsh -NoProfile -c "pytest" as $true
+- codex: classifies wrapped Positive row sh -c "npm --prefix $(pwd) run lint" as $true
+- codex: classifies wrapped Positive row sh -c "npm run lint" as $true
+- codex: classifies wrapped Positive row sh -c "pytest -q" as $true
+- codex: classifies wrapped Positive row timeout 600 sh -c 'npx jest' as $true
+- codex: W ascending distinct union of two indexes
+- codex: W command prefix
+- codex: W empty command
+- codex: W env -C DIR
+- codex: W env --chdir DIR separate value
+- codex: W env -S split string is declined
+- codex: W env -u NAME
+- codex: W env --unset NAME separate value
+- codex: W env --unset=NAME
+- codex: W eval payload
+- codex: W hit that stage 2 later drops
+- codex: W index 0 is never returned
+- codex: W masked mention in a payload
+- codex: W nested payload at depth 4
+- codex: W nested payload at depth 5
+- codex: W nohup prefix
+- codex: W option bundle -lc
+- codex: W payload matched through the supplement only
+- codex: W plain sh -c payload
+- codex: W pwsh -Command prefix
+- codex: W pwsh -CommandWithArgs
+- codex: W pwsh -cwa
+- codex: W pwsh -e encoded command is declined
+- codex: W pwsh -ec encoded command is declined
+- codex: W repeated index is returned once
+- codex: W segment with no wrapper
+- codex: W time -p prefix
+- codex: W timeout prefix
+- codex: W unbalanced payload quote yields no payload
+- codex: W variable payload
+- codex: W xargs injected words
