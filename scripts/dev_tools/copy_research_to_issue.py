@@ -19,16 +19,48 @@ import shutil
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
+from scripts.dev_tools.json_config import (
+    development_docs_relative_path,
+    resolve_development_docs_root,
+)
 from scripts.dev_tools.tk_dialog_helpers import (
     pick_file_with_tkinter,
     resolve_initial_dir,
     resolve_workspace_root,
 )
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 RESEARCH_START_DIR = Path("artifacts") / "research"
-ACTIVE_ISSUE_START_DIR = Path("docs") / "features" / "active"
+
+
+def resolve_active_issue_start_dir(
+    workspace_root: Path,
+    *,
+    resolve_root: Callable[[Path], str] = resolve_development_docs_root,
+) -> Path:
+    """Return the workspace-relative start directory of the issue picker.
+
+    Purpose:
+        Open the active-issue picker in the active area of the configured
+        development-docs root rather than a fixed ``docs/features`` path.
+
+    Args:
+        workspace_root (Path): Workspace root that holds the routing file.
+        resolve_root (Callable[[Path], str]): Resolver of the
+            development-docs root; injected so tests need no file system.
+
+    Returns:
+        Path: Relative path of the active area, for example
+        ``docs/features/active`` or ``.dev/active``.
+
+    Raises:
+        ValueError: When the routing file is malformed or names an unknown root.
+    """
+    return Path(development_docs_relative_path(resolve_root(workspace_root), "active"))
 
 
 class FileSystem(Protocol):
@@ -289,7 +321,7 @@ def main(argv: list[str] | None = None) -> None:
         title="Select active issue file (e.g., issue.md)",
         label="active issue document",
         fs=fs,
-        initial_relative_dir=ACTIVE_ISSUE_START_DIR,
+        initial_relative_dir=resolve_active_issue_start_dir(resolve_workspace_root()),
     )
 
     overwrite = bool(args.overwrite)

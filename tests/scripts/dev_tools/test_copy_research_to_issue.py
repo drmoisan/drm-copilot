@@ -142,3 +142,24 @@ def test_compute_tk_scaling_respects_explicit_override_multiplier() -> None:
     )
     expected = (96.0 / 72.0) * 1.5
     assert abs(scaling - expected) < 1e-9
+
+
+@pytest.mark.parametrize(
+    ("root", "expected"),
+    [("docs/features", Path("docs/features/active")), (".dev", Path(".dev/active"))],
+)
+def test_resolve_active_issue_start_dir_uses_resolved_root(
+    root: str, expected: Path
+) -> None:
+    """The issue picker starts in the active area of the resolved root."""
+    workspace = Path("/workspace")
+    seen: list[Path] = []
+
+    def resolve_root(path: Path) -> str:
+        seen.append(path)
+        return root
+
+    result = mod.resolve_active_issue_start_dir(workspace, resolve_root=resolve_root)
+
+    assert result == expected
+    assert seen == [workspace]

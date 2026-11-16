@@ -48,6 +48,23 @@ def test_iter_governed_files_empty(mem_fs_path: Path) -> None:
     assert result == []
 
 
+def test_governed_globs_include_dev_json() -> None:
+    """GOVERNED_GLOBS includes JSON under the .dev development-docs root."""
+    assert ".dev/**/*.json" in GOVERNED_GLOBS
+
+
+def test_iter_governed_files_finds_dev_json(mem_fs_path: Path) -> None:
+    """A JSON file under .dev/research is discovered as a governed file."""
+    research_dir = mem_fs_path / ".dev" / "research"
+    research_dir.mkdir(parents=True)
+    dev_json = research_dir / "x.json"
+    dev_json.write_text("{}")
+
+    result = list(iter_governed_files(mem_fs_path))
+
+    assert dev_json in result
+
+
 def test_iter_governed_files_excludes_vscode_json(mem_fs_path: Path) -> None:
     """Files in .vscode/*.json should NOT be found (JSONC, not pure JSON)."""
     vscode_dir = mem_fs_path / ".vscode"

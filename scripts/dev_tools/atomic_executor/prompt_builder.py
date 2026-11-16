@@ -17,6 +17,7 @@ from scripts.dev_tools.atomic_executor.plan_discovery import (
     resolve_feature_plan,
 )
 from scripts.dev_tools.atomic_executor.plan_parser import TASK_LINE_RE
+from scripts.dev_tools.json_config import development_docs_path
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -236,9 +237,10 @@ This execution uses model "{self.preferred_model}" for task completion.
         # Basic token replacement for template variables
         agent_name = "GitHub Copilot"
 
-        # Compute feature name as relative path from workspace/docs/features/active/
-        # (REQ-004 compliance: use full relative path, not just feature_dir.name)
-        active_root = self.workspace / "docs" / "features" / "active"
+        # Compute feature name as relative path from the active area of the
+        # configured development-docs root (REQ-004 compliance: use full
+        # relative path, not just feature_dir.name)
+        active_root = development_docs_path(self.workspace, "active")
         try:
             feature_name = feature_dir.relative_to(active_root).as_posix()
         except ValueError:

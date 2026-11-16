@@ -42,6 +42,7 @@ from scripts.dev_tools._orchestrator_state_promotion_tools import (
     BUG_PROMOTION_ENTRY_TOOL,
     FEATURE_PROMOTION_ENTRY_TOOL,
 )
+from scripts.dev_tools.json_config import known_root_prefixes
 
 if TYPE_CHECKING:
     from collections.abc import Collection, Sequence
@@ -79,7 +80,8 @@ PROMOTION_ENTRY_TOOLS: tuple[str, ...] = (
     FEATURE_PROMOTION_ENTRY_TOOL,
     BUG_PROMOTION_ENTRY_TOOL,
 )
-POTENTIAL_RECORD_PREFIX = "docs/features/potential/"
+# A potential record may live under either known development-docs root.
+POTENTIAL_RECORD_PREFIXES: tuple[str, ...] = known_root_prefixes("potential")
 POTENTIAL_RECORD_SUFFIX = ".md"
 # Origins whose promotion-entry waiver may omit the potential_record key (rule 9).
 RECORD_OPTIONAL_ORIGINS: frozenset[str] = frozenset(
@@ -272,7 +274,7 @@ def _potential_record_errors(
 
     record_is_valid = (
         isinstance(potential_record, str)
-        and potential_record.startswith(POTENTIAL_RECORD_PREFIX)
+        and potential_record.startswith(POTENTIAL_RECORD_PREFIXES)
         and potential_record.endswith(POTENTIAL_RECORD_SUFFIX)
     )
     if record_is_valid:

@@ -31,13 +31,17 @@ from __future__ import annotations
 import re
 from typing import Any, cast
 
+from scripts.dev_tools.json_config import known_root_prefixes
+
 # Lifecycle path prefixes a feature_folder hint may carry. A hint may point into
 # active/ or completed/; stripping the prefix yields the stable basename used as
 # the canonical resolution key, which is what lets a dependency expressed with
 # either lifecycle location resolve to the same feature.
+# Lifecycle prefixes of both known development-docs roots (matchers accept
+# the union).
 _LIFECYCLE_PREFIXES = (
-    "docs/features/active/",
-    "docs/features/completed/",
+    *known_root_prefixes("active"),
+    *known_root_prefixes("completed"),
     "active/",
     "completed/",
 )

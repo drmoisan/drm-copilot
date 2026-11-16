@@ -156,22 +156,22 @@
 
 ### Phase 4 — Python Consumers
 
-- [ ] [P4-T1] Route `scripts/dev_tools/new_potential_bug_entry.py`, `copy_research_to_issue.py` (`ACTIVE_ISSUE_START_DIR`), `atomic_executor/cli.py` and `atomic_executor/prompt_builder.py` (the `active_root` join in `build`; the QC command block stays unchanged, D-P21) through `development_docs_path`; `atomic_executor/cli_workspace.py` help and `atomic_executor/feature_resolver.py` messages from the resolver.
+- [x] [P4-T1] Route `scripts/dev_tools/new_potential_bug_entry.py`, `copy_research_to_issue.py` (`ACTIVE_ISSUE_START_DIR`), `atomic_executor/cli.py` and `atomic_executor/prompt_builder.py` (the `active_root` join in `build`; the QC command block stays unchanged, D-P21) through `development_docs_path`; `atomic_executor/cli_workspace.py` help and `atomic_executor/feature_resolver.py` messages from the resolver.
   - Tests: existing suites unchanged (`test_atomic_executor_cli.py` receives no case, D-P1); one `.dev` case each in `test_new_potential_bug_entry.py` and `test_copy_research_to_issue.py`.
   - Acceptance: affected modules pass.
-- [ ] [P4-T2] Route `scripts/dev_tools/pr_context/feature_docs.py`, `render_feature_excerpts.py`, `verification_evidence.py`, `summary_helpers.py` (union) and `collector.py` (add `.dev/` bucket), matching P3-T3.
+- [x] [P4-T2] Route `scripts/dev_tools/pr_context/feature_docs.py`, `render_feature_excerpts.py`, `verification_evidence.py`, `summary_helpers.py` (union) and `collector.py` (add `.dev/` bucket), matching P3-T3.
   - Tests: existing suites unchanged; `.dev` cases in `tests/scripts/dev_tools/pr_context/test_verification_evidence.py`, `tests/scripts/dev_tools/test_feature_docs.py` and `tests/scripts/dev_tools/test_collect_pr_context.py` (collector bucket, summary helper).
   - Acceptance: modules pass.
-- [ ] [P4-T3] Route to the union `scripts/dev_tools/epic_planner_readiness.py` (prefixes; manifest and kickoff paths through the resolver), `MANIFEST_RE` in `epic_kickoff_contract.py` and `parallel_kickoff_contract.py`, `POTENTIAL_RECORD_PREFIX` in `_orchestrator_state_issue_adoption.py`, `_LIFECYCLE_PREFIXES` in `_epic_orchestrator_state_resolution.py` and the prefix tuple in `_parallel_orchestrator_state_cohort_barrier.py`; the `validate_evidence_locations.py` hint comes from the resolver.
+- [x] [P4-T3] Route to the union `scripts/dev_tools/epic_planner_readiness.py` (prefixes; manifest and kickoff paths through the resolver), `MANIFEST_RE` in `epic_kickoff_contract.py` and `parallel_kickoff_contract.py`, `POTENTIAL_RECORD_PREFIX` in `_orchestrator_state_issue_adoption.py`, `_LIFECYCLE_PREFIXES` in `_epic_orchestrator_state_resolution.py` and the prefix tuple in `_parallel_orchestrator_state_cohort_barrier.py`; the `validate_evidence_locations.py` hint comes from the resolver.
   - Tests: existing suites unchanged; one in-memory `.dev` case each in `test_epic_planner_readiness.py`, `test_epic_kickoff_contract.py`, `test_parallel_kickoff_contract.py`, `test_orchestrator_state_issue_adoption.py`, `test_epic_cross_dependency_validation.py`, `test_parallel_cohort_barrier_parity.py` and `test_validate_evidence_locations.py`.
   - Acceptance: modules pass; the TypeScript parity suites for these validators pass.
-- [ ] [P4-T4] Make `FEATURE_FOLDER_PATH_PATTERN` in `scripts/dev_tools/_orchestrator_state_feature_folder_record.py` accept both roots; `ERROR_FEATURE_FOLDER_PATH_FORMAT` unchanged.
+- [x] [P4-T4] Make `FEATURE_FOLDER_PATH_PATTERN` in `scripts/dev_tools/_orchestrator_state_feature_folder_record.py` accept both roots; `ERROR_FEATURE_FOLDER_PATH_FORMAT` unchanged.
   - Tests: existing cases of `test_orchestrator_state_issue_adoption_feature_folder.py` unchanged; new in-memory case mirroring P3-T5; `test_orchestrator_state_issue_adoption_parity.py` unchanged (D-P11).
   - Acceptance: both modules pass.
-- [ ] [P4-T5] Add `.dev/**/*.json` to `GOVERNED_GLOBS` in `scripts/dev_tools/json_config.py`; `EXCLUDE_GLOBS` unchanged (spec amendment A-5).
+- [x] [P4-T5] Add `.dev/**/*.json` to `GOVERNED_GLOBS` in `scripts/dev_tools/json_config.py`; `EXCLUDE_GLOBS` unchanged (spec amendment A-5).
   - Tests: `test_iter_governed_files_finds_dev_json` in `test_json_config.py` (the `mem_fs_path` fixture, a `.dev/research/x.json` file) and a membership assertion.
   - Acceptance: module passes.
-- [ ] [P4-T6] [phase-gate] Run stages 1 to 6 per `## Test Cadence (Mandatory)` over `scripts/`, `.claude/`, `.codex/`, `extensions/drm-copilot/` and `tests/`.
+- [x] [P4-T6] [phase-gate] Run stages 1 to 6 per `## Test Cadence (Mandatory)` over `scripts/`, `.claude/`, `.codex/`, `extensions/drm-copilot/` and `tests/`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/phase-gate.P4.<timestamp>.md` records one clean pass.
 
 ### Phase 5 — PowerShell Consumers (research inventory)

@@ -116,3 +116,16 @@ def test_kickoff_parses_and_validates_optional_integrity_fields() -> None:
         "| plan-path | plan-hash |", "| wrong | hash |"
     )
     assert validate_epic_kickoff_text(invalid)
+
+
+def test_kickoff_accepts_manifest_under_dev_root() -> None:
+    """A manifest under the .dev epics area satisfies the invocation grammar."""
+
+    dev_kickoff = _kickoff().replace(
+        "docs/features/epics/sample-epic/epic.md", ".dev/epics/sample-epic/epic.md"
+    )
+
+    assert validate_epic_kickoff_text(dev_kickoff) == []
+    parsed, errors = parse_epic_kickoff(dev_kickoff)
+    assert errors == []
+    assert parsed is not None

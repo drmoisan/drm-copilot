@@ -489,3 +489,39 @@ def test_git_repository_uses_injected_runner_without_a_shell() -> None:
             "docs/features/active/feature-101/plan.md",
         )
     ]
+
+
+def test_readiness_resolves_the_epics_area_from_a_dev_root() -> None:
+    """A configured, present .dev root moves the expected manifest to .dev/epics."""
+
+    _, state_text, context, _ = _fixture()
+    file_system = context.file_system
+    assert isinstance(file_system, MemoryFileSystem)
+    file_system.files["C:/workspace/config/orchestration-routing.json"] = (
+        '{"development_docs_root": ".dev"}'
+    )
+    file_system.directories.add("C:/workspace/.dev")
+
+    errors = validate_epic_planner_state_text(
+        state_text, require_ready_for_execution=True, readiness_context=context
+    )
+
+    assert any(".dev/epics/sample-epic/epic.md" in error for error in errors)
+    assert not any("must be under docs/features" in error for error in errors)
+
+
+def test_readiness_accepts_a_dev_active_feature_folder_prefix() -> None:
+    """A .dev/active feature folder passes the lifecycle-prefix check."""
+
+    state, _, context, _ = _fixture()
+    state["features"][0]["feature_folder"] = ".dev/active/feature-101"
+    state["features"][0]["plan_path"] = ".dev/active/feature-101/plan.md"
+
+    errors = validate_epic_planner_state_text(
+        json.dumps(state), require_ready_for_execution=True, readiness_context=context
+    )
+
+    assert not any("must be under docs/features" in error for error in errors)
+    assert any(
+        "requires feature folder: .dev/active/feature-101" in error for error in errors
+    )

@@ -20,6 +20,12 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from scripts.dev_tools.json_config import (
+    DEFAULT_DEVELOPMENT_DOCS_ROOT,
+    development_docs_relative_path,
+    resolve_development_docs_root,
+)
+
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
@@ -35,21 +41,48 @@ _FORBIDDEN_PREFIX_TO_CANONICAL: dict[str, str] = {
     "artifacts/evidence/": "<FEATURE>/evidence/<kind>/",
     "artifacts/regression-testing/": "<FEATURE>/evidence/qa-gates/",
     "artifacts/post-change/": "<FEATURE>/evidence/qa-gates/",
-    "artifacts/research/": "docs/features/active/<feature>/research/ or docs/research/",
 }
 
+# Forbidden prefix whose canonical hint names the resolved research areas.
+_RESEARCH_PREFIX = "artifacts/research/"
 
-def find_forbidden_paths(root: Path) -> Iterator[tuple[Path, str]]:
+
+def forbidden_prefix_table(docs_root: str) -> dict[str, str]:
+    """Return the forbidden-prefix table with the research hint of a root.
+
+    Args:
+        docs_root: Resolved development-docs root, a known root.
+
+    Returns:
+        The forbidden-prefix map; the research row is last and names the
+        active-area research folder and the research area of ``docs_root``.
+    """
+    active = development_docs_relative_path(docs_root, "active")
+    research = development_docs_relative_path(docs_root, "research")
+    return {
+        **_FORBIDDEN_PREFIX_TO_CANONICAL,
+        _RESEARCH_PREFIX: f"{active}/<feature>/research/ or {research}/",
+    }
+
+
+def find_forbidden_paths(
+    root: Path,
+    *,
+    docs_root: str = DEFAULT_DEVELOPMENT_DOCS_ROOT,
+) -> Iterator[tuple[Path, str]]:
     """Walk ``root`` and yield every file that lives under a forbidden evidence prefix.
 
     Args:
         root: Repository root (or any directory) to scan recursively.
+        docs_root: Resolved development-docs root; the research hint names
+            its areas. ``main`` passes the root resolved for ``root``.
 
     Yields:
         Tuples of (absolute_path, canonical_suggestion) for each violation found.
         ``canonical_suggestion`` is a human-readable hint of the form
         ``<FEATURE>/evidence/<kind>/``.
     """
+    table = forbidden_prefix_table(docs_root)
     # Iterate over all files reachable from root and check each against the
     # forbidden-prefix table.  Converting to POSIX form ensures consistent
     # forward-slash separators on Windows.
@@ -69,7 +102,7 @@ def find_forbidden_paths(root: Path) -> Iterator[tuple[Path, str]]:
         for (
             forbidden_prefix,
             canonical_suggestion,
-        ) in _FORBIDDEN_PREFIX_TO_CANONICAL.items():
+        ) in table.items():
             if relative_posix.startswith(forbidden_prefix):
                 yield candidate, canonical_suggestion
                 break
@@ -78,7 +111,8 @@ def find_forbidden_paths(root: Path) -> Iterator[tuple[Path, str]]:
 def main() -> None:
     """Entry point: parse arguments, scan the tree, and report violations.
 
-    Exits with code 1 if any forbidden evidence paths are found, 0 if clean.
+    Exits with code 1 if any forbidden evidence paths are found, 0 if clean,
+    and 2 when the development-docs root cannot be resolved.
     """
     parser = argparse.ArgumentParser(
         description=(
@@ -95,7 +129,16 @@ def main() -> None:
     args = parser.parse_args()
     root: Path = args.root
 
-    violations: list[tuple[Path, str]] = list(find_forbidden_paths(root))
+    # A malformed routing file or an unknown root fails closed with its reason.
+    try:
+        docs_root = resolve_development_docs_root(root)
+    except ValueError as error:
+        print(f"ERROR: {error}", file=sys.stderr)
+        sys.exit(2)
+
+    violations: list[tuple[Path, str]] = list(
+        find_forbidden_paths(root, docs_root=docs_root)
+    )
 
     # Report each violation on its own line so callers can parse or display them.
     for forbidden_path, canonical_suggestion in violations:

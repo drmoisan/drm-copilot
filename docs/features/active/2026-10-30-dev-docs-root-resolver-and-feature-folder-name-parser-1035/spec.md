@@ -493,7 +493,7 @@ All such tests use in-memory fakes; no temporary files are created.
 - [ ] `tests/scripts/ci/CiChangeScope.Tests.ps1`, `Invoke-CiChangeScope.Tests.ps1`, `Invoke-CiChangeScopeMergeBase.Tests.ps1` and `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1` pass.
 - [ ] A Pester test shows `Get-DocsOnlyDiffTextViolation` in `hook-docs-only-diff.ps1` treats a `.dev/` path as docs-only.
 - [ ] The execution-environment brief section `## CI Shape and Required Checks` and `.github/workflows/README.md` list the `.dev/` docs-only prefixes and the `.dev` exclusion, and `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` passes.
-- [ ] `GOVERNED_GLOBS` in `scripts/dev_tools/json_config.py` and in `extensions/drm-copilot/src/lib/json-config.ts` contains both `.dev/**/*.json` and `docs/**/*.json`; a Python test using the `mem_fs_path` fixture and a Jest test using the in-memory fake each show that governed-file discovery returns a JSON file under `.dev/`.
+- [x] `GOVERNED_GLOBS` in `scripts/dev_tools/json_config.py` and in `extensions/drm-copilot/src/lib/json-config.ts` contains both `.dev/**/*.json` and `docs/**/*.json`; a Python test using the `mem_fs_path` fixture and a Jest test using the in-memory fake each show that governed-file discovery returns a JSON file under `.dev/`.
 
 ### Dot-folder handling
 

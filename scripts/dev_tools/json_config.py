@@ -31,6 +31,9 @@ if TYPE_CHECKING:
 GOVERNED_GLOBS: Sequence[str] = (
     "scripts/**/*.json",
     "docs/**/*.json",
+    # JSON under the .dev development-docs root (issue #1035); EXCLUDE_GLOBS
+    # is unchanged, so whether .dev records are excluded is decided later.
+    ".dev/**/*.json",
     "examples/**/*.json",
 )
 
