@@ -298,9 +298,9 @@ Each hook that imports the module uses the guarded import pattern and Codex hook
   - Acceptance: `<FEATURE>/evidence/qa-gates/python-static.<timestamp>.md` records exit 0 and finding count per tool and Black's unchanged-files summary.
 - [x] [P9-T4] Run the Python gate once (configuration in `pyproject.toml`, suites under `tests/scripts/dev_tools/`): `pytest -n auto` with line and branch coverage and a JSON report under `SCRATCH`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/python-tests.<timestamp>.md` records zero failures and the repo-wide and per-file line and branch percentages of `## Coverage Targets`.
-- [ ] [P9-T5] Run Prettier in check mode, lint and typecheck in `extensions/drm-copilot/`; restart on any failure or fix.
+- [x] [P9-T5] Run Prettier in check mode, lint and typecheck in `extensions/drm-copilot/`; restart on any failure or fix.
   - Acceptance: `<FEATURE>/evidence/qa-gates/typescript-static.<timestamp>.md` with exit 0 and finding count per tool.
-- [ ] [P9-T6] Run the Jest gate in `extensions/drm-copilot/` once with coverage; record the P1-T4 and P7-T5 negative observations.
+- [x] [P9-T6] Run the Jest gate in `extensions/drm-copilot/` once with coverage; record the P1-T4 and P7-T5 negative observations.
   - Acceptance: `<FEATURE>/evidence/qa-gates/typescript-tests.<timestamp>.md` records zero failures, every `coverageThreshold` met, and per-file line and branch percentages of `## Coverage Targets` from `extensions/drm-copilot/coverage/lcov.info`.
 - [ ] [P9-T7] Run the PoshQC format check (no-op `-WriteFile` form of P0-T6) and the direct analyzer run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`; restart on any finding.
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-static.<timestamp>.md` records no `Formatted:` line (every file logs `Already formatted:`) and zero Error and Warning findings.

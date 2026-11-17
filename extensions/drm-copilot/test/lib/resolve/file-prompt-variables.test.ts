@@ -139,6 +139,38 @@ describe("file-prompt-variables path helpers", () => {
     // Assert
     expect(folderpath).toBe("docs/features/active/feature-1");
   });
+
+  it("returns an empty relative path for the workspace root itself", () => {
+    // Arrange / Act
+    const relative = tryRelativeToWorkspace("C:/workspace/", "C:/workspace");
+
+    // Assert
+    expect(relative).toBe("");
+  });
+
+  it("resolves folderpath of a bare file name at the workspace root as '.'", () => {
+    // Arrange / Act
+    const folderpath = resolveFolderpath(
+      "C:/workspace/plan.md",
+      "C:/workspace",
+    );
+
+    // Assert
+    expect(folderpath).toBe(".");
+  });
+});
+
+describe("file-prompt-variables stripFrontMatter without a closing delimiter", () => {
+  it("returns the content unchanged when the front matter never closes", () => {
+    // Arrange
+    const content = "---\ntitle: x\n# Heading";
+
+    // Act
+    const result = stripFrontMatter(content);
+
+    // Assert
+    expect(result).toBe(content);
+  });
 });
 
 describe("file-prompt-variables feature foldername and name", () => {

@@ -116,6 +116,18 @@ describe("parseVerificationEvidenceMarkdown", () => {
     expect(record.timestamp).toBe("2026-01-01T00-00");
   });
 
+  it("skips lines that carry no key separator", () => {
+    const md =
+      "# Task Check\n\nTimestamp: 2026-01-01T00-00\nCommand: npm test\nEXIT_CODE: 0";
+    const record = parseVerificationEvidenceMarkdown({
+      feature: FEATURE,
+      sourceFile: "evidence/qa-gates/a.md",
+      markdown: md,
+    });
+    expect(record.normalizedResult).toBe("pass");
+    expect(record.command).toBe("npm test");
+  });
+
   it("returns fail when exit code is non-zero", () => {
     const md = "Timestamp: t\nCommand: c\nEXIT_CODE: 1";
     const record = parseVerificationEvidenceMarkdown({

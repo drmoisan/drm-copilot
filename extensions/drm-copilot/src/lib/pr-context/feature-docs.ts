@@ -320,7 +320,10 @@ function buildContextFiles(params: {
 function activeFeatureSegment(posixPath: string): string | null {
   for (const prefix of knownRootPrefixes("active")) {
     if (posixPath.startsWith(prefix)) {
-      const segment = posixPath.slice(prefix.length).split("/")[0] ?? "";
+      // The segment runs to the next separator, or to the end of the path.
+      const rest = posixPath.slice(prefix.length);
+      const end = rest.indexOf("/");
+      const segment = end < 0 ? rest : rest.slice(0, end);
       return segment === "" ? null : segment;
     }
   }

@@ -128,6 +128,22 @@ describe("createActiveFolder validation", () => {
     ).toThrow(`Template folder not found: ${TEMPLATE_ROOT}/feature`);
   });
 
+  it("falls back to the templates area of the resolved root when no template root is given", () => {
+    // Arrange: no templateRoot, so the workspace templates area is used.
+    const fs = new FakeFolderFileSystem();
+
+    // Act / Assert: the missing-folder error names the workspace templates area.
+    expect(() =>
+      createActiveFolder({
+        featureName: "notes",
+        fs,
+        workspace: WORKSPACE,
+      }),
+    ).toThrow(
+      `Template folder not found: ${WORKSPACE}/docs/features/templates/feature`,
+    );
+  });
+
   it("throws when the target exists without force and proceeds with force", () => {
     // Arrange
     const fs = new FakeFolderFileSystem();

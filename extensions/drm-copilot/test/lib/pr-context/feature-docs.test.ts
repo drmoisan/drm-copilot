@@ -5,6 +5,7 @@ import {
   completedPlanTasks,
   extractIssueReferences,
   latestGlobPath,
+  parseReadinessValue,
   parseSection,
   relativeToPosix,
   resolveFeatureDir,
@@ -396,6 +397,24 @@ describe("gatherFeatureExcerpts development-docs root", () => {
     // Assert
     expect(excerpts.map((excerpt) => excerpt.feature)).toEqual(["1016-foo"]);
   });
+
+  it("reads a folder path with no trailing segment and skips an empty segment", () => {
+    // Arrange: one changed path names the folder itself; the other has an empty segment.
+    const fs = new TreeFileSystem();
+    const dir = `${ROOT}/docs/features/active/1016-foo`;
+    fs.addDir(dir);
+    fs.addDir(`${ROOT}/docs/features/potential/promoted`);
+    fs.addFile(`${dir}/spec.md`, "## Overview\nFolder spec.");
+
+    // Act
+    const excerpts = gatherFeatureExcerpts(fs, ROOT, [
+      "docs/features/active/1016-foo",
+      ".dev/active//spec.md",
+    ]);
+
+    // Assert
+    expect(excerpts.map((excerpt) => excerpt.feature)).toEqual(["1016-foo"]);
+  });
 });
 
 describe("feature-docs-parsers glob under the .dev root", () => {
@@ -425,5 +444,15 @@ describe("feature-docs-parsers glob under the .dev root", () => {
     // Assert
     expect(readiness).toBe("PASS");
     expect(source).toBe(`${dir}/feature-audit.2026-11-02T10-00.md`);
+  });
+});
+
+describe("parseReadinessValue", () => {
+  it("returns null when the text has no readiness marker", () => {
+    expect(parseReadinessValue("## Summary\nNo marker here.\n")).toBeNull();
+  });
+
+  it("returns null for a readiness value outside the accepted set", () => {
+    expect(parseReadinessValue("Readiness: MAYBE\n")).toBeNull();
   });
 });
