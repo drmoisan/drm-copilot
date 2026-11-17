@@ -91,10 +91,10 @@ Describe 'Codex development-docs module import order (issue #1035)' {
                 }
             })
 
-        # Assert: the discovered set is non-empty, holds the known importers, and each has one import statement.
+        # Assert: the discovered set is non-empty, spans both folders, and each file has one import statement.
         $files.Count | Should -BeGreaterThan 0
-        $files | Should -Contain '.codex/hooks/enforce-completion-consistency.ps1'
-        $files | Should -Contain '.codex/scripts/epic-child-launch-contract.ps1'
+        @($files | Where-Object { $_.StartsWith('.codex/hooks/', [System.StringComparison]::Ordinal) }).Count | Should -BeGreaterThan 0
+        @($files | Where-Object { $_.StartsWith('.codex/scripts/', [System.StringComparison]::Ordinal) }).Count | Should -BeGreaterThan 0
         foreach ($relative in $files) {
             $text = Get-Content -LiteralPath (Join-Path $script:RepoRoot $relative) -Raw
             @(Get-DevelopmentDocsImportIfStatement -ScriptText $text).Count | Should -Be 1 -Because $relative

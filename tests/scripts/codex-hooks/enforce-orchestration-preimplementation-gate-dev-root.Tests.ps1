@@ -15,9 +15,15 @@
 
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../../.codex/hooks/enforce-orchestration-preimplementation-gate.ps1')
+    . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')
+    Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
+    Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
+    Mock Get-EpicScopeCheckpointText { $null }
 }
 
 Describe 'Codex preimplementation gate development-docs root union' {
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Codex' -Seam 'Get-EpicScopeCheckpointText' }
+
     It 'treats <Path> as a feature document path' -ForEach @(
         @{ Path = 'docs/features/active/2026-09-29-sample-509/evidence/other/x.json' }
         @{ Path = '.dev/active/2026-09-29-sample-509/evidence/other/x.json' }

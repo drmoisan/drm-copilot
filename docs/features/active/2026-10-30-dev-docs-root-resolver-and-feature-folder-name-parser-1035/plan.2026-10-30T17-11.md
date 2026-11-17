@@ -218,10 +218,10 @@ Each hook that imports the module uses the guarded import pattern and Codex hook
   - Existing tests: `new-potential-entry.Tests.ps1` Describe blocks and its static-text cases are unchanged (the unified text keeps every asserted function, parameter and block, including the guarded `Get-AuthorName` that `falls back to USERNAME environment variable when git is unavailable` needs); `new-potential-entry.TemplateRoot.Tests.ps1` existing cases unchanged; `.vscode/tasks.json`, the promotion hook suites and the push-down rewrite tests assert only the file name and are unchanged.
   - New tests: `tests/scripts/dev-tools/new-potential-entry.CopyParity.Tests.ps1` (equal SHA-256 of the two copies); `.dev` and bundled-copy (`Get-Location` mocked) cases in `new-potential-entry.TemplateRoot.Tests.ps1`; a `.dev` case in `link-feature-docs.Tests.ps1`.
   - Acceptance: the four suites pass.
-- [ ] [P5-T12] Add `tests/fixtures/orchestrator_state_issue_adoption/valid-large-waives-feature-folder-dev-root.json` (keys `name`, `notes`, `checkpoint`, `expected_errors`; `name` equals the stem; modeled on `valid-large-waives-feature-folder-with-record.json` with checkpoint `feature-folder` and record `path` `.dev/active/2026-09-29-sample-feature-509`; `expected_errors` empty).
+- [x] [P5-T12] Add `tests/fixtures/orchestrator_state_issue_adoption/valid-large-waives-feature-folder-dev-root.json` (keys `name`, `notes`, `checkpoint`, `expected_errors`; `name` equals the stem; modeled on `valid-large-waives-feature-folder-with-record.json` with checkpoint `feature-folder` and record `path` `.dev/active/2026-09-29-sample-feature-509`; `expected_errors` empty).
   - Tests: `orchestrator-state-issue-adoption-parity.test.ts`, `test_orchestrator_state_issue_adoption_parity.py` and `OrchestratorStateIssueAdoption.Parity.Tests.ps1` are unchanged in source; each discovers one file more (above `MINIMUM_CORPUS_COUNT`; the on-disk count check holds) and reports no error for it.
   - Acceptance: the three parity suites pass.
-- [ ] [P5-T13] [phase-gate] Run stages 1 to 6 per `## Test Cadence (Mandatory)` over `scripts/`, `.claude/`, `.codex/`, `extensions/drm-copilot/` and `tests/`.
+- [x] [P5-T13] [phase-gate] Run stages 1 to 6 per `## Test Cadence (Mandatory)` over `scripts/`, `.claude/`, `.codex/`, `extensions/drm-copilot/` and `tests/`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/phase-gate.P5.<timestamp>.md` records one clean pass.
 
 ### Phase 6 — PowerShell Consumers (refresh inventory)
