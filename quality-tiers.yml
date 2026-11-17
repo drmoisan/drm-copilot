@@ -112,3 +112,6 @@ projects:
   - path: "scripts/harness"
     tier: T4
     rationale: "Repository-internal parity-matrix and contract checks run by the PowerShell QC gate; not published by push-down"
+  - path: "scripts/harness-generation"
+    tier: T4
+    rationale: "Repository-internal generators and drift check for the shared harness surfaces (issue #1028); dev tooling run by developers and the PowerShell QC gate; not published by push-down"
