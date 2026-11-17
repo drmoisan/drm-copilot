@@ -60,7 +60,7 @@ function Get-HarnessMatrixSelection {
     if ($PSBoundParameters.ContainsKey('Disposition')) { $filters['disposition'] = $Disposition }
     $selected = [System.Collections.Generic.List[object]]::new()
     foreach ($entry in @($Matrix.features)) {
-        $names = @($entry.PSObject.Properties.Name)
+        $names = @($entry.PSObject.Properties | ForEach-Object { $_.Name })
         $match = $true
         foreach ($field in $filters.Keys) {
             if ($names -notcontains $field -or [string]$entry.$field -cne $filters[$field]) { $match = $false; break }
