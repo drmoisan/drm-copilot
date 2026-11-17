@@ -4,7 +4,7 @@
 - Parent: epic #1018, child 3
 - Owner: drmoisan
 - Status: Draft
-- Last Updated: 2026-10-31
+- Last Updated: 2026-11-17
 - Work Mode: full-feature
 - Spec: `docs/features/active/2026-10-30-shared-source-generators-skills-rules-mcp-agents-1028/spec.md`
 
@@ -50,7 +50,7 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 
 ### Phase 0 gate
 
-- [ ] Execution stops before any change, with the reason recorded in `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md`, when an owner answer recorded in the spec differs from its default or the plan departs from a recorded decision (spec D-1), when child 1's or child 2's outputs are not merged into the integration branch, when an approved difference would change a pinned frozen file or a selected target does not exist, or when a named file, symbol or heading has moved relative to the merge base of `origin/main` and `HEAD`.
+- [ ] Execution stops before any change, with the reason recorded in `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md`, when an owner answer recorded in the spec differs from its default or the plan departs from a recorded decision (spec D-1), when child 1's or child 2's outputs are not merged into the integration branch, when an approved difference would change a pinned frozen file other than through the one re-baseline of the epic skill digest that spec D-13 decides, or a selected target does not exist, or when a named file, symbol or heading has moved relative to the merge base of `origin/main` and `HEAD`.
 
 ### Generation and drift reporting
 
@@ -88,7 +88,7 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 
 - [ ] No new Python or TypeScript file is added; every new code file is PowerShell and is listed with its language in the spec's `## Language Classification`.
 - [ ] Each new PowerShell module has at least 85% line coverage, the parallel test gates and the leak scan pass (spec D-6), and no added or changed file exceeds 800 lines.
-- [ ] No blast-radius tooling file, child 2 file, or file in the spec's excluded paths is changed by this child.
+- [ ] No blast-radius tooling file, child 2 file (other than the `### Interface for epic child 3` section of child 2's spec, which spec D-12 amends), or file in the spec's excluded paths is changed by this child.
 
 ## Non-Goals
 
@@ -96,7 +96,8 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 - Symlinked mirrors.
 - Generating hooks (child 5), pushing generators or generated layers down to destination repositories and per-ecosystem pack selection (child 4), and retiring `.github/skills`, `.github/agents` or `scripts/dev-tools/sync-agents-from-instructions.ps1` (child 6; for `sync-agents-from-instructions.ps1`, per OQ-6 as decided by owner H3). Redirecting the Codex native converter so it no longer writes `AGENTS.md` is in scope for this child (H3).
 - Editing `.github/copilot-instructions.md` (child 6).
-- Editing child 2's files or spec, including `extensions/drm-copilot/src/lib/development-docs/write-scopes.ts` and `.claude/lib/development-docs/DevelopmentDocsRoot.psm1`; the amendment that OQ-9 requires belongs to child 2's owner.
+- Editing child 2's files or spec, including `extensions/drm-copilot/src/lib/development-docs/write-scopes.ts` and `.claude/lib/development-docs/DevelopmentDocsRoot.psm1`; the one exception is the `### Interface for epic child 3` section of child 2's spec, which this child amends to the OQ-9 answer (spec D-12).
+- Generating the single-ecosystem agents (spec D-11); they are `native` and stay hand-maintained.
 - Editing `scripts/dev_tools/generate_codex_agent_variants.py`, `scripts/dev-tools/Invoke-FullRelease.ps1` or any CI workflow file.
 - Any change to `.claude/lib/blast-radius/**`, `config/blast-radius.json`, the blast-radius Python modules or their tests.
 - Generating the bundle-only variant subtrees (`.claude-variants/`, `.agents-variants/`, `.codex-variants/`).
