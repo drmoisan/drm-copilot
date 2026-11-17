@@ -220,6 +220,33 @@ Describe 'Invoke-RootEpicInvocationHook' {
         Should -Invoke Write-RootEpicInvocationReceipt -Times 0 -Exactly
     }
 
+    It 'returns the exit code after writing nothing for an empty result' {
+        $writes = [System.Collections.Generic.List[string]]::new()
+        $record = { param([string] $Text) $writes.Add($Text) }.GetNewClosure()
+
+        Write-RootEpicInvocationHookResult -Result ([pscustomobject]@{ ExitCode = 0; Output = $null; ErrorText = $null }) -WriteStdout $record -WriteStderr $record | Should -Be 0
+        $writes.Count | Should -Be 0
+    }
+
+    It 'writes the output to stdout and the error text to stderr through the seams' {
+        $stdout = [System.Collections.Generic.List[string]]::new()
+        $stderr = [System.Collections.Generic.List[string]]::new()
+        $writeOut = { param([string] $Text) $stdout.Add($Text) }.GetNewClosure()
+        $writeErr = { param([string] $Text) $stderr.Add($Text) }.GetNewClosure()
+
+        $code = Write-RootEpicInvocationHookResult -Result ([pscustomobject]@{ ExitCode = 2; Output = '{"a":1}'; ErrorText = 'EPIC_INVOCATION_ORIGIN_BLOCKED: x' }) -WriteStdout $writeOut -WriteStderr $writeErr
+
+        $code | Should -Be 2
+        @($stdout) | Should -Be @('{"a":1}')
+        @($stderr) | Should -Be @('EPIC_INVOCATION_ORIGIN_BLOCKED: x')
+    }
+
+    It 'returns only the exit code when the default console writers run' {
+        $code = @(Write-RootEpicInvocationHookResult -Result ([pscustomobject]@{ ExitCode = 0; Output = 'hook-output-line'; ErrorText = 'hook-error-line' }))
+
+        $code | Should -Be @(0)
+    }
+
     It 'exits 2 with the blocking text for a malformed payload' {
         $result = Invoke-RootEpicInvocationHook -PayloadRaw '{ not json' -RepositoryRoot $script:RepoRoot -Now $script:Now
 

@@ -225,8 +225,7 @@ function Invoke-RootEpicGitExe {
     [OutputType([pscustomobject])]
     param([Parameter(Mandatory)][string[]] $GitArgs)
 
-    $output = @(& git @GitArgs 2>$null)
-    return [pscustomobject]@{ Output = $output; ExitCode = $LASTEXITCODE }
+    return [pscustomobject]@{ Output = @(& git @GitArgs 2>$null); ExitCode = $LASTEXITCODE }
 }
 
 function Invoke-RootEpicInvocationHook {
@@ -267,11 +266,23 @@ function Invoke-RootEpicInvocationHook {
     }
 }
 
+function Write-RootEpicInvocationHookResult {
+    # Writes the hook output to stdout and the error text to stderr, and returns the exit code.
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [Parameter(Mandatory)] $Result,
+        [scriptblock] $WriteStdout = { param([string] $Text) [Console]::Out.WriteLine($Text) },
+        [scriptblock] $WriteStderr = { param([string] $Text) [Console]::Error.WriteLine($Text) }
+    )
+
+    if ($Result.Output) { & $WriteStdout ([string]$Result.Output) }
+    if ($Result.ErrorText) { & $WriteStderr ([string]$Result.ErrorText) }
+    return [int]$Result.ExitCode
+}
+
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-$hookResult = Invoke-RootEpicInvocationHook -PayloadRaw ([Console]::In.ReadToEnd()) -RepositoryRoot (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
-if ($hookResult.Output) { Write-Output $hookResult.Output }
-if ($hookResult.ErrorText) { [Console]::Error.WriteLine($hookResult.ErrorText) }
-exit $hookResult.ExitCode
+exit (Write-RootEpicInvocationHookResult -Result (Invoke-RootEpicInvocationHook -PayloadRaw ([Console]::In.ReadToEnd()) -RepositoryRoot (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)))
