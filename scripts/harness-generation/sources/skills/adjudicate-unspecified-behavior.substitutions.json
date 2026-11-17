@@ -1,0 +1,9 @@
+{
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "- [Canonical requirements-reconciler contract](../../../.codex/agents/requirements-reconciler.toml)\n",
+      "replace": "- [Canonical requirements-reconciler contract](../../../.claude/agents/requirements-reconciler.md)\n"
+    }
+  ]
+}

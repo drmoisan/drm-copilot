@@ -2138,11 +2138,7 @@
       "kind": "skill",
       "name": "atomic-plan-contract",
       "source_path": ".claude/skills/atomic-plan-contract/SKILL.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/skills/atomic-plan-contract/SKILL.md"
-      ],
-      "generated_from": ".agents/skills/atomic-plan-contract/SKILL.md",
+      "disposition": "native",
       "parity_group": "skill:atomic-plan-contract",
       "consumers": [
         "claude-code",
@@ -2151,7 +2147,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:skill:characterize-runtime-behavior",
@@ -2263,11 +2259,7 @@
       "kind": "skill",
       "name": "csharp-qa-gate",
       "source_path": ".claude/skills/csharp-qa-gate/SKILL.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/skills/csharp-qa-gate/SKILL.md"
-      ],
-      "generated_from": ".agents/skills/csharp-qa-gate/SKILL.md",
+      "disposition": "native",
       "parity_group": "skill:csharp-qa-gate",
       "consumers": [
         "claude-code",
@@ -2276,7 +2268,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:skill:discovery-behavior-reconciliation",
@@ -2599,11 +2591,7 @@
       "kind": "skill",
       "name": "epic-orchestrate",
       "source_path": ".claude/skills/epic-orchestrate/SKILL.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/skills/epic-orchestrate/SKILL.md"
-      ],
-      "generated_from": ".agents/skills/epic-orchestrate/SKILL.md",
+      "disposition": "native",
       "parity_group": "skill:epic-orchestrate",
       "consumers": [
         "claude-code",
@@ -2612,7 +2600,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:skill:epic-plan",
@@ -2661,11 +2649,7 @@
       "kind": "skill",
       "name": "epic-run",
       "source_path": ".claude/skills/epic-run/SKILL.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/skills/epic-run/SKILL.md"
-      ],
-      "generated_from": ".agents/skills/epic-run/SKILL.md",
+      "disposition": "native",
       "parity_group": "skill:epic-run",
       "consumers": [
         "claude-code",
@@ -2674,7 +2658,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:skill:evidence-and-timestamp-conventions",
@@ -2787,11 +2771,7 @@
       "kind": "skill",
       "name": "feature-review-workflow",
       "source_path": ".claude/skills/feature-review-workflow/SKILL.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/skills/feature-review-workflow/SKILL.md"
-      ],
-      "generated_from": ".agents/skills/feature-review-workflow/SKILL.md",
+      "disposition": "native",
       "parity_group": "skill:feature-review-workflow",
       "consumers": [
         "claude-code",
@@ -2800,7 +2780,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:skill:fill-feature-docs",
@@ -2930,11 +2910,7 @@
       "kind": "skill",
       "name": "invoke-csharp-engineer",
       "source_path": ".claude/skills/invoke-csharp-engineer/SKILL.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/skills/invoke-csharp-engineer/SKILL.md"
-      ],
-      "generated_from": ".agents/skills/invoke-csharp-engineer/SKILL.md",
+      "disposition": "native",
       "parity_group": "skill:invoke-csharp-engineer",
       "consumers": [
         "claude-code",
@@ -2943,7 +2919,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:skill:invoke-powershell-engineer",
@@ -2951,11 +2927,7 @@
       "kind": "skill",
       "name": "invoke-powershell-engineer",
       "source_path": ".claude/skills/invoke-powershell-engineer/SKILL.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/skills/invoke-powershell-engineer/SKILL.md"
-      ],
-      "generated_from": ".agents/skills/invoke-powershell-engineer/SKILL.md",
+      "disposition": "native",
       "parity_group": "skill:invoke-powershell-engineer",
       "consumers": [
         "claude-code",
@@ -2964,7 +2936,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:skill:invoke-python-engineer",
@@ -2972,11 +2944,7 @@
       "kind": "skill",
       "name": "invoke-python-engineer",
       "source_path": ".claude/skills/invoke-python-engineer/SKILL.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/skills/invoke-python-engineer/SKILL.md"
-      ],
-      "generated_from": ".agents/skills/invoke-python-engineer/SKILL.md",
+      "disposition": "native",
       "parity_group": "skill:invoke-python-engineer",
       "consumers": [
         "claude-code",
@@ -2985,7 +2953,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:skill:make-skill-template",
@@ -3034,11 +3002,7 @@
       "kind": "skill",
       "name": "orchestrate",
       "source_path": ".claude/skills/orchestrate/SKILL.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/skills/orchestrate/SKILL.md"
-      ],
-      "generated_from": ".agents/skills/orchestrate/SKILL.md",
+      "disposition": "native",
       "parity_group": "skill:orchestrate",
       "consumers": [
         "claude-code",
@@ -3047,7 +3011,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:skill:owner-directives",
@@ -3280,11 +3244,7 @@
       "kind": "skill",
       "name": "powershell-qa-gate",
       "source_path": ".claude/skills/powershell-qa-gate/SKILL.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/skills/powershell-qa-gate/SKILL.md"
-      ],
-      "generated_from": ".agents/skills/powershell-qa-gate/SKILL.md",
+      "disposition": "native",
       "parity_group": "skill:powershell-qa-gate",
       "consumers": [
         "claude-code",
@@ -3293,7 +3253,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:skill:pr-author",
@@ -3385,11 +3345,7 @@
       "kind": "skill",
       "name": "python-qa-gate",
       "source_path": ".claude/skills/python-qa-gate/SKILL.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/skills/python-qa-gate/SKILL.md"
-      ],
-      "generated_from": ".agents/skills/python-qa-gate/SKILL.md",
+      "disposition": "native",
       "parity_group": "skill:python-qa-gate",
       "consumers": [
         "claude-code",
@@ -3398,7 +3354,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:skill:quota-throttling",

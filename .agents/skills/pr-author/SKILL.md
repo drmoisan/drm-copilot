@@ -39,12 +39,94 @@ Use these sections in this order:
 10. **Follow-ups** — known TODOs, deferred cleanup, next PRs
 11. **GitHub Auto-close** — `- Closes #NNN` only from verified autoclose lists; do not invent issue numbers
 
+## Output Artifact
+
+The PR body produced by this skill is persisted as a body file plus a sibling receipt so the
+PreToolUse hook can verify the body passed to `gh pr create --body-file` is the one this skill
+produced:
+
+1. Write the body text to `artifacts/pr_body_<N>.md`, where `<N>` is the target issue or PR number.
+2. Compute the SHA-256 of the body file by running `sha256sum artifacts/pr_body_<N>.md` as a single command (no chaining) and take the lowercase hexadecimal digest.
+3. Write the sibling receipt `artifacts/pr_body_<N>.receipt.json` with the shape:
+
+   ```json
+   {
+     "skill": "pr-author",
+     "pr_body_path": "artifacts/pr_body_<N>.md",
+     "number": <N>,
+     "sha256": "<lowercase-hex SHA-256 of the body bytes>",
+     "context_summary_path": "artifacts/pr_context.summary.txt",
+     "created_at": "<ISO-8601 UTC timestamp newer than pr_context.summary.txt last-write>"
+   }
+   ```
+
+   Obtain it by running `date -u +%Y-%m-%dT%H:%M:%SZ` as a single command.
+
+4. Pass the body to the pull request via `--body-file artifacts/pr_body_<N>.md`; do not use inline
+   `--body`.
+
+The body-file and receipt write operations remain in the pr-author agent scope, which holds
+`Write(/artifacts/**)`. This skill authors the body text; the pr-author agent performs the file
+writes and the `gh pr create` / `gh pr edit --body-file` handoff.
+
 ## Issue/PR Reference Rules
 
 - Only mention an issue/PR number if it appears verbatim in the provided context.
 - Do not treat PR numbers as issues.
 - Auto-close bullets must use exactly `- Closes #NNN` format, sourced only from "Issues to autoclose" or "Author-asserted autoclose issues."
 - If GitHub validation is unavailable or unverified, do not emit `Closes`; use the `None` bullet.
+
+## Closing-Reference Verification
+
+The pr-author agent MUST run `gh pr view <N> --json closingIssuesReferences,body` as a single
+command (no chaining, no extra flags) after every `gh pr create` or `gh pr edit` it issues, where
+`<N>` is the pull request number. It reports the closing issue numbers that
+`closingIssuesReferences` lists, and reports any mismatch with the author-asserted list: an
+author-asserted issue that GitHub does not list as closing, or a closing issue that no source
+named. The command is read-only, and this exact form is the only pull-request view form the
+agent's allowlist hook permits.
+
+## Required `--head` on `gh pr create` (issue #687)
+
+Every `gh pr create` command this agent issues MUST carry an explicit
+`--head <branch>` naming the branch the pull request is opened from, for example
+`gh pr create --head <branch> --body-file artifacts/pr_body_<N>.md`.
+
+This is what makes the call's target derivable. `enforce-pr-author-skill.ps1` resolves the
+worktree the call pertains to from the command text, and validates the orchestrator checkpoint
+belonging to that worktree. Without `--head`, `gh pr create` infers its head branch from the
+current checkout and the command carries no signal at all, so the gate falls back to the branch
+checked out in its own working directory (issue #989) and denies with
+`TARGET_WORKTREE_NOT_DERIVABLE` when that checkout is detached or unreadable, rather than
+validating against whichever checkpoint occupies the session root, which in a parallel or epic
+topology belongs to a different item.
+
+Pass `--head` even when the branch is the current one: the gate resolves it to the session root
+and behaves exactly as before, and the command stays correct if it is ever replayed elsewhere.
+
+`gh pr edit` takes no head-branch flag, and --head is not valid for gh pr edit. Name the target of
+an edit in one of two ways:
+
+- Run `gh pr edit <N> --body-file artifacts/pr_body_<N>.md` from the item worktree. The gate
+  derives the branch from that worktree's checkout.
+- When running outside the item worktree, append the shell comment `# branch: <branch>` to the
+  command, and pass the absolute canonical body path beneath the item worktree.
+
+## Coordinator-Session Topology (issue #1011)
+
+When the process directory is not the item worktree (for example, when the orchestrator delegates
+from a coordinator session rooted in another checkout), a relative `artifacts/` path resolves to the
+wrong checkout. In that topology, use this procedure instead of the relative forms above:
+
+1. Run `git worktree list --porcelain` as a single command. Select the `worktree` entry whose `branch refs/heads/<branch>` line names the `--head` branch, and use that entry's absolute root, written with forward slashes, as `<item worktree>`. If zero or more than one entry matches, stop and report the result; do not choose a root.
+2. Confirm that the PR context summary already exists at `<item worktree>/artifacts/pr_context.summary.txt`. The orchestrator produces it; pr-author does not call `collect_pr_context`.
+3. Write the body to `<item worktree>/artifacts/pr_body_<N>.md` by absolute path.
+4. Run `sha256sum <item worktree>/artifacts/pr_body_<N>.md` as a single command and take the lowercase hexadecimal digest.
+5. Write the receipt to `<item worktree>/artifacts/pr_body_<N>.receipt.json` by absolute path. Keep `pr_body_path` and `context_summary_path` repo-relative (`artifacts/pr_body_<N>.md` and `artifacts/pr_context.summary.txt`), so no absolute path is recorded in the receipt. The receipt `created_at` must be strictly newer than the last-write time of the summary.
+6. Run `gh pr create --head <branch> --body-file <item worktree>/artifacts/pr_body_<N>.md`. The gate resolves the item worktree from `--head` and verifies the body and receipt beneath it; in this topology it denies a relative `--body-file` with `PR_BODY_PATH_NONCANONICAL`.
+
+In this topology pr-author is delegated without worktree isolation, because an isolated agent
+worktree refuses command text that names another worktree.
 
 ## Checkpoint-Free Docs-Estate Delegation (issue #1169)
 

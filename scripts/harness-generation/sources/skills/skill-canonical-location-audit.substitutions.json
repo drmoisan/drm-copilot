@@ -1,0 +1,14 @@
+{
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "- Applies to all skills under `.agents/skills/**/SKILL.md`.\n",
+      "replace": "- Applies to all skills under `.claude/skills/**/SKILL.md`.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- Only treat explicit canonical paths or filenames as definitions.\n",
+      "replace": "- Only treat explicit canonical paths or filenames as definitions.\n\n\n"
+    }
+  ]
+}

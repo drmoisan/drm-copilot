@@ -1,0 +1,14 @@
+{
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "- If all candidates fail, surface explicit error context and stop unless repository metadata directly identifies the default branch.\n",
+      "replace": "- If all candidates fail, surface explicit error context and use repository default branch only as last-resort fallback.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- top competing candidates with timestamps when available.\n",
+      "replace": "- top competing candidates with timestamps when available.\n\n"
+    }
+  ]
+}

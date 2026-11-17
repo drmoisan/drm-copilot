@@ -1,0 +1,19 @@
+{
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "[docs-coverage-reviewer](../../../.codex/agents/docs-coverage-reviewer.toml) runs\n",
+      "replace": "[docs-coverage-reviewer](../../../.claude/agents/docs-coverage-reviewer.md) runs\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "Root steps run `Invoke-DocsCommand.ps1` from the docs helper library that the Claude customization push-down delivers, under PowerShell 7.4 or later. Without that library every root step in this skill is unavailable; the docs MCP tools stay available.\n",
+      "replace": "Root steps run the docs helper library at `.claude/lib/docs/` under PowerShell 7.4 or later.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "   Root step (unavailable without the docs helper library): `Invoke-DocsCommand.ps1 -Command surface-delta -Base <base-ref> -Profile docs/documentation-estate/docs-profile.json`\n",
+      "replace": "   Root step: `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command surface-delta -Base <base-ref> -Profile docs/documentation-estate/docs-profile.json`\n"
+    }
+  ]
+}

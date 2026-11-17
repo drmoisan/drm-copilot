@@ -1,0 +1,9 @@
+{
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "- [Canonical legacy-parity-analyst contract](../../../.codex/agents/legacy-parity-analyst.toml)\n",
+      "replace": "- [Canonical legacy-parity-analyst contract](../../../.claude/agents/legacy-parity-analyst.md)\n"
+    }
+  ]
+}

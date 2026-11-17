@@ -58,6 +58,18 @@ backfill the final positive `issue_num` and active `feature_folder`, commit and 
 manifest, and persist the promotion receipts. Launch specifications and their immutable receipts
 must never use placeholders.
 
+## Epic-Level Issue Promotion
+
+Issue #663. Before the first preparation-mode child delegation, `epic-planner` promotes one epic-level GitHub issue for the epic itself. It authors a potential entry under `docs/features/potential/` describing the epic and promotes it through `mcp__drm-copilot__potential_to_issue` with `promotion_type: epic`; `gh issue create` is not used. It records the resulting number as `epic_issue_num` in the epic planning checkpoint (`artifacts/orchestration/epic-planner-state.json`) and in the kickoff prompt artifact, and `epic-orchestrator` copies it into the epic checkpoint `artifacts/orchestration/epic-orchestrator-state.json` at its first checkpoint write. The integration-to-`main` pull request uses `epic_issue_num` as its canonical issue number.
+
+## Complexity Assessment
+
+Assess each child feature's complexity band (`C1`-`C4`) using the `model_policy` scale and
+signals in `config/orchestration-routing.json`, and record the band with a short rationale in
+the planning checkpoint's `features[]` entries and in the epic narrative. The bands serve two
+purposes: they feed the epic-worthiness rationale, and they give each child orchestrator's own
+model-selection step a reviewed starting assessment.
+
 ## Integration Branch
 
 Create or reuse `epic/<epic-slug>-integration` from `origin/main`, push it, and commit the epic

@@ -184,6 +184,16 @@ This is a policy-level control, not a security control: any writer in the sessio
 record, and the git checks bound what a record can authorize. `git worktree remove` deletes
 ignored files in the worktree, including the child's gitignored checkpoint; this is accepted.
 
+## Execution-Readiness Gate
+
+Do not emit a kickoff until the manifest is valid and every child has a promoted issue, active
+folder, `issue.md`, research, `spec.md`, `user-story.md`, approved atomic plan, `PREFLIGHT: ALL
+CLEAR` evidence, and a pushed preparation commit fanned in to the integration branch.
+
+Invoke `mcp__drm-copilot__validate_orchestration_artifacts` for `epic-planner-state` with
+`require_ready_for_execution: true` and the explicit workspace root. Do not write the kickoff
+until this canonical gate succeeds.
+
 ## Kickoff Prompt Artifact
 
 After all features are prepared and committed, write the epic-orchestrator kickoff prompt to

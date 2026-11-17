@@ -1,0 +1,19 @@
+{
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "[docs-author](../../../.codex/agents/docs-author.toml) runs this skill for each page\n",
+      "replace": "[docs-author](../../../.claude/agents/docs-author.md) runs this skill for each page\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "Root steps run `Invoke-DocsCommand.ps1` from the docs helper library that the Claude customization push-down delivers, under PowerShell 7.4 or later. Without that library every root step in this skill is unavailable; the docs MCP tools stay available.\n",
+      "replace": "Root steps run the docs helper library at `.claude/lib/docs/` under PowerShell 7.4 or later.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "   Root step (unavailable without the docs helper library): `Invoke-DocsCommand.ps1 -Command generate-reference -Profile docs/documentation-estate/docs-profile.json -Write`\n",
+      "replace": "   Root step: `pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command generate-reference -Profile docs/documentation-estate/docs-profile.json -Write`\n"
+    }
+  ]
+}

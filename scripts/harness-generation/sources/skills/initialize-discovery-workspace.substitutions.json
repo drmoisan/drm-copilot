@@ -1,0 +1,9 @@
+{
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "- [Canonical migration-coverage-reviewer contract](../../../.codex/agents/migration-coverage-reviewer.toml)\n",
+      "replace": "- [Canonical migration-coverage-reviewer contract](../../../.claude/agents/migration-coverage-reviewer.md)\n"
+    }
+  ]
+}

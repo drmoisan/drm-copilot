@@ -1,0 +1,19 @@
+{
+  "substitutions": [
+    {
+      "file": "example.runbook.md",
+      "find": "This is a self-contained, contract-conformant example runbook per `.agents/skills/human-exception-runbook/SKILL.md`. It demonstrates the required five sections and the dated-citation requirement. It does not reference any other feature folder. The values below (tenant, application name) are illustrative placeholders.\n",
+      "replace": "This is a self-contained, contract-conformant example runbook per `.claude/skills/human-exception-runbook/SKILL.md`. It demonstrates the required five sections and the dated-citation requirement. It does not reference any other feature folder. The values below (tenant, application name) are illustrative placeholders.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "---\nname: human-exception-runbook\ndescription: Contract for runbooks that document permitted human exceptions recorded in orchestrator state.\n---\n\n# Human-Exception Runbook\n\nDefines the contract for a human-exception runbook: the artifact the orchestrator emits when an unautomatable requirement is resolved with the `exception` response under the autonomous-execution mandate (see `.agents/skills/orchestrate/SKILL.md`).\n",
+      "replace": "# Human-Exception Runbook\n\nDefines the contract for a human-exception runbook: the artifact the orchestrator emits when an unautomatable requirement is resolved with the `exception` response under the autonomous-execution mandate (see `.claude/skills/orchestrate/SKILL.md`).\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "A self-contained, conformant example is provided at `.agents/skills/human-exception-runbook/example.runbook.md`.\n",
+      "replace": "A self-contained, conformant example is provided at `.claude/skills/human-exception-runbook/example.runbook.md`.\n"
+    }
+  ]
+}
