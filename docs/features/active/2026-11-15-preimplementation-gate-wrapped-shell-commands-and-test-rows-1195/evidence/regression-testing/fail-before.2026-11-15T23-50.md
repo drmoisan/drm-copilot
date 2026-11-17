@@ -1,0 +1,163 @@
+# Fail-Before: Wrapped-Payload Rows Against the Unchanged Hooks (P1-T4)
+
+Timestamp: 2026-11-15T23-50
+Command: sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-classify.Tests.ps1 tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-classify.Tests.ps1 (launched from SCRATCH/issue-1195-gate.sh at 2026-11-15T23-47 with the worktree as cwd); per-row results read from artifacts/pester/parallel/shard-1 and shard-2 pester-junit.xml (a run with failures writes no merged JUnit) by SCRATCH/issue-1195-shards.ps1; base64 recomputed with [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes(<the six-letter runner word>)) in pwsh -NoProfile -File SCRATCH/issue-1195-b64.ps1
+EXIT_CODE: 1
+ExpectedExitCode: 1
+Output Summary:
+- Hooks unchanged at this point: .claude/hooks and .codex/hooks classify siblings and gates carry no branch change (P0-T1); only test files changed (P1-T1 to P1-T3).
+- Invoke-PoshQCParallelTest workers=2, exit code 1; 274 test cases: 180 passed, 94 failed.
+- Every Positive wrapped gate row fails with "Expected $true ... but got $false" on both surfaces (observed $false before the change): 16 per surface.
+- Every Negative and Control wrapped gate row holds its expected value before the change on both surfaces (14 Negative, 4 Control per surface).
+- Every wrapped function row fails with CommandNotFoundException because Get-OrchestrationGateWrappedPatternIndex is undefined: 31 per surface.
+- Every P1-T1 row (four function rows, two gate rows) passes on both surfaces.
+- No other test failed.
+- Base64 recomputed: cAB5AHQAZQBzAHQA, equal to the row literal in pwsh -EncodedCommand / -e / -ec rows.
+- Spec D-8: no Positive row was observed $true, and no Negative or Control row missed its value, so no row kind was changed and no row was dropped.
+
+## Per-row results (Kind | Command | expected | result)
+
+### Surface: claude
+- Positive | sh -c "pytest -q" | expected $true | FAIL
+- Positive | bash -c 'ruff check .' | expected $true | FAIL
+- Positive | bash -lc "pyright" | expected $true | FAIL
+- Positive | sh -c "npm run lint" | expected $true | FAIL
+- Positive | bash -c "npx jest" | expected $true | FAIL
+- Positive | pwsh -Command "npm run lint" | expected $true | FAIL
+- Positive | pwsh -NoProfile -c "pytest" | expected $true | FAIL
+- Positive | powershell -Command "npx eslint ." | expected $true | FAIL
+- Positive | pwsh -CommandWithArgs "pytest" | expected $true | FAIL
+- Positive | eval "pytest" | expected $true | FAIL
+- Positive | env -u VIRTUAL_ENV bash -c "pytest" | expected $true | FAIL
+- Positive | timeout 600 sh -c 'npx jest' | expected $true | FAIL
+- Positive | echo x | xargs sh -c 'pytest' | expected $true | FAIL
+- Positive | bash -c "bash -c 'pytest'" | expected $true | FAIL
+- Positive | bash -c "pwsh -File tests/scripts/x.Tests.ps1" | expected $true | FAIL
+- Positive | sh -c "npm --prefix $(pwd) run lint" | expected $true | FAIL
+- Negative | sh -c "echo 'pytest'" | expected $false | PASS
+- Negative | bash -c "grep -rn 'ruff' docs/" | expected $false | PASS
+- Negative | pwsh -c "Write-Output 'npm run lint'" | expected $false | PASS
+- Negative | echo "sh -c 'pytest'" | expected $false | PASS
+- Negative | sh -c "$CMD" | expected $false | PASS
+- Negative | CMD=pytest; sh -c "$CMD" | expected $false | PASS
+- Negative | pwsh -EncodedCommand cAB5AHQAZQBzAHQA | expected $false | PASS
+- Negative | sh -c "$(cat cmd.txt)" | expected $false | PASS
+- Negative | env -S "sh -c 'pytest'" | expected $false | PASS
+- Negative | powershell -Command "Invoke-Pester" | expected $false | PASS
+- Negative | cmd /c "pytest" | expected $false | PASS
+- Negative | timeout 60 "pytest" | expected $false | PASS
+- Negative | bash -c -- "pytest" | expected $false | PASS
+- Negative | sh -c "grep pytest docs" | expected $false | PASS
+- Control | sh -c "poetry run pytest" | expected $true | PASS
+- Control | pwsh -NoProfile -Command "Invoke-Pester -Path tests/scripts/claude-hooks" | expected $true | PASS
+- Control | bash -c 'git add .' | expected $true | PASS
+- Control | sh -c "cd x && npm run lint" | expected $true | PASS
+- function row | plain sh -c payload | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | option bundle -lc | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | pwsh -Command prefix | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | pwsh -CommandWithArgs | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | pwsh -cwa | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | eval payload | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | env -u NAME | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | env --unset=NAME | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | env -C DIR | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | env --unset NAME separate value | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | env --chdir DIR separate value | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | env -S split string is declined | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | pwsh -e encoded command is declined | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | pwsh -ec encoded command is declined | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | unbalanced payload quote yields no payload | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | xargs injected words | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | timeout prefix | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | time -p prefix | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | command prefix | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | nohup prefix | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | nested payload at depth 4 | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | nested payload at depth 5 | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | payload matched through the supplement only | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | masked mention in a payload | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | variable payload | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | segment with no wrapper | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | empty command | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | ascending distinct union of two indexes | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | repeated index is returned once | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | index 0 is never returned | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | hit that stage 2 later drops | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- P1-T1 row | classifies Negative row echo `npm --version` lint as $false | PASS
+- P1-T1 row | classifies Negative row echo $(echo npm --version) lint as $false | PASS
+- P1-T1 row | Get-OrchestrationGateSupplementalPatternIndex alone (function rows).F npm inside a backtick substitution only (C2) | PASS
+- P1-T1 row | Get-OrchestrationGateSupplementalPatternIndex alone (function rows).F npm inside a nested substitution only (C4) | PASS
+- P1-T1 row | Get-OrchestrationGateSupplementalPatternIndex alone (function rows).F npx inside an assignment substitution only (C5) | PASS
+- P1-T1 row | Get-OrchestrationGateSupplementalPatternIndex alone (function rows).F npm script word inside an assignment substitution only (C3) | PASS
+### Surface: codex
+- Positive | sh -c "pytest -q" | expected $true | FAIL
+- Positive | bash -c 'ruff check .' | expected $true | FAIL
+- Positive | bash -lc "pyright" | expected $true | FAIL
+- Positive | sh -c "npm run lint" | expected $true | FAIL
+- Positive | bash -c "npx jest" | expected $true | FAIL
+- Positive | pwsh -Command "npm run lint" | expected $true | FAIL
+- Positive | pwsh -NoProfile -c "pytest" | expected $true | FAIL
+- Positive | powershell -Command "npx eslint ." | expected $true | FAIL
+- Positive | pwsh -CommandWithArgs "pytest" | expected $true | FAIL
+- Positive | eval "pytest" | expected $true | FAIL
+- Positive | env -u VIRTUAL_ENV bash -c "pytest" | expected $true | FAIL
+- Positive | timeout 600 sh -c 'npx jest' | expected $true | FAIL
+- Positive | echo x | xargs sh -c 'pytest' | expected $true | FAIL
+- Positive | bash -c "bash -c 'pytest'" | expected $true | FAIL
+- Positive | bash -c "pwsh -File tests/scripts/x.Tests.ps1" | expected $true | FAIL
+- Positive | sh -c "npm --prefix $(pwd) run lint" | expected $true | FAIL
+- Negative | sh -c "echo 'pytest'" | expected $false | PASS
+- Negative | bash -c "grep -rn 'ruff' docs/" | expected $false | PASS
+- Negative | pwsh -c "Write-Output 'npm run lint'" | expected $false | PASS
+- Negative | echo "sh -c 'pytest'" | expected $false | PASS
+- Negative | sh -c "$CMD" | expected $false | PASS
+- Negative | CMD=pytest; sh -c "$CMD" | expected $false | PASS
+- Negative | pwsh -EncodedCommand cAB5AHQAZQBzAHQA | expected $false | PASS
+- Negative | sh -c "$(cat cmd.txt)" | expected $false | PASS
+- Negative | env -S "sh -c 'pytest'" | expected $false | PASS
+- Negative | powershell -Command "Invoke-Pester" | expected $false | PASS
+- Negative | cmd /c "pytest" | expected $false | PASS
+- Negative | timeout 60 "pytest" | expected $false | PASS
+- Negative | bash -c -- "pytest" | expected $false | PASS
+- Negative | sh -c "grep pytest docs" | expected $false | PASS
+- Control | sh -c "poetry run pytest" | expected $true | PASS
+- Control | pwsh -NoProfile -Command "Invoke-Pester -Path tests/scripts/claude-hooks" | expected $true | PASS
+- Control | bash -c 'git add .' | expected $true | PASS
+- Control | sh -c "cd x && npm run lint" | expected $true | PASS
+- function row | plain sh -c payload | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | option bundle -lc | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | pwsh -Command prefix | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | pwsh -CommandWithArgs | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | pwsh -cwa | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | eval payload | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | env -u NAME | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | env --unset=NAME | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | env -C DIR | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | env --unset NAME separate value | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | env --chdir DIR separate value | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | env -S split string is declined | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | pwsh -e encoded command is declined | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | pwsh -ec encoded command is declined | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | unbalanced payload quote yields no payload | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | xargs injected words | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | timeout prefix | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | time -p prefix | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | command prefix | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | nohup prefix | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | nested payload at depth 4 | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | nested payload at depth 5 | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | payload matched through the supplement only | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | masked mention in a payload | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | variable payload | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | segment with no wrapper | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | empty command | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | ascending distinct union of two indexes | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | repeated index is returned once | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | index 0 is never returned | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- function row | hit that stage 2 later drops | FAIL (CommandNotFoundException: Get-OrchestrationGateWrappedPatternIndex undefined)
+- P1-T1 row | classifies Negative row echo `npm --version` lint as $false | PASS
+- P1-T1 row | classifies Negative row echo $(echo npm --version) lint as $false | PASS
+- P1-T1 row | Get-OrchestrationGateSupplementalPatternIndex alone (function rows).F npm inside a backtick substitution only (C2) | PASS
+- P1-T1 row | Get-OrchestrationGateSupplementalPatternIndex alone (function rows).F npm inside a nested substitution only (C4) | PASS
+- P1-T1 row | Get-OrchestrationGateSupplementalPatternIndex alone (function rows).F npx inside an assignment substitution only (C5) | PASS
+- P1-T1 row | Get-OrchestrationGateSupplementalPatternIndex alone (function rows).F npm script word inside an assignment substitution only (C3) | PASS

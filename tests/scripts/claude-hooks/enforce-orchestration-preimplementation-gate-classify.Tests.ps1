@@ -3,9 +3,13 @@
 
 <#
 .SYNOPSIS
-    Stage-1 classification supplement rows for the Claude preimplementation gate (issue #1188).
+    Stage-1 classification supplement rows for the Claude preimplementation gate (issues #1188 and #1195).
 
 .DESCRIPTION
+    Issue #1195 adds the wrapped-payload rows: ClassifyWrappedGateRows drive Test-ImplementationCommand,
+    and ClassifyWrappedFunctionRows drive Get-OrchestrationGateWrappedPatternIndex alone with the
+    gate's own stage-1 patterns, read from Test-ImplementationCommand through the PowerShell parser.
+
     The classification rows drive Test-ImplementationCommand of
     .claude/hooks/enforce-orchestration-preimplementation-gate.ps1 for the two supplement forms
     (a joined shell word split at $(, ${, or a backtick, and npx options before the tool word), their
@@ -64,6 +68,33 @@ Describe 'Claude gate stage-1 classification supplement (issue #1188)' {
 
             # Assert
             ($result -join ',') | Should -BeExactly (@($Indexes) -join ',') -Because 'the supplement returns exactly the stage-1 indexes its two forms match'
+        }
+    }
+
+    It 'classifies wrapped <Kind> row <Command> as <Expected>' -ForEach $script:ClassifyWrappedGateRows {
+        # Act
+        $result = Test-ImplementationCommand -Command $Command
+
+        # Assert
+        $result | Should -Be $Expected -Because "the wrapped $Kind row's classification is pinned by issue #1195"
+    }
+
+    Context 'Get-OrchestrationGateWrappedPatternIndex alone (wrapped function rows)' {
+        BeforeAll {
+            . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-orchestration-preimplementation-gate-classify.ps1").Path
+            $gateAst = [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-orchestration-preimplementation-gate.ps1").Path, [ref]$null, [ref]$null)
+            $gateFunction = $gateAst.Find({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Test-ImplementationCommand' }, $true)
+            $patternAssignment = $gateFunction.Body.Find({ param($node) $node -is [System.Management.Automation.Language.AssignmentStatementAst] -and $node.Left.Extent.Text -ceq '$implementationCommandPatterns' }, $true)
+            $script:WrappedGatePattern = [string[]]@($patternAssignment.Right.FindAll({ param($node) $node -is [System.Management.Automation.Language.StringConstantExpressionAst] }, $true) | ForEach-Object { $_.Value })
+            if ($script:WrappedGatePattern.Count -ne 5) { throw "Expected five stage-1 patterns in Test-ImplementationCommand; read $($script:WrappedGatePattern.Count)." }
+        }
+
+        It 'W <Name>' -ForEach $script:ClassifyWrappedFunctionRows {
+            # Act
+            $result = @(Get-OrchestrationGateWrappedPatternIndex -CommandText $Command -Pattern $script:WrappedGatePattern)
+
+            # Assert
+            ($result -join ',') | Should -BeExactly (@($Indexes) -join ',') -Because 'the wrapped-payload function returns exactly the stage-1 indexes its literal payloads match'
         }
     }
 

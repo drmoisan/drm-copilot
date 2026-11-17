@@ -1,0 +1,12 @@
+# Scope Verification (remediation cycle 1, P2-T4)
+
+Timestamp: 2026-11-16T04-15
+Plan: remediation-plan.2026-11-16T02-21.md
+Command: git -C <worktree> diff --name-status CYCLE_BASE HEAD; git -C <worktree> status --porcelain; git -C <worktree> diff --numstat CYCLE_BASE HEAD -- tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-classify.Cases.ps1; git -C <worktree> diff --name-only CYCLE_BASE HEAD -- '*hook-command-payload.ps1' '*enforce-orchestration-preimplementation-gate.ps1' '*enforce-orchestration-preimplementation-gate-commands.ps1'; sh SCRATCH/issue-1195-c1-guards.sh (parses CLASSIFY at MB, CYCLE_BASE, and HEAD with the PowerShell parser and compares extents ordinally); wc -l and a trailing-byte check over the changed files. CYCLE_BASE = 995725d6974c3c18da21beb8f1e7a7d506de7a92; MB = b58f045bc58d237129963543e445c7c8d2987772 (re-derived after fetch, unchanged); HEAD = 9063a8c07
+EXIT_CODE: 0
+Output Summary:
+- Changed paths from CYCLE_BASE to HEAD outside FEATURE: the four classify copies (.claude/hooks, .codex/hooks, extensions/drm-copilot/resources/claude-customizations/.claude/hooks, extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks) and CASES, all status M. Every other changed path is under FEATURE (the plan and this cycle's evidence). git status --porcelain lists only FEATURE paths (the plan check-offs and the uncommitted P2 evidence).
+- Unchanged surfaces (AC-7): the diff names no copy of hook-command-payload.ps1, no enforce-orchestration-preimplementation-gate.ps1 gate or bundle copy, and no enforce-orchestration-preimplementation-gate-commands.ps1 copy (0 paths), so their state against MB is the one the prior cycle verified.
+- CASES numstat from CYCLE_BASE: 6 added, 0 removed (no existing row or header edited, AC-8).
+- Guards (AC-15): Get-OrchestrationGateJoinedWordText, Get-OrchestrationGateSupplementalPatternIndex, and the four $script:OrchestrationGateSupplement*Pattern assignments (Npm, Npx, NpxOption, Join) are byte-equal at MB, CYCLE_BASE, and HEAD; Get-OrchestrationGateWrappedPatternIndex is byte-equal between CYCLE_BASE and HEAD (absent at MB, added by the prior cycle); 0 mismatches.
+- File sizes (logical lines; each file ends with one line terminator): four classify copies 232 each (at or below the pinned 500, AC-19); CASES 186. No changed file exceeds 800 lines and none is at or above 700, so no advisory warning applies. FEATURE Markdown files are exempt.
