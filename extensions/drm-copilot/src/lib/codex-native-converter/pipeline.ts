@@ -24,7 +24,6 @@ import {
 import { renderTargetContent } from "./pipeline-render";
 
 export {
-  renderMergedStandingGuidance,
   renderSectionEmissionContent,
   renderTargetContent,
 } from "./pipeline-render";
@@ -63,7 +62,9 @@ function extractTopologyDestinations(
 /**
  * Build report topology edges from per-source rendered native intent.
  *
- * Mirrors `build_topology_edges`.
+ * Mirrors `build_topology_edges`. Standing-guidance source paths are taken
+ * from the role alone; those records have a null target, so they contribute a
+ * `[no target]` edge and never an `AGENTS.md` destination.
  *
  * @param fileSystem Injected filesystem.
  * @param runOptions Requested run options.
@@ -79,11 +80,7 @@ export function buildTopologyEdges(
   translationTraces: ReadonlyArray<TranslationTrace>,
 ): ReadonlyArray<TopologyEdge> {
   const standingGuidanceSourcePaths = mappingRecords
-    .filter(
-      (record) =>
-        record.targetRole === TargetRole.STANDING_GUIDANCE &&
-        record.targetPath === "AGENTS.md",
-    )
+    .filter((record) => record.targetRole === TargetRole.STANDING_GUIDANCE)
     .map((record) => record.sourcePath);
   const knownDestinationPaths = [
     ...new Set(

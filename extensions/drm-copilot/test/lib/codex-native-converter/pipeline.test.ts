@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from "@jest/globals";
 
 import {
-  renderMergedStandingGuidance,
   renderSectionEmissionContent,
   renderTargetContent,
 } from "../../../src/lib/codex-native-converter/pipeline-render";
@@ -57,16 +56,16 @@ describe("renderTargetContent", () => {
     fs = new InMemoryFileSystem();
   });
 
-  it("wraps standing-guidance content with the converted-guidance header and rewrite summary", () => {
+  it("renders standing-guidance content without a converted-guidance header", () => {
     fs.addFile(
       `${SOURCE_ROOT}/.github/copilot-instructions.md`,
       "Follow .github/instructions/x.instructions.md.",
     );
     const rendered = renderTargetContent(fs, runOptions(), record({}), []);
-    expect(rendered).toContain("# Converted standing guidance");
-    expect(rendered).toContain("Applied rewrites:");
-    // The body's source reference is rewritten to the native skill path.
-    expect(rendered).toContain(".agents/skills/x/SKILL.md");
+    expect(rendered).not.toContain("# Converted standing guidance");
+    expect(rendered).not.toContain("Applied rewrites:");
+    // The body's source reference is still rewritten to the native skill path.
+    expect(rendered).toBe("Follow .agents/skills/x/SKILL.md.\n");
   });
 
   it("wraps subagent content as a TOML manifest using the target stem", () => {
@@ -127,33 +126,6 @@ describe("renderTargetContent", () => {
     );
     expect(rendered.startsWith("# Converted hook\n")).toBe(true);
     expect(rendered).toContain("Write-Output 1");
-  });
-});
-
-describe("renderMergedStandingGuidance", () => {
-  it("merges multiple standing-guidance sources with deterministic ordering", () => {
-    const fs = new InMemoryFileSystem();
-    fs.addFile(`${SOURCE_ROOT}/.github/copilot-instructions.md`, "Alpha body.");
-    fs.addFile(
-      `${SOURCE_ROOT}/.github/instructions/general.instructions.md`,
-      "Beta body.",
-    );
-    const records = [
-      record({ sourcePath: ".github/copilot-instructions.md" }),
-      record({
-        sourcePath: ".github/instructions/general.instructions.md",
-        sourceKind: SourceKind.PATH_SCOPED_INSTRUCTION,
-        conversionClass: ConversionClass.DECOMPOSED,
-      }),
-    ];
-    const merged = renderMergedStandingGuidance(fs, runOptions(), records);
-    expect(merged).toContain("# Converted standing guidance");
-    expect(merged).toContain("Merged standing-guidance sources:");
-    expect(merged).toContain("## Source: `copilot-instructions.md`");
-    expect(merged).toContain("## Source: `general.instructions.md`");
-    expect(merged.indexOf("copilot-instructions.md")).toBeLessThan(
-      merged.indexOf("general.instructions.md"),
-    );
   });
 });
 
@@ -246,6 +218,42 @@ describe("buildTopologyEdges", () => {
     expect(edges).toEqual([
       {
         sourcePath: ".github/skills/README.md",
+        destinationPath: "[no target]",
+      },
+    ]);
+  });
+
+  it("adds no AGENTS.md destination when standing guidance is not emitted", () => {
+    const fs = new InMemoryFileSystem();
+    fs.addFile(`${SOURCE_ROOT}/.github/skills/review/SKILL.md`, "skill");
+    const edges = buildTopologyEdges(
+      fs,
+      runOptions(),
+      [
+        // planTargetPaths leaves standing guidance with a null target.
+        record({
+          sourcePath: ".github/copilot-instructions.md",
+          targetPath: null,
+        }),
+        record({
+          sourcePath: ".github/skills/review/SKILL.md",
+          sourceKind: SourceKind.REUSABLE_SKILL,
+          targetRole: TargetRole.SHARED_SKILL,
+          targetPath: ".agents/skills/review/SKILL.md",
+        }),
+      ],
+      [],
+    );
+    expect(edges.some((edge) => edge.destinationPath === "AGENTS.md")).toBe(
+      false,
+    );
+    expect(
+      edges.filter(
+        (edge) => edge.sourcePath === ".github/copilot-instructions.md",
+      ),
+    ).toEqual([
+      {
+        sourcePath: ".github/copilot-instructions.md",
         destinationPath: "[no target]",
       },
     ]);
