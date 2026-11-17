@@ -6,9 +6,9 @@ Budget-first routing contract for Python work. Estimate production-file scope, c
 
 ## Observable Behaviors
 
-- **OB-1** Canonical Routing Rules: Estimate rough change budget first based on likely production Python files touched.
+- **OB-1** Canonical Routing Rules: The skill first estimates the change budget from the likely production Python files touched and then routes 1 to 3 production files with their tests to the small path (`python-typed-engineer` direct mode) and more than 3 production files to the orchestrated large path, which has no production-file cap, and test files are not counted toward the routing threshold.
 - **OB-2** Direct-Mode Rejection Rule: Stop before editing the 4th production file.
-- **OB-3** Orchestrated Small-Path Requirements: If the MCP server or required tool is unavailable, stop before promotion.
+- **OB-3** Orchestrated Small-Path Requirements: Promotion and folder lifecycle steps run through the repository automation tools, and when the required tool is unavailable the skill stops before promotion begins.
 - **OB-4** Documentation Expectations: The response or logs record the estimated production file count, the chosen path (`small` or `large`), and a rationale summary of one to three bullets.
 
 ## Acceptance Checks
