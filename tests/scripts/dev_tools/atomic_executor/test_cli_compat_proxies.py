@@ -46,6 +46,7 @@ def test_clean_session_file_forwards_arguments_to_original(
     calls: list[tuple[tuple[object, ...], dict[str, object]]] = []
 
     def fake_clean(*args: object, **kwargs: object) -> None:
+        """Record the forwarded arguments."""
         calls.append((args, kwargs))
 
     monkeypatch.setattr(cli, "_ORIGINAL_CLEAN_FN", fake_clean)

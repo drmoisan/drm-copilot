@@ -111,6 +111,8 @@ class TestResolveFeatureAndType:
 
 
 class TestReadAndGenerate:
+    """Plan reading and report composition, with disk reads replaced by recorders."""
+
     def test_read_plan_docs_reads_each_path_as_utf8(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -119,6 +121,7 @@ class TestReadAndGenerate:
         reads: list[tuple[Path, str | None]] = []
 
         def fake_read_text(self: Path, encoding: str | None = None) -> str:
+            """Record the read and return text derived from the file name."""
             reads.append((self, encoding))
             return f"text of {self.name}"
 
@@ -142,10 +145,12 @@ class TestReadAndGenerate:
         seen: dict[str, object] = {}
 
         def fake_discover(root: Path) -> list[Path]:
+            """Record the scanned root and return one plan path."""
             seen["discover"] = root
             return [plan_path]
 
         def fake_read(paths: list[Path]) -> list[tuple[Path, str]]:
+            """Record the paths and return one incomplete plan."""
             seen["read"] = paths
             return [(plan_path, "- Issue: #9\n- [ ] Todo\n- [x] Done\n")]
 
@@ -163,6 +168,8 @@ class TestReadAndGenerate:
 
 
 class TestMain:
+    """The CLI entry point, with report generation and disk writes replaced."""
+
     def _patch_io(
         self, monkeypatch: pytest.MonkeyPatch, calls: dict[str, object]
     ) -> None:
@@ -174,15 +181,18 @@ class TestMain:
         """
 
         def fake_generate(*, active_root: Path, report_path: Path | None = None) -> str:
+            """Record the generation arguments and return a fixed report."""
             calls["generate"] = (active_root, report_path)
             return "REPORT"
 
         def fake_mkdir(
             self: Path, parents: bool = False, exist_ok: bool = False
         ) -> None:
+            """Record the directory creation request."""
             calls["mkdir"] = (self, parents, exist_ok)
 
         def fake_write_text(self: Path, data: str, encoding: str | None = None) -> int:
+            """Record the write and report the written length."""
             calls["write"] = (self, data, encoding)
             return len(data)
 

@@ -191,6 +191,7 @@ def _scripted_input(answers: list[str]) -> Callable[[str], str]:
     remaining: Iterator[str] = iter(answers)
 
     def fake_input(prompt: str = "") -> str:
+        """Return the next scripted answer and ignore the prompt."""
         del prompt
         return next(remaining)
 
@@ -204,6 +205,7 @@ def test_resolve_issue_parent_dir_directory_returns_itself(
 
     # Arrange: the selected path reports itself as a directory without disk access.
     def fake_is_dir(self: Path) -> bool:
+        """Report every path as a directory."""
         del self
         return True
 
@@ -231,13 +233,16 @@ def test_real_file_system_delegates_exists_copy_and_resolve(
     calls: list[tuple[str, object]] = []
 
     def fake_exists(self: Path) -> bool:
+        """Record the existence check and report the path as present."""
         calls.append(("exists", self))
         return True
 
     def fake_mkdir(self: Path, parents: bool = False, exist_ok: bool = False) -> None:
+        """Record the directory creation request."""
         calls.append(("mkdir", (self, parents, exist_ok)))
 
     def fake_copyfile(src: Path, dest: Path) -> None:
+        """Record the copy request."""
         calls.append(("copyfile", (src, dest)))
 
     monkeypatch.setattr(Path, "exists", fake_exists)
@@ -312,10 +317,12 @@ def test_select_file_returns_picked_path(monkeypatch: pytest.MonkeyPatch) -> Non
     def fake_resolve_initial_dir(
         *, workspace_root: Path, relative_start_dir: Path, exists: object
     ) -> Path:
+        """Record the start-folder resolution and join it to the workspace."""
         seen["initial"] = (workspace_root, relative_start_dir, exists)
         return workspace / relative_start_dir
 
     def fake_pick(*, title: str, initial_dir: Path | None) -> Path | None:
+        """Record the picker arguments and return the picked file."""
         seen["pick"] = (title, initial_dir)
         return picked
 
@@ -345,6 +352,7 @@ def test_select_file_prompts_when_picker_returns_none(
     seen: list[Path | None] = []
 
     def fake_pick(*, title: str, initial_dir: Path | None) -> Path | None:
+        """Record the start folder and simulate a picker that returns nothing."""
         del title
         seen.append(initial_dir)
         return None
@@ -394,14 +402,17 @@ def _arrange_main(
     def fake_select_file(
         *, title: str, label: str, fs: object, initial_relative_dir: Path | None
     ) -> Path:
+        """Return the research file first and the issue file second."""
         del title, label, fs, initial_relative_dir
         return next(selections)
 
     def fake_is_dir(self: Path) -> bool:
+        """Report every path as a file, so the issue parent is its folder."""
         del self
         return False
 
     def fake_start_dir(workspace_root: Path) -> Path:
+        """Return the default active area without reading the routing file."""
         del workspace_root
         return Path("docs/features/active")
 
