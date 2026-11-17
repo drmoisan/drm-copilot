@@ -1,0 +1,87 @@
+[
+  {
+    "stage": "S5_atomic_execution",
+    "attempt": 1,
+    "started_at": "2026-11-16T00:34:22Z",
+    "ended_at": "2026-11-16T00:43:51Z"
+  },
+  {
+    "stage": "S4_replanning_s2",
+    "attempt": 1,
+    "started_at": "2026-11-16T00:43:51Z",
+    "ended_at": "2026-11-16T00:49:38Z"
+  },
+  {
+    "stage": "S5_atomic_execution",
+    "attempt": 2,
+    "started_at": "2026-11-16T00:49:38Z",
+    "ended_at": "2026-11-16T03:50:24Z"
+  },
+  {
+    "stage": "owner_stop",
+    "attempt": 1,
+    "started_at": "2026-11-16T03:50:24Z",
+    "ended_at": "2026-11-16T03:52:04Z"
+  },
+  {
+    "stage": "S5_atomic_execution_plan_b",
+    "attempt": 1,
+    "started_at": "2026-11-16T03:52:04Z",
+    "ended_at": "2026-11-16T05:18:35Z"
+  },
+  {
+    "stage": "S7_feature_review",
+    "attempt": 1,
+    "started_at": "2026-11-16T05:18:35Z",
+    "ended_at": "2026-11-16T05:33:14Z"
+  },
+  {
+    "stage": "remediation.cycle_1",
+    "attempt": 1,
+    "started_at": "2026-11-16T05:33:14Z",
+    "ended_at": "2026-11-16T06:05:54Z"
+  },
+  {
+    "stage": "remediation.cycle_1.reaudit",
+    "attempt": 1,
+    "started_at": "2026-11-16T06:05:54Z",
+    "ended_at": "2026-11-16T06:22:03Z"
+  },
+  {
+    "stage": "remediation.cycle_2",
+    "attempt": 1,
+    "started_at": "2026-11-16T06:22:03Z",
+    "ended_at": "2026-11-17T04:38:48Z",
+    "note": "includes the owner quota pause; ended at the WIP quota-pause commit time; pause start not recorded"
+  },
+  {
+    "stage": "remediation.cycle_2",
+    "attempt": 2,
+    "started_at": "2026-11-17T04:40:52Z",
+    "ended_at": "2026-11-17T06:58:22Z"
+  },
+  {
+    "stage": "remediation.cycle_3",
+    "attempt": 1,
+    "started_at": "2026-11-17T06:58:22Z",
+    "ended_at": "2026-11-17T07:54:24Z"
+  },
+  {
+    "stage": "S8_create_pr",
+    "attempt": 1,
+    "started_at": "2026-11-17T07:54:24Z",
+    "ended_at": "2026-11-17T07:58:17Z"
+  },
+  {
+    "stage": "S9_ci_green",
+    "attempt": 1,
+    "started_at": "2026-11-17T07:58:17Z",
+    "ended_at": "2026-11-17T08:17:47Z"
+  },
+  {
+    "stage": "S9_ci_green",
+    "attempt": 2,
+    "started_at": "2026-11-17T08:18:30Z",
+    "ended_at": null
+  }
+]

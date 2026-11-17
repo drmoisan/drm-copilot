@@ -106,3 +106,6 @@ projects:
   - path: "scripts/ci"
     tier: T4
     rationale: "CI change-scope decision script and its pure helper module (CI scaffolding)"
+  - path: "scripts/harness"
+    tier: T4
+    rationale: "Repository-internal parity-matrix and contract checks run by the PowerShell QC gate; not published by push-down"
