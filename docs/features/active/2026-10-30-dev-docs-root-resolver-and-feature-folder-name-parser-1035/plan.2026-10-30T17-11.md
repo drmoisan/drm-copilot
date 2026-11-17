@@ -285,7 +285,7 @@ Each hook that imports the module uses the guarded import pattern and Codex hook
   - Asserting tests and dispositions: the `test_derivation_*` feature-folder cases of `test_compute_blast_radius.py`, `test_blast_radius_parity.py` with `blast_radius_parity_test_support.py`, and the other `derive_blast_radius` callers under `tests/scripts/dev_tools/` pass no root and are unchanged; parity is unchanged under the default. No test reads `FEATURE_FOLDER_ROOT`.
   - New cases: `test_derivation_feature_folder_glob_uses_passed_root` (`development_docs_root=".dev"` gives `.dev/active/f/**`; fails when the passed root is ignored), `test_derivation_rejects_an_unknown_development_docs_root`, `test_derivation_passes_through_a_dev_qualified_feature_folder` (feature folder `.dev/active/f` with no root gives `.dev/active/f/**`; fails when `FEATURE_FOLDER_PREFIX` is not widened) and `test_compute_blast_radius_calls_no_resolver` (AST: the module names no `resolve_development_docs_root`) in `test_compute_blast_radius.py`; `.dev` cases in `test_blast_radius_token_shapes.py` and `test_blast_radius_write_intent.py`.
   - Acceptance: suites pass.
-- [ ] [P8-T5] [phase-gate] Run stages 1 to 6 per `## Test Cadence (Mandatory)` over `scripts/`, `.claude/`, `.codex/`, `extensions/drm-copilot/` and `tests/`.
+- [x] [P8-T5] [phase-gate] Run stages 1 to 6 per `## Test Cadence (Mandatory)` over `scripts/`, `.claude/`, `.codex/`, `extensions/drm-copilot/` and `tests/`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/phase-gate.P8.<timestamp>.md` records one clean pass.
 
 ### Phase 9 — Final QA, Evidence and Self-Review
