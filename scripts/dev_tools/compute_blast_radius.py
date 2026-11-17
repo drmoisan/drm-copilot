@@ -82,6 +82,11 @@ from scripts.dev_tools._blast_radius_write_intent import (
     select_plan_paths,
     select_write_intent_path_entries,
 )
+from scripts.dev_tools.json_config import (
+    DEFAULT_DEVELOPMENT_DOCS_ROOT,
+    KNOWN_DEVELOPMENT_DOCS_ROOTS,
+    development_docs_relative_path,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
@@ -133,9 +138,13 @@ RADIUS_KEYS: tuple[str, ...] = tuple(
 )
 
 # Feature-folder handling. Every radius contains its own feature folder, and a
-# caller may pass either a bare folder name or an already-qualified path.
-FEATURE_FOLDER_ROOT = "docs/features/active"
-FEATURE_FOLDER_PREFIX = "docs/features/"
+# caller may pass either a bare folder name or a path already qualified under
+# any known development-docs root (issue #1035). The derivation stays pure: the
+# root is a keyword argument defaulting to ``DEFAULT_DEVELOPMENT_DOCS_ROOT``,
+# never a configuration read.
+FEATURE_FOLDER_PREFIX: tuple[str, ...] = tuple(
+    f"{root}/" for root in KNOWN_DEVELOPMENT_DOCS_ROOTS
+)
 
 
 @dataclass(frozen=True)
@@ -266,6 +275,7 @@ def derive_blast_radius(
     *,
     source: str = RADIUS_SOURCE_DERIVED,
     computed_at: str,
+    development_docs_root: str = DEFAULT_DEVELOPMENT_DOCS_ROOT,
 ) -> BlastRadius:
     """Derive a blast radius from an approved plan and its feature spec.
 
@@ -273,11 +283,14 @@ def derive_blast_radius(
         plan_text (str): Approved atomic-plan document text; may be empty.
         spec_text (str): Feature ``spec.md`` document text; may be empty.
         feature_folder (str): Bare feature folder name, or a path that already
-            starts with ``docs/features/``.
+            starts with a known development-docs root and ``/``.
         config (Mapping[str, object]): Parsed ``config/blast-radius.json``.
         source (str): Confidence source to record; ``derived`` by default and
             ``declared`` when a planner adopts the result as authoritative.
         computed_at (str): Caller-supplied ISO-8601 timestamp.
+        development_docs_root (str): Root whose active area holds a bare
+            feature folder; defaults to ``DEFAULT_DEVELOPMENT_DOCS_ROOT``. No
+            configuration is read (issue #1035).
 
     Returns:
         BlastRadius: The derived radius. A plan and spec with no extractable
@@ -286,7 +299,8 @@ def derive_blast_radius(
     Raises:
         TypeError: If an argument or the truth table has a wrong type.
         ValueError: If ``feature_folder``, ``source``, or ``computed_at`` is
-            blank, or ``source`` is outside ``RADIUS_SOURCES``.
+            blank, ``source`` is outside ``RADIUS_SOURCES``, or
+            ``development_docs_root`` is not a known root.
     """
     require_text(plan_text, "plan_text", allow_empty=True)
     require_text(spec_text, "spec_text", allow_empty=True)
@@ -325,7 +339,12 @@ def derive_blast_radius(
     # keeps the derived radius passing V1 and V2 against its own plan. The
     # feature-folder glob is added afterwards so it can never be excluded.
     surviving = set(exclude_mandate_reads(tuple(entries), mandate_reads))
-    surviving.add(_feature_folder_glob(require_text(feature_folder, "feature_folder")))
+    surviving.add(
+        _feature_folder_glob(
+            require_text(feature_folder, "feature_folder"),
+            root=development_docs_root,
+        )
+    )
     paths = tuple(sorted(surviving))
 
     return BlastRadius(
@@ -458,21 +477,34 @@ def radius_from_observed_paths(
     )
 
 
-def _feature_folder_glob(feature_folder: str) -> str:
+def _feature_folder_glob(
+    feature_folder: str, *, root: str = DEFAULT_DEVELOPMENT_DOCS_ROOT
+) -> str:
     """Render a feature folder as the glob covering everything beneath it.
 
     Args:
-        feature_folder (str): Bare folder name or an already-qualified path;
-            surrounding whitespace and separators are trimmed.
+        feature_folder (str): Bare folder name or a path already qualified
+            under a known development-docs root; surrounding whitespace and
+            separators are trimmed.
+        root (str): Development-docs root whose active area holds a bare
+            folder; defaults to ``DEFAULT_DEVELOPMENT_DOCS_ROOT``.
 
     Returns:
         str: A ``**`` glob rooted at the feature folder.
+
+    Raises:
+        ValueError: If ``root`` is not in ``KNOWN_DEVELOPMENT_DOCS_ROOTS``.
     """
+    if root not in KNOWN_DEVELOPMENT_DOCS_ROOTS:
+        raise ValueError(
+            f"Unknown development docs root {root!s}; expected one of: "
+            f"{', '.join(KNOWN_DEVELOPMENT_DOCS_ROOTS)}."
+        )
     trimmed = feature_folder.strip().strip("/")
 
     # Accepting an already-qualified path avoids producing a doubled
-    # ``docs/features/active/docs/features/active/...`` entry when a caller
-    # passes the folder path it already holds.
+    # ``<root>/active/<root>/active/...`` entry when a caller passes the folder
+    # path it already holds.
     if trimmed.startswith(FEATURE_FOLDER_PREFIX):
         return f"{trimmed}/**"
-    return f"{FEATURE_FOLDER_ROOT}/{trimmed}/**"
+    return f"{development_docs_relative_path(root, 'active')}/{trimmed}/**"

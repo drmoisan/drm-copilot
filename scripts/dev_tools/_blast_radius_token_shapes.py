@@ -72,6 +72,8 @@ from __future__ import annotations
 
 import re
 
+from scripts.dev_tools.json_config import KNOWN_DEVELOPMENT_DOCS_ROOTS
+
 # Placeholder and interpolation markers. A token carrying any of these was
 # written to document a shape, not to name a file, so it can never be a write
 # claim. The set is character-identical to PLACEHOLDER_MARKERS in
@@ -87,10 +89,13 @@ import re
 # resolves at run time to text that is not in the token.
 PLACEHOLDER_MARKERS: tuple[str, ...] = ("<", ">", "${", "$(", "%")
 
-# Documentation-corpus root and the index, counted after that prefix, of the
-# segment that names one feature folder. A glob whose wildcard reaches this
-# segment or any earlier one claims every feature folder in the corpus.
-FEATURE_CORPUS_PREFIX = "docs/features/"
+# Documentation-corpus roots (every known development-docs root, issue #1035)
+# and the index, counted after that prefix, of the segment that names one
+# feature folder. A glob whose wildcard reaches this segment or any earlier one
+# claims every feature folder in the corpus.
+FEATURE_CORPUS_PREFIX: tuple[str, ...] = tuple(
+    f"{root}/" for root in KNOWN_DEVELOPMENT_DOCS_ROOTS
+)
 FEATURE_FOLDER_SEGMENT_INDEX = 1
 
 # File-shape extension pattern (issue #797). A final component names a file when
@@ -168,7 +173,8 @@ def spans_multiple_feature_folders(token: str) -> bool:
     """Report whether a glob claims more than one documentation feature folder.
 
     The documentation corpus is laid out as
-    ``docs/features/<bucket>/<feature-folder>/...``. A glob whose wildcard
+    ``<root>/<bucket>/<feature-folder>/...`` under each known development-docs
+    root (issue #1035). A glob whose wildcard
     occupies or truncates the feature-folder segment therefore claims every
     feature folder in the corpus, which made two unrelated work items contend
     purely because both wrote documentation (issue #489). A glob that carries a
@@ -190,10 +196,15 @@ def spans_multiple_feature_folders(token: str) -> bool:
     Side Effects:
         None.
     """
-    if not token.startswith(FEATURE_CORPUS_PREFIX):
+    # The token must start with one corpus root; segments count after it.
+    corpus_prefix = next(
+        (prefix for prefix in FEATURE_CORPUS_PREFIX if token.startswith(prefix)),
+        None,
+    )
+    if corpus_prefix is None:
         return False
 
-    segments = token[len(FEATURE_CORPUS_PREFIX) :].split("/")
+    segments = token[len(corpus_prefix) :].split("/")
 
     # A token that stops at or before the feature-folder segment has had that
     # segment truncated away by the wildcard, so it spans the whole corpus.
