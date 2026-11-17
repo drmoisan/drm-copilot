@@ -45,8 +45,8 @@
     PowerShell 7+. Only Get-OrchestrationGateBookkeepingConfigText reads a file; every other
     function is pure, and the staged index is read only through the injected reader. No
     StrictMode or preference assignment, because a dot-sourced file changes its caller's scope.
-    The file holds no artifacts-tree string literal: the five trees come from
-    $script:OrchestrationBookkeepingTrees (helpers file) and the checkpoint suffix from
+    The file holds no artifacts-tree string literal: the exempt trees come from
+    Get-OrchestrationBookkeepingTree (helpers file) and the checkpoint suffix from
     $script:CheckpointPaths (gate file). Call-time dependencies: Get-EpicFanInAllowance and
     Test-EpicMergedFeaturePath (hook-epic-fan-in.ps1), Split-OrchestrationCommandLine,
     ConvertTo-OrchestrationCommandToken, and Test-ExemptOrchestrationSelector (helpers file),
@@ -275,7 +275,7 @@ function Get-OrchestrationBookkeepingStagingResult {
 
     # The predicate records every operand and staged name it judges, for the anchor test, and
     # reads both variables through the caller scope chain when Get-EpicFanInAllowance invokes it.
-    $bookkeepingUnionRoot = [string[]](@($script:OrchestrationBookkeepingTrees) + $bookkeepingDeclaredRoot)
+    $bookkeepingUnionRoot = [string[]](@(Get-OrchestrationBookkeepingTree) + $bookkeepingDeclaredRoot)
     $bookkeepingObservedPath = [System.Collections.Generic.List[string]]::new()
     $predicate = { param([string] $Path) $bookkeepingObservedPath.Add($Path); Test-EpicMergedFeaturePath -RelativePath $Path -Root $bookkeepingUnionRoot }
     $worktreeRoot = Get-OrchestrationGateBookkeepingWorktreeRoot -CheckpointPath $CheckpointPath -CheckpointSuffix ([string]@($script:CheckpointPaths)[0])

@@ -25,6 +25,7 @@
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+Import-Module (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 # The only route id that describes an epic checkpoint. Compared case-sensitively.
 $script:EpicRouteId = 'epic'
@@ -33,9 +34,10 @@ $script:EpicRouteId = 'epic'
 # missing one, means a child has not landed on the integration branch.
 $script:TerminalMergeStatuses = @('merged', 'worktree_removed')
 
-# An epic manifest lives under the epics tree; the pattern is tested after backslash
-# normalisation so either separator spelling is accepted.
-$script:EpicManifestPattern = '(^|/)docs/features/epics/'
+# An epic manifest lives under the epics area of either known development-docs root;
+# the pattern is tested after backslash normalisation so either separator spelling is
+# accepted.
+$script:EpicManifestPattern = '(^|/)(?:' + (@(Get-DevelopmentDocsKnownRoot | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')/epics/'
 
 function Get-EpicReadinessPropertyValue {
     # Pure: the named property of an object, or $null when the object or the property

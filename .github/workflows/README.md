@@ -115,7 +115,7 @@ Reason codes: `EVENT_NOT_PULL_REQUEST`, `FORK_PULL_REQUEST`, `RUN_LIST_FAILED`, 
 
 ### Allowlist
 
-`config/ci-docs-only-paths.json` holds the allowlist. A path is allowlisted only when it starts with an include prefix (`docs/features/active/`, `docs/features/archive/`, `docs/features/completed/`, `docs/features/epics/`, `docs/features/parallel/`, `docs/features/potential/`, or `docs/research/`), does not start with an exclude prefix (`docs/features/templates/` or `docs/features/potential/template.md`), ends in one of the extensions `.md`, `.txt`, `.log`, `.json`, or `.xml` (compared case-insensitively), and contains no `..` segment, no backslash, and no leading `/`. Prefixes are compared case-sensitively. A change to the allowlist file itself is not allowlisted.
+`config/ci-docs-only-paths.json` holds the allowlist. A path is allowlisted only when it starts with an include prefix (`docs/features/active/`, `docs/features/archive/`, `docs/features/completed/`, `docs/features/epics/`, `docs/features/parallel/`, `docs/features/potential/`, `docs/research/`, or one of their `.dev` forms `.dev/active/`, `.dev/archive/`, `.dev/completed/`, `.dev/epics/`, `.dev/parallel/`, `.dev/potential/`, or `.dev/research/`, issue #1035), does not start with an exclude prefix (`docs/features/templates/`, `docs/features/potential/template.md`, or `.dev/potential/template.md`), ends in one of the extensions `.md`, `.txt`, `.log`, `.json`, or `.xml` (compared case-insensitively), and contains no `..` segment, no backslash, and no leading `/`. Prefixes are compared case-sensitively. A change to the allowlist file itself is not allowlisted.
 
 ### Fail-closed rules
 

@@ -275,3 +275,18 @@ describe("iterGovernedFiles", () => {
     expect(result).not.toContain(`${ROOT}/scripts/weird.json`);
   });
 });
+
+describe("iterGovernedFiles development-docs root", () => {
+  it("governs JSON under .dev", () => {
+    // Arrange
+    const fs = new VirtualFileSystem([".dev/research/x.json"], ROOT);
+
+    // Act
+    const result = iterGovernedFiles(fs, ROOT);
+
+    // Assert
+    expect(GOVERNED_GLOBS).toContain(".dev/**/*.json");
+    expect(GOVERNED_GLOBS).toContain("docs/**/*.json");
+    expect(result).toContain(`${ROOT}/.dev/research/x.json`);
+  });
+});

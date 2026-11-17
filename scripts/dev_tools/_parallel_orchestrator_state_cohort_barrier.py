@@ -54,6 +54,7 @@ from scripts.dev_tools._parallel_state_common import (
     is_non_negative_integer,
     is_positive_integer,
 )
+from scripts.dev_tools.json_config import known_root_prefixes
 
 # Literal token of the Layer 2 invariant (design section 9). The message form is
 # byte-exact and, unlike every other error this validator family emits, carries
@@ -79,8 +80,8 @@ GATING_KEYS: tuple[str, ...] = ("conflict_edges", "cohorts")
 # Lifecycle prefixes a ``feature_folder`` hint may carry, longest first so the
 # repository-rooted form is stripped before the bare lifecycle form.
 FOLDER_HINT_PREFIXES: tuple[str, ...] = (
-    "docs/features/active/",
-    "docs/features/completed/",
+    *known_root_prefixes("active"),
+    *known_root_prefixes("completed"),
     "active/",
     "completed/",
 )

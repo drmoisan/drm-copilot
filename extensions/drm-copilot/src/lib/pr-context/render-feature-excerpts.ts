@@ -26,6 +26,11 @@ import {
   splitLines,
   truncate,
 } from "./models";
+import {
+  developmentDocsPath,
+  knownRootPrefixes,
+  resolveDevelopmentDocsRoot,
+} from "../development-docs/root";
 
 /** Spec headings extracted into the excerpt, in fixed order. */
 const SPEC_HEADINGS = [
@@ -192,7 +197,8 @@ export function readTextFile(fs: FileSystem, path: string): string {
 }
 
 /**
- * Extract feature directory names from `docs/features/active/**` paths.
+ * Extract feature directory names from paths under the active area of
+ * either known development-docs root.
  *
  * Mirrors Python `extract_features_from_paths`.
  *
@@ -204,14 +210,9 @@ export function extractFeaturesFromPaths(
 ): Set<string> {
   const features = new Set<string>();
   for (const raw of changedFiles) {
-    const parts = toPosixPath(raw).split("/");
-    if (
-      parts.length >= 4 &&
-      parts[0] === "docs" &&
-      parts[1] === "features" &&
-      parts[2] === "active"
-    ) {
-      features.add(parts[3]!);
+    const feature = activeFeatureSegment(toPosixPath(raw));
+    if (feature !== null) {
+      features.add(feature);
     }
   }
   return features;
@@ -359,8 +360,9 @@ export function gatherFeatureExcerpts(
   const normalizedRoot = toPosixPath(root).replace(/\/+$/u, "");
   const features = extractFeaturesFromPaths(changedFiles);
   const excerpts: FeatureDocExcerpt[] = [];
-  const baseDir = `${normalizedRoot}/docs/features/active`;
-  const promotedDir = `${normalizedRoot}/docs/features/potential/promoted`;
+  const docsRoot = resolveDevelopmentDocsRoot(fs, normalizedRoot);
+  const baseDir = `${normalizedRoot}/${developmentDocsPath(docsRoot, "active")}`;
+  const promotedDir = `${normalizedRoot}/${developmentDocsPath(docsRoot, "potential/promoted")}`;
 
   for (const feature of [...features].sort(compareCodePoint)) {
     const featureDir = resolveFeatureDir(fs, baseDir, feature);
@@ -427,4 +429,25 @@ export function gatherFeatureExcerpts(
   }
 
   return excerpts;
+}
+
+/**
+ * Return the feature segment of a path under the `active` area of either
+ * known development-docs root (matchers accept the union).
+ *
+ * @param posixPath Repo-relative forward-slash path.
+ * @returns The segment after the active area, or `null` when the path is not
+ *   under an active area.
+ */
+function activeFeatureSegment(posixPath: string): string | null {
+  for (const prefix of knownRootPrefixes("active")) {
+    if (posixPath.startsWith(prefix)) {
+      // The segment runs to the next separator, or to the end of the path.
+      const rest = posixPath.slice(prefix.length);
+      const end = rest.indexOf("/");
+      const segment = end < 0 ? rest : rest.slice(0, end);
+      return segment === "" ? null : segment;
+    }
+  }
+  return null;
 }

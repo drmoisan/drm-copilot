@@ -83,6 +83,10 @@ export type {
   PushDownClaudeCustomizationsInput,
   PushDownCodexAndAgentsCustomizationsInput,
 } from "./repo-automation-service-contract";
+import {
+  DEFAULT_DEVELOPMENT_DOCS_ROOT,
+  resolveDevelopmentDocsRoot,
+} from "./lib/development-docs/root";
 
 export interface RepoAutomationServiceOptions {
   readonly extensionRoot: string;
@@ -233,13 +237,28 @@ class DefaultRepoAutomationService
   async newPotentialEntry(
     input: WorkspaceExecutionInput & { readonly shortName: string },
   ): Promise<RepoAutomationExecutionResult> {
+    const args = [
+      "-ShortName",
+      input.shortName,
+      "-TemplateRoot",
+      this.templateRoot,
+    ];
+    // D-P4: pass the resolved root only when it differs from the default, so
+    // the default argv stays byte-identical.
+    const docsRoot = resolveDevelopmentDocsRoot(
+      this.fileSystem,
+      input.workspaceRoot,
+    );
+    if (docsRoot !== DEFAULT_DEVELOPMENT_DOCS_ROOT) {
+      args.push("-DevelopmentDocsRoot", docsRoot);
+    }
     return this.executeScript({
       tool: "new_potential_entry",
       runtimeKind: "powershell",
       bundledRelativePath: "resources/templates/new-potential-entry.ps1",
       workspaceRoot: input.workspaceRoot,
       invocationId: input.invocationId ?? "new_potential_entry",
-      args: ["-ShortName", input.shortName, "-TemplateRoot", this.templateRoot],
+      args,
       summary: `Created a new potential entry for '${input.shortName}'.`,
       stdoutArtifactPattern: /^Created:\s*(.+)$/im,
     });

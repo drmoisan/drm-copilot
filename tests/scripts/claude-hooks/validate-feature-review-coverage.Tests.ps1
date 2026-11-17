@@ -260,6 +260,47 @@ feature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md
         }
     }
 
+    Context 'development-docs roots (issue #1035)' {
+        It 'accepts a .dev/active review artifact path (<Label>)' -ForEach @(
+            @{ Label = 'flat layout'; Path = '.dev/active/2026-11-01-sample-1035/code-review.2026-11-01T10-00.md' }
+            @{ Label = 'audit folder layout'; Path = '.dev/active/2026-11-01-sample-1035/audit/2026-11-01T10-00/code-review.md' }
+            @{ Label = 'backslash separators'; Path = '.dev\active\2026-11-01-sample-1035\code-review.2026-11-01T10-00.md' }
+        ) {
+            # Act
+            $result = Get-ReviewArtifactInfo -Path $Path -Stem 'code-review'
+
+            # Assert
+            $result.Folder | Should -BeExactly '2026-11-01-sample-1035'
+            $result.Timestamp | Should -BeExactly '2026-11-01T10-00'
+        }
+
+        It 'rejects a review artifact outside the active area of a known root (<Path>)' -ForEach @(
+            @{ Path = '.dev/research/2026-11-01-sample-1035/code-review.2026-11-01T10-00.md' }
+            @{ Path = 'docs/research/2026-11-01-sample-1035/code-review.2026-11-01T10-00.md' }
+            @{ Path = 'x.dev/active/2026-11-01-sample-1035/code-review.2026-11-01T10-00.md' }
+        ) {
+            Get-ReviewArtifactInfo -Path $Path -Stem 'code-review' | Should -BeNullOrEmpty
+        }
+
+        It 'names the default active area in the outside-location message' {
+            # Arrange: every advertised artifact lies outside the active area of both roots.
+            $raw = [ordered]@{
+                session_id = 't1-1035'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $false; last_assistant_message = @"
+policy-audit-path: docs/other/foo/policy-audit.2026-05-04T08-00.md
+code-review-path: docs/other/foo/code-review.2026-05-04T08-00.md
+feature-audit-path: docs/other/foo/feature-audit.2026-05-04T08-00.md
+"@
+            } | ConvertTo-Json -Compress
+
+            # Act
+            $result = Invoke-FeatureReviewCoverageValidation -InputText $raw
+
+            # Assert: the message text is unchanged under the default root.
+            $result.Ok | Should -BeFalse
+            $result.Message | Should -BeLike '*is outside the required docs/features/active/.../policy-audit.<timestamp>.md location*'
+        }
+    }
+
     Context 'E4-CORPUS (issue #896 corpus gate)' {
         BeforeAll {
             # Reject transformation for SANCTIONED-S1-S2 rule3 rows: drop the Rejected Scope

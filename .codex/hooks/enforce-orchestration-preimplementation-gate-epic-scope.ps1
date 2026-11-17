@@ -47,6 +47,13 @@
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-epic-resolution.ps1')
 . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-targets.ps1')
 try { . (Join-Path $PSScriptRoot 'hook-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'hook-target-worktree.ps1' -ErrorRecord $_ }
+# Development-docs root module (issue #1035), a call-time dependency of hook-epic-fan-in.ps1: published .codex/lib copy first.
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -PathType Leaf) {
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+}
+else {
+    try { Import-Module (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+}
 try { . (Join-Path $PSScriptRoot 'hook-epic-fan-in.ps1') } catch { Add-HookDependencyFailure -Name 'hook-epic-fan-in.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-epic-regeneration.ps1') } catch { Add-HookDependencyFailure -Name 'hook-epic-regeneration.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-operands.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-operands.ps1' -ErrorRecord $_ }
@@ -57,10 +64,6 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-o
 # .claude/lib, so the two literals are restated once here and pinned equal by a test.
 $script:OrchestrationGateAmbiguousReasonCode = 'TARGET_WORKTREE_AMBIGUOUS'
 $script:OrchestrationGateNotDerivableReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'
-
-# An epic manifest lives under the epics tree; the pattern is tested after backslash
-# normalisation so either separator spelling is accepted.
-$script:EpicScopeManifestPattern = '(^|/)docs/features/epics/'
 
 # The two per-mode read seams (issue #554). Each takes its path from the fixed mode
 # table and never from a delegation's own text; an absent file returns an empty
@@ -379,7 +382,10 @@ function Get-EpicCommandLegReadinessFailure {
         return 'epic_feature_folder'
     }
     $manifestPath = ([string](Get-EpicScopePropertyValue -InputObject $Checkpoint -Name 'epic_manifest_path')) -replace '\\', '/'
-    if ([string]::IsNullOrWhiteSpace($manifestPath) -or $manifestPath -notmatch $script:EpicScopeManifestPattern) {
+    # The manifest lives under the epics area of either known development-docs root (read at call
+    # time, D-P16); the path is backslash-normalised above, so either separator is accepted.
+    $manifestPattern = '(^|/)(?:' + (@(Get-DevelopmentDocsKnownRootPrefix -Area 'epics' | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
+    if ([string]::IsNullOrWhiteSpace($manifestPath) -or $manifestPath -notmatch $manifestPattern) {
         return 'epic_manifest_path'
     }
     if ([string]::IsNullOrWhiteSpace([string](Get-EpicScopePropertyValue -InputObject $Checkpoint -Name 'integration_branch'))) {

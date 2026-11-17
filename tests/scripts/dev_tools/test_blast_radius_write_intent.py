@@ -154,6 +154,17 @@ def test_w1_feature_folder_glob_is_never_dropped() -> None:
     assert kept == (FOLDER_GLOB,)
 
 
+def test_w1_dev_feature_folder_glob_is_never_dropped() -> None:
+    """A .dev feature-folder glob survives the token-level filter (issue #1035)."""
+    dev_glob = ".dev/active/demo-feature-1/**"
+
+    kept = select_write_intent_path_entries(
+        [dev_glob], root_surfaces=(), path_roots=("src",)
+    )
+
+    assert kept == (dev_glob,)
+
+
 def test_w2_multi_word_span_tokens_are_dropped() -> None:
     """W2: every token of a span that splits into more than one word is dropped."""
     plan = task("Update `src/app.py`, then run `git add src/other.py`.")

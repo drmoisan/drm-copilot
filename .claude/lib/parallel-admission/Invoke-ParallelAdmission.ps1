@@ -51,6 +51,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ParallelAdmissionJson.p
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ParallelAdmissionPrecedenceGate.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../blast-radius/BlastRadiusScheduling.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../blast-radius/BlastRadiusAccess.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 $script:AdmissionUsagePrefix = 'parallel admission usage error: '
 $script:AdmissionFailurePrefix = 'parallel admission failed: '
@@ -70,8 +71,6 @@ $script:AdmissionRequiredOption = @{
     'test-precedence' = @('Entry')
     'access-paths'    = @('Entry')
 }
-$script:AdmissionSpecTemplatePath = 'docs/features/templates/feature/spec.md'
-$script:AdmissionPlanTemplatePath = 'docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md'
 
 function Invoke-ParallelAdmissionGit {
     <#
@@ -122,6 +121,22 @@ function Resolve-ParallelAdmissionPath {
 
     if ([System.IO.Path]::IsPathRooted($Path)) { return $Path }
     return Join-Path -Path (Get-Location).Path -ChildPath $Path
+}
+
+function Get-ParallelAdmissionDocsRoot {
+    <#
+    .SYNOPSIS
+        Resolve the development-docs root against the current location (issue #1035), the base Resolve-ParallelAdmissionPath joins to.
+    .DESCRIPTION
+        A failed resolution throws the resolver Reason, which Invoke-ParallelAdmissionCli reports as exit 1 with the failure prefix.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param()
+
+    $resolution = Resolve-DevelopmentDocsRoot -WorkspaceRoot (Get-Location).Path
+    if (-not $resolution.Succeeded) { throw [string]$resolution.Reason }
+    return [string]$resolution.Root
 }
 
 function Read-ParallelAdmissionDocument {
@@ -220,7 +235,9 @@ function Get-ParallelAdmissionUsageError {
     foreach ($token in (Split-ParallelAdmissionToken -Text $Option['Pinned'])) {
         if ($token -notmatch '^[0-9]+$') { return "-Pinned entries must be integer item keys; got '$token'." }
     }
-    if ($Subcommand -ceq 'record' -and $Option['RunFolder'] -notmatch '^docs/features/parallel/[^/\s]+/?$') {
+    # The run folder may lie in the parallel area of either known development-docs root (issue #1035).
+    $parallelArea = '(?:' + (@(Get-DevelopmentDocsKnownRootPrefix -Area 'parallel' | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
+    if ($Subcommand -ceq 'record' -and $Option['RunFolder'] -notmatch "^$parallelArea[^/\s]+/?$") {
         return "-RunFolder must be docs/features/parallel/<slug>; got '$($Option['RunFolder'])'."
     }
     if (-not [string]::IsNullOrEmpty($Option['Slug']) -and $Option['Slug'] -match '[/\s]') {
@@ -310,16 +327,19 @@ function Get-ParallelAdmissionTemplateLine {
     <#
     .SYNOPSIS
         Read the spec placeholder lines (non-blank, not starting with '#', '-', '|') and plan template task lines from main.
+    .DESCRIPTION
+        The templates are read from the templates area of -DevelopmentDocsRoot (issue #1035), the first known root by default.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
-    param([string] $Main)
+    param([string] $Main, [string] $DevelopmentDocsRoot = @(Get-DevelopmentDocsKnownRoot)[0])
 
-    $specLine = @((Get-ParallelAdmissionBlobText -Ref $Main -Path $script:AdmissionSpecTemplatePath) -split "`n" | Where-Object {
+    $templates = Get-DevelopmentDocsPath -Root $DevelopmentDocsRoot -Area 'templates'
+    $specLine = @((Get-ParallelAdmissionBlobText -Ref $Main -Path "$templates/feature/spec.md") -split "`n" | Where-Object {
             $trimmed = $_.Trim()
             $trimmed -and -not ($trimmed.StartsWith('#') -or $trimmed.StartsWith('-') -or $trimmed.StartsWith('|'))
         })
-    $taskLine = @((Get-ParallelAdmissionBlobText -Ref $Main -Path $script:AdmissionPlanTemplatePath) -split "`n" | Where-Object { $_ -match '^- \[[ x]\] \[P\d+-T\d+\]' })
+    $taskLine = @((Get-ParallelAdmissionBlobText -Ref $Main -Path "$templates/feature/plan.yyyy-MM-ddTHH-mm.md") -split "`n" | Where-Object { $_ -match '^- \[[ x]\] \[P\d+-T\d+\]' })
     return [pscustomobject]@{ SpecPlaceholderLine = [string[]]$specLine; PlanTemplateTaskLine = [string[]]$taskLine }
 }
 
@@ -405,10 +425,11 @@ function Invoke-ParallelAdmissionAssess {
     $branch = $Option.Branch
     $main = $Option.Main
     $folder = $Option.FeatureFolder.Trim().TrimEnd('/')
+    $docsRoot = Get-ParallelAdmissionDocsRoot
     [void](Invoke-ParallelAdmissionGitChecked -GitArgs @('fetch', '--quiet', 'origin'))
     # Seam results are parenthesized so the pipeline enumerates their lines rather than one array object.
     $tree = [string[]]@((Invoke-ParallelAdmissionGitChecked -GitArgs @('ls-tree', '-r', '--name-only', $branch, '--', $folder)) | Where-Object { $_.StartsWith("$folder/", [System.StringComparison]::Ordinal) })
-    $template = Get-ParallelAdmissionTemplateLine -Main $main
+    $template = Get-ParallelAdmissionTemplateLine -Main $main -DevelopmentDocsRoot $docsRoot
     $files = Read-ParallelAdmissionBranchFile -Branch $branch -FeatureFolder $folder -TreePath $tree
     $inferred = Get-ParallelAdmissionInferredStage -TreePath $tree -FileText $files.FileText -CommitTime $files.CommitTime `
         -SpecPlaceholderLine $template.SpecPlaceholderLine -PlanTemplateTaskLine $template.PlanTemplateTaskLine -FeatureFolder $folder
@@ -541,7 +562,9 @@ function Invoke-ParallelAdmissionRecord {
     [OutputType([pscustomobject])]
     param([hashtable] $Option)
 
-    $slug = $Option.RunFolder.TrimEnd('/').Substring('docs/features/parallel/'.Length)
+    $runFolder = $Option.RunFolder.TrimEnd('/')
+    $prefix = @(Get-DevelopmentDocsKnownRootPrefix -Area 'parallel' | Where-Object { $runFolder.StartsWith($_, [System.StringComparison]::Ordinal) })[0]
+    $slug = $runFolder.Substring($prefix.Length)
     $entry = ConvertFrom-ParallelAdmissionJson -Text $Option.Entry
     if ($entry -isnot [System.Collections.IDictionary]) { throw '-Entry must be a JSON object.' }
     $record = New-ParallelSchedulingRecord -Slug $slug -Edge @(Get-ParallelAdmissionMapValue -Map $entry -Key 'edges') `
@@ -556,14 +579,15 @@ function Get-ParallelAdmissionRecordedEdge {
         Read a run's committed scheduling record by ref and apply the edge-reuse rule for one item.
     .DESCRIPTION
         Reads the record from origin/parallel/<slug>-plan (or -Ref) through the git
-        seam; a missing record gives a recompute marker with reason record_missing.
+        seam; a missing record gives a recompute marker with reason record_missing. The record lies in
+        the parallel area of -DevelopmentDocsRoot (issue #1035), the first known root by default.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
-    param([string] $Slug, [long] $IssueNum, [AllowEmptyString()][string] $CurrentPlanHash, [string] $Ref = '')
+    param([string] $Slug, [long] $IssueNum, [AllowEmptyString()][string] $CurrentPlanHash, [string] $Ref = '', [string] $DevelopmentDocsRoot = @(Get-DevelopmentDocsKnownRoot)[0])
 
     if ([string]::IsNullOrWhiteSpace($Ref)) { $Ref = "origin/parallel/$Slug-plan" }
-    $recordPath = "docs/features/parallel/$Slug/parallel-scheduling.json"
+    $recordPath = (Get-DevelopmentDocsPath -Root $DevelopmentDocsRoot -Area 'parallel') + "/$Slug/parallel-scheduling.json"
     $shown = Invoke-ParallelAdmissionGit -GitArgs @('show', "${Ref}:$recordPath")
     if ($shown.ExitCode -ne 0) { return [pscustomobject]@{ action = 'recompute'; reason = 'record_missing'; edges = [object[]]@() } }
     $record = ConvertFrom-ParallelAdmissionJson -Text (@($shown.Output) -join "`n")
@@ -580,7 +604,7 @@ function Invoke-ParallelAdmissionEdgeReuse {
     [OutputType([pscustomobject])]
     param([hashtable] $Option)
 
-    $reuse = Get-ParallelAdmissionRecordedEdge -Slug $Option.Slug -IssueNum ([long]$Option.IssueNum) -CurrentPlanHash $Option.PlanHash -Ref ([string]$Option.Ref)
+    $reuse = Get-ParallelAdmissionRecordedEdge -Slug $Option.Slug -IssueNum ([long]$Option.IssueNum) -CurrentPlanHash $Option.PlanHash -Ref ([string]$Option.Ref) -DevelopmentDocsRoot (Get-ParallelAdmissionDocsRoot)
     $result = [ordered]@{ action = $reuse.action; edges = [object[]]@($reuse.edges); reason = $reuse.reason }
     return ConvertTo-ParallelAdmissionCliOutcome -ExitCode 0 -Stdout (ConvertTo-ParallelAdmissionJson -Value $result)
 }

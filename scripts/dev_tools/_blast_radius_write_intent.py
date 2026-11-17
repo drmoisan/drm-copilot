@@ -64,6 +64,7 @@ from scripts.dev_tools._blast_radius_extraction import (
 )
 from scripts.dev_tools._blast_radius_guards import require_str_tuple
 from scripts.dev_tools._blast_radius_token_shapes import is_generic_contract_token
+from scripts.dev_tools.json_config import KNOWN_DEVELOPMENT_DOCS_ROOTS
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping, Sequence
@@ -99,8 +100,11 @@ _WRITE_VERB_RE = re.compile(r"\b(?:" + "|".join(WRITE_VERBS) + r")\b", re.IGNORE
 _READ_VERB_SET = frozenset(verb.lower() for verb in READ_VERBS)
 _PLACEHOLDER_STEM_SET = frozenset(PLACEHOLDER_STEMS)
 
-# The feature-folder glob kept by the token-level filter.
-_FEATURE_FOLDER_PREFIX = "docs/features/"
+# The feature-folder glob kept by the token-level filter, under any known
+# development-docs root (issue #1035).
+_FEATURE_FOLDER_PREFIX: tuple[str, ...] = tuple(
+    f"{root}/" for root in KNOWN_DEVELOPMENT_DOCS_ROOTS
+)
 _FEATURE_FOLDER_SUFFIX = "/**"
 _WILDCARDS = ("*", "?")
 
@@ -174,8 +178,8 @@ def is_feature_folder_glob(entry: str) -> bool:
         entry (str): One radius entry.
 
     Returns:
-        bool: ``True`` for an entry under ``docs/features/`` that ends with
-        ``/**`` and carries no other wildcard.
+        bool: ``True`` for an entry under a known development-docs root that
+        ends with ``/**`` and carries no other wildcard.
     """
     if not (
         entry.startswith(_FEATURE_FOLDER_PREFIX)

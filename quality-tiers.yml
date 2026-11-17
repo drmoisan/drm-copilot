@@ -55,6 +55,9 @@ projects:
   - path: ".claude/lib/codex-routing"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/development-docs"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle; development-docs root resolver, area map, and feature-folder name rules"
   - path: ".claude/lib/discovery-validation"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"

@@ -14,6 +14,13 @@ param()
 . (Join-Path $PSScriptRoot 'codex-agent-profile-attestation.ps1')
 . (Join-Path $PSScriptRoot 'codex-epic-child-launch-attestation.ps1')
 . (Join-Path $PSScriptRoot 'discovery-start-attestation.ps1')
+# Development-docs root module (issue #1035): the published .codex/lib copy first, the self-hosted .claude/lib copy otherwise.
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -PathType Leaf) {
+    Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+}
+else {
+    Import-Module (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+}
 $script:EpicPersonas = @('epic-planner', 'epic-orchestrator')
 
 function ConvertFrom-SubagentAttestationJson {
@@ -123,7 +130,14 @@ function Test-RootEpicReceipt {
         } else {
             ''
         }
-        if (-not $slug -or $kickoffPath -ne "docs/features/epics/$slug/epic-kickoff.md") {
+        if (-not $slug) {
+            return $false
+        }
+        # The kickoff lives in the epics area of the root configured in RepositoryRoot (issue #1035);
+        # an unresolvable root rejects the receipt.
+        $docsRoot = Resolve-DevelopmentDocsRoot -WorkspaceRoot $RepositoryRoot
+        if (-not $docsRoot.Succeeded -or
+            $kickoffPath -ne ((Get-DevelopmentDocsPath -Root $docsRoot.Root -Area 'epics') + "/$slug/epic-kickoff.md")) {
             return $false
         }
     } elseif (-not [string]::IsNullOrWhiteSpace($kickoffPath)) {

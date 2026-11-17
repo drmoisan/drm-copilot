@@ -32,6 +32,7 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'premortem-section.ps1') } catch { Add-HookDependencyFailure -Name 'premortem-section.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'subagentstop-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-target-worktree.ps1' -ErrorRecord $_ }
+try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -80,6 +81,31 @@ function Get-ResearchPathFromOutput {
     return $value
 }
 
+function Test-IsFeatureDocsRootPath {
+    <#
+    .SYNOPSIS
+        Returns $true when a path lies under a known development-docs root and outside its research area.
+    .DESCRIPTION
+        Feature research lives under docs/features/ or .dev/ (issue #1035); the one-off research
+        areas docs/research/ and .dev/research/ are excluded, so .dev/research/ is exempt from
+        the Pre-Mortem as docs/research/ is.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Path
+    )
+
+    $normalized = $Path -replace '\\', '/'
+    $research =@(Get-DevelopmentDocsKnownRootPrefix -Area 'research' | Where-Object { $normalized.StartsWith($_, [System.StringComparison]::OrdinalIgnoreCase) })
+    if ($research.Count -gt 0) {
+        return $false
+    }
+    $roots = @(Get-DevelopmentDocsKnownRoot | Where-Object { $normalized.StartsWith("$_/", [System.StringComparison]::OrdinalIgnoreCase) })
+    return ($roots.Count -gt 0)
+}
+
 function Test-IsUnderResearchRoot {
     [CmdletBinding()]
     [OutputType([bool])]
@@ -90,17 +116,18 @@ function Test-IsUnderResearchRoot {
 
     $normalized = $Path -replace '\\', '/'
 
-    # Accept either of the two tracked research roots:
-    #   - feature-associated research: docs/features/<...>/research/<file>
+    # Accept either of the two tracked research roots, under either known
+    # development-docs root (issue #1035):
+    #   - feature-associated research: <root>/<...>/research/<file>
     #     (a feature-folder path that contains a /research/ segment), or
-    #   - one-off research: docs/research/<file>.
+    #   - one-off research: the research area (docs/research/ or .dev/research/).
     # The /research/ segment requirement distinguishes feature research from
-    # other files under docs/features/ (for example spec.md or plan files).
+    # other files under the root (for example spec.md or plan files).
     $isFeatureResearch =
-    $normalized.StartsWith('docs/features/', [System.StringComparison]::OrdinalIgnoreCase) -and
+    (Test-IsFeatureDocsRootPath -Path $normalized) -and
     $normalized.IndexOf('/research/', [System.StringComparison]::OrdinalIgnoreCase) -ge 0
     $isOneOffResearch =
-    $normalized.StartsWith('docs/research/', [System.StringComparison]::OrdinalIgnoreCase)
+    @(Get-DevelopmentDocsKnownRootPrefix -Area 'research' | Where-Object { $normalized.StartsWith($_, [System.StringComparison]::OrdinalIgnoreCase) }).Count -gt 0
 
     return ($isFeatureResearch -or $isOneOffResearch)
 }
@@ -315,8 +342,9 @@ function Invoke-TaskResearcherOutputValidation {
         if (-not $numericEvidenceResult.Ok) {
             return $numericEvidenceResult
         }
-        # Issue #964: feature research carries a Pre-Mortem; one-off research under docs/research/ is exempt.
-        if ((($shapePath -replace '\\', '/') -replace '^\./', '').StartsWith('docs/features/', [System.StringComparison]::OrdinalIgnoreCase)) {
+        # Issue #964: feature research carries a Pre-Mortem; one-off research under docs/research/
+        # or .dev/research/ is exempt (issue #1035).
+        if (Test-IsFeatureDocsRootPath -Path (($shapePath -replace '\\', '/') -replace '^\./', '')) {
             $preMortem = Test-PreMortemSection -Content ([string]$researchContent)
             if (-not $preMortem.Ok) { return @{ Ok = $false; Message = "task-researcher hook: feature research '$researchPath' $($preMortem.Message)" } }
         }

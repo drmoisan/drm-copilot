@@ -1,0 +1,9 @@
+# Task Check P1-T5 (Remediation Cycle 1)
+
+Timestamp: 2026-11-17T13-12
+Command: sh SCRATCH/issue-1035-pscheck.sh p1t5 write tests/scripts/codex-hooks/epic-child-launch-contract.Tests.ps1 -- tests/scripts/codex-hooks/epic-child-launch-contract.Tests.ps1 tests/scripts/codex-hooks/epic-child-launch-hardening.Tests.ps1; then sh SCRATCH/issue-1035-pscheck.sh p1t5b check tests/scripts/codex-hooks/epic-child-launch-contract.Tests.ps1 --
+EXIT_CODE: 0
+Output Summary: Changed file: new tests/scripts/codex-hooks/epic-child-launch-contract.Tests.ps1. Selection rule: the new test file plus the existing suite of .codex/scripts/epic-child-launch-contract.ps1 named by the plan (epic-child-launch-hardening.Tests.ps1). The first pass formatted the new file (`Formatted:`) before the tests ran; the check-mode re-run reports `Already formatted:` and 0 analyzer findings. Launcher pester selection exit code 0 (Invoke-PoshQCParallelTest workers=2): new suite 27 tests, hardening suite 21 tests, 0 failures, 0 errors.
+
+- Cases: ConvertFrom-CodexChildLaunchJson (empty and malformed throw EPIC_CHILD_LAUNCH_BLOCKED, valid parses); ConvertTo-CodexChildReceiptTimestamp (invalid, missing); Get-CodexChildActiveReceiptErrorList (valid, wrong state, session mismatch, expired, unparseable timestamp, missing fields); Get-CodexChildTerminalReceiptErrorList (valid, completed with non-zero exit code, failed without failed_at, out-of-order timestamps with missing session and non-terminal state); ConvertFrom-CodexAgentProfile (valid, missing key, missing skills.config, absent skills section); Find-CodexChildDelegationReceipt (`id` fallback with a null checkpoint-level entry, no id); Find-CodexChildModelReceipt (checkpoint-level receipt, none); Test-CodexChildLaunchSpec (legacy `wave` field, no matching feature, planner prompt without the preparation marker, empty launches).
+- `git diff --stat <Baseline-Head> -- .codex/scripts/epic-child-launch-contract.ps1`: empty (exit 0).

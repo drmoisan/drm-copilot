@@ -69,8 +69,7 @@ def test_promote_potential_success_updates_metadata_and_moves_file() -> None:
     assert "- Issue URL: https://example.com/issues/123" in lines
     assert "- Last Updated: 2024-01-02" in lines
     assert (
-        "- Status: Promoted -> docs/features/active/Feature_Title/ (Issue #123)"
-        in lines
+        "- Status: Promoted -> docs/features/active/0123-sample/ (Issue #123)" in lines
     )
     assert any(line.startswith("Moved potential file") for line in messages)
 
@@ -280,3 +279,86 @@ def test_promote_potential_fails_fast_when_not_authenticated() -> None:
     assert (
         len(gh.calls) == 0
     ), "No gh commands should be executed when not authenticated"
+
+
+class _DevRootFileSystem(FakeFileSystem):
+    """Fake filesystem whose ``exists`` also answers for ``/workspace/.dev``."""
+
+    def __init__(self, *, dev_present: bool) -> None:
+        """Initialize the fake with the ``.dev`` presence flag.
+
+        Args:
+            dev_present: Whether the ``.dev`` directory exists.
+        """
+        super().__init__()
+        self.dev_present = dev_present
+
+    def exists(self, path: Path) -> bool:
+        """Return whether a file, ``docs/features``, or a present ``.dev`` exists."""
+        return (
+            super().exists(path)
+            or path == Path("/workspace/docs/features")
+            or (self.dev_present and path == Path("/workspace/.dev"))
+        )
+
+
+def _promote_foo_with_dev_root(*, dev_present: bool) -> tuple[Path | None, list[str]]:
+    """Promote ``2026-10-30-foo.md`` as issue 1016 with ``.dev`` configured.
+
+    Args:
+        dev_present: Whether the ``.dev`` directory exists.
+
+    Returns:
+        The promoted destination and the promoted file lines.
+    """
+    workspace = Path("/workspace")
+    fs = _DevRootFileSystem(dev_present=dev_present)
+    fs.files[workspace / "config/orchestration-routing.json"] = (
+        '{"development_docs_root": ".dev"}'
+    )
+    potential = workspace / ".dev/potential/2026-10-30-foo.md"
+    fs.files[potential] = "# Foo\n## Problem / Why\nwhy"
+    gh = FakeGhClient(
+        mod.GhResult(["Created: https://example.com/issues/1016"], 0),
+        mod.GhResult([], 1),
+    )
+    outcome = mod.promote_potential(
+        potential_path=str(potential), fs=fs, gh=gh, workspace=workspace
+    )
+    destination = outcome.destination
+    lines = fs.files[destination].splitlines() if destination else []
+    return destination, lines
+
+
+def test_promote_potential_routes_to_dev_when_configured_and_present() -> None:
+    """Verify a present ``.dev`` root receives the promoted file and status."""
+    destination, lines = _promote_foo_with_dev_root(dev_present=True)
+
+    assert destination == Path("/workspace/.dev/potential/promoted/2026-10-30-foo.md")
+    assert "- Status: Promoted -> .dev/active/1016-foo/ (Issue #1016)" in lines
+
+
+def test_promote_potential_falls_back_to_docs_features_when_dev_absent() -> None:
+    """Verify an absent ``.dev`` keeps the ``docs/features`` forms."""
+    destination, lines = _promote_foo_with_dev_root(dev_present=False)
+
+    assert destination == Path(
+        "/workspace/docs/features/potential/promoted/2026-10-30-foo.md"
+    )
+    assert "- Status: Promoted -> docs/features/active/1016-foo/ (Issue #1016)" in lines
+
+
+def test_promote_potential_raises_before_issue_creation_on_malformed_routing() -> None:
+    """Verify a malformed routing file fails before any gh call."""
+    workspace = Path("/workspace")
+    fs = FakeFileSystem()
+    fs.files[workspace / "config/orchestration-routing.json"] = "{"
+    potential = workspace / "docs/features/potential/sample.md"
+    fs.files[potential] = "# Sample\n## Problem / Why\nwhy"
+    gh = FakeGhClient(mod.GhResult([], 0), mod.GhResult([], 0))
+
+    with pytest.raises(ValueError, match="development_docs_root"):
+        mod.promote_potential(
+            potential_path=str(potential), fs=fs, gh=gh, workspace=workspace
+        )
+    assert gh.calls == []

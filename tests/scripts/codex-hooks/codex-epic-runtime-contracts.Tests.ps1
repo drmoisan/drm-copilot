@@ -221,4 +221,24 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
                 Should -BeLessOrEqual $hardLimit -Because $file.FullName
         }
     }
+
+    It 'imports the development-docs module from the bundle-layout sibling lib in <RuntimeFile> when it is present (issue #1035)' -ForEach @(
+        @{ RuntimeFile = '.codex/hooks/record-subagent-routing-attestation.ps1' }
+        @{ RuntimeFile = '.codex/scripts/epic-child-launch-contract.ps1' }
+        @{ RuntimeFile = '.codex/hooks/authorize-root-epic-invocation.ps1' }
+    ) {
+        # Arrange: the sibling ../lib module is reported present; module loads are recorded, not performed;
+        # every other Test-Path call keeps its native result.
+        $originalTestPath = Get-Command Test-Path -CommandType Cmdlet
+        Mock Test-Path { & $originalTestPath @PesterBoundParameters }
+        Mock Test-Path { $true } -ParameterFilter { $LiteralPath -like '*development-docs*DevelopmentDocsRoot.psm1' }
+        Mock Import-Module { }
+
+        # Act
+        . (Join-Path $script:RepoRoot $RuntimeFile)
+
+        # Assert: the sibling path is imported and the repository fallback is not.
+        Should -Invoke Import-Module -ParameterFilter { "$Name" -match '[\\/]\.\.[\\/]lib[\\/]development-docs[\\/]DevelopmentDocsRoot\.psm1$' } -Scope It
+        Should -Invoke Import-Module -ParameterFilter { "$Name" -match '[\\/]\.claude[\\/]lib[\\/]development-docs[\\/]' } -Times 0 -Exactly -Scope It
+    }
 }

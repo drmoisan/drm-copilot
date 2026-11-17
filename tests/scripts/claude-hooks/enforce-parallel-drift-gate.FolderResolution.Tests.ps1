@@ -58,6 +58,8 @@ Describe 'enforce-parallel-drift-gate.ps1 feature-folder resolution (issue #565)
 
     BeforeEach {
         $script:CheckpointJson = Get-DriftCheckpoint
+        # D-P16 (issue #1035): setup mock of the development-docs root resolver.
+        Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $true; Root = 'docs/features'; Reason = $null } }
     }
 
     Context 'nested-artifact citations resolve to the target folder' {
@@ -186,6 +188,20 @@ Describe 'enforce-parallel-drift-gate.ps1 feature-folder resolution (issue #565)
             # Assert
             $decision.permissionDecision | Should -Be 'allow'
             Should -Invoke Test-ParallelDriftFindingPresent -Times 1 -Exactly -ParameterFilter { $FeatureFolder -ceq '2026-08-07-parallel-alpha-501' }
+        }
+
+        It 'D9: probes the .dev active area when the item worktree resolves the .dev root (issue #1035)' {
+            # Arrange: the target carries an unresolved drift event; its worktree resolves .dev.
+            $script:CheckpointJson = Get-DriftCheckpoint -Unresolved
+            Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $true; Root = '.dev'; Reason = $null } }
+            Mock Test-ParallelDriftFindingPresent { $true }
+
+            # Act
+            $decision = Invoke-DriftDecision -Prompt "$script:Kickoff Review docs/features/active/$script:Target now"
+
+            # Assert
+            $decision.permissionDecision | Should -Be 'allow'
+            Should -Invoke Test-ParallelDriftFindingPresent -Times 1 -Exactly -ParameterFilter { $ActiveFeatureRoot -ceq '.dev/active' -and $WorktreePath -ceq $script:SyntheticWorktree }
         }
     }
 }

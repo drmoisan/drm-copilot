@@ -31,6 +31,8 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING, Any, cast
 
+from scripts.dev_tools.json_config import KNOWN_DEVELOPMENT_DOCS_ROOTS
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
@@ -55,9 +57,13 @@ CHECKPOINT_FEATURE_FOLDER_KEY = "feature-folder"
 # A repository-relative folder under docs/features/active/: every segment
 # starts with an alphanumeric character, so dot segments, empty segments, a
 # trailing slash, backslashes, drive letters, glob characters, and a leading
-# hyphen cannot match. Applied with re.fullmatch.
+# hyphen cannot match. Applied with re.fullmatch. The folder may sit under the
+# active area of either known development-docs root; the error text keeps
+# naming docs/features/active (D-P11).
 FEATURE_FOLDER_PATH_PATTERN = re.compile(
-    r"^docs/features/active/[A-Za-z0-9][A-Za-z0-9._-]*(/[A-Za-z0-9][A-Za-z0-9._-]*)*$"
+    "^(?:"
+    + "|".join(re.escape(root) for root in KNOWN_DEVELOPMENT_DOCS_ROOTS)
+    + r")/active/[A-Za-z0-9][A-Za-z0-9._-]*(/[A-Za-z0-9][A-Za-z0-9._-]*)*$"
 )
 FEATURE_FOLDER_VERIFIED_VIA: tuple[str, ...] = ("git_cat_file_head", "git_ls_tree_head")
 

@@ -314,6 +314,32 @@ def test_create_bug_entry_falls_back_to_workspace_when_no_template_root() -> Non
     assert created == workspace / "docs/features/potential/2025-12-15-api-timeout.md"
 
 
+def test_create_bug_entry_writes_under_dev_root_when_resolved() -> None:
+    """A resolved .dev root places the template and target under .dev."""
+    fs = FakeFileSystem()
+    workspace = Path("/workspace")
+    fs.files[workspace / ".dev/templates/bug/potential_bug.md"] = "<bug-name>"
+    resolved: list[Path] = []
+
+    def resolve_root(path: Path) -> str:
+        resolved.append(path)
+        return ".dev"
+
+    created = mod.create_bug_entry(
+        short_name="api-timeout",
+        workspace=workspace,
+        fs=fs,
+        author_provider=lambda: "Jane",
+        code_launcher=lambda files: True,
+        entry_date="2025-12-15",
+        resolve_root=resolve_root,
+    )
+
+    assert created == workspace / ".dev/potential/2025-12-15-api-timeout.md"
+    assert fs.files[created] == "api-timeout"
+    assert resolved == [workspace]
+
+
 def _clear_signal_variables(monkeypatch: pytest.MonkeyPatch) -> None:
     """Remove every Insiders signal variable so the session reads as non-Insiders."""
     for name in insiders_signal_names:

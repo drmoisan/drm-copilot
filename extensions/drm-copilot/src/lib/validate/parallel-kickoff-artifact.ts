@@ -21,8 +21,9 @@
 
 const KICKOFF_HEADING_RE = /^# Parallel Kickoff: (?<slug>[a-z0-9][a-z0-9-]*)$/;
 const PARALLEL_RUN_RE = /Run `\/parallel-run (?<slug>[a-z0-9][a-z0-9-]*)`/;
+// The manifest may live under either known development-docs root.
 const MANIFEST_RE =
-  /docs\/features\/parallel\/[a-z0-9][a-z0-9-]*\/parallel\.md/;
+  /(?:docs\/features|\.dev)\/parallel\/[a-z0-9][a-z0-9-]*\/parallel\.md/;
 const PLAN_BRANCH_RE = /parallel\/[a-z0-9][a-z0-9-]*-plan/;
 const RESUME_RE =
   /(?:Every item|Each item|items)\s+resumes?\s+at atomic execution\s+from\s+(?:its|their)\s+committed plan-path\s+on\s+(?:its|their)\s+own\s+(?:pushed\s+)?feature branch/i;

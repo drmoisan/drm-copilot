@@ -240,3 +240,54 @@ def test_main_exits_one_when_violations_found(
     assert (
         str(fake_path) in captured.out
     ), f"Expected path in stdout but got: {captured.out!r}"
+
+
+def test_artifacts_research_hint_names_dev_areas_for_dev_root() -> None:
+    """The research hint names the .dev areas when the resolved root is .dev."""
+    root = Path("/fake/repo")
+    forbidden_mock = MagicMock(spec=Path)
+    forbidden_mock.is_file.return_value = True
+    forbidden_mock.relative_to.return_value = Path("artifacts/research/seeded.md")
+    root_mock = MagicMock(spec=Path)
+    root_mock.rglob.return_value = iter([forbidden_mock])
+
+    results = list(find_forbidden_paths(root_mock, docs_root=".dev"))
+
+    assert [suggestion for _, suggestion in results] == [
+        ".dev/active/<feature>/research/ or .dev/research/"
+    ], f"Unexpected suggestions for root {root}: {results!r}"
+
+
+def test_main_passes_resolved_root_and_fails_closed_on_resolver_error(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """main() passes the resolved root and exits 2 when resolution fails."""
+    from scripts.dev_tools import validate_evidence_locations
+
+    monkeypatch.setattr(sys, "argv", ["validate_evidence_locations", "--root", "/r"])
+    seen: list[str] = []
+
+    def fake_find(_root: Path, *, docs_root: str) -> list[tuple[Path, str]]:
+        seen.append(docs_root)
+        return []
+
+    def dev_resolver(_root: Path) -> str:
+        return ".dev"
+
+    monkeypatch.setattr(
+        validate_evidence_locations, "resolve_development_docs_root", dev_resolver
+    )
+    monkeypatch.setattr(validate_evidence_locations, "find_forbidden_paths", fake_find)
+    validate_evidence_locations.main()
+    assert seen == [".dev"]
+
+    def failing_resolver(_root: Path) -> str:
+        raise ValueError("config/orchestration-routing.json development_docs_root")
+
+    monkeypatch.setattr(
+        validate_evidence_locations, "resolve_development_docs_root", failing_resolver
+    )
+    with pytest.raises(SystemExit) as excinfo:
+        validate_evidence_locations.main()
+    assert excinfo.value.code == 2
+    assert "development_docs_root" in capsys.readouterr().err

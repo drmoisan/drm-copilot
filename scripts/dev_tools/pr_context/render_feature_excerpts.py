@@ -3,13 +3,19 @@
 from __future__ import annotations
 
 import re
-from pathlib import Path
 from typing import TYPE_CHECKING
+
+from scripts.dev_tools.json_config import (
+    development_docs_path,
+    known_root_prefixes,
+    resolve_development_docs_root,
+)
 
 from .models import ISSUE_REFERENCE_PATTERN, FeatureDocExcerpt, section, truncate
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from pathlib import Path
 
 
 def parse_section(markdown: str, heading: str) -> str:
@@ -92,18 +98,45 @@ def read_text_file(path: Path) -> str:
     return path.read_text(encoding="utf-8") if path.exists() else ""
 
 
+def active_feature_segment(raw_path: str) -> str | None:
+    """Return the feature segment of a path under either known active area.
+
+    Matchers accept the union of both known development-docs roots, so a
+    path under ``docs/features/active/`` or ``.dev/active/`` yields its
+    feature folder name regardless of the configured root.
+
+    Args:
+        raw_path: Repository-relative path with either separator.
+
+    Returns:
+        The segment after the active area, or ``None`` when the path is not
+        under an active area or names no segment.
+    """
+    posix_path = raw_path.replace("\\", "/")
+    # Probe each known root's active-area prefix; the first match decides.
+    for prefix in known_root_prefixes("active"):
+        if posix_path.startswith(prefix):
+            segment = posix_path[len(prefix) :].split("/")[0]
+            return segment or None
+    return None
+
+
 def extract_features_from_paths(changed_files: Iterable[str]) -> set[str]:
-    """Extract feature directory names from `docs/features/active/**` paths."""
+    """Extract feature directory names from paths under either active area.
+
+    Args:
+        changed_files: Repository-relative changed paths.
+
+    Returns:
+        The set of feature folder names under ``docs/features/active/`` or
+        ``.dev/active/``.
+    """
     features: set[str] = set()
+    # Keep the feature segment of every changed path under an active area.
     for raw in changed_files:
-        parts = Path(raw).parts
-        if (
-            len(parts) >= 4
-            and parts[0] == "docs"
-            and parts[1] == "features"
-            and parts[2] == "active"
-        ):
-            features.add(parts[3])
+        segment = active_feature_segment(raw)
+        if segment is not None:
+            features.add(segment)
     return features
 
 
@@ -195,8 +228,10 @@ def gather_feature_excerpts(
     """Gather feature excerpt payloads for changed active-feature files."""
     features = extract_features_from_paths(changed_files)
     excerpts: list[FeatureDocExcerpt] = []
-    base_dir = root / "docs" / "features" / "active"
-    promoted_dir = root / "docs" / "features" / "potential" / "promoted"
+    # Writers and readers of feature folders use the resolved root.
+    docs_root = resolve_development_docs_root(root)
+    base_dir = development_docs_path(root, "active", root=docs_root)
+    promoted_dir = development_docs_path(root, "potential/promoted", root=docs_root)
 
     for feature in sorted(features):
         feature_dir = resolve_feature_dir(base_dir, feature)

@@ -2,6 +2,10 @@ import * as fs from "node:fs";
 import * as nodePath from "node:path";
 import { type FileSystem, toPosixPath } from "./file-system";
 import { type CommandRunner, SubprocessRunner } from "./subprocess-runner";
+import {
+  developmentDocsPath,
+  resolveDevelopmentDocsRoot,
+} from "./development-docs/root";
 
 /**
  * In-process TypeScript port of the bundled Python
@@ -412,11 +416,15 @@ export function createBugEntry(options: CreateBugEntryOptions): string {
   // toPosixPath-normalized inputs) to match the F1 FileSystem convention and the
   // Python `Path` POSIX-style outputs, so the returned/written path is stable
   // and OS-neutral.
+  // The potential and template areas come from the resolved development-docs
+  // root (writers use the resolved root, spec "Writer/matcher split").
+  const docsRoot = resolveDevelopmentDocsRoot(
+    options.fs,
+    toPosixPath(options.workspace),
+  );
   const targetDir = nodePath.posix.join(
     toPosixPath(options.workspace),
-    "docs",
-    "features",
-    "potential",
+    developmentDocsPath(docsRoot, "potential"),
   );
   const targetPath = nodePath.posix.join(
     targetDir,
@@ -435,9 +443,7 @@ export function createBugEntry(options: CreateBugEntryOptions): string {
         )
       : nodePath.posix.join(
           toPosixPath(options.workspace),
-          "docs",
-          "features",
-          "templates",
+          developmentDocsPath(docsRoot, "templates"),
           "bug",
           "potential_bug.md",
         );

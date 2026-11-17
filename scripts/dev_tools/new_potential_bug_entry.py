@@ -12,6 +12,11 @@ from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING, Protocol
 
+from scripts.dev_tools.json_config import (
+    development_docs_path,
+    resolve_development_docs_root,
+)
+
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
 
@@ -321,6 +326,7 @@ def create_bug_entry(
     code_launcher: Callable[[Iterable[Path]], bool] = default_code_launcher,
     entry_date: str | None = None,
     template_root: Path | None = None,
+    resolve_root: Callable[[Path], str] = resolve_development_docs_root,
 ) -> Path:
     """Create a potential bug markdown file from the selected template root.
 
@@ -345,12 +351,16 @@ def create_bug_entry(
             deterministic generation.
         template_root (Path | None): Optional bundled feature-template
             root that overrides workspace-local templates.
+        resolve_root (Callable[[Path], str]): Resolver of the
+            development-docs root of the workspace; the potential and
+            template areas are taken under the root it returns.
 
     Returns:
         Path: Absolute path to the generated potential bug markdown file.
 
     Raises:
-        ValueError: Raised when `short_name` violates the kebab-case contract.
+        ValueError: Raised when `short_name` violates the kebab-case contract,
+            or when the routing file names an unknown development-docs root.
         FileNotFoundError: Raised when the selected template cannot be
             copied from the resolved template path.
 
@@ -364,16 +374,15 @@ def create_bug_entry(
     filesystem = fs or RealFileSystem()
     date_str = entry_date or date.today().strftime("%Y-%m-%d")
 
-    target_dir = workspace_path / "docs" / "features" / "potential"
+    docs_root = resolve_root(workspace_path)
+    target_dir = development_docs_path(workspace_path, "potential", root=docs_root)
     target = target_dir / f"{date_str}-{short_name}.md"
+    # A bundled template root overrides the workspace templates area.
     if template_root is not None:
         template = template_root / "bug" / "potential_bug.md"
     else:
         template = (
-            workspace_path
-            / "docs"
-            / "features"
-            / "templates"
+            development_docs_path(workspace_path, "templates", root=docs_root)
             / "bug"
             / "potential_bug.md"
         )

@@ -35,6 +35,7 @@ from scripts.dev_tools._parallel_kickoff_tables import (
     parse_integrity,
     table_rows,
 )
+from scripts.dev_tools.json_config import KNOWN_DEVELOPMENT_DOCS_ROOTS
 
 __all__ = [
     "HASH_HEADERS",
@@ -58,7 +59,13 @@ KICKOFF_HEADING_RE = re.compile(r"^# Parallel Kickoff: (?P<slug>[a-z0-9][a-z0-9-
 PARALLEL_RUN_RE = re.compile(r"Run `/parallel-run (?P<slug>[a-z0-9][a-z0-9-]*)`")
 
 # The run manifest lives under the parallel feature tree, never the epic tree.
-MANIFEST_RE = re.compile(r"docs/features/parallel/[a-z0-9][a-z0-9-]*/parallel\.md")
+# The manifest may live under the parallel area of either known
+# development-docs root; the alternation is built from the known roots.
+MANIFEST_RE = re.compile(
+    "(?:"
+    + "|".join(re.escape(root) for root in KNOWN_DEVELOPMENT_DOCS_ROOTS)
+    + r")/parallel/[a-z0-9][a-z0-9-]*/parallel\.md"
+)
 
 # The plan-home branch carries the committed plans. There is no integration
 # branch on the parallel surface, so this pattern replaces the epic analogue's

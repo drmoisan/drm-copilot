@@ -10,6 +10,8 @@ tools:
   - Glob
   - "Write(docs/features/epics/**)"
   - "Edit(docs/features/epics/**)"
+  - "Write(.dev/epics/**)"
+  - "Edit(.dev/epics/**)"
   - "Write(artifacts/orchestration/**)"
   - "Edit(artifacts/orchestration/**)"
   - "Bash(git *)"

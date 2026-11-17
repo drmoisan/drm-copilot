@@ -208,6 +208,7 @@
     ".codex/lib/epic-wave/Invoke-EpicWave.ps1",
     ".codex/lib/epic-wave/EpicCrossDependency.psm1",
     ".codex/lib/epic-wave/Invoke-EpicCrossReadiness.ps1",
+    ".codex/lib/development-docs/DevelopmentDocsRoot.psm1",
     ".codex/lib/discovery-validation/DiscoveryAuthority.psd1",
     ".codex/lib/discovery-validation/DiscoveryAuthority.psm1",
     ".codex/lib/discovery-validation/DiscoveryAuthorization.psm1",

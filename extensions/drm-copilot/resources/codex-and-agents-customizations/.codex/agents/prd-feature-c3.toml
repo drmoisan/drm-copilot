@@ -31,6 +31,7 @@ tools:
   - Grep
   - Glob
   - "Write(/docs/features/active/**)"
+  - "Write(/.dev/active/**)"
 skills:
   - acceptance-criteria-tracking
 memory: project

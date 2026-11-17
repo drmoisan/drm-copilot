@@ -70,6 +70,7 @@ describe("mcp-server prepack", () => {
     const resources = [
       "lib/discovery-validation/DiscoveryAuthority.psm1",
       "lib/discovery-validation/DiscoveryStop.psm1",
+      "lib/development-docs/DevelopmentDocsRoot.psm1",
       "customizations/.github/hooks/discovery-pre-tool.ps1",
       "customizations/.github/hooks/discovery.json",
       "customizations/.github/agents/legacy-parity-analyst.agent.md",

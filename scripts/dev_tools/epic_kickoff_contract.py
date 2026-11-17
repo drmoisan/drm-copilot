@@ -5,9 +5,17 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from scripts.dev_tools.json_config import KNOWN_DEVELOPMENT_DOCS_ROOTS
+
 KICKOFF_HEADING_RE = re.compile(r"^# Epic Kickoff: (?P<slug>[a-z0-9][a-z0-9-]*)$")
 EPIC_RUN_RE = re.compile(r"Run `/epic-run (?P<slug>[a-z0-9][a-z0-9-]*)`")
-MANIFEST_RE = re.compile(r"docs/features/epics/[a-z0-9][a-z0-9-]*/epic\.md")
+# The manifest may live under the epics area of either known development-docs
+# root; the alternation is built from the known roots.
+MANIFEST_RE = re.compile(
+    "(?:"
+    + "|".join(re.escape(root) for root in KNOWN_DEVELOPMENT_DOCS_ROOTS)
+    + r")/epics/[a-z0-9][a-z0-9-]*/epic\.md"
+)
 INTEGRATION_BRANCH_RE = re.compile(r"epic/[a-z0-9][a-z0-9-]*-integration")
 RESUME_RE = re.compile(
     r"(?:Every child|child features)\s+resumes?\s+at atomic execution\s+"

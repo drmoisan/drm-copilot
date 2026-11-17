@@ -61,6 +61,12 @@ Describe 'enforce-parallel-drift-gate.ps1' {
         Mock Resolve-ParallelDriftGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }
 
+    # D-P16 (issue #1035): the drift allowance resolves the development-docs root; no case reads
+    # the real routing file.
+    BeforeEach {
+        Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $true; Root = 'docs/features'; Reason = $null } }
+    }
+
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     Context 'allow paths that never engage the gate' {

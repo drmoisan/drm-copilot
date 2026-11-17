@@ -144,6 +144,50 @@ Describe 'Get-BlastRadius path derivation' {
             # Assert: trimming keeps the glob well formed.
             @($radius['paths']) | Should -Be @('docs/features/active/f/**')
         }
+
+        It 'BR-FEATURE-GLOB-USES-PASSED-ROOT places a bare folder under the passed root' {
+            # Arrange / Act: pass the .dev root explicitly (issue #1035).
+            $radius = Get-BlastRadius -PlanText '' -SpecText '' -FeatureFolder 'f' `
+                -DevelopmentDocsRoot '.dev' -Config $script:TestConfig -ComputedAt 't'
+
+            # Assert: the glob is the active area of the passed root, not the default root.
+            @($radius['paths']) | Should -Be @('.dev/active/f/**')
+        }
+
+        It 'BR-FEATURE-GLOB-REJECTS-UNKNOWN-ROOT throws an argument error naming the value' {
+            # Arrange / Act / Assert: a root outside the known set is malformed input.
+            { Get-BlastRadius -PlanText '' -SpecText '' -FeatureFolder 'f' `
+                    -DevelopmentDocsRoot 'docs/dev' -Config $script:TestConfig -ComputedAt 't' } |
+                Should -Throw "*Unknown development docs root 'docs/dev'*" -ExceptionType ([System.ArgumentException])
+        }
+
+        It 'BR-FEATURE-PREFIX-PASSES-DEV-QUALIFIED-FOLDER uses a .dev-qualified folder as is' {
+            # Arrange / Act: pass a .dev-qualified folder with no root argument.
+            $radius = Get-BlastRadius -PlanText '' -SpecText '' -FeatureFolder '.dev/active/f' `
+                -Config $script:TestConfig -ComputedAt 't'
+
+            # Assert: the widened prefix keeps the folder and never nests it under the default root.
+            @($radius['paths']) | Should -Contain '.dev/active/f/**'
+            @($radius['paths'] | Where-Object { $_.StartsWith('docs/features/active/.dev/', [System.StringComparison]::Ordinal) }).Count |
+                Should -Be 0
+        }
+
+        It 'BR-DERIVATION-CALLS-NO-RESOLVER keeps the derivation free of configuration reads' {
+            # Arrange: parse the facade module.
+            $path = Join-Path -Path $script:RepoRoot -ChildPath '.claude/lib/blast-radius/BlastRadius.psm1'
+            $tokens = $null
+            $parseErrors = $null
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile($path, [ref] $tokens, [ref] $parseErrors)
+
+            # Act: collect every command name the module invokes.
+            $commandNames = @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.CommandAst] }, $true) |
+                    ForEach-Object { $_.GetCommandName() } | Where-Object { $null -ne $_ })
+
+            # Assert: the module parses and names no resolver command (spec OD-P4).
+            @($parseErrors).Count | Should -Be 0
+            $commandNames | Should -Contain 'Get-DevelopmentDocsKnownRoot'
+            $commandNames | Should -Not -Contain 'Resolve-DevelopmentDocsRoot'
+        }
     }
 
     Context 'Plan and spec contributions' {

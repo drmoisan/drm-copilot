@@ -276,6 +276,8 @@ Describe 'enforce-epic-merge-gate-regeneration.ps1 (issue #1156)' {
     Context 'review guard precedes the check' {
         BeforeAll {
             . (Join-Path $script:RepoRoot '.codex/hooks/enforce-epic-merge-gate-review.ps1')
+            # D-P16 (issue #1035): the review guard reads the development-docs roots at call time.
+            Import-Module (Join-Path $script:RepoRoot '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
             function Invoke-DocsOnlyGitExe { param([string] $WorktreeRoot, [string[]] $GitArgs) }
         }
 

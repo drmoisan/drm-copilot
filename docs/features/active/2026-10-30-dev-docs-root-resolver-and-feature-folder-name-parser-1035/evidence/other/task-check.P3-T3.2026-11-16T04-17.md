@@ -1,0 +1,6 @@
+# Task Check P3-T3
+
+Timestamp: 2026-11-16T04-17
+Command: sh SCRATCH/issue-1035-p3checks.sh P3-T3 (SCRATCH/issue-1035-tscheck.sh: npx prettier --write <changed>; npx eslint <changed>; npx tsc -p ./ --noEmit and tsconfig.jest.json; sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest-extension test/lib/pr-context)
+EXIT_CODE: 0
+Output Summary: Changed files: extensions/drm-copilot/src/lib/pr-context/feature-docs.ts and render-feature-excerpts.ts (part-index matchers replaced by the union of knownRootPrefixes("active"); base and promoted directories through the resolver), verification-evidence.ts (feature root through the resolver), summary-helpers.ts (isScopingDoc accepts either known root), collector-core.ts (docs bucket adds .dev/), and tests feature-docs.test.ts (.dev present and union-matcher cases), verification-evidence.test.ts (.dev feature root), summary-helpers.test.ts (isScopingDoc rows), collector-core.test.ts (.dev path routed to the docs bucket). Existing pr-context cases unchanged. Selection rule: every suite under test/lib/pr-context (mirrored tests and importers). First run: the appended collector case referenced richGh outside its describe scope (tsc TS2304, one Jest failure); the case was moved inside that describe; rerun: Prettier unchanged, ESLint 0, tsc 0, Jest 22 suites 399 tests passed.

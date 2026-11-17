@@ -74,6 +74,32 @@ Describe 'validate-required-artifact-output.ps1' {
             $result.Message.Contains('Expected format: token|regex|description') | Should -BeTrue -Because $result.Message
         }
 
+        It 'R2b blocks with the spec error when a RequiredArtifact spec has a single pipe (issue #1035)' {
+            $raw = @{ last_assistant_message = 'spec-path: docs/features/active/foo/spec.md' } | ConvertTo-Json -Compress
+            $result = Invoke-RequiredArtifactOutputValidation -InputText $raw -AgentName 'prd-feature' -RequiredArtifact 'spec-path|^docs/.+$'
+            $result.Ok | Should -BeFalse
+            $result.Message.Contains('Expected format: token|regex|description') | Should -BeTrue -Because $result.Message
+        }
+
+        It 'parses the contracted spec-path spec and matches .dev/active/x/spec.md (issue #1035)' {
+            # Arrange: the union pattern carries its own alternation.
+            $contracted = 'spec-path|^(?:docs/features|\.dev)/active/.+/spec\.md$|feature spec artifact'
+            Mock -CommandName Test-ArtifactFile -MockWith { $true }
+
+            # Act
+            $parsed = ConvertTo-ArtifactSpec -Spec $contracted
+            $result = Invoke-RequiredArtifactOutputValidation -InputText (@{ last_assistant_message = 'spec-path: .dev/active/x/spec.md' } | ConvertTo-Json -Compress) -AgentName 'prd-feature' -RequiredArtifact $contracted
+
+            # Assert
+            $parsed.Token | Should -BeExactly 'spec-path'
+            $parsed.Pattern | Should -BeExactly '^(?:docs/features|\.dev)/active/.+/spec\.md$'
+            $parsed.Description | Should -BeExactly 'feature spec artifact'
+            '.dev/active/x/spec.md' | Should -Match $parsed.Pattern
+            'docs/features/active/x/spec.md' | Should -Match $parsed.Pattern
+            'docs/research/x/spec.md' | Should -Not -Match $parsed.Pattern
+            $result.Ok | Should -BeTrue -Because $result.Message
+        }
+
         It 'R3 blocks when the advertised artifact does not exist' {
             # Arrange
             Mock -CommandName Test-ArtifactFile -MockWith { $false }

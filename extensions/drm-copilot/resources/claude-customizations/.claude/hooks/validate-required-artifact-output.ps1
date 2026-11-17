@@ -61,15 +61,18 @@ function ConvertTo-ArtifactSpec {
         [string] $Spec
     )
 
-    $parts = $Spec -split '\|', 3
-    if ($parts.Count -ne 3) {
+    # The token ends at the first '|' and the description starts after the last '|', so a pattern
+    # may carry its own alternation (issue #1035, D-P2); a three-part spec parses as before.
+    $first = $Spec.IndexOf('|')
+    $last = $Spec.LastIndexOf('|')
+    if ($first -lt 0 -or $last -eq $first) {
         throw "Invalid artifact spec '$Spec'. Expected format: token|regex|description."
     }
 
     return @{
-        Token       = $parts[0].Trim()
-        Pattern     = $parts[1].Trim()
-        Description = $parts[2].Trim()
+        Token       = $Spec.Substring(0, $first).Trim()
+        Pattern     = $Spec.Substring($first + 1, $last - $first - 1).Trim()
+        Description = $Spec.Substring($last + 1).Trim()
     }
 }
 

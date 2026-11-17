@@ -377,3 +377,23 @@ def test_require_complete_text_accepts_adopted_feature_folder() -> None:
         if "issue_adoption" in line or "new_active_feature_folder" in line
     ]
     assert offending == [], f"unexpected adoption lines: {offending}"
+
+
+def test_record_under_dev_active_area_is_accepted() -> None:
+    """A record and checkpoint naming a .dev/active folder yield no error."""
+
+    # Arrange
+    dev_folder = ".dev/active/2026-09-29-sample-feature-509"
+    adoption = build_folder_adoption(
+        build_feature_folder_record(
+            path=dev_folder, evidence=f"git cat-file -t HEAD:{dev_folder} printed tree"
+        )
+    )
+    state = build_folder_state(adoption, feature_folder=dev_folder)
+
+    # Act
+    result = run_folder_resolver(state)
+
+    # Assert
+    assert result.errors == (), f"unexpected errors: {result.errors}"
+    assert FEATURE_FOLDER_TOOL in result.waived_tools

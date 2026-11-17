@@ -25,6 +25,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from scripts.dev_tools.json_config import parse_feature_folder_name
 from scripts.dev_tools.prompt_mode_contract import (
     build_fallback_reason,
     resolve_selected_work_mode,
@@ -201,13 +202,17 @@ def _resolve_feature_foldername(folderpath: str) -> str:
     return leaf
 
 
+# A partial-date feature (``MM-dd``) marks a bare ``yyyy-MM-dd`` name.
+_BARE_DATE_FEATURE = re.compile(r"[0-9]{2}-[0-9]{2}")
+
+
 def _resolve_name_from_feature_foldername(feature_foldername: str) -> str:
     """Extract ${name} from a feature folder name.
 
     Purpose:
-        Feature folders follow the convention:
-            yyyy-MM-dd-${name}-${issue}
-        where ${name} may contain hyphens.
+        Feature folders follow ``yyyy-MM-dd-${name}-${issue}`` or the
+        issue-first ``NNNN-${name}`` convention, where ${name} may contain
+        hyphens. Parsing is delegated to ``parse_feature_folder_name`` (D-P14).
 
     Args:
         feature_foldername: The feature folder name to parse.
@@ -216,26 +221,18 @@ def _resolve_name_from_feature_foldername(feature_foldername: str) -> str:
         The extracted feature name, or the original folder name if the
         convention doesn't match.
     """
-    parts = feature_foldername.split("-")
-
-    # Check if folder follows yyyy-MM-dd-name-issue convention
-    if (
-        len(parts) >= 5
-        and len(parts[0]) == 4
-        and len(parts[1]) == 2
-        and len(parts[2]) == 2
+    parsed = parse_feature_folder_name(feature_foldername)
+    # D-P14: an issue-first name and a date-first name with a trailing issue
+    # yield the parsed feature. A bare date such as ``2025-12-18`` parses as
+    # issue-first with a partial-date feature (the shape rule N-5 never
+    # creates), so it keeps today's whole-name result, as does every other name.
+    is_issue_first = parsed.format == "issue-first" and not (
+        _BARE_DATE_FEATURE.fullmatch(parsed.feature)
+    )
+    if is_issue_first or (
+        parsed.format == "date-first" and parsed.issue_number is not None
     ):
-        if (
-            parts[0].isdigit()
-            and parts[1].isdigit()
-            and parts[2].isdigit()
-            and parts[-1].isdigit()
-        ):
-            # Extract name parts between date and issue number
-            name_parts = parts[3:-1]
-            if name_parts:
-                return "-".join(name_parts)
-
+        return parsed.feature
     return feature_foldername
 
 

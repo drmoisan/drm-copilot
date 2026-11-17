@@ -293,6 +293,41 @@ describe("collectPrContext classification and buckets", () => {
     };
   }
 
+  it("routes a .dev path into the docs bucket", () => {
+    // Arrange: the diff carries one path under the .dev root.
+    const devPath = ".dev/active/1016-foo/spec.md";
+    const fs = seedFeatureTree();
+    const gh = richGh();
+    const runner = new ScriptRunner((args) => {
+      if (isGh(args)) {
+        return gh(args) ?? okResult("{}");
+      }
+      const sub = args.slice(1).join(" ");
+      if (sub.startsWith("diff --name-status")) {
+        return okResult(`M\t${devPath}`);
+      }
+      if (sub.startsWith("diff --numstat")) {
+        return okResult(`1\t0\t${devPath}`);
+      }
+      return gitHandler(args);
+    });
+
+    // Act
+    const result = collectPrContext({
+      base: "main",
+      head: "feature/docs",
+      repoRoot: ROOT,
+      includeUntracked: false,
+      fs,
+      runner,
+      whichGh: () => GH_PATH,
+    });
+
+    // Assert
+    expect(result.bucketDocs.map(([path]) => path)).toEqual([devPath]);
+    expect(result.bucketCore).toEqual([]);
+  });
+
   it("classifies pull/invalid refs and partitions core/rename buckets", () => {
     // Arrange: branch name carries #5 (pull) and #7 (invalid); the diff has a
     // renamed file and a .py core file plus the docs spec.

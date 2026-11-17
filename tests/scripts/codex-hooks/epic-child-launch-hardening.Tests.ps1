@@ -173,6 +173,35 @@ Describe 'Codex epic-child launcher hardening' {
         }
     }
 
+    It 'accepts a .dev/active feature-folder identity and rejects other .dev forms (issue #1035)' {
+        Test-CodexChildActiveFeatureFolder -Path '.dev/active/child-a' | Should -BeTrue
+        Test-CodexChildActiveFeatureFolder -Path '.dev\active\child-a' | Should -BeTrue
+        foreach ($path in @('.dev/potential/child-a', 'x.dev/active/child-a', '.dev/active/pending', '.dev/active/child-a/spec.md')) {
+            Test-CodexChildActiveFeatureFolder -Path $path | Should -BeFalse -Because $path
+        }
+    }
+
+    It 'resolves the active root against -RepositoryRoot (issue #1035)' {
+        # Arrange: a synthetic trusted root whose git reads succeed up to the development-docs resolution.
+        $root = [System.IO.Path]::GetFullPath((Join-Path $script:RepoRoot 'synthetic-roots/launch-root'))
+        $spec = [pscustomobject]@{ integration_branch = 'epic/sample-integration'; launches = @() }
+        Mock Get-CodexChildGitScalar {
+            param([string[]] $GitArgs)
+            if ($GitArgs -contains '--show-toplevel') { return $root }
+            if ($GitArgs -contains '--show-current') { return 'epic/sample-integration' }
+            return ('b' * 40)
+        }.GetNewClosure()
+        Mock Get-CodexChildCommonDirectory { 'synthetic-common' }
+        Mock Invoke-CodexChildGit { @() }
+        Mock Test-CodexChildCustomizationClean { $true }
+        Mock Get-CodexChildSurfaceObjectMap { @{} }
+        Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $false; Root = $null; Reason = 'synthetic routing failure' } }
+
+        # Act / Assert: the failed resolution blocks the launch with the resolver reason.
+        { Get-CodexChildRuntimeContext -Spec $spec -RepositoryRoot $root } | Should -Throw '*EPIC_CHILD_LAUNCH_BLOCKED: synthetic routing failure*'
+        Should -Invoke Resolve-DevelopmentDocsRoot -Times 1 -Exactly -ParameterFilter { $WorkspaceRoot -ceq $root }
+    }
+
     It 'rejects duplicate checkpoint feature identities before exactly-once coverage' {
         $duplicate = $script:FeatureA.PSObject.Copy(); $duplicate.branch_name = 'feature/different'
         $checkpoint = $script:Checkpoint.PSObject.Copy(); $checkpoint.features = @($script:FeatureA, $duplicate)

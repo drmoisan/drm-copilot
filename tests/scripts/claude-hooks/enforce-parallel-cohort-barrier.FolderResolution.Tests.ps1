@@ -97,6 +97,20 @@ Describe 'enforce-parallel-cohort-barrier.ps1 feature-folder resolution (issue #
         }
     }
 
+    Context 'development-docs root citations (issue #1035)' {
+        It 'C9a: a prompt citing a .dev/active folder selects the matching record and allows' {
+            $script:CheckpointJson = Get-CohortCheckpoint -MemberFolder ".dev/active/$script:Member" -TargetFolder ".dev/active/$script:Target"
+            (Invoke-CohortDecision -Prompt "$script:Kickoff Execute .dev/active/$script:Target/spec.md now").permissionDecision | Should -Be 'allow'
+        }
+
+        It 'C9b: two .dev/active citations are both read and reported as ambiguous' {
+            $decision = Invoke-CohortDecision -Prompt "$script:Kickoff Execute .dev/active/$script:Target after .dev\active\$script:Member merged."
+            $decision.permissionDecision | Should -Be 'deny'
+            $decision.permissionDecisionReason | Should -Match '^PARALLEL_COHORT_BARRIER_BLOCKED: ambiguous target feature folder'
+            $decision.permissionDecisionReason | Should -Match $script:Member
+        }
+    }
+
     Context 'two non-member folders are ambiguous' {
         It 'C5a: denies as ambiguous and names both candidates' {
             $decision = Invoke-CohortDecision -Prompt "$script:Kickoff docs/features/active/zulu-901 and docs/features/active/yankee-with-a-much-longer-slug-902/spec.md"

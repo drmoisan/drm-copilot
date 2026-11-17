@@ -15,6 +15,8 @@ Describe 'preimplementation gate helpers chain escapes (<Surface>)' -ForEach @(
     BeforeAll {
         $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
         $helpersPath = Join-Path (Join-Path $repoRoot $Surface) 'enforce-orchestration-preimplementation-gate-helpers.ps1'
+        # The helpers read the development-docs root module that their gate imports (D-P16).
+        Import-Module (Join-Path $repoRoot '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -Force
         . $helpersPath
     }
 

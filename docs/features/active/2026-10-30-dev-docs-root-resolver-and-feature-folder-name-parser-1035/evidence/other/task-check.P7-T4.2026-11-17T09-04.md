@@ -1,0 +1,6 @@
+# Task Check P7-T4
+
+Timestamp: 2026-11-17T09-04
+Command: sh SCRATCH/issue-1035-p7t4-edit.sh (edits, then env -u VIRTUAL_ENV poetry run python -m scripts.dev_tools.generate_codex_agent_variants and the same with --check) and sh SCRATCH/issue-1035-p7t4-run.sh (generator --check, then env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest -q -p no:cacheprovider tests/scripts/dev_tools/test_codex_agent_wrapper_contracts.py tests/scripts/dev_tools/test_codex_handoff_contract_parity.py tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py)
+EXIT_CODE: 0
+Output Summary: The base Codex agents .codex/agents/atomic-planner.toml, prd-feature.toml, feature-review.toml, status-updater.toml and epic-review.toml carry the .dev literal directly after each docs literal with the same leading-slash spelling (Edit(.dev/**) and Write(.dev/**) in atomic-planner, Write(/.dev/active/**) in prd-feature and feature-review, Write(/.dev/**) in status-updater and epic-review); the five bundle copies are byte copies. The generator write run exited 0 and regenerated the atomic-planner and prd-feature variants (-c1, -c2, -c3, -c3-elevated, -c4) and their bundle copies; the --check run exited 0 with no drift output, both after the write run and again in the task check. Contract pytest 21 passed, 0 failed.

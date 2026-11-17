@@ -116,6 +116,18 @@ describe("parseVerificationEvidenceMarkdown", () => {
     expect(record.timestamp).toBe("2026-01-01T00-00");
   });
 
+  it("skips lines that carry no key separator", () => {
+    const md =
+      "# Task Check\n\nTimestamp: 2026-01-01T00-00\nCommand: npm test\nEXIT_CODE: 0";
+    const record = parseVerificationEvidenceMarkdown({
+      feature: FEATURE,
+      sourceFile: "evidence/qa-gates/a.md",
+      markdown: md,
+    });
+    expect(record.normalizedResult).toBe("pass");
+    expect(record.command).toBe("npm test");
+  });
+
   it("returns fail when exit code is non-zero", () => {
     const md = "Timestamp: t\nCommand: c\nEXIT_CODE: 1";
     const record = parseVerificationEvidenceMarkdown({
@@ -449,5 +461,26 @@ describe("parseVerificationEvidenceFile", () => {
         relativePath: "evidence/qa-gates/missing.md",
       }),
     ).toThrow("ENOENT");
+  });
+});
+
+describe("discoverCanonicalEvidenceFiles development-docs root", () => {
+  it("globs the .dev active feature root when .dev is configured and present", () => {
+    // Arrange
+    const fs = new SeededFileSystem();
+    fs.files.set(
+      `${ROOT}/config/orchestration-routing.json`,
+      '{"development_docs_root": ".dev"}',
+    );
+    fs.dirs.add(`${ROOT}/.dev`);
+    const featureRoot = `${ROOT}/.dev/active/${FEATURE}`;
+    fs.dirs.add(featureRoot);
+    fs.files.set(`${featureRoot}/evidence/other/o.md`, "x");
+
+    // Act
+    const found = discoverCanonicalEvidenceFiles(fs, ROOT, FEATURE);
+
+    // Assert
+    expect(found).toEqual([`.dev/active/${FEATURE}/evidence/other/o.md`]);
   });
 });

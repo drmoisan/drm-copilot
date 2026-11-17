@@ -25,6 +25,8 @@ Describe 'enforce-orchestration-preimplementation-gate-bookkeeping.ps1 (<Surface
     BeforeAll {
         $script:BookkeepingRepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
         $hookDirectory = Join-Path $script:BookkeepingRepoRoot $Directory
+        # The helpers read the development-docs root module that their gate imports (D-P16).
+        Import-Module (Join-Path $script:BookkeepingRepoRoot '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -Force
         . (Join-Path $hookDirectory 'enforce-orchestration-preimplementation-gate-helpers.ps1')
         . (Join-Path $hookDirectory 'hook-epic-fan-in.ps1')
         . (Join-Path $hookDirectory 'enforce-orchestration-preimplementation-gate-bookkeeping.ps1')

@@ -149,6 +149,29 @@ Describe 'hook-docs-only-diff shared helper (issue #927)' {
         }
     }
 
+    Context 'development-docs root (issue #1035)' {
+        It 'returns null for .dev paths (<Path>)' -ForEach @(
+            @{ Path = '.dev/active/x/spec.md' }
+            @{ Path = '.dev/engineering/x.md' }
+        ) {
+            Get-DocsOnlyPathViolation -Path @('docs/a.md', $Path) | Should -BeNullOrEmpty -Because '.dev/ is a documentation tree as a whole'
+        }
+
+        It 'returns NON_DOCS_PATH for <Path> with the message unchanged' -ForEach @(
+            @{ Path = '.dev' }
+            @{ Path = '.dev/' }
+            @{ Path = '.devx/a.md' }
+            @{ Path = 'x/.dev/a.md' }
+        ) {
+            $result = Get-DocsOnlyPathViolation -Path @($Path)
+            $result | Should -BeExactly "DOCS_ONLY_EXEMPTION_NON_DOCS_PATH: '$Path' is outside docs/."
+        }
+
+        It 'treats a NUL-terminated .dev listing as docs-only' {
+            Get-DocsOnlyDiffTextViolation -DiffText ".dev/active/x/spec.md`0.dev/engineering/x.md`0" -BaseName 'main' | Should -BeNullOrEmpty
+        }
+    }
+
     Context 'ConvertFrom-DocsOnlyNameList' {
         It 'splits a NUL list with spaces and non-ASCII names' {
             # Arrange

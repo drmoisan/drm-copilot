@@ -1,14 +1,20 @@
 from __future__ import annotations
 
 import re
-from pathlib import Path
 from typing import TYPE_CHECKING
 
+from scripts.dev_tools.json_config import (
+    development_docs_path,
+    resolve_development_docs_root,
+)
+
 from .models import ISSUE_REFERENCE_PATTERN, FeatureDocExcerpt, section, truncate
+from .render_feature_excerpts import extract_features_from_paths
 from .verification_evidence import discover_canonical_evidence_files
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from pathlib import Path
 
 
 def parse_section(markdown: str, heading: str) -> str:
@@ -198,20 +204,14 @@ def _resolve_readiness_signal(feature_dir: Path) -> tuple[str | None, Path | Non
 def gather_feature_excerpts(
     root: Path, changed_files: Iterable[str]
 ) -> list[FeatureDocExcerpt]:
-    features: set[str] = set()
-    for raw in changed_files:
-        parts = Path(raw).parts
-        if (
-            len(parts) >= 4
-            and parts[0] == "docs"
-            and parts[1] == "features"
-            and parts[2] == "active"
-        ):
-            features.add(parts[3])
+    # Matchers accept the active area of either known root.
+    features = extract_features_from_paths(changed_files)
 
     excerpts: list[FeatureDocExcerpt] = []
-    base_dir = root / "docs" / "features" / "active"
-    promoted_dir = root / "docs" / "features" / "potential" / "promoted"
+    # Feature folders are read under the resolved development-docs root.
+    docs_root = resolve_development_docs_root(root)
+    base_dir = development_docs_path(root, "active", root=docs_root)
+    promoted_dir = development_docs_path(root, "potential/promoted", root=docs_root)
     for feature in sorted(features):
         feature_dir: Path | None = _resolve_feature_dir(base_dir, feature)
         promoted_feature_dir: Path | None = _resolve_feature_dir(promoted_dir, feature)

@@ -149,6 +149,26 @@ def test_spans_multiple_feature_folders_ignores_a_token_rooted_elsewhere() -> No
     assert spans_multiple_feature_folders("scripts/dev_tools/**") is False
 
 
+@pytest.mark.parametrize(
+    ("token", "expected"),
+    [
+        (".dev/**/plan*.md", True),
+        (".dev/active/*/plan.md", True),
+        (".dev/**", True),
+        (".dev/active/2026-11-17-one-feature-1035/**", False),
+    ],
+)
+def test_spans_multiple_feature_folders_reads_the_dev_root(
+    token: str, expected: bool
+) -> None:
+    """Treat the .dev root as a documentation corpus root (issue #1035)."""
+    # Arrange / Act
+    observed = spans_multiple_feature_folders(token)
+
+    # Assert
+    assert observed is expected, f"Expected {token!r} span result {expected}."
+
+
 # Predicate cases for the file-shape rule (issue #797). The non-ASCII cases
 # (including the Kelvin sign and the dotted capital I, which lower-case to
 # ASCII letters, issue #903) are built with ``chr`` so this file contains no

@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, jest } from "@jest/globals";
 import * as fs from "node:fs";
 
 import { realDirectoryLister } from "../../../src/lib/push-down/claude-blast-radius-derive";
+import { isExcludedDirectoryName } from "../../../src/lib/push-down/claude-blast-radius-derive-manifests";
 
 jest.mock("node:fs", () => ({
   ...jest.requireActual<typeof import("node:fs")>("node:fs"),
@@ -68,5 +69,12 @@ describe("coverage: claude-blast-radius-derive.ts", () => {
 
     // Assert
     expect(entries).toEqual([]);
+  });
+});
+
+describe("development-docs root scan exclusion", () => {
+  it("excludes the .dev directory from the destination scan", () => {
+    // Act / Assert
+    expect(isExcludedDirectoryName(".dev")).toBe(true);
   });
 });

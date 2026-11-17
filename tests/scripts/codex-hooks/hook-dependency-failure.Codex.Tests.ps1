@@ -30,6 +30,14 @@ BeforeDiscovery {
         }
     }
     $script:ContractRows = @(@{ Hook = '.codex/hooks/enforce-epic-wave-barrier.ps1' }, @{ Hook = '.codex/hooks/enforce-epic-child-worktree-binding.ps1' })
+    # Issue #1035 (D-P16): hooks whose development-docs import probes the bundle-layout sibling module first.
+    $script:ProbeRows = @(
+        @{ Hook = '.codex/hooks/enforce-completion-consistency.ps1' }
+        @{ Hook = '.codex/hooks/enforce-epic-merge-gate.ps1' }
+        @{ Hook = '.codex/hooks/enforce-epic-planning-only.ps1' }
+        @{ Hook = '.codex/hooks/enforce-orchestration-preimplementation-gate.ps1' }
+        @{ Hook = '.codex/hooks/validate-feature-review-coverage.ps1' }
+    )
 }
 
 Describe 'Codex hook dependency-failure behaviour (issue #786)' {
@@ -229,6 +237,22 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
         finally { Initialize-HookDependencyState }
         # Assert
         Assert-DependencyBlock -Result $result -HookEvent 'PreToolUse' -Prefix $script:ReasonPrefix[$Hook] -Dependency 'epic-child-launch-contract.ps1'
+    }
+
+    It 'X4: <Hook> imports the development-docs module from the bundle-layout sibling lib when it is present' -ForEach $script:ProbeRows {
+        # Arrange: the sibling ../lib module is reported present; module loads are recorded, not performed.
+        Mock Test-Path { $true } -ParameterFilter { $LiteralPath -like '*development-docs*DevelopmentDocsRoot.psm1' }
+        Mock Import-Module { }
+        # Act
+        try {
+            . (Get-HookInvocationPath -Left $script:RepoRoot -Right $Hook)
+            $failed = Test-HookDependencyFailure
+        }
+        finally { Initialize-HookDependencyState }
+        # Assert: the sibling path is imported, the repository fallback is not, and no dependency failed.
+        $failed | Should -BeFalse
+        Should -Invoke Import-Module -ParameterFilter { "$Name" -match '[\\/]\.\.[\\/]lib[\\/]development-docs[\\/]DevelopmentDocsRoot\.psm1$' } -Scope It
+        Should -Invoke Import-Module -ParameterFilter { "$Name" -match '[\\/]\.claude[\\/]lib[\\/]development-docs[\\/]' } -Times 0 -Exactly -Scope It
     }
 
     It 'X3: validate-bash denies a dependency failure with HOOK_DEPENDENCY_LOAD_FAILED:' {

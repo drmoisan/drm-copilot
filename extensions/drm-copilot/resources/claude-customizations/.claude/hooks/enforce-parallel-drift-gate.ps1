@@ -75,6 +75,9 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.ps
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
+# Development-docs root module (issue #1035): the drift allowance resolves the item's
+# active area under its recorded worktree_path.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
 $script:ParallelDriftGateResolutionImportFailure = $null
 
 # Shared feature-folder resolution (issue #565). Guarded so a failed dot-source denies
@@ -92,7 +95,6 @@ try { . (Join-Path $PSScriptRoot 'enforce-parallel-drift-gate-helpers.ps1') } ca
 
 $script:ParallelModeMarker = 'Parallel mode: true'
 $script:ReviewSubagentType = 'feature-review'
-$script:ActiveFeatureRoot = 'docs/features/active'
 $script:FindingFilePrefix = 'remediation-inputs.'
 $script:FindingFileSuffix = '.md'
 
@@ -150,7 +152,9 @@ function Test-ParallelDriftFindingPresent {
         the child's own active feature folder (flat form), reached through the item's recorded
         worktree_path, which is optional in the schema and may be null: absence reports $false
         so the caller fails closed. Names are compared with ordinal prefix and suffix tests, so
-        no glob matcher is involved.
+        no glob matcher is involved. ActiveFeatureRoot is the worktree-relative active area
+        (issue #1035); its default is the active area of the first known development-docs
+        root, the folder used before the root became configurable.
 
         The finding must correspond to the CURRENT unresolved drift event, not to any earlier
         remediation cycle: a matched name's embedded yyyy-MM-ddTHH-mm timestamp must be
@@ -171,7 +175,8 @@ function Test-ParallelDriftFindingPresent {
     param(
         [AllowNull()][AllowEmptyString()][string] $WorktreePath,
         [AllowNull()][AllowEmptyString()][string] $FeatureFolder,
-        [Parameter(Mandatory)][AllowEmptyString()][string] $EventAt
+        [Parameter(Mandatory)][AllowEmptyString()][string] $EventAt,
+        [string] $ActiveFeatureRoot = (Get-DevelopmentDocsPath -Root @(Get-DevelopmentDocsKnownRoot)[0] -Area 'active')
     )
 
     if ([string]::IsNullOrWhiteSpace($WorktreePath) -or [string]::IsNullOrWhiteSpace($FeatureFolder)) {
@@ -183,7 +188,7 @@ function Test-ParallelDriftFindingPresent {
     if (-not (Test-ParallelDriftGateCanonicalTimestamp -Value $EventAt)) {
         return $false
     }
-    $folder = Join-Path -Path $WorktreePath -ChildPath $script:ActiveFeatureRoot -AdditionalChildPath $FeatureFolder
+    $folder = Join-Path -Path $WorktreePath -ChildPath $ActiveFeatureRoot -AdditionalChildPath $FeatureFolder
     if (-not (Test-Path -LiteralPath $folder -PathType Container)) {
         return $false
     }
@@ -395,8 +400,20 @@ function Invoke-ParallelDriftGateDecision {
     if ($driftState.LatestAt.ContainsKey($itemKey)) {
         $eventAt = [string]$driftState.LatestAt[$itemKey]
     }
-    if ($eventAt -and (Test-ParallelDriftFindingPresent -WorktreePath ([string]$item.worktree_path) -FeatureFolder $featureFolder -EventAt $eventAt)) {
-        return Get-ParallelDriftGateAllowDecision
+    # The finding is looked up in the active area of the item's own worktree, so the
+    # development-docs root is resolved against the recorded worktree_path (issue #1035),
+    # never against the parallel checkpoint root or the session location. A blank
+    # worktree_path skips resolution and keeps the deny below; a failed resolution blocks.
+    $itemWorktree = [string]$item.worktree_path
+    if ($eventAt -and -not [string]::IsNullOrWhiteSpace($itemWorktree)) {
+        $resolution = Resolve-DevelopmentDocsRoot -WorkspaceRoot $itemWorktree
+        if (-not $resolution.Succeeded) {
+            return Get-ParallelDriftGateBlockDecision -Reason "PARALLEL_DRIFT_GATE_BLOCKED: $($resolution.Reason)"
+        }
+        $activeRoot = Get-DevelopmentDocsPath -Root $resolution.Root -Area 'active'
+        if (Test-ParallelDriftFindingPresent -WorktreePath $itemWorktree -FeatureFolder $featureFolder -EventAt $eventAt -ActiveFeatureRoot $activeRoot) {
+            return Get-ParallelDriftGateAllowDecision
+        }
     }
 
     return Get-ParallelDriftGateBlockDecision -Reason "PARALLEL_DRIFT_GATE_BLOCKED: item $itemKey ('$featureFolder') has an unresolved radius drift event and no $script:FindingFilePrefix<timestamp>$script:FindingFileSuffix finding dated at or after that event recorded in its feature folder. The synthetic Blocking finding for the current event must be written before review proceeds, or the drift event log was unreadable."

@@ -178,6 +178,19 @@ Describe 'Get-ReviewVerdictRecordsPrDecision' {
         param($Path)
         (Get-ReviewVerdictRecordsPrDecision -PrNumber 8 -Fact (Get-RecordsFact -Path $Path)).Code | Should -Be 'REVIEW_VERDICT_NOT_RECORDS_ONLY'
     }
+
+    It 'posts on a records-only pull request under the .dev root (issue #1035)' {
+        (Get-ReviewVerdictRecordsPrDecision -PrNumber 8 -Fact (Get-RecordsFact -Path @('.dev/active/x/plan.md', '.dev/potential/x.md'))).Eligible | Should -BeTrue
+    }
+
+    It 'refuses the .dev listing <Name> (issue #1035)' -TestCases @(
+        @{ Name = 'templates path'; Path = @('.dev/templates/plan.md') }
+        @{ Name = 'potential template'; Path = @('.dev/potential/template.md') }
+        @{ Name = '.devx path'; Path = @('.devx/active/x/plan.md') }
+    ) {
+        param($Path)
+        (Get-ReviewVerdictRecordsPrDecision -PrNumber 8 -Fact (Get-RecordsFact -Path $Path)).Code | Should -Be 'REVIEW_VERDICT_NOT_RECORDS_ONLY'
+    }
 }
 
 Describe 'Get-ReviewVerdictPromotionPrDecision' {
@@ -228,5 +241,18 @@ Describe 'Get-ReviewVerdictPromotionPrDecision' {
         $fact = Get-PromotionFact
         $fact.FolderTree = Get-ProcessFact -ExitCode 128
         (Get-ReviewVerdictPromotionPrDecision -PrNumber 9 -Fact $fact).Code | Should -Be 'REVIEW_VERDICT_GIT_FAILED'
+    }
+
+    It 'posts on a .dev promotion record and checks the folder under its own root (issue #1035)' {
+        $entry = @('D', '.dev/potential/thing.md', 'A', '.dev/active/thing-77/issue.md', 'A', '.dev/active/thing-77/spec.md')
+        $fact = Get-PromotionFact -Entry $entry
+        (Get-ReviewVerdictPromotionPrDecision -PrNumber 9 -Fact $fact).Eligible | Should -BeTrue
+        $fact.Remove('FolderTree')
+        (Get-ReviewVerdictPromotionPrDecision -PrNumber 9 -Fact $fact).Request.Arguments | Should -Be @('ls-tree', '-d', '--name-only', $script:Base, '--', '.dev/active/thing-77')
+    }
+
+    It 'refuses a .dev promotion listing whose potential path is the template (issue #1035)' {
+        $entry = @('M', '.dev/potential/template.md', 'A', '.dev/active/thing-77/issue.md')
+        (Get-ReviewVerdictPromotionPrDecision -PrNumber 9 -Fact (Get-PromotionFact -Entry $entry)).Code | Should -Be 'REVIEW_VERDICT_NOT_PROMOTION_RECORD'
     }
 }

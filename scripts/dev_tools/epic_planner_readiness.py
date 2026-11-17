@@ -21,6 +21,11 @@ from scripts.dev_tools.epic_planner_git_integrity import (
 from scripts.dev_tools.epic_planner_launch_evidence import (
     validate_epic_planner_launch_evidence,
 )
+from scripts.dev_tools.json_config import (
+    development_docs_relative_path,
+    known_root_prefixes,
+    resolve_development_docs_root,
+)
 
 if TYPE_CHECKING:
     from scripts.dev_tools.pr_context.git import CommandRunner
@@ -69,6 +74,14 @@ class LocalReadinessFileSystem:
         """Return sorted paths matching the relative glob."""
 
         return sorted(directory.glob(pattern))
+
+
+# Feature folders may sit under the active or completed area of either known
+# development-docs root; matchers accept the union.
+_FEATURE_FOLDER_PREFIXES: tuple[str, ...] = (
+    *known_root_prefixes("active"),
+    *known_root_prefixes("completed"),
+)
 
 
 @dataclass(frozen=True)
@@ -140,6 +153,35 @@ def _validate_artifact_source(
     return errors
 
 
+def _resolve_epics_area(context: EpicReadinessContext) -> str:
+    """Return the repository-relative epics area of the resolved docs root.
+
+    The routing file is read through the injected readiness filesystem, so
+    tests resolve the root from in-memory content.
+
+    Args:
+        context: Readiness context holding the workspace root and filesystem.
+
+    Returns:
+        The epics area, for example ``docs/features/epics`` or ``.dev/epics``.
+
+    Raises:
+        ValueError: When the routing file is malformed or names an unknown root.
+    """
+    file_system = context.file_system
+
+    def read_text(path: Path) -> str:
+        """Read the routing file, raising ``FileNotFoundError`` when absent."""
+        if not file_system.is_file(path):
+            raise FileNotFoundError(str(path))
+        return file_system.read_text(path)
+
+    root = resolve_development_docs_root(
+        context.workspace_root, read_text=read_text, is_dir=file_system.is_dir
+    )
+    return development_docs_relative_path(root, "epics")
+
+
 def _validate_feature_files(
     feature: dict[str, Any], index: int, context: EpicReadinessContext
 ) -> tuple[str | None, list[str]]:
@@ -159,10 +201,7 @@ def _validate_feature_files(
     errors.extend(research_errors)
     if folder is None or plan is None or research_path is None:
         return plan, errors
-    if not (
-        folder.startswith("docs/features/active/")
-        or folder.startswith("docs/features/completed/")
-    ):
+    if not folder.startswith(_FEATURE_FOLDER_PREFIXES):
         errors.append(
             f"{prefix}.feature_folder must be under docs/features/active or completed."
         )
@@ -288,7 +327,8 @@ def validate_epic_readiness_integrity(
     slug = state.get("epic_feature_folder")
     if not isinstance(slug, str) or re.fullmatch(r"[a-z0-9][a-z0-9-]*", slug) is None:
         return [*errors, "Epic planner checkpoint epic_feature_folder must be a slug."]
-    expected_manifest = f"docs/features/epics/{slug}/epic.md"
+    epics_area = _resolve_epics_area(context)
+    expected_manifest = f"{epics_area}/{slug}/epic.md"
     if state.get("epic_manifest_path") != expected_manifest:
         errors.append(
             f"Execution-ready epic_manifest_path must be {expected_manifest!r}."
@@ -307,7 +347,7 @@ def validate_epic_readiness_integrity(
         ignored, field="Epic planner checkpoint kickoff_prompt_path"
     )
     errors.extend(ignored_path_errors)
-    durable_path = f"docs/features/epics/{slug}/epic-kickoff.md"
+    durable_path = f"{epics_area}/{slug}/epic-kickoff.md"
     durable_text, durable_errors = _read_required(
         context, durable_path, label="the committed epic kickoff"
     )

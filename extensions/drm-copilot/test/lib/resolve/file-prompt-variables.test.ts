@@ -139,6 +139,38 @@ describe("file-prompt-variables path helpers", () => {
     // Assert
     expect(folderpath).toBe("docs/features/active/feature-1");
   });
+
+  it("returns an empty relative path for the workspace root itself", () => {
+    // Arrange / Act
+    const relative = tryRelativeToWorkspace("C:/workspace/", "C:/workspace");
+
+    // Assert
+    expect(relative).toBe("");
+  });
+
+  it("resolves folderpath of a bare file name at the workspace root as '.'", () => {
+    // Arrange / Act
+    const folderpath = resolveFolderpath(
+      "C:/workspace/plan.md",
+      "C:/workspace",
+    );
+
+    // Assert
+    expect(folderpath).toBe(".");
+  });
+});
+
+describe("file-prompt-variables stripFrontMatter without a closing delimiter", () => {
+  it("returns the content unchanged when the front matter never closes", () => {
+    // Arrange
+    const content = "---\ntitle: x\n# Heading";
+
+    // Act
+    const result = stripFrontMatter(content);
+
+    // Assert
+    expect(result).toBe(content);
+  });
 });
 
 describe("file-prompt-variables feature foldername and name", () => {
@@ -178,6 +210,29 @@ describe("file-prompt-variables feature foldername and name", () => {
 
     // Assert
     expect(name).toBe("feature-123");
+  });
+
+  it("extracts ${name} from an issue-first feature foldername", () => {
+    // Arrange
+    const featureFoldername = "1016-foo-bar";
+
+    // Act
+    const name = resolveNameFromFeatureFoldername(featureFoldername);
+
+    // Assert
+    expect(name).toBe("foo-bar");
+  });
+
+  it("returns the whole foldername for a bare date", () => {
+    // Arrange / Act / Assert
+    expect(resolveNameFromFeatureFoldername("2025-12-18")).toBe("2025-12-18");
+  });
+
+  it("returns the whole foldername for a date-first name without an issue", () => {
+    // Arrange / Act / Assert
+    expect(resolveNameFromFeatureFoldername("2026-01-02-port-cmd")).toBe(
+      "2026-01-02-port-cmd",
+    );
   });
 });
 

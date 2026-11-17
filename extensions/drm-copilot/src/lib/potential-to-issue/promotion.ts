@@ -49,11 +49,17 @@ import {
   getFeatureName,
   getFeaturePath,
   getSection,
+  getStatusFolderToken,
   normalizeSmartPunctuation,
   parseIssueReference,
   updateMetadataLines,
 } from "./content";
 import { type GhClient, RealGhClient } from "./gh-client";
+import {
+  type DevelopmentDocsRoot,
+  developmentDocsPath,
+  resolveDevelopmentDocsRoot,
+} from "../development-docs/root";
 
 /** Accepted promotion types (byte-identical to the Python tuple). */
 export const PROMOTION_TYPES: readonly string[] = [
@@ -328,6 +334,9 @@ export function promotePotential(
     throw new PromotionError(`Potential file is empty: ${resolved}`);
   }
 
+  // Resolve the development-docs root before creating the issue, so a
+  // malformed routing file fails fast without side effects.
+  const docsRoot = resolvePromotionDocsRoot(filesystem, workspacePath);
   const featureName = getFeatureName(content, resolved);
   const featurePath = getFeaturePath(featureName);
   const prefix = TITLE_PREFIXES[promotionType] ?? "Feature";
@@ -421,7 +430,12 @@ export function promotePotential(
       issueNumber,
       issueUrl,
       lastUpdated,
-      featurePath,
+      getStatusFolderToken(
+        issueNumber,
+        posixStem(posixBasename(resolved)),
+        featurePath,
+      ),
+      developmentDocsPath(docsRoot, "active"),
     );
     filesystem.writeLines(resolved, updatedLines);
     emitLine(`Updated potential file with issue metadata: ${resolved}`);
@@ -432,7 +446,7 @@ export function promotePotential(
   // matching the Python `Path` join behavior on the test/workspace inputs.
   const promotedDir = posixJoin(
     workspacePath,
-    "docs/features/potential/promoted",
+    developmentDocsPath(docsRoot, "potential/promoted"),
   );
   filesystem.ensureDir(promotedDir);
   const destPath = posixJoin(promotedDir, posixBasename(resolved));
@@ -447,4 +461,40 @@ export function promotePotential(
   emitLine(`Moved potential file to promoted folder: ${destPath}`);
 
   return { exitCode: 0, messages, destination: destPath };
+}
+
+/**
+ * Resolve the development-docs root through the promotion filesystem seam.
+ *
+ * `PotentialFileSystem` has no directory probe, so `exists` serves both probes
+ * and `promotion-filesystem.ts` is unchanged (D-P10).
+ *
+ * @param filesystem Promotion filesystem seam.
+ * @param workspacePath Workspace root.
+ * @returns The resolved development-docs root.
+ * @throws Error When the routing file is malformed or names an unknown root.
+ */
+function resolvePromotionDocsRoot(
+  filesystem: PotentialFileSystem,
+  workspacePath: string,
+): DevelopmentDocsRoot {
+  return resolveDevelopmentDocsRoot(
+    {
+      exists: (path: string): boolean => filesystem.exists(path),
+      isDirectory: (path: string): boolean => filesystem.exists(path),
+      readTextFile: (path: string): string => filesystem.readText(path),
+    },
+    workspacePath,
+  );
+}
+
+/**
+ * Return a file name without its final extension.
+ *
+ * @param name File basename.
+ * @returns The stem.
+ */
+function posixStem(name: string): string {
+  const dot = name.lastIndexOf(".");
+  return dot <= 0 ? name : name.slice(0, dot);
 }

@@ -59,6 +59,7 @@ from scripts.dev_tools.atomic_executor.plan_parser import (
 )
 from scripts.dev_tools.atomic_executor.prompt_builder import PromptBuilder
 from scripts.dev_tools.atomic_executor.qc_runner import QCRunner
+from scripts.dev_tools.json_config import development_docs_path
 
 if TYPE_CHECKING:
     from scripts.dev_tools.atomic_executor.cli_copilot_runtime import CopilotRunResult
@@ -235,7 +236,8 @@ def main(argv: list[str] | None = None) -> int:
     refuse_protected_branch(workspace)
 
     # Resolve feature folder
-    active_dir = workspace / "docs" / "features" / "active"
+    # The active area comes from the configured development-docs root.
+    active_dir = development_docs_path(workspace, "active")
     resolver = FeatureResolver(workspace, active_dir)
     _, feature_dir = resolver.resolve(args.path, args.feature)
 

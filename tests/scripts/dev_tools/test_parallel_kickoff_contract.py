@@ -447,3 +447,21 @@ def test_invocation_without_the_resume_boundary_sentence_is_reported() -> None:
         "Parallel kickoff invocation must structurally name the manifest, "
         "plan-home branch, and atomic-execution resume boundary." in errors
     )
+
+
+def test_manifest_under_dev_root_is_parsed() -> None:
+    """A run manifest under the .dev parallel area satisfies the invocation."""
+
+    # Arrange
+    document = kickoff_with_integrity(rows=(ITEM_ROW_101, ITEM_ROW_202)).replace(
+        "docs/features/parallel/sample-run/parallel.md",
+        ".dev/parallel/sample-run/parallel.md",
+    )
+
+    # Act
+    parsed, errors = parse_parallel_kickoff(document)
+
+    # Assert
+    assert errors == []
+    assert parsed is not None
+    assert parsed.manifest_path == ".dev/parallel/sample-run/parallel.md"

@@ -14,6 +14,7 @@ import pytest
 
 from scripts.dev_tools.pr_context.verification_evidence import (
     VerificationEvidenceRecord,
+    discover_canonical_evidence_files,
     normalize_result,
     parse_verification_evidence_file,
     parse_verification_evidence_markdown,
@@ -401,3 +402,25 @@ def test_parse_verification_evidence_file_reads_declared_expectation(
     assert record.exit_code == 1
     assert record.expected_exit_code == 1
     assert record.source_file == relative.as_posix()
+
+
+def test_discover_canonical_evidence_files_reads_dev_active_folder(
+    mem_fs_path: Path,
+) -> None:
+    """Evidence discovery reads the feature under a configured, present ``.dev``."""
+    # Arrange
+    config_dir = mem_fs_path / "config"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    (config_dir / "orchestration-routing.json").write_text(
+        '{"development_docs_root": ".dev"}', encoding="utf-8"
+    )
+    relative = Path(".dev/active/feature-485/evidence/qa-gates/gate.md")
+    target = mem_fs_path / relative
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text("Timestamp: t\nCommand: c\nEXIT_CODE: 0\n", encoding="utf-8")
+
+    # Act
+    discovered = discover_canonical_evidence_files(mem_fs_path, FEATURE)
+
+    # Assert
+    assert [path.as_posix() for path in discovered] == [relative.as_posix()]

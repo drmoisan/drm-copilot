@@ -186,6 +186,26 @@ Describe 'enforce-feature-folder-order.ps1' {
         It 'rejects paths outside docs/features' {
             (Test-IsFeaturePlanPath -NormalizedPath 'other/plan.md') | Should -BeFalse
         }
+        It 'recognizes a .dev plan path (<Path>) (issue #1035)' -ForEach @(
+            @{ Path = '.dev/active/foo/plan.md' }
+            @{ Path = '.dev/archive/foo/plan.2026-08-23T23-22.md' }
+            @{ Path = '/repo/.dev/active/foo/plan.md' }
+        ) {
+            (Test-IsFeaturePlanPath -NormalizedPath $Path) | Should -BeTrue
+        }
+        It 'rejects a .dev path outside the active and archive areas (<Path>) (issue #1035)' -ForEach @(
+            @{ Path = '.dev/research/foo/plan.md' }
+            @{ Path = 'x.dev/active/foo/plan.md' }
+        ) {
+            (Test-IsFeaturePlanPath -NormalizedPath $Path) | Should -BeFalse
+        }
+        It 'denies a .dev/active plan write when the prerequisite documents are missing (issue #1035)' {
+            Mock -CommandName Get-FeatureFolderFileExistence -MockWith { $false }
+            $json = '{"tool_input":{"file_path":".dev/active/2026-01-01-foo-1/plan.md"}}'
+            $decision = Invoke-FeatureFolderOrderDecision -ToolInputRaw $json
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            Should -Invoke -CommandName Get-FeatureFolderFileExistence -ParameterFilter { $Path -eq '.dev/active/2026-01-01-foo-1/issue.md' }
+        }
     }
 
     Context 'issue #568 plan-path matching' {

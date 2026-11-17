@@ -592,5 +592,19 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1035: the host-neutral development-docs modules (root resolver,
+    // feature-folder name parser, write-scope contract). Per-file entries only.
+    "./src/lib/development-docs/root.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/development-docs/feature-folder-name.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/development-docs/write-scopes.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };

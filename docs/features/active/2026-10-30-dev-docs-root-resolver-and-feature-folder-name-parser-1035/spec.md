@@ -467,69 +467,69 @@ All such tests use in-memory fakes; no temporary files are created.
 
 ### Configuration key and resolvers
 
-- [ ] `config/orchestration-routing.json`, `extensions/drm-copilot/resources/config/orchestration-routing.json` and `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json` each contain the flat top-level entry `"development_docs_root": "docs/features"`, and `tests/scripts/dev_tools/test_orchestration_routing_config_parity.py` passes.
-- [ ] The TypeScript resolver suite `extensions/drm-copilot/test/lib/development-docs/root.test.ts` covers resolution cases R-1 to R-8 from this spec using the in-memory `FileSystem` fake, and passes.
-- [ ] Python tests for `resolve_development_docs_root` in `scripts/dev_tools/json_config.py` cover cases R-1 to R-8 with injected readers and directory probes, and pass.
-- [ ] The Pester suite `tests/scripts/claude-lib/development-docs/DevelopmentDocsRoot.Tests.ps1` covers cases R-1 to R-8 for `Resolve-DevelopmentDocsRoot` with injected script blocks, and passes.
-- [ ] In each runtime, the area-path function returns the area-map value for every listed area under both `docs/features` and `.dev`, and an unknown area name raises an explicit error; each case is asserted by a unit test.
-- [ ] In each runtime, the known-root prefix function returns both the `docs/features` form and the `.dev` form for each area, and the PowerShell pattern function matches sample paths with forward and back slashes under both roots; each case is asserted by a unit test.
-- [ ] No module under `extensions/drm-copilot/src/lib/development-docs/` imports `vscode`, asserted by a test or a dependency-cruiser rule that fails on such an import.
-- [ ] The resolver and parser in Python are added to `scripts/dev_tools/json_config.py`; the change adds no new Python file under `scripts/`, no new `pyproject.toml` script entry, and no Python invocation in any enforcement hook (`tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes).
+- [x] `config/orchestration-routing.json`, `extensions/drm-copilot/resources/config/orchestration-routing.json` and `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json` each contain the flat top-level entry `"development_docs_root": "docs/features"`, and `tests/scripts/dev_tools/test_orchestration_routing_config_parity.py` passes.
+- [x] The TypeScript resolver suite `extensions/drm-copilot/test/lib/development-docs/root.test.ts` covers resolution cases R-1 to R-8 from this spec using the in-memory `FileSystem` fake, and passes.
+- [x] Python tests for `resolve_development_docs_root` in `scripts/dev_tools/json_config.py` cover cases R-1 to R-8 with injected readers and directory probes, and pass.
+- [x] The Pester suite `tests/scripts/claude-lib/development-docs/DevelopmentDocsRoot.Tests.ps1` covers cases R-1 to R-8 for `Resolve-DevelopmentDocsRoot` with injected script blocks, and passes.
+- [x] In each runtime, the area-path function returns the area-map value for every listed area under both `docs/features` and `.dev`, and an unknown area name raises an explicit error; each case is asserted by a unit test.
+- [x] In each runtime, the known-root prefix function returns both the `docs/features` form and the `.dev` form for each area, and the PowerShell pattern function matches sample paths with forward and back slashes under both roots; each case is asserted by a unit test.
+- [x] No module under `extensions/drm-copilot/src/lib/development-docs/` imports `vscode`, asserted by a test or a dependency-cruiser rule that fails on such an import.
+- [x] The resolver and parser in Python are added to `scripts/dev_tools/json_config.py`; the change adds no new Python file under `scripts/`, no new `pyproject.toml` script entry, and no Python invocation in any enforcement hook (`tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` passes).
 
 ### Consumer routing and behavior
 
-- [ ] With the default key, the full Python, PowerShell and TypeScript test suites pass, and the only changed expectations in existing tests are the folder-naming and status-line expectations for supplied issue numbers.
-- [ ] A recorded repository search over the production roots `.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts` and `extensions/drm-copilot/src` for `docs/features` and its separator-variant regex forms returns only the resolver constant definitions and entries on a recorded allowlist of Stay rows from the research inventory; the search command, output and allowlist are stored under the feature folder's `evidence/` directory.
-- [ ] TypeScript tests show that, with the routing configuration set to `.dev` and a `.dev` directory present in the in-memory fake, `createActiveFolder`, the new potential bug entry flow and the potential-to-issue promotion write under `.dev/<area>`, and with `.dev` absent they write under `docs/features/<area>`.
-- [ ] Matcher tests in each runtime show that the feature-folder record validators (`orchestrator-state-feature-folder-record.ts`, `_orchestrator_state_feature_folder_record.py`, `OrchestratorStateFeatureFolderRecord.psm1`) accept both `docs/features/active/<folder>` and `.dev/active/<folder>` independent of the configured value.
-- [ ] Pester tests for `enforce-orchestration-preimplementation-gate.ps1` (Claude and Codex) and `validate-task-researcher-output.ps1` show that paths under `.dev/active/`, `.dev/epics/` and `.dev/research/` are recognized alongside their `docs/features` and `docs/research` forms.
-- [ ] `new-potential-entry.ps1` in `scripts/dev-tools/` and in `extensions/drm-copilot/resources/templates/` accepts `-DevelopmentDocsRoot` with the default `docs/features`, the two copies have equal text, and a test shows `RepoAutomationService.newPotentialEntry` passes the resolved root.
-- [ ] A resolver error (malformed routing JSON or an out-of-set value) causes a hook that reads the key to fail closed with a reason naming the configuration file and key, asserted by a Pester test.
-- [ ] Each consumer in "Consumers inventoried at the 2026-11-14 refresh" with a Route disposition accepts its `.dev` form (matchers) or uses the resolved root (writers), asserted by a `.dev` case in that file's existing Pester suite, and each Stay row appears on the residual-search allowlist.
+- [x] With the default key, the full Python, PowerShell and TypeScript test suites pass, and the only changed expectations in existing tests are the folder-naming and status-line expectations for supplied issue numbers.
+- [x] A recorded repository search over the production roots `.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts` and `extensions/drm-copilot/src` for `docs/features` and its separator-variant regex forms returns only the resolver constant definitions and entries on a recorded allowlist of Stay rows from the research inventory; the search command, output and allowlist are stored under the feature folder's `evidence/` directory.
+- [x] TypeScript tests show that, with the routing configuration set to `.dev` and a `.dev` directory present in the in-memory fake, `createActiveFolder`, the new potential bug entry flow and the potential-to-issue promotion write under `.dev/<area>`, and with `.dev` absent they write under `docs/features/<area>`.
+- [x] Matcher tests in each runtime show that the feature-folder record validators (`orchestrator-state-feature-folder-record.ts`, `_orchestrator_state_feature_folder_record.py`, `OrchestratorStateFeatureFolderRecord.psm1`) accept both `docs/features/active/<folder>` and `.dev/active/<folder>` independent of the configured value.
+- [x] Pester tests for `enforce-orchestration-preimplementation-gate.ps1` (Claude and Codex) and `validate-task-researcher-output.ps1` show that paths under `.dev/active/`, `.dev/epics/` and `.dev/research/` are recognized alongside their `docs/features` and `docs/research` forms.
+- [x] `new-potential-entry.ps1` in `scripts/dev-tools/` and in `extensions/drm-copilot/resources/templates/` accepts `-DevelopmentDocsRoot` with the default `docs/features`, the two copies have equal text, and a test shows `RepoAutomationService.newPotentialEntry` passes the resolved root.
+- [x] A resolver error (malformed routing JSON or an out-of-set value) causes a hook that reads the key to fail closed with a reason naming the configuration file and key, asserted by a Pester test.
+- [x] Each consumer in "Consumers inventoried at the 2026-11-14 refresh" with a Route disposition accepts its `.dev` form (matchers) or uses the resolved root (writers), asserted by a `.dev` case in that file's existing Pester suite, and each Stay row appears on the residual-search allowlist.
 
 ### CI docs-only scope and JSON governance
 
-- [ ] `config/ci-docs-only-paths.json` includes `.dev/active/`, `.dev/archive/`, `.dev/completed/`, `.dev/epics/`, `.dev/parallel/`, `.dev/potential/` and `.dev/research/` and excludes `.dev/potential/template.md`, with existing `docs/` entries unchanged; `tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1` asserts that `.dev/active/x/spec.md` is docs-only and that `.dev/templates/x.md`, `.dev/potential/template.md`, `.dev/engineering/x.md` and `.dev/discovery/x.md` are not, and passes.
-- [ ] `tests/scripts/ci/CiChangeScope.Tests.ps1`, `Invoke-CiChangeScope.Tests.ps1`, `Invoke-CiChangeScopeMergeBase.Tests.ps1` and `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1` pass.
-- [ ] A Pester test shows `Get-DocsOnlyDiffTextViolation` in `hook-docs-only-diff.ps1` treats a `.dev/` path as docs-only.
-- [ ] The execution-environment brief section `## CI Shape and Required Checks` and `.github/workflows/README.md` list the `.dev/` docs-only prefixes and the `.dev` exclusion, and `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` passes.
-- [ ] `GOVERNED_GLOBS` in `scripts/dev_tools/json_config.py` and in `extensions/drm-copilot/src/lib/json-config.ts` contains both `.dev/**/*.json` and `docs/**/*.json`; a Python test using the `mem_fs_path` fixture and a Jest test using the in-memory fake each show that governed-file discovery returns a JSON file under `.dev/`.
+- [x] `config/ci-docs-only-paths.json` includes `.dev/active/`, `.dev/archive/`, `.dev/completed/`, `.dev/epics/`, `.dev/parallel/`, `.dev/potential/` and `.dev/research/` and excludes `.dev/potential/template.md`, with existing `docs/` entries unchanged; `tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1` asserts that `.dev/active/x/spec.md` is docs-only and that `.dev/templates/x.md`, `.dev/potential/template.md`, `.dev/engineering/x.md` and `.dev/discovery/x.md` are not, and passes.
+- [x] `tests/scripts/ci/CiChangeScope.Tests.ps1`, `Invoke-CiChangeScope.Tests.ps1`, `Invoke-CiChangeScopeMergeBase.Tests.ps1` and `tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1` pass.
+- [x] A Pester test shows `Get-DocsOnlyDiffTextViolation` in `hook-docs-only-diff.ps1` treats a `.dev/` path as docs-only.
+- [x] The execution-environment brief section `## CI Shape and Required Checks` and `.github/workflows/README.md` list the `.dev/` docs-only prefixes and the `.dev` exclusion, and `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` passes.
+- [x] `GOVERNED_GLOBS` in `scripts/dev_tools/json_config.py` and in `extensions/drm-copilot/src/lib/json-config.ts` contains both `.dev/**/*.json` and `docs/**/*.json`; a Python test using the `mem_fs_path` fixture and a Jest test using the in-memory fake each show that governed-file discovery returns a JSON file under `.dev/`.
 
 ### Dot-folder handling
 
-- [ ] The include-dot behavior of `compileGlob`/`RealFileSystem.glob` in `src/lib/file-system.ts` is stated by a named constant or documented comment, and a test shows the matching seam matches `.dev/active/x/spec.md` for the patterns `**` and `**/*.md`.
-- [ ] Each of `iterGovernedFiles` (`json-config.ts`), `json-validator.ts`, `evidence-locations.ts`, `verification-evidence.ts` and `feature-docs-parsers.ts` has a Jest test, using in-memory fakes, that finds a file under `.dev`.
-- [ ] A Jest test asserts `isExcludedDirectoryName(".dev")` returns `true`.
+- [x] The include-dot behavior of `compileGlob`/`RealFileSystem.glob` in `src/lib/file-system.ts` is stated by a named constant or documented comment, and a test shows the matching seam matches `.dev/active/x/spec.md` for the patterns `**` and `**/*.md`.
+- [x] Each of `iterGovernedFiles` (`json-config.ts`), `json-validator.ts`, `evidence-locations.ts`, `verification-evidence.ts` and `feature-docs-parsers.ts` has a Jest test, using in-memory fakes, that finds a file under `.dev`.
+- [x] A Jest test asserts `isExcludedDirectoryName(".dev")` returns `true`.
 
 ### Feature-folder name parser and folder creation
 
-- [ ] `extensions/drm-copilot/test/lib/development-docs/feature-folder-name.test.ts` asserts parser cases F-1 to F-6 and formatter cases N-1 to N-5 from this spec, and passes.
-- [ ] Python tests for `parse_feature_folder_name` and `format_feature_folder_name` and Pester tests for `ConvertFrom-FeatureFolderName` and `ConvertTo-FeatureFolderName` assert the same cases F-1 to F-6 and N-1 to N-5, and pass.
-- [ ] `resolveNameFromFeatureFoldername` (`file-prompt-variables.ts`), `_resolve_name_from_feature_foldername` in `resolve_execute_plan_prompt.py` and in `resolve_file_prompt.py`, and the trailing-issue extraction in `plan_progress_report.py` delegate to the shared parser, and their test suites include an issue-first folder-name case that passes.
-- [ ] Folder-creation tests in TypeScript (`io.test.ts`, `flow.test.ts`, `new-active-feature-folder-service-call.test.ts`) and Python (`test_new_active_feature_folder.py`) show that issue 1016 with potential stem `2026-10-30-foo` creates `<active area>/1016-foo`, issue 42 creates `<active area>/0042-<feature>`, and a request without an issue number keeps the current slug.
-- [ ] Epic folder creation still produces `<epics area>/<slug>` with no date or issue prefix, asserted by an existing or new test.
-- [ ] Potential-to-issue status-line tests in TypeScript (`content.test.ts`, `promotion.test.ts`) and Python (`test_potential_to_issue_content.py`, `test_potential_to_issue.py`) assert `Promoted -> docs/features/active/<NNNN>-<feature>/` under the default root.
+- [x] `extensions/drm-copilot/test/lib/development-docs/feature-folder-name.test.ts` asserts parser cases F-1 to F-6 and formatter cases N-1 to N-5 from this spec, and passes.
+- [x] Python tests for `parse_feature_folder_name` and `format_feature_folder_name` and Pester tests for `ConvertFrom-FeatureFolderName` and `ConvertTo-FeatureFolderName` assert the same cases F-1 to F-6 and N-1 to N-5, and pass.
+- [x] `resolveNameFromFeatureFoldername` (`file-prompt-variables.ts`), `_resolve_name_from_feature_foldername` in `resolve_execute_plan_prompt.py` and in `resolve_file_prompt.py`, and the trailing-issue extraction in `plan_progress_report.py` delegate to the shared parser, and their test suites include an issue-first folder-name case that passes.
+- [x] Folder-creation tests in TypeScript (`io.test.ts`, `flow.test.ts`, `new-active-feature-folder-service-call.test.ts`) and Python (`test_new_active_feature_folder.py`) show that issue 1016 with potential stem `2026-10-30-foo` creates `<active area>/1016-foo`, issue 42 creates `<active area>/0042-<feature>`, and a request without an issue number keeps the current slug.
+- [x] Epic folder creation still produces `<epics area>/<slug>` with no date or issue prefix, asserted by an existing or new test.
+- [x] Potential-to-issue status-line tests in TypeScript (`content.test.ts`, `promotion.test.ts`) and Python (`test_potential_to_issue_content.py`, `test_potential_to_issue.py`) assert `Promoted -> docs/features/active/<NNNN>-<feature>/` under the default root.
 
 ### Write-scope literal contract (D-16)
 
-- [ ] `extensions/drm-copilot/src/lib/development-docs/write-scopes.ts` exports `WriteScopeArea`, `WriteScopeRule`, `SettingsAllowRule`, `RequiredArtifactRule`, `WRITE_SCOPE_RULES`, `SETTINGS_ALLOW_RULES`, `REQUIRED_ARTIFACT_RULES`, `expandWriteScopeLiterals` and `expandRequiredArtifactPattern` with the signatures in this spec, and unit tests assert the rule-table rows and example outputs in this spec.
-- [ ] The checker suite under `extensions/drm-copilot/test/lib/development-docs/` passes all three directions: forward coverage (every contracted literal present in each `.claude/agents/*.md`, each base `.codex/agents/*.toml` and `.claude/settings.json`), reverse coverage (every `docs/features`, `docs/research`, `docs/**` or `.dev` scope found in those files is produced by a rule), and root coverage (sample paths under both roots match the expanded literals and required-artifact patterns).
-- [ ] Each agent file and `.claude/settings.json` in the rule table carries both the `docs/features` form and the `.dev` form of its literals with its existing leading-slash spelling, and the `prd-feature` and `epic-review` `-RequiredArtifact` patterns accept paths under both roots.
-- [ ] `scripts/dev_tools/generate_codex_agent_variants.py --check` reports no drift after the base Codex agent files are edited, and `test_codex_agent_wrapper_contracts.py` passes.
-- [ ] `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a dated comment for each pinned agent file whose content changes, and the parallel-orchestrator surface tests and `test_parallel_planner_surface_contracts.py` pass.
+- [x] `extensions/drm-copilot/src/lib/development-docs/write-scopes.ts` exports `WriteScopeArea`, `WriteScopeRule`, `SettingsAllowRule`, `RequiredArtifactRule`, `WRITE_SCOPE_RULES`, `SETTINGS_ALLOW_RULES`, `REQUIRED_ARTIFACT_RULES`, `expandWriteScopeLiterals` and `expandRequiredArtifactPattern` with the signatures in this spec, and unit tests assert the rule-table rows and example outputs in this spec.
+- [x] The checker suite under `extensions/drm-copilot/test/lib/development-docs/` passes all three directions: forward coverage (every contracted literal present in each `.claude/agents/*.md`, each base `.codex/agents/*.toml` and `.claude/settings.json`), reverse coverage (every `docs/features`, `docs/research`, `docs/**` or `.dev` scope found in those files is produced by a rule), and root coverage (sample paths under both roots match the expanded literals and required-artifact patterns).
+- [x] Each agent file and `.claude/settings.json` in the rule table carries both the `docs/features` form and the `.dev` form of its literals with its existing leading-slash spelling, and the `prd-feature` and `epic-review` `-RequiredArtifact` patterns accept paths under both roots.
+- [x] `scripts/dev_tools/generate_codex_agent_variants.py --check` reports no drift after the base Codex agent files are edited, and `test_codex_agent_wrapper_contracts.py` passes.
+- [x] `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a dated comment for each pinned agent file whose content changes, and the parallel-orchestrator surface tests and `test_parallel_planner_surface_contracts.py` pass.
 
 ### Mirrors, manifests and Codex counterparts
 
-- [ ] `DevelopmentDocsRoot.psm1` exists with equal text at `.claude/lib/development-docs/`, `extensions/drm-copilot/resources/claude-customizations/.claude/lib/development-docs/` and `extensions/drm-copilot/resources/lib/development-docs/`, and `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes.
-- [ ] The Codex `VIRTUAL_RESOURCE_DIRECTORIES` entry publishing `.codex/lib/development-docs/` exists in `codex-agents-customizations.ts` and in `push_down_codex_and_agents_customizations.py`, and `test_push_down_codex_and_agents_virtual_paths.py` passes.
-- [ ] `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` and `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json` list the new module, and `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py` and `test_push_down_pack_manifest_dependency_closure.py` pass.
-- [ ] Every edited file under `.claude/` and `.codex/` has equal text in its bundle copy, and `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_codex_handoff_contract_parity.py`, `test_claude_rules_frontmatter.py`, `test_push_down_issue_824_follow_ups.py`, `test_typescript_toolchain_instruction_contracts.py`, `claude-architecture-doc.Tests.ps1` and `hook-dependency-guard-completeness.Tests.ps1` pass.
+- [x] `DevelopmentDocsRoot.psm1` exists with equal text at `.claude/lib/development-docs/`, `extensions/drm-copilot/resources/claude-customizations/.claude/lib/development-docs/` and `extensions/drm-copilot/resources/lib/development-docs/`, and `tests/scripts/claude-lib/ClaudeLibModuleConvention.Tests.ps1` passes.
+- [x] The Codex `VIRTUAL_RESOURCE_DIRECTORIES` entry publishing `.codex/lib/development-docs/` exists in `codex-agents-customizations.ts` and in `push_down_codex_and_agents_customizations.py`, and `test_push_down_codex_and_agents_virtual_paths.py` passes.
+- [x] `extensions/drm-copilot/resources/claude-customizations/pack-manifests/core.json` and `extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json` list the new module, and `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_codex_and_agents_pack_manifest_completeness.py` and `test_push_down_pack_manifest_dependency_closure.py` pass.
+- [x] Every edited file under `.claude/` and `.codex/` has equal text in its bundle copy, and `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_codex_handoff_contract_parity.py`, `test_claude_rules_frontmatter.py`, `test_push_down_issue_824_follow_ups.py`, `test_typescript_toolchain_instruction_contracts.py`, `claude-architecture-doc.Tests.ps1` and `hook-dependency-guard-completeness.Tests.ps1` pass.
 
 ### Scope boundary, quality and evidence
 
-- [ ] After this child, the repository contains no `.dev/` directory, `development_docs_root` is `docs/features`, no existing feature folder is renamed, and no migration command is added.
-- [ ] Each new TypeScript production file under `src/lib/development-docs/` has its own `coverageThreshold` entry in `extensions/drm-copilot/jest.config.cjs` with `lines: 85` and `branches: 75`, and coverage evidence for changed code meets 85% line coverage in every language and 75% branch coverage for Python and TypeScript, recorded under the feature folder's `evidence/qa-gates/`.
-- [ ] The seven-stage toolchain passes in a single pass for Python, PowerShell and TypeScript, and no changed production file exceeds 800 lines.
+- [x] After this child, the repository contains no `.dev/` directory, `development_docs_root` is `docs/features`, no existing feature folder is renamed, and no migration command is added.
+- [x] Each new TypeScript production file under `src/lib/development-docs/` has its own `coverageThreshold` entry in `extensions/drm-copilot/jest.config.cjs` with `lines: 85` and `branches: 75`, and coverage evidence for changed code meets 85% line coverage in every language and 75% branch coverage for Python and TypeScript, recorded under the feature folder's `evidence/qa-gates/`.
+- [x] The seven-stage toolchain passes in a single pass for Python, PowerShell and TypeScript, and no changed production file exceeds 800 lines.
 
 ## Refresh Amendments (2026-11-14)
 
@@ -556,13 +556,13 @@ Recorded by the planner on 2026-11-15 under the coordinator's autonomous-mode di
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (README, docs/features/active/... links)
-- [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format → lint → type-check → test)
+- [x] Acceptance criteria documented and mapped to tests or demos
+- [x] Behavior matches acceptance criteria in all documented environments
+- [x] Tests updated/added (unit/integration as applicable)
+- [x] Edge cases and error handling covered by tests
+- [x] Docs updated (README, docs/features/active/... links)
+- [x] Telemetry/logging added or updated (if applicable)
+- [x] Toolchain pass completed (format → lint → type-check → test)
 
 ## Seeded Test Conditions (from potential)
 

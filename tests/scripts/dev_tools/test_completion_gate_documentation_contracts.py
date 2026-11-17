@@ -346,6 +346,7 @@ def test_feature_review_agent_grants_mcp_artifact_validator() -> None:
         "Bash(git diff *)",
         "Bash(git log *)",
         "Write(/docs/features/active/**)",
+        "Write(/.dev/active/**)",
         "mcp__drm-copilot__validate_orchestration_artifacts",
     )
 

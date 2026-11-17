@@ -20,7 +20,11 @@ from scripts.dev_tools.pr_context.collector import (
     find_user_story_link,
     format_diff_path,
     gather_feature_excerpts,
+    is_docs_bucket_path,
     select_default_base,
+)
+from scripts.dev_tools.pr_context.summary_helpers import (
+    is_scoping_doc,
 )
 from scripts.dev_tools.pr_context.summary_helpers import (
     issue_appendix as _issue_appendix,
@@ -478,3 +482,18 @@ def test_scoping_doc_changes_marks_non_material_link_only():
     )
     assert changes
     assert changes[0][1] is False
+
+
+def test_is_docs_bucket_path_accepts_dev_root_paths() -> None:
+    """Paths under the .dev development-docs root land in the docs bucket."""
+    assert is_docs_bucket_path(".dev/active/feat/spec.md")
+    assert is_docs_bucket_path("docs/features/active/feat/spec.md")
+    assert not is_docs_bucket_path(".devcontainer/devcontainer.json")
+    assert not is_docs_bucket_path("src/module.ts")
+
+
+def test_is_scoping_doc_accepts_dev_root_feature_files() -> None:
+    """Scoping docs are recognized under either known development-docs root."""
+    assert is_scoping_doc(".dev/active/feat/spec.md")
+    assert is_scoping_doc(".dev/potential/promoted/feat/user-story.md")
+    assert not is_scoping_doc(".dev-notes/feat/spec.md")

@@ -24,6 +24,7 @@
  */
 
 import { type FileSystem, toPosixPath } from "../file-system";
+import { parseFeatureFolderName } from "../development-docs/feature-folder-name";
 import {
   buildFallbackReason,
   resolveSelectedWorkMode,
@@ -169,12 +170,12 @@ export function resolveFeatureFoldername(folderpath: string): string {
 }
 
 /**
- * Extract `${name}` from a dated feature-folder name.
+ * Extract `${name}` from a feature-folder name.
  *
- * Mirrors Python `_resolve_name_from_feature_foldername`: the convention is
- * `yyyy-MM-dd-${name}-${issue}` where `${name}` may contain hyphens. When the
- * name matches the date prefix and trailing numeric issue token, the middle
- * segment is returned; otherwise the whole folder name is returned.
+ * Mirrors Python `_resolve_name_from_feature_foldername` and delegates to
+ * `parseFeatureFolderName` (D-P14): a date-first name with a trailing issue
+ * (`yyyy-MM-dd-${name}-${issue}`) and an issue-first name (`NNNN-${name}`)
+ * yield the feature; otherwise the whole folder name is returned.
  *
  * @param featureFoldername Feature folder name.
  * @returns The extracted name, or the original folder name.
@@ -182,40 +183,21 @@ export function resolveFeatureFoldername(folderpath: string): string {
 export function resolveNameFromFeatureFoldername(
   featureFoldername: string,
 ): string {
-  const parts = featureFoldername.split("-");
-
-  // Decision logic mirrors the Python guards: a 4-2-2 date prefix plus a
-  // trailing all-digit issue token marks a dated feature folder.
+  const parsed = parseFeatureFolderName(featureFoldername);
+  // D-P14: a date-first name with an issue and an issue-first name yield the
+  // parsed feature; every other name (including `feature-123`) is returned
+  // whole, as before. A bare date such as `2025-12-18` parses as issue-first
+  // with a partial-date feature (a shape rule N-5 never creates), so it keeps
+  // the whole-name result.
+  const isIssueFirst =
+    parsed.format === "issue-first" && !/^\d{2}-\d{2}$/.test(parsed.feature);
   if (
-    parts.length >= 5 &&
-    (parts[0] ?? "").length === 4 &&
-    (parts[1] ?? "").length === 2 &&
-    (parts[2] ?? "").length === 2 &&
-    isAllDigits(parts[0] ?? "") &&
-    isAllDigits(parts[1] ?? "") &&
-    isAllDigits(parts[2] ?? "") &&
-    isAllDigits(parts[parts.length - 1] ?? "")
+    isIssueFirst ||
+    (parsed.format === "date-first" && parsed.issueNumber !== null)
   ) {
-    const nameParts = parts.slice(3, parts.length - 1);
-    if (nameParts.length > 0) {
-      return nameParts.join("-");
-    }
+    return parsed.feature;
   }
-
   return featureFoldername;
-}
-
-/**
- * Test whether a string is non-empty and contains only ASCII digits.
- *
- * Mirrors Python `str.isdigit()` for the date/issue-token guards used by
- * {@link resolveNameFromFeatureFoldername}.
- *
- * @param value Candidate string.
- * @returns True when `value` is non-empty and all characters are `0`-`9`.
- */
-function isAllDigits(value: string): boolean {
-  return value.length > 0 && /^[0-9]+$/.test(value);
 }
 
 /**

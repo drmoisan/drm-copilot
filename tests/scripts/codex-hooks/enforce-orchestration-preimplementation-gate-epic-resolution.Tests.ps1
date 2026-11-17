@@ -28,6 +28,8 @@
 Describe 'Codex epic-scope resolution sibling (issue #707)' {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
+        # The dot-sourced file reads the development-docs root module that its gate imports (D-P16).
+        Import-Module (Join-Path $script:RepoRoot '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -Force
         . (Join-Path $script:RepoRoot '.codex/hooks/enforce-orchestration-preimplementation-gate-epic-scope.ps1')
         $script:RealGetEpicScopeCheckpointText = ${function:Get-EpicScopeCheckpointText}
         . (Join-Path $PSScriptRoot '../claude-hooks/EpicStateIsolation.Baseline.Helpers.ps1')

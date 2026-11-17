@@ -474,3 +474,11 @@ def test_copy_to_clipboard_command_failure(monkeypatch: pytest.MonkeyPatch) -> N
 # =============================================================================
 # Tests for parse_args
 # =============================================================================
+
+
+def test_resolve_name_from_feature_foldername_issue_first() -> None:
+    """Test _resolve_name_from_feature_foldername with the issue-first convention."""
+    result = module._resolve_name_from_feature_foldername(  # type: ignore[reportPrivateUsage]
+        "1016-foo-bar"
+    )
+    assert result == "foo-bar"

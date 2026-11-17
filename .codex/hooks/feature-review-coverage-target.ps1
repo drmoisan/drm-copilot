@@ -121,11 +121,14 @@ function Get-CodexReviewPolicyAuditPath {
     }
 
     $text = $Message -replace '\\', '/'
-    $tokenPattern = '(?<![^\s`''"()<>|*?,;\[\]])[^\s`''"()<>|*?,;\[\]]*docs/features/active/[^\s`''"()<>|*?,;\[\]]+?\.md(?=[.:]*(?:[\s`''"()<>|*?,;\[\]]|$))'
-    $spanPattern = '`([^`\r\n]*docs/features/active/[^`\r\n]*)`|''([^''\r\n]*docs/features/active/[^''\r\n]*)''|"([^"\r\n]*docs/features/active/[^"\r\n]*)"'
-    $shapePattern = '^docs/features/active/[^/]+/(?:(?:[^/]+/)?policy-audit\.[^/]+\.md|audit/[^/]+/policy-audit\.md)$'
+    # The active area of either known development-docs root (issue #1035); a call-time dependency on
+    # the development-docs module, which the dot-sourcing hook imports.
+    $activePrefixes = [string[]]@(Get-DevelopmentDocsKnownRootPrefix -Area 'active')
+    $active = '(?:' + (@($activePrefixes | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
+    $tokenPattern = '(?<![^\s`''"()<>|*?,;\[\]])[^\s`''"()<>|*?,;\[\]]*' + $active + '[^\s`''"()<>|*?,;\[\]]+?\.md(?=[.:]*(?:[\s`''"()<>|*?,;\[\]]|$))'
+    $spanPattern = '`([^`\r\n]*' + $active + '[^`\r\n]*)`|''([^''\r\n]*' + $active + '[^''\r\n]*)''|"([^"\r\n]*' + $active + '[^"\r\n]*)"'
+    $shapePattern = '^' + $active + '[^/]+/(?:(?:[^/]+/)?policy-audit\.[^/]+\.md|audit/[^/]+/policy-audit\.md)$'
     $auditNamePattern = '^policy-audit\.(?:[^/]+\.)?md$'
-    $docsPrefix = 'docs/features/active/'
     $candidates = [System.Collections.Generic.List[string]]::new()
     foreach ($labelMatch in [regex]::Matches($text, 'policy-audit-path:(?<rest>[^\r\n]*)')) {
         $candidates.Add(($labelMatch.Groups['rest'].Value.Trim() -replace '^(?<q>[`''"])(?<c>.*)\k<q>$', '${c}'))
@@ -138,8 +141,13 @@ function Get-CodexReviewPolicyAuditPath {
         $token = $candidateText -replace '^policy-audit-path:', ''
         $token = $token -replace '/{2,}', '/'
         $token = $token -replace '(?<=\.md)[.,:;]+$', ''
-        $index = $token.IndexOf($docsPrefix, [System.StringComparison]::Ordinal)
-        if ($index -lt 0 -or $token.LastIndexOf($docsPrefix, [System.StringComparison]::Ordinal) -ne $index) { continue }
+        # Examine the candidate only when exactly one active-area prefix occurs in it, exactly once.
+        $hits = @(foreach ($activePrefix in $activePrefixes) {
+                $first = $token.IndexOf($activePrefix, [System.StringComparison]::Ordinal)
+                if ($first -ge 0) { [pscustomobject]@{ First = $first; Last = $token.LastIndexOf($activePrefix, [System.StringComparison]::Ordinal) } }
+            })
+        if ($hits.Count -ne 1 -or $hits[0].Last -ne $hits[0].First) { continue }
+        $index = $hits[0].First
         $segments = @($token -split '/')
         if ($segments[-1] -match $auditNamePattern -and $segments -contains '..') {
             return [pscustomobject]@{ Paths = [string[]]@(); ReasonCode = 'AUDIT_PATH_TRAVERSAL'; Reason = "the policy-audit path '$token' contains a '..' segment; name the audit by a path without '..'." }
@@ -172,8 +180,10 @@ function Select-CodexReviewPolicyAudit {
     [OutputType([pscustomobject])]
     param([AllowNull()] [AllowEmptyCollection()] [string[]] $RelativePath)
 
+    # The active area of either known development-docs root (issue #1035).
+    $active = '(?:' + (@(Get-DevelopmentDocsKnownRootPrefix -Area 'active' | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
     $audits = @(foreach ($path in @($RelativePath | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })) {
-            $match = [regex]::Match($path, '^docs/features/active/(?<folder>[^/]+)/(?:(?:[^/]+/)?policy-audit\.(?<stamp>[^/]+)\.md|audit/(?<stamp>[^/]+)/policy-audit\.md)$')
+            $match = [regex]::Match($path, '^' + $active + '(?<folder>[^/]+)/(?:(?:[^/]+/)?policy-audit\.(?<stamp>[^/]+)\.md|audit/(?<stamp>[^/]+)/policy-audit\.md)$')
             if ($match.Success) { [pscustomobject]@{ Path = $path; Folder = $match.Groups['folder'].Value; Stamp = $match.Groups['stamp'].Value } }
         })
     if ($audits.Count -eq 0) {

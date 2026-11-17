@@ -176,7 +176,14 @@ function Get-CodexChildRuntimeContext {
     if ($rootHead -ne $integrationHead) {
         throw 'EPIC_CHILD_LAUNCH_BLOCKED: RepositoryRoot HEAD must equal the integration branch tip.'
     }
-    $profiles = [System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)
+    # The active area of the development-docs root configured in RepositoryRoot (issue #1035);
+    # the development-docs module is loaded by epic-child-launch-contract.ps1, dot-sourced first.
+    $docsRoot = Resolve-DevelopmentDocsRoot -WorkspaceRoot $RepositoryRoot
+    if (-not $docsRoot.Succeeded) {
+        throw "EPIC_CHILD_LAUNCH_BLOCKED: $($docsRoot.Reason)"
+    }
+    $activeRoot = Get-CodexChildCanonicalPath -Path (Get-DevelopmentDocsPath -Root $docsRoot.Root -Area 'active') -BasePath $RepositoryRoot
+    $profiles =[System.Collections.Generic.Dictionary[string, object]]::new([System.StringComparer]::Ordinal)
     $pathComparer = if ($IsWindows) { [System.StringComparer]::OrdinalIgnoreCase } else { [System.StringComparer]::Ordinal }
     $branches = [System.Collections.Generic.Dictionary[string, string]]::new($pathComparer)
     foreach ($entry in @($Spec.launches)) {
@@ -190,7 +197,6 @@ function Get-CodexChildRuntimeContext {
         if ($worktree -eq $RepositoryRoot -or -not (Test-Path -LiteralPath $worktree -PathType Container)) {
             throw "EPIC_CHILD_LAUNCH_BLOCKED: child path must be a distinct existing worktree: $worktree"
         }
-        $activeRoot = Get-CodexChildCanonicalPath -Path 'docs/features/active' -BasePath $RepositoryRoot
         $rootFeatureFolder = Get-CodexChildCanonicalPath -Path ([string]$entry.feature_folder) -BasePath $RepositoryRoot
         $childFeatureFolder = Get-CodexChildCanonicalPath -Path ([string]$entry.feature_folder) -BasePath $worktree
         $folderComparison = if ($IsWindows) { [System.StringComparison]::OrdinalIgnoreCase } else { [System.StringComparison]::Ordinal }
@@ -379,7 +385,19 @@ function New-CodexChildIsolatedHome {
 
 function Restore-CodexChildIsolatedAuth {
     [CmdletBinding(SupportsShouldProcess)]
-    param([Parameter(Mandatory)][string] $HomePath, [Parameter(Mandatory)][string] $OriginalAuthPath)
+    param(
+        [Parameter(Mandatory)][string] $HomePath,
+        [Parameter(Mandatory)][string] $OriginalAuthPath,
+        # Testability seams (issue #1035): the defaults open, create and delete through real
+        # file streams exactly as before.
+        [scriptblock] $OpenSource = { param([string] $Path) [System.IO.File]::OpenRead($Path) },
+        [scriptblock] $OpenDestination = {
+            param([string] $Path)
+            [System.IO.File]::Open($Path, [System.IO.FileMode]::CreateNew,
+                [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+        },
+        [scriptblock] $DeleteFile = { param([string] $Path) [System.IO.File]::Delete($Path) }
+    )
     $target = Join-Path $HomePath 'auth.json'
     if (Test-Path -LiteralPath $target) {
         throw 'EPIC_CHILD_RESUME_BLOCKED: isolated auth copy already exists before resume.'
@@ -387,17 +405,17 @@ function Restore-CodexChildIsolatedAuth {
     if ($PSCmdlet.ShouldProcess($target, 'Restore isolated Codex authentication')) {
         $source = $null; $destination = $null; $ownsDestination = $false
         try {
-            $source = [System.IO.File]::OpenRead($OriginalAuthPath)
-            $destination = [System.IO.File]::Open($target, [System.IO.FileMode]::CreateNew,
-                [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+            $source = & $OpenSource $OriginalAuthPath
+            $destination = & $OpenDestination $target
             $ownsDestination = $true
-            $source.CopyTo($destination); $destination.Flush($true)
+            $source.CopyTo($destination)
+            if ($destination -is [System.IO.FileStream]) { $destination.Flush($true) } else { $destination.Flush() }
         } catch {
             $copyError = $_
             if ($null -ne $destination) { $destination.Dispose(); $destination = $null }
             if ($null -ne $source) { $source.Dispose(); $source = $null }
             if ($ownsDestination -and (Test-Path -LiteralPath $target)) {
-                [System.IO.File]::Delete($target)
+                & $DeleteFile $target
             }
             throw $copyError
         } finally {

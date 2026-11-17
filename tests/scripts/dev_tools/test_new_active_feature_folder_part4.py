@@ -277,7 +277,7 @@ def test_create_active_folder_auto_resolve_feature_name_from_promoted_active_fil
         / "docs"
         / "features"
         / "active"
-        / "2026-02-22-testing-missing-mock-injections-42"
+        / "0042-testing-missing-mock-injections"
     )
     assert result.target == expected_folder
     assert result.potential_issue_path == expected_folder / "issue.md"

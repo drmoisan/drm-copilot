@@ -2,7 +2,9 @@
 
 const KICKOFF_HEADING_RE = /^# Epic Kickoff: (?<slug>[a-z0-9][a-z0-9-]*)$/;
 const EPIC_RUN_RE = /Run `\/epic-run (?<slug>[a-z0-9][a-z0-9-]*)`/;
-const MANIFEST_RE = /docs\/features\/epics\/[a-z0-9][a-z0-9-]*\/epic\.md/;
+// The manifest may live under either known development-docs root.
+const MANIFEST_RE =
+  /(?:docs\/features|\.dev)\/epics\/[a-z0-9][a-z0-9-]*\/epic\.md/;
 const INTEGRATION_BRANCH_RE = /epic\/[a-z0-9][a-z0-9-]*-integration/;
 const RESUME_RE =
   /(?:Every child|child features)\s+resumes?\s+at atomic execution\s+from\s+(?:its|their)\s+committed plan-path/i;

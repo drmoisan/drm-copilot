@@ -16,6 +16,8 @@ BeforeAll {
     $script:RepoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))
     . (Join-Path $script:RepoRoot '.codex/hooks/hook-target-worktree.ps1')
     . (Join-Path $script:RepoRoot '.codex/hooks/feature-review-coverage-target.ps1')
+    # D-P16 (issue #1035): the dot-sourced selection reads DevelopmentDocsRoot.psm1 at call time.
+    Import-Module (Join-Path $script:RepoRoot '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
     $script:SessionRoot = '/synthetic-worktrees/main'
     $script:ItemRoot = '/synthetic-worktrees/item-a'
@@ -359,5 +361,41 @@ Describe 'git wrappers (issue #1114)' {
             Mock Invoke-CodexReviewCoverageGitExe { param([string[]] $GitArgs) $null = $GitArgs; throw 'git is not installed' }
             Get-CodexReviewCoverageWorktreeList -SessionRoot $script:SessionRoot | Should -BeExactly ''
         }
+    }
+}
+
+Describe 'development-docs roots in policy-audit selection (issue #1035)' {
+    It '1035: extracts a .dev/active policy-audit path (<Case>)' -ForEach @(
+        @{ Case = 'dated'; Path = '.dev/active/2026-11-07-item-a-1114/policy-audit.2026-11-07T20-00.md' }
+        @{ Case = 'audit folder'; Path = '.dev/active/2026-11-07-item-a-1114/audit/2026-11-07T20-00/policy-audit.md' }
+        @{ Case = 'labelled'; Path = '.dev/active/2026-11-07-item-a-1114/policy-audit.2026-11-07T21-00.md' }
+    ) {
+        $result = Get-CodexReviewPolicyAuditPath -Message "policy-audit-path: $Path"
+        @($result.Paths) | Should -Be @($Path)
+        $result.ReasonCode | Should -BeNullOrEmpty
+    }
+
+    It '1035: extracts the audits of both roots from one message' {
+        $devAudit = '.dev/active/2026-11-07-item-b-1115/policy-audit.2026-11-07T22-00.md'
+        $result = Get-CodexReviewPolicyAuditPath -Message "Wrote $script:AuditA and $devAudit today."
+        @($result.Paths) | Should -Be @($script:AuditA, $devAudit)
+    }
+
+    It '1035: ignores a .dev policy audit outside the active area' {
+        $result = Get-CodexReviewPolicyAuditPath -Message 'Wrote .dev/research/2026-11-07-item-a-1114/policy-audit.2026-11-07T20-00.md today.'
+        @($result.Paths).Count | Should -Be 0
+    }
+
+    It '1035: selects a .dev/active audit and reads its folder' {
+        $devAudit = '.dev/active/2026-11-07-item-a-1114/policy-audit.2026-11-07T20-00.md'
+        $result = Select-CodexReviewPolicyAudit -RelativePath @($devAudit)
+        $result.RelativePath | Should -BeExactly $devAudit
+        $result.ReasonCode | Should -BeNullOrEmpty
+    }
+
+    It '1035: keeps the AUDIT_NOT_NAMED reason text unchanged' {
+        $result = Select-CodexReviewPolicyAudit -RelativePath @()
+        $result.ReasonCode | Should -BeExactly 'AUDIT_NOT_NAMED'
+        $result.Reason | Should -BeLike '*(policy-audit-path: docs/features/active/<folder>/policy-audit.<timestamp>.md)*'
     }
 }

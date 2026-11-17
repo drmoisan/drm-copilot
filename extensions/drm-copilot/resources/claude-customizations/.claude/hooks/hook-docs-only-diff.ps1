@@ -105,7 +105,8 @@ function Get-DocsOnlyPathViolation {
         Return $null when every path is under docs/, else the denial sub-code text.
     .DESCRIPTION
         An empty set returns DOCS_ONLY_EXEMPTION_EMPTY_DIFF. Otherwise the first path that does
-        not start with docs/ under ordinal comparison, or that is not longer than docs/ itself,
+        not start with docs/ or .dev/ (issue #1035) under ordinal comparison, or that is not longer
+        than that prefix itself,
         returns DOCS_ONLY_EXEMPTION_NON_DOCS_PATH naming that path. A path ordinally equal to
         $script:DocsOnlyInitWorkflowPath is admitted (issue #1169); no glob or prefix applies.
     .PARAMETER Path
@@ -127,7 +128,9 @@ function Get-DocsOnlyPathViolation {
         if ([string]::Equals($entry, $script:DocsOnlyInitWorkflowPath, [System.StringComparison]::Ordinal)) {
             continue
         }
-        if ($entry.Length -le 5 -or -not $entry.StartsWith('docs/', [System.StringComparison]::Ordinal)) {
+        # docs/ and the .dev/ development-docs root are both documentation trees as a whole (issue #1035, OQ-3).
+        $underDocsTree = $entry.StartsWith('docs/', [System.StringComparison]::Ordinal) -or $entry.StartsWith('.dev/', [System.StringComparison]::Ordinal)
+        if ($entry.Length -le 5 -or -not $underDocsTree) {
             return "DOCS_ONLY_EXEMPTION_NON_DOCS_PATH: '$entry' is outside docs/."
         }
     }

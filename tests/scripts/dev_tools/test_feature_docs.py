@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from scripts.dev_tools.pr_context.feature_docs import (
+    _parse_readiness_value,  # pyright: ignore[reportPrivateUsage]
     _resolve_feature_dir,  # pyright: ignore[reportPrivateUsage]
     completed_plan_tasks,
     extract_issue_references,
@@ -430,3 +431,42 @@ def test_primary_issue_and_pass_readiness_from_issue_md_and_overall_marker(
         f"docs/features/active/{feature}/feature-audit.2026-03-03T19-24.md"
         in excerpts[0].context_files
     )
+
+
+class TestGatherFeatureExcerptsDevRoot:
+    """Feature excerpts under a configured and present ``.dev`` root."""
+
+    def test_gather_feature_excerpts_reads_dev_active_folder(
+        self, mem_fs_path: Path
+    ) -> None:
+        """A ``.dev/active`` change is matched and read under the ``.dev`` root."""
+        config_dir = mem_fs_path / "config"
+        config_dir.mkdir(parents=True)
+        (config_dir / "orchestration-routing.json").write_text(
+            '{"development_docs_root": ".dev"}', encoding="utf-8"
+        )
+        feature_dir = mem_fs_path / ".dev" / "active" / "dev-feature"
+        feature_dir.mkdir(parents=True)
+        (mem_fs_path / ".dev" / "potential" / "promoted").mkdir(parents=True)
+        (feature_dir / "user-story.md").write_text(
+            "## Problem / Why\nDev root story content", encoding="utf-8"
+        )
+
+        excerpts = gather_feature_excerpts(
+            mem_fs_path, [".dev/active/dev-feature/user-story.md"]
+        )
+
+        assert [excerpt.feature for excerpt in excerpts] == ["dev-feature"]
+        assert "Dev root story content" in excerpts[0].excerpt
+
+
+class TestParseReadinessValue:
+    """Readiness markers that yield no readiness value."""
+
+    def test_returns_none_without_a_readiness_marker(self) -> None:
+        """Text with no readiness line has no readiness value."""
+        assert _parse_readiness_value("## Summary\nNo marker here.\n") is None
+
+    def test_returns_none_for_an_unknown_readiness_value(self) -> None:
+        """A readiness line outside PASS, NEEDS REVISION and BLOCKED is ignored."""
+        assert _parse_readiness_value("Readiness: MAYBE\n") is None
