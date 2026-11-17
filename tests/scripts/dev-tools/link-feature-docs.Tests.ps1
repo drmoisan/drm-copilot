@@ -203,6 +203,33 @@ other
         }
     }
 
+    Context "Invoke-GhCli" {
+        It "returns the injected process output and the native exit code" {
+            # Arrange: the injected process sets the native exit code; the prior value is restored below.
+            $priorExitCode = $global:LASTEXITCODE
+            $seenArgs = [System.Collections.Generic.List[string]]::new()
+            $invokeProcess = {
+                param([string[]] $GhArgs)
+                foreach ($arg in $GhArgs) { $seenArgs.Add($arg) }
+                $global:LASTEXITCODE = 7
+                'gh output'
+            }.GetNewClosure()
+
+            try {
+                # Act
+                $result = Invoke-GhCli -GhArgs @('issue', 'view', '42') -InvokeProcess $invokeProcess
+
+                # Assert
+                $result.Output | Should -Be 'gh output'
+                $result.ExitCode | Should -Be 7
+                @($seenArgs) | Should -Be @('issue', 'view', '42')
+            }
+            finally {
+                $global:LASTEXITCODE = $priorExitCode
+            }
+        }
+    }
+
     Context "Invoke-LinkFeatureDocument" {
         BeforeEach {
             $script:ghCalls = New-Object System.Collections.Generic.List[object]
@@ -242,6 +269,14 @@ other
         It "throws when feature name is missing" {
             $action = { Invoke-LinkFeatureDocument -IssueNumberParam '42' -FeatureNameParam '' }
             Should -ActualValue $action -Throw -ExceptionType ([System.InvalidOperationException]) -ExpectedMessage 'Feature name is required*'
+        }
+
+        It "throws when gh CLI is not on PATH" {
+            Mock -CommandName Get-Command -ParameterFilter { $Name -eq 'gh' } -MockWith { $null }
+
+            $action = { Invoke-LinkFeatureDocument -IssueNumberParam '42' -FeatureNameParam 'demo' }
+            Should -ActualValue $action -Throw -ExceptionType ([System.InvalidOperationException]) -ExpectedMessage 'gh CLI not found on PATH*'
+            Should -Invoke -CommandName Invoke-GhCli -Times 0 -Exactly
         }
 
         It "throws when gh view fails" {

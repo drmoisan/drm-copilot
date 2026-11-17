@@ -90,6 +90,142 @@ class TestResolveFeatureAndType:
         assert feature == "feat-73"
         assert plan_type == "v2"
 
+    def test_rejects_plan_outside_active_root(self) -> None:
+        """A plan path outside the active root raises ValueError."""
+        active_root = Path("/repo/docs/features/active")
+        plan_path = Path("/repo/docs/features/completed/feat-1/plan.md")
+
+        with pytest.raises(ValueError, match="plan_path is not under active_root"):
+            resolve_feature_and_type(plan_path, active_root=active_root)
+
+    def test_plan_directly_under_active_root_is_base_type(self) -> None:
+        """A plan file directly under the active root uses its own name and base."""
+        active_root = Path("/repo/docs/features/active")
+        plan_path = Path("/repo/docs/features/active/plan.md")
+
+        feature, plan_type = resolve_feature_and_type(
+            plan_path, active_root=active_root
+        )
+
+        assert (feature, plan_type) == ("plan.md", "base")
+
+
+class TestReadAndGenerate:
+    def test_read_plan_docs_reads_each_path_as_utf8(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Each plan is read once with UTF-8 and paired with its path in order."""
+        # Arrange: serve text per path and record the requested encoding.
+        reads: list[tuple[Path, str | None]] = []
+
+        def fake_read_text(self: Path, encoding: str | None = None) -> str:
+            reads.append((self, encoding))
+            return f"text of {self.name}"
+
+        monkeypatch.setattr(Path, "read_text", fake_read_text)
+        first = Path("/repo/docs/features/active/a/plan.md")
+        second = Path("/repo/docs/features/active/b/plan.md")
+
+        # Act
+        docs = plan_progress_report_module.read_plan_docs([first, second])
+
+        # Assert
+        assert docs == [(first, "text of plan.md"), (second, "text of plan.md")]
+        assert reads == [(first, "utf-8"), (second, "utf-8")]
+
+    def test_generate_report_composes_discovery_reading_and_rendering(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The report renders rows built from the discovered and read plans."""
+        active_root = Path("/repo/docs/features/active")
+        plan_path = Path("/repo/docs/features/active/feat-9/plan.md")
+        seen: dict[str, object] = {}
+
+        def fake_discover(root: Path) -> list[Path]:
+            seen["discover"] = root
+            return [plan_path]
+
+        def fake_read(paths: list[Path]) -> list[tuple[Path, str]]:
+            seen["read"] = paths
+            return [(plan_path, "- Issue: #9\n- [ ] Todo\n- [x] Done\n")]
+
+        monkeypatch.setattr(
+            plan_progress_report_module, "discover_plan_files", fake_discover
+        )
+        monkeypatch.setattr(plan_progress_report_module, "read_plan_docs", fake_read)
+
+        report = plan_progress_report_module.generate_plan_progress_report(
+            active_root=active_root
+        )
+
+        assert seen == {"discover": active_root, "read": [plan_path]}
+        assert "| feat-9 | #9 | base | 1/2 | [plan]" in report
+
+
+class TestMain:
+    def _patch_io(
+        self, monkeypatch: pytest.MonkeyPatch, calls: dict[str, object]
+    ) -> None:
+        """Replace report generation and disk writes with recorders.
+
+        Args:
+            monkeypatch: Fixture used to replace the module and Path seams.
+            calls: Mapping that receives the recorded arguments.
+        """
+
+        def fake_generate(*, active_root: Path, report_path: Path | None = None) -> str:
+            calls["generate"] = (active_root, report_path)
+            return "REPORT"
+
+        def fake_mkdir(
+            self: Path, parents: bool = False, exist_ok: bool = False
+        ) -> None:
+            calls["mkdir"] = (self, parents, exist_ok)
+
+        def fake_write_text(self: Path, data: str, encoding: str | None = None) -> int:
+            calls["write"] = (self, data, encoding)
+            return len(data)
+
+        monkeypatch.setattr(
+            plan_progress_report_module, "generate_plan_progress_report", fake_generate
+        )
+        monkeypatch.setattr(Path, "mkdir", fake_mkdir)
+        monkeypatch.setattr(Path, "write_text", fake_write_text)
+
+    def test_main_writes_report_to_out_path(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """main renders the active root report to --out and returns 0."""
+        calls: dict[str, object] = {}
+        self._patch_io(monkeypatch, calls)
+        out = Path("artifacts/custom/progress.md")
+
+        result = plan_progress_report_module.main(
+            ["--active-root", "docs/features/active", "--out", str(out)]
+        )
+
+        assert result == 0
+        assert calls["generate"] == (Path("docs/features/active"), out)
+        assert calls["mkdir"] == (out.parent, True, True)
+        assert calls["write"] == (out, "REPORT", "utf-8")
+
+    def test_main_prefers_feature_over_active_root(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """--feature, when given, replaces --active-root as the scanned root."""
+        calls: dict[str, object] = {}
+        self._patch_io(monkeypatch, calls)
+
+        result = plan_progress_report_module.main(
+            ["--feature", "docs/features/active/feat-3", "--active-root", "elsewhere"]
+        )
+
+        assert result == 0
+        assert calls["generate"] == (
+            Path("docs/features/active/feat-3"),
+            Path("artifacts/active_plan_progress.md"),
+        )
+
 
 class TestBuildReportRows:
     def test_excludes_complete_plans(self) -> None:
