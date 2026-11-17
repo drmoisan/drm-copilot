@@ -4,8 +4,20 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from scripts.dev_tools.codex_native_converter.engine import run_review_mode
+from scripts.dev_tools.codex_native_converter.engine import (
+    ConversionRunResult,
+    run_review_mode,
+)
+from scripts.dev_tools.codex_native_converter.mapping import (
+    STANDING_GUIDANCE_NOT_EMITTED_NOTE,
+)
 from scripts.dev_tools.codex_native_converter.models import RunOptions, SourceEcosystem
+
+# Repo-wide standing-guidance sources of the GitHub Copilot fixture.
+STANDING_GUIDANCE_SOURCES = (
+    ".github/copilot-instructions.md",
+    ".github/instructions/general-code-change.instructions.md",
+)
 
 
 class RecordingFileSystem:
@@ -78,15 +90,21 @@ def test_github_copilot_fixture_review_run_produces_required_report_set() -> Non
     assert any(path.endswith("conversion-report.md") for path in written_paths)
     assert any(path.endswith("mapping-catalog.json") for path in written_paths)
     assert any(path.endswith("validation-results.json") for path in written_paths)
-    assert any("proposed-tree/AGENTS.md" in path for path in written_paths)
+    assert not any("proposed-tree/AGENTS.md" in path for path in written_paths)
     assert len(result.mapping_records) >= 4
 
 
-def test_github_copilot_fixture_merges_repo_wide_instructions_into_agents() -> None:
-    """Merge repo-wide GitHub instruction files into one generated `AGENTS.md`."""
+def _run_github_review(recording_fs: RecordingFileSystem) -> ConversionRunResult:
+    """Run review mode over the GitHub Copilot fixture into a recording file system.
 
-    recording_fs = RecordingFileSystem()
-    result = run_review_mode(
+    Args:
+        recording_fs (RecordingFileSystem): Adapter that records report writes.
+
+    Returns:
+        ConversionRunResult: The review-mode run result.
+    """
+
+    return run_review_mode(
         RunOptions(
             mode="review",
             source_root=_fixture_root("github_copilot"),
@@ -98,23 +116,69 @@ def test_github_copilot_fixture_merges_repo_wide_instructions_into_agents() -> N
         fs=recording_fs,
     )
 
-    agents_output = next(
-        content
-        for path, content in recording_fs.files.items()
-        if path.endswith("proposed-tree/AGENTS.md")
-    )
 
-    assert "Copilot fixture instructions" in agents_output
-    assert "fixture-general-policy" in agents_output
-    assert any(
-        record.source_path == ".github/instructions/general-code-change.instructions.md"
-        and record.target_path == "AGENTS.md"
-        for record in result.mapping_records
+def test_github_copilot_fixture_emits_no_agents_target_for_standing_guidance() -> None:
+    """Emit no `AGENTS.md` output for repo-wide standing-guidance sources."""
+
+    result = _run_github_review(RecordingFileSystem())
+
+    assert "AGENTS.md" not in result.generated_output
+    assert not any(
+        "Converted standing guidance" in output
+        for output in result.generated_output.values()
     )
+    standing_records = [
+        record
+        for record in result.mapping_records
+        if record.source_path in STANDING_GUIDANCE_SOURCES
+    ]
+    assert len(standing_records) == len(STANDING_GUIDANCE_SOURCES)
+    assert all(record.target_path is None for record in standing_records)
     assert not any(
         finding.code == "duplicate-target-path"
         for finding in result.validation_findings
     )
+
+
+def test_github_copilot_fixture_reports_standing_guidance_as_not_emitted() -> None:
+    """Record each standing-guidance source as not emitted, with the reason."""
+
+    recording_fs = RecordingFileSystem()
+    result = _run_github_review(recording_fs)
+
+    report = next(
+        content
+        for path, content in recording_fs.files.items()
+        if path.endswith("conversion-report.md")
+    )
+    # Check the record note and the report row of each standing-guidance source.
+    for source_path in STANDING_GUIDANCE_SOURCES:
+        record = next(
+            record
+            for record in result.mapping_records
+            if record.source_path == source_path
+        )
+        assert STANDING_GUIDANCE_NOT_EMITTED_NOTE in record.notes
+        row = next(
+            line
+            for line in report.splitlines()
+            if line.startswith(f"| `{source_path}`")
+        )
+        assert STANDING_GUIDANCE_NOT_EMITTED_NOTE in row
+
+
+def test_github_copilot_fixture_keeps_standing_guidance_reference_rewrites() -> None:
+    """Keep the rewrites to `AGENTS.md` in the topology agent output."""
+
+    result = _run_github_review(RecordingFileSystem())
+
+    agent_output = next(
+        output
+        for target_path, output in result.generated_output.items()
+        if target_path.endswith("beast-topology.toml")
+    )
+    assert "AGENTS.md" in agent_output
+    assert ".github/copilot-instructions.md" not in agent_output
 
 
 def _test_claude_fixture_review_maps_rules_to_shared_skills() -> None:

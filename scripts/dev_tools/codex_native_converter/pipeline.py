@@ -8,8 +8,9 @@ Purpose:
 
 Responsibilities:
     - Source text reading and rewriting.
-    - Native target content rendering (per-record, merged standing-guidance,
-      and section-level emission).
+    - Native target content rendering (per-record and section-level emission).
+      Standing guidance is never rendered: ``AGENTS.md`` is a hand-authored
+      source (issue #1028).
     - Topology edge construction.
     - Prompt translation-trace construction.
 
@@ -95,15 +96,24 @@ def _wrap_rendered_target_content(
     rewritten_text: str,
     rewrite_summary: str,
 ) -> str:
-    """Wrap rewritten text in the target-role-specific native output shape."""
+    """Wrap rewritten text in the target-role-specific native output shape.
 
-    if target_role is TargetRole.STANDING_GUIDANCE:
-        return (
-            "# Converted standing guidance\n\n"
-            f"Applied rewrites:\n{rewrite_summary}\n\n"
-            f"{rewritten_text}\n"
-        )
+    Standing guidance has no branch because it is never rendered; any role
+    without a branch falls through to the plain rewritten text.
 
+    Args:
+        target_role (TargetRole): Role that selects the output shape.
+        target_path (str | None): Planned target path, used for subagent names
+            and shared-helper detection.
+        rewritten_text (str): Source text after reference rewrites.
+        rewrite_summary (str): Markdown list of applied rewrites.
+
+    Returns:
+        str: The wrapped native output text.
+    """
+
+    # Route by target role: each role has its own literal template, and roles
+    # without one (including standing guidance) fall through to plain text.
     if target_role is TargetRole.SHARED_SKILL:
         return (
             "# Converted skill\n\n"
@@ -190,74 +200,6 @@ def render_target_content(
         rewritten_text=rewritten_text,
         rewrite_summary=rewrite_summary,
     )
-
-
-def render_merged_standing_guidance(
-    run_options: RunOptions,
-    mapping_records: tuple[MappingRecord, ...],
-) -> str:
-    """Render one merged `AGENTS.md` output from standing-guidance sources.
-
-    Purpose:
-        Combine repo-wide standing-guidance inputs into one deterministic native
-        `AGENTS.md` output while preserving source ordering and rewrite notes.
-
-    Args:
-        run_options (RunOptions): Requested run options for the current run.
-        mapping_records (tuple[MappingRecord, ...]): Standing-guidance mapping
-            records that all target `AGENTS.md`.
-
-    Returns:
-        str: One merged `AGENTS.md` output body.
-
-    Raises:
-        OSError: Raised when a required source file cannot be read.
-
-    Side Effects:
-        Reads the source files associated with the mapping records.
-    """
-
-    standing_guidance_source_paths = tuple(
-        record.source_path for record in mapping_records
-    )
-
-    # Pre-rewrite the human-readable source labels so that header listings and
-    # per-source sub-headings cannot reintroduce raw source-runtime references
-    # (for example, a literal "CLAUDE.md" filename) that the validator would
-    # later flag as a lingering source-runtime reference.
-    def _label_for(source_path: str) -> str:
-        rewritten_label, _ = rewrite_supported_automation_reference(
-            Path(source_path).name,
-            enable_repo_prompts=run_options.enable_repo_prompts,
-            standing_guidance_source_paths=standing_guidance_source_paths,
-        )
-        return rewritten_label
-
-    rendered_sections: list[str] = [
-        "# Converted standing guidance",
-        "",
-        "Merged standing-guidance sources:",
-        *(f"- `{_label_for(record.source_path)}`" for record in mapping_records),
-        "",
-    ]
-
-    for mapping_record in mapping_records:
-        rendered_text = render_target_content(
-            run_options,
-            mapping_record,
-            standing_guidance_source_paths=standing_guidance_source_paths,
-        ).rstrip()
-        section_label = _label_for(mapping_record.source_path)
-        rendered_sections.extend(
-            (
-                f"## Source: `{section_label}`",
-                "",
-                rendered_text,
-                "",
-            )
-        )
-
-    return "\n".join(rendered_sections).rstrip() + "\n"
 
 
 def render_section_emission_content(
@@ -384,6 +326,9 @@ def build_topology_edges(
     Purpose:
         Capture many-to-many relationships for decomposed artifacts and merged
         targets so Mermaid charts reflect actual native fan-out and fan-in.
+        Standing-guidance source paths are taken from the role alone; those
+        records have no target, so they contribute a ``[no target]`` edge and
+        never an ``AGENTS.md`` destination.
 
     Args:
         run_options (RunOptions): Requested run options.
@@ -401,11 +346,12 @@ def build_topology_edges(
         Reads source files from disk through target rendering.
     """
 
+    # Collect every standing-guidance source path by role so reference rewrites
+    # in other outputs still point at AGENTS.md.
     standing_guidance_source_paths = tuple(
         record.source_path
         for record in mapping_records
         if record.target_role is TargetRole.STANDING_GUIDANCE
-        and record.target_path == "AGENTS.md"
     )
     known_destination_paths = tuple(
         sorted(

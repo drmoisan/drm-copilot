@@ -127,4 +127,5 @@ def test_review_mode_writes_required_artifacts_without_destination_mutation() ->
     assert any(path.endswith("conversion-report.md") for path in written_paths)
     assert any(path.endswith("mapping-catalog.json") for path in written_paths)
     assert any(path.endswith("validation-results.json") for path in written_paths)
-    assert any("proposed-tree/AGENTS.md" in path for path in written_paths)
+    # Standing guidance is not emitted, so the proposed tree holds no AGENTS.md.
+    assert not any("proposed-tree/AGENTS.md" in path for path in written_paths)

@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from scripts.dev_tools.codex_native_converter.mapping import (
+    STANDING_GUIDANCE_NOT_EMITTED_NOTE,
+)
 from scripts.dev_tools.codex_native_converter.models import (
     ConversionClass,
     MappingRecord,
@@ -134,17 +137,28 @@ globals()[
 ] = _test_validate_conversion_plan_blocks_duplicate_targets_and_runtime_refs
 
 
-def test_validate_conversion_plan_allows_merged_standing_guidance_targets() -> None:
-    """Allow multiple standing-guidance inputs to merge into one `AGENTS.md` target."""
+def _standing_guidance_records(
+    target_path: str | None, notes: tuple[str, ...] = ()
+) -> tuple[MappingRecord, MappingRecord]:
+    """Build the two repo-wide standing-guidance records of the GitHub fixture.
 
-    mapping_records = (
+    Args:
+        target_path (str | None): Target path given to both records.
+        notes (tuple[str, ...]): Notes given to both records.
+
+    Returns:
+        tuple[MappingRecord, MappingRecord]: The two standing-guidance records.
+    """
+
+    return (
         MappingRecord(
             source_path=".github/copilot-instructions.md",
             source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
             source_kind=SourceKind.STANDING_INSTRUCTION,
             conversion_class=ConversionClass.DIRECT,
             target_role=TargetRole.STANDING_GUIDANCE,
-            target_path="AGENTS.md",
+            target_path=target_path,
+            notes=notes,
         ),
         MappingRecord(
             source_path=".github/instructions/general-code-change.instructions.md",
@@ -152,13 +166,40 @@ def test_validate_conversion_plan_allows_merged_standing_guidance_targets() -> N
             source_kind=SourceKind.PATH_SCOPED_INSTRUCTION,
             conversion_class=ConversionClass.DECOMPOSED,
             target_role=TargetRole.STANDING_GUIDANCE,
-            target_path="AGENTS.md",
+            target_path=target_path,
+            notes=notes,
         ),
+    )
+
+
+def test_validate_conversion_plan_ignores_unemitted_standing_guidance_records() -> None:
+    """Ignore standing-guidance records with no target in duplicate-target checks."""
+
+    mapping_records = _standing_guidance_records(
+        None, (STANDING_GUIDANCE_NOT_EMITTED_NOTE,)
     )
 
     findings = validate_conversion_plan(_run_options(), mapping_records, (), {})
 
     assert not any(finding.code == "duplicate-target-path" for finding in findings)
+    assert [finding for finding in findings if finding.blocking] == []
+
+
+def test_validate_conversion_plan_reports_duplicate_agents_targets() -> None:
+    """Report duplicate-target-path for two records that target `AGENTS.md`."""
+
+    mapping_records = _standing_guidance_records("AGENTS.md")
+
+    findings = validate_conversion_plan(_run_options(), mapping_records, (), {})
+
+    duplicates = [
+        finding for finding in findings if finding.code == "duplicate-target-path"
+    ]
+    assert sorted(finding.source_path or "" for finding in duplicates) == [
+        ".github/copilot-instructions.md",
+        ".github/instructions/general-code-change.instructions.md",
+    ]
+    assert all(finding.target_path == "AGENTS.md" for finding in duplicates)
 
 
 def test_validate_conversion_plan_allows_same_source_section_emissions_to_merge() -> (

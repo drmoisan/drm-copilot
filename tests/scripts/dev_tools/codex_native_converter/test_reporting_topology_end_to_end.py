@@ -90,7 +90,9 @@ def test_conversion_report_topology_shows_decomposed_agent_fan_out() -> None:
 
     beast_source = ".github/agents/beast-topology.agent.md"
     beast_agent_target = ".codex/agents/beast-topology.toml"
-    shared_guidance_target = "AGENTS.md"
+    # AGENTS.md is a hand-authored source that the converter never emits, so
+    # no topology edge may end at it (issue #1028).
+    unemitted_guidance_target = "AGENTS.md"
     skill_target = ".agents/skills/review-workflow/SKILL.md"
 
     shared_edges = _extract_labeled_edges(mermaid_blocks[0])
@@ -98,11 +100,11 @@ def test_conversion_report_topology_shows_decomposed_agent_fan_out() -> None:
     repeated_source_edges = _extract_labeled_edges(mermaid_blocks[2])
 
     assert (beast_source, beast_agent_target) in shared_edges
-    assert (beast_source, shared_guidance_target) in shared_edges
     assert (beast_source, skill_target) in shared_edges
     assert (beast_source, beast_agent_target) in repeated_destination_edges
-    assert (beast_source, shared_guidance_target) in repeated_destination_edges
     assert (beast_source, skill_target) in repeated_destination_edges
     assert (beast_agent_target, beast_source) in repeated_source_edges
-    assert (shared_guidance_target, beast_source) in repeated_source_edges
     assert (skill_target, beast_source) in repeated_source_edges
+    # Check every edge of the three charts for an AGENTS.md endpoint.
+    for edges in (shared_edges, repeated_destination_edges, repeated_source_edges):
+        assert not any(unemitted_guidance_target in edge for edge in edges)
