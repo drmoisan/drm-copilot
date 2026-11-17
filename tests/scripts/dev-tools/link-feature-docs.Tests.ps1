@@ -62,6 +62,18 @@ Describe "link-feature-docs.ps1" {
             $block | Should -Match "\[Spec\]\(docs/features/active/test/spec.md\)"
             $block | Should -Match "\[Plan\]\(docs/features/active/test/plan.md\)"
         }
+
+        It "links the .dev active area when -DevelopmentDocsRoot is .dev (issue #1035)" {
+            $block = Build-FeatureDocumentationBlock -FeatureName "test" -DevelopmentDocsRoot '.dev'
+            $block | Should -Match "\[User Story\]\(\.dev/active/test/user-story.md\)"
+            $block | Should -Match "\[Spec\]\(\.dev/active/test/spec.md\)"
+            $block | Should -Match "\[Plan\]\(\.dev/active/test/plan.md\)"
+            $block | Should -Not -Match "docs/features"
+        }
+
+        It "rejects a -DevelopmentDocsRoot outside the two known roots (issue #1035)" {
+            { Build-FeatureDocumentationBlock -FeatureName "test" -DevelopmentDocsRoot 'docs' } | Should -Throw
+        }
     }
 
     Context "Set-OrAppendSection function" {

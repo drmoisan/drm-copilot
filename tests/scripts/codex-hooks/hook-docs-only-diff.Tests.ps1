@@ -112,6 +112,9 @@ Describe 'Codex hook-docs-only-diff copy (issue #927)' {
         @{ Name = 'a case variant of the workflow path (issue #1169)'; Text = "docs/a.md`0.github/workflows/_Docs-quality.yml`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
         @{ Name = 'a prefixed workflow path (issue #1169)'; Text = "docs/a.md`0x/.github/workflows/_docs-quality.yml`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
         @{ Name = 'a suffixed workflow path (issue #1169)'; Text = "docs/a.md`0.github/workflows/_docs-quality.yml.bak`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
+        @{ Name = '.dev/active and .dev/engineering paths (issue #1035)'; Text = ".dev/active/x/spec.md`0.dev/engineering/x.md`0"; Expected = 'NONE' }
+        @{ Name = 'the bare .dev directory (issue #1035)'; Text = ".dev`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
+        @{ Name = 'a .devx path (issue #1035)'; Text = ".devx/a.md`0"; Expected = 'DOCS_ONLY_EXEMPTION_NON_DOCS_PATH*' }
     ) {
         # Arrange: the row supplies the diff text and the expected result.
 

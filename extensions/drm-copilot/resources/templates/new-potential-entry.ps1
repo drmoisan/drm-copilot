@@ -1,7 +1,10 @@
 # Creates a dated potential feature file from the template and opens it plus backlog.md.
 param(
     [string] $ShortName,
-    [string] $TemplateRoot
+    [string] $TemplateRoot,
+    # The development-docs root that holds the potential area and the backlog (issue #1035).
+    [ValidateSet('docs/features', '.dev')]
+    [string] $DevelopmentDocsRoot = 'docs/features'
 )
 
 . (Join-Path -Path $PSScriptRoot -ChildPath 'vscode-cli.helpers.ps1')
@@ -27,11 +30,19 @@ function Test-ValidShortName {
 function Get-AuthorName {
     [CmdletBinding()]
     param(
+        [scriptblock] $GetCommand = { param([string] $Name) Get-Command $Name -ErrorAction SilentlyContinue },
         [scriptblock] $GetGitConfig = { param([string] $Key) git config $Key 2>$null },
         [scriptblock] $GetEnvironmentVariable = { param([string] $Name) [Environment]::GetEnvironmentVariable($Name) }
     )
 
-    $author = & $GetGitConfig 'user.name'
+    # Test Explorer can run under a host where git is not on PATH, so guard the
+    # git lookup before invoking the external command and fall back cleanly.
+    $author = $null
+    $gitCommand = & $GetCommand 'git'
+    if ($gitCommand) {
+        $author = & $GetGitConfig 'user.name'
+    }
+
     if (-not $author -or [string]::IsNullOrWhiteSpace($author)) {
         $author = & $GetEnvironmentVariable 'USERNAME'
     }
@@ -144,21 +155,30 @@ if (-not (Test-ValidShortName -CandidateName $ShortName)) {
     exit 1
 }
 
-$workspace = (Get-Location).Path
+# The repository copy under scripts/dev-tools resolves the workspace two levels up; the bundled
+# copy runs from the extension resources, so its workspace is the current location.
+$scriptFolder = Split-Path -Leaf $PSScriptRoot
+$scriptParentFolder = Split-Path -Leaf (Split-Path -Parent $PSScriptRoot)
+if ($scriptFolder -eq 'dev-tools' -and $scriptParentFolder -eq 'scripts') {
+    $workspace = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+}
+else {
+    $workspace = (Get-Location).Path
+}
 $today = Get-Date -Format 'yyyy-MM-dd'
 $lastUpdated = Get-Date -Format 'yyyy-MM-ddTHH-mm'
-$target = Join-Path $workspace "docs/features/potential/$today-$ShortName.md"
+$target = Join-Path $workspace "$DevelopmentDocsRoot/potential/$today-$ShortName.md"
 if ($TemplateRoot -and (Test-Path (Join-Path $TemplateRoot 'potential/template.md'))) {
     $template = Join-Path $TemplateRoot 'potential/template.md'
 }
 else {
-    $template = Join-Path $workspace 'docs/features/potential/template.md'
+    $template = Join-Path $workspace "$DevelopmentDocsRoot/potential/template.md"
 }
 if (-not (Test-Path $template)) {
     Write-Error "Template not found: $template"
     exit 1
 }
-$backlog = Join-Path $workspace 'docs/features/backlog.md'
+$backlog = Join-Path $workspace "$DevelopmentDocsRoot/backlog.md"
 
 $targetDir = Split-Path -Parent $target
 if (-not (Test-Path $targetDir)) {
@@ -184,4 +204,3 @@ if (-not $opened) {
     Write-Output "  $target"
     Write-Output "  $backlog"
 }
-
