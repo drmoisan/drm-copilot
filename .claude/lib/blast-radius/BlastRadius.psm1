@@ -74,11 +74,13 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConflict.psm
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusScheduling.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusWriteIntent.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusCombination.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 # Feature-folder handling. Every radius contains its own feature folder, and a
-# caller may pass either a bare folder name or an already-qualified path.
-$script:FeatureFolderRoot = 'docs/features/active'
-$script:FeatureFolderPrefix = 'docs/features/'
+# caller may pass either a bare folder name or a path already qualified under any
+# known development-docs root (issue #1035). The derivation stays pure: the root
+# is a parameter that defaults to the first known root, never a configuration read.
+$script:FeatureFolderPrefix = [string[]]@(Get-DevelopmentDocsKnownRoot | ForEach-Object { "$_/" })
 
 # The default confidence source for derivation, and the source a diff-derived
 # radius always records.
@@ -99,22 +101,33 @@ $script:ConflictContractDependency = 'contract_dependency'
 
 
 # Port of _feature_folder_glob. Accepting an already-qualified path avoids
-# producing a doubled docs/features/active/docs/features/active/... entry when a
-# caller passes the folder path it already holds.
+# producing a doubled <root>/active/<root>/active/... entry when a caller passes
+# the folder path it already holds. A root outside the known set is an argument
+# error naming the value.
 function Get-FeatureFolderGlob {
     [CmdletBinding()]
     [OutputType([string])]
     param(
         [Parameter(Mandatory = $true)]
-        [string] $FeatureFolder
+        [string] $FeatureFolder,
+        [string] $DevelopmentDocsRoot = @(Get-DevelopmentDocsKnownRoot)[0]
     )
 
-    $trimmed = $FeatureFolder.Trim().Trim('/')
-    if ($trimmed.StartsWith($script:FeatureFolderPrefix, [System.StringComparison]::Ordinal)) {
-        return "$trimmed/**"
+    $knownRoot = [string[]]@(Get-DevelopmentDocsKnownRoot)
+    if ($knownRoot -cnotcontains $DevelopmentDocsRoot) {
+        throw [System.ArgumentException]::new(
+            "Unknown development docs root '$DevelopmentDocsRoot'; expected one of: $($knownRoot -join ', ').",
+            'DevelopmentDocsRoot')
     }
 
-    return "$script:FeatureFolderRoot/$trimmed/**"
+    $trimmed = $FeatureFolder.Trim().Trim('/')
+    foreach ($prefix in $script:FeatureFolderPrefix) {
+        if ($trimmed.StartsWith($prefix, [System.StringComparison]::Ordinal)) {
+            return "$trimmed/**"
+        }
+    }
+
+    return "$(Get-DevelopmentDocsPath -Root $DevelopmentDocsRoot -Area 'active')/$trimmed/**"
 }
 
 function Get-BlastRadius {
@@ -136,8 +149,14 @@ function Get-BlastRadius {
         Feature spec.md document text; may be empty.
 
     .PARAMETER FeatureFolder
-        Bare feature folder name, or a path that already starts with
-        docs/features/.
+        Bare feature folder name, or a path that already starts with a known
+        development-docs root and '/'.
+
+    .PARAMETER DevelopmentDocsRoot
+        Development-docs root under whose active area a bare feature folder is
+        placed. Defaults to the first known root (docs/features); a value outside
+        the known roots is an argument error. The derivation reads no
+        configuration (issue #1035).
 
     .PARAMETER Config
         Parsed config/blast-radius.json.
@@ -171,7 +190,8 @@ function Get-BlastRadius {
         [string] $Source = $script:SourceDerived,
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
-        [string] $ComputedAt
+        [string] $ComputedAt,
+        [string] $DevelopmentDocsRoot = @(Get-DevelopmentDocsKnownRoot)[0]
     )
 
     [void](Get-RequiredText -Value $PlanText -FieldName 'plan_text' -AllowEmpty)
@@ -206,7 +226,7 @@ function Get-BlastRadius {
     $surviving = [System.Collections.Generic.List[string]]::new()
     $surviving.AddRange([string[]]@(Get-NonMandateReadEntry -Entry $entry.ToArray() `
                 -MandateRead ([string[]]@(Get-ConfigMandateRead -Config $Config))))
-    $surviving.Add((Get-FeatureFolderGlob -FeatureFolder (
+    $surviving.Add((Get-FeatureFolderGlob -DevelopmentDocsRoot $DevelopmentDocsRoot -FeatureFolder (
                 Get-RequiredText -Value $FeatureFolder -FieldName 'feature_folder')))
 
     $paths = [string[]]@(Get-OrdinalSortedEntry -Entry $surviving.ToArray())

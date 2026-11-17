@@ -126,6 +126,17 @@ Describe 'BlastRadiusWriteIntent' {
             Join-TestValue $kept | Should -BeExactly $script:FolderGlob
         }
 
+        It 'never drops a .dev feature-folder glob (W1, issue #1035)' {
+            # Arrange: a feature-folder glob under the .dev root.
+            $devGlob = '.dev/active/demo-feature-1/**'
+
+            # Act
+            $kept = @(Select-WriteIntentPathEntry -Entry @($devGlob) -PathRoot @('src'))
+
+            # Assert: the .dev form is kept like the docs/features form.
+            Join-TestValue $kept | Should -BeExactly $devGlob
+        }
+
         It 'drops every token of a multi-word span (W2)' {
             $plan = Format-TestTask 'Update `src/app.py`, then run `git add src/other.py`.'
             @(Get-PlanPaths -PlanText $plan) | Should -Contain 'src/other.py'
