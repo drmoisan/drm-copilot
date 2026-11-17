@@ -602,5 +602,9 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    "./src/lib/development-docs/write-scopes.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };
