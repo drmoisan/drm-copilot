@@ -25,7 +25,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 Import-Module (Join-Path $PSScriptRoot 'WorktreeResolution.psm1') -ErrorAction Stop
-Import-Module (Join-Path -Path (Split-Path -Parent $PSScriptRoot) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+Import-Module (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 # The four states of a derived target. The set is closed so a caller writes exactly
 # one branch per state; a fifth value would silently fall through every caller.

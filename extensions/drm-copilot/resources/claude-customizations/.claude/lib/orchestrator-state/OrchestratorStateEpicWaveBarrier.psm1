@@ -42,7 +42,7 @@ $ErrorActionPreference = 'Stop'
 # Get-OrchestratorStateEpicWaveBarrierError. A load failure stops this import, so the stop
 # hook's guarded import of this module fails closed.
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateEpicCrossDependency.psm1') -Force -ErrorAction Stop
-Import-Module (Join-Path -Path (Split-Path -Parent $PSScriptRoot) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+Import-Module (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 # Lifecycle prefixes a folder hint may carry, tested in this order; the first match is stripped.
 $script:LifecyclePrefixes = @((Get-DevelopmentDocsKnownRootPrefix -Area 'active') + (Get-DevelopmentDocsKnownRootPrefix -Area 'completed') + @('active/', 'completed/'))

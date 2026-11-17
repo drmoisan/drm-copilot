@@ -30,7 +30,7 @@ $ErrorActionPreference = 'Stop'
 # module's directory so the import travels with the pushed-down pack.
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateFeatureFolderRecord.psm1') -Force -ErrorAction Stop
-Import-Module (Join-Path -Path (Split-Path -Parent $PSScriptRoot) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+Import-Module (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 $script:ISSUE_ADOPTION_KEY = 'issue_adoption'
 $script:POTENTIAL_TO_ISSUE_TOOL = 'potential_to_issue'

@@ -24,8 +24,8 @@
 #>
 
 Set-StrictMode -Version Latest
-Import-Module (Join-Path -Path (Split-Path -Parent $PSScriptRoot) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 $ErrorActionPreference = 'Stop'
+Import-Module (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 # The only route id that describes an epic checkpoint. Compared case-sensitively.
 $script:EpicRouteId = 'epic'

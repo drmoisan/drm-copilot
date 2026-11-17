@@ -25,11 +25,22 @@
 # The exempt orchestration-bookkeeping trees (D2): the epics, parallel, active, and
 # potential areas of every known development-docs root (issue #1035), then the
 # orchestration artifacts tree. Directory prefixes, repo-relative, forward-slash
-# spelled. No glob, no absolute entry, no literal-file entry.
-$script:OrchestrationBookkeepingTrees = @(
-    @('epics', 'parallel', 'active', 'potential') | ForEach-Object { Get-DevelopmentDocsKnownRootPrefix -Area $_ }
-    'artifacts/orchestration/'
-)
+# spelled. No glob, no absolute entry, no literal-file entry. Read at call time, so
+# DevelopmentDocsRoot.psm1 is a call-time dependency of this file (D-P16).
+function Get-OrchestrationBookkeepingTree {
+    <#
+    .SYNOPSIS
+        Returns the exempt orchestration-bookkeeping tree prefixes.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param()
+
+    return [string[]]@(
+        @('epics', 'parallel', 'active', 'potential') | ForEach-Object { Get-DevelopmentDocsKnownRootPrefix -Area $_ }
+        'artifacts/orchestration/'
+    )
+}
 
 # Characters that make a command line statically unresolvable (D4 row 12, as narrowed by
 # issues #663, #713, #732, and #735): interpolation characters outside single quotes;
@@ -239,7 +250,7 @@ function Test-ExemptOrchestrationOperand {
     if (($Operand -split '/') -contains '..') {
         return $false
     }
-    foreach ($tree in $script:OrchestrationBookkeepingTrees) {
+    foreach ($tree in (Get-OrchestrationBookkeepingTree)) {
         if ($Operand.StartsWith($tree)) {
             return $true
         }

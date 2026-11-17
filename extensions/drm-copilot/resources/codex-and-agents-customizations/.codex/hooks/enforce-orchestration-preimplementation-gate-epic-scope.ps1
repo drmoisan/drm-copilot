@@ -58,11 +58,6 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-o
 $script:OrchestrationGateAmbiguousReasonCode = 'TARGET_WORKTREE_AMBIGUOUS'
 $script:OrchestrationGateNotDerivableReasonCode = 'TARGET_WORKTREE_NOT_DERIVABLE'
 
-# An epic manifest lives under the epics area of either known development-docs root;
-# the pattern is tested after backslash normalisation so either separator spelling is
-# accepted.
-$script:EpicScopeManifestPattern = '(^|/)(?:' + (@(Get-DevelopmentDocsKnownRootPrefix -Area 'epics' | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
-
 # The two per-mode read seams (issue #554). Each takes its path from the fixed mode
 # table and never from a delegation's own text; an absent file returns an empty
 # string, which the readiness predicate then treats as a deny.
@@ -380,7 +375,10 @@ function Get-EpicCommandLegReadinessFailure {
         return 'epic_feature_folder'
     }
     $manifestPath = ([string](Get-EpicScopePropertyValue -InputObject $Checkpoint -Name 'epic_manifest_path')) -replace '\\', '/'
-    if ([string]::IsNullOrWhiteSpace($manifestPath) -or $manifestPath -notmatch $script:EpicScopeManifestPattern) {
+    # The manifest lives under the epics area of either known development-docs root (read at call
+    # time, D-P16); the path is backslash-normalised above, so either separator is accepted.
+    $manifestPattern = '(^|/)(?:' + (@(Get-DevelopmentDocsKnownRootPrefix -Area 'epics' | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
+    if ([string]::IsNullOrWhiteSpace($manifestPath) -or $manifestPath -notmatch $manifestPattern) {
         return 'epic_manifest_path'
     }
     if ([string]::IsNullOrWhiteSpace([string](Get-EpicScopePropertyValue -InputObject $Checkpoint -Name 'integration_branch'))) {

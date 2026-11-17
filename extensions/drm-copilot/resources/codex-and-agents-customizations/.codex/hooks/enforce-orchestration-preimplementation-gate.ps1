@@ -24,7 +24,7 @@ if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/development-docs/Dev
     try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
 }
 else {
-    try { Import-Module (Join-Path $PSScriptRoot '../../.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+    try { Import-Module (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
 }
 
 # Pure pathspec classifier for the issue #539 orchestration-bookkeeping staging exemption.

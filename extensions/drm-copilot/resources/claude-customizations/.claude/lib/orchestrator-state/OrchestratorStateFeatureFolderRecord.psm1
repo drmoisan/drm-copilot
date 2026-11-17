@@ -29,7 +29,7 @@ $ErrorActionPreference = 'Stop'
 # Import the shared checkpoint-value primitives, resolved relative to this
 # module's directory so the import travels with the pushed-down pack.
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force -ErrorAction Stop
-Import-Module (Join-Path -Path (Split-Path -Parent $PSScriptRoot) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+Import-Module (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 $script:FEATURE_FOLDER_TOOL = 'new_active_feature_folder'
 $script:FEATURE_FOLDER_RECORD_KEY = 'feature_folder_record'
