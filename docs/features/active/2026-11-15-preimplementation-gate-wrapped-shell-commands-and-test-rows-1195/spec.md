@@ -241,7 +241,7 @@ Cross-cutting
 - [x] AC-17: the classify sibling `.DESCRIPTION` states the wrapped-payload form and the D18 exclusions, and the Cases file header defines `$script:ClassifyWrappedFunctionRows` and `$script:ClassifyWrappedGateRows`.
 - [x] AC-18: `.claude/hooks/enforce-orchestration-preimplementation-gate-classify.ps1` reports at least 85% line coverage in `artifacts/pester/powershell-coverage.xml` from the parallel phase-gate Pester run, and no changed executable line in it has zero hits.
 - [x] AC-19: every changed file is at or below 800 logical lines; the classify sibling is at or below 500 lines; any changed file at or above 700 lines is reported as an advisory warning in the plan.
-- [ ] AC-20: the full PowerShell toolchain (PoshQC format, PoshQC analyze with zero findings, parallel Pester run) passes in a single pass with no file changed by the formatter, and CI on the PR head succeeds, including the Linux hook-suite job.
+- [x] AC-20: the full PowerShell toolchain (PoshQC format, PoshQC analyze with zero findings, parallel Pester run) passes in a single pass with no file changed by the formatter, and CI on the PR head succeeds, including the Linux hook-suite job.
 
 ## Decisions
 
