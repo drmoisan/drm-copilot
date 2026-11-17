@@ -156,6 +156,7 @@ Describe 'preimplementation gate merged-feature follow-up allowance (issue #1141
             @{ Case = 'an absolute Write into the integration root under the completed root of child-c'; Tool = 'Write'; Operand = '/synthetic-worktrees/epic-coordinator/docs/features/completed/2026-09-25-child-c-903/x.json' }
             @{ Case = 'git add of a child-a and a child-c completed path'; Tool = 'Bash'; Operand = 'git add docs/features/completed/2026-09-25-child-a-901/a.md docs/features/completed/2026-09-25-child-c-903/c.md' }
             @{ Case = 'git add -- of a child-c completed path'; Tool = 'Bash'; Operand = 'git add -- docs/features/completed/2026-09-25-child-c-903/c.md' }
+            @{ Case = 'git add of a child-a .dev completed path (issue #1035)'; Tool = 'Bash'; Operand = 'git add .dev/completed/2026-09-25-child-a-901/a.md' }
             @{ Case = 'git -C the integration root commit --message with a child-a completed pathspec'; Tool = 'Bash'; Operand = 'git -C /synthetic-worktrees/epic-coordinator commit --message m -- docs/features/completed/2026-09-25-child-a-901/a.md' }
             @{ Case = 'git commit --file --trailer with a child-c completed pathspec'; Tool = 'Bash'; Operand = 'git commit --file /scratch/msg.txt --trailer Co-Authored-By:x -- docs/features/completed/2026-09-25-child-c-903/c.md' }
         ) {

@@ -167,9 +167,9 @@ function Get-EpicMergeGateLastReviewOutcome {
 function Test-EpicMergeGateReviewFeatureFolder {
     <#
     .SYNOPSIS
-        True when a value is a clean relative path below docs/features/ (pure).
+        True when a value is a clean relative path below a known development-docs root (pure).
     .DESCRIPTION
-        A blank value, a value outside docs/features/ (which includes every absolute path), a
+        A blank value, a value outside every Get-DevelopmentDocsKnownRoot member (call-time), a
         backslash, an empty segment (which includes a trailing slash), and a dot segment all return
         $false, so a value such as . cannot widen the feature-folder rule.
     .PARAMETER Value
@@ -182,7 +182,7 @@ function Test-EpicMergeGateReviewFeatureFolder {
     param([AllowNull()] $Value)
 
     if ($Value -isnot [string] -or [string]::IsNullOrWhiteSpace($Value)) { return $false }
-    if (-not $Value.StartsWith('docs/features/', [System.StringComparison]::Ordinal)) { return $false }
+    if (@(Get-DevelopmentDocsKnownRoot | Where-Object { $Value.StartsWith("$_/", [System.StringComparison]::Ordinal) }).Count -eq 0) { return $false }
     if ($Value.IndexOf([char]92) -ge 0) { return $false }
     foreach ($segment in $Value.Split('/')) {
         if ($segment.Length -eq 0 -or $segment -ceq '.' -or $segment -ceq '..') { return $false }
