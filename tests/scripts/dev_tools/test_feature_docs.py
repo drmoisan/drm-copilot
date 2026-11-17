@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from scripts.dev_tools.pr_context.feature_docs import (
+    _parse_readiness_value,  # pyright: ignore[reportPrivateUsage]
     _resolve_feature_dir,  # pyright: ignore[reportPrivateUsage]
     completed_plan_tasks,
     extract_issue_references,
@@ -457,3 +458,15 @@ class TestGatherFeatureExcerptsDevRoot:
 
         assert [excerpt.feature for excerpt in excerpts] == ["dev-feature"]
         assert "Dev root story content" in excerpts[0].excerpt
+
+
+class TestParseReadinessValue:
+    """Readiness markers that yield no readiness value."""
+
+    def test_returns_none_without_a_readiness_marker(self) -> None:
+        """Text with no readiness line has no readiness value."""
+        assert _parse_readiness_value("## Summary\nNo marker here.\n") is None
+
+    def test_returns_none_for_an_unknown_readiness_value(self) -> None:
+        """A readiness line outside PASS, NEEDS REVISION and BLOCKED is ignored."""
+        assert _parse_readiness_value("Readiness: MAYBE\n") is None
