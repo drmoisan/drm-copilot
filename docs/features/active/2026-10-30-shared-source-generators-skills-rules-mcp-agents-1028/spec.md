@@ -260,23 +260,23 @@ No artifact of this child requires a language outside the rule; the D-16 consump
 
 ### Phase 0 gate
 
-- [ ] `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md` records, for every row of `## Owner Decisions`, its status, the default or decision the plan follows (D-1), and that the plan follows it, before any Phase 1 task runs; a recorded owner answer that differs from a default, or a plan that departs from a row, is recorded as a stop and no later phase runs.
-- [ ] The Phase 0 record shows child 1's matrix, schema, approval artifact (`approved` or `approved-with-overrides`), E2 result or owner deferral, Q2 and Q4 answers, and child 2's `DevelopmentDocsRoot.psm1`, `write-scopes.ts` and write-scope checker suite present on the integration branch, with the matrix entries selected per `### Matrix Consumption` holding the dispositions this spec assumes.
-- [ ] The Phase 0 record shows that no approved child 1 difference is applied to a file pinned in `PINNED_FROZEN_SURFACE_HASHES` (the `epic-orchestrate` differences are deferred under D-14), that each D-14 excluded skill still carries the recorded region D-14 names for it and each retained ledgered skill's regions are carried verbatim by its Claude copy, that every selected target exists at `HEAD` (D-8), and that every file, symbol and heading named in this spec and the plan was re-checked against the merge base of `origin/main` and `HEAD` with no moved, renamed or removed item.
+- [x] `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md` records, for every row of `## Owner Decisions`, its status, the default or decision the plan follows (D-1), and that the plan follows it, before any Phase 1 task runs; a recorded owner answer that differs from a default, or a plan that departs from a row, is recorded as a stop and no later phase runs.
+- [x] The Phase 0 record shows child 1's matrix, schema, approval artifact (`approved` or `approved-with-overrides`), E2 result or owner deferral, Q2 and Q4 answers, and child 2's `DevelopmentDocsRoot.psm1`, `write-scopes.ts` and write-scope checker suite present on the integration branch, with the matrix entries selected per `### Matrix Consumption` holding the dispositions this spec assumes.
+- [x] The Phase 0 record shows that no approved child 1 difference is applied to a file pinned in `PINNED_FROZEN_SURFACE_HASHES` (the `epic-orchestrate` differences are deferred under D-14), that each D-14 excluded skill still carries the recorded region D-14 names for it and each retained ledgered skill's regions are carried verbatim by its Claude copy, that every selected target exists at `HEAD` (D-8), and that every file, symbol and heading named in this spec and the plan was re-checked against the merge base of `origin/main` and `HEAD` with no moved, renamed or removed item.
 
 ### Framework
 
-- [ ] `Invoke-HarnessGeneration.ps1 -Check` exits 0 on a tree with no drift and exits non-zero on drift, printing one line per drifted, missing or extra file by repository-relative POSIX path; Pester unit tests cover each outcome with injected in-memory listing and reading.
+- [x] `Invoke-HarnessGeneration.ps1 -Check` exits 0 on a tree with no drift and exits non-zero on drift, printing one line per drifted, missing or extra file by repository-relative POSIX path; Pester unit tests cover each outcome with injected in-memory listing and reading.
 - [ ] A malformed source (missing frontmatter, unknown target, missing required agent field) fails the run before any write and names the source path; a unit test asserts that the injected writer was not called.
-- [ ] Unit tests show that generated text is LF and UTF-8 without BOM, that check mode reports a CRLF or BOM target as drift, and that check mode reports a symlink or reparse-point target as drift.
-- [ ] `quality-tiers.yml` has a `scripts/harness-generation` entry with tier T4 and a rationale, and `poetry run python -m scripts.dev_tools.check_quality_tiers` exits 0 with no QT007 or QT008 finding.
+- [x] Unit tests show that generated text is LF and UTF-8 without BOM, that check mode reports a CRLF or BOM target as drift, and that check mode reports a symlink or reparse-point target as drift.
+- [x] `quality-tiers.yml` has a `scripts/harness-generation` entry with tier T4 and a rationale, and `poetry run python -m scripts.dev_tools.check_quality_tiers` exits 0 with no QT007 or QT008 finding.
 
 ### Instructions
 
-- [ ] `AGENTS.md` contains no `# Converted standing guidance` heading, no `> NOTE: This file is **generated** from:` line and no embedded copy of a `.claude/rules` file, and every `.agents/skills/<name>/SKILL.md` path it cites exists; the instructions check asserts each condition and has a failing unit test for each.
-- [ ] The first line of `CLAUDE.md` after its YAML frontmatter is `@AGENTS.md`, and no whitespace-normalized H2 section body in `CLAUDE.md` equals one in `AGENTS.md`; the instructions check passes on the committed tree and fails in unit tests for a missing import and for a duplicated section.
-- [ ] `AGENTS.md` carries no coverage-threshold statement, and the Pester tests for `.claude/hooks/validate-feature-review-coverage.ps1`, `.claude/hooks/validate-feature-review-coverage-metrics.ps1` and `.claude/hooks/feature-review-coverage-thresholds.ps1` pass unchanged.
-- [ ] `extensions/drm-copilot/resources/codex-and-agents-customizations/AGENTS.md` equals `AGENTS.md`.
+- [x] `AGENTS.md` contains no `# Converted standing guidance` heading, no `> NOTE: This file is **generated** from:` line and no embedded copy of a `.claude/rules` file, and every `.agents/skills/<name>/SKILL.md` path it cites exists; the instructions check asserts each condition and has a failing unit test for each.
+- [x] The first line of `CLAUDE.md` after its YAML frontmatter is `@AGENTS.md`, and no whitespace-normalized H2 section body in `CLAUDE.md` equals one in `AGENTS.md`; the instructions check passes on the committed tree and fails in unit tests for a missing import and for a duplicated section.
+- [x] `AGENTS.md` carries no coverage-threshold statement, and the Pester tests for `.claude/hooks/validate-feature-review-coverage.ps1`, `.claude/hooks/validate-feature-review-coverage-metrics.ps1` and `.claude/hooks/feature-review-coverage-thresholds.ps1` pass unchanged.
+- [x] `extensions/drm-copilot/resources/codex-and-agents-customizations/AGENTS.md` equals `AGENTS.md`.
 
 ### Codex native converter (H3)
 
@@ -287,9 +287,9 @@ No artifact of this child requires a language outside the rule; the D-16 consump
 
 ### MCP server configuration
 
-- [ ] `.mcp.json` and the `[mcp_servers.*]` region of `.codex/config.toml` are produced from `scripts/harness-generation/sources/mcp-servers.json`, and `-Surface mcp -Check` exits 0 on the committed tree.
-- [ ] A unit test shows that the MCP generator leaves every byte of `.codex/config.toml` outside the `[mcp_servers.*]` region unchanged, including `default_permissions`, `[permissions.*]`, `[features]`, `[agents]` and `[[hooks.*]]`.
-- [ ] The generated Codex `args` line has the single-line shape matched by `Set-CodexMcpVersionPin`, its version equals `packages/mcp-server/package.json` `version`, and `tests/scripts/dev-tools/Invoke-FullRelease.Tests.ps1` and `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py` pass unchanged.
+- [x] `.mcp.json` and the `[mcp_servers.*]` region of `.codex/config.toml` are produced from `scripts/harness-generation/sources/mcp-servers.json`, and `-Surface mcp -Check` exits 0 on the committed tree.
+- [x] A unit test shows that the MCP generator leaves every byte of `.codex/config.toml` outside the `[mcp_servers.*]` region unchanged, including `default_permissions`, `[permissions.*]`, `[features]`, `[agents]` and `[[hooks.*]]`.
+- [x] The generated Codex `args` line has the single-line shape matched by `Set-CodexMcpVersionPin`, its version equals `packages/mcp-server/package.json` `version`, and `tests/scripts/dev-tools/Invoke-FullRelease.Tests.ps1` and `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py` pass unchanged.
 
 ### Skill mirror
 

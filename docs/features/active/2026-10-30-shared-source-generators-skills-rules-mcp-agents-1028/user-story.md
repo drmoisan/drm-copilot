@@ -50,7 +50,7 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 
 ### Phase 0 gate
 
-- [ ] Execution stops before any change, with the reason recorded in `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md`, when an owner answer recorded in the spec differs from its default or the plan departs from a recorded decision (spec D-1), when child 1's or child 2's outputs are not merged into the integration branch, when an approved difference would change a pinned frozen file (spec D-14 defers the epic skill's approved differences, so no pinned digest changes), or a selected target does not exist, or when a named file, symbol or heading has moved relative to the merge base of `origin/main` and `HEAD`.
+- [x] Execution stops before any change, with the reason recorded in `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md`, when an owner answer recorded in the spec differs from its default or the plan departs from a recorded decision (spec D-1), when child 1's or child 2's outputs are not merged into the integration branch, when an approved difference would change a pinned frozen file (spec D-14 defers the epic skill's approved differences, so no pinned digest changes), or a selected target does not exist, or when a named file, symbol or heading has moved relative to the merge base of `origin/main` and `HEAD`.
 
 ### Generation and drift reporting
 
@@ -60,12 +60,12 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 
 ### Instructions
 
-- [ ] `AGENTS.md` is a hand-authored source with no generated-file header and no embedded rule copies, and `CLAUDE.md` imports it with `@AGENTS.md` and adds only Claude-only text.
+- [x] `AGENTS.md` is a hand-authored source with no generated-file header and no embedded rule copies, and `CLAUDE.md` imports it with `@AGENTS.md` and adds only Claude-only text.
 - [ ] Running the Codex native converter (MCP tool, extension command or Poetry script) on a source set with standing-guidance files no longer writes or overwrites `AGENTS.md`; the converter report lists those files as not emitted with a reason, and the TypeScript and Python implementations behave the same (owner decision H3).
 
 ### MCP server configuration
 
-- [ ] `.mcp.json` and the MCP server tables of `.codex/config.toml` come from one server list, the rest of `.codex/config.toml` is untouched by generation, and the release script's version pin keeps working.
+- [x] `.mcp.json` and the MCP server tables of `.codex/config.toml` come from one server list, the rest of `.codex/config.toml` is untouched by generation, and the release script's version pin keeps working.
 
 ### Skill mirror
 
