@@ -31,6 +31,7 @@ tools:
   - "Bash(git diff *)"
   - "Bash(git log *)"
   - "Write(/docs/features/active/**)"
+  - "Write(/.dev/active/**)"
 skills:
   - policy-compliance-order
   - acceptance-criteria-tracking
