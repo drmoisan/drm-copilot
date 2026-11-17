@@ -302,9 +302,9 @@ Each hook that imports the module uses the guarded import pattern and Codex hook
   - Acceptance: `<FEATURE>/evidence/qa-gates/typescript-static.<timestamp>.md` with exit 0 and finding count per tool.
 - [x] [P9-T6] Run the Jest gate in `extensions/drm-copilot/` once with coverage; record the P1-T4 and P7-T5 negative observations.
   - Acceptance: `<FEATURE>/evidence/qa-gates/typescript-tests.<timestamp>.md` records zero failures, every `coverageThreshold` met, and per-file line and branch percentages of `## Coverage Targets` from `extensions/drm-copilot/coverage/lcov.info`.
-- [ ] [P9-T7] Run the PoshQC format check (no-op `-WriteFile` form of P0-T6) and the direct analyzer run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`; restart on any finding.
+- [x] [P9-T7] Run the PoshQC format check (no-op `-WriteFile` form of P0-T6) and the direct analyzer run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`; restart on any finding.
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-static.<timestamp>.md` records no `Formatted:` line (every file logs `Already formatted:`) and zero Error and Warning findings.
-- [ ] [P9-T8] Run the Pester gate over `tests/scripts/` once: one `Invoke-PoshQCParallelTest` from `scripts/powershell/PoshQC/PoshQC.psd1`.
+- [x] [P9-T8] Run the Pester gate over `tests/scripts/` once: one `Invoke-PoshQCParallelTest` from `scripts/powershell/PoshQC/PoshQC.psd1`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/powershell-tests.<timestamp>.md` records `ExitCode` 0, zero failures from the merged JUnit file and line coverage of each PowerShell file in `## Coverage Targets` from the merged coverage XML.
 - [ ] [P9-T9] Run the order-dependence check `Invoke-PoshQCLeakScan -Root` (from `scripts/powershell/PoshQC/PoshQC.psd1`, allowlist `config/poshqc-leak-allowlist.json`) through the launcher route of the brief, and the check mode of `scripts/dev_tools/generate_codex_agent_variants.py`.
   - Acceptance: `<FEATURE>/evidence/regression-testing/leak-scan.<timestamp>.md` records exit 0 for both; a finding is fixed on both sides (leaker and victim) and P9-T8 re-runs.

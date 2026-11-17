@@ -82,4 +82,20 @@ Describe 'preimplementation gate helpers operand normalization (<Surface>)' -For
         # Assert
         $isExempt | Should -BeTrue -Because "$Label is a plain operand under an exempt orchestration tree"
     }
+
+    It 'denies an empty command text' {
+        # Arrange / Act
+        $isExempt = Test-ExemptOrchestrationStagingCommand -CommandText ''
+
+        # Assert
+        $isExempt | Should -BeFalse -Because 'an empty command text names no staging invocation'
+    }
+
+    It 'denies a segment that holds only the command name' {
+        # Arrange / Act
+        $isExempt = Test-ExemptOrchestrationSegmentToken -Token @('git')
+
+        # Assert
+        $isExempt | Should -BeFalse -Because 'a segment without a subcommand is not a recognized staging invocation'
+    }
 }
