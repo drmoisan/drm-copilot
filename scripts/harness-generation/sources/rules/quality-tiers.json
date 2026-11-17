@@ -1,0 +1,47 @@
+{
+  "claudeUnconditional": true,
+  "targets": [
+    {
+      "kind": "claude",
+      "path": ".claude/rules/quality-tiers.md",
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**\""
+        },
+        {
+          "key": "description",
+          "value": " Module rigor tier system and uniform coverage thresholds."
+        }
+      ],
+      "sections": [
+        "head",
+        "tiers",
+        "source-of-truth",
+        "uniform-vs-tier-dependent-gate-matrix",
+        "rationale-uniform-coverage-thresholds"
+      ]
+    },
+    {
+      "kind": "codex",
+      "path": ".agents/skills/quality-tiers/SKILL.md",
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " quality-tiers"
+        },
+        {
+          "key": "description",
+          "value": " Module rigor tier system and uniform coverage thresholds."
+        }
+      ],
+      "sections": [
+        "head-2",
+        "tiers",
+        "source-of-truth",
+        "uniform-vs-tier-dependent-gate-matrix-2",
+        "rationale-uniform-coverage-thresholds-2"
+      ]
+    }
+  ]
+}

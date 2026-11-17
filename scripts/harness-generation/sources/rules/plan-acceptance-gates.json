@@ -1,0 +1,30 @@
+{
+  "targets": [
+    {
+      "kind": "claude",
+      "path": ".claude/rules/plan-acceptance-gates.md",
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"scripts/dev_tools/plan_gate_*\"\n  - \"scripts/dev_tools/validate_orchestration_artifacts.py\"\n  - \"extensions/drm-copilot/src/lib/validate/plan-gate-*\"\n  - \"extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts\"\n  - \"docs/features/**/plan.*.md\"\n  - \"docs/features/**/remediation-plan.*.md\"\n  - \".claude/skills/atomic-plan-contract/SKILL.md\""
+        },
+        {
+          "key": "description",
+          "value": " Acceptance-gate rules G1 through G13 for atomic plans. G1 through G9 judge the shell commands a plan states as acceptance conditions; the document-level rules G10 through G13 report a SCRATCH definition that is not namespaced by issue number, a line-number citation, a commit-SHA citation, and a plan above the size guideline without a size justification."
+        }
+      ],
+      "sections": [
+        "head",
+        "scope-of-invocation-no-exemption-marker",
+        "rule-table",
+        "severity-decisions",
+        "the-write-mode-register",
+        "deliberately-uncovered-sub-classes",
+        "checkable-literal-definition-and-the-placeholder-g",
+        "message-formatting-no-repr-no-r-no-pythonrepr",
+        "authoring-guidance-for-plan-authors",
+        "enforcement"
+      ]
+    }
+  ]
+}

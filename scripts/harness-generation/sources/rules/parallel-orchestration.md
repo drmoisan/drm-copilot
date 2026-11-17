@@ -1,0 +1,852 @@
+<!-- harness-section: head -->
+
+# Parallel Orchestration Artifact Invariants
+
+This rule governs the three artifacts of the `parallel` orchestration surface: the parallel-run manifest at `docs/features/parallel/<slug>/parallel.md`, the parallel-orchestrator checkpoint at `artifacts/orchestration/parallel-orchestrator-state.json`, and the parallel-planner checkpoint at `artifacts/orchestration/parallel-planner-state.json`. It records the invariants those artifacts must satisfy as numbered prose so that downstream features consume a fixed schema and add behavior only.
+
+The `parallel` surface schedules thematically unrelated items concurrently by computed blast-radius contention rather than by a human-authored dependency graph. There is no `depends_on` field anywhere, `issue_num` is the primary key for every item reference, and there is no integration branch: each item opens its own pull request against `main`.
+
+<!-- harness-section: foreign-schema-warning-do-not-copy-verbatim -->
+## Foreign Schema Warning (do not copy verbatim)
+
+The prohibition recorded in `.claude/rules/orchestrator-state.md` is restated here for the parallel artifacts. A hardened snapshot from another repository contains a JSON Schema for the orchestrator-state artifact whose `$id` references a foreign origin (`drmoisan.github.io/mix-calculator/`). That schema MUST NOT be copied verbatim into this repository, and it MUST NOT be adapted into a parallel-artifact schema: its `$id`, its top-level required-field set, and its cycle-level `additionalProperties: false` do not match this repository's checkpoint contract.
+
+No JSON Schema file is authored, imported, or read for the parallel manifest or for either parallel checkpoint. The invariants above are expressed as prose in this file and enforced by validator logic. A schema whose `$id` is repo-local is not the disqualified foreign artifact, but the repository's enforcement mechanism remains prose-and-validator-logic regardless.
+
+<!-- harness-section: scope-and-backward-compatibility -->
+## Scope and Backward Compatibility
+
+These invariants apply only to the three parallel artifacts named above. They do not apply to, and do not change, the epic artifacts (`artifacts/orchestration/epic-orchestrator-state.json`, `artifacts/orchestration/epic-planner-state.json`) or the standard orchestrator-state checkpoint governed by `.claude/rules/orchestrator-state.md`. The parallel validators are additive: the existing epic validators, their helper modules, their TypeScript cores, and their tests are unmodified.
+
+Every validator named below returns a list of error strings, never mutates its input, returns a single-element list for text that is not parseable, and rejects a non-object (non-mapping) root. Error strings use the literal context-prefixed style with the prefixes `Parallel checkpoint`, `Parallel planner checkpoint`, and `Parallel manifest`.
+
+The parallel-orchestrator checkpoint may carry two optional, tolerated top-level keys (issue #1182): `model_routing_receipts` and `complexity_assessments`. The coordinator writes them at Run Closing for the pr-author delegation of the records pull request, with the per-entry shapes of `.claude/rules/orchestrator-state.md` (`{ agent, phase, complexity_band, fable_policy, table_model, clamped_from, model }` and `{ phase, band, floor, signals_present, rationale, assessed_at }`). Only the Claude parallel records legs read them: `enforce-model-routing-receipt-parallel.ps1` and `enforce-orchestration-preimplementation-gate-parallel-records.ps1`, through the shared predicates of `hook-parallel-records-context.ps1`, which check a pr-author receipt with `Get-OrchestratorStateModelRoutingReceiptError`. The Python and TypeScript parallel validators do not validate them, and a checkpoint without either key validates exactly as before. Neither key adds a member to any enum of `## Enum Ownership (F6/F7/F8 consume, never extend)`.
+
+<!-- harness-section: invariants-parallel-orchestrator-checkpoint -->
+## Invariants (parallel orchestrator checkpoint)
+
+Enforced by `validate_parallel_orchestrator_state_text(text, *, require_complete=False)` in `scripts/dev_tools/validate_parallel_orchestrator_state.py`. Invariants 1 through 19 are enforced unconditionally; invariants 20 and 21 are enforced only under `require_complete`.
+
+1. **Required keys.** The checkpoint must carry `objective`, `completed_steps`, `next_step`, `last_updated`, `route_id`, `parallel_slug`, `parallel_manifest_path`, `parallel_status_doc_path`, `mode`, `max_concurrency`, `current_cohort`, `recolor_generation`, `cohorts`, `items`, `conflict_edges`, `mutations`, and `drift_events`. One error is emitted per missing key.
+
+2. **Route identity.** `route_id` must be exactly `'parallel'`.
+
+3. **Mode enum.** `mode` must be `closed` or `open`.
+
+4. **Bounded concurrency.** `max_concurrency` must be an integer from 1 through 32, and must not be a boolean.
+
+5. **Item uniqueness and shape.** Each `items[]` entry must be an object whose `issue_num` is a positive integer unique across items and whose `feature_folder` is a non-empty string.
+
+6. **Item state enum.** Each item's `state` must be one of the eight item-state values `proposed | admitted | prepared | scheduled | in_flight | merged | withdrawn | blocked`.
+
+7. **Merge-status enum.** Each item's `merge_status`, when present, must be one of the eight merge-status values `not_started | worktree_created | pr_open | ci_green | merged | worktree_removed | blocked_drift | blocked_ci_loop_limit`. An absent `merge_status` is treated as `not_started` and contributes zero errors.
+
+8. **State/merge-status consistency.** An item whose `merge_status` is `merged` or `worktree_removed` must have `state == 'merged'`. An item whose `merge_status` is `blocked_drift` or `blocked_ci_loop_limit` must have `state == 'blocked'`.
+
+9. **Blast-radius shape.** Each item's `blast_radius` must be an object carrying `paths`, `modules`, `shared_surfaces`, and `contracts` as lists of non-empty strings, a `source` in `{derived, declared, observed}`, and a non-empty `computed_at` string. `modules`, `shared_surfaces`, and `contracts` may be empty lists.
+
+10. **Prohibited dependency edges.** No object anywhere in the checkpoint may carry a `depends_on` key, and no top-level `depends_on` key may be present. Ordering is expressed only as blast-radius overlap and as the operator precedence input declared in `## Prepared-Item Admission (issue #1047)`, which is a separating input and not a dependency key. Presence is an explicit rejection, not mere absence.
+
+11. **Prohibited integration-branch fields.** The checkpoint must not carry `integration_branch` or `epic_merge_pr` at any level. Each parallel item opens its own pull request against `main`, so there is no integration branch and no final integration pull request.
+
+12. **Cohort shape and resolution.** Each `cohorts[]` entry must be an object with a non-negative integer `index`, a non-negative integer `generation` that is `<= recolor_generation`, and an `item_keys` list in which every entry resolves to an `items[].issue_num`.
+
+13. **Current-generation cohort uniqueness.** Among the `cohorts[]` entries whose `generation` equals `recolor_generation`, `index` values must be unique and every non-withdrawn item must appear in exactly one such cohort's `item_keys`. An item that appears in no current-generation cohort is permitted only in state `withdrawn`, `merged`, or `blocked`. The strictness is "exactly one", following the pinning model in which recoloring is a pure function over the unstarted subgraph and therefore implies full coverage.
+
+14. **Current-cohort bound.** `current_cohort` must be a non-negative integer. When any current-generation cohort exists, `current_cohort` must not exceed the maximum current-generation `index`.
+
+15. **Conflict-edge shape.** Each `conflict_edges[]` entry must be an object whose `a` and `b` resolve to distinct `items[].issue_num` values with `a < b` (numeric normalization, so edge identity is canonical and recomputation is deterministic), and whose `reason` is in `{path_overlap, module_overlap, shared_surface_overlap, contract_dependency}`. A self-edge, an unresolved endpoint, an unnormalized pair, a duplicate `(a, b)` pair, or an out-of-enum reason is a malformed edge.
+
+16. **Mutation shape.** Each `mutations[]` entry must satisfy the mutation table: `op` in `{add, remove, close, requeue}`; `item_key` resolving to an `items[].issue_num` for `add`, `remove`, and `requeue`, and null for `close` (a run-level operation); a non-empty `at`; `prior_state` and `new_state` either null or in the item-state enum, with `prior_state` null for `add` and `close` and `new_state` null for `close`; and `recolor_generation` a non-negative integer that is `<=` the top-level `recolor_generation`. Transition legality — which state may follow which — is downstream behavior, not schema; this validator checks shape, enum membership, and the null rules only.
+
+17. **In-flight removal requires a disposition.** A `mutations[]` entry with `op == 'remove'` and `prior_state == 'in_flight'` must carry `disposition` exactly `'detach'` or `'abandon'`. A `disposition` on any other entry must be null.
+
+18. **Drift-event shape.** Each `drift_events[]` entry must carry an `item_key` that resolves to an `items[].issue_num`, `declared` and `observed` as lists of non-empty strings, an `escaped_paths` list that is non-empty and holds non-empty strings (an event with zero escaped paths is not a drift event), a non-empty `at`, and an `action` in `{raised_blocking_finding, halted_later_started_item}`.
+
+19. **Receipt arrays.** `delegation_receipts`, `skill_receipts`, and `mcp_call_receipts`, when present, must each be a list. Absent receipt arrays contribute zero errors. Per-receipt content validation follows the loose tolerance of the standard checkpoint validators.
+
+20. **Completion gate, closed mode.** Under `require_complete` with `mode == 'closed'`, every item whose `state` is not `withdrawn` must have `merge_status` in `{merged, worktree_removed}`.
+
+21. **Completion gate, open mode.** Under `require_complete` with `mode == 'open'`, the checkpoint must additionally record a `mutations[]` entry with `op == 'close'` (the run-close record). Invariant 20's per-item condition applies in open mode as well.
+
+When `require_complete` is not passed, invariants 20 and 21 contribute zero errors and the validation result is byte-identical to a plain call.
+
+<!-- harness-section: invariants-parallel-planner-checkpoint -->
+## Invariants (parallel planner checkpoint)
+
+Enforced by `validate_parallel_planner_state_text(text, *, require_ready_for_execution=False)` in `scripts/dev_tools/validate_parallel_planner_state.py`. P1 through P4 are enforced unconditionally; P6 through P10 are ready-gate invariants, enforced only under `require_ready_for_execution`.
+
+- **P1 — Required keys.** The checkpoint must carry `objective`, `parallel_slug`, `parallel_manifest_path`, `mode`, `max_concurrency`, `items`, `cohorts`, `conflict_edges`, `recolor_generation`, `completed_steps`, `next_step`, and `last_updated`. One error is emitted per missing key. `kickoff_prompt_path` is optional outside the ready gate.
+
+- **P2 — Route-consistent identity.** `parallel_slug` and `parallel_manifest_path` must be non-empty strings; `mode` and `max_concurrency` satisfy orchestrator invariants 3 and 4.
+
+- **P3 — Item shape.** Each `items[]` entry must carry `issue_num`, `feature_folder`, `kind`, `state`, `blast_radius`, `preparation_status`, `research_path`, `plan_path`, and `preflight_status`. `issue_num` must be a positive integer unique across items; `kind` must be in `{feature, bug}`; `state` must be in the item-state enum; `blast_radius` must satisfy orchestrator invariant 9; `complexity_band` is optional outside the ready gate (P10 requires it under `require_ready_for_execution`) and, when present, must be in `{C1, C2, C3, C4}`. The prohibited-key rejections of orchestrator invariants 10 and 11 apply.
+
+- **P4 — Cohort and edge shape.** `cohorts[]`, `conflict_edges[]`, and `recolor_generation` satisfy orchestrator invariants 12 through 15.
+
+- **P5 — Deterministic recoloring seam (deliberately absent).** This feature does not recompute the cohort coloring. Recomputation parity against the cohort-computation module is the planner-surface feature's check (the analogue of the epic planner's wave-number cross-check). The omission is recorded here explicitly so a later reader does not mistake it for an oversight. There is no P5 check in the validator.
+
+- **P6 — Ready gate, cardinality.** Under `require_ready_for_execution`, `items` must contain at least two entries.
+
+- **P7 — Ready gate, preparation.** Under `require_ready_for_execution`, each item must have `preparation_status == 'prepared'`, `preflight_status == 'PREFLIGHT: ALL CLEAR'`, non-empty `research_path` and `plan_path`, and `blast_radius.source == 'declared'`. Only the planner-computed radius is authoritative for scheduling.
+
+- **P8 — Ready gate, sentinel.** Under `require_ready_for_execution`, `next_step` must be exactly `'PARALLEL_EXECUTION_READY'`.
+
+- **P9 — Ready gate, kickoff path.** Under `require_ready_for_execution`, `kickoff_prompt_path` must be exactly `artifacts/orchestration/parallel-kickoff-<parallel_slug>.md`.
+
+- **P10 — Ready gate, routing record.** Under `require_ready_for_execution`, each object-shaped item must carry `complexity_band` in `{C1, C2, C3, C4}`; a `complexity_assessment` object `{band, floor, signals_present, rationale, assessed_at}` whose `floor` equals `compute_complexity_floor(signals_present)`, whose `band` is at or above `floor` and equals `complexity_band`, and whose `rationale` and `assessed_at` are non-empty strings; and a Claude `model_routing_receipt` object `{agent, phase, complexity_band, fable_policy, table_model, clamped_from, model}` with `agent == 'orchestrator'`, `complexity_band` equal to the item's band, `fable_policy` in `{disabled, available, preferred}`, and `model` equal to `resolve_delegation_model('orchestrator', complexity_band, fable_policy)['model']`, including the disabled-mode clamp invariants. The checks run per item in this order: (1) the band enum, reported as `None` when absent; (2) the assessment object, skipping checks 3 through 5 when it fails; (3) the assessment entry checks of `_validate_complexity_assessments`, prefix-rewritten to `<item> complexity_assessment`; (4) `assessed_at`; (5) assessment band equals item band; (6) the receipt object, skipping checks 7 through 10 when it fails; (7) the receipt entry checks of `_validate_model_routing_receipts`, prefix-rewritten to `<item> model_routing_receipt`; (8) `agent`; (9) receipt band equals item band; (10) the `fable_policy` enum. Checks 5 and 9 are reported whenever the two values differ, including when check 1 failed. Each item's P10 errors follow that item's P7 errors.
+
+The planner checkpoint carries no `epic_worthiness` analogue and no `NON_EPIC_RECOMMENDED` branch; the parallel surface has no worthiness verdict, and scale assessment happens before parallel planning is invoked. When `require_ready_for_execution` is not passed, P6 through P10 contribute zero errors.
+
+<!-- harness-section: invariants-parallel-run-manifest -->
+## Invariants (parallel run manifest)
+
+Enforced by `validate_parallel_manifest_text(text)` in `scripts/dev_tools/parallel_manifest_contract.py`, with the default-resolving accessors `manifest_mode(mapping)` and `manifest_max_concurrency(mapping)`. Manifest validation is a library call; it is deliberately not a third MCP `artifact_type`.
+
+- **M1 — Frontmatter block.** The document must open with a `---` YAML frontmatter block terminated by `---`, parseable by `yaml.safe_load` into a mapping. Extraction is tolerant of LF, CRLF, and CR line endings. A missing, unterminated, unparseable, or non-mapping frontmatter block is malformed.
+
+- **M2 — Slug.** `parallel` must be a non-empty string.
+
+- **M3 — Mode default.** `mode`, when present, must be `closed` or `open`. When absent it defaults to `closed`: the accessor `manifest_mode(mapping)` returns the default and the validator emits no error for absence.
+
+- **M4 — Concurrency default.** `max_concurrency`, when present, must be an integer from 1 through 32. When absent it defaults to `4`: the accessor `manifest_max_concurrency(mapping)` returns the default and the validator emits no error for absence.
+
+- **M5 — Created-at.** `created_at` must be a non-empty string.
+
+- **M6 — Items.** `items` must be a list. An empty list is valid at authoring time. Each entry must be an object carrying `issue_num` (positive integer, unique across items), `feature_folder` (non-empty string), `kind` in `{feature, bug}`, `state` in the item-state enum, and `blast_radius` in the shape of orchestrator invariant 9.
+
+- **M7 — Prohibited keys.** No `depends_on` key may appear at any level, and no `integration_branch` key may appear at top level. Presence is an explicit rejection.
+
+- **M8 — Expected conflict components (optional assertion).** `expected_conflict_components`, when present, must be a list. Each entry must be an object carrying a required `members` list that is non-empty and holds positive integers, each of which resolves to an `items[].issue_num`, with no `issue_num` appearing in more than one component; and an optional `name` that, when present, must be a non-empty string. When the key is ABSENT the invariant contributes zero errors and the manifest's error list is byte-identical to what it was before M8 existed.
+
+  The value must be authored as a YAML BLOCK sequence. The destination-runtime bash YAML subset parser (`.claude/lib/bash/parallel-yaml-scan.sh`) rejects a non-empty flow collection, so a flow-style value such as `members: [101, 102]` is outside the supported subset and is not accepted on the bash path.
+
+  `expected_conflict_components` is an ASSERTION, not a declaration. It NEVER overrides a derived conflict edge, NEVER feeds `compute_cohorts`, and NEVER influences scheduling. It is consumed by a planner diagnostic (`scripts/dev_tools/parallel_lane_assertion.py`), invoked advisory-only, whose findings never block. Its name deliberately references the DERIVED conflict graph: the field asserts what the operator expects blast-radius derivation to produce, and a mismatch is a signal to re-examine the radii, never a licence to edit the graph. The prohibition on narrowing a radius beyond the configured exclusions to suppress an edge is unaffected, as is the `depends_on` prohibition of invariant 10, P3, and M7 — this key is not a dependency edge and does not express ordering.
+
+  Example, in the mandatory block-sequence form:
+
+  ```yaml
+  expected_conflict_components:
+    - name: hooks-lane          # optional, diagnostic label only
+      members:                  # required, non-empty, positive ints
+        - 101
+        - 102
+  ```
+
+- **M9 — Pair decisions (optional record, issue #1164).** `pair_decisions`, when present, must be a list written by the planner at seeding, one entry per detected pair. Each entry must be an object carrying `a` and `b` (each resolving to an `items[].issue_num`, with `a < b`, and no pair recorded twice), `reasons` (a non-empty list drawn from the four `conflict_edges[].reason` members), `hard` (a boolean), `cost` and `benefit` (the merge-time and gain estimates in integer minutes, each a non-negative integer), and `verdict` (`edge` or `tolerated`); `hard: true` requires `verdict: edge`. When the key is ABSENT the invariant contributes zero errors. The value must be authored as a YAML block sequence, as M8 requires. Admissions by `/parallel-add` after seeding are recorded in the orchestrator checkpoint and `parallel-scheduling.json` only, because the orchestrator keeps the manifest read-only. M9 is checked by `scripts/dev_tools/parallel_manifest_contract.py` (authority) and by `.claude/lib/bash/parallel-manifest-pairs.sh`, sourced by `.claude/lib/bash/parallel-manifest-validate.sh`, over the shared corpus `tests/fixtures/parallel_manifest_bash/*.json`.
+
+<!-- harness-section: cache-doctrine-the-checkpoint-is-not-the-source-of -->
+## Cache Doctrine — the checkpoint is not the source of truth
+
+The parallel-orchestrator checkpoint is a CACHE of durable state, not the source of truth. Every field it records is re-derivable from the repository and from GitHub:
+
+- `git worktree list --porcelain` — worktree existence and path (`items[].worktree_path`, `worktree_created_at`, `worktree_removed_at`).
+- `git branch` — branch existence and name (`items[].branch_name`).
+- `gh pr view --json state,mergedAt,headRefOid` — pull-request state, merge time, and merge commit (`items[].pr_number`, `pr_url`, `merge_status`, `merged_at`, `merge_commit_sha`).
+
+No downstream feature may treat the checkpoint as authoritative. When the checkpoint disagrees with those three commands, the commands win and the checkpoint is rewritten from them. The validators in this rule check the checkpoint's structural shape only; they never assert that the cached values agree with the repository, because that reconciliation is a runtime concern of the orchestrator surface, not a schema concern.
+
+<!-- harness-section: omitted-epic-schema-fields-s8 -->
+## Omitted Epic Schema Fields (S8)
+
+There is no integration branch for a parallel run: each item opens its own pull request against `main`. The parallel schema therefore carries no integration-branch and no final-integration-pull-request fields. The disposition of every relevant epic field is fixed as follows.
+
+| Epic field | Disposition in the parallel schema |
+| --- | --- |
+| `integration_branch` (top level) | OMITTED — no integration branch; its presence is a prohibited-key violation (invariant 11, M7) |
+| `epic_merge_pr` / `epic_merge_pr.merge_commit_sha` | OMITTED — no final integration pull request; the completion gate checks per-item terminal states instead (invariants 20-21) |
+| `features[].depends_on` | OMITTED everywhere — ordering is derived from blast-radius overlap; presence is a prohibited-key violation (invariant 10, P3, M7) |
+| `waves[]`, `features[].wave_number`, `current_wave` | REPLACED by `cohorts[]`, `current_cohort`, and `recolor_generation` |
+| `max_parallel_features` | REPLACED by `max_concurrency` |
+| `epic_feature_folder` | REPLACED by `parallel_slug`, plus `parallel_manifest_path` and `parallel_status_doc_path` |
+| merge-status values `merge_conflict`, `blocked_conflict_loop_limit` | REPLACED by `blocked_drift` and `blocked_ci_loop_limit` — the fan-in merge-conflict path does not exist; drift and per-item CI loops are the parallel failure modes |
+| planner `epic_worthiness`, `NON_EPIC_RECOMMENDED` branch | OMITTED — the parallel planner contract carries no worthiness verdict |
+
+Per-item `merge_commit_sha` is retained; only the run-level merge-pull-request block is omitted.
+
+<!-- harness-section: concurrency-bound-a7 -->
+## Concurrency Bound (A7)
+
+`max_concurrency` is bounded at 1 through 32 inclusive and defaults to `4` when absent from the manifest. The design document sets only the default of 4. Booleans are rejected even though `True` and `False` are integers in Python.
+
+The upper bound is derived from a constraint analysis of this surface alone. No other surface's bound is a reason for it. The findings recorded here so that downstream features do not re-litigate them:
+
+- **No constraint binds hard below O(100) concurrent worktrees.** Git worktrees, per-item feature branches, checkpoint size, and the cohort-coloring computation all scale well past a hundred concurrent items; none of them fails, or degrades sharply, anywhere near 32.
+- **The first-binding constraint is GitHub Actions job concurrency**, which begins to bite at roughly 10 to 20 concurrent items on a typical plan. It binds by QUEUING, not by failing: excess jobs wait for a runner and the run completes more slowly. A `max_concurrency` above that point is therefore not an error, merely a setting whose marginal throughput is absorbed by the queue.
+- **The ceiling of 32 is a SANITY limit, not a capacity limit.** Its purpose is to reject an order-of-magnitude operator typo (`320` for `32`), not to express a supported maximum. Do not read a value at or below 32 as an assurance that the runner pool can serve it.
+- **Under the per-edge cohort barrier `max_concurrency` is a pure throughput throttle.** Mutual exclusion inside a conflict component is automatic: a conflicting neighbour in a strictly prior current-generation cohort must be `merged` or `worktree_removed` before an item starts, so raising the cap can never co-schedule two conflicting items. Raising it changes only how many independent lanes advance at once.
+
+The bound is enforced in three places with the same semantics: orchestrator invariant 4, planner invariant P2, and manifest invariant M4.
+
+The epic surface is unaffected. `max_parallel_features` remains bounded at `1..8`; it is a different field on a different surface and is not changed by this bound.
+
+<!-- harness-section: drift-event-recording-rule-a8 -->
+## Drift-Event Recording Rule (A8)
+
+`drift_events[].action` is the two-member enum `{raised_blocking_finding, halted_later_started_item}`. The recording rule is: one event per drift occurrence, carrying the STRONGEST action taken. `halted_later_started_item` subsumes `raised_blocking_finding`, so an occurrence that halted a later-started item records exactly one event with `action == 'halted_later_started_item'` and does not additionally record a `raised_blocking_finding` event for the same occurrence.
+
+The drift-detection feature consumes this enum and this rule without extending either.
+
+<!-- harness-section: enum-ownership-f6-f7-f8-consume-never-extend -->
+## Enum Ownership (F6/F7/F8 consume, never extend)
+
+All nine enums of the parallel surface are owned by the schema-and-validator feature (F3) and are fixed by this rule file:
+
+| Enum | Members |
+| --- | --- |
+| `mode` | `closed`, `open` (default `closed`) |
+| item `state` | `proposed`, `admitted`, `prepared`, `scheduled`, `in_flight`, `merged`, `withdrawn`, `blocked` |
+| `merge_status` | `not_started`, `worktree_created`, `pr_open`, `ci_green`, `merged`, `worktree_removed`, `blocked_drift`, `blocked_ci_loop_limit` |
+| `blast_radius.source` | `derived`, `declared`, `observed` |
+| `items[].kind` | `feature`, `bug` |
+| `conflict_edges[].reason` | `path_overlap`, `module_overlap`, `shared_surface_overlap`, `contract_dependency` |
+| `mutations[].op` | `add`, `remove`, `close`, `requeue` |
+| `mutations[].disposition` | `detach`, `abandon`, or null |
+| `drift_events[].action` | `raised_blocking_finding`, `halted_later_started_item` |
+
+The wave-4 features — F6 (mutation protocol), F7 (enforcement hooks), and F8 (drift detection) — CONSUME these member sets and NEVER extend them. A wave-4 feature that needs a new member must amend this rule file and the validators at spec review, not add the member at implementation time. This constraint exists because the wave-4 features are prepared concurrently and would otherwise add fields to the same files at the same time.
+
+Integration-cost scheduling (issue #722) adds no `conflict_edges[].reason` member; the four members above are unchanged. The scheduling data travels in optional fields that are checked when present (issue #1164): an edge may carry `hard` (a boolean), `cost`, and `benefit` (non-negative integers, booleans rejected); the planner and orchestrator checkpoints may carry a `tolerated_overlaps` list of `{a, b, reasons, cost, benefit}` objects with resolvable, distinct, normalized endpoints and a non-empty `reasons` list drawn from the four members above with no hard reason; no unordered pair may be in both `conflict_edges` and `tolerated_overlaps`; an item's `read_paths` and `separable_paths` are lists of non-empty strings drawn from its `blast_radius.paths`; and a `precedence[].kind` is `cost` or `correctness`, the latter with a non-empty `reason`. A checkpoint without these fields validates as before. The Python validators and the TypeScript validator port apply the same checks with byte-identical errors, and the new rules apply through `mcp__drm-copilot__validate_orchestration_artifacts` only after the extension release that carries the TypeScript port is installed; until then installed MCP accepts the fields as tolerated, and branch-current validation runs `scripts/dev_tools/validate_orchestration_artifacts.py` with its `parallel-planner-state` and `parallel-orchestrator-state` subcommands. `kind` and `verdict` are not added to the nine enums of this table.
+
+<!-- harness-section: mutation-rejection-signal-issue-1012 -->
+## Mutation Rejection Signal (issue #1012)
+
+A parallel skill that rejects a mutation before any run checkpoint exists stops without writing state. Its final output then carries a rejection signal so that the completion stop hook `.claude/hooks/validate-orchestrator-output.ps1` can release the stop without demanding a checkpoint that the skill correctly did not write.
+
+**Line grammar.** The signal is the last non-blank line of the final output, after trailing whitespace (including a carriage return) is trimmed, and it matches `^PARALLEL_MUTATION_REJECTED: (?<code>[a-z_]+)$` case-sensitively: the uppercase prefix, a colon, exactly one space, and one code from the table below, with no Markdown formatting (no backticks, no bold), no leading text, and no trailing text. A token on an earlier line, inside prose, or in any other form is not a signal. Where the run's slug is known, the line `parallel_slug: <slug>` precedes the signal.
+
+**Closed code set.** The set is defined here and nowhere else:
+
+| Code | Meaning |
+| --- | --- |
+| `kickoff_artifact_missing` | `/parallel-run` found no committed kickoff artifact for the run and delegated nothing. |
+| `run_not_started` | The run is pending or not started, or no checkpoint tracks the named `parallel_slug`, so there is no running run to mutate. |
+| `items_in_flight` | The mutation is rejected because an item is in flight: a close while any item is in flight, or a removal of an in-flight item without `--disposition`. |
+| `unknown_item` | The removal target is not a live item: it is unknown, `withdrawn`, or `blocked`. |
+
+**Output signal, not a schema member.** The signal is an output signal, not a checkpoint field, and it is not one of the nine enums owned by `## Enum Ownership (F6/F7/F8 consume, never extend)`; that table and its count are unchanged. No validator reads the signal and no checkpoint records it.
+
+**Hook behavior.** The hook evaluates the signal only for `parallel-orchestrator-state` when the checkpoint resolution status is `NoTarget`:
+
+| Condition | Result |
+| --- | --- |
+| parallel, `NoTarget`, valid signal, no contradicting state in any live worktree | allow, regardless of `stop_hook_active` |
+| parallel, `NoTarget`, no signal or an invalid signal | block as before (repairable); the message gains a hint line naming the signal form and this section, and lists the allowed codes when the final line carries the prefix with an invalid code |
+| parallel, `NoTarget`, valid signal, and a live worktree holds parallel checkpoint text that is unparseable, has a non-object root, is off-route, lacks a `parallel_slug`, or records the slug the output names | block as before |
+| parallel, `Ambiguous` or `Rejected`, any signal | block as before |
+| parallel, resolved checkpoint, any signal | full validation as before |
+| `orchestrator-state` or `epic-orchestrator-state`, any signal | unchanged |
+
+A signal never relaxes validation when a checkpoint resolves, and a path that wrote state validates fully. The parser, the state-absence scan, and the decision live in `.claude/hooks/validate-orchestrator-output-rejection.ps1`, whose code array mirrors the table above and is pinned to it by a parity test.
+
+**Ownership.** The parallel skills consume these codes and never redefine them. Each mapped STOP path in `parallel-run`, `parallel-add`, `parallel-close`, and `parallel-remove` names only its own code and cites this section by heading; no skill restates the full set. A new code requires an amendment to this section, to the hook array, and to the parity test in the same change.
+
+<!-- harness-section: f7-seam -->
+## F7 Seam
+
+The retrospective cohort-ordering invariant `PARALLEL_COHORT_BARRIER_VIOLATION` (design section 9, Layer 2) is F7's explicitly assigned addition to the orchestrator validator. It is NOT implemented here. The entry point of `scripts/dev_tools/validate_parallel_orchestrator_state.py` contains a clearly delimited, appendable helper-invocation block, marked with explicit begin and end comments that name F7 and the invariant token, so that F7's edit is one appended helper call with no reflow of existing code. The TypeScript core `extensions/drm-copilot/src/lib/validate/parallel-orchestrator-state-core.ts` carries the matching comment-delimited seam. Existing helper calls sit outside the block.
+
+<!-- harness-section: f3-scope-boundary-kickoff-contract-deferred-to-f4 -->
+## F3 Scope Boundary — kickoff contract deferred to F4
+
+F3 deliberately excludes the kickoff-prompt contract module `scripts/dev_tools/parallel_kickoff_contract.py` and the `parallel-kickoff` `artifact_type`. Both are F4's scope, and F3 neither creates the module nor registers the artifact type on the CLI or MCP surfaces. The MCP surface grows by exactly two `artifact_type` values: `parallel-orchestrator-state` and `parallel-planner-state`.
+
+F3's `require_ready_for_execution` gate is STRUCTURAL ONLY. It enforces the kickoff-PATH invariant (P9: `kickoff_prompt_path` must equal `artifacts/orchestration/parallel-kickoff-<parallel_slug>.md`) and does not parse or cross-check kickoff CONTENT. The deeper readiness-integrity machinery of the epic surface — git-integrity checks, launch-evidence binding, and kickoff-contract cross-checks — is left to F4, which may layer repository-aware checks behind an additional keyword without changing the schema. F3 likewise does not recompute the cohort coloring (planner invariant P5).
+
+<!-- harness-section: prepared-item-admission-issue-1047 -->
+## Prepared-Item Admission (issue #1047)
+
+`/parallel-add` and `/parallel-plan` admit an item at the stage its pushed branch already reached. The decisions are made in code by the admission helper `.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1` (subcommands `guard-run`, `assess`, `order-cohorts`, `test-cohorts`, `record`, `reuse-edges`, `test-precedence`, and `access-paths`). The fields below are tolerated: the Python validators and the TypeScript validator port accept them with zero errors, and no enum of `## Enum Ownership (F6/F7/F8 consume, never extend)` changes. The one exception is `precedence[].kind` and `precedence[].reason` (issue #1164), which both validators check when present: `kind` is `cost` or `correctness`, and `correctness` requires a non-empty `reason`.
+
+**Tolerated item fields.** A parallel-orchestrator checkpoint item may carry `preparation_status` (`none|research|spec|plan|cleared`, as reported by `assess`), `plan_hash` (the git blob hash of the plan at the item branch head), `base_commit` (the commit the staleness check compares `origin/main` against), and `band_source` (`caller|planner_checkpoint|assessment`). A parallel-planner checkpoint item may carry `plan_hash` and `base_commit`. The planner keeps its ready value `preparation_status: prepared` (invariant P7), which corresponds to the admission stage `cleared`; no second ready value is introduced.
+
+**Precedence input.** Both checkpoints may carry a top-level `precedence[]` list of `{before, after, source, recorded_at, kind[, reason]}` entries, recorded from the operator's `--after` flags with `source` equal to `operator`, and from planner-proposed orderings with `source` equal to `planner`. A `--reason "<text>"` binds to the immediately preceding `--after`: with it the entry records `kind: "correctness"` and `reason` set to the text; without it the entry records `kind: "cost"` and no `reason`. After the scheduling entry point returns, the helper's `test-precedence` subcommand accepts a `kind: "cost"` entry only when its pair is a returned edge (hard, or merge time greater than gain), accepts a `kind: "correctness"` entry only with a non-empty `reason`, and otherwise rejects with `precedence_not_justified`, which stops the scheduling step. A legacy entry without `kind` is honoured unchanged and is not re-tested. An entry states that the `after` item starts in a later cohort than the `before` item and only after the `before` item has merged. It is a separating input: each pair is passed to the cohort computation as an extra edge, and `order-cohorts` lifts an unstarted `after` item above its `before` item. It is not a `depends_on` key, and invariant 10, P3, and M7 are unchanged. Keys must resolve to items, an item is never paired with itself, and the entries must be acyclic. An entry is inactive once its `before` item has `merge_status` `merged` or `worktree_removed` or `state` `withdrawn`; a `blocked` predecessor still holds its dependent. A combined item inherits the union of its members' entries, and a pair inside one combination is dropped.
+
+**Preparation receipt.** The preparation child writes `<feature folder>/evidence/other/preparation-receipt.<yyyy-MM-ddTHH-mm>.json` before its commit, carrying `schema_version`, `stage`, `research_path`, `spec_path`, `plan_path`, `plan_hash`, `base_commit`, `preflight_status`, and `recorded_at`. The lexicographically greatest receipt name wins, a newer receipt supersedes an older one, and no receipt is deleted. A receipt whose `plan_hash` differs from the current blob hash is downgraded to `plan`.
+
+**Durable scheduling record.** `docs/features/parallel/<slug>/parallel-scheduling.json`, committed on `parallel/<slug>-plan`, carries `schema_version`, `parallel_slug`, `edges[]`, `tolerated_overlaps[]`, `precedence[]`, and `items[]` with `issue_num`, `branch_name`, `plan_path`, `plan_hash`, `base_commit`, `preparation_status`, and `complexity_band`. An edge also carries `hard`, `cost`, and `benefit`, and a precedence entry also carries `kind` and `reason`, each only when present on the input (issue #1164), so an input without them yields the same record as before. The planner writes it at seeding and `/parallel-add` rewrites it after each admission; the helper's `record` subcommand prints the content and performs no git write. A re-seed applies the reuse rule through the helper's `reuse-edges` subcommand, which reads the record by ref and reuses an item's recorded edges only when the recorded `plan_hash` equals the current blob hash. The run manifest stays read-only to the orchestrator.
+
+**Admission output signal.** A helper rule rejection exits 1 with one stderr line `PARALLEL_ADMISSION_REJECTED: <code>: <detail>`, where the code is one of `run_closed`, `precedence_cycle`, `precedence_unknown_item`, `precedence_violated`, and `precedence_not_justified` (issue #1164, emitted by `test-precedence` for an ordering that fails the parallel scheduling rule). This signal is separate from the mutation rejection signal of `## Mutation Rejection Signal (issue #1012)`: a `run_closed` rejection is emitted after a checkpoint exists and emits no mutation rejection signal, and that section's closed code set is unchanged.
+
+**Known gap (Layer 2).** The Python orchestrator-state validator checks the shape of `precedence[]` entries (`kind` and `reason`) when present, but not the precedence ordering. The ordering is enforced by the helper's `test-cohorts` rejection and by Layer 1 of the cohort barrier hook (`Test-ParallelCohortBarrierClear` in `.claude/hooks/enforce-parallel-cohort-barrier-helpers.ps1`); the retrospective Layer 2 invariant reads `conflict_edges[]` only.
+
+<!-- harness-section: blast-radius-contention-doctrine-issue-489 -->
+## Blast-Radius Contention Doctrine (issue #489)
+
+The conflict graph that seeds cohorts is only as good as the evidence that produces its edges. Two
+classes of derivation defect made thematically unrelated items contend, and the corrections below
+are part of the landed contract. Enforcement remains prose plus validator logic; no JSON Schema is
+authored, imported, or read for any of it.
+
+### Read-by-mandate classification
+
+Every agent in this repository is instructed to read the policy rules, the tier map, and the process
+artifacts before doing any work. A plan that cites `.claude/rules/python.md` or `quality-tiers.yml`
+is therefore reporting compliance with the reading order, not declaring that its diff will write
+those files. Counting such a citation as contention made every well-formed plan collide with every
+other well-formed plan.
+
+`config/blast-radius.json` carries an optional `mandate_reads` list enumerating those paths as exact
+entries and `**` subtree globs. That list is the mandate-read exclusion set. `derive_blast_radius` removes matching citations from the harvest
+before resolving modules and shared surfaces, and `validate_blast_radius` removes them from its
+plan-side extraction so V1 and V2 stay self-consistent against a radius derived from the same plan.
+The key is optional and fail-closed: a truth table that omits it excludes nothing and reproduces
+pre-change behaviour exactly.
+
+The Copilot instructions file `.github/copilot-instructions.md` is a mandate read as well (issue
+#722): the policy reading order begins with it, so a plan that cites copilot-instructions.md is
+reporting that it read the tone and communication policy. Both committed copies of
+`config/blast-radius.json` list it in `mandate_reads`.
+
+Three constraints bound the mandate-read exclusion:
+
+1. **The planner remains obliged to enumerate a genuine write explicitly.** An exclusion describes
+   the default reading relationship, not a permanent ban. When an item's plan will actually write an
+   excluded path, the planner appends that exact path to the declared radius after normalization.
+2. **`quality-tiers.yml` is an append-only registry and a mandate read (issue #1006).** Every item
+   that adds a module appends one entry to it, so both committed truth tables list it in
+   `conflict_tolerance.append_only_paths` and in `mandate_reads`, not in `shared_surfaces`. When an
+   item really writes it, the planner-appended or observed path contends on `path_overlap` at the
+   `append_only` weight and is never a hard edge; when an item merely cites it, the mandate-read
+   exclusion drops the citation. Separator-free token acceptance for it through the root-surface rule
+   (`config_root_surfaces`, `Get-ConfigRootSurface`) no longer applies, because that rule reads only
+   the separator-free entries of `shared_surfaces`; the planner append obligation in constraint 1 and
+   `detect_escaped_paths` in constraint 3 are the backstops.
+3. **`detect_escaped_paths` makes the read/write distinction exact at execution time.** The
+   derivation heuristic reads intent from plan text and can be wrong in either direction; drift
+   detection compares the declared radius against the paths a diff actually touched, so an item that
+   wrote an excluded path is caught against observed evidence rather than against prose.
+
+The extractor additionally rejects five token shapes that were never write claims: a wildcard-free
+token whose final component names a directory rather than a file, a `docs/features/` glob whose
+wildcard occupies or truncates the feature-folder segment, a contract token carrying no ASCII
+letter, a token containing a placeholder or interpolation marker, and a contract token that is a
+default spreadsheet sheet name (`Sheet` or `Chart` followed by ASCII digits, compared
+case-insensitively). `artifacts/` is not a known top-level segment, so a bare `artifacts/**`
+subtree claim no longer satisfies the shape rules.
+
+#### Generic contract-token rejection (issue #1006)
+
+A spreadsheet application names a new worksheet or chart sheet with a default stem followed by a
+number, so a spec that mentions `Sheet1` in an interface section names a worksheet, not an
+exported symbol, schema, or CLI identifier. Two unrelated items that both named `Sheet1` received a
+hard `contract_dependency` edge. The stems are a code constant, not a truth-table key:
+`GENERIC_CONTRACT_STEMS` in `scripts/dev_tools/_blast_radius_token_shapes.py` and
+`$script:GenericContractStem` in `.claude/lib/blast-radius/BlastRadiusTokenShape.psm1`, pinned equal
+across Python and PowerShell by a Pester parity test that reads the Python source. Workbook and
+object names such as `Book1` and `Table1` are a different class and are not rejected. The predicate
+(`is_generic_contract_token`, `Test-GenericContractToken`) first requires an ASCII token, because a
+.NET case-insensitive match folds the Kelvin sign and the long s to ASCII letters while Python
+`re.ASCII` does not (the issue #903 precedent). It is applied at all six contract-filtering sites:
+`extract_contract_identifiers`, `extract_write_intent_contracts`, and `normalize_declared_radius` in
+Python, and `Get-ContractIdentifier`, `Get-WriteIntentSpecContract`, and
+`Get-NormalizedDeclaredRadius` in PowerShell, so a previously recorded `Sheet1` is dropped on
+recompute. TypeScript has no contract extractor, so no TypeScript parity applies.
+
+### Mechanically-mergeable path class (issue #643)
+
+Some contended paths are not a design collision. A `.csproj` item list, a `packages.config` package
+list, and an `app.config` binding-redirect list are additive registries: two items that each append a
+distinct entry produce a textual conflict that a deterministic union resolves without judgement.
+Serializing those items buys nothing.
+
+`config/blast-radius.json` carries an optional `mergeable_paths` list of exact entries and `**`
+globs. That list is the mechanically-mergeable path class. Its published default is the five-entry
+list `**/*.csproj`, `**/packages.config`, `**/app.config`, `**/*.vbproj`, `**/*.props`.
+
+A matching path **stays in the declared `paths`**. The exclusion is applied at exactly one place per
+runtime — inside `conflicts` (`scripts/dev_tools/_blast_radius_conflicts.py`) and inside
+`Test-BlastRadiusConflict` (`.claude/lib/blast-radius/BlastRadius.psm1`), on both radii's `paths`
+immediately before the smallest-path-overlap computation. Derivation, normalization,
+observed-radius construction, V1, V2, V3, and `detect_escaped_paths` are therefore unchanged: the
+class narrows one comparison and nothing else. The key is optional and fail-closed: a truth table
+that omits it excludes nothing and reproduces pre-change behaviour exactly.
+
+The matcher is local to this comparison and does not extend the glob engine. A declared path matches
+the class when, against some configured entry, any of the following holds: the two strings are
+ordinally equal; or the declared path is concrete (carries no wildcard) and the configured entry is
+a glob that contains it; or the declared path is concrete and, for a configured entry beginning with
+`**/`, the same two-step test succeeds against the entry with that prefix removed, which is what
+makes a root-level `Directory.Build.props` match `**/*.props`. A declared path that is itself a glob
+is mergeable only when it equals a configured entry verbatim, because a glob can expand over
+non-mergeable files. `_glob_to_regex_text` (`scripts/dev_tools/_blast_radius_glob.py`) and its
+PowerShell mirror `BlastRadiusGlob.psm1` are unchanged by this class; if either is ever changed, both
+it and this matcher must be re-examined together, since the containment step depends on the glob
+engine's semantics.
+
+Three constraints bound the mergeable-path class:
+
+1. **The planner remains obliged to enumerate a genuine write explicitly.** The class describes how a
+   contention is scored, not what an item may touch. An item that will write a `.csproj` still
+   declares that exact path in its radius.
+2. **The path stays in the declared radius, so the audits still see it.** Nothing is removed from any
+   stored record. Over-breadth, shared-surface, and manifest audits read the same `paths` they read
+   before; only the pairwise overlap set is narrowed.
+3. **`detect_escaped_paths` remains the backstop at execution time.** A mergeable classification is a
+   scheduling decision taken from declared text; `detect_escaped_paths` still compares the declared
+   radius against the paths a diff actually touched, so an item that wrote outside its radius is
+   caught against observed evidence regardless of this class.
+
+An item record of the parallel-orchestrator checkpoint MAY carry an optional
+`mergeable_conflicts_resolved` list recording the mergeable conflicts an item resolved mechanically.
+The field is additive and tolerated-not-validated: no validator in Python, TypeScript, or bash reads
+it, and it follows the `expected_conflict_components` diagnostic precedent — a record written for a
+human reader and for post-hoc audit, never a scheduling input. Each entry carries `path`,
+`resolved_at`, `merged_against`, `merge_commit_sha`, `entries_added_from_ours`,
+`entries_added_from_theirs`, and `version_resolutions`. Entry keys inside those three lists use
+`<ItemType>:<Include>` for MSBuild items, `package:<id>` for `packages.config` packages, and
+`bindingRedirect:<name>` for `app.config` binding redirects. Invariant 9 (the six `blast_radius`
+keys) and invariant 15 (the four edge reasons) are unchanged by this field.
+
+### Placeholder-shape rejection (issue #502)
+
+The fourth shape is a token containing any member of the marker set
+
+```text
+<    >    ${    $(    %
+```
+
+The set is not a configuration key and is not read from `config/blast-radius.json`. It originates in
+the checkable-literal placeholder guard defined in `.claude/rules/plan-acceptance-gates.md`, which
+uses the identical five markers to decide that a plan operand documents a command *shape* rather
+than stating a real assertion. Both subsystems answer the same question about the same text, so the
+two vocabularies are pinned equal by test rather than left to convention.
+
+**A marker-bearing token never matches a tracked path.** A placeholder or interpolation form
+resolves at run time to text that is not in the token, so the token as written names nothing. For
+the two angle brackets the claim is stronger than a heuristic: Windows forbids both characters in a
+filename outright, so an angle-bracketed token cannot name a file on the platform this repository is
+developed on. Admitting such a token recorded a `paths` entry that no diff could ever touch, and two
+items citing the identical shape then acquired a `path_overlap` edge on a string that resolves to
+nothing.
+
+**The dominant token is a mandated artifact shape, which is why the exposure was corpus-wide rather
+than incidental.** Every agent in this repository is instructed to write its evidence to the
+canonical scheme defined in `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, and that
+scheme is non-overridable, so a well-formed plan quotes the same feature-relative artifact shape
+that every other well-formed plan quotes. The shape is therefore the most widely shared token in the
+corpus, and admitting it made compliance with the evidence-path scheme a source of contention. The
+same reasoning applies to the feature-document shapes and to the session-keyed state-file shape.
+
+**The planner remains obliged to enumerate a genuine write explicitly.** This rejection describes a
+plan that documents a shape, not a permanent ban on the paths a shape resembles. When an item's plan
+will actually write a path it expressed as a shape, the planner appends that exact concrete path to
+the declared radius after normalization. This is the same obligation constraint 1 of the
+mandate-read exclusion imposes, and `detect_escaped_paths` is the same backstop: drift detection
+compares the declared radius against the paths a diff actually touched, so an item that wrote a path
+it expressed only as a shape is caught against observed evidence rather than against prose.
+
+**Accepted fail-open trade.** The rejection runs inside the classifier, upstream of shared-surface
+resolution, so a marker-bearing token whose shape matches a configured `shared_surface_globs`
+pattern is dropped before it can be reported as a touched shared surface. The trade is inherent to
+that placement: a guard downstream of surface resolution would leave the token in `paths` and
+reintroduce the path-level false edge it exists to remove. Corpus exposure was measured empty — no
+plan in the 58-plan corpus examined for issue #502 cited a marker-bearing token whose shape matched a
+configured shared-surface glob — and the planner obligation above is what keeps a genuine write
+visible. A later change that widens the marker set must re-take that measurement.
+
+**Known residual: the whitespace split.** Extraction harvests whitespace-free inline-code tokens, so
+a placeholder form written with internal whitespace is split into fragments before the marker test
+ever runs. Each fragment is then judged on its own shape and is normally rejected for an unrelated
+reason, most often for carrying no separator. The residual is therefore benign in the accepting
+direction but is recorded here because it means the rejection is not a complete guard against every
+way a shape can be written; it is a guard against the whitespace-free forms the extractor actually
+admits.
+
+Enforcement of this rejection is prose plus validator logic, exactly as for the three shapes above.
+No JSON Schema is authored, imported, or read for it, and `config/blast-radius.json` gains no key.
+
+### File-shape recognition (issue #797)
+
+The classifier accepts a wildcard-free token that carries a separator only when its final component
+names a file. After any `:<line>` suffix is stripped, the final component names a file when either
+condition holds:
+
+1. **Dotted file name.** The component has a non-empty stem before its last dot, and the text after
+   that dot, lower-cased, fully matches the pattern
+   `[a-z][a-z0-9]*`
+   (an ASCII letter followed by ASCII letters or digits).
+2. **Known file name.** The component is an exact, ordinal member of the closed known-name set:
+   `Dockerfile`, `Makefile`, `LICENSE`, `CODEOWNERS`, `NOTICE`, `.gitignore`, `.gitattributes`,
+   `.gitkeep`, `.gitmodules`, `.vscodeignore`, `.npmignore`, `.npmrc`, `.nvmrc`, `.editorconfig`,
+   `.prettierrc`, `.prettierignore`, `.eslintignore`, `.shellcheckrc`.
+
+This rule replaces the former extension allowlist, which dropped files a plan writes with an
+unlisted extension (`.bats`, `.cjs`, `.out`), every dotfile, and every extensionless file name. The
+same predicate decides the wildcard branch: a wildcard token outside the known top-level segments is
+accepted only when its final component names a file by this rule.
+
+Directory-shaped tokens remain rejected (issue #489). A final component with no dot, a trailing
+slash, a dot-directory such as `.claude` or `.git` that is not in the known-name set, a digit-led
+tail such as `v1.2.0`, and a trailing dot all fail the predicate.
+
+**Accepted residuals (fail-closed direction).** Three token shapes that do not name a file are
+accepted by this rule: a dotted directory cited without a trailing slash, such as the C#-style
+`src/<Product>.Domain`; host-qualified tokens such as `example.com/page.html` or `owner/repo.git`;
+and refs whose final segment has a letter-led dotted tail. Each produces at most an extra contention
+edge, which serializes work. A missed write schedules concurrent edits, which is the unsafe
+direction under this doctrine. In the self-hosted repository W4 removes the host-qualified cases; in
+destinations, where `path_roots` is empty, W2 and W3 bound them.
+
+**Parity.** The known-name set and the extension pattern are code constants in both runtimes
+(`scripts/dev_tools/_blast_radius_token_shapes.py` and
+`.claude/lib/blast-radius/BlastRadiusTokenShape.psm1`), not configuration keys, so neither copy of
+`config/blast-radius.json` changes. A Pester test reads the Python source and pins the PowerShell
+known-name set and extension pattern equal to it.
+
+### Module-map granularity criterion
+
+Issue #472 removed the location-bucket modules `docs` and `tests` because a bucket keyed on where a
+file lives rather than on which subsystem owns it attaches to nearly every work item. The same
+reasoning extends to umbrella buckets keyed on a top-level directory that essentially every item
+writes into: an umbrella that matches almost every radius is not a coherent unit of contention,
+because a level that always fires carries no information and only suppresses concurrency.
+
+Under that criterion `python-dev-tools`, `vscode-extension`, `claude-runtime`, `copilot-surface`,
+and `agents-surface` were removed, leaving the seven subsystem modules `mcp-server`, `benchmarks`,
+`poshqc`, `powershell-dev-tools`, `codex-runtime`, `config`, and `schemas`. Removing a module never
+weakens the relation below the path level: two items editing the same file still contend on
+`path_overlap`, and two items editing a declared shared surface still contend on
+`shared_surface_overlap`.
+
+A candidate module belongs in the map when it names a subsystem an item could plausibly not touch.
+A candidate that matches the majority of work items belongs nowhere.
+
+### Integration-cost scheduling (issue #722)
+
+Two items run sequentially if and only if the expected merge time exceeds the expected time gained by running them in parallel.
+
+Both estimates are integer minutes: merge time is the summed overlap-class weights, and a path that one side only reads costs 0; gain is the shorter of the two band durations. Hard classes are always edges. At `tolerance_percent` 100 the rule is exactly merge time greater than gain, and a tie runs in parallel. `--after` flags and planner-proposed orderings pass the same test and are rejected with `precedence_not_justified` unless marked as a correctness ordering with `--reason`.
+
+The rule above is the owner-directed scheduling policy of issue #1164 (OD-1164-1). The merge time is the pair's `cost` and the gain is its `benefit`, both computed by the scheduling entry point below. A path is read-only on one side when it is in that item's `read_paths`, and a path both items declare in their `separable_paths` costs the `separable` weight (see `**Configuration.**` and `**Soft-overlap handling.**`).
+
+Detection and scheduling are separate steps. The detection relation (`conflicts` in Python,
+`Test-BlastRadiusConflict` in PowerShell) is unchanged and still answers one question: do two radii
+contend? Scheduling decides whether a detected contention must serialize the two items. The entry
+points are `schedule_conflict_edges` in `scripts/dev_tools/_blast_radius_scheduling.py` and
+Get-BlastRadiusConflictEdge in `.claude/lib/blast-radius/BlastRadiusScheduling.psm1`; both return
+the edges and the tolerated overlaps of a set of items. Planners call the entry point instead of
+applying the detection relation to every pair by hand.
+
+This is an operator-directed configured policy change (issue #722, 2026-09-27), not ad hoc
+narrowing. The only sanctioned mechanisms for relaxing contention are the configured
+`conflict_tolerance` key and configured write-intent extraction. Planners still never hand-narrow a
+radius: editing a declared radius to suppress an edge remains prohibited.
+
+**Configuration.** `config/blast-radius.json` carries an optional `conflict_tolerance` object with
+tolerance_percent (integer, at least 0), `weights` (same_file, possible_overlap, append_only,
+module, and contract, each an integer of at least 1), `band_durations` (C1 through C4, each an
+integer of at least 1), `default_band` (one of C1 through C4), append_only_paths (a list of exact
+entries and `**` globs), and the optional `combination_threshold_percent` (integer, at least 0;
+default 400 when absent). The `contract` weight (issue #1013) is required and validated like the
+other weights; its committed value is 90, and a destination overrides it, like every other member,
+through `config/blast-radius.local.json`. `combination_threshold_percent` is committed as 400 and is
+overridden through the same overlay. The committed values are integer minutes (issue #1164):
+`band_durations` C1 30, C2 45, C3 90, and C4 180; `weights` same_file 90, contract 90,
+possible_overlap 20, module 10, and append_only 10; and append_only_paths includes
+`extensions/drm-copilot/resources/**`, the regenerated bundle mirrors. `weights` may also carry the optional separable weight, an integer of at least 1 committed as 15, which prices a path that both items declare in `separable_paths`; when it is absent, such a path is priced as a write. The reader fails fast with an error naming the key for any other
+shape; booleans are rejected wherever an integer is required. An absent key means strict scheduling,
+identical to tolerance_percent 0.
+
+**Edge rule.** For each unordered pair of items:
+
+1. Run the unchanged detection relation. No conflict means no edge and no tolerated overlap.
+2. **Hard classes.** A reason list containing `shared_surface_overlap` or `contract_dependency`
+   makes the pair an edge at every tolerance.
+3. **Cost** (integer, computed only for a detected conflict). Re-enumerate the overlapping entry
+   pairs with the same mergeable-path exclusion and the same entry-overlap primitive the relation
+   uses, then sum the append_only weight for a concrete overlapping path that matches an
+   append_only_paths entry, the same_file weight for two equal concrete entries, the
+   possible_overlap weight for a glob or directory-prefix overlap, and the module weight times the
+   number of shared modules. The append_only_paths check runs before the same_file check (append-only
+   precedence), so an append-only file stays low cost even when both items name it. Mergeable paths
+   contribute 0 because they are excluded before enumeration. Add the contract weight times the
+   number of distinct shared contract identifiers: the set the relation intersects to report
+   `contract_dependency`, each identifier counted once however often either radius lists it.
+   `contract_dependency` remains a hard class, so the contract term changes recorded edge costs and
+   combination eligibility and never an edge set. Invariant: at tolerance_percent 0 the edge set
+   equals strict scheduling for any `contract` weight, and at every tolerance the edge set with the
+   contract term equals the edge set without it; only the `cost` of edges whose pair shares a
+   contract differs.
+4. **Benefit** (integer, pairwise). The smaller of the two items' band durations; a missing band uses
+   `default_band`. Running the pair concurrently saves at most one cohort step of the shorter item.
+5. **Rule.** The pair is an edge if and only if it conflicts and either it is hard or
+   `cost * 100 > benefit * tolerance_percent`.
+6. **Recorded reason.** The first member of the relation's reason list in canonical kind order.
+
+**Strict-identity proof.** Every weight and every band duration is validated as an integer of at
+least 1. A detected conflict that is not hard therefore has a cost of at least 1, so at
+tolerance_percent 0 the inequality `cost * 100 > 0` always holds and the edge set equals the
+detected-conflict set exactly; cohort coloring of that set is identical to strict scheduling. At
+every tolerance an edge requires a conflict, so every edge implies a conflict and the edge set is
+always a subset of the detected-conflict set. Raising tolerance_percent never turns a pairwise
+decision into an edge, and the decision for (a, b) equals the decision for (b, a). Because the
+aggregate cap below can promote a tolerated overlap, this monotonicity holds for the pairwise
+decision only, not for the capped edge set.
+
+**Aggregate cap (issue #1013).** The pairwise rule judges each pair alone, so the single entry point
+in each runtime (`schedule_conflict_edges` through `select_capped_pairs` in
+`scripts/dev_tools/_blast_radius_aggregate.py`, and Get-BlastRadiusConflictEdge through
+Get-AggregateCappedPair in `.claude/lib/blast-radius/BlastRadiusAggregate.psm1`) applies a post-pass
+that planners and `parallel-add` cannot skip. For item `i`, `total(i)` is the summed cost of its
+remaining tolerated overlaps, and `i` is over its cap when
+`total(i) * 100 > band_duration(i) * tolerance_percent` (integers only; a missing band reads as
+`default_band`). While any item is over its cap, the smallest-key such item promotes the overlap with
+the minimum key (benefit ascending, cost descending, a ascending, b ascending) to an edge carrying
+`hard` false and the overlap's first reason, and the totals are recomputed. At tolerance_percent 0
+nothing is tolerated, so the pass is a no-op and strict identity holds. A single tolerated overlap
+never exceeds the cap, so the cap binds only for an item with two or more tolerated overlaps. The
+capped scheduling output has five pinned set-level properties: the capped edges are a superset of
+the pairwise edges and a subset of the detected conflicts; the output at tolerance 0 equals the
+uncapped output; every item is within its cap after the pass; the output is invariant to input
+order; and a second pass changes nothing.
+
+**Soft-overlap handling.** A detected, non-hard pair within tolerance is a tolerated overlap, not an
+edge. The planner records it in a tolerated_overlaps list on the planner checkpoint (and the
+orchestrator carries it), each entry holding `a`, `b`, `reasons`, `cost`, and `benefit`. Tolerated
+pairs run in the same or adjacent cohorts without a barrier. The later-merging item of a tolerated
+pair merges `origin/main` under the existing per-item merge-conflict handling and re-passes CI before
+it merges. An item may carry two optional access lists beside its `blast_radius` block (issue
+#1164): `read_paths`, derived by the helper's `access-paths` subcommand from the approved plan, and
+`separable_paths`, declared by the planner with a one-line rationale per path. Each entry must be a
+member of the item's `blast_radius.paths`, and declaring a path in either list never removes it from `blast_radius.paths`: the lists lower a pair's merge time and never narrow a radius. Drift
+detection reports an observed write to a read-declared path as an escape and prices each peer with
+its declared lists.
+
+**Drift behaviour.** When an item's observed radius replaces its declared radius, drift detection
+evaluates each in-flight peer pair through the same edge rule, using the items' complexity bands from
+the checkpoint (`default_band` when absent), through the helper module
+`scripts/dev_tools/_parallel_drift_scheduling.py`. A pair is newly conflicting only when the rule
+yields an edge and the pair is not already a recorded edge. A tolerated pair whose observed overlap
+stays within tolerance halts neither item; one whose observed overlap exceeds tolerance, or becomes
+hard, is reported. An unevaluable peer radius still counts as an edge (fail closed). At
+tolerance_percent 0 the drift output equals strict drift output. Drift detection stays pairwise: it
+does not apply the aggregate cap, and a cap-promoted pair is a recorded edge, so drift never reports
+it as newly conflicting.
+
+**Telemetry (issue #1013).** Three fields are tolerated and not validated; no validator reads them:
+`tolerated_overlaps[].observed_resolution` on the orchestrator checkpoint, `items[].combined_issue_nums`
+on the planner and orchestrator checkpoints and the run manifest, and a top-level `combinations` list
+on the planner checkpoint. `observed_resolution` has the shape `later_item` (integer), `conflicted`
+(boolean), `conflict_detected_at` (timestamp or null), `resolved_at` (timestamp or null),
+`resolution_minutes` (integer), and `recorded_at` (timestamp). The parallel orchestrator writes it for
+the later-merging item of a tolerated pair. Attribution is non-exclusive: one conflict episode is
+attributed to every tolerated peer that merged before it. Nothing reads `observed_resolution`, and no
+weight changes automatically from it.
+
+**Issue combination (issue #1013).** At planning time only, `find_combinations` in
+`scripts/dev_tools/_blast_radius_combination.py` and Get-BlastRadiusCombination in
+`.claude/lib/blast-radius/BlastRadiusCombination.psm1` find pairs that are cheaper to deliver as one
+item. Combination is disabled when `conflict_tolerance` is absent or tolerance_percent is 0. A
+conflicting pair is a candidate when its full reasons contain `contract_dependency` or it has a
+same-file overlap (two equal concrete entries, after the mergeable exclusion, neither matching
+append_only_paths), and it qualifies when `cost * 100 >= benefit * combination_threshold_percent`.
+A contract-only pair is a candidate and qualifies when its contract-term cost meets the threshold;
+one that does not qualify still serializes as a hard `contract_dependency` edge. Qualifying pairs
+are grouped into connected components; each becomes one combination with ascending members, the
+smallest member as primary, its pairs sorted by `(a, b)`, and `estimated_savings` equal to the sum
+of its pair costs. There is no size cap on a combined item. The planner re-plans the primary
+member's branch to cover every member, removes the other members from `items[]`, and records
+`combined_issue_nums` and the `combinations` entry. No umbrella issue is created: the member issues
+stay separate on GitHub, and the one PR closes every member through its author-asserted autoclose
+line. A combined item remediates as one unit (one child, one `remediation_loop`, one PR) and never
+splits back into separate PRs. A larger combined PR to review and a shared remediation budget are an
+accepted trade; a destination tunes `combination_threshold_percent` to change how often items
+combine.
+
+### Write-intent extraction (issue #722)
+
+The extractor harvests every inline-code token of a plan and spec, so a path an item only reads,
+mentions as a glob, or quotes inside a command becomes a radius path and can create a false edge.
+Write-intent extraction keeps only tokens that state a write. It is the second sanctioned mechanism,
+beside `conflict_tolerance`, for relaxing contention; like it, it is an operator-directed configured
+policy change, and planners still never hand-narrow a radius.
+
+**Configuration.** `config/blast-radius.json` carries two optional keys. `write_intent_extraction`
+is a boolean; when it is true, rules W1 through W6 below apply. `path_roots` is a list of non-empty
+first path segments that enables rule W4. Both readers fail fast with an error naming the key for any
+other shape. An absent or false `write_intent_extraction` reproduces pre-change extraction exactly
+(fail closed), and an empty or absent `path_roots` disables W4. The self-hosted copy sets
+`path_roots` to this repository's tracked top-level directories. The implementations are
+`scripts/dev_tools/_blast_radius_write_intent.py` and
+`.claude/lib/blast-radius/BlastRadiusWriteIntent.psm1`.
+
+**Rules.** Each rule is a pure, statically decidable function of the text and the truth table.
+
+- **W1 glob mention.** Drop any harvested token containing a wildcard character. The feature-folder
+  glob is added after filtering and is never dropped.
+- **W2 command span.** Drop every token of an inline span whose whitespace split yields more than
+  one word.
+- **W3 read task.** Drop the tokens of a task attribution window (a task line plus the following
+  non-task lines up to the next ATX heading, as defined in `.claude/rules/plan-acceptance-gates.md`)
+  whose title's first word, after an optional bold label, is in the read-verb set (Read, Verify,
+  Confirm, Inspect, Review, Baseline) and whose title contains no member of the write-verb set (Fix,
+  Write, Update, Edit, Add, Create, Delete, Remove, Rename, Author, Append, Replace). A write verb
+  anywhere in the title overrides the read verb.
+- **W4 root anchoring.** Drop a concrete token whose first segment, after stripping a leading `./`,
+  is not in `path_roots` and is not a configured root surface.
+- **W5 spec paths.** The spec contributes contracts only, not paths. Contract harvesting from the
+  spec applies W1 and W2.
+- **W6 placeholder stem.** Drop a concrete token whose final-component stem is in the placeholder
+  set (the single ASCII letters, and foo, bar, baz, example, sample, placeholder), compared
+  case-insensitively.
+
+The read-verb, write-verb, and placeholder-stem sets are code constants pinned equal across Python
+and PowerShell by a parity test. Shared surfaces are still resolved from the surviving concrete
+paths, so a shared surface cited only in a read task, a command span, or the spec produces no hard
+edge, while a shared surface an item writes in a write task survives and stays hard.
+
+**One extractor for derivation and validation.** W1, W4, and W6 are token-level and also apply when
+`normalize_declared_radius` and Get-NormalizedDeclaredRadius re-filter a recorded radius; an entry
+that starts with `docs/features/`, ends with `/**`, and carries no other wildcard (the feature-folder
+glob) is always kept. W2, W3, and W5 need line context and apply only to derivation and to the
+plan-side extraction of validation. `derive_blast_radius` and `validate_blast_radius` (and their
+PowerShell ports) select the same extractor from the same flag, so a derived radius still passes V1
+and V2 against its own plan in both modes.
+
+#### Known false negatives
+
+Write-intent extraction can drop a genuine write in these cases:
+
+1. a genuine write stated only as a glob (W1);
+2. a genuine write stated only inside a command span (W2);
+3. a write named only in spec prose (W5);
+4. a read-verb task that also writes without a write verb in its title (W3);
+5. a new top-level directory not yet in `path_roots` (W4);
+6. a genuine file whose stem is in the placeholder set (W6).
+
+The file-shape classifier, which runs before write-intent extraction, drops one further case: a
+genuine file cited only as a separator-free bare file name is not recorded, because only
+repository-relative paths and configured root surfaces are accepted (issue #797). The planner
+cites the repository-relative path or appends it to the declared radius.
+
+Three mitigations bound these cases:
+
+1. **The planner remains obliged to enumerate a genuine write explicitly.** When an item's plan will
+   write a path that one of the rules drops, the planner appends that exact path to the declared
+   radius after normalization, as for the mandate-read exclusion.
+2. **Execution-time escaped-path detection.** `detect_escaped_paths` compares the declared radius
+   against the paths a diff actually touched, so a dropped write is caught against observed evidence
+   rather than against prose.
+3. **The fail-closed absent key.** A truth table without `write_intent_extraction`, or with it set
+   to false, reproduces pre-change extraction exactly, so an operator can disable the rules at once.
+
+### The published truth table is not a copy of this one (issue #500)
+
+The push-down publishes a second truth table into a destination workspace at
+`extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json`. That copy stood
+stale after issue #489 corrected only the self-hosted one, and correcting it fixed contention in
+both directions at once. Three points fix the relation between the two copies so a later maintainer
+does not re-synchronise them by hand.
+
+**A destination's module map is DERIVED, so the bundled `modules` key is not consumed.**
+`assembleModules` in `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts`
+computes a destination's module map from the destination's OWN layout — the manifest-bearing
+directories its scan observes — unioned with `PAYLOAD_MODULES`. It never reads the source document's
+`modules` key. The bundled `modules` key is retained rather than deleted only so that a maintainer
+reading the file is not told something false, and because
+`tests/scripts/dev_tools/test_blast_radius_config.py` calls `load_module_globs` on it and that
+helper raises on an absent key. Nothing schedules on it.
+
+**The .NET manifest family is a structure signal, not a module source (issue #643).** `.csproj`,
+`.fsproj`, `.vbproj`, `.sln`, and `.slnx` are classified in
+`extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-manifests.ts` as
+structure-observing manifests: each one marks a project root and suppresses the
+top-level-directory fallback, and none of them contributes a module. A .NET solution layout
+therefore derives exactly `{ "config": ["config/**"] }` from `PAYLOAD_MODULES` alone. The reason is
+the granularity criterion: a per-assembly module would fire for the majority of work items in that
+solution, so it discriminates nothing and belongs in neither the module map nor the surface list.
+
+**`PAYLOAD_MODULES` carries `config` only.** `claude-runtime` was removed from it by the same
+granularity criterion that removed it from this repository's own map. The criterion transfers
+without modification: every agent in the runtime is instructed to read the policy rules and process
+skills before doing any work, so a `.claude/**` umbrella matches nearly every radius in a
+destination exactly as it did here. The no-signal floor is preserved because `config/**` in a
+destination holds only the two published files, which makes `config` a subsystem an item can
+plausibly not touch and keeps the assembled map non-empty so the forbidden-glob guard has a
+non-vacuous input.
+
+**The bundled `shared_surfaces` and `shared_surface_globs` sets are the destination-portable
+subset, not a copy of the self-hosted sets.** They were authored narrow when the bundled copy was
+created and were never a copy that fell behind, so the correct gate is portable-set equality against
+a declared constant plus a subset relation against the self-hosted list — never byte-equality with
+the self-hosted file. Only `version`, `over_breadth_fraction`, `mandate_reads`, `mergeable_paths`,
+`conflict_tolerance`, and `write_intent_extraction` are byte-equal across the two copies.
+`path_roots` is a Class 2 key: its self-hosted value is this repository's tracked top-level
+directory list, and its bundled value is an empty list, because the bundle cannot know a
+destination's top-level directories and an empty list disables root anchoring there.
+
+The reason the two key groups take different relations is an asymmetry between surfaces and modules.
+An over-matching MODULE glob costs concurrency on every pair of items it touches, because a module
+that fires for both radii forces contention whether or not the items are related. A SURFACE or
+mandate-read entry naming a path the destination lacks is inert: it matches nothing, so it costs
+nothing. Erring wide is therefore free on the surface side and expensive on the module side, which
+is why the portable surface set carries ecosystem-standard root filenames a given destination may
+not have. A separator-free shared surface carries additional weight: it is the sole gate on whether
+the path-token extractor accepts a separator-free token at all, so a published table with no
+separator-free surface entry cannot detect two items rewriting the same root build file, whatever
+that file is named.
+
+**A directional invariant closes the residual Class 2 gap (issue #500 remediation).** Portable-set
+equality against the declared portable-surface constant and the `bundled <= self_hosted` subset
+relation together do not observe the self-hosted copy gaining a portable separator-free surface
+that never reaches the bundle: both checks are satisfied by a bundled set that stays fixed while
+the self-hosted set grows around it. `test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle`
+in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, mirrored in
+`tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, closes that gap
+structurally by asserting the reverse containment for separator-free entries: every separator-free
+self-hosted `shared_surfaces` entry must also appear in the bundled separator-free set.
+
+**The key-partition gate now asserts exhaustiveness (issue #500 remediation, R8).** The three
+declared classes each assert a property of the keys they name, but none of them asserted that
+the two committed copies' top-level key sets are identical, or that every top-level key
+belongs to one of the three declared classes. `test_every_top_level_key_is_classified_and_shared_by_both_copies`
+in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, mirrored in
+`tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, closes that gap: the
+union of both copies' top-level keys is exhaustively covered by the three declared classes, and
+an unclassified key or a key present in only one copy fails loudly and names itself.
+
+**A destination records its own entries in `config/blast-radius.local.json` (issue #508).** The
+push-down regenerates a destination's `config/blast-radius.json` on every push, so an entry
+hand-added to that file does not survive the next push. The supported extension point is the
+destination-owned overlay `config/blast-radius.local.json`. No payload contains it, and the
+push-down never writes or publishes it: both implementations list it in `EXCLUDED_RELATIVE_PATHS`.
+At push time the overlay is composed onto the freshly generated base document (the derived document
+in TypeScript, the published document in Python), and the composed result is written to
+`config/blast-radius.json`, so consumers continue to read one file. Per-key semantics: the
+string-list keys `shared_surfaces`, `shared_surface_globs`, `mandate_reads`, `mergeable_paths`, and
+`path_roots` take an ordered union (base entries first, then overlay-only entries, duplicates
+removed); an overlay module absent from the base is added and an overlay module with the same name
+replaces that module's glob list, with module names emitted in ordinal order; `conflict_tolerance`
+merges recursively (nested lists by union, nested objects per member, nested scalars overlay-wins);
+the scalars `over_breadth_fraction` and `write_intent_extraction` take the overlay value; overlay-only
+keys are appended after the base keys. An overlay `version` must equal the base `version`, and the
+forbidden-glob guard (`**`, `docs/**`, `tests/**`) applies to the composed module map, including
+overlay-authored modules. A malformed overlay, a `version` mismatch, or a forbidden glob raises an
+error before any write, so `config/blast-radius.json` keeps its prior bytes. With no overlay
+present, the written file is byte-identical to the base document. A destination demotes a shipped
+shared surface with the overlay directive `shared_surfaces_demote`, a list of strings (issue
+#1006). It is applied after all other keys are composed: each named entry is removed from
+`shared_surfaces`, with the order of the remaining entries preserved, and unioned into
+`conflict_tolerance.append_only_paths`, base entries first. The directive is consumed, not emitted,
+so the composed file stays within the truth-table key set. An entry that is already an append-only
+path and not a shared surface is accepted as a no-op, so composing a composed result again yields
+identical output. The directive fails closed, before any write, on a non-list value, a non-string
+member, a composed document without `conflict_tolerance.append_only_paths` (no partial
+`conflict_tolerance` is created), or an unknown entry that is neither a shared surface nor an
+append-only path. Demotion never touches `modules`, so the forbidden-glob guard is unchanged. A
+demoted entry that a `shared_surface_globs` pattern still matches stays shared through the glob; the
+bundled glob list is empty. The overlay still cannot remove a derived module.
+
+<!-- harness-section: enforcement -->
+## Enforcement
+
+- `scripts/dev_tools/validate_parallel_orchestrator_state.py`, with the helper modules `scripts/dev_tools/_parallel_state_common.py`, `scripts/dev_tools/_parallel_state_structures.py`, and `scripts/dev_tools/_parallel_state_records.py`, appends one error per violated orchestrator invariant. The completion-gate invariants 20 and 21 run only when the caller passes `require_complete=True`.
+- `scripts/dev_tools/validate_parallel_planner_state.py`, with the helper module `scripts/dev_tools/_parallel_planner_state_routing.py` for invariant P10, appends one error per violated planner invariant. The ready-gate invariants P6 through P10 run only when the caller passes `require_ready_for_execution=True`.
+- `scripts/dev_tools/parallel_manifest_contract.py` appends one error per violated manifest invariant and exposes the default-resolving accessors. Manifest validation is a library call, not an MCP artifact type.
+- `scripts/dev_tools/validate_orchestration_artifacts.py` registers the CLI subparsers `parallel-orchestrator-state` (with `--require-complete`) and `parallel-planner-state` (with `--require-ready-for-execution`). An unknown artifact type continues to fail with `Unsupported artifact type: {type}`.
+- The TypeScript parity port at `extensions/drm-copilot/src/lib/validate/parallel-state-shared.ts`, `parallel-state-structures.ts`, `parallel-state-records.ts`, `parallel-orchestrator-state-core.ts`, and `parallel-planner-state-core.ts` reproduces the same invariants and is dispatched from `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` for both new `artifact_type` values. Verified scope: 96 of 96 error strings matched across 43 constructed documents, for JSON-representable values that round-trip through both runtimes' native types. Three divergence classes are known outside that verified scope: (1) **`pythonRepr` quote selection and string escaping** — `pythonRepr` in `parallel-state-shared.ts` now follows Python's `repr` quote selection (double quotes when the value contains a single quote and no double quote) and string escaping (the backslash, `\t`, `\n`, `\r`, and a `\x`, `\u`, or `\U` hex escape for every code point that `str.isprintable` rejects), resolved for these validators by issue #1164 and pinned by the apostrophe and escape cases of `tests/fixtures/parallel_state_scheduling/`; one residual divergence remains, because the printable test follows each runtime's Unicode database, so a code point assigned in one runtime's Unicode version and unassigned in the other's can render differently; the other local copies named by `docs/features/potential/2026-08-07-python-repr-quote-selection-divergence.md` still always single-quote; (2) **integral floats** — `JSON.parse` erases Python's `int`/`float` distinction, so an integral float value produces a different Python-side error count than the TypeScript side; (3) **boolean/integer equality** — `parallel-state-structures.ts:228` uses `===`, so a boolean value is not selected the way Python's `True == 1` equality selects it, producing differing error counts. For ready-gate invariant P10, `extensions/drm-copilot/src/lib/validate/parallel-planner-state-routing.ts` enforces the P10 structural subset (the band enums, the assessment and receipt object checks, `signals_present` shape, `band >= floor` ordering, non-empty `rationale` and `assessed_at`, the band-equality cross-checks, `agent`, and the `fable_policy` enum) with byte-identical error strings; the Python validator is authoritative for floor equality, resolved-model equality, and the disabled clamp, which the TypeScript port does not check.
+- Enforcement is therefore Python validator logic, plus the TypeScript parity port, plus this prose file. It is NEVER an imported JSON Schema. No schema file is read at validation time.
+- The `parallel` route entry lives in `config/orchestration-routing.json` with `requires_pr_gate: false` (there is no run-level pull request to gate; each child's own route checkpoint enforces its per-item pull-request gate) and is mirrored byte-for-byte in `extensions/drm-copilot/resources/config/orchestration-routing.json`.
+- The `PreToolUse` merge gate `.claude/hooks/enforce-epic-merge-gate.ps1` carries a parallel allow-branch that authorizes a per-item `gh pr merge --merge` from the parallel-orchestrator checkpoint when `route_id == "parallel"`, the target item's `merge_status == "ci_green"`, and the command's PR number matches that item's `pr_number`; any other case fails closed with `EPIC_MERGE_GATE_BLOCKED`. After the parallel allow-branch, a standalone green-CI branch (issue #997), implemented in `.claude/hooks/enforce-epic-merge-gate-green-ci.ps1`, allows a run to merge its own pull request only when no epic or parallel checkpoint records the PR number or the item worktree path, the per-feature checkpoint carries no `parallel_mode` or `parallel_slug` marker, and its recorded green S9 gate matches the live PR head. That parallel exclusion is best-effort, because the `Parallel mode: true` marker is not visible in a Bash payload; a parallel child never merges its own pull request.
+- The `PreToolUse` worktree-removal gate `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` likewise carries a parallel allow-branch that authorizes a per-item worktree removal from the parallel-orchestrator checkpoint when `route_id == "parallel"` and the `items[]` entry whose `worktree_path` matches the removal target has `merge_status` in `{merged, worktree_removed}`, where a rooted `worktree_path` is compared to the normalized target, a relative one is joined to the main checkout root and to the root holding the checkpoint, and a blank, `.`, `..`, dot-segment, or `:`-bearing relative value matches nothing, through `Test-WorktreeRunRecordedPathMatchesTarget` in `.claude/lib/worktree-resolution/WorktreeRunRecordPath.psm1` (issue #995); any other case — neither checkpoint present, either checkpoint unparseable, `route_id` absent or not `"parallel"`, no matching `worktree_path`, or a matched entry whose `merge_status` is outside that set or absent — fails closed with `EPIC_WORKTREE_REMOVAL_BLOCKED`. Removal is keyed on the worktree path rather than on `pr_number`, because the command names a path. This gate and the sibling gate `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1`, which owns `PARALLEL_WORKTREE_REMOVAL_BLOCKED`, both fire on the same command, and `PreToolUse` denials are conjunctive, so both must allow for a removal to proceed. Both gates also carry a planner allow branch (issue #1161), evaluated before their manifest branch, that authorizes removing an epic-planner preparation worktree recorded by branch in `planner_worktrees` of `artifacts/orchestration/epic-planner-state.json` when the record is eligible and the worktree is not in use, clean, and pushed; neither gate reads `artifacts/orchestration/parallel-planner-state.json`.

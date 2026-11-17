@@ -1,0 +1,87 @@
+{
+  "targets": [
+    {
+      "kind": "claude",
+      "path": ".claude/rules/ci-workflows.md",
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \".github/workflows/**\""
+        },
+        {
+          "key": "description",
+          "value": " Exit-code rules for GitHub Actions workflow steps that run pwsh."
+        }
+      ],
+      "sections": [
+        "head",
+        "deliberately-failing-nested-command-pattern-requir",
+        "epic-integration-branch-trigger-required-when-epic",
+        "rationale",
+        "enforcement",
+        "scope"
+      ]
+    },
+    {
+      "kind": "copilot",
+      "path": ".github/instructions/github-actions.instructions.md",
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \".github/workflows/**/*.yml,.github/workflows/**/*.yaml\""
+        }
+      ],
+      "sections": [
+        "head-2"
+      ]
+    },
+    {
+      "kind": "copilot",
+      "path": ".github/instructions/github-actions-ci-cd-best-practices.instructions.md",
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " '.github/workflows/*.yml,.github/workflows/*.yaml'"
+        },
+        {
+          "key": "description",
+          "value": " 'Comprehensive guide for building robust, secure, and efficient CI/CD pipelines using GitHub Actions. Covers workflow structure, jobs, steps, environment variables, secret management, caching, matrix strategies, testing, and deployment strategies.'"
+        }
+      ],
+      "sections": [
+        "head-3",
+        "your-mission",
+        "core-concepts-and-structure",
+        "security-best-practices-in-github-actions",
+        "optimization-and-performance",
+        "comprehensive-testing-in-ci-cd-expanded",
+        "advanced-deployment-strategies-expanded",
+        "github-actions-workflow-review-checklist-comprehen",
+        "troubleshooting-common-github-actions-issues-deep",
+        "conclusion"
+      ]
+    },
+    {
+      "kind": "codex",
+      "path": ".agents/skills/ci-workflows/SKILL.md",
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " ci-workflows"
+        },
+        {
+          "key": "description",
+          "value": " GitHub Actions PowerShell workflow authoring rules."
+        }
+      ],
+      "sections": [
+        "head-4",
+        "deliberately-failing-nested-command-pattern-requir",
+        "epic-integration-branch-trigger-required-when-epic-2",
+        "rationale",
+        "enforcement-2",
+        "scope"
+      ]
+    }
+  ]
+}

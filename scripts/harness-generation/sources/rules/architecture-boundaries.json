@@ -1,0 +1,48 @@
+{
+  "targets": [
+    {
+      "kind": "claude",
+      "path": ".claude/rules/architecture-boundaries.md",
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**/*.ts\"\n  - \"**/*.cs\""
+        },
+        {
+          "key": "description",
+          "value": " Architecture boundary enforcement rules for a host-neutral layered architecture."
+        }
+      ],
+      "sections": [
+        "head",
+        "enforcement-tools",
+        "host-neutral-architecture-rules-enforceable-assert",
+        "layer-boundary-assertions-typescript",
+        "layer-boundary-assertions-net-applies-once-the-bac",
+        "enforcement-outcome"
+      ]
+    },
+    {
+      "kind": "codex",
+      "path": ".agents/skills/architecture-boundaries/SKILL.md",
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " architecture-boundaries"
+        },
+        {
+          "key": "description",
+          "value": " Architecture boundary enforcement rules for a host-neutral layered architecture."
+        }
+      ],
+      "sections": [
+        "head-2",
+        "enforcement-tools",
+        "host-neutral-architecture-rules-enforceable-assert",
+        "layer-boundary-assertions-typescript",
+        "layer-boundary-assertions-net-applies-once-the-bac",
+        "enforcement-outcome"
+      ]
+    }
+  ]
+}

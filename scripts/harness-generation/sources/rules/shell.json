@@ -1,0 +1,27 @@
+{
+  "targets": [
+    {
+      "kind": "claude",
+      "path": ".claude/rules/shell.md",
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**/*.sh\"\n  - \"**/*.bats\"\n  - \"scripts/bash/**\"\n  - \"tests/shell/**\""
+        },
+        {
+          "key": "description",
+          "value": " Shell (bash) toolchain and coding standards."
+        }
+      ],
+      "sections": [
+        "head",
+        "toolchain",
+        "native-invocation-and-environment",
+        "discovery-contract",
+        "coverage-expectations",
+        "ci-vs-local-version-drift",
+        "coding-standards"
+      ]
+    }
+  ]
+}

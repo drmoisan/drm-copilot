@@ -1,0 +1,83 @@
+{
+  "targets": [
+    {
+      "kind": "claude",
+      "path": ".claude/rules/self-explanatory-code-commenting.md",
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**/*.py\""
+        },
+        {
+          "key": "description",
+          "value": " Intent-first docstring and commenting standards. Applies to Python files."
+        }
+      ],
+      "sections": [
+        "head",
+        "core-principle",
+        "mandatory-class-docstrings",
+        "mandatory-function-and-method-docstrings",
+        "loops-and-comprehensions-intent-comments-required",
+        "branching-decision-logic-comments-required",
+        "multi-step-blocks-meta-what-comments",
+        "6-do-not-number-notes",
+        "meta-what-vs-narration",
+        "quality-checklist"
+      ]
+    },
+    {
+      "kind": "copilot",
+      "path": ".github/instructions/self-explanatory-code-commenting.instructions.md",
+      "frontmatter": [
+        {
+          "key": "description",
+          "value": " \"Guidelines for agent-authored code: mandatory robust docstrings + intent-level comments for control flow and multi-step blocks. Optimized for strongly-typed Python repos.\""
+        },
+        {
+          "key": "applyTo",
+          "value": " \"**/*.py\""
+        }
+      ],
+      "sections": [
+        "head-2",
+        "core-principle-2",
+        "1-mandatory-class-docstrings-robust",
+        "2-mandatory-function-method-docstrings-robust-c-li",
+        "3-loops-and-list-comprehensions-must-be-explained",
+        "4-branching-must-explain-decision-logic-if-elif-el",
+        "5-forest-through-the-trees-comment-multi-step-bloc",
+        "6-do-not-number-notes-2",
+        "7-what-vs-why-allow-meta-what-when-it-explains-int",
+        "anti-patterns-still-avoid",
+        "quality-checklist-2"
+      ]
+    },
+    {
+      "kind": "codex",
+      "path": ".agents/skills/self-explanatory-code-commenting/SKILL.md",
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " self-explanatory-code-commenting"
+        },
+        {
+          "key": "description",
+          "value": " Intent-first docstring and commenting standards."
+        }
+      ],
+      "sections": [
+        "head",
+        "core-principle",
+        "mandatory-class-docstrings",
+        "mandatory-function-and-method-docstrings",
+        "loops-and-comprehensions-intent-comments-required",
+        "branching-decision-logic-comments-required",
+        "multi-step-blocks-meta-what-comments",
+        "6-do-not-number-notes",
+        "meta-what-vs-narration",
+        "quality-checklist"
+      ]
+    }
+  ]
+}

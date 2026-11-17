@@ -1,0 +1,48 @@
+{
+  "targets": [
+    {
+      "kind": "claude",
+      "path": ".claude/rules/benchmark-baselines.md",
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"scripts/benchmarks/**\"\n  - \"**/baseline*.json\""
+        },
+        {
+          "key": "description",
+          "value": " Runner-environment parity and provenance rules for committed benchmark baselines."
+        }
+      ],
+      "sections": [
+        "head",
+        "runner-environment-parity-required",
+        "prohibited-unknown-processor",
+        "required-sibling-provenance-file",
+        "enforcement",
+        "scope"
+      ]
+    },
+    {
+      "kind": "codex",
+      "path": ".agents/skills/benchmark-baselines/SKILL.md",
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " benchmark-baselines"
+        },
+        {
+          "key": "description",
+          "value": " Benchmark baseline provenance rules for performance regression gates."
+        }
+      ],
+      "sections": [
+        "head-2",
+        "runner-environment-parity-required",
+        "prohibited-unknown-processor",
+        "required-sibling-provenance-file",
+        "enforcement-2",
+        "scope"
+      ]
+    }
+  ]
+}

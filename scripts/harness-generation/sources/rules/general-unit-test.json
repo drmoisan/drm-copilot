@@ -1,0 +1,85 @@
+{
+  "claudeUnconditional": true,
+  "targets": [
+    {
+      "kind": "claude",
+      "path": ".claude/rules/general-unit-test.md",
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**\""
+        },
+        {
+          "key": "description",
+          "value": " Cross-language unit test policy. Applies to all files."
+        }
+      ],
+      "sections": [
+        "head",
+        "core-principles",
+        "coverage-requirements",
+        "coverage-exclusion-policy",
+        "scenario-completeness",
+        "test-structure-arrange-act-assert",
+        "external-dependencies",
+        "test-file-location",
+        "documentation",
+        "test-categories",
+        "determinism-infrastructure"
+      ]
+    },
+    {
+      "kind": "copilot",
+      "path": ".github/instructions/general-unit-test.instructions.md",
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**\""
+        },
+        {
+          "key": "name",
+          "value": " general-unit-test-policy"
+        },
+        {
+          "key": "description",
+          "value": " \"Baseline unit test policy that applies to all languages in this repo\""
+        }
+      ],
+      "sections": [
+        "head-2",
+        "1-core-principles",
+        "2-coverage-and-scenarios",
+        "3-test-structure-and-diagnostics",
+        "4-external-dependencies-and-environment",
+        "5-policy-audit"
+      ]
+    },
+    {
+      "kind": "codex",
+      "path": ".agents/skills/general-unit-test/SKILL.md",
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " general-unit-test"
+        },
+        {
+          "key": "description",
+          "value": " Cross-language unit test policy for all files."
+        }
+      ],
+      "sections": [
+        "head-3",
+        "core-principles",
+        "coverage-requirements-2",
+        "coverage-exclusion-policy",
+        "scenario-completeness",
+        "test-structure-arrange-act-assert",
+        "external-dependencies",
+        "test-file-location",
+        "documentation",
+        "test-categories-2",
+        "determinism-infrastructure"
+      ]
+    }
+  ]
+}

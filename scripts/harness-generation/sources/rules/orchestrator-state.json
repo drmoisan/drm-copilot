@@ -1,0 +1,74 @@
+{
+  "targets": [
+    {
+      "kind": "claude",
+      "path": ".claude/rules/orchestrator-state.md",
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"artifacts/orchestration/*orchestrator-state.json\"\n  - \"artifacts/orchestration/*planner-state.json\"\n  - \"scripts/dev_tools/*orchestrator_state*\"\n  - \"extensions/drm-copilot/src/lib/validate/orchestrator-state-*\"\n  - \"scripts/dev_tools/compute_complexity_floor.py\"\n  - \"scripts/dev_tools/resolve_delegation_model.py\"\n  - \".claude/hooks/validate-orchestrator-output.ps1\"\n  - \".claude/hooks/enforce-model-routing-receipt.ps1\"\n  - \"config/orchestration-routing.json\"\n  - \".claude/agents/orchestrator.md\"\n  - \".claude/agents/epic-orchestrator.md\"\n  - \".claude/agents/parallel-orchestrator.md\"\n  - \".claude/agents/epic-planner.md\"\n  - \".claude/agents/parallel-planner.md\"\n  - \".claude/skills/orchestrate/SKILL.md\"\n  - \".claude/skills/epic-orchestrate/SKILL.md\"\n  - \".claude/skills/parallel-orchestrate/SKILL.md\"\n  - \".claude/skills/epic-plan/SKILL.md\"\n  - \".claude/skills/parallel-plan/SKILL.md\""
+        },
+        {
+          "key": "description",
+          "value": " Checkpoint invariants for the orchestration state artifact and the surfaces that write or validate it."
+        }
+      ],
+      "sections": [
+        "head",
+        "foreign-schema-warning-do-not-copy-verbatim",
+        "required-top-level-keys",
+        "scope-and-backward-compatibility",
+        "invariants-per-remediation-cycle",
+        "invariants-remediation-loop-review-outcomes",
+        "human-interaction-scope-and-backward-compatibility",
+        "invariants-human-interaction-block",
+        "blocked-reason-vocabulary",
+        "complexity-assessment-scope-and-backward-compatibi",
+        "invariants-complexity-assessments-array",
+        "model-routing-receipt-scope-and-backward-compatibi",
+        "invariants-model-routing-receipts-array",
+        "model-budget-contract",
+        "require-model-routing-mode-scope-and-backward-comp",
+        "bare-module-cli-contract",
+        "invariants-require-model-routing-mode",
+        "epic-launch-binding-activation-scope",
+        "standalone-merge-authorization-scope-and-backward",
+        "invariants-standalone-merge-authorizations-array",
+        "green-ci-standalone-merge-issue-997",
+        "epic-child-ci-verification-issue-1130",
+        "issue-adoption-scope-and-backward-compatibility",
+        "invariants-issue-adoption-object",
+        "concurrent-review-scope-and-backward-compatibility",
+        "owner-directive-scope-and-backward-compatibility",
+        "regeneration-path-scope-and-backward-compatibility",
+        "enforcement"
+      ]
+    },
+    {
+      "kind": "codex",
+      "path": ".agents/skills/orchestrator-state/SKILL.md",
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " orchestrator-state"
+        },
+        {
+          "key": "description",
+          "value": " Orchestrator-state remediation-cycle and human-interaction invariants."
+        }
+      ],
+      "sections": [
+        "head-2",
+        "foreign-schema-warning-do-not-copy-verbatim",
+        "portable-handoff-projection-invariants",
+        "scope-and-backward-compatibility",
+        "invariants-per-remediation-cycle",
+        "invariants-remediation-loop-review-outcomes",
+        "concurrent-review-key-review-mode",
+        "human-interaction-scope-and-backward-compatibility-2",
+        "invariants-human-interaction-block",
+        "enforcement-2"
+      ]
+    }
+  ]
+}

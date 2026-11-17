@@ -1,0 +1,104 @@
+{
+  "targets": [
+    {
+      "kind": "claude",
+      "path": ".claude/rules/csharp.md",
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**/*.cs\"\n  - \"**/*.csproj\""
+        },
+        {
+          "key": "description",
+          "value": " C#-specific toolchain and coding standards (MSTest)."
+        }
+      ],
+      "sections": [
+        "head",
+        "toolchain",
+        "coding-standards",
+        "testing-standards",
+        "analyzer-stack",
+        "banned-apis",
+        "deterministic-test-rules",
+        "di-seams",
+        "prohibited-behaviors"
+      ]
+    },
+    {
+      "kind": "copilot",
+      "path": ".github/instructions/csharp-code-change.instructions.md",
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**/*.cs,**/*.csproj,**/*.props,**/*.targets\""
+        },
+        {
+          "key": "name",
+          "value": " csharp-code-change-policy"
+        },
+        {
+          "key": "description",
+          "value": " \"C#-specific code change rules layered on top of the general code change policy\""
+        }
+      ],
+      "sections": [
+        "head-2",
+        "1-tooling-baseline-for-c",
+        "2-c-design-type-safety-principles",
+        "3-classes-methods-and-apis-c-specific-guidance",
+        "4-error-handling-logging-and-contracts-c",
+        "5-module-file-structure-c",
+        "6-naming-docs-and-comments-c",
+        "7-dependencies-and-analyzer-configuration-c"
+      ]
+    },
+    {
+      "kind": "copilot",
+      "path": ".github/instructions/csharp-unit-test.instructions.md",
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**/*.cs\""
+        },
+        {
+          "key": "name",
+          "value": " csharp-unit-test-policy"
+        },
+        {
+          "key": "description",
+          "value": " \"C#-specific unit test rules, layered on top of the general unit test policy\""
+        }
+      ],
+      "sections": [
+        "head-3",
+        "1-framework-selection",
+        "2-c-specific-libraries-and-conventions",
+        "3-c-toolchain-command-selection"
+      ]
+    },
+    {
+      "kind": "codex",
+      "path": ".agents/skills/csharp/SKILL.md",
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " csharp"
+        },
+        {
+          "key": "description",
+          "value": " C#-specific toolchain and coding standards."
+        }
+      ],
+      "sections": [
+        "head-4",
+        "toolchain-2",
+        "coding-standards-2",
+        "testing-standards-2",
+        "deterministic-test-rules",
+        "di-seams-2",
+        "prohibited-behaviors"
+      ]
+    }
+  ]
+}

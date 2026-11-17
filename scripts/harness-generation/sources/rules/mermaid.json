@@ -1,0 +1,46 @@
+{
+  "targets": [
+    {
+      "kind": "claude",
+      "path": ".claude/rules/mermaid.md",
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**/*.mmd\"\n  - \"**/*.mermaid\""
+        },
+        {
+          "key": "description",
+          "value": " Mermaid diagram authoring standards, validation mandate, and managed-diagram constraint."
+        }
+      ],
+      "sections": [
+        "head",
+        "diagram-file-conventions",
+        "validation-mandate",
+        "managed-diagrams-do-not-hand-edit",
+        "opt-out-marker-for-deliberate-counter-examples",
+        "out-of-scope-the-non-portable-extension-mechanisms",
+        "example"
+      ]
+    },
+    {
+      "kind": "copilot",
+      "path": ".github/instructions/mermaid.instructions.md",
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**\""
+        }
+      ],
+      "sections": [
+        "head-2",
+        "workflow",
+        "lm-tools-call-these-for-every-diagram-interaction",
+        "vs-code-commands",
+        "mermaid-chart-slash-commands",
+        "rules",
+        "docs"
+      ]
+    }
+  ]
+}
