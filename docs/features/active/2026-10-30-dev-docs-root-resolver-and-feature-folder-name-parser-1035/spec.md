@@ -342,7 +342,9 @@ Claude Code path-limited tool entries in agent frontmatter (for example `Write(/
 
 ### Interface for epic child 3
 
-Child 3's agent generator imports `WRITE_SCOPE_RULES`, `SETTINGS_ALLOW_RULES`, `REQUIRED_ARTIFACT_RULES`, `expandWriteScopeLiterals`, `expandRequiredArtifactPattern` and `KNOWN_DEVELOPMENT_DOCS_ROOTS`, emits the literals, and uses the three-direction checker as its `--check` assertion for write scopes.
+Child 3's agent source files carry the D-16 write-scope literals verbatim.
+Child 3's PowerShell agent generator passes them through unchanged and computes none.
+Child 3 imports nothing from `write-scopes.ts`, and this child's TypeScript three-direction checker remains the sole D-16 assertion over the generated agent files. This section was amended by issue #1028 under its decision D-12.
 
 ## Data & State
 
