@@ -265,7 +265,7 @@ Each hook that imports the module uses the guarded import pattern and Codex hook
   - Acceptance: `claude-settings.Tests.ps1` and the resource contract pass.
 - [x] [P7-T4] Add the `.dev` literals to `.codex/agents/atomic-planner.toml`, `prd-feature.toml`, `feature-review.toml`, `status-updater.toml` and `epic-review.toml` and their bundle copies; run `scripts/dev_tools/generate_codex_agent_variants.py` once and then with `--check`.
   - Acceptance: the check exits 0 reporting no drift; `test_codex_agent_wrapper_contracts.py`, `test_codex_handoff_contract_parity.py` and `test_push_down_codex_and_agents_resource_contracts.py` pass.
-- [ ] [P7-T5] Add `test/lib/development-docs/write-scopes.contract.test.ts` implementing the three directions of spec `### Checker test (three directions)`; reverse coverage maps Codex variant files (`-c1` to `-c4`, `-c3-elevated`) to their base agent; reads use forward-slash repository-relative paths.
+- [x] [P7-T5] Add `test/lib/development-docs/write-scopes.contract.test.ts` implementing the three directions of spec `### Checker test (three directions)`; reverse coverage maps Codex variant files (`-c1` to `-c4`, `-c3-elevated`) to their base agent; reads use forward-slash repository-relative paths.
   - Acceptance: passes, and fails when one `.dev` literal is removed locally (observation recorded in the P9-T6 artifact).
 - [ ] [P7-T6] [phase-gate] Run stages 1 to 6 per `## Test Cadence (Mandatory)` over `scripts/`, `.claude/`, `.codex/`, `extensions/drm-copilot/` and `tests/`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/phase-gate.P7.<timestamp>.md` records one clean pass, including the generator check.

@@ -513,10 +513,10 @@ All such tests use in-memory fakes; no temporary files are created.
 ### Write-scope literal contract (D-16)
 
 - [x] `extensions/drm-copilot/src/lib/development-docs/write-scopes.ts` exports `WriteScopeArea`, `WriteScopeRule`, `SettingsAllowRule`, `RequiredArtifactRule`, `WRITE_SCOPE_RULES`, `SETTINGS_ALLOW_RULES`, `REQUIRED_ARTIFACT_RULES`, `expandWriteScopeLiterals` and `expandRequiredArtifactPattern` with the signatures in this spec, and unit tests assert the rule-table rows and example outputs in this spec.
-- [ ] The checker suite under `extensions/drm-copilot/test/lib/development-docs/` passes all three directions: forward coverage (every contracted literal present in each `.claude/agents/*.md`, each base `.codex/agents/*.toml` and `.claude/settings.json`), reverse coverage (every `docs/features`, `docs/research`, `docs/**` or `.dev` scope found in those files is produced by a rule), and root coverage (sample paths under both roots match the expanded literals and required-artifact patterns).
-- [ ] Each agent file and `.claude/settings.json` in the rule table carries both the `docs/features` form and the `.dev` form of its literals with its existing leading-slash spelling, and the `prd-feature` and `epic-review` `-RequiredArtifact` patterns accept paths under both roots.
-- [ ] `scripts/dev_tools/generate_codex_agent_variants.py --check` reports no drift after the base Codex agent files are edited, and `test_codex_agent_wrapper_contracts.py` passes.
-- [ ] `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a dated comment for each pinned agent file whose content changes, and the parallel-orchestrator surface tests and `test_parallel_planner_surface_contracts.py` pass.
+- [x] The checker suite under `extensions/drm-copilot/test/lib/development-docs/` passes all three directions: forward coverage (every contracted literal present in each `.claude/agents/*.md`, each base `.codex/agents/*.toml` and `.claude/settings.json`), reverse coverage (every `docs/features`, `docs/research`, `docs/**` or `.dev` scope found in those files is produced by a rule), and root coverage (sample paths under both roots match the expanded literals and required-artifact patterns).
+- [x] Each agent file and `.claude/settings.json` in the rule table carries both the `docs/features` form and the `.dev` form of its literals with its existing leading-slash spelling, and the `prd-feature` and `epic-review` `-RequiredArtifact` patterns accept paths under both roots.
+- [x] `scripts/dev_tools/generate_codex_agent_variants.py --check` reports no drift after the base Codex agent files are edited, and `test_codex_agent_wrapper_contracts.py` passes.
+- [x] `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a dated comment for each pinned agent file whose content changes, and the parallel-orchestrator surface tests and `test_parallel_planner_surface_contracts.py` pass.
 
 ### Mirrors, manifests and Codex counterparts
 

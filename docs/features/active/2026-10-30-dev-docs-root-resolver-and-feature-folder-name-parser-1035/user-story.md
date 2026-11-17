@@ -81,9 +81,9 @@ Today no shared constant exists: TypeScript has `ACTIVE_FEATURE_DOCS_DIRECTORY` 
 ### Epic child 3 generator author
 
 - [x] `extensions/drm-copilot/src/lib/development-docs/write-scopes.ts` exports `WriteScopeArea`, `WriteScopeRule`, `SettingsAllowRule`, `RequiredArtifactRule`, `WRITE_SCOPE_RULES`, `SETTINGS_ALLOW_RULES`, `REQUIRED_ARTIFACT_RULES`, `expandWriteScopeLiterals` and `expandRequiredArtifactPattern` with the signatures in `spec.md`, and imports no `vscode` module.
-- [ ] The write-scope checker suite passes forward coverage, reverse coverage and root coverage against `.claude/agents/*.md`, the base `.codex/agents/*.toml` files and `.claude/settings.json`.
-- [ ] Each surface in the `spec.md` rule table carries both the `docs/features` and `.dev` forms of its literals with its existing leading-slash spelling, and the `prd-feature` and `epic-review` `-RequiredArtifact` patterns accept paths under both roots.
-- [ ] `generate_codex_agent_variants.py --check` reports no drift, and `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a dated comment for each pinned agent file whose content changes, with the parallel-orchestrator surface tests passing.
+- [x] The write-scope checker suite passes forward coverage, reverse coverage and root coverage against `.claude/agents/*.md`, the base `.codex/agents/*.toml` files and `.claude/settings.json`.
+- [x] Each surface in the `spec.md` rule table carries both the `docs/features` and `.dev` forms of its literals with its existing leading-slash spelling, and the `prd-feature` and `epic-review` `-RequiredArtifact` patterns accept paths under both roots.
+- [x] `generate_codex_agent_variants.py --check` reports no drift, and `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a dated comment for each pinned agent file whose content changes, with the parallel-orchestrator surface tests passing.
 
 ## Non-Goals
 
