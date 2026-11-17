@@ -82,7 +82,7 @@
   - Acceptance: `<FEATURE>/evidence/qa-gates/rule-sources.<timestamp>.md` lists each source, its targets, its section lists, each ported positive and each `deferred-ledger-region` positive.
 - [x] [P4-T3] Run `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface rules` in write mode once, then with `-Check`.
   - Acceptance: the check exits 0; `.github/instructions/general-unit-test.instructions.md` and its bundle copy begin with `---`; `test_claude_rules_frontmatter.py`, `test_push_down_tier_rule_adoption_gate.py`, `test_typescript_toolchain_instruction_contracts.py` and `ProcessReductionChain.Ledger.Tests.ps1` pass; the changed-path list is recorded in `<FEATURE>/evidence/qa-gates/rules-generation.<timestamp>.md`.
-- [ ] [P4-T4] [phase-gate] Run the Phase 4 gate per `## Constraints` over `scripts/`, `tests/` and `extensions/drm-copilot/` (Pester through `scripts/powershell/PoshQC/PoshQC.psd1`) and write `<FEATURE>/evidence/qa-gates/phase-gate.P4.<timestamp>.md`.
+- [x] [P4-T4] [phase-gate] Run the Phase 4 gate per `## Constraints` over `scripts/`, `tests/` and `extensions/drm-copilot/` (Pester through `scripts/powershell/PoshQC/PoshQC.psd1`) and write `<FEATURE>/evidence/qa-gates/phase-gate.P4.<timestamp>.md`.
   - Acceptance: one clean pass, recorded in `<FEATURE>/evidence/qa-gates/phase-gate.P4.<timestamp>.md`.
 
 ### Phase 5 — Agents
