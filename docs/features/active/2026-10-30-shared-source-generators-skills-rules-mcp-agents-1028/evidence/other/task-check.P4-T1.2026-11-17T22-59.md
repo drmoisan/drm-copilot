@@ -1,0 +1,13 @@
+# Task Check — [P4-T1]
+
+Timestamp: 2026-11-17T22-59
+Command: sh SCRATCH/issue-1028-run.sh SCRATCH/issue-1028-psstatic.ps1 -Mode both -FolderList 'scripts/harness-generation;tests/scripts/harness-generation'; sh SCRATCH/issue-1028-retry.sh pester -TestPath tests/scripts/harness-generation; wc -l scripts/harness-generation/HarnessRuleGeneration.psm1
+EXIT_CODE: 0
+Output Summary: Format: 12 files, 0 would change. PSScriptAnalyzer: 12 files, 0 findings, 0 errors. Pester over `tests/scripts/harness-generation` (6 suites): 152 tests, 152 passed, 0 failed. Line coverage of `HarnessRuleGeneration.psm1` is 100.00% (93 of 93). The module has 207 lines, which is below the 500-line limit in the acceptance.
+
+The first run failed one case, `rejects a claude target with a ** glob unless claudeUnconditional`. The module threw the expected message, but the test's wildcard pattern escaped the asterisks in a way `-Throw` did not match. The pattern now matches on the message's literal tail, and the re-run passed. Two launcher attempts ended with exit 75 (`TEST_EXECUTION_QUEUE_TIMEOUT`, lock held by another worktree's Pester run); those are queue timeouts and were re-run.
+
+Changed files: `scripts/harness-generation/HarnessRuleGeneration.psm1` (new) and `tests/scripts/harness-generation/HarnessRuleGeneration.Tests.ps1` (new).
+Selection rule: `## Test Cadence (Mandatory)`. The selection is the new suite and the other suites of the same folder, because the new module imports `HarnessGeneration.psm1` and is called through `Invoke-HarnessGeneration`.
+
+Behaviors covered: section splitting (ordered keys, no marker, leading text, duplicate key); target-path patterns for the claude, copilot and codex kinds; frontmatter rendering (ordered raw values, empty list); target validation (a missing field, an unknown path, a codex rule-skill whose stem has a Claude skill (OQ-2), a frontmatter item without a key, a copilot target with no frontmatter, a claude target with no `paths:` key or with a `**` glob, each accepted with `claudeUnconditional: true`, and an unknown section); rendering with ordered sections and exact-once substitutions (zero, two and empty `find` rejected); the file map (each target and its bundle copy, `NO-SOURCE` for a selected target without a source, rejection of an unselected claude or copilot target, a codex target outside the matrix, a target produced twice, invalid JSON, a missing `targets` list, a missing body, CRLF normalization); and a write run through `Invoke-HarnessGeneration` followed by a clean check. No Copilot file is renamed or deleted: the module only writes listed targets and declares no managed folder (PQ-1).
