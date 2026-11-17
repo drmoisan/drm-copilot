@@ -16,6 +16,8 @@
 BeforeAll {
     $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../../..')).Path
     Import-Module -Name (Join-Path $script:RepoRoot '.claude/lib/epic-wave/EpicCrossDependency.psm1') -Force -ErrorAction Stop
+    # D-P16 (issue #1035): the command entry resolves the development-docs root; no case reads the routing file.
+    Mock Resolve-DevelopmentDocsRoot -ModuleName EpicCrossDependency { [pscustomobject]@{ Succeeded = $true; Root = 'docs/features'; Reason = $null } }
 
     $script:Consumer = (@(
             '---', 'epic: consumer', 'integration_branch: epic/consumer-integration', 'features:',
@@ -57,7 +59,6 @@ BeforeAll {
 AfterAll {
     Remove-Module -Name EpicCrossDependency -Force -ErrorAction SilentlyContinue
 }
-
 Describe 'Gather adapter argument arrays' {
     It 'reads the other manifest from the integration branch first' {
         InModuleScope EpicCrossDependency -Parameters @{ Text = $script:ProviderText } {

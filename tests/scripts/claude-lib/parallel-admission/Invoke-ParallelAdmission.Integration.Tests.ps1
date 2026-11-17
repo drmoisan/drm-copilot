@@ -18,6 +18,8 @@ BeforeAll {
     $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../../..").Path
     $script:EntryScriptPath = (Resolve-Path (Join-Path -Path $script:RepoRoot -ChildPath '.claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1')).Path
     . $script:EntryScriptPath
+    # D-P16 (issue #1035): assess and reuse-edges resolve the development-docs root; no case reads the routing file.
+    Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $true; Root = 'docs/features'; Reason = $null } }
 
     # Committed fixtures, read once as text.
     $script:FixtureRoot = Join-Path -Path $script:RepoRoot -ChildPath 'tests/fixtures/parallel_admission'
@@ -75,7 +77,6 @@ BeforeAll {
 AfterAll {
     Remove-Module -Name ParallelAdmission, ParallelAdmissionPrecedence, ParallelAdmissionJson -Force -ErrorAction SilentlyContinue
 }
-
 Describe 'Seed from prepared items' {
     BeforeEach {
         $script:GitResponse = @{}

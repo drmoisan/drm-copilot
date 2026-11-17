@@ -19,6 +19,8 @@ BeforeAll {
     $script:CliPath = Join-Path $script:RepoRoot '.claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1'
     $script:Fixture = Join-Path $script:RepoRoot 'tests/fixtures/epic_cross_dependency/epic-without-cross-edges.md'
     Import-Module -Name $script:ModulePath -Force -ErrorAction Stop
+    # D-P16 (issue #1035): the command entry resolves the development-docs root; no case reads the routing file.
+    Mock Resolve-DevelopmentDocsRoot -ModuleName EpicCrossDependency { [pscustomobject]@{ Succeeded = $true; Root = 'docs/features'; Reason = $null } }
 
     $script:Edge = '[{ epic: provider-epic, integration_branch: epic/provider-epic-integration, issue_num: 1188 }]'
     $script:Consumer = (@(
@@ -33,7 +35,6 @@ BeforeAll {
 AfterAll {
     Remove-Module -Name EpicCrossDependency -Force -ErrorAction SilentlyContinue
 }
-
 Describe 'Invoke-EpicCrossReadinessCommand usage' {
     It 'exits 2 for <Name>' -ForEach @(
         @{ Name = '-WaitSeconds 541'; Splat = @{ Mode = 'feature'; ManifestPath = 'm'; WaitSeconds = 541 } }

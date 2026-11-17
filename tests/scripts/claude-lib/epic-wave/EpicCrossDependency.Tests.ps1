@@ -15,6 +15,8 @@
 BeforeAll {
     $script:RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../../..')).Path
     Import-Module -Name (Join-Path $script:RepoRoot '.claude/lib/epic-wave/EpicCrossDependency.psm1') -Force -ErrorAction Stop
+    # D-P16 (issue #1035): the command entry resolves the development-docs root; no case reads the routing file.
+    Mock Resolve-DevelopmentDocsRoot -ModuleName EpicCrossDependency { [pscustomobject]@{ Succeeded = $true; Root = 'docs/features'; Reason = $null } }
 
     # Build epic.md text from a slug and feature item lines (each already indented).
     $script:ManifestText = {
@@ -54,7 +56,6 @@ BeforeAll {
 AfterAll {
     Remove-Module -Name EpicCrossDependency -Force -ErrorAction SilentlyContinue
 }
-
 Describe 'ConvertFrom-EpicCrossDependencyManifest' {
     It 'parses the epic, the integration branch, and one inline edge' {
         $manifest = & $script:Consumer $script:ProviderEdge
@@ -197,6 +198,8 @@ Describe 'Get-EpicCrossDependencyPrerequisitePr' {
     It 'matches a PR by <Name>' -ForEach @(
         @{ Name = 'the file rule alone (active)'; Head = 'feature/unrelated-branch'; Path = @('docs/features/active/2026-11-01-provider-1188/spec.md') }
         @{ Name = 'the file rule alone (completed)'; Head = 'feature/unrelated-branch'; Path = @('docs/features/completed/2026-11-01-provider-1188/plan.md') }
+        @{ Name = 'the file rule alone (.dev active, issue #1035)'; Head = 'feature/unrelated-branch'; Path = @('.dev/active/2026-11-01-provider-1188/spec.md') }
+        @{ Name = 'the file rule alone (.dev completed, issue #1035)'; Head = 'feature/unrelated-branch'; Path = @('.dev/completed/2026-11-01-provider-1188/plan.md') }
         @{ Name = 'the token rule with a trailing issue'; Head = 'feature/provider-thing-1188'; Path = @('src/a.ts') }
         @{ Name = 'the token rule with a retry token'; Head = 'feature/provider-thing-1188-r2'; Path = @() }
         @{ Name = 'the token rule after an exec token'; Head = 'exec-1188-provider'; Path = @() }
@@ -402,5 +405,63 @@ Describe 'Pure function isolation' {
             Should -Invoke Get-EpicCrossUtcNow -Times 0 -Exactly
             Should -Invoke Wait-EpicCrossInterval -Times 0 -Exactly
         }
+    }
+}
+
+Describe 'Development-docs root of the readiness command (issue #1035)' {
+    BeforeAll {
+        # A consumer manifest with one cross-epic edge, served by an in-memory reader.
+        $script:CrossManifestText = & $script:ManifestText 'consumer' @('  - issue_num: 1201', '    feature_folder: 2026-11-10-consumer-1201', '    depends_on: []', "    cross_epic_depends_on: $script:ProviderEdge")
+        $text = $script:CrossManifestText
+        $script:CrossReader = { param([string] $Path) $null = $Path; $text }.GetNewClosure()
+        $script:SyntheticWorkspace = if ($IsWindows) { 'C:/synthetic-checkouts/consumer' } else { '/synthetic-checkouts/consumer' }
+    }
+
+    It 'EPIC-CROSS-ROOT-FROM-WORKSPACE-ROOT' {
+        # Arrange: the passed workspace resolves the .dev root; every git read fails.
+        Mock Resolve-DevelopmentDocsRoot -ModuleName EpicCrossDependency { [pscustomobject]@{ Succeeded = $true; Root = '.dev'; Reason = $null } }
+        Mock Invoke-EpicCrossGitExe -ModuleName EpicCrossDependency { param([string[]] $GitArgs) $null = $GitArgs; [pscustomobject]@{ ExitCode = 1; Output = '' } }
+
+        # Act
+        $null = Invoke-EpicCrossReadinessCommand -Mode validate -ManifestPath 'synthetic/epic.md' -ReadManifestText $script:CrossReader -WorkspaceRoot $script:SyntheticWorkspace
+
+        # Assert: the resolver saw exactly that root, and the other manifest was read from the .dev epics area.
+        Should -Invoke Resolve-DevelopmentDocsRoot -ModuleName EpicCrossDependency -Times 1 -Exactly -ParameterFilter { $WorkspaceRoot -ceq $script:SyntheticWorkspace }
+        Should -Invoke Invoke-EpicCrossGitExe -ModuleName EpicCrossDependency -ParameterFilter { $GitArgs[0] -ceq 'show' -and $GitArgs[1] -ceq 'origin/epic/provider-epic-integration:.dev/epics/provider-epic/epic.md' }
+        Should -Invoke Invoke-EpicCrossGitExe -ModuleName EpicCrossDependency -Times 0 -Exactly -ParameterFilter { $GitArgs[1] -like '*docs/features/*' }
+    }
+
+    It 'EPIC-CROSS-ROOT-DEFAULTS-TO-CURRENT-LOCATION' {
+        # Arrange: the module's current location is a synthetic path.
+        $location = $script:SyntheticWorkspace
+        Mock Get-Location -ModuleName EpicCrossDependency { [pscustomobject]@{ Path = $location } }.GetNewClosure()
+        Mock Invoke-EpicCrossGitExe -ModuleName EpicCrossDependency { param([string[]] $GitArgs) $null = $GitArgs; [pscustomobject]@{ ExitCode = 1; Output = '' } }
+
+        # Act
+        $null = Invoke-EpicCrossReadinessCommand -Mode validate -ManifestPath 'synthetic/epic.md' -ReadManifestText $script:CrossReader
+
+        # Assert
+        Should -Invoke Resolve-DevelopmentDocsRoot -ModuleName EpicCrossDependency -Times 1 -Exactly -ParameterFilter { $WorkspaceRoot -ceq $script:SyntheticWorkspace }
+    }
+
+    It 'EPIC-CROSS-ROOT-FAILURE-EXITS-1' {
+        # Arrange
+        Mock Resolve-DevelopmentDocsRoot -ModuleName EpicCrossDependency { [pscustomobject]@{ Succeeded = $false; Root = $null; Reason = 'config/orchestration-routing.json development_docs_root value "docs" is not one of: docs/features, .dev.' } }
+        Mock Invoke-EpicCrossGitExe -ModuleName EpicCrossDependency { throw 'git called' }
+
+        # Act
+        $result = Invoke-EpicCrossReadinessCommand -Mode feature -ManifestPath 'synthetic/epic.md' -ReadManifestText $script:CrossReader -WorkspaceRoot $script:SyntheticWorkspace
+
+        # Assert
+        $result.ExitCode | Should -Be 1
+        $result.Stderr | Should -BeExactly 'config/orchestration-routing.json development_docs_root value "docs" is not one of: docs/features, .dev.'
+        Should -Invoke Invoke-EpicCrossGitExe -ModuleName EpicCrossDependency -Times 0 -Exactly
+    }
+
+    It 'does not resolve the root for a manifest without a cross edge' {
+        $plain = & $script:ManifestText 'consumer' @('  - issue_num: 1201', '    feature_folder: 2026-11-10-consumer-1201', '    depends_on: []')
+        $result = Invoke-EpicCrossReadinessCommand -Mode validate -ManifestPath 'synthetic/epic.md' -ReadManifestText ({ param([string] $Path) $null = $Path; $plain }.GetNewClosure()) -WorkspaceRoot $script:SyntheticWorkspace
+        $result.ExitCode | Should -Be 0
+        Should -Invoke Resolve-DevelopmentDocsRoot -ModuleName EpicCrossDependency -Times 0 -Exactly
     }
 }
