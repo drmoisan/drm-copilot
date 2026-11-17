@@ -12,6 +12,13 @@
 param()
 
 . (Join-Path $PSScriptRoot 'codex-authority-store.ps1')
+# Development-docs root module (issue #1035): the published .codex/lib copy first, the self-hosted .claude/lib copy otherwise.
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -PathType Leaf) {
+    Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+}
+else {
+    Import-Module (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+}
 
 $script:ReceiptLifetimeMinutes = 60
 
@@ -53,7 +60,8 @@ function Get-RootEpicReference {
     if ($Prompt -match '(?im)^\s*(?:/|\$)?epic-(?:plan|run|orchestrate)\s+(?<reference>[^\r\n]+)') {
         return $Matches.reference.Trim()
     }
-    if ($Prompt -match '(?i)(?<reference>docs[\\/]features[\\/]epics[\\/][^\s"'']+)') {
+    # An epic reference under the epics area of either known development-docs root (issue #1035).
+    if ($Prompt -match ('(?i)(?<reference>' + (Get-DevelopmentDocsKnownRootPattern -Area 'epics') + '[\\/][^\s"'']+)')) {
         return ($Matches.reference -replace '\\', '/').TrimEnd('.', ',', ';')
     }
     return ''
@@ -137,7 +145,12 @@ function Get-RootEpicInvocationReceipt {
     if ($persona -eq 'epic-orchestrator' -and $entryKind -eq 'epic-run') {
         $slug = Get-RootEpicSlug -Reference $reference
         if ($slug) {
-            $kickoffPath = "docs/features/epics/$slug/epic-kickoff.md"
+            # The kickoff lives in the epics area of the root configured in RepositoryRoot (issue #1035).
+            $docsRoot = Resolve-DevelopmentDocsRoot -WorkspaceRoot $RepositoryRoot
+            if (-not $docsRoot.Succeeded) {
+                throw "EPIC_INVOCATION_ORIGIN_BLOCKED: $($docsRoot.Reason)"
+            }
+            $kickoffPath = (Get-DevelopmentDocsPath -Root $docsRoot.Root -Area 'epics') + "/$slug/epic-kickoff.md"
         }
     }
 

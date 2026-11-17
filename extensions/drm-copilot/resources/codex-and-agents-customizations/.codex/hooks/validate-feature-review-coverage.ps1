@@ -72,6 +72,13 @@ try { . (Join-Path $PSScriptRoot 'feature-review-coverage-thresholds.ps1') } cat
 try { . (Join-Path $PSScriptRoot 'hook-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'hook-target-worktree.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'validate-feature-review-coverage-freshness.ps1') } catch { Add-HookDependencyFailure -Name 'validate-feature-review-coverage-freshness.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'feature-review-coverage-target.ps1') } catch { Add-HookDependencyFailure -Name 'feature-review-coverage-target.ps1' -ErrorRecord $_ }
+# Development-docs root module (issue #1035), a call-time dependency of the audit selection: the published .codex/lib copy first, the self-hosted .claude/lib copy otherwise.
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -PathType Leaf) {
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+}
+else {
+    try { Import-Module (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+}
 
 $ErrorActionPreference = 'Stop'
 

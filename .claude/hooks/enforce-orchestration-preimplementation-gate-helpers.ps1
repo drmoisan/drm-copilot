@@ -25,8 +25,8 @@
 # The exempt orchestration-bookkeeping trees (D2): the epics, parallel, active, and
 # potential areas of every known development-docs root (issue #1035), then the
 # orchestration artifacts tree. Directory prefixes, repo-relative, forward-slash
-# spelled. No glob, no absolute entry, no literal-file entry. Read at call time, so
-# DevelopmentDocsRoot.psm1 is a call-time dependency of this file (D-P16).
+# spelled. No glob, no absolute entry, no literal-file entry. Read at call time, so the
+# development-docs module is a call-time dependency of this file (D-P16).
 function Get-OrchestrationBookkeepingTree {
     <#
     .SYNOPSIS
