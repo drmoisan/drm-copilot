@@ -1,0 +1,12 @@
+# Instructions check after the AGENTS.md rewrite ([P1-T4])
+
+Timestamp: 2026-11-17T19-34
+Command: sh SCRATCH/issue-1028-gen.sh instructions check (runs `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface instructions -Check` from the worktree root); sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1 tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1 tests/scripts/harness-generation/HarnessInstructions.Tests.ps1
+EXIT_CODE: 0
+Output Summary: `-Surface instructions -Check` printed "harness-generation: no drift" and exited 0 on the working tree. Before the rewrite it reported 33 findings (see the [P1-T3] task check). The Pester selection exited 0: `test-cadence-wording.Tests.ps1` 136 passed, `ProcessReductionChain.Ledger.Tests.ps1` 5 passed, `HarnessInstructions.Tests.ps1` 15 passed, and the merged JUnit has 0 failure elements. Named results: `TCW-POLICY-AGENTS-MD`, `TCW-POLICY-AGENTS-MD-BUNDLE`, `TCW-BUNDLE-AGENTS-MD`, `PRC-LEDGER-CHAIN-HOLDS`, `PRC-LEDGER-SUBCHAIN-HOLDS`, `PRC-LEDGER-NO-EXCEPTIONS` and `PRC-LEDGER-END-STATE-RECORDED` all passed.
+
+State after the change:
+- `AGENTS.md` is hand-authored. It has no `# Converted standing guidance` heading, no generated-file note, no embedded copy of a `.claude/rules` section and no coverage-threshold statement (OQ-7). Every cited `.agents/skills/<name>/SKILL.md` exists, and `## Codex Epic Planning and Model Routing` is kept verbatim.
+- Ledger rule (entry 0011): `## Mandatory Toolchain Loop` is hand-authored, keeps the "**Restart from step 1**" sentence, and ends with the recorded paragraph ("This loop is the phase-gate and final-QA requirement; ...") directly followed by `## File Size Limit`. The paragraph and the heading each occur once. The `## File Size Limit` body points to `.agents/skills/general-code-change/SKILL.md`, so neither body equals a `.claude/rules` H2 body.
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/AGENTS.md` is byte-identical to `AGENTS.md` (cmp).
+- `CLAUDE.md` keeps its frontmatter, and `@AGENTS.md` is the first line after it. `## Tone Policy` was removed because `AGENTS.md` carries it. `## Policy Compliance Reading Order` now names `scripts/harness-generation/sources/rules/` as the policy source and `.claude/rules/*.md` and `.github/instructions/*.instructions.md` as generated outputs (OQ-3). `## Language-Specific Rules` and `## Architecture` remain as Claude-only sections, and no H2 body is shared with `AGENTS.md`.
