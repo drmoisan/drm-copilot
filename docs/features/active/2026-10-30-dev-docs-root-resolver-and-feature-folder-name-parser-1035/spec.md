@@ -478,7 +478,7 @@ All such tests use in-memory fakes; no temporary files are created.
 
 ### Consumer routing and behavior
 
-- [ ] With the default key, the full Python, PowerShell and TypeScript test suites pass, and the only changed expectations in existing tests are the folder-naming and status-line expectations for supplied issue numbers.
+- [x] With the default key, the full Python, PowerShell and TypeScript test suites pass, and the only changed expectations in existing tests are the folder-naming and status-line expectations for supplied issue numbers.
 - [x] A recorded repository search over the production roots `.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts` and `extensions/drm-copilot/src` for `docs/features` and its separator-variant regex forms returns only the resolver constant definitions and entries on a recorded allowlist of Stay rows from the research inventory; the search command, output and allowlist are stored under the feature folder's `evidence/` directory.
 - [x] TypeScript tests show that, with the routing configuration set to `.dev` and a `.dev` directory present in the in-memory fake, `createActiveFolder`, the new potential bug entry flow and the potential-to-issue promotion write under `.dev/<area>`, and with `.dev` absent they write under `docs/features/<area>`.
 - [x] Matcher tests in each runtime show that the feature-folder record validators (`orchestrator-state-feature-folder-record.ts`, `_orchestrator_state_feature_folder_record.py`, `OrchestratorStateFeatureFolderRecord.psm1`) accept both `docs/features/active/<folder>` and `.dev/active/<folder>` independent of the configured value.
@@ -529,7 +529,7 @@ All such tests use in-memory fakes; no temporary files are created.
 
 - [x] After this child, the repository contains no `.dev/` directory, `development_docs_root` is `docs/features`, no existing feature folder is renamed, and no migration command is added.
 - [x] Each new TypeScript production file under `src/lib/development-docs/` has its own `coverageThreshold` entry in `extensions/drm-copilot/jest.config.cjs` with `lines: 85` and `branches: 75`, and coverage evidence for changed code meets 85% line coverage in every language and 75% branch coverage for Python and TypeScript, recorded under the feature folder's `evidence/qa-gates/`.
-- [ ] The seven-stage toolchain passes in a single pass for Python, PowerShell and TypeScript, and no changed production file exceeds 800 lines.
+- [x] The seven-stage toolchain passes in a single pass for Python, PowerShell and TypeScript, and no changed production file exceeds 800 lines.
 
 ## Refresh Amendments (2026-11-14)
 
@@ -557,7 +557,7 @@ Recorded by the planner on 2026-11-15 under the coordinator's autonomous-mode di
 ## Definition of Done
 
 - [x] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
+- [x] Behavior matches acceptance criteria in all documented environments
 - [x] Tests updated/added (unit/integration as applicable)
 - [x] Edge cases and error handling covered by tests
 - [x] Docs updated (README, docs/features/active/... links)
