@@ -20,7 +20,7 @@ The repository contains four primary deliverables:
 - [.claude/](.claude/) — the Claude Code runtime surface: `rules/`, `skills/`, `agents/`, `hooks/`, `agent-memory/`, and `settings.json`.
 - [.codex/](.codex/) and [.agents/](.agents/) — the Codex-native runtime surface: prompts and skills.
 - [docs/features/](docs/features/) — feature, backlog, and planning documents, organized into `potential/`, `active/`, `completed/`, `archive/`, and `research/`. Multi-feature epics use `docs/features/epics/<epic-slug>/epic.md` as their single home once created (see Epic orchestration below).
-- [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md) — generated standing-instruction roots for Claude Code and Codex respectively.
+- [AGENTS.md](AGENTS.md) — the hand-authored source of standing guidance shared by every agent; [CLAUDE.md](CLAUDE.md) imports it with `@AGENTS.md` and adds the Claude-only instructions.
 
 ## Agentic runtime architecture
 
@@ -77,7 +77,7 @@ Selected CLI entrypoints exposed by Poetry:
 
 ## Codex-native converter
 
-The Codex-native converter is a Python-first workflow that reviews or applies a deterministic migration from GitHub Copilot or Claude runtime customization surfaces into the native Codex layout. The Python CLI is the authoritative converter surface; the VS Code command and MCP tool are thin wrappers over the same bundled Python runner.
+The Codex-native converter reviews or applies a deterministic migration from GitHub Copilot or Claude runtime customization surfaces into the native Codex layout. It has two implementations that are kept in parity: the extension command `drmCopilotExtension.runCodexNativeConverter` and the MCP tool `run_codex_native_converter` run the in-process TypeScript port in [extensions/drm-copilot/src/lib/codex-native-converter/](extensions/drm-copilot/src/lib/codex-native-converter/), and the Poetry script `codex-native-converter` runs the Python package in [scripts/dev_tools/codex_native_converter/](scripts/dev_tools/codex_native_converter/). For the same input, both produce the same mapping, generated output, and report disposition.
 
 ### Review and apply commands
 
@@ -90,7 +90,7 @@ Optional flags:
 - `--artifact-root <artifact-root>` overrides the default report location.
 - `--enable-repo-prompts` allows `.codex/prompts/**` output when repository prompts are intentionally enabled.
 
-Repo-wide GitHub instruction files that declare `applyTo: "**"` are merged into the generated `AGENTS.md`. Narrower `.github/instructions/*.instructions.md` files map to `.agents/skills/**`. GitHub prompt assets under `.github/prompts/*.md` are treated as optional launcher inputs and do not block validation by themselves when prompt output is disabled.
+Standing-guidance sources, such as `.github/copilot-instructions.md` and repo-wide GitHub instruction files that declare `applyTo: "**"`, are reported as not emitted, with the reason that `AGENTS.md` is a hand-authored source maintained outside the converter; the converter never creates or modifies `AGENTS.md`, and references to those sources in other outputs are still rewritten to `AGENTS.md`. Narrower `.github/instructions/*.instructions.md` files map to `.agents/skills/**`. GitHub prompt assets under `.github/prompts/*.md` are treated as optional launcher inputs and do not block validation by themselves when prompt output is disabled.
 
 ### Artifact outputs
 
@@ -105,7 +105,7 @@ The CLI prints the resolved artifact root and the final validation outcome to st
 
 ### Fail-closed validation model
 
-The converter blocks destination writes when it finds unresolved hard-gate mappings, unresolved handoff mappings, unresolved MCP rewrites, duplicate targets, lingering `.github`, `.claude`, or `CLAUDE.md` runtime references in generated native output, malformed artifacts, unsupported ecosystems, or missing required inputs. Review mode still writes the report set so the caller can inspect blocking findings without mutating the destination tree. The converter is implemented in [scripts/dev_tools/codex_native_converter/](scripts/dev_tools/codex_native_converter/), with modules split to satisfy the 500-line file-size policy.
+The converter blocks destination writes when it finds unresolved hard-gate mappings, unresolved handoff mappings, unresolved MCP rewrites, duplicate targets, lingering `.github`, `.claude`, or `CLAUDE.md` runtime references in generated native output, malformed artifacts, unsupported ecosystems, or missing required inputs. Review mode still writes the report set so the caller can inspect blocking findings without mutating the destination tree. Both implementations apply the same validation: the TypeScript port in [extensions/drm-copilot/src/lib/codex-native-converter/](extensions/drm-copilot/src/lib/codex-native-converter/) and the Python package in [scripts/dev_tools/codex_native_converter/](scripts/dev_tools/codex_native_converter/), each with modules split to satisfy the 500-line file-size policy.
 
 ## VS Code extension
 
