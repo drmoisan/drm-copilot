@@ -40,6 +40,8 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+# Development-docs root module (issue #1035): plan paths under every known root are gated.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
 
 # Shared work-mode parser and prerequisite map (issue #565). Guarded so a failed
 # dot-source denies plan writes rather than failing open.
@@ -145,7 +147,8 @@ function Test-IsFeaturePlanPath {
         [string] $NormalizedPath
     )
 
-    return $NormalizedPath -match '(^|/)docs/features/(active|archive)/[^/]+/plan(\.\d{4}-\d{2}-\d{2}T\d{2}-\d{2})?\.md$'
+    # Either known development-docs root (issue #1035); the path is already forward-slash normalized.
+    return $NormalizedPath -match ('(^|/)' + (Get-DevelopmentDocsKnownRootPattern) + '/(active|archive)/[^/]+/plan(\.\d{4}-\d{2}-\d{2}T\d{2}-\d{2})?\.md$')
 }
 
 function Get-FeatureFolderOrderDenyDecision {

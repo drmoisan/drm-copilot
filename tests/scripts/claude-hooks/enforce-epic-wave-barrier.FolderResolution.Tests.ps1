@@ -255,4 +255,21 @@ Describe 'enforce-epic-wave-barrier.ps1 feature-folder resolution (issue #565)' 
             (Invoke-WaveDecision -Prompt "$script:Kickoff Execute docs/features/active/$script:Target.").permissionDecision | Should -Be 'allow'
         }
     }
+
+    Context 'development-docs root citations (issue #1035)' {
+        It 'W11a: a prompt citing a .dev/active folder selects the matching record and allows when its dependency is merged' {
+            $script:CheckpointJson = '{"features":[' +
+            '{"issue_num":300,"feature_folder":".dev/active/' + $script:Upstream + '","depends_on":[],"merge_status":"merged"},' +
+            '{"issue_num":301,"feature_folder":".dev/active/' + $script:Target + '","depends_on":["' + $script:Upstream + '"],"merge_status":"not_started"}' +
+            ']}'
+            (Invoke-WaveDecision -Prompt "$script:Kickoff Execute .dev/active/$script:Target/spec.md now").permissionDecision | Should -Be 'allow'
+        }
+
+        It 'W11b: a prompt citing a .dev/active folder selects the matching record and denies when its dependency is pr_open' {
+            $script:CheckpointJson = Get-TargetCheckpoint -UpstreamStatus 'pr_open'
+            $decision = Invoke-WaveDecision -Prompt "$script:Kickoff Execute .dev\active\$script:Target now"
+            $decision.permissionDecision | Should -Be 'deny'
+            $decision.permissionDecisionReason | Should -Match "'$script:Target' cannot start"
+        }
+    }
 }

@@ -53,6 +53,8 @@
 [CmdletBinding()]
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
+# Development-docs root module (issue #1035): the artifact-location rule accepts the active area of every known root.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'feature-review-coverage-thresholds.ps1') } catch { Add-HookDependencyFailure -Name 'feature-review-coverage-thresholds.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'validate-feature-review-coverage-metrics.ps1') } catch { Add-HookDependencyFailure -Name 'validate-feature-review-coverage-metrics.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'validate-feature-review-coverage-rules.ps1') } catch { Add-HookDependencyFailure -Name 'validate-feature-review-coverage-rules.ps1' -ErrorRecord $_ }
@@ -144,7 +146,7 @@ function Invoke-FeatureReviewCoverageValidation {
                 }
                 $metadata = Get-ReviewArtifactInfo -Path $location.RelativePath -Stem $artifact.Stem
                 if ($null -eq $metadata) {
-                    $errors.Add("$($artifact.Token) '$path' is outside the required docs/features/active/.../$($artifact.Stem).<timestamp>.md location")
+                    $errors.Add("$($artifact.Token) '$path' is outside the required $(@(Get-DevelopmentDocsKnownRootPrefix -Area 'active')[0]).../$($artifact.Stem).<timestamp>.md location")
                     continue
                 }
 
@@ -179,7 +181,7 @@ function Invoke-FeatureReviewCoverageValidation {
                         $errors.Add("remediation-inputs-path '$remediationPath' is rejected: $($remediationLocation.RejectionDetail)")
                     }
                     elseif ($null -eq $remediation) {
-                        $errors.Add("remediation-inputs-path '$remediationPath' is outside the required docs/features/active/.../remediation-inputs.<timestamp>.md location")
+                        $errors.Add("remediation-inputs-path '$remediationPath' is outside the required $(@(Get-DevelopmentDocsKnownRootPrefix -Area 'active')[0]).../remediation-inputs.<timestamp>.md location")
                     }
                     elseif ($remediation.Folder -ne $reference.Folder -or $remediation.Timestamp -ne $reference.Timestamp) {
                         $errors.Add('remediation-inputs artifact must share the same feature folder and timestamp as the policy audit artifact.')

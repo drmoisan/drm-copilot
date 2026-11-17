@@ -288,6 +288,35 @@ Describe 'Get-ExecutorOutputBlockDecision single-pass preflight rules (issue #96
         Should -Invoke -CommandName Test-PreflightFixRecord -Times 1 -Exactly -ParameterFilter { $Path -eq 'docs/features/active/foo/evidence/other/preflight-fixes.2026-10-16T23-07.md' }
     }
 
+    It 'allows a PREFLIGHT-FIX line whose record exists under .dev/ (issue #1035)' {
+        # Arrange
+        Mock -CommandName Test-PreflightFixRecord -MockWith { $true }
+        $output = "$script:PlanPath`nPREFLIGHT: ALL CLEAR`nPREFLIGHT-FIX: [P0-T1] | stale anchor | renamed the heading`npreflight-fix-record: ``.dev/active/foo/evidence/other/preflight-fixes.2026-10-16T23-07.md``"
+
+        # Act
+        $decision = Get-ExecutorOutputBlockDecision -AgentOutput $output -TranscriptPath $script:TranscriptPath -ReadTranscriptHead $script:PreflightReader
+
+        # Assert
+        $decision.Ok | Should -BeTrue
+        Should -Invoke -CommandName Test-PreflightFixRecord -Times 1 -Exactly -ParameterFilter { $Path -eq '.dev/active/foo/evidence/other/preflight-fixes.2026-10-16T23-07.md' }
+    }
+
+    It 'blocks an existing PREFLIGHT-FIX record outside both known roots (<Record>)' -ForEach @(
+        @{ Record = '.devx/active/foo/evidence/other/preflight-fixes.2026-10-16T23-07.md' }
+        @{ Record = 'docs/research/foo/preflight-fixes.2026-10-16T23-07.md' }
+    ) {
+        # Arrange: the record exists, so only the root prefix decides.
+        Mock -CommandName Test-PreflightFixRecord -MockWith { $true }
+        $output = "$script:PlanPath`nPREFLIGHT: ALL CLEAR`nPREFLIGHT-FIX: [P0-T1] | stale anchor | renamed the heading`npreflight-fix-record: $Record"
+
+        # Act
+        $decision = Get-ExecutorOutputBlockDecision -AgentOutput $output -TranscriptPath $script:TranscriptPath -ReadTranscriptHead $script:PreflightReader
+
+        # Assert: the message text is unchanged.
+        $decision.Ok | Should -BeFalse
+        $decision.Message | Should -BeLike '*naming an existing record under docs/features/.*'
+    }
+
     It 'allows a canonical preflight BLOCKED report in a preflight run' {
         # Arrange
         $output = "$script:PlanPath`nBLOCKED at preflight (before [P0-T1])`nPlan delta: add [P1-T3]."

@@ -62,11 +62,14 @@ function Get-ReviewArtifactInfo {
     )
 
     $normalized = $Path -replace '\\', '/'
-    $pattern = "^docs/features/active/(?<Folder>.+)/$Stem\.(?<Timestamp>\d{4}-\d{2}-\d{2}T\d{2}-\d{2})\.md$"
+    # The active area of either known development-docs root (issue #1035); a call-time
+    # dependency on DevelopmentDocsRoot.psm1, which the dot-sourcing hook imports.
+    $rootPattern = Get-DevelopmentDocsKnownRootPattern
+    $pattern = "^$rootPattern/active/(?<Folder>.+)/$Stem\.(?<Timestamp>\d{4}-\d{2}-\d{2}T\d{2}-\d{2})\.md$"
     $match = [regex]::Match($normalized, $pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
     if (-not $match.Success) {
         # Remediation-handoff layout: <slug>/audit/<timestamp>/<stem>.md (timestamp on the folder).
-        $auditPattern = "^docs/features/active/(?<Folder>[^/]+)/audit/(?<Timestamp>\d{4}-\d{2}-\d{2}T\d{2}-\d{2})/$Stem\.md$"
+        $auditPattern = "^$rootPattern/active/(?<Folder>[^/]+)/audit/(?<Timestamp>\d{4}-\d{2}-\d{2}T\d{2}-\d{2})/$Stem\.md$"
         $match = [regex]::Match($normalized, $auditPattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
     }
     if (-not $match.Success) {

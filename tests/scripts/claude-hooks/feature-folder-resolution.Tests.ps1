@@ -274,6 +274,62 @@ Describe 'feature-folder-resolution.ps1 (Claude surface)' {
         }
     }
 
+    Context 'development-docs roots and -RootPattern (issue #1035)' {
+        It 'D01: reads the folder of a .dev/active token (<Label>)' -ForEach @(
+            @{ Label = 'nested research path'; Text = 'read .dev/active/alpha/research/notes.md first' }
+            @{ Label = 'backslash separators'; Text = '.dev\active\alpha\spec.md' }
+            @{ Label = 'absolute prefix'; Text = '/repo/.dev/active/alpha/plan.md' }
+        ) {
+            Get-CandidateText -Text $Text | Should -BeExactly 'alpha'
+        }
+
+        It 'D02: yields no candidate for a bare .dev/active/ token' {
+            @(Find-FeatureFolderCandidate -Text 'see .dev/active/ for the work').Count | Should -Be 0
+        }
+
+        It 'D03: reads both roots in first-occurrence order' {
+            Get-CandidateText -Text '.dev/active/a/spec.md docs/features/active/b .dev/active/a' | Should -BeExactly 'a|b'
+        }
+
+        It 'D04: strips a .dev lifecycle prefix from <Value>' -ForEach @(
+            @{ Value = '.dev/active/b'; Expected = 'b' }
+            @{ Value = '.dev\completed\b\'; Expected = 'b' }
+            @{ Value = '.dev/active'; Expected = $null }
+        ) {
+            ConvertTo-FeatureFolderBasename -Value $Value | Should -Be $Expected
+        }
+
+        It 'D05: a passed -RootPattern limits the candidate scan to that root' {
+            @(Find-FeatureFolderCandidate -Text 'see .dev/active/alpha' -RootPattern 'docs[\\/]features').Count | Should -Be 0
+            Get-CandidateText -Text 'see docs/features/active/alpha' | Should -BeExactly 'alpha'
+            @(Find-FeatureFolderCandidate -Text 'see docs/features/active/beta' -RootPattern 'docs[\\/]features') | Should -BeExactly @('beta')
+        }
+
+        It 'D06: a passed -RootPattern limits the basename prefix strip to that root' {
+            # '.dev/active' is a bare area under the default (no folder) but a plain path under a docs-only pattern.
+            ConvertTo-FeatureFolderBasename -Value '.dev/active' -RootPattern 'docs[\\/]features' | Should -BeExactly 'active'
+            ConvertTo-FeatureFolderBasename -Value '.dev/active' | Should -BeNullOrEmpty
+            ConvertTo-FeatureFolderBasename -Value 'docs/features/active' -RootPattern 'docs[\\/]features' | Should -BeNullOrEmpty
+        }
+
+        It 'D07: the -RootPattern default of <Name> equals Get-DevelopmentDocsKnownRootPattern without -Area' -ForEach @(
+            @{ Name = 'Find-FeatureFolderCandidate' }
+            @{ Name = 'ConvertTo-FeatureFolderBasename' }
+        ) {
+            # Arrange: read the default from the function AST of the file under test.
+            $repoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
+            Import-Module (Join-Path $repoRoot '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile($script:UnderTest, [ref]$null, [ref]$null)
+            $functionName = $Name
+            $function = $ast.Find({ param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $functionName }, $true)
+            $parameter = @($function.Body.ParamBlock.Parameters | Where-Object { $_.Name.VariablePath.UserPath -ceq 'RootPattern' })
+
+            # Act / Assert
+            $parameter.Count | Should -Be 1
+            $parameter[0].DefaultValue.Value | Should -BeExactly (Get-DevelopmentDocsKnownRootPattern)
+        }
+    }
+
     Context 'Claude and Codex copies' {
         It 'H01: the Claude and Codex copies of the resolver have equal SHA256 hashes' {
             $repoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path

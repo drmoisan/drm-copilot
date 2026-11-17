@@ -43,6 +43,8 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 Set-StrictMode -Version Latest
 try { . (Join-Path $PSScriptRoot 'subagentstop-envelope.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-envelope.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'subagentstop-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'subagentstop-target-worktree.ps1' -ErrorRecord $_ }
+# Development-docs root module (issue #1035): a preflight-fix record may lie under either known root.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
 $ErrorActionPreference = 'Stop'
 $script:SubagentStopReportAndHaltLine = 'This condition is not repairable by the subagent. Report it to the operator and halt.'
 
@@ -179,7 +181,10 @@ function Get-PreflightRunBlockDecision {
         if ($location.Rejected) {
             return @{ Ok = $false; Repairable = $true; Message = "atomic-executor hook: preflight-fix-record '$recordPath' is rejected: $($location.RejectionDetail)." }
         }
-        if (-not ([string]$location.RelativePath).StartsWith('docs/features/', [System.StringComparison]::OrdinalIgnoreCase) -or -not (Test-PreflightFixRecord -Path $location.ProbePath)) {
+        # The record lies under either known development-docs root (issue #1035).
+        $relativePath = [string]$location.RelativePath
+        $underKnownRoot = @(Get-DevelopmentDocsKnownRoot | Where-Object { $relativePath.StartsWith("$_/", [System.StringComparison]::OrdinalIgnoreCase) }).Count -gt 0
+        if (-not $underKnownRoot -or -not (Test-PreflightFixRecord -Path $location.ProbePath)) {
             return @{ Ok = $false; Repairable = $true; Message = 'atomic-executor hook: a `PREFLIGHT-FIX:` line requires a `preflight-fix-record: <path>` line naming an existing record under docs/features/.' + (Get-SubagentStopTargetNote -Target $Target -ProbePath $location.ProbePath -SessionRoot $root) }
         }
     }
