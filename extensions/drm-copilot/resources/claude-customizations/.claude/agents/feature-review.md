@@ -9,6 +9,7 @@ tools:
   - "Bash(git diff *)"
   - "Bash(git log *)"
   - "Write(/docs/features/active/**)"
+  - "Write(/.dev/active/**)"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
   - policy-compliance-order

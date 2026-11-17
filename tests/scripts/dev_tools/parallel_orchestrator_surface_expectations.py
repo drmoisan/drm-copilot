@@ -260,10 +260,16 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # status-mapping (D7) paragraph to both surfaces, and both digests moved again;
 # they were recomputed after the merge of origin/main that brought in #1156, so
 # each digest below is the merged result of #1156 and #1162.
+#
+# RE-BASELINED by issue #1035 on 2026-11-17. That change added the
+# `Write(.dev/epics/**)` and `Edit(.dev/epics/**)` literals to the epic agent
+# `tools:` list after `Edit(docs/features/epics/**)`. Only the `tools:` list
+# changed, so only the agent digest moved; the skill digest is unchanged and the
+# pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
-        "5561f79d2942aef31b168027564256f80bdfe501b7c19fc80c962abcece4af03",
+        "47c4c5925c0ecbd53bcbbcab9672355826b971052939d3a81d2c7b82b00b549f",
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",

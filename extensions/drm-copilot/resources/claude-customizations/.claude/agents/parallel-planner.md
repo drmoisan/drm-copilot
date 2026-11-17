@@ -8,7 +8,9 @@ tools:
   - Grep
   - Glob
   - "Write(docs/features/parallel/**)"
+  - "Write(.dev/parallel/**)"
   - "Edit(docs/features/parallel/**)"
+  - "Edit(.dev/parallel/**)"
   - "Write(artifacts/orchestration/**)"
   - "Edit(artifacts/orchestration/**)"
   - "Bash(git *)"

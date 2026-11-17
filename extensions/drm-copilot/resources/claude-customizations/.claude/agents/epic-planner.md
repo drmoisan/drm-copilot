@@ -8,8 +8,11 @@ tools:
   - Grep
   - Glob
   - "Write(docs/features/epics/**)"
+  - "Write(.dev/epics/**)"
   - "Edit(docs/features/epics/**)"
+  - "Edit(.dev/epics/**)"
   - "Write(docs/features/potential/**)"
+  - "Write(.dev/potential/**)"
   - "Write(artifacts/orchestration/**)"
   - "Edit(artifacts/orchestration/**)"
   - "Bash(git *)"

@@ -8,7 +8,9 @@ tools:
   - Glob
   - WebFetch
   - "Write(/docs/features/**/research/**)"
+  - "Write(/.dev/**/research/**)"
   - "Write(/docs/research/**)"
+  - "Write(/.dev/research/**)"
 skills:
   - evidence-and-timestamp-conventions
   - execution-environment

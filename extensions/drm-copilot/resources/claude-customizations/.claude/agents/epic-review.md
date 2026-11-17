@@ -7,6 +7,7 @@ tools:
   - Grep
   - Glob
   - "Write(/docs/features/**)"
+  - "Write(/.dev/**)"
 skills:
   - acceptance-criteria-tracking
 memory: project
@@ -15,7 +16,7 @@ hooks:
     - matcher: "epic-review"
       hooks:
         - type: command
-          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName epic-review -RequiredArtifact 'epic-audit-path|^docs/features/epics/.+/epic-audit\.\d{4}-\d{2}-\d{2}T\d{2}-\d{2}\.md$|epic audit artifact'
+          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName epic-review -RequiredArtifact 'epic-audit-path|^(?:docs/features|\.dev)/epics/.+/epic-audit\.\d{4}-\d{2}-\d{2}T\d{2}-\d{2}\.md$|epic audit artifact'
 ---
 
 # Epic Review Agent
