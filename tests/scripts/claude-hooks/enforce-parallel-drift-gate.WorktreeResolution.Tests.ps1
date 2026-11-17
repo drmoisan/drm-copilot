@@ -73,6 +73,10 @@ BeforeAll {
 }
 
 Describe 'parallel drift gate target resolution' {
+    # D-P16 (issue #1035): setup mock of the development-docs root resolver.
+    BeforeEach {
+        Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $true; Root = 'docs/features'; Reason = $null } }
+    }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 

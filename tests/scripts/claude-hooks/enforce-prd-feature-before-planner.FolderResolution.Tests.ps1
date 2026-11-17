@@ -90,6 +90,25 @@ Describe 'enforce-prd-feature-before-planner.ps1 folder resolution' {
                 Should -Be 'docs/features/active/2026-08-23-dedupe-1'
             Should -Invoke -CommandName Get-PrdFeatureCheckpointFolder -Times 0 -Exactly
         }
+
+        It 'resolves a .dev/active feature folder cited through a nested artifact (issue #1035)' {
+            $prompt = 'Read .dev/active/2026-08-23-equivalence-1/research/2026-08-23T23-40-findings.md first.'
+            Find-PrdFeatureFolderFromPrompt -Prompt $prompt |
+                Should -Be '.dev/active/2026-08-23-equivalence-1'
+        }
+
+        It 'resolves a backslash-separated .dev\active citation (issue #1035)' {
+            ConvertTo-PrdFeatureFolderToken -Path '.dev\active\2026-08-23-equivalence-1\spec.md' |
+                Should -Be '.dev/active/2026-08-23-equivalence-1'
+        }
+
+        It 'rejects a .dev/active/. token that carries no feature folder (issue #1035)' {
+            Find-PrdFeatureFolderFromPrompt -Prompt 'A degenerate token .dev/active/. appears here.' | Should -BeNullOrEmpty
+        }
+
+        It 'ignores a .dev/active/ substring that does not start a path segment (issue #1035)' {
+            ConvertTo-PrdFeatureFolderToken -Path 'notes/x.dev/active/2026-08-23-equivalence-1' | Should -BeNullOrEmpty
+        }
     }
 
     Context 'deterministic selection among two feature folders' {

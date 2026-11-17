@@ -57,6 +57,16 @@ try { . (Join-Path $PSScriptRoot 'enforce-checkpoint-monotonic.ps1') } catch { A
 # the shared parser is called with -HookName 'enforce-completion-consistency'.
 try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
 
+# Development-docs root module (issue #1035): the published .codex/lib copy first,
+# the self-hosted .claude/lib copy otherwise. Test-IsValidFeatureFolder in the
+# dot-sourced helpers below reads it, so it loads before them.
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -PathType Leaf) {
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+}
+else {
+    try { Import-Module (Join-Path $PSScriptRoot '../../.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+}
+
 # Dot-source the shared validation helpers. Guarded so a missing file produces a
 # clear error and so dot-sourcing this hook in tests loads the helpers too.
 try { . (Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-completion-helpers.ps1' -ErrorRecord $_ }
@@ -223,7 +233,7 @@ function Get-MissingCompletionEvidence {
         $featureFolder = Get-CheckpointStringValue -Payload $Payload.variables -Name 'feature-folder'
     }
     if (-not (Test-IsValidFeatureFolder -Value $featureFolder -FolderExistsCheck $FolderExistsCheck)) {
-        $missing += "feature-folder value '$featureFolder' is not a valid feature folder (must be under docs/features/active/ and exist)"
+        $missing += "feature-folder value '$featureFolder' is not a valid feature folder (must be under $(@(Get-DevelopmentDocsKnownRootPrefix -Area 'active')[0]) and exist)"
     }
 
     $ciGate = $null

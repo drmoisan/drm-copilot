@@ -12,7 +12,9 @@
     The file declares no file-scope parameter block, no requires directive, and no
     entrypoint. Apart from its function declarations, its file-scope statements are
     the resolution-module import that follows this block, which brings in issue
-    #669's path normalisation and ambiguity reason code, and the guarded dot-source
+    #669's path normalisation and ambiguity reason code, the development-docs root
+    module import (issue #1035), which supplies the known-root active-area forms,
+    and the guarded dot-source
     of the pure shared resolver feature-folder-resolution.ps1 (issue #565), which
     owns the single work-mode parser. The module import is deliberately unguarded,
     for the same reason the parent hook's is: a resolution module that cannot be
@@ -28,6 +30,10 @@
 # unguarded for the same reason the parent's is: a resolution module that cannot be
 # loaded is itself the target-not-resolvable state.
 Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeResolution.psm1') -Force -ErrorAction Stop
+
+# Development-docs root module (issue #1035): the token reader accepts the active area
+# of every known root. Unguarded for the same reason as the import above.
+Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 # Shared work-mode parser (issue #565). Guarded so a failed dot-source fails closed
 # through the planner gate's deny-on-unknown branch.
@@ -149,26 +155,41 @@ function ConvertTo-PrdFeatureFolderToken {
 
     # Read the feature-folder remainder from wherever it starts in the normalised
     # token. A normalised token starts at it already; a token that named no
-    # worktree keeps whatever prefix it was cited with.
-    $start = $normalized.IndexOf('docs/features/active/')
+    # worktree keeps whatever prefix it was cited with. Every known root's active
+    # area is accepted (issue #1035); the earliest occurrence wins, and a prefix
+    # that is not the default root must start the token or follow a '/'.
+    $start = -1
+    $prefix = $null
+    $defaultPrefix = @(Get-DevelopmentDocsKnownRootPrefix -Area 'active')[0]
+    foreach ($candidate in @(Get-DevelopmentDocsKnownRootPrefix -Area 'active')) {
+        $index = $normalized.IndexOf($candidate, [System.StringComparison]::Ordinal)
+        while ($index -gt 0 -and $candidate -cne $defaultPrefix -and $normalized[$index - 1] -ne '/') {
+            $index = $normalized.IndexOf($candidate, $index + 1, [System.StringComparison]::Ordinal)
+        }
+        if ($index -ge 0 -and ($start -lt 0 -or $index -lt $start)) {
+            $start = $index
+            $prefix = $candidate
+        }
+    }
     if ($start -lt 0) {
         return $null
     }
     $normalized = $normalized.Substring($start)
 
-    # Truncate to exactly two segments past the docs/features/active/ prefix,
-    # that is, to the four segments docs, features, active, and the feature
-    # folder name. Truncation is depth-insensitive, so a folder path, a
-    # spec.md path, a research/ artifact path, and an evidence/ artifact path
-    # all reduce to the same value. A '.' component is a path no-op and is
-    # discarded first, so a degenerate token such as docs/features/active/.
-    # yields three segments and is rejected rather than resolved.
+    # Truncate to exactly one segment past the active-area prefix, that is, to
+    # the root segments, active, and the feature folder name (four segments
+    # under the default root). Truncation is depth-insensitive, so a folder
+    # path, a spec.md path, a research/ artifact path, and an evidence/ artifact
+    # path all reduce to the same value. A '.' component is a path no-op and is
+    # discarded first, so a degenerate token such as <root>/active/. is one
+    # segment short and is rejected rather than resolved.
+    $kept = @($prefix.TrimEnd('/') -split '/').Count + 1
     $segments = @($normalized -split '/' | Where-Object { $_ -ne '' -and $_ -ne '.' })
-    if ($segments.Count -lt 4) {
+    if ($segments.Count -lt $kept) {
         return $null
     }
 
-    return ($segments[0..3] -join '/')
+    return ($segments[0..($kept - 1)] -join '/')
 }
 
 function Find-PrdFeatureFolderCandidate {
@@ -194,8 +215,12 @@ function Find-PrdFeatureFolderCandidate {
     }
 
     # Allow forward or backslash separators inside the matched path token, and
-    # keep any prefix the token carries.
-    $pattern = '(?:[^\s"''`]*[\\/])?docs[\\/]+features[\\/]+active[\\/]+[^\s"''`]+'
+    # keep any prefix the token carries. Every known root's active area is
+    # scanned (issue #1035).
+    $activeForms = foreach ($root in @(Get-DevelopmentDocsKnownRoot)) {
+        (@("$root/active" -split '/' | ForEach-Object { [regex]::Escape($_) })) -join '[\\/]+'
+    }
+    $pattern = '(?:[^\s"''`]*[\\/])?(?:' + ($activeForms -join '|') + ')[\\/]+[^\s"''`]+'
     $matchList = [regex]::Matches($Prompt, $pattern)
     if ($matchList.Count -eq 0) {
         return [string[]]@()
