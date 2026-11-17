@@ -256,3 +256,30 @@ def test_validate_conversion_plan_blocks_conflicting_section_emission_targets() 
     findings = validate_conversion_plan(_run_options(), (), planned_emissions, {})
 
     assert any(finding.code == "duplicate-target-path" for finding in findings)
+
+
+def test_validate_conversion_plan_ignores_emissions_without_target_path() -> None:
+    """Ignore planned emissions that have no target in duplicate-target checks."""
+
+    planned_emissions = (
+        PlannedEmission(
+            source_path=".github/prompts/a.prompt.md",
+            section_id=".github/prompts/a.prompt.md#gate-1",
+            heading="Gate",
+            intent_kind=SectionIntentKind.HOOK_CANDIDATE,
+            target_role=TargetRole.HOOK,
+            target_path=None,
+        ),
+        PlannedEmission(
+            source_path=".github/prompts/b.prompt.md",
+            section_id=".github/prompts/b.prompt.md#gate-1",
+            heading="Gate",
+            intent_kind=SectionIntentKind.HOOK_CANDIDATE,
+            target_role=TargetRole.HOOK,
+            target_path=None,
+        ),
+    )
+
+    findings = validate_conversion_plan(_run_options(), (), planned_emissions, {})
+
+    assert list(findings) == []

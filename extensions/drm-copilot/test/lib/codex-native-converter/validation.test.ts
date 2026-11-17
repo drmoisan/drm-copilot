@@ -174,6 +174,19 @@ describe("validateConversionPlan", () => {
     expect(findings.filter((f) => f.blocking)).toEqual([]);
   });
 
+  it("ignores planned emissions without a target path in duplicate-target checks", () => {
+    const findings = validateConversionPlan(
+      runOptions(),
+      [],
+      [
+        emission({ sectionId: "a#gate-1", targetPath: null }),
+        emission({ sectionId: "b#gate-1", targetPath: null }),
+      ],
+      {},
+    );
+    expect(findings).toEqual([]);
+  });
+
   it("reports duplicate-target-path for two records targeting AGENTS.md", () => {
     const findings = validateConversionPlan(
       runOptions(),

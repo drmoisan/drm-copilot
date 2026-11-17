@@ -280,9 +280,9 @@ No artifact of this child requires a language outside the rule; the D-16 consump
 
 ### Codex native converter (H3)
 
-- [ ] For a fixture source set that contains standing-guidance sources, the converter's generated output (TypeScript port and Python package) contains no `AGENTS.md` target and no `# Converted standing guidance` text, and an apply-mode run neither creates nor modifies a destination `AGENTS.md`; named Jest and pytest tests assert each condition.
-- [ ] For the same fixture, the converter report records each standing-guidance source as not emitted, with a reason, and a named test in each implementation asserts the disposition and the reason.
-- [ ] The converter tests updated for the new disposition, each named in the plan, pass under Jest for `extensions/drm-copilot/test/lib/codex-native-converter/` and under pytest for `tests/scripts/dev_tools/codex_native_converter/`, and the remaining tests in both directories pass unchanged.
+- [x] For a fixture source set that contains standing-guidance sources, the converter's generated output (TypeScript port and Python package) contains no `AGENTS.md` target and no `# Converted standing guidance` text, and an apply-mode run neither creates nor modifies a destination `AGENTS.md`; named Jest and pytest tests assert each condition.
+- [x] For the same fixture, the converter report records each standing-guidance source as not emitted, with a reason, and a named test in each implementation asserts the disposition and the reason.
+- [x] The converter tests updated for the new disposition, each named in the plan, pass under Jest for `extensions/drm-copilot/test/lib/codex-native-converter/` and under pytest for `tests/scripts/dev_tools/codex_native_converter/`, and the remaining tests in both directories pass unchanged.
 - [ ] The converter change adds no Python module and no pushed-down TypeScript file; converter production code is changed only in existing files under `extensions/drm-copilot/src/lib/codex-native-converter/` and `scripts/dev_tools/codex_native_converter/`, recorded in `<FEATURE>/evidence/qa-gates/`.
 
 ### MCP server configuration

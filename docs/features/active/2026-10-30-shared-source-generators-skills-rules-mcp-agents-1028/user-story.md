@@ -61,7 +61,7 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 ### Instructions
 
 - [x] `AGENTS.md` is a hand-authored source with no generated-file header and no embedded rule copies, and `CLAUDE.md` imports it with `@AGENTS.md` and adds only Claude-only text.
-- [ ] Running the Codex native converter (MCP tool, extension command or Poetry script) on a source set with standing-guidance files no longer writes or overwrites `AGENTS.md`; the converter report lists those files as not emitted with a reason, and the TypeScript and Python implementations behave the same (owner decision H3).
+- [x] Running the Codex native converter (MCP tool, extension command or Poetry script) on a source set with standing-guidance files no longer writes or overwrites `AGENTS.md`; the converter report lists those files as not emitted with a reason, and the TypeScript and Python implementations behave the same (owner decision H3).
 
 ### MCP server configuration
 
