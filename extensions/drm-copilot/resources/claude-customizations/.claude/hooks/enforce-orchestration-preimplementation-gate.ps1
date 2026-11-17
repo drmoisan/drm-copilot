@@ -157,7 +157,7 @@ function Test-ImplementationCommand {
     $scanText = @(Read-CommandLineSegment -CommandText $normalizedCommand).ScanText
     $isStaging = @('add', 'commit').Where({ Test-CommandLineInvocation -CommandText $normalizedCommand -CommandWord 'git' -SubcommandPath @($_) }).Count -gt 0
 
-    $supplementalIndex = @(Get-OrchestrationGateSupplementalPatternIndex -CommandText $normalizedCommand)
+    $supplementalIndex = @(Get-OrchestrationGateSupplementalPatternIndex -CommandText $normalizedCommand) + @(Get-OrchestrationGateWrappedPatternIndex -CommandText $normalizedCommand -Pattern $implementationCommandPatterns)
     for ($index = 0; $index -lt $implementationCommandPatterns.Count; $index++) {
         $structural = ($index -eq 0 -and $isStaging)
         if (-not ($structural -or $supplementalIndex -contains $index -or ($scanText | Where-Object { $_ -match $implementationCommandPatterns[$index] }))) { continue }
