@@ -561,7 +561,7 @@ Recorded by the planner on 2026-11-15 under the coordinator's autonomous-mode di
 - [x] Tests updated/added (unit/integration as applicable)
 - [x] Edge cases and error handling covered by tests
 - [x] Docs updated (README, docs/features/active/... links)
-- [ ] Telemetry/logging added or updated (if applicable)
+- [x] Telemetry/logging added or updated (if applicable)
 - [x] Toolchain pass completed (format → lint → type-check → test)
 
 ## Seeded Test Conditions (from potential)
