@@ -16,15 +16,18 @@
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+Import-Module (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 $script:FactRequiredCode = 'REVIEW_VERDICT_FACT_REQUIRED'
 $script:ObjectIdPattern = '^(?:[0-9a-f]{40}|[0-9a-f]{64})\z'
 $script:MaximumDescriptionLength = 140
 $script:StatusContext = 'review/verdict'
-$script:FeatureRoot = 'docs/features/'
-$script:PotentialRoot = 'docs/features/potential/'
-$script:PotentialTemplate = 'docs/features/potential/template.md'
-$script:ActiveFolderPattern = '^docs/features/active/([^/]+)/.'
+# Every known development-docs root and its areas (issue #1035); a matched path keeps its own root.
+$script:FeatureRoot = [string[]]@(Get-DevelopmentDocsKnownRoot | ForEach-Object { "$_/" })
+$script:PotentialRoot = [string[]]@(Get-DevelopmentDocsKnownRootPrefix -Area 'potential')
+$script:PotentialTemplate = [string[]]@($script:PotentialRoot | ForEach-Object { "${_}template.md" })
+$script:TemplateRoot = [string[]]@(Get-DevelopmentDocsKnownRootPrefix -Area 'templates')
+$script:ActiveFolderPattern = '^(' + (@(Get-DevelopmentDocsKnownRootPrefix -Area 'active' | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')([^/]+)/.'
 $script:IntegrationBranchPattern = '^epic/[A-Za-z0-9][A-Za-z0-9._-]*-integration\z'
 $script:PromotionBranchPattern = '^(?:feature|bug)/[a-z0-9][a-z0-9-]*-([0-9]+)\z'
 $script:RecordsBranch = 'documentationandmemories'
@@ -105,15 +108,15 @@ function ConvertFrom-ReviewVerdictNulList {
 function Test-ReviewVerdictFeatureFolder {
     <#
     .SYNOPSIS
-        Return true for a feature folder under docs/features/ with no blank, dot, or dot-dot
-        segment, no backslash, and no trailing slash.
+        Return true for a feature folder under a known development-docs root with no blank, dot,
+        or dot-dot segment, no backslash, and no trailing slash.
     #>
     [CmdletBinding()]
     [OutputType([bool])]
     param([AllowNull()][object] $FeatureFolder)
 
     if ($FeatureFolder -isnot [string]) { return $false }
-    if (-not $FeatureFolder.StartsWith($script:FeatureRoot, [System.StringComparison]::Ordinal)) { return $false }
+    if (@($script:FeatureRoot | Where-Object { $FeatureFolder.StartsWith($_, [System.StringComparison]::Ordinal) }).Count -eq 0) { return $false }
     if ($FeatureFolder.Contains([string][char]92) -or $FeatureFolder.EndsWith('/', [System.StringComparison]::Ordinal)) { return $false }
     foreach ($segment in $FeatureFolder.Split('/')) {
         if ([string]::IsNullOrWhiteSpace($segment) -or $segment -ceq '.' -or $segment -ceq '..') { return $false }
@@ -433,8 +436,8 @@ function Get-ReviewVerdictBaseListing {
 function Test-ReviewVerdictRecordsPrPath {
     <#
     .SYNOPSIS
-        Return true for a records path: under docs/features/ except templates/ and the potential
-        template, or under .claude/agent-memory/.
+        Return true for a records path: under a known development-docs root except its templates
+        area and the potential template, or under .claude/agent-memory/.
     #>
     [CmdletBinding()]
     [OutputType([bool])]
@@ -442,7 +445,9 @@ function Test-ReviewVerdictRecordsPrPath {
 
     $ordinal = [System.StringComparison]::Ordinal
     if ($Path.StartsWith('.claude/agent-memory/', $ordinal)) { return $true }
-    return $Path.StartsWith($script:FeatureRoot, $ordinal) -and -not $Path.StartsWith('docs/features/templates/', $ordinal) -and $Path -cne $script:PotentialTemplate
+    $underRoot = @($script:FeatureRoot | Where-Object { $Path.StartsWith($_, $ordinal) }).Count -gt 0
+    $underTemplates = @($script:TemplateRoot | Where-Object { $Path.StartsWith($_, $ordinal) }).Count -gt 0
+    return $underRoot -and -not $underTemplates -and $script:PotentialTemplate -cnotcontains $Path
 }
 
 function Get-ReviewVerdictRecordsPrDecision {
@@ -492,11 +497,13 @@ function Get-ReviewVerdictPromotionPrDecision {
     $folder = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
     for ($index = 0; $index -lt $listing.Entry.Count; $index += 2) {
         $status = $listing.Entry[$index]; $path = $listing.Entry[$index + 1]
-        if ($path.StartsWith($script:PotentialRoot, [System.StringComparison]::Ordinal) -and $path -cne $script:PotentialTemplate) { continue }
+        $isPotential = @($script:PotentialRoot | Where-Object { $path.StartsWith($_, [System.StringComparison]::Ordinal) }).Count -gt 0
+        if ($isPotential -and $script:PotentialTemplate -cnotcontains $path) { continue }
         $match = [regex]::Match($path, $script:ActiveFolderPattern)
-        $isRecord = $status -ceq 'A' -and $match.Success -and $match.Groups[1].Value.EndsWith("-$number", [System.StringComparison]::Ordinal)
+        $isRecord = $status -ceq 'A' -and $match.Success -and $match.Groups[2].Value.EndsWith("-$number", [System.StringComparison]::Ordinal)
         if (-not $isRecord) { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code $code -Detail "'$status $path' is not a potential record or an added file of the promoted folder" }
-        [void]$folder.Add("docs/features/active/$($match.Groups[1].Value)")
+        # The promoted folder keeps the root its path was matched under.
+        [void]$folder.Add("$($match.Groups[1].Value)$($match.Groups[2].Value)")
     }
     if ($folder.Count -ne 1) { return ConvertTo-ReviewVerdictDecision -Eligible $false -Code $code -Detail "the pull request adds $($folder.Count) promoted folders, not 1" }
     $promoted = @($folder)[0]

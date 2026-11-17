@@ -91,6 +91,12 @@ Describe 'Test-ReviewVerdictFeatureFolder and Test-ReviewVerdictRecordsOnlyPath'
         Test-ReviewVerdictFeatureFolder -FeatureFolder $Value | Should -BeFalse
     }
 
+    It 'accepts a folder under the .dev root and refuses a .devx folder (issue #1035)' {
+        Test-ReviewVerdictFeatureFolder -FeatureFolder '.dev/active/item-42' | Should -BeTrue
+        Test-ReviewVerdictFeatureFolder -FeatureFolder '.devx/active/item-42' | Should -BeFalse
+        Test-ReviewVerdictFeatureFolder -FeatureFolder '.dev/active/../x' | Should -BeFalse
+    }
+
     It 'accepts a path under the folder and refuses a sibling-prefix path and the folder itself' {
         Test-ReviewVerdictRecordsOnlyPath -Path "$($script:Folder)/notes.md" -FeatureFolder $script:Folder | Should -BeTrue
         Test-ReviewVerdictRecordsOnlyPath -Path "$($script:Folder)-sibling/notes.md" -FeatureFolder $script:Folder | Should -BeFalse
