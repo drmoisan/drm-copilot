@@ -108,6 +108,12 @@ Describe 'HarnessGeneration module' {
             ConvertTo-HarnessGeneratedText -Text ([string][char]0xFEFF + "a`r`nb`rc`n") | Should -BeExactly "a`nb`nc`n"
         }
 
+        It 'keeps the first character of text that has no byte order mark' {
+            [string]::Equals((ConvertTo-HarnessGeneratedText -Text "---`nname: x`n"), "---`nname: x`n", [System.StringComparison]::Ordinal) | Should -BeTrue
+            [string]::Equals((ConvertTo-HarnessGeneratedText -Text 'alpha'), 'alpha', [System.StringComparison]::Ordinal) | Should -BeTrue
+            ConvertTo-HarnessGeneratedText -Text '' | Should -BeExactly ''
+        }
+
         It 'accepts repository-relative POSIX paths and rejects other forms' -ForEach @(
             @{ Path = '.claude/skills/x/SKILL.md'; Expected = $true }
             @{ Path = '/abs/path'; Expected = $false }

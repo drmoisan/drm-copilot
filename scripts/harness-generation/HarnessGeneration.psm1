@@ -112,7 +112,8 @@ function ConvertTo-HarnessGeneratedText {
     [OutputType([string])]
     param([Parameter(Mandatory = $true)][AllowEmptyString()][string] $Text)
     $normalized = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
-    if ($normalized.StartsWith([string][char]0xFEFF)) { $normalized = $normalized.Substring(1) }
+    # Ordinal character test: a culture-aware StartsWith treats U+FEFF as ignorable and matches every string.
+    if ($normalized.Length -gt 0 -and $normalized[0] -eq [char]0xFEFF) { $normalized = $normalized.Substring(1) }
     return $normalized
 }
 
