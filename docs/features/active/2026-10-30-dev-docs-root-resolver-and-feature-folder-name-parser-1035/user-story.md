@@ -61,10 +61,10 @@ Today no shared constant exists: TypeScript has `ACTIVE_FEATURE_DOCS_DIRECTORY` 
 - [x] Resolver unit tests in TypeScript (`root.test.ts`), Python (tests for `resolve_development_docs_root` in `json_config.py`) and PowerShell (`DevelopmentDocsRoot.Tests.ps1`) each cover resolution cases R-1 to R-8 in `spec.md` and pass.
 - [x] The Python resolver and parser are added to `scripts/dev_tools/json_config.py` with no new Python file under `scripts/`, no new `pyproject.toml` script entry, and no Python invocation in any enforcement hook.
 - [ ] With the default key, the full Python, PowerShell and TypeScript test suites pass, and the only changed expectations in existing tests are the folder-naming and status-line expectations for supplied issue numbers.
-- [ ] A recorded repository search over the production roots for `docs/features` returns only the resolver constant definitions and the recorded allowlist of Stay rows, stored under the feature folder's `evidence/` directory.
+- [x] A recorded repository search over the production roots for `docs/features` returns only the resolver constant definitions and the recorded allowlist of Stay rows, stored under the feature folder's `evidence/` directory.
 - [x] Matcher tests in each runtime show that the feature-folder record validators accept both `docs/features/active/<folder>` and `.dev/active/<folder>` independent of the configured value.
 - [x] `config/ci-docs-only-paths.json` includes the `.dev` forms of its seven docs-only include prefixes and excludes `.dev/potential/template.md`, so `.dev/templates/`, `.dev/engineering/` and `.dev/discovery/` stay outside the docs-only scope, and `CiDocsOnlyPathsConfig.Tests.ps1` asserts that classification and passes (spec refresh amendment A-3).
-- [ ] Each production consumer found at the 2026-11-14 refresh (spec "Consumers inventoried at the 2026-11-14 refresh") is routed with a `.dev` test or recorded as a Stay row on the residual-search allowlist.
+- [x] Each production consumer found at the 2026-11-14 refresh (spec "Consumers inventoried at the 2026-11-14 refresh") is routed with a `.dev` test or recorded as a Stay row on the residual-search allowlist.
 - [x] `GOVERNED_GLOBS` in Python and TypeScript contains `.dev/**/*.json` and `docs/**/*.json`, and a test in each runtime finds a JSON file under `.dev/` using in-memory fixtures.
 - [x] Each in-house `RealFileSystem.glob` consumer named in `spec.md` (`iterGovernedFiles`, `json-validator.ts`, `evidence-locations.ts`, `verification-evidence.ts`, `feature-docs-parsers.ts`) has a test that finds a file under `.dev`, the include-dot behavior of `compileGlob` is documented with a test, and `isExcludedDirectoryName(".dev")` is asserted `true`.
 - [x] The new PowerShell module exists with equal text in its Claude, Claude-bundle and Codex source locations; the Codex publication entry exists in TypeScript and the existing Python push-down twin; the Claude and Codex `pack-manifests/core.json` files list it; and the resource-contract, pack-manifest completeness, dependency-closure, `ClaudeLibModuleConvention.Tests.ps1` and `hook-dependency-guard-completeness.Tests.ps1` suites pass.
@@ -76,7 +76,7 @@ Today no shared constant exists: TypeScript has `ACTIVE_FEATURE_DOCS_DIRECTORY` 
 - [x] A malformed routing file or an out-of-set value produces an explicit error, and a hook that reads the key fails closed with a reason naming the configuration file and key, asserted by a Pester test.
 - [x] Folder-creation tests in TypeScript and Python show that issue 1016 with potential stem `2026-10-30-foo` creates `<active area>/1016-foo`, issue 42 creates `<active area>/0042-<feature>`, and a request without an issue number keeps the current slug.
 - [x] Parser tests in TypeScript, Python and PowerShell assert cases F-1 to F-6 and N-1 to N-5 in `spec.md`, so existing date-first folders keep parsing alongside the new `<NNNN>-<feature>` format.
-- [ ] After this child, the repository contains no `.dev/` directory, `development_docs_root` is `docs/features`, no existing feature folder is renamed, and no migration command is added.
+- [x] After this child, the repository contains no `.dev/` directory, `development_docs_root` is `docs/features`, no existing feature folder is renamed, and no migration command is added.
 
 ### Epic child 3 generator author
 

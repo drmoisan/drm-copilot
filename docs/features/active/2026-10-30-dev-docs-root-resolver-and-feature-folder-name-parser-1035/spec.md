@@ -479,13 +479,13 @@ All such tests use in-memory fakes; no temporary files are created.
 ### Consumer routing and behavior
 
 - [ ] With the default key, the full Python, PowerShell and TypeScript test suites pass, and the only changed expectations in existing tests are the folder-naming and status-line expectations for supplied issue numbers.
-- [ ] A recorded repository search over the production roots `.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts` and `extensions/drm-copilot/src` for `docs/features` and its separator-variant regex forms returns only the resolver constant definitions and entries on a recorded allowlist of Stay rows from the research inventory; the search command, output and allowlist are stored under the feature folder's `evidence/` directory.
+- [x] A recorded repository search over the production roots `.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts` and `extensions/drm-copilot/src` for `docs/features` and its separator-variant regex forms returns only the resolver constant definitions and entries on a recorded allowlist of Stay rows from the research inventory; the search command, output and allowlist are stored under the feature folder's `evidence/` directory.
 - [x] TypeScript tests show that, with the routing configuration set to `.dev` and a `.dev` directory present in the in-memory fake, `createActiveFolder`, the new potential bug entry flow and the potential-to-issue promotion write under `.dev/<area>`, and with `.dev` absent they write under `docs/features/<area>`.
 - [x] Matcher tests in each runtime show that the feature-folder record validators (`orchestrator-state-feature-folder-record.ts`, `_orchestrator_state_feature_folder_record.py`, `OrchestratorStateFeatureFolderRecord.psm1`) accept both `docs/features/active/<folder>` and `.dev/active/<folder>` independent of the configured value.
 - [x] Pester tests for `enforce-orchestration-preimplementation-gate.ps1` (Claude and Codex) and `validate-task-researcher-output.ps1` show that paths under `.dev/active/`, `.dev/epics/` and `.dev/research/` are recognized alongside their `docs/features` and `docs/research` forms.
 - [x] `new-potential-entry.ps1` in `scripts/dev-tools/` and in `extensions/drm-copilot/resources/templates/` accepts `-DevelopmentDocsRoot` with the default `docs/features`, the two copies have equal text, and a test shows `RepoAutomationService.newPotentialEntry` passes the resolved root.
 - [x] A resolver error (malformed routing JSON or an out-of-set value) causes a hook that reads the key to fail closed with a reason naming the configuration file and key, asserted by a Pester test.
-- [ ] Each consumer in "Consumers inventoried at the 2026-11-14 refresh" with a Route disposition accepts its `.dev` form (matchers) or uses the resolved root (writers), asserted by a `.dev` case in that file's existing Pester suite, and each Stay row appears on the residual-search allowlist.
+- [x] Each consumer in "Consumers inventoried at the 2026-11-14 refresh" with a Route disposition accepts its `.dev` form (matchers) or uses the resolved root (writers), asserted by a `.dev` case in that file's existing Pester suite, and each Stay row appears on the residual-search allowlist.
 
 ### CI docs-only scope and JSON governance
 
@@ -527,7 +527,7 @@ All such tests use in-memory fakes; no temporary files are created.
 
 ### Scope boundary, quality and evidence
 
-- [ ] After this child, the repository contains no `.dev/` directory, `development_docs_root` is `docs/features`, no existing feature folder is renamed, and no migration command is added.
+- [x] After this child, the repository contains no `.dev/` directory, `development_docs_root` is `docs/features`, no existing feature folder is renamed, and no migration command is added.
 - [ ] Each new TypeScript production file under `src/lib/development-docs/` has its own `coverageThreshold` entry in `extensions/drm-copilot/jest.config.cjs` with `lines: 85` and `branches: 75`, and coverage evidence for changed code meets 85% line coverage in every language and 75% branch coverage for Python and TypeScript, recorded under the feature folder's `evidence/qa-gates/`.
 - [ ] The seven-stage toolchain passes in a single pass for Python, PowerShell and TypeScript, and no changed production file exceeds 800 lines.
 
