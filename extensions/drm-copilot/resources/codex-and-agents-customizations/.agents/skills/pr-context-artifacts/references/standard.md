@@ -6,7 +6,7 @@ PR context artifact locations and refresh rules. Use when generating, reading, o
 
 ## Observable Behaviors
 
-- **OB-1** Canonical Artifact Locations: Summary: `artifacts/pr_context.summary.txt`.
+- **OB-1** Canonical Artifact Locations: The PR context artifacts have two canonical locations, the summary at `artifacts/pr_context.summary.txt` and the appendix at `artifacts/pr_context.appendix.txt`.
 - **OB-2** Refresh Rule: If the artifacts are missing or stale relative to the current branch state, re-generate them using the repo’s PR context collector.
 
 ## Acceptance Checks

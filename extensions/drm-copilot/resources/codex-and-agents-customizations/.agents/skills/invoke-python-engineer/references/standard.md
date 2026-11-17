@@ -6,11 +6,11 @@ Invoke the python-typed-engineer worker to design, implement, and verify Python 
 
 ## Observable Behaviors
 
-- **OB-1** Inputs: Objective statement (what the change must accomplish).
-- **OB-2** Output Paths: Python source and test files within the approved scope.
-- **OB-3** Required Reporting Block: Baseline (Ruff, Pyright, Pytest, coverage status).
+- **OB-1** Inputs: The skill takes an objective statement of what the change must accomplish, the files or entrypoints in scope, the constraints including public APIs that must be preserved, and an optional approved plan (without which the worker delegates plan authoring to the planner before any edits).
+- **OB-2** Output Paths: The worker writes Python source and test files within the approved scope, baseline evidence (static and `Phase 0 baseline` test-suite) under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` at the non-overridable canonical location of `evidence-and-timestamp-conventions`, and plan artifacts under the active feature folder when the task is feature-scoped.
+- **OB-3** Required Reporting Block: The worker returns the `python-qa-gate` reporting block of five entries in order: Scope (the exact file list), Baseline (Ruff, Pyright, Pytest and coverage status), Plan (the design and test strategy), Diffs (patch-style or full-file replacements), and QA Gate Results (Ruff, Pyright, Pytest and coverage deltas against the baseline, with failures and per-file coverage read from the single gate run, or clearly marked **unverified**).
 - **OB-4** Worker Routing: Worker: `python-typed-engineer`.
-- **OB-5** Preloaded Contracts: `policy-compliance-order`.
+- **OB-5** Preloaded Contracts: The worker operates under eight preloaded shared skills, `policy-compliance-order`, `python-change-budget-router`, `atomic-plan-contract`, `python-qa-gate`, `acceptance-criteria-tracking`, `feature-promotion-lifecycle`, `remediation-handoff-atomic-planner` and `evidence-and-timestamp-conventions`, together with the Python coding rule scoped to `**/*.py` files and the cross-language code-change, unit-test and tonality policies.
 
 ## Acceptance Checks
 

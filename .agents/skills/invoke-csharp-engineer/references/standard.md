@@ -6,11 +6,11 @@ Invoke the csharp-typed-engineer worker to design, implement, and verify C# chan
 
 ## Observable Behaviors
 
-- **OB-1** Inputs: Objective statement (what the change must accomplish).
-- **OB-2** Output Paths: C# source and test files within the approved scope.
-- **OB-3** Required Reporting Block: Baseline (CSharpier, .NET Analyzers, Nullable Analysis, MSTest, coverage status).
+- **OB-1** Inputs: The skill takes an objective statement of what the change must accomplish, the files or entrypoints in scope, the constraints including public APIs that must be preserved, an optional approved plan (without which the worker delegates plan authoring to the planner before any edits), and an optional budget override of the form `budget: prod=<N>, test=<M>` subject to repository policy.
+- **OB-2** Output Paths: The worker writes C# source and test files within the approved scope, baseline evidence (static and `Phase 0 baseline` test-suite) under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` at the non-overridable canonical location of `evidence-and-timestamp-conventions`, and plan artifacts under the active feature folder when the task is feature-scoped.
+- **OB-3** Required Reporting Block: The worker returns a reporting block of five entries in order: Scope (the exact file list), Baseline (CSharpier, .NET Analyzers, Nullable Analysis, MSTest and coverage status), Plan (the design and test strategy), Diffs (patch-style or full-file replacements), and QA Gate Results (CSharpier, .NET Analyzers, Nullable Analysis, MSTest and coverage deltas against the baseline, with failures and per-file coverage read from the single gate run, or clearly marked **unverified**).
 - **OB-4** Worker Routing: Worker: `csharp-typed-engineer`.
-- **OB-5** Preloaded Contracts: `policy-compliance-order`.
+- **OB-5** Preloaded Contracts: The worker operates under eight preloaded shared skills, `policy-compliance-order`, `csharp-change-budget-router`, `atomic-plan-contract`, `csharp-qa-gate`, `acceptance-criteria-tracking`, `feature-promotion-lifecycle`, `remediation-handoff-atomic-planner` and `evidence-and-timestamp-conventions`, together with the C# coding rule scoped to `**/*.cs` and `**/*.csproj` files and the cross-language code-change, unit-test and tonality policies.
 
 ## Acceptance Checks
 

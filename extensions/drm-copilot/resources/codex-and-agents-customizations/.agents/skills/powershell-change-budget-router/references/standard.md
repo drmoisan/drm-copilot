@@ -6,7 +6,7 @@ Budget-first routing contract for PowerShell work: estimate production-file scop
 
 ## Observable Behaviors
 
-- **OB-1** Canonical Routing Rules: `1-2` production files (+ corresponding tests) → small path (`powershell-typed-engineer` direct mode).
+- **OB-1** Canonical Routing Rules: The skill first estimates the change budget from the likely production PowerShell files touched and then routes 1 to 2 production files with their tests to the small path (`powershell-typed-engineer` direct mode) and more than 2 production files to the large path (`powershell-orchestrator`).
 - **OB-2** Orchestrated Small-Path Requirements: Promotion and folder lifecycle steps run through the repository automation tools, and when the required tool is unavailable the skill stops before promotion begins.
 - **OB-3** Direct-Mode Rejection Rule: Stop before implementation.
 - **OB-4** Documentation Expectations: The response or logs record the estimated production file count, the chosen path (`small` or `large`), and a rationale summary of one to three bullets.

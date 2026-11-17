@@ -6,9 +6,9 @@ Extract evidence-backed feature contracts for selected legacy components and rec
 
 ## Observable Behaviors
 
-- **OB-1** Inputs: These are human-facing workflow selections, not additional service-request fields.
-- **OB-2** Routing: Logical role: `legacy-parity-analyst`.
-- **OB-3** Exact output boundary: These rows are maximum workflow caps, not instructions to create every kind.
+- **OB-1** Inputs: The skill takes explicit human-facing workflow selections rather than additional service-request fields, namely the required `profile`, `component_ids`, `feature_ids`, `source_refs`, `test_refs`, `documentation_refs` and `evidence_refs`, and neither an omitted input nor a profile root creates authority.
+- **OB-2** Routing: The root prepares and launches the `legacy-parity-analyst` logical role, which the skill never auto-launches, the existing resolver selects the exact deployment, model, effort and profile hash under the existing C1-C4 ceiling and execution context, the skill chooses no model, does not self-launch, creates no other scheduler and promotes no ordinary discovery action into an issue, and its production-write count is zero.
+- **OB-3** Exact output boundary: Only the prepared required outputs may be created or replaced, and the artifact kinds `feature-contract`, `coverage-ledger`, `evidence-reference`, `unspecified-behavior`, `unspecified-behavior-collection` and `required-output-manifest` are maximum workflow caps rather than instructions to create every kind, with each prepared output row binding `artifact_kind`, `id`, `path`, `format` and `expected_sha256` and the profile keys serving as maximum configured locations, not write grants.
 - **OB-4** Prerequisites: Missing or malformed configuration blocks delegation.
 - **OB-5** Step-by-Step Workflows: Validate the explicit inputs and selected configuration.
 

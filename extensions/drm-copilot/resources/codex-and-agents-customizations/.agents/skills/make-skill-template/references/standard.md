@@ -6,7 +6,7 @@ Create new Agent Skills from prompts or by duplicating this template. This stand
 
 ## Observable Behaviors
 
-- **OB-1** Prerequisites: Understanding of what the skill should accomplish.
+- **OB-1** Prerequisites: Before creating a skill, the author understands what the skill should accomplish, has a clear keyword-rich description of its capabilities and triggers, and knows the bundled resources it needs (scripts, references, assets and templates).
 - **OB-2** Creating a New Skill: CRITICAL: The `description` is the PRIMARY mechanism for automatic skill discovery.
 - **OB-3** Example: Complete Skill Structure: A skill folder holds a required `SKILL.md` and optional `LICENSE.txt`, `scripts/`, `references/`, `assets/`, and `templates/` entries.
 - **OB-4** Quick Start: Duplicate This Template: Copy the `make-skill-template/` folder.

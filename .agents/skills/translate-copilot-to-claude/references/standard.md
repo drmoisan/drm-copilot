@@ -6,11 +6,11 @@ Translate GitHub Copilot native files, including instructions, agents, prompts, 
 
 ## Observable Behaviors
 
-- **OB-1** Inputs: One or more source paths under `.github/`.
-- **OB-2** Phase 1 — Intake and Section Extraction: Read the full file with `Read`.
+- **OB-1** Inputs: The skill requires one or more source paths under `.github/` and accepts the optional `mode=plan-only` (the default, which writes nothing and emits the translation plan), `mode=apply` (which applies the plan after it is produced and approved in the same turn), `target-scope=<agent|rule|skill|hook|all>` and `timestamp-override=<ISO-8601>` inputs, and applying requires explicit confirmation.
+- **OB-2** Phase 1 — Intake and Section Extraction: For each input file the skill reads the full source file, parses its YAML frontmatter (name, description, tools, applyTo, agent, handoffs, model and other keys), splits the body into top-level sections at `#`, `##` and `###` headings, classifies each section as declarative, procedural, enforceable, identity or handoff by the Phase 2 taxonomy, and records each section as `{source_path, heading, classification, raw_content}` in an in-memory list, never modifying or deleting a source file because translation copies forward.
 - **OB-3** Phase 2 — Classification Taxonomy: Each section is classified by the first matching decision rule, applied in order: enforceable, declarative standard, reusable procedure, identity and preload manifest, handoff and delegation, repository-wide tone or policy precedence, and out-of-scope content.
-- **OB-4** Phase 3 — Target Resolution: Rule: `.agents/skills/<topic>.md` where topic is the language (`python.md`, `csharp.md`, `powershell.md`, `typescript.md`) or cross-cutting concern (`tonality.md`, `general-code-change.md`, `general-unit-test.md`).
-- **OB-5** Phase 4 — Existing State Diff: `Read` the existing file when it exists.
+- **OB-4** Phase 3 — Target Resolution: For each classified section the skill computes a concrete target path of one of six kinds, a hook script with a verb-noun name whose verb is `check`, `enforce` or `validate`, a rule file named for its language or cross-cutting topic, a skill folder with a kebab-case name (verb-first for action skills and a topic name for contract skills), an agent persona with a kebab-case name, the single repository-wide standing-instruction file at the workspace root, or the hooks and permissions sections of the runtime settings file, and it records the target paths in the plan without writing anything yet.
+- **OB-5** Phase 4 — Existing State Diff: For every target path the skill reads the existing target file when it exists and computes a per-section delta of add, replace, merge, skip or conflict, computes add-only updates to the hook arrays and allowed permissions of the runtime configuration file without removing an existing permission unless explicitly instructed, prefers merge over replace for agent personas already present, and flags every conflict row in the plan so that the row stops in Phase 6 until it is resolved.
 
 ## Acceptance Checks
 

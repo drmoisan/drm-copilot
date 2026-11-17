@@ -9,8 +9,8 @@ Generate a conventional commit message from staged Git changes following the rep
 - **OB-1** Inputs: Staged Git changes are the primary source of truth.
 - **OB-2** Context Gathering: Use the supplied commit-context artifact first when present.
 - **OB-3** Classification: Follow Conventional Commits semantics.
-- **OB-4** Message Format: Header rules: imperative mood, 72 characters or fewer, no trailing period, no filler words.
-- **OB-5** Prohibitions: No commentary outside the fenced code block.
+- **OB-4** Message Format: The skill outputs exactly one fenced code block with language tag `text` that holds a header of type, optional scope and concise imperative summary in 72 characters or fewer with no trailing period and no filler words, body bullets only when they add signal beyond the header and no implementation trivia, and a `Refs:` footer only when issue or PR references are present in the context, never inventing references.
+- **OB-5** Prohibitions: The message contains no emojis, no commentary outside the fenced code block, no Markdown in the body beyond plain-text hyphen bullets, no reference to "this commit", no speculation about unstaged work, and no multiple alternative commit messages.
 
 ## Acceptance Checks
 

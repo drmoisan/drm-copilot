@@ -6,7 +6,7 @@ Repository policy compliance order and hard constraints. Use when an agent must 
 
 ## Observable Behaviors
 
-- **OB-1** Required Policy Reading Order (Baseline): Python: `.agents/skills/python/SKILL.md`, `.agents/skills/python-suppressions/SKILL.md`.
+- **OB-1** Required Policy Reading Order (Baseline): When policies conflict, precedence follows the reading order of the repository standing instructions first, then the cross-language code-change policy, then the cross-language unit-test policy, then the language- or domain-specific rules for the files in scope (the Python rule and the Python suppressions rule, the PowerShell rule, the TypeScript rule and the TypeScript suppressions rule, and the C# rule).
 - **OB-2** Hard Constraints (Baseline): Do NOT modify the repository's canonical policy documents or the rule files that mirror them.
 
 ## Acceptance Checks

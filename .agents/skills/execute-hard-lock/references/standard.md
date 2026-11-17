@@ -6,11 +6,11 @@ Place the session in atomic execution mode bound to a specific plan-of-record. T
 
 ## Observable Behaviors
 
-- **OB-1** Inputs: `plan-path` — absolute or repo-relative path to the plan-of-record markdown file.
-- **OB-2** Invocation Flow: `target` (required): the plan-of-record path (`${plan-path}`).
+- **OB-1** Inputs: The skill requires two inputs, `plan-path` (the absolute or repo-relative path of the plan-of-record markdown file) and `work-mode` (`minor-audit`, `full-feature` or `full-bug`, with legacy `full` normalized to `full-feature` and a missing or malformed value failing closed to `full-feature`).
+- **OB-2** Invocation Flow: As its first action the skill resolves the hard-lock prompt from two required inputs, the plan-of-record path and the absolute root of the calling checkout or worktree, then reads the resolved prompt file that the resolver returns and treats its contents as the authoritative hard-lock instruction set, and then delegates to the plan executor with the resolved prompt as its kickoff directive followed by the plan path and the work mode, stopping with a `BLOCKED: execute-hard-lock` report when the plan executor is unavailable.
 - **OB-3** Abort Conditions: The skill stops immediately and reports `BLOCKED: execute-hard-lock <cause>` when the prompt-resolution tool is unavailable or not permitted, when its response is not ok, is malformed, or omits the artifact path, or when reading the artifact fails, and it never reconstructs the hard-lock prompt from another source.
 - **OB-4** Equivalent Entry Points (Reference): Every entry point to the hard-lock prompt resolver produces the same resolved hard-lock prompt for a given plan path, and this skill uses the form that writes the prompt to a file artifact.
-- **OB-5** Delegation Contract: `policy-compliance-order` — mandatory policy reading order.
+- **OB-5** Delegation Contract: Execution is delegated to the plan executor, which enforces anti-replanning, preflight-only blocking, persistence across turns and resume, and preloads four shared skills: `policy-compliance-order` for the mandatory policy reading order, `atomic-plan-contract` for plan format, Phase 0 requirements, preflight signals, the validator gate and mode-specific plan gates, `acceptance-criteria-tracking` for the check-off protocol and status summary format, and `evidence-and-timestamp-conventions` for baseline and final-QC artifact paths and required fields.
 
 ## Acceptance Checks
 

@@ -62,7 +62,7 @@ A failed check is fixed and the task check is re-run into a new record.
 
 ### Phase 1 — Named Fixes and Source-Comparison Sweep
 
-- [ ] [P1-T1] Fix finding R3 and D-C2-1 under `## Rewrite Rules` in `.agents/skills/<name>/references/standard.md` and its twin `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/<name>/references/standard.md`. That is 10 items in 8 contracts:
+- [x] [P1-T1] Fix finding R3 and D-C2-1 under `## Rewrite Rules` in `.agents/skills/<name>/references/standard.md` and its twin `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/<name>/references/standard.md`. That is 10 items in 8 contracts:
   - `acceptance-criteria-tracking` OB-4: when the completion summary is required and what it holds.
   - `atomic-plan-contract` OB-4: all four blocks of the short-path minimal plan. OB-5: every required planner output of the minimal-audit directive.
   - `evidence-and-timestamp-conventions` OB-5: the full twelve-place discovery order, the default use of that order, and the remediation-reconciliation exception.
@@ -72,7 +72,7 @@ A failed check is fixed and the task check is re-run into a new record.
   - `csharp-orchestration-state-machine` OB-4 and `powershell-orchestration-state-machine` OB-4: the four resume steps as one sentence.
   
   Acceptance: the [Task Check] passes, and the source-check table has 10 rows, each with every member named.
-- [ ] [P1-T2] Fix finding R4, part 1, under `## Rewrite Rules` in `.agents/skills/<name>/references/standard.md` and its twin `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/<name>/references/standard.md`. That is 9 items in 8 contracts:
+- [x] [P1-T2] Fix finding R4, part 1, under `## Rewrite Rules` in `.agents/skills/<name>/references/standard.md` and its twin `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/<name>/references/standard.md`. That is 9 items in 8 contracts:
   - `policy-compliance-order` OB-1: the full precedence order, stated tool-neutrally. It runs from the standing instructions to the cross-language code-change policy, then the cross-language unit-test policy, then the language or domain rules for files in scope (Python and its suppressions rule, PowerShell, TypeScript and its suppressions rule, C#).
   - `evidence-and-timestamp-conventions` OB-3: all five locations.
   - `csharp-orchestration-state-machine` OB-2 and `powershell-orchestration-state-machine` OB-2: every required checkpoint field.
@@ -82,26 +82,26 @@ A failed check is fixed and the task check is re-run into a new record.
   - `pr-context-artifacts` OB-1: the summary and the appendix.
   
   Acceptance: the [Task Check] passes, and the source-check table has 9 rows whose named-member count equals the source member count.
-- [ ] [P1-T3] Fix finding R4, part 2, under `## Rewrite Rules` in `.agents/skills/<name>/references/standard.md` and its twin `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/<name>/references/standard.md`. That is 8 items in 4 contracts:
+- [x] [P1-T3] Fix finding R4, part 2, under `## Rewrite Rules` in `.agents/skills/<name>/references/standard.md` and its twin `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/<name>/references/standard.md`. That is 8 items in 4 contracts:
   - `invoke-csharp-engineer`, `invoke-powershell-engineer` and `invoke-python-engineer` OB-3: all five reporting-block entries. OB-5: every preloaded contract.
   - `execute-hard-lock` OB-2: both required resolver inputs, stated as the plan path and the calling checkout root, with no MCP tool name. OB-5: the delegation to the plan executor and all four preloaded shared skills.
   
   Acceptance: the [Task Check] passes, and the source-check table has 8 rows whose named-member count equals the source member count.
-- [ ] [P1-T4] Fix finding R5 under `## Rewrite Rules` in `.agents/skills/<name>/references/standard.md` and its twin `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/<name>/references/standard.md`. That is 4 items in 3 contracts:
+- [x] [P1-T4] Fix finding R5 under `## Rewrite Rules` in `.agents/skills/<name>/references/standard.md` and its twin `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/<name>/references/standard.md`. That is 4 items in 3 contracts:
   - `translate-copilot-to-claude` OB-2: reads the full source file, plus every other step of the Phase 1 section. OB-5: reads the existing target file when it exists, plus the rest of the Phase 4 section.
   - `orchestrate` OB-1: reads the repository standing instructions, plus every other prerequisite of the section.
   - `epic-plan` OB-1: reads the repository standing instructions, the applicable language policies, `config/orchestration-routing.json` and any existing epic-planner checkpoint.
   
   Acceptance: the [Task Check] passes, the R3–R5 grep returns 0 lines in both trees, and the source-check table has 4 rows, none of which names a rule 3 mechanism.
-- [ ] [P1-T5] Apply the CR-14 nit (D-C2-2) to OB-2 of `.agents/skills/powershell-qa-gate/references/standard.md` and its twin `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/references/standard.md`. The coverage-check step carries a neutral form of the source qualifier, stating that it applies when the task or repository flow enforces it. The rest of the item is unchanged. Acceptance: the [Task Check] passes, and its source-check row shows the qualifier against `## Toolchain Execution Sequence` step 4.
-- [ ] [P1-T6] Compare every item of all 65 contracts with its source, using the reviewer's source-comparison method and `## Defect Class Tests`, and write `<FEATURE>/evidence/other/source-comparison.<timestamp>.md`. There is one row per OB item (262) and one per AC item (327). Each row holds: contract, id, source heading, class (or `none`), disposition (`accepted`, `fixed-P1-T<M>`, or `fix-required`), and reason.
+- [x] [P1-T5] Apply the CR-14 nit (D-C2-2) to OB-2 of `.agents/skills/powershell-qa-gate/references/standard.md` and its twin `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/references/standard.md`. The coverage-check step carries a neutral form of the source qualifier, stating that it applies when the task or repository flow enforces it. The rest of the item is unchanged. Acceptance: the [Task Check] passes, and its source-check row shows the qualifier against `## Toolchain Execution Sequence` step 4.
+- [x] [P1-T6] Compare every item of all 65 contracts with its source, using the reviewer's source-comparison method and `## Defect Class Tests`, and write `<FEATURE>/evidence/other/source-comparison.<timestamp>.md`. There is one row per OB item (262) and one per AC item (327). Each row holds: contract, id, source heading, class (or `none`), disposition (`accepted`, `fixed-P1-T<M>`, or `fix-required`), and reason.
   - An AC row is `accepted` when its text is one of the two template forms, its per-behavior form names the heading of its cited OB, and the closing AC cites every OB. The template count is 327.
   - These candidates each need an explicit reasoned disposition: the nine canonical discovery contracts (`adjudicate-unspecified-behavior`, `characterize-runtime-behavior`, `extract-feature-contract`, `generate-acceptance-scenarios`, `initialize-discovery-workspace`, `inventory-legacy-system`, `reconcile-parity-matrix`, `review-discovery-coverage`, `validate-discovery-artifacts`) OB-1, OB-2 and OB-3; `human-exception-runbook` OB-2; the C#, PowerShell and Python `qa-gate` OB-4; the three `invoke-*-engineer` OB-1 and OB-4; `make-skill-template` OB-1; `fill-feature-docs` OB-1; `pr-author` OB-1 and OB-3; `research-issue` OB-1; `execute-hard-lock` OB-1; `csharp-change-budget-router` OB-1 and OB-4; `powershell-change-budget-router` OB-1; `execution-environment` OB-3 and OB-4; `review-staged`, `review-feature` and `update-status` OB-1.
   - A CR-12 item is `fix-required` only with its failing class test stated.
   
   Acceptance: 589 rows, a per-disposition count summary, and no row without a reason. No tracked file changes.
-- [ ] [P1-T7] Fix every `fix-required` row of the newest `source-comparison.*.md` under `## Rewrite Rules`, each contract with its twin. Write `<FEATURE>/evidence/other/sweep-fixes.<timestamp>.md` with one row per fixed item: contract, id, class, source heading, prior text, new text, disposition `fixed`. Then add a row count that equals the `fix-required` count. Acceptance: the [Task Check] passes over the contracts changed here. When the count is zero, the record states so, no contract changes, and the task check records an empty selection.
-- [ ] [P1-T8] [phase-gate] Run the plan A `## Gate Shape` phase gate (stages 1 to 6), and write `<FEATURE>/evidence/qa-gates/phase-gate.P1.<timestamp>.md`. Acceptance: no test fails that did not fail in `cycle-2-pester`, PSSA reports no finding beyond `pssa-baseline`, and every contract command exits 0. A failure or auto-fix restarts the gate at stage 1.
+- [x] [P1-T7] Fix every `fix-required` row of the newest `source-comparison.*.md` under `## Rewrite Rules`, each contract with its twin. Write `<FEATURE>/evidence/other/sweep-fixes.<timestamp>.md` with one row per fixed item: contract, id, class, source heading, prior text, new text, disposition `fixed`. Then add a row count that equals the `fix-required` count. Acceptance: the [Task Check] passes over the contracts changed here. When the count is zero, the record states so, no contract changes, and the task check records an empty selection.
+- [x] [P1-T8] [phase-gate] Run the plan A `## Gate Shape` phase gate (stages 1 to 6), and write `<FEATURE>/evidence/qa-gates/phase-gate.P1.<timestamp>.md`. Acceptance: no test fails that did not fail in `cycle-2-pester`, PSSA reports no finding beyond `pssa-baseline`, and every contract command exits 0. A failure or auto-fix restarts the gate at stage 1.
 
 ### Phase 2 — Final QA
 

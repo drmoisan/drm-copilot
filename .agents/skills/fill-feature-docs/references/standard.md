@@ -6,8 +6,8 @@ Invoke the prd-feature worker to produce feature-document outputs from issue and
 
 ## Observable Behaviors
 
-- **OB-1** Inputs: Feature folder issue and research context.
-- **OB-2** Output Paths: `docs/features/active/<feature>/spec.md`.
+- **OB-1** Inputs: The skill takes the feature folder's issue and research context and the existing spec and user-story files when present.
+- **OB-2** Output Paths: The skill writes two output files, `docs/features/active/<feature>/spec.md` and `docs/features/active/<feature>/user-story.md`.
 - **OB-3** Worker Routing: Require the worker to report the authoritative `research-path` when a numeric acceptance criterion is written.
 
 ## Acceptance Checks

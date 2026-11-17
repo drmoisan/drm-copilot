@@ -9,7 +9,7 @@ Track and check off acceptance criteria in requirement source files (issue.md, s
 - **OB-1** AC Source Resolution (by Work Mode): Deterministic mode rule: use the persisted `- Work Mode: ...` marker from `issue.md` as the single source of truth.
 - **OB-2** AC Identification: Acceptance criteria are markdown checkbox items within AC source files.
 - **OB-3** Check-Off Protocol: One-at-a-time: Check off each AC item individually as the corresponding work is verified.
-- **OB-4** AC Status Summary (Required at Completion): The executor's final completion report (after last plan task).
+- **OB-4** AC Status Summary (Required at Completion): At the end of plan execution or feature review, an acceptance-criteria status summary is reported that names the source file or files, the total number of criteria, the number checked off as delivered, the number remaining unchecked and the text of each remaining criterion, and it appears in both the executor's final completion report after the last plan task and the reviewer's feature-audit artifact (Phase F or equivalent).
 
 ## Acceptance Checks
 

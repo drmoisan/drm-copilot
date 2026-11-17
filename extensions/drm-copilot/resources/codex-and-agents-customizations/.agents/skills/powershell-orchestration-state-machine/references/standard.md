@@ -7,9 +7,9 @@ Checkpoint schema and resume protocol for long-running PowerShell orchestration 
 ## Observable Behaviors
 
 - **OB-1** Canonical Checkpoint Location: `artifacts/orchestration/powershell-orchestrator-state.json`.
-- **OB-2** Required Checkpoint Fields: `path_selected` (`small` or `large`).
+- **OB-2** Required Checkpoint Fields: The checkpoint records `objective`, `change_budget_estimate`, `path_selected` (`small` or `large`), `promotion-type`, `short-name`, `relativeFile`, `long-name`, `issue-num`, `feature-folder`, `work-mode` (`minor-audit`, `full-feature` or `full-bug`, with legacy `full` normalized to `full-feature` before persistence), `plan-path` (the minimal or full plan path), `completed_steps`, `next_step` and `last_updated`, and a short-path run also persists `small_path_qc_summary`, `small_path_audit_artifacts`, `bootstrap_mode` (`manual-bootstrap` or `auto-small-dev`), `phase0_execution_summary` and `resume_after_manual_bootstrap` (the next step token).
 - **OB-3** Update Protocol: Write checkpoint after every completed orchestration sub-step.
-- **OB-4** Resume Protocol: On invocation: 1) Read checkpoint if it exists. 2) If incomplete, resume from `next_step` without re-running `completed_steps`. 3) If missing or completed, start at phase-0 intake. 4) If user explicitly requests restart, reset checkpoint and start phase-0.
+- **OB-4** Resume Protocol: On invocation the orchestrator reads the checkpoint if it exists, resumes from `next_step` without re-running `completed_steps` when the checkpoint is incomplete, starts at phase-0 intake when the checkpoint is missing or completed, and resets the checkpoint and starts phase-0 when the user explicitly requests a restart.
 
 ## Acceptance Checks
 

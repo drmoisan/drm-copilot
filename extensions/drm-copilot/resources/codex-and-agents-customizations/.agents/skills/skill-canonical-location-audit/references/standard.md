@@ -7,8 +7,8 @@ Audit skills for canonical-location duplication. Use when ensuring a canonical l
 ## Observable Behaviors
 
 - **OB-1** Scope: Applies to every `SKILL.md` file at any depth under the repository's skill folder.
-- **OB-2** Audit Workflow: 1) Inventory canonical-location statements.
-- **OB-3** Output Template (Suggested): Item: <canonical item name>.
+- **OB-2** Audit Workflow: The audit runs three steps in order: it inventories canonical-location statements by reading each skill file, extracting its explicit canonical location statements (paths, folders and file names) and grouping them by the item they describe; it detects duplicates by verifying that exactly one skill defines each item's canonical location and flagging any item whose canonical location two or more skills define; and it reports the results in a short report that lists each item with a duplicated canonical location, the conflicting skills, and a consolidation recommendation naming the single skill to keep as the source of truth.
+- **OB-3** Output Template (Suggested): The suggested output gives, for each item with a duplicated canonical location, the canonical item name, the skills with definitions of it, and a recommendation that keeps one named skill as canonical and removes the duplicates from the others.
 
 ## Acceptance Checks
 

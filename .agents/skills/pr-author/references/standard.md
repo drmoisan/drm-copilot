@@ -6,9 +6,9 @@ Write a GitHub-ready pull request body from the canonical PR-context bundle with
 
 ## Observable Behaviors
 
-- **OB-1** Inputs: `artifacts/pr_context.summary.txt` — PR context summary (primary).
+- **OB-1** Inputs: The skill takes the PR context summary `artifacts/pr_context.summary.txt` as its primary input, the PR context appendix `artifacts/pr_context.appendix.txt` (full baseline diff, commits and changed files) and optional user directives, and it references only files listed under Additional context files in the context bundle.
 - **OB-2** Output Requirements: Output only the PR text body in GitHub-flavored Markdown.
-- **OB-3** PR Body Structure: Suggested title — crisp, prioritizing the primary outcome.
+- **OB-3** PR Body Structure: The PR body uses eleven sections in order: Suggested title (crisp, prioritizing the primary outcome), Summary (three to seven bullets, most important first), Why (motivation, constraints and root cause from the embedded feature-doc excerpts and PR Intent fields only), What Changed (grouped by theme), Architecture / How It Fits Together (a short wiring description), Verification (Completed from context and Recommended commands), Backward Compatibility / Migration Notes, Risks and Mitigations, Review Guide, Follow-ups, and GitHub Auto-close (`- Closes #NNN` only from verified autoclose lists).
 - **OB-4** Issue/PR Reference Rules: Only mention an issue/PR number if it appears verbatim in the provided context.
 - **OB-5** Checkpoint-Free Docs-Estate Delegation (issue #1169): A documentation run (`/documentation-workflow`) writes no orchestration checkpoint.
 

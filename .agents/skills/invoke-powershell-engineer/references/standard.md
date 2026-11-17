@@ -6,11 +6,11 @@ Invoke the powershell-typed-engineer worker to design, implement, and verify Pow
 
 ## Observable Behaviors
 
-- **OB-1** Inputs: Objective statement (what the change must accomplish).
-- **OB-2** Output Paths: PowerShell source (`*.ps1`, `*.psm1`, `*.psd1`) and Pester test (`*.Tests.ps1`) files within the approved scope.
-- **OB-3** Required Reporting Block: Baseline (PSScriptAnalyzer, Pester, coverage status).
+- **OB-1** Inputs: The skill takes an objective statement of what the change must accomplish, the files or entrypoints in scope (the exact script or module paths and their `*.Tests.ps1` paths), the constraints including public function or module contracts that must be preserved, and an optional approved plan (without which the worker delegates plan authoring to the planner before any edits).
+- **OB-2** Output Paths: The worker writes PowerShell source (`*.ps1`, `*.psm1`, `*.psd1`) and Pester test (`*.Tests.ps1`) files within the approved scope, baseline evidence (static and `Phase 0 baseline` test-suite) under `<FEATURE>/evidence/baseline/<timestamp>/` and post-change evidence under `<FEATURE>/evidence/qa-gates/<timestamp>/` at the non-overridable canonical location of `evidence-and-timestamp-conventions`, and plan artifacts under the active feature folder when the task is feature-scoped.
+- **OB-3** Required Reporting Block: The worker returns the `powershell-qa-gate` reporting block of five entries in order: Scope (the exact file list), Baseline (PSScriptAnalyzer, Pester and coverage status), Plan (the design and test strategy, including minimal DI seams and the external executable wrapper mock strategy), Diffs (patch-style or full-file replacements), and QA Gate Results (PSScriptAnalyzer, Pester and coverage deltas against the baseline, with failures and per-file coverage read from the single gate run, or clearly marked **unverified**).
 - **OB-4** Worker Routing: Worker: `powershell-typed-engineer`.
-- **OB-5** Preloaded Contracts: `policy-compliance-order`.
+- **OB-5** Preloaded Contracts: The worker operates under nine preloaded shared skills, `policy-compliance-order`, `powershell-change-budget-router`, `powershell-orchestration-state-machine`, `atomic-plan-contract`, `powershell-qa-gate`, `acceptance-criteria-tracking`, `feature-promotion-lifecycle`, `remediation-handoff-atomic-planner` and `evidence-and-timestamp-conventions`, together with the PowerShell coding rule scoped to `**/*.ps1`, `**/*.psm1` and `**/*.psd1` files and the cross-language code-change, unit-test and tonality policies.
 
 ## Acceptance Checks
 

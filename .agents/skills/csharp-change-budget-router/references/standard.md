@@ -6,10 +6,10 @@ Budget-first routing contract for C# work: estimate production-file scope, choos
 
 ## Observable Behaviors
 
-- **OB-1** Canonical Routing Rules: `1-3` production files (+ corresponding tests) → small path (`csharp-typed-engineer` direct mode).
+- **OB-1** Canonical Routing Rules: The skill first estimates the change budget from the likely production C# files touched and then routes 1 to 3 production files with their tests to the small path (`csharp-typed-engineer` direct mode) and more than 3 production files or more than 3 test files to the large path (the orchestration workflow with promotion, research, spec, planning, execution and review).
 - **OB-2** Orchestrated Small-Path Requirements: Promotion and folder lifecycle steps run through the repository automation tools, and when the required tool is unavailable the skill stops before promotion begins.
 - **OB-3** Direct-Mode Rejection Rule: Stop before implementation.
-- **OB-4** Invocation Mode: Direct mode (default): no handoff directive present.
+- **OB-4** Invocation Mode: The worker runs in direct mode by default, when no handoff directive is present and the strict change-budget limits apply, or in orchestrator handoff mode only when the request contains the exact line `DIRECTIVE: ORCHESTRATOR HANDOFF MODE`, which lifts the overall limits but requires a complete context package of the objective and expected outcome, `${promotion-type}` and `${issue-num}` when available, the `${feature-folder}` path, the issue, spec and user-story paths (or an explicit `NONE` for the user story), the research artifact paths, and the constraints, APIs or invariants to preserve, and it stops to request any missing field before Phase A proceeds.
 - **OB-5** Per-Batch Cap: In all modes, per-batch budget remains: at most 3 production files and 3 test files unless an explicit override is approved by the user.
 
 ## Acceptance Checks

@@ -6,7 +6,7 @@ Feature-branch review workflow for base-branch resolution, PR-context refresh, a
 
 ## Observable Behaviors
 
-- **OB-1** Required Shared Skills: `policy-compliance-order`.
+- **OB-1** Required Shared Skills: The review always applies seven shared skills: `policy-compliance-order`, `evidence-and-timestamp-conventions`, `policy-audit-template-usage`, `pr-context-artifacts`, `pr-base-branch-merge-base`, `acceptance-criteria-tracking` and `remediation-handoff-atomic-planner`.
 - **OB-2** Role: Review a feature branch relative to the correct base branch.
 - **OB-3** Workflow Contract: Treat the review as a feature-vs-base audit, not an isolated file inspection.
 - **OB-4** Policy Rules: If the branch diff modifies any path matching `.github/workflows/`, `scripts/benchmarks/`, or `.github/actions/`, the policy audit emits a Blocking finding unless evidence of a green workflow run against the branch head is present in the remediation inputs.

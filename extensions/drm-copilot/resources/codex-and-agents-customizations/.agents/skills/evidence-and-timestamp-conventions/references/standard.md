@@ -8,9 +8,9 @@ Evidence storage and timestamp naming conventions for audits and remediation. Us
 
 - **OB-1** Non-Overridable Authority: This skill is the single source of truth for evidence paths.
 - **OB-2** ISO-8601 Timestamp Format: Use `yyyy-MM-ddTHH-mm` for all audit, remediation, and evidence artifacts.
-- **OB-3** Canonical Evidence Locations: Baseline evidence: `evidence/baseline/`.
+- **OB-3** Canonical Evidence Locations: Evidence is stored in five canonical locations under the feature folder, `evidence/baseline/` for baseline evidence, `evidence/regression-testing/` for regression testing evidence, `evidence/other/` for other evidence, `evidence/qa-gates/` for QA gate evidence and `evidence/issue-updates/` for issue update mirrors, and epic rollups may mirror them under the epic root.
 - **OB-4** Feature Scope (Versioned Features): In this repo, a feature may be single-version (docs at feature root) or multi-version (`v1/`, `v2/`, etc.).
-- **OB-5** Canonical Evidence Discovery Order: Use the list order by default for audit fidelity.
+- **OB-5** Canonical Evidence Discovery Order: When locating evidence artifacts for audits or plan reconciliation, the default search order for audit fidelity is the feature's `evidence/issue-updates/`, `evidence/regression-testing/`, `evidence/other/`, `evidence/qa-gates/`, `evidence/baseline/` and `evidence/remediation-baseline/` folders, then the same six folders in the same sequence under the epic root; an explicit remediation reconciliation may prefer `remediation-baseline` over `baseline` while still recording the original baseline as the authoritative audit reference, and evidence found anywhere else is recorded as non-canonical with a remediation step to move or copy it into the first applicable canonical location.
 
 ## Acceptance Checks
 
