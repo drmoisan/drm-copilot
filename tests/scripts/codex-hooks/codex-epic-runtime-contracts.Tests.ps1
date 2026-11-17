@@ -225,6 +225,7 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
     It 'imports the development-docs module from the bundle-layout sibling lib in <RuntimeFile> when it is present (issue #1035)' -ForEach @(
         @{ RuntimeFile = '.codex/hooks/record-subagent-routing-attestation.ps1' }
         @{ RuntimeFile = '.codex/scripts/epic-child-launch-contract.ps1' }
+        @{ RuntimeFile = '.codex/hooks/authorize-root-epic-invocation.ps1' }
     ) {
         # Arrange: the sibling ../lib module is reported present; module loads are recorded, not performed;
         # every other Test-Path call keeps its native result.

@@ -385,7 +385,19 @@ function New-CodexChildIsolatedHome {
 
 function Restore-CodexChildIsolatedAuth {
     [CmdletBinding(SupportsShouldProcess)]
-    param([Parameter(Mandatory)][string] $HomePath, [Parameter(Mandatory)][string] $OriginalAuthPath)
+    param(
+        [Parameter(Mandatory)][string] $HomePath,
+        [Parameter(Mandatory)][string] $OriginalAuthPath,
+        # Testability seams (issue #1035): the defaults open, create and delete through real
+        # file streams exactly as before.
+        [scriptblock] $OpenSource = { param([string] $Path) [System.IO.File]::OpenRead($Path) },
+        [scriptblock] $OpenDestination = {
+            param([string] $Path)
+            [System.IO.File]::Open($Path, [System.IO.FileMode]::CreateNew,
+                [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+        },
+        [scriptblock] $DeleteFile = { param([string] $Path) [System.IO.File]::Delete($Path) }
+    )
     $target = Join-Path $HomePath 'auth.json'
     if (Test-Path -LiteralPath $target) {
         throw 'EPIC_CHILD_RESUME_BLOCKED: isolated auth copy already exists before resume.'
@@ -393,17 +405,17 @@ function Restore-CodexChildIsolatedAuth {
     if ($PSCmdlet.ShouldProcess($target, 'Restore isolated Codex authentication')) {
         $source = $null; $destination = $null; $ownsDestination = $false
         try {
-            $source = [System.IO.File]::OpenRead($OriginalAuthPath)
-            $destination = [System.IO.File]::Open($target, [System.IO.FileMode]::CreateNew,
-                [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+            $source = & $OpenSource $OriginalAuthPath
+            $destination = & $OpenDestination $target
             $ownsDestination = $true
-            $source.CopyTo($destination); $destination.Flush($true)
+            $source.CopyTo($destination)
+            if ($destination -is [System.IO.FileStream]) { $destination.Flush($true) } else { $destination.Flush() }
         } catch {
             $copyError = $_
             if ($null -ne $destination) { $destination.Dispose(); $destination = $null }
             if ($null -ne $source) { $source.Dispose(); $source = $null }
             if ($ownsDestination -and (Test-Path -LiteralPath $target)) {
-                [System.IO.File]::Delete($target)
+                & $DeleteFile $target
             }
             throw $copyError
         } finally {
