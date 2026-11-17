@@ -45,8 +45,8 @@ Finding-Scope: contained
 
 ## Light Fix Tasks
 
-- [ ] [P0-T1] Fix R6 (CR-15) in `.agents/skills/python-change-budget-router/references/standard.md` OB-3 with the required text, optionally apply the CR-17 alignment to OB-1 in the same edit, and copy the file byte for byte to its bundle mirror.
-- [ ] [P0-T2] Fix R7 (CR-16) in `.agents/skills/execution-environment/references/standard.md` OB-4 with one complete sentence naming both mechanisms and the preferred form, and copy the file byte for byte to its bundle mirror.
+- [x] [P0-T1] Fix R6 (CR-15) in `.agents/skills/python-change-budget-router/references/standard.md` OB-3 with the required text, optionally apply the CR-17 alignment to OB-1 in the same edit, and copy the file byte for byte to its bundle mirror.
+- [x] [P0-T2] Fix R7 (CR-16) in `.agents/skills/execution-environment/references/standard.md` OB-4 with one complete sentence naming both mechanisms and the preferred form, and copy the file byte for byte to its bundle mirror.
 
 ## Verification Commands
 
