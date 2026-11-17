@@ -1,4 +1,3 @@
-
 ---
 description: "TypeScript-specific unit test rules, layered on top of the general unit test policy"
 applyTo: "**/*.ts"
