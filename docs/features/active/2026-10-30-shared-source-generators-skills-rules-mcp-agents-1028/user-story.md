@@ -81,7 +81,7 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 
 ### CI
 
-- [ ] Every check mode runs in the existing `poshqc / PowerShell QC` shards through one Pester repository gate, with no new CI job, and the required `CI Required Gate` check passes on the pull request head (CI-dependent; checked off at S9).
+- [x] Every check mode runs in the existing `poshqc / PowerShell QC` shards through one Pester repository gate, with no new CI job, and the required `CI Required Gate` check passes on the pull request head (CI-dependent; checked off at S9).
 - [x] The parity-matrix entries owned by this child record their single source in `generated_from` and their generator in `generator` once the source exists, and child 1's matrix gate passes.
 
 ### Quality and language

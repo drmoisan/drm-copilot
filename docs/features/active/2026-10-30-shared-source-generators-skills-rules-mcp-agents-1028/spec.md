@@ -315,7 +315,7 @@ No artifact of this child requires a language outside the rule; the D-16 consump
 
 - [x] `tests/scripts/harness-generation/HarnessGeneration.RepoGate.Tests.ps1` runs every check mode (skills, rules, MCP, agents, instructions) against the committed working tree without starting a process or reading git history, passes on the committed tree, and a unit test shows that the gate fails and lists the path when an injected reader returns drifted content.
 - [x] No file under `.github/workflows/` changes relative to the merge base, recorded in `<FEATURE>/evidence/qa-gates/`.
-- [ ] The required `CI Required Gate` check passes on the pull request head (D-7; CI-dependent; checked off at S9).
+- [x] The required `CI Required Gate` check passes on the pull request head (D-7; CI-dependent; checked off at S9).
 - [x] No matrix entry selected in `### Matrix Consumption` whose source exists still holds a `pending-source:` value in `generated_from`, each such entry has `generator` set, and child 1's repository gate passes.
 - [x] The execution-environment brief names the repository gate in all six copies (D-5), and the six copies are byte-identical, recorded in `<FEATURE>/evidence/qa-gates/`.
 
@@ -330,6 +330,6 @@ No artifact of this child requires a language outside the rule; the D-16 consump
 
 ## Definition of Done
 
-- [ ] Every item in `## Acceptance Criteria` is checked off with its evidence.
-- [ ] The full toolchain loop (format, lint, type check where applicable, architecture, unit, contract, integration) passes in a single pass, recorded in `<FEATURE>/evidence/qa-gates/`.
+- [x] Every item in `## Acceptance Criteria` is checked off with its evidence.
+- [x] The full toolchain loop (format, lint, type check where applicable, architecture, unit, contract, integration) passes in a single pass, recorded in `<FEATURE>/evidence/qa-gates/`.
 - [x] `user-story.md` acceptance criteria are checked off consistently with this spec.
