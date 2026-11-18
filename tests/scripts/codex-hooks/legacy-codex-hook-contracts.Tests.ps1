@@ -20,7 +20,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
             'enforce-checkpoint-monotonic.ps1',
             'enforce-completion-consistency.ps1'
         )
-        $script:AllHookNames = @($script:PreToolHookNames) + @('validate-feature-review-coverage.ps1')
+        $script:AllHookNames = @($script:PreToolHookNames) + @('validate-feature-review-coverage.ps1', 'validate-pr-author-output.ps1')
 
         # Shared, entrypoint-free modules that the hooks dot-source. They are
         # subject to the same static checks (parse, 500-line cap, root/bundle

@@ -258,6 +258,7 @@
     ".codex/agents/migration-coverage-reviewer-c3.toml",
     ".codex/agents/migration-coverage-reviewer-c3-elevated.toml",
     ".codex/agents/migration-coverage-reviewer-c4.toml",
-    ".codex/hooks/subagentstop-envelope.ps1"
+    ".codex/hooks/subagentstop-envelope.ps1",
+    ".codex/hooks/validate-pr-author-output.ps1"
   ]
 }
