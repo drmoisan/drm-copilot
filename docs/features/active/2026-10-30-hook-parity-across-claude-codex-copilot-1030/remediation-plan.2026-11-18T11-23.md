@@ -10,7 +10,7 @@
 
 ### Phase 0 — Baseline
 
-- [ ] [P0-T1] Reproduce the fail-before state: run the generator check `pwsh -NoProfile -File scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface all -Check` (route per the `execution-environment` skill) and write `FEATURE/evidence/baseline/generator-drift-baseline.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Acceptance: `EXIT_CODE` is 1 and the output carries a DRIFT line for each of the two named targets, which is the pre-change state the fix must remove.
+- [x] [P0-T1] Reproduce the fail-before state: run the generator check `pwsh -NoProfile -File scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface all -Check` (route per the `execution-environment` skill) and write `FEATURE/evidence/baseline/generator-drift-baseline.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Acceptance: `EXIT_CODE` is 1 and the output carries a DRIFT line for each of the two named targets, which is the pre-change state the fix must remove.
 
 ### Phase 1 — Correct the generator source
 
