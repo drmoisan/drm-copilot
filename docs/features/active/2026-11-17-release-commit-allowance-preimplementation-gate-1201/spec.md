@@ -297,7 +297,7 @@ Documentation:
 Quality gates:
 
 - [x] AC-30: Both new PowerShell files reach >= 85% line coverage in the parallel Pester run, and the Jest coverage thresholds in `extensions/drm-copilot/jest.config.cjs` pass. Verified by the JUnit and coverage files recorded under `evidence/qa-gates/`.
-- [ ] AC-31: The full toolchain loop passes in a single pass in parallel form (format, lint including PSScriptAnalyzer and ESLint, type-check, architecture, unit, contract), and CI on the PR head is green. Verified by the QA gate evidence and `ci_gate.conclusion` `success` (CI-dependent; checked off at S9).
+- [x] AC-31: The full toolchain loop passes in a single pass in parallel form (format, lint including PSScriptAnalyzer and ESLint, type-check, architecture, unit, contract), and CI on the PR head is green. Verified by the QA gate evidence and `ci_gate.conclusion` `success` (CI-dependent; checked off at S9).
 - [x] AC-32: No hook added or edited by this change invokes Python, and no new Python module or Python test file is added. Verified by `hook-release-allowance-context.Parity.Tests.ps1` (asserts neither new file contains `python` or `poetry`) and the branch file list in the QA evidence.
 
 ## Risks & Mitigations
