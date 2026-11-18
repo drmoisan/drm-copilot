@@ -119,6 +119,8 @@
     ".claude/hooks/enforce-model-routing-receipt-docs.ps1",
     ".claude/hooks/hook-parallel-records-context.ps1",
     ".claude/hooks/enforce-model-routing-receipt-parallel.ps1",
+    ".claude/hooks/hook-release-allowance-context.ps1",
+    ".claude/hooks/enforce-orchestration-preimplementation-gate-release.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate-parallel-records.ps1",
     ".claude/hooks/persist-session-id.ps1",
     ".claude/hooks/premortem-section.ps1",

@@ -33,6 +33,10 @@ BeforeDiscovery {
 }
 
 Describe 'Claude hook dependency-failure behaviour (issue #786)' {
+    # The rows run validate-orchestrator-output.ps1 in-process, which force-imports the run module;
+    # discard only the stale fixture-owned scope binding after the last row.
+    AfterAll { Reset-EpicStateProbeModuleBinding }
+
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path -replace '\\', '/'
         . (Join-Path $PSScriptRoot '../claude-runtime/HookDependencyGraph.Helpers.ps1')

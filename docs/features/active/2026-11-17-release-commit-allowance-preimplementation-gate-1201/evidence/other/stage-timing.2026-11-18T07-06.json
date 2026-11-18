@@ -1,0 +1,49 @@
+{
+  "issue": 1201,
+  "recorded_at": "2026-11-18T07:06:47Z",
+  "note": "wall-clock times, include queueing; merge stage not captured",
+  "stage_timing": [
+    {
+      "stage": "S2_research",
+      "attempt": 1,
+      "started_at": "2026-11-17T19:08:56Z",
+      "ended_at": "2026-11-17T19:20:52Z"
+    },
+    {
+      "stage": "S2_spec",
+      "attempt": 1,
+      "started_at": "2026-11-17T19:20:52Z",
+      "ended_at": "2026-11-17T19:28:26Z"
+    },
+    {
+      "stage": "S4_atomic_planning",
+      "attempt": 1,
+      "started_at": "2026-11-17T19:28:26Z",
+      "ended_at": "2026-11-17T20:17:29Z"
+    },
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 1,
+      "started_at": "2026-11-17T20:17:29Z",
+      "ended_at": "2026-11-18T01:13:51Z"
+    },
+    {
+      "stage": "S8_create_pr",
+      "attempt": 1,
+      "started_at": "2026-11-18T01:14:44Z",
+      "ended_at": "2026-11-18T01:17:17Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 1,
+      "started_at": "2026-11-18T01:17:17Z",
+      "ended_at": "2026-11-18T01:32:13Z"
+    },
+    {
+      "stage": "S9_ci_gate",
+      "attempt": 1,
+      "started_at": "2026-11-18T01:32:13Z",
+      "ended_at": "2026-11-18T07:06:47Z"
+    }
+  ]
+}

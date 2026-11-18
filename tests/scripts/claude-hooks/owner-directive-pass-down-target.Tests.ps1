@@ -257,3 +257,9 @@ Describe 'default seam parameters delegate to the named readers and resolvers' {
         Should -Invoke Resolve-WorktreeParallelTarget -Times 1 -Exactly
     }
 }
+
+AfterAll {
+    # The suite force-imports the run module; discard only the stale fixture-owned scope binding.
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Reset-EpicStateProbeModuleBinding
+}

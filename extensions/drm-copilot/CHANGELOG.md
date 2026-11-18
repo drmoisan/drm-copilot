@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Release-commit allowance leg (issue #1201): the Claude and Codex preimplementation gates
+  allow a checkpoint-free `git add` and `git commit` of the paths that a repository lists in
+  `.claude/release-commit-allowance.json`, on a branch that matches one of its patterns.
+  Destinations receive the leg through the next push-down refresh after the extension release
+  and opt in by committing `.claude/release-commit-allowance.json`; push-down never creates,
+  overwrites, or deletes that file, and without it the gates decide as before.
 - Docs MCP tools (issue #1036): `run_docs_check`, `run_docs_inventory`, `run_docs_coverage`,
   `update_docs_ledger`, `generate_docs_reference`, and `validate_docs_artifacts` run the
   workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1 -Json` with `pwsh` 7.4 or later and
