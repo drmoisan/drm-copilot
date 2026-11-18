@@ -6642,6 +6642,22 @@
       "decision_status": "approved"
     },
     {
+      "id": "codex:hook-registration:SubagentStop/pr-author/validate-pr-author-output",
+      "ecosystem": "codex",
+      "kind": "hook-registration",
+      "name": "SubagentStop/pr-author/validate-pr-author-output",
+      "source_path": ".codex/config.toml",
+      "source_pointer": "[[hooks.SubagentStop]]",
+      "disposition": "native",
+      "parity_group": "hook:validate-pr-author-output",
+      "consumers": [
+        "codex"
+      ],
+      "owner_child": 5,
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
+    },
+    {
       "id": "codex:hook-registration:UserPromptSubmit//authorize-root-epic-invocation",
       "ecosystem": "codex",
       "kind": "hook-registration",

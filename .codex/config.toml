@@ -151,3 +151,12 @@ type = "command"
 command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-feature-review-coverage.ps1"'
 command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-feature-review-coverage.ps1"'
 timeout = 30
+
+[[hooks.SubagentStop]]
+matcher = "pr-author"
+
+[[hooks.SubagentStop.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-pr-author-output.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-pr-author-output.ps1"'
+timeout = 30

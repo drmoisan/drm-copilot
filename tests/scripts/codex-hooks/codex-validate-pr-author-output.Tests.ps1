@@ -9,8 +9,9 @@
     validate-pr-author-output.Coverage.Tests.ps1 on Codex SubagentStop payloads (hook_event_name,
     agent_type pr-author, last_assistant_message, stop_hook_active), pins the twin-rule functions against the
     Claude source, covers the Codex one-continuation decision, and drives the entrypoint in-process with
-    stdin and stderr redirected through [System.Console] (both restored in finally) and in child processes.
-    No test creates, renames, moves, or deletes a file.
+    stdin and stderr redirected through [System.Console] (both restored in finally) and in child processes,
+    and checks the [[hooks.SubagentStop]] registration in the root and bundled .codex/config.toml. No test
+    creates, renames, moves, or deletes a file.
 #>
 
 Describe 'Codex validate-pr-author-output.ps1' {
@@ -230,6 +231,64 @@ Describe 'Codex validate-pr-author-output.ps1' {
             $result.ExitCode | Should -Be 0
             $result.Stdout | Should -BeNullOrEmpty
             $result.Stderr | Should -BeNullOrEmpty
+        }
+    }
+}
+
+Describe 'pr-author SubagentStop registration' {
+    BeforeAll {
+        $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
+        $script:HookLeaf = 'validate-pr-author-output.ps1'
+
+        function Get-CodexSubagentStopTable {
+            # Returns one record per [[hooks.SubagentStop]] table: its matcher and the command, command_windows and timeout of its handler.
+            param([Parameter(Mandatory)][string] $Path)
+            $tables = [System.Collections.Generic.List[object]]::new()
+            $current = $null
+            $inSubagentStop = $false
+            foreach ($line in @(Get-Content -LiteralPath $Path)) {
+                if ($line -match '^\[\[hooks\.SubagentStop\]\]\s*$') { $current = [ordered]@{ Matcher = $null; Command = $null; CommandWindows = $null; Timeout = $null }; $tables.Add($current); $inSubagentStop = $true; continue }
+                if ($line -match '^\[\[hooks\.SubagentStop\.hooks\]\]\s*$') { continue }
+                if ($line -match '^\[') { $inSubagentStop = $false; continue }
+                if (-not $inSubagentStop) { continue }
+                if ($line -match '^matcher\s*=\s*"(?<v>[^"]*)"') { $current.Matcher = $Matches['v'] }
+                elseif ($line -match "^command\s*=\s*'(?<v>[^']*)'") { $current.Command = $Matches['v'] }
+                elseif ($line -match "^command_windows\s*=\s*'(?<v>[^']*)'") { $current.CommandWindows = $Matches['v'] }
+                elseif ($line -match '^timeout\s*=\s*(?<v>\d+)') { $current.Timeout = [int]$Matches['v'] }
+            }
+            return $tables.ToArray()
+        }
+    }
+
+    Context 'the <Copy> .codex/config.toml' -ForEach @(
+        @{ Copy = 'root'; ConfigPath = '.codex/config.toml'; RegistryPath = '.codex/hooks/pretooluse-dispatch.json' }
+        @{ Copy = 'bundled'; ConfigPath = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/config.toml'; RegistryPath = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/pretooluse-dispatch.json' }
+    ) {
+        BeforeAll {
+            $script:Tables = @(Get-CodexSubagentStopTable -Path (Join-Path $script:RepoRoot $ConfigPath) | Where-Object { "$($_.Command)" -like "*/.codex/hooks/$($script:HookLeaf)*" })
+        }
+
+        It 'has exactly one SubagentStop table naming the hook' {
+            $script:Tables.Count | Should -Be 1
+        }
+
+        It 'uses a matcher that admits pr-author and does not admit feature-review' {
+            'pr-author' | Should -Match $script:Tables[0].Matcher
+            'feature-review' | Should -Not -Match $script:Tables[0].Matcher
+        }
+
+        It 'starts both commands with pwsh -NoProfile -File and names the hook in each' {
+            $script:Tables[0].Command | Should -BeLike 'pwsh -NoProfile -File *'
+            $script:Tables[0].CommandWindows | Should -BeLike 'pwsh -NoProfile -File *'
+            $script:Tables[0].CommandWindows | Should -BeLike "*/.codex/hooks/$($script:HookLeaf)*"
+        }
+
+        It 'sets the handler timeout to 30' {
+            $script:Tables[0].Timeout | Should -Be 30
+        }
+
+        It 'has no dispatch-registry entry naming the hook' {
+            Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot $RegistryPath) | Should -Not -Match ([regex]::Escape($script:HookLeaf))
         }
     }
 }
