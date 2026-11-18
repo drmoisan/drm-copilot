@@ -1,0 +1,10 @@
+# Scope and size verification (P3-T4)
+
+Timestamp: 2026-11-18T05-44
+Command: `git add` of the feature folder, `git status --porcelain`, `git diff --name-only origin/main...HEAD` (three-dot form, so the comparison starts at the merge base of `origin/main` and `HEAD`), `git diff --name-only --cached`, and `wc -l` of each new source, test, config, and ledger file
+EXIT_CODE: 0
+Output Summary:
+- Changed paths outside the feature folder (from the merge-base diff): `.github/workflows/_npm-audit-gate.yml`, `config/npm-audit-exceptions.json`, `docs/engineering/process-reductions/0013-npm-audit-advisory-exception.md`, `docs/engineering/process-reductions/README.md`, `scripts/ci/Invoke-NpmAuditGate.ps1`, `scripts/ci/NpmAuditGate.psm1`, `tests/scripts/ci/Invoke-NpmAuditGate.Tests.ps1`, `tests/scripts/ci/NpmAuditGate.Tests.ps1`, `tests/scripts/workflows/NpmAuditGateWorkflow.Tests.ps1`, plus the promotion record `docs/features/potential/promoted/2026-11-17-npm-audit-gate-advisory-exception.md` that the orchestration lifecycle created before this run. All of them are on the spec file list or are lifecycle records; none lies outside the spec list plus the feature folder other than that promotion record.
+- No changed path ends in `.py`. No file under `.claude/`, `.agents/`, `.github/skills/`, or `extensions/` changed, so the execution-environment brief copies are untouched.
+- `git status --porcelain` before the commit of this evidence shows only the new qa-gates artifacts and the plan check-offs staged; the cached name list matches.
+- Logical line counts (`wc -l`): scripts/ci/NpmAuditGate.psm1 408; scripts/ci/Invoke-NpmAuditGate.ps1 249; tests/scripts/ci/NpmAuditGate.Tests.ps1 406; tests/scripts/ci/Invoke-NpmAuditGate.Tests.ps1 285; tests/scripts/workflows/NpmAuditGateWorkflow.Tests.ps1 70; config/npm-audit-exceptions.json 13; the ledger entry 52. Every new source and test file is below 500 lines; the module and the larger test file are within the 500-line guidance and below the 700-line advisory tier.

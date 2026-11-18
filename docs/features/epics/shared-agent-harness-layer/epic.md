@@ -35,19 +35,19 @@ features:
     depends_on: [1028]
   - issue_num: 1032
     feature_folder: 2026-10-30-retire-github-skills-and-thin-copilot-layer-1032
-    depends_on: [1029, 1030]
+    depends_on: [1030]
   - issue_num: 1049
     feature_folder: 2026-10-31-pushed-down-vendored-code-coverage-carve-out-1049
     depends_on: [1029]
   - issue_num: 1050
     feature_folder: 2026-10-31-push-down-ci-workflows-per-ecosystem-pack-1050
-    depends_on: [1049, 1028, 1029]
+    depends_on: [1028, 1029]
   - issue_num: 1051
     feature_folder: 2026-10-31-push-down-integration-mcp-tools-and-skill-1051
-    depends_on: [1049, 1050]
+    depends_on: [1050]
   - issue_num: 1016
     feature_folder: 2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production-1016
-    depends_on: [1035, 1032, 1051]
+    depends_on: [1035, 1032, 1049, 1051]
 ---
 
 # Epic: Shared Agent-Harness Layer Across Claude Code, Codex and GitHub Copilot
@@ -387,3 +387,39 @@ wave 5 = {1051}; wave 6 = {1016}. The execution precondition on the parallel run
   the brief; per-pack CI templates); C3.
 - Child 10 (#1051): two new deterministic MCP tools and one skill over contracts from children 8
   and 9; C3.
+
+## Cost-Benefit Re-examination 2026-11-17 (owner directive OD-4)
+
+Owner directive OD-4 (2026-11-17): "reexamine under the cost benefit rule". The rule: tolerate an
+overlap when the time saved by running in parallel exceeds the expected time to resolve the
+conflicts; only edits to the same logic stay hard edges. #1016 runs last by owner requirement.
+
+Method. Overlap is the intersection of the backticked repository paths each child's plan(s) cite
+(feature-folder documents excluded). Class: `hard` when the downstream plan consumes an artifact,
+symbol or contract the upstream child creates and its Phase 0 stops without it, or both edit the
+same logic; `overlap` otherwise. Saved hours use the observed rate of about 13 minutes per plan
+task (#1035: 82 tasks in about 18 active hours, review and CI included) and the remaining task
+counts (#1029 40, #1030 20, #1032 67 on one agents branch, #1049 40, #1050 20, #1051 19). Hours
+are estimates, not measurements.
+
+| Edge | Class | Cited-path overlap | Saved h | Risk | Decision |
+| --- | --- | --- | --- | --- | --- |
+| 1028 -> 1029 | hard: push-down installs the generated shared layer; pack manifests list generated files | 19 (`repo-automation-service.ts`, agent generator, `.mcp.json`) | n/a | same logic | keep |
+| 1028 -> 1030 | hard: Phase 0 check (b) reads generator-owned regions of `.codex/config.toml`, agent `hooks:` and the dispatch registries, which #1030 edits | 17 (`.codex/config.toml`, `.claude/agents/*.md`, dispatch registries) | n/a | same logic | keep |
+| 1030 -> 1032 | hard: UA-C5 stops without the `.github/hooks` dispositions #1030 records | 8 | n/a | stop gate | keep |
+| 1029 -> 1032 | overlap: UA-C4a to UA-C4c are record-only (present or absent both handled); P2-T1 already scans pack manifests for retired paths | 16 (CHANGELOG, README, brief, `repo-automation-command-registration-admin.ts`) | about 4 (1029 minus 1030 remaining) | low to medium: if #1032 lands first, #1029 regenerates pack manifests (about 1 to 2 h, likelihood low because #1032 is longer) | relax |
+| 1029 -> 1049 | hard: P0-T1 gate (a) requires #1029's `push-down-destination-manifest.ts` exports; same push-down pipeline | 13 | n/a | same logic | keep |
+| 1028 -> 1050 | transitive through 1029 | 15 | 0 | none | keep |
+| 1029 -> 1050 | hard: D3 rides #1029's `shared` layer; harness suites are #1029's | 16 | n/a | same logic | keep |
+| 1049 -> 1050 | overlap: the manifest symbols #1050 cites (`parseDestinationManifest`, `hashPayloadText`) are #1029 code that #1049 only verifies (#1049 edits no TypeScript production); #1050 cites #1049's spec, which is committed | 9 (`jest.config.cjs` append-only thresholds, `poshqc-coverage.json`, CHANGELOG, ledger) | about 8.7 | medium: mechanical merges on shared config files (about 1.5 h); one light plan revision for the [P0-T1] upstream gate | relax |
+| 1050 -> 1051 | hard: S20, S38, S39, S44 build fixtures from #1050's renderer; data file schema | 6 | n/a | consumes | keep |
+| 1049 -> 1051 | overlap: #1051 reads manifest symbols owned by #1029 code and #1049's committed spec; no #1049 artifact consumed | 6 | about 4.3 (1049 minus 1050 remaining) | low (about 0.5 h); light revision of EX-1 wording only | relax |
+| 1035, 1032, 1051 -> 1016 | owner requirement (#1016 runs last) | 15 / 10 | n/a | owner | keep; 1049 -> 1016 added so #1016 still follows every child once 1049 -> 1051 is relaxed |
+
+Revised `depends_on`: 1032 [1030]; 1050 [1028, 1029]; 1051 [1050]; 1016 [1035, 1032, 1049, 1051].
+`Invoke-EpicWave.ps1` layering: wave 0 = {1025, 1035}; wave 1 = {1028}; wave 2 = {1029, 1030};
+wave 3 = {1032, 1049, 1050}; wave 4 = {1051}; wave 5 = {1016}. Peak width 3 under the cap of 4;
+seven waves become six. Launches remain per-edge: each child starts when its own `depends_on`
+are merged. #1050 and #1051 each receive one light plan revision through the
+extra-planner-revision route at launch, recorded in their checkpoints with this table as the
+reason.
