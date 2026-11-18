@@ -1,0 +1,469 @@
+# Policy Compliance Audit: npm audit gate advisory exception (#1204)
+
+**Audit Date:** 2026-11-18  
+**Code Under Test:** merge base `1b9e5746eaa5e32366de695e3f511dbc28700b08` of `origin/main` and reviewed head `f3df6dcf1de2dedb804d9dbb0a80007bb890281c` (PR #1205, branch `bug/npm-audit-gate-advisory-exception`); the diff between them lists the changed files
+
+**Coverage Metrics by Language:**
+
+| Language | Files Changed | Tests | Test Result | Baseline Coverage | Post-Change Coverage | New Code Coverage |
+|----------|--------------|-------|-------------|-------------------|---------------------|-------------------|
+| PowerShell | 5 files (2 production, 3 test) | 111 new tests (27605 repo-wide) | ✅ 27587 pass, 0 fail, 18 skipped | 96.05% lines | 96.05% lines | 97.69% lines |
+| JSON | 1 file | N/A | ✅ validation | N/A (config files) | N/A (config files) | N/A |
+
+**Note:** No Python, TypeScript, C#, or Bash file is in the branch diff; the YAML workflow change is covered by a Pester text test and by actionlint.
+
+### Coverage Evidence Checklist
+
+- TypeScript baseline coverage artifact: N/A - zero changed TypeScript files
+- TypeScript post-change coverage artifact: N/A - zero changed TypeScript files
+- PowerShell baseline coverage artifact: `docs/features/active/2026-11-17-npm-audit-gate-advisory-exception-1204/evidence/baseline/pester-gate.2026-11-18T03-56.md`
+- PowerShell post-change coverage artifact: `docs/features/active/2026-11-17-npm-audit-gate-advisory-exception-1204/evidence/qa-gates/final-qc-pester.2026-11-18T05-43.md` (per-file figures re-derived from `artifacts/pester/parallel/shard-*/powershell-coverage.xml`)
+- Per-language comparison summary: `### 1.2.1 Per-Language Coverage Comparison` in this document
+
+Baseline coverage is read from the plan's `Phase 0 baseline` artifact, one run of the language's gate. Both production files are new files, so no per-file pre-change figure exists for them; the repo-wide baseline is numeric.
+
+**Non-negotiable verdict rule:** This audit reports numeric baseline and post-change metrics for PowerShell, the only coverage language with changed files.
+
+**Fail-closed rule:** Every required artifact was present; the one artifact that no longer holds a full-run figure is disclosed under `## CI Cross-check` and `## 8. Gaps and Exceptions`.
+
+**Evidence rule:** Figures below come from the evidence records and from the shard coverage files re-read in this review; none is synthesized.
+
+**CI-proven checks:** Format, lint, and type-check results are read from the final-QC static artifact (`evidence/qa-gates/final-qc-static-powershell.2026-11-18T05-29.md`) and are not re-run during the review. Each CI check relied on is recorded in `## CI Cross-check`.
+
+---
+
+## Executive Summary
+
+The branch replaces the single bare `npm audit --audit-level="$AUDIT_LEVEL"` workflow line with a `pwsh` step that runs `scripts/ci/Invoke-NpmAuditGate.ps1`. The script runs a strict production-only audit and then a full audit, filtered by the committed `config/npm-audit-exceptions.json` (one entry, GHSA-fc5q-39xc-vjpf, expires 2026-12-18). A pure module `scripts/ci/NpmAuditGate.psm1` holds the decision logic. The review found no blocking policy violation.
+
+Gate-semantics probes run in this review against the real module with a synthetic audit JSON: an excepted dev-only advisory passes; an additional unexcepted advisory fails with `NPM_AUDIT_UNEXCEPTED_ADVISORY`; the day after `expires` fails with `NPM_AUDIT_EXCEPTION_EXPIRED` while the `expires` date itself passes; trailing garbage after valid JSON fails with `NPM_AUDIT_OUTPUT_UNPARSEABLE`; an entry missing fields and a duplicate JSON key both fail with `NPM_AUDIT_EXCEPTION_INVALID`; an upper-case severity string is still classified; a non-zero production exit fails with `NPM_AUDIT_PROD_FINDING`; at audit level `critical` the high-severity advisory is below the level and ignored.
+
+**Policy documents evaluated:**
+- ✅ `general-code-change.md` (file size, I/O boundaries, error handling, evidence and ledger rules)
+- ✅ `general-unit-test.md` (independence, no temporary files, determinism, coverage)
+
+**Language-specific policies evaluated:**
+- ✅ `powershell.md` (code change and unit test)
+- N/A Python: no changed Python file
+- N/A Bash: no changed shell file
+- ✅ JSON: `config/npm-audit-exceptions.json` is strict JSON with deterministic key order
+
+Pester reports 27605 tests, 0 failures, 18 skipped; line coverage of the two new production files is 100.00% and 90.91%; no repo-wide drop is recorded.
+
+**Temporary artifacts cleanup:**
+- ✅ All temporary/one-time scripts created during development have been deleted or live only under the scratch directory outside the repository
+- ✅ Ongoing tooling scripts (`Invoke-NpmAuditGate.ps1`, `NpmAuditGate.psm1`) are tested and compliant
+- No temporary script is committed; the branch diff contains no stray helper file.
+
+---
+
+## 1. General Unit Test Policy Compliance
+
+### 1.1 Core Principles
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Independence** - Tests run in any order | ✅ PASS | The new suites build every input in memory inside `BeforeEach` or per-test blocks and share no mutable state. The entry-script suite resets its fake npm results per test. The full gate run used 8 parallel workers with 0 failures. |
+| **Isolation** - Each test targets single behavior | ✅ PASS | Test ids such as `NAG-DEC-EXPIRED-FAILS` and `INA-NPM-ARGS` name one behavior each; the module suite has 3 Describe or Context blocks and 30 It blocks, the entry suite 6 and 24, the workflow suite 1 and 7. |
+| **Fast Execution** - Tests complete quickly | ✅ PASS | The repo-wide gate took 770.94 s for 27605 tests; the 111 added tests ran inside the shared run with no per-test wait or sleep. |
+| **Determinism** - Consistent results | ✅ PASS | The clock enters through the `-GetUtcDate` seam, the file read through `-ReadFile`, and npm through a mocked `Invoke-NpmAuditExe`. No test reads the wall clock or the network. |
+| **Readability & Maintainability** - Clear structure | ✅ PASS | Stable test ids prefix every It title (`NAG-`, `INA-`, `NAW-`); header comments state the isolation approach. |
+
+### 1.2 Coverage and Scenarios
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Baseline Coverage Documented** | ✅ PASS | **Baseline:** 96.05% lines (44864/46711), read from the `Phase 0 baseline` artifact<br>**Command:** `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`<br>**Artifact:** `evidence/baseline/pester-gate.2026-11-18T03-56.md`<br>**Timestamp:** 2026-11-18 03:56 |
+| **No Coverage Regression** | ❌ FAIL | **Post-change coverage:** 96.05% lines (45075/46927), read from the single gate run<br>**Change:** +0.0074 points lines against the `Phase 0 baseline`<br>**Status:** FAIL as a repo-wide gate until CI corroborates: the canonical file now reads 0.82% (25-test rewrite), and the 96.05% figure rests on the evidence record; per-file no-regression holds: 0 of 461 baseline files dropped, every existing `scripts/ci/` file unchanged |
+| **Changed Files Meet Thresholds** | ✅ PASS | **Post-change coverage:** 100.00% lines for `NpmAuditGate.psm1`, 90.91% lines for `Invoke-NpmAuditGate.ps1`<br>**Thresholds:** 85% lines; PowerShell has no branch threshold<br>**Status:** Both new files meet the threshold; no existing production file was modified |
+| **New Code Coverage ≥90%** | ✅ PASS | **New/modified files:** `scripts/ci/NpmAuditGate.psm1`, `scripts/ci/Invoke-NpmAuditGate.ps1`<br>**New code coverage:** 211/216 lines = 97.69%<br>**Calculation method:** per-file line union of the shard coverage files re-read in this review (161/161 and 50/55), equal to the evidence record<br>**Example:** `Invoke-NpmAuditGate.ps1` uncovered lines are the two-line `Invoke-NpmAuditExe` body that starts the real npm process and the guarded entry lines `exit 0` and `exit 1` |
+| **Comprehensive Coverage** | ✅ PASS | **All functions tested:**<br>- `ConvertFrom-NpmAuditException` and its helpers: the exception-file cases (ten named ids)<br>- `Get-NpmAuditAdvisories`: 5 extraction cases<br>- `Get-NpmAuditGateDecision`: the decision cases covering all five codes<br>- entry-script functions: 24 It blocks<br>**Untested code:** the real `npm` process start (2 lines) and the two `exit` lines, which are the thinnest host-bound wiring |
+| **Positive Flows** - Valid inputs | ✅ PASS | `NAG-EXC-VALID-PASSES`, `NAG-EXC-COMMITTED-FILE`, `NAG-DEC-DEV-ONLY-EXCEPTED-PASSES`, `NAG-DEC-TRANSITIVE-COVERED`, `INA-EXIT-0-PASS`. |
+| **Negative Flows** - Invalid inputs | ✅ PASS | Wrong version, unknown key, duplicate id, missing field, empty field, malformed id, bad date, `expires` not after `approved_at`, unparseable JSON, unexcepted advisory, mixed advisories. |
+| **Edge Cases** - Boundary conditions | ✅ PASS | Equal-date boundary passes, below-level severity ignored, string-only `via` entries ignored, source-id fallback, deduplication across `via` objects, unused exception informational. |
+| **Error Handling** - Error paths | ✅ PASS | `INA-FAIL-CLOSED-ENVELOPE` (a seam exception yields exit 1), `INA-EXIT-1-FOR-EACH-CODE` over all five codes, unreadable exception file path. |
+| **Concurrency** - If applicable | N/A | The gate is a single sequential script; no concurrent state. |
+| **State Transitions** - If applicable | N/A | No stateful component; the decision function is pure. |
+
+### 1.2.1 Per-Language Coverage Comparison
+
+- PowerShell: Baseline: 96.05% lines (from the `Phase 0 baseline` artifact `evidence/baseline/pester-gate.2026-11-18T03-56.md`) -> Post-change: 96.05% lines. Change: +0.0074 points lines. New/changed-code coverage: 97.69% lines (`NpmAuditGate.psm1` 161/161 = 100.00%, `Invoke-NpmAuditGate.ps1` 50/55 = 90.91%). Disposition: FAIL. Evidence: `evidence/qa-gates/final-qc-pester.2026-11-18T05-43.md`, `artifacts/pester/parallel/shard-*/powershell-coverage.xml`.
+
+### 1.3 Test Structure and Diagnostics
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Clear Failure Messages** | ✅ PASS | Assertions use `-Because` text where the reason is not obvious (for example in `NAW-BARE-AUDIT-LINE-ABSENT`), and the code assertions compare exact code strings. |
+| **Arrange-Act-Assert Pattern** | ✅ PASS | Each It builds its inputs, calls the single function under test, then asserts. |
+| **Document Intent** | ✅ PASS | Descriptive stable ids and header comments in all three suites. |
+
+### 1.4 External Dependencies and Environment
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Avoid External Dependencies** | ✅ PASS | No test starts npm or any process, and none touches the network. Two tests read repository files with path joins (`config/npm-audit-exceptions.json`, the workflow text), which is read-only and not a temporary file. |
+| **Use Mocks/Stubs** | ✅ PASS | `Invoke-NpmAuditExe` is mocked with the production parameter name `NpmArgs`; `Add-Content`, `Write-Information`, and the environment-variable helper are mocked where the default seams are exercised. |
+| **Environment Stability** | ✅ PASS | A grep of both suites for `New-TemporaryFile`, `GetTempPath`, `TestDrive`, `Start-Process`, `Set-Content`, and `Out-File` returns only the forbidden-cmdlet list of the module purity test (an AST scan that asserts the module calls none of them) and mock declarations. No temporary file is created. |
+
+### 1.5 Policy Audit Requirement
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Pre-submission Review** | ✅ PASS | This document is the policy review for PR #1205. Outstanding item: the CI results for the PR head are pending at review time (see `## CI Cross-check`). |
+
+---
+
+## 2. General Code Change Policy Compliance
+
+### 2.1 Before Making Changes
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Clarify the objective** | ✅ PASS | Issue #1204 and `spec.md` state the objective: stop the NPM Audit Gate failing on GHSA-fc5q-39xc-vjpf while keeping the gate strict. |
+| **Read existing change plans** | ✅ PASS | `research/research.2026-11-17.md` weighs the approaches; `plan.2026-11-17T22-23.md` carries the plan. |
+| **Document the plan** | ✅ PASS | `plan.2026-11-17T22-23.md` in the feature folder; every task has a task-check or gate artifact under `evidence/`. |
+
+### 2.2 Design Principles
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Simplicity first** | ✅ PASS | Three exported decision functions plus one severity helper; one id-keyed exception list. |
+| **Reusability** | ✅ PASS | Follows the `Invoke-CiRequiredGate.ps1` pattern (seams, dot-source guard, explicit exit). |
+| **Extensibility** | ✅ PASS | The exception file is versioned (`version` 1) and each entry has a scope field; new entries need no code change. |
+| **Separation of concerns** | ✅ PASS | The module performs no I/O and does not read the clock; the entry script holds all I/O behind injectable seams. |
+
+### 2.3 Module & File Structure
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Cohesive modules** | ✅ PASS | One pure module, one entry script, one config file. |
+| **At or below the 800-line hard limit** | ✅ PASS | Logical line counts: `NpmAuditGate.psm1` 408, `Invoke-NpmAuditGate.ps1` 249, `NpmAuditGate.Tests.ps1` 406, `Invoke-NpmAuditGate.Tests.ps1` 285, `NpmAuditGateWorkflow.Tests.ps1` 70. All are under the 500-line guidance tier; no file reaches the 700-line advisory tier; `config/file-size-baseline.json` is unchanged. |
+| **Public vs internal** | ✅ PASS | The module exports four functions; helpers stay private. |
+| **No circular dependencies** | ✅ PASS | The entry script imports the module; the module imports nothing. |
+
+### 2.4 Naming, Docs, and Comments
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Descriptive names** | ✅ PASS | `Get-NpmAuditGateDecision`, `ConvertFrom-NpmAuditException`, `Get-NpmAuditAdvisories`. |
+| **Docs/docstrings** | ✅ PASS | Every function has a comment-based help block. |
+| **Comment why, not what** | ✅ PASS | Comments explain fail-closed ranking of an unknown severity, the single code print, and the stderr split. |
+
+### 2.5 After Making Changes - Toolchain Execution
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **1. Formatting** | ✅ PASS | **Command:** `Invoke-PoshQCFormat` over `scripts/ci`, `tests/scripts/ci`, `tests/scripts/workflows`<br>**Result:** 0 files rewritten, per `evidence/qa-gates/final-qc-static-powershell.2026-11-18T05-29.md` |
+| **2. Linting** | ✅ PASS | **Command:** `Invoke-PoshQCAnalyze` with `pssa.settings.psd1`<br>**Result:** 0 findings, same artifact; actionlint 1.7.12 on the workflow exited 0 (`evidence/other/actionlint.2026-11-18T05-06.md`) |
+| **3. Type checking** | N/A | Not applicable for PowerShell. |
+| **4. Testing** | ✅ PASS | **Command:** `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester`<br>**Result:** 27605 tests, 0 failures, 18 skipped |
+| **Full toolchain loop** | ✅ PASS | Phase gates P1 and P2 and the final QC each record a clean single pass. |
+| **Explicit reporting** | ✅ PASS | Every command and result is recorded under `evidence/`. |
+
+### 2.6 Summarize and Document
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Summarize changes** | ✅ PASS | `spec.md`, ledger entry 0013, and the promotion record. |
+| **Design choices explained** | ✅ PASS | The research record compares approaches; the spec states approach A and its invariants. |
+| **Update supporting documents** | ✅ PASS | Ledger entry `0013-npm-audit-advisory-exception.md` and its index row in `docs/engineering/process-reductions/README.md`. |
+| **Provide next steps** | ✅ PASS | The spec `Rollout & Follow-up` section names the expiry date and the revert trigger. |
+
+---
+
+## 3. Language-Specific Code Change Policy Compliance
+
+### Section 3B: PowerShell Code Change Policy Compliance
+
+#### 3B.1 Tooling & Baseline
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Formatting with Invoke-Formatter** | ✅ PASS | **Command:** `Invoke-PoshQCFormat`<br>**Result:** 0 rewritten (final-qc static artifact) |
+| **Linting with PSScriptAnalyzer** | ✅ PASS | **Command:** `Invoke-PoshQCAnalyze`<br>**Result:** 0 findings; one justified `PSUseSingularNouns` suppression on `Get-NpmAuditAdvisories`, whose name is fixed by the spec |
+| **Fix all findings** | ✅ PASS | The baseline static artifact and the final artifact both record zero findings. |
+| **PowerShell 5.1 & 7.6+ compatible** | ✅ PASS | The module uses `System.Text.Json`, available in PowerShell 7; the repository CI runs PowerShell 7 on the runner. The step sets `shell: pwsh`. |
+
+#### 3B.2 PowerShell Design & Safety
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Advanced functions** | ✅ PASS | Every function has `[CmdletBinding()]` and `[OutputType()]`. |
+| **Parameter validation** | ✅ PASS | `ValidateSet` on the audit level, `ValidatePattern` on the date, typed parameters throughout. |
+| **Avoid global state** | ✅ PASS | Only script-scope constants in the module. |
+| **Error handling** | ✅ PASS | Fail-closed throughout: unreadable file gives a blank text that fails validation; a throwing seam gives exit 1; a missing exit code maps to 1. |
+
+#### 3B.3 Structure, Naming, and Comments
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Cohesive and at or below the 800-line hard limit** | ✅ PASS | Largest file 408 logical lines. |
+| **Approved verbs** | ✅ PASS | `ConvertFrom`, `ConvertTo`, `Get`, `Invoke`, `Split`, `Test`, `Write` are approved verbs. |
+| **Comment why** | ✅ PASS | Header comments state the fail-closed rationale and the I/O boundary. |
+
+#### 3B.4 Running the Toolchain
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Step 1: Format** | ✅ PASS | 0 rewritten. |
+| **Step 2: Analyze** | ✅ PASS | 0 findings. |
+| **Step 3: Type check** | N/A | Not applicable for PowerShell. |
+| **Step 4: Test** | ✅ PASS | 27605 tests, 0 failures. |
+| **Rerun loop if needed** | ✅ PASS | One printed-twice summary defect was fixed during the work and pinned by `NAG-DEC-ORDER`; the gates were re-run clean. |
+
+---
+
+### Section 3D: JSON Configuration Policy Compliance
+
+#### 3D.1 JSON Tooling
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Formatting with jq** | ✅ PASS | `npx prettier --check config/npm-audit-exceptions.json` passed in `evidence/qa-gates/phase-gate.P1.2026-11-18T05-01.md`. |
+| **Schema validation** | ✅ PASS | The file is validated by `ConvertFrom-NpmAuditException` in `NAG-EXC-COMMITTED-FILE`. |
+| **Required $schema** | N/A | The file is a code-consumed config with a closed key set; an added `$schema` key would be rejected by its own validator by design. |
+
+#### 3D.2 JSON Structure
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Strict JSON only** | ✅ PASS | Parsed by `System.Text.Json` in strict mode. |
+| **Deterministic key order** | ✅ PASS | Keys are in a fixed order. |
+
+---
+
+## 4. Language-Specific Unit Test Policy Compliance
+
+### Section 4B: PowerShell Unit Test Policy Compliance
+
+#### 4B.1 Framework and Scope
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Use Pester v6.x** | ✅ PASS | Describe, Context, It, `BeforeAll`, `-ForEach`, and `Should` syntax. |
+| **Use PoshQC Configuration** | ✅ PASS | **Command:** `Invoke-PoshQCParallelTest` through the launcher<br>**Config:** `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`, unchanged |
+| **PowerShell 5.1 & 7.6+ Compatible** | ✅ PASS | Run under PowerShell 7 in the gate and in CI. |
+
+#### 4B.2 Test Style and Structure
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Focused Unit Tests** | ✅ PASS | 61 It blocks expand to 111 tests across the three suites. |
+| **Test Behavior Over Implementation** | ✅ PASS | Tests assert decision outcomes, codes, and summary text, not internals. |
+| **Mocking Used Sparingly** | ✅ PASS | Only the npm wrapper, the `Add-Content` write, the information stream, and the environment helper are mocked. |
+| **Organization** | ✅ PASS | **Test file:** `tests/scripts/ci/NpmAuditGate.Tests.ps1`, `tests/scripts/ci/Invoke-NpmAuditGate.Tests.ps1`, `tests/scripts/workflows/NpmAuditGateWorkflow.Tests.ps1`<br>**Code file:** `scripts/ci/NpmAuditGate.psm1`, `scripts/ci/Invoke-NpmAuditGate.ps1`, `.github/workflows/_npm-audit-gate.yml`<br>The structure mirrors the code location. |
+
+#### 4B.3 Naming and Readability
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **File Naming** - *.Tests.ps1 | ✅ PASS | All three end in `.Tests.ps1`. |
+| **Describe/Context/It Structure** | ✅ PASS | 10 Describe or Context blocks and 61 It blocks in total. |
+| **Logical Grouping** | ✅ PASS | Context blocks group exception file, advisory extraction, and decision cases. |
+| **Docstrings/Comments** | ✅ PASS | Header comments and self-documenting ids. |
+
+#### 4B.4 Running the Toolchain
+
+| Requirement | Status | Evidence |
+|------------|--------|----------|
+| **Use PoshQCTest Command** | ✅ PASS | **Command:** launcher `pester` gate run<br>**Result:** 27605 tests, 0 failures |
+| **No Alternative Test Runners** | ✅ PASS | Only Pester through PoshQC. |
+
+---
+
+## 5. Test Coverage Detail
+
+### NpmAuditGate.psm1 (decision and exception logic, 111 new tests across the branch)
+
+| Test Name | Scenario Type | Lines Covered | Status |
+|-----------|--------------|---------------|--------|
+| NAG-EXC-WRONG-VERSION, NAG-EXC-UNKNOWN-KEY, NAG-EXC-DUPLICATE-ID, NAG-EXC-MISSING-FIELD, NAG-EXC-EMPTY-FIELD, NAG-EXC-MALFORMED-ID, NAG-EXC-BAD-DATE, NAG-EXC-EXPIRES-NOT-AFTER-APPROVED, NAG-EXC-UNPARSEABLE-JSON | Negative | exception parsing and entry validation | ✅ |
+| NAG-DEC-EXPIRED-FAILS, NAG-DEC-UNEXCEPTED-FAILS, NAG-DEC-MIXED-FAILS, NAG-DEC-PROD-FINDING-FAILS, NAG-DEC-UNPARSEABLE-FAILS | Negative | decision code paths | ✅ |
+| NAG-DEC-DEV-ONLY-EXCEPTED-PASSES, NAG-DEC-TRANSITIVE-COVERED, NAG-DEC-BELOW-LEVEL-IGNORED, NAG-DEC-UNUSED-INFORMATIONAL | Positive and edge | decision pass paths and unused report | ✅ |
+
+**Coverage:** 100.00% of the module (161/161 lines).
+
+**Not covered:** None.
+
+---
+
+### Invoke-NpmAuditGate.ps1 (entry script)
+
+| Test Name | Scenario Type | Lines Covered | Status |
+|-----------|--------------|---------------|--------|
+| INA-EXIT-0-PASS, INA-EXIT-1-FOR-EACH-CODE, INA-FAIL-CLOSED-ENVELOPE | Positive, negative, error handling | gate flow and exit mapping | ✅ |
+| INA-NPM-ARGS, INA-OUTPUT-WRITER, INA-DOT-SOURCE-GUARD | Edge case | npm arguments, writer targets, guard | ✅ |
+
+**Coverage:** 90.91% of the script (50/55 lines).
+
+**Not covered:** the two-line `Invoke-NpmAuditExe` body that starts the real npm process, and the guarded entry lines `exit 0` and `exit 1`; the first is the process boundary and the second is the entry tail, which a dot-sourcing test cannot reach by design. A real end-to-end run is recorded in `evidence/other/gate-script-local-run.2026-11-18T05-28.md`.
+
+---
+
+## 6. Test Execution Metrics
+
+| Metric | Value | Status |
+|--------|-------|--------|
+| Total Tests | 27605 repo-wide, 111 new | ✅ |
+| Tests Passed | 27587 (99.93%) | ✅ |
+| Tests Failed | 0 | ✅ |
+| Execution Time | 770.94 s total | ✅ Fast for 8 workers |
+| Average Time per Test | 28 ms | ✅ Fast |
+| Discovery Time | not itemized by the runner | ✅ |
+| Functions/Classes Tested | 4 of 4 exported module functions, all entry-script functions | ✅ |
+| Test File Size | 406 logical lines (largest) | ✅ PASS at or below 800 lines; no Warning |
+| Code Coverage (if applicable) | 96.05% lines repo-wide; 100.00% and 90.91% lines for the new files | ✅ |
+
+---
+
+## 7. Code Quality Checks
+
+**For PowerShell:**
+
+| Check | Command | Result | Status |
+|-------|---------|--------|--------|
+| Invoke-Formatter | `Invoke-PoshQCFormat` over `scripts/ci`, `tests/scripts/ci`, `tests/scripts/workflows` | 0 files rewritten | ✅ |
+| PSScriptAnalyzer | `Invoke-PoshQCAnalyze` over the same folders | 0 findings | ✅ |
+| Pester Tests | `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester` | 27605 tests, 0 failures | ✅ |
+| actionlint | `actionlint .github/workflows/_npm-audit-gate.yml` | exit 0 | ✅ |
+
+**Notes:** The 18 skipped tests are pre-existing (the Phase 0 baseline records the same 18). The baseline Pester launch first exited 75 on a machine-lock queue timeout and was re-run unchanged; the record states this.
+
+---
+
+## CI Cross-check
+
+| Check | Claimed outcome | Claimed figure | Head | Source |
+|-------|-----------------|----------------|------|--------|
+| poshqc / PowerShell QC static | pass | 0 format rewrites, 0 analyzer findings | f3df6dcf1de2dedb804d9dbb0a80007bb890281c | `evidence/qa-gates/final-qc-static-powershell.2026-11-18T05-29.md` |
+| poshqc / PowerShell QC shards 1 to 6 | pass | 27605 tests, 0 failures, 96.05% lines | f3df6dcf1de2dedb804d9dbb0a80007bb890281c | `evidence/qa-gates/final-qc-pester.2026-11-18T05-43.md` |
+| NPM Audit Gate / npm audit (.) | pass | exit 0 | f3df6dcf1de2dedb804d9dbb0a80007bb890281c | `evidence/other/gate-script-local-run.2026-11-18T05-28.md` |
+| NPM Audit Gate / npm audit (packages/mcp-server) | pass | exit 0 | f3df6dcf1de2dedb804d9dbb0a80007bb890281c | `evidence/other/gate-script-local-run.2026-11-18T05-28.md` |
+| NPM Audit Gate / npm audit (extensions/drm-copilot) | pass | exit 0 | f3df6dcf1de2dedb804d9dbb0a80007bb890281c | `evidence/other/gate-script-local-run.2026-11-18T05-28.md` |
+
+At review time the live PR checks for the NPM Audit Gate on `(.)` and `(packages/mcp-server)` were already green, the `(extensions/drm-copilot)` check and the poshqc shard checks were still running; the PR head is unchanged since the local evidence was recorded.
+
+---
+
+## 8. Gaps and Exceptions
+
+### Identified Gaps
+- Canonical coverage file: `artifacts/pester/powershell-coverage.xml` was rewritten at 05:55 UTC by a later two-suite ledger run (its junit lists 25 tests; root counter 0.8%), after the full gate run at 05:43 UTC. The per-file figures for both new production files were recovered exactly (161/161 and 50/55) from the untouched `artifacts/pester/parallel/shard-3` through `shard-8` files, which are newer than the last production commit (00:29 local). The repo-wide figure 96.05% rests on the final-QC evidence record; arithmetic confirms it cannot fall, because the branch adds 211 covered of 216 measured lines at 97.69% against a 96.05% base. The poshqc CI shards corroborate it once green. Because a local artifact reads 0.82% against the 85% floor, this is recorded as blocking finding F1 with remediability awaiting_ci; the poshqc CI shard coverage on the PR head closes it.
+- Non-blocking observation: an exception matches an advisory by id only; the `package` field is documentation and is not compared. With the strict production pass and a one-entry file this carries no present risk.
+
+### Approved Exceptions
+**None.** No policy exception is needed. The advisory exception itself is a recorded process reduction (ledger entry 0013), reviewed in `## 9. Summary of Changes`.
+
+### Removed/Skipped Tests
+**None.** All planned tests were implemented.
+
+---
+
+## 9. Summary of Changes
+
+The change makes the NPM Audit Gate pass while advisory GHSA-fc5q-39xc-vjpf is the only finding and it is dev-only and unexpired, by running a strict production audit plus a full audit filtered through a validated, expiring exception file, with audit level, dev-dependency scope, and fail-closed behavior preserved.
+
+Policy checks specific to this item, each verified in this review:
+
+- Audit level not lowered: the workflow passes `-AuditLevel "$env:AUDIT_LEVEL"` unchanged and keeps the `moderate` default (`NAW-AUDIT-LEVEL-FROM-ENV`).
+- No wholesale `--omit=dev`: the workflow text has no `--omit`; the strict production pass is inside the script and the full pass has no `--omit` (`INA-NPM-ARGS`).
+- Applied exceptions printed: id, package, scope, approved_at, expires, days remaining, and reason go to the log and to `GITHUB_STEP_SUMMARY` through the Summary and Log targets (`INA-OUTPUT-WRITER`; local end-to-end log lines in `evidence/other/gate-script-local-run.2026-11-18T05-28.md`).
+- Process-reduction ledger entry 0013: present with the prior text `run: npm audit --audit-level="$AUDIT_LEVEL"`, a Current and Prior revert block, six ordered revert steps, revert signals, and its index row; the full Pester run includes the chain, index, and replay ledger tests with 0 failures.
+- No new Python: no changed path ends in `.py`.
+- No absolute path in any added line of the branch diff (a pattern scan for drive-letter and home-directory paths returned nothing).
+- Evidence append-only: no evidence file in the branch is modified or deleted by a later commit (log filter on modified and deleted evidence paths returned nothing).
+- Evidence location: no branch path lies under `artifacts/baselines/`, `artifacts/qa/`, `artifacts/evidence/`, or `artifacts/coverage/`.
+- Documentation surface check: `docs/documentation-estate/docs-profile.json` is absent, so the check is not applicable.
+- Tier classification: `quality-tiers.yml` lists `scripts/ci`, and no new project folder was added.
+
+---
+
+## 10. Compliance Verdict
+
+### Overall Status: ⚠️ PARTIALLY COMPLIANT
+
+The branch meets the general code change, general unit test, PowerShell, and JSON policies. One blocking finding, F1 (awaiting_ci): the canonical coverage file was overwritten, so the repo-wide PowerShell figure cannot be verified locally. The CI results for the PR head are pending at review time and are the only open item.
+
+**Fail-closed reminder:** No required baseline artifact, QA artifact, coverage metric, or coverage-comparison artifact is absent; the one overwritten canonical file is disclosed and its figures re-derived.
+
+---
+
+### Policy-by-Policy Summary
+
+#### General Code Change Policy (Section 2)
+- ✅ Before Making Changes: objective, research, and plan documented
+- ✅ Design Principles: pure module plus seam-injected entry script
+- ✅ Module & File Structure: all files under 500 logical lines
+- ✅ Naming, Docs, Comments: approved verbs, help blocks, why-comments
+- ✅ Toolchain Execution: single clean pass at each gate
+- ✅ Summarize & Document: spec, research, ledger entry 0013
+
+#### Language-Specific Code Change Policy (Section 3)
+
+**For PowerShell:**
+- ✅ Tooling & Baseline: 0 rewrites, 0 findings
+- ✅ PowerShell Design & Safety: CmdletBinding, validation, fail-closed handling
+- ✅ Structure & Naming: approved verbs, cohesive files
+- ✅ Toolchain: format, analyze, test clean
+
+#### General Unit Test Policy (Section 1)
+- ✅ Core Principles: independent, deterministic, in-memory
+- ✅ Coverage & Scenarios: 100.00% and 90.91% line coverage, all five codes asserted
+- ✅ Test Structure: AAA with stable ids
+- ✅ External Dependencies: no npm, no temporary file, no network
+- ✅ Policy Audit: this document
+
+#### Language-Specific Unit Test Policy (Section 4)
+
+**For PowerShell:**
+- ✅ Framework & Scope: Pester 6 through PoshQC
+- ✅ Test Style & Structure: focused, mirrors code layout
+- ✅ Naming & Readability: `.Tests.ps1` suffix, stable ids
+- ✅ Toolchain: launcher gate run
+
+---
+
+### Metrics Summary
+
+- ✅ 27587 of 27605 tests passing, 0 failing, 18 pre-existing skips
+- ✅ 4 of 4 exported functions tested
+- ✅ 96.05% line coverage repo-wide; 100.00% and 90.91% for the new production files
+- ✅ Proper file organization: tests mirror code paths
+- ✅ All code quality checks passing
+- ✅ Test execution time: 770.94 seconds for the full run (fast for 8 workers)
+
+---
+
+### Recommendation
+
+**Needs revision (AWAITING_CI)**: the repo-wide PowerShell line coverage figure is awaiting CI corroboration (finding F1), then ready for merge.
+
+The remaining step is the CI-dependent acceptance criterion, which the item's own run checks off at S9.
+
+---
+
+## Appendix A: Test Inventory
+
+### Complete Test List
+
+1. NpmAuditGate.Tests.ps1: exception file cases (`NAG-EXC-VALID-PASSES`, `NAG-EXC-COMMITTED-FILE`, and the nine failing cases listed in Section 5)
+2. NpmAuditGate.Tests.ps1: advisory extraction cases (`NAG-ADV-GHSA-FROM-URL`, `NAG-ADV-SOURCE-FALLBACK`, `NAG-ADV-STRING-VIA-IGNORED`, `NAG-ADV-DEDUPLICATED`, `NAG-ADV-UNPARSEABLE`)
+3. NpmAuditGate.Tests.ps1: decision cases (`NAG-DEC-*`, cases including `NAG-DEC-ORDER` and `NAG-DEC-APPLIED-REPORT`)
+4. Invoke-NpmAuditGate.Tests.ps1: `INA-EXIT-0-PASS`, `INA-EXIT-1-FOR-EACH-CODE`, `INA-NPM-ARGS`, `INA-OUTPUT-WRITER`, `INA-DOT-SOURCE-GUARD`, `INA-FAIL-CLOSED-ENVELOPE`, plus the seam helper cases
+5. NpmAuditGateWorkflow.Tests.ps1: `NAW-JOB-ID-NAME-UNCHANGED`, `NAW-NODE-VERSION-LINE`, `NAW-STEP-CALLS-GATE-SCRIPT`, `NAW-BARE-AUDIT-LINE-ABSENT`, `NAW-EXCEPTIONS-PATH-PASSED`, `NAW-AUDIT-LEVEL-FROM-ENV`, `NAW-SHELL-PWSH`
+
+---
+
+## Appendix B: Toolchain Commands Reference
+
+**For PowerShell:**
+```powershell
+# Formatting
+Invoke-PoshQCFormat -ScanFolders scripts/ci, tests/scripts/ci, tests/scripts/workflows
+
+# Linting
+Invoke-PoshQCAnalyze -ScanFolders scripts/ci, tests/scripts/ci, tests/scripts/workflows
+
+# Testing (launcher)
+sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester
+```
