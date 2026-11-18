@@ -66,6 +66,12 @@ function seedInProcessFileSystem(): Map<string, string> {
         paths: [".claude/rules/csharp.md"],
       }),
     ],
+    // R3 (issue #1029): the push-down harness loads the shared-layer manifest
+    // on every run, so the node:fs-backed bundle seeds it as one more file.
+    [
+      `${EXT}/resources/codex-and-agents-customizations/pack-manifests/shared.json`,
+      JSON.stringify({ name: "shared", label: "Shared layer", paths: [] }),
+    ],
   ]);
   const dirs = new Set<string>([WS]);
   // Register every ancestor directory of each seeded file as a directory.

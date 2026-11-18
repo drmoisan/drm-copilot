@@ -38,14 +38,14 @@ The repository pushes its agent harness down to destination repositories through
 
 ## Acceptance Criteria
 
-- [ ] The MCP tools `push_down_claude_customizations`, `push_down_codex_and_agents_customizations` and `push_down_copilot_customizations` keep their names and existing inputs and results, and each delegates to the same pipeline for its own ecosystem.
+- [x] The MCP tools `push_down_claude_customizations`, `push_down_codex_and_agents_customizations` and `push_down_copilot_customizations` keep their names and existing inputs and results, and each delegates to the same pipeline for its own ecosystem.
 - [ ] Every push-down installs the shared layer, whichever ecosystem's tool is called.
 - [ ] A push-down for one ecosystem writes no file under another ecosystem's layer.
 - [ ] A maintainer can select packs per ecosystem, including for Copilot, and only `core` plus the selected packs of that ecosystem are installed.
-- [ ] A dry run returns the full plan (path, layer, pack and action per file) and leaves the destination unchanged.
-- [ ] An apply run reports the same plan it executes, computed before its first write.
-- [ ] A file the maintainer edited since the last push-down is not overwritten and is reported as a conflict.
-- [ ] A destination pushed down by an earlier release (no manifest) is not overwritten where its files differ from the payload; those files are reported, and an explicit `overwrite_unmanaged: true` opt-in overwrites them.
+- [x] A dry run returns the full plan (path, layer, pack and action per file) and leaves the destination unchanged.
+- [x] An apply run reports the same plan it executes, computed before its first write.
+- [x] A file the maintainer edited since the last push-down is not overwritten and is reported as a conflict.
+- [x] A destination pushed down by an earlier release (no manifest) is not overwritten where its files differ from the payload; those files are reported, and an explicit `overwrite_unmanaged: true` opt-in overwrites them.
 - [ ] A second push-down with no source change and no destination change changes no file outside `artifacts/`.
 - [ ] The destination receives `.push-down-manifest.json` at its root with a SHA-256 hash per managed file and the pack selection per ecosystem, and with no timestamp and no absolute path.
 - [ ] Destination exclusions in `.push-down-exclusions` are honored by all three tools, and files of a deselected pack or ecosystem are reported as orphaned rather than deleted.

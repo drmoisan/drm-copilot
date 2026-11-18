@@ -8,6 +8,7 @@ import {
 } from "@jest/globals";
 
 import { InMemoryPushDownFileSystem } from "./lib/push-down/push-down.test-helpers";
+import { seedSharedLayerManifest } from "./lib/push-down/push-down-pipeline.test-helpers";
 
 const appendLineMock = jest.fn<(line: string) => void>();
 
@@ -59,6 +60,13 @@ function seedClaudeBundle(): InMemoryPushDownFileSystem {
       paths: [".claude/rules/csharp.md"],
       source_prefix: ".claude-variants/csharp-legacy",
     }),
+  );
+  // R3 (issue #1029): the service reaches the push-down harness, which loads
+  // the shared-layer manifest on every run.
+  seedSharedLayerManifest(
+    fs,
+    [],
+    `${EXT}/resources/codex-and-agents-customizations`,
   );
   return fs;
 }

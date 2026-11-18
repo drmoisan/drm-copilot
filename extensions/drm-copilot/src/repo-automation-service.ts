@@ -53,6 +53,7 @@ import type {
   CollectPrContextInput,
   PushDownClaudeCustomizationsInput,
   PushDownCodexAndAgentsCustomizationsInput,
+  PushDownCopilotCustomizationsInput,
   RepoAutomationExecutionResult,
   RepoAutomationService,
   WorkspaceExecutionInput,
@@ -82,6 +83,7 @@ export type {
   WorkspaceExecutionInput,
   PushDownClaudeCustomizationsInput,
   PushDownCodexAndAgentsCustomizationsInput,
+  PushDownCopilotCustomizationsInput,
 } from "./repo-automation-service-contract";
 import {
   DEFAULT_DEVELOPMENT_DOCS_ROOT,
@@ -200,13 +202,10 @@ class DefaultRepoAutomationService
     });
   }
   async pushDownCopilotCustomizations(
-    input: WorkspaceExecutionInput,
+    input: PushDownCopilotCustomizationsInput,
   ): Promise<RepoAutomationExecutionResult> {
-    // In-process TS port (F3): delegate to the push-down helper.
-    return runPushDownCopilotCustomizations(
-      input.workspaceRoot,
-      this.pushDownDeps,
-    );
+    // In-process TS port (F3): the helper forwards packs and run options.
+    return runPushDownCopilotCustomizations(input, this.pushDownDeps);
   }
   async pushDownCodexAndAgentsCustomizations(
     input: PushDownCodexAndAgentsCustomizationsInput,

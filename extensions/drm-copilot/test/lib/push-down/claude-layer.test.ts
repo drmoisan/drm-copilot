@@ -9,6 +9,7 @@ import {
   buildClaudeLayer,
   MERGED_RELATIVE_PATHS,
   passthroughRewrite,
+  pushDownCustomizations,
   ROOT_FOLDERS,
 } from "../../../src/lib/push-down/claude-customizations";
 import { mergeClaudeGitignore } from "../../../src/lib/push-down/claude-gitignore-merge";
@@ -20,6 +21,43 @@ import { WriteIfChangedFileSystem } from "../../../src/lib/push-down/push-down-w
 import { buildInMemoryFileSystem } from "./push-down.test-helpers";
 
 const BUNDLE = "/ext/resources/claude-customizations";
+
+describe("Claude single-layer adapter (issue #1029)", () => {
+  it("overwrites an unmanaged differing file on request and defaults the artifact root", () => {
+    const fs = buildInMemoryFileSystem(
+      {
+        [`${BUNDLE}/.claude/agents/a.md`]: "payload\n",
+        "/dest/.claude/agents/a.md": "theirs\n",
+      },
+      ["/dest"],
+    );
+
+    const summary = pushDownCustomizations({
+      repoRoot: BUNDLE,
+      destinationRoot: "/dest",
+      fs,
+      bundleRoot: BUNDLE,
+      overwriteUnmanaged: true,
+      listEntries: () => [],
+    });
+
+    expect(fs.readTextFile("/dest/.claude/agents/a.md")).toBe("payload\n");
+    expect(summary.artifactPath.startsWith(`${BUNDLE}/artifacts/`)).toBe(true);
+  });
+
+  it("resolves the bundle under an empty source root", () => {
+    const fs = buildInMemoryFileSystem({}, ["/dest"]);
+
+    const layer = buildClaudeLayer({
+      repoRoot: "",
+      destinationRoot: "/dest",
+      fs,
+    });
+
+    expect(layer.sourceRoot).toBe("");
+    expect(layer.resourcesRoot).toBe("extensions/drm-copilot/resources");
+  });
+});
 
 describe("composeClaudeLayer", () => {
   it("declares MERGED_RELATIVE_PATHS and the .gitignore delivery as merged", () => {

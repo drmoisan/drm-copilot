@@ -21,6 +21,7 @@ import type {
   TransitionPreparedOrchestrationResult,
 } from "./mcp-repo-automation-tool-definitions-handoff";
 import type { DiscoveryServiceResult } from "./discovery-service-types";
+import type { PushDownReport } from "./lib/push-down/push-down-report";
 import type {
   DocsCommandOutcome,
   DocsCommandRequest,
@@ -90,6 +91,8 @@ export interface RepoAutomationExecutionResult {
   readonly receipt?: FinalizedReceiptSummary;
   /** Sentinel tool observation; evidence for the capability probe only. */
   readonly sentinel?: SentinelObservationSummary;
+  /** Dry-run or apply report; present only on the push-down tools (#1029). */
+  readonly pushDownReport?: PushDownReport;
 }
 
 export interface WorkspaceExecutionInput {
@@ -102,13 +105,28 @@ export interface CollectPrContextInput extends WorkspaceExecutionInput {
   readonly targetRef?: string;
 }
 
-export interface PushDownClaudeCustomizationsInput extends WorkspaceExecutionInput {
+/** Optional push-down run options shared by the three tools (#1029). */
+export interface PushDownRunOptions {
+  /** Plan and report only; write nothing. */
+  readonly dryRun?: boolean;
+  /** Overwrite `unmanaged-conflict` files (O-4 opt-in). */
+  readonly overwriteUnmanaged?: boolean;
+}
+
+export interface PushDownCopilotCustomizationsInput
+  extends WorkspaceExecutionInput, PushDownRunOptions {
+  readonly packs?: ReadonlyArray<string>;
+}
+
+export interface PushDownClaudeCustomizationsInput
+  extends WorkspaceExecutionInput, PushDownRunOptions {
   readonly packs?: ReadonlyArray<string>;
   readonly csharpVariant?: "modern" | "legacy";
   readonly memoryMode?: "overwrite" | "merge" | "skip";
 }
 
-export interface PushDownCodexAndAgentsCustomizationsInput extends WorkspaceExecutionInput {
+export interface PushDownCodexAndAgentsCustomizationsInput
+  extends WorkspaceExecutionInput, PushDownRunOptions {
   readonly packs?: ReadonlyArray<string>;
   readonly csharpVariant?: "modern" | "legacy";
   readonly memoryMode?: "overwrite" | "merge" | "skip";
@@ -125,7 +143,7 @@ export interface RepoAutomationService {
     input: RunCodexNativeConverterInput,
   ): Promise<RepoAutomationExecutionResult>;
   pushDownCopilotCustomizations(
-    input: WorkspaceExecutionInput,
+    input: PushDownCopilotCustomizationsInput,
   ): Promise<RepoAutomationExecutionResult>;
   pushDownCodexAndAgentsCustomizations(
     input: PushDownCodexAndAgentsCustomizationsInput,

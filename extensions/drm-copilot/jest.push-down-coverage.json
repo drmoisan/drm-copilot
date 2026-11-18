@@ -46,5 +46,9 @@
   "./src/lib/push-down/push-down-harness.ts": {
     "lines": 85,
     "branches": 75
+  },
+  "./src/push-down-command-support.ts": {
+    "lines": 85,
+    "branches": 75
   }
 }
