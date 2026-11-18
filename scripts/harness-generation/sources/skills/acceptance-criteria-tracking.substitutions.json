@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "## AC Identification\n\n",
+      "replace": "## AC Identification\n\nFor generated-document summaries, call `.claude/lib/requirements/GeneratedDocumentCounters.psm1` and supply `Acceptance Criteria` as the named section. The counter begins after that heading and ends at the next equal-or-shallower heading. Do not use `scripts/dev_tools/plan_progress_report.py`, which counts plan tasks rather than generated requirements criteria.\n\n"
+    }
+  ]
+}

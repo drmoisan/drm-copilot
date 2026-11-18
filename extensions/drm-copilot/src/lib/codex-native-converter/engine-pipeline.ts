@@ -31,7 +31,6 @@ import {
 } from "./models";
 import { parseSourceArtifact } from "./parser";
 import {
-  renderMergedStandingGuidance,
   renderSectionEmissionContent,
   renderTargetContent,
 } from "./pipeline-render";
@@ -83,9 +82,11 @@ export function planMappings(
  * Render the generated output set for one run.
  *
  * Mirrors `_render_generated_output`: renders concrete targets in sorted path
- * order, merges multiple standing-guidance records into `AGENTS.md`, parses
- * launcher prompts for section lookups, and renders section emissions for
- * targets not already produced.
+ * order, parses launcher prompts for section lookups, and renders section
+ * emissions for targets not already produced. Standing-guidance records have a
+ * null target, so they produce no output; their source paths, taken from the
+ * role alone, still drive the reference rewrites to `AGENTS.md` in other
+ * outputs.
  *
  * @param fileSystem Injected filesystem.
  * @param runOptions Requested run options.
@@ -102,11 +103,7 @@ export function renderGeneratedOutput(
 ): Record<string, string> {
   const generatedOutput: Record<string, string> = {};
   const standingGuidanceSourcePaths = mappingRecords
-    .filter(
-      (record) =>
-        record.targetRole === TargetRole.STANDING_GUIDANCE &&
-        record.targetPath === "AGENTS.md",
-    )
+    .filter((record) => record.targetRole === TargetRole.STANDING_GUIDANCE)
     .map((record) => record.sourcePath);
 
   const mappingRecordsByTarget = new Map<string, MappingRecord[]>();
@@ -132,27 +129,12 @@ export function renderGeneratedOutput(
     sectionEmissionsByTarget.set(plannedEmission.targetPath, bucket);
   }
 
-  // Render each target's content; AGENTS.md merges when several
-  // standing-guidance records resolve to it.
+  // Render each target's content from the last record that resolves to it.
   for (const targetPath of [...mappingRecordsByTarget.keys()].sort(
     compareCodePoint,
   )) {
     const recordsForTarget = mappingRecordsByTarget.get(targetPath) ?? [];
     if (recordsForTarget.length === 0) {
-      continue;
-    }
-    if (
-      targetPath === "AGENTS.md" &&
-      recordsForTarget.every(
-        (record) => record.targetRole === TargetRole.STANDING_GUIDANCE,
-      ) &&
-      recordsForTarget.length > 1
-    ) {
-      generatedOutput[targetPath] = renderMergedStandingGuidance(
-        fileSystem,
-        runOptions,
-        recordsForTarget,
-      );
       continue;
     }
     generatedOutput[targetPath] = renderTargetContent(

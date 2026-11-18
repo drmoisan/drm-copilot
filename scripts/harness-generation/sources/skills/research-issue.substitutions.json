@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "description: Investigate the best implementation approach for a feature or bug by analyzing the codebase and external references, then writing structured findings to the applicable tracked research folder.\n",
+      "replace": "description: Investigate the best implementation approach for a feature or bug by analyzing the codebase and external references, then writing structured findings to the resolved research path under docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off).\nallowed-tools:\n  - Read\n  - Grep\n  - Glob\n  - WebFetch\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "Create or update a single research file in the applicable tracked research root:\n\n- Feature-associated path: `docs/features/<feature>/research/<timestamp>-<short-name>-research.md`\n- One-off path: `docs/research/<timestamp>-<short-name>-research.md`\n",
+      "replace": "Create or update a single research file at one of the two tracked research roots:\n\n- Feature-associated research: `docs/features/<feature>/research/<timestamp>-<short-name>-research.md` (for example `docs/features/active/<feature>/research/<timestamp>-<short-name>-research.md`).\n- One-off research not tied to a feature: `docs/research/<timestamp>-<short-name>-research.md`.\n- Routing rule: write to the feature research root when an active feature folder is in scope (the orchestrator supplies the resolved path from `feature-folder` in `orchestrator-state.json`); otherwise write to `docs/research/`. The filename convention `<timestamp>-<short-name>-research.md` is unchanged.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- Propose state model, transitions, internal API boundaries, and required file changes.\n",
+      "replace": "- Propose state model, transitions, internal API boundaries, and required file changes.\n- For every numeric count, enumeration, or population proposed for an approved `spec.md` acceptance criterion, add complete `## Numeric Derivation Evidence`. Each record must identify `Complete Family`, `Exhaustive Search Scope`, `Inclusion Rules`, `Exclusion Rules`, `Primary Search Strategy or Query Expression`, `Primary Member Set`, `Primary Count`, `Cross-check Search Strategy or Query Expression`, `Cross-check Member Set`, `Cross-check Count`, and `Member-set Comparison`.\n- Both derivations must be non-empty and independently constructed. They must use distinct search strategies or query expressions, independently enumerate the member sets, and explicitly compare normalized member sets. The scope must cover the entire declared family, including all relevant overloads and members; reject a single grep, a narrow named-pattern search, or a query that covers only one family member even when totals and member sets appear equal. Withhold the numeric assertion if the records are incomplete, duplicated, non-exhaustive, narrow, or disagree.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- The `execution-environment` skill states the CI shape, contract tests, and isolation checks the section accounts for.\n",
+      "replace": "- The researcher SubagentStop hook blocks feature research without a complete section. The `execution-environment` skill states the CI shape, contract tests, and isolation checks the section accounts for.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- Do not claim or perform nested worker delegation.\n",
+      "replace": "- Do not claim or perform nested worker delegation.\n- Omit numeric acceptance-criterion facts when the numeric derivation record is absent, incomplete, or disagrees.\n"
+    }
+  ]
+}

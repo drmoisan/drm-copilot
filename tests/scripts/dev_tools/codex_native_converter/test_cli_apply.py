@@ -103,3 +103,62 @@ def _test_apply_mode_requires_destination_root_and_writes_outputs() -> None:
 globals()[
     "test_apply_mode_requires_destination_root_and_writes_outputs_plus_report_artifacts"
 ] = _test_apply_mode_requires_destination_root_and_writes_outputs
+
+
+def _github_apply_options() -> RunOptions:
+    """Build apply-mode run options for the GitHub Copilot fixture.
+
+    Returns:
+        RunOptions: Apply-mode options with a relative virtual destination root.
+    """
+
+    return RunOptions(
+        mode="apply",
+        source_root=_fixture_root("github_copilot"),
+        source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+        selected_paths=(),
+        destination_root=Path("virtual/destination"),
+        artifact_root=Path("virtual/apply-artifacts"),
+    )
+
+
+def _destination_agents_path(run_options: RunOptions) -> str:
+    """Return the POSIX path of `AGENTS.md` under the resolved destination root.
+
+    Args:
+        run_options (RunOptions): Apply-mode options with a destination root.
+
+    Returns:
+        str: The destination `AGENTS.md` path as the engine would write it.
+    """
+
+    destination_root = run_options.destination_root
+    assert destination_root is not None
+    return f"{destination_root.resolve().as_posix()}/AGENTS.md"
+
+
+def test_apply_mode_writes_no_destination_agents_file() -> None:
+    """Write destination outputs without creating a destination `AGENTS.md`."""
+
+    recording_fs = RecordingFileSystem()
+    run_options = _github_apply_options()
+
+    result = run_apply_mode(run_options, fs=recording_fs)
+
+    assert result.wrote_destination is True
+    assert _destination_agents_path(run_options) not in recording_fs.files
+
+
+def test_apply_mode_leaves_existing_destination_agents_file_unchanged() -> None:
+    """Leave a hand-authored destination `AGENTS.md` unchanged in apply mode."""
+
+    recording_fs = RecordingFileSystem()
+    run_options = _github_apply_options()
+    agents_path = _destination_agents_path(run_options)
+    hand_authored = "# AGENTS.md\n\nHand-authored guidance.\n"
+    recording_fs.files[agents_path] = hand_authored
+
+    result = run_apply_mode(run_options, fs=recording_fs)
+
+    assert result.wrote_destination is True
+    assert recording_fs.files[agents_path] == hand_authored

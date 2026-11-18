@@ -1,0 +1,91 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "claudeUnconditional": true,
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**\""
+        },
+        {
+          "key": "description",
+          "value": " Cross-language code change policy. Applies to all files."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/general-code-change.md",
+      "sections": [
+        "head",
+        "design-principles",
+        "classes-functions-and-apis",
+        "module-rigor-tiers",
+        "mandatory-toolchain-loop",
+        "file-size-limit",
+        "error-handling-and-logging",
+        "naming",
+        "public-apis-and-compatibility",
+        "dependencies",
+        "i-o-boundaries"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**\""
+        },
+        {
+          "key": "name",
+          "value": " \"general-code-change-policy\""
+        },
+        {
+          "key": "description",
+          "value": " \"Baseline rules that apply to any code change in this repo\""
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/general-code-change.instructions.md",
+      "sections": [
+        "head-2",
+        "before-making-changes",
+        "bugfix-workflow-all-languages-defects-only",
+        "1-design-principles",
+        "2-classes-functions-and-apis",
+        "3-error-handling-logging-and-contracts",
+        "4-module-file-structure",
+        "5-naming-docs-and-comments",
+        "6-performance-i-o-and-dependencies",
+        "7-how-to-interact-with-existing-code",
+        "8-after-making-changes"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " general-code-change"
+        },
+        {
+          "key": "description",
+          "value": " Cross-language code change policy for all files."
+        }
+      ],
+      "kind": "codex",
+      "path": ".agents/skills/general-code-change/SKILL.md",
+      "sections": [
+        "head-3",
+        "design-principles",
+        "classes-functions-and-apis",
+        "module-rigor-tiers-2",
+        "mandatory-toolchain-loop",
+        "file-size-limit",
+        "error-handling-and-logging",
+        "naming",
+        "public-apis-and-compatibility",
+        "dependencies",
+        "i-o-boundaries"
+      ]
+    }
+  ]
+}

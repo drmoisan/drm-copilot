@@ -1,32 +1,27 @@
 ---
 description: Standing instructions for Claude Code sessions in this repository.
 ---
+@AGENTS.md
 
 # CLAUDE.md
 
-## Tone Policy
-
-Use a strictly professional, factual, and neutral tone in all responses.
-
-The specific tone rules are stated once in `.claude/rules/tonality.md`, which the runtime loads as a mirror of the authoritative source defined below; they are not restated here.
-
-The full tone policy is defined in `.github/copilot-instructions.md` and `.github/instructions/tonality.instructions.md`. Those files are authoritative.
+The import above loads `AGENTS.md`, the hand-authored standing guidance shared with every agent: tone, the Codex rule skills, the toolchain loop, the file-size pointer, the harness sources, and Codex epic routing. The sections below are Claude-only.
 
 ## Policy Compliance Reading Order
 
-Before performing any code or test changes, read the following policy files in this order:
+Before performing any code or test changes, read the following policy rules in this order:
 
-1. `.github/copilot-instructions.md` — repository tone and communication policy
-2. `.github/instructions/general-code-change.instructions.md` — baseline code change rules
-3. `.github/instructions/general-unit-test.instructions.md` — baseline unit test rules
-4. Language-specific policies based on files in scope:
-   - Python: `.github/instructions/python-code-change.instructions.md`, `.github/instructions/python-unit-test.instructions.md`
-   - PowerShell: `.github/instructions/powershell-code-change.instructions.md`, `.github/instructions/powershell-unit-test.instructions.md`
-   - TypeScript: `.github/instructions/typescript-code-change.instructions.md`, `.github/instructions/typescript-unit-test.instructions.md`
-   - C#: `.github/instructions/csharp-code-change.instructions.md`, `.github/instructions/csharp-unit-test.instructions.md`
-   - GitHub Actions: `.github/instructions/github-actions.instructions.md`
+1. `.claude/rules/tonality.md` — repository tone and communication policy
+2. `.claude/rules/general-code-change.md` — baseline code change rules
+3. `.claude/rules/general-unit-test.md` — baseline unit test rules
+4. Language-specific rules based on files in scope:
+   - Python: `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`
+   - PowerShell: `.claude/rules/powershell.md`
+   - TypeScript: `.claude/rules/typescript.md`, `.claude/rules/typescript-suppressions.md`
+   - C#: `.claude/rules/csharp.md`
+   - GitHub Actions: `.claude/rules/ci-workflows.md`
 
-These files are the canonical policy source. Do not modify them. `.claude/` files mirror or reference their content.
+The policy source is the rule source set under `scripts/harness-generation/sources/rules/`. The Claude rules `.claude/rules/*.md` and the Copilot instructions `.github/instructions/*.instructions.md` are generated outputs of `scripts/harness-generation/Invoke-HarnessGeneration.ps1`. Change a policy by editing its source and running the generator; do not edit a generated rule or instruction file by hand.
 
 ## Language-Specific Rules
 
@@ -43,7 +38,7 @@ Each rule file uses YAML frontmatter with a `paths:` field to scope activation t
 
 This repository uses a four-layer Claude Code runtime architecture that maps the existing Copilot orchestration model onto Claude-native primitives:
 
-1. **Standing Instructions** — `CLAUDE.md` (this file) and `.claude/rules/*.md` provide persistent policy context. `CLAUDE.md` carries repository-wide tone, policy-compliance order, and architectural context. Rule files carry language-specific toolchain and coding standards, scoped by file path.
+1. **Standing Instructions** — `CLAUDE.md` (this file, which imports `AGENTS.md`) and `.claude/rules/*.md` provide persistent policy context. `AGENTS.md` carries the repository-wide tone and shared guidance; `CLAUDE.md` carries the Claude policy-compliance order and architectural context. Rule files carry language-specific toolchain and coding standards, scoped by file path.
 
 2. **Skills** — `.claude/skills/<name>/SKILL.md` files define reusable, user-invocable workflows. Skills are the primary entry point for direct-use operations such as orchestration, commit message generation, PR authoring, and research. Each skill declares its own `allowed-tools`, `context`, and `agent` routing in YAML frontmatter.
 

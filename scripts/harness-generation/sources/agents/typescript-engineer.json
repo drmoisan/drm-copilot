@@ -1,0 +1,56 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " typescript-engineer"
+      },
+      {
+        "key": "model",
+        "value": " sonnet"
+      },
+      {
+        "key": "description",
+        "value": " Project-scoped worker that implements and verifies TypeScript changes within typed repository boundaries."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - \"Bash(npx *)\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - acceptance-criteria-tracking\n  - owner-directives"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      }
+    ],
+    "path": ".claude/agents/typescript-engineer.md",
+    "sections": [
+      "head",
+      "evidence-location-invariant",
+      "test-execution-launcher"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"typescript-engineer\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "path": ".codex/agents/typescript-engineer.toml",
+    "sections": [
+      "head-2",
+      "evidence-location-invariant-2",
+      "test-execution-launcher"
+    ]
+  }
+}

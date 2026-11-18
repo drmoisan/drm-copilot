@@ -1,0 +1,54 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " migration-coverage-reviewer"
+      },
+      {
+        "key": "description",
+        "value": " Review configured discovery coverage and parity through authoritative reports with explicit passing or failing results."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - \"mcp__drm-copilot__read_discovery_source\"\n  - \"mcp__drm-copilot__validate_discovery_artifacts\"\n  - \"mcp__drm-copilot__run_discovery_report\"\n  - \"mcp__drm-copilot__finalize_discovery_agent\""
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      }
+    ],
+    "path": ".claude/agents/migration-coverage-reviewer.md",
+    "sections": [
+      "head",
+      "prepared-inputs-and-launch",
+      "selected-reads-and-controlled-operations",
+      "exact-output-boundary",
+      "denied-authority-and-managed-memory",
+      "finalization-and-explicit-result"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"migration-coverage-reviewer\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "path": ".codex/agents/migration-coverage-reviewer.toml",
+    "sections": [
+      "head-2",
+      "prepared-inputs-and-launch",
+      "selected-reads-and-controlled-operations",
+      "exact-output-boundary",
+      "denied-authority-and-managed-memory",
+      "finalization-and-explicit-result"
+    ]
+  }
+}

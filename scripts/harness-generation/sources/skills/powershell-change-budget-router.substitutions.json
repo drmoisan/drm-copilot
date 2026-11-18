@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "description: 'Budget-first routing contract for PowerShell work: estimate production-file scope, choose small vs large path, enforce direct-mode escalation to orchestrator, and use the VS Code extension command surface for promotion lifecycle steps when available.'\n",
+      "replace": "description: Budget-first routing contract for PowerShell work: estimate production-file scope, choose small vs large path, enforce direct-mode escalation to orchestrator, and use the VS Code extension command surface for promotion lifecycle steps when available.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "Canonical guidance for deciding whether work should execute directly in `powershell-typed-engineer` or be escalated to `powershell-orchestrator`.\n",
+      "replace": "Canonical guidance for deciding whether work should execute directly in `powershell-typed-engineer` or be escalated to the orchestrated large path through `/orchestrate` (the `orchestrator` agent).\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- `1-2` production files (+ corresponding tests) \u2192 **small path** (`powershell-typed-engineer` direct mode).\n- `>2` production files \u2192 **large path** (`powershell-orchestrator`).\n",
+      "replace": "- `1-3` production files (+ corresponding tests) \u2192 **small path** (`powershell-typed-engineer` direct mode).\n- More than 3 production files \u2192 **large path** (`/orchestrate`, the `orchestrator` agent). The large path has no production-file cap.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "When routed through `powershell-orchestrator`, small path still requires lifecycle scaffolding before implementation:\n- invoke promotion/folder lifecycle steps through the `drm-copilot` MCP tools required by `repo-automation-adapter`. If the MCP server or required tool is unavailable, stop before promotion,\n",
+      "replace": "When routed through `/orchestrate`, small path still requires lifecycle scaffolding before implementation:\n- invoke promotion/folder lifecycle steps through `vscode/runCommand` + extension access per `feature-promotion-lifecycle` when available; use script/CLI fallback only when direct extension command execution is unavailable,\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "If `powershell-typed-engineer` is invoked directly and estimated scope is `>2` production files:\n- Stop before implementation.\n- Return explicit routing instruction to invoke `powershell-orchestrator`.\n",
+      "replace": "If `powershell-typed-engineer` is invoked directly and estimated scope is more than 3 production files:\n- Stop before implementation.\n- Return explicit routing instruction to invoke `/orchestrate`.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- rationale summary (1-3 bullets).\n",
+      "replace": "- rationale summary (1-3 bullets).\n\n"
+    }
+  ]
+}

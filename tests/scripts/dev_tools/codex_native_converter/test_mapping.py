@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from scripts.dev_tools.codex_native_converter.mapping import plan_target_paths
+from scripts.dev_tools.codex_native_converter.mapping import (
+    STANDING_GUIDANCE_NOT_EMITTED_NOTE,
+    plan_target_paths,
+)
 from scripts.dev_tools.codex_native_converter.models import (
     ConversionClass,
     MappingRecord,
@@ -10,6 +13,32 @@ from scripts.dev_tools.codex_native_converter.models import (
     SourceKind,
     TargetRole,
 )
+
+
+def test_plan_target_paths_leaves_standing_guidance_unemitted_with_reason() -> None:
+    """Leave standing guidance with no target and the hand-authored-source note."""
+
+    mapping_record = MappingRecord(
+        source_path=".github/copilot-instructions.md",
+        source_ecosystem=SourceEcosystem.GITHUB_COPILOT,
+        source_kind=SourceKind.STANDING_INSTRUCTION,
+        conversion_class=ConversionClass.DIRECT,
+        target_role=TargetRole.STANDING_GUIDANCE,
+        target_path=None,
+        notes=("existing-note",),
+    )
+
+    planned_record = plan_target_paths(mapping_record, enable_repo_prompts=False)
+
+    assert planned_record.target_path is None
+    assert planned_record.target_role is TargetRole.STANDING_GUIDANCE
+    assert planned_record.conversion_class is ConversionClass.DIRECT
+    assert planned_record.notes == (
+        "existing-note",
+        "Not emitted: AGENTS.md is a hand-authored source maintained outside the "
+        "converter.",
+    )
+    assert STANDING_GUIDANCE_NOT_EMITTED_NOTE == planned_record.notes[1]
 
 
 def _test_plan_target_paths_leaves_launcher_prompts_unsupported() -> None:

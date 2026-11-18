@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "Research output is not an `artifacts/` sub-path. Use `docs/features/<feature>/research/` for feature-associated research or `docs/research/` for one-off research.\n\n",
+      "replace": ""
+    },
+    {
+      "file": "SKILL.md",
+      "find": "If `PostedAs: body`, mirror the same update into the local feature `issue.md` (current version folder if present; otherwise feature root).\n",
+      "replace": "If `PostedAs: body`, mirror the same update into the local feature `issue.md` (current version folder if present; otherwise feature root).\n\n"
+    }
+  ]
+}

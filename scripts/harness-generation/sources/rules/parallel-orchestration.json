@@ -1,0 +1,38 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"artifacts/orchestration/parallel-*\"\n  - \"docs/features/parallel/**\"\n  - \"scripts/dev_tools/*parallel*\"\n  - \"extensions/drm-copilot/src/lib/validate/parallel-*\"\n  - \"scripts/dev_tools/*blast_radius*\"\n  - \"config/blast-radius.json\"\n  - \"**/config/blast-radius.json\"\n  - \"extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts\"\n  - \".claude/lib/blast-radius/**\"\n  - \".claude/lib/bash/parallel-yaml-scan.sh\"\n  - \"scripts/dev_tools/validate_orchestration_artifacts.py\"\n  - \"extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts\"\n  - \".claude/hooks/enforce-epic-merge-gate.ps1\"\n  - \".claude/hooks/validate-orchestrator-output-rejection.ps1\"\n  - \".claude/agents/parallel-orchestrator.md\"\n  - \".claude/agents/parallel-planner.md\"\n  - \".claude/skills/parallel-*/SKILL.md\""
+        },
+        {
+          "key": "description",
+          "value": " Artifact invariants and blast-radius contention doctrine for the parallel orchestration surface."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/parallel-orchestration.md",
+      "sections": [
+        "head",
+        "foreign-schema-warning-do-not-copy-verbatim",
+        "scope-and-backward-compatibility",
+        "invariants-parallel-orchestrator-checkpoint",
+        "invariants-parallel-planner-checkpoint",
+        "invariants-parallel-run-manifest",
+        "cache-doctrine-the-checkpoint-is-not-the-source-of",
+        "omitted-epic-schema-fields-s8",
+        "concurrency-bound-a7",
+        "drift-event-recording-rule-a8",
+        "enum-ownership-f6-f7-f8-consume-never-extend",
+        "mutation-rejection-signal-issue-1012",
+        "f7-seam",
+        "f3-scope-boundary-kickoff-contract-deferred-to-f4",
+        "prepared-item-admission-issue-1047",
+        "blast-radius-contention-doctrine-issue-489",
+        "enforcement"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "claudeUnconditional": true,
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**\""
+        },
+        {
+          "key": "description",
+          "value": " Module rigor tier system and uniform coverage thresholds."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/quality-tiers.md",
+      "sections": [
+        "head",
+        "tiers",
+        "source-of-truth",
+        "uniform-vs-tier-dependent-gate-matrix",
+        "rationale-uniform-coverage-thresholds"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " quality-tiers"
+        },
+        {
+          "key": "description",
+          "value": " Module rigor tier system and uniform coverage thresholds."
+        }
+      ],
+      "kind": "codex",
+      "path": ".agents/skills/quality-tiers/SKILL.md",
+      "sections": [
+        "head-2",
+        "tiers",
+        "source-of-truth",
+        "uniform-vs-tier-dependent-gate-matrix-2",
+        "rationale-uniform-coverage-thresholds-2"
+      ]
+    }
+  ]
+}

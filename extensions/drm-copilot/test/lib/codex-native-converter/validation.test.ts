@@ -143,7 +143,51 @@ describe("validateConversionPlan", () => {
     expect(codes.has("lingering-source-runtime-reference")).toBe(true);
   });
 
-  it("allows multiple standing-guidance inputs to merge into AGENTS.md", () => {
+  it("ignores unemitted standing-guidance records in duplicate-target checks", () => {
+    const notEmitted =
+      "Not emitted: AGENTS.md is a hand-authored source maintained outside the converter.";
+    const findings = validateConversionPlan(
+      runOptions(),
+      [
+        record({
+          sourcePath: ".github/copilot-instructions.md",
+          sourceKind: SourceKind.STANDING_INSTRUCTION,
+          targetRole: TargetRole.STANDING_GUIDANCE,
+          targetPath: null,
+          notes: [notEmitted],
+        }),
+        record({
+          sourcePath: ".github/instructions/general.instructions.md",
+          sourceKind: SourceKind.PATH_SCOPED_INSTRUCTION,
+          conversionClass: ConversionClass.DECOMPOSED,
+          targetRole: TargetRole.STANDING_GUIDANCE,
+          targetPath: null,
+          notes: [notEmitted],
+        }),
+      ],
+      [],
+      {},
+    );
+    expect(findings.some((f) => f.code === "duplicate-target-path")).toBe(
+      false,
+    );
+    expect(findings.filter((f) => f.blocking)).toEqual([]);
+  });
+
+  it("ignores planned emissions without a target path in duplicate-target checks", () => {
+    const findings = validateConversionPlan(
+      runOptions(),
+      [],
+      [
+        emission({ sectionId: "a#gate-1", targetPath: null }),
+        emission({ sectionId: "b#gate-1", targetPath: null }),
+      ],
+      {},
+    );
+    expect(findings).toEqual([]);
+  });
+
+  it("reports duplicate-target-path for two records targeting AGENTS.md", () => {
     const findings = validateConversionPlan(
       runOptions(),
       [
@@ -164,9 +208,14 @@ describe("validateConversionPlan", () => {
       [],
       {},
     );
-    expect(findings.some((f) => f.code === "duplicate-target-path")).toBe(
-      false,
+    const duplicates = findings.filter(
+      (f) => f.code === "duplicate-target-path",
     );
+    expect(duplicates.map((f) => f.sourcePath).sort()).toEqual([
+      ".github/copilot-instructions.md",
+      ".github/instructions/general.instructions.md",
+    ]);
+    expect(duplicates.every((f) => f.targetPath === "AGENTS.md")).toBe(true);
   });
 
   it("allows multiple sections from one source prompt to merge into one target", () => {

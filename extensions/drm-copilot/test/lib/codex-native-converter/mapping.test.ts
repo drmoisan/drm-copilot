@@ -3,6 +3,7 @@ import { describe, expect, it } from "@jest/globals";
 import {
   planSectionTargetPath,
   planTargetPaths,
+  STANDING_GUIDANCE_NOT_EMITTED_NOTE,
 } from "../../../src/lib/codex-native-converter/mapping";
 import {
   ConversionClass,
@@ -27,12 +28,23 @@ function record(overrides: Partial<MappingRecord>): MappingRecord {
 }
 
 describe("planTargetPaths", () => {
-  it("maps standing guidance to AGENTS.md", () => {
+  it("leaves standing guidance unemitted with the hand-authored-source reason", () => {
     const planned = planTargetPaths(
-      record({ targetRole: TargetRole.STANDING_GUIDANCE }),
+      record({
+        targetRole: TargetRole.STANDING_GUIDANCE,
+        conversionClass: ConversionClass.DIRECT,
+        notes: ["existing-note"],
+      }),
       { enableRepoPrompts: false },
     );
-    expect(planned.targetPath).toBe("AGENTS.md");
+    expect(planned.targetPath).toBeNull();
+    expect(planned.targetRole).toBe(TargetRole.STANDING_GUIDANCE);
+    expect(planned.conversionClass).toBe(ConversionClass.DIRECT);
+    expect(planned.notes).toEqual([
+      "existing-note",
+      "Not emitted: AGENTS.md is a hand-authored source maintained outside the converter.",
+    ]);
+    expect(STANDING_GUIDANCE_NOT_EMITTED_NOTE).toBe(planned.notes[1]);
   });
 
   it("uses the reusable skill folder name for SKILL.md targets", () => {

@@ -1,0 +1,66 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " task-researcher"
+      },
+      {
+        "key": "description",
+        "value": " Research specialist that performs deep investigation and writes structured findings to the orchestrator-supplied research path under docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off)."
+      },
+      {
+        "key": "model",
+        "value": " sonnet"
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - WebFetch\n  - \"Write(/docs/features/**/research/**)\"\n  - \"Write(/.dev/**/research/**)\"\n  - \"Write(/docs/research/**)\"\n  - \"Write(/.dev/research/**)\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - evidence-and-timestamp-conventions\n  - execution-environment\n  - owner-directives"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      },
+      {
+        "key": "hooks",
+        "value": "\n  SubagentStop:\n    - matcher: \"task-researcher\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-task-researcher-output.ps1"
+      }
+    ],
+    "path": ".claude/agents/task-researcher.md",
+    "sections": [
+      "head",
+      "output-location",
+      "core-principles",
+      "research-workflow",
+      "constraints",
+      "evidence-location-invariant"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"task-researcher\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "path": ".codex/agents/task-researcher.toml",
+    "sections": [
+      "head-2",
+      "output-location-2",
+      "core-principles",
+      "research-workflow-2",
+      "constraints-2",
+      "evidence-location-invariant-2"
+    ]
+  }
+}

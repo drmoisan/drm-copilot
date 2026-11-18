@@ -1,0 +1,86 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "claudeUnconditional": true,
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**\""
+        },
+        {
+          "key": "description",
+          "value": " Cross-language unit test policy. Applies to all files."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/general-unit-test.md",
+      "sections": [
+        "head",
+        "core-principles",
+        "coverage-requirements",
+        "coverage-exclusion-policy",
+        "scenario-completeness",
+        "test-structure-arrange-act-assert",
+        "external-dependencies",
+        "test-file-location",
+        "documentation",
+        "test-categories",
+        "determinism-infrastructure"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**\""
+        },
+        {
+          "key": "name",
+          "value": " general-unit-test-policy"
+        },
+        {
+          "key": "description",
+          "value": " \"Baseline unit test policy that applies to all languages in this repo\""
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/general-unit-test.instructions.md",
+      "sections": [
+        "head-2",
+        "1-core-principles",
+        "2-coverage-and-scenarios",
+        "3-test-structure-and-diagnostics",
+        "4-external-dependencies-and-environment",
+        "5-policy-audit"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " general-unit-test"
+        },
+        {
+          "key": "description",
+          "value": " Cross-language unit test policy for all files."
+        }
+      ],
+      "kind": "codex",
+      "path": ".agents/skills/general-unit-test/SKILL.md",
+      "sections": [
+        "head-3",
+        "core-principles",
+        "coverage-requirements-2",
+        "coverage-exclusion-policy",
+        "scenario-completeness",
+        "test-structure-arrange-act-assert",
+        "external-dependencies",
+        "test-file-location",
+        "documentation",
+        "test-categories-2",
+        "determinism-infrastructure"
+      ]
+    }
+  ]
+}

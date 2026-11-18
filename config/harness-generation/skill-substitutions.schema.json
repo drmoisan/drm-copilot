@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "config/harness-generation/skill-substitutions.schema.json",
+  "title": "Harness generation skill mirror substitutions",
+  "description": "Ordered exact-text substitutions that render a Claude skill copy from its shared .agents/skills body (issue #1028).",
+  "type": "object",
+  "required": ["$schema", "substitutions"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "substitutions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["file", "find", "replace"],
+        "additionalProperties": false,
+        "properties": {
+          "file": { "type": "string", "minLength": 1 },
+          "find": { "type": "string", "minLength": 1 },
+          "replace": { "type": "string" }
+        }
+      }
+    }
+  }
+}

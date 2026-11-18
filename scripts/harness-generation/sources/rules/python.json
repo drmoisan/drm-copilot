@@ -1,0 +1,102 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**/*.py\""
+        },
+        {
+          "key": "description",
+          "value": " Python-specific toolchain and coding standards."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/python.md",
+      "sections": [
+        "head",
+        "toolchain",
+        "coding-standards",
+        "python-design-rules",
+        "pytest-rules",
+        "prohibited-behaviors"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**/*.py\""
+        },
+        {
+          "key": "name",
+          "value": " python-code-change-policy"
+        },
+        {
+          "key": "description",
+          "value": " \"Python-specific code change rules layered on top of the general code change policy\""
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/python-code-change.instructions.md",
+      "sections": [
+        "head-2",
+        "1-tooling-baseline-for-python",
+        "2-python-design-typing-principles",
+        "3-classes-functions-and-apis-python-specific-guida",
+        "4-error-handling-logging-and-contracts-python",
+        "5-module-file-structure-python",
+        "6-naming-docs-and-comments-python",
+        "7-dependencies-and-third-party-libraries-python"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**/*.py\""
+        },
+        {
+          "key": "name",
+          "value": " python-unit-test-policy"
+        },
+        {
+          "key": "description",
+          "value": " \"Python-specific unit test rules, layered on top of the general unit test policy\""
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/python-unit-test.instructions.md",
+      "sections": [
+        "head-3",
+        "1-framework-and-scope",
+        "2-test-style-and-structure-python",
+        "3-naming-and-readability-python",
+        "4-respecting-the-toolchain-loop"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " python"
+        },
+        {
+          "key": "description",
+          "value": " Python-specific toolchain and coding standards."
+        }
+      ],
+      "kind": "codex",
+      "path": ".agents/skills/python/SKILL.md",
+      "sections": [
+        "head",
+        "toolchain-2",
+        "coding-standards",
+        "python-design-rules",
+        "pytest-rules-2",
+        "prohibited-behaviors"
+      ]
+    }
+  ]
+}

@@ -606,5 +606,19 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1028: converter files changed by the AGENTS.md redirection (H3)
+    // that had no per-file entry. Per-file entries only.
+    "./src/lib/codex-native-converter/engine-pipeline.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/pipeline.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/validation.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };

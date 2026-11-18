@@ -4,7 +4,7 @@
 - Parent: epic #1018, child 3
 - Owner: drmoisan
 - Status: Draft
-- Last Updated: 2026-10-31
+- Last Updated: 2026-11-17
 - Work Mode: full-feature
 - Spec: `docs/features/active/2026-10-30-shared-source-generators-skills-rules-mcp-agents-1028/spec.md`
 
@@ -50,45 +50,45 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 
 ### Phase 0 gate
 
-- [ ] Execution stops before any change, with the reason recorded in `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md`, when an owner answer recorded in the spec differs from its default or the plan departs from a recorded decision (spec D-1), when child 1's or child 2's outputs are not merged into the integration branch, when an approved difference would change a pinned frozen file or a selected target does not exist, or when a named file, symbol or heading has moved relative to the merge base of `origin/main` and `HEAD`.
+- [x] Execution stops before any change, with the reason recorded in `<FEATURE>/evidence/baseline/phase0-gate.<timestamp>.md`, when an owner answer recorded in the spec differs from its default or the plan departs from a recorded decision (spec D-1), when child 1's or child 2's outputs are not merged into the integration branch, when an approved difference would change a pinned frozen file (spec D-14 defers the epic skill's approved differences, so no pinned digest changes), or a selected target does not exist, or when a named file, symbol or heading has moved relative to the merge base of `origin/main` and `HEAD`.
 
 ### Generation and drift reporting
 
-- [ ] Running `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface <surface> -Check` for each of skills, rules, MCP, agents and instructions exits 0 on the committed tree and, when a generated file differs from its rendered form, exits non-zero and names each drifted, missing or extra file by repository-relative path.
-- [ ] Generated files are written as regular LF, UTF-8-without-BOM files, never as symlinks, and each generated file's bundle copy under `extensions/drm-copilot/resources/` is written with it.
-- [ ] A malformed source stops generation before any file is written, and the error names the source file.
+- [x] Running `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface <surface> -Check` for each of skills, rules, MCP, agents and instructions exits 0 on the committed tree and, when a generated file differs from its rendered form, exits non-zero and names each drifted, missing or extra file by repository-relative path.
+- [x] Generated files are written as regular LF, UTF-8-without-BOM files, never as symlinks, and each generated file's bundle copy under `extensions/drm-copilot/resources/` is written with it.
+- [x] A malformed source stops generation before any file is written, and the error names the source file.
 
 ### Instructions
 
-- [ ] `AGENTS.md` is a hand-authored source with no generated-file header and no embedded rule copies, and `CLAUDE.md` imports it with `@AGENTS.md` and adds only Claude-only text.
-- [ ] Running the Codex native converter (MCP tool, extension command or Poetry script) on a source set with standing-guidance files no longer writes or overwrites `AGENTS.md`; the converter report lists those files as not emitted with a reason, and the TypeScript and Python implementations behave the same (owner decision H3).
+- [x] `AGENTS.md` is a hand-authored source with no generated-file header and no embedded rule copies, and `CLAUDE.md` imports it with `@AGENTS.md` and adds only Claude-only text.
+- [x] Running the Codex native converter (MCP tool, extension command or Poetry script) on a source set with standing-guidance files no longer writes or overwrites `AGENTS.md`; the converter report lists those files as not emitted with a reason, and the TypeScript and Python implementations behave the same (owner decision H3).
 
 ### MCP server configuration
 
-- [ ] `.mcp.json` and the MCP server tables of `.codex/config.toml` come from one server list, the rest of `.codex/config.toml` is untouched by generation, and the release script's version pin keeps working.
+- [x] `.mcp.json` and the MCP server tables of `.codex/config.toml` come from one server list, the rest of `.codex/config.toml` is untouched by generation, and the release script's version pin keeps working.
 
 ### Skill mirror
 
-- [ ] Each shared skill in `.claude/skills` is generated from `.agents/skills`; tool-only skills and Codex metadata files are not mirrored.
+- [x] Each shared skill in `.claude/skills` is generated from `.agents/skills`; tool-only skills and Codex metadata files are not mirrored.
 
 ### Path-scoped rules
 
-- [ ] Each Claude rule and Copilot instruction file selected for generation is produced from one rule source with its native glob frontmatter (`paths:` or `applyTo:`), and the existing rule-frontmatter and tier-precedence tests pass unchanged.
+- [x] Each Claude rule and Copilot instruction file selected for generation is produced from one rule source with its native glob frontmatter (`paths:` or `applyTo:`), and the existing rule-frontmatter and tier-precedence tests pass unchanged.
 
 ### Agents
 
-- [ ] Each agent selected for generation is produced as Claude Markdown and Codex base TOML from one definition, the existing Codex variant generator runs unchanged and reports no drift afterwards, and write-scope literals equal the source literals exactly and pass child 2's write-scope checker.
+- [x] Each agent selected for generation is produced as Claude Markdown and Codex base TOML from one definition, the existing Codex variant generator runs unchanged and reports no drift afterwards, and write-scope literals equal the source literals exactly and pass child 2's write-scope checker.
 
 ### CI
 
-- [ ] Every check mode runs in the existing `poshqc / PowerShell QC` shards through one Pester repository gate, with no new CI job, and the required `CI Required Gate` check passes on the pull request head (CI-dependent; checked off at S9).
-- [ ] The parity-matrix entries owned by this child record their single source in `generated_from` and their generator in `generator` once the source exists, and child 1's matrix gate passes.
+- [x] Every check mode runs in the existing `poshqc / PowerShell QC` shards through one Pester repository gate, with no new CI job, and the required `CI Required Gate` check passes on the pull request head (CI-dependent; checked off at S9).
+- [x] The parity-matrix entries owned by this child record their single source in `generated_from` and their generator in `generator` once the source exists, and child 1's matrix gate passes.
 
 ### Quality and language
 
-- [ ] No new Python or TypeScript file is added; every new code file is PowerShell and is listed with its language in the spec's `## Language Classification`.
-- [ ] Each new PowerShell module has at least 85% line coverage, the parallel test gates and the leak scan pass (spec D-6), and no added or changed file exceeds 800 lines.
-- [ ] No blast-radius tooling file, child 2 file, or file in the spec's excluded paths is changed by this child.
+- [x] No new Python or TypeScript file is added; every new code file is PowerShell and is listed with its language in the spec's `## Language Classification`.
+- [x] Each new PowerShell module has at least 85% line coverage, the parallel test gates and the leak scan pass (spec D-6), and no added or changed file exceeds 800 lines.
+- [x] No blast-radius tooling file, child 2 file (other than the `### Interface for epic child 3` section of child 2's spec, which spec D-12 amends), or file in the spec's excluded paths is changed by this child.
 
 ## Non-Goals
 
@@ -96,7 +96,8 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 - Symlinked mirrors.
 - Generating hooks (child 5), pushing generators or generated layers down to destination repositories and per-ecosystem pack selection (child 4), and retiring `.github/skills`, `.github/agents` or `scripts/dev-tools/sync-agents-from-instructions.ps1` (child 6; for `sync-agents-from-instructions.ps1`, per OQ-6 as decided by owner H3). Redirecting the Codex native converter so it no longer writes `AGENTS.md` is in scope for this child (H3).
 - Editing `.github/copilot-instructions.md` (child 6).
-- Editing child 2's files or spec, including `extensions/drm-copilot/src/lib/development-docs/write-scopes.ts` and `.claude/lib/development-docs/DevelopmentDocsRoot.psm1`; the amendment that OQ-9 requires belongs to child 2's owner.
+- Editing child 2's files or spec, including `extensions/drm-copilot/src/lib/development-docs/write-scopes.ts` and `.claude/lib/development-docs/DevelopmentDocsRoot.psm1`; the one exception is the `### Interface for epic child 3` section of child 2's spec, which this child amends to the OQ-9 answer (spec D-12).
+- Generating the single-ecosystem agents (spec D-11); they are `native` and stay hand-maintained.
 - Editing `scripts/dev_tools/generate_codex_agent_variants.py`, `scripts/dev-tools/Invoke-FullRelease.ps1` or any CI workflow file.
 - Any change to `.claude/lib/blast-radius/**`, `config/blast-radius.json`, the blast-radius Python modules or their tests.
 - Generating the bundle-only variant subtrees (`.claude-variants/`, `.agents-variants/`, `.codex-variants/`).

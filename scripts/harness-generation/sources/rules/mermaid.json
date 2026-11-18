@@ -1,0 +1,47 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**/*.mmd\"\n  - \"**/*.mermaid\""
+        },
+        {
+          "key": "description",
+          "value": " Mermaid diagram authoring standards, validation mandate, and managed-diagram constraint."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/mermaid.md",
+      "sections": [
+        "head",
+        "diagram-file-conventions",
+        "validation-mandate",
+        "managed-diagrams-do-not-hand-edit",
+        "opt-out-marker-for-deliberate-counter-examples",
+        "out-of-scope-the-non-portable-extension-mechanisms",
+        "example"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**\""
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/mermaid.instructions.md",
+      "sections": [
+        "head-2",
+        "workflow",
+        "lm-tools-call-these-for-every-diagram-interaction",
+        "vs-code-commands",
+        "mermaid-chart-slash-commands",
+        "rules",
+        "docs"
+      ]
+    }
+  ]
+}

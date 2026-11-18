@@ -1,0 +1,49 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"scripts/benchmarks/**\"\n  - \"**/baseline*.json\""
+        },
+        {
+          "key": "description",
+          "value": " Runner-environment parity and provenance rules for committed benchmark baselines."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/benchmark-baselines.md",
+      "sections": [
+        "head",
+        "runner-environment-parity-required",
+        "prohibited-unknown-processor",
+        "required-sibling-provenance-file",
+        "enforcement",
+        "scope"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " benchmark-baselines"
+        },
+        {
+          "key": "description",
+          "value": " Benchmark baseline provenance rules for performance regression gates."
+        }
+      ],
+      "kind": "codex",
+      "path": ".agents/skills/benchmark-baselines/SKILL.md",
+      "sections": [
+        "head-2",
+        "runner-environment-parity-required",
+        "prohibited-unknown-processor",
+        "required-sibling-provenance-file",
+        "enforcement-2",
+        "scope"
+      ]
+    }
+  ]
+}

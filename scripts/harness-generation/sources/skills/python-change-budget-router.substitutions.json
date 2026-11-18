@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "Canonical guidance for deciding whether Python work stays on the small path (`python-typed-engineer` direct mode) or escalates to the orchestrated large path through `.codex/prompts/orchestrate-work.md`.\n",
+      "replace": "Canonical guidance for deciding whether Python work stays on the small path (`python-typed-engineer` direct mode) or escalates to the orchestrated large path through `/orchestrate` (the `orchestrator` agent).\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "   - More than 3 production files \u2192 **large path** (`.codex/prompts/orchestrate-work.md`). The large path has no production-file cap.\n",
+      "replace": "   - More than 3 production files \u2192 **large path** (`/orchestrate`, the `orchestrator` agent). The large path has no production-file cap.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- Return an explicit routing instruction to invoke `.codex/prompts/orchestrate-work.md`.\n",
+      "replace": "- Return an explicit routing instruction to invoke `/orchestrate`.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "When routed through the orchestrator, the small path still requires lifecycle scaffolding before implementation:\n\n- invoke promotion and folder lifecycle steps through the `drm-copilot` MCP tools required by `repo-automation-adapter`. If the MCP server or required tool is unavailable, stop before promotion.\n",
+      "replace": "When routed through `/orchestrate`, the small path still requires lifecycle scaffolding before implementation:\n\n- invoke promotion and folder lifecycle steps through `vscode/runCommand` and extension access per `feature-promotion-lifecycle` when available. Use script or CLI fallback only when direct extension command execution is unavailable.\n"
+    }
+  ]
+}

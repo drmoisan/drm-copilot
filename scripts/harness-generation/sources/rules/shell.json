@@ -1,0 +1,28 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**/*.sh\"\n  - \"**/*.bats\"\n  - \"scripts/bash/**\"\n  - \"tests/shell/**\""
+        },
+        {
+          "key": "description",
+          "value": " Shell (bash) toolchain and coding standards."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/shell.md",
+      "sections": [
+        "head",
+        "toolchain",
+        "native-invocation-and-environment",
+        "discovery-contract",
+        "coverage-expectations",
+        "ci-vs-local-version-drift",
+        "coding-standards"
+      ]
+    }
+  ]
+}

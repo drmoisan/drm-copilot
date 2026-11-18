@@ -1,0 +1,67 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "claudeUnconditional": true,
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "description",
+          "value": " Bash command shape for running a tool or reading a file in another directory without chaining cd. Loaded at launch, before the first Bash call."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/bash-command-shape.md",
+      "sections": [
+        "head",
+        "forms-by-context",
+        "agent-isolated-worktree",
+        "sibling-worktree"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**\""
+        },
+        {
+          "key": "name",
+          "value": " \"bash-command-shape\""
+        },
+        {
+          "key": "description",
+          "value": " \"Bash command shape for running a tool or reading a file in another directory without chaining cd\""
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/bash-command-shape.instructions.md",
+      "sections": [
+        "head",
+        "forms-by-context",
+        "agent-isolated-worktree",
+        "sibling-worktree"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " bash-command-shape"
+        },
+        {
+          "key": "description",
+          "value": " Bash command shape for running a tool or reading a file in another directory without chaining cd."
+        }
+      ],
+      "kind": "codex",
+      "path": ".agents/skills/bash-command-shape/SKILL.md",
+      "sections": [
+        "head-2",
+        "forms-by-context",
+        "agent-isolated-worktree",
+        "sibling-worktree-2",
+        "literal-paths"
+      ]
+    }
+  ]
+}
