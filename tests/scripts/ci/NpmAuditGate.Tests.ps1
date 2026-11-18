@@ -391,6 +391,13 @@ Describe 'NpmAuditGate.psm1 gate decision' {
         $decision.SummaryText | Should -BeLike '*Exception applied: id=GHSA-fc5q-39xc-vjpf package=picomatch scope=dev approved_at=2026-11-18 expires=2026-12-18 days_remaining=28 reason=no patched version exists*'
     }
 
+    It 'NAG-DEC-ORDER prints the invalid-file code once in the failing summary' {
+        $decision = Invoke-TestDecision -ExceptionJson '{' -FullAuditJson '{}'
+
+        $decision.SummaryText | Should -BeLike 'NPM Audit Gate: FAIL NPM_AUDIT_EXCEPTION_INVALID: the exception file is not valid JSON*'
+        $decision.SummaryText | Should -Not -BeLike '*NPM_AUDIT_EXCEPTION_INVALID: NPM_AUDIT_EXCEPTION_INVALID*'
+    }
+
     It 'NAG-DEC-APPLIED-REPORT starts a failing summary with the failure code' {
         $decision = Invoke-TestDecision -ProductionExitCode 2 -FullAuditJson '{}'
 

@@ -312,6 +312,10 @@ function Get-NpmAuditGateResult {
     if ($Passed) {
         $lines.Add('NPM Audit Gate: PASS')
     }
+    elseif ($Detail.StartsWith("$Code", [StringComparison]::Ordinal)) {
+        # The detail of an invalid exception file already begins with its code; print the code once.
+        $lines.Add("NPM Audit Gate: FAIL $Detail")
+    }
     else {
         $lines.Add("NPM Audit Gate: FAIL $($Code): $Detail")
     }

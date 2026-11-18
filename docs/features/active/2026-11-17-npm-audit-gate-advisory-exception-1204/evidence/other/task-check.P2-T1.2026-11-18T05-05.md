@@ -1,0 +1,8 @@
+# Task check P2-T1
+
+Timestamp: 2026-11-18T05-05
+Changed files: .github/workflows/_npm-audit-gate.yml (step `Audit dependencies`: `shell: pwsh` and a `run:` line that calls scripts/ci/Invoke-NpmAuditGate.ps1 with `-AuditLevel "$env:AUDIT_LEVEL"` and `-ExceptionsPath` under `github.workspace`; `working-directory`, the `AUDIT_LEVEL` env, the job id `npm-audit`, the job name, the matrix, and the `node-version` line are unchanged).
+Selection and rule: the contract tests that read the changed workflow path, found by searching tests/ for the file name, the job id, and the old command: tests/scripts/workflows/NpmAuditGateWorkflow.Tests.ps1 (new, P2-T2), tests/scripts/workflows/CiRequiredGateWorkflow.Tests.ps1, tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1, tests/scripts/ci/CiRequiredGate.Tests.ps1. tests/scripts/dev_tools/test_host_environment_contracts.py matches only the `node-version` line (unchanged line) and tests/scripts/dev_tools/test_execution_environment_brief_contracts.py pins check names (unchanged); both are unaffected and are Python tests that run in CI, not in this plan's Pester gate.
+Command: sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath tests/scripts/workflows/NpmAuditGateWorkflow.Tests.ps1 tests/scripts/workflows/CiRequiredGateWorkflow.Tests.ps1 tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1 tests/scripts/ci/CiRequiredGate.Tests.ps1
+EXIT_CODE: 0
+Output Summary: `Invoke-PoshQCParallelTest: workers=4; exit code=0`; the four selected files passed in their shards (counts 103, 7, 43, 5; 0 failed). The seven new NAW-* cases run against this edit and pass; the three existing suites that read the workflow or its caller job id are unchanged and pass.
