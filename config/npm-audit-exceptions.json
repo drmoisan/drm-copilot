@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "exceptions": [
+    {
+      "id": "GHSA-fc5q-39xc-vjpf",
+      "package": "picomatch",
+      "scope": "dev",
+      "reason": "High-severity ReDoS in picomatch <= 4.0.7 with no patched release. picomatch is reachable only through development dependencies (jest, @parcel/watcher); npm ls picomatch --omit=dev --all is empty in all three manifests. Tracked by issue #1204.",
+      "approved_at": "2026-11-18",
+      "expires": "2026-12-18"
+    }
+  ]
+}
