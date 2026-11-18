@@ -159,3 +159,8 @@ Describe 'validate-orchestrator-output.ps1 model-routing gate' {
         }
     }
 }
+
+AfterAll {
+    # The hook force-imports the run module; discard only the stale fixture-owned scope binding.
+    Reset-EpicStateProbeModuleBinding
+}

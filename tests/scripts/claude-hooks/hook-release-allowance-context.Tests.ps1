@@ -23,6 +23,9 @@ Describe 'hook-release-allowance-context.ps1 (<Surface>)' -ForEach @(
         . (Join-Path $repoRoot $GateRelativePath)
         . (Join-Path $repoRoot $ContextRelativePath)
         . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+        # A prior suite in the same process can leave the scope module bound to a replaced run module
+        # (validate-orchestrator-output.ps1 force-imports it); discard it so the baseline mocks bind fresh.
+        Reset-EpicStateProbeModuleBinding
         Register-EpicStateBaselineMock -Seam $Seam -Surface $Surface
         Register-EpicStateBaselineMock -Seam $ExtraSeam -Surface $Surface
         $script:ReleaseRoot = '/synthetic-worktrees/release'

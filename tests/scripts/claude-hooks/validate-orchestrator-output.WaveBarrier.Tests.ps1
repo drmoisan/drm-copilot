@@ -248,3 +248,8 @@ Describe 'validate-orchestrator-output Layer 2 wave barrier' {
         $result.Reason.StartsWith('ORCHESTRATOR_CHECKPOINT_UNRESOLVED:', [System.StringComparison]::Ordinal) | Should -BeTrue -Because $result.Reason
     }
 }
+
+AfterAll {
+    # The hook force-imports the run module; discard only the stale fixture-owned scope binding.
+    Reset-EpicStateProbeModuleBinding
+}

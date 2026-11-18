@@ -478,6 +478,9 @@ Describe 'orchestrator output validator handler proof' {
         }
     }
 
+    # The hook force-imports the run module; discard only the stale fixture-owned scope binding.
+    AfterAll { Reset-EpicStateProbeModuleBinding }
+
     It 'H7 validate-orchestrator-output.ps1 exits 2 naming WorktreeRunResolution.psm1 when that resolver import fails' {
         # Arrange
         Mock Import-Module { }
