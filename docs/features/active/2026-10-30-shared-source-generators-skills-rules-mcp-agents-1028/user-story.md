@@ -54,9 +54,9 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 
 ### Generation and drift reporting
 
-- [ ] Running `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface <surface> -Check` for each of skills, rules, MCP, agents and instructions exits 0 on the committed tree and, when a generated file differs from its rendered form, exits non-zero and names each drifted, missing or extra file by repository-relative path.
-- [ ] Generated files are written as regular LF, UTF-8-without-BOM files, never as symlinks, and each generated file's bundle copy under `extensions/drm-copilot/resources/` is written with it.
-- [ ] A malformed source stops generation before any file is written, and the error names the source file.
+- [x] Running `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface <surface> -Check` for each of skills, rules, MCP, agents and instructions exits 0 on the committed tree and, when a generated file differs from its rendered form, exits non-zero and names each drifted, missing or extra file by repository-relative path.
+- [x] Generated files are written as regular LF, UTF-8-without-BOM files, never as symlinks, and each generated file's bundle copy under `extensions/drm-copilot/resources/` is written with it.
+- [x] A malformed source stops generation before any file is written, and the error names the source file.
 
 ### Instructions
 
@@ -69,26 +69,26 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 
 ### Skill mirror
 
-- [ ] Each shared skill in `.claude/skills` is generated from `.agents/skills`; tool-only skills and Codex metadata files are not mirrored.
+- [x] Each shared skill in `.claude/skills` is generated from `.agents/skills`; tool-only skills and Codex metadata files are not mirrored.
 
 ### Path-scoped rules
 
-- [ ] Each Claude rule and Copilot instruction file selected for generation is produced from one rule source with its native glob frontmatter (`paths:` or `applyTo:`), and the existing rule-frontmatter and tier-precedence tests pass unchanged.
+- [x] Each Claude rule and Copilot instruction file selected for generation is produced from one rule source with its native glob frontmatter (`paths:` or `applyTo:`), and the existing rule-frontmatter and tier-precedence tests pass unchanged.
 
 ### Agents
 
-- [ ] Each agent selected for generation is produced as Claude Markdown and Codex base TOML from one definition, the existing Codex variant generator runs unchanged and reports no drift afterwards, and write-scope literals equal the source literals exactly and pass child 2's write-scope checker.
+- [x] Each agent selected for generation is produced as Claude Markdown and Codex base TOML from one definition, the existing Codex variant generator runs unchanged and reports no drift afterwards, and write-scope literals equal the source literals exactly and pass child 2's write-scope checker.
 
 ### CI
 
 - [ ] Every check mode runs in the existing `poshqc / PowerShell QC` shards through one Pester repository gate, with no new CI job, and the required `CI Required Gate` check passes on the pull request head (CI-dependent; checked off at S9).
-- [ ] The parity-matrix entries owned by this child record their single source in `generated_from` and their generator in `generator` once the source exists, and child 1's matrix gate passes.
+- [x] The parity-matrix entries owned by this child record their single source in `generated_from` and their generator in `generator` once the source exists, and child 1's matrix gate passes.
 
 ### Quality and language
 
-- [ ] No new Python or TypeScript file is added; every new code file is PowerShell and is listed with its language in the spec's `## Language Classification`.
+- [x] No new Python or TypeScript file is added; every new code file is PowerShell and is listed with its language in the spec's `## Language Classification`.
 - [ ] Each new PowerShell module has at least 85% line coverage, the parallel test gates and the leak scan pass (spec D-6), and no added or changed file exceeds 800 lines.
-- [ ] No blast-radius tooling file, child 2 file (other than the `### Interface for epic child 3` section of child 2's spec, which spec D-12 amends), or file in the spec's excluded paths is changed by this child.
+- [x] No blast-radius tooling file, child 2 file (other than the `### Interface for epic child 3` section of child 2's spec, which spec D-12 amends), or file in the spec's excluded paths is changed by this child.
 
 ## Non-Goals
 

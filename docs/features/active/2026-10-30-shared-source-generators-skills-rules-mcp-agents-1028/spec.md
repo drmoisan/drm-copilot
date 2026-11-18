@@ -267,7 +267,7 @@ No artifact of this child requires a language outside the rule; the D-16 consump
 ### Framework
 
 - [x] `Invoke-HarnessGeneration.ps1 -Check` exits 0 on a tree with no drift and exits non-zero on drift, printing one line per drifted, missing or extra file by repository-relative POSIX path; Pester unit tests cover each outcome with injected in-memory listing and reading.
-- [ ] A malformed source (missing frontmatter, unknown target, missing required agent field) fails the run before any write and names the source path; a unit test asserts that the injected writer was not called.
+- [x] A malformed source (missing frontmatter, unknown target, missing required agent field) fails the run before any write and names the source path; a unit test asserts that the injected writer was not called.
 - [x] Unit tests show that generated text is LF and UTF-8 without BOM, that check mode reports a CRLF or BOM target as drift, and that check mode reports a symlink or reparse-point target as drift.
 - [x] `quality-tiers.yml` has a `scripts/harness-generation` entry with tier T4 and a rationale, and `poetry run python -m scripts.dev_tools.check_quality_tiers` exits 0 with no QT007 or QT008 finding.
 
@@ -283,7 +283,7 @@ No artifact of this child requires a language outside the rule; the D-16 consump
 - [x] For a fixture source set that contains standing-guidance sources, the converter's generated output (TypeScript port and Python package) contains no `AGENTS.md` target and no `# Converted standing guidance` text, and an apply-mode run neither creates nor modifies a destination `AGENTS.md`; named Jest and pytest tests assert each condition.
 - [x] For the same fixture, the converter report records each standing-guidance source as not emitted, with a reason, and a named test in each implementation asserts the disposition and the reason.
 - [x] The converter tests updated for the new disposition, each named in the plan, pass under Jest for `extensions/drm-copilot/test/lib/codex-native-converter/` and under pytest for `tests/scripts/dev_tools/codex_native_converter/`, and the remaining tests in both directories pass unchanged.
-- [ ] The converter change adds no Python module and no pushed-down TypeScript file; converter production code is changed only in existing files under `extensions/drm-copilot/src/lib/codex-native-converter/` and `scripts/dev_tools/codex_native_converter/`, recorded in `<FEATURE>/evidence/qa-gates/`.
+- [x] The converter change adds no Python module and no pushed-down TypeScript file; converter production code is changed only in existing files under `extensions/drm-copilot/src/lib/codex-native-converter/` and `scripts/dev_tools/codex_native_converter/`, recorded in `<FEATURE>/evidence/qa-gates/`.
 
 ### MCP server configuration
 
@@ -293,43 +293,43 @@ No artifact of this child requires a language outside the rule; the D-16 consump
 
 ### Skill mirror
 
-- [ ] For every matrix entry selected for the skill mirror in `### Matrix Consumption`, `.claude/skills/<name>/` and its bundle copy equal the rendered mirror of `.agents/skills/<name>/`, and `-Surface skills -Check` exits 0 on the committed tree; the `claude` entries of the eleven D-14 excluded skills are `native`, and no copy of those skills changes relative to the merge base.
-- [ ] Unit tests show that a skill with no selected matrix entry is neither written nor deleted, that `agents/openai.yaml` is not mirrored, and that an extra file in a generated `.claude/skills/<name>/` folder is reported.
-- [ ] Each approved positive difference in child 1's approval artifact that ports into a skill selected for the mirror is applied in `.agents/skills/<name>/SKILL.md`, or recorded `deferred-ledger-region` with its entry number under D-10, and each approved difference that targets a D-14 excluded skill is recorded `deferred-ledger-region` with the entries D-14 lists, all recorded per Diff ID in `<FEATURE>/evidence/qa-gates/`.
-- [ ] `PINNED_FROZEN_SURFACE_HASHES` and `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` are unchanged (D-14); `.claude/skills/epic-orchestrate/SKILL.md` is unchanged and `.claude/agents/epic-orchestrator.md` renders byte-equal; no file under `docs/engineering/process-reductions/` changes; and `test_frozen_epic_surface_matches_pinned_baseline_digest` and `ProcessReductionChain.Ledger.Tests.ps1` pass.
+- [x] For every matrix entry selected for the skill mirror in `### Matrix Consumption`, `.claude/skills/<name>/` and its bundle copy equal the rendered mirror of `.agents/skills/<name>/`, and `-Surface skills -Check` exits 0 on the committed tree; the `claude` entries of the eleven D-14 excluded skills are `native`, and no copy of those skills changes relative to the merge base.
+- [x] Unit tests show that a skill with no selected matrix entry is neither written nor deleted, that `agents/openai.yaml` is not mirrored, and that an extra file in a generated `.claude/skills/<name>/` folder is reported.
+- [x] Each approved positive difference in child 1's approval artifact that ports into a skill selected for the mirror is applied in `.agents/skills/<name>/SKILL.md`, or recorded `deferred-ledger-region` with its entry number under D-10, and each approved difference that targets a D-14 excluded skill is recorded `deferred-ledger-region` with the entries D-14 lists, all recorded per Diff ID in `<FEATURE>/evidence/qa-gates/`.
+- [x] `PINNED_FROZEN_SURFACE_HASHES` and `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` are unchanged (D-14); `.claude/skills/epic-orchestrate/SKILL.md` is unchanged and `.claude/agents/epic-orchestrator.md` renders byte-equal; no file under `docs/engineering/process-reductions/` changes; and `test_frozen_epic_surface_matches_pinned_baseline_digest` and `ProcessReductionChain.Ledger.Tests.ps1` pass.
 
 ### Path-scoped rules
 
-- [ ] Each selected `.claude/rules/*.md` (with a `paths:` list) and `.github/instructions/*.instructions.md` (with an `applyTo:` string), and, under OQ-2's default, each Codex rule-skill, is produced from `scripts/harness-generation/sources/rules/` with its bundle copy, and `-Surface rules -Check` exits 0 on the committed tree.
-- [ ] `tests/scripts/dev_tools/test_claude_rules_frontmatter.py`, `tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py` and `tests/scripts/dev_tools/test_typescript_toolchain_instruction_contracts.py` pass unchanged, and a unit test shows that a source whose Claude glob list would make a non-deliberate rule unconditional is rejected.
-- [ ] `.github/instructions/general-unit-test.instructions.md` begins with a `---` frontmatter delimiter after generation.
+- [x] Each selected `.claude/rules/*.md` (with a `paths:` list) and `.github/instructions/*.instructions.md` (with an `applyTo:` string), and, under OQ-2's default, each Codex rule-skill, is produced from `scripts/harness-generation/sources/rules/` with its bundle copy, and `-Surface rules -Check` exits 0 on the committed tree.
+- [x] `tests/scripts/dev_tools/test_claude_rules_frontmatter.py`, `tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py` and `tests/scripts/dev_tools/test_typescript_toolchain_instruction_contracts.py` pass unchanged, and a unit test shows that a source whose Claude glob list would make a non-deliberate rule unconditional is rejected.
+- [x] `.github/instructions/general-unit-test.instructions.md` begins with a `---` frontmatter delimiter after generation.
 
 ### Agents
 
-- [ ] For every matrix entry selected for agents, `.claude/agents/<name>.md` and base `.codex/agents/<name>.toml` with their bundle copies equal the rendered output of the agent source, and `-Surface agents -Check` exits 0 on the committed tree.
-- [ ] After the PowerShell agent generator runs, the first write-mode run of `poetry run python -m scripts.dev_tools.generate_codex_agent_variants` changes no base `.codex/agents/<family>.toml`, no bundle base copy and no pack manifest, and the variant paths it rewrites are recorded; a second write-mode run changes no file; its `--check` exits 0; and `scripts/dev_tools/generate_codex_agent_variants.py` is unchanged relative to the merge base.
-- [ ] A unit test shows that each agent's `Write(`/`Edit(` literals in the generated Claude and Codex files equal the source literals exactly, including leading-slash spelling, and child 2's write-scope checker suite passes on the generated files.
-- [ ] `tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py`, `tests/scripts/dev_tools/test_codex_agent_wrapper_contracts.py`, `tests/scripts/dev_tools/test_codex_handoff_contract_parity.py` and `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` pass after agent generation.
+- [x] For every matrix entry selected for agents, `.claude/agents/<name>.md` and base `.codex/agents/<name>.toml` with their bundle copies equal the rendered output of the agent source, and `-Surface agents -Check` exits 0 on the committed tree.
+- [x] After the PowerShell agent generator runs, the first write-mode run of `poetry run python -m scripts.dev_tools.generate_codex_agent_variants` changes no base `.codex/agents/<family>.toml`, no bundle base copy and no pack manifest, and the variant paths it rewrites are recorded; a second write-mode run changes no file; its `--check` exits 0; and `scripts/dev_tools/generate_codex_agent_variants.py` is unchanged relative to the merge base.
+- [x] A unit test shows that each agent's `Write(`/`Edit(` literals in the generated Claude and Codex files equal the source literals exactly, including leading-slash spelling, and child 2's write-scope checker suite passes on the generated files.
+- [x] `tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py`, `tests/scripts/dev_tools/test_codex_agent_wrapper_contracts.py`, `tests/scripts/dev_tools/test_codex_handoff_contract_parity.py` and `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` pass after agent generation.
 
 ### CI gate and matrix upkeep
 
-- [ ] `tests/scripts/harness-generation/HarnessGeneration.RepoGate.Tests.ps1` runs every check mode (skills, rules, MCP, agents, instructions) against the committed working tree without starting a process or reading git history, passes on the committed tree, and a unit test shows that the gate fails and lists the path when an injected reader returns drifted content.
-- [ ] No file under `.github/workflows/` changes relative to the merge base, recorded in `<FEATURE>/evidence/qa-gates/`.
+- [x] `tests/scripts/harness-generation/HarnessGeneration.RepoGate.Tests.ps1` runs every check mode (skills, rules, MCP, agents, instructions) against the committed working tree without starting a process or reading git history, passes on the committed tree, and a unit test shows that the gate fails and lists the path when an injected reader returns drifted content.
+- [x] No file under `.github/workflows/` changes relative to the merge base, recorded in `<FEATURE>/evidence/qa-gates/`.
 - [ ] The required `CI Required Gate` check passes on the pull request head (D-7; CI-dependent; checked off at S9).
-- [ ] No matrix entry selected in `### Matrix Consumption` whose source exists still holds a `pending-source:` value in `generated_from`, each such entry has `generator` set, and child 1's repository gate passes.
-- [ ] The execution-environment brief names the repository gate in all six copies (D-5), and the six copies are byte-identical, recorded in `<FEATURE>/evidence/qa-gates/`.
+- [x] No matrix entry selected in `### Matrix Consumption` whose source exists still holds a `pending-source:` value in `generated_from`, each such entry has `generator` set, and child 1's repository gate passes.
+- [x] The execution-environment brief names the repository gate in all six copies (D-5), and the six copies are byte-identical, recorded in `<FEATURE>/evidence/qa-gates/`.
 
 ### QA
 
-- [ ] Each new module under `scripts/harness-generation/` has at least 85% line coverage, read from `artifacts/pester/powershell-coverage.xml` and recorded per file in `<FEATURE>/evidence/qa-gates/`.
-- [ ] The final parallel gates (one `Invoke-PoshQCParallelTest`, one `pytest -n auto`, Jest through its normal workers) report zero failures and `Invoke-PoshQCLeakScan` passes (D-6), recorded in `<FEATURE>/evidence/qa-gates/`.
-- [ ] The files added relative to the merge base include no `.py` file and no `.ts` file, and each added code file appears in `## Language Classification` with the language it is written in, recorded in `<FEATURE>/evidence/qa-gates/`.
-- [ ] The files changed relative to the merge base include none of the paths in the `Blast-radius tooling`, `Child 2 files` and `Excluded from edit` items of `## Constraints & Risks`, recorded in `<FEATURE>/evidence/qa-gates/`.
+- [x] Each new module under `scripts/harness-generation/` has at least 85% line coverage, read from `artifacts/pester/powershell-coverage.xml` and recorded per file in `<FEATURE>/evidence/qa-gates/`.
+- [x] The final parallel gates (one `Invoke-PoshQCParallelTest`, one `pytest -n auto`, Jest through its normal workers) report zero failures and `Invoke-PoshQCLeakScan` passes (D-6), recorded in `<FEATURE>/evidence/qa-gates/`.
+- [x] The files added relative to the merge base include no `.py` file and no `.ts` file, and each added code file appears in `## Language Classification` with the language it is written in, recorded in `<FEATURE>/evidence/qa-gates/`.
+- [x] The files changed relative to the merge base include none of the paths in the `Blast-radius tooling`, `Child 2 files` and `Excluded from edit` items of `## Constraints & Risks`, recorded in `<FEATURE>/evidence/qa-gates/`.
 - [ ] No file added or changed by this child exceeds 800 lines; `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` passes, recorded in `<FEATURE>/evidence/qa-gates/`.
-- [ ] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`, `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`, `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py`, `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py` and `tests/scripts/dev_tools/test_generate_codex_agent_variants.py` pass after all generation, recorded in `<FEATURE>/evidence/qa-gates/`.
+- [x] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`, `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`, `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py`, `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py` and `tests/scripts/dev_tools/test_generate_codex_agent_variants.py` pass after all generation, recorded in `<FEATURE>/evidence/qa-gates/`.
 
 ## Definition of Done
 
 - [ ] Every item in `## Acceptance Criteria` is checked off with its evidence.
 - [ ] The full toolchain loop (format, lint, type check where applicable, architecture, unit, contract, integration) passes in a single pass, recorded in `<FEATURE>/evidence/qa-gates/`.
-- [ ] `user-story.md` acceptance criteria are checked off consistently with this spec.
+- [x] `user-story.md` acceptance criteria are checked off consistently with this spec.
