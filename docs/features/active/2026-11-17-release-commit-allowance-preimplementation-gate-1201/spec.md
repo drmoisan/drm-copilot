@@ -255,7 +255,7 @@ Absent file and decline paths:
 - [x] AC-4: With the config seam returning `$null`, a checkpoint-free `git add package.json` and `git commit -m 'x'` produce exactly today's generic `PREIMPLEMENTATION_GATE_BLOCKED` text, and `Get-EpicScopeWorktreeHeadBranch`, `Get-OrchestrationGateStagedIndex`, and `Test-OrchestrationGateReleaseAllowancePathIsContainer` are invoked zero times (`Should -Invoke ... -Times 0 -Exactly`). Verified by the Claude and Codex decision suites.
 - [x] AC-5: A blank command, Codex `apply_patch` text beginning `*** Begin Patch`, a Write/Edit path call, and an empty `$checkpointPath` (injected `-CheckpointRaw`) all decline with an empty suffix and zero calls to the config seam. Verified by `enforce-orchestration-preimplementation-gate-release.Tests.ps1` and the decision suites.
 - [x] AC-6 (AD-3): With a valid allowance file present, a classified command line containing no `git add` or `git commit` segment (for example `pytest`) produces the generic deny text with no release suffix and zero config-seam calls. Verified by the decision suites.
-- [ ] AC-7: Every existing test file under `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks` passes without modification (no diff to any pre-existing test file in the branch). Verified by the parallel Pester run JUnit evidence and `git diff --name-status main` showing only added test files under those folders.
+- [x] AC-7: Every existing test file under `tests/scripts/claude-hooks` and `tests/scripts/codex-hooks` passes without modification (no diff to any pre-existing test file in the branch). Verified by the parallel Pester run JUnit evidence and `git diff --name-status main` showing only added test files under those folders.
 
 Allowed paths:
 
@@ -296,9 +296,9 @@ Documentation:
 
 Quality gates:
 
-- [ ] AC-30: Both new PowerShell files reach >= 85% line coverage in the parallel Pester run, and the Jest coverage thresholds in `extensions/drm-copilot/jest.config.cjs` pass. Verified by the JUnit and coverage files recorded under `evidence/qa-gates/`.
+- [x] AC-30: Both new PowerShell files reach >= 85% line coverage in the parallel Pester run, and the Jest coverage thresholds in `extensions/drm-copilot/jest.config.cjs` pass. Verified by the JUnit and coverage files recorded under `evidence/qa-gates/`.
 - [ ] AC-31: The full toolchain loop passes in a single pass in parallel form (format, lint including PSScriptAnalyzer and ESLint, type-check, architecture, unit, contract), and CI on the PR head is green. Verified by the QA gate evidence and `ci_gate.conclusion` `success` (CI-dependent; checked off at S9).
-- [ ] AC-32: No hook added or edited by this change invokes Python, and no new Python module or Python test file is added. Verified by `hook-release-allowance-context.Parity.Tests.ps1` (asserts neither new file contains `python` or `poetry`) and the branch file list in the QA evidence.
+- [x] AC-32: No hook added or edited by this change invokes Python, and no new Python module or Python test file is added. Verified by `hook-release-allowance-context.Parity.Tests.ps1` (asserts neither new file contains `python` or `poetry`) and the branch file list in the QA evidence.
 
 ## Risks & Mitigations
 
