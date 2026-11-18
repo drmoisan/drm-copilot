@@ -149,6 +149,7 @@ assert_manifest_path_is_root_level(  # the manifest is never a payload path
 EXCLUDED_RELATIVE_PATHS: tuple[Path, ...] = (
     Path(".claude/settings.local.json"),
     Path("config/blast-radius.local.json"),
+    Path(".claude/release-commit-allowance.json"),
 )
 
 __all__ = [

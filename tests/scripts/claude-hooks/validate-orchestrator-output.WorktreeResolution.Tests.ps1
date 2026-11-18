@@ -372,3 +372,8 @@ Describe 'validate-orchestrator-output target-worktree resolution' {
         Should -Invoke Get-CheckpointFileContent -Times 0 -Exactly
     }
 }
+
+AfterAll {
+    # The hook force-imports the run module; discard only the stale fixture-owned scope binding.
+    Reset-EpicStateProbeModuleBinding
+}

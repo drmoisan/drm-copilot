@@ -252,3 +252,8 @@ Describe 'validate-orchestrator-output resolution sibling' {
         $result.Message.Contains('RESOLVER_FAILED') | Should -BeTrue -Because $result.Message
     }
 }
+
+AfterAll {
+    # The hook force-imports the run module; discard only the stale fixture-owned scope binding.
+    Reset-EpicStateProbeModuleBinding
+}

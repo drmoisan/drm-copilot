@@ -92,6 +92,7 @@ export const ROUTING_MERGE_RELATIVE_PATH = "config/orchestration-routing.json";
 export const EXCLUDED_RELATIVE_PATHS: ReadonlyArray<string> = [
   ".claude/settings.local.json",
   "config/blast-radius.local.json",
+  ".claude/release-commit-allowance.json",
 ];
 
 /** One destination-side write decorator registered for a relative path. */

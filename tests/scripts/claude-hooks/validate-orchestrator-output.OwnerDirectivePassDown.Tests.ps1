@@ -360,3 +360,9 @@ Describe 'non-ASCII directive text (issue #1187)' {
         $decision.Message | Should -BeLike 'OWNER_DIRECTIVE_BLOCKED: OWNER_DIRECTIVE_LEDGER_INVALID: item-ledger: *text_sha256*'
     }
 }
+
+AfterAll {
+    # The suite force-imports the run module; discard only the stale fixture-owned scope binding.
+    . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    Reset-EpicStateProbeModuleBinding
+}

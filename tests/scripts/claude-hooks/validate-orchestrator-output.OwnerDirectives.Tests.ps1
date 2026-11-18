@@ -209,3 +209,8 @@ Describe 'validate-orchestrator-output owner-directive check' {
         }
     }
 }
+
+AfterAll {
+    # The hook force-imports the run module; discard only the stale fixture-owned scope binding.
+    Reset-EpicStateProbeModuleBinding
+}

@@ -208,3 +208,8 @@ Describe 'validate-orchestrator-output.ps1 re-entry policy' {
         ([string]$result.Message).Contains('DONE is blocked while a halt is present') | Should -BeTrue -Because $result.Message
     }
 }
+
+AfterAll {
+    # The hook force-imports the run module; discard only the stale fixture-owned scope binding.
+    Reset-EpicStateProbeModuleBinding
+}

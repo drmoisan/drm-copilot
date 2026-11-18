@@ -307,3 +307,8 @@ Describe 'Write-OrchestratorOutputAllowNote' {
         $writer.ToString() | Should -Be ''
     }
 }
+
+AfterAll {
+    # The hook force-imports the run module; discard only the stale fixture-owned scope binding.
+    Reset-EpicStateProbeModuleBinding
+}

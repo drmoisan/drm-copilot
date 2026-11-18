@@ -1,0 +1,18 @@
+# Phase gate - Phase 2 (toolchain stages 1 to 6)
+
+Timestamp: 2026-11-18T00-48
+Command: the stages below, run in order through SCRATCH launcher scripts inside the worktree
+EXIT_CODE: 0
+Output Summary: one clean pass with zero failures and zero findings in every stage; no stage changed a file.
+
+1. Stage 1-2 PowerShell: Command: sh SCRATCH/issue-1201-ps-static.sh over the four copies of each new hook file, the four gate copies, and the six new test files (18 files; check-only Invoke-Formatter compare and PSScriptAnalyzer with the repository settings). EXIT_CODE: 0. Format drift 0; findings 0.
+2. Leak scan: Command: sh SCRATCH/issue-1201-leak-scan.sh. EXIT_CODE: 0. "Leak scan: 865 files, 78 findings, 76 exempt, 2 allowlisted, 0 failures."
+3. Stages 1-3 Python: Command: env -u VIRTUAL_ENV poetry run black --check . / ruff check . / pyright (repository-wide, via SCRATCH/issue-1201-py-static-repo.sh). EXIT_CODE: 0 each. "1070 files would be left unchanged."; "All checks passed!"; "0 errors, 0 warnings, 0 informations".
+4. Stages 1-3 TypeScript: Command: npx prettier --check "src/**/*.ts" "test/**/*.ts" "*.json" "*.cjs"; npx eslint --no-error-on-unmatched-pattern src test; npx tsc -p ./ --noEmit; npx tsc -p tsconfig.jest.json --noEmit (extensions/drm-copilot, via SCRATCH/issue-1201-static-py-ts.sh). EXIT_CODE: 0 each; findings 0.
+5. Stage 4 architecture boundaries: not applicable; the repository has no dependency-cruiser configuration and no .NET architecture tests. Finding count 0.
+6. Stage 5 Pester: Command: sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester (one Invoke-PoshQCParallelTest run, 8 workers, 716.38 s, 2026-11-18T00-28 to 00-40). EXIT_CODE: 0. 28105 tests, 28087 passed, 0 failed, 18 skipped. Repo-wide line coverage 45276/47121 = 96.08%. New files 100.00% in .claude and .codex (171/171 and 32/32); .claude gate 171/177 = 96.61%; .codex gate 182/182 = 100.00%.
+7. Stage 5 pytest: Command: env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest --cov --cov-branch --cov-report=term --cov-report=json:SCRATCH/issue-1201-pg2-py-coverage.json (one pytest -n auto run). EXIT_CODE: 0. 16957 passed, 0 failed, 6 skipped; lines 97.74%, branches 95.15%; scripts/dev_tools/push_down_claude_customizations.py lines 74/79 = 93.67%, branches 14/16 = 87.50%.
+8. Stage 5 Jest: Command: env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest-extension --coverage (normal parallel workers; one earlier attempt exited 75 on a busy lock, a queue timeout). EXIT_CODE: 0. 345 suites and 5684 tests passed, 0 failed; coverageThreshold map met; src/lib/push-down/claude-customizations.ts lines 497/497 = 100%, branches 61/63 = 96.82%.
+9. Stage 6 contract checks: Command: env -u VIRTUAL_ENV poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check. EXIT_CODE: 0, no output, no drift. The contract tests named in the execution-environment brief (push-down resource contracts, pack-manifest completeness and dependency closure, Codex wrapper and handoff parity, rules frontmatter, brief contracts, test-execution-policy registration, dependency-guard completeness, parallel-gate wording, planning-contract wording, regeneration-path and documentation-workflow contracts, and the new hook-release-allowance-context.Parity.Tests.ps1) ran inside the pytest and Pester gates above and passed.
+
+Physical line counts: extensions/drm-copilot/src/lib/push-down/claude-customizations.ts 497 (under 800 and under 500); hook-release-allowance-context.ps1 495 and enforce-orchestration-preimplementation-gate-release.ps1 166 in each of the four roots; Claude gate 495; Codex gate 487.
