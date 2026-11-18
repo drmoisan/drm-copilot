@@ -28,7 +28,10 @@ import {
   PACK_MANIFEST_DIRECTORY,
   PublishedPathFilterFileSystem,
 } from "./push-down-pack-resolver";
-import { WriteIfChangedFileSystem } from "./push-down-write-if-changed";
+import {
+  mergedDestinationPaths,
+  WriteIfChangedFileSystem,
+} from "./push-down-write-if-changed";
 
 /** One file of a shared skill folder that stays in an ecosystem layer. */
 export interface SharedLayerEcosystemException {
@@ -102,7 +105,11 @@ export function buildSharedLayer(options: SharedLayerOptions): PushDownLayer {
     );
   }
   const merging = new RoutingMergeFileSystem(
-    new WriteIfChangedFileSystem(options.fs),
+    new WriteIfChangedFileSystem(options.fs, {
+      jsonEquivalentPaths: mergedDestinationPaths(options.destinationRoot, [
+        ROUTING_CONFIG_RELATIVE_PATH,
+      ]),
+    }),
     options.destinationRoot,
     ROUTING_CONFIG_RELATIVE_PATH,
   );

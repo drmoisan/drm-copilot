@@ -2,7 +2,10 @@
  * Unit tests for the write-if-changed push-down decorator (issue #1029).
  */
 
-import { WriteIfChangedFileSystem } from "../../../src/lib/push-down/push-down-write-if-changed";
+import {
+  mergedDestinationPaths,
+  WriteIfChangedFileSystem,
+} from "../../../src/lib/push-down/push-down-write-if-changed";
 import { buildInMemoryFileSystem } from "./push-down.test-helpers";
 
 describe("WriteIfChangedFileSystem", () => {
@@ -37,6 +40,40 @@ describe("WriteIfChangedFileSystem", () => {
     fs.writeTextFile("/dest/b.md", "text");
 
     expect(inner.writtenPaths).toEqual(["/dest/b.md"]);
+  });
+
+  it("skips a JSON-equivalent write only for a merged JSON path", () => {
+    const inner = buildInMemoryFileSystem({
+      "/dest/config/merged.json": '{"b": [1, 2], "a": 1}\n',
+      "/dest/config/plain.json": '{"b": [1, 2], "a": 1}\n',
+    });
+    const fs = new WriteIfChangedFileSystem(inner, {
+      jsonEquivalentPaths: mergedDestinationPaths("/dest/", [
+        "config/merged.json",
+      ]),
+    });
+    const reformatted = `${JSON.stringify({ a: 1, b: [1, 2] }, null, 2)}\n`;
+
+    fs.writeTextFile("/dest/config/merged.json", reformatted);
+    fs.writeTextFile("/dest/config/plain.json", reformatted);
+
+    expect(fs.skippedPaths).toEqual(["/dest/config/merged.json"]);
+    expect(fs.writtenPaths).toEqual(["/dest/config/plain.json"]);
+  });
+
+  it("writes a merged JSON path whose value changed or does not parse", () => {
+    const inner = buildInMemoryFileSystem({
+      "/dest/m.json": '{"a": 1}\n',
+      "/dest/bad.json": "not json\n",
+    });
+    const fs = new WriteIfChangedFileSystem(inner, {
+      jsonEquivalentPaths: ["/dest/m.json", "/dest/bad.json"],
+    });
+
+    fs.writeTextFile("/dest/m.json", '{"a": 2}\n');
+    fs.writeTextFile("/dest/bad.json", '{"a": 1}\n');
+
+    expect(fs.writtenPaths).toEqual(["/dest/m.json", "/dest/bad.json"]);
   });
 
   it("delegates every other method to the inner adapter", () => {

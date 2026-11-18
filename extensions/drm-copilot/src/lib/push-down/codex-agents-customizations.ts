@@ -26,7 +26,10 @@ import { LAYER_ROOT_FILES, type PushDownLayer } from "./push-down-layer";
 import { resolveLayerPublishedPaths } from "./push-down-pack-resolver";
 import { runPushDownPipeline } from "./push-down-pipeline";
 import { applyPushDownPlan, UNKNOWN_PAYLOAD_VERSION } from "./push-down-apply";
-import { WriteIfChangedFileSystem } from "./push-down-write-if-changed";
+import {
+  mergedDestinationPaths,
+  WriteIfChangedFileSystem,
+} from "./push-down-write-if-changed";
 
 /** Artifact directory for the Codex/agents push-down summary. */
 export const ARTIFACT_DIRECTORY = "artifacts/codex-and-agents-customizations";
@@ -355,7 +358,11 @@ export function buildCodexLayer(
   });
   // The routing document is merged like the Claude push-down merges it (D2).
   const merging = new RoutingMergeFileSystem(
-    new WriteIfChangedFileSystem(options.fs),
+    new WriteIfChangedFileSystem(options.fs, {
+      jsonEquivalentPaths: mergedDestinationPaths(options.destinationRoot, [
+        ROUTING_CONFIG_RELATIVE_PATH,
+      ]),
+    }),
     options.destinationRoot,
     ROUTING_CONFIG_RELATIVE_PATH,
   );

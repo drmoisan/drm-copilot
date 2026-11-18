@@ -24,7 +24,10 @@ import { type CSharpVariant, type MemoryMode } from "./claude-pack-selection";
 import { LAYER_ROOT_FILES, type PushDownLayer } from "./push-down-layer";
 import { resolveLayerPublishedPaths } from "./push-down-pack-resolver";
 import { type RewriteFunction } from "./reference-rewrites";
-import { WriteIfChangedFileSystem } from "./push-down-write-if-changed";
+import {
+  mergedDestinationPaths,
+  WriteIfChangedFileSystem,
+} from "./push-down-write-if-changed";
 
 /** Structural form of one destination-side write decorator. */
 export interface ClaudeLayerWriteDecorator {
@@ -97,7 +100,12 @@ export function composeClaudeLayer(
     declarations.destinationWriteDecorators.reduce<PushDownFileSystem>(
       (inner, decorator) =>
         decorator.wrap(inner, options.destinationRoot, decoratorOptions),
-      new WriteIfChangedFileSystem(options.fs),
+      new WriteIfChangedFileSystem(options.fs, {
+        jsonEquivalentPaths: mergedDestinationPaths(
+          options.destinationRoot,
+          declarations.mergedRelativePaths,
+        ),
+      }),
     );
   const excluding = new ExcludingFileSystem(
     decorated,
