@@ -104,7 +104,7 @@ Pester tests with in-memory JSON strings and injected seams; no `npm` process, n
 - [x] Line coverage of `NpmAuditGate.psm1` and `Invoke-NpmAuditGate.ps1` is at least 85%.
 - [x] Process-reduction ledger entry `0013-npm-audit-advisory-exception.md` exists with the prior text (`run: npm audit --audit-level="$AUDIT_LEVEL"`), a revert note and six ordered revert steps, plus its index row in `docs/engineering/process-reductions/README.md`; the ledger chain and index tests pass.
 - [x] The executor's one real run per manifest confirms `--omit=dev` is honored and the audit JSON shape (or the `npm ls` fallback is implemented and recorded), with evidence appended under `evidence/other/`.
-- [ ] CI-dependent: `NPM Audit Gate / npm audit (.)`, `(extensions/drm-copilot)` and `(packages/mcp-server)` pass on the PR head (checked off at S9 only).
+- [x] CI-dependent: `NPM Audit Gate / npm audit (.)`, `(extensions/drm-copilot)` and `(packages/mcp-server)` pass on the PR head (checked off at S9 only).
 
 ## Risks & Mitigations
 
