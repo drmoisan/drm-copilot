@@ -293,7 +293,7 @@ Rule: execution proceeds on the recommended defaults below unless the owner answ
 
 ## Acceptance Criteria
 
-- [ ] `push_down_claude_customizations`, `push_down_codex_and_agents_customizations` and `push_down_copilot_customizations` each delegate to the same pipeline entry point with a selection that names only their own ecosystem; a Jest test per wrapper verifies the delegation, and no wrapper module contains its own enumeration, planning or write loop.
+- [x] `push_down_claude_customizations`, `push_down_codex_and_agents_customizations` and `push_down_copilot_customizations` each delegate to the same pipeline entry point with a selection that names only their own ecosystem; a Jest test per wrapper verifies the delegation, and no wrapper module contains its own enumeration, planning or write loop.
 - [x] For each ecosystem, an apply run into an empty in-memory destination writes every file of the shared-layer set resolved at the Phase 0 gate; verified by a data-driven Jest test over the Claude, Codex and Copilot wrappers.
 - [x] For each ecosystem, every path written by a run lies in the shared-layer set or under that ecosystem's layer roots, and no path lies under another ecosystem's layer (including Codex-only `.agents/skills` entries for non-Codex runs); verified by a data-driven Jest test.
 - [x] Each wrapper, including `push_down_copilot_customizations`, accepts `packs` and publishes only `core` plus the selected packs for its ecosystem layer, with C# variant rules unchanged; verified by Jest tests.
@@ -311,12 +311,12 @@ Rule: execution proceeds on the recommended defaults below unless the owner answ
 - [x] An omitted `packs` reuses the selection recorded for that ecosystem in `.push-down-manifest.json`, and publishes the full ecosystem tree when no selection is recorded (O-5 default).
 - [x] The pack manifests list every generated file that child 3 produces, as recorded by the Phase 0 gate, and a Jest full-bundle completeness test passes: every file under a published root of each bundle is listed by a layer manifest or by a documented exception with a stated reason.
 - [x] The Phase 0 gate and the execution-precondition gate ran before any edit and their records are under `<FEATURE>/evidence/qa-gates/`, including confirmation that child 1 (#1025) and child 3 (#1028) have merged.
-- [ ] The language classification holds: the branch diff against `origin/main` adds no `.py` file, adds no TypeScript or Python file under a pushed-down root or its bundle copy, and adds or changes no `scripts/dev_tools/push_down_*.py` file.
+- [x] The language classification holds: the branch diff against `origin/main` adds no `.py` file, adds no TypeScript or Python file under a pushed-down root or its bundle copy, and adds or changes no `scripts/dev_tools/push_down_*.py` file.
 - [x] Existing MCP tool names are unchanged, existing input properties keep their types, enums and defaults, and for calls without the new properties the result keeps `ok`, `tool`, `workspace_root`, `summary`, a one-element `artifacts` and `warnings` only when non-empty, with `push_down_report` as the only added field; verified by a wrapper-compatibility Jest test.
-- [ ] The static parity tests (`test_push_down_claude_parity.py`, `test_push_down_claude_overlay_parity.py`, `test_push_down_claude_exclusion_parity.py`, `test_push_down_claude_gitignore_parity.py`, `test_skill_bundle_contract_repo.py`) pass without modification (O-6 default).
-- [ ] The bundle-mirror and contract tests listed in `## Non-Functional Requirements`, the Pester `*.Manifest.Tests.ps1` suites and the Codex generator `--check` pass, with results recorded under `<FEATURE>/evidence/qa-gates/`.
-- [ ] Each new production TypeScript file has its own `coverageThreshold` entry (lines 85, branches 75) in `extensions/drm-copilot/jest.config.cjs`, and the Jest run meets every threshold.
-- [ ] No new or changed file exceeds 800 lines, no test creates a temporary file, and no file under `.claude/hooks`, `.codex/hooks` or `.github/hooks` is changed.
+- [x] The static parity tests (`test_push_down_claude_parity.py`, `test_push_down_claude_overlay_parity.py`, `test_push_down_claude_exclusion_parity.py`, `test_push_down_claude_gitignore_parity.py`, `test_skill_bundle_contract_repo.py`) pass without modification (O-6 default).
+- [x] The bundle-mirror and contract tests listed in `## Non-Functional Requirements`, the Pester `*.Manifest.Tests.ps1` suites and the Codex generator `--check` pass, with results recorded under `<FEATURE>/evidence/qa-gates/`.
+- [x] Each new production TypeScript file has its own `coverageThreshold` entry (lines 85, branches 75) in `extensions/drm-copilot/jest.config.cjs`, and the Jest run meets every threshold.
+- [x] No new or changed file exceeds 800 lines, no test creates a temporary file, and no file under `.claude/hooks`, `.codex/hooks` or `.github/hooks` is changed.
 
 ## Definition of Done
 
