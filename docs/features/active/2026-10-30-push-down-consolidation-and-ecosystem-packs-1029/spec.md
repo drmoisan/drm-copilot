@@ -3,9 +3,9 @@
 - **Issue:** #1029
 - **Parent (optional):** epic #1018 (`docs/features/epics/shared-agent-harness-layer/epic.md`), child 4
 - **Owner:** drmoisan
-- **Last Updated:** 2026-11-14
+- **Last Updated:** 2026-11-18
 - **Status:** Draft
-- **Version:** 0.3
+- **Version:** 0.4 (amendment A-1, `## Spec Amendments`)
 - **Work Mode:** full-feature (AC sources: this file and `user-story.md`)
 - **Primary research input:** `docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/research/research.2026-10-30T23-07.md` (cited below as "the research")
 
@@ -42,7 +42,7 @@ Out of scope:
 ## Behavior
 
 1. **One pipeline.** A single pipeline entry point accepts a workspace (source) root, a destination root, an ecosystem selection, and options (`dryRun`, `overwriteUnmanaged`). The Claude, Codex and Copilot service calls in `extensions/drm-copilot/src/lib/push-down/push-down-service-call.ts` call that entry point with exactly one ecosystem each. Enumeration, pack resolution, planning, comparison, writing, manifest handling and reporting happen only inside the pipeline. Per-ecosystem specifics (root folders, Copilot `rewriteTextReferences`, Claude memory scope and mode, Claude blast-radius derive and overlay, C# variant source prefixes, Codex virtual resource pairs) are supplied to the pipeline as ecosystem descriptors and are not reimplemented.
-2. **Shared layer always installed.** Every run installs the shared layer: `AGENTS.md`, the shared `.agents/skills/<name>/**` set (skills whose child 1 matrix entry `codex:skill:<name>` has disposition `shared`, including `references/standard.md` per the Q1 default), and the shared configuration `config/orchestration-routing.json` (merged, not overwritten), `config/orchestration-handoff-registry.json` and `config/orchestration-handoff.schema.json`. The exact shared-layer set is confirmed at the Phase 0 gate.
+2. **Shared layer always installed.** Every run installs the shared layer: `AGENTS.md`, the shared `.agents/skills/<name>/**` set (skills whose child 1 matrix entry `codex:skill:<name>` has disposition `shared`, including `references/standard.md` per the Q1 default), and the shared configuration `config/orchestration-routing.json` (merged, not overwritten), `config/orchestration-handoff-registry.json` and `config/orchestration-handoff.schema.json`. A file of a shared skill folder whose runtime dependencies lie outside the shared layer is excluded from it and stays in its ecosystem layer as a named ecosystem-layer exception with a stated reason (amendment A-1). The exact shared-layer set is confirmed at the Phase 0 gate.
 3. **Ecosystem layers.** Claude: `.claude/**`, `config/blast-radius.json`, and per O-10 `CLAUDE.md` and `.mcp.json` when bundled. Codex: `.codex/**` (including `.codex/lib/**` and the virtual resource pairs) and Codex-only `.agents/skills/**`. Copilot: `.github/**` sub-roots published today plus `.github/copilot-instructions.md` per O-10.
 4. **Pack selection.** Each ecosystem layer is filtered by `core` plus the selected packs of that ecosystem's pack manifests. Copilot gains pack manifests and a `packs` input. C# variant routing and mutual exclusion keep today's rules. When `packs` is omitted: if the destination manifest records a selection for that ecosystem, that selection is reused (O-5); otherwise the full ecosystem tree is published, as today.
 5. **Unselected ecosystem.** A run writes no file under the roots of an ecosystem that was not selected for that run, and no Codex-only skill under `.agents/skills` unless Codex is selected.
@@ -144,7 +144,7 @@ Ecosystem selection: under the O-2 default each wrapper selects exactly its own 
 
 - Existing per-bundle `pack-manifests/` directories under `extensions/drm-copilot/resources/claude-customizations/` and `extensions/drm-copilot/resources/codex-and-agents-customizations/` keep their location and format (`{ "name", "label", "paths", "source_prefix"? }`), because the Pester `*.Manifest.Tests.ps1` suites and `scripts/dev_tools/generate_codex_agent_variants.py` read them.
 - New Copilot manifests under `extensions/drm-copilot/resources/customizations/pack-manifests/`, same format.
-- One new shared-layer manifest named `shared`, same format, loaded on every run; its bundle location is fixed in the plan. Its `paths` are exactly the shared-layer set of Behavior 2 (`AGENTS.md`, the shared `.agents/skills/<name>/**` files, and the three shared configuration paths), and the Phase 0 gate, the manifest, the shared-layer tests and the completeness test use that one set.
+- One new shared-layer manifest named `shared`, same format, loaded on every run; its bundle location is fixed in the plan. Its `paths` are exactly the shared-layer set of Behavior 2 (`AGENTS.md`, the shared `.agents/skills/<name>/**` files minus the ecosystem-layer exceptions of amendment A-1, and the three shared configuration paths), and the Phase 0 gate, the manifest, the shared-layer tests and the completeness test use that one set.
 - Partitioning `.agents/skills` entries between the shared manifest and the Codex `core.json` keeps every required agent path that the Codex generator `--check` demands.
 
 ## Language Classification
@@ -216,6 +216,10 @@ Recorded by the preparation-mode orchestrator under the coordinator's autonomous
 - R-5 `VIRTUAL_RESOURCE_DIRECTORIES` in `codex-agents-customizations.ts` gained the `.codex/lib/epic-wave` pair (#1134). It stays a pinned declaration that the Codex layer reuses unchanged.
 - R-6 #1025 and #1028 are still open on 2026-11-14, so the Phase 0 upstream gate (owner decision E3) is kept unchanged.
 - R-7 The destination manifest location (`.push-down-manifest.json` at the destination root), its field names, and the pack names (`core`, `python`, `powershell`, `typescript`, `csharp-modern`, `csharp-legacy`, Copilot `csharp`, and `shared`) are unchanged, because the prepared plans of #1049, #1050 and #1051 cite them.
+
+## Spec Amendments
+
+- A-1 (2026-11-18, the one plan revision accepted under `### Phase 0 gate (execution time)`). The Phase 0 gate recorded `Result: BLOCKED` (`<FEATURE>/evidence/qa-gates/phase0-upstream-recheck.2026-11-18T07-25.md`): the shared skill `test-execution-policy` bundles `scripts/Invoke-PesterSuite.ps1`, `scripts/Invoke-TestSuite.ps1` and `scripts/run-test-suite.sh`; `Invoke-TestSuite.ps1` dot-sources helpers from `.claude/hooks` or `.codex/hooks` and reads `config/test-execution-policy.json`, none of which is in the shared layer, so a Copilot-only destination would receive a launcher that exits 2. Amendment: the shared-layer set of Behavior 2 and `### Pack Manifests` excludes a named list of ecosystem-layer exceptions, each with its owning layer and reason. The list holds exactly those three files, owned by the Codex layer through their existing Codex `core.json` entries; the Claude layer keeps its own `.claude/skills/test-execution-policy/scripts/` copy. The Phase 0 assumption becomes: no `.py` or `.ts` file in a shared skill's bundle folder, and every `.ps1`, `.psm1` or `.sh` file there either has all runtime dependencies inside the shared-layer set or is on the exception list. The single shared-set definition, the manifest name, and every other behavior are unchanged. The plan records the list as decision D16.
 
 ## Open Owner Questions
 
