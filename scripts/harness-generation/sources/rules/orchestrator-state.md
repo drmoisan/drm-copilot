@@ -426,6 +426,17 @@ At start, argv[0] resolves to an application through PATH (and PATHEXT on Window
 
 Honest disclosure: the merge-gate check and the preimplementation allowance are policy-level controls, not security controls. A writer in the same session can author `regeneration_events[]` and a delta outcome; the controls prove internal consistency, not origin. The delta outcome is not a full review, and the review/verdict status names the last full review's audit file.
 
+<!-- harness-section: release-commit-allowance-scope -->
+## Release-Commit Allowance Scope
+
+These rules apply only to a repository that commits `.claude/release-commit-allowance.json` at its worktree root (issue #1201). The file is destination-owned: it is never bundled, never published by push-down (both Claude publishers list it in `EXCLUDED_RELATIVE_PATHS`), and never shipped with a default; this repository commits none.
+
+- **Command-only, allow-side only.** `Get-OrchestrationReleaseAllowanceResult` in `enforce-orchestration-preimplementation-gate-release.ps1`, byte-identical in `.claude/hooks/` and `.codex/hooks/`, runs in both preimplementation gates after every other leg and immediately before the final deny, for a Bash `git add` or `git commit` line only. It never denies on its own, never changes trigger classification, and never applies to a Write, Edit, or delegation call.
+- **No checkpoint key.** The leg reads no orchestrator-state key and writes none; the validators are unchanged.
+- **Codes.** A failure appends ` Release allowance not applied: <CODE>: <detail>` as the last deny suffix with one of `RELEASE_ALLOWANCE_CONFIG_INVALID`, `RELEASE_ALLOWANCE_COMMAND_NOT_MODELLED`, `RELEASE_ALLOWANCE_BRANCH_NOT_MATCHED`, `RELEASE_ALLOWANCE_OPTION_NOT_ALLOWED`, `RELEASE_ALLOWANCE_PATH_NOT_ALLOWED`, `RELEASE_ALLOWANCE_STAGED_PATH_NOT_ALLOWED`, `RELEASE_ALLOWANCE_STAGED_INDEX_EMPTY`, and `RELEASE_ALLOWANCE_STAGED_INDEX_UNREADABLE`. An absent file adds no suffix.
+
+Honest disclosure: the leg is a policy-level control, not a security control. Whoever can commit the allowance file decides which paths an agent may commit on a matching branch without a checkpoint.
+
 <!-- harness-section: enforcement -->
 ## Enforcement
 

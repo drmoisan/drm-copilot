@@ -42,6 +42,7 @@
         "concurrent-review-scope-and-backward-compatibility",
         "owner-directive-scope-and-backward-compatibility",
         "regeneration-path-scope-and-backward-compatibility",
+        "release-commit-allowance-scope",
         "enforcement"
       ]
     },
