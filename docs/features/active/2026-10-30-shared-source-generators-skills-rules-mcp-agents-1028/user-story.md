@@ -87,7 +87,7 @@ Shared skills, path-scoped rules, MCP servers, agents and top-level instructions
 ### Quality and language
 
 - [x] No new Python or TypeScript file is added; every new code file is PowerShell and is listed with its language in the spec's `## Language Classification`.
-- [ ] Each new PowerShell module has at least 85% line coverage, the parallel test gates and the leak scan pass (spec D-6), and no added or changed file exceeds 800 lines.
+- [x] Each new PowerShell module has at least 85% line coverage, the parallel test gates and the leak scan pass (spec D-6), and no added or changed file exceeds 800 lines.
 - [x] No blast-radius tooling file, child 2 file (other than the `### Interface for epic child 3` section of child 2's spec, which spec D-12 amends), or file in the spec's excluded paths is changed by this child.
 
 ## Non-Goals

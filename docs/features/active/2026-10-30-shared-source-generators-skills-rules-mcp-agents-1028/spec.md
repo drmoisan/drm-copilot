@@ -325,7 +325,7 @@ No artifact of this child requires a language outside the rule; the D-16 consump
 - [x] The final parallel gates (one `Invoke-PoshQCParallelTest`, one `pytest -n auto`, Jest through its normal workers) report zero failures and `Invoke-PoshQCLeakScan` passes (D-6), recorded in `<FEATURE>/evidence/qa-gates/`.
 - [x] The files added relative to the merge base include no `.py` file and no `.ts` file, and each added code file appears in `## Language Classification` with the language it is written in, recorded in `<FEATURE>/evidence/qa-gates/`.
 - [x] The files changed relative to the merge base include none of the paths in the `Blast-radius tooling`, `Child 2 files` and `Excluded from edit` items of `## Constraints & Risks`, recorded in `<FEATURE>/evidence/qa-gates/`.
-- [ ] No file added or changed by this child exceeds 800 lines; `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` passes, recorded in `<FEATURE>/evidence/qa-gates/`.
+- [x] No file added or changed by this child exceeds 800 lines; `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` passes, recorded in `<FEATURE>/evidence/qa-gates/`.
 - [x] `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`, `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`, `tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py`, `tests/scripts/dev_tools/test_push_down_codex_and_agents_pack_manifest_completeness.py`, `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py` and `tests/scripts/dev_tools/test_generate_codex_agent_variants.py` pass after all generation, recorded in `<FEATURE>/evidence/qa-gates/`.
 
 ## Definition of Done
