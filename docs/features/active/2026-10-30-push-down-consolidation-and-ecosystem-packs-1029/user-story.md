@@ -49,7 +49,7 @@ The repository pushes its agent harness down to destination repositories through
 - [ ] A second push-down with no source change and no destination change changes no file outside `artifacts/`.
 - [ ] The destination receives `.push-down-manifest.json` at its root with a SHA-256 hash per managed file and the pack selection per ecosystem, and with no timestamp and no absolute path.
 - [ ] Destination exclusions in `.push-down-exclusions` are honored by all three tools, and files of a deselected pack or ecosystem are reported as orphaned rather than deleted.
-- [ ] The pack manifests list the generated files that child 3 (#1028) produces, as confirmed at the Phase 0 gate.
+- [x] The pack manifests list the generated files that child 3 (#1028) produces, as confirmed at the Phase 0 gate.
 - [ ] No new Python file is added, and no TypeScript or Python file is pushed down to destinations.
 
 ## Non-Goals
