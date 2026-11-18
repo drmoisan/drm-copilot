@@ -3,8 +3,8 @@
 - Issue: #1030
 - Owner: drmoisan
 - Status: Draft
-- Last Updated: 2026-11-14
-- Version: 0.3
+- Last Updated: 2026-11-18
+- Version: 0.4
 - Spec: `spec.md` (this feature folder)
 
 ## Story Statement
@@ -14,10 +14,11 @@
   disposition and a parity group, with a recorded gap class and reason wherever a Claude gate has no
   Codex counterpart, so that a missing gate in one ecosystem is detected by a test rather than
   discovered after a workflow runs unguarded.
-- As a destination-repository operator using Codex, I want the pr-author output validator and the
-  feature-folder order gate to run as Codex hooks with the same decisions on the same inputs, so
-  that Codex sessions are held to the same pr-author completion and ordering rules as Claude
-  sessions.
+- As a destination-repository operator using Codex, I want the pr-author output validator to run as
+  a Codex hook with the same decisions on the same inputs, so that Codex sessions are held to the
+  same pr-author completion rules as Claude sessions. The feature-folder order gate is deferred
+  (spec AD-8) until child 4 publishes the development-docs module it needs, and the matrix records
+  that gap.
 - As a repository maintainer, I want enforcement hooks in every ecosystem to run without Python and
   the bundled mirrors to stay byte-identical, so that pushed-down hooks behave the same in
   destination repositories as in this one.
@@ -47,9 +48,11 @@ covers function parity only.
 - Persona: destination-repository operator using Codex
   - Runs Codex in a repository that received the Codex pack through push-down.
   - Cares that pr-author output is validated before the subagent stops, and that plan writes are
-    blocked until prerequisite feature documents exist.
+    blocked until prerequisite feature documents exist; the second gate is deferred in Codex and
+    recorded as a gap.
   - Constraint: the destination does not receive `.claude/lib`; Codex hooks must be self-contained
-    or use published `.codex/lib` modules, which is why lib-dependent validators are deferred.
+    or use published `.codex/lib` modules, which is why lib-dependent validators and the
+    feature-folder order gate are deferred.
 - Scenario: maintainer detects a gap
   - The maintainer adds a new Claude hook to `.claude/hooks/pretooluse-dispatch.json` in a later
     change.
@@ -67,9 +70,9 @@ covers function parity only.
 
 - [ ] Every hook registration enumerated by child 1's inventory module at execution time, including the entries of `.claude/hooks/pretooluse-dispatch.json` and `.codex/hooks/pretooluse-dispatch.json`, has exactly one matrix entry with `disposition: native`, a `parity_group` and a `decision_ref`, and `tests/scripts/harness/HarnessParityMatrix.RepoGate.Tests.ps1` passes.
 - [ ] Every Claude hook `parity_group` has a Codex member or a recorded gap class with reason, and `tests/scripts/harness/HarnessHookParity.RepoGate.Tests.ps1` passes, including its negative cases.
-- [ ] Codex `validate-pr-author-output.ps1` and `enforce-feature-folder-order.ps1` each have a behavior suite under `tests/scripts/codex-hooks/` running the same decision cases as the corresponding Claude suite on equivalent Codex payloads, and the pr-author validator allows a stop when `stop_hook_active` is set.
-- [ ] Codex `enforce-feature-folder-order.ps1` is registered in the `^(apply_patch|Edit|Write)$` group of the Codex dispatch registry (root and bundle), not in `.codex/config.toml`.
-- [ ] The matrix records the five worktree-resolution-dependent SubagentStop validators, `enforce-prd-feature-before-planner`, `enforce-mermaid-validation`, `enforce-pr-author-skill`, `validate-orchestrator-output` and the pr-author Bash allowlist as `DEFER`, and the Codex preimplementation-gate delegation registration as `NOT-EXPRESSIBLE` naming issue #555, each with its reason.
+- [ ] Codex `validate-pr-author-output.ps1` has a behavior suite under `tests/scripts/codex-hooks/` running the same decision cases as the corresponding Claude suite on equivalent Codex payloads, and the validator allows a stop when `stop_hook_active` is set.
+- [ ] The Codex `enforce-feature-folder-order` port is deferred (spec AD-8): no `.codex/hooks/enforce-feature-folder-order.ps1` file and no Codex dispatch-registry or `.codex/config.toml` entry for it is added (root and bundle), and the Claude `hook:enforce-feature-folder-order` entry carries a `GAP:DEFER: ` note naming `.claude/lib/development-docs/DevelopmentDocsRoot.psm1` and child 4, verified by `tests/scripts/harness/HarnessHookParity.RepoGate.Tests.ps1`.
+- [ ] The matrix records the five worktree-resolution-dependent SubagentStop validators, `enforce-feature-folder-order`, `enforce-prd-feature-before-planner`, `enforce-mermaid-validation`, `enforce-pr-author-skill`, `validate-orchestrator-output` and the pr-author Bash allowlist as `DEFER`, and the Codex preimplementation-gate delegation registration as `NOT-EXPRESSIBLE` naming issue #555, each with its reason.
 - [ ] Copilot hook registrations have `disposition: native` and `owner_child: 6`.
 - [ ] `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` scans `.github/hooks` in addition to its existing roots and passes.
 - [ ] Bundled mirrors, pack manifests and their contract tests listed in the spec pass.
@@ -80,5 +83,5 @@ covers function parity only.
 
 - Re-opening the settled design for hooks (native, parity of function).
 - PreToolUse registration-shape parity (delivered by #1159).
-- Porting the deferred hooks or publishing `.claude/lib` modules to `.codex/lib` (child 4).
+- Porting the deferred hooks (including `enforce-feature-folder-order`) or publishing `.claude/lib` modules to `.codex/lib` (child 4).
 - Finalizing the thin Copilot layer (child 6).
