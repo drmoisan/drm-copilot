@@ -3,124 +3,118 @@
 - **Issue:** #1204
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-11-17T22-23
+- **Last Updated:** 2026-11-18
 - **Status:** Draft
-- **Version:** 0.1
+- **Version:** 0.2
 
 ## Context
-The NPM Audit Gate (`.github/workflows/_npm-audit-gate.yml`, `npm audit --audit-level=moderate` in `.`, `extensions/drm-copilot` and `packages/mcp-server`) now fails on every branch, including `main`. The cause is advisory GHSA-fc5q-39xc-vjpf: a high-severity ReDoS in `picomatch` (`<= 4.0.7`, published 2026-10-19, updated 2026-11-17). It has no patched version, and 4.0.7 is the latest release. `picomatch` reaches the repository only through development dependencies (`jest`, `@parcel/watcher`): `npm ls picomatch --omit=dev --all` is empty in all three manifests, so no shipped artifact contains it. Every PR is blocked, including the high-priority #1201 and its release, and epic #1018.
 
-Environment:
-- OS/version: GitHub Actions ubuntu-latest, Node 26.13.0
-- Python version: not applicable
-- Command/flags used: `npm audit --audit-level=moderate`
-- Data source or fixture: the three npm manifests and lockfiles; 42 high findings, all from GHSA-fc5q-39xc-vjpf
+The NPM Audit Gate (`.github/workflows/_npm-audit-gate.yml`, matrix over `.`, `extensions/drm-copilot`, `packages/mcp-server`, step `npm audit --audit-level="$AUDIT_LEVEL"`) fails on every branch, including `main`. The cause is advisory GHSA-fc5q-39xc-vjpf, a high-severity ReDoS in `picomatch` (`<= 4.0.7`). No patched version exists. `picomatch` reaches the repository only through development dependencies (`jest`, `@parcel/watcher`); `npm ls picomatch --omit=dev --all` is empty in all three manifests. Every PR is blocked, including #1201 and epic #1018.
 
-Impact / Severity:
-- [x] Blocker
-- [ ] High
-- [ ] Medium
-- [ ] Low
-
+Impact / Severity: Blocker.
 
 ## Repro & Evidence
-Steps to Reproduce:
+
 1. Run CI on any branch.
-2. Observe that `NPM Audit Gate / npm audit (.)` and `(extensions/drm-copilot)` fail with GHSA-fc5q-39xc-vjpf.
+2. Observe `NPM Audit Gate / npm audit (.)` and `(extensions/drm-copilot)` fail with GHSA-fc5q-39xc-vjpf.
 
-Expected:
-The gate still fails on any advisory at or above the configured level, except for advisories listed in a committed, reviewed exception file. Each exception names one advisory id, gives a reason, an owner-approved date and an expiry date, and applies only while every affected path is a development dependency. An exception that has expired, or whose advisory reaches a production dependency, fails the gate. All exceptions are reported in the job log.
+Expected: the gate fails on any advisory at or above the configured level except advisories listed in a committed exception file. Each exception names one advisory id, a reason, an approval date and an expiry date. An expired exception, or an excepted advisory that reaches a production dependency, fails the gate. Every applied exception is reported in the job log.
 
-Actual:
-The gate fails on a development-only advisory that has no fix, so every PR is blocked.
-
-Logs / Screenshots:
-- [ ] Attached minimal logs or screenshot
-- Snippet: `picomatch <=4.0.7 Severity: high ... ReDoS through single-branch repeated extglobs - https://github.com/advisories/GHSA-fc5q-39xc-vjpf`, with no fix available.
-
+Actual: the gate fails on a development-only advisory that has no fix.
 
 ## Scope & Non-Goals
-- In scope:
-- Out of scope / non-goals:
-- Explicitly excluded systems, integrations, or datasets:
+
+- In scope: the exception file and its validation; the gate script and module; the workflow step; tests; the process-reduction ledger entry.
+- Out of scope: lowering `AUDIT_LEVEL`; omitting dev dependencies from the audit wholesale; upgrading or overriding `picomatch`; changing job ids, job names, check names, or the `node-version` line; any Python; any edit to the execution-environment brief copies.
 
 ## Root Cause Analysis
-Upstream has not published a patched `picomatch`. The gate has no exception mechanism. Coordinator decision under the owner's autonomy directive: add the narrowest exception possible. It covers one advisory id, is dev-only (verified in the gate with `npm ls <package> --omit=dev --all` or the audit JSON `isDirect`/`effects` data, whichever is simpler and reliable), and expires 30 days after merge (2026-12-18). The exception is recorded in the process-reduction ledger with the prior gate text and a revert note, so it can be removed once upstream ships a fix. The logic goes in bash or node inside the workflow, or in a small PowerShell or bash script under `scripts/ci/`, with no new Python.
 
+Upstream has not published a patched `picomatch`, and the gate has no exception mechanism. The narrowest remedy is one advisory id, dev-only, expiring 2026-12-18, enforced in code, with the prior gate text recorded in the process-reduction ledger.
 
 ## Proposed Fix
 
-### Design summary (what changes where):
+### Design summary
 
-### Boundaries and invariants to preserve:
+Approach A from the research record (`research/research.2026-11-17.md`):
 
-### Dependencies or blocked work:
+1. Strict production pass: `npm audit --omit=dev --audit-level="$AUDIT_LEVEL"` runs with no exception logic. Any finding fails with `NPM_AUDIT_PROD_FINDING`. An excepted advisory reaching production therefore fails.
+2. Full audit, filtered: `npm audit --json` (all dependency types). Collect the unique advisory objects from `via[]` object elements, keyed by the GHSA id extracted from `url` with `GHSA-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}` (fall back to numeric `source` when no GHSA is present). Keep advisories whose severity rank is at or above `AUDIT_LEVEL` (`info < low < moderate < high < critical`). Remove advisories matching a valid, unexpired exception id. Any remainder fails with `NPM_AUDIT_UNEXCEPTED_ADVISORY`. String-only `via` entries need no handling: transitive dependents are covered by their chain's advisory objects.
+3. Fail closed: empty or unparseable audit JSON fails with `NPM_AUDIT_OUTPUT_UNPARSEABLE`.
 
-### Implementation strategy (what changes, not sequencing):
-	
-#### Files/modules to change:
+### Boundaries and invariants
 
-#### Functions/classes/CLI commands impacted:
+- Audit level is passed through unchanged from `inputs.audit-level` (default `moderate`).
+- Check order: exception file validation, production audit, full audit. The log names the first cause.
+- Failure codes: `NPM_AUDIT_EXCEPTION_INVALID`, `NPM_AUDIT_EXCEPTION_EXPIRED`, `NPM_AUDIT_PROD_FINDING`, `NPM_AUDIT_UNEXCEPTED_ADVISORY`, `NPM_AUDIT_OUTPUT_UNPARSEABLE`. Each is distinct and appears in the log.
+- An exception for an advisory absent from the audit is reported as unused (informational, not a failure).
+- The pure module performs no I/O and does not read the clock. The entry script injects file read, clock (UTC date), the `npm` wrapper, and output writers.
 
-#### Data flow and validation changes:
+### Files to change or add
 
-#### Error handling and logging updates:
+- `config/npm-audit-exceptions.json` (new)
+- `scripts/ci/NpmAuditGate.psm1` (new, pure: `ConvertFrom-NpmAuditException`, `Get-NpmAuditAdvisories`, `Get-NpmAuditGateDecision`)
+- `scripts/ci/Invoke-NpmAuditGate.ps1` (new, entry, seams `-ReadFile`, `-GetUtcDate`, `Invoke-NpmAuditExe -NpmArgs`, `-OutputWriter`, dot-source guard, explicit `exit 0` / `exit 1`)
+- `.github/workflows/_npm-audit-gate.yml` (step replaced)
+- `tests/scripts/ci/NpmAuditGate.Tests.ps1`, `tests/scripts/ci/Invoke-NpmAuditGate.Tests.ps1`, `tests/scripts/workflows/NpmAuditGateWorkflow.Tests.ps1` (new)
+- `docs/engineering/process-reductions/0013-npm-audit-advisory-exception.md` (new) and its row in `docs/engineering/process-reductions/README.md`
 
-#### Rollback/feature-flag considerations (if applicable):
+### Exception file contract
 
-### Technical specifications (interfaces/contracts):
+`{ "version": 1, "exceptions": [ { "id", "package", "scope", "reason", "approved_at", "expires" } ] }`. Dates are `yyyy-MM-dd`, compared as UTC dates; `expires` strictly before the clock date is expired. Exactly one id per entry. Unknown keys at any level, a `version` other than 1, a missing or empty required field, a duplicate id, a malformed id, a bad date, or `expires` not after `approved_at` fails with `NPM_AUDIT_EXCEPTION_INVALID`.
 
-#### Inputs/outputs and formats:
+### Workflow step
 
-#### Required configuration keys and defaults:
+`shell: pwsh`, `working-directory: ${{ matrix.manifest }}`, running `${{ github.workspace }}/scripts/ci/Invoke-NpmAuditGate.ps1` with `-AuditLevel "$env:AUDIT_LEVEL"` and `-ExceptionsPath "${{ github.workspace }}/config/npm-audit-exceptions.json"`. The bare `npm audit --audit-level` line is removed. Every applied exception (id, package, reason, approved_at, expires, days remaining) is written to the log and `GITHUB_STEP_SUMMARY`.
 
-#### Backward-compatibility expectations:
+### Rollback
 
-#### Performance constraints (latency/throughput/memory):
+Revert per `0013-npm-audit-advisory-exception.md`: restore the prior single line `run: npm audit --audit-level="$AUDIT_LEVEL"` and delete the new script, module, config, and tests.
 
 ## Assumptions, Constraints, Dependencies
-- Assumptions (environment, data, access):
-- Constraints (budget, performance, compatibility):
-- External dependencies (services, libraries, releases):
+
+- `pwsh` is available on `ubuntu-latest` (already used by `ci.yml`).
+- Constraint: no new Python; no temp files in tests; no `Get-Date` in the module; each new file under 500 lines.
+- Open item for the executor: run `npm audit --omit=dev --json` and `npm audit --json` once per manifest and confirm `--omit=dev` is honored, the `via` object shape, and exit codes; record counts only (advisory ids, severities, exit codes) under `evidence/other/` with clock-read UTC stamps, append-only. If `--omit=dev` is not honored, fall back to `npm ls <pkg> --omit=dev --all` for the dev-only proof only.
 
 ## Data / API / Config Impact
-- User-facing or API changes:
-- Data or migration considerations:
-- Logging/telemetry updates (if any):
-- Compatibility notes (CLI flags, config schemas, versioning):
+
+- New config file `config/npm-audit-exceptions.json`; no change to the reusable workflow's `inputs` interface.
+- Logging: each applied exception and each failure code is printed; applied exceptions go to `GITHUB_STEP_SUMMARY`.
 
 ## Test Strategy
-Seeded from issue:
 
-- [ ] `config/npm-audit-exceptions.json` with one entry for GHSA-fc5q-39xc-vjpf (id, package, reason, approved_at, expires)
-- [ ] Gate step: run `npm audit --json`, fail on any advisory at or above the level that is not excepted, fail on an expired exception, and fail when an excepted advisory reaches a production dependency
-- [ ] Tests for the filter script: excepted dev-only advisory passes; unexcepted advisory fails; expired exception fails; excepted advisory in a production path fails; malformed exception file fails
-- [ ] Process-reduction ledger entry with the prior text and a revert note; actionlint passes; the gate goes green on the PR
+Pester tests with in-memory JSON strings and injected seams; no `npm` process, no disk access, no temp files.
 
-- Regression tests to add or update:
-- Unit tests (pytest) for the fixed behavior and boundaries:
-- Edge cases and negative scenarios (invalid inputs, missing data, boundary values):
-- Error handling and logging verification:
-- Coverage impact and targets for changed lines/modules:
-- Toolchain commands to run (format → lint → type-check → test):
-- Manual validation steps (if required):
-
+- Decision tests: dev-only excepted advisory passes; unexcepted advisory fails; expired exception fails; production audit nonempty (excepted advisory reaching production) fails; transitive dependent of an excepted advisory is covered; mixed advisories (one excepted, one not) fail; severity below `AUDIT_LEVEL` is ignored; unparseable or empty JSON fails; GHSA extraction from `url`; unused exception is informational.
+- Exception file tests: wrong version, unknown key, duplicate id, missing field, bad date, `expires` not after `approved_at` each fail.
+- Entry script tests: exit codes 0 and 1 and the printed failure code for each path, with `Invoke-NpmAuditExe` mocked using matching `-NpmArgs` parameter names.
+- Workflow text test: job id and name unchanged, `node-version` line present, step calls `Invoke-NpmAuditGate.ps1`, old bare `npm audit --audit-level` line absent, exceptions path passed, audit level taken from `AUDIT_LEVEL`.
+- Toolchain: format, lint, actionlint 1.7.12 over the changed workflow, PoshQC tests with coverage, ledger tests `ProcessReductionChain.Ledger.Tests.ps1` and `ProcessReductionLedger.Index.Tests.ps1`.
 
 ## Acceptance Criteria
-- [ ] Repro steps now produce the expected behavior in all documented environments.
-- [ ] Regression test(s) added and passing (list file path and test name).
-- [ ] Edge cases and invalid inputs are handled with correct errors or fallbacks.
-- [ ] No unintended behavior changes outside the defined scope.
-- [ ] Required logs/telemetry updated and validated (if applicable).
-- [ ] Performance constraints met or explicitly waived with rationale.
-- [ ] Full toolchain pass completed (format → lint → type-check → test).
-- [ ] Docs/config references updated to match the new behavior.
+
+- [ ] `config/npm-audit-exceptions.json` exists with `version` 1 and exactly one entry: `id` GHSA-fc5q-39xc-vjpf, `package` picomatch, a non-empty `reason`, `approved_at` 2026-11-18, `expires` 2026-12-18.
+- [ ] Exception-file validation fails with `NPM_AUDIT_EXCEPTION_INVALID` for a wrong `version`, an unknown key, a duplicate id, a missing or empty field, a malformed id, a bad or non-`yyyy-MM-dd` date, and `expires` not after `approved_at`; each case has a failing-then-passing test.
+- [ ] `scripts/ci/NpmAuditGate.psm1` and `scripts/ci/Invoke-NpmAuditGate.ps1` implement approach A: strict `npm audit --omit=dev` pass, then full `npm audit --json` advisory-set filter by GHSA from `via` url, severity rank at or above `AUDIT_LEVEL`, expiry against the injected UTC date (expired when `expires` is strictly earlier), fail closed on unparseable output, and distinct codes `NPM_AUDIT_EXCEPTION_INVALID`, `NPM_AUDIT_EXCEPTION_EXPIRED`, `NPM_AUDIT_PROD_FINDING`, `NPM_AUDIT_UNEXCEPTED_ADVISORY`, `NPM_AUDIT_OUTPUT_UNPARSEABLE`, evaluated in that order.
+- [ ] Every applied exception (id, package, reason, approved_at, expires, days remaining) is printed to the log and to `GITHUB_STEP_SUMMARY`; an unused exception is reported as informational without failing.
+- [ ] `.github/workflows/_npm-audit-gate.yml` replaces the bare `npm audit` step with the `pwsh` step calling `Invoke-NpmAuditGate.ps1`; `AUDIT_LEVEL` is not lowered; dev dependencies are not omitted from the full audit; the job id, job name, check names, and `node-version` line are unchanged; actionlint passes.
+- [ ] Pester tests pass for: dev-only excepted advisory passes; unexcepted advisory fails; expired exception fails; excepted advisory reaching a production path fails; malformed exception file fails; transitive dependent covered; mixed advisories fail; below-level severity ignored; unparseable JSON fails.
+- [ ] `tests/scripts/workflows/NpmAuditGateWorkflow.Tests.ps1` passes and asserts the workflow text conditions listed in Test Strategy.
+- [ ] New tests create no temp files and call no real `npm`; no new Python is added; each new file is under 500 lines.
+- [ ] Line coverage of `NpmAuditGate.psm1` and `Invoke-NpmAuditGate.ps1` is at least 85%.
+- [ ] Process-reduction ledger entry `0013-npm-audit-advisory-exception.md` exists with the prior text (`run: npm audit --audit-level="$AUDIT_LEVEL"`), a revert note and six ordered revert steps, plus its index row in `docs/engineering/process-reductions/README.md`; the ledger chain and index tests pass.
+- [ ] The executor's one real run per manifest confirms `--omit=dev` is honored and the audit JSON shape (or the `npm ls` fallback is implemented and recorded), with evidence appended under `evidence/other/`.
+- [ ] CI-dependent: `NPM Audit Gate / npm audit (.)`, `(extensions/drm-copilot)` and `(packages/mcp-server)` pass on the PR head (checked off at S9 only).
 
 ## Risks & Mitigations
-- Technical or operational risks:
-- Mitigations and rollbacks:
+
+- Reviewer reads the gate as weakened: one id, enforced expiry, strict production pass, ledger entry with revert steps, exceptions printed in the log.
+- `--omit=dev` not honored by npm 11: verified once per manifest; `npm ls` fallback for the dev-only proof.
+- Coverage shortfall on entry script: seams for npm, file read, clock, and writers; dot-source guard.
+- Real gate behavior exists only on the runner: green run on the PR head required.
 
 ## Rollout & Follow-up
-- Release/rollout steps:
-- Post-fix monitoring or clean-up tasks:
-- Links: issue, PRs, related docs
+
+- Merge, then back-fill `Merge commit:` in the ledger entry.
+- Remove the exception and revert per the ledger when upstream ships a patched `picomatch`, or by 2026-12-18.
+- Links: issue #1204; research `research/research.2026-11-17.md`.
