@@ -119,7 +119,7 @@
   - Acceptance: every listed condition holds in the record.
 - [x] [P7-T4] Check off the satisfied acceptance criteria in `docs/features/active/2026-10-30-shared-source-generators-skills-rules-mcp-agents-1028/spec.md` and `docs/features/active/2026-10-30-shared-source-generators-skills-rules-mcp-agents-1028/user-story.md`, leaving the two CI-dependent items for S9; only `- [ ]` changes to `- [x]`.
   - Acceptance: each checked item cites its evidence file in the executor's AC status summary.
-- [ ] [P7-T5] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md` and `feature-audit.yyyy-MM-ddTHH-mm.md` against the branch diff from `BASE` and write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL or N/A row per checklist item; fix any FAIL, re-run from [P7-T1], and write a new record.
+- [x] [P7-T5] Walk `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`, `code-review.yyyy-MM-ddTHH-mm.md` and `feature-audit.yyyy-MM-ddTHH-mm.md` against the branch diff from `BASE` and write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL or N/A row per checklist item; fix any FAIL, re-run from [P7-T1], and write a new record.
   - Acceptance: the newest record has no FAIL row.
 
 ## Existing Test Disposition
