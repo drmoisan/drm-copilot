@@ -12,7 +12,8 @@
       "target_paths": [
         ".claude/agents/atomic-executor.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/atomic-executor.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:atomic-executor",
       "consumers": [
         "claude-code",
@@ -32,7 +33,8 @@
       "target_paths": [
         ".claude/agents/atomic-planner.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/atomic-planner.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:atomic-planner",
       "consumers": [
         "claude-code",
@@ -68,7 +70,8 @@
       "target_paths": [
         ".claude/agents/csharp-typed-engineer.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/csharp-typed-engineer.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:csharp-typed-engineer",
       "consumers": [
         "claude-code",
@@ -88,7 +91,8 @@
       "target_paths": [
         ".claude/agents/discovery-capability-sentinel.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/discovery-capability-sentinel.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:discovery-capability-sentinel",
       "consumers": [
         "claude-code",
@@ -108,7 +112,8 @@
       "target_paths": [
         ".claude/agents/docs-architect.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/docs-architect.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:docs-architect",
       "consumers": [
         "claude-code",
@@ -128,7 +133,8 @@
       "target_paths": [
         ".claude/agents/docs-author.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/docs-author.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:docs-author",
       "consumers": [
         "claude-code",
@@ -148,7 +154,8 @@
       "target_paths": [
         ".claude/agents/docs-coverage-reviewer.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/docs-coverage-reviewer.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:docs-coverage-reviewer",
       "consumers": [
         "claude-code",
@@ -168,7 +175,8 @@
       "target_paths": [
         ".claude/agents/docs-reconciler.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/docs-reconciler.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:docs-reconciler",
       "consumers": [
         "claude-code",
@@ -188,7 +196,8 @@
       "target_paths": [
         ".claude/agents/epic-orchestrator.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/epic-orchestrator.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:epic-orchestrator",
       "consumers": [
         "claude-code",
@@ -208,7 +217,8 @@
       "target_paths": [
         ".claude/agents/epic-planner.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/epic-planner.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:epic-planner",
       "consumers": [
         "claude-code",
@@ -228,7 +238,8 @@
       "target_paths": [
         ".claude/agents/epic-review.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/epic-review.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:epic-review",
       "consumers": [
         "claude-code",
@@ -248,7 +259,8 @@
       "target_paths": [
         ".claude/agents/feature-review.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/feature-review.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:feature-review",
       "consumers": [
         "claude-code",
@@ -284,7 +296,8 @@
       "target_paths": [
         ".claude/agents/legacy-parity-analyst.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/legacy-parity-analyst.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:legacy-parity-analyst",
       "consumers": [
         "claude-code",
@@ -304,7 +317,8 @@
       "target_paths": [
         ".claude/agents/migration-coverage-reviewer.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/migration-coverage-reviewer.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:migration-coverage-reviewer",
       "consumers": [
         "claude-code",
@@ -324,7 +338,8 @@
       "target_paths": [
         ".claude/agents/orchestrator.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/orchestrator.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:orchestrator",
       "consumers": [
         "claude-code",
@@ -376,7 +391,8 @@
       "target_paths": [
         ".claude/agents/powershell-typed-engineer.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/powershell-typed-engineer.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:powershell-typed-engineer",
       "consumers": [
         "claude-code",
@@ -396,7 +412,8 @@
       "target_paths": [
         ".claude/agents/pr-author.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/pr-author.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:pr-author",
       "consumers": [
         "claude-code",
@@ -416,7 +433,8 @@
       "target_paths": [
         ".claude/agents/prd-feature.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/prd-feature.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:prd-feature",
       "consumers": [
         "claude-code",
@@ -436,7 +454,8 @@
       "target_paths": [
         ".claude/agents/python-typed-engineer.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/python-typed-engineer.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:python-typed-engineer",
       "consumers": [
         "claude-code",
@@ -456,7 +475,8 @@
       "target_paths": [
         ".claude/agents/requirements-reconciler.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/requirements-reconciler.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:requirements-reconciler",
       "consumers": [
         "claude-code",
@@ -476,7 +496,8 @@
       "target_paths": [
         ".claude/agents/runtime-characterization-analyst.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/runtime-characterization-analyst.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:runtime-characterization-analyst",
       "consumers": [
         "claude-code",
@@ -496,7 +517,8 @@
       "target_paths": [
         ".claude/agents/staged-review.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/staged-review.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:staged-review",
       "consumers": [
         "claude-code",
@@ -516,7 +538,8 @@
       "target_paths": [
         ".claude/agents/status-updater.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/status-updater.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:status-updater",
       "consumers": [
         "claude-code",
@@ -536,7 +559,8 @@
       "target_paths": [
         ".claude/agents/task-researcher.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/task-researcher.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:task-researcher",
       "consumers": [
         "claude-code",
@@ -556,7 +580,8 @@
       "target_paths": [
         ".claude/agents/typescript-engineer.md"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/typescript-engineer.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:typescript-engineer",
       "consumers": [
         "claude-code",
@@ -1494,7 +1519,8 @@
       "target_paths": [
         ".mcp.json"
       ],
-      "generated_from": "pending-source:mcp-server",
+      "generated_from": "scripts/harness-generation/sources/mcp-servers.json",
+      "generator": "harness-generation/mcp",
       "parity_group": "mcp:drm-copilot",
       "consumers": [
         "claude-code"
@@ -1513,7 +1539,8 @@
       "target_paths": [
         ".claude/rules/architecture-boundaries.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/architecture-boundaries.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:architecture-boundaries",
       "consumers": [
         "claude-code",
@@ -1533,7 +1560,8 @@
       "target_paths": [
         ".claude/rules/bash-command-shape.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/bash-command-shape.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:bash-command-shape",
       "consumers": [
         "claude-code",
@@ -1553,7 +1581,8 @@
       "target_paths": [
         ".claude/rules/benchmark-baselines.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/benchmark-baselines.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:benchmark-baselines",
       "consumers": [
         "claude-code",
@@ -1573,7 +1602,8 @@
       "target_paths": [
         ".claude/rules/ci-workflows.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/ci-workflows.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:ci-workflows",
       "consumers": [
         "claude-code",
@@ -1593,7 +1623,8 @@
       "target_paths": [
         ".claude/rules/csharp.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/csharp.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:csharp",
       "consumers": [
         "claude-code",
@@ -1613,7 +1644,8 @@
       "target_paths": [
         ".claude/rules/general-code-change.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/general-code-change.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:general-code-change",
       "consumers": [
         "claude-code",
@@ -1633,7 +1665,8 @@
       "target_paths": [
         ".claude/rules/general-unit-test.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/general-unit-test.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:general-unit-test",
       "consumers": [
         "claude-code",
@@ -1653,7 +1686,8 @@
       "target_paths": [
         ".claude/rules/mermaid.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/mermaid.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:mermaid",
       "consumers": [
         "claude-code",
@@ -1673,7 +1707,8 @@
       "target_paths": [
         ".claude/rules/orchestrator-state.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/orchestrator-state.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:orchestrator-state",
       "consumers": [
         "claude-code",
@@ -1693,7 +1728,8 @@
       "target_paths": [
         ".claude/rules/parallel-orchestration.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/parallel-orchestration.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:parallel-orchestration",
       "consumers": [
         "claude-code",
@@ -1713,7 +1749,8 @@
       "target_paths": [
         ".claude/rules/plan-acceptance-gates.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/plan-acceptance-gates.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:plan-acceptance-gates",
       "consumers": [
         "claude-code",
@@ -1733,7 +1770,8 @@
       "target_paths": [
         ".claude/rules/powershell.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/powershell.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:powershell",
       "consumers": [
         "claude-code",
@@ -1753,7 +1791,8 @@
       "target_paths": [
         ".claude/rules/python.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/python.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:python",
       "consumers": [
         "claude-code",
@@ -1773,7 +1812,8 @@
       "target_paths": [
         ".claude/rules/python-suppressions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/python-suppressions.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:python-suppressions",
       "consumers": [
         "claude-code",
@@ -1793,7 +1833,8 @@
       "target_paths": [
         ".claude/rules/quality-tiers.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/quality-tiers.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:quality-tiers",
       "consumers": [
         "claude-code",
@@ -1813,7 +1854,8 @@
       "target_paths": [
         ".claude/rules/self-explanatory-code-commenting.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/self-explanatory-code-commenting.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:self-explanatory-code-commenting",
       "consumers": [
         "claude-code",
@@ -1833,7 +1875,8 @@
       "target_paths": [
         ".claude/rules/shell.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/shell.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:shell",
       "consumers": [
         "claude-code",
@@ -1853,7 +1896,8 @@
       "target_paths": [
         ".claude/rules/tonality.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/tonality.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:tonality",
       "consumers": [
         "claude-code",
@@ -1873,7 +1917,8 @@
       "target_paths": [
         ".claude/rules/typescript.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/typescript.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:typescript",
       "consumers": [
         "claude-code",
@@ -1893,7 +1938,8 @@
       "target_paths": [
         ".claude/rules/typescript-suppressions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/typescript-suppressions.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:typescript-suppressions",
       "consumers": [
         "claude-code",
@@ -2085,6 +2131,7 @@
         ".claude/skills/acceptance-criteria-tracking/SKILL.md"
       ],
       "generated_from": ".agents/skills/acceptance-criteria-tracking/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:acceptance-criteria-tracking",
       "consumers": [
         "claude-code",
@@ -2106,6 +2153,7 @@
         ".claude/skills/adjudicate-unspecified-behavior/SKILL.md"
       ],
       "generated_from": ".agents/skills/adjudicate-unspecified-behavior/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:adjudicate-unspecified-behavior",
       "consumers": [
         "claude-code",
@@ -2144,6 +2192,7 @@
         ".claude/skills/characterize-runtime-behavior/SKILL.md"
       ],
       "generated_from": ".agents/skills/characterize-runtime-behavior/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:characterize-runtime-behavior",
       "consumers": [
         "claude-code",
@@ -2185,6 +2234,7 @@
         ".claude/skills/commit-message/SKILL.md"
       ],
       "generated_from": ".agents/skills/commit-message/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:commit-message",
       "consumers": [
         "claude-code",
@@ -2206,6 +2256,7 @@
         ".claude/skills/csharp-change-budget-router/SKILL.md"
       ],
       "generated_from": ".agents/skills/csharp-change-budget-router/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:csharp-change-budget-router",
       "consumers": [
         "claude-code",
@@ -2227,6 +2278,7 @@
         ".claude/skills/csharp-orchestration-state-machine/SKILL.md"
       ],
       "generated_from": ".agents/skills/csharp-orchestration-state-machine/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:csharp-orchestration-state-machine",
       "consumers": [
         "claude-code",
@@ -2265,6 +2317,7 @@
         ".claude/skills/discovery-behavior-reconciliation/SKILL.md"
       ],
       "generated_from": ".agents/skills/discovery-behavior-reconciliation/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:discovery-behavior-reconciliation",
       "consumers": [
         "claude-code",
@@ -2286,6 +2339,7 @@
         ".claude/skills/discovery-coverage-ledger/SKILL.md"
       ],
       "generated_from": ".agents/skills/discovery-coverage-ledger/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:discovery-coverage-ledger",
       "consumers": [
         "claude-code",
@@ -2307,6 +2361,7 @@
         ".claude/skills/discovery-parity-matrix/SKILL.md"
       ],
       "generated_from": ".agents/skills/discovery-parity-matrix/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:discovery-parity-matrix",
       "consumers": [
         "claude-code",
@@ -2328,6 +2383,7 @@
         ".claude/skills/discovery-repo-inventory/SKILL.md"
       ],
       "generated_from": ".agents/skills/discovery-repo-inventory/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:discovery-repo-inventory",
       "consumers": [
         "claude-code",
@@ -2349,6 +2405,7 @@
         ".claude/skills/discovery-runtime-characterization/SKILL.md"
       ],
       "generated_from": ".agents/skills/discovery-runtime-characterization/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:discovery-runtime-characterization",
       "consumers": [
         "claude-code",
@@ -2370,6 +2427,7 @@
         ".claude/skills/discovery-validate-artifacts/SKILL.md"
       ],
       "generated_from": ".agents/skills/discovery-validate-artifacts/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:discovery-validate-artifacts",
       "consumers": [
         "claude-code",
@@ -2391,6 +2449,7 @@
         ".claude/skills/discovery-workflow/SKILL.md"
       ],
       "generated_from": ".agents/skills/discovery-workflow/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:discovery-workflow",
       "consumers": [
         "claude-code",
@@ -2412,6 +2471,7 @@
         ".claude/skills/docs-author-page/SKILL.md"
       ],
       "generated_from": ".agents/skills/docs-author-page/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:docs-author-page",
       "consumers": [
         "claude-code",
@@ -2433,6 +2493,7 @@
         ".claude/skills/docs-init/SKILL.md"
       ],
       "generated_from": ".agents/skills/docs-init/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:docs-init",
       "consumers": [
         "claude-code",
@@ -2454,6 +2515,7 @@
         ".claude/skills/docs-inventory-surface/SKILL.md"
       ],
       "generated_from": ".agents/skills/docs-inventory-surface/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:docs-inventory-surface",
       "consumers": [
         "claude-code",
@@ -2475,6 +2537,7 @@
         ".claude/skills/docs-plan-ia/SKILL.md"
       ],
       "generated_from": ".agents/skills/docs-plan-ia/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:docs-plan-ia",
       "consumers": [
         "claude-code",
@@ -2496,6 +2559,7 @@
         ".claude/skills/docs-reconcile-behavior/SKILL.md"
       ],
       "generated_from": ".agents/skills/docs-reconcile-behavior/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:docs-reconcile-behavior",
       "consumers": [
         "claude-code",
@@ -2517,6 +2581,7 @@
         ".claude/skills/docs-review-coverage/SKILL.md"
       ],
       "generated_from": ".agents/skills/docs-review-coverage/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:docs-review-coverage",
       "consumers": [
         "claude-code",
@@ -2538,6 +2603,7 @@
         ".claude/skills/docs-validate/SKILL.md"
       ],
       "generated_from": ".agents/skills/docs-validate/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:docs-validate",
       "consumers": [
         "claude-code",
@@ -2559,6 +2625,7 @@
         ".claude/skills/documentation-workflow/SKILL.md"
       ],
       "generated_from": ".agents/skills/documentation-workflow/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:documentation-workflow",
       "consumers": [
         "claude-code",
@@ -2597,6 +2664,7 @@
         ".claude/skills/epic-plan/SKILL.md"
       ],
       "generated_from": ".agents/skills/epic-plan/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:epic-plan",
       "consumers": [
         "claude-code",
@@ -2655,6 +2723,7 @@
         ".claude/skills/evidence-and-timestamp-conventions/SKILL.md"
       ],
       "generated_from": ".agents/skills/evidence-and-timestamp-conventions/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:evidence-and-timestamp-conventions",
       "consumers": [
         "claude-code",
@@ -2676,6 +2745,7 @@
         ".claude/skills/execute-hard-lock/SKILL.md"
       ],
       "generated_from": ".agents/skills/execute-hard-lock/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:execute-hard-lock",
       "consumers": [
         "claude-code",
@@ -2697,6 +2767,7 @@
         ".claude/skills/execution-environment/SKILL.md"
       ],
       "generated_from": ".agents/skills/execution-environment/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:execution-environment",
       "consumers": [
         "claude-code",
@@ -2718,6 +2789,7 @@
         ".claude/skills/extract-feature-contract/SKILL.md"
       ],
       "generated_from": ".agents/skills/extract-feature-contract/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:extract-feature-contract",
       "consumers": [
         "claude-code",
@@ -2739,6 +2811,7 @@
         ".claude/skills/feature-promotion-lifecycle/SKILL.md"
       ],
       "generated_from": ".agents/skills/feature-promotion-lifecycle/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:feature-promotion-lifecycle",
       "consumers": [
         "claude-code",
@@ -2777,6 +2850,7 @@
         ".claude/skills/fill-feature-docs/SKILL.md"
       ],
       "generated_from": ".agents/skills/fill-feature-docs/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:fill-feature-docs",
       "consumers": [
         "claude-code",
@@ -2798,6 +2872,7 @@
         ".claude/skills/generate-acceptance-scenarios/SKILL.md"
       ],
       "generated_from": ".agents/skills/generate-acceptance-scenarios/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:generate-acceptance-scenarios",
       "consumers": [
         "claude-code",
@@ -2819,6 +2894,7 @@
         ".claude/skills/human-exception-runbook/SKILL.md"
       ],
       "generated_from": ".agents/skills/human-exception-runbook/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:human-exception-runbook",
       "consumers": [
         "claude-code",
@@ -2857,6 +2933,7 @@
         ".claude/skills/initialize-discovery-workspace/SKILL.md"
       ],
       "generated_from": ".agents/skills/initialize-discovery-workspace/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:initialize-discovery-workspace",
       "consumers": [
         "claude-code",
@@ -2878,6 +2955,7 @@
         ".claude/skills/inventory-legacy-system/SKILL.md"
       ],
       "generated_from": ".agents/skills/inventory-legacy-system/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:inventory-legacy-system",
       "consumers": [
         "claude-code",
@@ -2950,6 +3028,7 @@
         ".claude/skills/make-skill-template/SKILL.md"
       ],
       "generated_from": ".agents/skills/make-skill-template/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:make-skill-template",
       "consumers": [
         "claude-code",
@@ -3008,6 +3087,7 @@
         ".claude/skills/owner-directives/SKILL.md"
       ],
       "generated_from": ".agents/skills/owner-directives/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:owner-directives",
       "consumers": [
         "claude-code",
@@ -3149,6 +3229,7 @@
         ".claude/skills/policy-audit-template-usage/SKILL.md"
       ],
       "generated_from": ".agents/skills/policy-audit-template-usage/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:policy-audit-template-usage",
       "consumers": [
         "claude-code",
@@ -3170,6 +3251,7 @@
         ".claude/skills/policy-compliance-order/SKILL.md"
       ],
       "generated_from": ".agents/skills/policy-compliance-order/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:policy-compliance-order",
       "consumers": [
         "claude-code",
@@ -3191,6 +3273,7 @@
         ".claude/skills/powershell-change-budget-router/SKILL.md"
       ],
       "generated_from": ".agents/skills/powershell-change-budget-router/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:powershell-change-budget-router",
       "consumers": [
         "claude-code",
@@ -3212,6 +3295,7 @@
         ".claude/skills/powershell-orchestration-state-machine/SKILL.md"
       ],
       "generated_from": ".agents/skills/powershell-orchestration-state-machine/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:powershell-orchestration-state-machine",
       "consumers": [
         "claude-code",
@@ -3250,6 +3334,7 @@
         ".claude/skills/pr-author/SKILL.md"
       ],
       "generated_from": ".agents/skills/pr-author/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:pr-author",
       "consumers": [
         "claude-code",
@@ -3271,6 +3356,7 @@
         ".claude/skills/pr-base-branch-merge-base/SKILL.md"
       ],
       "generated_from": ".agents/skills/pr-base-branch-merge-base/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:pr-base-branch-merge-base",
       "consumers": [
         "claude-code",
@@ -3292,6 +3378,7 @@
         ".claude/skills/pr-context-artifacts/SKILL.md"
       ],
       "generated_from": ".agents/skills/pr-context-artifacts/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:pr-context-artifacts",
       "consumers": [
         "claude-code",
@@ -3313,6 +3400,7 @@
         ".claude/skills/python-change-budget-router/SKILL.md"
       ],
       "generated_from": ".agents/skills/python-change-budget-router/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:python-change-budget-router",
       "consumers": [
         "claude-code",
@@ -3368,6 +3456,7 @@
         ".claude/skills/reconcile-parity-matrix/SKILL.md"
       ],
       "generated_from": ".agents/skills/reconcile-parity-matrix/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:reconcile-parity-matrix",
       "consumers": [
         "claude-code",
@@ -3389,6 +3478,7 @@
         ".claude/skills/remediation-handoff-atomic-planner/SKILL.md"
       ],
       "generated_from": ".agents/skills/remediation-handoff-atomic-planner/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:remediation-handoff-atomic-planner",
       "consumers": [
         "claude-code",
@@ -3410,6 +3500,7 @@
         ".claude/skills/research-issue/SKILL.md"
       ],
       "generated_from": ".agents/skills/research-issue/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:research-issue",
       "consumers": [
         "claude-code",
@@ -3431,6 +3522,7 @@
         ".claude/skills/review-discovery-coverage/SKILL.md"
       ],
       "generated_from": ".agents/skills/review-discovery-coverage/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:review-discovery-coverage",
       "consumers": [
         "claude-code",
@@ -3452,6 +3544,7 @@
         ".claude/skills/review-epic/SKILL.md"
       ],
       "generated_from": ".agents/skills/review-epic/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:review-epic",
       "consumers": [
         "claude-code",
@@ -3473,6 +3566,7 @@
         ".claude/skills/review-feature/SKILL.md"
       ],
       "generated_from": ".agents/skills/review-feature/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:review-feature",
       "consumers": [
         "claude-code",
@@ -3494,6 +3588,7 @@
         ".claude/skills/review-staged/SKILL.md"
       ],
       "generated_from": ".agents/skills/review-staged/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:review-staged",
       "consumers": [
         "claude-code",
@@ -3532,6 +3627,7 @@
         ".claude/skills/skill-canonical-location-audit/SKILL.md"
       ],
       "generated_from": ".agents/skills/skill-canonical-location-audit/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:skill-canonical-location-audit",
       "consumers": [
         "claude-code",
@@ -3553,6 +3649,7 @@
         ".claude/skills/test-execution-policy/SKILL.md"
       ],
       "generated_from": ".agents/skills/test-execution-policy/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:test-execution-policy",
       "consumers": [
         "claude-code",
@@ -3574,6 +3671,7 @@
         ".claude/skills/translate-copilot-to-claude/SKILL.md"
       ],
       "generated_from": ".agents/skills/translate-copilot-to-claude/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:translate-copilot-to-claude",
       "consumers": [
         "claude-code",
@@ -3595,6 +3693,7 @@
         ".claude/skills/update-status/SKILL.md"
       ],
       "generated_from": ".agents/skills/update-status/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:update-status",
       "consumers": [
         "claude-code",
@@ -3616,6 +3715,7 @@
         ".claude/skills/validate-discovery-artifacts/SKILL.md"
       ],
       "generated_from": ".agents/skills/validate-discovery-artifacts/SKILL.md",
+      "generator": "harness-generation/skills",
       "parity_group": "skill:validate-discovery-artifacts",
       "consumers": [
         "claude-code",
@@ -3786,7 +3886,8 @@
       "target_paths": [
         ".codex/agents/atomic-executor.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/atomic-executor.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:atomic-executor",
       "consumers": [
         "codex"
@@ -3895,7 +3996,8 @@
       "target_paths": [
         ".codex/agents/atomic-planner.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/atomic-planner.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:atomic-planner",
       "consumers": [
         "codex"
@@ -4184,7 +4286,8 @@
       "target_paths": [
         ".codex/agents/csharp-typed-engineer.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/csharp-typed-engineer.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:csharp-typed-engineer",
       "consumers": [
         "codex"
@@ -4293,7 +4396,8 @@
       "target_paths": [
         ".codex/agents/discovery-capability-sentinel.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/discovery-capability-sentinel.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:discovery-capability-sentinel",
       "consumers": [
         "codex"
@@ -4312,7 +4416,8 @@
       "target_paths": [
         ".codex/agents/docs-architect.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/docs-architect.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:docs-architect",
       "consumers": [
         "codex"
@@ -4331,7 +4436,8 @@
       "target_paths": [
         ".codex/agents/docs-author.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/docs-author.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:docs-author",
       "consumers": [
         "codex"
@@ -4350,7 +4456,8 @@
       "target_paths": [
         ".codex/agents/docs-coverage-reviewer.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/docs-coverage-reviewer.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:docs-coverage-reviewer",
       "consumers": [
         "codex"
@@ -4369,7 +4476,8 @@
       "target_paths": [
         ".codex/agents/docs-reconciler.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/docs-reconciler.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:docs-reconciler",
       "consumers": [
         "codex"
@@ -4388,7 +4496,8 @@
       "target_paths": [
         ".codex/agents/epic-orchestrator.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/epic-orchestrator.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:epic-orchestrator",
       "consumers": [
         "codex"
@@ -4407,7 +4516,8 @@
       "target_paths": [
         ".codex/agents/epic-planner.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/epic-planner.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:epic-planner",
       "consumers": [
         "codex"
@@ -4426,7 +4536,8 @@
       "target_paths": [
         ".codex/agents/epic-review.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/epic-review.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:epic-review",
       "consumers": [
         "codex"
@@ -4475,7 +4586,8 @@
       "target_paths": [
         ".codex/agents/feature-review.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/feature-review.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:feature-review",
       "consumers": [
         "codex"
@@ -4629,7 +4741,8 @@
       "target_paths": [
         ".codex/agents/legacy-parity-analyst.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/legacy-parity-analyst.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:legacy-parity-analyst",
       "consumers": [
         "codex"
@@ -4753,7 +4866,8 @@
       "target_paths": [
         ".codex/agents/migration-coverage-reviewer.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/migration-coverage-reviewer.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:migration-coverage-reviewer",
       "consumers": [
         "codex"
@@ -4862,7 +4976,8 @@
       "target_paths": [
         ".codex/agents/orchestrator.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/orchestrator.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:orchestrator",
       "consumers": [
         "codex"
@@ -5031,7 +5146,8 @@
       "target_paths": [
         ".codex/agents/powershell-typed-engineer.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/powershell-typed-engineer.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:powershell-typed-engineer",
       "consumers": [
         "codex"
@@ -5140,7 +5256,8 @@
       "target_paths": [
         ".codex/agents/pr-author.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/pr-author.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:pr-author",
       "consumers": [
         "codex"
@@ -5264,7 +5381,8 @@
       "target_paths": [
         ".codex/agents/prd-feature.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/prd-feature.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:prd-feature",
       "consumers": [
         "codex"
@@ -5448,7 +5566,8 @@
       "target_paths": [
         ".codex/agents/python-typed-engineer.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/python-typed-engineer.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:python-typed-engineer",
       "consumers": [
         "codex"
@@ -5557,7 +5676,8 @@
       "target_paths": [
         ".codex/agents/requirements-reconciler.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/requirements-reconciler.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:requirements-reconciler",
       "consumers": [
         "codex"
@@ -5666,7 +5786,8 @@
       "target_paths": [
         ".codex/agents/runtime-characterization-analyst.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/runtime-characterization-analyst.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:runtime-characterization-analyst",
       "consumers": [
         "codex"
@@ -5775,7 +5896,8 @@
       "target_paths": [
         ".codex/agents/staged-review.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/staged-review.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:staged-review",
       "consumers": [
         "codex"
@@ -5794,7 +5916,8 @@
       "target_paths": [
         ".codex/agents/status-updater.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/status-updater.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:status-updater",
       "consumers": [
         "codex"
@@ -5813,7 +5936,8 @@
       "target_paths": [
         ".codex/agents/task-researcher.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/task-researcher.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:task-researcher",
       "consumers": [
         "codex"
@@ -5967,7 +6091,8 @@
       "target_paths": [
         ".codex/agents/typescript-engineer.toml"
       ],
-      "generated_from": "pending-source:agent",
+      "generated_from": "scripts/harness-generation/sources/agents/typescript-engineer.json",
+      "generator": "harness-generation/agents",
       "parity_group": "agent:typescript-engineer",
       "consumers": [
         "codex"
@@ -6542,7 +6667,8 @@
       "target_paths": [
         ".codex/config.toml"
       ],
-      "generated_from": "pending-source:mcp-server",
+      "generated_from": "scripts/harness-generation/sources/mcp-servers.json",
+      "generator": "harness-generation/mcp",
       "parity_group": "mcp:drm-copilot",
       "consumers": [
         "codex"
@@ -6773,7 +6899,12 @@
       "kind": "skill",
       "name": "architecture-boundaries",
       "source_path": ".agents/skills/architecture-boundaries/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/architecture-boundaries/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/architecture-boundaries.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:architecture-boundaries",
       "consumers": [
         "codex",
@@ -6782,6 +6913,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -6844,7 +6976,12 @@
       "kind": "skill",
       "name": "bash-command-shape",
       "source_path": ".agents/skills/bash-command-shape/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/bash-command-shape/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/bash-command-shape.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:bash-command-shape",
       "consumers": [
         "codex",
@@ -6853,6 +6990,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -6861,7 +6999,12 @@
       "kind": "skill",
       "name": "benchmark-baselines",
       "source_path": ".agents/skills/benchmark-baselines/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/benchmark-baselines/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/benchmark-baselines.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:benchmark-baselines",
       "consumers": [
         "codex",
@@ -6870,6 +7013,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -6898,7 +7042,12 @@
       "kind": "skill",
       "name": "ci-workflows",
       "source_path": ".agents/skills/ci-workflows/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/ci-workflows/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/ci-workflows.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:ci-workflows",
       "consumers": [
         "codex",
@@ -6907,6 +7056,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -6969,7 +7119,12 @@
       "kind": "skill",
       "name": "csharp",
       "source_path": ".agents/skills/csharp/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/csharp/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/csharp.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:csharp",
       "consumers": [
         "codex",
@@ -6978,6 +7133,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -7563,7 +7719,12 @@
       "kind": "skill",
       "name": "general-code-change",
       "source_path": ".agents/skills/general-code-change/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/general-code-change/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/general-code-change.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:general-code-change",
       "consumers": [
         "codex",
@@ -7572,6 +7733,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -7580,7 +7742,12 @@
       "kind": "skill",
       "name": "general-unit-test",
       "source_path": ".agents/skills/general-unit-test/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/general-unit-test/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/general-unit-test.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:general-unit-test",
       "consumers": [
         "codex",
@@ -7589,6 +7756,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -7777,7 +7945,12 @@
       "kind": "skill",
       "name": "orchestrator-state",
       "source_path": ".agents/skills/orchestrator-state/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/orchestrator-state/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/orchestrator-state.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:orchestrator-state",
       "consumers": [
         "codex",
@@ -7786,6 +7959,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -7871,7 +8045,12 @@
       "kind": "skill",
       "name": "powershell",
       "source_path": ".agents/skills/powershell/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/powershell/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/powershell.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:powershell",
       "consumers": [
         "codex",
@@ -7880,6 +8059,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -8025,7 +8205,12 @@
       "kind": "skill",
       "name": "python",
       "source_path": ".agents/skills/python/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/python/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/python.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:python",
       "consumers": [
         "codex",
@@ -8034,6 +8219,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -8082,7 +8268,12 @@
       "kind": "skill",
       "name": "python-suppressions",
       "source_path": ".agents/skills/python-suppressions/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/python-suppressions/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/python-suppressions.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:python-suppressions",
       "consumers": [
         "codex",
@@ -8091,6 +8282,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -8099,7 +8291,12 @@
       "kind": "skill",
       "name": "quality-tiers",
       "source_path": ".agents/skills/quality-tiers/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/quality-tiers/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/quality-tiers.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:quality-tiers",
       "consumers": [
         "codex",
@@ -8108,6 +8305,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -8273,7 +8471,12 @@
       "kind": "skill",
       "name": "self-explanatory-code-commenting",
       "source_path": ".agents/skills/self-explanatory-code-commenting/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/self-explanatory-code-commenting/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/self-explanatory-code-commenting.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:self-explanatory-code-commenting",
       "consumers": [
         "codex",
@@ -8282,6 +8485,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -8330,7 +8534,12 @@
       "kind": "skill",
       "name": "tonality",
       "source_path": ".agents/skills/tonality/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/tonality/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/tonality.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:tonality",
       "consumers": [
         "codex",
@@ -8339,6 +8548,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -8384,7 +8594,12 @@
       "kind": "skill",
       "name": "typescript",
       "source_path": ".agents/skills/typescript/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/typescript/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/typescript.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:typescript",
       "consumers": [
         "codex",
@@ -8393,6 +8608,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -8401,7 +8617,12 @@
       "kind": "skill",
       "name": "typescript-suppressions",
       "source_path": ".agents/skills/typescript-suppressions/SKILL.md",
-      "disposition": "native",
+      "disposition": "generated",
+      "target_paths": [
+        ".agents/skills/typescript-suppressions/SKILL.md"
+      ],
+      "generated_from": "scripts/harness-generation/sources/rules/typescript-suppressions.json",
+      "generator": "harness-generation/rules",
       "parity_group": "skill:typescript-suppressions",
       "consumers": [
         "codex",
@@ -8410,6 +8631,7 @@
       ],
       "owner_child": 3,
       "decision_status": "approved",
+      "decision_ref": "#1028:spec.md#owner-decisions",
       "notes": "approved: native"
     },
     {
@@ -10027,7 +10249,8 @@
       "target_paths": [
         ".github/instructions/bash-command-shape.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/bash-command-shape.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:bash-command-shape",
       "consumers": [
         "copilot-vscode"
@@ -10046,7 +10269,8 @@
       "target_paths": [
         ".github/instructions/csharp-code-change.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/csharp.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:csharp-code-change",
       "consumers": [
         "copilot-vscode"
@@ -10065,7 +10289,8 @@
       "target_paths": [
         ".github/instructions/csharp-unit-test.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/csharp.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:csharp-unit-test",
       "consumers": [
         "copilot-vscode"
@@ -10084,7 +10309,8 @@
       "target_paths": [
         ".github/instructions/general-code-change.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/general-code-change.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:general-code-change",
       "consumers": [
         "copilot-vscode"
@@ -10103,7 +10329,8 @@
       "target_paths": [
         ".github/instructions/general-unit-test.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/general-unit-test.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:general-unit-test",
       "consumers": [
         "copilot-vscode"
@@ -10122,7 +10349,8 @@
       "target_paths": [
         ".github/instructions/github-actions.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/ci-workflows.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:github-actions",
       "consumers": [
         "copilot-vscode"
@@ -10141,7 +10369,8 @@
       "target_paths": [
         ".github/instructions/github-actions-ci-cd-best-practices.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/ci-workflows.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:github-actions-ci-cd-best-practices",
       "consumers": [
         "copilot-vscode"
@@ -10160,7 +10389,8 @@
       "target_paths": [
         ".github/instructions/mermaid.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/mermaid.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:mermaid",
       "consumers": [
         "copilot-vscode"
@@ -10179,7 +10409,8 @@
       "target_paths": [
         ".github/instructions/powershell-code-change.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/powershell.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:powershell-code-change",
       "consumers": [
         "copilot-vscode"
@@ -10198,7 +10429,8 @@
       "target_paths": [
         ".github/instructions/powershell-unit-test.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/powershell.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:powershell-unit-test",
       "consumers": [
         "copilot-vscode"
@@ -10217,7 +10449,8 @@
       "target_paths": [
         ".github/instructions/python-code-change.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/python.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:python-code-change",
       "consumers": [
         "copilot-vscode"
@@ -10236,7 +10469,8 @@
       "target_paths": [
         ".github/instructions/python-suppressions.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/python-suppressions.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:python-suppressions",
       "consumers": [
         "copilot-vscode"
@@ -10255,7 +10489,8 @@
       "target_paths": [
         ".github/instructions/python-unit-test.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/python.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:python-unit-test",
       "consumers": [
         "copilot-vscode"
@@ -10274,7 +10509,8 @@
       "target_paths": [
         ".github/instructions/self-explanatory-code-commenting.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/self-explanatory-code-commenting.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:self-explanatory-code-commenting",
       "consumers": [
         "copilot-vscode"
@@ -10293,7 +10529,8 @@
       "target_paths": [
         ".github/instructions/tonality.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/tonality.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:tonality",
       "consumers": [
         "copilot-vscode"
@@ -10312,7 +10549,8 @@
       "target_paths": [
         ".github/instructions/typescript-code-change.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/typescript.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:typescript-code-change",
       "consumers": [
         "copilot-vscode"
@@ -10331,7 +10569,8 @@
       "target_paths": [
         ".github/instructions/typescript-suppressions.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/typescript-suppressions.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:typescript-suppressions",
       "consumers": [
         "copilot-vscode"
@@ -10350,7 +10589,8 @@
       "target_paths": [
         ".github/instructions/typescript-unit-test.instructions.md"
       ],
-      "generated_from": "pending-source:path-scoped-rule",
+      "generated_from": "scripts/harness-generation/sources/rules/typescript.json",
+      "generator": "harness-generation/rules",
       "parity_group": "rule:typescript-unit-test",
       "consumers": [
         "copilot-vscode"
