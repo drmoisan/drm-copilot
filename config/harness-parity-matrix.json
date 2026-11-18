@@ -48,11 +48,7 @@
       "kind": "agent",
       "name": "commit-message",
       "source_path": ".claude/agents/commit-message.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/agents/commit-message.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:commit-message",
       "consumers": [
         "claude-code",
@@ -60,7 +56,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:agent:csharp-typed-engineer",
@@ -268,11 +264,7 @@
       "kind": "agent",
       "name": "human-exception-runbook",
       "source_path": ".claude/agents/human-exception-runbook.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/agents/human-exception-runbook.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:human-exception-runbook",
       "consumers": [
         "claude-code",
@@ -280,7 +272,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:agent:legacy-parity-analyst",
@@ -348,11 +340,7 @@
       "kind": "agent",
       "name": "parallel-orchestrator",
       "source_path": ".claude/agents/parallel-orchestrator.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/agents/parallel-orchestrator.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:parallel-orchestrator",
       "consumers": [
         "claude-code",
@@ -360,7 +348,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:agent:parallel-planner",
@@ -368,11 +356,7 @@
       "kind": "agent",
       "name": "parallel-planner",
       "source_path": ".claude/agents/parallel-planner.md",
-      "disposition": "generated",
-      "target_paths": [
-        ".claude/agents/parallel-planner.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:parallel-planner",
       "consumers": [
         "claude-code",
@@ -380,7 +364,7 @@
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "claude:agent:powershell-typed-engineer",
@@ -3753,18 +3737,14 @@
       "kind": "agent",
       "name": "5.1-beast-adjusted",
       "source_path": ".codex/agents/5.1-beast-adjusted.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/5.1-beast-adjusted.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:5.1-beast-adjusted",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:5.1-thinking-beast-mode-adjusted",
@@ -3772,18 +3752,14 @@
       "kind": "agent",
       "name": "5.1-thinking-beast-mode-adjusted",
       "source_path": ".codex/agents/5.1-thinking-beast-mode-adjusted.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/5.1-thinking-beast-mode-adjusted.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:5.1-thinking-beast-mode-adjusted",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:api-architect",
@@ -3791,18 +3767,14 @@
       "kind": "agent",
       "name": "api-architect",
       "source_path": ".codex/agents/api-architect.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/api-architect.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:api-architect",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:atomic-executor",
@@ -4028,18 +4000,14 @@
       "kind": "agent",
       "name": "atomic-planning",
       "source_path": ".codex/agents/atomic-planning.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/atomic-planning.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:atomic-planning",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:commentary-remediation",
@@ -4047,18 +4015,14 @@
       "kind": "agent",
       "name": "commentary-remediation",
       "source_path": ".codex/agents/commentary-remediation.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/commentary-remediation.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:commentary-remediation",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:commit-steward",
@@ -4066,18 +4030,14 @@
       "kind": "agent",
       "name": "commit-steward",
       "source_path": ".codex/agents/commit-steward.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/commit-steward.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:commit-steward",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:commit-steward-c1",
@@ -4175,18 +4135,14 @@
       "kind": "agent",
       "name": "csharp-atomic-executor",
       "source_path": ".codex/agents/csharp-atomic-executor.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/csharp-atomic-executor.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:csharp-atomic-executor",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:csharp-atomic-planning",
@@ -4194,18 +4150,14 @@
       "kind": "agent",
       "name": "csharp-atomic-planning",
       "source_path": ".codex/agents/csharp-atomic-planning.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/csharp-atomic-planning.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:csharp-atomic-planning",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:csharp-orchestrator",
@@ -4213,18 +4165,14 @@
       "kind": "agent",
       "name": "csharp-orchestrator",
       "source_path": ".codex/agents/csharp-orchestrator.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/csharp-orchestrator.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:csharp-orchestrator",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:csharp-typed-engineer",
@@ -4493,18 +4441,14 @@
       "kind": "agent",
       "name": "expert-nextjs-developer",
       "source_path": ".codex/agents/expert-nextjs-developer.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/expert-nextjs-developer.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:expert-nextjs-developer",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:expert-react-frontend-engineer",
@@ -4512,18 +4456,14 @@
       "kind": "agent",
       "name": "expert-react-frontend-engineer",
       "source_path": ".codex/agents/expert-react-frontend-engineer.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/expert-react-frontend-engineer.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:expert-react-frontend-engineer",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:feature-review",
@@ -4550,18 +4490,14 @@
       "kind": "agent",
       "name": "feature-reviewer",
       "source_path": ".codex/agents/feature-reviewer.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/feature-reviewer.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:feature-reviewer",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:feature-reviewer-c1",
@@ -4659,18 +4595,14 @@
       "kind": "agent",
       "name": "gpt-5-beast-mode",
       "source_path": ".codex/agents/gpt-5-beast-mode.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/gpt-5-beast-mode.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:gpt-5-beast-mode",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:hlbpa",
@@ -4678,18 +4610,14 @@
       "kind": "agent",
       "name": "hlbpa",
       "source_path": ".codex/agents/hlbpa.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/hlbpa.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:hlbpa",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:legacy-parity-analyst",
@@ -4806,18 +4734,14 @@
       "kind": "agent",
       "name": "mentor",
       "source_path": ".codex/agents/mentor.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/mentor.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:mentor",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:migration-coverage-reviewer",
@@ -5043,18 +4967,14 @@
       "kind": "agent",
       "name": "powershell-atomic-executor",
       "source_path": ".codex/agents/powershell-atomic-executor.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/powershell-atomic-executor.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:powershell-atomic-executor",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:powershell-atomic-planning",
@@ -5062,18 +4982,14 @@
       "kind": "agent",
       "name": "powershell-atomic-planning",
       "source_path": ".codex/agents/powershell-atomic-planning.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/powershell-atomic-planning.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:powershell-atomic-planning",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:powershell-di-unit-test-engineer",
@@ -5081,18 +4997,14 @@
       "kind": "agent",
       "name": "powershell-di-unit-test-engineer",
       "source_path": ".codex/agents/powershell-di-unit-test-engineer.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/powershell-di-unit-test-engineer.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:powershell-di-unit-test-engineer",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:powershell-orchestrator",
@@ -5100,18 +5012,14 @@
       "kind": "agent",
       "name": "powershell-orchestrator",
       "source_path": ".codex/agents/powershell-orchestrator.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/powershell-orchestrator.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:powershell-orchestrator",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:powershell-typed-engineer",
@@ -5337,18 +5245,14 @@
       "kind": "agent",
       "name": "prd",
       "source_path": ".codex/agents/prd.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/prd.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:prd",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:prd-feature",
@@ -5465,18 +5369,14 @@
       "kind": "agent",
       "name": "pytest-unit-test-coding",
       "source_path": ".codex/agents/pytest-unit-test-coding.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/pytest-unit-test-coding.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:pytest-unit-test-coding",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:python-atomic-executor",
@@ -5484,18 +5384,14 @@
       "kind": "agent",
       "name": "python-atomic-executor",
       "source_path": ".codex/agents/python-atomic-executor.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/python-atomic-executor.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:python-atomic-executor",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:python-atomic-planning",
@@ -5503,18 +5399,14 @@
       "kind": "agent",
       "name": "python-atomic-planning",
       "source_path": ".codex/agents/python-atomic-planning.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/python-atomic-planning.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:python-atomic-planning",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:python-execution-only-typed",
@@ -5522,18 +5414,14 @@
       "kind": "agent",
       "name": "python-execution-only-typed",
       "source_path": ".codex/agents/python-execution-only-typed.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/python-execution-only-typed.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:python-execution-only-typed",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:python-orchestrator",
@@ -5541,18 +5429,14 @@
       "kind": "agent",
       "name": "python-orchestrator",
       "source_path": ".codex/agents/python-orchestrator.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/python-orchestrator.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:python-orchestrator",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:python-typed-engineer",
@@ -6034,18 +5918,14 @@
       "kind": "agent",
       "name": "tdd-green",
       "source_path": ".codex/agents/tdd-green.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/tdd-green.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:tdd-green",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:tdd-red",
@@ -6053,18 +5933,14 @@
       "kind": "agent",
       "name": "tdd-red",
       "source_path": ".codex/agents/tdd-red.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/tdd-red.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:tdd-red",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:tdd-refactor",
@@ -6072,18 +5948,14 @@
       "kind": "agent",
       "name": "tdd-refactor",
       "source_path": ".codex/agents/tdd-refactor.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/tdd-refactor.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:tdd-refactor",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:agent:typescript-engineer",
@@ -6200,18 +6072,14 @@
       "kind": "agent",
       "name": "voidbeast-gpt41enhanced",
       "source_path": ".codex/agents/voidbeast-gpt41enhanced.toml",
-      "disposition": "generated",
-      "target_paths": [
-        ".codex/agents/voidbeast-gpt41enhanced.toml"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
       "parity_group": "agent:voidbeast-gpt41enhanced",
       "consumers": [
         "codex"
       ],
       "owner_child": 3,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e4-copilot-workspace-settings.runbook.md"
+      "decision_ref": "#1028:spec.md#owner-decisions"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Agent%7CTask%7Cspawn_agent%7Crun_subagent%7Cdelegate%29%24/enforce-discovery-artifact-gate",
