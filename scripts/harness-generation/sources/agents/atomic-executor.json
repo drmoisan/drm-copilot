@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/atomic-executor.md",
     "frontmatter": [
       {
         "key": "name",
@@ -31,6 +31,7 @@
         "value": "\n  SubagentStop:\n    - matcher: \"atomic-executor\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-executor-output.ps1"
       }
     ],
+    "path": ".claude/agents/atomic-executor.md",
     "sections": [
       "head",
       "plan-authority",
@@ -47,7 +48,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/atomic-executor.toml",
+    "delimiter": "'''",
     "keys": [
       {
         "key": "name",
@@ -58,7 +59,7 @@
         "value": "\"Converted subagent\""
       }
     ],
-    "delimiter": "'''",
+    "path": ".codex/agents/atomic-executor.toml",
     "sections": [
       "head-2",
       "plan-authority",

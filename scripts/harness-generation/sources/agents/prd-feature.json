@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/prd-feature.md",
     "frontmatter": [
       {
         "key": "name",
@@ -31,6 +31,7 @@
         "value": "\n  SubagentStop:\n    - matcher: \"prd-feature\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName prd-feature -RequiredArtifact 'spec-path|^(?:docs/features|\\.dev)/active/.+/spec\\.md$|feature spec artifact'\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-prd-feature-output.ps1"
       }
     ],
+    "path": ".claude/agents/prd-feature.md",
     "sections": [
       "head",
       "expected-outputs",
@@ -39,7 +40,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/prd-feature.toml",
+    "delimiter": "'''",
     "keys": [
       {
         "key": "name",
@@ -50,7 +51,7 @@
         "value": "\"Converted subagent\""
       }
     ],
-    "delimiter": "'''",
+    "path": ".codex/agents/prd-feature.toml",
     "sections": [
       "head-2",
       "expected-outputs-2",

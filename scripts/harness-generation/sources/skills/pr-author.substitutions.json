@@ -1,4 +1,5 @@
 {
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
   "substitutions": [
     {
       "file": "SKILL.md",
@@ -7,8 +8,8 @@
     },
     {
       "file": "SKILL.md",
-      "find": "11. **GitHub Auto-close** — `- Closes #NNN` only from verified autoclose lists; do not invent issue numbers\n",
-      "replace": "11. **GitHub Auto-close** — `- Closes #NNN` from the three sources in Issue/PR Reference Rules (the PR-context \"Issues to autoclose\" list, the PR-context \"Author-asserted autoclose issues\" list, and an issue named as author-asserted in the delegation prompt); `- None` only when no source has an entry; do not invent issue numbers\n"
+      "find": "11. **GitHub Auto-close** \u2014 `- Closes #NNN` only from verified autoclose lists; do not invent issue numbers\n",
+      "replace": "11. **GitHub Auto-close** \u2014 `- Closes #NNN` from the three sources in Issue/PR Reference Rules (the PR-context \"Issues to autoclose\" list, the PR-context \"Author-asserted autoclose issues\" list, and an issue named as author-asserted in the delegation prompt); `- None` only when no source has an entry; do not invent issue numbers\n"
     },
     {
       "file": "SKILL.md",

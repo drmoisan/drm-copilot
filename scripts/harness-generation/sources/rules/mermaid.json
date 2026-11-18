@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/mermaid.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " Mermaid diagram authoring standards, validation mandate, and managed-diagram constraint."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/mermaid.md",
       "sections": [
         "head",
         "diagram-file-conventions",
@@ -24,14 +25,14 @@
       ]
     },
     {
-      "kind": "copilot",
-      "path": ".github/instructions/mermaid.instructions.md",
       "frontmatter": [
         {
           "key": "applyTo",
           "value": " \"**\""
         }
       ],
+      "kind": "copilot",
+      "path": ".github/instructions/mermaid.instructions.md",
       "sections": [
         "head-2",
         "workflow",

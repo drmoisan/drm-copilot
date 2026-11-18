@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/python-suppressions.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " Pre-authorized Python Ruff and Pyright suppression patterns. Applies to Python files."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/python-suppressions.md",
       "sections": [
         "head",
         "authorization-requirement",
@@ -23,8 +24,6 @@
       ]
     },
     {
-      "kind": "copilot",
-      "path": ".github/instructions/python-suppressions.instructions.md",
       "frontmatter": [
         {
           "key": "applyTo",
@@ -39,6 +38,8 @@
           "value": " \"Pre-authorized patterns for # noqa and # type: ignore suppressions in Python code\""
         }
       ],
+      "kind": "copilot",
+      "path": ".github/instructions/python-suppressions.instructions.md",
       "sections": [
         "head-2",
         "ruff-suppressions",
@@ -49,8 +50,6 @@
       ]
     },
     {
-      "kind": "codex",
-      "path": ".agents/skills/python-suppressions/SKILL.md",
       "frontmatter": [
         {
           "key": "name",
@@ -61,6 +60,8 @@
           "value": " Python suppression policy for linting and type-checking exceptions."
         }
       ],
+      "kind": "codex",
+      "path": ".agents/skills/python-suppressions/SKILL.md",
       "sections": [
         "head",
         "authorization-requirement",

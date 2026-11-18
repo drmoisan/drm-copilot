@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/self-explanatory-code-commenting.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " Intent-first docstring and commenting standards. Applies to Python files."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/self-explanatory-code-commenting.md",
       "sections": [
         "head",
         "core-principle",
@@ -27,8 +28,6 @@
       ]
     },
     {
-      "kind": "copilot",
-      "path": ".github/instructions/self-explanatory-code-commenting.instructions.md",
       "frontmatter": [
         {
           "key": "description",
@@ -39,6 +38,8 @@
           "value": " \"**/*.py\""
         }
       ],
+      "kind": "copilot",
+      "path": ".github/instructions/self-explanatory-code-commenting.instructions.md",
       "sections": [
         "head-2",
         "core-principle-2",
@@ -54,8 +55,6 @@
       ]
     },
     {
-      "kind": "codex",
-      "path": ".agents/skills/self-explanatory-code-commenting/SKILL.md",
       "frontmatter": [
         {
           "key": "name",
@@ -66,6 +65,8 @@
           "value": " Intent-first docstring and commenting standards."
         }
       ],
+      "kind": "codex",
+      "path": ".agents/skills/self-explanatory-code-commenting/SKILL.md",
       "sections": [
         "head",
         "core-principle",

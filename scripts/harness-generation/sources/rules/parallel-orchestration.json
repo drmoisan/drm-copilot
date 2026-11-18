@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/parallel-orchestration.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " Artifact invariants and blast-radius contention doctrine for the parallel orchestration surface."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/parallel-orchestration.md",
       "sections": [
         "head",
         "foreign-schema-warning-do-not-copy-verbatim",

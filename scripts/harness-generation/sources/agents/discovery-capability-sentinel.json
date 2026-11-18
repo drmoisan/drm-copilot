@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/discovery-capability-sentinel.md",
     "frontmatter": [
       {
         "key": "name",
@@ -15,6 +15,7 @@
         "value": "\n  - \"mcp__drm-copilot__discovery_capability_sentinel\"\n  - \"Bash\""
       }
     ],
+    "path": ".claude/agents/discovery-capability-sentinel.md",
     "sections": [
       "head",
       "procedure",
@@ -22,7 +23,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/discovery-capability-sentinel.toml",
+    "delimiter": "'''",
     "keys": [
       {
         "key": "name",
@@ -33,7 +34,7 @@
         "value": "\"Exercise the native discovery hooks once so the capability probe can prove host attribution from recorded observations.\""
       }
     ],
-    "delimiter": "'''",
+    "path": ".codex/agents/discovery-capability-sentinel.toml",
     "sections": [
       "head-2",
       "procedure",

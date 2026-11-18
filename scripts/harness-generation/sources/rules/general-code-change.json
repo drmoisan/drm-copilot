@@ -1,9 +1,8 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "claudeUnconditional": true,
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/general-code-change.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -14,6 +13,8 @@
           "value": " Cross-language code change policy. Applies to all files."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/general-code-change.md",
       "sections": [
         "head",
         "design-principles",
@@ -29,8 +30,6 @@
       ]
     },
     {
-      "kind": "copilot",
-      "path": ".github/instructions/general-code-change.instructions.md",
       "frontmatter": [
         {
           "key": "applyTo",
@@ -45,6 +44,8 @@
           "value": " \"Baseline rules that apply to any code change in this repo\""
         }
       ],
+      "kind": "copilot",
+      "path": ".github/instructions/general-code-change.instructions.md",
       "sections": [
         "head-2",
         "before-making-changes",
@@ -60,8 +61,6 @@
       ]
     },
     {
-      "kind": "codex",
-      "path": ".agents/skills/general-code-change/SKILL.md",
       "frontmatter": [
         {
           "key": "name",
@@ -72,6 +71,8 @@
           "value": " Cross-language code change policy for all files."
         }
       ],
+      "kind": "codex",
+      "path": ".agents/skills/general-code-change/SKILL.md",
       "sections": [
         "head-3",
         "design-principles",

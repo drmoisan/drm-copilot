@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/migration-coverage-reviewer.md",
     "frontmatter": [
       {
         "key": "name",
@@ -19,6 +19,7 @@
         "value": " project"
       }
     ],
+    "path": ".claude/agents/migration-coverage-reviewer.md",
     "sections": [
       "head",
       "prepared-inputs-and-launch",
@@ -29,7 +30,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/migration-coverage-reviewer.toml",
+    "delimiter": "'''",
     "keys": [
       {
         "key": "name",
@@ -40,7 +41,7 @@
         "value": "\"Converted subagent\""
       }
     ],
-    "delimiter": "'''",
+    "path": ".codex/agents/migration-coverage-reviewer.toml",
     "sections": [
       "head-2",
       "prepared-inputs-and-launch",

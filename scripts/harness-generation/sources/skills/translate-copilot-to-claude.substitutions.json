@@ -1,4 +1,5 @@
 {
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
   "substitutions": [
     {
       "file": "SKILL.md",
@@ -67,8 +68,8 @@
     },
     {
       "file": "SKILL.md",
-      "find": "1. **Rules** — add or merge rule files under `.agents/skills/`.\n2. **Skills** — add or merge skill files under `.agents/skills/<name>/SKILL.md`.\n3. **Hooks** — add hook scripts under `.codex/hooks/` and parse-check them with `pwsh -NoProfile -Command \"[System.Management.Automation.Language.Parser]::ParseFile(..., [ref]$null, [ref]$errors)\"`.\n4. **Agent personas** — update `.codex/agents/<name>.md` frontmatter (tools, skills, memory) and trim the body to identity + workflow index.\n5. **settings.json** — append hook registrations and `Skill(...)` permissions. Never rewrite the file; use targeted edits.\n6. **AGENTS.md** — append cross-references only; never overwrite existing sections.\n",
-      "replace": "1. **Rules** — add or merge rule files under `.claude/rules/`.\n2. **Skills** — add or merge skill files under `.claude/skills/<name>/SKILL.md`.\n3. **Hooks** — add hook scripts under `.claude/hooks/` and parse-check them with `pwsh -NoProfile -Command \"[System.Management.Automation.Language.Parser]::ParseFile(..., [ref]$null, [ref]$errors)\"`.\n4. **Agent personas** — update `.claude/agents/<name>.md` frontmatter (tools, skills, memory) and trim the body to identity + workflow index.\n5. **settings.json** — append hook registrations and `Skill(...)` permissions. Never rewrite the file; use targeted edits.\n6. **CLAUDE.md** — append cross-references only; never overwrite existing sections.\n"
+      "find": "1. **Rules** \u2014 add or merge rule files under `.agents/skills/`.\n2. **Skills** \u2014 add or merge skill files under `.agents/skills/<name>/SKILL.md`.\n3. **Hooks** \u2014 add hook scripts under `.codex/hooks/` and parse-check them with `pwsh -NoProfile -Command \"[System.Management.Automation.Language.Parser]::ParseFile(..., [ref]$null, [ref]$errors)\"`.\n4. **Agent personas** \u2014 update `.codex/agents/<name>.md` frontmatter (tools, skills, memory) and trim the body to identity + workflow index.\n5. **settings.json** \u2014 append hook registrations and `Skill(...)` permissions. Never rewrite the file; use targeted edits.\n6. **AGENTS.md** \u2014 append cross-references only; never overwrite existing sections.\n",
+      "replace": "1. **Rules** \u2014 add or merge rule files under `.claude/rules/`.\n2. **Skills** \u2014 add or merge skill files under `.claude/skills/<name>/SKILL.md`.\n3. **Hooks** \u2014 add hook scripts under `.claude/hooks/` and parse-check them with `pwsh -NoProfile -Command \"[System.Management.Automation.Language.Parser]::ParseFile(..., [ref]$null, [ref]$errors)\"`.\n4. **Agent personas** \u2014 update `.claude/agents/<name>.md` frontmatter (tools, skills, memory) and trim the body to identity + workflow index.\n5. **settings.json** \u2014 append hook registrations and `Skill(...)` permissions. Never rewrite the file; use targeted edits.\n6. **CLAUDE.md** \u2014 append cross-references only; never overwrite existing sections.\n"
     },
     {
       "file": "SKILL.md",

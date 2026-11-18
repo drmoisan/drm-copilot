@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/typescript-suppressions.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " Pre-authorized ESLint and TypeScript suppression patterns. Applies to TypeScript files."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/typescript-suppressions.md",
       "sections": [
         "head",
         "authorization-requirement",
@@ -22,8 +23,6 @@
       ]
     },
     {
-      "kind": "copilot",
-      "path": ".github/instructions/typescript-suppressions.instructions.md",
       "frontmatter": [
         {
           "key": "description",
@@ -38,6 +37,8 @@
           "value": " typescript-suppressions-policy"
         }
       ],
+      "kind": "copilot",
+      "path": ".github/instructions/typescript-suppressions.instructions.md",
       "sections": [
         "head-2",
         "eslint-suppressions",
@@ -47,8 +48,6 @@
       ]
     },
     {
-      "kind": "codex",
-      "path": ".agents/skills/typescript-suppressions/SKILL.md",
       "frontmatter": [
         {
           "key": "name",
@@ -59,6 +58,8 @@
           "value": " TypeScript suppression policy for linting and type-checking exceptions."
         }
       ],
+      "kind": "codex",
+      "path": ".agents/skills/typescript-suppressions/SKILL.md",
       "sections": [
         "head",
         "authorization-requirement",

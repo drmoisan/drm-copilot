@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/feature-review.md",
     "frontmatter": [
       {
         "key": "name",
@@ -31,6 +31,7 @@
         "value": "\n  SubagentStop:\n    - matcher: \"feature-review\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-feature-review-coverage.ps1"
       }
     ],
+    "path": ".claude/agents/feature-review.md",
     "sections": [
       "head",
       "required-outputs",
@@ -46,7 +47,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/feature-review.toml",
+    "delimiter": "'''",
     "keys": [
       {
         "key": "name",
@@ -57,7 +58,7 @@
         "value": "\"Converted subagent\""
       }
     ],
-    "delimiter": "'''",
+    "path": ".codex/agents/feature-review.toml",
     "sections": [
       "head-2",
       "required-outputs-2",

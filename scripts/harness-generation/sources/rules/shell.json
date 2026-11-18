@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/shell.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " Shell (bash) toolchain and coding standards."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/shell.md",
       "sections": [
         "head",
         "toolchain",

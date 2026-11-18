@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/python.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " Python-specific toolchain and coding standards."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/python.md",
       "sections": [
         "head",
         "toolchain",
@@ -23,8 +24,6 @@
       ]
     },
     {
-      "kind": "copilot",
-      "path": ".github/instructions/python-code-change.instructions.md",
       "frontmatter": [
         {
           "key": "applyTo",
@@ -39,6 +38,8 @@
           "value": " \"Python-specific code change rules layered on top of the general code change policy\""
         }
       ],
+      "kind": "copilot",
+      "path": ".github/instructions/python-code-change.instructions.md",
       "sections": [
         "head-2",
         "1-tooling-baseline-for-python",
@@ -51,8 +52,6 @@
       ]
     },
     {
-      "kind": "copilot",
-      "path": ".github/instructions/python-unit-test.instructions.md",
       "frontmatter": [
         {
           "key": "applyTo",
@@ -67,6 +66,8 @@
           "value": " \"Python-specific unit test rules, layered on top of the general unit test policy\""
         }
       ],
+      "kind": "copilot",
+      "path": ".github/instructions/python-unit-test.instructions.md",
       "sections": [
         "head-3",
         "1-framework-and-scope",
@@ -76,8 +77,6 @@
       ]
     },
     {
-      "kind": "codex",
-      "path": ".agents/skills/python/SKILL.md",
       "frontmatter": [
         {
           "key": "name",
@@ -88,6 +87,8 @@
           "value": " Python-specific toolchain and coding standards."
         }
       ],
+      "kind": "codex",
+      "path": ".agents/skills/python/SKILL.md",
       "sections": [
         "head",
         "toolchain-2",

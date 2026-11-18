@@ -1,4 +1,5 @@
 {
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
   "substitutions": [
     {
       "file": "SKILL.md",
@@ -22,7 +23,7 @@
     },
     {
       "file": "SKILL.md",
-      "find": "Create `remediation/<timestamp>/remediation-inputs.md` (one timestamped `remediation/` folder per cycle; reaudit artifacts from a triggering or exit review live under the sibling `audit/<timestamp>/` folder, per the canonical pattern documented in the Claude-side `remediation-handoff-atomic-planner` skill) with:\n- Enumerated fix list with file paths, expected behavior, and verification commands.\n- A “do not do” list (no scope creep, no policy weakening, no silent skips).\n",
+      "find": "Create `remediation/<timestamp>/remediation-inputs.md` (one timestamped `remediation/` folder per cycle; reaudit artifacts from a triggering or exit review live under the sibling `audit/<timestamp>/` folder, per the canonical pattern documented in the Claude-side `remediation-handoff-atomic-planner` skill) with:\n- Enumerated fix list with file paths, expected behavior, and verification commands.\n- A \u201cdo not do\u201d list (no scope creep, no policy weakening, no silent skips).\n",
       "replace": "The orchestrator authors `remediation/<entry-ts>/remediation-inputs.md` with:\n\n- Enumerated fix list with file paths, expected behavior, and verification commands.\n- A \"do not do\" list (no scope creep, no policy weakening, no silent skips).\n- A pointer to the audit artifacts that produced the findings.\n"
     },
     {
@@ -42,12 +43,12 @@
     },
     {
       "file": "SKILL.md",
-      "find": "The exhaustive-pass, defect-classification, in-place-fix, and fix-self-check rules that govern how `atomic-executor` conducts preflight are defined in the `## Preflight Validation (Planner ↔ Executor)` section of `.agents/skills/atomic-plan-contract/SKILL.md` and are not restated here.\n",
-      "replace": "The exhaustive-pass, defect-classification, in-place-fix, and fix-self-check rules that govern how `atomic-executor` conducts preflight are defined in the `## Preflight Validation (Planner ↔ Executor)` section of `.claude/skills/atomic-plan-contract/SKILL.md` and are not restated here.\n"
+      "find": "The exhaustive-pass, defect-classification, in-place-fix, and fix-self-check rules that govern how `atomic-executor` conducts preflight are defined in the `## Preflight Validation (Planner \u2194 Executor)` section of `.agents/skills/atomic-plan-contract/SKILL.md` and are not restated here.\n",
+      "replace": "The exhaustive-pass, defect-classification, in-place-fix, and fix-self-check rules that govern how `atomic-executor` conducts preflight are defined in the `## Preflight Validation (Planner \u2194 Executor)` section of `.claude/skills/atomic-plan-contract/SKILL.md` and are not restated here.\n"
     },
     {
       "file": "SKILL.md",
-      "find": "## Plan Creation and Handoff\n\n1) Create a remediation plan target file using the repo’s plan template.\n2) Delegate to `atomic_planner` with:\n   - `${spec}` pointing to remediation inputs (authoritative)\n   - `${file}` pointing to the remediation plan target file\n3) Require `atomic_planner` to output a deterministic, atomic plan with phases and `[P#-T#]` IDs.\n4) Require the same `${file}` path to be updated in place across all remediation-plan revisions in the same remediation loop.\n5) The caller owns the downstream clearance step:\n   - hand the resulting remediation plan to `atomic_executor` in preflight-validation mode, with the preflight directive in the delegation prompt and never in the plan file; preflight is single-pass and fixes trivial defects in place,\n   - if preflight returns `PREFLIGHT: REVISIONS REQUIRED`, re-delegate to `atomic_planner` once against the same `${file}` path with the full `PREFLIGHT-DEFECT:` list, then run one confirming preflight,\n   - if the confirming preflight still reports a substantive defect, record `final_status: \"blocked_preflight_iteration_limit\"` and halt the cycle,\n   - execute the remediation plan only after `PREFLIGHT: ALL CLEAR`.\n\n## Context Package (When Required)\n\nIf the calling agent requires a context package, inline the specified audit artifacts, PR context artifacts, and any relevant plan files in the delegated prompt.\n",
+      "find": "## Plan Creation and Handoff\n\n1) Create a remediation plan target file using the repo\u2019s plan template.\n2) Delegate to `atomic_planner` with:\n   - `${spec}` pointing to remediation inputs (authoritative)\n   - `${file}` pointing to the remediation plan target file\n3) Require `atomic_planner` to output a deterministic, atomic plan with phases and `[P#-T#]` IDs.\n4) Require the same `${file}` path to be updated in place across all remediation-plan revisions in the same remediation loop.\n5) The caller owns the downstream clearance step:\n   - hand the resulting remediation plan to `atomic_executor` in preflight-validation mode, with the preflight directive in the delegation prompt and never in the plan file; preflight is single-pass and fixes trivial defects in place,\n   - if preflight returns `PREFLIGHT: REVISIONS REQUIRED`, re-delegate to `atomic_planner` once against the same `${file}` path with the full `PREFLIGHT-DEFECT:` list, then run one confirming preflight,\n   - if the confirming preflight still reports a substantive defect, record `final_status: \"blocked_preflight_iteration_limit\"` and halt the cycle,\n   - execute the remediation plan only after `PREFLIGHT: ALL CLEAR`.\n\n## Context Package (When Required)\n\nIf the calling agent requires a context package, inline the specified audit artifacts, PR context artifacts, and any relevant plan files in the delegated prompt.\n",
       "replace": "## Context Package (When Required)\n\nIf the calling agent requires a context package, inline the relevant audit artifacts, PR context artifacts, and any active plan files in the delegated prompt to `atomic-planner` rather than referencing them by path alone.\n"
     }
   ]

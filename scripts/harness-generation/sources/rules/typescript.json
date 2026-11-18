@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/typescript.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " TypeScript-specific toolchain and coding standards."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/typescript.md",
       "sections": [
         "head",
         "toolchain",
@@ -26,8 +27,6 @@
       ]
     },
     {
-      "kind": "copilot",
-      "path": ".github/instructions/typescript-code-change.instructions.md",
       "frontmatter": [
         {
           "key": "description",
@@ -42,6 +41,8 @@
           "value": " typescript-code-change-policy"
         }
       ],
+      "kind": "copilot",
+      "path": ".github/instructions/typescript-code-change.instructions.md",
       "sections": [
         "head-2",
         "1-tooling-baseline-for-typescript",
@@ -57,8 +58,6 @@
       ]
     },
     {
-      "kind": "copilot",
-      "path": ".github/instructions/typescript-unit-test.instructions.md",
       "frontmatter": [
         {
           "key": "description",
@@ -73,6 +72,8 @@
           "value": " typescript-unit-test-policy"
         }
       ],
+      "kind": "copilot",
+      "path": ".github/instructions/typescript-unit-test.instructions.md",
       "sections": [
         "head-3",
         "1-framework-and-scope",
@@ -84,8 +85,6 @@
       ]
     },
     {
-      "kind": "codex",
-      "path": ".agents/skills/typescript/SKILL.md",
       "frontmatter": [
         {
           "key": "name",
@@ -96,6 +95,8 @@
           "value": " TypeScript-specific toolchain and coding standards."
         }
       ],
+      "kind": "codex",
+      "path": ".agents/skills/typescript/SKILL.md",
       "sections": [
         "head",
         "toolchain",

@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/ci-workflows.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " Exit-code rules for GitHub Actions workflow steps that run pwsh."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/ci-workflows.md",
       "sections": [
         "head",
         "deliberately-failing-nested-command-pattern-requir",
@@ -23,21 +24,19 @@
       ]
     },
     {
-      "kind": "copilot",
-      "path": ".github/instructions/github-actions.instructions.md",
       "frontmatter": [
         {
           "key": "applyTo",
           "value": " \".github/workflows/**/*.yml,.github/workflows/**/*.yaml\""
         }
       ],
+      "kind": "copilot",
+      "path": ".github/instructions/github-actions.instructions.md",
       "sections": [
         "head-2"
       ]
     },
     {
-      "kind": "copilot",
-      "path": ".github/instructions/github-actions-ci-cd-best-practices.instructions.md",
       "frontmatter": [
         {
           "key": "applyTo",
@@ -48,6 +47,8 @@
           "value": " 'Comprehensive guide for building robust, secure, and efficient CI/CD pipelines using GitHub Actions. Covers workflow structure, jobs, steps, environment variables, secret management, caching, matrix strategies, testing, and deployment strategies.'"
         }
       ],
+      "kind": "copilot",
+      "path": ".github/instructions/github-actions-ci-cd-best-practices.instructions.md",
       "sections": [
         "head-3",
         "your-mission",
@@ -62,8 +63,6 @@
       ]
     },
     {
-      "kind": "codex",
-      "path": ".agents/skills/ci-workflows/SKILL.md",
       "frontmatter": [
         {
           "key": "name",
@@ -74,6 +73,8 @@
           "value": " GitHub Actions PowerShell workflow authoring rules."
         }
       ],
+      "kind": "codex",
+      "path": ".agents/skills/ci-workflows/SKILL.md",
       "sections": [
         "head-4",
         "deliberately-failing-nested-command-pattern-requir",

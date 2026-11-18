@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/orchestrator.md",
     "frontmatter": [
       {
         "key": "name",
@@ -31,6 +31,7 @@
         "value": "\n  SubagentStop:\n    - matcher: \"orchestrator\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-orchestrator-output.ps1"
       }
     ],
+    "path": ".claude/agents/orchestrator.md",
     "sections": [
       "head",
       "startup-protocol",
@@ -43,7 +44,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/orchestrator.toml",
+    "delimiter": "'''",
     "keys": [
       {
         "key": "name",
@@ -58,7 +59,7 @@
         "value": "\"orchestrator-workspace\""
       }
     ],
-    "delimiter": "'''",
+    "path": ".codex/agents/orchestrator.toml",
     "sections": [
       "head-2",
       "startup-protocol-2",

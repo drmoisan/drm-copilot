@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/plan-acceptance-gates.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " Acceptance-gate rules G1 through G13 for atomic plans. G1 through G9 judge the shell commands a plan states as acceptance conditions; the document-level rules G10 through G13 report a SCRATCH definition that is not namespaced by issue number, a line-number citation, a commit-SHA citation, and a plan above the size guideline without a size justification."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/plan-acceptance-gates.md",
       "sections": [
         "head",
         "scope-of-invocation-no-exemption-marker",

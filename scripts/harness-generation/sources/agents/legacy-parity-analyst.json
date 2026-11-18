@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/legacy-parity-analyst.md",
     "frontmatter": [
       {
         "key": "name",
@@ -19,6 +19,7 @@
         "value": " project"
       }
     ],
+    "path": ".claude/agents/legacy-parity-analyst.md",
     "sections": [
       "head",
       "prepared-inputs-and-launch",
@@ -29,7 +30,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/legacy-parity-analyst.toml",
+    "delimiter": "'''",
     "keys": [
       {
         "key": "name",
@@ -40,7 +41,7 @@
         "value": "\"Converted subagent\""
       }
     ],
-    "delimiter": "'''",
+    "path": ".codex/agents/legacy-parity-analyst.toml",
     "sections": [
       "head-2",
       "prepared-inputs-and-launch",

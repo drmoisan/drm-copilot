@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/docs-architect.md",
     "frontmatter": [
       {
         "key": "name",
@@ -19,6 +19,7 @@
         "value": "\n  - docs-inventory-surface\n  - docs-plan-ia"
       }
     ],
+    "path": ".claude/agents/docs-architect.md",
     "sections": [
       "head",
       "prepared-inputs",
@@ -29,7 +30,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/docs-architect.toml",
+    "delimiter": "'''",
     "keys": [
       {
         "key": "name",
@@ -40,7 +41,7 @@
         "value": "\"Inventory the documented surface and plan the information architecture; read-only, uses the docs MCP tools.\""
       }
     ],
-    "delimiter": "'''",
+    "path": ".codex/agents/docs-architect.toml",
     "sections": [
       "head-2",
       "prepared-inputs",

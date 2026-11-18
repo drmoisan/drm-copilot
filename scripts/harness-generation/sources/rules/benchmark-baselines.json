@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/benchmark-baselines.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " Runner-environment parity and provenance rules for committed benchmark baselines."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/benchmark-baselines.md",
       "sections": [
         "head",
         "runner-environment-parity-required",
@@ -23,8 +24,6 @@
       ]
     },
     {
-      "kind": "codex",
-      "path": ".agents/skills/benchmark-baselines/SKILL.md",
       "frontmatter": [
         {
           "key": "name",
@@ -35,6 +34,8 @@
           "value": " Benchmark baseline provenance rules for performance regression gates."
         }
       ],
+      "kind": "codex",
+      "path": ".agents/skills/benchmark-baselines/SKILL.md",
       "sections": [
         "head-2",
         "runner-environment-parity-required",

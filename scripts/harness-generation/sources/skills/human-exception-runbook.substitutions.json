@@ -1,4 +1,5 @@
 {
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
   "substitutions": [
     {
       "file": "example.runbook.md",

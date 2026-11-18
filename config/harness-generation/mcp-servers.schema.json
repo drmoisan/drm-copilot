@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "config/harness-generation/mcp-servers.schema.json",
+  "title": "Harness generation MCP server source",
+  "description": "The single source of .mcp.json and the [mcp_servers.*] region of .codex/config.toml (issue #1028).",
+  "type": "object",
+  "required": ["$schema", "servers"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "servers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["args", "claude", "codex", "command", "name", "package"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "command": { "type": "string", "minLength": 1 },
+          "package": { "type": "string", "minLength": 1 },
+          "args": { "type": "array", "items": { "type": "string" } },
+          "claude": { "type": "object" },
+          "codex": {
+            "type": "object",
+            "properties": {
+              "pin_version": { "type": "boolean" },
+              "version_source": { "type": "string" },
+              "required": { "type": "boolean" },
+              "enabled_tools": { "type": "array", "items": { "type": "string" } },
+              "default_tools_approval_mode": { "type": "string" },
+              "tool_approval_modes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["approval_mode", "tool"],
+                  "properties": {
+                    "tool": { "type": "string" },
+                    "approval_mode": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

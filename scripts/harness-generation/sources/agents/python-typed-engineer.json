@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/python-typed-engineer.md",
     "frontmatter": [
       {
         "key": "name",
@@ -27,6 +27,7 @@
         "value": " project"
       }
     ],
+    "path": ".claude/agents/python-typed-engineer.md",
     "sections": [
       "head",
       "standing-rules",
@@ -38,7 +39,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/python-typed-engineer.toml",
+    "delimiter": "'''",
     "keys": [
       {
         "key": "name",
@@ -49,7 +50,7 @@
         "value": "\"Converted subagent\""
       }
     ],
-    "delimiter": "'''",
+    "path": ".codex/agents/python-typed-engineer.toml",
     "sections": [
       "head-2",
       "standing-rules-2",

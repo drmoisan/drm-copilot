@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/pr-author.md",
     "frontmatter": [
       {
         "key": "name",
@@ -31,6 +31,7 @@
         "value": "\n  PreToolUse:\n    - matcher: \"Bash\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/enforce-pr-author-command-allowlist.ps1\n  SubagentStop:\n    - matcher: \"pr-author\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-pr-author-output.ps1"
       }
     ],
+    "path": ".claude/agents/pr-author.md",
     "sections": [
       "head",
       "skill",
@@ -44,7 +45,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/pr-author.toml",
+    "delimiter": "\"\"\"",
     "keys": [
       {
         "key": "name",
@@ -55,7 +56,7 @@
         "value": "\"Write a GitHub-ready pull request body from the canonical PR-context bundle and its enumerated additional context files.\""
       }
     ],
-    "delimiter": "\"\"\"",
+    "path": ".codex/agents/pr-author.toml",
     "sections": [
       "head-2"
     ],

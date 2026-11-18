@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/task-researcher.md",
     "frontmatter": [
       {
         "key": "name",
@@ -31,6 +31,7 @@
         "value": "\n  SubagentStop:\n    - matcher: \"task-researcher\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-task-researcher-output.ps1"
       }
     ],
+    "path": ".claude/agents/task-researcher.md",
     "sections": [
       "head",
       "output-location",
@@ -41,7 +42,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/task-researcher.toml",
+    "delimiter": "'''",
     "keys": [
       {
         "key": "name",
@@ -52,7 +53,7 @@
         "value": "\"Converted subagent\""
       }
     ],
-    "delimiter": "'''",
+    "path": ".codex/agents/task-researcher.toml",
     "sections": [
       "head-2",
       "output-location-2",

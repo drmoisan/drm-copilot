@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/typescript-engineer.md",
     "frontmatter": [
       {
         "key": "name",
@@ -27,6 +27,7 @@
         "value": " project"
       }
     ],
+    "path": ".claude/agents/typescript-engineer.md",
     "sections": [
       "head",
       "evidence-location-invariant",
@@ -34,7 +35,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/typescript-engineer.toml",
+    "delimiter": "'''",
     "keys": [
       {
         "key": "name",
@@ -45,7 +46,7 @@
         "value": "\"Converted subagent\""
       }
     ],
-    "delimiter": "'''",
+    "path": ".codex/agents/typescript-engineer.toml",
     "sections": [
       "head-2",
       "evidence-location-invariant-2",

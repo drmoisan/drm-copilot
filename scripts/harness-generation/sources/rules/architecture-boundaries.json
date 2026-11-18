@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/architecture-boundaries.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " Architecture boundary enforcement rules for a host-neutral layered architecture."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/architecture-boundaries.md",
       "sections": [
         "head",
         "enforcement-tools",
@@ -23,8 +24,6 @@
       ]
     },
     {
-      "kind": "codex",
-      "path": ".agents/skills/architecture-boundaries/SKILL.md",
       "frontmatter": [
         {
           "key": "name",
@@ -35,6 +34,8 @@
           "value": " Architecture boundary enforcement rules for a host-neutral layered architecture."
         }
       ],
+      "kind": "codex",
+      "path": ".agents/skills/architecture-boundaries/SKILL.md",
       "sections": [
         "head-2",
         "enforcement-tools",

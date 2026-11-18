@@ -1,8 +1,7 @@
 {
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
   "targets": [
     {
-      "kind": "claude",
-      "path": ".claude/rules/orchestrator-state.md",
       "frontmatter": [
         {
           "key": "paths",
@@ -13,6 +12,8 @@
           "value": " Checkpoint invariants for the orchestration state artifact and the surfaces that write or validate it."
         }
       ],
+      "kind": "claude",
+      "path": ".claude/rules/orchestrator-state.md",
       "sections": [
         "head",
         "foreign-schema-warning-do-not-copy-verbatim",
@@ -45,8 +46,6 @@
       ]
     },
     {
-      "kind": "codex",
-      "path": ".agents/skills/orchestrator-state/SKILL.md",
       "frontmatter": [
         {
           "key": "name",
@@ -57,6 +56,8 @@
           "value": " Orchestrator-state remediation-cycle and human-interaction invariants."
         }
       ],
+      "kind": "codex",
+      "path": ".agents/skills/orchestrator-state/SKILL.md",
       "sections": [
         "head-2",
         "foreign-schema-warning-do-not-copy-verbatim",

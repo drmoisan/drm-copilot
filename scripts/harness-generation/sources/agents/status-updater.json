@@ -1,6 +1,6 @@
 {
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
   "claude": {
-    "path": ".claude/agents/status-updater.md",
     "frontmatter": [
       {
         "key": "name",
@@ -31,6 +31,7 @@
         "value": "\n  SubagentStop:\n    - matcher: \"status-updater\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName status-updater -RequiredArtifact 'status-sync-path|^artifacts/status/status-sync\\.\\d{4}-\\d{2}-\\d{2}T\\d{2}-\\d{2}\\.md$|status sync artifact'"
       }
     ],
+    "path": ".claude/agents/status-updater.md",
     "sections": [
       "head",
       "expected-outputs",
@@ -39,7 +40,7 @@
     ]
   },
   "codex": {
-    "path": ".codex/agents/status-updater.toml",
+    "delimiter": "'''",
     "keys": [
       {
         "key": "name",
@@ -50,7 +51,7 @@
         "value": "\"Converted subagent\""
       }
     ],
-    "delimiter": "'''",
+    "path": ".codex/agents/status-updater.toml",
     "sections": [
       "head-2",
       "expected-outputs",
