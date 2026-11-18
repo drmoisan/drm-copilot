@@ -23,6 +23,7 @@ import {
 import { type CSharpVariant, type MemoryMode } from "./claude-pack-selection";
 import { LAYER_ROOT_FILES, type PushDownLayer } from "./push-down-layer";
 import { resolveLayerPublishedPaths } from "./push-down-pack-resolver";
+import { type RewriteFunction } from "./reference-rewrites";
 import { WriteIfChangedFileSystem } from "./push-down-write-if-changed";
 
 /** Structural form of one destination-side write decorator. */
@@ -42,6 +43,8 @@ export interface ClaudeLayerDeclarations {
   readonly mergedRelativePaths: ReadonlyArray<string>;
   readonly destinationWriteDecorators: ReadonlyArray<ClaudeLayerWriteDecorator>;
   readonly artifactDirectory: string;
+  /** Text rewrite (the Claude passthrough). */
+  readonly rewrite: RewriteFunction;
 }
 
 /** Run inputs of {@link composeClaudeLayer}. */
@@ -63,11 +66,6 @@ export interface ClaudeLayerOptions {
   readonly memoryMode: MemoryMode;
   /** Destination directory lister for the blast-radius derivation. */
   readonly listEntries?: DirectoryLister;
-}
-
-/** Passthrough rewrite for `.claude` content. */
-function passthrough(text: string): [string, number, number, string[]] {
-  return [text, 0, 0, []];
 }
 
 /**
@@ -121,7 +119,7 @@ export function composeClaudeLayer(
     rootFolders: declarations.rootFolders,
     rootFiles: LAYER_ROOT_FILES.claude,
     fs: excluding,
-    rewrite: passthrough,
+    rewrite: declarations.rewrite,
     mergedPaths: declarations.mergedRelativePaths,
     mergedDeliveries: [
       {

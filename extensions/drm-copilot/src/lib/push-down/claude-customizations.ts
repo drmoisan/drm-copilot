@@ -26,14 +26,7 @@ import {
   type DirectoryLister,
 } from "./claude-blast-radius-derive";
 import { BlastRadiusOverlayFileSystem } from "./claude-blast-radius-overlay";
-import {
-  assertSingleCsharpToolchain,
-  computePublishedPaths,
-  type CSharpVariant,
-  loadPackManifests,
-  type MemoryMode,
-  type PackManifest,
-} from "./claude-pack-selection";
+import { type CSharpVariant, type MemoryMode } from "./claude-pack-selection";
 import {
   assertManifestPathIsRootLevel,
   EXCLUSION_MANIFEST_RELATIVE_PATH,
@@ -252,46 +245,6 @@ export function parsePacksArgument(
   return names.size === 0 ? null : names;
 }
 
-/**
- * Compute the published `.claude`-relative path set for a pack selection.
- *
- * Returns null when no pack selection was supplied (publish everything, no
- * manifest read). Otherwise loads manifests, computes the union (always
- * including core), and asserts C# mutual exclusion.
- *
- * @param packs Selected pack names, or null/empty for the default.
- * @param bundleRoot Bundle root containing the `pack-manifests` subdirectory.
- * @param fs Adapter used to read the manifest files.
- * @returns The union path set, or null for the publish-everything default.
- * @throws ManifestError When a manifest is missing/malformed or both C# variants
- *   are selected.
- */
-export function resolvePublishedPaths(
-  packs: ReadonlySet<string> | null,
-  bundleRoot: string,
-  fs: PushDownFileSystem,
-): ReadonlySet<string> | null {
-  // No explicit selection means publish everything without a manifest read.
-  if (packs === null || packs.size === 0) {
-    return null;
-  }
-
-  const manifestDir = joinPosix(bundleRoot, PACK_MANIFEST_SUBDIR);
-  const manifests: Map<string, PackManifest> = loadPackManifests(
-    manifestDir,
-    packs,
-    fs,
-  );
-  const published = computePublishedPaths(packs, manifests);
-  // computePublishedPaths returns null only for an empty selection, already
-  // excluded above; treat a null here as an empty set so the C# exclusion check
-  // still runs on a concrete value.
-  const effectivePublished: ReadonlySet<string> =
-    published ?? new Set<string>();
-  assertSingleCsharpToolchain(effectivePublished, packs);
-  return effectivePublished;
-}
-
 /** Options for the Claude {@link pushDownCustomizations} entry point. */
 export interface ClaudePushDownOptions {
   readonly repoRoot: string;
@@ -353,6 +306,7 @@ export function buildClaudeLayer(
       mergedRelativePaths: MERGED_RELATIVE_PATHS,
       destinationWriteDecorators: DESTINATION_WRITE_DECORATORS,
       artifactDirectory: ARTIFACT_DIRECTORY,
+      rewrite: passthroughRewrite,
     },
     {
       repoRoot: options.repoRoot,

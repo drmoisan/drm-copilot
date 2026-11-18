@@ -8,6 +8,7 @@ import { type PushDownFileSystem } from "../../../src/lib/push-down/filesystem-a
 import {
   buildClaudeLayer,
   MERGED_RELATIVE_PATHS,
+  passthroughRewrite,
   ROOT_FOLDERS,
 } from "../../../src/lib/push-down/claude-customizations";
 import { mergeClaudeGitignore } from "../../../src/lib/push-down/claude-gitignore-merge";
@@ -109,6 +110,7 @@ describe("composeClaudeLayer", () => {
         mergedRelativePaths: [],
         destinationWriteDecorators: [recording("first"), recording("second")],
         artifactDirectory: "artifacts/x",
+        rewrite: passthroughRewrite,
       },
       {
         repoRoot: "/src",
