@@ -69,11 +69,11 @@ covers function parity only.
 ## Acceptance Criteria
 
 - [x] Every hook registration enumerated by child 1's inventory module at execution time, including the entries of `.claude/hooks/pretooluse-dispatch.json` and `.codex/hooks/pretooluse-dispatch.json`, has exactly one matrix entry with `disposition: native`, a `parity_group` and a `decision_ref`, and `tests/scripts/harness/HarnessParityMatrix.RepoGate.Tests.ps1` passes.
-- [ ] Every Claude hook `parity_group` has a Codex member or a recorded gap class with reason, and `tests/scripts/harness/HarnessHookParity.RepoGate.Tests.ps1` passes, including its negative cases.
+- [x] Every Claude hook `parity_group` has a Codex member or a recorded gap class with reason, and `tests/scripts/harness/HarnessHookParity.RepoGate.Tests.ps1` passes, including its negative cases.
 - [x] Codex `validate-pr-author-output.ps1` has a behavior suite under `tests/scripts/codex-hooks/` running the same decision cases as the corresponding Claude suite on equivalent Codex payloads, and the validator allows a stop when `stop_hook_active` is set.
 - [ ] The Codex `enforce-feature-folder-order` port is deferred (spec AD-8): no `.codex/hooks/enforce-feature-folder-order.ps1` file and no Codex dispatch-registry or `.codex/config.toml` entry for it is added (root and bundle), and the Claude `hook:enforce-feature-folder-order` entry carries a `GAP:DEFER: ` note naming `.claude/lib/development-docs/DevelopmentDocsRoot.psm1` and child 4, verified by `tests/scripts/harness/HarnessHookParity.RepoGate.Tests.ps1`.
-- [ ] The matrix records the five worktree-resolution-dependent SubagentStop validators, `enforce-feature-folder-order`, `enforce-prd-feature-before-planner`, `enforce-mermaid-validation`, `enforce-pr-author-skill`, `validate-orchestrator-output` and the pr-author Bash allowlist as `DEFER`, and the Codex preimplementation-gate delegation registration as `NOT-EXPRESSIBLE` naming issue #555, each with its reason.
-- [ ] Copilot hook registrations have `disposition: native` and `owner_child: 6`.
+- [x] The matrix records the five worktree-resolution-dependent SubagentStop validators, `enforce-feature-folder-order`, `enforce-prd-feature-before-planner`, `enforce-mermaid-validation`, `enforce-pr-author-skill`, `validate-orchestrator-output` and the pr-author Bash allowlist as `DEFER`, and the Codex preimplementation-gate delegation registration as `NOT-EXPRESSIBLE` naming issue #555, each with its reason.
+- [x] Copilot hook registrations have `disposition: native` and `owner_child: 6`.
 - [ ] `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` scans `.github/hooks` in addition to its existing roots and passes.
 - [ ] Bundled mirrors, pack manifests and their contract tests listed in the spec pass.
 - [ ] No edit is made to Codex hook files at 490 or more physical lines at Phase 0.
