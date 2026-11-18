@@ -30,5 +30,21 @@
   "./src/lib/push-down/push-down-apply.ts": {
     "lines": 85,
     "branches": 75
+  },
+  "./src/lib/push-down/push-down-shared-layer.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/claude-layer.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/push-down-ecosystem-registry.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/push-down-harness.ts": {
+    "lines": 85,
+    "branches": 75
   }
 }

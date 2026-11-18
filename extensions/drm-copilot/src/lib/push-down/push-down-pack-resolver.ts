@@ -52,6 +52,20 @@ const FULL_TREE_PACKS: Readonly<
   copilot: () => [...COPILOT_PACK_NAMES],
 };
 
+/**
+ * Return the pack list a full-tree publish records for an ecosystem (D5).
+ *
+ * @param ecosystem Ecosystem name.
+ * @param csharpVariant Effective C# variant.
+ * @returns The sorted pack names, including `core`.
+ */
+export function fullTreePacks(
+  ecosystem: EcosystemName,
+  csharpVariant: "modern" | "legacy",
+): string[] {
+  return recordedPacks(FULL_TREE_PACKS[ecosystem](csharpVariant));
+}
+
 /** One loaded pack manifest (the shape both existing loaders return). */
 interface LoadedManifest {
   readonly name: string;
@@ -197,9 +211,7 @@ export function resolveLayerPublishedPaths(
       publishedPaths: null,
       ownerPack: () => MANIFEST_CORE_PACK,
       selection: {
-        packs: recordedPacks(
-          FULL_TREE_PACKS[input.ecosystem](input.csharpVariant),
-        ),
+        packs: fullTreePacks(input.ecosystem, input.csharpVariant),
         ...variantFields,
       },
     };
