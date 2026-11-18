@@ -3,9 +3,11 @@ import { describe, expect, it } from "@jest/globals";
 import {
   COPILOT_ROOT_FOLDERS,
   enumerateSourceFiles,
-  pushDownCustomizations,
   stringifySorted,
 } from "../../../src/lib/push-down/copilot-customizations-engine";
+// Issue #1029 (X1): the engine copy loop moved into the push-down pipeline;
+// the Copilot wrapper takes the identical options, so these cases now drive it.
+import { pushDownCustomizations } from "../../../src/lib/push-down/copilot-customizations";
 import { buildInMemoryFileSystem, fixedClock } from "./push-down.test-helpers";
 
 const CLOCK = fixedClock("2026-06-26T00:15:00.000Z");

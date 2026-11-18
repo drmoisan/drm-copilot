@@ -1,0 +1,14 @@
+{
+  "name": "python",
+  "label": "Python",
+  "paths": [
+    ".github/agents/python-atomic-executor.agent.md",
+    ".github/agents/python-atomic-planning.agent.md",
+    ".github/agents/python-execution-only-typed.agent.md",
+    ".github/agents/python-orchestrator.agent.md",
+    ".github/agents/python-typed-engineer.agent.md",
+    ".github/instructions/python-code-change.instructions.md",
+    ".github/instructions/python-suppressions.instructions.md",
+    ".github/instructions/python-unit-test.instructions.md"
+  ]
+}

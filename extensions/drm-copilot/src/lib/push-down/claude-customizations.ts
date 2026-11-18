@@ -17,10 +17,8 @@
 import { type PushDownFileSystem } from "./filesystem-adapter";
 import {
   type Clock,
-  pushDownCustomizations as enginePushDown,
   type PushDownSummary,
 } from "./copilot-customizations-engine";
-import { ExcludingFileSystem } from "./claude-filesystem-adapter";
 import { RoutingMergeFileSystem } from "./claude-routing-merge";
 import {
   BLAST_RADIUS_RELATIVE_PATH,
@@ -28,10 +26,6 @@ import {
   type DirectoryLister,
 } from "./claude-blast-radius-derive";
 import { BlastRadiusOverlayFileSystem } from "./claude-blast-radius-overlay";
-import {
-  CLAUDE_GITIGNORE_RELATIVE_PATH,
-  mergeClaudeGitignore,
-} from "./claude-gitignore-merge";
 import {
   assertSingleCsharpToolchain,
   computePublishedPaths,
@@ -43,17 +37,12 @@ import {
 import {
   assertManifestPathIsRootLevel,
   EXCLUSION_MANIFEST_RELATIVE_PATH,
-  type ExclusionManifest,
-  matchesExclusionEntry,
-  type SkippedPath,
 } from "./claude-exclusion-manifest";
-import {
-  appendExclusionsToArtifact,
-  buildExclusionReport,
-  ExclusionFilterFileSystem,
-  type ExclusionReport,
-  readExclusionManifest,
-} from "./claude-exclusion-filter";
+import { type ExclusionReport } from "./claude-exclusion-filter";
+import { composeClaudeLayer } from "./claude-layer";
+import { type PushDownLayer } from "./push-down-layer";
+import { runPushDownPipeline } from "./push-down-pipeline";
+import { applyPushDownPlan, UNKNOWN_PAYLOAD_VERSION } from "./push-down-apply";
 
 /** Artifact directory for the Claude push-down summary. */
 export const ARTIFACT_DIRECTORY = "artifacts/claude-customizations";
@@ -324,14 +313,71 @@ export interface ClaudePushDownOptions {
    * the real lister cannot see an in-memory tree.
    */
   readonly listEntries?: DirectoryLister;
+
+  /** Overwrite `unmanaged-conflict` files (O-4 opt-in, issue #1029). */
+  readonly overwriteUnmanaged?: boolean;
+}
+
+/**
+ * Return the parent directory of a POSIX path.
+ *
+ * @param path POSIX path.
+ * @returns The parent path, or `""` for a bare name.
+ */
+function parentPosix(path: string): string {
+  const normalized = path.replace(/\\/g, "/").replace(/\/+$/, "");
+  return normalized.slice(0, Math.max(normalized.lastIndexOf("/"), 0));
+}
+
+/**
+ * Build the Claude layer from the pinned declarations of this module (D10).
+ *
+ * @param options Entry options (roots, filesystem, pack/variant/memory inputs).
+ * @returns The Claude layer for the push-down pipeline.
+ * @throws ManifestError When a selected manifest is missing/malformed or both C#
+ *   variants are selected.
+ */
+export function buildClaudeLayer(
+  options: ClaudePushDownOptions,
+): PushDownLayer {
+  const effectiveSource = options.sourceRoot ?? options.repoRoot;
+  // The repository layout nests the bundle under the source root; an explicit
+  // bundleRoot (the bundled template) overrides this.
+  const effectiveBundle =
+    options.bundleRoot ?? joinPosix(effectiveSource, BUNDLE_ROOT_RELATIVE_DIR);
+  const packs = options.packs ?? null;
+  return composeClaudeLayer(
+    {
+      rootFolders: ROOT_FOLDERS,
+      excludedRelativePaths: EXCLUDED_RELATIVE_PATHS,
+      mergedRelativePaths: MERGED_RELATIVE_PATHS,
+      destinationWriteDecorators: DESTINATION_WRITE_DECORATORS,
+      artifactDirectory: ARTIFACT_DIRECTORY,
+    },
+    {
+      repoRoot: options.repoRoot,
+      sourceRoot: effectiveSource,
+      bundleRoot: effectiveBundle,
+      resourcesRoot: parentPosix(effectiveBundle),
+      destinationRoot: options.destinationRoot,
+      fs: options.fs,
+      packs: packs === null ? null : [...packs],
+      csharpVariant: options.csharpVariant ?? "modern",
+      memoryMode: options.memoryMode ?? "overwrite",
+      ...(options.listEntries === undefined
+        ? {}
+        : { listEntries: options.listEntries }),
+    },
+  );
 }
 
 /**
  * Copy the `.claude` tree into the destination workspace.
  *
- * Composes {@link ExcludingFileSystem} over the injected adapter and delegates
- * to the shared engine with the Claude root folders, artifact directory, and the
- * passthrough rewrite.
+ * A single-layer adapter over the push-down pipeline (no shared layer): the
+ * Claude layer is planned, then applied, so the destination manifest, the
+ * no-overwrite rule, exclusions, merged paths, and the `.gitignore` delivery
+ * all follow the pipeline.
  *
  * @param options Entry options (roots, filesystem, pack/variant/memory inputs).
  * @returns The completed run summary including the written artifact path.
@@ -343,155 +389,21 @@ export interface ClaudePushDownOptions {
 export function pushDownCustomizations(
   options: ClaudePushDownOptions,
 ): ClaudePushDownSummary {
-  const {
-    repoRoot,
-    destinationRoot,
-    fs,
-    sourceRoot,
-    artifactRoot,
-    packs,
-    csharpVariant,
-    memoryMode,
-    bundleRoot,
-    clock,
-    listEntries,
-  } = options;
-
-  const effectiveSource = sourceRoot ?? repoRoot;
-  // Resolve the bundle root that holds manifests and the variant subtree. The
-  // repository layout nests the bundle under the source root; an explicit
-  // bundleRoot (the bundled template) overrides this.
-  const effectiveBundle =
-    bundleRoot ?? joinPosix(effectiveSource, BUNDLE_ROOT_RELATIVE_DIR);
-
-  // Read the destination manifest before any write so a malformed manifest
-  // fails the run with the destination untouched.
-  const manifest = readExclusionManifest(fs, destinationRoot);
-
-  // Resolve the published-path set only when a pack selection is supplied so the
-  // no-argument path performs no manifest I/O.
-  const publishedPaths = resolvePublishedPaths(
-    packs ?? null,
-    effectiveBundle,
-    fs,
-  );
-
-  // Build the destination-side write chain from the registry, innermost first,
-  // below the filtering wrapper so enumeration is unaffected.
-  const decoratorOptions = listEntries === undefined ? {} : { listEntries };
-  const decoratedFs = DESTINATION_WRITE_DECORATORS.reduce<PushDownFileSystem>(
-    (inner, decorator) =>
-      decorator.wrap(inner, destinationRoot, decoratorOptions),
-    fs,
-  );
-
-  // Wrap the adapter so enumeration omits excluded paths and honors selections.
-  const excludingFs = new ExcludingFileSystem(
-    decoratedFs,
-    repoRoot,
-    EXCLUDED_RELATIVE_PATHS,
-    {
-      sourceRoot: effectiveSource,
-      destinationRoot,
-      publishedPaths,
-      csharpVariant: csharpVariant ?? "modern",
-      memoryMode: memoryMode ?? "overwrite",
-      variantRoot: effectiveBundle,
-    },
-  );
-
-  // Outermost, so a matched path never reaches any decorator beneath it.
-  const exclusionFs =
-    manifest === undefined
-      ? undefined
-      : new ExclusionFilterFileSystem(
-          excludingFs,
-          effectiveSource,
-          destinationRoot,
-          manifest,
-          ARTIFACT_DIRECTORY,
-        );
-
-  const summary = enginePushDown({
-    repoRoot,
-    destinationRoot,
-    fs: exclusionFs ?? excludingFs,
-    ...(sourceRoot === undefined ? {} : { sourceRoot }),
-    ...(artifactRoot === undefined ? {} : { artifactRoot }),
-    rootFolders: ROOT_FOLDERS,
-    artifactDirectory: ARTIFACT_DIRECTORY,
-    rewriteReferences: passthroughRewrite,
-    ...(clock === undefined ? {} : { clock }),
+  const planned = runPushDownPipeline({
+    repoRoot: options.repoRoot,
+    destinationRoot: options.destinationRoot,
+    fs: options.fs,
+    buildLayers: () => [buildClaudeLayer(options)],
+    overwriteUnmanaged: options.overwriteUnmanaged === true,
+    ...(options.clock === undefined ? {} : { clock: options.clock }),
   });
-
-  const gitignoreSkip = deliverDestinationGitignore(
-    fs,
-    destinationRoot,
-    manifest,
-  );
-  if (manifest === undefined || exclusionFs === undefined) {
-    return summary;
-  }
-  const skipped =
-    gitignoreSkip === undefined
-      ? exclusionFs.skipped
-      : [...exclusionFs.skipped, gitignoreSkip];
-  const report = buildExclusionReport(manifest, skipped);
-  appendExclusionsToArtifact(fs, summary.artifactPath, report);
-  return { ...summary, exclusions: report };
-}
-
-/**
- * Merge the managed ignore entries into the destination workspace `.gitignore`.
- *
- * The pushed-down hooks write runtime state under `.claude/state/` and
- * `.codex/state/`; a destination that does not ignore those paths reports them
- * as untracked churn after every publish. The merge itself lives in the pure
- * {@link mergeClaudeGitignore}; this function owns only the read and the
- * conditional write.
- *
- * The raw injected adapter is used rather than any of the composed decorators,
- * because none of them applies here: the filtering wrapper governs the copied
- * source set, and the {@link DESTINATION_WRITE_DECORATORS} registry governs the
- * routing document and the derived, overlay-composed blast-radius map. This
- * write is post-copy and has no source file behind it.
- *
- * A missing destination `.gitignore` is a valid input, not an error. The write
- * is skipped when the merged text equals the current text, so a second publish
- * performs no write at all and the delivery is idempotent.
- *
- * @param fs Adapter used to read and write the destination file.
- * @param destinationRoot Absolute destination workspace root.
- * @param manifest Parsed exclusion manifest, or `undefined` without one.
- * @returns The skip record, with no read or write performed, when the manifest
- *   excludes `.gitignore`; otherwise `undefined`.
- */
-function deliverDestinationGitignore(
-  fs: PushDownFileSystem,
-  destinationRoot: string,
-  manifest: ExclusionManifest | undefined,
-): SkippedPath | undefined {
-  const destinationPath = joinPosix(
-    destinationRoot,
-    CLAUDE_GITIGNORE_RELATIVE_PATH,
-  );
-  const entry = manifest?.entries.find((candidate) =>
-    matchesExclusionEntry(candidate, CLAUDE_GITIGNORE_RELATIVE_PATH),
-  );
-  if (entry !== undefined) {
-    return {
-      relativePath: CLAUDE_GITIGNORE_RELATIVE_PATH,
-      entry: entry.normalized,
-      line: entry.line,
-      destinationStatus: fs.isFile(destinationPath) ? "present" : "absent",
-    };
-  }
-  const currentText = fs.isFile(destinationPath)
-    ? fs.readTextFile(destinationPath)
-    : "";
-  const mergedText = mergeClaudeGitignore(currentText);
-  if (mergedText !== currentText) {
-    fs.writeTextFile(destinationPath, mergedText);
-  }
-  return undefined;
+  const applied = applyPushDownPlan(planned, {
+    payloadVersion: UNKNOWN_PAYLOAD_VERSION,
+    artifactRoot: options.artifactRoot ?? options.repoRoot,
+    artifactDirectory: ARTIFACT_DIRECTORY,
+    ...(options.clock === undefined ? {} : { clock: options.clock }),
+  });
+  return applied.exclusions === undefined
+    ? applied.summary
+    : { ...applied.summary, exclusions: applied.exclusions };
 }
