@@ -51,4 +51,5 @@ jobs:
         working-directory: ${{ matrix.manifest }}
         env:
           AUDIT_LEVEL: ${{ inputs.audit-level }}
-        run: npm audit --audit-level="$AUDIT_LEVEL"
+        shell: pwsh
+        run: ${{ github.workspace }}/scripts/ci/Invoke-NpmAuditGate.ps1 -AuditLevel "$env:AUDIT_LEVEL" -ExceptionsPath "${{ github.workspace }}/config/npm-audit-exceptions.json"
