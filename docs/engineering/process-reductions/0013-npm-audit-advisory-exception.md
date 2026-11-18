@@ -5,7 +5,7 @@
 reduction: 0013
 Date: 2026-11-18
 Issue: #1204
-Merge commit: pending (PR #1204)
+Merge commit: pending (PR #1205)
 
 The NPM Audit Gate (`.github/workflows/_npm-audit-gate.yml`) stops failing on advisory GHSA-fc5q-39xc-vjpf (picomatch, high severity, no patched version) while every affected path is development-only and the exception has not expired. The bare step `npm audit --audit-level="$AUDIT_LEVEL"` is replaced by `scripts/ci/Invoke-NpmAuditGate.ps1`, which runs a strict production pass (`npm audit --omit=dev --audit-level=<level>`, no exception logic) and a full pass (`npm audit --json`, dev dependencies included) filtered by the committed `config/npm-audit-exceptions.json`. The exception names one advisory id, expires on 2026-12-18, and is enforced in code. The audit level is not lowered, and dev dependencies are not omitted from the full audit.
 
