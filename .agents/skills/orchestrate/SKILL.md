@@ -261,6 +261,18 @@ out by committing `config/preimplementation-gate.json` with
 `git commit -m <msg> -- <paths>`, or with a pathless commit when the staged
 index holds only bookkeeping paths.
 
+Release-commit allowance (issue #1201): without a ready checkpoint, the gate
+also allows a release version bump that the repository declares in
+`.claude/release-commit-allowance.json` (schema version 1: `allowances`
+entries with `id`, `branch_patterns`, and `allowed_paths`). On a branch that
+matches a pattern, `git add <allowed paths>` and `git commit -m '<message>'`
+(or `-F <file>`) are allowed when one allowance lists every added and staged
+path. Any other form is denied with one `RELEASE_ALLOWANCE_*` code appended
+to the deny text, and an absent file leaves the deny text unchanged. The file
+is destination-owned: push-down never writes it and this repository commits
+none. Quote a commit message in single quotes or pass it with `-F <file>`,
+because `$`, a backtick, or a backslash is not modelled.
+
 ## Plan-Path Resolution Gate
 
 After active feature folder creation and before any planning delegation, the
