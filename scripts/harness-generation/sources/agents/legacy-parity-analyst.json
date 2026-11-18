@@ -1,0 +1,53 @@
+{
+  "claude": {
+    "path": ".claude/agents/legacy-parity-analyst.md",
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " legacy-parity-analyst"
+      },
+      {
+        "key": "description",
+        "value": " Record selected legacy inventory, feature contracts, coverage dispositions and unresolved behavior from supplied source evidence."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - \"mcp__drm-copilot__read_discovery_source\"\n  - \"mcp__drm-copilot__run_discovery_repo_inventory\"\n  - \"mcp__drm-copilot__create_discovery_artifact\"\n  - \"mcp__drm-copilot__update_discovery_artifact\"\n  - \"mcp__drm-copilot__link_discovery_evidence\"\n  - \"mcp__drm-copilot__finalize_discovery_agent\""
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      }
+    ],
+    "sections": [
+      "head",
+      "prepared-inputs-and-launch",
+      "selected-reads-and-controlled-operations",
+      "exact-output-boundary",
+      "denied-authority-and-managed-memory",
+      "finalization-and-explicit-result"
+    ]
+  },
+  "codex": {
+    "path": ".codex/agents/legacy-parity-analyst.toml",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"legacy-parity-analyst\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "delimiter": "'''",
+    "sections": [
+      "head-2",
+      "prepared-inputs-and-launch",
+      "selected-reads-and-controlled-operations",
+      "exact-output-boundary",
+      "denied-authority-and-managed-memory",
+      "finalization-and-explicit-result"
+    ]
+  }
+}

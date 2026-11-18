@@ -1,0 +1,78 @@
+{
+  "claude": {
+    "path": ".claude/agents/atomic-executor.md",
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " atomic-executor"
+      },
+      {
+        "key": "model",
+        "value": " opus"
+      },
+      {
+        "key": "description",
+        "value": " Plan execution agent that runs approved atomic plans task-by-task with explicit toolchain commands for Python, TypeScript, PowerShell, and C# quality gates."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - Edit\n  - Write\n  - \"Bash(poetry run black *)\"\n  - \"Bash(poetry run ruff *)\"\n  - \"Bash(poetry run pyright *)\"\n  - \"Bash(sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh *)\"\n  - \"Bash(npx prettier *)\"\n  - \"Bash(npx eslint *)\"\n  - \"Bash(npx tsc *)\"\n  - \"Bash(env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh *)\"\n  - \"Bash(pwsh *)\"\n  - \"Bash(git *)\"\n  - \"mcp__drm-copilot__run_poshqc_format\"\n  - \"mcp__drm-copilot__run_poshqc_analyze\"\n  - \"mcp__drm-copilot__run_poshqc_test\"\n  - \"mcp__drm-copilot__run_poshqc_analyze_autofix\"\n  - \"mcp__drm-copilot__validate_orchestration_artifacts\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - policy-compliance-order\n  - atomic-plan-contract\n  - evidence-and-timestamp-conventions\n  - acceptance-criteria-tracking\n  - execution-environment\n  - owner-directives"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      },
+      {
+        "key": "hooks",
+        "value": "\n  SubagentStop:\n    - matcher: \"atomic-executor\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-executor-output.ps1"
+      }
+    ],
+    "sections": [
+      "head",
+      "plan-authority",
+      "anti-replanning-rules",
+      "execution-protocol",
+      "toolchain-commands",
+      "scratch-location",
+      "preflight-validation",
+      "blocking-protocol",
+      "persistence-across-turns",
+      "resume-behavior",
+      "completion-requirements",
+      "evidence-location-invariant"
+    ]
+  },
+  "codex": {
+    "path": ".codex/agents/atomic-executor.toml",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"atomic-executor\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "delimiter": "'''",
+    "sections": [
+      "head-2",
+      "plan-authority",
+      "anti-replanning-rules",
+      "execution-protocol",
+      "toolchain-commands",
+      "scratch-location",
+      "preflight-validation-2",
+      "blocking-protocol-2",
+      "persistence-across-turns",
+      "resume-behavior",
+      "completion-requirements",
+      "evidence-location-invariant-2",
+      "test-execution-launcher"
+    ]
+  }
+}

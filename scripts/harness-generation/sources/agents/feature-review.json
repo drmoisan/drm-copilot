@@ -1,0 +1,74 @@
+{
+  "claude": {
+    "path": ".claude/agents/feature-review.md",
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " feature-review"
+      },
+      {
+        "key": "model",
+        "value": " opus"
+      },
+      {
+        "key": "description",
+        "value": " Feature branch review specialist that produces policy-audit, code-review, and feature-audit artifacts restricted to docs/features/active/ write path."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - \"Bash(git diff *)\"\n  - \"Bash(git log *)\"\n  - \"Write(/docs/features/active/**)\"\n  - \"Write(/.dev/active/**)\"\n  - \"mcp__drm-copilot__validate_orchestration_artifacts\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - policy-compliance-order\n  - acceptance-criteria-tracking\n  - owner-directives"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      },
+      {
+        "key": "hooks",
+        "value": "\n  SubagentStop:\n    - matcher: \"feature-review\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-feature-review-coverage.ps1"
+      }
+    ],
+    "sections": [
+      "head",
+      "required-outputs",
+      "output-reporting",
+      "context-sources",
+      "work-mode-routing",
+      "constraints",
+      "scope-invariant-non-negotiable",
+      "coverage-verification",
+      "file-size-advisory",
+      "documentation-surface-check",
+      "evidence-location-invariant"
+    ]
+  },
+  "codex": {
+    "path": ".codex/agents/feature-review.toml",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"feature-review\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "delimiter": "'''",
+    "sections": [
+      "head-2",
+      "required-outputs-2",
+      "context-sources",
+      "work-mode-routing",
+      "constraints",
+      "scope-invariant-non-negotiable",
+      "coverage-verification-2",
+      "file-size-advisory-2",
+      "documentation-surface-check",
+      "evidence-location-invariant-2"
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "claude": {
+    "path": ".claude/agents/typescript-engineer.md",
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " typescript-engineer"
+      },
+      {
+        "key": "model",
+        "value": " sonnet"
+      },
+      {
+        "key": "description",
+        "value": " Project-scoped worker that implements and verifies TypeScript changes within typed repository boundaries."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - \"Bash(npx *)\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - acceptance-criteria-tracking\n  - owner-directives"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      }
+    ],
+    "sections": [
+      "head",
+      "evidence-location-invariant",
+      "test-execution-launcher"
+    ]
+  },
+  "codex": {
+    "path": ".codex/agents/typescript-engineer.toml",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"typescript-engineer\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "delimiter": "'''",
+    "sections": [
+      "head-2",
+      "evidence-location-invariant-2",
+      "test-execution-launcher"
+    ]
+  }
+}

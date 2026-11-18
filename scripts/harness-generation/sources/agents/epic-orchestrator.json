@@ -1,0 +1,84 @@
+{
+  "claude": {
+    "path": ".claude/agents/epic-orchestrator.md",
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " epic-orchestrator"
+      },
+      {
+        "key": "model",
+        "value": " opus"
+      },
+      {
+        "key": "description",
+        "value": " Deterministic epic-scale orchestrator that schedules a dependency graph of child features across parallel, isolated git worktrees, fans results back into a shared integration branch, and drives the final integration-to-main PR. Distinct from orchestrator; only this agent is authorized to delegate to Agent(orchestrator)."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - \"Agent(orchestrator)\"\n  - \"Agent(pr-author)\"\n  - Read\n  - Grep\n  - Glob\n  - \"Write(docs/features/epics/**)\"\n  - \"Edit(docs/features/epics/**)\"\n  - \"Write(.dev/epics/**)\"\n  - \"Edit(.dev/epics/**)\"\n  - \"Write(artifacts/orchestration/**)\"\n  - \"Edit(artifacts/orchestration/**)\"\n  - \"Bash(git *)\"\n  - \"Bash(gh *)\"\n  - \"Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-CiGateParser.ps1*)\"\n  - \"Bash(pwsh -NoProfile -File .claude/lib/regeneration/Invoke-RegenerationPath.ps1*)\"\n  - \"Bash(pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1*)\"\n  - \"Bash(poetry run python -m scripts.dev_tools.validate_orchestration_artifacts *)\"\n  - \"Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)\"\n  - \"Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1*)\"\n  - \"mcp__drm-copilot__collect_pr_context\"\n  - \"mcp__drm-copilot__validate_orchestration_artifacts\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - policy-compliance-order\n  - epic-orchestrate\n  - acceptance-criteria-tracking"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      },
+      {
+        "key": "hooks",
+        "value": "\n  SubagentStop:\n    - matcher: \"epic-orchestrator\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-orchestrator-output.ps1 -CheckpointPath artifacts/orchestration/epic-orchestrator-state.json -ArtifactType epic-orchestrator-state"
+      }
+    ],
+    "sections": [
+      "head",
+      "skill",
+      "startup-protocol",
+      "invocation-origin",
+      "prepared-epic-execution-epic-planner-handoff",
+      "delegation-model",
+      "wave-scheduling",
+      "checkpoint-persistence",
+      "documentation-maintenance",
+      "completion-requirements"
+    ]
+  },
+  "codex": {
+    "path": ".codex/agents/epic-orchestrator.toml",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"epic-orchestrator\""
+      },
+      {
+        "key": "description",
+        "value": "\"Root-invoked epic execution coordinator that schedules prepared or manual epic features in dependency waves and drives integration fan-in and the final PR.\""
+      },
+      {
+        "key": "model",
+        "value": "\"gpt-6-astra\""
+      },
+      {
+        "key": "model_reasoning_effort",
+        "value": "\"ultra\""
+      },
+      {
+        "key": "default_permissions",
+        "value": "\"orchestrator-workspace\""
+      }
+    ],
+    "delimiter": "'''",
+    "sections": [
+      "head-2",
+      "root-invocation",
+      "startup",
+      "prepared-epic",
+      "manual-epic",
+      "scheduling-and-routing",
+      "checkpoint-and-status",
+      "completion"
+    ],
+    "trailer": "\n[skills]\nconfig = [\n    { name = \"policy-compliance-order\", enabled = true },\n    { name = \"codex-model-routing\", enabled = true },\n    { name = \"epic-orchestrate\", enabled = true },\n    { name = \"epic-run\", enabled = true },\n    { name = \"feature-promotion-lifecycle\", enabled = true },\n    { name = \"atomic-plan-contract\", enabled = true },\n    { name = \"acceptance-criteria-tracking\", enabled = true },\n    { name = \"evidence-and-timestamp-conventions\", enabled = true },\n    { name = \"pr-context-artifacts\", enabled = true },\n]\n"
+  }
+}

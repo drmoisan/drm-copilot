@@ -1,0 +1,53 @@
+{
+  "claude": {
+    "path": ".claude/agents/docs-author.md",
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " docs-author"
+      },
+      {
+        "key": "description",
+        "value": " Write and revise narrative and reference Markdown pages from the docs page templates; the only documentation role that writes files."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - Write\n  - Edit\n  - \"mcp__drm-copilot__generate_docs_reference\"\n  - \"mcp__drm-copilot__run_docs_check\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - docs-author-page"
+      }
+    ],
+    "sections": [
+      "head",
+      "prepared-inputs",
+      "skills",
+      "mcp-tool-inputs",
+      "write-scope",
+      "report"
+    ]
+  },
+  "codex": {
+    "path": ".codex/agents/docs-author.toml",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"docs-author\""
+      },
+      {
+        "key": "description",
+        "value": "\"Write and revise narrative and reference Markdown pages from the docs page templates; the only documentation role that writes files.\""
+      }
+    ],
+    "delimiter": "'''",
+    "sections": [
+      "head-2",
+      "prepared-inputs",
+      "skills",
+      "mcp-tool-inputs",
+      "write-scope",
+      "report"
+    ]
+  }
+}
