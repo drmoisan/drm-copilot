@@ -109,6 +109,17 @@ describe("destination CI contract", () => {
       findHarnessWorkflowViolations(
         "powershell",
         powershell.replace(
+          "if (-not (Test-Path -LiteralPath tests -PathType Container)) {",
+          "if ($false) {",
+        ),
+      ),
+    ).toContain(
+      "powershell: copy-mode Pester step does not fail when tests is absent",
+    );
+    expect(
+      findHarnessWorkflowViolations(
+        "powershell",
+        powershell.replace(
           "repository: ${{ inputs.harness_repository }}",
           "repository: ${{ job.workflow_repository }}",
         ),

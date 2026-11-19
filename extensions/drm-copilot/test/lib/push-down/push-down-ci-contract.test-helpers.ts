@@ -248,6 +248,15 @@ function findPowerShellHarnessViolations(body: string): string[] {
       "powershell: no direct Pester step guarded by !inputs.poshqc without the side folder",
     );
   }
+  if (
+    pester !== undefined &&
+    (!pester.includes("Test-Path -LiteralPath tests") ||
+      !pester.includes("exit 1"))
+  ) {
+    violations.push(
+      "powershell: copy-mode Pester step does not fail when tests is absent",
+    );
+  }
   for (const token of [
     "artifacts/pester/powershell-coverage.xml",
     "artifacts/pester/pester-junit.xml",

@@ -76,6 +76,24 @@ Describe 'Invoke-GhExe' {
 
         $result.Output | Should -Be "body:{`"a`":1}`nargs:api repos/o/r/rulesets"
     }
+
+    It 'returns standard output only when the command writes a warning to standard error' {
+        # A native command's standard error arrives through 2>&1 as error records; this double writes one.
+        function Invoke-TestGhWarningDouble {
+            [CmdletBinding(PositionalBinding = $false)]
+            [OutputType([string])]
+            param([Parameter(ValueFromRemainingArguments = $true)] [string[]] $Rest)
+            $null = $Rest
+            # Native standard error never terminates, so the record is written non-terminating under any preference.
+            Write-Error -Message 'warning: rate limit is low' -ErrorAction Continue
+            '[{"id":1}]'
+        }
+
+        $result = Invoke-GhExe -GhArgs @('api', 'repos/o/r/rulesets') -GhCommand 'Invoke-TestGhWarningDouble'
+
+        @($result.Output | ConvertFrom-Json)[0].id | Should -Be 1
+        $result.ErrorOutput | Should -Be 'warning: rate limit is low'
+    }
 }
 
 Describe 'New-CiRequiredChecksRulesetBody' {
@@ -127,17 +145,19 @@ Describe 'Get-CiRequiredChecksDataText' {
 
 Describe 'Invoke-SetCiRequiredChecks' {
     BeforeEach {
-        $script:ExistingRulesets = '[]'
+        # The list call runs with --paginate --slurp, so gh prints one JSON array whose elements are the pages.
+        $script:ExistingRulesets = '[[]]'
         $script:CreateExitCode = 0
         $script:ListExitCode = 0
-        $script:ViewResult = [pscustomobject]@{ ExitCode = 0; Output = "owner/repo`n" }
+        $script:ListErrorOutput = ''
+        $script:ViewResult = [pscustomobject]@{ ExitCode = 0; Output = "owner/repo`n"; ErrorOutput = '' }
         Mock Get-CiRequiredChecksDataText { param([string] $Path) $null = $Path; $script:ValidData }
         Mock Invoke-GhExe {
             param([string[]] $GhArgs, [string] $InputText)
             $null = $InputText
             if ($GhArgs[0] -eq 'repo') { return $script:ViewResult }
-            if ($GhArgs -contains 'POST') { return [pscustomobject]@{ ExitCode = $script:CreateExitCode; Output = '{"id":42}' } }
-            return [pscustomobject]@{ ExitCode = $script:ListExitCode; Output = $script:ExistingRulesets }
+            if ($GhArgs -contains 'POST') { return [pscustomobject]@{ ExitCode = $script:CreateExitCode; Output = '{"id":42}'; ErrorOutput = '' } }
+            return [pscustomobject]@{ ExitCode = $script:ListExitCode; Output = $script:ExistingRulesets; ErrorOutput = $script:ListErrorOutput }
         }
     }
 
@@ -174,7 +194,7 @@ Describe 'Invoke-SetCiRequiredChecks' {
     }
 
     It 'reports an existing ruleset of the same name and issues no write' {
-        $script:ExistingRulesets = '[{"id":7,"name":"drm-copilot CI Required Gate"}]'
+        $script:ExistingRulesets = '[[{"id":7,"name":"drm-copilot CI Required Gate"}]]'
 
         $output = @(Invoke-SetCiRequiredChecks -Apply -DataFilePath 'ci-required-checks.json' -Repository 'owner/repo')
 
@@ -186,10 +206,34 @@ Describe 'Invoke-SetCiRequiredChecks' {
         $null = Invoke-SetCiRequiredChecks -DataFilePath 'ci-required-checks.json' -Repository 'owner/repo'
         $null = Invoke-SetCiRequiredChecks -Apply -WhatIf -DataFilePath 'ci-required-checks.json' -Repository 'owner/repo'
         $null = Invoke-SetCiRequiredChecks -Apply -DataFilePath 'ci-required-checks.json' -Repository 'owner/repo'
-        $script:ExistingRulesets = '[{"id":7,"name":"drm-copilot CI Required Gate"}]'
+        $script:ExistingRulesets = '[[{"id":7,"name":"drm-copilot CI Required Gate"}]]'
         $null = Invoke-SetCiRequiredChecks -Apply -DataFilePath 'ci-required-checks.json' -Repository 'owner/repo'
 
         Should -Invoke Invoke-GhExe -Times 0 -Exactly -ParameterFilter { @($GhArgs | Where-Object { $_ -in @('PUT', 'PATCH', 'DELETE') }).Count -gt 0 }
+    }
+
+    It 'lists the rulesets with --paginate and --slurp' {
+        $null = Invoke-SetCiRequiredChecks -Apply -DataFilePath 'ci-required-checks.json' -Repository 'owner/repo'
+
+        Should -Invoke Invoke-GhExe -Times 1 -Exactly -ParameterFilter { ($GhArgs -join ' ') -eq 'api repos/owner/repo/rulesets --paginate --slurp' }
+    }
+
+    It 'finds a same-name ruleset on the second page and issues no write' {
+        # Without --paginate gh returns the first page only; with --paginate --slurp it returns every page.
+        Mock Invoke-GhExe {
+            param([string[]] $GhArgs, [string] $InputText)
+            $null = $InputText
+            if ($GhArgs -contains 'POST') { return [pscustomobject]@{ ExitCode = 0; Output = '{"id":42}'; ErrorOutput = '' } }
+            if ($GhArgs -contains '--paginate' -and $GhArgs -contains '--slurp') {
+                return [pscustomobject]@{ ExitCode = 0; Output = '[[{"id":1,"name":"other"}],[{"id":9,"name":"drm-copilot CI Required Gate"}]]'; ErrorOutput = '' }
+            }
+            return [pscustomobject]@{ ExitCode = 0; Output = '[{"id":1,"name":"other"}]'; ErrorOutput = '' }
+        }
+
+        $output = @(Invoke-SetCiRequiredChecks -Apply -DataFilePath 'ci-required-checks.json' -Repository 'owner/repo')
+
+        ($output -join "`n") | Should -Match 'already exists in owner/repo \(id 9\)'
+        Should -Invoke Invoke-GhExe -Times 0 -Exactly -ParameterFilter { $GhArgs -contains 'POST' }
     }
 
     It 'throws when the repository cannot be resolved' {
@@ -202,6 +246,22 @@ Describe 'Invoke-SetCiRequiredChecks' {
         $script:ListExitCode = 1
 
         { Invoke-SetCiRequiredChecks -Apply -DataFilePath 'ci-required-checks.json' -Repository 'owner/repo' } | Should -Throw '*Could not list*'
+    }
+
+    It 'names the gh call and its error output when listing fails' {
+        $script:ListExitCode = 1
+        $script:ListErrorOutput = 'HTTP 404: Not Found'
+
+        { Invoke-SetCiRequiredChecks -Apply -DataFilePath 'ci-required-checks.json' -Repository 'owner/repo' } |
+            Should -Throw '*api repos/owner/repo/rulesets*HTTP 404: Not Found*'
+    }
+
+    It 'names the gh call when the ruleset list is not JSON' {
+        $script:ExistingRulesets = 'not json'
+
+        { Invoke-SetCiRequiredChecks -Apply -DataFilePath 'ci-required-checks.json' -Repository 'owner/repo' } |
+            Should -Throw '*gh api repos/owner/repo/rulesets*not JSON*'
+        Should -Invoke Invoke-GhExe -Times 0 -Exactly -ParameterFilter { $GhArgs -contains 'POST' }
     }
 
     It 'throws when the POST fails' {

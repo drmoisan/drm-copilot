@@ -299,6 +299,7 @@ The three push-down tools accept the optional `ci_workflows` input with the valu
 - Risk: a build without a published tag references a missing tag, so reference mode works only with a published extension release.
 - Rule: a private source repository requires copy mode, because a destination cannot call a reusable workflow it cannot read.
 - Limitation: the #1049 vendored-code exemption is unavailable in copy mode, because copy mode runs Pester directly and does not load PoshQC.
+- Requirement: copy mode runs Pester over the top-level tests directory, and the PowerShell job fails with `Copy mode requires a top-level tests directory` when it is absent; reference mode (PoshQC) has no such requirement.
 - No CI file is written over an existing unmanaged file, even with `overwrite_unmanaged`; an edited caller is reported `conflict` and kept; when another destination workflow is already named `CI`, the caller is withheld and a `push-down conflict:` warning names that file.
 - Opt-in branch protection: `.github/drm-copilot/Set-CiRequiredChecks.ps1` (`Set-CiRequiredChecks.ps1`) is delivered with the CI files and never run by the push-down; by default it prints the planned ruleset, and with `-Apply` it creates one ruleset on the default branch that requires `CI Required Gate`, without editing or deleting an existing ruleset.
 

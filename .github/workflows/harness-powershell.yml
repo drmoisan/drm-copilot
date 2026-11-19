@@ -71,6 +71,10 @@ jobs:
         if: ${{ !inputs.poshqc }}
         shell: pwsh
         run: |
+          if (-not (Test-Path -LiteralPath tests -PathType Container)) {
+            Write-Error 'Copy mode requires a top-level tests directory.' -ErrorAction Continue
+            exit 1
+          }
           Import-Module Pester -RequiredVersion 6.2.0
           New-Item -ItemType Directory -Force -Path artifacts/pester | Out-Null
           $sources = @(Get-ChildItem -Path . -Recurse -File -Include '*.ps1', '*.psm1' |

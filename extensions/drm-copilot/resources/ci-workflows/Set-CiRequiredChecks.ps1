@@ -39,7 +39,8 @@ param(
 function Invoke-GhExe {
     <#
     .SYNOPSIS
-    Run gh with the given arguments and optional standard input; return the exit code and output.
+    Run gh with the given arguments and optional standard input; return the exit code, the standard
+    output (Output), and the standard-error text (ErrorOutput) separately.
 
     .PARAMETER GhCommand
     Command to run; defaults to gh. The unit tests pass a local test double so the wrapper body runs
@@ -62,7 +63,11 @@ function Invoke-GhExe {
     } else {
         $output = & $GhCommand @GhArgs 2>&1
     }
-    return [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = (@($output) -join "`n") }
+    $exitCode = $LASTEXITCODE
+    # 2>&1 delivers standard error as error records; keep them out of Output so a warning cannot corrupt JSON.
+    $errorText = @($output | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] } | ForEach-Object { $_.ToString() })
+    $standardText = @($output | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] })
+    return [pscustomobject]@{ ExitCode = $exitCode; Output = ($standardText -join "`n"); ErrorOutput = ($errorText -join "`n") }
 }
 
 function Get-CiRequiredChecksDataText {
@@ -161,27 +166,38 @@ function Invoke-SetCiRequiredChecks {
 
     $repo = $Repository
     if ([string]::IsNullOrWhiteSpace($repo)) {
-        $view = Invoke-GhExe -GhArgs @('repo', 'view', '--json', 'nameWithOwner', '--jq', '.nameWithOwner')
+        $viewArgs = @('repo', 'view', '--json', 'nameWithOwner', '--jq', '.nameWithOwner')
+        $view = Invoke-GhExe -GhArgs $viewArgs
         if ($view.ExitCode -ne 0 -or [string]::IsNullOrWhiteSpace($view.Output)) {
-            throw "Could not resolve the repository with gh repo view: $($view.Output)"
+            throw "Could not resolve the repository with gh $($viewArgs -join ' '): $($view.ErrorOutput) $($view.Output)"
         }
         $repo = $view.Output.Trim()
     }
 
-    $list = Invoke-GhExe -GhArgs @('api', "repos/$repo/rulesets")
+    # --paginate --slurp prints one JSON array whose elements are the per-page arrays, so a ruleset beyond
+    # the first page is still found; the pages are flattened before the same-name filter.
+    $listArgs = @('api', "repos/$repo/rulesets", '--paginate', '--slurp')
+    $list = Invoke-GhExe -GhArgs $listArgs
     if ($list.ExitCode -ne 0) {
-        throw "Could not list the rulesets of ${repo}: $($list.Output)"
+        throw "Could not list the rulesets of ${repo} with gh $($listArgs -join ' '): $($list.ErrorOutput) $($list.Output)"
     }
-    $existing = @(($list.Output | ConvertFrom-Json -ErrorAction Stop) | Where-Object { $_.name -ceq $RulesetName })
+    try {
+        $pages = ConvertFrom-Json -InputObject $list.Output -NoEnumerate -ErrorAction Stop
+    } catch {
+        throw "The output of gh $($listArgs -join ' ') is not JSON: $($_.Exception.Message)"
+    }
+    $rulesets = @(foreach ($page in @($pages)) { foreach ($ruleset in @($page)) { $ruleset } })
+    $existing = @($rulesets | Where-Object { $_.name -ceq $RulesetName })
     if ($existing.Count -gt 0) {
         Write-Output "Ruleset '$RulesetName' already exists in $repo (id $($existing[0].id)); no change was made."
         return
     }
 
     if ($PSCmdlet.ShouldProcess("repos/$repo/rulesets", "Create ruleset '$RulesetName'")) {
-        $created = Invoke-GhExe -GhArgs @('api', '--method', 'POST', "repos/$repo/rulesets", '--input', '-') -InputText $body
+        $createArgs = @('api', '--method', 'POST', "repos/$repo/rulesets", '--input', '-')
+        $created = Invoke-GhExe -GhArgs $createArgs -InputText $body
         if ($created.ExitCode -ne 0) {
-            throw "Creating the ruleset failed: $($created.Output)"
+            throw "Creating the ruleset failed with gh $($createArgs -join ' '): $($created.ErrorOutput) $($created.Output)"
         }
         Write-Output "Created ruleset '$RulesetName' in $repo."
     }
