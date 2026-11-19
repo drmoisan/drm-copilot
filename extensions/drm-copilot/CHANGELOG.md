@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Unified push-down pipeline (issue #1029): the Claude, Codex, and Copilot push-down tools
+  and commands run one pipeline that installs the shared layer (`AGENTS.md`, the shared
+  `.agents/skills`, and the shared configuration) on every run, then only the selected
+  ecosystem's layer and packs. Every call plans before its first write and returns
+  `push_down_report`. All three tools accept optional `dry_run` and `overwrite_unmanaged`;
+  `push_down_copilot_customizations` accepts `packs`, backed by new Copilot pack manifests,
+  and the Copilot command offers a pack selection. Apply runs write the destination manifest
+  `.push-down-manifest.json` (SHA-256 per managed file, selection per ecosystem).
+  Behavior changes: a destination file edited since the last push-down is reported as a
+  conflict and kept; a destination file with no manifest entry that differs from the payload
+  is reported as `unmanaged-conflict` and kept unless `overwrite_unmanaged` is `true` (it was
+  overwritten before); and the Codex push-down now merges `config/orchestration-routing.json`
+  into the destination copy, as the Claude push-down does, instead of overwriting it.
+
 - Release-commit allowance leg (issue #1201): the Claude and Codex preimplementation gates
   allow a checkpoint-free `git add` and `git commit` of the paths that a repository lists in
   `.claude/release-commit-allowance.json`, on a branch that matches one of its patterns.

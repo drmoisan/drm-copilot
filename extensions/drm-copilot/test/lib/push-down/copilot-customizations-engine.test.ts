@@ -1,11 +1,15 @@
 import { describe, expect, it } from "@jest/globals";
 
 import {
+  buildArtifactPath,
   COPILOT_ROOT_FOLDERS,
   enumerateSourceFiles,
-  pushDownCustomizations,
   stringifySorted,
 } from "../../../src/lib/push-down/copilot-customizations-engine";
+import { type PushDownFileSystem } from "../../../src/lib/push-down/filesystem-adapter";
+// Issue #1029 (X1): the engine copy loop moved into the push-down pipeline;
+// the Copilot wrapper takes the identical options, so these cases now drive it.
+import { pushDownCustomizations } from "../../../src/lib/push-down/copilot-customizations";
 import { buildInMemoryFileSystem, fixedClock } from "./push-down.test-helpers";
 
 const CLOCK = fixedClock("2026-06-26T00:15:00.000Z");
@@ -242,6 +246,51 @@ describe("enumerateSourceFiles", () => {
       "/src/.github/agents/nested/a.md",
       "/src/.github/agents/z.md",
     ]);
+  });
+});
+
+// Issue #1029: the engine copy loop moved into the push-down pipeline, so the
+// path-helper branches it exercised are covered directly here.
+describe("engine path helpers (issue #1029)", () => {
+  it("builds an artifact path under an empty artifact root", () => {
+    // Act
+    const path = buildArtifactPath(
+      new Date("2026-06-26T00:15:00.000Z"),
+      "",
+      "artifacts/x",
+    );
+
+    // Assert: an empty root yields a relative path with no leading slash.
+    expect(path).toBe("artifacts/x/push-down-20260626T001500Z.json");
+  });
+
+  it("enumerates the source root itself when a scoped root is empty", () => {
+    // Arrange
+    const fs = buildInMemoryFileSystem({ "/src/b.md": "b", "/src/a.md": "a" });
+
+    // Act
+    const result = enumerateSourceFiles(fs, "/src/", [""]);
+
+    // Assert
+    expect(result).toEqual(["/src/a.md", "/src/b.md"]);
+  });
+
+  it("orders a listed path outside or equal to the root by its full path", () => {
+    // Arrange: a stub lists the root itself and a path outside it.
+    const stub: PushDownFileSystem = {
+      listFiles: () => ["/src/r/z.md", "/other/a.md", "/src/r"],
+      isDir: () => true,
+      isFile: () => true,
+      readTextFile: () => "",
+      writeTextFile: () => undefined,
+      ensureDir: () => undefined,
+    };
+
+    // Act
+    const result = enumerateSourceFiles(stub, "/src", ["r"]);
+
+    // Assert: the root itself ("") sorts first, then "/other/a.md", then "z.md".
+    expect(result).toEqual(["/src/r", "/other/a.md", "/src/r/z.md"]);
   });
 });
 

@@ -1,0 +1,6 @@
+# Task check P1-T1
+
+Timestamp: 2026-11-18T12-17
+Command: sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath tests/scripts/harness-generation/HarnessGeneration.RepoGate.Tests.ps1
+EXIT_CODE: 1
+Output Summary: Expected interim result (plan P1-T1). Changed files: `scripts/harness-generation/sources/rules/orchestrator-state.md`, which gained 11 lines: the marker `<!-- harness-section: release-commit-allowance-scope -->` and the `## Release-Commit Allowance Scope` section, copied from the committed `.claude/rules/orchestrator-state.md`. The file has 0 CR bytes. The marker occurs 1 time and the heading 1 time. Selection rule: contract tests that read a changed path. `HarnessGeneration.RepoGate.Tests.ps1` reads the generator sources. Format, lint, and type check: N/A, because the file is a Markdown generator source and no PowerShell, Python, or TypeScript file changed. Result: 2 passed, 1 failed. The failure is `reports no drift for any generated target in the working tree`, with the same two drift paths, `.claude/rules/orchestrator-state.md` and `extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md`. This is expected because the section is not yet listed in the Claude target of `orchestrator-state.json`.

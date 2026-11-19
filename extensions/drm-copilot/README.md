@@ -171,8 +171,9 @@ If the server is launched from a different working directory, pass `workspace_ro
 - `collect_commit_context`: required `workspace_root`
 - `collect_pr_context`: required `workspace_root`, required `base`
 - `run_codex_native_converter`: required `workspace_root`, required `mode`, required `source_ecosystem`, required `source_root`, optional `selected_paths`, optional `destination_root`, optional `artifact_root`, optional `enable_repo_prompts`
-- `push_down_copilot_customizations`: required `workspace_root`
-- `push_down_codex_and_agents_customizations`: required `workspace_root`, optional `packs`, optional `csharp_variant`, optional `memory_mode`
+- `push_down_copilot_customizations`: required `workspace_root`, optional `packs`, optional `dry_run`, optional `overwrite_unmanaged`
+- `push_down_codex_and_agents_customizations`: required `workspace_root`, optional `packs`, optional `csharp_variant`, optional `memory_mode`, optional `dry_run`, optional `overwrite_unmanaged`
+- `push_down_claude_customizations`: required `workspace_root`, optional `packs`, optional `csharp_variant`, optional `memory_mode`, optional `dry_run`, optional `overwrite_unmanaged`
 - `new_potential_bug_entry`: required `workspace_root`, required `short_name`
 - `new_potential_entry`: required `workspace_root`, required `short_name`
 - `link_parent_child`: required `workspace_root`, required `child_issue_number`, required `parent_issue_number`
@@ -272,6 +273,18 @@ The command and MCP tool accept optional Codex language-pack selection. Omitted 
 The optional `csharp_variant` field accepts `modern` or `legacy`. The `modern` value uses the root Codex C# profile. The `legacy` value reads C# content from the bundle-only `.agents-variants/csharp-legacy/` and `.codex-variants/csharp-legacy/` roots and writes it to the canonical `.agents` and `.codex` destination paths. The variant roots are not destination roots.
 
 The optional `memory_mode` field accepts `overwrite`, `merge`, or `skip` for schema parity with Claude push-down. It is inert for the current Codex bundle because no Codex memory subtree is present.
+
+## Push-Down Pipeline
+
+The three push-down tools (`push_down_claude_customizations`, `push_down_codex_and_agents_customizations`, and `push_down_copilot_customizations`) and the three push-down commands share one pipeline. Each tool selects exactly its own ecosystem.
+
+- Shared layer: every run installs the shared layer first: `AGENTS.md`, the shared `.agents/skills/<name>/` files listed by `resources/codex-and-agents-customizations/pack-manifests/shared.json`, and the shared configuration files. `config/orchestration-routing.json` is merged into the destination copy, never overwritten. A run then installs only the selected ecosystem's layer and packs, and writes nothing under another ecosystem's layer.
+- Packs: `packs` is accepted by all three tools; `core` is always included. Copilot packs are `python`, `powershell`, `typescript`, and `csharp`. When `packs` is omitted, the selection recorded in the destination manifest is reused; with no recorded selection the full tree is published.
+- `dry_run` (all three tools, default `false`): plan and return the report without writing any file. A dry run returns no summary-artifact path.
+- `overwrite_unmanaged` (all three tools, default `false`): overwrite destination files that have no manifest entry and differ from the payload.
+- Destination manifest: an apply run writes `.push-down-manifest.json` at the destination root. It records the selection per ecosystem and, per managed file, the layer, the owning pack, and the SHA-256 of the LF-normalized text. It holds no timestamp and no absolute path, and it is rewritten only when its text changes. Destinations commit it.
+- No-overwrite rule: a destination file edited since the last push-down is reported as `conflict` and left in place. A file with no manifest entry that differs from the payload is reported as `unmanaged-conflict` and left in place unless `overwrite_unmanaged` is `true`. Files of a deselected pack are reported as `orphaned` and never deleted. Paths listed in `.push-down-exclusions` are withheld for every ecosystem and reported as `excluded`.
+- `push_down_report`: every call returns the report with `mode` (`dry-run` or `apply`), the selection per ecosystem, every planned, merged, excluded, and orphaned path with its `layer`, `pack`, `action`, and `reason`, and `counts` per action. `conflict`, `unmanaged-conflict`, and `deleted-locally` lines are also returned in `warnings` with the prefix `push-down conflict:`. A second run with no source or destination change writes no file outside `artifacts/`.
 
 ## Run PoshQC Suite
 

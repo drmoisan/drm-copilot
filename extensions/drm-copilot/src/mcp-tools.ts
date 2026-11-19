@@ -75,6 +75,7 @@ import { normalizeWorkspaceRoot } from "./workflow-command-arguments";
 import { handlePortableHandoffTool } from "./mcp-handlers/orchestration-handoff-handlers";
 import { handleDocsTool } from "./mcp-handlers/docs-handlers";
 import type { DocsCommandEnvelope } from "./docs-command-envelope";
+import type { PushDownReport } from "./lib/push-down/push-down-report";
 
 export { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "./mcp-handlers/resolve-execute-hard-lock-prompt-handler";
 
@@ -112,6 +113,7 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly receipt?: FinalizedReceiptSummary;
   readonly sentinel?: SentinelObservationSummary;
   readonly docs?: DocsCommandEnvelope;
+  readonly push_down_report?: PushDownReport;
 }
 
 function inferWorkspaceRoot(rawInput: unknown): string {
@@ -167,6 +169,9 @@ function toMcpToolResult(
       : { invocation: result.invocation }),
     ...(result.receipt === undefined ? {} : { receipt: result.receipt }),
     ...(result.sentinel === undefined ? {} : { sentinel: result.sentinel }),
+    ...(result.pushDownReport === undefined
+      ? {}
+      : { push_down_report: result.pushDownReport }),
   };
 }
 
