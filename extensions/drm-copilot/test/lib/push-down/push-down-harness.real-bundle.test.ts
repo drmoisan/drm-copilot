@@ -166,6 +166,10 @@ describe("push-down harness over the real bundle", () => {
     expect(second.warnings.some((line) => line.includes("AGENTS.md"))).toBe(
       true,
     );
+    // Issue #1051: the kept edit is recorded as an integration item.
+    expect(
+      second.report.integration_needed?.items.map((item) => item.id),
+    ).toEqual(["destination-edited-file:AGENTS.md"]);
   });
 
   it("first run without a manifest adopts and reports unmanaged-conflict", () => {
@@ -186,6 +190,9 @@ describe("push-down harness over the real bundle", () => {
       result.report.files.find((file) => file.path === path)?.action;
     expect(action("AGENTS.md")).toBe("adopt");
     expect(action(".codex/config.toml")).toBe("unmanaged-conflict");
+    expect(
+      result.report.integration_needed?.items.map((item) => item.id),
+    ).toContain("unmanaged-conflict:.codex/config.toml");
     expect(declined.memory.readTextFile(`${DEST}/.codex/config.toml`)).toBe(
       "theirs\n",
     );

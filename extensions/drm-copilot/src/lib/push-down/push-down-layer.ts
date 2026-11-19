@@ -103,6 +103,11 @@ export interface PushDownLayer {
   readonly selection: DestinationManifestSelection | undefined;
   /** Destination-relative directory of the per-run summary artifact. */
   readonly artifactDirectory: string;
+  /**
+   * Destination-relative paths classified with `overwrite_unmanaged` false
+   * whatever the run option is (issue #1050); absent means none.
+   */
+  readonly unmanagedProtectedPaths?: ReadonlyArray<string>;
 }
 
 /**

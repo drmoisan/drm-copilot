@@ -25,6 +25,7 @@ import {
   type MemoryMode as CodexMemoryMode,
 } from "./codex-pack-selection";
 import { type CSharpVariant, type MemoryMode } from "./claude-pack-selection";
+import { type CiWorkflowsMode } from "./push-down-ci-workflows";
 import { pushDownHarness } from "./push-down-harness";
 import {
   type EcosystemName,
@@ -60,6 +61,8 @@ export interface PushDownServiceCallInput {
   readonly dryRun?: boolean;
   /** Overwrite `unmanaged-conflict` files (O-4 opt-in). */
   readonly overwriteUnmanaged?: boolean;
+  /** Destination CI mode (issue #1050); omitted reuses the recorded mode. */
+  readonly ciWorkflows?: CiWorkflowsMode;
 }
 
 /** Input for the Copilot service call (adds the Copilot pack selection). */
@@ -128,6 +131,9 @@ function runServiceCall(
     ecosystems: { [descriptor.ecosystem]: selection },
     dryRun: input.dryRun === true,
     overwriteUnmanaged: input.overwriteUnmanaged === true,
+    ...(input.ciWorkflows === undefined
+      ? {}
+      : { ciWorkflows: input.ciWorkflows }),
     ...(input.clock === undefined ? {} : { clock: input.clock }),
   });
   // Exclusion and conflict lines reach the output channel through the log

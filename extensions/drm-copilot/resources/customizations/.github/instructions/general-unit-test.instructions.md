@@ -53,6 +53,31 @@ Every new or modified unit test must adhere to these guidelines.
 
 ---
 
+## Coverage Exclusion Policy
+
+No production file may be excluded from coverage measurement. Every production source file is in the denominator of the coverage metric, regardless of whether its lines are reachable in the test environment.
+
+The correct response to a file that contains untestable lines is to refactor it — extract all logic into host-neutral, testable modules and leave only the thinnest possible wiring in the host-bound entry point. The entry point's uncovered lines then represent a real and visible cost in the coverage metric, which creates ongoing pressure to keep those files minimal.
+
+**Permitted `exclude` entries** (non-production paths only):
+- Build output directories: `dist/**`, `lib/**`, `lib-amd/**`.
+- Test files and test infrastructure: `**/*.test.ts`, `tests/**`, `src/test-support/**`.
+- Config files that are not production code: `jest.config.cjs`, `eslint.config.mjs`, `.dependency-cruiser.cjs`, `webpack.config.js`.
+- `node_modules/**`.
+
+**Prohibited `exclude` entries:**
+- Any path under `src/` that contains production runtime code, regardless of whether it is auto-generated, host-bound, or difficult to test.
+
+**Vendored push-down files** (destination repositories that receive pushed-down files):
+- A pushed-down file may be excluded from a destination's coverage measurement only when all three conditions hold: its exact path is a key in `.push-down-manifest.json`; its canonical content hash equals the recorded `sha256`; and the exemption is derived by tooling at measurement time, never written by hand. A directory glob such as `.claude/**` never qualifies.
+- Modified files, unlisted files, and files the destination adds (for example a hook added under `.claude/hooks/`) stay in the denominator.
+- Pushed-down code is tested upstream. A modified copy is owned and tested by the destination; after a `conflict` re-run it stays non-exempt until it is reverted or deleted and pushed down again.
+- A destination may remove its recreated duplicate tests of unmodified pushed-down files.
+- The tooling records what it exempted in `vendored-coverage-exemptions.json` beside the coverage output file.
+- The repository that is the source of the pushed-down files measures and tests them; the exception does not apply there.
+
+**Enforcement:** Feature-review agents must treat any hand-written `exclude`, `omit`, `coveragePathIgnorePatterns`, or kcov `--exclude-path` entry, or omitted settings-file coverage path, that matches a production source path as a **Blocking** finding. The boolean opt-in `exempt_unchanged_push_down_files` is not an `exclude` entry: a manifest-derived run-time exemption is recognized, and the reviewer verifies it through `vendored-coverage-exemptions.json`. A branch diff that changes `.push-down-manifest.json` hashes without a push-down run (no `payload_version` change and no push-down summary) is a **Blocking** finding.
+
 ## 3. Test Structure and Diagnostics
 
 - **Clear Failure Messages**  

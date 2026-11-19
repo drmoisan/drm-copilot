@@ -126,8 +126,12 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `update_docs_ledger`
 - `generate_docs_reference`
 - `validate_docs_artifacts`
+- `detect_push_down_integration`
+- `validate_push_down_integration`
 
 The six docs tools run the workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1` with `pwsh -NoProfile -File <script> -Command <subcommand> -Json`, with the workspace root as working directory. They require PowerShell 7.4 or later on `PATH` (there is no fallback to Windows PowerShell) and the pushed-down `.claude/lib/docs/` library in the target workspace; run `push_down_claude_customizations` first when it is missing. Only `update_docs_ledger` can change files, and only when `write` is `true`; every other docs tool is read-only.
+
+The two push-down integration tools are read-only and deterministic, and neither calls a model. `detect_push_down_integration` reports a destination's harness ecosystems and language packs, its `.github/workflows/` files with their jobs, the structured integration conflicts, and a summary of `.push-down-integration-needed.json`, which an apply-mode push-down writes when it meets a decision it cannot make mechanically. `validate_push_down_integration` returns a `pass` or `fail` verdict over rules V1 to V5 and the fixed `not_checked` list; a completed run is `ok: true` even when the verdict is `fail`. The `push-down-integration` skill describes the read, resolve and validate loop.
 
 ### MCP Runtime Expectations
 
@@ -189,6 +193,8 @@ If the server is launched from a different working directory, pass `workspace_ro
 - `update_docs_ledger`: required `workspace_root`, required `operation`, required `actor_kind`, required `actor_id`, optional `profile`, `element` or `limit`, `disposition`, `pages`, `rationale`, `owner`, `target`, `dimension`, `state`, `claim`, and `write` (default `false`, a dry run); the fields each operation requires or permits are checked before launch
 - `generate_docs_reference`: required `workspace_root`, optional `profile`, optional `snapshot`, optional `output_directory` (always a dry run)
 - `validate_docs_artifacts`: required `workspace_root`, required `mode`, required `revision`, optional `profile` (never persists a receipt)
+- `detect_push_down_integration`: required `workspace_root` (no other property)
+- `validate_push_down_integration`: required `workspace_root` (no other property)
 
 ### MCP Result Shape
 
@@ -201,6 +207,7 @@ MCP tool calls return structured JSON with:
 - `summary`
 - `stderr_excerpt` when a subprocess failure surfaces stderr diagnostics
 - `docs` for the docs tools: the `Invoke-DocsCommand.ps1 -Json` envelope (`command`, `exit_code`, `findings`, `ok`, `result`) passed through unchanged; `ok` equals the envelope `ok`, `summary` is `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>`, and `stderr_excerpt` is added only for exit code 3
+- `integration` for the two push-down integration tools: the detect facts (`ecosystems`, `workflows`, `conflicts`, `integration_needed`) or the validate verdict (`verdict`, `rules`, `not_checked`)
 
 A docs tool that fails before or instead of producing a valid envelope returns `ok: false` without `docs`, and its `summary` begins with one of these host failure codes:
 
@@ -280,6 +287,23 @@ The three push-down tools (`push_down_claude_customizations`, `push_down_codex_a
 - Destination manifest: an apply run writes `.push-down-manifest.json` at the destination root. It records the selection per ecosystem and, per managed file, the layer, the owning pack, and the SHA-256 of the LF-normalized text. It holds no timestamp and no absolute path, and it is rewritten only when its text changes. Destinations commit it.
 - No-overwrite rule: a destination file edited since the last push-down is reported as `conflict` and left in place. A file with no manifest entry that differs from the payload is reported as `unmanaged-conflict` and left in place unless `overwrite_unmanaged` is `true`. Files of a deselected pack are reported as `orphaned` and never deleted. Paths listed in `.push-down-exclusions` are withheld for every ecosystem and reported as `excluded`.
 - `push_down_report`: every call returns the report with `mode` (`dry-run` or `apply`), the selection per ecosystem, every planned, merged, excluded, and orphaned path with its `layer`, `pack`, `action`, and `reason`, and `counts` per action. `conflict`, `unmanaged-conflict`, and `deleted-locally` lines are also returned in `warnings` with the prefix `push-down conflict:`. A second run with no source or destination change writes no file outside `artifacts/`.
+
+## Push-Down CI Workflows
+
+The three push-down tools accept the optional `ci_workflows` input with the values `off` (default), `reference`, and `copy`; when it is omitted, the mode recorded in the destination manifest is reused.
+
+- `off`: no CI file is planned; CI files delivered earlier are reported as `orphaned` and left in place.
+- `reference`: the push-down writes the caller `.github/workflows/drm-copilot-ci.yml` (workflow `CI` with one job per selected language pack and the `CI Required Gate` job) and the data file `.github/drm-copilot/ci-required-checks.json`; each caller job calls `drmoisan/drm-copilot/.github/workflows/harness-<pack>.yml` at the pinned tag.
+- `copy`: the push-down also writes the selected packs' reusable workflows as `.github/workflows/drm-copilot-<pack>.yml`, and the caller jobs use those local copies.
+- Pin: reference mode pins the harness workflows at the release tag `v<payload_version>`, where `payload_version` is the extension version that ran the push-down.
+- Bump process: upgrade the extension and re-run the push-down; an unedited caller is reported `update` and rewritten with the new tag.
+- Risk: an unprotected tag can be moved, because no tag ruleset protects the release tags of the source repository.
+- Risk: a build without a published tag references a missing tag, so reference mode works only with a published extension release.
+- Rule: a private source repository requires copy mode, because a destination cannot call a reusable workflow it cannot read.
+- Limitation: the #1049 vendored-code exemption is unavailable in copy mode, because copy mode runs Pester directly and does not load PoshQC.
+- Requirement: copy mode runs Pester over the top-level tests directory, and the PowerShell job fails with `Copy mode requires a top-level tests directory` when it is absent; reference mode (PoshQC) has no such requirement.
+- No CI file is written over an existing unmanaged file, even with `overwrite_unmanaged`; an edited caller is reported `conflict` and kept; when another destination workflow is already named `CI`, the caller is withheld and a `push-down conflict:` warning names that file.
+- Opt-in branch protection: `.github/drm-copilot/Set-CiRequiredChecks.ps1` (`Set-CiRequiredChecks.ps1`) is delivered with the CI files and never run by the push-down; by default it prints the planned ruleset, and with `-Apply` it creates one ruleset on the default branch that requires `CI Required Gate`, without editing or deleting an existing ruleset.
 
 ## Run PoshQC Suite
 

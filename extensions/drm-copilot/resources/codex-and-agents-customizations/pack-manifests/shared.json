@@ -113,6 +113,8 @@
     ".agents/skills/pr-base-branch-merge-base/references/standard.md",
     ".agents/skills/pr-context-artifacts/SKILL.md",
     ".agents/skills/pr-context-artifacts/references/standard.md",
+    ".agents/skills/push-down-integration/SKILL.md",
+    ".agents/skills/push-down-integration/references/standard.md",
     ".agents/skills/python-change-budget-router/SKILL.md",
     ".agents/skills/python-change-budget-router/references/standard.md",
     ".agents/skills/python-qa-gate/SKILL.md",

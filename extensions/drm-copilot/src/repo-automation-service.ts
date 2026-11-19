@@ -76,6 +76,13 @@ import {
   type DocsCommandOutcome,
   type DocsCommandRequest,
 } from "./repo-automation-execute-docs";
+import {
+  detectPushDownIntegrationServiceCall,
+  validatePushDownIntegrationServiceCall,
+} from "./repo-automation-service-push-down-integration";
+import type { DetectIntegrationResult } from "./lib/push-down-integration/integration-detect";
+import type { ValidateIntegrationResult } from "./lib/push-down-integration/integration-validate";
+import type { PushDownIntegrationToolInput } from "./mcp-tool-inputs-push-down-integration";
 
 export type {
   RepoAutomationExecutionResult,
@@ -478,6 +485,18 @@ class DefaultRepoAutomationService
         ...this.docsOptions,
       }),
     );
+  }
+
+  async detectPushDownIntegration(
+    input: PushDownIntegrationToolInput,
+  ): Promise<DetectIntegrationResult> {
+    return detectPushDownIntegrationServiceCall(input, this.pushDownDeps);
+  }
+
+  async validatePushDownIntegration(
+    input: PushDownIntegrationToolInput,
+  ): Promise<ValidateIntegrationResult> {
+    return validatePushDownIntegrationServiceCall(input, this.pushDownDeps);
   }
 
   private async executeScript(

@@ -119,6 +119,7 @@ foreach ($subModuleName in @(
         'PoshQC.ScanConfig.psm1',
         'PoshQC.LeakScan.psm1',
         'PoshQC.LeakAllowlist.psm1',
+        'PoshQC.VendoredCoverage.psm1',
         'PoshQC.Coverage.psm1',
         'PoshQC.Analyzer.psm1',
         'PoshQC.Shard.psm1',
@@ -164,6 +165,7 @@ Export-ModuleMember -Function @(
     'ConvertTo-PoshQCShardWeight',
     'Export-PoshQCShardWeight',
     'Invoke-PoshQCParallelTest',
-    'Invoke-PoshQCLeakScan'
+    'Invoke-PoshQCLeakScan',
+    'Get-PoshQCVendoredCoverageStatus'
 ) -Alias @('Install-PoshQCTools')
 

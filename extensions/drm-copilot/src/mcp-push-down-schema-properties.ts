@@ -41,10 +41,19 @@ const overwriteUnmanagedProperty = {
     "Optional. When true, overwrite destination files that have no manifest entry and differ from the payload (default false).",
 } as const;
 
+/** Optional destination CI mode shared by the three push-down tools (issue #1050). */
+const ciWorkflowsProperty = {
+  type: "string",
+  enum: ["off", "reference", "copy"],
+  description:
+    "Optional destination CI workflows: 'off' (default) plans no CI file, 'reference' delivers the caller and data file pinned to the harness workflows at the release tag, 'copy' also delivers the selected packs' workflow copies. When omitted, the mode recorded in the destination manifest is reused.",
+} as const;
+
 /** Run options added to every push-down tool schema. */
 const pushDownRunProperties = {
   dry_run: dryRunProperty,
   overwrite_unmanaged: overwriteUnmanagedProperty,
+  ci_workflows: ciWorkflowsProperty,
 } as const;
 
 export const codexPushDownSelectionProperties = {

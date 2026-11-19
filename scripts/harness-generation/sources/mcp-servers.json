@@ -30,7 +30,9 @@
           "resolve_policy_audit_template_asset",
           "resolve_execute_hard_lock_prompt",
           "resolve_atomic_plan_prompt",
-          "validate_orchestration_artifacts"
+          "validate_orchestration_artifacts",
+          "detect_push_down_integration",
+          "validate_push_down_integration"
         ],
         "pin_version": true,
         "required": true,

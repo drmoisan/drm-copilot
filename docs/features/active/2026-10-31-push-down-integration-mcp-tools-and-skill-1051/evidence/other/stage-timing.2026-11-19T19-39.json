@@ -1,0 +1,17 @@
+{
+  "issue-num": "1051",
+  "stage_timing": [
+    { "stage": "S3_promotion", "attempt": 1, "started_at": "2026-11-14T15:43:00Z", "ended_at": "2026-11-14T15:44:39Z" },
+    { "stage": "S3b_research", "attempt": 1, "started_at": "2026-11-14T15:44:39Z", "ended_at": "2026-11-14T15:55:11Z" },
+    { "stage": "S3c_feature_documents", "attempt": 1, "started_at": "2026-11-14T15:56:30Z", "ended_at": "2026-11-14T16:06:33Z" },
+    { "stage": "S4_atomic_planning", "attempt": 1, "started_at": "2026-11-14T16:06:33Z", "ended_at": "2026-11-14T16:18:06Z" },
+    { "stage": "S4b_preflight", "attempt": 1, "started_at": "2026-11-14T16:18:06Z", "ended_at": "2026-11-14T16:30:30Z" },
+    { "stage": "S4_atomic_planning", "attempt": 2, "started_at": "2026-11-14T16:31:45Z", "ended_at": "2026-11-14T16:39:58Z" },
+    { "stage": "S4b_preflight", "attempt": 2, "started_at": "2026-11-14T16:39:58Z", "ended_at": "2026-11-14T16:48:30Z" },
+    { "stage": "S5_atomic_execution", "attempt": 1, "started_at": "2026-11-19T15:29:28Z", "ended_at": "2026-11-19T19:03:35Z" },
+    { "stage": "S7_feature_review", "attempt": 1, "started_at": "2026-11-19T19:03:35Z", "ended_at": "2026-11-19T19:17:45Z" },
+    { "stage": "S8_create_pr", "attempt": 1, "started_at": "2026-11-19T19:17:45Z", "ended_at": "2026-11-19T19:22:15Z" },
+    { "stage": "S9_ci_green", "attempt": 1, "started_at": "2026-11-19T19:22:15Z", "ended_at": "2026-11-19T19:39:22Z" },
+    { "stage": "S9_ci_green", "attempt": 2, "started_at": "2026-11-19T19:39:22Z", "ended_at": null }
+  ]
+}

@@ -37,16 +37,16 @@ The push-down copies hooks, skills, agents, libraries and rules into destination
 
 ## Acceptance Criteria
 
-- [ ] As a maintainer, I can read in the pushed-down `general-unit-test` rule that a file may be excluded from coverage only when its exact path is listed in `.push-down-manifest.json` with a matching hash and the exemption is derived by tooling at measurement time.
-- [ ] As a maintainer, the manifest written by the push-down records a path and canonical content hash for every file it writes, and each hash matches the bytes written.
-- [ ] As a maintainer, a pushed-down file that I modify, and any file not listed in the manifest, is not exempt and stays in my coverage denominator.
-- [ ] As a maintainer, a hook I add under `.claude/hooks/` stays in my coverage denominator.
-- [ ] As a maintainer, I enable the exemption with one boolean key in `config/poshqc-coverage.json` and write no exclusion path by hand.
-- [ ] As a maintainer, an invalid manifest with the opt-in set fails my coverage run with a message naming `.push-down-manifest.json`, and a missing manifest exempts nothing.
-- [ ] As a reviewer, I can verify the exemption from `vendored-coverage-exemptions.json` beside the coverage output file, which is sorted and contains no timestamps or absolute paths.
-- [ ] As a reviewer, the rule and the feature-review coverage step treat hand-written production-path exclusions and hand-edited manifest hashes as Blocking, and recognize the manifest-derived exemption.
-- [ ] As a maintainer, the rule and the PoshQC README state that pushed-down code is tested upstream, that a modified copy is owned and tested locally, and that recreated duplicate tests of unmodified pushed-down files may be removed.
-- [ ] As a maintainer of this repository, I can confirm that this repository does not opt in and keeps its own tests, enforced by a repo-gate test.
+- [x] As a maintainer, I can read in the pushed-down `general-unit-test` rule that a file may be excluded from coverage only when its exact path is listed in `.push-down-manifest.json` with a matching hash and the exemption is derived by tooling at measurement time.
+- [x] As a maintainer, the manifest written by the push-down records a path and canonical content hash for every file it writes, and each hash matches the bytes written.
+- [x] As a maintainer, a pushed-down file that I modify, and any file not listed in the manifest, is not exempt and stays in my coverage denominator.
+- [x] As a maintainer, a hook I add under `.claude/hooks/` stays in my coverage denominator.
+- [x] As a maintainer, I enable the exemption with one boolean key in `config/poshqc-coverage.json` and write no exclusion path by hand.
+- [x] As a maintainer, an invalid manifest with the opt-in set fails my coverage run with a message naming `.push-down-manifest.json`, and a missing manifest exempts nothing.
+- [x] As a reviewer, I can verify the exemption from `vendored-coverage-exemptions.json` beside the coverage output file, which is sorted and contains no timestamps or absolute paths.
+- [x] As a reviewer, the rule and the feature-review coverage step treat hand-written production-path exclusions and hand-edited manifest hashes as Blocking, and recognize the manifest-derived exemption.
+- [x] As a maintainer, the rule and the PoshQC README state that pushed-down code is tested upstream, that a modified copy is owned and tested locally, and that recreated duplicate tests of unmodified pushed-down files may be removed.
+- [x] As a maintainer of this repository, I can confirm that this repository does not opt in and keeps its own tests, enforced by a repo-gate test.
 
 ## Non-Goals
 

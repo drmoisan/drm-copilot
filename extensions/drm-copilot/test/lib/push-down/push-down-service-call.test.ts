@@ -10,6 +10,7 @@ import {
   fixedClock,
 } from "./push-down.test-helpers";
 import { hashPayloadText } from "../../../src/lib/push-down/push-down-destination-manifest";
+import { type PushDownReportWithIntegration } from "../../../src/lib/push-down/push-down-integration-needed";
 import { seedSharedLayerManifest } from "./push-down-pipeline.test-helpers";
 
 const CLOCK = fixedClock("2026-06-26T00:15:00.000Z");
@@ -469,6 +470,13 @@ describe("push-down service calls over the unified harness (issue #1029)", () =>
       "push-down conflict: conflict AGENTS.md",
     ]);
     expect(log.mock.calls.map(([line]) => line)).toEqual(result.warnings);
+    // Issue #1051: the three actions are also integration items.
+    const report = result.pushDownReport as PushDownReportWithIntegration;
+    expect(report.integration_needed?.items.map((item) => item.id)).toEqual([
+      "deleted-locally:.agents/skills/shared/SKILL.md",
+      "destination-edited-file:AGENTS.md",
+      "unmanaged-conflict:.codex/agents/a.toml",
+    ]);
     expect(fs.readTextFile(`${WS}/AGENTS.md`)).toBe("local edit\n");
     expect(fs.readTextFile(`${WS}/.codex/agents/a.toml`)).toBe("theirs\n");
   });

@@ -50,6 +50,7 @@
         "head-2",
         "1-core-principles",
         "2-coverage-and-scenarios",
+        "coverage-exclusion-policy",
         "3-test-structure-and-diagnostics",
         "4-external-dependencies-and-environment",
         "5-policy-audit"

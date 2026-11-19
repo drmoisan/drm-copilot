@@ -1,0 +1,86 @@
+# Destination-generic Python quality workflow delivered by the drm-copilot
+# push-down (issue #1050). It is called from a destination's CI caller and
+# runs only steps that work in any Poetry-managed repository.
+name: Harness Python
+
+on:
+  workflow_call:
+    inputs:
+      python_version:
+        description: Python version to install.
+        type: string
+        default: "3.13"
+      line_threshold:
+        description: Minimum line coverage percentage.
+        type: number
+        default: 85
+      branch_threshold:
+        description: Minimum branch coverage percentage.
+        type: number
+        default: 75
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python QC
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ inputs.python_version }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 2.5.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Check formatting with Black
+        run: poetry run black --check .
+
+      - name: Lint with Ruff
+        run: poetry run ruff check .
+
+      - name: Type check with Pyright
+        run: poetry run pyright
+
+      - name: Run tests with coverage
+        run: >-
+          poetry run pytest --cov --cov-branch
+          --cov-report=lcov:artifacts/python/lcov.info
+          --cov-report=json:artifacts/python/coverage.json
+
+      - name: Check coverage thresholds
+        shell: pwsh
+        env:
+          LINE_THRESHOLD: ${{ inputs.line_threshold }}
+          BRANCH_THRESHOLD: ${{ inputs.branch_threshold }}
+        run: |
+          $report = Get-Content -Raw -LiteralPath 'artifacts/python/coverage.json' | ConvertFrom-Json -AsHashtable
+          $totals = $report['totals']
+          $line = if ([double]$totals['num_statements'] -gt 0) { 100.0 * [double]$totals['covered_lines'] / [double]$totals['num_statements'] } else { 100.0 }
+          $branch = if ([double]$totals['num_branches'] -gt 0) { 100.0 * [double]$totals['covered_branches'] / [double]$totals['num_branches'] } else { 100.0 }
+          Write-Output ("Line coverage {0:N2}% (minimum {1}%)" -f $line, $env:LINE_THRESHOLD)
+          Write-Output ("Branch coverage {0:N2}% (minimum {1}%)" -f $branch, $env:BRANCH_THRESHOLD)
+          $failed = $false
+          if ($line -lt [double]$env:LINE_THRESHOLD) { Write-Error 'Line coverage is below the threshold.' -ErrorAction Continue; $failed = $true }
+          if ($branch -lt [double]$env:BRANCH_THRESHOLD) { Write-Error 'Branch coverage is below the threshold.' -ErrorAction Continue; $failed = $true }
+          if ($failed) { exit 1 }
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-coverage
+          path: artifacts/python/
+          if-no-files-found: ignore

@@ -3485,6 +3485,28 @@
       "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
     },
     {
+      "id": "claude:skill:push-down-integration",
+      "ecosystem": "claude",
+      "kind": "skill",
+      "name": "push-down-integration",
+      "source_path": ".claude/skills/push-down-integration/SKILL.md",
+      "disposition": "generated",
+      "target_paths": [
+        ".claude/skills/push-down-integration/SKILL.md"
+      ],
+      "generated_from": ".agents/skills/push-down-integration/SKILL.md",
+      "generator": "harness-generation/skills",
+      "parity_group": "skill:push-down-integration",
+      "consumers": [
+        "claude-code",
+        "copilot-vscode",
+        "copilot-cli"
+      ],
+      "owner_child": 3,
+      "decision_status": "approved",
+      "decision_ref": "#1051:spec.md#resolved-open-questions"
+    },
+    {
       "id": "claude:skill:python-change-budget-router",
       "ecosystem": "claude",
       "kind": "skill",
@@ -8346,6 +8368,26 @@
       "decision_ref": "#1025:runbooks/e1-copilot-duplicate-skill-listing.runbook.md"
     },
     {
+      "id": "codex:skill:push-down-integration",
+      "ecosystem": "codex",
+      "kind": "skill",
+      "name": "push-down-integration",
+      "source_path": ".agents/skills/push-down-integration/SKILL.md",
+      "disposition": "shared",
+      "target_paths": [
+        ".claude/skills/push-down-integration/SKILL.md"
+      ],
+      "parity_group": "skill:push-down-integration",
+      "consumers": [
+        "codex",
+        "copilot-vscode",
+        "copilot-cli"
+      ],
+      "owner_child": 3,
+      "decision_status": "approved",
+      "decision_ref": "#1051:spec.md#resolved-open-questions"
+    },
+    {
       "id": "codex:skill:python",
       "ecosystem": "codex",
       "kind": "skill",
@@ -11657,6 +11699,23 @@
       "owner_child": 6,
       "decision_status": "approved",
       "decision_ref": "#1025:survey/difference-approval.md#disposition-proposals"
+    },
+    {
+      "id": "copilot:skill:push-down-integration",
+      "ecosystem": "copilot",
+      "kind": "skill",
+      "name": "push-down-integration",
+      "source_path": ".github/skills/push-down-integration/SKILL.md",
+      "disposition": "dropped",
+      "reason": "Superseded by the shared .agents/skills/push-down-integration, which Copilot reads natively",
+      "parity_group": "skill:push-down-integration",
+      "consumers": [
+        "copilot-vscode",
+        "copilot-cli"
+      ],
+      "owner_child": 6,
+      "decision_status": "approved",
+      "decision_ref": "#1051:spec.md#resolved-open-questions"
     },
     {
       "id": "copilot:skill:reconcile-parity-matrix",
