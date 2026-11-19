@@ -110,7 +110,7 @@ No artifact adds Python; no pushed-down artifact is TypeScript or Python; no hoo
   - Acceptance: `<FEATURE>/evidence/baseline/pytest-baseline.<timestamp>.md` records the pass and fail counts, repository-wide line and branch coverage, and the line and branch coverage of `scripts/dev_tools/agentic_sync.py`, read from the JSON report.
 - [x] [P0-T8] Run the Jest `Phase 0 baseline` `GATE-RUN` of `extensions/drm-copilot` with coverage (the full suite; the `coverageThreshold` map is per-file).
   - Acceptance: `<FEATURE>/evidence/baseline/jest-baseline.<timestamp>.md` records the pass and fail counts, overall coverage, and the line and branch coverage of `src/lib/push-down/copilot-customizations-engine.ts`.
-- [ ] [P0-T9] Run the Pester `Phase 0 baseline` `GATE-RUN` (one `Invoke-PoshQCParallelTest` over the scan folders of `config/poshqc-scan.json`).
+- [x] [P0-T9] Run the Pester `Phase 0 baseline` `GATE-RUN` (one `Invoke-PoshQCParallelTest` over the scan folders of `config/poshqc-scan.json`).
   - Acceptance: `<FEATURE>/evidence/baseline/pester-baseline.<timestamp>.md` records the returned `ExitCode`, the pass and fail counts from the merged JUnit file, repository-wide line coverage, the pass state of `LEDGER-CHAIN-TESTS` and of the parity-matrix gate, and `no in-scope production PowerShell file`.
 
 ### Phase 1 — Retire `.github/skills` and Update Its Pins
