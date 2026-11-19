@@ -9,20 +9,22 @@
     `$script:ScanRoot` at call time and create, write, or delete no file.
 #>
 
-# Exactly three scan roots, anchored at the resolved repository root. A repo-wide
+# Exactly four scan roots, anchored at the resolved repository root. A repo-wide
 # recursive glob is deliberately NOT used: the bundled mirror under
 # `extensions/drm-copilot/resources/claude-customizations/.claude/**` is a
 # byte-identical second copy of these files and must stay out of scope, because
-# allowlist keys are repo-root-relative paths.
+# allowlist keys are repo-root-relative paths. `.github/hooks` holds the Copilot
+# hooks (issue #1030).
 $script:ScanRoot = @(
     (Join-Path -Path $script:RepoRoot -ChildPath '.claude/hooks'),
     (Join-Path -Path $script:RepoRoot -ChildPath '.claude/lib'),
-    (Join-Path -Path $script:RepoRoot -ChildPath '.codex/hooks')
+    (Join-Path -Path $script:RepoRoot -ChildPath '.codex/hooks'),
+    (Join-Path -Path $script:RepoRoot -ChildPath '.github/hooks')
 )
 
 <#
 .SYNOPSIS
-    Enumerates every `*.ps1` and `*.psm1` beneath the three scan roots, excluding
+    Enumerates every `*.ps1` and `*.psm1` beneath the four scan roots, excluding
     `.claude/lib/bash/**` (shell, not PowerShell). Each result carries the
     absolute path and the repo-root-relative label used by the allowlist.
 #>

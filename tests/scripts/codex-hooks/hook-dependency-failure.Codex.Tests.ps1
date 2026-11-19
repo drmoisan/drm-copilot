@@ -99,6 +99,7 @@ Describe 'Codex hook dependency-failure behaviour (issue #786)' {
             '.codex/hooks/validate-codex-subagent-routing.ps1'              = 'MODEL_ROUTING_ATTESTATION_BLOCKED:'
             '.codex/hooks/validate-discovery-agent-output.ps1'              = 'DISCOVERY_ARTIFACT_GATE_BLOCKED:'
             '.codex/hooks/validate-feature-review-coverage.ps1'             = 'validate-feature-review-coverage:'
+            '.codex/hooks/validate-pr-author-output.ps1'                    = 'PR_AUTHOR_OUTPUT_MISSING:'
         }
 
         function Invoke-HookProcess {
