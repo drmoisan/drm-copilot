@@ -75,9 +75,9 @@ covers function parity only.
 - [x] The matrix records the five worktree-resolution-dependent SubagentStop validators, `enforce-feature-folder-order`, `enforce-prd-feature-before-planner`, `enforce-mermaid-validation`, `enforce-pr-author-skill`, `validate-orchestrator-output` and the pr-author Bash allowlist as `DEFER`, and the Codex preimplementation-gate delegation registration as `NOT-EXPRESSIBLE` naming issue #555, each with its reason.
 - [x] Copilot hook registrations have `disposition: native` and `owner_child: 6`.
 - [x] `tests/scripts/claude-runtime/enforcement-hooks-no-python-invocation.Tests.ps1` scans `.github/hooks` in addition to its existing roots and passes.
-- [ ] Bundled mirrors, pack manifests and their contract tests listed in the spec pass.
+- [x] Bundled mirrors, pack manifests and their contract tests listed in the spec pass.
 - [x] No edit is made to Codex hook files at 490 or more physical lines at Phase 0.
-- [ ] The `poshqc / PowerShell hook suites (Linux)` CI job passes on the PR head.
+- [x] The `poshqc / PowerShell hook suites (Linux)` CI job passes on the PR head.
 
 ## Non-Goals
 
