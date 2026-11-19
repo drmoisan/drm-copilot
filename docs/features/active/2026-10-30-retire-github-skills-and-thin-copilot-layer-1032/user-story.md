@@ -49,14 +49,14 @@ Epic #1018 moves the three agent ecosystems in this repository onto shared cross
 
 - [x] US-AC1 — `.github/skills/` and `extensions/drm-copilot/resources/customizations/.github/skills/` are absent from the tree (spec AC1, AC2).
 - [x] US-AC2 — The U1 to U5 dispositions are recorded with reasons under `<FEATURE>/evidence/other/`, and any owner-overridden section is present in `.agents/skills/<name>/SKILL.md` (spec AC3).
-- [ ] US-AC3 — Exactly one agents branch plan ran, matching child 1's recorded E3 result, and the `.github/agents` outcome matches that branch; every prompt binding and handoff target resolves (spec AC4, AC5, AC6).
+- [x] US-AC3 — Exactly one agents branch plan ran, matching child 1's recorded E3 result, and the `.github/agents` outcome matches that branch; every prompt binding and handoff target resolves (spec AC4, AC5, AC6).
 - [x] US-AC4 — `.github/copilot-instructions.md` holds only Copilot-only text, and `.github/prompts` and `.github/hooks` remain native (spec AC7, AC8).
 - [x] US-AC5 — Collision controls are in the tracked `.vscode/settings.json`, with no copy step, when E4 shows workspace scope works, otherwise documented as user-scope settings in `README.md`, and `test_vscode_workspace_settings.py` passes (spec AC9).
 - [x] US-AC6 — The remaining execution-environment brief copies are byte-identical, every copy-count statement names the number of copies that remain, and their contract tests pass (spec AC10).
 - [x] US-AC7 — The named contract tests and push-down contract tests pass, and no pack manifest or bundle mirror lists a removed file (spec AC11, AC12).
 - [x] US-AC8 — No stale `.github/skills` reference remains outside classified hits, and current-fact documents are updated (spec AC13, AC15).
-- [ ] US-AC9 — Parity-matrix entries are updated and `HarnessParityMatrix.RepoGate.Tests.ps1` passes (spec AC14).
-- [ ] US-AC10 — Toolchain, coverage, parallel-gate isolation and file-size gates are green and no new Python is added (spec AC16, AC17, AC18, AC19).
+- [x] US-AC9 — Parity-matrix entries are updated and `HarnessParityMatrix.RepoGate.Tests.ps1` passes (spec AC14).
+- [x] US-AC10 — Toolchain, coverage, parallel-gate isolation and file-size gates are green and no new Python is added (spec AC16, AC17, AC18, AC19).
 - [x] US-AC11 — The `AGENTS.md` sync writer, its template, test, extension command, task, rewrite entries and shard-weight key are removed, and no unclassified writer reference remains (spec AC20, AC21).
 - [x] US-AC12 — The process-reduction ledger records are updated in the same commits as the deletions and edits, the ledger chain tests pass, and `ProcessReductionChain.psm1` is unchanged (spec AC22).
 
