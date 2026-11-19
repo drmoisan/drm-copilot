@@ -74,7 +74,7 @@ No artifact adds Python, nothing is pushed down, and no tool, command, skill or 
 
 ### Phase 2 — Final QA, Evidence and Self-Review
 
-- [ ] [P2-T1] Run the pytest (`tests/scripts` and the other configured roots) and Pester (`config/poshqc-scan.json` folders) `GATE-RUN`s with coverage; no Jest-tested file changes, and the phase gate ran Jest.
+- [x] [P2-T1] Run the pytest (`tests/scripts` and the other configured roots) and Pester (`config/poshqc-scan.json` folders) `GATE-RUN`s with coverage; no Jest-tested file changes, and the phase gate ran Jest.
   - Acceptance: `<FEATURE>/evidence/regression-testing/branch-b-pytest-final.<timestamp>.md` and `branch-b-pester-final.<timestamp>.md` record zero failures, pass counts and repository-wide coverage no lower than the P0-T3 and P0-T4 values, with every `AGENT-PY` module, every `AGENT-PESTER` suite and `FileSizePolicy.RepoGate.Tests.ps1` passing.
 - [ ] [P2-T2] Record end state: list added files from the diff of `MB` and `HEAD` together with `git status --porcelain`, confirm no `LEDGER-RECORDS` file under `docs/engineering/process-reductions/` changed in this plan's commits (the range from the parent of the commit that added the greatest `branch-b-main-plan-check.*.md` to `HEAD`), and write the completion record.
   - Acceptance: `<FEATURE>/evidence/qa-gates/branch-b-end-state.<timestamp>.md` records no added `*.py` file, no pushed-down TypeScript or Python, and no ledger change; `<FEATURE>/evidence/other/plan-completion-branch.<timestamp>.md` records `Branch: B`.
