@@ -43,7 +43,15 @@ The correct response to a file that contains untestable lines is to refactor it 
 **Prohibited `exclude` entries:**
 - Any path under `src/` that contains production runtime code, regardless of whether it is auto-generated, host-bound, or difficult to test.
 
-**Enforcement:** Feature-review agents must treat any `exclude` entry that matches a production source path as a **Blocking** finding.
+**Vendored push-down files** (destination repositories that receive pushed-down files):
+- A pushed-down file may be excluded from a destination's coverage measurement only when all three conditions hold: its exact path is a key in `.push-down-manifest.json`; its canonical content hash equals the recorded `sha256`; and the exemption is derived by tooling at measurement time, never written by hand. A directory glob such as `.claude/**` never qualifies.
+- Modified files, unlisted files, and files the destination adds (for example a hook added under `.claude/hooks/`) stay in the denominator.
+- Pushed-down code is tested upstream. A modified copy is owned and tested by the destination; after a `conflict` re-run it stays non-exempt until it is reverted or deleted and pushed down again.
+- A destination may remove its recreated duplicate tests of unmodified pushed-down files.
+- The tooling records what it exempted in `vendored-coverage-exemptions.json` beside the coverage output file.
+- The repository that is the source of the pushed-down files measures and tests them; the exception does not apply there.
+
+**Enforcement:** Feature-review agents must treat any hand-written `exclude`, `omit`, `coveragePathIgnorePatterns`, or kcov `--exclude-path` entry, or omitted settings-file coverage path, that matches a production source path as a **Blocking** finding. The boolean opt-in `exempt_unchanged_push_down_files` is not an `exclude` entry: a manifest-derived run-time exemption is recognized, and the reviewer verifies it through `vendored-coverage-exemptions.json`. A branch diff that changes `.push-down-manifest.json` hashes without a push-down run (no `payload_version` change and no push-down summary) is a **Blocking** finding.
 
 <!-- harness-section: scenario-completeness -->
 ## Scenario Completeness

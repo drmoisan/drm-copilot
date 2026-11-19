@@ -1,0 +1,49 @@
+{
+  "cases": [
+    {
+      "name": "empty",
+      "text": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "abc",
+      "text": "abc",
+      "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    },
+    {
+      "name": "lf-pair",
+      "text": "a\nb",
+      "sha256": "7e18f737311b2dc3b2f269dd78396b0351f14fb66efa879f768cb23181883c78"
+    },
+    {
+      "name": "crlf-pair",
+      "text": "a\r\nb",
+      "sha256": "7e18f737311b2dc3b2f269dd78396b0351f14fb66efa879f768cb23181883c78"
+    },
+    {
+      "name": "lone-cr",
+      "text": "a\rb",
+      "sha256": "7e18f737311b2dc3b2f269dd78396b0351f14fb66efa879f768cb23181883c78"
+    },
+    {
+      "name": "cr-crlf",
+      "text": "a\r\r\nb",
+      "sha256": "38022fd2b8dbc5cb3d2cee74e083edbf59e3d4e13d067ebcb5db633d4cff4d8c"
+    },
+    {
+      "name": "bom",
+      "text": "\ufeffabc",
+      "sha256": "1c28dc3f1f804a1ad9c9b4b4cf5e2658d16ad4ed08e3020d04a8d2865018947c"
+    },
+    {
+      "name": "non-ascii",
+      "text": "caf\u00e9 \u4e2d",
+      "sha256": "a9482a7dcae6feb80be9e0a1ba47b979b8cd46c7e17ac8af8fc772eac448e247"
+    },
+    {
+      "name": "trailing-crlf",
+      "text": "x\r\n",
+      "sha256": "73cb3858a687a8494ca3323053016282f3dad39d42cf62ca4e79dda2aac7d9ac"
+    }
+  ]
+}
