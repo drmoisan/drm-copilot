@@ -204,6 +204,33 @@ describe("destination CI contract", () => {
     );
   });
 
+  it("every brief copy names the CI data file after the refresh rule", () => {
+    const copies = [
+      ".claude/skills/execution-environment/SKILL.md",
+      "extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md",
+      ".agents/skills/execution-environment/SKILL.md",
+      "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md",
+      ".github/skills/execution-environment/SKILL.md",
+      "extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md",
+    ];
+    const token = ".github/drm-copilot/ci-required-checks.json";
+
+    for (const copy of copies) {
+      const text = readRepo(copy).replace(/\r\n?/g, "\n");
+      const start = text.indexOf("## CI Shape and Required Checks");
+      const end = text.indexOf("\n## ", start + 1);
+      const section = text.slice(start, end < 0 ? undefined : end);
+      const refresh = section.indexOf("- Refresh rule:");
+      const skipped = section.indexOf("- Skipped-check semantics:");
+      const position = section.indexOf(token);
+
+      expect(start).toBeGreaterThanOrEqual(0);
+      expect(refresh).toBeGreaterThanOrEqual(0);
+      expect(position).toBeGreaterThan(refresh);
+      expect(position).toBeLessThan(skipped);
+    }
+  });
+
   it("new push-down CI modules invoke no gh", () => {
     for (const module of [
       "push-down-ci-workflows.ts",

@@ -183,3 +183,16 @@ The scope is docs-only only when `needs.changes.outputs.code` is exactly the str
 | scope docs-only (`code` is exactly `false`) | green only if `changes`, `quality-checks7`, `security-scan`, `docs-validation`, `build-check`, `poshqc`, `shell-coverage`, and `drm-copilot-extension-tests` are `success`, and `full-run-marker`, `root-typescript-tests`, and `npm-audit-gate` are each `skipped` or `success` |
 
 Until the owner applies the post-merge ruleset edit described in the issue #1074 runbook, `CI Required Gate` is an additional check that is not required. After the edit it is the single required context of ruleset 15241672, and the individual job contexts remain visible. A new `ci.yml` job must be added to the gate's `needs:` list; `tests/scripts/workflows/CiRequiredGateWorkflow.Tests.ps1` derives the expected list from the file and fails until it is.
+
+## Destination Harness Workflows (Issue #1050)
+
+These reusable workflows are triggered only by `workflow_call`. This repository's `ci.yml` does not call them; destinations call them from the caller the push-down renders (`ci_workflows`), at the release tag `v<payload_version>`, or run byte-identical local copies in copy mode. Each runs only destination-generic steps.
+
+| Workflow | Runs | Writes |
+| --- | --- | --- |
+| `harness-python.yml` | Black, Ruff, Pyright, pytest with coverage, inline threshold check (inputs `line_threshold` 85, `branch_threshold` 75) | `artifacts/python/lcov.info`, `artifacts/python/coverage.json` |
+| `harness-powershell.yml` | With `poshqc` true, PoshQC from a side checkout of `harness_repository` at `harness_ref` into `.drm-copilot-harness`; with `poshqc` false, Pester 6 directly | `artifacts/pester/powershell-coverage.xml`, `artifacts/pester/pester-junit.xml` |
+| `harness-typescript.yml` | npm scripts `format` (with a drift check), `lint`, `typecheck`, `test:unit:coverage` on Node 26.13.0 | `coverage/lcov.info` |
+| `harness-dotnet.yml` | Input `variant`: `modern` (.NET SDK on `ubuntu-latest`) or `legacy` (msbuild and vstest on `windows-latest`); Cobertura totals converted to JaCoCo | `artifacts/csharp/coverage.xml` |
+
+The bundle copies under `extensions/drm-copilot/resources/ci-workflows/workflows/` are byte-identical to these files, which the Jest contract test `push-down-ci-contract.test.ts` checks.
