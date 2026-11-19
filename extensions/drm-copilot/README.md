@@ -131,8 +131,12 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `update_docs_ledger`
 - `generate_docs_reference`
 - `validate_docs_artifacts`
+- `detect_push_down_integration`
+- `validate_push_down_integration`
 
 The six docs tools run the workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1` with `pwsh -NoProfile -File <script> -Command <subcommand> -Json`, with the workspace root as working directory. They require PowerShell 7.4 or later on `PATH` (there is no fallback to Windows PowerShell) and the pushed-down `.claude/lib/docs/` library in the target workspace; run `push_down_claude_customizations` first when it is missing. Only `update_docs_ledger` can change files, and only when `write` is `true`; every other docs tool is read-only.
+
+The two push-down integration tools are read-only and deterministic, and neither calls a model. `detect_push_down_integration` reports a destination's harness ecosystems and language packs, its `.github/workflows/` files with their jobs, the structured integration conflicts, and a summary of `.push-down-integration-needed.json`, which an apply-mode push-down writes when it meets a decision it cannot make mechanically. `validate_push_down_integration` returns a `pass` or `fail` verdict over rules V1 to V5 and the fixed `not_checked` list; a completed run is `ok: true` even when the verdict is `fail`. The `push-down-integration` skill describes the read, resolve and validate loop.
 
 ### MCP Runtime Expectations
 
@@ -194,6 +198,8 @@ If the server is launched from a different working directory, pass `workspace_ro
 - `update_docs_ledger`: required `workspace_root`, required `operation`, required `actor_kind`, required `actor_id`, optional `profile`, `element` or `limit`, `disposition`, `pages`, `rationale`, `owner`, `target`, `dimension`, `state`, `claim`, and `write` (default `false`, a dry run); the fields each operation requires or permits are checked before launch
 - `generate_docs_reference`: required `workspace_root`, optional `profile`, optional `snapshot`, optional `output_directory` (always a dry run)
 - `validate_docs_artifacts`: required `workspace_root`, required `mode`, required `revision`, optional `profile` (never persists a receipt)
+- `detect_push_down_integration`: required `workspace_root` (no other property)
+- `validate_push_down_integration`: required `workspace_root` (no other property)
 
 ### MCP Result Shape
 
@@ -206,6 +212,7 @@ MCP tool calls return structured JSON with:
 - `summary`
 - `stderr_excerpt` when a subprocess failure surfaces stderr diagnostics
 - `docs` for the docs tools: the `Invoke-DocsCommand.ps1 -Json` envelope (`command`, `exit_code`, `findings`, `ok`, `result`) passed through unchanged; `ok` equals the envelope `ok`, `summary` is `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>`, and `stderr_excerpt` is added only for exit code 3
+- `integration` for the two push-down integration tools: the detect facts (`ecosystems`, `workflows`, `conflicts`, `integration_needed`) or the validate verdict (`verdict`, `rules`, `not_checked`)
 
 A docs tool that fails before or instead of producing a valid envelope returns `ok: false` without `docs`, and its `summary` begins with one of these host failure codes:
 

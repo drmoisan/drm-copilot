@@ -84,6 +84,8 @@ EXPECTED_DRM_COPILOT_TOOLS = (
     "resolve_execute_hard_lock_prompt",
     "resolve_atomic_plan_prompt",
     "validate_orchestration_artifacts",
+    "detect_push_down_integration",
+    "validate_push_down_integration",
 )
 APPROVED_DRM_COPILOT_TOOLS = tuple(
     tool
@@ -94,6 +96,8 @@ APPROVED_DRM_COPILOT_TOOLS = tuple(
         "push_down_copilot_customizations",
         "push_down_codex_and_agents_customizations",
         "push_down_claude_customizations",
+        "detect_push_down_integration",
+        "validate_push_down_integration",
     }
 )
 

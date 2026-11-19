@@ -55,7 +55,7 @@ The integration judgment belongs in an agent session, where the model is already
 - [x] AC5 (draft 5): `detect_push_down_integration` and `validate_push_down_integration` follow the existing MCP tool conventions (explicit required `workspace_root`, `additionalProperties: false`, read-only annotations, structured `integration` result, `ok` semantics) and have unit tests with injected in-memory file-system seams (spec S23, S34, S42, S45 to S48).
 - [ ] AC6 (draft 6): No new Python file is added; the tools and writer are TypeScript and no helper script is added (spec C1, C2, Language Classification).
 - [x] AC7 (owner behavior 5): No new module calls a model or uses MCP sampling, shown by the text test of spec S49 and the capability and in-memory client test of S50.
-- [ ] AC8: Both tools are reachable from Codex through `enabled_tools` and the `repo-automation-adapter` skill without a `.claude/settings.json` edit (spec S55), and the execution-environment brief bullet is present after the docs-tools bullet in every `_BRIEF_COPIES` copy with byte identity preserved (S56).
+- [x] AC8: Both tools are reachable from Codex through `enabled_tools` and the `repo-automation-adapter` skill without a `.claude/settings.json` edit (spec S55), and the execution-environment brief bullet is present after the docs-tools bullet in every `_BRIEF_COPIES` copy with byte identity preserved (S56).
 
 ## Non-Goals
 
