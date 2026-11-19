@@ -111,6 +111,8 @@ export interface PushDownRunOptions {
   readonly dryRun?: boolean;
   /** Overwrite `unmanaged-conflict` files (O-4 opt-in). */
   readonly overwriteUnmanaged?: boolean;
+  /** Destination CI mode (#1050); omitted reuses the recorded mode. */
+  readonly ciWorkflows?: "off" | "reference" | "copy";
 }
 
 export interface PushDownCopilotCustomizationsInput

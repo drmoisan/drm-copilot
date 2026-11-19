@@ -6,11 +6,16 @@ import {
   asToolArgumentObject,
   type WorkspaceToolInput,
 } from "./mcp-tool-inputs";
+import {
+  type CiWorkflowsMode,
+  parseCiWorkflowsMode,
+} from "./lib/push-down/push-down-ci-workflows";
 
-/** Optional run options of every push-down tool input (issue #1029). */
+/** Optional run options of every push-down tool input (issues #1029, #1050). */
 export interface PushDownRunToolInput {
   readonly dryRun?: boolean;
   readonly overwriteUnmanaged?: boolean;
+  readonly ciWorkflows?: CiWorkflowsMode;
 }
 
 export interface PushDownCopilotCustomizationsToolInput
@@ -54,11 +59,13 @@ function resolveBooleanField(
 }
 
 /**
- * Resolve `dry_run` and `overwrite_unmanaged`, each only when present.
+ * Resolve `dry_run`, `overwrite_unmanaged`, and `ci_workflows`, each only
+ * when present.
  *
  * @param args Tool argument object.
  * @returns The present run options.
- * @throws Error When either field is present and not a boolean.
+ * @throws Error When a boolean field is not a boolean, or `ci_workflows` is
+ *   not `off`, `reference`, or `copy` (the error names the value).
  */
 function resolveRunOptions(
   args: Readonly<Record<string, unknown>>,
@@ -68,9 +75,15 @@ function resolveRunOptions(
     args["overwrite_unmanaged"],
     "overwrite_unmanaged",
   );
+  const rawCiWorkflows = args["ci_workflows"];
+  const ciWorkflows =
+    rawCiWorkflows === undefined
+      ? undefined
+      : parseCiWorkflowsMode(rawCiWorkflows);
   return {
     ...(dryRun === undefined ? {} : { dryRun }),
     ...(overwriteUnmanaged === undefined ? {} : { overwriteUnmanaged }),
+    ...(ciWorkflows === undefined ? {} : { ciWorkflows }),
   };
 }
 
