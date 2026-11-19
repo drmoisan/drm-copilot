@@ -114,10 +114,6 @@
         "title": "drm-copilot: Run Codex-native Converter"
       },
       {
-        "command": "drmCopilotExtension.syncAgentsFromInstructions",
-        "title": "drm-copilot: Sync AGENTS.md from Instructions"
-      },
-      {
         "command": "drmCopilotExtension.runPoshQCSuite",
         "title": "drm-copilot: Run PoshQC Suite"
       },

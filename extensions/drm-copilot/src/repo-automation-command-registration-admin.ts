@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { executeBundledScript, getWorkspaceRoot } from "./command-runtime";
+import { getWorkspaceRoot } from "./command-runtime";
 import {
   promptForChoice,
   resolveWorkflowInvocation,
@@ -390,26 +390,6 @@ function registerRunCodexNativeConverterCommand(
   );
 }
 
-function registerSyncAgentsFromInstructionsCommand(
-  options: RepoAutomationCommandRegistrationOptions,
-): vscode.Disposable {
-  return vscode.commands.registerCommand(
-    "drmCopilotExtension.syncAgentsFromInstructions",
-    async () => {
-      const commandId = "drmCopilotExtension.syncAgentsFromInstructions";
-      const workspaceRoot = getWorkspaceRoot();
-
-      await executeBundledScript(options.context, options.output, {
-        runtimeKind: "powershell",
-        bundledRelativePath:
-          "resources/templates/sync-agents-from-instructions.ps1",
-        commandId,
-        args: ["-RepoRoot", workspaceRoot],
-      });
-    },
-  );
-}
-
 function registerListMcpToolsCommand(
   options: RepoAutomationCommandRegistrationOptions,
 ): vscode.Disposable {
@@ -454,7 +434,6 @@ export function registerRepoAutomationAdminCommands(
     registerPushDownCodexAndAgentsCustomizationsCommand(options),
     registerPushDownClaudeCustomizationsCommand(options),
     registerRunCodexNativeConverterCommand(options),
-    registerSyncAgentsFromInstructionsCommand(options),
     registerListMcpToolsCommand(options),
   ];
 }
