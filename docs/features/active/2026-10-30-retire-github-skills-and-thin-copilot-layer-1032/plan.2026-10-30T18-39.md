@@ -172,7 +172,7 @@ Tasks P1-T2 to P1-T8 drop or retarget assertions about retired copies, so each p
   - Acceptance: `<FEATURE>/evidence/qa-gates/ledger-and-new-files.<timestamp>.md` records a token for every modified entry in every listed subject, the P1-T9 coverage of retired-path records, `ProcessReductionChain.psm1` unchanged, no added `*.py` file, and no added TypeScript or Python file under a pushed-down tree.
 - [x] [P2-T8] Check off AC1, AC2, AC3, AC7, AC8, AC9, AC10, AC11, AC12, AC13, AC15 and AC22 in `docs/features/active/2026-10-30-retire-github-skills-and-thin-copilot-layer-1032/spec.md` and US-AC1, US-AC2, US-AC4, US-AC5, US-AC6, US-AC7, US-AC8 and US-AC12 in `docs/features/active/2026-10-30-retire-github-skills-and-thin-copilot-layer-1032/user-story.md` per `acceptance-criteria-tracking`, each against its evidence.
   - Acceptance: each listed criterion is `[x]`; AC4 to AC6, AC14, AC16 to AC21, US-AC3 and US-AC9 to US-AC11 remain open for the H3 and branch plans.
-- [ ] [P2-T9] Walk the policy-audit, code-review and feature-audit templates under `docs/features/templates/policy_audit/` against the diff from `MB`.
+- [x] [P2-T9] Walk the policy-audit, code-review and feature-audit templates under `docs/features/templates/policy_audit/` against the diff from `MB`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` carries `Plan: plan.2026-10-30T18-39.md` and one PASS, FAIL or N/A row per checklist item with no FAIL row; a FAIL is fixed and the loop restarts at P2-T1 before a new file is written.
 
 ## Spec Traceability
