@@ -103,7 +103,7 @@ def test_force_left_to_right_overrides_newer_right() -> None:
     """Forced direction should override timestamp-based selection."""
     fs = InMemorySyncFileSystem()
     repo_left, repo_right = make_repo_paths()
-    root = Path(".github/skills")
+    root = Path(".github/prompts")
     add_files(
         fs,
         repo_left=repo_left,

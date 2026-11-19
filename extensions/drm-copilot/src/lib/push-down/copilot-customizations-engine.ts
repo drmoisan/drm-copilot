@@ -40,7 +40,6 @@ export const COPILOT_ROOT_FOLDERS: ReadonlyArray<string> = [
   ".github/hooks",
   ".github/instructions",
   ".github/prompts",
-  ".github/skills",
 ];
 
 /** Clock seam returning the current instant; injected for determinism. */

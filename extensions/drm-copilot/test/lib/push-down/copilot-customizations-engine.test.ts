@@ -58,7 +58,7 @@ describe("pushDownCustomizations (engine)", () => {
         "/src/.github/prompts/b.prompt.md": "no references here",
         "/src/.github/prompts/a.prompt.md": "also plain",
         "/src/.github/agents/agent.md": "agent body",
-        "/src/.github/skills/s/SKILL.md": "skill body",
+        "/src/.github/instructions/s.instructions.md": "instruction body",
         "/dest/.github/agents/agent.md": "old destination content",
       },
       ["/dest"],
@@ -74,12 +74,12 @@ describe("pushDownCustomizations (engine)", () => {
       clock: CLOCK,
     });
 
-    // Assert: agents root first (overwritten), then prompts sorted a,b, then skills.
+    // Assert: agents root first (overwritten), then instructions, then prompts sorted a,b.
     expect(summary.files.map((f) => f.relativePath)).toEqual([
       ".github/agents/agent.md",
+      ".github/instructions/s.instructions.md",
       ".github/prompts/a.prompt.md",
       ".github/prompts/b.prompt.md",
-      ".github/skills/s/SKILL.md",
     ]);
     expect(summary.files[0]!.destinationStatus).toBe("overwritten");
     expect(summary.files[1]!.destinationStatus).toBe("created");
@@ -93,7 +93,7 @@ describe("pushDownCustomizations (engine)", () => {
       {
         "/src/.github/prompts/a.prompt.md":
           "Run scripts.dev_tools.potential_to_issue here.",
-        "/src/.github/skills/s/SKILL.md":
+        "/src/.github/instructions/s.instructions.md":
           "Use scripts.dev_tools.unknown_x then scripts.dev_tools.unknown_y.",
       },
       ["/dest"],
@@ -170,7 +170,6 @@ describe("pushDownCustomizations (engine)", () => {
       ".github/hooks",
       ".github/instructions",
       ".github/prompts",
-      ".github/skills",
     ]);
   });
 

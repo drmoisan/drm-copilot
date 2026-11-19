@@ -356,13 +356,13 @@ def test_push_down_reports_unmatched_script_references_without_rewrite() -> None
     fs = InMemoryPushDownFileSystem()
     fs.ensure_dir(source_repo)
     fs.ensure_dir(destination_repo)
-    skill_path = source_repo / ".github/skills/example/SKILL.md"
-    fs.ensure_dir(skill_path.parent)
+    instruction_path = source_repo / ".github/instructions/example.instructions.md"
+    fs.ensure_dir(instruction_path.parent)
     original_text = (
         "Run poetry run python -m "
         "scripts.dev_tools.unknown_future_tool before continuing."
     )
-    fs.write_text(skill_path, original_text)
+    fs.write_text(instruction_path, original_text)
 
     summary = module.push_down_customizations(
         repo_root=source_repo,
@@ -370,7 +370,9 @@ def test_push_down_reports_unmatched_script_references_without_rewrite() -> None
         fs=fs,
     )
 
-    copied_text = fs.read_text(destination_repo / ".github/skills/example/SKILL.md")
+    copied_text = fs.read_text(
+        destination_repo / ".github/instructions/example.instructions.md"
+    )
     assert copied_text == original_text
     assert summary.unmatched_references == [
         "scripts.dev_tools.unknown_future_tool",
