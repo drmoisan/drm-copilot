@@ -80,7 +80,7 @@ No artifact adds Python, nothing is pushed down, and no tool, command, skill or 
   - Acceptance: `<FEATURE>/evidence/qa-gates/branch-b-end-state.<timestamp>.md` records no added `*.py` file, no pushed-down TypeScript or Python, and no ledger change; `<FEATURE>/evidence/other/plan-completion-branch.<timestamp>.md` records `Branch: B`.
 - [x] [P2-T3] Check off AC5, AC6, AC14 and US-AC9; when the greatest `plan-completion-h3.*.md` exists, also check off `LAST-PLAN-CRITERIA` against the three plans' gate, coverage and end-state artifacts, writing `<FEATURE>/evidence/other/plan-order.<timestamp>.md` (E3 result path or deferral, selected branch, order of the executed plans).
   - Acceptance: AC5, AC6, AC14 and US-AC9 are `[x]`; `LAST-PLAN-CRITERIA` are `[x]` exactly when the H3 completion record exists, with the plan-order record written.
-- [ ] [P2-T4] Walk the policy-audit, code-review and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from `MB`, which includes this plan's commits.
+- [x] [P2-T4] Walk the policy-audit, code-review and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from `MB`, which includes this plan's commits.
   - Acceptance: `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` carries `Plan: plan-agents-branch-b.md` and one PASS, FAIL or N/A row per checklist item with no FAIL row; a FAIL is fixed and the loop restarts at P2-T1.
 
 ## Spec Traceability
