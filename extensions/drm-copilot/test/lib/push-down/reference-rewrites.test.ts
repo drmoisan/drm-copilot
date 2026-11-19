@@ -8,7 +8,7 @@ import {
 } from "../../../src/lib/push-down/reference-rewrites";
 
 describe("buildRewriteCatalog", () => {
-  it("contains all seven catalog entries keyed by normalized reference", () => {
+  it("contains all six catalog entries keyed by normalized reference", () => {
     // Arrange / Act
     const catalog = buildRewriteCatalog();
 
@@ -21,7 +21,6 @@ describe("buildRewriteCatalog", () => {
         "scripts/dev_tools/new_potential_bug_entry.py",
         "scripts/dev_tools/new-potential-entry.ps1",
         "scripts.dev_tools.push_down_copilot_customizations",
-        "scripts/dev_tools/sync-agents-from-instructions.ps1",
       ].sort(),
     );
   });
@@ -170,22 +169,6 @@ describe("rewriteTextReferences", () => {
     expect(rewritten).toContain(
       "command ID: `drmCopilotExtension.pushDownCopilotCustomizations`",
     );
-  });
-
-  it("rewrites the sync-agents-from-instructions reference", () => {
-    // Arrange
-    const text =
-      "Run ${workspaceFolder}/scripts/dev-tools/sync-agents-from-instructions.ps1 to regenerate.";
-
-    // Act
-    const [rewritten, rewrittenCount] = rewriteTextReferences(text);
-
-    // Assert
-    expect(rewrittenCount).toBe(1);
-    expect(rewritten).toContain(
-      "command ID: `drmCopilotExtension.syncAgentsFromInstructions`",
-    );
-    expect(rewritten).not.toContain("sync-agents-from-instructions.ps1");
   });
 
   it("preserves trailing punctuation around a rewritten reference", () => {
