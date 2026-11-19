@@ -407,7 +407,7 @@ def test_architecture_doc_lists_brief() -> None:
 
     # Assert
     assert (
-        "| `.github/skills/execution-environment/SKILL.md` | "
+        "| `.agents/skills/execution-environment/SKILL.md` | "
         "`.claude/skills/execution-environment/SKILL.md` |"
     ) in text
 
