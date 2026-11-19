@@ -22,7 +22,10 @@ import {
 import { type ExclusionReport } from "./claude-exclusion-filter";
 import { type PushDownFileSystem } from "./filesystem-adapter";
 import { applyPushDownPlan, UNKNOWN_PAYLOAD_VERSION } from "./push-down-apply";
-import { type DestinationManifest } from "./push-down-destination-manifest";
+import {
+  type DestinationManifest,
+  type DestinationManifestSelection,
+} from "./push-down-destination-manifest";
 import {
   assertDestinationManifestOutsideLayers,
   ECOSYSTEM_BUNDLE_DIRECTORIES,
@@ -169,12 +172,14 @@ function ciSelectionUnion(
   const recorded = Object.entries(previous?.selection ?? {})
     .filter(([ecosystem]) => !inRun.has(ecosystem))
     .map(([, selection]) => selection);
-  return [
-    ...ecosystemLayers.flatMap((layer) =>
-      layer.selection === undefined ? [] : [layer.selection],
-    ),
-    ...recorded,
-  ];
+  // Every ecosystem layer records a selection; the guard narrows the type.
+  const resolved = ecosystemLayers
+    .map((layer) => layer.selection)
+    .filter(
+      (selection): selection is DestinationManifestSelection =>
+        selection !== undefined,
+    );
+  return [...resolved, ...recorded];
 }
 
 /**
