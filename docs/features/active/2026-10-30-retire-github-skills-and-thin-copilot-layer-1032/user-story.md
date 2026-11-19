@@ -57,7 +57,7 @@ Epic #1018 moves the three agent ecosystems in this repository onto shared cross
 - [x] US-AC8 — No stale `.github/skills` reference remains outside classified hits, and current-fact documents are updated (spec AC13, AC15).
 - [ ] US-AC9 — Parity-matrix entries are updated and `HarnessParityMatrix.RepoGate.Tests.ps1` passes (spec AC14).
 - [ ] US-AC10 — Toolchain, coverage, parallel-gate isolation and file-size gates are green and no new Python is added (spec AC16, AC17, AC18, AC19).
-- [ ] US-AC11 — The `AGENTS.md` sync writer, its template, test, extension command, task, rewrite entries and shard-weight key are removed, and no unclassified writer reference remains (spec AC20, AC21).
+- [x] US-AC11 — The `AGENTS.md` sync writer, its template, test, extension command, task, rewrite entries and shard-weight key are removed, and no unclassified writer reference remains (spec AC20, AC21).
 - [x] US-AC12 — The process-reduction ledger records are updated in the same commits as the deletions and edits, the ledger chain tests pass, and `ProcessReductionChain.psm1` is unchanged (spec AC22).
 
 ## Non-Goals
