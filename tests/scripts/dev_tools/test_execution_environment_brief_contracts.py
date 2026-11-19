@@ -376,7 +376,7 @@ def test_brief_is_referenced_by_copilot_base_agents() -> None:
     """The Copilot base agents carry the read-first instruction."""
 
     # Arrange
-    instruction = "Read `.github/skills/execution-environment/SKILL.md` first"
+    instruction = "Read `.agents/skills/execution-environment/SKILL.md` first"
 
     # Act
     lacking = [path for path in _COPILOT_AGENTS if instruction not in _read(path)]
