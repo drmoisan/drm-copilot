@@ -11162,14 +11162,15 @@
       "name": "description",
       "source_path": ".github/skills",
       "source_pointer": "description",
-      "disposition": "native",
+      "disposition": "dropped",
+      "reason": "Retired with the Copilot skill copies by issue #1032; superseded by the shared .agents/skills source.",
       "parity_group": "skill-field:description",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e2-codex-claude-frontmatter.runbook.md"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#scope"
     },
     {
       "id": "copilot:skill-frontmatter-field:name",
@@ -11178,14 +11179,15 @@
       "name": "name",
       "source_path": ".github/skills",
       "source_pointer": "name",
-      "disposition": "native",
+      "disposition": "dropped",
+      "reason": "Retired with the Copilot skill copies by issue #1032; superseded by the shared .agents/skills source.",
       "parity_group": "skill-field:name",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 3,
-      "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e2-codex-claude-frontmatter.runbook.md"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#scope"
     },
     {
       "id": "copilot:skill:acceptance-criteria-tracking",
