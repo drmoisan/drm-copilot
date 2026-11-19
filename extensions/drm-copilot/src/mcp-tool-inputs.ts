@@ -26,11 +26,13 @@ export interface WorkspaceToolInput {
 export {
   resolvePushDownClaudeCustomizationsToolInput,
   resolvePushDownCodexAndAgentsCustomizationsToolInput,
+  resolvePushDownCopilotCustomizationsToolInput,
 } from "./mcp-tool-inputs-push-down";
 export { resolvePotentialToIssueToolInput } from "./mcp-tool-inputs-potential-to-issue";
 export type {
   PushDownClaudeCustomizationsToolInput,
   PushDownCodexAndAgentsCustomizationsToolInput,
+  PushDownCopilotCustomizationsToolInput,
 } from "./mcp-tool-inputs-push-down";
 
 export interface CollectPrContextToolInput extends WorkspaceToolInput {
@@ -246,19 +248,6 @@ export function resolveRunCodexNativeConverterToolInput(
           ),
         }),
     ...(enableRepoPrompts === true ? { enableRepoPrompts: true } : {}),
-  };
-}
-
-export function resolvePushDownCopilotCustomizationsToolInput(
-  rawInput: unknown,
-  fallbackWorkspaceRoot?: string,
-): WorkspaceToolInput {
-  const args = asToolArgumentObject(rawInput);
-  return {
-    workspaceRoot: normalizeWorkspaceRoot(
-      args["workspace_root"],
-      fallbackWorkspaceRoot,
-    ),
   };
 }
 

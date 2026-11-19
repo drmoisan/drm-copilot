@@ -33,6 +33,12 @@ Scope note (issue #372):
     Closing this pre-existing gap is a separate, out-of-scope remediation
     item; see the executor's completion report for issue #372 for the
     reproduction evidence recommending a follow-up remediation cycle.
+
+    Issue #1029 closed the gap (spec owner question O-12): every previously
+    excepted agent and skill is now listed by a Codex pack manifest or, for a
+    shared skill, by `shared.json`, so the agent and skill exception sets are
+    empty and the full-bundle Jest test
+    `push-down-bundle-manifest-completeness.test.ts` guards the whole bundle.
 """
 
 from __future__ import annotations
@@ -51,83 +57,19 @@ BUNDLED_CODEX_ROOT = (
 )
 MANIFEST_DIR = BUNDLED_CODEX_ROOT / "pack-manifests"
 
-# Pre-existing, unrelated Codex-side manifest gaps out of scope for issue #372
-# (see the module docstring "Scope note"). Verified against the real bundle
-# at plan-execution time; a path removed from this set must actually gain a
-# manifest entry, and a path added here must be independently justified as
-# pre-existing and unrelated, not used to mask a new regression.
-PRE_EXISTING_UNRELATED_AGENT_EXCEPTIONS: frozenset[str] = frozenset(
-    {
-        ".codex/agents/5.1-beast-adjusted.toml",
-        ".codex/agents/5.1-thinking-beast-mode-adjusted.toml",
-        ".codex/agents/api-architect.toml",
-        ".codex/agents/atomic-planning.toml",
-        ".codex/agents/commentary-remediation.toml",
-        ".codex/agents/commit-steward.toml",
-        ".codex/agents/csharp-atomic-executor.toml",
-        ".codex/agents/csharp-atomic-planning.toml",
-        ".codex/agents/csharp-orchestrator.toml",
-        ".codex/agents/epic-review.toml",
-        ".codex/agents/expert-nextjs-developer.toml",
-        ".codex/agents/expert-react-frontend-engineer.toml",
-        ".codex/agents/feature-review.toml",
-        ".codex/agents/gpt-5-beast-mode.toml",
-        ".codex/agents/hlbpa.toml",
-        ".codex/agents/mentor.toml",
-        ".codex/agents/powershell-di-unit-test-engineer.toml",
-        ".codex/agents/prd.toml",
-        ".codex/agents/pytest-unit-test-coding.toml",
-        ".codex/agents/python-execution-only-typed.toml",
-        ".codex/agents/staged-review.toml",
-        ".codex/agents/status-updater.toml",
-        ".codex/agents/tdd-green.toml",
-        ".codex/agents/tdd-red.toml",
-        ".codex/agents/tdd-refactor.toml",
-        ".codex/agents/voidbeast-gpt41enhanced.toml",
-    }
-)
+# Issue #1029 registered every previously excepted agent in the Codex manifests
+# (see the module docstring "Scope note"), so the set is empty. A path added
+# here must be independently justified as pre-existing and unrelated, not used
+# to mask a new regression.
+PRE_EXISTING_UNRELATED_AGENT_EXCEPTIONS: frozenset[str] = frozenset()
 
 # Issue #697 registered the twelve previously excepted hooks in `core.json`, so
 # no hook remains a pre-existing exception.
 PRE_EXISTING_UNRELATED_HOOK_EXCEPTIONS: frozenset[str] = frozenset()
 
-PRE_EXISTING_UNRELATED_SKILL_EXCEPTIONS: frozenset[str] = frozenset(
-    {
-        ".agents/skills/architecture-boundaries/SKILL.md",
-        ".agents/skills/benchmark-baselines/SKILL.md",
-        ".agents/skills/commit-message-conventions/SKILL.md",
-        ".agents/skills/commit-message/SKILL.md",
-        ".agents/skills/csharp-change-budget-router/SKILL.md",
-        ".agents/skills/csharp-orchestration-state-machine/SKILL.md",
-        ".agents/skills/execute-hard-lock/SKILL.md",
-        ".agents/skills/feature-promotion-lifecycle/SKILL.md",
-        ".agents/skills/feature-review-workflow/SKILL.md",
-        ".agents/skills/feature-review/SKILL.md",
-        ".agents/skills/fill-feature-docs/SKILL.md",
-        ".agents/skills/general-code-change/SKILL.md",
-        ".agents/skills/general-unit-test/SKILL.md",
-        ".agents/skills/human-exception-runbook/SKILL.md",
-        ".agents/skills/make-skill-template/SKILL.md",
-        ".agents/skills/orchestrator-state/SKILL.md",
-        ".agents/skills/policy-audit-template-usage/SKILL.md",
-        ".agents/skills/pr-author/SKILL.md",
-        ".agents/skills/pr-authoring/SKILL.md",
-        ".agents/skills/pr-base-branch-merge-base/SKILL.md",
-        ".agents/skills/pr-context-artifacts/SKILL.md",
-        ".agents/skills/quality-tiers/SKILL.md",
-        ".agents/skills/remediation-handoff-atomic-planner/SKILL.md",
-        ".agents/skills/research-issue/SKILL.md",
-        ".agents/skills/review-epic/SKILL.md",
-        ".agents/skills/review-feature/SKILL.md",
-        ".agents/skills/review-staged/SKILL.md",
-        ".agents/skills/self-explanatory-code-commenting/SKILL.md",
-        ".agents/skills/skill-canonical-location-audit/SKILL.md",
-        ".agents/skills/tonality/SKILL.md",
-        ".agents/skills/translate-claude-to-codex/SKILL.md",
-        ".agents/skills/translate-copilot-to-claude/SKILL.md",
-        ".agents/skills/update-status/SKILL.md",
-    }
-)
+# Issue #1029 registered every previously excepted skill (shared skills in
+# `shared.json`, the rest in the Codex manifests), so none remains an exception.
+PRE_EXISTING_UNRELATED_SKILL_EXCEPTIONS: frozenset[str] = frozenset()
 
 PRE_EXISTING_UNRELATED_EXCEPTIONS: frozenset[str] = (
     PRE_EXISTING_UNRELATED_AGENT_EXCEPTIONS

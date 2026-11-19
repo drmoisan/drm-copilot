@@ -113,7 +113,10 @@ describe("repo automation MCP tool definitions", () => {
     });
   });
 
-  it("keeps Copilot push-down schemas workspace-root-only", () => {
+  // Issue #1029 (X9): renamed from "keeps Copilot push-down schemas
+  // workspace-root-only"; spec `### MCP Wrapper Input Additions` adds the
+  // optional `dry_run`, `overwrite_unmanaged`, and Copilot `packs` properties.
+  it("keeps Copilot push-down schemas to the documented optional fields", () => {
     const repoDefinition = REPO_AUTOMATION_TOOL_DEFINITIONS.find(
       ({ name }) => name === "push_down_copilot_customizations",
     );
@@ -124,7 +127,12 @@ describe("repo automation MCP tool definitions", () => {
     for (const definition of [repoDefinition, baseDefinition]) {
       expect(definition).toBeDefined();
       const properties = definition?.inputSchema.properties ?? {};
-      expect(Object.keys(properties).sort()).toEqual(["workspace_root"]);
+      expect(Object.keys(properties).sort()).toEqual([
+        "dry_run",
+        "overwrite_unmanaged",
+        "packs",
+        "workspace_root",
+      ]);
       expect(definition?.inputSchema.additionalProperties).toBe(false);
       expect(definition?.inputSchema.required).toEqual(["workspace_root"]);
     }

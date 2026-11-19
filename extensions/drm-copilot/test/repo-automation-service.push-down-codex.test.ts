@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 
 import { InMemoryPushDownFileSystem } from "./lib/push-down/push-down.test-helpers";
+import { seedSharedLayerManifest } from "./lib/push-down/push-down-pipeline.test-helpers";
 
 const appendLineMock = jest.fn<(line: string) => void>();
 
@@ -36,6 +37,9 @@ function seedCodexBundle(): InMemoryPushDownFileSystem {
       paths: [".agents/skills/csharp/SKILL.md"],
     }),
   );
+  // R3 (issue #1029): the service reaches the push-down harness, which loads
+  // the shared-layer manifest on every run.
+  seedSharedLayerManifest(fs, [], BUNDLE);
   return fs;
 }
 
