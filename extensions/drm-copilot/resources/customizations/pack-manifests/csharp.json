@@ -7,8 +7,6 @@
     ".github/agents/csharp-orchestrator.agent.md",
     ".github/agents/csharp-typed-engineer.agent.md",
     ".github/instructions/csharp-code-change.instructions.md",
-    ".github/instructions/csharp-unit-test.instructions.md",
-    ".github/skills/csharp-change-budget-router/SKILL.md",
-    ".github/skills/csharp-orchestration-state-machine/SKILL.md"
+    ".github/instructions/csharp-unit-test.instructions.md"
   ]
 }
