@@ -12,6 +12,7 @@ jest.mock("vscode", () => ({}), { virtual: true });
 
 import { REPO_AUTOMATION_TOOL_DEFINITIONS } from "../src/mcp-repo-automation-tool-definitions";
 import { toolDefinitions } from "../src/mcp-tool-definitions";
+import { type PushDownReportWithIntegration } from "../src/lib/push-down/push-down-integration-needed";
 import { dispatchRepoAutomationTool } from "../src/mcp-tools";
 import { createRepoAutomationService } from "../src/repo-automation-service";
 import { type RepoAutomationToolName } from "../src/repo-automation-tool-names";
@@ -125,6 +126,11 @@ describe("push-down wrapper compatibility", () => {
         kept.push_down_report?.files.find((file) => file.path === payloadPath)
           ?.action,
       ).toBe("unmanaged-conflict");
+      // Issue #1051: the declined run records the item in push_down_report.
+      const report = kept.push_down_report as PushDownReportWithIntegration;
+      expect(report.integration_needed?.items.map((item) => item.id)).toContain(
+        `unmanaged-conflict:${payloadPath}`,
+      );
       expect(opted.readTextFile(`${DEST}/${payloadPath}`)).toBe(payload);
     },
   );

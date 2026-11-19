@@ -29,6 +29,8 @@ export const REPO_AUTOMATION_TOOLS = [
   "update_docs_ledger",
   "generate_docs_reference",
   "validate_docs_artifacts",
+  "detect_push_down_integration",
+  "validate_push_down_integration",
   "validate_discovery_artifacts",
   "run_discovery_init",
   "run_discovery_repo_inventory",

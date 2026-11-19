@@ -101,6 +101,14 @@ function action(
   return result.report.files.find((file) => file.path === path)?.action;
 }
 
+/** Path of the integration-needed file (issue #1051). */
+const INTEGRATION_FILE = ".push-down-integration-needed.json";
+
+/** Return the integration item ids of a run (issue #1051). */
+function integrationIds(result: ReturnType<typeof run>): string[] {
+  return (result.report.integration_needed?.items ?? []).map((item) => item.id);
+}
+
 /** Return the CI paths a report lists. */
 function ciPaths(result: ReturnType<typeof run>): string[] {
   return result.report.files
@@ -267,6 +275,9 @@ describe("pushDownHarness ci_workflows", () => {
       expect(fs.readTextFile(`/dest/${DATA}`)).toBe(DATA_TEXT);
     }
     expect(withheld.isFile(`/dest/${CALLER}`)).toBe(false);
+    // Issue #1051: only the withheld-caller run has items, so only it writes the file.
+    expect(withheld.isFile(`/dest/${INTEGRATION_FILE}`)).toBe(true);
+    expect(reference.isFile(`/dest/${INTEGRATION_FILE}`)).toBe(false);
   });
 
   it("second identical apply reports every CI file unchanged", () => {
@@ -317,6 +328,7 @@ describe("pushDownHarness ci_workflows", () => {
 
       expect(action(result, path)).toBe("unmanaged-conflict");
       expect(fs.readTextFile(`/dest/${path}`)).toBe("local\n");
+      expect(integrationIds(result)).toContain(`unmanaged-conflict:${path}`);
     },
   );
 
@@ -329,6 +341,9 @@ describe("pushDownHarness ci_workflows", () => {
 
     expect(action(second, CALLER)).toBe("conflict");
     expect(fs.readTextFile(`/dest/${CALLER}`)).toBe("name: CI\n# edited\n");
+    expect(integrationIds(second)).toContain(
+      `destination-edited-file:${CALLER}`,
+    );
   });
 
   it("writes no workflows path other than the caller and selected copies", () => {
@@ -368,7 +383,14 @@ describe("pushDownHarness ci_workflows", () => {
         ),
       ).toBe(true);
       expect(action(result, CALLER)).toBeUndefined();
+      // Issue #1051: the collision is also an integration item in both modes.
+      expect(integrationIds(result)).toContain(
+        "workflow-name-collision:.github/workflows/build.yml",
+      );
     }
+    expect(dryRun.report.integration_needed?.written).toBe(false);
+    expect(apply.report.integration_needed?.written).toBe(true);
+    expect(fs.isFile(`/dest/${INTEGRATION_FILE}`)).toBe(true);
     expect(fs.isFile(`/dest/${CALLER}`)).toBe(false);
     expect(fs.readTextFile(`/dest/${DATA}`)).toBe(DATA_TEXT);
     expect(fs.isFile("/dest/.github/workflows/drm-copilot-python.yml")).toBe(

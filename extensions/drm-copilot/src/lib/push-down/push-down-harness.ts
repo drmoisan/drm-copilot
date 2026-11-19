@@ -39,7 +39,11 @@ import {
 } from "./push-down-layer";
 import { fullTreePacks } from "./push-down-pack-resolver";
 import { joinPosix, runPushDownPipeline } from "./push-down-pipeline";
-import { type PushDownReport } from "./push-down-report";
+import {
+  attachIntegrationNeeded,
+  type PushDownReportWithIntegration,
+  recordIntegrationNeeded,
+} from "./push-down-integration-needed";
 import { buildSharedLayer } from "./push-down-shared-layer";
 import {
   buildCiWorkflowsContribution,
@@ -75,7 +79,8 @@ export interface PushDownHarnessOptions {
 
 /** Result of {@link pushDownHarness}. */
 export interface PushDownHarnessResult {
-  readonly report: PushDownReport;
+  /** Report; carries `integration_needed` when the run has items (#1051). */
+  readonly report: PushDownReportWithIntegration;
   /** Summary; `artifactPath` is empty for a dry run. */
   readonly summary: PushDownSummary;
   readonly exclusions?: ExclusionReport;
@@ -266,27 +271,31 @@ export function pushDownHarness(
     overwriteUnmanaged: options.overwriteUnmanaged === true,
     ...(options.clock === undefined ? {} : { clock: options.clock }),
   });
-  if (options.dryRun === true) {
-    return {
-      report: planned.report,
-      summary: planned.summary,
-      ...(planned.exclusions === undefined
-        ? {}
-        : { exclusions: planned.exclusions }),
-      warnings: [...planned.warnings, ...ciWarnings],
-    };
-  }
-  const applied = applyPushDownPlan(planned, {
+  const applied =
+    options.dryRun === true
+      ? undefined
+      : applyPushDownPlan(planned, {
+          payloadVersion,
+          artifactRoot: options.destinationRoot,
+          ...(options.clock === undefined ? {} : { clock: options.clock }),
+        });
+  const outcome = applied ?? planned;
+  // Issue #1051: record the decisions the run could not make mechanically.
+  const integration = recordIntegrationNeeded({
+    planned,
+    report: outcome.report,
+    apply: applied !== undefined,
+    fs: options.fs,
+    destinationRoot: options.destinationRoot,
+    extensionRoot: options.extensionRoot,
     payloadVersion,
-    artifactRoot: options.destinationRoot,
-    ...(options.clock === undefined ? {} : { clock: options.clock }),
   });
   return {
-    report: applied.report,
-    summary: applied.summary,
-    ...(applied.exclusions === undefined
+    report: attachIntegrationNeeded(outcome.report, integration),
+    summary: outcome.summary,
+    ...(outcome.exclusions === undefined
       ? {}
-      : { exclusions: applied.exclusions }),
-    warnings: [...applied.warnings, ...ciWarnings],
+      : { exclusions: outcome.exclusions }),
+    warnings: [...outcome.warnings, ...ciWarnings],
   };
 }

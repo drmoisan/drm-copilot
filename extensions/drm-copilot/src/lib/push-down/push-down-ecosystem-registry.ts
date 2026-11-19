@@ -4,7 +4,8 @@
  * Purpose:
  *     Map each ecosystem name to its bundle directory, its declared roots, and
  *     the builder of its layer, and guard that no layer root or root-file
- *     destination can capture the destination manifest path.
+ *     destination can capture the destination manifest path or the
+ *     integration-needed file (issue #1051).
  *
  * Invariants / Constraints:
  *     The guard runs once at module load over the declared roots and again in
@@ -35,6 +36,7 @@ import {
   type RootFilePair,
 } from "./push-down-layer";
 import { SHARED_LAYER_ROOT_FOLDERS } from "./push-down-shared-layer";
+import { INTEGRATION_NEEDED_RELATIVE_PATH } from "../push-down-integration/integration-items";
 
 /** Bundle directory under the extension `resources` root, per ecosystem. */
 export const ECOSYSTEM_BUNDLE_DIRECTORIES: Readonly<
@@ -117,25 +119,33 @@ export interface LayerRootDeclaration {
 }
 
 /**
- * Assert that no layer root or root-file destination captures the
- * destination manifest path.
+ * Root-level destination paths no layer may capture: the destination manifest
+ * and the integration-needed file (issue #1051).
+ */
+export const RESERVED_ROOT_LEVEL_PATHS: ReadonlyArray<string> = [
+  DESTINATION_MANIFEST_RELATIVE_PATH,
+  INTEGRATION_NEEDED_RELATIVE_PATH,
+];
+
+/**
+ * Assert that no layer root or root-file destination captures a reserved
+ * root-level path.
  *
  * @param layers Layers (or layer declarations) to check.
- * @throws Error When a root folder could contain the manifest path or a root
- *   file is published at it.
+ * @throws Error When a root folder could contain a reserved path or a root
+ *   file is published at one.
  */
 export function assertDestinationManifestOutsideLayers(
   layers: ReadonlyArray<LayerRootDeclaration>,
 ): void {
   for (const layer of layers) {
-    assertManifestPathIsRootLevel(
-      DESTINATION_MANIFEST_RELATIVE_PATH,
-      layer.rootFolders,
-    );
+    for (const reserved of RESERVED_ROOT_LEVEL_PATHS) {
+      assertManifestPathIsRootLevel(reserved, layer.rootFolders);
+    }
     for (const [destination] of layer.rootFiles) {
-      if (destination === DESTINATION_MANIFEST_RELATIVE_PATH) {
+      if (RESERVED_ROOT_LEVEL_PATHS.includes(destination)) {
         throw new Error(
-          `Layer ${layer.name} publishes a root file at the destination manifest path: ${destination}`,
+          `Layer ${layer.name} publishes a root file at a reserved root-level path: ${destination}`,
         );
       }
     }
