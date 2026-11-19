@@ -292,6 +292,8 @@
     ".codex/codex-web-setup.plan.md",
     ".codex/codex-web-setup.sh",
     ".codex/prompts/feature-review-remediate.md",
-    ".codex/prompts/generate-commit-message-repo.md"
+    ".codex/prompts/generate-commit-message-repo.md",
+    ".codex/hooks/subagentstop-envelope.ps1",
+    ".codex/hooks/validate-pr-author-output.ps1"
   ]
 }

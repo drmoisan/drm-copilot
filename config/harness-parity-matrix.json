@@ -604,7 +604,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-epic-invocation-origin",
@@ -614,12 +615,13 @@
       "source_path": ".claude/hooks/pretooluse-dispatch.json",
       "source_pointer": "/hooks/PreToolUse/4/hooks/5",
       "disposition": "native",
-      "parity_group": "hook:enforce-epic-invocation-origin",
+      "parity_group": "hook:epic-invocation-origin",
       "consumers": [
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-epic-wave-barrier",
@@ -634,7 +636,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-model-routing-receipt",
@@ -644,12 +647,13 @@
       "source_path": ".claude/hooks/pretooluse-dispatch.json",
       "source_pointer": "/hooks/PreToolUse/4/hooks/4",
       "disposition": "native",
-      "parity_group": "hook:enforce-model-routing-receipt",
+      "parity_group": "hook:model-routing",
       "consumers": [
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-orchestration-preimplementation-gate",
@@ -659,12 +663,14 @@
       "source_path": ".claude/hooks/pretooluse-dispatch.json",
       "source_pointer": "/hooks/PreToolUse/4/hooks/2",
       "disposition": "native",
-      "parity_group": "hook:enforce-orchestration-preimplementation-gate",
+      "parity_group": "hook:preimplementation-gate-delegation",
       "consumers": [
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:NOT-EXPRESSIBLE: .codex/hooks/enforce-orchestration-preimplementation-gate.ps1 routes tool_input only for Bash and apply_patch and maps every other tool name through ConvertTo-CodexFileEditInput, so the delegation tool names cannot be gated without editing that file, which is at its 500-line Codex cap; the gap is owned by issue #555 (spec AD-3, C1)."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-parallel-cohort-barrier",
@@ -679,7 +685,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:NOT-APPLICABLE: no parallel orchestration surface exists in Codex (no parallel-* skill under .agents/skills and no parallel-* base agent under .codex/agents), research section 3."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-parallel-drift-gate",
@@ -694,7 +702,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:NOT-APPLICABLE: no parallel orchestration surface exists in Codex (no parallel-* skill under .agents/skills and no parallel-* base agent under .codex/agents), research section 3."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Agent/enforce-prd-feature-before-planner",
@@ -709,7 +719,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/worktree-resolution/WorktreeTargetResolution.psm1, WorktreeItemResolution.psm1 and .claude/lib/hook-payload/HookPayload.psm1; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3)."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash%7CWrite%7CEdit%7CMultiEdit%7CNotebookEdit%7CAgent%7CTask%7CWebFetch%7CWebSearch%7Cmcp__.%2A/enforce-discovery-artifact-gate",
@@ -724,7 +736,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash%7CWrite%7CEdit%7CMultiEdit%7CNotebookEdit%7CAgent%7CTask%7CWebFetch%7CWebSearch%7Cmcp__.%2A/invoke-pretooluse-dispatch",
@@ -739,7 +752,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash%7CWrite%7CEdit%7CMultiEdit%7CNotebookEdit%7CAgent%7CTask%7Cmcp__.%2A/enforce-owner-directive-pass-down",
@@ -754,7 +768,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/orchestrator-state/OrchestratorStateOwnerDirectives.psm1, .claude/lib/worktree-resolution and .claude/lib/hook-payload modules; .claude/rules/orchestrator-state.md records the pass-down hook as Claude only; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3)."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash%7Cmcp__drm-copilot__run_poshqc_test%7Cmcp__drm-copilot__run_poshqc_suite/enforce-test-execution-policy",
@@ -769,7 +785,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-docs-complete-gate",
@@ -784,7 +801,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/docs/DocsCompleteGate.psm1, .claude/lib/hook-payload/HookPayload.psm1 and .claude/lib/worktree-resolution/AgentTargetWorktree.psm1; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3)."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-epic-merge-gate",
@@ -799,7 +818,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-epic-worktree-removal-gate",
@@ -814,7 +834,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-orchestration-preimplementation-gate",
@@ -829,7 +850,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-parallel-abandon-gate",
@@ -844,7 +866,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:NOT-APPLICABLE: no parallel orchestration surface exists in Codex (no parallel-* skill under .agents/skills and no parallel-* base agent under .codex/agents), research section 3."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-parallel-worktree-removal-gate",
@@ -859,7 +883,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:NOT-APPLICABLE: no parallel orchestration surface exists in Codex (no parallel-* skill under .agents/skills and no parallel-* base agent under .codex/agents), research section 3."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-pr-author-command-allowlist",
@@ -868,12 +894,14 @@
       "name": "PreToolUse/Bash/enforce-pr-author-command-allowlist",
       "source_path": ".claude/agents/pr-author.md",
       "disposition": "native",
-      "parity_group": "hook:enforce-pr-author-command-allowlist",
+      "parity_group": "hook:pr-author-command-allowlist",
       "consumers": [
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: per-agent scoping needs the agent_type field in Codex subagent PreToolUse payloads, and no recorded verification shows that Codex carries it (spec AD-3, C2)."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-pr-author-skill",
@@ -888,7 +916,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/orchestrator-state/OrchestratorState.psm1 and .claude/lib/hook-payload/HookPayload.psm1, and Codex PR authoring uses its own receipts; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3) (spec OQ-8)."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-promotion-mcp-only",
@@ -903,7 +933,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/enforce-worktree-poetry-venv",
@@ -918,7 +949,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Bash/validate-bash",
@@ -933,7 +965,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "Divergence (spec AD-5): the Codex validate-bash.ps1 omits the cd-chained read leg that the Claude copy carries; the destructive patterns are shared."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit%7CMultiEdit%7CNotebookEdit%7CBash/enforce-docs-role-write-scope",
@@ -948,7 +982,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/hook-payload/HookPayload.psm1; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3)."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/check-powershell-test-purity",
@@ -963,7 +999,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/check-python-test-purity",
@@ -978,7 +1015,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-checkpoint-monotonic",
@@ -993,7 +1031,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-completion-consistency",
@@ -1008,7 +1047,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-evidence-locations",
@@ -1023,7 +1063,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "Divergence (research section 4): the Claude copy adds a payload-anomaly deny path (Get-EvidenceLocationAnomalyDecision), and the block text differs only in the skill-pointer path (.claude/skills versus .agents/skills)."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-feature-folder-order",
@@ -1038,7 +1080,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/development-docs/DevelopmentDocsRoot.psm1 (the #1035 resolver; Test-IsFeaturePlanPath calls Get-DevelopmentDocsKnownRootPattern), which is not published to .codex/lib; the port is deferred to child 4 (spec AD-8, OQ-3)."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-file-size-limit",
@@ -1053,7 +1097,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-mermaid-validation",
@@ -1068,7 +1113,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source needs .claude/lib/mermaid/MermaidValidation.psm1 and .claude/lib/hook-payload/HookPayload.psm1, and Codex has no mermaid-diagram skill; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3)."
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-orchestration-preimplementation-gate",
@@ -1083,7 +1130,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-powershell-batch-budget",
@@ -1098,7 +1146,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:PreToolUse/Write%7CEdit/enforce-python-batch-budget",
@@ -1113,7 +1162,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:SessionStart//persist-session-id",
@@ -1128,7 +1178,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:NOT-APPLICABLE: the consumer skill identify-session-id exists only under .claude/skills, so Codex has no consumer of a persisted session id (research section 3)."
     },
     {
       "id": "claude:hook-registration:SubagentStart/legacy-parity-analyst%7Cruntime-characterization-analyst%7Crequirements-reconciler%7Cmigration-coverage-reviewer/record-discovery-agent-start",
@@ -1138,12 +1190,13 @@
       "source_path": ".claude/settings.json",
       "source_pointer": "/hooks/SubagentStart/0/hooks/0",
       "disposition": "native",
-      "parity_group": "hook:record-discovery-agent-start",
+      "parity_group": "hook:subagent-start-attestation",
       "consumers": [
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:SubagentStop/atomic-executor/validate-executor-output",
@@ -1157,7 +1210,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source dot-sources subagentstop-target-worktree.ps1, which imports .claude/lib/worktree-resolution/HookTargetWorktree.psm1 (with AgentTargetWorktree.psm1, WorktreeTargetResolution.psm1 and WorktreeItemResolution.psm1); lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3) (spec AD-2)."
     },
     {
       "id": "claude:hook-registration:SubagentStop/atomic-planner%7Catomic-executor%7Cfeature-review%7Ctask-researcher%7Cprd-feature%7Cstaged-review%7Cepic-review%7Cstatus-updater%7Cpython-typed-engineer%7Cpowershell-typed-engineer%7Ccsharp-typed-engineer%7Ctypescript-engineer%7Corchestrator%7Cepic-orchestrator%7Cepic-planner/validate-discovery-artifact-gate",
@@ -1167,12 +1222,13 @@
       "source_path": ".claude/settings.json",
       "source_pointer": "/hooks/SubagentStop/0/hooks/0",
       "disposition": "native",
-      "parity_group": "hook:validate-discovery-artifact-gate",
+      "parity_group": "hook:discovery-stop",
       "consumers": [
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:SubagentStop/atomic-planner/validate-planner-output~.claude%2Fagents%2Fatomic-planner.md",
@@ -1186,7 +1242,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source dot-sources subagentstop-target-worktree.ps1, which imports .claude/lib/worktree-resolution/HookTargetWorktree.psm1 (with AgentTargetWorktree.psm1, WorktreeTargetResolution.psm1 and WorktreeItemResolution.psm1); lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3) (spec AD-2)."
     },
     {
       "id": "claude:hook-registration:SubagentStop/atomic-planner/validate-planner-output~.claude%2Fsettings.json",
@@ -1201,7 +1259,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source dot-sources subagentstop-target-worktree.ps1, which imports .claude/lib/worktree-resolution/HookTargetWorktree.psm1 (with AgentTargetWorktree.psm1, WorktreeTargetResolution.psm1 and WorktreeItemResolution.psm1); lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3) (spec AD-2)."
     },
     {
       "id": "claude:hook-registration:SubagentStop/docs-architect%7Cdocs-author%7Cdocs-reconciler%7Cdocs-coverage-reviewer/validate-docs-role-output",
@@ -1216,7 +1276,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source dot-sources subagentstop-target-worktree.ps1, which imports .claude/lib/worktree-resolution/HookTargetWorktree.psm1; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3)."
     },
     {
       "id": "claude:hook-registration:SubagentStop/epic-orchestrator/validate-orchestrator-output~.claude%2Fagents%2Fepic-orchestrator.md",
@@ -1230,7 +1292,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/orchestrator-state/OrchestratorState.psm1 and further orchestrator-state and .claude/lib/worktree-resolution modules; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3); the parallel registration form has no Codex workflow."
     },
     {
       "id": "claude:hook-registration:SubagentStop/epic-orchestrator/validate-orchestrator-output~.claude%2Fsettings.json",
@@ -1245,7 +1309,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/orchestrator-state/OrchestratorState.psm1 and further orchestrator-state and .claude/lib/worktree-resolution modules; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3); the parallel registration form has no Codex workflow."
     },
     {
       "id": "claude:hook-registration:SubagentStop/epic-review/validate-required-artifact-output",
@@ -1259,7 +1325,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source dot-sources subagentstop-target-worktree.ps1, which imports .claude/lib/worktree-resolution/HookTargetWorktree.psm1 (with AgentTargetWorktree.psm1, WorktreeTargetResolution.psm1 and WorktreeItemResolution.psm1); lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3) (spec AD-2)."
     },
     {
       "id": "claude:hook-registration:SubagentStop/feature-review/validate-feature-review-coverage~.claude%2Fagents%2Ffeature-review.md",
@@ -1273,7 +1341,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:SubagentStop/feature-review/validate-feature-review-coverage~.claude%2Fsettings.json",
@@ -1288,7 +1357,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:SubagentStop/human-exception-runbook/validate-human-exception-runbook-output",
@@ -1302,7 +1372,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/runbook/RunbookCommandVersion.psm1 and dot-sources subagentstop-target-worktree.ps1 (.claude/lib/worktree-resolution); lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3)."
     },
     {
       "id": "claude:hook-registration:SubagentStop/legacy-parity-analyst%7Cruntime-characterization-analyst%7Crequirements-reconciler%7Cmigration-coverage-reviewer/validate-discovery-artifact-gate",
@@ -1312,12 +1384,13 @@
       "source_path": ".claude/settings.json",
       "source_pointer": "/hooks/SubagentStop/1/hooks/0",
       "disposition": "native",
-      "parity_group": "hook:validate-discovery-artifact-gate",
+      "parity_group": "hook:discovery-stop",
       "consumers": [
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:SubagentStop/orchestrator/validate-orchestrator-output~.claude%2Fagents%2Forchestrator.md",
@@ -1331,7 +1404,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/orchestrator-state/OrchestratorState.psm1 and further orchestrator-state and .claude/lib/worktree-resolution modules; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3); the parallel registration form has no Codex workflow."
     },
     {
       "id": "claude:hook-registration:SubagentStop/orchestrator/validate-orchestrator-output~.claude%2Fsettings.json",
@@ -1346,7 +1421,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/orchestrator-state/OrchestratorState.psm1 and further orchestrator-state and .claude/lib/worktree-resolution modules; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3); the parallel registration form has no Codex workflow."
     },
     {
       "id": "claude:hook-registration:SubagentStop/parallel-orchestrator/validate-orchestrator-output~.claude%2Fagents%2Fparallel-orchestrator.md",
@@ -1360,7 +1437,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/orchestrator-state/OrchestratorState.psm1 and further orchestrator-state and .claude/lib/worktree-resolution modules; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3); the parallel registration form has no Codex workflow."
     },
     {
       "id": "claude:hook-registration:SubagentStop/parallel-orchestrator/validate-orchestrator-output~.claude%2Fsettings.json",
@@ -1375,7 +1454,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source imports .claude/lib/orchestrator-state/OrchestratorState.psm1 and further orchestrator-state and .claude/lib/worktree-resolution modules; lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3); the parallel registration form has no Codex workflow."
     },
     {
       "id": "claude:hook-registration:SubagentStop/pr-author/validate-pr-author-output~.claude%2Fagents%2Fpr-author.md",
@@ -1389,7 +1470,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:SubagentStop/pr-author/validate-pr-author-output~.claude%2Fsettings.json",
@@ -1404,7 +1486,8 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "claude:hook-registration:SubagentStop/prd-feature/validate-prd-feature-output~.claude%2Fagents%2Fprd-feature.md",
@@ -1418,7 +1501,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source dot-sources subagentstop-target-worktree.ps1, which imports .claude/lib/worktree-resolution/HookTargetWorktree.psm1 (with AgentTargetWorktree.psm1, WorktreeTargetResolution.psm1 and WorktreeItemResolution.psm1); lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3) (spec AD-2)."
     },
     {
       "id": "claude:hook-registration:SubagentStop/prd-feature/validate-prd-feature-output~.claude%2Fsettings.json",
@@ -1433,7 +1518,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source dot-sources subagentstop-target-worktree.ps1, which imports .claude/lib/worktree-resolution/HookTargetWorktree.psm1 (with AgentTargetWorktree.psm1, WorktreeTargetResolution.psm1 and WorktreeItemResolution.psm1); lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3) (spec AD-2)."
     },
     {
       "id": "claude:hook-registration:SubagentStop/prd-feature/validate-required-artifact-output",
@@ -1447,7 +1534,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source dot-sources subagentstop-target-worktree.ps1, which imports .claude/lib/worktree-resolution/HookTargetWorktree.psm1 (with AgentTargetWorktree.psm1, WorktreeTargetResolution.psm1 and WorktreeItemResolution.psm1); lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3) (spec AD-2)."
     },
     {
       "id": "claude:hook-registration:SubagentStop/staged-review/validate-required-artifact-output",
@@ -1461,7 +1550,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source dot-sources subagentstop-target-worktree.ps1, which imports .claude/lib/worktree-resolution/HookTargetWorktree.psm1 (with AgentTargetWorktree.psm1, WorktreeTargetResolution.psm1 and WorktreeItemResolution.psm1); lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3) (spec AD-2)."
     },
     {
       "id": "claude:hook-registration:SubagentStop/status-updater/validate-required-artifact-output",
@@ -1475,7 +1566,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source dot-sources subagentstop-target-worktree.ps1, which imports .claude/lib/worktree-resolution/HookTargetWorktree.psm1 (with AgentTargetWorktree.psm1, WorktreeTargetResolution.psm1 and WorktreeItemResolution.psm1); lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3) (spec AD-2)."
     },
     {
       "id": "claude:hook-registration:SubagentStop/task-researcher/validate-task-researcher-output",
@@ -1489,7 +1582,9 @@
         "claude-code"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "GAP:DEFER: the Claude source dot-sources subagentstop-target-worktree.ps1, which imports .claude/lib/worktree-resolution/HookTargetWorktree.psm1 (with AgentTargetWorktree.psm1, WorktreeTargetResolution.psm1 and WorktreeItemResolution.psm1); lib-dependent ports wait for .codex/lib publication by child 4 (spec OQ-3) (spec AD-2)."
     },
     {
       "id": "claude:instructions:CLAUDE.md",
@@ -6219,7 +6314,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Agent%7CTask%7Cspawn_agent%7Crun_subagent%7Cdelegate%29%24/enforce-discovery-planning-gate",
@@ -6234,7 +6330,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cmcp__drm-copilot__run_poshqc_test%7Cmcp__drm-copilot__run_poshqc_suite%29%24/enforce-test-execution-policy",
@@ -6249,7 +6346,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%29%24/enforce-codex-model-routing",
@@ -6259,12 +6357,13 @@
       "source_path": ".codex/hooks/pretooluse-dispatch.json",
       "source_pointer": "/hooks/PreToolUse/2/hooks/2",
       "disposition": "native",
-      "parity_group": "hook:enforce-codex-model-routing",
+      "parity_group": "hook:model-routing",
       "consumers": [
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%29%24/enforce-discovery-artifact-gate",
@@ -6279,7 +6378,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%29%24/enforce-epic-child-worktree-binding",
@@ -6294,7 +6394,9 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "CODEX-NATIVE: Claude binds epic children to their item worktrees through agent isolation worktrees; Codex launches children through .codex/scripts/launch-epic-child-wave.ps1 and expresses the binding as a hook (research section 3)."
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%29%24/enforce-epic-planning-only",
@@ -6309,7 +6411,9 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "CODEX-NATIVE: Claude bounds the epic planner through the agent tools: allowlist; Codex has no per-agent tool allowlist and expresses the planning-only boundary as a hook (research section 3)."
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%29%24/enforce-epic-root-invocation",
@@ -6319,12 +6423,13 @@
       "source_path": ".codex/hooks/pretooluse-dispatch.json",
       "source_pointer": "/hooks/PreToolUse/2/hooks/1",
       "disposition": "native",
-      "parity_group": "hook:enforce-epic-root-invocation",
+      "parity_group": "hook:epic-invocation-origin",
       "consumers": [
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%29%24/enforce-epic-wave-barrier",
@@ -6339,7 +6444,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28Bash%7Cshell_command%7Capply_patch%7CEdit%7CWrite%7Cmcp__.%2A%7CAgent%7CTask%7Cspawn_agent%7Crun_subagent%7Cdelegate%29%24/invoke-pretooluse-dispatch",
@@ -6354,7 +6460,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/check-powershell-test-purity",
@@ -6369,7 +6476,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/check-python-test-purity",
@@ -6384,7 +6492,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-checkpoint-monotonic",
@@ -6399,7 +6508,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-completion-consistency",
@@ -6414,7 +6524,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-evidence-locations",
@@ -6429,7 +6540,9 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "Divergence (research section 4): the Claude copy adds a payload-anomaly deny path (Get-EvidenceLocationAnomalyDecision), and the block text differs only in the skill-pointer path (.claude/skills versus .agents/skills)."
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-file-size-limit",
@@ -6444,7 +6557,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-orchestration-preimplementation-gate",
@@ -6459,7 +6573,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-powershell-batch-budget",
@@ -6474,7 +6589,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5E%28apply_patch%7CEdit%7CWrite%29%24/enforce-python-batch-budget",
@@ -6489,7 +6605,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5EBash%24/enforce-epic-merge-gate",
@@ -6504,7 +6621,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5EBash%24/enforce-epic-worktree-removal-gate",
@@ -6519,7 +6637,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5EBash%24/enforce-orchestration-preimplementation-gate",
@@ -6534,7 +6653,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5EBash%24/enforce-promotion-mcp-only",
@@ -6549,7 +6669,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5EBash%24/enforce-worktree-poetry-venv",
@@ -6564,7 +6685,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:PreToolUse/%5EBash%24/validate-bash",
@@ -6579,7 +6701,9 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "Divergence (spec AD-5): the Codex validate-bash.ps1 omits the cd-chained read leg that the Claude copy carries; the destructive patterns are shared."
     },
     {
       "id": "codex:hook-registration:SubagentStart/epic-planner%7Cepic-orchestrator%7Corchestrator%7Catomic-planner%7Catomic-executor%7Cfeature-review%7Cfeature-reviewer%7Ctask-researcher%7Cprd-feature%7Cpr-author%7Ctyped-engineer%7C-c%7Clegacy-parity-analyst%7Cruntime-characterization-analyst%7Crequirements-reconciler%7Cmigration-coverage-reviewer/record-subagent-routing-attestation",
@@ -6589,12 +6713,13 @@
       "source_path": ".codex/config.toml",
       "source_pointer": "[[hooks.SubagentStart]]",
       "disposition": "native",
-      "parity_group": "hook:record-subagent-routing-attestation",
+      "parity_group": "hook:subagent-start-attestation",
       "consumers": [
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:SubagentStop/epic-planner%7Cepic-orchestrator%7Corchestrator%7Catomic-planner%7Catomic-executor%7Cfeature-review%7Cfeature-reviewer%7Ctask-researcher%7Cprd-feature%7Cpr-author%7Ctyped-engineer%7C-c%7Clegacy-parity-analyst%7Cruntime-characterization-analyst%7Crequirements-reconciler%7Cmigration-coverage-reviewer/validate-codex-subagent-routing",
@@ -6604,12 +6729,13 @@
       "source_path": ".codex/config.toml",
       "source_pointer": "[[hooks.SubagentStop]]",
       "disposition": "native",
-      "parity_group": "hook:validate-codex-subagent-routing",
+      "parity_group": "hook:model-routing",
       "consumers": [
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:SubagentStop/feature-review%7Cfeature-reviewer/validate-feature-review-coverage",
@@ -6624,7 +6750,8 @@
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:hook-registration:SubagentStop/legacy-parity-analyst%7Cruntime-characterization-analyst%7Crequirements-reconciler%7Cmigration-coverage-reviewer/validate-discovery-agent-output",
@@ -6634,12 +6761,30 @@
       "source_path": ".codex/config.toml",
       "source_pointer": "[[hooks.SubagentStop]]",
       "disposition": "native",
-      "parity_group": "hook:validate-discovery-agent-output",
+      "parity_group": "hook:discovery-stop",
       "consumers": [
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
+    },
+    {
+      "id": "codex:hook-registration:SubagentStop/pr-author/validate-pr-author-output",
+      "ecosystem": "codex",
+      "kind": "hook-registration",
+      "name": "SubagentStop/pr-author/validate-pr-author-output",
+      "source_path": ".codex/config.toml",
+      "source_pointer": "[[hooks.SubagentStop]]",
+      "disposition": "native",
+      "parity_group": "hook:validate-pr-author-output",
+      "consumers": [
+        "codex"
+      ],
+      "owner_child": 5,
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md",
+      "notes": "Divergence: the Codex copy allows the one-continuation stop when stop_hook_active is true, while the Claude copy keeps validating a re-entered stop."
     },
     {
       "id": "codex:hook-registration:UserPromptSubmit//authorize-root-epic-invocation",
@@ -6649,12 +6794,13 @@
       "source_path": ".codex/config.toml",
       "source_pointer": "[[hooks.UserPromptSubmit]]",
       "disposition": "native",
-      "parity_group": "hook:authorize-root-epic-invocation",
+      "parity_group": "hook:epic-invocation-origin",
       "consumers": [
         "codex"
       ],
       "owner_child": 5,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "codex:mcp-server:drm-copilot",
@@ -10172,12 +10318,13 @@
       "source_path": ".github/hooks/discovery.json",
       "source_pointer": "/hooks/PreToolUse/1",
       "disposition": "native",
-      "parity_group": "hook:discovery-planning",
+      "parity_group": "hook:enforce-discovery-planning-gate",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "copilot:hook-registration:PreToolUse//discovery-pre-tool",
@@ -10187,12 +10334,13 @@
       "source_path": ".github/hooks/discovery.json",
       "source_pointer": "/hooks/PreToolUse/0",
       "disposition": "native",
-      "parity_group": "hook:discovery-pre-tool",
+      "parity_group": "hook:enforce-discovery-artifact-gate",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "copilot:hook-registration:SubagentStart//discovery-agent-start",
@@ -10202,12 +10350,13 @@
       "source_path": ".github/hooks/discovery.json",
       "source_pointer": "/hooks/SubagentStart/0",
       "disposition": "native",
-      "parity_group": "hook:discovery-agent-start",
+      "parity_group": "hook:subagent-start-attestation",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "copilot:hook-registration:SubagentStop//discovery-agent-stop",
@@ -10217,12 +10366,13 @@
       "source_path": ".github/hooks/discovery.json",
       "source_pointer": "/hooks/SubagentStop/0",
       "disposition": "native",
-      "parity_group": "hook:discovery-agent-stop",
+      "parity_group": "hook:discovery-stop",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "provisional",
+      "decision_ref": "#1030:hook-parity-dispositions.md"
     },
     {
       "id": "copilot:instructions:copilot-instructions.md",
