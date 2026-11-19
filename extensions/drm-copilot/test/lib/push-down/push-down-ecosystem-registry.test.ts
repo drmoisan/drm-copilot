@@ -68,12 +68,26 @@ describe("push-down ecosystem registry", () => {
         rootFiles: [[".push-down-manifest.json", "x.json"] as const],
       },
     ],
+    [
+      "a root folder capturing the integration-needed file",
+      { name: "x", rootFolders: [".push-down-integration"], rootFiles: [] },
+    ],
+    [
+      "a root-file destination at the integration-needed file",
+      {
+        name: "x",
+        rootFolders: [".x"],
+        rootFiles: [[".push-down-integration-needed.json", "x.json"] as const],
+      },
+    ],
   ])(
-    "rejects a layer root or root-file destination that captures the destination manifest path (%s)",
+    "rejects a layer root or root-file destination that captures a reserved root-level path (%s)",
     (_label, declaration) => {
       expect(() =>
         assertDestinationManifestOutsideLayers([declaration]),
-      ).toThrow(/\.push-down-manifest\.json|published root/);
+      ).toThrow(
+        /\.push-down-manifest\.json|\.push-down-integration-needed\.json|published root/,
+      );
     },
   );
 });

@@ -178,7 +178,7 @@ describe("DOCS_TOOL_DEFINITIONS", () => {
         next: surface[start + DOCS_TOOL_DEFINITIONS.length]?.name,
       }).toEqual({
         label,
-        next: "validate_discovery_artifacts",
+        next: "detect_push_down_integration",
       });
     }
   });

@@ -22,6 +22,9 @@ import type {
 } from "./mcp-repo-automation-tool-definitions-handoff";
 import type { DiscoveryServiceResult } from "./discovery-service-types";
 import type { PushDownReport } from "./lib/push-down/push-down-report";
+import type { DetectIntegrationResult } from "./lib/push-down-integration/integration-detect";
+import type { ValidateIntegrationResult } from "./lib/push-down-integration/integration-validate";
+import type { PushDownIntegrationToolInput } from "./mcp-tool-inputs-push-down-integration";
 import type {
   DocsCommandOutcome,
   DocsCommandRequest,
@@ -324,4 +327,12 @@ export interface RepoAutomationService {
    * `Invoke-DocsCommand.ps1` and return the parsed envelope (issue #1036).
    */
   runDocsCommand?(request: DocsCommandRequest): Promise<DocsCommandOutcome>;
+  /** Detect a push-down destination's integration facts (issue #1051). */
+  detectPushDownIntegration?(
+    input: PushDownIntegrationToolInput,
+  ): Promise<DetectIntegrationResult>;
+  /** Validate an integrated push-down destination (issue #1051). */
+  validatePushDownIntegration?(
+    input: PushDownIntegrationToolInput,
+  ): Promise<ValidateIntegrationResult>;
 }
