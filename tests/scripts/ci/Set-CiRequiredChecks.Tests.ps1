@@ -37,6 +37,47 @@ Describe 'Set-CiRequiredChecks.ps1 script shape' {
     }
 }
 
+Describe 'Set-CiRequiredChecks.ps1 direct run' {
+    It 'fails before any gh call when no data file lies beside the script' {
+        # scripts/ci holds no ci-required-checks.json, so the default -DataFilePath does not exist and the
+        # command stops at the data read; Invoke-GhExe is never reached, so no process starts.
+        { & $script:ScriptPath } | Should -Throw '*CI data file not found*'
+    }
+}
+
+Describe 'Invoke-GhExe' {
+    BeforeAll {
+        # Test double passed through -GhCommand: echoes its arguments and any piped request body.
+        function Invoke-TestGhDouble {
+            [CmdletBinding(PositionalBinding = $false)]
+            [OutputType([string])]
+            param(
+                [Parameter(ValueFromPipeline = $true)] [string] $Body,
+                [Parameter(ValueFromRemainingArguments = $true)] [string[]] $Rest
+            )
+            process {
+                if ($Body) { "body:$Body" }
+            }
+            end {
+                "args:$($Rest -join ' ')"
+            }
+        }
+    }
+
+    It 'runs the command with the arguments and joins its output' {
+        $result = Invoke-GhExe -GhArgs @('api', 'repos/o/r/rulesets') -GhCommand 'Invoke-TestGhDouble'
+
+        $result.Output | Should -Be 'args:api repos/o/r/rulesets'
+        $result.PSObject.Properties.Name | Should -Contain 'ExitCode'
+    }
+
+    It 'pipes the request body to the command when InputText is given' {
+        $result = Invoke-GhExe -GhArgs @('api', 'repos/o/r/rulesets') -InputText '{"a":1}' -GhCommand 'Invoke-TestGhDouble'
+
+        $result.Output | Should -Be "body:{`"a`":1}`nargs:api repos/o/r/rulesets"
+    }
+}
+
 Describe 'New-CiRequiredChecksRulesetBody' {
     It 'targets the default branch and requires the context read from the data text' {
         $body = New-CiRequiredChecksRulesetBody -DataText $script:ValidData -RulesetName 'gate' | ConvertFrom-Json

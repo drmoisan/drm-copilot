@@ -40,6 +40,10 @@ function Invoke-GhExe {
     <#
     .SYNOPSIS
     Run gh with the given arguments and optional standard input; return the exit code and output.
+
+    .PARAMETER GhCommand
+    Command to run; defaults to gh. The unit tests pass a local test double so the wrapper body runs
+    without starting a process.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -47,13 +51,16 @@ function Invoke-GhExe {
         [Parameter(Mandatory = $true)]
         [string[]] $GhArgs,
 
-        [string] $InputText = ''
+        [string] $InputText = '',
+
+        [string] $GhCommand = 'gh'
     )
 
+    # Standard input is piped only when there is a request body (the POST); other calls take none.
     if ($InputText -ne '') {
-        $output = $InputText | & gh @GhArgs 2>&1
+        $output = $InputText | & $GhCommand @GhArgs 2>&1
     } else {
-        $output = & gh @GhArgs 2>&1
+        $output = & $GhCommand @GhArgs 2>&1
     }
     return [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = (@($output) -join "`n") }
 }
