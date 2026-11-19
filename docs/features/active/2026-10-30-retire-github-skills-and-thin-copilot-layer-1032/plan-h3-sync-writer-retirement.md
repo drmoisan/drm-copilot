@@ -55,7 +55,7 @@ No artifact adds Python; nothing pushed down is TypeScript or Python; no hook in
   - Acceptance: `<FEATURE>/evidence/baseline/h3-pytest-baseline.<timestamp>.md` records pass and fail counts, repository-wide coverage, and line and branch coverage of `scripts/dev_tools/push_down_copilot_customizations_rewrites.py`.
 - [x] [P0-T4] Run the Jest `Phase 0 baseline` `GATE-RUN` of `extensions/drm-copilot` with coverage.
   - Acceptance: `<FEATURE>/evidence/baseline/h3-jest-baseline.<timestamp>.md` records pass and fail counts and the line and branch coverage of `src/repo-automation-command-registration-admin.ts` and `src/lib/push-down/reference-rewrites.ts`.
-- [ ] [P0-T5] Run the Pester `Phase 0 baseline` `GATE-RUN` over the scan folders of `config/poshqc-scan.json`.
+- [x] [P0-T5] Run the Pester `Phase 0 baseline` `GATE-RUN` over the scan folders of `config/poshqc-scan.json`.
   - Acceptance: `<FEATURE>/evidence/baseline/h3-pester-baseline.<timestamp>.md` records `ExitCode`, pass and fail counts (including `tests/scripts/dev-tools/sync-agents-from-instructions.Tests.ps1` as the pre-deletion record), repository-wide line coverage, and the line coverage of `scripts/dev-tools/sync-agents-from-instructions.ps1` or `not in coverage population` when `config/poshqc-coverage.json` does not derive it.
 
 ### Phase 1 — Retire the Writer
