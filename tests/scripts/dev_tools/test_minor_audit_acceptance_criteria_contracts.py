@@ -8,19 +8,19 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 ROOT_MIRROR_PAIRS = (
     (
-        ".github/skills/acceptance-criteria-tracking/SKILL.md",
-        "extensions/drm-copilot/resources/customizations/.github/skills/"
-        "acceptance-criteria-tracking/SKILL.md",
+        ".agents/skills/acceptance-criteria-tracking/SKILL.md",
+        "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/"
+        "skills/acceptance-criteria-tracking/SKILL.md",
     ),
     (
-        ".github/skills/atomic-plan-contract/SKILL.md",
-        "extensions/drm-copilot/resources/customizations/.github/skills/"
-        "atomic-plan-contract/SKILL.md",
+        ".agents/skills/atomic-plan-contract/SKILL.md",
+        "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/"
+        "skills/atomic-plan-contract/SKILL.md",
     ),
     (
-        ".github/skills/feature-promotion-lifecycle/SKILL.md",
-        "extensions/drm-copilot/resources/customizations/.github/skills/"
-        "feature-promotion-lifecycle/SKILL.md",
+        ".agents/skills/feature-promotion-lifecycle/SKILL.md",
+        "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/"
+        "skills/feature-promotion-lifecycle/SKILL.md",
     ),
     (
         ".github/prompts/review-feature.prompt.md",
@@ -48,9 +48,9 @@ def read_repo_text(relative_path: str) -> str:
 def test_minor_audit_contract_files_require_explicit_acceptance_section() -> None:
     """Require minor-audit contracts to mention the explicit issue AC section."""
     required_paths = (
-        ".github/skills/acceptance-criteria-tracking/SKILL.md",
-        ".github/skills/atomic-plan-contract/SKILL.md",
-        ".github/skills/feature-promotion-lifecycle/SKILL.md",
+        ".agents/skills/acceptance-criteria-tracking/SKILL.md",
+        ".agents/skills/atomic-plan-contract/SKILL.md",
+        ".agents/skills/feature-promotion-lifecycle/SKILL.md",
         ".github/prompts/review-feature.prompt.md",
         ".github/prompts/orchestrate-work.prompt.md",
         ".github/prompts/orchestrate-csharp-work.prompt.md",

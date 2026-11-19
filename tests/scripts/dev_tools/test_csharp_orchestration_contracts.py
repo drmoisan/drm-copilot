@@ -61,7 +61,7 @@ def test_orchestrate_csharp_work_prompt_requires_minor_audit_lifecycle() -> None
 def _assert_state_machine_contract() -> None:
     """Require the C# checkpoint contract to include short-path continuity fields."""
     state_machine_text = read_repo_text(
-        ".github/skills/csharp-orchestration-state-machine/SKILL.md"
+        ".agents/skills/csharp-orchestration-state-machine/SKILL.md"
     )
 
     assert "work-mode" in state_machine_text
@@ -78,7 +78,7 @@ test_csharp_orchestration_state_machine_requires_plan_path_and_bootstrap_fields 
 
 def test_csharp_change_budget_router_requires_orchestrated_small_path_wording() -> None:
     """Require the C# router to describe the enforced short-path lifecycle."""
-    router_text = read_repo_text(".github/skills/csharp-change-budget-router/SKILL.md")
+    router_text = read_repo_text(".agents/skills/csharp-change-budget-router/SKILL.md")
 
     assert "1-3" in router_text
     assert ">3" in router_text
@@ -100,16 +100,16 @@ def _assert_bundle_mirror_contract() -> None:
         "orchestrate-csharp-work.prompt.md"
     )
     mirror_state_machine_path = REPO_ROOT / (
-        "extensions/drm-copilot/resources/customizations/.github/skills/"
-        "csharp-orchestration-state-machine/SKILL.md"
+        "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/"
+        "skills/csharp-orchestration-state-machine/SKILL.md"
     )
     mirror_router_path = REPO_ROOT / (
-        "extensions/drm-copilot/resources/customizations/.github/skills/"
-        "csharp-change-budget-router/SKILL.md"
+        "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/"
+        "skills/csharp-change-budget-router/SKILL.md"
     )
     mirror_acceptance_skill_path = REPO_ROOT / (
-        "extensions/drm-copilot/resources/customizations/.github/skills/"
-        "acceptance-criteria-tracking/SKILL.md"
+        "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/"
+        "skills/acceptance-criteria-tracking/SKILL.md"
     )
 
     assert mirror_agent_path.read_text(encoding="utf-8") == root_agent
@@ -117,10 +117,10 @@ def _assert_bundle_mirror_contract() -> None:
         ".github/prompts/orchestrate-csharp-work.prompt.md"
     )
     assert mirror_state_machine_path.read_text(encoding="utf-8") == read_repo_text(
-        ".github/skills/csharp-orchestration-state-machine/SKILL.md"
+        ".agents/skills/csharp-orchestration-state-machine/SKILL.md"
     )
     assert mirror_router_path.read_text(encoding="utf-8") == read_repo_text(
-        ".github/skills/csharp-change-budget-router/SKILL.md"
+        ".agents/skills/csharp-change-budget-router/SKILL.md"
     )
     assert mirror_acceptance_skill_path.exists()
 
