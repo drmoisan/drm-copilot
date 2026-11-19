@@ -87,7 +87,7 @@ No artifact adds Python; nothing pushed down is TypeScript or Python; no hook in
   - Acceptance: `<FEATURE>/evidence/other/writer-reference-classification.<timestamp>.md` lists every hit with zero unclassified and none in a file Phase 1 edited; `<FEATURE>/evidence/qa-gates/h3-end-state.<timestamp>.md` records no added `*.py` file, no pushed-down TypeScript or Python, and a `reduction:` token for every modified ledger entry; `<FEATURE>/evidence/other/plan-completion-h3.<timestamp>.md` records the completion.
 - [x] [P2-T5] Check off AC20, AC21 and US-AC11; when the greatest `plan-completion-branch.*.md` exists, also check off `LAST-PLAN-CRITERIA` against the three plans' gate, coverage and end-state artifacts, writing `<FEATURE>/evidence/other/plan-order.<timestamp>.md` (E3 result path, selected branch, order of the executed plans).
   - Acceptance: AC20, AC21 and US-AC11 are `[x]`; `LAST-PLAN-CRITERIA` are `[x]` exactly when the branch completion record exists, with the plan-order record written.
-- [ ] [P2-T6] Walk the policy-audit, code-review and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from `MB`, which includes this plan's commits.
+- [x] [P2-T6] Walk the policy-audit, code-review and feature-audit templates under `docs/features/templates/policy_audit/` against the branch diff from `MB`, which includes this plan's commits.
   - Acceptance: `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` carries `Plan: plan-h3-sync-writer-retirement.md` and one PASS, FAIL or N/A row per checklist item with no FAIL row; a FAIL is fixed and the loop restarts at P2-T1.
 
 ## Spec Traceability
