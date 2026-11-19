@@ -77,7 +77,7 @@ No artifact adds Python; nothing pushed down is TypeScript or Python; no hook in
 
 ### Phase 2 — Final QA, Evidence and Self-Review
 
-- [ ] [P2-T1] Run the final static loop per language over the files this plan changed under `extensions/drm-copilot/src`, `extensions/drm-copilot/test`, `scripts/dev_tools` and `tests/scripts` (TypeScript, Python, PowerShell as in P0-T2), restarting from the format step on any failure or change.
+- [x] [P2-T1] Run the final static loop per language over the files this plan changed under `extensions/drm-copilot/src`, `extensions/drm-copilot/test`, `scripts/dev_tools` and `tests/scripts` (TypeScript, Python, PowerShell as in P0-T2), restarting from the format step on any failure or change.
   - Acceptance: `<FEATURE>/evidence/qa-gates/h3-final-static-<language>.<timestamp>.md` per language records each step's command, exit code 0 and zero findings.
 - [ ] [P2-T2] Run the pytest, Jest (`extensions/drm-copilot`) and Pester (`config/poshqc-scan.json` folders) `GATE-RUN`s with coverage.
   - Acceptance: `<FEATURE>/evidence/regression-testing/h3-pytest-final.<timestamp>.md`, `h3-jest-final.<timestamp>.md` and `h3-pester-final.<timestamp>.md` each record zero failures, the pass count and coverage; the Pester record shows `GUARD-SUITE` and `LEDGER-CHAIN-TESTS` passing and no run of the deleted suite.
