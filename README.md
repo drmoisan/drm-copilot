@@ -446,6 +446,6 @@ The repository uses the following GitHub Actions workflows under [.github/workfl
 
 ## Policy and skills references
 
-- Repository tone and policy: [CLAUDE.md](CLAUDE.md), `.github/copilot-instructions.md`, and `.github/instructions/`.
+- Repository tone and policy: [AGENTS.md](AGENTS.md) (shared tone and guidance), [CLAUDE.md](CLAUDE.md), and `.github/instructions/`; `.github/copilot-instructions.md` holds Copilot-only text.
 - Language-specific rules: [.claude/rules/](.claude/rules/) (Python, PowerShell, TypeScript, C#), scoped by file path.
-- Skills taxonomy: [.github/skills/README.md](.github/skills/README.md), [.claude/skills/](.claude/skills/), and [.agents/skills/](.agents/skills/).
+- Skills taxonomy: [.agents/skills/README.md](.agents/skills/README.md) (the shared skill source), [.claude/skills/](.claude/skills/), and [.agents/skills/](.agents/skills/).
