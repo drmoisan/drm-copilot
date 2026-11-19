@@ -1,8 +1,7 @@
-# Tone policy
+# Copilot-only instructions
 
-- Use a strictly professional, factual, and neutral tone in all user-facing responses.
-- Be concise, direct, and literal.
-- Do not use jokes, humor, metaphors, playful analogies, banter, emojis, GIF references, sarcasm, or conversational filler.
-- Do not use motivational hype, celebratory phrasing, or grandiose narration.
-- If a sentence could read as casual, playful, or informal, rewrite it in neutral business language.
-
+- Shared standing instructions, including the tone policy, live in `AGENTS.md`, which GitHub Copilot reads; this file does not repeat them.
+- Shared skills live in `.agents/skills/<name>/SKILL.md`, which GitHub Copilot reads natively.
+- Path-scoped Copilot instructions live in `.github/instructions/*.instructions.md` and are generated from their shared rule sources.
+- Direct-use prompts live natively in `.github/prompts`, and the handoff-bearing Copilot agents live natively in `.github/agents`; neither has a shared equivalent.
+- Copilot hook registrations live natively in `.github/hooks`.
