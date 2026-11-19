@@ -1,0 +1,17 @@
+{
+  "issue": 1050,
+  "written_at": "2026-11-19T15:17:41Z",
+  "note": "Wall-clock times from the execution-run checkpoint, including queueing; the merge stage is not captured. Preparation-run stages (S3 to S4b, 2026-11-14 to 2026-11-15) are in the archived preparation checkpoint.",
+  "stage_timing": [
+    { "stage": "S4_od4_light_revision", "attempt": 1, "started_at": "2026-11-19T08:13:35Z", "ended_at": "2026-11-19T08:21:00Z" },
+    { "stage": "S4b_preflight_od4", "attempt": 1, "started_at": "2026-11-19T08:21:00Z", "ended_at": "2026-11-19T08:24:52Z" },
+    { "stage": "S5_atomic_execution", "attempt": 1, "started_at": "2026-11-19T08:24:52Z", "ended_at": "2026-11-19T11:53:41Z" },
+    { "stage": "S7_feature_review", "attempt": 1, "started_at": "2026-11-19T11:53:41Z", "ended_at": "2026-11-19T12:06:49Z" },
+    { "stage": "S6_advisory_fix", "attempt": 1, "started_at": "2026-11-19T12:06:49Z", "ended_at": "2026-11-19T13:44:38Z" },
+    { "stage": "S7_feature_review", "attempt": 2, "started_at": "2026-11-19T13:44:38Z", "ended_at": "2026-11-19T13:57:59Z" },
+    { "stage": "S8_create_pr", "attempt": 1, "started_at": "2026-11-19T13:57:59Z", "ended_at": "2026-11-19T14:03:10Z" },
+    { "stage": "S9_ci_green", "attempt": 1, "started_at": "2026-11-19T14:03:10Z", "ended_at": "2026-11-19T14:16:00Z" },
+    { "stage": "remediation.cycle_1", "attempt": 1, "started_at": "2026-11-19T14:16:00Z", "ended_at": "2026-11-19T14:52:00Z" },
+    { "stage": "S9_ci_green", "attempt": 2, "started_at": "2026-11-19T14:52:00Z", "ended_at": "2026-11-19T15:17:41Z" }
+  ]
+}

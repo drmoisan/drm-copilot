@@ -25,6 +25,8 @@ interface PushDownForwardedRunOptions {
   readonly dryRun?: boolean;
   /** Overwrite `unmanaged-conflict` files (O-4 opt-in). */
   readonly overwriteUnmanaged?: boolean;
+  /** Destination CI mode (issue #1050); omitted reuses the recorded mode. */
+  readonly ciWorkflows?: "off" | "reference" | "copy";
 }
 
 /**
@@ -63,7 +65,8 @@ export interface PushDownCopilotServiceForwardedOptions extends PushDownForwarde
  * Copy the run options that were supplied.
  *
  * @param input A push-down service input.
- * @returns `dryRun` and `overwriteUnmanaged`, each only when present.
+ * @returns `dryRun`, `overwriteUnmanaged`, and `ciWorkflows`, each only when
+ *   present.
  */
 function forwardRunOptions(
   input: PushDownForwardedRunOptions,
@@ -73,6 +76,9 @@ function forwardRunOptions(
     ...(input.overwriteUnmanaged === undefined
       ? {}
       : { overwriteUnmanaged: input.overwriteUnmanaged }),
+    ...(input.ciWorkflows === undefined
+      ? {}
+      : { ciWorkflows: input.ciWorkflows }),
   };
 }
 

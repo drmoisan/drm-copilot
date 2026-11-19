@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Push-down CI workflows (issue #1050): the three push-down tools accept the optional `ci_workflows` input (`off` default, `reference`, `copy`; omitted reuses the recorded mode); `reference` delivers the caller `.github/workflows/drm-copilot-ci.yml` (workflow `CI`, one job per selected language pack plus `CI Required Gate`) and the data file `.github/drm-copilot/ci-required-checks.json`, with caller jobs pinned to the new `harness-<pack>.yml` reusable workflows at the release tag `v<payload_version>`; `copy` also delivers the selected `.github/workflows/drm-copilot-<pack>.yml` copies; to bump, upgrade the extension and re-run the push-down, and an unedited caller is reported `update` and rewritten; risks: an unprotected tag can be moved, and a build without a published tag references a missing tag; a private source repository requires copy mode; the #1049 vendored-code exemption is unavailable in copy mode; the opt-in `.github/drm-copilot/Set-CiRequiredChecks.ps1` creates the `CI Required Gate` ruleset only when run with `-Apply`.
 - Unified push-down pipeline (issue #1029): the Claude, Codex, and Copilot push-down tools
   and commands run one pipeline that installs the shared layer (`AGENTS.md`, the shared
   `.agents/skills`, and the shared configuration) on every run, then only the selected

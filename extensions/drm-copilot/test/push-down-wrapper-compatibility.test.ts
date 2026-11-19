@@ -221,7 +221,9 @@ describe("push-down wrapper compatibility", () => {
         },
       },
     ];
-    const added = new Set(["dry_run", "overwrite_unmanaged"]);
+    // Optional inputs added after the frozen schemas: #1029 run options and
+    // the #1050 `ci_workflows` mode (rule K of the #1050 plan).
+    const added = new Set(["dry_run", "overwrite_unmanaged", "ci_workflows"]);
 
     for (const definitions of [
       REPO_AUTOMATION_TOOL_DEFINITIONS,

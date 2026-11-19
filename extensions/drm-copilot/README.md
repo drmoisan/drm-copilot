@@ -286,6 +286,23 @@ The three push-down tools (`push_down_claude_customizations`, `push_down_codex_a
 - No-overwrite rule: a destination file edited since the last push-down is reported as `conflict` and left in place. A file with no manifest entry that differs from the payload is reported as `unmanaged-conflict` and left in place unless `overwrite_unmanaged` is `true`. Files of a deselected pack are reported as `orphaned` and never deleted. Paths listed in `.push-down-exclusions` are withheld for every ecosystem and reported as `excluded`.
 - `push_down_report`: every call returns the report with `mode` (`dry-run` or `apply`), the selection per ecosystem, every planned, merged, excluded, and orphaned path with its `layer`, `pack`, `action`, and `reason`, and `counts` per action. `conflict`, `unmanaged-conflict`, and `deleted-locally` lines are also returned in `warnings` with the prefix `push-down conflict:`. A second run with no source or destination change writes no file outside `artifacts/`.
 
+## Push-Down CI Workflows
+
+The three push-down tools accept the optional `ci_workflows` input with the values `off` (default), `reference`, and `copy`; when it is omitted, the mode recorded in the destination manifest is reused.
+
+- `off`: no CI file is planned; CI files delivered earlier are reported as `orphaned` and left in place.
+- `reference`: the push-down writes the caller `.github/workflows/drm-copilot-ci.yml` (workflow `CI` with one job per selected language pack and the `CI Required Gate` job) and the data file `.github/drm-copilot/ci-required-checks.json`; each caller job calls `drmoisan/drm-copilot/.github/workflows/harness-<pack>.yml` at the pinned tag.
+- `copy`: the push-down also writes the selected packs' reusable workflows as `.github/workflows/drm-copilot-<pack>.yml`, and the caller jobs use those local copies.
+- Pin: reference mode pins the harness workflows at the release tag `v<payload_version>`, where `payload_version` is the extension version that ran the push-down.
+- Bump process: upgrade the extension and re-run the push-down; an unedited caller is reported `update` and rewritten with the new tag.
+- Risk: an unprotected tag can be moved, because no tag ruleset protects the release tags of the source repository.
+- Risk: a build without a published tag references a missing tag, so reference mode works only with a published extension release.
+- Rule: a private source repository requires copy mode, because a destination cannot call a reusable workflow it cannot read.
+- Limitation: the #1049 vendored-code exemption is unavailable in copy mode, because copy mode runs Pester directly and does not load PoshQC.
+- Requirement: copy mode runs Pester over the top-level tests directory, and the PowerShell job fails with `Copy mode requires a top-level tests directory` when it is absent; reference mode (PoshQC) has no such requirement.
+- No CI file is written over an existing unmanaged file, even with `overwrite_unmanaged`; an edited caller is reported `conflict` and kept; when another destination workflow is already named `CI`, the caller is withheld and a `push-down conflict:` warning names that file.
+- Opt-in branch protection: `.github/drm-copilot/Set-CiRequiredChecks.ps1` (`Set-CiRequiredChecks.ps1`) is delivered with the CI files and never run by the push-down; by default it prints the planned ruleset, and with `-Apply` it creates one ruleset on the default branch that requires `CI Required Gate`, without editing or deleting an existing ruleset.
+
 ## Run PoshQC Suite
 
 Use the `drm-copilot: Run PoshQC Suite` command (command ID: `drmCopilotExtension.runPoshQCSuite`) from the Command Palette to run the bundled PowerShell quality gate from extension resources against the destination workspace. The bundled PowerShell wrapper executes `resources/templates/run-poshqc-suite.ps1`, imports the colocated `resources/powershell/PoshQC/` module copy, and can limit scanning to one or more selected destination-workspace folders.

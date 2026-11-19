@@ -623,5 +623,15 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1050: destination CI workflow rendering (pure module).
+    "./src/lib/push-down/push-down-ci-workflows.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #1050: CI contribution to the shared push-down layer.
+    "./src/lib/push-down/push-down-ci-layer.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };
