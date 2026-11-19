@@ -85,6 +85,28 @@ Describe 'Get-PoshQCCoverageConfigRoot (issue #527)' {
             { Get-PoshQCCoverageConfigRoot @parameters } | Should -Throw -ExpectedMessage '*config/poshqc-coverage.json*'
         }
     }
+
+    It 'returns ExemptUnchangedPushDownFiles for <Case>' -ForEach @(
+        @{ Case = 'absent file'; Present = $false; Content = ''; Expected = $false }
+        @{ Case = 'key absent'; Present = $true; Content = '{"version": 1, "roots": ["scripts"]}'; Expected = $false }
+        @{ Case = 'true'; Present = $true; Content = '{"version": 1, "roots": ["scripts"], "exempt_unchanged_push_down_files": true}'; Expected = $true }
+        @{ Case = 'false'; Present = $true; Content = '{"version": 1, "roots": ["scripts"], "exempt_unchanged_push_down_files": false}'; Expected = $false }
+    ) {
+        InModuleScope -ModuleName PoshQC -Parameters @{ Present = $Present; Content = $Content; Expected = $Expected } -ScriptBlock {
+            param([bool] $Present, [string] $Content, [bool] $Expected)
+
+            # Arrange (issue #1049): the version rule is unchanged; the opt-in is an optional boolean.
+            $parameters = & $script:cfgNewParameters
+            if (-not $Present) { $parameters.TestPathExists = { param([string] $Path) [void] $Path; $false } }
+            $script:cfgContent = $Content
+
+            # Act
+            $result = Get-PoshQCCoverageConfigRoot @parameters
+
+            # Assert
+            $result.ExemptUnchangedPushDownFiles | Should -Be $Expected
+        }
+    }
 }
 
 Describe 'Resolve-PoshQCCoveragePopulation precedence (issue #527)' {
@@ -123,6 +145,27 @@ Describe 'Resolve-PoshQCCoveragePopulation precedence (issue #527)' {
                         Get-PoshQCCoverageFileSet @fileSetParameters
                     }
                 }
+            }
+            # Issue #1049: an exemption seam that runs the real status classification over in-memory content.
+            $script:resInMemoryExemption = {
+                param([string] $RootPath, $Files)
+                $getStatus = {
+                    param([string] $StatusRoot, [string[]] $Candidates)
+                    $statusParameters = @{
+                        Root             = $StatusRoot
+                        CandidatePaths   = $Candidates
+                        ReadBytes        = {
+                            param([string] $Path)
+                            $text = if ($Path -like '*/.push-down-manifest.json') { $script:resManifest } else { $script:resContent[$Path] }
+                            , [Text.Encoding]::UTF8.GetBytes($text)
+                        }
+                        TestPathExists   = { param([string] $Path) $Path -like '*/.push-down-manifest.json' -or $script:resContent.ContainsKey($Path) }
+                        TestReparsePoint = { param([string] $Path) [void] $Path; $false }
+                        WarningLogger    = { param([string] $Message) $script:resWarnings.Add($Message) }
+                    }
+                    Get-PoshQCVendoredCoverageStatus @statusParameters
+                }
+                Resolve-PoshQCVendoredCoverageExemption -Root $RootPath -Files $Files -GetStatus $getStatus
             }
         }
     }
@@ -248,6 +291,114 @@ Describe 'Resolve-PoshQCCoveragePopulation precedence (issue #527)' {
             $paths = @($result.Paths)
             $paths | Should -Be @()
             $script:resWarnings.Count | Should -Be 2
+        }
+    }
+
+    It 'subtracts exempt paths for the config source with the opt-in' {
+        InModuleScope PoshQC {
+            # Arrange (issue #1049): the default exemption seam runs; the status function is mocked in module scope.
+            $parameters = & $script:resNewParameters
+            $script:resFiles = @('/res-root/tools/t.ps1', '/res-root/tools/u.ps1')
+            $script:resConfig = [pscustomobject]@{ Present = $true; Roots = [string[]] @('tools'); ExemptUnchangedPushDownFiles = $true }
+            Mock Get-PoshQCVendoredCoverageStatus {
+                [pscustomobject]@{ path = 'tools/t.ps1'; status = 'exempt'; manifest_sha256 = 'aa'; actual_sha256 = 'aa' }
+                [pscustomobject]@{ path = 'tools/u.ps1'; status = 'unlisted'; manifest_sha256 = $null; actual_sha256 = $null }
+            }
+
+            # Act
+            $result = Resolve-PoshQCCoveragePopulation @parameters
+
+            # Assert
+            $result.Source | Should -Be 'config'
+            @($result.Paths | ForEach-Object { $_ -replace '\\', '/' }) | Should -Be @('/res-root/tools/u.ps1')
+            @($result.Exemptions).Count | Should -Be 2
+            Should -Invoke Get-PoshQCVendoredCoverageStatus -Times 1 -Exactly -ParameterFilter { $Root -eq '/res-root' -and (@($CandidatePaths) -join ',') -eq 'tools/t.ps1,tools/u.ps1' }
+        }
+    }
+
+    It 'keeps the population for the config source without the opt-in' {
+        InModuleScope PoshQC {
+            $parameters = & $script:resNewParameters
+            $parameters.ResolveVendoredExemption = { param([string] $RootPath, $Files) throw "exemption seam must not run for $RootPath $Files" }
+            $script:resConfig = [pscustomobject]@{ Present = $true; Roots = [string[]] @('tools'); ExemptUnchangedPushDownFiles = $false }
+
+            $result = Resolve-PoshQCCoveragePopulation @parameters
+
+            $result.Source | Should -Be 'config'
+            @($result.Paths | ForEach-Object { $_ -replace '\\', '/' }) | Should -Be @('/res-root/tools/t.ps1')
+            $result.PSObject.Properties.Name | Should -Contain 'Exemptions'
+            $result.Exemptions | Should -BeNullOrEmpty
+        }
+    }
+
+    It 'ignores the opt-in for the settings source and never calls the exemption seam' {
+        InModuleScope PoshQC {
+            $parameters = & $script:resNewParameters
+            $parameters.Settings = @{ CodeCoverage = @{ Enabled = $true; Path = @('scripts/a.ps1') } }
+            $parameters.ResolveVendoredExemption = { param([string] $RootPath, $Files) throw "exemption seam must not run for $RootPath $Files" }
+            $script:resConfig = [pscustomobject]@{ Present = $true; Roots = [string[]] @('tools'); ExemptUnchangedPushDownFiles = $true }
+
+            $result = Resolve-PoshQCCoveragePopulation @parameters
+
+            $result.Source | Should -Be 'settings'
+            @($result.Paths | ForEach-Object { $_ -replace '\\', '/' }) | Should -Be @('/res-root/scripts/a.ps1')
+            $result.PSObject.Properties.Name | Should -Contain 'Exemptions'
+            $result.Exemptions | Should -BeNullOrEmpty
+        }
+    }
+
+    It 'ignores the opt-in for the fallback source' {
+        InModuleScope PoshQC {
+            $parameters = & $script:resNewParameters
+            $parameters.ScanFolderRoots = @('scripts')
+            $parameters.ResolveVendoredExemption = { param([string] $RootPath, $Files) throw "exemption seam must not run for $RootPath $Files" }
+            $script:resConfig = [pscustomobject]@{ Present = $false; Roots = [string[]] @(); ExemptUnchangedPushDownFiles = $true }
+
+            $result = Resolve-PoshQCCoveragePopulation @parameters
+
+            $result.Source | Should -Be 'fallback'
+            @($result.Paths | ForEach-Object { $_ -replace '\\', '/' }) | Should -Be @('/res-root/scripts/a.ps1')
+            $result.PSObject.Properties.Name | Should -Contain 'Exemptions'
+            $result.Exemptions | Should -BeNullOrEmpty
+        }
+    }
+
+    It 'keeps a destination-added .claude/hooks file in the population' {
+        InModuleScope PoshQC {
+            # Arrange: a real status classification over an in-memory destination with a manifest.
+            $parameters = & $script:resNewParameters
+            $parameters.ResolveVendoredExemption = $script:resInMemoryExemption
+            $script:resDirectories = @('/res-root/.claude/hooks')
+            $script:resFiles = @('/res-root/.claude/hooks/pushed.ps1', '/res-root/.claude/hooks/added.ps1')
+            $script:resContent = @{ '/res-root/.claude/hooks/pushed.ps1' = 'abc'; '/res-root/.claude/hooks/added.ps1' = 'abc' }
+            $script:resManifest = '{"schema_version": "1.0.0", "files": {".claude/hooks/pushed.ps1": {"sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"}}}'
+            $script:resConfig = [pscustomobject]@{ Present = $true; Roots = [string[]] @('.claude/hooks'); ExemptUnchangedPushDownFiles = $true }
+
+            # Act
+            $result = Resolve-PoshQCCoveragePopulation @parameters
+
+            # Assert
+            @($result.Paths | ForEach-Object { $_ -replace '\\', '/' }) | Should -Be @('/res-root/.claude/hooks/added.ps1')
+            ($result.Exemptions | Where-Object { $_.path -ceq '.claude/hooks/added.ps1' }).status | Should -Be 'unlisted'
+            ($result.Exemptions | Where-Object { $_.path -ceq '.claude/hooks/pushed.ps1' }).status | Should -Be 'exempt'
+        }
+    }
+
+    It 'keeps modified and unlisted files in the population' {
+        InModuleScope PoshQC {
+            $parameters = & $script:resNewParameters
+            $parameters.ResolveVendoredExemption = $script:resInMemoryExemption
+            $script:resDirectories = @('/res-root/.claude/lib')
+            $script:resFiles = @('/res-root/.claude/lib/same.psm1', '/res-root/.claude/lib/edited.psm1', '/res-root/.claude/lib/own.psm1')
+            $script:resContent = @{ '/res-root/.claude/lib/same.psm1' = 'abc'; '/res-root/.claude/lib/edited.psm1' = 'abc edited'; '/res-root/.claude/lib/own.psm1' = 'abc' }
+            $script:resManifest = '{"schema_version": "1.0.0", "files": {".claude/lib/same.psm1": {"sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"}, ".claude/lib/edited.psm1": {"sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"}}}'
+            $script:resConfig = [pscustomobject]@{ Present = $true; Roots = [string[]] @('.claude/lib'); ExemptUnchangedPushDownFiles = $true }
+
+            $result = Resolve-PoshQCCoveragePopulation @parameters
+
+            @($result.Paths | ForEach-Object { $_ -replace '\\', '/' }) | Should -Be @('/res-root/.claude/lib/edited.psm1', '/res-root/.claude/lib/own.psm1')
+            ($result.Exemptions | Where-Object { $_.path -ceq '.claude/lib/edited.psm1' }).status | Should -Be 'modified'
+            ($result.Exemptions | Where-Object { $_.path -ceq '.claude/lib/own.psm1' }).status | Should -Be 'unlisted'
         }
     }
 }

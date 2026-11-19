@@ -49,7 +49,8 @@ Resolves the workspace-relative configuration file (default 'config/poshqc-cover
 against Root. An absent file reports Present = $false. A present file must be a JSON object
 with 'version' equal to 1 and a 'roots' array of workspace-relative paths; every validation
 failure throws a message that names the configuration file. An empty 'roots' array is valid
-and yields an empty coverage population.
+and yields an empty coverage population. ExemptUnchangedPushDownFiles reports the optional boolean
+'exempt_unchanged_push_down_files' (issue #1049): $false when the file or the key is absent.
 .PARAMETER Root
 Workspace root the configuration path resolves against.
 .PARAMETER ConfigRelativePath
@@ -78,7 +79,7 @@ function Get-PoshQCCoverageConfigRoot {
     }
 
     if (-not (& $TestPathExists $configPath)) {
-        return [pscustomobject]@{ Present = $false; Roots = [string[]] @() }
+        return [pscustomobject]@{ Present = $false; Roots = [string[]] @(); ExemptUnchangedPushDownFiles = $false }
     }
 
     $raw = [string] (& $ReadContent $configPath)
@@ -125,7 +126,8 @@ function Get-PoshQCCoverageConfigRoot {
         $validated.Add($entry)
     }
 
-    return [pscustomobject]@{ Present = $true; Roots = [string[]] $validated.ToArray() }
+    $optIn = Get-PoshQCVendoredCoverageOptIn -Parsed $parsed -ConfigRelativePath $ConfigRelativePath
+    return [pscustomobject]@{ Present = $true; Roots = [string[]] $validated.ToArray(); ExemptUnchangedPushDownFiles = $optIn }
 }
 
 <#
@@ -220,6 +222,9 @@ to Root, rooted entries are kept as written, and each nonexistent entry is prune
 A non-empty CodeCoverage.Path in the module-default settings file is ignored and logged.
 (2) 'config': the workspace coverage configuration reports Present.
 (3) 'fallback': the effective scan-folder roots when non-empty, else the settings Run.Path.
+Only for the 'config' source with ExemptUnchangedPushDownFiles $true, the file set passes through
+the ResolveVendoredExemption seam, which removes unchanged pushed-down files (issue #1049). Every
+result carries Exemptions: the status records when the exemption was applied, otherwise $null.
 .PARAMETER Root
 Absolute workspace root.
 .PARAMETER Settings
@@ -242,6 +247,8 @@ Injectable warning seam passed to the file-set seam. Defaults to Write-Warning.
 Injectable configuration seam. Defaults to Get-PoshQCCoverageConfigRoot.
 .PARAMETER GetFileSet
 Injectable file-set seam. Defaults to Get-PoshQCCoverageFileSet.
+.PARAMETER ResolveVendoredExemption
+Injectable exemption seam (issue #1049). Defaults to Resolve-PoshQCVendoredCoverageExemption.
 #>
 function Resolve-PoshQCCoveragePopulation {
     [CmdletBinding()]
@@ -260,7 +267,8 @@ function Resolve-PoshQCCoveragePopulation {
         [scriptblock] $GetFileSet = {
             param([string] $RootPath, [string[]] $Roots, [string[]] $Excluded, [scriptblock] $Warn)
             Get-PoshQCCoverageFileSet -Root $RootPath -Roots $Roots -ExcludeDirs $Excluded -WarningLogger $Warn
-        }
+        },
+        [scriptblock] $ResolveVendoredExemption = { param([string] $RootPath, $Files) Resolve-PoshQCVendoredCoverageExemption -Root $RootPath -Files $Files }
     )
 
     $ErrorActionPreference = 'Stop'
@@ -290,16 +298,21 @@ function Resolve-PoshQCCoveragePopulation {
                 }
             }
 
-            return [pscustomobject]@{ Source = 'settings'; Paths = [string[]] $survivingPaths.ToArray() }
+            return [pscustomobject]@{ Source = 'settings'; Paths = [string[]] $survivingPaths.ToArray(); Exemptions = $null }
         }
 
         & $Logger 'Ignored CodeCoverage.Path from the module-default settings file; the coverage population is derived from the workspace.'
     }
 
     $configRoot = & $ReadConfig $Root
+    $applyExemption = $false
     if ($null -ne $configRoot -and $configRoot.Present) {
         $source = 'config'
         $coverageRoots = @($configRoot.Roots)
+        # Issue #1049: the vendored push-down exemption applies to the config source only, behind a boolean
+        # opt-in read through PSObject so a config record without the property means no opt-in.
+        $optInProperty = $configRoot.PSObject.Properties['ExemptUnchangedPushDownFiles']
+        $applyExemption = $null -ne $optInProperty -and $optInProperty.Value -is [bool] -and $optInProperty.Value
     } else {
         $source = 'fallback'
         $coverageRoots = @($ScanFolderRoots | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
@@ -309,6 +322,10 @@ function Resolve-PoshQCCoveragePopulation {
     }
 
     $files = @(& $GetFileSet $Root ([string[]] $coverageRoots) $ExcludeDirs $WarningLogger)
+    if ($applyExemption) {
+        $exemption = & $ResolveVendoredExemption $Root $files
+        return [pscustomobject]@{ Source = $source; Paths = [string[]] @($exemption.Paths); Exemptions = @($exemption.Exemptions) }
+    }
     $paths = [string[]] @($files | Where-Object { $null -ne $_ } | ForEach-Object { $_.FullPath })
-    return [pscustomobject]@{ Source = $source; Paths = $paths }
+    return [pscustomobject]@{ Source = $source; Paths = $paths; Exemptions = $null }
 }

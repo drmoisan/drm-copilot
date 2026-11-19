@@ -28,7 +28,8 @@
         'ConvertTo-PoshQCShardWeight',
         'Export-PoshQCShardWeight',
         'Invoke-PoshQCParallelTest',
-        'Invoke-PoshQCLeakScan'
+        'Invoke-PoshQCLeakScan',
+        'Get-PoshQCVendoredCoverageStatus'
     )
     CmdletsToExport      = @()
     VariablesToExport    = @()

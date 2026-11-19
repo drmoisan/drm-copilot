@@ -1,0 +1,6 @@
+# Task Check [P2-T2]
+
+Timestamp: 2026-11-19T10-09
+Command: sh SCRATCH/issue-1049-ps-filecheck.sh on both files (parse, formatter drift, Invoke-ScriptAnalyzer: exit 0); sh SCRATCH/issue-1049-export-check.sh (Import-Module PoshQC.psd1 -Force; Get-Command -Module PoshQC Get-PoshQCVendoredCoverageStatus; Import-PowerShellDataFile FunctionsToExport: exit 0); sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath tests/scripts/powershell/PoshQC/PoshQC.ModuleCoverage.Tests.ps1 tests/scripts/powershell/PoshQC/PoshQC.EntryPoints.Tests.ps1 (attempts 1 and 2 exit 75 queue timeout; attempt 3 exit 0)
+EXIT_CODE: 0
+Output Summary: Changed files: scripts/powershell/PoshQC/PoshQC.psm1; scripts/powershell/PoshQC/PoshQC.psd1. Results: parse errors 0, formatter drift False, analyzer findings 0 for both files; IMPORTED_EXPOSES: True (importing PoshQC.psd1 exposes Get-PoshQCVendoredCoverageStatus); PSD1_LISTS: True (FunctionsToExport lists it); 21 exported functions. Selection rule: tests that name PoshQC.psm1 or PoshQC.psd1 and assert the sub-module or manifest data (MC05-SUBMODULE-CACHE-MISS-IMPORT in PoshQC.ModuleCoverage.Tests.ps1; PoshQC.EntryPoints.Tests.ps1). Pester selection: 2 files, 10 tests, 10 passed, 0 failed.

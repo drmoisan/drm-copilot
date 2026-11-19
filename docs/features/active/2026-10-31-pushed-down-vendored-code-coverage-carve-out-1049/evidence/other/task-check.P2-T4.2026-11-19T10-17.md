@@ -1,0 +1,6 @@
+# Task Check [P2-T4]
+
+Timestamp: 2026-11-19T10-17
+Command: sh SCRATCH/issue-1049-ps-filecheck.sh scripts/powershell/PoshQC/PoshQC.Testing.psm1 (exit 0); sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath tests/scripts/powershell/PoshQC tests/scripts/workflows/PoshQcWorkflow.Tests.ps1 tests/scripts/codex-hooks/hook-target-worktree.Tests.ps1 tests/scripts/claude-hooks/enforce-test-execution-policy.Tests.ps1 tests/scripts/codex-hooks/enforce-test-execution-policy.Tests.ps1 tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1 (exit 0)
+EXIT_CODE: 0
+Output Summary: Changed files: scripts/powershell/PoshQC/PoshQC.Testing.psm1. Results: parse errors 0; logical line count 567 (554 on HEAD before the edit; cap 580); formatter drift False; analyzer findings 0. Selection rule: the mirrored and asserting suites the task names (every Testing*, Coverage, ScanFolders, RunSettings, EntryPoints, Comprehensive, McpTemplateLock and ParallelScoped suite in tests/scripts/powershell/PoshQC, run as the folder) plus the five named outside suites. Pester selection: 32 files, 902 tests, 895 passed, 0 failed, 7 skipped. The asserting suites pass unchanged. Split assessment deferred to the self-review as the task states.
