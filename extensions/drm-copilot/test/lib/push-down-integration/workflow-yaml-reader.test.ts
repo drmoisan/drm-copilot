@@ -352,4 +352,76 @@ describe("readWorkflowText", () => {
     expect(result.jobs[0]?.needs).toEqual(["b", "c"]);
     expect(result.jobs[0]?.with_versions["node-version"]).toEqual(["22"]);
   });
+
+  it("keeps expressions and comments opaque in sequence and flow items", () => {
+    const result = ok(
+      readWorkflowText(
+        lf([
+          "jobs:",
+          "  a:",
+          "    needs:",
+          "      - ${{ matrix.first }}",
+          "      - second # trailing comment",
+          "  b:",
+          "    needs: [${{ inputs.x }}, plain]",
+        ]),
+      ),
+    );
+
+    expect(result.jobs[0]?.needs).toEqual(["${{ matrix.first }}", "second"]);
+    expect(result.jobs[1]?.needs).toEqual(["${{ inputs.x }}", "plain"]);
+  });
+
+  it("decodes double-quoted escapes and folds more-indented lines", () => {
+    const result = ok(
+      readWorkflowText(
+        lf([
+          'name: "a\\nb\\tc\\"d"',
+          "jobs:",
+          "  a:",
+          "    if: >",
+          "      first",
+          "        indented",
+          "      last",
+          "  b:",
+          "    if: |+",
+          "  c:",
+          "    if: {[k]: v}",
+        ]),
+      ),
+    );
+
+    expect(result.name).toBe('a\nb\tc"d');
+    expect(result.jobs.map((job) => job.if)).toEqual([
+      "first\n  indented\nlast\n",
+      "",
+      null,
+    ]);
+  });
+
+  it.each([
+    [
+      "an over-indented sequence item",
+      lf(["on:", "  - a", "  # note", "   - b"]),
+      "error",
+    ],
+    [
+      "a document marker inside a sequence",
+      lf(["on:", "- a", "---"]),
+      "unsupported",
+    ],
+    ["an empty key", lf(["name: a", ": b"]), "error"],
+    [
+      "a key line inside a plain continuation",
+      lf(["jobs:", "  a:", "    name: x", "      y: z"]),
+      "error",
+    ],
+    [
+      "a tab before block scalar content",
+      lf(["jobs:", "  a:", "    if: |", "\tx"]),
+      "unsupported",
+    ],
+  ])("returns status %s for %s", (_label, text, status) => {
+    expect(readWorkflowText(text).status).toBe(status);
+  });
 });

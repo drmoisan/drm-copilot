@@ -633,5 +633,50 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1051: push-down integration modules (per-file entries; no `global` key).
+    "./src/lib/push-down-integration/workflow-yaml-reader.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down-integration/integration-items.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down-integration/integration-ecosystems.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down-integration/integration-detect.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down-integration/integration-validate.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down-integration/integration-validate-artifacts.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down/push-down-integration-needed.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-push-down-integration-tool-definitions.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-tool-inputs-push-down-integration.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-handlers/push-down-integration-handlers.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/repo-automation-service-push-down-integration.ts": {
+      lines: 85,
+      branches: 75,
+    },
   },
 };

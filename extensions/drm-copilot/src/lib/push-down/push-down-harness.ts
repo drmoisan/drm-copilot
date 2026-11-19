@@ -199,10 +199,12 @@ function ciSelectionUnion(
 export function pushDownHarness(
   options: PushDownHarnessOptions,
 ): PushDownHarnessResult {
-  const selected = ECOSYSTEM_NAMES.filter(
-    (name) => options.ecosystems[name] !== undefined,
-  );
-  const lastEcosystem = selected[selected.length - 1];
+  // Each selected ecosystem keeps its input, so no later lookup can miss it.
+  const selected = ECOSYSTEM_NAMES.flatMap((name) => {
+    const input = options.ecosystems[name];
+    return input === undefined ? [] : [{ name, input }];
+  });
+  const lastEcosystem = selected[selected.length - 1]?.name;
   if (lastEcosystem === undefined) {
     throw new Error("Push-down harness requires at least one ecosystem.");
   }
@@ -219,12 +221,12 @@ export function pushDownHarness(
   const buildLayers = (
     previous: DestinationManifest | undefined,
   ): PushDownLayer[] => {
-    const ecosystemLayers = selected.map((name) =>
+    const ecosystemLayers = selected.map(({ name, input }) =>
       ECOSYSTEM_LAYER_BUILDERS[name]({
         bundleRoot: bundleRoot(name),
         destinationRoot: options.destinationRoot,
         fs: options.fs,
-        ...effectiveSelection(options.ecosystems[name] ?? {}, previous, name),
+        ...effectiveSelection(input, previous, name),
         ...(options.listEntries === undefined
           ? {}
           : { listEntries: options.listEntries }),
