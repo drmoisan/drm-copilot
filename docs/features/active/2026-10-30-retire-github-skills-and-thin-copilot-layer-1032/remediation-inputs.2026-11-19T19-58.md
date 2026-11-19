@@ -5,7 +5,7 @@ Issue: #1032
 Branch: feature/retire-github-skills-and-thin-copilot-layer-1032
 Trigger: integration_sync merge conflict. origin/epic/shared-agent-harness-layer-integration advanced with #1049 (PR #1209), #1050 (PR #1210) and #1051 (PR #1211) after the H3 and Branch B plans completed at 660f6c7c5. config/orchestration-regeneration.json is absent, so the regenerate path does not apply (no_config) and the conflict is handled through the remediation loop.
 Review-Verdict: REMEDIATION_REQUIRED
-Remediation-Mode: proportionate
+Remediation-Mode: design
 
 Rationale for the mode: every finding is resolved inside files already in the branch diff (the retired brief copies, the remaining execution-environment brief copies, the Copilot pack manifests) plus their tests and mirrors. No spec acceptance criterion or public interface changes.
 
