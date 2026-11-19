@@ -147,7 +147,7 @@ def skill(name: str) -> tuple[dict[str, object], str]:
     repository Markdown and performs no writes or consumer-source operations.
     """
     assert name in SKILLS
-    text = (ROOT / ".github" / "skills" / name / "SKILL.md").read_text(encoding="utf-8")
+    text = (ROOT / ".agents" / "skills" / name / "SKILL.md").read_text(encoding="utf-8")
     opening, metadata, body = text.split("---", 2)
     assert opening == "" and body.startswith("\n")
     decoded: object = yaml.safe_load(metadata)
