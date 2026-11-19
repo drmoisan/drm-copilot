@@ -72,7 +72,7 @@ No artifact adds Python; nothing pushed down is TypeScript or Python; no hook in
   - Acceptance: both READMEs hold no `WRITER-TOKENS` token and no `Sync AGENTS.md from`; the CHANGELOG holds `### Removed` and `Sync AGENTS.md from Instructions` between `## [Unreleased]` and the next `## [` heading.
 - [x] [P1-T6] Extend `GUARD-SUITE` with checks `CLR-WRITER-FILES-ABSENT` (the three deleted paths absent), `CLR-WRITER-COMMAND-ABSENT` (no `WRITER-TOKENS` token in `package.json`, the admin file, `reference-rewrites.ts`, the Python rewrites module, `.vscode/tasks.json`, `config/poshqc-shard-weights.json`) and `CLR-WRITER-CHANGELOG` (the `### Removed` entry under `## [Unreleased]`), each a pure function over reader-seam text with one `-REJECTS` negative case, tokens built at runtime.
   - Acceptance: `GUARD-SUITE` passes in the task check, including every `-REJECTS` case, and holds no `WRITER-TOKENS` literal.
-- [ ] [P1-T7] [phase-gate] Run stages 1 to 6 across the repository per `## Test Cadence (Mandatory)`, with the unit stage as the three `PARALLEL-GATES` runs, writing `<FEATURE>/evidence/qa-gates/phase-gate.P1.<timestamp>.md`.
+- [x] [P1-T7] [phase-gate] Run stages 1 to 6 across the repository per `## Test Cadence (Mandatory)`, with the unit stage as the three `PARALLEL-GATES` runs, writing `<FEATURE>/evidence/qa-gates/phase-gate.P1.<timestamp>.md`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/phase-gate.P1.<timestamp>.md` carries `Plan: plan-h3-sync-writer-retirement.md` and one clean pass of every stage.
 
 ### Phase 2 — Final QA, Evidence and Self-Review
