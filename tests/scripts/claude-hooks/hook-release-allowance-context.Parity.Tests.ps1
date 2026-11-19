@@ -151,10 +151,8 @@ Describe 'release-commit allowance parity and absence contracts (issue #1201)' {
     It 'states the release-commit allowance in <Path> (AC-27)' -ForEach @(
         @{ Path = '.claude/skills/execution-environment/SKILL.md' }
         @{ Path = '.agents/skills/execution-environment/SKILL.md' }
-        @{ Path = '.github/skills/execution-environment/SKILL.md' }
         @{ Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md' }
         @{ Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md' }
-        @{ Path = 'extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md' }
     ) {
         # Arrange
         $text = Get-ReleaseParityText -RelativePath $Path

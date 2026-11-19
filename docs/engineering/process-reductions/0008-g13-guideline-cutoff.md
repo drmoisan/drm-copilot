@@ -48,6 +48,7 @@ Result check: `docs/features/active/reduce-feature-cycle-time-with-revertible-le
 - `extensions/drm-copilot/resources/customizations/.github/agents/atomic_planning.agent.md`: byte-identical bundle copy
 - `docs/engineering/process-reductions/0008-g13-guideline-cutoff.md`: this entry
 - `docs/engineering/process-reductions/README.md`: index row
+- Issue #1032 retired the Copilot skill copies (the `skills` folder under `.github` and its bundle copy under `extensions/drm-copilot/resources/customizations/`). In the same commit this entry's revert blocks and stored-patch sections for those copies were removed; a revert step that names one of those copies no longer applies.
 
 ## Stored Patch
 

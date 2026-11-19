@@ -172,6 +172,7 @@ Several features ran full test suites at the same time on one machine, each with
 - `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/test-execution-policy.ps1` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/test-execution-policy.ps1`, bundle copies of the twins
 - `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`, contract test (lane tokens)
 - `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py`, contract test (lane tokens)
+- Issue #1032 retired the Copilot skill copies (the `skills` folder under `.github` and its bundle copy under `extensions/drm-copilot/resources/customizations/`). In the same commit this entry's revert blocks and stored-patch sections for those copies were removed; a revert step that names one of those copies no longer applies.
 
 ## Prior Text
 
@@ -205,15 +206,6 @@ Local test gates exclude the integration and golden lanes: CI integration and go
 ````
 
 ### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md
-
-````Current
-Local test gates exclude the integration and golden lanes: CI integration and golden lanes are evidence, and a step that would run a lane locally records a non-blocking deviation under evidence/other/.
-````
-
-````Prior
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
 
 ````Current
 Local test gates exclude the integration and golden lanes: CI integration and golden lanes are evidence, and a step that would run a lane locally records a non-blocking deviation under evidence/other/.

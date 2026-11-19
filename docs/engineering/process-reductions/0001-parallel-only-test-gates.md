@@ -301,6 +301,7 @@ Paths of the #1096 landing. The six `execution-environment` copies listed above 
 - `tests/scripts/dev_tools/atomic_executor/test_qc_runner.py`: contract test, with Revert Blocks
 - `tests/scripts/dev_tools/test_fix_all_branches.py`: contract test, with a Revert Block
 - `tests/scripts/workflows/VsCodeQualityTasks.Tests.ps1`: contract test, with a Revert Block
+- Issue #1032 retired the Copilot skill copies (the `skills` folder under `.github` and its bundle copy under `extensions/drm-copilot/resources/customizations/`). In the same commit this entry's revert blocks and stored-patch sections for those copies were removed; a revert step that names one of those copies no longer applies.
 
 ## Stored Patch
 
@@ -355,16 +356,6 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
 ````
 
 ### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md
-
-````Current
-The `Test isolation` bullet names the parallel gates the plan uses: one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers, each re-run only after a fix.
-````
-
-````Prior
-The `Test isolation` bullet names the isolation runs the plan performs: a seeded shuffled Jest run with the seed recorded, a reversed-order run of the new or changed Python test modules, and a seeded shuffled file-order run of the touched Pester suites with at least three seeds, each seed recorded.
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
 
 ````Current
 The `Test isolation` bullet names the parallel gates the plan uses: one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers, each re-run only after a fix.

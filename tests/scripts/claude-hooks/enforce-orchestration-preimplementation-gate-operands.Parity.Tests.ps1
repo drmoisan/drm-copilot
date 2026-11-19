@@ -54,10 +54,8 @@ Describe 'enforce-orchestration-preimplementation-gate-operands.ps1 surface pari
     It 'states the issue #1188 command-operand resolution in the Hook Execution Context section of <Copy>' -ForEach @(
         @{ Copy = '.claude/skills/execution-environment/SKILL.md' }
         @{ Copy = '.agents/skills/execution-environment/SKILL.md' }
-        @{ Copy = '.github/skills/execution-environment/SKILL.md' }
         @{ Copy = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md' }
         @{ Copy = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md' }
-        @{ Copy = 'extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md' }
     ) {
         # Arrange
         $text = [System.IO.File]::ReadAllText((Join-Path $script:RepoRoot $Copy))

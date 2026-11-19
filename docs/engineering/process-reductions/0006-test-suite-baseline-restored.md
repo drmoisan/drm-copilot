@@ -246,6 +246,7 @@ The list covers every path of the stored patch, with rename detection off.
 - `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: contract test
 - `tests/scripts/dev_tools/test_codex_orchestration_contracts.py`: contract test
 - `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py`: contract test
+- Issue #1032 retired the Copilot skill copies (the `skills` folder under `.github` and its bundle copy under `extensions/drm-copilot/resources/customizations/`). In the same commit this entry's revert blocks and stored-patch sections for those copies were removed; a revert step that names one of those copies no longer applies.
 
 ## Stored Patch
 
@@ -402,81 +403,6 @@ Phase 0 must also capture static baselines (format, lint, type check, and analyz
 ````
 
 ### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md
-
-````Current
-- `minor-audit` plans MUST include baseline evidence tasks (static baselines and the `Phase 0 baseline` test-suite run), targeted verification evidence tasks read from the gate run, and end-state evidence tasks.
-````
-
-````Prior
-- `minor-audit` plans MUST include static baseline evidence tasks, targeted verification evidence tasks read from the gate run, and end-state evidence tasks.
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
-````
-
-````Prior
-- static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-	- each baseline step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
-	- baseline test-step artifacts for languages with mandatory coverage policy MUST include the pass and fail counts and numeric coverage headline values in `Output Summary:` (repo-wide percent and the percent of each in-scope file), read from the one parallel gate run.
-
-2) Delegated implementation block
-````
-
-````Prior
-	- each baseline step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
-
-2) Delegated implementation block
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-record numeric post-change coverage values from the single gate run in `Output Summary:`, compared with the `Phase 0 baseline` run of the same gate.
-````
-
-````Prior
-record numeric coverage values from the single gate run in `Output Summary:`.
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched and, for each language in scope with coverage policy, one `Phase 0 baseline` run of its test gate: one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, and one Jest coverage run where TypeScript is in scope. Each test-suite baseline artifact records the pass and fail counts, the repo-wide coverage, and the coverage of each in-scope file. The final gate's run of the same gate is compared with it: no new failing test, no per-file or repo-wide coverage drop, the thresholds still apply, and new behavior is tested. A new file has no pre-change run and is judged against the thresholds. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
-
-A plan written before this rule that captures static baselines only stays valid: preflight does not return it as a defect, its final gate reads coverage against the thresholds, and its audit records `N/A - no pre-change run`.
-````
-
-````Prior
-Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched, and no test suite runs in it. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-- The approved plan MUST include explicit baseline and final-QC coverage capture tasks: the `Phase 0 baseline` run and the final gate run, each one run of the language's parallel gate.
-- Baseline and final-QC artifacts MUST record numeric coverage values (not placeholders such as `UNVERIFIED`).
-- Where policy requires no-regression and new-code thresholds, the plan MUST include a delta/threshold verification task that reports, with post-change figures from the single gate run:
-	- baseline coverage, from the `Phase 0 baseline` artifact,
-	- post-change coverage,
-	- new/changed-code coverage.
-- Each changed file meets the coverage thresholds and shows no drop against the `Phase 0 baseline`; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
-````
-
-````Prior
-- The approved plan MUST include an explicit final-QC coverage capture task.
-- The final-QC artifact MUST record numeric coverage values (not placeholders such as `UNVERIFIED`).
-- The plan MUST include a threshold task that reports each changed file from the single gate run against the coverage thresholds. New behavior is tested. No earlier figure is compared.
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
 
 ````Current
 - `minor-audit` plans MUST include baseline evidence tasks (static baselines and the `Phase 0 baseline` test-suite run), targeted verification evidence tasks read from the gate run, and end-state evidence tasks.
