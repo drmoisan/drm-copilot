@@ -9818,12 +9818,14 @@
       "source_path": ".github/agents/Powershell DI Unit Test Engineer.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:Powershell DI Unit Test Engineer",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:atomic_planning",
@@ -9833,12 +9835,14 @@
       "source_path": ".github/agents/atomic_planning.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:atomic_planning",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:csharp-atomic-planning",
@@ -9848,12 +9852,14 @@
       "source_path": ".github/agents/csharp-atomic-planning.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:csharp-atomic-planning",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:csharp-orchestrator",
@@ -9863,12 +9869,14 @@
       "source_path": ".github/agents/csharp-orchestrator.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:csharp-orchestrator",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:csharp-typed-engineer",
@@ -9878,12 +9886,14 @@
       "source_path": ".github/agents/csharp-typed-engineer.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:csharp-typed-engineer",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:epic-review",
@@ -9893,12 +9903,14 @@
       "source_path": ".github/agents/epic-review.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:epic-review",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:feature-review",
@@ -9908,12 +9920,14 @@
       "source_path": ".github/agents/feature-review.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:feature-review",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:orchestrator",
@@ -9923,12 +9937,14 @@
       "source_path": ".github/agents/orchestrator.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:orchestrator",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:powershell-atomic-planning",
@@ -9938,12 +9954,14 @@
       "source_path": ".github/agents/powershell-atomic-planning.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:powershell-atomic-planning",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:powershell-orchestrator",
@@ -9953,12 +9971,14 @@
       "source_path": ".github/agents/powershell-orchestrator.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:powershell-orchestrator",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:powershell-typed-engineer",
@@ -9968,12 +9988,14 @@
       "source_path": ".github/agents/powershell-typed-engineer.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:powershell-typed-engineer",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:prd-feature",
@@ -9983,12 +10005,14 @@
       "source_path": ".github/agents/prd-feature.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:prd-feature",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:pytest-unit-test-coding",
@@ -9998,12 +10022,14 @@
       "source_path": ".github/agents/pytest-unit-test-coding.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:pytest-unit-test-coding",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:python-atomic-planning",
@@ -10013,12 +10039,14 @@
       "source_path": ".github/agents/python-atomic-planning.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:python-atomic-planning",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:python-execution-only-typed",
@@ -10028,12 +10056,14 @@
       "source_path": ".github/agents/python-execution-only-typed.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:python-execution-only-typed",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:python-orchestrator",
@@ -10043,12 +10073,14 @@
       "source_path": ".github/agents/python-orchestrator.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:python-orchestrator",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:python-typed-engineer",
@@ -10058,12 +10090,14 @@
       "source_path": ".github/agents/python-typed-engineer.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:python-typed-engineer",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:staged-review",
@@ -10073,12 +10107,14 @@
       "source_path": ".github/agents/staged-review.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:staged-review",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:status_updater",
@@ -10088,12 +10124,14 @@
       "source_path": ".github/agents/status_updater.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:status_updater",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:handoff:typescript-engineer",
@@ -10103,12 +10141,14 @@
       "source_path": ".github/agents/typescript-engineer.agent.md",
       "source_pointer": "handoffs",
       "disposition": "native",
+      "reason": "Handoffs stay native in .github/agents (settled design).",
       "parity_group": "handoff:typescript-engineer",
       "consumers": [
         "copilot-vscode"
       ],
       "owner_child": 6,
-      "decision_status": "approved"
+      "decision_status": "approved",
+      "decision_ref": "#1018:epic.md#shared-design"
     },
     {
       "id": "copilot:hook-registration:PreToolUse//discovery-planning",
