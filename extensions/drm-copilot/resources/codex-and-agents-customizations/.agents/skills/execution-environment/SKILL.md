@@ -198,7 +198,7 @@ These pass every validator rule and are found only by reading the plan against t
 
 ## Coverage and File-Size Gates
 
-- Line coverage of at least 85% and branch coverage of at least 75% apply per changed production file in Python and TypeScript. PowerShell has a line threshold of 85% and no branch gate, because Pester does not measure branch coverage. No production file may be excluded from measurement.
+- Line coverage of at least 85% and branch coverage of at least 75% apply per changed production file in Python and TypeScript. PowerShell has a line threshold of 85% and no branch gate, because Pester does not measure branch coverage. No production file may be excluded from measurement, except under the vendored push-down exception of the `general-unit-test` rule: in a destination repository whose `config/poshqc-coverage.json` sets `exempt_unchanged_push_down_files`, PoshQC exempts at run time each unchanged pushed-down file listed in `.push-down-manifest.json`, the `config` population omits the files with status `exempt`, and the run writes `vendored-coverage-exemptions.json` beside the coverage output file; this repository does not opt in.
 - Python: measure a module with `--cov=<dotted.module>`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:<path>`; read branch figures from the JSON report.
 - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
 - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.

@@ -139,6 +139,7 @@ For each language that has changed files in the feature branch:
 
 1. Determine which files are new (added) vs modified (changed) using the PR diff.
 2. Check whether the coverage artifact exists for that language.
+   - Vendored push-down exemptions: when `vendored-coverage-exemptions.json` exists beside the coverage output file, read it and confirm that only paths with status `exempt` left the coverage population. Flag any hand-written production-path exclusion (an `exclude`, `omit`, `coveragePathIgnorePatterns`, or kcov `--exclude-path` entry, or an omitted settings-file coverage path) as **Blocking**. Flag a `.push-down-manifest.json` hash change without a push-down run (no `payload_version` change and no push-down summary) as **Blocking**.
 3. If the artifact exists:
    - Parse the repo-wide coverage percentage and report it in the policy audit.
    - If repo-wide line or branch coverage is below the governing repo-wide thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.

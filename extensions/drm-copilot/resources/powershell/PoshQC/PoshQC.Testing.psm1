@@ -210,6 +210,9 @@ Pester tags appended to Filter.ExcludeTag for this invocation (issue #1158). Emp
 .PARAMETER ExcludeTestFileSuffix
 Test file-name suffixes (case-insensitive) removed from the enumerated test files before sharding (issue #1158).
 When a file is removed and ShardCount is 0, Run.Path becomes the kept file list. Empty keeps today's enumeration.
+.PARAMETER WriteVendoredCoverageReport
+Injectable seam that writes vendored-coverage-exemptions.json beside the coverage output file when the coverage
+population carries exemptions (issue #1049). Defaults to Write-PoshQCVendoredCoverageReport.
 #>
 function Invoke-PoshQCTest {
     [CmdletBinding()]
@@ -362,6 +365,10 @@ function Invoke-PoshQCTest {
         [scriptblock] $ResolveCoveragePopulation = {
             param([string] $RootPath, $Settings, [string] $SettingsFile, [string[]] $ScanFolderRoots, [string[]] $Excluded, [scriptblock] $PathExists, [scriptblock] $Log)
             Resolve-PoshQCCoveragePopulation -Root $RootPath -Settings $Settings -SettingsFile $SettingsFile -ScanFolderRoots $ScanFolderRoots -ExcludeDirs $Excluded -SettingsPathExists $PathExists -Logger $Log
+        },
+        [scriptblock] $WriteVendoredCoverageReport = {
+            param([string] $RootPath, [string] $OutputPath, $Exemptions)
+            Write-PoshQCVendoredCoverageReport -Root $RootPath -CoverageOutputPath $OutputPath -Exemptions $Exemptions
         }
     )
 
@@ -427,6 +434,7 @@ function Invoke-PoshQCTest {
         }
     }
 
+    $population = $null
     if ($coverageEnabled -and $config.CodeCoverage) {
         # The coverage population is derived from the workspace, not from a list shipped with the
         # module, so the measured set does not depend on which module copy was loaded (issue #527).
@@ -466,6 +474,11 @@ function Invoke-PoshQCTest {
         } elseif ($config.CodeCoverage.OutputPath -and $config.CodeCoverage.OutputPath.Value) {
             $coverageOutputPath = $config.CodeCoverage.OutputPath.Value
         }
+    }
+    # Issue #1049: an opted-in population carries Exemptions; write the report beside the coverage output file.
+    $exemptionsProperty = if ($null -ne $population) { $population.PSObject.Properties['Exemptions'] } else { $null }
+    if ($null -ne $exemptionsProperty -and $null -ne $exemptionsProperty.Value) {
+        $null = & $WriteVendoredCoverageReport $Root $coverageOutputPath @($exemptionsProperty.Value)
     }
 
     $runPaths = if ($config.Run.Path -is [System.Array]) { [string[]]$config.Run.Path } elseif ($config.Run.Path -and $config.Run.Path.Value) { [string[]]$config.Run.Path.Value } else { @() }

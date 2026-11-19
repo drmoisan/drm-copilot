@@ -1,0 +1,6 @@
+# Reviewer Coverage Gates - feature review
+
+Timestamp: 2026-11-19T13-43
+Command: env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest --cov --cov-branch; sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest --coverage (both at head a9fcaf343c8966df05f10a517b0cae9b3d0bb358, wrapped in a retry loop for launcher exit 75; totals read with awk over the LF/LH/BRF/BRH records of artifacts/python/lcov.info and coverage/lcov.info)
+EXIT_CODE: 0
+Output Summary: pytest attempts 1-5 exit 75 (queue timeout: machine test-suite lock held by another worktree's Pester run); attempt 6 exit 0 at 13:42:16Z: `17122 passed, 6 skipped in 219.93s`, `Coverage LCOV written to file artifacts/python/lcov.info`; Python repo-wide 98.00% lines (35359/36079), 95.46% branches (13091/13714). Root Jest attempt 1 exit 0 at 13:42:45Z: 374 suites, 6159 tests passed, 0 failed; root coverage/lcov.info 98.39% lines (74683/75905), 94.39% branches (11262/11931). Run by the feature-review agent because the root TypeScript report and the Python report were absent in the item worktree; no Python or TypeScript production file differs between the merge base 021a52e74999d17c6ae67ed7a32c14958448ceab and the head.
