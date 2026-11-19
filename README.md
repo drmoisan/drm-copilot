@@ -305,6 +305,26 @@ Run `scripts/dev-tools/bootstrap-host.ps1` without `-Apply` to preview missing o
 
 Python 3.11/3.12 compatibility jobs, consumer engine requirements, and release-publishing runtime pins remain independent of this development baseline.
 
+### Copilot collision controls
+
+GitHub Copilot in VS Code reads the shared `.agents/skills` source and, by default, also the generated Claude copies under `.claude/`, so each skill, rule, and agent can load twice. Add these keys to your VS Code user settings (user scope; the repository's `.vscode/settings.json` does not carry them) to stop Copilot from loading the Claude copies:
+
+```json
+{
+  "chat.agentSkillsLocations": { ".claude/skills": false },
+  "chat.instructionsFilesLocations": { ".claude/rules": false },
+  "chat.agentFilesLocations": { ".claude/agents": false },
+  "chat.useClaudeMdFile": false
+}
+```
+
+- `chat.agentSkillsLocations` with `".claude/skills": false`: Copilot reads skills from `.agents/skills` only.
+- `chat.instructionsFilesLocations` with `".claude/rules": false`: Copilot reads path-scoped instructions from `.github/instructions` only.
+- `chat.agentFilesLocations` with `".claude/agents": false`: Copilot reads agents from `.github/agents` only, while that folder remains.
+- `chat.useClaudeMdFile` set to `false`: Copilot reads the shared standing instructions from `AGENTS.md` and does not also load `CLAUDE.md`.
+
+Leave `chat.useAgentsMdFile`, `chat.useClaudeHooks`, and `github.copilot.chat.codeGeneration.useInstructionFiles` at their defaults. The Copilot CLI and the Copilot cloud agent do not read these editor settings.
+
 ### Standalone MCP package
 
 - Node.js 18+
