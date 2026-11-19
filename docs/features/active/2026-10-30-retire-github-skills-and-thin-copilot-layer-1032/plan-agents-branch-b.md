@@ -56,7 +56,7 @@ No artifact adds Python, nothing is pushed down, and no tool, command, skill or 
   - Acceptance: `<FEATURE>/evidence/baseline/branch-b-recheck.<timestamp>.md` records `GithubAgentsTarget`, each file with its hash, the file and handoff-bearing counts, the two id counts, both cross-check results, each assumption as `holds` or `differs`, and under `OVERRIDE-IDS:` each recorded id with its source row or Diff ID, the owner decision, and its current `disposition`, `reason`, `decision_status` and `decision_ref` (or `none`); any `differs` on UB-2 to UB-4 records `blocked: premise_falsified`.
 - [x] [P0-T3] Run the pytest `Phase 0 baseline` `GATE-RUN` over `tests/scripts` and the other configured test roots with coverage.
   - Acceptance: `<FEATURE>/evidence/baseline/branch-b-pytest-baseline.<timestamp>.md` records pass and fail counts and repository-wide line and branch coverage, with every `AGENT-PY` module in the run, and `no in-scope production file`.
-- [ ] [P0-T4] Run the Pester `Phase 0 baseline` `GATE-RUN` over the scan folders of `config/poshqc-scan.json`.
+- [x] [P0-T4] Run the Pester `Phase 0 baseline` `GATE-RUN` over the scan folders of `config/poshqc-scan.json`.
   - Acceptance: `<FEATURE>/evidence/baseline/branch-b-pester-baseline.<timestamp>.md` records `ExitCode`, pass and fail counts, repository-wide line coverage, and the pass state of every `AGENT-PESTER` suite.
 
 ### Phase 1 — Matrix, Bindings and Outcome
