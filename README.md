@@ -132,7 +132,6 @@ Customization conversion and publishing:
 - `drmCopilotExtension.pushDownCopilotCustomizations`
 - `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`
 - `drmCopilotExtension.pushDownClaudeCustomizations`
-- `drmCopilotExtension.syncAgentsFromInstructions`
 
 PowerShell quality control (PoshQC):
 
@@ -277,10 +276,6 @@ A matched payload path is not written. Each skipped path and each entry that mat
 These lines appear in the summary artifact's `exclusions` object (with `conflict_count`, `entries`, `manifest_path`, `skipped`, `skipped_count`, and `unmatched_entries`), in the MCP result's `warnings` field, in the drm-copilot output channel, and on Python CLI stdout after the `Wrote push-down summary artifact to:` line. The VS Code command additionally shows a warning notification when at least one conflict is reported. When no manifest exists, behavior is unchanged: no `exclusions` key, no `warnings` field, no additional lines, and no notification.
 
 Limitations: the push-down never deletes destination files, so a file already present at an excluded path is removed by the destination once. Detection of dangling references (an excluded file that other pushed-down content still cites) is a non-goal of this feature and is not reported.
-
-### Sync AGENTS.md from instructions
-
-`drmCopilotExtension.syncAgentsFromInstructions` regenerates `AGENTS.md` in the destination workspace by discovering all `.github/instructions/*.instructions.md` files under the active workspace root, aggregating their content deterministically, and writing the consolidated result. This replaces any manual edits to `AGENTS.md` with a fully generated output derived from the canonical instruction files.
 
 ## Requirements
 
