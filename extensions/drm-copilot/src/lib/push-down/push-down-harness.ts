@@ -38,6 +38,15 @@ import { fullTreePacks } from "./push-down-pack-resolver";
 import { joinPosix, runPushDownPipeline } from "./push-down-pipeline";
 import { type PushDownReport } from "./push-down-report";
 import { buildSharedLayer } from "./push-down-shared-layer";
+import {
+  buildCiWorkflowsContribution,
+  withCiWorkflows,
+} from "./push-down-ci-layer";
+import {
+  type CiSelectionRecord,
+  type CiWorkflowsMode,
+  inferCiWorkflowsMode,
+} from "./push-down-ci-workflows";
 
 /** Options of {@link pushDownHarness}. */
 export interface PushDownHarnessOptions {
@@ -54,6 +63,11 @@ export interface PushDownHarnessOptions {
   readonly clock?: Clock;
   /** Destination lister for the Claude blast-radius derivation. */
   readonly listEntries?: DirectoryLister;
+  /**
+   * Destination CI mode (issue #1050); omitted reuses the mode inferred from
+   * the destination manifest, which is `off` without a CI data-file entry.
+   */
+  readonly ciWorkflows?: CiWorkflowsMode;
 }
 
 /** Result of {@link pushDownHarness}. */
@@ -140,6 +154,30 @@ function effectiveSelection(
 }
 
 /**
+ * Return the selection union the CI caller covers: the selections this run
+ * resolved plus the recorded selections of ecosystems outside the run.
+ *
+ * @param ecosystemLayers Ecosystem layers of the run.
+ * @param previous Destination manifest, when present.
+ * @returns One selection record per ecosystem.
+ */
+function ciSelectionUnion(
+  ecosystemLayers: ReadonlyArray<PushDownLayer>,
+  previous: DestinationManifest | undefined,
+): CiSelectionRecord[] {
+  const inRun = new Set<string>(ecosystemLayers.map((layer) => layer.name));
+  const recorded = Object.entries(previous?.selection ?? {})
+    .filter(([ecosystem]) => !inRun.has(ecosystem))
+    .map(([, selection]) => selection);
+  return [
+    ...ecosystemLayers.flatMap((layer) =>
+      layer.selection === undefined ? [] : [layer.selection],
+    ),
+    ...recorded,
+  ];
+}
+
+/**
  * Push the shared layer and the selected ecosystem layers into a destination.
  *
  * @param options Extension root, destination, adapter, ecosystem selection,
@@ -161,6 +199,13 @@ export function pushDownHarness(
   const resourcesRoot = joinPosix(options.extensionRoot, "resources");
   const bundleRoot = (name: EcosystemName): string =>
     joinPosix(resourcesRoot, ECOSYSTEM_BUNDLE_DIRECTORIES[name]);
+  const payloadVersion = resolvePayloadVersion(
+    options.fs,
+    options.extensionRoot,
+  );
+  // Workflow-name collision lines of the CI contribution, filled while the
+  // layers are built so a dry run reports them too.
+  const ciWarnings: string[] = [];
   const buildLayers = (
     previous: DestinationManifest | undefined,
   ): PushDownLayer[] => {
@@ -175,16 +220,33 @@ export function pushDownHarness(
           : { listEntries: options.listEntries }),
       }),
     );
+    const sharedLayer = buildSharedLayer({
+      bundleRoot: bundleRoot("codex"),
+      resourcesRoot,
+      destinationRoot: options.destinationRoot,
+      fs: options.fs,
+      artifactDirectory:
+        ecosystemLayers[ecosystemLayers.length - 1]?.artifactDirectory ??
+        "artifacts/push-down",
+    });
+    // An explicit mode wins; otherwise the recorded mode is reused (O-5).
+    const mode = options.ciWorkflows ?? inferCiWorkflowsMode(previous);
+    const contribution =
+      mode === "off"
+        ? undefined
+        : buildCiWorkflowsContribution({
+            fs: options.fs,
+            resourcesRoot,
+            destinationRoot: options.destinationRoot,
+            mode,
+            selectionRecords: ciSelectionUnion(ecosystemLayers, previous),
+            payloadVersion,
+          });
+    ciWarnings.push(...(contribution?.warnings ?? []));
     const layers = [
-      buildSharedLayer({
-        bundleRoot: bundleRoot("codex"),
-        resourcesRoot,
-        destinationRoot: options.destinationRoot,
-        fs: options.fs,
-        artifactDirectory:
-          ecosystemLayers[ecosystemLayers.length - 1]?.artifactDirectory ??
-          "artifacts/push-down",
-      }),
+      contribution === undefined
+        ? sharedLayer
+        : withCiWorkflows(sharedLayer, contribution),
       ...ecosystemLayers,
     ];
     assertDestinationManifestOutsideLayers(layers);
@@ -206,11 +268,11 @@ export function pushDownHarness(
       ...(planned.exclusions === undefined
         ? {}
         : { exclusions: planned.exclusions }),
-      warnings: planned.warnings,
+      warnings: [...planned.warnings, ...ciWarnings],
     };
   }
   const applied = applyPushDownPlan(planned, {
-    payloadVersion: resolvePayloadVersion(options.fs, options.extensionRoot),
+    payloadVersion,
     artifactRoot: options.destinationRoot,
     ...(options.clock === undefined ? {} : { clock: options.clock }),
   });
@@ -220,6 +282,6 @@ export function pushDownHarness(
     ...(applied.exclusions === undefined
       ? {}
       : { exclusions: applied.exclusions }),
-    warnings: applied.warnings,
+    warnings: [...applied.warnings, ...ciWarnings],
   };
 }

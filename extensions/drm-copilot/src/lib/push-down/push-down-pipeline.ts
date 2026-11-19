@@ -247,6 +247,10 @@ function planPayloadFile(
   }
   const present = context.fs.isFile(destinationPath);
   const merged = layer.mergedPaths.includes(relativePath);
+  // A protected path (issue #1050) never takes the overwrite opt-in.
+  const overwriteUnmanaged =
+    context.overwriteUnmanaged &&
+    !(layer.unmanagedProtectedPaths?.includes(relativePath) ?? false);
   const classification = merged
     ? undefined
     : classifyPayloadFile({
@@ -255,7 +259,7 @@ function planPayloadFile(
           : undefined,
         manifestHash: context.previous?.files[relativePath]?.sha256,
         payloadHash: hashPayloadText(payloadText),
-        overwriteUnmanaged: context.overwriteUnmanaged,
+        overwriteUnmanaged,
       });
   state.entries.push({
     kind: "payload",
