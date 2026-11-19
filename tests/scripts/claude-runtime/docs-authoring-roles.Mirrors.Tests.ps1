@@ -56,7 +56,7 @@ Describe 'documentation mirror set' {
         $hashes['CodexBundle'] | Should -Be $hashes['Codex']
     }
 
-    It 'places <Skill> at all six skill locations with byte-identical bundle copies' -ForEach $script:SkillRows {
+    It 'places <Skill> at all four skill locations with byte-identical bundle copies' -ForEach $script:SkillRows {
         # Act
         $hashes = @{}
         foreach ($key in $script:Roots.Keys) { $hashes[$key] = Get-RepoFileHash -RelativePath "$($script:Roots[$key])/$Skill/SKILL.md" }
@@ -64,11 +64,10 @@ Describe 'documentation mirror set' {
         # Assert
         foreach ($key in $script:Roots.Keys) { $hashes[$key] | Should -Not -BeNullOrEmpty -Because "$key copy of $Skill" }
         $hashes['ClaudeBundle'] | Should -Be $hashes['Claude']
-        $hashes['CopilotBundle'] | Should -Be $hashes['Copilot']
         $hashes['CodexBundle'] | Should -Be $hashes['Codex']
     }
 
-    It 'keeps the <Template> template byte-identical at all six skill locations' -ForEach $script:TemplateRows {
+    It 'keeps the <Template> template byte-identical at all four skill locations' -ForEach $script:TemplateRows {
         # Act
         $hashes = @(foreach ($key in $script:Roots.Keys) { Get-RepoFileHash -RelativePath "$($script:Roots[$key])/docs-author-page/templates/$Template.md" })
 
