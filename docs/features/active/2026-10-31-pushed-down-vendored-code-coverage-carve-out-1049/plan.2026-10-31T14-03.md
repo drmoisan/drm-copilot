@@ -112,7 +112,7 @@ No analyzer suppression is added, and no hook, skill or library invokes Python.
   - Acceptance: `<FEATURE>/evidence/qa-gates/poshqc-bundle-copy.<timestamp>.md` records equal SHA-256 hashes for the six pairs.
 - [x] [P2-T10] Extend `POSHQC_PARITY_PATHS` in `tests/scripts/dev_tools/test_poshqc_bundled_parity.py` in place with `scripts/powershell/PoshQC/PoshQC.VendoredCoverage.psm1` only (AD-4); no other change.
   - Acceptance: the task check runs `tests/scripts/dev_tools/test_poshqc_bundled_parity.py::test_poshqc_bundled_module_files_match_repo_root_sources` with one pass.
-- [ ] [P2-T11] [phase-gate] Run the gate loop of the preamble for Phase 2, writing `<FEATURE>/evidence/qa-gates/phase-gate.P2.<timestamp>.md`.
+- [x] [P2-T11] [phase-gate] Run the gate loop of the preamble for Phase 2, writing `<FEATURE>/evidence/qa-gates/phase-gate.P2.<timestamp>.md`.
   - Acceptance: `<FEATURE>/evidence/qa-gates/phase-gate.P2.<timestamp>.md` records one clean pass of stages 1 to 6, no failing test outside the pre-existing sets of [P0-T6], [P0-T8] and [P0-T9], the three new or extended Pester files in the JUnit file, and `Invoke-PoshQCLeakScan` exit 0.
 
 ### Phase 3 — Rule, Feature-Review Step, Brief, Repo Gate
