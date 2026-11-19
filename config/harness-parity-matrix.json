@@ -8916,12 +8916,8 @@
       "kind": "agent",
       "name": "5.1-Beast-adjusted",
       "source_path": ".github/agents/5.1-Beast-adjusted.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/5.1-Beast-adjusted.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:5.1-Beast-adjusted",
       "consumers": [
         "copilot-vscode",
@@ -8930,7 +8926,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:5.1-Thinking-Beast-Mode-adjusted",
@@ -8938,12 +8934,8 @@
       "kind": "agent",
       "name": "5.1-Thinking-Beast-Mode-adjusted",
       "source_path": ".github/agents/5.1-Thinking-Beast-Mode-adjusted.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/5.1-Thinking-Beast-Mode-adjusted.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:5.1-Thinking-Beast-Mode-adjusted",
       "consumers": [
         "copilot-vscode",
@@ -8952,7 +8944,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:Powershell%20DI%20Unit%20Test%20Engineer",
@@ -8960,12 +8952,8 @@
       "kind": "agent",
       "name": "Powershell DI Unit Test Engineer",
       "source_path": ".github/agents/Powershell DI Unit Test Engineer.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/Powershell DI Unit Test Engineer.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:Powershell DI Unit Test Engineer",
       "consumers": [
         "copilot-vscode",
@@ -8974,7 +8962,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:api-architect",
@@ -8982,12 +8970,8 @@
       "kind": "agent",
       "name": "api-architect",
       "source_path": ".github/agents/api-architect.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/api-architect.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:api-architect",
       "consumers": [
         "copilot-vscode",
@@ -8996,7 +8980,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:atomic_executor",
@@ -9004,12 +8988,8 @@
       "kind": "agent",
       "name": "atomic_executor",
       "source_path": ".github/agents/atomic_executor.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/atomic_executor.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:atomic_executor",
       "consumers": [
         "copilot-vscode",
@@ -9018,7 +8998,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:atomic_planning",
@@ -9026,12 +9006,8 @@
       "kind": "agent",
       "name": "atomic_planning",
       "source_path": ".github/agents/atomic_planning.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/atomic_planning.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:atomic_planning",
       "consumers": [
         "copilot-vscode",
@@ -9040,7 +9016,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:commentary-remediation",
@@ -9048,12 +9024,8 @@
       "kind": "agent",
       "name": "commentary-remediation",
       "source_path": ".github/agents/commentary-remediation.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/commentary-remediation.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:commentary-remediation",
       "consumers": [
         "copilot-vscode",
@@ -9062,7 +9034,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:commit-steward",
@@ -9070,12 +9042,8 @@
       "kind": "agent",
       "name": "commit-steward",
       "source_path": ".github/agents/commit-steward.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/commit-steward.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:commit-steward",
       "consumers": [
         "copilot-vscode",
@@ -9084,7 +9052,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:csharp-atomic-executor",
@@ -9092,12 +9060,8 @@
       "kind": "agent",
       "name": "csharp-atomic-executor",
       "source_path": ".github/agents/csharp-atomic-executor.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/csharp-atomic-executor.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:csharp-atomic-executor",
       "consumers": [
         "copilot-vscode",
@@ -9106,7 +9070,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:csharp-atomic-planning",
@@ -9114,12 +9078,8 @@
       "kind": "agent",
       "name": "csharp-atomic-planning",
       "source_path": ".github/agents/csharp-atomic-planning.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/csharp-atomic-planning.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:csharp-atomic-planning",
       "consumers": [
         "copilot-vscode",
@@ -9128,7 +9088,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:csharp-orchestrator",
@@ -9136,12 +9096,8 @@
       "kind": "agent",
       "name": "csharp-orchestrator",
       "source_path": ".github/agents/csharp-orchestrator.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/csharp-orchestrator.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:csharp-orchestrator",
       "consumers": [
         "copilot-vscode",
@@ -9150,7 +9106,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:csharp-typed-engineer",
@@ -9158,12 +9114,8 @@
       "kind": "agent",
       "name": "csharp-typed-engineer",
       "source_path": ".github/agents/csharp-typed-engineer.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/csharp-typed-engineer.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:csharp-typed-engineer",
       "consumers": [
         "copilot-vscode",
@@ -9172,7 +9124,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:discovery-capability-sentinel",
@@ -9180,12 +9132,8 @@
       "kind": "agent",
       "name": "discovery-capability-sentinel",
       "source_path": ".github/agents/discovery-capability-sentinel.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/discovery-capability-sentinel.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:discovery-capability-sentinel",
       "consumers": [
         "copilot-vscode",
@@ -9194,7 +9142,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:docs-architect",
@@ -9202,12 +9150,8 @@
       "kind": "agent",
       "name": "docs-architect",
       "source_path": ".github/agents/docs-architect.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/docs-architect.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:docs-architect",
       "consumers": [
         "copilot-vscode",
@@ -9216,7 +9160,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:docs-author",
@@ -9224,12 +9168,8 @@
       "kind": "agent",
       "name": "docs-author",
       "source_path": ".github/agents/docs-author.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/docs-author.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:docs-author",
       "consumers": [
         "copilot-vscode",
@@ -9238,7 +9178,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:docs-coverage-reviewer",
@@ -9246,12 +9186,8 @@
       "kind": "agent",
       "name": "docs-coverage-reviewer",
       "source_path": ".github/agents/docs-coverage-reviewer.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/docs-coverage-reviewer.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:docs-coverage-reviewer",
       "consumers": [
         "copilot-vscode",
@@ -9260,7 +9196,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:docs-reconciler",
@@ -9268,12 +9204,8 @@
       "kind": "agent",
       "name": "docs-reconciler",
       "source_path": ".github/agents/docs-reconciler.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/docs-reconciler.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:docs-reconciler",
       "consumers": [
         "copilot-vscode",
@@ -9282,7 +9214,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:epic-review",
@@ -9290,12 +9222,8 @@
       "kind": "agent",
       "name": "epic-review",
       "source_path": ".github/agents/epic-review.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/epic-review.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:epic-review",
       "consumers": [
         "copilot-vscode",
@@ -9304,7 +9232,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:expert-nextjs-developer",
@@ -9312,12 +9240,8 @@
       "kind": "agent",
       "name": "expert-nextjs-developer",
       "source_path": ".github/agents/expert-nextjs-developer.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/expert-nextjs-developer.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:expert-nextjs-developer",
       "consumers": [
         "copilot-vscode",
@@ -9326,7 +9250,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:expert-react-frontend-engineer",
@@ -9334,12 +9258,8 @@
       "kind": "agent",
       "name": "expert-react-frontend-engineer",
       "source_path": ".github/agents/expert-react-frontend-engineer.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/expert-react-frontend-engineer.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:expert-react-frontend-engineer",
       "consumers": [
         "copilot-vscode",
@@ -9348,7 +9268,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:feature-review",
@@ -9356,12 +9276,8 @@
       "kind": "agent",
       "name": "feature-review",
       "source_path": ".github/agents/feature-review.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/feature-review.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:feature-review",
       "consumers": [
         "copilot-vscode",
@@ -9370,7 +9286,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:gpt-5-beast-mode",
@@ -9378,12 +9294,8 @@
       "kind": "agent",
       "name": "gpt-5-beast-mode",
       "source_path": ".github/agents/gpt-5-beast-mode.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/gpt-5-beast-mode.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:gpt-5-beast-mode",
       "consumers": [
         "copilot-vscode",
@@ -9392,7 +9304,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:hlbpa",
@@ -9400,12 +9312,8 @@
       "kind": "agent",
       "name": "hlbpa",
       "source_path": ".github/agents/hlbpa.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/hlbpa.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:hlbpa",
       "consumers": [
         "copilot-vscode",
@@ -9414,7 +9322,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:legacy-parity-analyst",
@@ -9422,12 +9330,8 @@
       "kind": "agent",
       "name": "legacy-parity-analyst",
       "source_path": ".github/agents/legacy-parity-analyst.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/legacy-parity-analyst.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:legacy-parity-analyst",
       "consumers": [
         "copilot-vscode",
@@ -9436,7 +9340,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:mentor",
@@ -9444,12 +9348,8 @@
       "kind": "agent",
       "name": "mentor",
       "source_path": ".github/agents/mentor.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/mentor.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:mentor",
       "consumers": [
         "copilot-vscode",
@@ -9458,7 +9358,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:migration-coverage-reviewer",
@@ -9466,12 +9366,8 @@
       "kind": "agent",
       "name": "migration-coverage-reviewer",
       "source_path": ".github/agents/migration-coverage-reviewer.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/migration-coverage-reviewer.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:migration-coverage-reviewer",
       "consumers": [
         "copilot-vscode",
@@ -9480,7 +9376,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:orchestrator",
@@ -9488,12 +9384,8 @@
       "kind": "agent",
       "name": "orchestrator",
       "source_path": ".github/agents/orchestrator.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/orchestrator.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:orchestrator",
       "consumers": [
         "copilot-vscode",
@@ -9502,7 +9394,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:powershell-atomic-executor",
@@ -9510,12 +9402,8 @@
       "kind": "agent",
       "name": "powershell-atomic-executor",
       "source_path": ".github/agents/powershell-atomic-executor.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/powershell-atomic-executor.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:powershell-atomic-executor",
       "consumers": [
         "copilot-vscode",
@@ -9524,7 +9412,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:powershell-atomic-planning",
@@ -9532,12 +9420,8 @@
       "kind": "agent",
       "name": "powershell-atomic-planning",
       "source_path": ".github/agents/powershell-atomic-planning.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/powershell-atomic-planning.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:powershell-atomic-planning",
       "consumers": [
         "copilot-vscode",
@@ -9546,7 +9430,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:powershell-orchestrator",
@@ -9554,12 +9438,8 @@
       "kind": "agent",
       "name": "powershell-orchestrator",
       "source_path": ".github/agents/powershell-orchestrator.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/powershell-orchestrator.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:powershell-orchestrator",
       "consumers": [
         "copilot-vscode",
@@ -9568,7 +9448,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:powershell-typed-engineer",
@@ -9576,12 +9456,8 @@
       "kind": "agent",
       "name": "powershell-typed-engineer",
       "source_path": ".github/agents/powershell-typed-engineer.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/powershell-typed-engineer.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:powershell-typed-engineer",
       "consumers": [
         "copilot-vscode",
@@ -9590,7 +9466,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:pr-author",
@@ -9598,12 +9474,8 @@
       "kind": "agent",
       "name": "pr-author",
       "source_path": ".github/agents/pr-author.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/pr-author.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:pr-author",
       "consumers": [
         "copilot-vscode",
@@ -9612,7 +9484,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:prd",
@@ -9620,12 +9492,8 @@
       "kind": "agent",
       "name": "prd",
       "source_path": ".github/agents/prd.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/prd.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:prd",
       "consumers": [
         "copilot-vscode",
@@ -9634,7 +9502,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:prd-feature",
@@ -9642,12 +9510,8 @@
       "kind": "agent",
       "name": "prd-feature",
       "source_path": ".github/agents/prd-feature.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/prd-feature.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:prd-feature",
       "consumers": [
         "copilot-vscode",
@@ -9656,7 +9520,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:pytest-unit-test-coding",
@@ -9664,12 +9528,8 @@
       "kind": "agent",
       "name": "pytest-unit-test-coding",
       "source_path": ".github/agents/pytest-unit-test-coding.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/pytest-unit-test-coding.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:pytest-unit-test-coding",
       "consumers": [
         "copilot-vscode",
@@ -9678,7 +9538,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:python-atomic-executor",
@@ -9686,12 +9546,8 @@
       "kind": "agent",
       "name": "python-atomic-executor",
       "source_path": ".github/agents/python-atomic-executor.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/python-atomic-executor.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:python-atomic-executor",
       "consumers": [
         "copilot-vscode",
@@ -9700,7 +9556,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:python-atomic-planning",
@@ -9708,12 +9564,8 @@
       "kind": "agent",
       "name": "python-atomic-planning",
       "source_path": ".github/agents/python-atomic-planning.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/python-atomic-planning.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:python-atomic-planning",
       "consumers": [
         "copilot-vscode",
@@ -9722,7 +9574,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:python-execution-only-typed",
@@ -9730,12 +9582,8 @@
       "kind": "agent",
       "name": "python-execution-only-typed",
       "source_path": ".github/agents/python-execution-only-typed.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/python-execution-only-typed.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:python-execution-only-typed",
       "consumers": [
         "copilot-vscode",
@@ -9744,7 +9592,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:python-orchestrator",
@@ -9752,12 +9600,8 @@
       "kind": "agent",
       "name": "python-orchestrator",
       "source_path": ".github/agents/python-orchestrator.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/python-orchestrator.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:python-orchestrator",
       "consumers": [
         "copilot-vscode",
@@ -9766,7 +9610,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:python-typed-engineer",
@@ -9774,12 +9618,8 @@
       "kind": "agent",
       "name": "python-typed-engineer",
       "source_path": ".github/agents/python-typed-engineer.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/python-typed-engineer.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:python-typed-engineer",
       "consumers": [
         "copilot-vscode",
@@ -9788,7 +9628,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:requirements-reconciler",
@@ -9796,12 +9636,8 @@
       "kind": "agent",
       "name": "requirements-reconciler",
       "source_path": ".github/agents/requirements-reconciler.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/requirements-reconciler.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:requirements-reconciler",
       "consumers": [
         "copilot-vscode",
@@ -9810,7 +9646,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:runtime-characterization-analyst",
@@ -9818,12 +9654,8 @@
       "kind": "agent",
       "name": "runtime-characterization-analyst",
       "source_path": ".github/agents/runtime-characterization-analyst.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/runtime-characterization-analyst.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:runtime-characterization-analyst",
       "consumers": [
         "copilot-vscode",
@@ -9832,7 +9664,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:staged-review",
@@ -9840,12 +9672,8 @@
       "kind": "agent",
       "name": "staged-review",
       "source_path": ".github/agents/staged-review.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/staged-review.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:staged-review",
       "consumers": [
         "copilot-vscode",
@@ -9854,7 +9682,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:status_updater",
@@ -9862,12 +9690,8 @@
       "kind": "agent",
       "name": "status_updater",
       "source_path": ".github/agents/status_updater.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/status_updater.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:status_updater",
       "consumers": [
         "copilot-vscode",
@@ -9876,7 +9700,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:task-researcher",
@@ -9884,12 +9708,8 @@
       "kind": "agent",
       "name": "task-researcher",
       "source_path": ".github/agents/task-researcher.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/task-researcher.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:task-researcher",
       "consumers": [
         "copilot-vscode",
@@ -9898,7 +9718,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:tdd-green",
@@ -9906,12 +9726,8 @@
       "kind": "agent",
       "name": "tdd-green",
       "source_path": ".github/agents/tdd-green.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/tdd-green.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:tdd-green",
       "consumers": [
         "copilot-vscode",
@@ -9920,7 +9736,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:tdd-red",
@@ -9928,12 +9744,8 @@
       "kind": "agent",
       "name": "tdd-red",
       "source_path": ".github/agents/tdd-red.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/tdd-red.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:tdd-red",
       "consumers": [
         "copilot-vscode",
@@ -9942,7 +9754,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:tdd-refactor",
@@ -9950,12 +9762,8 @@
       "kind": "agent",
       "name": "tdd-refactor",
       "source_path": ".github/agents/tdd-refactor.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/tdd-refactor.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:tdd-refactor",
       "consumers": [
         "copilot-vscode",
@@ -9964,7 +9772,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:typescript-engineer",
@@ -9972,12 +9780,8 @@
       "kind": "agent",
       "name": "typescript-engineer",
       "source_path": ".github/agents/typescript-engineer.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/typescript-engineer.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:typescript-engineer",
       "consumers": [
         "copilot-vscode",
@@ -9986,7 +9790,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:agent:voidbeast-gpt41enhanced",
@@ -9994,12 +9798,8 @@
       "kind": "agent",
       "name": "voidbeast-gpt41enhanced",
       "source_path": ".github/agents/voidbeast-gpt41enhanced.agent.md",
-      "disposition": "generated",
-      "reason": "E3 pending: documentation indicates the Copilot CLI and cloud agent do not read .claude/agents, so this file is kept and generated from one logical definition; dropped if the E3 result shows both read .claude/agents",
-      "target_paths": [
-        ".github/agents/voidbeast-gpt41enhanced.agent.md"
-      ],
-      "generated_from": "pending-source:agent",
+      "disposition": "native",
+      "reason": "Branch B: E3 did not show that the Copilot CLI and cloud agent read .claude/agents, so .github/agents stays the repository agent source; no .github/agents generator target exists.",
       "parity_group": "agent:voidbeast-gpt41enhanced",
       "consumers": [
         "copilot-vscode",
@@ -10008,7 +9808,7 @@
       ],
       "owner_child": 6,
       "decision_status": "provisional",
-      "decision_ref": "#1025:runbooks/e3-copilot-cli-cloud-claude-agents.runbook.md"
+      "decision_ref": "#1025:survey/difference-approval.md#owner-overrides"
     },
     {
       "id": "copilot:handoff:Powershell%20DI%20Unit%20Test%20Engineer",
