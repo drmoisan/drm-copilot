@@ -1,0 +1,144 @@
+{
+  "objective": "Execute epic #1018 child 4 (issue #1029, band C3) from its approved, preflight-cleared atomic plan; resume at atomic execution (S5), then review, PR into epic/shared-agent-harness-layer-integration, CI gate, and merge.",
+  "change_budget_estimate": "large: cross-cutting push-down pipeline across Claude, Codex and Copilot push-downs, MCP wrappers, pack manifests and bundled mirrors (4+ production files)",
+  "path_selected": "large",
+  "route_id": "large",
+  "epic_mode": true,
+  "epic_context": {
+    "epic_issue": 1018,
+    "epic_feature_folder": "shared-agent-harness-layer",
+    "integration_branch": "epic/shared-agent-harness-layer-integration",
+    "epic_checkpoint_path": "artifacts/orchestration/epic-orchestrator-state.json",
+    "child_index": 4,
+    "upstream": [{"issue": 1028, "pr": 1203, "merge_commit_sha": "0d52a1f6cf51f77068c251fe0fec0e03cba78075"}],
+    "pr_base_branch": "epic/shared-agent-harness-layer-integration"
+  },
+  "epic_feature_folder": "shared-agent-harness-layer",
+  "integration_branch": "epic/shared-agent-harness-layer-integration",
+  "branch": "feature/push-down-consolidation-and-ecosystem-packs-1029",
+  "promotion-type": "feature",
+  "short-name": "push-down-consolidation-and-ecosystem-packs",
+  "relativeFile": "docs/features/potential/2026-10-30-push-down-consolidation-and-ecosystem-packs.md",
+  "long-name": "2026-10-30-push-down-consolidation-and-ecosystem-packs",
+  "issue-num": "1029",
+  "feature-folder": "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029",
+  "work-mode": "full-feature",
+  "plan-path": "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/plan.2026-10-30T18-37.md",
+  "research_path": "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/research/research.2026-10-30T23-07.md",
+  "lifecycle_ready": true,
+  "required_agents": ["task-researcher", "prd-feature", "atomic-planner", "atomic-executor", "feature-review", "pr-author"],
+  "required_skills": ["orchestrate", "feature-promotion-lifecycle", "atomic-plan-contract", "acceptance-criteria-tracking", "pr-context-artifacts", "pr-base-branch-merge-base"],
+  "required_mcp_tools": ["new_potential_entry", "potential_to_issue", "new_active_feature_folder", "collect_pr_context", "validate_orchestration_artifacts"],
+  "mcp_call_receipts": [
+    {"tool": "new_potential_entry", "ok": true, "evidence": "docs/features/potential/2026-10-30-push-down-consolidation-and-ecosystem-packs.md (preparation run)"},
+    {"tool": "potential_to_issue", "ok": true, "evidence": "https://github.com/drmoisan/drm-copilot/issues/1029 (preparation run)"},
+    {"tool": "new_active_feature_folder", "ok": true, "evidence": "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029 (preparation run)"},
+    {"tool": "validate_orchestration_artifacts", "ok": true, "evidence": "orchestrator-state validated with require_model_routing=true at 2026-11-18T07:19:53Z"},
+    {"tool": "collect_pr_context", "ok": true, "evidence": "base origin/epic/shared-agent-harness-layer-integration, head feature/push-down-consolidation-and-ecosystem-packs-1029 at 9345046c3a64c95a56cec354fba3ed2fb9e04110; artifacts/pr_context.summary.txt, artifacts/pr_context.appendix.txt"}
+  ],
+  "skill_receipts": [
+    {"skill": "orchestrate", "required": true, "evidence": "execution run resumed at S5 per the orchestrate checkpoint protocol"},
+    {"skill": "feature-promotion-lifecycle", "required": true, "evidence": "MCP promotion sequence executed in the preparation run; receipts carried under delegation_receipts.promotion"},
+    {"skill": "atomic-plan-contract", "required": true, "evidence": "loaded at startup; contract relayed to atomic-executor brief"},
+    {"skill": "acceptance-criteria-tracking", "required": true, "evidence": "loaded at startup; executor brief requires AC check-off per the skill"},
+    {"skill": "pr-context-artifacts", "required": true, "evidence": "collect_pr_context run against the integration base before review; summary and appendix written under artifacts/"},
+    {"skill": "pr-base-branch-merge-base", "required": true, "evidence": "PR base resolved to epic/shared-agent-harness-layer-integration (epic child); merge base 2d487f5b070b401a6d14271a039b1207a6e0383f relayed to review"}
+  ],
+  "completed_steps": ["S1_change_budget", "S2_route_selection", "S3_promotion", "S3b_research", "S3c_feature_documents", "S4a_plan_authored", "S4_atomic_planning", "S5_atomic_execution", "S6_pre_review_commit", "S7_feature_review"],
+  "next_step": "S8_create_pr",
+  "resume_point": "remediation.cycle_1.reaudit: delegate feature-review for the cycle 1 exit reaudit at the pushed HEAD (diff from merge base with origin/epic/shared-agent-harness-layer-integration); then exit_check, collect_pr_context, pr-author (base epic/shared-agent-harness-layer-integration), S9 CI dispatch and merge per the original brief.",
+  "preflight_status": "PREFLIGHT: ALL CLEAR",
+  "premise_check": {"checked_at": "2026-11-18T07:18:41Z", "head": "2d487f5b070b401a6d14271a039b1207a6e0383f", "feature_branch_ancestor_of_head": true, "head_descends_from_required": true, "plan_exists": true, "result": "pass"},
+  "carried_from_preparation_checkpoint": "artifacts/orchestration/handoff/orchestrator-state.issue-1029.stale-planning.2026-11-17T04-42.json (read-only, in the preparation worktree)",
+  "preparation_preflight_rounds": [
+    {"round": 1, "completed_at": "2026-11-14T17:30:00Z", "signal": "PREFLIGHT: REVISIONS REQUIRED", "fix_record": "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/evidence/other/preflight-fixes.2026-11-14T17-28.md"},
+    {"round": 2, "completed_at": "2026-11-14T17:50:00Z", "signal": "PREFLIGHT: REVISIONS REQUIRED", "fix_record": "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/evidence/other/preflight-fixes.2026-11-14T17-49.md"},
+    {"round": "confirming", "completed_at": "2026-11-15T18:14:00Z", "signal": "PREFLIGHT: ALL CLEAR", "convergence": "CONVERGENCE: NO FURTHER ROUNDS EXPECTED"}
+  ],
+  "step5_status": "completed",
+  "step6_status": "completed",
+  "step7_status": "completed",
+  "step8_status": "in_progress",
+  "step9_status": "pending",
+  "step10_status": "pending",
+  "owner_directives": [
+    {"id": "OD-1", "text": "you are in autonomous mode. Do not ask permissions. Do not stop. Continue until you have completed this epic in its entirety. You are capable of doing this. You do not need human intervention.", "text_sha256": "c45c28e68d1f3007fbea727f939b5080cb7189d44e3a3d9786b4d5e8c43d81c3", "class": "scheduling", "recorded_at": "2026-11-18T07:18:41Z", "expires_at": "2026-12-17T04:40:04Z", "scope": {"issue": 1018, "branch": "epic/shared-agent-harness-layer-integration", "step": "any"}, "issued_by_session": "session_018K3BZt5eZmuFfK9J7fM2YL"},
+    {"id": "OD-2", "text": "once a CI for a branch is green, please do a squash merge into the integration branch", "text_sha256": "d68a777181d86d767f50a83dc8adc1a975ff899c976d3a64bc3916da9bc9e9d5", "class": "merge_timing", "recorded_at": "2026-11-18T07:18:41Z", "expires_at": "2026-12-17T13:40:33Z", "scope": {"issue": 1018, "branch": "epic/shared-agent-harness-layer-integration", "step": "any"}, "issued_by_session": "session_018K3BZt5eZmuFfK9J7fM2YL"},
+    {"id": "OD-3", "text": "Once you do the merge successfully, be sure to delete the branch you squash merged locally and on the origin", "text_sha256": "9affde8082ef475a7985d8e88f9c2a63109ed3f5a697e8dcb05b5edc2f6187b0", "class": "merge_timing", "recorded_at": "2026-11-18T07:18:41Z", "expires_at": "2026-12-17T13:41:47Z", "scope": {"issue": 1018, "branch": "epic/shared-agent-harness-layer-integration", "step": "any"}, "issued_by_session": "session_018K3BZt5eZmuFfK9J7fM2YL"},
+    {"id": "OD-4", "text": "reexamine under the cost benefit rule", "text_sha256": "af0a3a9b3bb72cdf4e262f9cb67716d8099a7c678cbf58f3c22eac982de311c6", "class": "scheduling", "recorded_at": "2026-11-18T07:18:41Z", "expires_at": "2026-12-17T17:47:35Z", "scope": {"issue": 1018, "branch": "epic/shared-agent-harness-layer-integration", "step": "any"}, "issued_by_session": "session_018K3BZt5eZmuFfK9J7fM2YL"}
+  ],
+  "owner_directive_records": [
+    {"directive_id": "OD-3", "class": "merge_timing", "outcome": "honored", "reason": "Branch and worktree deletion is performed by the parent epic orchestrator after merge, per the delegation brief; this run leaves the branch and worktree in place.", "decided_by": "orchestrator", "decided_at": "2026-11-18T07:18:41Z"}
+  ],
+  "model_budget": {"fable_policy": "disabled"},
+  "complexity_assessments": [
+    {"phase": "research", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Carried from the preparation checkpoint: push-down MCP tool contract and pack manifests are consumed by every ecosystem.", "assessed_at": "2026-10-30T22:38:47Z"},
+    {"phase": "feature_documents", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Carried from the preparation checkpoint: spec defines the cross-ecosystem pipeline and manifest contract.", "assessed_at": "2026-10-30T22:38:47Z"},
+    {"phase": "atomic_planning", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Carried from the preparation checkpoint: plan spans TypeScript MCP wrappers, pipeline modules, pack manifests and bundle mirrors.", "assessed_at": "2026-10-30T22:38:47Z"},
+    {"phase": "preflight", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Carried from the preparation checkpoint: preflight checks cross-module citations against the tree.", "assessed_at": "2026-10-30T22:38:47Z"},
+    {"phase": "remediation_planning", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Remediation touches the harness-generation source that renders a rule file and its bundle copy consumed by every ecosystem.", "assessed_at": "2026-11-18T11:52:50Z"},
+    {"phase": "remediation_execution", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Execution regenerates generated targets and runs the full parallel gates.", "assessed_at": "2026-11-18T11:52:50Z"},
+    {"phase": "feature_review", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Review spans the cross-ecosystem push-down pipeline, MCP wrapper contract and pack manifests.", "assessed_at": "2026-11-18T11:39:19Z"},
+    {"phase": "atomic_execution", "band": "C3", "floor": "C3", "signals_present": ["cross_module_contract_change"], "rationale": "Execution spans TypeScript MCP wrappers, push-down pipeline modules, pack manifests and bundled mirrors (epic child 4, band C3).", "assessed_at": "2026-11-18T07:18:41Z"}
+  ],
+  "model_routing_receipts": [
+    {"agent": "task-researcher", "phase": "research", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "prd-feature", "phase": "feature_documents", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-planner", "phase": "atomic_planning", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-executor", "phase": "preflight", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-planner", "phase": "remediation_planning", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-executor", "phase": "remediation_execution", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "feature-review", "phase": "feature_review", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"},
+    {"agent": "atomic-executor", "phase": "atomic_execution", "complexity_band": "C3", "fable_policy": "disabled", "table_model": "opus", "clamped_from": null, "model": "opus"}
+  ],
+  "model_routing_preflight": {"status": "pass", "checked_at": "2026-11-19T07:30:02Z", "validator_command": "mcp validate_orchestration_artifacts orchestrator-state require_model_routing=true", "output_summary": "Validated orchestrator-state artifact; feature-review receipt feature_review C3 opus for the cycle 1 reaudit"},
+  "delegation_receipts": {
+    "promotion": {
+      "potential_entry": {"ok": true, "tool": "new_potential_entry", "summary": "Created a new potential entry for 'push-down-consolidation-and-ecosystem-packs'.", "artifacts": ["docs/features/potential/2026-10-30-push-down-consolidation-and-ecosystem-packs.md"]},
+      "issue": {"ok": true, "tool": "potential_to_issue", "summary": "Promoted 'docs/features/potential/2026-10-30-push-down-consolidation-and-ecosystem-packs.md' as a feature workflow in full-feature mode.", "artifacts": ["https://github.com/drmoisan/drm-copilot/issues/1029"], "destination_path": "docs/features/potential/promoted/2026-10-30-push-down-consolidation-and-ecosystem-packs.md", "target_repository": "drmoisan/drm-copilot"},
+      "feature_folder": {"ok": true, "tool": "new_active_feature_folder", "summary": "Created a new active feature feature folder for 'push-down-consolidation-and-ecosystem-packs'.", "artifacts": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/issue.md"], "destination_path": "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029"}
+    },
+    "agents": [
+      {"agent_name": "task-researcher", "step": "S3b_research", "agent_id": "task-researcher", "skill_source": ".claude/agents/task-researcher.md", "started_at": "2026-10-30T22:53:30Z", "completed_at": "2026-10-30T23:15:00Z", "result_signal": "research artifact written", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/research/research.2026-10-30T23-07.md"]},
+      {"agent_name": "prd-feature", "step": "S3c_feature_documents", "agent_id": "prd-feature", "skill_source": ".claude/agents/prd-feature.md", "started_at": "2026-10-30T23:20:00Z", "completed_at": "2026-10-30T23:30:00Z", "result_signal": "spec.md and user-story.md written", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/spec.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/user-story.md"]},
+      {"agent_name": "atomic-planner", "step": "S4_extra_planner_revision", "agent_id": "atomic-planner", "skill_source": ".claude/agents/atomic-planner.md", "started_at": "2026-11-15T18:00:00Z", "completed_at": "2026-11-15T18:07:00Z", "result_signal": "PLANNER-INTERNAL-REVIEW: PASS; SELF-REVIEW: RE-DERIVED THIS PASS; 40 tasks, 241 lines", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/plan.2026-10-30T18-37.md"]},
+      {"agent_name": "atomic-planner", "step": "S4_plan_revision_after_phase0_block", "agent_id": "atomic-planner", "skill_source": ".claude/agents/atomic-planner.md", "started_at": "2026-11-18T07:28:41Z", "completed_at": "2026-11-18T07:36:45Z", "result_signal": "PLANNER-INTERNAL-REVIEW: PASS; SELF-REVIEW: RE-DERIVED THIS PASS; 40 tasks, 244 lines; MCP plan validator ok; spec v0.4 amendment A-1; committed ed10585164fd64d6de9b9b5eff64d5c906daf79a", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/plan.2026-10-30T18-37.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/spec.md"]},
+      {"agent_name": "feature-review", "step": "remediation.cycle_1.reaudit", "agent_id": "feature-review", "skill_source": ".claude/agents/feature-review.md", "started_at": "2026-11-19T07:30:02Z", "completed_at": "2026-11-19T07:38:28Z", "result_signal": "Review-Verdict: PASS; blocking_count 0; F-1 and Jest note closed; 37/37 AC PASS; three validators ok; reviewer ran one root Jest coverage gate (exit 0, 6136 tests) to satisfy the coverage hook, disclosed in the policy audit", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/policy-audit.2026-11-19T07-30.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/code-review.2026-11-19T07-30.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/feature-audit.2026-11-19T07-30.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/evidence/qa-gates/jest-gate.2026-11-19T07-37.md"]},
+      {"agent_name": "atomic-executor", "step": "remediation.cycle_1.execute", "agent_id": "atomic-executor", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-18T12:06:05Z", "completed_at": "2026-11-18T12:43:35Z", "result_signal": "Remediation plan complete through P1-T9; HEAD 3588292f3; Pester 29032 tests 0 failures; generator -Surface all -Check exit 0", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/evidence/qa-gates/final-pester.2026-11-18T12-40.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/evidence/other/correction.cycle1-evidence-stamps.2026-11-18T12-39.md"]},
+      {"agent_name": "atomic-executor", "step": "remediation.cycle_1.preflight", "agent_id": "atomic-executor", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-18T11:59:32Z", "completed_at": "2026-11-18T12:06:05Z", "result_signal": "PREFLIGHT: ALL CLEAR; CONVERGENCE: NO FURTHER ROUNDS EXPECTED; 3 in-place fixes; committed eed36c1b3", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/evidence/other/preflight-fixes.2026-11-18T12-04.md"]},
+      {"agent_name": "atomic-planner", "step": "remediation.cycle_1.plan", "agent_id": "atomic-planner", "skill_source": ".claude/agents/atomic-planner.md", "started_at": "2026-11-18T11:52:50Z", "completed_at": "2026-11-18T11:59:32Z", "result_signal": "PLANNER-INTERNAL-REVIEW: PASS; SELF-REVIEW: RE-DERIVED THIS PASS; 12 tasks; MCP plan validator ok; committed a73ca2eaa", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/remediation-plan.2026-11-18T11-45.md"]},
+      {"agent_name": "feature-review", "step": "S6_feature_review", "agent_id": "feature-review", "skill_source": ".claude/agents/feature-review.md", "started_at": "2026-11-18T11:39:19Z", "completed_at": "2026-11-18T11:52:50Z", "result_signal": "REMEDIATION_REQUIRED; 1 blocking finding F-1 (autonomous, contained, Remediation-Mode design); 37/37 AC PASS; artifacts committed 2ed6554f0", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/policy-audit.2026-11-18T11-45.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/code-review.2026-11-18T11-45.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/feature-audit.2026-11-18T11-45.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/remediation-inputs.2026-11-18T11-45.md"]},
+      {"agent_name": "atomic-executor", "step": "S5_atomic_execution","agent_id": "atomic-executor", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-18T07:47:07Z", "completed_at": "2026-11-18T11:39:19Z", "result_signal": "All tasks P0-T1..P5-T7 complete; HEAD 9345046c3; TS and Python PASS; Pester exit 1 on one baseline failure (HarnessGeneration.RepoGate drift in .claude/rules/orchestrator-state.md from upstream merges); 37/37 AC checked", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/evidence/qa-gates/self-review.2026-11-18T11-36.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/evidence/qa-gates/coverage-delta.2026-11-18T11-35.md"]},
+      {"agent_name": "atomic-executor", "step": "S4_confirming_preflight_after_revision", "agent_id": "atomic-executor", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-18T07:36:45Z", "completed_at": "2026-11-18T07:47:07Z", "result_signal": "PREFLIGHT: ALL CLEAR; CONVERGENCE: NO FURTHER ROUNDS EXPECTED; 2 in-place fixes; commit a5b9e2766", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/evidence/other/preflight-fixes.2026-11-18T07-45.md"]},
+      {"agent_name": "atomic-executor", "step": "S5_atomic_execution_attempt_1", "agent_id": "atomic-executor", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-18T07:20:26Z", "completed_at": "2026-11-18T07:28:41Z", "result_signal": "BLOCKED at [P0-T1]", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/evidence/qa-gates/phase0-upstream-recheck.2026-11-18T07-25.md"]},
+      {"agent_name": "atomic-executor", "step": "S4_confirming_preflight", "agent_id": "atomic-executor", "skill_source": ".claude/agents/atomic-executor.md", "started_at": "2026-11-15T18:08:00Z", "completed_at": "2026-11-15T18:14:00Z", "result_signal": "PREFLIGHT: ALL CLEAR; CONVERGENCE: NO FURTHER ROUNDS EXPECTED", "artifact_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/plan.2026-10-30T18-37.md"]}
+    ]
+  },
+  "stage_timing": [
+    {"stage": "atomic_execution", "attempt": 1, "started_at": "2026-11-18T07:18:41Z", "ended_at": "2026-11-18T11:39:19Z"},
+    {"stage": "feature_review", "attempt": 1, "started_at": "2026-11-18T11:39:19Z", "ended_at": "2026-11-18T11:52:50Z"},
+    {"stage": "remediation_cycle_1", "attempt": 1, "started_at": "2026-11-18T11:52:50Z", "ended_at": "2026-11-18T12:43:35Z"},
+    {"stage": "remediation_cycle_1_reaudit", "attempt": 1, "started_at": "2026-11-19T07:30:02Z", "ended_at": "2026-11-19T07:38:28Z"},
+    {"stage": "pr_authoring", "attempt": 1, "started_at": "2026-11-19T07:38:28Z", "ended_at": null}
+  ],
+  "local_execution_overrides": [],
+  "delegation_bypasses": [],
+  "phase0_block": {"task": "P0-T1", "recorded_at": "2026-11-18T07:28:41Z", "head": "c816d97dfe3508fe471e6c48af437d95d4ba9c87", "reason": "Shared skill test-execution-policy bundles scripts (Invoke-PesterSuite.ps1, Invoke-TestSuite.ps1, run-test-suite.sh) whose runtime dependencies (.claude/.codex hooks, config/test-execution-policy.json) are outside S; plan assumed no script files in shared skill folders.", "evidence": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/evidence/qa-gates/phase0-upstream-recheck.2026-11-18T07-25.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/evidence/other/phase0-blocked-supplementary-findings.2026-11-18T07-27.md"]},
+  "decisions": [{"id": "DEC-1", "decided_at": "2026-11-18T07:28:41Z", "decision": "Use the single accepted plan revision: delegate atomic-planner with the executor's PREFLIGHT-DEFECT and supplementary findings, then one confirming preflight.", "reason": "Brief permits one plan revision when a Phase 0 gate finds that merged upstream output invalidates the plan; the executor's recommended change is adopted (OD-1 autonomous mode)."}],
+  "remediation_loop": {
+    "current_cycle": 0,
+    "completed_attempts": 1,
+    "review_outcomes": [
+      {"verdict": "REMEDIATION_REQUIRED", "findings": [{"remediability": "autonomous", "scope": "contained"}], "inputs_path": "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/remediation-inputs.2026-11-18T11-45.md"},
+      {"verdict": "PASS", "findings": []}
+    ],
+    "cycles": [
+      {"entry_timestamp": "2026-11-18T11:52:50Z", "inputs_path": "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/remediation-inputs.2026-11-18T11-45.md", "plan_path": "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/remediation-plan.2026-11-18T11-45.md", "remediation_path": "full", "preflight": {"iterations": 1, "final_status": "clear"}, "execution_status": "complete", "audit_paths": ["docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/code-review.2026-11-19T07-30.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/feature-audit.2026-11-19T07-30.md", "docs/features/active/2026-10-30-push-down-consolidation-and-ecosystem-packs-1029/policy-audit.2026-11-19T07-30.md"], "blocking_count": 0, "exit_condition_met": true, "candidate_applied": true, "opened_by_review": 0}
+    ]
+  },
+  "owner_pause": {"received_at": "2026-11-18T12:36:12Z", "words": "Please pause all work, commit all files on all worktrees", "relayed_by": "coordinator", "handling": "let in-flight cycle 1 executor finish its current turn; start nothing new; commit, push, stop"},
+  "owner_resume": {"lifted_at": "2026-11-19T07:28:03Z", "words": "please resume. use existing worktrees and bramches. do not recreate", "relayed_by": "coordinator", "lifted_blocked_reason": "user_requested_stop", "handling": "resume existing worktree, branch and checkpoint at remediation.cycle_1.reaudit; nothing recreated"},
+  "active_delegation": null,
+  "last_updated": "2026-11-19T07:38:28Z",
+  "blocked_reason": "none"
+}
