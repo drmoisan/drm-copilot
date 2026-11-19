@@ -168,7 +168,7 @@ No Python file is added or modified, and no hook is added or changed.
 - [x] S14: `Set-CiRequiredChecks.ps1` Pester tests with a mocked `Invoke-GhExe` show: the default run prints the ruleset body and issues no write; `-WhatIf` issues no write; `-Apply` issues one POST that creates a ruleset requiring `CI Required Gate` read from the data file; an existing ruleset with the same name produces no write; no PUT, PATCH, or DELETE is issued. Line coverage of the command is at least 85%. A Jest text test shows the new push-down modules contain no `gh` invocation.
 - [x] S15: `extensions/drm-copilot/README.md` and `CHANGELOG.md` document the pin, the bump process, the unprotected-tag and missing-tag risks, the copy-mode requirement for a private source, and the unavailability of the #1049 exemption in copy mode; `.github/workflows/README.md` lists the `harness-*.yml` workflows.
 - [x] S16: The branch diff adds or modifies no `.py` file, changes no file under `.claude/hooks/` or `.codex/hooks/`, and its new production code is TypeScript, PowerShell, YAML, or JSON.
-- [ ] S17 (CI-dependent, orchestrator-owned): A rendered reference-mode caller for each language pack, dispatched once in a scratch destination, parses and completes, and its check list shows the pack's check and `CI Required Gate`; evidence is recorded under `evidence/` with clock-read timestamps.
+- [x] S17 (CI-dependent, orchestrator-owned): A rendered reference-mode caller for each language pack, dispatched once in a scratch destination, parses and completes, and its check list shows the pack's check and `CI Required Gate`; evidence is recorded under `evidence/` with clock-read timestamps.
 
 ## Issue-to-Spec Mapping
 
