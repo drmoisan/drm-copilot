@@ -96,7 +96,6 @@ BeforeDiscovery {
     $contractBase = @(
         @{ Id = 'CLAUDE'; Path = '.claude/skills/atomic-plan-contract/SKILL.md' }
         @{ Id = 'AGENTS'; Path = '.agents/skills/atomic-plan-contract/SKILL.md' }
-        @{ Id = 'GITHUB'; Path = '.github/skills/atomic-plan-contract/SKILL.md' }
     )
     $canonicalRequired = @(
         'task check', "the task's test selection", 'mirrored test files', 'imports, dot-sources, or names',
@@ -227,7 +226,6 @@ BeforeDiscovery {
     $script:WordingRow += Get-TcwRow -Group 'BRIEF' -Base @(
         @{ Id = 'CLAUDE'; Path = '.claude/skills/execution-environment/SKILL.md' }
         @{ Id = 'AGENTS'; Path = '.agents/skills/execution-environment/SKILL.md' }
-        @{ Id = 'GITHUB'; Path = '.github/skills/execution-environment/SKILL.md' }
     ) -Check @(
         (Get-TcwCheck -Heading '## Test Isolation Checks' -Required @('task-check evidence', 'never as a gate result or coverage evidence', $anchor, '-TestPath'))
         (Get-TcwCheck -Heading '## Test Runtime' -Required @('its phase-gate QC loop') -Forbidden @('its full QC loop'))
@@ -483,7 +481,7 @@ Describe 'Test cadence wording' {
         BeforeAll {
             $resourceRoot = 'extensions/drm-copilot/resources'
             $script:SweepRoot = @(
-                '.claude/skills', '.claude/agents', '.agents/skills', '.github/agents', '.github/skills', '.github/prompts',
+                '.claude/skills', '.claude/agents', '.agents/skills', '.github/agents', '.github/prompts',
                 '.github/codex', '.codex/agents', 'docs/features/templates', '.claude/rules', '.github/instructions', 'AGENTS.md', 'CLAUDE.md', '.github/copilot-instructions.md',
                 "$resourceRoot/claude-customizations", "$resourceRoot/codex-and-agents-customizations", "$resourceRoot/customizations",
                 "$resourceRoot/templates/policy_audit", "$resourceRoot/feature-templates"

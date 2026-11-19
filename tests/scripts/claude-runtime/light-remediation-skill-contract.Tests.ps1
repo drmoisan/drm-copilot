@@ -21,10 +21,8 @@ BeforeDiscovery {
     $script:ReviewCopy = @(
         @{ Copy = '.claude/skills/feature-review-workflow/SKILL.md' }
         @{ Copy = '.agents/skills/feature-review-workflow/SKILL.md' }
-        @{ Copy = '.github/skills/feature-review-workflow/SKILL.md' }
         @{ Copy = "$resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md" }
         @{ Copy = "$resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md" }
-        @{ Copy = "$resources/customizations/.github/skills/feature-review-workflow/SKILL.md" }
         @{ Copy = '.claude/agents/feature-review.md' }
         @{ Copy = "$resources/claude-customizations/.claude/agents/feature-review.md" }
         @{ Copy = '.agents/skills/feature-review/SKILL.md' }

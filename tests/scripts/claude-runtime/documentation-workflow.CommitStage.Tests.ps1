@@ -4,7 +4,7 @@
 <#
 .SYNOPSIS
     The commit, receipt, and pull-request stage and the refresh procedure of the
-    documentation-workflow skill in all six copies (issue #1169).
+    documentation-workflow skill in all four copies (issue #1169).
 
 .DESCRIPTION
     Each row reads one committed copy, takes the text of one level-two section (from its heading to
@@ -17,18 +17,14 @@ BeforeDiscovery {
     $script:WorkflowCopyRows = @(
         @{ Path = '.claude/skills/documentation-workflow/SKILL.md' }
         @{ Path = '.agents/skills/documentation-workflow/SKILL.md' }
-        @{ Path = '.github/skills/documentation-workflow/SKILL.md' }
         @{ Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/documentation-workflow/SKILL.md' }
         @{ Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/documentation-workflow/SKILL.md' }
-        @{ Path = 'extensions/drm-copilot/resources/customizations/.github/skills/documentation-workflow/SKILL.md' }
     )
     $script:BriefCopyRows = @(
         @{ Path = '.claude/skills/execution-environment/SKILL.md' }
         @{ Path = '.agents/skills/execution-environment/SKILL.md' }
-        @{ Path = '.github/skills/execution-environment/SKILL.md' }
         @{ Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md' }
         @{ Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md' }
-        @{ Path = 'extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md' }
     )
 }
 
