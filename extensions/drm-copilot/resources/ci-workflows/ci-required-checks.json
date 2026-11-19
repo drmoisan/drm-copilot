@@ -1,0 +1,8 @@
+{
+  "required_contexts": [
+    "CI Required Gate"
+  ],
+  "schema_version": "1.0.0",
+  "workflow": "CI",
+  "workflow_file": ".github/workflows/drm-copilot-ci.yml"
+}

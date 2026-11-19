@@ -1,0 +1,38 @@
+# Destination CI caller delivered by the drm-copilot push-down (issue #1050).
+# The push-down renders this file; edits are reported as conflicts on the next
+# push-down run. The workflow name and the gate job name are read by the
+# harness merge gate and recorded in .github/drm-copilot/ci-required-checks.json.
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - "epic/**"
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  __DRM_COPILOT_CI_JOBS__
+  ci-required-gate:
+    name: CI Required Gate
+    if: always()
+    __DRM_COPILOT_CI_GATE_NEEDS__
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate needed job results
+        shell: pwsh
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: |
+          $needs = $env:NEEDS_JSON | ConvertFrom-Json -AsHashtable
+          $failed = @($needs.Keys | Where-Object { $needs[$_].result -ne 'success' })
+          foreach ($name in $failed) { Write-Output "Job $name finished with result $($needs[$name].result)." }
+          if ($failed.Count -gt 0) { exit 1 }
+          Write-Output 'Every needed job succeeded.'
