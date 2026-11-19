@@ -66,10 +66,10 @@ jobs:
           LINE_THRESHOLD: ${{ inputs.line_threshold }}
           BRANCH_THRESHOLD: ${{ inputs.branch_threshold }}
         run: |
-          $report = Get-Content -Raw -LiteralPath 'artifacts/python/coverage.json' | ConvertFrom-Json
-          $totals = $report.totals
-          $line = if ([double]$totals.num_statements -gt 0) { 100.0 * [double]$totals.covered_lines / [double]$totals.num_statements } else { 100.0 }
-          $branch = if ([double]$totals.num_branches -gt 0) { 100.0 * [double]$totals.covered_branches / [double]$totals.num_branches } else { 100.0 }
+          $report = Get-Content -Raw -LiteralPath 'artifacts/python/coverage.json' | ConvertFrom-Json -AsHashtable
+          $totals = $report['totals']
+          $line = if ([double]$totals['num_statements'] -gt 0) { 100.0 * [double]$totals['covered_lines'] / [double]$totals['num_statements'] } else { 100.0 }
+          $branch = if ([double]$totals['num_branches'] -gt 0) { 100.0 * [double]$totals['covered_branches'] / [double]$totals['num_branches'] } else { 100.0 }
           Write-Output ("Line coverage {0:N2}% (minimum {1}%)" -f $line, $env:LINE_THRESHOLD)
           Write-Output ("Branch coverage {0:N2}% (minimum {1}%)" -f $branch, $env:BRANCH_THRESHOLD)
           $failed = $false

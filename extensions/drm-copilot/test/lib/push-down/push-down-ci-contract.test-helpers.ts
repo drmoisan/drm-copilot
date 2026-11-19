@@ -109,6 +109,35 @@ export function workflowSteps(text: string): string[] {
 }
 
 /**
+ * Check that the Python harness threshold step parses the coverage.py JSON
+ * report with `ConvertFrom-Json -AsHashtable`, which tolerates the
+ * empty-string key of the report, and reads the totals by hashtable access.
+ *
+ * @param text Python harness workflow text.
+ * @returns One message per violation; empty when the step complies.
+ */
+export function findPythonCoverageStepViolations(text: string): string[] {
+  const step = workflowSteps(text).find((candidate) =>
+    candidate.includes("name: Check coverage thresholds"),
+  );
+  if (step === undefined) {
+    return ["python: step Check coverage thresholds is absent"];
+  }
+  const violations: string[] = [];
+  if (!step.includes("ConvertFrom-Json -AsHashtable")) {
+    violations.push(
+      "python: threshold step does not use ConvertFrom-Json -AsHashtable",
+    );
+  }
+  if (/\.totals\b|\$totals\./.test(step)) {
+    violations.push(
+      "python: threshold step reads the report by property access",
+    );
+  }
+  return violations;
+}
+
+/**
  * Check that a harness workflow is destination-generic and writes the
  * artifacts of the template contract.
  *

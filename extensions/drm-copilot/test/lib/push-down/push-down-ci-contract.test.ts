@@ -19,6 +19,7 @@ import {
   findCiContractDivergences,
   findHarnessWorkflowViolations,
   findPowerShellInputDivergences,
+  findPythonCoverageStepViolations,
 } from "./push-down-ci-contract.test-helpers";
 
 const REPO_ROOT = join(__dirname, "..", "..", "..", "..", "..");
@@ -94,6 +95,26 @@ function renderAll(mode: "reference" | "copy"): string {
 }
 
 describe("destination CI contract", () => {
+  it("python harness threshold step parses the report with -AsHashtable", () => {
+    const python = HARNESS.python;
+    expect(findPythonCoverageStepViolations(python)).toEqual([]);
+    expect(
+      findPythonCoverageStepViolations(
+        python.replace("ConvertFrom-Json -AsHashtable", "ConvertFrom-Json"),
+      ),
+    ).toContain(
+      "python: threshold step does not use ConvertFrom-Json -AsHashtable",
+    );
+    expect(
+      findPythonCoverageStepViolations(
+        python.replace("$report['totals']", "$report.totals"),
+      ),
+    ).toContain("python: threshold step reads the report by property access");
+    expect(findPythonCoverageStepViolations("jobs:\n")).toEqual([
+      "python: step Check coverage thresholds is absent",
+    ]);
+  });
+
   it("harness workflows are destination-generic", () => {
     for (const stem of CI_STEMS) {
       expect(findHarnessWorkflowViolations(stem, HARNESS[stem])).toEqual([]);
