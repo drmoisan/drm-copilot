@@ -158,9 +158,9 @@ Tasks P1-T2 to P1-T8 drop or retarget assertions about retired copies, so each p
 
 - [x] [P2-T1] Run the final static loop per language over the files this plan changed (Python: Black check, Ruff, Pyright; PowerShell: PSScriptAnalyzer and formatter comparison; TypeScript: Prettier check, ESLint, `typecheck`), the Codex generator check, child 3's generator check, and a search of every `pack-manifests/*.json` for `RETIRED-PATH`; restart from the format step on any failure or change.
   - Acceptance: `<FEATURE>/evidence/qa-gates/final-static-<language>.<timestamp>.md` per language records each step's command, exit code 0 and zero findings; `<FEATURE>/evidence/qa-gates/contract-checks.<timestamp>.md` records both generator checks with exit code 0 and zero manifest matches.
-- [ ] [P2-T2] Run the pytest `GATE-RUN` over `tests/scripts` and the other configured test roots with line and branch coverage and a JSON report under `SCRATCH`.
+- [x] [P2-T2] Run the pytest `GATE-RUN` over `tests/scripts` and the other configured test roots with line and branch coverage and a JSON report under `SCRATCH`.
   - Acceptance: `<FEATURE>/evidence/regression-testing/pytest-final.<timestamp>.md` records zero failures, the pass count, repository-wide coverage, and the line and branch coverage of `agentic_sync.py` from the JSON report; every `UPDATED-PYTEST-MODULES`, `UNCHANGED-AGENT-PYTEST` and `PUSH-DOWN-CONTRACT-TESTS` module is in the passing set.
-- [ ] [P2-T3] Run the Jest `GATE-RUN` of `extensions/drm-copilot` with coverage.
+- [x] [P2-T3] Run the Jest `GATE-RUN` of `extensions/drm-copilot` with coverage.
   - Acceptance: `<FEATURE>/evidence/regression-testing/jest-final.<timestamp>.md` records zero failures, the pass count, and the line and branch coverage of `copilot-customizations-engine.ts`; the `coverageThreshold` entries are unchanged.
 - [ ] [P2-T4] Run the Pester `GATE-RUN` over the scan folders of `config/poshqc-scan.json`.
   - Acceptance: `<FEATURE>/evidence/regression-testing/pester-final.<timestamp>.md` records `ExitCode` 0, zero failures, repository-wide line coverage, and passes for `UPDATED-PESTER-SUITES`, `UNCHANGED-AGENT-PESTER`, `LEDGER-CHAIN-TESTS`, `GUARD-SUITE`, `HarnessParityMatrix.RepoGate.Tests.ps1` and `FileSizePolicy.RepoGate.Tests.ps1`.
