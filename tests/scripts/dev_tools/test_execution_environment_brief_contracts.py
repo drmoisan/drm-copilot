@@ -1,6 +1,6 @@
 """Contract tests for the execution-environment brief (issue #964).
 
-The brief is one byte-identical text in six locations. These tests pin its
+The brief is one byte-identical text in four locations. These tests pin its
 copies, its required headings and section content, its preload wiring on the
 Claude, Codex, and Copilot surfaces, and that it carries no line-number or
 commit-SHA citation. Files are read in place; no file is written.
@@ -137,7 +137,7 @@ def _frontmatter_skills(relative_path: str) -> list[str]:
 
 
 def test_brief_copies_are_byte_identical() -> None:
-    """All six brief copies exist and are byte-identical."""
+    """All four brief copies exist and are byte-identical."""
 
     # Arrange
     canonical = (_REPO_ROOT / _BRIEF).read_bytes()
@@ -487,7 +487,7 @@ def test_brief_preflight_classes_include_brief_maintenance() -> None:
             "A plan that alters a fact this brief states",
             "adds or renames a CI job, changes a required status context, a tool "
             "route, or a batch-budget rule",
-            "updates the brief in the same change, in all six byte-identical copies",
+            "updates the brief in the same change, in all four byte-identical copies",
             "breaks the maintenance rule in `## Purpose and Maintenance`",
             "the plan's `Mirror parity` Pre-Mortem bullet names it",
         ),

@@ -572,7 +572,7 @@ Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract`
 
 ````Current
 - `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`: the light-remediation text of issue #1097 in the review and orchestration surfaces and their mirrors.
-- `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`: the test-cadence wording of issue #1167 in the six `atomic-plan-contract` copies and the referring surfaces, the sweep for per-task full-suite wording, and the byte identity of the edited Copilot files and their bundles.
+- `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`: the test-cadence wording of issue #1167 in the four `atomic-plan-contract` copies and the referring surfaces, the sweep for per-task full-suite wording, and the byte identity of the edited Copilot files and their bundles.
 
 ````
 

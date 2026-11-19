@@ -1,0 +1,14 @@
+# Task Check P1-T10
+
+Timestamp: 2026-11-19T09-40
+Plan: plan.2026-10-30T18-39.md
+Changed files: canonical `.agents/skills/execution-environment/SKILL.md` — S1 (`## Purpose and Maintenance`) now reads "byte-identical in four locations" and its location list names exactly the four `REMAINING-BRIEF-COPIES` paths; S2 "in all four byte-identical copies"; S3 "in the four `documentation-workflow` copies" and "in the four copies of this brief"; S4 and S5 "in the four `atomic-plan-contract` copies". The two other `## Contract Tests That Pin Mirrored Files` bullets that also said "in the six copies of this brief" (the operands and classify parity suites) changed the same way, so no copy that held a statement still gives a count of six. `.claude/skills/execution-environment/SKILL.md` and its `claude-customizations` bundle copy regenerated with `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface skills`; the `codex-and-agents-customizations` bundle copy copied; all four copies byte-identical (`cmp`). `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py`: module docstring, `test_brief_copies_are_byte_identical` docstring, and the token of `test_brief_preflight_classes_include_brief_maintenance`.
+LEDGER-STEP: entry `0011-task-check-cadence.md` (the `Current` fence of the `.claude/skills/execution-environment/SKILL.md` block that holds the S5 bullet); patches 0001 and 0006, the context lines holding S4 and S5 in each `execution-environment` section (the `.claude`, `.agents`, and both bundle paths), so both images carry the edit.
+Selection rule: `BRIEF-PIN-TESTS`, the other tests that read the brief copies (`parallel-gate-wording`, the three hook parity suites, `test_bash_command_shape_surfaces.py`), the push-down resource contract modules (bundle text equality), and LEDGER-STEP's ledger suites.
+
+| Command | EXIT_CODE | Result |
+| --- | --- | --- |
+| `pwsh -NoProfile -File scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface skills -Check` | 0 | harness-generation: no drift |
+| `env -u VIRTUAL_ENV poetry run black --check` / `ruff check` / `pyright` (brief contract module) | 0 | unchanged; all checks passed; 0 errors |
+| `env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest` brief contracts, discovery documentation, single-pass preflight, bash command shape, both push-down resource contract modules | 0 | 106 passed, including `test_brief_copies_are_byte_identical` and `test_execution_environment_fact_is_unchanged_across_copies` |
+| `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath` 4 ledger suites, `documentation-workflow.CommitStage`, `planning-contract-wording`, `test-cadence-wording`, `NestingDepthContract`, `parallel-gate-wording`, 3 hook parity suites | 0 | Invoke-PoshQCParallelTest exit code 0 (workers 8, 160.02s) |
