@@ -60,6 +60,23 @@ BeforeAll {
         'chat.useClaudeMdFile'            = 'false'
     }
     $script:KeptDefaultKeys = @('chat.useAgentsMdFile', 'chat.useClaudeHooks', 'github.copilot.chat.codeGeneration.useInstructionFiles')
+    # Writer tokens (H3 plan), built from parts so this file does not carry them as literals.
+    $script:WriterScriptName = (@('sync', 'agents', 'from', 'instructions') -join '-')
+    $script:WriterCommandName = (@('sync', 'Agents', 'From', 'Instructions') -join '')
+    $script:WriterTokens = @($script:WriterScriptName, $script:WriterCommandName)
+    $script:WriterFiles = @(
+        "scripts/dev-tools/$($script:WriterScriptName).ps1"
+        "$($script:Bundle)/templates/$($script:WriterScriptName).ps1"
+        "tests/scripts/dev-tools/$($script:WriterScriptName).Tests.ps1"
+    )
+    $script:WriterCommandFiles = @(
+        'extensions/drm-copilot/package.json'
+        'extensions/drm-copilot/src/repo-automation-command-registration-admin.ts'
+        'extensions/drm-copilot/src/lib/push-down/reference-rewrites.ts'
+        'scripts/dev_tools/push_down_copilot_customizations_rewrites.py'
+        '.vscode/tasks.json'
+        'config/poshqc-shard-weights.json'
+    )
 
     function Read-ClrText {
         # Reader seam: returns the text of one repository-relative file, or $null when it is absent.
@@ -169,10 +186,36 @@ BeforeAll {
             if ($null -ne $Text[$path] -and $Text[$path].Contains($RetiredPath)) { "${path}: names the retired path" }
         }
     }
+
+    function Test-ClrWriterFilesAbsent {
+        # CLR-WRITER-FILES-ABSENT: none of the retired writer files exists; the map holds each path's text or $null.
+        param([Parameter(Mandatory)] $Text)
+        foreach ($path in $Text.Keys) { if ($null -ne $Text[$path]) { "retired writer file present: $path" } }
+    }
+
+    function Test-ClrWriterCommandAbsent {
+        # CLR-WRITER-COMMAND-ABSENT: no supplied text holds a writer token.
+        param([Parameter(Mandatory)] $Text, [Parameter(Mandatory)] [string[]] $Token)
+        foreach ($path in $Text.Keys) {
+            if ($null -eq $Text[$path]) { "missing file: $path"; continue }
+            foreach ($t in $Token) { if ($Text[$path].Contains($t)) { "${path}: holds a writer token" } }
+        }
+    }
+
+    function Test-ClrWriterChangelog {
+        # CLR-WRITER-CHANGELOG: the Unreleased section holds a Removed subsection whose entries name the removed command.
+        param([AllowNull()] [string] $Text)
+        if ($null -eq $Text) { 'the extension CHANGELOG is missing'; return }
+        $unreleased = [regex]::Match($Text, '(?ms)^## \[Unreleased\]\n(?<body>.*?)(?=^## \[|\z)')
+        if (-not $unreleased.Success) { 'the CHANGELOG has no Unreleased section'; return }
+        $removed = [regex]::Match($unreleased.Groups['body'].Value, '(?ms)^### Removed\n(?<body>.*?)(?=^#{2,3} |\z)')
+        if (-not $removed.Success) { 'the Unreleased section has no Removed subsection'; return }
+        if (-not $removed.Groups['body'].Value.Contains('Sync AGENTS.md from Instructions')) { 'the Removed subsection does not name the removed command' }
+    }
 }
 
 AfterAll {
-    foreach ($name in 'Read-ClrText', 'Get-ClrFileUnder', 'Get-ClrTextMap', 'Test-ClrSkillTreesAbsent', 'Test-ClrBriefCount', 'Test-ClrReadFirst', 'Test-ClrCopilotInstruction', 'Test-ClrCollisionControl', 'Test-ClrRetiredPathAbsent') {
+    foreach ($name in 'Read-ClrText', 'Get-ClrFileUnder', 'Get-ClrTextMap', 'Test-ClrSkillTreesAbsent', 'Test-ClrBriefCount', 'Test-ClrReadFirst', 'Test-ClrCopilotInstruction', 'Test-ClrCollisionControl', 'Test-ClrRetiredPathAbsent', 'Test-ClrWriterFilesAbsent', 'Test-ClrWriterCommandAbsent', 'Test-ClrWriterChangelog') {
         Remove-Item -LiteralPath "function:$name" -ErrorAction SilentlyContinue
     }
 }
@@ -318,5 +361,57 @@ Describe 'Copilot layer retirement (issue #1032)' {
     It 'CLR-PACK-MANIFESTS-REJECTS a manifest entry under the retired tree' {
         # Act / Assert
         @(Test-ClrRetiredPathAbsent -Text ([ordered]@{ 'core.json' = "{ ""path"": ""$($script:RetiredPath)/x/SKILL.md"" }" }) -RetiredPath $script:RetiredPath).Count | Should -Be 1
+    }
+
+    It 'CLR-WRITER-FILES-ABSENT finds none of the retired writer files' {
+        # Act
+        $violations = @(Test-ClrWriterFilesAbsent -Text (Get-ClrTextMap -RelativePath $script:WriterFiles))
+
+        # Assert
+        $script:WriterFiles.Count | Should -Be 3
+        $violations | Should -BeNullOrEmpty
+    }
+
+    It 'CLR-WRITER-FILES-ABSENT-REJECTS a writer file that is present' {
+        # Arrange
+        $text = [ordered]@{ $script:WriterFiles[0] = '# writer'; $script:WriterFiles[1] = $null }
+
+        # Act / Assert
+        @(Test-ClrWriterFilesAbsent -Text $text).Count | Should -Be 1
+    }
+
+    It 'CLR-WRITER-COMMAND-ABSENT finds no writer token in the command, rewrite, task and shard-weight files' {
+        # Act
+        $violations = @(Test-ClrWriterCommandAbsent -Text (Get-ClrTextMap -RelativePath $script:WriterCommandFiles) -Token $script:WriterTokens)
+
+        # Assert
+        $violations | Should -BeNullOrEmpty
+    }
+
+    It 'CLR-WRITER-COMMAND-ABSENT-REJECTS a command id and a script reference' {
+        # Arrange
+        $text = [ordered]@{
+            'package.json' = """command"": ""drmCopilotExtension.$($script:WriterCommandName)"""
+            'tasks.json'   = '"${workspaceFolder}/scripts/dev-tools/' + $script:WriterScriptName + '.ps1"'
+        }
+
+        # Act / Assert
+        @(Test-ClrWriterCommandAbsent -Text $text -Token $script:WriterTokens).Count | Should -Be 2
+    }
+
+    It 'CLR-WRITER-CHANGELOG records the command removal under Unreleased' {
+        # Act
+        $violations = @(Test-ClrWriterChangelog -Text (Read-ClrText -RelativePath 'extensions/drm-copilot/CHANGELOG.md'))
+
+        # Assert
+        $violations | Should -BeNullOrEmpty
+    }
+
+    It 'CLR-WRITER-CHANGELOG-REJECTS a removal recorded only under a released version' {
+        # Arrange
+        $text = "# Changelog`n`n## [Unreleased]`n`n### Added`n`n- x`n`n## [0.0.1] - 2026-05-02`n`n### Removed`n`n- Sync AGENTS.md from Instructions command.`n"
+
+        # Act / Assert
+        @(Test-ClrWriterChangelog -Text $text).Count | Should -Be 1
     }
 }
