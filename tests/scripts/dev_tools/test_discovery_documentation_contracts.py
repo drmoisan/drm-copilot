@@ -445,16 +445,17 @@ def test_orchestration_skills_carry_the_linkage_and_current_mirrors(
 def test_execution_environment_fact_is_unchanged_across_copies() -> None:
     """The execution-environment brief is byte-identical across every committed copy."""
 
-    canonical = read(".github/skills/execution-environment/SKILL.md").encode("utf-8")
-    # The committed copies: .claude, .agents and the three bundle mirrors; the packaged
-    # mcp-server resources and agent worktrees are not part of the committed set.
+    canonical = read(".agents/skills/execution-environment/SKILL.md").encode("utf-8")
+    # The committed copies: .agents, .claude and their two bundle mirrors. The packaged
+    # mcp-server resources, agent worktrees, and the retired Copilot skill copies (any
+    # path with a .github segment, issue #1032) are not part of the committed set.
     copies = sorted(
         path
         for path in REPO_ROOT.rglob("execution-environment/SKILL.md")
-        if not {"node_modules", ".git", "packages", "worktrees"}
+        if not {"node_modules", ".git", "packages", "worktrees", ".github"}
         & set(path.relative_to(REPO_ROOT).parts)
     )
-    assert len(copies) == 6, [str(path) for path in copies]
+    assert len(copies) == 4, [str(path) for path in copies]
     for path in copies:
         assert (
             path.read_bytes() == canonical

@@ -9996,9 +9996,8 @@ diff --git a/tests/scripts/dev_tools/test_single_pass_preflight_contracts.py b/t
 index 2f0ac6a9f..cbe9fd5be 100644
 --- a/tests/scripts/dev_tools/test_single_pass_preflight_contracts.py
 +++ b/tests/scripts/dev_tools/test_single_pass_preflight_contracts.py
-@@ -21,6 +21,14 @@ _CONTRACTS = (
+@@ -21,5 +21,12 @@ _CONTRACTS = (
      ".agents/skills/atomic-plan-contract/SKILL.md",
-     ".github/skills/atomic-plan-contract/SKILL.md",
  )
 +_RESOURCES = "extensions/drm-copilot/resources"
 +_CONTRACT_COPIES = (
@@ -10006,12 +10005,11 @@ index 2f0ac6a9f..cbe9fd5be 100644
 +    f"{_RESOURCES}/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md",
 +    f"{_RESOURCES}/codex-and-agents-customizations/.agents/skills/"
 +    "atomic-plan-contract/SKILL.md",
-+    f"{_RESOURCES}/customizations/.github/skills/atomic-plan-contract/SKILL.md",
 +)
  _PREFLIGHT_SURFACES = (
      *_CONTRACTS,
      ".claude/agents/atomic-executor.md",
-@@ -360,22 +368,37 @@ def test_contract_requires_tests_asserting_changed_existing_behavior() -> None:
+@@ -353,22 +360,37 @@ def test_contract_requires_tests_asserting_changed_existing_behavior() -> None:
      assert lacking == {}, f"changed-behavior rule missing from section: {lacking}"
  
  
