@@ -1,0 +1,17 @@
+# Unique-Section Dispositions U1 to U5 ([P1-T1])
+
+Timestamp: 2026-11-19T08-13
+Plan: plan.2026-10-30T18-39.md
+Command: grep of section headings in the retired `feature-promotion-lifecycle` and `feature-review-workflow` Copilot copies; grep -c of `## File Size Advisory` and `## Documentation Surface Check` in `.claude/agents/feature-review.md`, `.agents/skills/feature-review/SKILL.md`, `.codex/agents/feature-review.toml`; child 1 and child 3 records from P0-T3 and P0-T4
+EXIT_CODE: 0
+Output Summary: U1 and U2 stale, U3 and U5 present elsewhere / mechanism-only, U4 per-tool link difference handled by child 3; no owner override and no `positive` class, so nothing is ported.
+
+| U | Retired section | Class | Reason | Reference |
+| --- | --- | --- | --- | --- |
+| U1 | `feature-promotion-lifecycle` Copilot copy, `## MCP-First Execution Rule` ("Documented alternatives" list) | stale | Issue #168 removed the non-MCP fallback policy; agent sessions have no approved non-MCP branch. Child 1 classed the section `negative` (Owner-Decision A: the shared body omits it). Porting would re-introduce the fallback. | `#1025:survey/difference-approval.md` D-feature-promotion-lifecycle-08, -09 (`## Disputed Cases`) |
+| U2 | Same file, `## Canonical Fallback Command Sequence` and the VS Code command forms of `## Canonical Fallback Short-Path Sequence (Minor Audit Mode)` | stale | Same reason as U1; the `drmCopilotExtension.*` command IDs stay documented by `extensions/drm-copilot/package.json` `contributes` commands. Child 1 classed both sections `negative` (Owner-Decision A). | `#1025:survey/difference-approval.md` D-feature-promotion-lifecycle-10, -11, -12, -13 (`## Disputed Cases`) |
+| U3 | `feature-review-workflow` Copilot copy, `## File Size Advisory` | present elsewhere / mechanism-only | Child 1 approved `mechanism-only`, port `none`: the same heading is in `.claude/agents/feature-review.md`, `.agents/skills/feature-review/SKILL.md` and `.codex/agents/feature-review.toml`. Not `positive`, so no port. | `#1025:survey/difference-approval.md` D-feature-review-workflow-07, -08 (`## Bulk Approval Set`) |
+| U4 | Copilot role links `../../agents/<role>.agent.md` in `DOCS-ROLE-LINK-SKILLS` (`docs-author-page`, `docs-inventory-surface`, `docs-plan-ia`, `docs-reconcile-behavior`, `docs-review-coverage`, `docs-validate`, `documentation-workflow`) | per-tool link difference (not unique content) | The `.agents` copies link `../../../.codex/agents/<role>.toml`; child 3's skill mirror rewrites each to `../../../.claude/agents/<role>.md` for the `.claude` copy through a per-skill substitution list. The Copilot link form has no remaining consumer once the Copilot copies are retired. | Child 3 output: `scripts/harness-generation/sources/skills/<name>.substitutions.json` for each of the seven skills; `Invoke-HarnessGeneration.ps1 -Surface skills -Check` exit 0 (P0-T4, `phase0-upstream-child3.2026-11-19T07-50.md`) |
+| U5 | `feature-review-workflow` Copilot copy, `## Documentation Surface Check` | present elsewhere / mechanism-only | Child 1 approved `mechanism-only`, port `none`: the same heading is in `.claude/agents/feature-review.md`, `.agents/skills/feature-review/SKILL.md` and `.codex/agents/feature-review.toml`. | `#1025:survey/difference-approval.md` D-feature-review-workflow-09, -10 (`## Bulk Approval Set`) |
+
+Owner overrides: `#1025:survey/difference-approval.md` `## Owner Overrides` holds rows E1, E2, E3, E4 and E6 only; none overrides U1 or U2. No port into `.agents/skills/<name>/SKILL.md` is required.
