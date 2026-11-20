@@ -538,6 +538,44 @@ function Invoke-ProcessReductionChain {
     return [pscustomobject]@{ IsValid = $errorList.Count -eq 0; Errors = $errorList.ToArray(); FinalText = $state }
 }
 
+function Resolve-ProcessReductionLivePath {
+    <#
+    .SYNOPSIS
+        Returns the repository-relative path to read for a recorded path (issue #1016).
+
+    .DESCRIPTION
+        A recorded path that is present is returned unchanged. A recorded path that is absent
+        and starts with a fallback prefix (docs/features/templates/ or docs/engineering/) is
+        returned at its moved location (.dev/templates/ or .dev/engineering/) when that
+        location is present. Any other path, and an absent path whose moved location is also
+        absent, is returned unchanged. Only the read location changes; keys stay recorded.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][string]$RepositoryRoot,
+        [Parameter(Mandatory = $true)][string]$Path,
+        [ValidateSet('Leaf', 'Container')][string]$PathType = 'Leaf'
+    )
+
+    if (Test-Path -LiteralPath (Join-Path -Path $RepositoryRoot -ChildPath $Path) -PathType $PathType) {
+        return $Path
+    }
+    $rows = @(
+        @{ From = 'docs/features/templates/'; To = '.dev/templates/' },
+        @{ From = 'docs/engineering/'; To = '.dev/engineering/' }
+    )
+    foreach ($row in $rows) {
+        if ($Path.StartsWith($row.From, [System.StringComparison]::Ordinal)) {
+            $moved = $row.To + $Path.Substring($row.From.Length)
+            if (Test-Path -LiteralPath (Join-Path -Path $RepositoryRoot -ChildPath $moved) -PathType $PathType) {
+                return $moved
+            }
+        }
+    }
+    return $Path
+}
+
 function Read-ProcessReductionChainInput {
     <#
     .SYNOPSIS
@@ -547,6 +585,8 @@ function Read-ProcessReductionChainInput {
         The one read seam of this module; it writes nothing. Returns Entries, PatchText, and
         LiveText ($null for a missing file) over every path a block or patch section names,
         each entry file, and each mapped source path, as Invoke-ProcessReductionChain takes.
+        A recorded path absent from the tree is read from its moved location through
+        Resolve-ProcessReductionLivePath; every LiveText key stays the recorded path.
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -555,7 +595,8 @@ function Read-ProcessReductionChainInput {
         [string]$LedgerPath = 'docs/engineering/process-reductions'
     )
 
-    $ledgerRoot = Join-Path -Path $RepositoryRoot -ChildPath $LedgerPath
+    $ledgerRead = Resolve-ProcessReductionLivePath -RepositoryRoot $RepositoryRoot -Path $LedgerPath -PathType Container
+    $ledgerRoot = Join-Path -Path $RepositoryRoot -ChildPath $ledgerRead
     $ledger = Read-ProcessReductionLedger -LedgerPath $ledgerRoot
     $paths = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
     $patchText = @{}
@@ -579,7 +620,8 @@ function Read-ProcessReductionChainInput {
 
     $liveText = @{}
     foreach ($path in $paths) {
-        $fullPath = Join-Path -Path $RepositoryRoot -ChildPath $path
+        $readPath = Resolve-ProcessReductionLivePath -RepositoryRoot $RepositoryRoot -Path $path
+        $fullPath = Join-Path -Path $RepositoryRoot -ChildPath $readPath
         $liveText[$path] = if (Test-Path -LiteralPath $fullPath -PathType Leaf) { [string](Get-Content -LiteralPath $fullPath -Raw) } else { $null }
     }
 
