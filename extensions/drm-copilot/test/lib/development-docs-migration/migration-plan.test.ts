@@ -166,6 +166,19 @@ describe("buildMigrationPlan refusal rules", () => {
     expect(apply({ "src/x.ts": "x" }, null).refusals).toEqual([]);
   });
 
+  it("names no open choice when only held items require the decision file", () => {
+    // Arrange: one held folder, no reference to rewrite and no discovery file.
+    const files = { [`${HELD}/a.md`]: "held" };
+
+    // Act
+    const { refusals } = apply(files, null);
+
+    // Assert
+    expect(refusals).toEqual([
+      "a decision file is required: 1 held items, open choices: none",
+    ]);
+  });
+
   it("refuses an unmapped entry under docs/features in apply mode and only reports it in dry run", () => {
     const files = { ...baseFiles(), "docs/features/unknown-area/x.md": "x" };
     expect(apply(files, decisionsFor(files)).refusals).toEqual([
