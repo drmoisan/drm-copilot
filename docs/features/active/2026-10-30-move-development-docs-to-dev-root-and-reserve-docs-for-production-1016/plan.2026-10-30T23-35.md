@@ -213,7 +213,7 @@ Apply mode refuses while tracked files have uncommitted changes. Each commit tas
 
 ### Phase 2 — Apply (run 1)
 
-- [ ] [P2-T1] Commit the pre-apply state under the protocol: `OLD_FEATURE/plan.2026-10-30T23-35.md`, `OLD_FEATURE/spec.md` when it has uncommitted changes, `DECISIONS`, the Phase 0 and Phase 1 evidence under `OLD_FEATURE/evidence/`, and the [P1-T5] edits to `scripts/dev-tools/ProcessReductionChain.psm1` and its test.
+- [x] [P2-T1] Commit the pre-apply state under the protocol: `OLD_FEATURE/plan.2026-10-30T23-35.md`, `OLD_FEATURE/spec.md` when it has uncommitted changes, `DECISIONS`, the Phase 0 and Phase 1 evidence under `OLD_FEATURE/evidence/`, and the [P1-T5] edits to `scripts/dev-tools/ProcessReductionChain.psm1` and its test.
   - Acceptance: `git status --porcelain --untracked-files=no` prints nothing after the commit.
 - [ ] [P2-T2] Run `TOOL` in `apply` mode with `rename_decisions_path` `OLD_FEATURE/evidence/other/<DECISIONS basename>` and `report_directory` `SCRATCH/apply-1/`, then copy the report pair into `<FEATURE>/evidence/other/` with its names unchanged.
   - Acceptance: exit 0; `NEW_FEATURE/plan.2026-10-30T23-35.md` exists and `OLD_FEATURE` does not; the copied report lists the moves, renames, rewritten files with occurrence counts, protected occurrences and untracked files; a refusal stops with `BLOCKED: apply-refused` and its reason.
