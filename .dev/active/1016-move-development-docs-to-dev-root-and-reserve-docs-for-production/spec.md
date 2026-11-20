@@ -449,22 +449,22 @@ Recorded as questions only; the 2026-11-14 answers are in `## Autonomous Decisio
 - [x] The epic manifest `feature_folder` for child 2 names the renamed folder, and the epic manifest validation passes.
 - [x] `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a dated comment for each pinned file whose text changed, `KICKOFF_IDENTITY_FRAGMENTS` matches the rewritten pinned text, and the parallel-orchestrator surface tests and `test_parallel_planner_surface_contracts.py` pass.
 - [x] Historical JSON fixtures under `tests/fixtures/` and `tests/fixtures/blast_radius/historical-runs/` are unchanged by the stage B change (empty diff for those paths), and the tests that read them pass through child 2's matchers with the key at `.dev`.
-- [ ] Child 2's write-scope checker suite passes all three directions with the key at `.dev`, and every `Write(`/`Edit(` literal keeps both root forms during the fallback release (unless the owner's OQ-6 answer removes the fallback, in which case the checker passes with `.dev` literals only).
+- [x] Child 2's write-scope checker suite passes all three directions with the key at `.dev`, and every `Write(`/`Edit(` literal keeps both root forms during the fallback release (unless the owner's OQ-6 answer removes the fallback, in which case the checker passes with `.dev` literals only).
 - [x] Every mirrored and bundled copy, pack manifest and Codex counterpart touched by the change has the text its contract requires, every generator `--check` reports no drift, and the tests in "Contract Tests" pass.
 - [x] A recorded search over production roots (`.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts`, `extensions/drm-copilot/src`) for `docs/features`, `docs/research`, `docs/engineering` and `docs/discovery` returns only child 2's resolver constants, its matcher unions and recorded Stay or exclusion entries; a link check over moved Markdown reports no link broken by the move; command, output and allowlist are stored under `<FEATURE>/evidence/other/`.
 - [x] The orchestrator checkpoint records the post-move `<FEATURE>` path, and every stage B evidence artifact written after the move is under that path.
 - [ ] The seven-stage toolchain passes in a single pass for TypeScript, Python and PowerShell with the key at `.dev`, recorded under `<FEATURE>/evidence/qa-gates/`, and no changed production file exceeds 800 lines.
-- [ ] The stage B change adds no Python file; any Python change is an in-place edit of an existing file, recorded by a name-status diff against the merge base of the integration branch and `HEAD` (ruling R6) stored under `<FEATURE>/evidence/qa-gates/`.
-- [ ] Each `global_decisions` answer that implies a stage B task (OQ-3, OQ-4, OQ-5, OQ-6, OQ-8, OQ-9, OQ-10, OQ-11) is either implemented with a named test or evidence artifact, or recorded as requiring no change, in the stage B completion evidence.
+- [x] The stage B change adds no Python file; any Python change is an in-place edit of an existing file, recorded by a name-status diff against the merge base of the integration branch and `HEAD` (ruling R6) stored under `<FEATURE>/evidence/qa-gates/`.
+- [x] Each `global_decisions` answer that implies a stage B task (OQ-3, OQ-4, OQ-5, OQ-6, OQ-8, OQ-9, OQ-10, OQ-11) is either implemented with a named test or evidence artifact, or recorded as requiring no change, in the stage B completion evidence.
 
 ### Epic-level criteria owned by this child (promoted record)
 
 - [x] `.dev/` holds all development records in the target layout, and `docs/` holds only production documentation plus a README stating its purpose.
 - [ ] The TypeScript migration command moves a repository's folders with `git mv`, rewrites references, and a second run changes nothing (the `migration-apply.test.ts` second-apply case and the post-apply dry run).
-- [ ] The migration command and its tests need no Python.
+- [x] The migration command and its tests need no Python.
 - [ ] With `development_docs_root` set to `.dev`, the full toolchain passes.
 - [x] Historical fixtures stay frozen and still pass through the fallback.
-- [ ] Mirrored and bundled files, pack manifests, Codex counterparts and contract tests pass.
+- [x] Mirrored and bundled files, pack manifests, Codex counterparts and contract tests pass.
 
 ## Risks and Pre-Mortem
 

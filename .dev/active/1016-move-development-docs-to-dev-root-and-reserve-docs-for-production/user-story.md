@@ -68,21 +68,21 @@
 ### (c) Owner decisions on held items
 
 - [ ] The orchestrator presents the dry-run report and OQ-1 to OQ-13 to the owner as questions, and neither plan decides them.
-- [ ] `<FEATURE>/evidence/other/folder-rename-decisions.<UTC>.json` records a `rename` (with an issue-first target) or `keep` action for every held item in the dry-run report, the report's `source_digest`, the `rewrite_exclusions` globs, and a `global_decisions` answer for each owner question that affects execution.
-- [ ] Apply honors each decision exactly: `keep` folders retain their names, `rename` folders receive the stated target, and unreported date-first folders with an issue number follow the mechanical rule; a mechanical comparison against the decision file is stored under `<FEATURE>/evidence/other/`.
-- [ ] A change to the tree after approval causes apply to refuse on the `source_digest` check until a new dry run and decision file are produced.
+- [x] `<FEATURE>/evidence/other/folder-rename-decisions.<UTC>.json` records a `rename` (with an issue-first target) or `keep` action for every held item in the dry-run report, the report's `source_digest`, the `rewrite_exclusions` globs, and a `global_decisions` answer for each owner question that affects execution.
+- [x] Apply honors each decision exactly: `keep` folders retain their names, `rename` folders receive the stated target, and unreported date-first folders with an issue number follow the mechanical rule; a mechanical comparison against the decision file is stored under `<FEATURE>/evidence/other/`.
+- [x] A change to the tree after approval causes apply to refuse on the `source_digest` check until a new dry run and decision file are produced.
 
 ### (d) This repository after the flip
 
-- [ ] `.dev/` holds the development records in the target layout, and `docs/` contains `docs/README.md` stating that it holds production documentation only and no mapped source remains under `docs/`.
-- [ ] `development_docs_root` is `.dev` in `config/orchestration-routing.json`, `extensions/drm-copilot/resources/config/orchestration-routing.json` and `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json`, and `test_orchestration_routing_config_parity.py` passes.
-- [ ] Feature folders under `.dev/active`, `.dev/completed` and `.dev/archive` use `<NNNN>-<feature>` names except the folders kept by rule or decision; potential records, epics, parallel runs and research keep their names.
-- [ ] A plan created from the feature plan template after the flip has working `.github/instructions/` links, and both template copies carry the same link depth.
-- [ ] Historical JSON fixtures under `tests/fixtures/` are unchanged and their tests pass through the fallback with the key at `.dev`.
-- [ ] Child 2's write-scope checker, every generator `--check`, and the contract tests listed in `spec.md` "Contract Tests" pass.
+- [x] `.dev/` holds the development records in the target layout, and `docs/` contains `docs/README.md` stating that it holds production documentation only and no mapped source remains under `docs/`.
+- [x] `development_docs_root` is `.dev` in `config/orchestration-routing.json`, `extensions/drm-copilot/resources/config/orchestration-routing.json` and `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json`, and `test_orchestration_routing_config_parity.py` passes.
+- [x] Feature folders under `.dev/active`, `.dev/completed` and `.dev/archive` use `<NNNN>-<feature>` names except the folders kept by rule or decision; potential records, epics, parallel runs and research keep their names.
+- [x] A plan created from the feature plan template after the flip has working `.github/instructions/` links, and both template copies carry the same link depth.
+- [x] Historical JSON fixtures under `tests/fixtures/` are unchanged and their tests pass through the fallback with the key at `.dev`.
+- [x] Child 2's write-scope checker, every generator `--check`, and the contract tests listed in `spec.md` "Contract Tests" pass.
 - [ ] The full seven-stage toolchain passes for TypeScript, Python and PowerShell with the key at `.dev`, recorded under `<FEATURE>/evidence/qa-gates/`.
 - [ ] A post-apply dry run reports an empty plan, recorded under `<FEATURE>/evidence/other/`.
-- [ ] No new Python file is added by this child.
+- [x] No new Python file is added by this child.
 
 ## Non-Goals
 

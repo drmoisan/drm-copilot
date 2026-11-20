@@ -1,0 +1,16 @@
+# Final QA Loop History (Phase 5)
+
+Timestamp: 2026-11-20T18-10
+Command: sh SCRATCH/issue-1016-p5.sh, issue-1016-p5b.sh, issue-1016-p5c.sh, issue-1016-p5d.sh, issue-1016-p5e.sh (static stages, then the Jest, pytest and Pester gates through the launcher, one suite at a time); node SCRATCH/issue-1016-p5t5.cjs after each pass
+EXIT_CODE: 0
+Output Summary: Five passes. Passes 1 to 4 each restarted the loop at [P5-T1]; pass 5 is the one clean pass from which every Phase 5 artifact is written. Fixes made inside this item: two focused Pester suites (cleanup leg, unresolved target, Claude and Codex), one guard-form correction of those suites, and one deterministic pytest case for the Copilot stream loop. No production file changed in Phase 5.
+
+| Pass | Result | Cause | Action |
+| --- | --- | --- | --- |
+| 1 | restart | `Invoke-ScriptAnalyzer` threw a NullReferenceException in the PowerShell lint step (no source change since the clean Phase 3 gate); the coverage dry run also showed one uncovered line in each cleanup hook copy and one Python branch below baseline | per-file diagnostic run: 1864 files, 0 findings, 0 errors; investigation of the coverage items |
+| 2 | restart | static clean; PowerShell line total below the Phase 0 baseline because line 366 of `enforce-orchestration-preimplementation-gate-cleanup.ps1` (both copies; the unresolved-target return of `Get-OrchestrationCleanupConsolidationCommandResult`) was reached up to the Phase 2 gate and not after Phase 3, while the hook and its suites are unchanged | added `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CleanupTargetUnresolved.Tests.ps1` and `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-cleanup-target-unresolved.Tests.ps1`, which drive that return with a relative session root |
+| 3 | restart | the analyzer exception recurred; Pester failed 3 rows of the epic-state isolation discovery guard (AC-4, AC-6) for the two new suites | the suites gained the closure-seam mocks and the interception-probe `It`; the analyzer step now retries a file once on an analyzer exception and names it |
+| 4 | restart | all gates green; the Python branch total was one branch below baseline: edge `395 -> 362` of `_stream_copilot_output` in `scripts/dev_tools/atomic_executor/cli_copilot_runtime.py` (unchanged) is reached only when the reader thread is still alive at end of output, so the total moved between identical runs (passes 2 and 3 reached it, passes 1 and 4 did not) | added `TestStreamCopilotOutput.test_stream_keeps_polling_without_idle_timeout_until_exit` to `tests/scripts/dev_tools/atomic_executor/test_cli_part4_part2.py`, which takes the edge on every run |
+| 5 | clean | every stage exit 0; analyzer 0 findings, 0 retries; Jest 6685 passed; pytest 17104 passed; Pester 29157 tests, 0 failures; coverage comparison 0 violations | artifacts written |
+
+Decision D-P5-1 (autonomous, OD-1 and OD-4): the coverage items were fixed by tests inside this item rather than recorded as deviations, because each fix is a small test-only change and the plan's [P5-T5] condition requires zero violations. The scratch coverage script initially applied the thresholds to every changed TypeScript file; it was corrected to the plan's rule (thresholds for hand-edited and new files, no per-file drop for the others) before pass 2 was evaluated.
