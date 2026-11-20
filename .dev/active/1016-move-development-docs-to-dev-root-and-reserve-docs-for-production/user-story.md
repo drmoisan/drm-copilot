@@ -43,6 +43,9 @@
   1. The orchestrator presents the dry-run report and OQ-1 to OQ-13.
   2. The owner answers; the orchestrator writes `folder-rename-decisions.<UTC>.json` with the report's `source_digest`.
   3. If the tree changes before apply, the tool refuses and a new dry run and decision are needed.
+
+  Supersession (2026-11-20, A14, OD-1): decision A14 in `spec.md`, made under owner directive OD-1, replaced the owner presentation of steps 1 and 2 with an orchestrator decision step that writes the decision file without asking the owner. The first criterion of `### (c) Owner decisions on held items` originally read: "The orchestrator presents the dry-run report and OQ-1 to OQ-13 to the owner as questions, and neither plan decides them." It is restated in place to match A14 (remediation cycle 1).
+
 - Scenario (d): this repository after the flip
   1. Stage B applies the decisions, flips `development_docs_root` to `.dev` and updates tests, prose, templates and pins.
   2. Contributors create folders under `.dev/active/`, and the full toolchain passes with the key at `.dev`.
@@ -67,7 +70,7 @@
 
 ### (c) Owner decisions on held items
 
-- [ ] The orchestrator presents the dry-run report and OQ-1 to OQ-13 to the owner as questions, and neither plan decides them.
+- [ ] The orchestrator decision step writes the decision file from A2 to A13 and the stage A dry-run JSON, and neither plan decides the owner questions.
 - [x] `<FEATURE>/evidence/other/folder-rename-decisions.<UTC>.json` records a `rename` (with an issue-first target) or `keep` action for every held item in the dry-run report, the report's `source_digest`, the `rewrite_exclusions` globs, and a `global_decisions` answer for each owner question that affects execution.
 - [x] Apply honors each decision exactly: `keep` folders retain their names, `rename` folders receive the stated target, and unreported date-first folders with an issue number follow the mechanical rule; a mechanical comparison against the decision file is stored under `<FEATURE>/evidence/other/`.
 - [x] A change to the tree after approval causes apply to refuse on the `source_digest` check until a new dry run and decision file are produced.
