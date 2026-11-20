@@ -70,7 +70,7 @@
 
 ### (c) Owner decisions on held items
 
-- [ ] The orchestrator decision step writes the decision file from A2 to A13 and the stage A dry-run JSON, and neither plan decides the owner questions.
+- [x] The orchestrator decision step writes the decision file from A2 to A13 and the stage A dry-run JSON, and neither plan decides the owner questions.
 - [x] `<FEATURE>/evidence/other/folder-rename-decisions.<UTC>.json` records a `rename` (with an issue-first target) or `keep` action for every held item in the dry-run report, the report's `source_digest`, the `rewrite_exclusions` globs, and a `global_decisions` answer for each owner question that affects execution.
 - [x] Apply honors each decision exactly: `keep` folders retain their names, `rename` folders receive the stated target, and unreported date-first folders with an issue number follow the mechanical rule; a mechanical comparison against the decision file is stored under `<FEATURE>/evidence/other/`.
 - [x] A change to the tree after approval causes apply to refuse on the `source_digest` check until a new dry run and decision file are produced.
