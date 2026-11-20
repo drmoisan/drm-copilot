@@ -108,7 +108,7 @@ NPM_RUN_PATTERN = re.compile(r"`npm run [^`]+`")
 ISSUE_NUMBER_PATTERN = re.compile(
     r"issue(?:[_-]?num(?:ber)?|\s+number)\s*[:=]\s*#?\d+", re.IGNORECASE
 )
-ACTIVE_FEATURE_PATH = "docs/features/active/"
+ACTIVE_FEATURE_PATH = ".dev/active/"
 
 NORMATIVE_SURFACE_GLOBS = (
     ".claude/agents/*.md",

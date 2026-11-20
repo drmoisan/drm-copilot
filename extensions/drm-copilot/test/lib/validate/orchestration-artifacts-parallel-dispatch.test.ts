@@ -133,7 +133,7 @@ describe("validateArtifact parallel dispatch", () => {
 
   // This case previously asserted that `parallel-kickoff` fell through to the
   // unsupported-artifact-type branch. That expectation became false by design:
-  // `docs/features/epics/parallel-orchestration/epic.md`, section "Planner
+  // `.dev/epics/parallel-orchestration/epic.md`, section "Planner
   // Adjudication: the kickoff-contract boundary (F3 / F4)", assigns the
   // kickoff-contract module and the `parallel-kickoff` artifact type to the
   // parallel-planner-surface feature, and this repository's

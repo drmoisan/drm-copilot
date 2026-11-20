@@ -42,13 +42,13 @@ Describe 'enforce-prd-feature-before-planner.ps1 checkpoint folder and work-mode
         It 'K1: returns the recorded feature-folder and reads the exact path once with -Raw' {
             # Arrange
             Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/session-root/artifacts/orchestration/orchestrator-state.json' }
-            Mock Get-Content { '{"feature-folder":"docs/features/active/2026-08-26-sample-565"}' } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/session-root/artifacts/orchestration/orchestrator-state.json' }
+            Mock Get-Content { '{"feature-folder":".dev/active/2026-08-26-sample-565"}' } -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/session-root/artifacts/orchestration/orchestrator-state.json' }
 
             # Act
             $result = Get-PrdFeatureCheckpointFolder -CheckpointPath $script:CheckpointPath
 
             # Assert
-            $result | Should -Be 'docs/features/active/2026-08-26-sample-565'
+            $result | Should -Be '.dev/active/2026-08-26-sample-565'
             Should -Invoke Test-Path -Times 1 -Exactly -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/session-root/artifacts/orchestration/orchestrator-state.json' }
             Should -Invoke Get-Content -Times 1 -Exactly -ParameterFilter { $LiteralPath -eq '/synthetic-worktrees/session-root/artifacts/orchestration/orchestrator-state.json' -and $Raw }
         }

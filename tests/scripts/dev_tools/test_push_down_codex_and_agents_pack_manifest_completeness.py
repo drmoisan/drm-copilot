@@ -20,7 +20,7 @@ Scope note (issue #372):
     agent, hook, and skill files that were never registered in any
     Codex-side manifest. These omissions predate this feature (this
     feature's own Phase 3 mirroring tasks copied zero new Codex-side files;
-    see `docs/features/active/2026-07-17-legacy-discovery-publishing-372/`
+    see `.dev/active/2026-07-17-legacy-discovery-publishing-372/`
     `evidence/other/codex-mirror-gap-inventory.2026-07-19T05-36.md`) and are
     unrelated to `legacy-discovery-publishing` (issue #372), which
     only mirrors newly landed discovery-framework assets and does not

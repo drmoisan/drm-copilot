@@ -447,7 +447,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--manifest",
         required=True,
-        help="Path to docs/features/parallel/<slug>/parallel.md",
+        help="Path to .dev/parallel/<slug>/parallel.md",
     )
     parser.add_argument(
         "--edges",

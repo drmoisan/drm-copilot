@@ -6,7 +6,7 @@
     Committed-ledger chain tests for scripts/dev-tools/ProcessReductionChain.psm1 (issue #1097).
 
 .DESCRIPTION
-    Reads docs/engineering/process-reductions/ and the paths its entries name read-only
+    Reads .dev/engineering/process-reductions/ and the paths its entries name read-only
     through Read-ProcessReductionChainInput, then reverts every entry newest-first in
     memory. The chain must hold with no exception: no test here filters the errors.
 #>
@@ -52,7 +52,7 @@ Describe 'Committed process-reduction ledger chain' {
     }
 
     It 'PRC-README-REVERT-ORDER-STATED states the newest-first revert order in the README' {
-        $readme = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot 'docs/engineering/process-reductions/README.md')
+        $readme = Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot '.dev/engineering/process-reductions/README.md')
 
         $section = Get-ProcessReductionSection -Text $readme -Heading 'Revert Order'
 

@@ -39,7 +39,7 @@ create epic scaffolding unless the user explicitly overrides the verdict.
 
 For an epic-worthy objective:
 
-1. Define `docs/features/epics/<epic-slug>/` and author `epic.md` using the manifest schema in
+1. Define `.dev/epics/<epic-slug>/` and author `epic.md` using the manifest schema in
    `epic-orchestrate`.
 2. Record goal, scope, non-goals, shared design, acceptance criteria, decomposition rationale,
    production-file estimates, and integration risks.
@@ -60,7 +60,7 @@ must never use placeholders.
 
 ## Epic-Level Issue Promotion
 
-Issue #663. Before the first preparation-mode child delegation, `epic-planner` promotes one epic-level GitHub issue for the epic itself. It authors a potential entry under `docs/features/potential/` describing the epic and promotes it through `mcp__drm-copilot__potential_to_issue` with `promotion_type: epic`; `gh issue create` is not used. It records the resulting number as `epic_issue_num` in the epic planning checkpoint (`artifacts/orchestration/epic-planner-state.json`) and in the kickoff prompt artifact, and `epic-orchestrator` copies it into the epic checkpoint `artifacts/orchestration/epic-orchestrator-state.json` at its first checkpoint write. The integration-to-`main` pull request uses `epic_issue_num` as its canonical issue number.
+Issue #663. Before the first preparation-mode child delegation, `epic-planner` promotes one epic-level GitHub issue for the epic itself. It authors a potential entry under `.dev/potential/` describing the epic and promotes it through `mcp__drm-copilot__potential_to_issue` with `promotion_type: epic`; `gh issue create` is not used. It records the resulting number as `epic_issue_num` in the epic planning checkpoint (`artifacts/orchestration/epic-planner-state.json`) and in the kickoff prompt artifact, and `epic-orchestrator` copies it into the epic checkpoint `artifacts/orchestration/epic-orchestrator-state.json` at its first checkpoint write. The integration-to-`main` pull request uses `epic_issue_num` as its canonical issue number.
 
 ## Complexity Assessment
 
@@ -77,7 +77,7 @@ home before preparation. All prepared child outputs must fan into this branch.
 
 ## Integration Commit Form
 
-The epic planner's own commits of the epic manifest, the fanned-in child feature folders and approved plans, and the kickoff copy are orchestration bookkeeping. `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` exempts them without a ready feature checkpoint only when the invocation is pathspec-bearing and every path operand lies inside `docs/features/epics/`, `docs/features/parallel/`, `docs/features/active/`, `docs/features/potential/`, or `artifacts/orchestration/`. A pathless commit, a whole-tree operand, or any operand outside those trees is denied.
+The epic planner's own commits of the epic manifest, the fanned-in child feature folders and approved plans, and the kickoff copy are orchestration bookkeeping. `.codex/hooks/enforce-orchestration-preimplementation-gate.ps1` exempts them without a ready feature checkpoint only when the invocation is pathspec-bearing and every path operand lies inside `.dev/epics/`, `.dev/parallel/`, `.dev/active/`, `.dev/potential/`, or `artifacts/orchestration/`. A pathless commit, a whole-tree operand, or any operand outside those trees is denied.
 
 Admitted commit forms, each followed by `--` and the exempt path operands:
 
@@ -196,7 +196,7 @@ As each preparation finishes:
 3. Backfill `issue_num` and `feature_folder` in `epic.md`.
 4. Record `preparation_status: "prepared"`, `research_path`, `plan_path`,
    `preflight_evidence_path`, and `preflight_status: "PREFLIGHT: ALL CLEAR"` in the planner
-   checkpoint. `research_path` must be under `docs/features/<feature>/research/` inside the feature folder.
+   checkpoint. `research_path` must be under `.dev/<feature>/research/` inside the feature folder.
    Each child references its immutable receipt and the shared `wave.<wave_id>.status.json` path.
 5. Remove the worktree only after its preparation branch is merged, following
    `## Preparation Worktree Records`.
@@ -252,7 +252,7 @@ kickoff until this canonical gate succeeds.
 ## Kickoff Artifacts
 
 Write the ignored copy to `artifacts/orchestration/epic-kickoff-<epic-slug>.md` and commit the
-durable copy at `docs/features/epics/<epic-slug>/epic-kickoff.md`:
+durable copy at `.dev/epics/<epic-slug>/epic-kickoff.md`:
 
 ```markdown
 # Epic Kickoff: <epic-slug>
@@ -265,7 +265,7 @@ artifacts/orchestration/epic-planner-state.json (branch: epic/<epic-slug>-integr
 Run `/epic-run <epic-slug>` to execute this epic, or paste the prompt below.
 
 Use the epic-orchestrator subagent to execute the prepared epic at
-docs/features/epics/<epic-slug>/epic.md. Reuse epic/<epic-slug>-integration. Every child resumes
+.dev/epics/<epic-slug>/epic.md. Reuse epic/<epic-slug>-integration. Every child resumes
 at atomic execution from its committed plan-path; do not repeat promotion, research, feature
 documents, planning, or preflight.
 

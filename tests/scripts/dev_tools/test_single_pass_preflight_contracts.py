@@ -214,13 +214,13 @@ def test_codex_and_copilot_executors_drop_loop_mandates() -> None:
 
 
 def test_feature_research_requires_premortem() -> None:
-    """Every research surface requires the pre-mortem and exempts docs/research/."""
+    """Every research surface requires the pre-mortem and exempts .dev/research/."""
 
     # Arrange
     tokens = (
         "## Pre-Mortem",
         *(f"`{label}`" for label in _LABELS),
-        "One-off research under `docs/research/` is exempt.",
+        "One-off research under `.dev/research/` is exempt.",
     )
 
     # Act
@@ -236,7 +236,7 @@ def test_plan_templates_carry_premortem_skeleton() -> None:
     # Arrange
     tokens = ("## Pre-Mortem", *(f"- {label}:" for label in _LABELS))
     paths = tuple(
-        f"docs/features/templates/{kind}/plan.yyyy-MM-ddTHH-mm.md"
+        f".dev/templates/{kind}/plan.yyyy-MM-ddTHH-mm.md"
         for kind in _TEMPLATES
     )
 
@@ -246,7 +246,7 @@ def test_plan_templates_carry_premortem_skeleton() -> None:
         kind
         for kind in _TEMPLATES
         if (
-            _REPO_ROOT / f"docs/features/templates/{kind}/plan.yyyy-MM-ddTHH-mm.md"
+            _REPO_ROOT / f".dev/templates/{kind}/plan.yyyy-MM-ddTHH-mm.md"
         ).read_bytes()
         != (_REPO_ROOT / f"{_FT}/{kind}/plan.yyyy-MM-ddTHH-mm.md").read_bytes()
     ]
@@ -265,7 +265,7 @@ def test_contract_requires_final_phase_self_review() -> None:
         (
             "**Final-phase self-review.**",
             "`<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`",
-            "`docs/features/templates/policy_audit/`",
+            "`.dev/templates/policy_audit/`",
         ),
     )
 

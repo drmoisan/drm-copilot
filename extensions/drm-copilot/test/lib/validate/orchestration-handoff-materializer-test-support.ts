@@ -46,9 +46,9 @@ export const INDEPENDENT_CONTEXT = {
   expectedSourceHeadSha: "0".repeat(40),
   allowedHeadRelationship: "equal_or_descendant",
   expectedIssueNumber: 614,
-  expectedFeatureFolder: "docs/features/active/portable-handoff-614",
+  expectedFeatureFolder: ".dev/active/portable-handoff-614",
   expectedWorkMode: "full-feature",
-  expectedPlanPath: "docs/features/active/portable-handoff-614/plan.md",
+  expectedPlanPath: ".dev/active/portable-handoff-614/plan.md",
   expectedPlanSha256: "2".repeat(64),
 } as const;
 
@@ -68,7 +68,7 @@ export function createEnvelope(sourceSha256: string): HandoffEnvelope {
     identity: {
       objectiveId: "github:drmoisan/drm-copilot#614",
       issueNumber: 614,
-      featureFolder: "docs/features/active/portable-handoff-614",
+      featureFolder: ".dev/active/portable-handoff-614",
       workMode: "full-feature",
     },
     binding: {
@@ -96,7 +96,7 @@ export function createEnvelope(sourceSha256: string): HandoffEnvelope {
     destinationCheckpointPath:
       "artifacts/orchestration/orchestrator-state.json",
     plan: {
-      path: "docs/features/active/portable-handoff-614/plan.md",
+      path: ".dev/active/portable-handoff-614/plan.md",
       sha256: "2".repeat(64),
       contractVersion: "atomic-plan-v1",
     },

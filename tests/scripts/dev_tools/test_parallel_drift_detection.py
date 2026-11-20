@@ -40,14 +40,14 @@ PROPERTY_PATHS: tuple[str, ...] = (
     "scripts/dev_tools/parallel_drift_detection.py",
     "scripts/dev_tools/nested/helper.py",
     "tests/scripts/dev_tools/test_parallel_drift_detection.py",
-    "docs/features/active/feature/spec.md",
+    ".dev/active/feature/spec.md",
     ".claude/settings.json",
 )
 PROPERTY_DECLARED: tuple[str, ...] = (
     "scripts/dev_tools/parallel_drift_detection.py",
     "scripts/dev_tools",
     "tests/scripts/dev_tools/*.py",
-    "docs/features/active/feature/**",
+    ".dev/active/feature/**",
 )
 
 
@@ -125,8 +125,8 @@ def test_action_constants_are_members_of_the_f3_owned_enum() -> None:
         (["scripts/dev_tools/a.py"], ["scripts/dev_tools/*.py"]),
         # Two changed paths covered by two different declared entries.
         (
-            ["scripts/dev_tools/a.py", "docs/features/active/f/spec.md"],
-            ["scripts/dev_tools/*.py", "docs/features/active/f/**"],
+            ["scripts/dev_tools/a.py", ".dev/active/f/spec.md"],
+            ["scripts/dev_tools/*.py", ".dev/active/f/**"],
         ),
         # An empty diff cannot escape anything.
         ([], ["scripts/dev_tools/**"]),

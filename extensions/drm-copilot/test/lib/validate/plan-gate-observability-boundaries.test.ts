@@ -63,7 +63,7 @@ const PARITY_G6 = PARITY_G5;
 
 /**
  * The two context-free blocking strings recorded by [P0-T13] in
- * `docs/features/active/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/baseline/plan-gate-preexisting-output.2026-08-24T00-00.md`.
+ * `.dev/active/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/baseline/plan-gate-preexisting-output.2026-08-24T00-00.md`.
  * Both are G1 findings; G1 is the only command-attributed Blocking rule that
  * decides without the repository seam. The document-level G10 rule (issue
  * #932) also runs without it, and these fixtures carry no SCRATCH definition,

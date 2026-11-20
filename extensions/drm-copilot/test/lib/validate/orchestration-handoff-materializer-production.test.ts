@@ -64,9 +64,9 @@ const INDEPENDENT_CONTEXT = {
   expectedSourceHeadSha: "0".repeat(40),
   allowedHeadRelationship: "equal_or_descendant",
   expectedIssueNumber: 614,
-  expectedFeatureFolder: "docs/features/active/portable-handoff-614",
+  expectedFeatureFolder: ".dev/active/portable-handoff-614",
   expectedWorkMode: "full-feature",
-  expectedPlanPath: "docs/features/active/portable-handoff-614/plan.md",
+  expectedPlanPath: ".dev/active/portable-handoff-614/plan.md",
   expectedPlanSha256: "2".repeat(64),
 } as const;
 
@@ -85,7 +85,7 @@ function validProjection(provider: "claude" | "codex") {
     provider,
     checkpoint_expression: `${provider}.orchestrator-state`,
     destination_projector: `portable-to-${provider}-v1`,
-    "plan-path": "docs/features/active/portable-handoff-614/plan.md",
+    "plan-path": ".dev/active/portable-handoff-614/plan.md",
     next_step: "atomic_execution",
     portable_handoff: {},
     destination_evidence: {

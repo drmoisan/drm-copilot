@@ -421,7 +421,7 @@ Describe 'WorktreeItemResolution target resolution' {
         Mock -CommandName Get-WorktreeItemLiveRoot -ModuleName WorktreeItemResolution -MockWith { throw 'enumeration must not run' }
 
         # Act
-        $target = Resolve-WorktreeItemTarget -Text 'Plan docs/features/active/2026-09-13-synthetic-target-672 now.' -SessionRoot $script:Session
+        $target = Resolve-WorktreeItemTarget -Text 'Plan .dev/active/2026-09-13-synthetic-target-672 now.' -SessionRoot $script:Session
 
         # Assert: a folder path selects nothing, so the call carries no identity.
         $target.Status | Should -Be 'NoTarget'
@@ -435,7 +435,7 @@ Describe 'WorktreeItemResolution target resolution' {
         Set-ItemTopology -Live @($script:Own, $script:Sibling, $script:Third) -BranchRoot @($script:Own) -Checkpoint @{}
 
         # Act
-        $target = Resolve-WorktreeItemTarget -Text ('Plan docs/features/active/2026-09-13-synthetic-target-672 ' +
+        $target = Resolve-WorktreeItemTarget -Text ('Plan .dev/active/2026-09-13-synthetic-target-672 ' +
             'branch: f5-fixture-own') -SessionRoot $script:Session
 
         # Assert: the branch decides and the reported signal is never a folder path.

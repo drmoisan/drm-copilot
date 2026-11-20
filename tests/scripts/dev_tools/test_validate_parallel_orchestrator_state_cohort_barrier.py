@@ -103,9 +103,9 @@ def build_state(
         "last_updated": "2026-08-08T10-00",
         "route_id": "parallel",
         "parallel_slug": "wave-four",
-        "parallel_manifest_path": "docs/features/parallel/wave-four/parallel.md",
+        "parallel_manifest_path": ".dev/parallel/wave-four/parallel.md",
         "parallel_status_doc_path": (
-            "docs/features/parallel/wave-four/parallel-status.md"
+            ".dev/parallel/wave-four/parallel-status.md"
         ),
         "mode": "closed",
         "max_concurrency": 4,
@@ -403,7 +403,7 @@ def test_feature_folder_hint_cohort_membership_resolves() -> None:
                 "index": 0,
                 "generation": 0,
                 "item_keys": [
-                    "docs/features/active/2026-08-07-parallel-item-444",
+                    ".dev/active/2026-08-07-parallel-item-444",
                     "2026-08-07-parallel-item-445",
                 ],
             }

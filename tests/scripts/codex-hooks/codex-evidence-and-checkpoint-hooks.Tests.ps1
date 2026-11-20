@@ -72,7 +72,7 @@ Describe 'Codex evidence-location and checkpoint-order PreToolUse hooks' {
             @{ Label = 'artifacts/qa-gates'; Path = 'artifacts/qa-gates/gate.md'; Expected = $true }
             @{ Label = 'artifacts/research'; Path = 'artifacts/research/notes.md'; Expected = $true }
             @{ Label = 'a Windows-separated forbidden path'; Path = 'C:\repo\artifacts\coverage\a.md'; Expected = $true }
-            @{ Label = 'a canonical feature evidence path'; Path = 'docs/features/active/x/evidence/qa-gates/a.md'; Expected = $false }
+            @{ Label = 'a canonical feature evidence path'; Path = '.dev/active/x/evidence/qa-gates/a.md'; Expected = $false }
             @{ Label = 'a permitted artifacts sub-path'; Path = 'artifacts/orchestration/orchestrator-state.json'; Expected = $false }
         ) {
             Test-EvidenceLocationForbidden -FilePath $Path | Should -Be $Expected
@@ -108,7 +108,7 @@ Describe 'Codex evidence-location and checkpoint-order PreToolUse hooks' {
         }
 
         It 'allows a canonical evidence path' {
-            $decision = Invoke-EvidenceLocationDecision -ToolInputRaw '{"file_path":"docs/features/active/x/evidence/other/a.md"}'
+            $decision = Invoke-EvidenceLocationDecision -ToolInputRaw '{"file_path":".dev/active/x/evidence/other/a.md"}'
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -135,7 +135,7 @@ Describe 'Codex evidence-location and checkpoint-order PreToolUse hooks' {
 
         It 'returns 0 with no output for an allowed mapped path' {
             $payload = ConvertTo-CodexGatePayload -ToolName 'Write' -ToolInput @{
-                file_path = 'docs/features/active/x/evidence/other/a.md'
+                file_path = '.dev/active/x/evidence/other/a.md'
                 content   = 'body'
             }
             $originalOut = [System.Console]::Out

@@ -148,7 +148,7 @@ const UNUSED_GIT: ReadinessGitRepository = {
 
 function feature(issueNum: number): JsonRecord {
   const delegationId = `prepare-${issueNum}`;
-  const folder = `docs/features/active/feature-${issueNum}`;
+  const folder = `.dev/active/feature-${issueNum}`;
   const launchRoot = "artifacts/orchestration/epic-child-launches/preparation";
   return {
     issue_num: issueNum,

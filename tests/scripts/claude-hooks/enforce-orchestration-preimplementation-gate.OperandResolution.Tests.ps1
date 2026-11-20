@@ -38,8 +38,8 @@ BeforeAll {
     $script:Session = (Get-Location).Path.Replace([string][char]92, '/')
     $script:HookRoot = (Resolve-Path "$PSScriptRoot/../../../.claude/hooks").Path
     $script:ItemRelative = 'artifacts/orchestration/orchestrator-state.json'
-    $script:ReadyItem = '{"issue-num":"301","feature-folder":"docs/features/active/child-b-301","route_id":"large","lifecycle_ready":true}'
-    $script:UnreadyItem = '{"issue-num":"301","feature-folder":"docs/features/active/child-b-301","route_id":"large","lifecycle_ready":false}'
+    $script:ReadyItem = '{"issue-num":"301","feature-folder":".dev/active/child-b-301","route_id":"large","lifecycle_ready":true}'
+    $script:UnreadyItem = '{"issue-num":"301","feature-folder":".dev/active/child-b-301","route_id":"large","lifecycle_ready":false}'
 
     function ConvertTo-WritePayload {
         param([string] $FilePath)

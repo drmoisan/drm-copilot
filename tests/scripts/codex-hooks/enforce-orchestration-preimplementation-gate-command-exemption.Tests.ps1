@@ -16,7 +16,7 @@
 # Scenario obligations are identical to the Claude-side sibling suite
 # `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.CommandExemption.Tests.ps1`.
 # The normative contract is the D4 fail-closed rule table in
-# docs/features/active/2026-08-24-preimplementation-gate-blocks-planner-integration-commits-539/spec.md.
+# .dev/active/2026-08-24-preimplementation-gate-blocks-planner-integration-commits-539/spec.md.
 
 Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (issue #539)' {
     BeforeAll {
@@ -36,31 +36,31 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
     Context 'issue #539 orchestration-tree staging exemption allow cases' {
         It 'allows staging an epic document under the epics tree' {
             # Arrange
-            $command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md'
+            $command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md'
 
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $command
 
             # Assert
             $decision.hookSpecificOutput.permissionDecision |
-                Should -Be 'allow' -Because 'every operand resolves inside docs/features/epics/'
+                Should -Be 'allow' -Because 'every operand resolves inside .dev/epics/'
         }
 
         It 'allows staging a parallel manifest and its kickoff in one two-operand invocation' {
             # Arrange
-            $command = 'git add docs/features/parallel/2026-08-24-sample-run/parallel.md docs/features/parallel/2026-08-24-sample-run/parallel-kickoff.md'
+            $command = 'git add .dev/parallel/2026-08-24-sample-run/parallel.md .dev/parallel/2026-08-24-sample-run/parallel-kickoff.md'
 
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $command
 
             # Assert
             $decision.hookSpecificOutput.permissionDecision |
-                Should -Be 'allow' -Because 'both operands resolve inside docs/features/parallel/'
+                Should -Be 'allow' -Because 'both operands resolve inside .dev/parallel/'
         }
 
         It 'allows a quoted operand under the active feature tree' {
             # Arrange
-            $command = 'git add "docs/features/active/2026-08-24-sample-feature-539/plan.md"'
+            $command = 'git add ".dev/active/2026-08-24-sample-feature-539/plan.md"'
 
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $command
@@ -96,7 +96,7 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
 
         It 'allows the pathspec-bearing integration form with a message option and a double-dash separator' {
             # Arrange
-            $command = 'git commit -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md'
+            $command = 'git commit -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md'
 
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $command
@@ -108,7 +108,7 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
 
         It 'allows a chained two-segment line whose every segment is independently exempt' {
             # Arrange
-            $command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md && git commit -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md'
+            $command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md && git commit -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md'
 
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $command
@@ -120,14 +120,14 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
 
         It 'allows staging a lifecycle record under the potential feature tree' {
             # Arrange
-            $command = 'git add docs/features/potential/2026-08-24-sample-candidate.md'
+            $command = 'git add .dev/potential/2026-08-24-sample-candidate.md'
 
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $command
 
             # Assert
             $decision.hookSpecificOutput.permissionDecision |
-                Should -Be 'allow' -Because 'docs/features/potential/ is in the five-tree exempt set'
+                Should -Be 'allow' -Because '.dev/potential/ is in the five-tree exempt set'
         }
     }
 
@@ -136,10 +136,10 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
         # invariant (D4 row 19) denies each pairing, and the deny reason must keep the
         # prefix and both phrases the pre-existing suites already assert.
         It 'denies an exempt operand paired with a <Extension> production operand' -ForEach @(
-            @{ Extension = '.ps1'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md scripts/powershell/Sample.ps1' }
-            @{ Extension = '.py'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md scripts/dev_tools/sample_module.py' }
-            @{ Extension = '.ts'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md extensions/drm-copilot/src/lib/sample.ts' }
-            @{ Extension = '.cs'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md src/TaskMaster.Domain/Sample.cs' }
+            @{ Extension = '.ps1'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md scripts/powershell/Sample.ps1' }
+            @{ Extension = '.py'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md scripts/dev_tools/sample_module.py' }
+            @{ Extension = '.ts'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md extensions/drm-copilot/src/lib/sample.ts' }
+            @{ Extension = '.cs'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md src/TaskMaster.Domain/Sample.cs' }
         ) {
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $Command
@@ -162,48 +162,48 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
             @{ Label = 'D4 row 1 - bare staging with zero operands'; Command = 'git add' }
             @{ Label = 'D4 row 2a - the tree-wide short all flag'; Command = 'git add -A' }
             @{ Label = 'D4 row 2b - the tree-wide long all flag'; Command = 'git add --all' }
-            @{ Label = 'D4 row 2c - the update short flag with an exempt operand'; Command = 'git add -u docs/features/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 2c - the update short flag with an exempt operand'; Command = 'git add -u .dev/epics/2026-08-24-sample-epic/epic.md' }
             @{ Label = 'D4 row 2d - the update long flag'; Command = 'git add --update' }
-            @{ Label = 'D4 row 2e - the no-all flag with an exempt operand'; Command = 'git add --no-all docs/features/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 2e - the no-all flag with an exempt operand'; Command = 'git add --no-all .dev/epics/2026-08-24-sample-epic/epic.md' }
             @{ Label = 'D4 row 3a - the dot whole-tree operand'; Command = 'git add .' }
             @{ Label = 'D4 row 3b - the colon-slash whole-tree operand'; Command = 'git add :/' }
             @{ Label = 'D4 row 4 - a pathless message-only integration invocation'; Command = 'git commit -m "epic scaffold"' }
-            @{ Label = 'D4 row 5a - the content-widening short all option'; Command = 'git commit -a -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 5b - the content-widening long all option'; Command = 'git commit --all -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 5c - the include short option'; Command = 'git commit -i -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 5d - the include long option'; Command = 'git commit --include -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 5e - the interactive long option'; Command = 'git commit --interactive -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 5f - the patch short option'; Command = 'git commit -p -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 5g - the history-rewriting amend option'; Command = 'git commit --amend -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5a - the content-widening short all option'; Command = 'git commit -a -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5b - the content-widening long all option'; Command = 'git commit --all -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5c - the include short option'; Command = 'git commit -i -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5d - the include long option'; Command = 'git commit --include -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5e - the interactive long option'; Command = 'git commit --interactive -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5f - the patch short option'; Command = 'git commit -p -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5g - the history-rewriting amend option'; Command = 'git commit --amend -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
             @{ Label = 'D4 row 6a - pathspecs supplied from a file'; Command = 'git add --pathspec-from-file=stage-list.txt' }
             @{ Label = 'D4 row 6b - the nul-delimited pathspec file option'; Command = 'git add --pathspec-file-nul --pathspec-from-file=stage-list.txt' }
             @{ Label = 'D4 row 7 - a double-dash separator with nothing after it'; Command = 'git add --' }
-            @{ Label = 'D4 row 8 - an unmodeled dash-leading option before the separator'; Command = 'git add --sparse docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 9a - the exclude pathspec magic operand'; Command = 'git add ":(exclude)scripts/" docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 9b - the bang shorthand exclude operand'; Command = 'git add :!scripts/ docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 9c - the top pathspec magic operand'; Command = 'git add ":(top)docs/features/epics/2026-08-24-sample-epic/epic.md"' }
-            @{ Label = 'D4 row 9d - the glob pathspec magic operand'; Command = 'git add ":(glob)docs/features/epics/2026-08-24-sample-epic/epic.md"' }
-            @{ Label = 'D4 row 9e - the icase pathspec magic operand'; Command = 'git add ":(icase)docs/features/epics/2026-08-24-sample-epic/epic.md"' }
+            @{ Label = 'D4 row 8 - an unmodeled dash-leading option before the separator'; Command = 'git add --sparse .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 9a - the exclude pathspec magic operand'; Command = 'git add ":(exclude)scripts/" .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 9b - the bang shorthand exclude operand'; Command = 'git add :!scripts/ .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 9c - the top pathspec magic operand'; Command = 'git add ":(top).dev/epics/2026-08-24-sample-epic/epic.md"' }
+            @{ Label = 'D4 row 9d - the glob pathspec magic operand'; Command = 'git add ":(glob).dev/epics/2026-08-24-sample-epic/epic.md"' }
+            @{ Label = 'D4 row 9e - the icase pathspec magic operand'; Command = 'git add ":(icase).dev/epics/2026-08-24-sample-epic/epic.md"' }
             @{ Label = 'D4 row 10 - a leading-dash operand with no preceding separator'; Command = 'git add -docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 11 - an unbalanced quote around an exempt operand'; Command = 'git add "docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 12a - a dollar-sign interpolation inside an operand'; Command = 'git add docs/features/epics/$slug/epic.md' }
-            @{ Label = 'D4 row 12b - a backtick substitution inside an operand'; Command = 'git add docs/features/epics/`whoami`/epic.md' }
-            @{ Label = 'D4 row 12c - an output redirection in the segment'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md > staged.txt' }
-            @{ Label = 'D4 row 12d - an input redirection in the segment'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md < stage-list.txt' }
-            @{ Label = 'D4 row 13a - a chained line whose second segment is not exempt'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md && poetry run pytest' }
-            @{ Label = 'D4 row 13b - unsplittable text whose quote spans the chain operator'; Command = 'git add "docs/features/epics/2026-08-24-sample-epic/epic.md && git commit -m ok' }
-            @{ Label = 'D4 row 14a - an environment-style prefix relocating the pathspec base'; Command = 'GIT_DIR=../other/.git git add docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 14b - a directory-relocating option before the subcommand'; Command = 'git -C ../other add docs/features/epics/2026-08-24-sample-epic/epic.md && git add docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 14c - a git-dir option before the subcommand'; Command = 'git --git-dir=../other/.git commit -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md && git add docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 14d - a work-tree option before the subcommand'; Command = 'git --work-tree=../other add docs/features/epics/2026-08-24-sample-epic/epic.md && git commit -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 15a - a glob whose literal prefix stops above the exempt trees'; Command = 'git add docs/features/*' }
+            @{ Label = 'D4 row 11 - an unbalanced quote around an exempt operand'; Command = 'git add ".dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 12a - a dollar-sign interpolation inside an operand'; Command = 'git add .dev/epics/$slug/epic.md' }
+            @{ Label = 'D4 row 12b - a backtick substitution inside an operand'; Command = 'git add .dev/epics/`whoami`/epic.md' }
+            @{ Label = 'D4 row 12c - an output redirection in the segment'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md > staged.txt' }
+            @{ Label = 'D4 row 12d - an input redirection in the segment'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md < stage-list.txt' }
+            @{ Label = 'D4 row 13a - a chained line whose second segment is not exempt'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md && poetry run pytest' }
+            @{ Label = 'D4 row 13b - unsplittable text whose quote spans the chain operator'; Command = 'git add ".dev/epics/2026-08-24-sample-epic/epic.md && git commit -m ok' }
+            @{ Label = 'D4 row 14a - an environment-style prefix relocating the pathspec base'; Command = 'GIT_DIR=../other/.git git add .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 14b - a directory-relocating option before the subcommand'; Command = 'git -C ../other add .dev/epics/2026-08-24-sample-epic/epic.md && git add .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 14c - a git-dir option before the subcommand'; Command = 'git --git-dir=../other/.git commit -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md && git add .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 14d - a work-tree option before the subcommand'; Command = 'git --work-tree=../other add .dev/epics/2026-08-24-sample-epic/epic.md && git commit -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 15a - a glob whose literal prefix stops above the exempt trees'; Command = 'git add .dev/*' }
             @{ Label = 'D4 row 15b - a glob whose wildcard occupies an ancestor segment'; Command = 'git add docs/*/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 15c - a glob carrying a parent-directory segment'; Command = 'git add docs/features/epics/../*.md' }
-            @{ Label = 'D4 row 16a - an absolute operand in the leading-slash spelling'; Command = 'git add /docs/features/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 15c - a glob carrying a parent-directory segment'; Command = 'git add .dev/epics/../*.md' }
+            @{ Label = 'D4 row 16a - an absolute operand in the leading-slash spelling'; Command = 'git add /.dev/epics/2026-08-24-sample-epic/epic.md' }
             @{ Label = 'D4 row 16b - an absolute operand in the drive-letter spelling'; Command = 'git add C:\docs\features\epics\2026-08-24-sample-epic\epic.md' }
             @{ Label = 'D4 row 16c - an absolute operand in the UNC spelling'; Command = 'git add \\server\share\docs\features\epics\2026-08-24-sample-epic\epic.md' }
-            @{ Label = 'D4 row 17 - a parent-directory segment inside an otherwise exempt operand'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/../2026-08-24-other-epic/epic.md' }
-            @{ Label = 'D4 row 19 - a mixed operand set of one exempt and one production path'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md scripts/powershell/Sample.ps1' }
+            @{ Label = 'D4 row 17 - a parent-directory segment inside an otherwise exempt operand'; Command = 'git add .dev/epics/2026-08-24-sample-epic/../2026-08-24-other-epic/epic.md' }
+            @{ Label = 'D4 row 19 - a mixed operand set of one exempt and one production path'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md scripts/powershell/Sample.ps1' }
         ) {
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $Command
@@ -234,8 +234,8 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
             # The deny direction is preserved wherever the heredoc feeds a wrapper;
             # the sibling case below pins that.
             $command = @'
-cat <<'NOTE' > docs/features/epics/2026-08-24-sample-epic/notes.md
-Run git add docs/features/epics/2026-08-24-sample-epic/epic.md once the scaffold lands.
+cat <<'NOTE' > .dev/epics/2026-08-24-sample-epic/notes.md
+Run git add .dev/epics/2026-08-24-sample-epic/epic.md once the scaffold lands.
 NOTE
 '@
 
@@ -255,7 +255,7 @@ NOTE
             # the staging command it carries is genuinely executed.
             $command = @'
 bash <<'NOTE'
-git add docs/features/epics/2026-08-24-sample-epic/epic.md
+git add .dev/epics/2026-08-24-sample-epic/epic.md
 NOTE
 '@
 

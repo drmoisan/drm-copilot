@@ -49,7 +49,7 @@ $CheckpointLiterals = @(
 # A .json artifact inside a feature folder. The documentation exemption is only
 # reachable for the extensions in the implementation pattern, and .md is not one
 # of them, so the reachable case is a .json or .yml artifact.
-$DocumentationArtifact = 'docs/features/active/2026-08-23-synthetic-feature-516/evidence/other/example.json'
+$DocumentationArtifact = '.dev/active/2026-08-23-synthetic-feature-516/evidence/other/example.json'
 
 # Seven literals x three spellings: repo-relative, forward-slash absolute, and
 # backslash absolute. The backslash spelling proves the upstream separator
@@ -158,7 +158,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 absolute-path classif
 
             return @{
                 'issue-num'      = '516'
-                'feature-folder' = 'docs/features/active/2026-08-23-synthetic-feature-516'
+                'feature-folder' = '.dev/active/2026-08-23-synthetic-feature-516'
                 route_id         = ''
                 lifecycle_ready  = $false
             } | ConvertTo-Json -Compress

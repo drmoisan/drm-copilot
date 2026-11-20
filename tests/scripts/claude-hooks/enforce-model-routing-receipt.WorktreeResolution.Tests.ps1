@@ -74,7 +74,7 @@ BeforeAll {
     $script:NoIdentityPrompt = 'Plan the change for the item.'
     # The prompt pinned by the archived reproduction control pair. Its only path token is a
     # repository-relative file path to a spec beneath a feature folder, not a folder token.
-    $script:PinnedPathPrompt = 'docs/features/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673/spec.md'
+    $script:PinnedPathPrompt = '.dev/active/2026-09-13-false-approval-elimination-pr-author-model-routing-673/spec.md'
 
     # Return an Agent PreToolUse payload for one subagent type and prompt.
     function New-AgentPayload {

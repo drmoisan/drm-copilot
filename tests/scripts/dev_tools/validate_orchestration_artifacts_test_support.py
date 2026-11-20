@@ -16,7 +16,7 @@ def build_valid_epic_state() -> dict[str, object]:
         "objective": "deliver epic-orchestrate-275",
         "route_id": "epic",
         "epic_feature_folder": "epic-orchestrate-275",
-        "epic_manifest_path": "docs/features/epics/epic-orchestrate-275/epic-plan.md",
+        "epic_manifest_path": ".dev/epics/epic-orchestrate-275/epic-plan.md",
         "integration_branch": "epic/epic-orchestrate-275-integration",
         "max_parallel_features": 4,
         "completed_steps": ["epic_manifest_parsed"],
@@ -69,12 +69,12 @@ def build_valid_orchestrator_state() -> dict[str, object]:
         "path_selected": "large",
         "promotion-type": "feature",
         "short-name": "short",
-        "relativeFile": "docs/features/potential/x.md",
+        "relativeFile": ".dev/potential/x.md",
         "long-name": "feature-1",
         "issue-num": "1",
-        "feature-folder": "docs/features/active/feature-1",
+        "feature-folder": ".dev/active/feature-1",
         "work-mode": "full-feature",
-        "plan-path": "docs/features/active/feature-1/plan.md",
+        "plan-path": ".dev/active/feature-1/plan.md",
         "completed_steps": [],
         "next_step": "done",
         "last_updated": "2026-04-07T10:00:00-04:00",
@@ -93,7 +93,7 @@ def build_valid_orchestrator_state() -> dict[str, object]:
                 "started_at": "2026-04-07T09:00:00-04:00",
                 "completed_at": "2026-04-07T09:05:00-04:00",
                 "result_signal": "PREFLIGHT: ALL CLEAR",
-                "artifact_paths": ["docs/features/active/feature-1/plan.md"],
+                "artifact_paths": [".dev/active/feature-1/plan.md"],
             }
         ],
         "blocked_reason": "none",
@@ -134,19 +134,19 @@ def build_valid_policy_audit_text() -> str:
             "",
             (
                 "- TypeScript baseline coverage artifact: "
-                "docs/features/active/example/evidence/baseline/typescript.md"
+                ".dev/active/example/evidence/baseline/typescript.md"
             ),
             (
                 "- TypeScript post-change coverage artifact: "
-                "docs/features/active/example/evidence/qa-gates/typescript.md"
+                ".dev/active/example/evidence/qa-gates/typescript.md"
             ),
             (
                 "- PowerShell baseline coverage artifact: "
-                "docs/features/active/example/evidence/baseline/powershell.md"
+                ".dev/active/example/evidence/baseline/powershell.md"
             ),
             (
                 "- PowerShell post-change coverage artifact: "
-                "docs/features/active/example/evidence/qa-gates/powershell.md"
+                ".dev/active/example/evidence/qa-gates/powershell.md"
             ),
             "- Per-language comparison summary: Section 1.2.1",
             "## Executive Summary",
@@ -157,16 +157,16 @@ def build_valid_policy_audit_text() -> str:
                 "Post-change: 93% lines, 90% functions. Change: +2% lines, "
                 "+2% functions. New/changed-code coverage: 95%. "
                 "Disposition: PASS. Evidence: "
-                "docs/features/active/example/evidence/baseline/typescript.md; "
-                "docs/features/active/example/evidence/qa-gates/typescript.md."
+                ".dev/active/example/evidence/baseline/typescript.md; "
+                ".dev/active/example/evidence/qa-gates/typescript.md."
             ),
             (
                 "- PowerShell: Baseline: 84% commands, 82% functions -> "
                 "Post-change: 86% commands, 84% functions. Change: "
                 "+2% commands, +2% functions. New/changed-code coverage: 92%. "
                 "Disposition: PASS. Evidence: "
-                "docs/features/active/example/evidence/baseline/powershell.md; "
-                "docs/features/active/example/evidence/qa-gates/powershell.md."
+                ".dev/active/example/evidence/baseline/powershell.md; "
+                ".dev/active/example/evidence/qa-gates/powershell.md."
             ),
             "## 2. General Code Change Policy Compliance",
             "## 3. Language-Specific Code Change Policy Compliance",
@@ -221,12 +221,12 @@ def build_complete_large_orchestrator_state() -> dict[str, object]:
         "path_selected": "large",
         "promotion-type": "feature",
         "short-name": "short",
-        "relativeFile": "docs/features/potential/x.md",
+        "relativeFile": ".dev/potential/x.md",
         "long-name": "feature-1",
         "issue-num": "1",
-        "feature-folder": "docs/features/active/feature-1",
+        "feature-folder": ".dev/active/feature-1",
         "work-mode": "full-feature",
-        "plan-path": "docs/features/active/feature-1/plan.md",
+        "plan-path": ".dev/active/feature-1/plan.md",
         "completed_steps": ["S7", "S8", "S9"],
         "next_step": "done",
         "last_updated": "2026-04-07T10:00:00-04:00",

@@ -10,16 +10,16 @@ agent: parallel-orchestrator
 
 A user invocation (`/parallel-run <parallel-slug>`) forks the `parallel-orchestrator` agent to
 execute a parallel run that `parallel-planner` has already prepared. The parallel slug (or a path
-under `docs/features/parallel/`) for this run is:
+under `.dev/parallel/`) for this run is:
 
 $ARGUMENTS
 
 ## Procedure
 
-1. Resolve the parallel home. A bare slug resolves to `docs/features/parallel/<parallel-slug>/`; a
+1. Resolve the parallel home. A bare slug resolves to `.dev/parallel/<parallel-slug>/`; a
    path argument resolves to its containing parallel run folder.
 2. Resolve the committed kickoff artifact
-   `docs/features/parallel/<parallel-slug>/parallel-kickoff.md`. Discovery is a single local path
+   `.dev/parallel/<parallel-slug>/parallel-kickoff.md`. Discovery is a single local path
    lookup in the invoking worktree. This surface has no integration branch, so there is no
    integration ref to fetch, no ref-existence probe to run, and no ref-reading fallback to attempt:
    the durable copy of the kickoff artifact is committed by `/parallel-plan` on the planner branch

@@ -39,7 +39,7 @@ Describe 'Get-SmallestPathOverlap record-form parity (issue #776)' {
         @{ EntryA = 'scripts/*/a.py'; EntryB = 'scripts/dev_tools/*.py'; Expected = $true }
         @{ EntryA = 'scripts/*.py'; EntryB = 'tests/*.py'; Expected = $false }
         @{ EntryA = 'scripts/dev_tools'; EntryB = 'scripts/dev_toolsX/a.py'; Expected = $false }
-        @{ EntryA = 'docs/features/active/alpha'; EntryB = 'docs/features/active/beta/**'; Expected = $false }
+        @{ EntryA = '.dev/active/alpha'; EntryB = '.dev/active/beta/**'; Expected = $false }
         @{ EntryA = 'scripts/dev_tools/'; EntryB = 'scripts/dev_tools/a.py'; Expected = $true }
         @{ EntryA = 'a//*'; EntryB = 'a//'; Expected = $true }
         @{ EntryA = 'scripts/dev_tools'; EntryB = 'scripts/*/a.py'; Expected = $true }

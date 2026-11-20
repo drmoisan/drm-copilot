@@ -38,19 +38,19 @@ def _feature(issue_num: int, *, depends_on: list[int] | None = None) -> dict[str
     topology_receipt["phase"] = f"prepare-feature-{issue_num}"
     return {
         "issue_num": issue_num,
-        "feature_folder": f"docs/features/active/feature-{issue_num}",
+        "feature_folder": f".dev/active/feature-{issue_num}",
         "depends_on": depends_on or [],
         "wave": 0 if not depends_on else 1,
         "complexity_band": "C3",
         "preparation_status": "prepared",
         "research_path": f"artifacts/research/feature-{issue_num}.md",
-        "plan_path": f"docs/features/active/feature-{issue_num}/plan.md",
+        "plan_path": f".dev/active/feature-{issue_num}/plan.md",
         "preflight_status": "PREFLIGHT: ALL CLEAR",
         "branch_name": f"feature/feature-{issue_num}",
         "worktree_path": f"/repo/worktrees/feature-{issue_num}",
         "delegation_receipt": {
             "delegation_id": delegation_id,
-            "feature_folder": f"docs/features/active/feature-{issue_num}",
+            "feature_folder": f".dev/active/feature-{issue_num}",
             "issue_num": issue_num,
             "agent_name": deployment_agent,
         },
@@ -71,7 +71,7 @@ def _ready_state() -> dict[str, Any]:
     return {
         "objective": "prepare two related features",
         "epic_feature_folder": "sample-epic",
-        "epic_manifest_path": "docs/features/epics/sample-epic/epic.md",
+        "epic_manifest_path": ".dev/epics/sample-epic/epic.md",
         "integration_branch": "epic/sample-epic-integration",
         "max_parallel_features": 4,
         "epic_worthiness": {"verdict": "epic", "rationale": "two features"},
@@ -379,15 +379,15 @@ def test_kickoff_contract_requires_all_execution_handoff_sections() -> None:
             "## Invocation Prompt",
             "Run `/epic-run sample-epic` to execute this epic.",
             "Use the epic-orchestrator subagent to execute the prepared epic at",
-            "docs/features/epics/sample-epic/epic.md. "
+            ".dev/epics/sample-epic/epic.md. "
             "Reuse epic/sample-epic-integration.",
             "Every child resumes at atomic execution from its committed plan-path;",
             "do not repeat planning or preflight.",
             "## Feature Summary",
             "| issue_num | feature_folder | wave | complexity | plan-path |",
             "| --- | --- | --- | --- | --- |",
-            "| 101 | docs/features/active/feature-101 | 0 | C3 | "
-            "docs/features/active/feature-101/plan.md |",
+            "| 101 | .dev/active/feature-101 | 0 | C3 | "
+            ".dev/active/feature-101/plan.md |",
         ]
     )
 

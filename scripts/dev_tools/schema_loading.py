@@ -4,7 +4,7 @@ Purpose:
     Provide the single public schema-resolution seam reused by
     ``validate_json.py`` and by the discovery-artifact schema validators, per
     the legacy-discovery-and-parity epic's Shared Design schema-loading reuse
-    requirement (``docs/features/epics/legacy-discovery-and-parity/epic.md``).
+    requirement (``.dev/epics/legacy-discovery-and-parity/epic.md``).
     This module isolates the scheme-resolution logic (scheme-less relative
     paths, ``file://`` absolute paths, ``http(s)://`` fetched-and-cached
     schemas) so both callers resolve schemas identically.

@@ -28,7 +28,7 @@ Describe 'epic-state baseline isolation (issue #1105)' {
 Describe 'validate-required-artifact-output.ps1 re-entry policy' {
     BeforeAll {
         $script:Hook = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.claude/hooks/validate-required-artifact-output.ps1'))
-        $script:Spec = 'spec-path|^docs/features/active/.+/spec\.md$|feature spec artifact'
+        $script:Spec = 'spec-path|^.dev/active/.+/spec\.md$|feature spec artifact'
 
         function Invoke-HookTail {
             # Runs the hook entry tail with stdin, stderr, and CLAUDE_HOOK_INPUT replaced for one call; all are restored in finally.

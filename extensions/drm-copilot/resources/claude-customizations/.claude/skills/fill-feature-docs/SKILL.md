@@ -16,8 +16,8 @@ For a numeric `spec.md` acceptance criterion, the research context must contain 
 
 ## Output Paths
 
-- `docs/features/active/<feature>/spec.md`
-- `docs/features/active/<feature>/user-story.md`
+- `.dev/active/<feature>/spec.md`
+- `.dev/active/<feature>/user-story.md`
 
 ## Worker Routing
 

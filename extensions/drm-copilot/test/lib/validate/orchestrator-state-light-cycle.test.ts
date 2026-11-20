@@ -54,7 +54,7 @@ function lightCycle(
   extra: Record<string, unknown> = {},
 ): Record<string, unknown> {
   return {
-    plan_path: "docs/features/active/x/remediation-inputs.md",
+    plan_path: ".dev/active/x/remediation-inputs.md",
     remediation_path: "light",
     opened_by_review: 0,
     execution_status: "complete",

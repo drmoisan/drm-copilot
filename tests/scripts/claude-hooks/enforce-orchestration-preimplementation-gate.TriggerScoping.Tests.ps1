@@ -34,7 +34,7 @@
 
     The normative contract is the D2 behaviour contract and the D3 fail-closed
     table in
-    docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
+    .dev/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
 
     Determinism: every decision is driven through the pure seam
     `Invoke-OrchestrationPreimplementationGateDecision` with a literal checkpoint
@@ -117,8 +117,8 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 trigger scoping (issu
             # The primary reported friction: writing a document that necessarily
             # quotes the token it describes. The heredoc feeds a file, not a shell.
             $command = @'
-cat <<'NOTE' > docs/features/active/sample/notes.md
-Run git add docs/features/active/sample/spec.md once the scaffold lands.
+cat <<'NOTE' > .dev/active/sample/notes.md
+Run git add .dev/active/sample/spec.md once the scaffold lands.
 NOTE
 '@
 
@@ -150,7 +150,7 @@ JSON
         It 'allows prose containing the English word black' {
             # Pattern 2 carries bare tool names, so it matches an ordinary English
             # word. No formatter runs on this line.
-            $command = 'echo "the background is black and the text is white" >> docs/features/active/sample/notes.md'
+            $command = 'echo "the background is black and the text is white" >> .dev/active/sample/notes.md'
 
             $decision = Get-TriggerScopingDecisionForCommand -Command $command
 

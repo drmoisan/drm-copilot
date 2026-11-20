@@ -40,7 +40,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 AGENT_RELATIVE = Path(".claude/agents/parallel-orchestrator.md")
 ORCHESTRATE_SKILL_RELATIVE = Path(".claude/skills/parallel-orchestrate/SKILL.md")
 RUN_SKILL_RELATIVE = Path(".claude/skills/parallel-run/SKILL.md")
-STATUS_TEMPLATE_RELATIVE = Path("docs/features/templates/parallel/parallel-status.md")
+STATUS_TEMPLATE_RELATIVE = Path(".dev/templates/parallel/parallel-status.md")
 
 # The three runtime files this feature delivers. The prescriptive-literal
 # negatives are scoped to exactly these paths and to no other file.

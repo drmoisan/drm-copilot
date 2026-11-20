@@ -19,7 +19,7 @@ BeforeAll {
 
     $script:SessionRoot = '/synthetic-worktrees/main'
     $script:ItemRoot = '/synthetic-worktrees/main/.claude/worktrees/bug-1128'
-    $script:Relative = 'docs/features/active/sample/runbooks/package.runbook.md'
+    $script:Relative = '.dev/active/sample/runbooks/package.runbook.md'
     $script:ItemRunbook = "$script:ItemRoot/$script:Relative"
     $script:ItemLock = "$script:ItemRoot/poetry.lock"
     $script:Prompt = "Canonical issue number for this feature is 1128.`nbranch: bug/sample-1128"
@@ -165,7 +165,7 @@ Describe 'Get-HumanExceptionRunbookDecision (AC 4)' {
 
     It 'blocks a path that is not a runbooks .runbook.md file' {
         # Arrange / Act
-        $result = Invoke-Case -Message 'runbook_path: docs/features/active/sample/notes.md' -File @{ 'x' = 'y' }
+        $result = Invoke-Case -Message 'runbook_path: .dev/active/sample/notes.md' -File @{ 'x' = 'y' }
 
         # Assert
         $result.Ok | Should -BeFalse

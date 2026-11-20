@@ -48,7 +48,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
             # orchestrated run, and the assertion would pass vacuously.
             param(
                 [string] $IssueNum = '554',
-                [string] $FeatureFolder = 'docs/features/active/preimplementation-gate-blocks-epic-execution-554',
+                [string] $FeatureFolder = '.dev/active/preimplementation-gate-blocks-epic-execution-554',
                 [string] $RouteId = 'large',
                 [bool] $LifecycleReady = $true
             )
@@ -64,9 +64,9 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
             param(
                 [string] $RouteId = 'epic',
                 [string] $EpicFeatureFolder = 'quickfiler-bug-family',
-                [string] $EpicManifestPath = 'docs/features/epics/quickfiler-bug-family/epic.md',
+                [string] $EpicManifestPath = '.dev/epics/quickfiler-bug-family/epic.md',
                 [string] $IntegrationBranch = 'epic/quickfiler-bug-family-integration',
-                [string] $FeatureFolder = 'docs/features/active/child-b-301',
+                [string] $FeatureFolder = '.dev/active/child-b-301',
                 [string] $IssueNum = '301',
                 [string] $MergeStatus = 'not_started',
                 [switch] $OmitFeatures,
@@ -89,8 +89,8 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
             param(
                 [string] $RouteId = 'parallel',
                 [string] $ParallelSlug = 'critical-bug-fixes',
-                [string] $ParallelManifestPath = 'docs/features/parallel/critical-bug-fixes/parallel.md',
-                [string] $FeatureFolder = 'docs/features/active/child-b-301',
+                [string] $ParallelManifestPath = '.dev/parallel/critical-bug-fixes/parallel.md',
+                [string] $FeatureFolder = '.dev/active/child-b-301',
                 [string] $IssueNum = '301',
                 [string] $MergeStatus = 'not_started',
                 [switch] $OmitItems,
@@ -208,11 +208,11 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
         }
 
         It 'returns the parent basename for a token ending in a Markdown file' {
-            Find-OrchestrationDelegationTargetFolder -Prompt 'Plan: docs/features/active/child-b-301/plan.md now.' | Should -Be 'child-b-301'
+            Find-OrchestrationDelegationTargetFolder -Prompt 'Plan: .dev/active/child-b-301/plan.md now.' | Should -Be 'child-b-301'
         }
 
         It 'returns the basename for a bare directory token' {
-            Find-OrchestrationDelegationTargetFolder -Prompt 'Target docs/features/active/child-b-301.' | Should -Be 'child-b-301'
+            Find-OrchestrationDelegationTargetFolder -Prompt 'Target .dev/active/child-b-301.' | Should -Be 'child-b-301'
         }
 
         It 'returns nothing for a prompt carrying no issue number' {
@@ -230,18 +230,18 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
 
     Context 'ordered mode record resolution' {
         It 'selects the later exact folder record in epic readiness' {
-            $checkpoint = '{"route_id":"epic","epic_feature_folder":"family","epic_manifest_path":"docs/features/epics/family/epic.md","integration_branch":"epic/family","features":[{"feature_folder":"docs/features/active/other-644","issue_num":644,"merge_status":"merged"},{"feature_folder":"docs/features/active/child-644","issue_num":999,"merge_status":"not_started"}]}' | ConvertFrom-Json
+            $checkpoint = '{"route_id":"epic","epic_feature_folder":"family","epic_manifest_path":".dev/epics/family/epic.md","integration_branch":"epic/family","features":[{"feature_folder":".dev/active/other-644","issue_num":644,"merge_status":"merged"},{"feature_folder":".dev/active/child-644","issue_num":999,"merge_status":"not_started"}]}' | ConvertFrom-Json
             Test-EpicOrchestrationReady -Checkpoint $checkpoint -TargetFolder 'child-644' -IssueNumber '644' | Should -BeTrue
         }
 
         It 'selects the later exact folder record in parallel readiness' {
-            $checkpoint = '{"route_id":"parallel","parallel_slug":"family","parallel_manifest_path":"docs/features/parallel/family/parallel.md","items":[{"feature_folder":"docs/features/active/other-644","issue_num":644,"merge_status":"worktree_removed"},{"feature_folder":"docs/features/active/child-644","issue_num":999,"merge_status":"not_started"}]}' | ConvertFrom-Json
+            $checkpoint = '{"route_id":"parallel","parallel_slug":"family","parallel_manifest_path":".dev/parallel/family/parallel.md","items":[{"feature_folder":".dev/active/other-644","issue_num":644,"merge_status":"worktree_removed"},{"feature_folder":".dev/active/child-644","issue_num":999,"merge_status":"not_started"}]}' | ConvertFrom-Json
             Test-ParallelOrchestrationReady -Checkpoint $checkpoint -TargetFolder 'child-644' -IssueNumber '644' | Should -BeTrue
         }
 
         It 'retains first matching issue fallback when no folder matches' {
-            $records = '[{"feature_folder":"docs/features/active/first-644","issue_num":644},{"feature_folder":"docs/features/active/second-644","issue_num":644}]' | ConvertFrom-Json
-            (Find-OrchestrationModeRecord -Records $records -TargetFolder 'no-match' -IssueNumber '644').feature_folder | Should -Be 'docs/features/active/first-644'
+            $records = '[{"feature_folder":".dev/active/first-644","issue_num":644},{"feature_folder":".dev/active/second-644","issue_num":644}]' | ConvertFrom-Json
+            (Find-OrchestrationModeRecord -Records $records -TargetFolder 'no-match' -IssueNumber '644').feature_folder | Should -Be '.dev/active/first-644'
         }
     }
 
@@ -250,10 +250,10 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
             @{ Failure = 'route_id'; Fixture = @{ RouteId = 'large' } }
             @{ Failure = 'epic_feature_folder'; Fixture = @{ EpicFeatureFolder = '' } }
             @{ Failure = 'epic_manifest_path'; Fixture = @{ EpicManifestPath = '' } }
-            @{ Failure = 'epic_manifest_path'; Fixture = @{ EpicManifestPath = 'docs/features/active/not-an-epic/epic.md' } }
+            @{ Failure = 'epic_manifest_path'; Fixture = @{ EpicManifestPath = '.dev/active/not-an-epic/epic.md' } }
             @{ Failure = 'integration_branch'; Fixture = @{ IntegrationBranch = '' } }
             @{ Failure = 'features'; Fixture = @{ OmitFeatures = $true } }
-            @{ Failure = 'target-record'; Fixture = @{ FeatureFolder = 'docs/features/active/other-child-999'; IssueNum = '999' } }
+            @{ Failure = 'target-record'; Fixture = @{ FeatureFolder = '.dev/active/other-child-999'; IssueNum = '999' } }
             @{ Failure = 'merge_status'; Fixture = @{ MergeStatus = 'merged' } }
         ) {
             $checkpoint = (ConvertTo-EpicCheckpointJson @Fixture) | ConvertFrom-Json
@@ -316,7 +316,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
             @{ Failure = 'parallel_slug'; Fixture = @{ ParallelSlug = '' } }
             @{ Failure = 'parallel_manifest_path'; Fixture = @{ ParallelManifestPath = '' } }
             @{ Failure = 'items'; Fixture = @{ OmitItems = $true } }
-            @{ Failure = 'target-record'; Fixture = @{ FeatureFolder = 'docs/features/active/other-child-999'; IssueNum = '999' } }
+            @{ Failure = 'target-record'; Fixture = @{ FeatureFolder = '.dev/active/other-child-999'; IssueNum = '999' } }
             @{ Failure = 'merge_status'; Fixture = @{ MergeStatus = 'worktree_removed' } }
         ) {
             $checkpoint = (ConvertTo-ParallelCheckpointJson @Fixture) | ConvertFrom-Json
@@ -389,13 +389,13 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
         # Every case here binds -EpicCheckpointRaw explicitly, including the empty-content
         # case, so no assertion falls through to the on-disk epic checkpoint.
         It '<Case>: <Label>' -ForEach @(
-            @{ Case = 'matrix case 1'; Label = 'a ready epic checkpoint allows'; Prompt = 'Epic mode: true. Execute docs/features/active/child-b-301.'; Fixture = @{}; Expect = 'allow'; Reason = '' }
-            @{ Case = 'matrix case 2'; Label = 'empty injected epic content denies, naming the epic checkpoint'; Prompt = 'Epic mode: true. Execute docs/features/active/child-b-301.'; Fixture = $null; Expect = 'deny'; Reason = 'epic-orchestrator-state.json' }
-            @{ Case = 'matrix case 3'; Label = 'a features array lacking the target record denies, naming the failed predicate'; Prompt = 'Epic mode: true. Execute docs/features/active/child-b-301.'; Fixture = @{ FeatureFolder = 'docs/features/active/other-child-999'; IssueNum = '999' }; Expect = 'deny'; Reason = "'target-record'" }
-            @{ Case = 'matrix case 4'; Label = 'a non-canonical declared epic_checkpoint_path denies'; Prompt = 'Epic mode: true. epic_checkpoint_path: artifacts/orchestration/rogue-epic-state.json. Execute docs/features/active/child-b-301.'; Fixture = @{}; Expect = 'deny'; Reason = "'declared-checkpoint-path'" }
+            @{ Case = 'matrix case 1'; Label = 'a ready epic checkpoint allows'; Prompt = 'Epic mode: true. Execute .dev/active/child-b-301.'; Fixture = @{}; Expect = 'allow'; Reason = '' }
+            @{ Case = 'matrix case 2'; Label = 'empty injected epic content denies, naming the epic checkpoint'; Prompt = 'Epic mode: true. Execute .dev/active/child-b-301.'; Fixture = $null; Expect = 'deny'; Reason = 'epic-orchestrator-state.json' }
+            @{ Case = 'matrix case 3'; Label = 'a features array lacking the target record denies, naming the failed predicate'; Prompt = 'Epic mode: true. Execute .dev/active/child-b-301.'; Fixture = @{ FeatureFolder = '.dev/active/other-child-999'; IssueNum = '999' }; Expect = 'deny'; Reason = "'target-record'" }
+            @{ Case = 'matrix case 4'; Label = 'a non-canonical declared epic_checkpoint_path denies'; Prompt = 'Epic mode: true. epic_checkpoint_path: artifacts/orchestration/rogue-epic-state.json. Execute .dev/active/child-b-301.'; Fixture = @{}; Expect = 'deny'; Reason = "'declared-checkpoint-path'" }
             @{ Case = 'epic target unresolvable'; Label = 'a prompt with no resolvable target token and no issue number denies'; Prompt = 'Epic mode: true. Begin the wave-0 child now.'; Fixture = @{}; Expect = 'deny'; Reason = "'target-record'" }
-            @{ Case = 'decision D8'; Label = 'a target record in a terminal-merged state denies'; Prompt = 'Epic mode: true. Execute docs/features/active/child-b-301.'; Fixture = @{ MergeStatus = 'merged' }; Expect = 'deny'; Reason = "'merge_status'" }
-            @{ Case = 'decision D8'; Label = 'a target record in a failure state allows, as legitimate remediation'; Prompt = 'Epic mode: true. Execute docs/features/active/child-b-301.'; Fixture = @{ MergeStatus = 'merge_conflict' }; Expect = 'allow'; Reason = '' }
+            @{ Case = 'decision D8'; Label = 'a target record in a terminal-merged state denies'; Prompt = 'Epic mode: true. Execute .dev/active/child-b-301.'; Fixture = @{ MergeStatus = 'merged' }; Expect = 'deny'; Reason = "'merge_status'" }
+            @{ Case = 'decision D8'; Label = 'a target record in a failure state allows, as legitimate remediation'; Prompt = 'Epic mode: true. Execute .dev/active/child-b-301.'; Fixture = @{ MergeStatus = 'merge_conflict' }; Expect = 'allow'; Reason = '' }
         ) {
             $raw = if ($null -eq $Fixture) { '' } else { ConvertTo-EpicCheckpointJson @Fixture }
             $json = ConvertTo-DelegationToolInputJson -Prompt $Prompt
@@ -457,9 +457,9 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
 
     Context 'the decision-level parallel matrix' {
         It '<Label>' -ForEach @(
-            @{ Label = 'a ready parallel checkpoint allows'; Prompt = 'Parallel mode: true. Execute docs/features/active/child-b-301.'; Fixture = @{}; Expect = 'allow'; Reason = '' }
-            @{ Label = 'an items array lacking the target record denies, naming the parallel checkpoint'; Prompt = 'Parallel mode: true. Execute docs/features/active/child-b-301.'; Fixture = @{ FeatureFolder = 'docs/features/active/other-child-999'; IssueNum = '999' }; Expect = 'deny'; Reason = 'parallel-orchestrator-state.json' }
-            @{ Label = 'a non-canonical declared parallel_checkpoint_path denies'; Prompt = 'Parallel mode: true. parallel_checkpoint_path: artifacts/orchestration/rogue-parallel-state.json. Execute docs/features/active/child-b-301.'; Fixture = @{}; Expect = 'deny'; Reason = 'parallel-orchestrator-state.json' }
+            @{ Label = 'a ready parallel checkpoint allows'; Prompt = 'Parallel mode: true. Execute .dev/active/child-b-301.'; Fixture = @{}; Expect = 'allow'; Reason = '' }
+            @{ Label = 'an items array lacking the target record denies, naming the parallel checkpoint'; Prompt = 'Parallel mode: true. Execute .dev/active/child-b-301.'; Fixture = @{ FeatureFolder = '.dev/active/other-child-999'; IssueNum = '999' }; Expect = 'deny'; Reason = 'parallel-orchestrator-state.json' }
+            @{ Label = 'a non-canonical declared parallel_checkpoint_path denies'; Prompt = 'Parallel mode: true. parallel_checkpoint_path: artifacts/orchestration/rogue-parallel-state.json. Execute .dev/active/child-b-301.'; Fixture = @{}; Expect = 'deny'; Reason = 'parallel-orchestrator-state.json' }
         ) {
             $json = ConvertTo-DelegationToolInputJson -Prompt $Prompt
 
@@ -487,7 +487,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 mode resolution' {
             # the empty string fallen through to the seam this case would error rather than
             # pass. Binding suppresses the seam: ContainsKey, not a truthiness test.
             function Get-EpicCheckpointContent { throw 'the epic read seam was consulted' }
-            $json = ConvertTo-DelegationToolInputJson -Prompt 'Epic mode: true. Execute docs/features/active/child-b-301.'
+            $json = ConvertTo-DelegationToolInputJson -Prompt 'Epic mode: true. Execute .dev/active/child-b-301.'
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -EpicCheckpointRaw ''
 

@@ -33,8 +33,8 @@ Describe 'feature-folder-order handler proof' {
         if (Get-Command Get-PrdFeatureCheckpointFolder -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-PrdFeatureCheckpointFolder' -Surface 'Codex' }
         if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-WorktreeResolutionGitFileText' -Surface 'Codex' }
         if (Get-Command Test-CodexEpicChildRoutingLaunchAuthority -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Test-CodexEpicChildRoutingLaunchAuthority' -Surface 'Codex' }
-        $script:PlanJson = '{"tool_input":{"file_path":"docs/features/active/foo/plan.md"}}'
-        $script:IssueJson = '{"tool_input":{"file_path":"docs/features/active/foo/issue.md"}}'
+        $script:PlanJson = '{"tool_input":{"file_path":".dev/active/foo/plan.md"}}'
+        $script:IssueJson = '{"tool_input":{"file_path":".dev/active/foo/issue.md"}}'
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
@@ -155,12 +155,12 @@ Describe 'preimplementation gate modes handler proof on the claude surface' {
         if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-WorktreeResolutionGitFileText' -Surface 'Codex' }
         if (Get-Command Test-CodexEpicChildRoutingLaunchAuthority -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Test-CodexEpicChildRoutingLaunchAuthority' -Surface 'Codex' }
         Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'synthetic SessionRoot target' } }
-        $script:GateEpicRaw = '{"route_id":"epic","epic_feature_folder":"x-family","epic_manifest_path":"docs/features/epics/x-family/epic.md","integration_branch":"epic/x-integration",' +
-        '"features":[{"feature_folder":"docs/features/active/child-a-300","issue_num":300,"depends_on":[],"merge_status":"merged"},{"feature_folder":"docs/features/active/child-b-301","issue_num":301,"depends_on":[300],"merge_status":"not_started"}]}'
-        $script:GateParallelRaw = '{"route_id":"parallel","parallel_slug":"demo","parallel_manifest_path":"docs/features/parallel/demo/parallel.md",' +
-        '"items":[{"feature_folder":"docs/features/active/child-b-301","issue_num":301,"merge_status":"not_started"}]}'
-        $script:GateEpicPayload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'orchestrator'; prompt = 'Epic mode: true. Execute docs/features/active/child-b-301 now' } } | ConvertTo-Json -Compress -Depth 5
-        $script:GateParallelPayload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'orchestrator'; prompt = 'Parallel mode: true. Execute docs/features/active/child-b-301 now' } } | ConvertTo-Json -Compress -Depth 5
+        $script:GateEpicRaw = '{"route_id":"epic","epic_feature_folder":"x-family","epic_manifest_path":".dev/epics/x-family/epic.md","integration_branch":"epic/x-integration",' +
+        '"features":[{"feature_folder":".dev/active/child-a-300","issue_num":300,"depends_on":[],"merge_status":"merged"},{"feature_folder":".dev/active/child-b-301","issue_num":301,"depends_on":[300],"merge_status":"not_started"}]}'
+        $script:GateParallelRaw = '{"route_id":"parallel","parallel_slug":"demo","parallel_manifest_path":".dev/parallel/demo/parallel.md",' +
+        '"items":[{"feature_folder":".dev/active/child-b-301","issue_num":301,"merge_status":"not_started"}]}'
+        $script:GateEpicPayload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'orchestrator'; prompt = 'Epic mode: true. Execute .dev/active/child-b-301 now' } } | ConvertTo-Json -Compress -Depth 5
+        $script:GateParallelPayload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'orchestrator'; prompt = 'Parallel mode: true. Execute .dev/active/child-b-301 now' } } | ConvertTo-Json -Compress -Depth 5
     }
 
     It 'H2 control: claude preimplementation gate allows a ready epic delegation when feature-folder-resolution.ps1 loads' {
@@ -238,7 +238,7 @@ Describe 'prd-feature planner handler proof' {
         if (Get-Command Test-CodexEpicChildRoutingLaunchAuthority -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Test-CodexEpicChildRoutingLaunchAuthority' -Surface 'Codex' }
         Mock Get-PrdFeatureCheckpointFolder { $null }
         Mock Resolve-PrdFeatureWorktreeTarget { New-WorktreeResolutionTargetResult -Status 'SessionRoot' -SessionRoot '/synthetic-worktrees/session-root' -WorktreeRoot '/synthetic-worktrees/session-root' -Signal 'Branch' -SignalValue 'proof-own' -Candidate @('/synthetic-worktrees/session-root') -Detail 'synthetic session-root target' }
-        $script:PlannerPayload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'See docs/features/active/2026-05-10-foo-1 for details.' } } | ConvertTo-Json -Compress -Depth 5
+        $script:PlannerPayload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'See .dev/active/2026-05-10-foo-1 for details.' } } | ConvertTo-Json -Compress -Depth 5
     }
 
     It 'H3 control: enforce-prd-feature-before-planner.ps1 allows a planner delegation whose prerequisites exist when feature-folder-resolution.ps1 loads' {
@@ -292,9 +292,9 @@ Describe 'epic wave barrier handler proof' {
         if (Get-Command Test-CodexEpicChildRoutingLaunchAuthority -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Test-CodexEpicChildRoutingLaunchAuthority' -Surface 'Codex' }
         Mock Resolve-EpicWaveBarrierTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'synthetic SessionRoot target' } }
         # The W10 scenario: lifecycle-prefixed record values with a merged upstream dependency.
-        $script:WaveCheckpoint = '{"features":[{"issue_num":300,"feature_folder":"docs/features/active/2026-07-02-upstream-300","depends_on":[],"merge_status":"merged"},' +
-        '{"issue_num":301,"feature_folder":"active/2026-07-02-target-301","depends_on":["docs/features/active/2026-07-02-upstream-300"],"merge_status":"not_started"}]}'
-        $script:WavePayload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'orchestrator'; prompt = 'Epic mode: true. integration_branch: epic/x-integration. Execute docs/features/active/2026-07-02-target-301.' } } | ConvertTo-Json -Compress -Depth 5
+        $script:WaveCheckpoint = '{"features":[{"issue_num":300,"feature_folder":".dev/active/2026-07-02-upstream-300","depends_on":[],"merge_status":"merged"},' +
+        '{"issue_num":301,"feature_folder":"active/2026-07-02-target-301","depends_on":[".dev/active/2026-07-02-upstream-300"],"merge_status":"not_started"}]}'
+        $script:WavePayload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'orchestrator'; prompt = 'Epic mode: true. integration_branch: epic/x-integration. Execute .dev/active/2026-07-02-target-301.' } } | ConvertTo-Json -Compress -Depth 5
     }
 
     It 'H4 control: enforce-epic-wave-barrier.ps1 allows the W10 delegation when feature-folder-resolution.ps1 loads' {
@@ -349,7 +349,7 @@ Describe 'parallel drift gate handler proof' {
         $script:DriftCheckpoint = '{"items":[{"issue_num":501,"feature_folder":"2026-08-07-parallel-alpha-501","state":"in_flight","worktree_path":"/worktrees/alpha",' +
         '"blast_radius":{"paths":["scripts/declared/"],"modules":[],"shared_surfaces":[],"contracts":[],"source":"declared","computed_at":"2026-01-01T00-00"}},' +
         '{"issue_num":502,"feature_folder":"2026-08-07-parallel-bravo-502","state":"in_flight"}],"drift_events":[]}'
-        $script:DriftPayload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'feature-review'; prompt = 'Parallel mode: true. parallel_slug: demo. Review docs/features/active/2026-08-07-parallel-alpha-501 now' } } | ConvertTo-Json -Compress -Depth 5
+        $script:DriftPayload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'feature-review'; prompt = 'Parallel mode: true. parallel_slug: demo. Review .dev/active/2026-08-07-parallel-alpha-501 now' } } | ConvertTo-Json -Compress -Depth 5
     }
 
     It 'H5 control: enforce-parallel-drift-gate.ps1 allows the D1 delegation when feature-folder-resolution.ps1 loads' {
@@ -401,10 +401,10 @@ Describe 'parallel cohort barrier handler proof' {
         if (Get-Command Test-CodexEpicChildRoutingLaunchAuthority -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Test-CodexEpicChildRoutingLaunchAuthority' -Surface 'Codex' }
         Mock Resolve-ParallelCohortBarrierTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'synthetic SessionRoot target' } }
         # The C1 scenario: the target sits in cohort 1 behind a merged cohort-0 conflict.
-        $script:CohortCheckpoint = '{"recolor_generation":2,"items":[{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"merged"},' +
-        '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}],' +
+        $script:CohortCheckpoint = '{"recolor_generation":2,"items":[{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"merged"},' +
+        '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}],' +
         '"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
-        $script:CohortPayload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'orchestrator'; prompt = 'Parallel mode: true. parallel_slug: demo. Execute docs/features/active/item-b-102 now' } } | ConvertTo-Json -Compress -Depth 5
+        $script:CohortPayload = @{ tool_name = 'Agent'; tool_input = @{ subagent_type = 'orchestrator'; prompt = 'Parallel mode: true. parallel_slug: demo. Execute .dev/active/item-b-102 now' } } | ConvertTo-Json -Compress -Depth 5
     }
 
     It 'H6 control: enforce-parallel-cohort-barrier.ps1 allows the C1 delegation when feature-folder-resolution.ps1 loads' {

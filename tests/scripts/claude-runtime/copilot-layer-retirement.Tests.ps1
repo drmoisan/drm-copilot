@@ -37,13 +37,13 @@ BeforeAll {
         }
     )
     $script:CurrentDocs = @(
-        'docs/engineering/claude-code-architecture.md'
+        '.dev/engineering/claude-code-architecture.md'
         '.agents/README.md'
         "$($script:Bundle)/codex-and-agents-customizations/.agents/README.md"
         'README.md'
-        'docs/engineering/legacy-discovery-and-parity/maintainer-guide.md'
-        'docs/engineering/legacy-discovery-and-parity/workflow.md'
-        'docs/engineering/legacy-discovery-and-parity/consumer-onboarding.md'
+        '.dev/engineering/legacy-discovery-and-parity/maintainer-guide.md'
+        '.dev/engineering/legacy-discovery-and-parity/workflow.md'
+        '.dev/engineering/legacy-discovery-and-parity/consumer-onboarding.md'
     )
     $script:BriefTargets = @(
         'byte-identical in four locations', 'in all four byte-identical copies', 'in the four `documentation-workflow` copies',

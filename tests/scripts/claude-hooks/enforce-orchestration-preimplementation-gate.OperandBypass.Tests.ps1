@@ -54,8 +54,8 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 exempt-operand bypass
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
     It 'denies <Label> without an authorizing checkpoint' -ForEach @(
-        @{ Label = 'the issue 732 brace-expansion shape'; Command = 'git add docs/features/active/{..,..}/{..,..}/{..,..}/src/prod.ts' }
-        @{ Label = 'the issue 732 escaped dot-segment shape'; Command = 'git add docs/features/active/.\./.\./.\./src/x.ps1' }
+        @{ Label = 'the issue 732 brace-expansion shape'; Command = 'git add .dev/active/{..,..}/{..,..}/{..,..}/src/prod.ts' }
+        @{ Label = 'the issue 732 escaped dot-segment shape'; Command = 'git add .dev/active/.\./.\./.\./src/x.ps1' }
     ) {
         # Arrange
         $payload = ConvertTo-BypassCommandPayload -Command $Command

@@ -33,9 +33,9 @@ Describe 'Codex gate target-worktree building blocks (issue #1010)' {
         $script:Listing = "worktree $($script:Session)`nbranch refs/heads/main`n`nworktree $($script:ItemRoot)`nbranch refs/heads/feature/item`n`nworktree $($script:OtherRoot)`nbranch refs/heads/feature/other`n"
         $script:ItemCheckpoint = "$($script:ItemRoot)/artifacts/orchestration/orchestrator-state.json"
         $script:SessionCheckpoint = "$($script:Session)/artifacts/orchestration/orchestrator-state.json"
-        $script:ReadyItem = '{"issue-num":"1010","feature-folder":"docs/features/active/sample-1010","route_id":"large","lifecycle_ready":true}'
-        $script:UnreadyItem = '{"issue-num":"1010","feature-folder":"docs/features/active/sample-1010","route_id":"large","lifecycle_ready":false}'
-        $script:StringFalseItem = '{"issue-num":"1010","feature-folder":"docs/features/active/sample-1010","route_id":"large","lifecycle_ready":"false"}'
+        $script:ReadyItem = '{"issue-num":"1010","feature-folder":".dev/active/sample-1010","route_id":"large","lifecycle_ready":true}'
+        $script:UnreadyItem = '{"issue-num":"1010","feature-folder":".dev/active/sample-1010","route_id":"large","lifecycle_ready":false}'
+        $script:StringFalseItem = '{"issue-num":"1010","feature-folder":".dev/active/sample-1010","route_id":"large","lifecycle_ready":"false"}'
 
         function ConvertTo-MappedToolInput {
             # Return the mapped tool_input JSON the gate's entry tail produces for one leg.

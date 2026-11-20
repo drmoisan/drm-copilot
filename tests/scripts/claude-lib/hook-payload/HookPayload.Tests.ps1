@@ -310,12 +310,12 @@ Describe 'Resolve-ClaudeHookToolInput end-to-end extraction' {
         }
 
         It 'extracts file_path from a Write-matcher envelope' {
-            $raw = '{"tool_name":"Write","tool_input":{"file_path":"docs/features/active/x/plan.md","content":"body"}}'
+            $raw = '{"tool_name":"Write","tool_input":{"file_path":".dev/active/x/plan.md","content":"body"}}'
             $resolved = Resolve-ClaudeHookToolInput -Raw $raw
 
             $resolved.IsValid | Should -BeTrue
             (Get-ClaudeHookToolInputString -ToolInput $resolved.Value -Name 'file_path') |
-                Should -Be 'docs/features/active/x/plan.md'
+                Should -Be '.dev/active/x/plan.md'
             (Get-ClaudeHookToolInputString -ToolInput $resolved.Value -Name 'content') |
                 Should -Be 'body'
         }

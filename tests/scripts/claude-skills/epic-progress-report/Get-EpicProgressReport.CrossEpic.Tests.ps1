@@ -109,7 +109,7 @@ Describe 'Read-EpicProgressCrossEpicPlanText' {
     }
 
     It 'reads the plan named by the other epic kickoff row on origin of its integration branch' {
-        $script:texts['origin/epic/provider-epic-integration|docs/features/epics/provider-epic/epic-kickoff.md'] = "| Issue | Title | Wave | Band | Plan |`n|---|---|---|---|---|`n| 1188 | P | 0 | small | docs/p/plan.md |"
+        $script:texts['origin/epic/provider-epic-integration|.dev/epics/provider-epic/epic-kickoff.md'] = "| Issue | Title | Wave | Band | Plan |`n|---|---|---|---|---|`n| 1188 | P | 0 | small | docs/p/plan.md |"
         $script:texts['origin/epic/provider-epic-integration|docs/p/plan.md'] = 'PLAN TEXT'
 
         Read-EpicProgressCrossEpicPlanText -Edge (& $script:edgeRecord) | Should -BeExactly 'PLAN TEXT'
@@ -120,14 +120,14 @@ Describe 'Read-EpicProgressCrossEpicPlanText' {
         @{ Name = 'a kickoff without the prerequisite row'; Kickoff = "| Issue | Title | Wave | Band | Plan |`n|---|---|---|---|---|`n| 7 | P | 0 | small | docs/p/plan.md |" }
         @{ Name = 'a kickoff table that does not parse'; Kickoff = 'no table here' }
     ) {
-        $script:texts['origin/epic/provider-epic-integration|docs/features/epics/provider-epic/epic-kickoff.md'] = $Kickoff
+        $script:texts['origin/epic/provider-epic-integration|.dev/epics/provider-epic/epic-kickoff.md'] = $Kickoff
 
         Read-EpicProgressCrossEpicPlanText -Edge (& $script:edgeRecord) | Should -BeExactly ''
     }
 
     It 'derives the integration branch from the epic slug when the edge has none' {
         $edge = [pscustomobject]@{ Issue = '1201'; Epic = 'b'; IntegrationBranch = ''; IssueNum = '2'; Status = ''; Node = 'b#2' }
-        $script:texts['origin/epic/b-integration|docs/features/epics/b/epic-kickoff.md'] = "| Issue | Title | Wave | Band | Plan |`n|---|---|---|---|---|`n| 2 | B | 0 | small | docs/b/plan.md |"
+        $script:texts['origin/epic/b-integration|.dev/epics/b/epic-kickoff.md'] = "| Issue | Title | Wave | Band | Plan |`n|---|---|---|---|---|`n| 2 | B | 0 | small | docs/b/plan.md |"
         $script:texts['origin/epic/b-integration|docs/b/plan.md'] = 'B PLAN'
 
         Read-EpicProgressCrossEpicPlanText -Edge $edge | Should -BeExactly 'B PLAN'

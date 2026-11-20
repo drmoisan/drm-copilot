@@ -24,7 +24,7 @@
 
 **Review Date:** [YYYY-MM-DD]
 **Reviewer:** [Agent or reviewer name]
-**Feature Folder:** `[docs/features/active/or/archive/path]`
+**Feature Folder:** `[.dev/active/or/archive/path]`
 **Feature Folder Selection Rule:** [How this feature folder was selected, or delete if obvious]
 **Base Branch:** `[branch-name]`
 **Head Branch:** `[branch-name or staged working tree]`

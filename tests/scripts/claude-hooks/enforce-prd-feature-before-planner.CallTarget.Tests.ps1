@@ -36,17 +36,17 @@ Describe 'enforce-prd-feature-before-planner.ps1 target resolution' {
         # then redirect these assertions.
         Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution/WorktreeResolution.psm1").Path -Force
         Import-Module (Resolve-Path "$PSScriptRoot/../../../.claude/lib/worktree-resolution/WorktreeTargetResolution.psm1").Path -Force
-        $script:TargetFeatureFolder = 'docs/features/active/2026-09-13-synthetic-target-672'
+        $script:TargetFeatureFolder = '.dev/active/2026-09-13-synthetic-target-672'
     }
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
 
     Context 'cross-file mock resolution smoke' {
         It 'observes a test-scope mock across the dot-source boundary' {
-            Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { 'docs/features/active/2026-01-01-checkpoint-only-000' }
+            Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { '.dev/active/2026-01-01-checkpoint-only-000' }
 
-            $prompt = 'Plan the work in docs/features/active/2026-09-13-smoke-1 now.'
+            $prompt = 'Plan the work in .dev/active/2026-09-13-smoke-1 now.'
             Find-PrdFeatureFolderFromPrompt -Prompt $prompt |
-                Should -Be 'docs/features/active/2026-09-13-smoke-1'
+                Should -Be '.dev/active/2026-09-13-smoke-1'
 
             Should -Invoke -CommandName Get-PrdFeatureCheckpointFolder -Times 0 -Exactly
         }

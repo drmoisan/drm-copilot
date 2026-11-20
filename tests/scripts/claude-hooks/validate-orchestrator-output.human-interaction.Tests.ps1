@@ -101,7 +101,7 @@ Describe 'validate-orchestrator-output.ps1 human-interaction validation' {
             $humanInteraction = [pscustomobject]@{
                 requirements = @([pscustomobject]@{
                         response     = 'exception'
-                        runbook_path = 'docs/features/active/x/runbooks/missing.runbook.md'
+                        runbook_path = '.dev/active/x/runbooks/missing.runbook.md'
                     })
             }
             $fileExistsStub = { param($Path) $false }
@@ -121,7 +121,7 @@ Describe 'validate-orchestrator-output.ps1 human-interaction validation' {
                     [pscustomobject]@{ response = 'scope_change' },
                     [pscustomobject]@{
                         response     = 'exception'
-                        runbook_path = 'docs/features/active/x/runbooks/admin-consent.runbook.md'
+                        runbook_path = '.dev/active/x/runbooks/admin-consent.runbook.md'
                     }
                 )
             }

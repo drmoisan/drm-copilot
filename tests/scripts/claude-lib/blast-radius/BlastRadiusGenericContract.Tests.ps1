@@ -164,7 +164,7 @@ Describe 'Generic contract-token rejection (issue #1006)' {
         It 'drops a recorded Sheet1 contract and keeps ParseLedger in Get-NormalizedDeclaredRadius' {
             # Arrange: a declared radius recorded by the pre-change extractor.
             $recorded = @{
-                paths           = @('docs/features/active/2026-10-30-recorded-item/**')
+                paths           = @('.dev/active/2026-10-30-recorded-item/**')
                 modules         = @()
                 shared_surfaces = @()
                 contracts       = @('ParseLedger', 'Sheet1')

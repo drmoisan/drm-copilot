@@ -48,7 +48,7 @@ Describe "claude-architecture-doc" {
         $atomicExecutorContent | Should -Not -Match 'mcp_drmcopilotext_run_poshqc_test'
     }
 
-    It "requires docs/engineering/claude-code-architecture.md to use the active PowerShell MCP contract" {
+    It "requires .dev/engineering/claude-code-architecture.md to use the active PowerShell MCP contract" {
         $docPath = Join-Path -Path $script:RepoRoot -ChildPath 'docs' -AdditionalChildPath 'engineering', 'claude-code-architecture.md'
         $docContent = Get-Content -Path $docPath -Raw
 
@@ -69,7 +69,7 @@ Describe "claude-architecture-doc" {
         }
         $content | Should -Match 'completion_gates\.planning_prerequisite'
         $content | Should -Match 'DISCOVERY_\*_BLOCKED:'
-        $content | Should -Match 'docs/engineering/legacy-discovery-and-parity/enforcement\.md'
+        $content | Should -Match '.dev/engineering/legacy-discovery-and-parity/enforcement\.md'
         # Criteria gate planning; the document must not claim the gate asserts an implementation pass.
         $content | Should -Match 'without asserting any implementation passes'
     }

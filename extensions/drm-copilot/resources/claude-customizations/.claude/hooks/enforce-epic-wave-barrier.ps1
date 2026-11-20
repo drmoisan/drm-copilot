@@ -11,7 +11,7 @@
       1. Resolve the worktree whose epic checkpoint records the prompt's
          integration_branch: value (issue #690) and deny an unresolved or ambiguous target.
       2. Collect the cited feature-folder candidates with the shared resolver
-         (feature-folder-resolution.ps1, issue #565): every docs/features/active/<token>
+         (feature-folder-resolution.ps1, issue #565): every .dev/active/<token>
          path is truncated to its feature-folder segment, so a nested research/ or
          evidence/ citation names its own folder. No candidate denies.
       3. Read artifacts/orchestration/epic-orchestrator-state.json beneath that worktree
@@ -117,7 +117,7 @@ function Find-EpicWaveBarrierFeatureFolderFromPrompt {
         order. Returns no output when no folder is cited.
     .DESCRIPTION
         Delegates to Find-FeatureFolderCandidate in the shared resolver (issue #565): each
-        docs/features/active/<token> path, in either separator style, is truncated to its
+        .dev/active/<token> path, in either separator style, is truncated to its
         feature-folder segment, so a nested research/ or evidence/ citation names its own
         folder. Selection among several candidates is made by Select-FeatureFolderTarget.
     .PARAMETER Prompt

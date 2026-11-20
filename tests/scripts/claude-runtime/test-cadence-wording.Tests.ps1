@@ -43,7 +43,7 @@ BeforeDiscovery {
         if ($Path.StartsWith('.claude/')) { return "$resources/claude-customizations/$Path" }
         if ($Path.StartsWith('.agents/') -or $Path.StartsWith('.codex/') -or $Path -eq 'AGENTS.md') { return "$resources/codex-and-agents-customizations/$Path" }
         if ($Path.StartsWith('.github/')) { return "$resources/customizations/$Path" }
-        if ($Path.StartsWith('docs/features/templates/')) { return "$resources/feature-templates/" + $Path.Substring('docs/features/templates/'.Length) }
+        if ($Path.StartsWith('.dev/templates/')) { return "$resources/feature-templates/" + $Path.Substring('.dev/templates/'.Length) }
         throw "No bundle mapping for '$Path'."
     }
 
@@ -242,7 +242,7 @@ BeforeDiscovery {
         refactor = @{ GateCount = 1; ExpectFailGate = 0; NoChangePhase = $null }
     }
     $script:TemplateRow = @(foreach ($name in 'bug', 'feature', 'refactor') {
-            $path = "docs/features/templates/$name/plan.yyyy-MM-ddTHH-mm.md"
+            $path = ".dev/templates/$name/plan.yyyy-MM-ddTHH-mm.md"
             $layout = $templateLayout[$name]
             foreach ($pair in @(@($name.ToUpperInvariant(), $path), @("$($name.ToUpperInvariant())-BUNDLE", (Get-TcwBundlePath -Path $path)))) {
                 @{ Id = $pair[0]; Path = $pair[1]; GateCount = $layout.GateCount; ExpectFailGate = $layout.ExpectFailGate; NoChangePhase = $layout.NoChangePhase }
@@ -482,7 +482,7 @@ Describe 'Test cadence wording' {
             $resourceRoot = 'extensions/drm-copilot/resources'
             $script:SweepRoot = @(
                 '.claude/skills', '.claude/agents', '.agents/skills', '.github/agents', '.github/prompts',
-                '.github/codex', '.codex/agents', 'docs/features/templates', '.claude/rules', '.github/instructions', 'AGENTS.md', 'CLAUDE.md', '.github/copilot-instructions.md',
+                '.github/codex', '.codex/agents', '.dev/templates', '.claude/rules', '.github/instructions', 'AGENTS.md', 'CLAUDE.md', '.github/copilot-instructions.md',
                 "$resourceRoot/claude-customizations", "$resourceRoot/codex-and-agents-customizations", "$resourceRoot/customizations",
                 "$resourceRoot/templates/policy_audit", "$resourceRoot/feature-templates"
             )

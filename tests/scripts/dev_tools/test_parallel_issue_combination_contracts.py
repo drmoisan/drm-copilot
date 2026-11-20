@@ -36,7 +36,7 @@ PR_AUTHOR_SKILL = Path(".claude/skills/pr-author/SKILL.md")
 CHILD_SKILL = Path(".claude/skills/orchestrate/SKILL.md")
 PLANNER_AGENT = Path(".claude/agents/parallel-planner.md")
 ORCHESTRATOR_AGENT = Path(".claude/agents/parallel-orchestrator.md")
-STATUS_TEMPLATE = Path("docs/features/templates/parallel/parallel-status.md")
+STATUS_TEMPLATE = Path(".dev/templates/parallel/parallel-status.md")
 SCHEDULING_SUBSECTION = "### Integration-cost scheduling (issue #722)"
 SCHEDULING_SOURCE = Path("scripts/dev_tools/_blast_radius_scheduling.py")
 SCHEDULING_MODULE = Path(".claude/lib/blast-radius/BlastRadiusScheduling.psm1")
@@ -190,7 +190,7 @@ def test_combination_example_lines_are_prompt_shape_safe(relative_path: Path) ->
 
     for line in lines:
         assert HOOK_ISSUE_NUMBER_PATTERN.search(line) is None, line
-        assert "docs/features/active/" not in line, line
+        assert ".dev/active/" not in line, line
 
 
 def test_combination_example_lines_are_present() -> None:

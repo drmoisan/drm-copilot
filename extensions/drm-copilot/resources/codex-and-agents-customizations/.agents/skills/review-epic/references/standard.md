@@ -7,7 +7,7 @@ Invoke the epic-review worker to produce epic-audit artifacts for an epic folder
 ## Observable Behaviors
 
 - **OB-1** Inputs: The skill takes two inputs, the path of the active epic folder and the evidence and child-feature context held in the same epic folder.
-- **OB-2** Output Paths: `docs/features/epics/<epic>/epic-audit.<timestamp>.md`.
+- **OB-2** Output Paths: `.dev/epics/<epic>/epic-audit.<timestamp>.md`.
 - **OB-3** Worker Routing: The review is routed to the `epic-review` worker.
 
 ## Acceptance Checks

@@ -238,7 +238,7 @@ Describe 'Invoke-EpicProgressReport' {
             }
             if ($GitArgs[0] -eq 'show') {
                 $objectPath = $GitArgs[1].Substring($script:integration.Length + 1)
-                if ($objectPath -eq 'docs/features/epics/example-epic/epic-kickoff.md') { return $script:kickoffLines }
+                if ($objectPath -eq '.dev/epics/example-epic/epic-kickoff.md') { return $script:kickoffLines }
                 return ($script:planText[$objectPath] -split "`n")
             }
         }
@@ -386,9 +386,9 @@ Describe 'Invoke-EpicProgressReport' {
         $expected = @(
             'fetch -q origin'
             'worktree list --porcelain'
-            "show $($script:integration):docs/features/epics/example-epic/epic-kickoff.md"
+            "show $($script:integration):.dev/epics/example-epic/epic-kickoff.md"
             # The fixture checkpoint carries no depends_on key, so epic.md is read once (issue #1153).
-            "show $($script:integration):docs/features/epics/example-epic/epic.md"
+            "show $($script:integration):.dev/epics/example-epic/epic.md"
             "show $($script:integration):docs/a/plan.md"
             "show $($script:integration):docs/c/plan.md"
         )

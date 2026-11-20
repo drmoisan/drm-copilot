@@ -140,7 +140,7 @@ Describe 'Test-BlastRadius rule V1' {
     Context 'Coverage of plan paths' {
         It 'emits a Blocking finding naming an uncovered plan path' {
             # Arrange: a radius that does not cover the path the plan cites.
-            $radius = Get-TestRadius -Paths @('docs/features/active/f/**')
+            $radius = Get-TestRadius -Paths @('.dev/active/f/**')
             $plan = '- [ ] [P1-T1] Touch `scripts/dev_tools/uncovered.py`.'
 
             # Act: validate the radius against its plan.
@@ -156,7 +156,7 @@ Describe 'Test-BlastRadius rule V1' {
 
         It 'emits one finding per uncovered path, ordinally ordered' {
             # Arrange: a plan citing two paths the radius does not cover.
-            $radius = Get-TestRadius -Paths @('docs/features/active/f/**')
+            $radius = Get-TestRadius -Paths @('.dev/active/f/**')
             $plan = '- [ ] [P1-T1] Touch `scripts/b.py` and `scripts/a.py`.'
 
             # Act: validate the radius.
@@ -195,7 +195,7 @@ Describe 'Test-BlastRadius rule V1' {
 
         It 'ignores glob citations in the plan because only concrete paths are checked' {
             # Arrange: a plan citing only a wildcard path.
-            $radius = Get-TestRadius -Paths @('docs/features/active/f/**')
+            $radius = Get-TestRadius -Paths @('.dev/active/f/**')
             $plan = '- [ ] [P1-T1] Touch `tests/**`.'
 
             # Act: validate the radius.

@@ -141,7 +141,7 @@ function Find-EpicProgressDependencyRow {
 function ConvertTo-EpicProgressFolderHint {
     <#
     .SYNOPSIS
-        Return the basename of a feature-folder reference: the last path segment, with a docs/features/active/ or completed/ prefix ignored.
+        Return the basename of a feature-folder reference: the last path segment, with a .dev/active/ or completed/ prefix ignored.
     .DESCRIPTION
         Unlike _epic_orchestrator_state_resolution.py, which strips only the four lifecycle prefixes and reads every string as a
         folder hint, any path gives its last segment here and a digits-only string is an issue number (in the graph builder).

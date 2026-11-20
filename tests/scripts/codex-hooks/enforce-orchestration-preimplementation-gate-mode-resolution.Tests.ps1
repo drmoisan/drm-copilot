@@ -54,9 +54,9 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode resolution (is
             param(
                 [string] $RouteId = 'epic',
                 [string] $EpicFeatureFolder = 'quickfiler-bug-family',
-                [string] $EpicManifestPath = 'docs/features/epics/quickfiler-bug-family/epic.md',
+                [string] $EpicManifestPath = '.dev/epics/quickfiler-bug-family/epic.md',
                 [string] $IntegrationBranch = 'epic/quickfiler-bug-family-integration',
-                [string] $FeatureFolder = 'docs/features/active/child-b-301',
+                [string] $FeatureFolder = '.dev/active/child-b-301',
                 [string] $IssueNum = '301',
                 [string] $MergeStatus = 'not_started',
                 [switch] $OmitFeatures
@@ -77,8 +77,8 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode resolution (is
             param(
                 [string] $RouteId = 'parallel',
                 [string] $ParallelSlug = 'critical-bug-fixes',
-                [string] $ParallelManifestPath = 'docs/features/parallel/critical-bug-fixes/parallel.md',
-                [string] $FeatureFolder = 'docs/features/active/child-b-301',
+                [string] $ParallelManifestPath = '.dev/parallel/critical-bug-fixes/parallel.md',
+                [string] $FeatureFolder = '.dev/active/child-b-301',
                 [string] $IssueNum = '301',
                 [string] $MergeStatus = 'not_started',
                 [switch] $OmitItems
@@ -148,17 +148,17 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode resolution (is
         }
 
         It 'returns the parent basename for a token ending in a Markdown file' {
-            Find-OrchestrationDelegationTargetFolder -Prompt 'Plan: docs/features/active/child-b-301/plan.md now.' | Should -Be 'child-b-301'
+            Find-OrchestrationDelegationTargetFolder -Prompt 'Plan: .dev/active/child-b-301/plan.md now.' | Should -Be 'child-b-301'
         }
 
         It 'returns the basename for a bare directory token' {
             # No trailing punctuation, so the strip loop is a no-op on this input.
-            Find-OrchestrationDelegationTargetFolder -Prompt 'Target docs/features/active/child-b-301 is next' | Should -Be 'child-b-301'
+            Find-OrchestrationDelegationTargetFolder -Prompt 'Target .dev/active/child-b-301 is next' | Should -Be 'child-b-301'
         }
 
         It 'returns the basename for a token followed by sentence punctuation' {
             # Exercises the trailing-period strip, which must not fire on a .md suffix.
-            Find-OrchestrationDelegationTargetFolder -Prompt 'Target docs/features/active/child-b-301.' | Should -Be 'child-b-301'
+            Find-OrchestrationDelegationTargetFolder -Prompt 'Target .dev/active/child-b-301.' | Should -Be 'child-b-301'
         }
 
         It 'returns nothing for a prompt carrying no issue number' {
@@ -203,7 +203,7 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode resolution (is
             @{ Failure = 'epic_manifest_path'; Fixture = @{ EpicManifestPath = '' } }
             @{ Failure = 'integration_branch'; Fixture = @{ IntegrationBranch = '' } }
             @{ Failure = 'features'; Fixture = @{ OmitFeatures = $true } }
-            @{ Failure = 'target-record'; Fixture = @{ FeatureFolder = 'docs/features/active/other-child-999'; IssueNum = '999' } }
+            @{ Failure = 'target-record'; Fixture = @{ FeatureFolder = '.dev/active/other-child-999'; IssueNum = '999' } }
             @{ Failure = 'merge_status'; Fixture = @{ MergeStatus = 'merged' } }
         ) {
             $checkpoint = (ConvertTo-CodexEpicCheckpointJson @Fixture) | ConvertFrom-Json
@@ -233,7 +233,7 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode resolution (is
             @{ Failure = 'parallel_slug'; Fixture = @{ ParallelSlug = '' } }
             @{ Failure = 'parallel_manifest_path'; Fixture = @{ ParallelManifestPath = '' } }
             @{ Failure = 'items'; Fixture = @{ OmitItems = $true } }
-            @{ Failure = 'target-record'; Fixture = @{ FeatureFolder = 'docs/features/active/other-child-999'; IssueNum = '999' } }
+            @{ Failure = 'target-record'; Fixture = @{ FeatureFolder = '.dev/active/other-child-999'; IssueNum = '999' } }
             @{ Failure = 'merge_status'; Fixture = @{ MergeStatus = 'merged' } }
         ) {
             $checkpoint = (ConvertTo-CodexParallelCheckpointJson @Fixture) | ConvertFrom-Json

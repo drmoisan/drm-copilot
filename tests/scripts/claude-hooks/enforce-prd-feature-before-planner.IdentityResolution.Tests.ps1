@@ -57,8 +57,8 @@ BeforeAll {
     # whether it does: every filesystem seam a row reaches is mocked.
     $script:CoordinatingSessionRoot = '/synthetic-worktrees/coordinating-session'
     $script:ItemWorktreeRoot = '/synthetic-worktrees/item-worktree'
-    $script:TargetFeatureFolder = 'docs/features/active/2026-09-13-synthetic-target-672'
-    $script:OtherFeatureFolder = 'docs/features/active/2026-09-13-synthetic-other-999'
+    $script:TargetFeatureFolder = '.dev/active/2026-09-13-synthetic-target-672'
+    $script:OtherFeatureFolder = '.dev/active/2026-09-13-synthetic-other-999'
     $script:ComposedTargetFolder = "$($script:ItemWorktreeRoot)/$($script:TargetFeatureFolder)"
     $script:IssueLine = 'Canonical issue number for this feature is 901. All artifact content must use this number.'
 
@@ -283,7 +283,7 @@ Describe 'enforce-prd-feature-before-planner.ps1 identity resolution' {
 
     It 'prd R8 denies with the ambiguity code when the resolved checkpoint names neither cited folder' {
         # Arrange: the same two citations, with a checkpoint naming a third folder.
-        Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { 'docs/features/active/2026-09-13-synthetic-third-000' }
+        Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { '.dev/active/2026-09-13-synthetic-third-000' }
         Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-bug`n" }
         Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
         $target = New-IdentityTarget -Status 'OtherWorktree' -SessionRoot $script:CoordinatingSessionRoot -WorktreeRoot $script:ItemWorktreeRoot

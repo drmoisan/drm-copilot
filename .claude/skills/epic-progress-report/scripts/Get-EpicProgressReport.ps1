@@ -33,7 +33,7 @@
 
 .PARAMETER EpicFolder
     Mandatory in the Epic parameter set (the default). The epic folder name under
-    docs/features/epics/. It is also the epic name printed in the status heading.
+    .dev/epics/. It is also the epic name printed in the status heading.
 
 .PARAMETER Issue
     Mandatory in the Item parameter set. The issue number of a standalone item: the worktree
@@ -59,7 +59,7 @@
 
 .PARAMETER KickoffPath
     The repository-relative path of the kickoff file on the integration branch. Default:
-    docs/features/epics/<EpicFolder>/epic-kickoff.md. Only the feature-summary table, whose
+    .dev/epics/<EpicFolder>/epic-kickoff.md. Only the feature-summary table, whose
     header's first cell is issue_num or Issue, is read; every other table in the file is ignored.
     Kickoff text without that header, a feature row with fewer than five cells, and a feature
     row with a blank plan cell each raise a terminating error.
@@ -117,7 +117,7 @@
 .EXAMPLE
     pwsh -NoProfile -File .claude/skills/epic-progress-report/scripts/Get-EpicProgressReport.ps1 -EpicFolder example-epic -StartUtc 2026-01-05T09:00:00Z -BaselineDone 40 -Mode TLDR
 
-    Prints the TL;DR block for the epic in docs/features/epics/example-epic/, measuring
+    Prints the TL;DR block for the epic in .dev/epics/example-epic/, measuring
     from 09:00 UTC and counting 40 steps as complete at the start; both values are stored
     for later runs.
 
@@ -462,7 +462,7 @@ function Invoke-EpicProgressReport {
         $kickoffIssues = [string[]] @($rows | ForEach-Object { $_.Issue })
         $epicRows = Get-EpicProgressEpicCheckpointRow -CheckpointPath $setting.CheckpointPath -KickoffIssue $kickoffIssues
         # Dependency and cap inputs (decision E5); item mode reads neither.
-        $manifestRows = @(Read-EpicProgressManifestFeature -KickoffIssue $kickoffIssues -CheckpointRow @($epicRows.Checkpoint.features | Where-Object { $null -ne $_ }) -ManifestPath "docs/features/epics/$EpicFolder/epic.md" -IntegrationBranch $setting.IntegrationBranch)
+        $manifestRows = @(Read-EpicProgressManifestFeature -KickoffIssue $kickoffIssues -CheckpointRow @($epicRows.Checkpoint.features | Where-Object { $null -ne $_ }) -ManifestPath ".dev/epics/$EpicFolder/epic.md" -IntegrationBranch $setting.IntegrationBranch)
         $configCap = Read-EpicProgressRoutingCap -RepositoryRoot $setting.RepositoryRoot
         foreach ($row in $rows) {
             $epicRow = $epicRows.Feature[$row.Issue]

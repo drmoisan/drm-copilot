@@ -33,7 +33,7 @@
 
     The normative contract is the D2 behaviour contract, the D3 fail-closed table,
     and D10 in
-    docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
+    .dev/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
 
     Determinism: every decision is driven through the pure seam with a literal
     tool_input string. No disk I/O, no child process, no live executable, and no

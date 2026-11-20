@@ -23,7 +23,7 @@ def _agent_receipt() -> dict[str, object]:
         "started_at": "2026-08-04T10:00:00Z",
         "completed_at": "2026-08-04T10:01:00Z",
         "result_signal": "PREFLIGHT: ALL CLEAR",
-        "artifact_paths": ["docs/features/active/example/plan.md"],
+        "artifact_paths": [".dev/active/example/plan.md"],
     }
 
 

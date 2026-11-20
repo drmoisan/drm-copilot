@@ -16,7 +16,7 @@ function buildEpicState(childBMergeStatus: unknown): Record<string, unknown> {
     objective: "deliver epic-orchestrate-275",
     route_id: "epic",
     epic_feature_folder: "epic-orchestrate-275",
-    epic_manifest_path: "docs/features/epics/epic-orchestrate-275/epic-plan.md",
+    epic_manifest_path: ".dev/epics/epic-orchestrate-275/epic-plan.md",
     integration_branch: "epic/epic-orchestrate-275-integration",
     max_parallel_features: 4,
     completed_steps: ["epic_manifest_parsed"],

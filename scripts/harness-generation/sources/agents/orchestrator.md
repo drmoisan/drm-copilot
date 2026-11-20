@@ -36,7 +36,7 @@ The first action is always to estimate the change budget by identifying likely a
 
 - **Small path** (1–3 production files + corresponding tests): promotion, active folder, minimal plan, implementation, QC, small-audit review.
 - **Large path** (4+ production files or cross-cutting changes): scope, promotion, research, spec, atomic planning, atomic execution, feature review.
-- **Epic outcome**: the objective names or references an epic manifest (`docs/features/epics/<epic-slug>/epic.md`) or explicitly requests multi-feature/epic orchestration. On this outcome the orchestrator does not route the work itself and does not delegate it: it halts and reports that epic-scale objectives are invoked from the main session — `Agent(epic-planner)` for planning, `Agent(epic-orchestrator)` for execution. The orchestrator never invokes either epic agent; both delegate to `Agent(orchestrator)`, so an orchestrator-originated invocation would nest orchestrator inside its own delegation chain, and the PreToolUse hook `enforce-epic-invocation-origin.ps1` denies it (`EPIC_INVOCATION_ORIGIN_BLOCKED`).
+- **Epic outcome**: the objective names or references an epic manifest (`.dev/epics/<epic-slug>/epic.md`) or explicitly requests multi-feature/epic orchestration. On this outcome the orchestrator does not route the work itself and does not delegate it: it halts and reports that epic-scale objectives are invoked from the main session — `Agent(epic-planner)` for planning, `Agent(epic-orchestrator)` for execution. The orchestrator never invokes either epic agent; both delegate to `Agent(orchestrator)`, so an orchestrator-originated invocation would nest orchestrator inside its own delegation chain, and the PreToolUse hook `enforce-epic-invocation-origin.ps1` denies it (`EPIC_INVOCATION_ORIGIN_BLOCKED`).
 - **Preparation mode (epic planning)**: the delegation prompt carries the literal marker `Preparation mode: true` (issued by `epic-planner` per the `epic-plan` skill). The orchestrator selects `route_id: preparation` and runs promotion, research, feature documents, atomic planning, and the atomic-executor preflight only, per `## Preparation Mode` in `.claude/skills/orchestrate/SKILL.md`. It stops after `PREFLIGHT: ALL CLEAR` with `next_step: "S5_atomic_execution"`, out-of-scope step statuses `not-applicable`, and no completion assertion; atomic execution, PR authoring, and CI monitoring are out of scope for the run.
 
 <!-- harness-section: delegation-model -->
@@ -47,7 +47,7 @@ Delegate exclusively through configured subagents:
 - `atomic-planner` — generates phased implementation plans (planning only)
 - `atomic-executor` — executes approved plans task-by-task (execution only)
 - `feature-review` — produces policy, code, and feature audit artifacts
-- `task-researcher` — performs deep research and writes findings to the research path the orchestrator resolves before delegating: `docs/features/<feature>/research/` when an active `feature-folder` is in scope in `orchestrator-state.json`, otherwise `docs/research/` for one-off research. The orchestrator passes the resolved path in the delegation prompt.
+- `task-researcher` — performs deep research and writes findings to the research path the orchestrator resolves before delegating: `.dev/<feature>/research/` when an active `feature-folder` is in scope in `orchestrator-state.json`, otherwise `.dev/research/` for one-off research. The orchestrator passes the resolved path in the delegation prompt.
 
 For required delegated steps, delegation is mandatory. If a handoff cannot be started, resumed, or completed, stop execution and record blocked state. Do not perform the step locally.
 
@@ -306,7 +306,7 @@ Every agent named above must exist as a native Codex agent under `.codex/agents/
 - Do not create or edit `${feature-folder}/issue.md`, `${feature-folder}/spec.md`, `${feature-folder}/user-story.md`, or `plan*.md` until lifecycle setup succeeds.
 - Do not persist placeholder lifecycle values such as `NONE`, `TBD`, or empty strings once lifecycle setup begins.
 - After active folder creation and before planner delegation, resolve `${plan-path}` by enumerating existing `${feature-folder}/plan*.md` files in deterministic filename order. If a scaffolded timestamped plan exists, persist and delegate against that exact file. Do not default to `${feature-folder}/plan.md` and do not create a second plan artifact when a plan already exists.
-- For issue #306, the canonical existing plan path is `docs/features/active/2026-07-04-codex-agent-role-config-306/plan.2026-07-04T13-47.md`; reuse that exact file and do not create `docs/features/active/2026-07-04-codex-agent-role-config-306/plan.md`.
+- For issue #306, the canonical existing plan path is `.dev/active/2026-07-04-codex-agent-role-config-306/plan.2026-07-04T13-47.md`; reuse that exact file and do not create `.dev/active/2026-07-04-codex-agent-role-config-306/plan.md`.
 
 <!-- harness-section: checkpoint-persistence-2 -->
 ## Checkpoint Persistence

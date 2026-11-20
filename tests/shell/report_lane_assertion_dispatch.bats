@@ -51,7 +51,7 @@ PAYLOAD_MANIFEST() {
     # Both option lines and the advisory closing line are part of the contract:
     # they are what tells an operator that --edges is optional and that the
     # report never blocks.
-    printf '%s\n' "$output" | grep -q -- '--manifest  Path to docs/features/parallel/<slug>/parallel.md (required).'
+    printf '%s\n' "$output" | grep -q -- '--manifest  Path to .dev/parallel/<slug>/parallel.md (required).'
     printf '%s\n' "$output" | grep -q -- '--edges     Derived conflict edges as "<a>:<b> <c>:<d>" (optional).'
     printf '%s\n' "$output" | grep -q -- 'Advisory only: the report never blocks. Every non-usage path exits 0.'
 }

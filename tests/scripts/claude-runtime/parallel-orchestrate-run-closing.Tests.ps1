@@ -10,7 +10,7 @@
     For each skill copy, the ### Run Closing section (up to the next heading of level three
     or higher) must name every closing-step token, and ## Completion Requirements must name
     Run Closing. Every backticked git add or git commit span in the skill section must stage
-    or commit only literal paths under docs/features/; the only
+    or commit only literal paths under .dev/; the only
     permitted git add -A or git add . spans are those inside a sentence that opens a
     prohibition with the word Never.
 
@@ -36,7 +36,7 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    $script:AllowedPathPrefixes = @('docs/features/')
+    $script:AllowedPathPrefixes = @('.dev/')
 
     # The staging sentence names the removed artifacts/orchestration/ alternative (issue #995).
     $script:RemovedAlternativePattern = 'or\s+`artifacts/orchestration/`'
@@ -133,7 +133,7 @@ Describe 'parallel-orchestrate skill Run Closing (<Copy> copy)' -ForEach $script
         $collapsed | Should -Not -Match $script:RemovedAlternativePattern -Because 'artifacts/ is gitignored and Run Closing never stages it'
     }
 
-    It 'RC4 stages and commits only literal docs/features/ paths (AC-11)' {
+    It 'RC4 stages and commits only literal .dev/ paths (AC-11)' {
         # Arrange
         $spans = @([regex]::Matches($script:Section, '`(?<span>git (add|commit)[^`]*)`') | ForEach-Object { $_.Groups['span'].Value })
         $sentences = @($script:Section -split '(?<=[.!?])\s+')

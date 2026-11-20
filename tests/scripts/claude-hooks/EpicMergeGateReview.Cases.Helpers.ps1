@@ -40,7 +40,7 @@ function Get-EpicMergeGateReviewFolder {
     [OutputType([string])]
     param()
 
-    return 'docs/features/active/item-42'
+    return '.dev/active/item-42'
 }
 
 function Get-EpicMergeGateReviewListing {
@@ -242,7 +242,7 @@ function Get-EpicMergeGateReviewShapeRow {
         'disclosed-script-file'              = 'sh scripts/merge-item.sh 42'
         'disclosed-encoded-payload'          = 'echo Z2ggcHIgbWVyZ2U= | base64 -d | sh'
         'allow-review-verdict-status-post'   = "gh api --method POST repos/{owner}/{repo}/statuses/$reviewed -f state=success -f context=review/verdict -f description='feature-review PASS: policy-audit.2026-01-01T00-00.md'"
-        'allow-review-verdict-entry-point'   = 'pwsh -NoProfile -File .claude/lib/review-verdict/Invoke-ReviewVerdictStatus.ps1 -Mode Review -PrNumber 42 -ReviewArtifact docs/features/active/item-42/policy-audit.2026-01-01T00-00.md'
+        'allow-review-verdict-entry-point'   = 'pwsh -NoProfile -File .claude/lib/review-verdict/Invoke-ReviewVerdictStatus.ps1 -Mode Review -PrNumber 42 -ReviewArtifact .dev/active/item-42/policy-audit.2026-01-01T00-00.md'
     }
     foreach ($name in $allowed.Keys) {
         @{ Name = $name; Command = $allowed[$name]; Remove = @('remediation_loop'); Expected = 'allow'; NoProcess = $true }
@@ -305,8 +305,8 @@ function Get-EpicMergeGateReviewCaseRow {
         @{ Name = 'ancestor-git-failure'; Ancestor = 128; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }
         @{ Name = 'feature-folder-blank'; Override = @{ 'feature-folder' = ' ' }; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }
         @{ Name = 'feature-folder-dot'; Override = @{ 'feature-folder' = '.' }; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }
-        @{ Name = 'feature-folder-dot-segment'; Override = @{ 'feature-folder' = 'docs/features/active/../..' }; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }
-        @{ Name = 'feature-folder-backslash'; Override = @{ 'feature-folder' = ('docs/features/active' + [char]92 + 'item-42') }; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }
+        @{ Name = 'feature-folder-dot-segment'; Override = @{ 'feature-folder' = '.dev/active/../..' }; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }
+        @{ Name = 'feature-folder-backslash'; Override = @{ 'feature-folder' = ('.dev/active' + [char]92 + 'item-42') }; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }
         @{ Name = 'feature-folder-trailing-slash'; Override = @{ 'feature-folder' = "$folder/" }; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }
         @{ Name = 'diff-git-failure'; DiffExit = 128; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }
         @{ Name = 'diff-not-nul-terminated'; Diff = $inFolder; Expected = 'REVIEW_GATE_HEAD_UNRESOLVED' }

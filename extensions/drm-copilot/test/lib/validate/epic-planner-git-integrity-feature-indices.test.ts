@@ -9,8 +9,8 @@ import {
 const BRANCH = "epic/sample-epic-integration";
 const COMMIT = "1".repeat(40);
 const HASH = "a".repeat(40);
-const PLAN_101 = "docs/features/active/feature-101/plan.md";
-const PLAN_102 = "docs/features/active/feature-102/plan.md";
+const PLAN_101 = ".dev/active/feature-101/plan.md";
+const PLAN_102 = ".dev/active/feature-102/plan.md";
 const INDEX_ZERO_COMMIT_ERROR =
   "Epic planner checkpoint features[0].planning_commit must be hexadecimal.";
 const INDEX_ONE_COMMIT_ERROR =
@@ -31,7 +31,7 @@ const git: ReadinessGitRepository = {
 const parsed: ParsedEpicKickoff = {
   slug: "sample-epic",
   invocationSlug: "sample-epic",
-  manifestPath: "docs/features/epics/sample-epic/epic.md",
+  manifestPath: ".dev/epics/sample-epic/epic.md",
   integrationBranch: BRANCH,
   features: [],
   planHashes: {},

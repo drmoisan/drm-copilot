@@ -38,9 +38,9 @@ Describe 'Codex preimplementation gate epic scope (issue #707)' {
         . (Join-Path $script:RepoRoot 'tests/scripts/claude-runtime/EnforcementHooksNoPythonInvocation.Helpers.ps1')
 
         $script:BundleHookRoot = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks'
-        $script:ReadyEpicJson = '{"route_id":"epic","epic_feature_folder":"sample-epic","epic_manifest_path":"docs/features/epics/sample-epic/epic.md","integration_branch":"epic/sample-epic-integration","epic_issue_num":900,"features":[{"feature_folder":"2026-09-25-child-a-901","merge_status":"merged"},{"feature_folder":"2026-09-25-child-b-902","merge_status":"worktree_removed"}],"model_routing_receipts":[{"agent":"pr-author"}]}'
+        $script:ReadyEpicJson = '{"route_id":"epic","epic_feature_folder":"sample-epic","epic_manifest_path":".dev/epics/sample-epic/epic.md","integration_branch":"epic/sample-epic-integration","epic_issue_num":900,"features":[{"feature_folder":"2026-09-25-child-a-901","merge_status":"merged"},{"feature_folder":"2026-09-25-child-b-902","merge_status":"worktree_removed"}],"model_routing_receipts":[{"agent":"pr-author"}]}'
         $script:NotReadySingleFeature = '{"issue-num":"707","route_id":"large","lifecycle_ready":false}'
-        $script:ReadySingleFeature = '{"issue-num":"707","feature-folder":"docs/features/active/sample","route_id":"full-bug","lifecycle_ready":true}'
+        $script:ReadySingleFeature = '{"issue-num":"707","feature-folder":".dev/active/sample","route_id":"full-bug","lifecycle_ready":true}'
         $script:SingleFeatureReason = 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
         $script:ProductionPath = 'scripts/powershell/Sample.ps1'
         $script:StageCommand = 'git add scripts/powershell/Sample.ps1'
@@ -174,7 +174,7 @@ Describe 'Codex preimplementation gate epic scope (issue #707)' {
         It 'the epic-scope decision names <Conjunct> and the epic checkpoint when the resolved scope carries an invalid <Conjunct>' -ForEach @(
             @{ Conjunct = 'route_id'; Value = 'parallel'; Remove = $false }
             @{ Conjunct = 'epic_feature_folder'; Value = $null; Remove = $true }
-            @{ Conjunct = 'epic_manifest_path'; Value = 'docs/features/active/sample-epic/epic.md'; Remove = $false }
+            @{ Conjunct = 'epic_manifest_path'; Value = '.dev/active/sample-epic/epic.md'; Remove = $false }
             @{ Conjunct = 'integration_branch'; Value = ''; Remove = $false }
             @{ Conjunct = 'features'; Value = @(); Remove = $false }
         ) {
@@ -276,7 +276,7 @@ Describe 'Codex preimplementation gate epic scope (issue #707)' {
         }
 
         It 'a bookkeeping <Leg> operand stays exempt without reading the epic checkpoint' -ForEach @(
-            @{ Leg = 'path'; ToolInput = '{"file_path":"docs/features/active/sample/spec.md"}' }
+            @{ Leg = 'path'; ToolInput = '{"file_path":".dev/active/sample/spec.md"}' }
             @{ Leg = 'command'; ToolInput = '{"command":"git add artifacts/orchestration/epic-orchestrator-state.json"}' }
         ) {
             # Arrange

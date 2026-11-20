@@ -14,7 +14,7 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
     BeforeAll {
         $script:HookRelativePath = '.claude/hooks/validate-task-researcher-output.ps1'
         $script:StdinHook = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot "../../../$script:HookRelativePath"))
-        $script:ResearchPath = 'docs/research/2026-10-11T12-05-synthetic-research.md'
+        $script:ResearchPath = '.dev/research/2026-10-11T12-05-synthetic-research.md'
         $script:PwshExe = if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSEdition -eq 'Core') {
             (Get-Process -Id $PID).Path
         } else {
@@ -64,8 +64,8 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
 
     It 'exits 0 when last_assistant_message carries a valid research-path' -Tag 'E3-Entry' {
         # Arrange: the synthetic research file is reported present with a plain body.
-        Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'docs/research/2026-10-11T12-05-synthetic-research.md' }
-        Mock Get-Content { '# Synthetic research' } -ParameterFilter { $LiteralPath -eq 'docs/research/2026-10-11T12-05-synthetic-research.md' }
+        Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq '.dev/research/2026-10-11T12-05-synthetic-research.md' }
+        Mock Get-Content { '# Synthetic research' } -ParameterFilter { $LiteralPath -eq '.dev/research/2026-10-11T12-05-synthetic-research.md' }
         $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage "research-path: $script:ResearchPath"
         # Act
         $result = Invoke-TaskResearcherOutputStdinEntry -Stdin $stdin
@@ -77,8 +77,8 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
 
     It 'blocks when research-path is supplied only in an output field or through CLAUDE_HOOK_INPUT' -Tag 'E3-Entry' {
         # Arrange: the research path appears only in an output key and in the environment variable.
-        Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'docs/research/2026-10-11T12-05-synthetic-research.md' }
-        Mock Get-Content { '# Synthetic research' } -ParameterFilter { $LiteralPath -eq 'docs/research/2026-10-11T12-05-synthetic-research.md' }
+        Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq '.dev/research/2026-10-11T12-05-synthetic-research.md' }
+        Mock Get-Content { '# Synthetic research' } -ParameterFilter { $LiteralPath -eq '.dev/research/2026-10-11T12-05-synthetic-research.md' }
         $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'Done. Findings recorded.' -OutputField "research-path: $script:ResearchPath"
         $priorInput = $env:CLAUDE_HOOK_INPUT
         try {
@@ -146,8 +146,8 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
 
     It 'exits 2 with a stderr reason when the research-path file cannot be read' -Tag 'E3-Entry' {
         # Arrange: the research path is present but its read fails.
-        Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'docs/research/2026-10-11T12-05-synthetic-research.md' }
-        Mock Get-Content { throw 'simulated read failure' } -ParameterFilter { $LiteralPath -eq 'docs/research/2026-10-11T12-05-synthetic-research.md' }
+        Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq '.dev/research/2026-10-11T12-05-synthetic-research.md' }
+        Mock Get-Content { throw 'simulated read failure' } -ParameterFilter { $LiteralPath -eq '.dev/research/2026-10-11T12-05-synthetic-research.md' }
         $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage "research-path: $script:ResearchPath"
         # Act
         $result = Invoke-TaskResearcherOutputStdinEntry -Stdin $stdin
@@ -202,9 +202,9 @@ Describe 'validate-task-researcher-output entry point (stdin envelope, issue #90
 
     It 'exits 0 when the research-path uses the research.yyyy-MM-ddTHH-mm.md form' -Tag 'E3-Entry' {
         # Arrange: the timestamped research.<stamp>.md form, reported present with a plain body.
-        Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq 'docs/research/research.2026-10-11T12-05.md' }
-        Mock Get-Content { '# Synthetic research' } -ParameterFilter { $LiteralPath -eq 'docs/research/research.2026-10-11T12-05.md' }
-        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: docs/research/research.2026-10-11T12-05.md'
+        Mock Test-Path { $true } -ParameterFilter { $LiteralPath -eq '.dev/research/research.2026-10-11T12-05.md' }
+        Mock Get-Content { '# Synthetic research' } -ParameterFilter { $LiteralPath -eq '.dev/research/research.2026-10-11T12-05.md' }
+        $stdin = ConvertTo-SubagentStopEnvelopeJson -AgentType 'task-researcher' -AssistantMessage 'research-path: .dev/research/research.2026-10-11T12-05.md'
         # Act
         $result = Invoke-TaskResearcherOutputStdinEntry -Stdin $stdin
         # Assert
@@ -222,18 +222,18 @@ Describe 'Test-IsValidResearchFileName rule R1 (issue #905)' {
     }
 
     It 'R1 accepts <Name>' -ForEach @(
-        @{ Name = '2026-10-11T10-26-subagentstop-envelope-artifact-gates-addendum-research.md'; Path = 'docs/research/2026-10-11T10-26-subagentstop-envelope-artifact-gates-addendum-research.md' }
-        @{ Name = '2026-10-11-short-name-research.md'; Path = 'docs/research/2026-10-11-short-name-research.md' }
-        @{ Name = '20261011-short-name-research.md'; Path = 'docs/research/20261011-short-name-research.md' }
-        @{ Name = '2026-10-11T1026-short-name-research.md'; Path = 'docs/research/2026-10-11T1026-short-name-research.md' }
-        @{ Name = '2026-10-11T10-26-short-name.research.md'; Path = 'docs/research/2026-10-11T10-26-short-name.research.md' }
-        @{ Name = '2026-10-11-short-name.research.md'; Path = 'docs/research/2026-10-11-short-name.research.md' }
-        @{ Name = '20261011-short-name.research.md'; Path = 'docs/research/20261011-short-name.research.md' }
-        @{ Name = '2026-10-11T1026-short-name.research.md'; Path = 'docs/research/2026-10-11T1026-short-name.research.md' }
-        @{ Name = 'research.2026-10-11T10-26.md'; Path = 'docs/research/research.2026-10-11T10-26.md' }
-        @{ Name = 'research.2026-10-11.md'; Path = 'docs/research/research.2026-10-11.md' }
-        @{ Name = 'research-addendum.2026-10-11T10-26.md'; Path = 'docs/research/research-addendum.2026-10-11T10-26.md' }
-        @{ Name = 'research-addendum.2026-10-11.md'; Path = 'docs/research/research-addendum.2026-10-11.md' }
+        @{ Name = '2026-10-11T10-26-subagentstop-envelope-artifact-gates-addendum-research.md'; Path = '.dev/research/2026-10-11T10-26-subagentstop-envelope-artifact-gates-addendum-research.md' }
+        @{ Name = '2026-10-11-short-name-research.md'; Path = '.dev/research/2026-10-11-short-name-research.md' }
+        @{ Name = '20261011-short-name-research.md'; Path = '.dev/research/20261011-short-name-research.md' }
+        @{ Name = '2026-10-11T1026-short-name-research.md'; Path = '.dev/research/2026-10-11T1026-short-name-research.md' }
+        @{ Name = '2026-10-11T10-26-short-name.research.md'; Path = '.dev/research/2026-10-11T10-26-short-name.research.md' }
+        @{ Name = '2026-10-11-short-name.research.md'; Path = '.dev/research/2026-10-11-short-name.research.md' }
+        @{ Name = '20261011-short-name.research.md'; Path = '.dev/research/20261011-short-name.research.md' }
+        @{ Name = '2026-10-11T1026-short-name.research.md'; Path = '.dev/research/2026-10-11T1026-short-name.research.md' }
+        @{ Name = 'research.2026-10-11T10-26.md'; Path = '.dev/research/research.2026-10-11T10-26.md' }
+        @{ Name = 'research.2026-10-11.md'; Path = '.dev/research/research.2026-10-11.md' }
+        @{ Name = 'research-addendum.2026-10-11T10-26.md'; Path = '.dev/research/research-addendum.2026-10-11T10-26.md' }
+        @{ Name = 'research-addendum.2026-10-11.md'; Path = '.dev/research/research-addendum.2026-10-11.md' }
         @{ Name = 'backslash path 2026-10-11T10-26-short-name-research.md'; Path = 'docs\research\2026-10-11T10-26-short-name-research.md' }
     ) {
         # Act
@@ -267,7 +267,7 @@ Describe 'Test-IsValidResearchFileName rule R1 (issue #905)' {
         @{ Name = 'research.2026-10-11T10-26-short-name.md'; Category = 'stamp after research. with a short name' }
     ) {
         # Arrange
-        $path = 'docs/research/' + $Name
+        $path = '.dev/research/' + $Name
         # Act
         $result = Test-IsValidResearchFileName -Path $path
         # Assert

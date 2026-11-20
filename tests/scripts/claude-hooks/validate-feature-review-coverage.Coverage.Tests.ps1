@@ -221,7 +221,7 @@ Describe 'validate-feature-review-coverage coverage (issue #786)' {
 
     Context 'Invoke-FeatureReviewCoverageValidation' {
         BeforeAll {
-            $script:Folder = 'docs/features/active/2026-10-10-sample'
+            $script:Folder = '.dev/active/2026-10-10-sample'
             $script:Stamp = '2026-10-10T00-00'
             function ConvertTo-ReviewEnvelope {
                 param([AllowEmptyString()] [string] $Output)

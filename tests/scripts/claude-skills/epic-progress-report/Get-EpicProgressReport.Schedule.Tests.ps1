@@ -116,7 +116,7 @@ Describe 'Get-EpicProgressDependencyGraph sources (AC-32, E5)' {
         # 103 names 101 by number; 102 names f-a through a lifecycle path; a row matched by folder names 'f-b'.
         $rows = @(
             Get-TestRow -Issue 103 -DependsOn @(101)
-            Get-TestRow -Issue 102 -DependsOn @('docs/features/active/f-a')
+            Get-TestRow -Issue 102 -DependsOn @('.dev/active/f-a')
             Get-TestRow -Issue $null -Folder 'completed/f-a' -DependsOn @()
         )
 

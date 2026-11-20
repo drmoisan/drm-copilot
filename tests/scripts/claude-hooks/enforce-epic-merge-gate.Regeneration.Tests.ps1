@@ -94,7 +94,7 @@ Describe 'enforce-epic-merge-gate regeneration check (issue #1156)' {
             [OutputType([hashtable])]
             param([string] $HeadSha = $script:Reviewed, [object[]] $EventList = @())
 
-            $outcome = [ordered]@{ verdict = 'PASS'; findings = @(); head_sha = $HeadSha; review_kind = 'regeneration_delta'; evidence_path = 'docs/features/active/item-42/evidence/qa-gates/regeneration-delta.2026-11-09T22-00.md' }
+            $outcome = [ordered]@{ verdict = 'PASS'; findings = @(); head_sha = $HeadSha; review_kind = 'regeneration_delta'; evidence_path = '.dev/active/item-42/evidence/qa-gates/regeneration-delta.2026-11-09T22-00.md' }
             return @{ remediation_loop = [ordered]@{ review_outcomes = @($outcome) }; regeneration_events = @($EventList) }
         }
     }

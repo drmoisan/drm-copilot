@@ -11,16 +11,16 @@ Research the best implementation approach for a feature or bug described in the 
 
 Accept one or more feature documents as context:
 
-- `docs/features/active/<feature>/issue.md` (primary)
-- `docs/features/active/<feature>/user-story.md` (when present)
-- `docs/features/active/<feature>/spec.md` (when present)
+- `.dev/active/<feature>/issue.md` (primary)
+- `.dev/active/<feature>/user-story.md` (when present)
+- `.dev/active/<feature>/spec.md` (when present)
 
 ## Output
 
 Create or update a single research file in the applicable tracked research root:
 
-- Feature-associated path: `docs/features/<feature>/research/<timestamp>-<short-name>-research.md`
-- One-off path: `docs/research/<timestamp>-<short-name>-research.md`
+- Feature-associated path: `.dev/<feature>/research/<timestamp>-<short-name>-research.md`
+- One-off path: `.dev/research/<timestamp>-<short-name>-research.md`
 - Use the Task Researcher template from the repository exactly.
 - Place rejected-alternatives summaries inside `## Recommended Approach`, not as a separate top-level header.
 
@@ -57,8 +57,8 @@ Create or update a single research file in the applicable tracked research root:
 
 ### 6. Pre-Mortem
 
-- Feature-associated research (a research path under `docs/features/`) MUST carry a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the next review or CI run could fail on that dimension and the mitigation the plan must carry; a label that does not apply is written as "not applicable" followed by the reason.
-- One-off research under `docs/research/` is exempt.
+- Feature-associated research (a research path under `.dev/`) MUST carry a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the next review or CI run could fail on that dimension and the mitigation the plan must carry; a label that does not apply is written as "not applicable" followed by the reason.
+- One-off research under `.dev/research/` is exempt.
 - The `execution-environment` skill states the CI shape, contract tests, and isolation checks the section accounts for.
 
 ## Constraints

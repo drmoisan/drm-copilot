@@ -75,7 +75,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 classifier (issue #55
             # It must be bound explicitly at every call site. An unbound value falls
             # through to the on-disk checkpoint, which is ready during an orchestrated
             # run, and an allow assertion would then pass vacuously.
-            return '{"issue-num":"554","feature-folder":"docs/features/active/preimplementation-gate-blocks-epic-execution-554","route_id":"","lifecycle_ready":false}'
+            return '{"issue-num":"554","feature-folder":".dev/active/preimplementation-gate-blocks-epic-execution-554","route_id":"","lifecycle_ready":false}'
         }
         Mock Resolve-OrchestrationGateTarget { [pscustomobject]@{ Status = 'SessionRoot'; WorktreeRoot = '/synthetic-worktrees/default-session'; ReasonCode = $null; Detail = 'default SessionRoot target (issue #690)' } }
     }

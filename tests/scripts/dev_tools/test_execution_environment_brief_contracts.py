@@ -403,7 +403,7 @@ def test_architecture_doc_lists_brief() -> None:
     """The architecture document's mirror table has a row for the brief."""
 
     # Arrange / Act
-    text = _read("docs/engineering/claude-code-architecture.md")
+    text = _read(".dev/engineering/claude-code-architecture.md")
 
     # Assert
     assert (

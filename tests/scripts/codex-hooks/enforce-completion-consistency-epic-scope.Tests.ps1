@@ -116,12 +116,12 @@ Describe 'Codex completion-consistency gate epic checkpoint (issue #707)' {
     }
 
     Context 'per-feature checkpoint writes are still intercepted' {
-        It 'still denies a completion-asserting per-feature checkpoint whose feature-folder is under docs/features/epics/' {
+        It 'still denies a completion-asserting per-feature checkpoint whose feature-folder is under .dev/epics/' {
             $content = [ordered]@{
                 next_step        = 'complete'
                 completed_steps  = @('S12_complete')
                 'issue-num'      = '707'
-                'feature-folder' = 'docs/features/epics/sample-epic'
+                'feature-folder' = '.dev/epics/sample-epic'
                 ci_gate          = [ordered]@{ conclusion = 'success'; head_sha = 'abc123' }
             } | ConvertTo-Json -Compress -Depth 10
             $toolInput = [ordered]@{ file_path = $script:FeatureCheckpointPath; content = $content }
@@ -130,7 +130,7 @@ Describe 'Codex completion-consistency gate epic checkpoint (issue #707)' {
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike 'COMPLETION_CONSISTENCY_BLOCKED*'
-            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*feature-folder value 'docs/features/epics/sample-epic'*"
+            $decision.hookSpecificOutput.permissionDecisionReason | Should -BeLike "*feature-folder value '.dev/epics/sample-epic'*"
         }
 
         It 'still denies a completion-asserting per-feature checkpoint that lacks ci_gate' {
@@ -138,7 +138,7 @@ Describe 'Codex completion-consistency gate epic checkpoint (issue #707)' {
                 next_step        = 'complete'
                 completed_steps  = @('S12_complete')
                 'issue-num'      = '707'
-                'feature-folder' = 'docs/features/active/sample'
+                'feature-folder' = '.dev/active/sample'
             } | ConvertTo-Json -Compress -Depth 10
             $toolInput = [ordered]@{ file_path = $script:FeatureCheckpointPath; content = $content }
 

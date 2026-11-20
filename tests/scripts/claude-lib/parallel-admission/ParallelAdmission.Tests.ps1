@@ -17,7 +17,7 @@ BeforeAll {
 
     # In-memory branch tree for stage inference: one feature folder with every
     # artifact satisfied, plus the template placeholder and task lines.
-    $script:Folder = 'docs/features/active/sample-feature-1101'
+    $script:Folder = '.dev/active/sample-feature-1101'
     $script:Placeholder = @('Brief summary of the behavior and scope.', 'Describe how the feature should behave end-to-end.')
     $script:TemplateTask = @('- [ ] [P1-T1] <Atomic task with strong verb>', '- [ ] [P1-T2] <Atomic task>')
     $script:ResearchPath = "$($script:Folder)/research/research.2026-11-01T10-00.md"
@@ -28,7 +28,7 @@ BeforeAll {
     # Build the inference arguments; each test removes or replaces what it needs.
     function Get-StageInput {
         param([string[]] $Omit = @(), [hashtable] $Text = @{}, [hashtable] $Time = @{})
-        $tree = @($script:ResearchPath, $script:SpecPath, $script:PlanPath, $script:PreflightPath, 'docs/features/active/other-feature/spec.md') | Where-Object { $Omit -notcontains $_ }
+        $tree = @($script:ResearchPath, $script:SpecPath, $script:PlanPath, $script:PreflightPath, '.dev/active/other-feature/spec.md') | Where-Object { $Omit -notcontains $_ }
         $fileText = @{
             $script:ResearchPath  = "# Research`nFindings."
             $script:SpecPath      = "# Spec`n`n## Overview`n`nThe helper admits prepared items."

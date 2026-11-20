@@ -197,7 +197,7 @@ def test_validate_from_args_routes_parallel_kickoff_to_its_validator(
     Purpose:
         This case previously asserted that `parallel-kickoff` was an unsupported
         artifact type. That expectation became false by design: the epic
-        manifest `docs/features/epics/parallel-orchestration/epic.md`, section
+        manifest `.dev/epics/parallel-orchestration/epic.md`, section
         "Planner Adjudication: the kickoff-contract boundary (F3 / F4)", assigns
         the kickoff-contract module and the `parallel-kickoff` artifact type to
         the parallel-planner-surface feature by producer ownership, and

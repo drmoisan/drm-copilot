@@ -35,8 +35,8 @@ Describe 'Codex preimplementation gate exempt-operand bypass (issue #732)' {
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Codex' -Seam 'Get-EpicScopeCheckpointText' }
 
     It 'denies <Label> without an authorizing checkpoint' -ForEach @(
-        @{ Label = 'the issue 732 brace-expansion shape'; Command = 'git add docs/features/active/{..,..}/{..,..}/{..,..}/src/prod.ts' }
-        @{ Label = 'the issue 732 escaped dot-segment shape'; Command = 'git add docs/features/active/.\./.\./.\./src/x.ps1' }
+        @{ Label = 'the issue 732 brace-expansion shape'; Command = 'git add .dev/active/{..,..}/{..,..}/{..,..}/src/prod.ts' }
+        @{ Label = 'the issue 732 escaped dot-segment shape'; Command = 'git add .dev/active/.\./.\./.\./src/x.ps1' }
     ) {
         # Arrange
         $toolInput = @{ command = $Command } | ConvertTo-Json -Compress -Depth 5

@@ -32,7 +32,7 @@ BeforeAll {
             launch_id               = 'launch-2'
             issue_num               = 2
             delegation_id           = 'delegation-2'
-            feature_folder          = 'docs/features/active/feature-two'
+            feature_folder          = '.dev/active/feature-two'
             deployment_agent        = 'orchestrator-c3-elevated'
             model                   = 'gpt-6-astra'
             model_reasoning_effort  = 'high'
@@ -75,13 +75,13 @@ BeforeAll {
             features = @(
                 [ordered]@{
                     issue_num      = 1
-                    feature_folder = 'docs/features/active/feature-one'
+                    feature_folder = '.dev/active/feature-one'
                     depends_on     = @()
                     merge_status   = $UpstreamStatus
                 },
                 [ordered]@{
                     issue_num      = 2
-                    feature_folder = 'docs/features/active/feature-two'
+                    feature_folder = '.dev/active/feature-two'
                     depends_on     = @('1')
                     merge_status   = 'pending'
                 }

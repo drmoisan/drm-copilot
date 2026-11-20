@@ -19,7 +19,7 @@ Do not ask clarifying questions. Make best-effort inferences, record assumptions
 ## Inputs (required)
 
 - **Epic root folder (required):** `${input:EpicRootFolder}`
-  - Example: `docs/features/active/2026-02-02-some-epic-47`
+  - Example: `.dev/active/2026-02-02-some-epic-47`
 
 ## Optional inputs
 

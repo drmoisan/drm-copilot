@@ -503,11 +503,11 @@ Follow this protocol:
 
 ### 9.1 Determine the target path
 
-1. **If the user provides a file path**, use that path verbatim (for example, `docs/features/active/PoshQc/plan.md`).
+1. **If the user provides a file path**, use that path verbatim (for example, `.dev/active/PoshQc/plan.md`).
 2. **If the user only mentions a folder or directory** (e.g., “put this in the PoshQC folder”) and does NOT specify a file path:
 
-   * Use `#tool:search/listDirectory` and/or `#tool:search/fileSearch` to infer likely plan locations (for example, `docs/features/active/PoshQC/`).
-   * Propose a concrete file path (for example, `docs/features/active/PoshQC/plan.md`) and **ask the user to confirm it** before writing.
+   * Use `#tool:search/listDirectory` and/or `#tool:search/fileSearch` to infer likely plan locations (for example, `.dev/active/PoshQC/`).
+   * Propose a concrete file path (for example, `.dev/active/PoshQC/plan.md`) and **ask the user to confirm it** before writing.
 3. **If the user does not mention any location**:
 
    * Propose a sensible default location and file name based on project conventions.

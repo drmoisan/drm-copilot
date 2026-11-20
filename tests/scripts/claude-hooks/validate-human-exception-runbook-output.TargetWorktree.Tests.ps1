@@ -18,7 +18,7 @@ BeforeAll {
 
     $script:SessionRoot = '/synthetic-worktrees/main'
     $script:ItemRoot = '/synthetic-worktrees/main/.claude/worktrees/bug-1128'
-    $script:Relative = 'docs/features/active/sample/runbooks/package.runbook.md'
+    $script:Relative = '.dev/active/sample/runbooks/package.runbook.md'
     $script:ItemRunbook = "$script:ItemRoot/$script:Relative"
     $script:Prompt = "Canonical issue number for this feature is 1128.`nbranch: bug/sample-1128"
     $script:Fence = [string][char]96 * 3

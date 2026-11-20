@@ -97,8 +97,8 @@ BeforeDiscovery {
         @{ Id = 'COPILOT-PY-PLANNING'; Path = '.github/agents/python-atomic-planning.agent.md'; Forbidden = $surfaceForbidden }
         @{ Id = 'HARD-LOCK-PROMPT'; Path = '.github/prompts/execute-hard-lock.prompt.md'; Forbidden = $surfaceForbidden }
         @{ Id = 'HARD-LOCK-CODEX'; Path = '.github/codex/execute-hard-lock.prompt.md'; Forbidden = $surfaceForbidden }
-        @{ Id = 'PLAN-TEMPLATE'; Path = 'docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md'; Forbidden = $surfaceForbidden }
-        @{ Id = 'ARCHITECTURE-DOC'; Path = 'docs/engineering/claude-code-architecture.md'; Forbidden = $surfaceForbidden + @('Phase 0 policy reads') }
+        @{ Id = 'PLAN-TEMPLATE'; Path = '.dev/templates/feature/plan.yyyy-MM-ddTHH-mm.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'ARCHITECTURE-DOC'; Path = '.dev/engineering/claude-code-architecture.md'; Forbidden = $surfaceForbidden + @('Phase 0 policy reads') }
         @{ Id = 'REVIEW-PROMPT'; Path = '.github/prompts/review-feature.prompt.md'; Forbidden = $surfaceForbidden }
     )
 }
@@ -169,7 +169,7 @@ Describe 'Planning contract wording' {
     It 'PCW-STANDING-RULE-<Copy> states the process-reduction ledger rule' -ForEach $script:ContractCopy {
         # Arrange
         $required = @(
-            '`docs/engineering/process-reductions/` exists',
+            '`.dev/engineering/process-reductions/` exists',
             'adds its ledger entry in the same commit',
             'One-off waivers for a single item are not entries.'
         )

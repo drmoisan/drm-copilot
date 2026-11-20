@@ -15,7 +15,7 @@ Do not ask clarifying questions. Make best-effort inferences, document assumptio
 
 ## Output Format
 
-Write outputs to the **active feature folder** determined by the agent. If no active feature folder can be inferred, use the agent’s fallback (e.g., `docs/features/active/<date>-feature-review/`).
+Write outputs to the **active feature folder** determined by the agent. If no active feature folder can be inferred, use the agent’s fallback (e.g., `.dev/active/<date>-feature-review/`).
 
 ### Baseline capture location (canonical)
 
@@ -87,7 +87,7 @@ Set `REVIEW_STATUS: PASS` only when no remediation artifact is required. Set `RE
 When remediation is triggered, the feature review agent MUST:
 
 1) Create a remediation plan target file from a plan template (so `${file}` exists and has structure to fill)
-   - Default template: `docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md`
+   - Default template: `.dev/templates/feature/plan.yyyy-MM-ddTHH-mm.md`
    - Output path: `<FEATURE_FOLDER>/remediation-plan.<timestamp>.md`
    - Replace top-level placeholders minimally (feature name, issue reference if known, last updated timestamp). Leave task checkboxes empty for atomic_planner to fill.
 

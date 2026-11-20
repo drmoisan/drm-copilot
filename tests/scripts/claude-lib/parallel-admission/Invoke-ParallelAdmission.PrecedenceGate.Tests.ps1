@@ -94,8 +94,8 @@ Describe 'Invoke-ParallelAdmission precedence gate subcommands' {
         }
         $entry = @{
             items = @(
-                @{ issue_num = 9; plan_path = 'docs/features/active/b/plan-9.md'; blast_radius = @{ paths = @('docs/rule.md') } },
-                @{ issue_num = 7; plan_path = 'docs/features/active/a/plan-7.md'; blast_radius = @{ paths = @('docs/rule.md', 'src/app.py') } }
+                @{ issue_num = 9; plan_path = '.dev/active/b/plan-9.md'; blast_radius = @{ paths = @('docs/rule.md') } },
+                @{ issue_num = 7; plan_path = '.dev/active/a/plan-7.md'; blast_radius = @{ paths = @('docs/rule.md', 'src/app.py') } }
             )
         } | ConvertTo-Json -Depth 6
 

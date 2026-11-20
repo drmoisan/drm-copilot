@@ -14,11 +14,11 @@ from tests.scripts.dev_tools.typescript_twin_test_support import (
     literals_missing_from_twin,
 )
 
-FOLDER = "docs/features/active/feature-101"
-PLAN = "docs/features/active/feature-101/plan.md"
+FOLDER = ".dev/active/feature-101"
+PLAN = ".dev/active/feature-101/plan.md"
 RESEARCH = "artifacts/research/feature-101.md"
 FOLDER_REQUIRED_ERROR = (
-    "Execution readiness requires feature folder: docs/features/active/feature-101"
+    "Execution readiness requires feature folder: .dev/active/feature-101"
 )
 ROOT_FOLDER_REQUIRED_ERROR = "Execution readiness requires feature folder: ."
 FOLDER_ESCAPE_ERROR = (
@@ -70,8 +70,8 @@ def _errors(feature_folder: str, plan_path: str = PLAN) -> list[str]:
     [
         (FOLDER, FOLDER_REQUIRED_ERROR),
         (f"./{FOLDER}", FOLDER_REQUIRED_ERROR),
-        ("docs/features/active/./feature-101", FOLDER_REQUIRED_ERROR),
-        ("docs/features/active//feature-101", FOLDER_REQUIRED_ERROR),
+        (".dev/active/./feature-101", FOLDER_REQUIRED_ERROR),
+        (".dev/active//feature-101", FOLDER_REQUIRED_ERROR),
         (f"{FOLDER}/", FOLDER_REQUIRED_ERROR),
         ("./", ROOT_FOLDER_REQUIRED_ERROR),
     ],
@@ -101,8 +101,8 @@ def test_feature_folder_spelling_normalizes_to_repository_path(
         (f"/{FOLDER}", FOLDER_ESCAPE_ERROR),
         ("docs\\features\\active\\feature-101", FOLDER_SLASH_ERROR),
         ("   ", FOLDER_EMPTY_ERROR),
-        ("C:/docs/features/active/feature-101", FOLDER_ESCAPE_ERROR),
-        ("c:docs/features/active/feature-101", FOLDER_ESCAPE_ERROR),
+        ("C:/.dev/active/feature-101", FOLDER_ESCAPE_ERROR),
+        ("c:.dev/active/feature-101", FOLDER_ESCAPE_ERROR),
     ],
     ids=["parent", "absolute", "backslash", "blank", "drive-letter", "drive-relative"],
 )

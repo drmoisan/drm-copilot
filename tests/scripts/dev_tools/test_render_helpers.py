@@ -76,11 +76,11 @@ class TestReadTextFile:
 
 class TestExtractFeaturesFromPaths:
     def test_extracts_from_active_paths(self) -> None:
-        """extract_features_from_paths gets names from docs/features/active/**."""
+        """extract_features_from_paths gets names from .dev/active/**."""
         paths = [
-            "docs/features/active/feature-a/spec.md",
-            "docs/features/active/feature-b/plan.md",
-            "docs/features/active/feature-a/user-story.md",
+            ".dev/active/feature-a/spec.md",
+            ".dev/active/feature-b/plan.md",
+            ".dev/active/feature-a/user-story.md",
         ]
         result = extract_features_from_paths(paths)
         assert result == {"feature-a", "feature-b"}
@@ -88,7 +88,7 @@ class TestExtractFeaturesFromPaths:
     def test_ignores_non_active_paths(self) -> None:
         """extract_features_from_paths only processes active paths."""
         paths = [
-            "docs/features/potential/feature-a/spec.md",
+            ".dev/potential/feature-a/spec.md",
             "README.md",
             "src/module.py",
         ]
@@ -97,7 +97,7 @@ class TestExtractFeaturesFromPaths:
 
     def test_requires_minimum_depth(self) -> None:
         """extract_features_from_paths requires at least 4 path parts."""
-        paths = ["docs/features/active"]
+        paths = [".dev/active"]
         result = extract_features_from_paths(paths)
         assert result == set()
 
@@ -223,7 +223,7 @@ class TestGatherFeatureExcerptsIntegration:
             "## Story Statement\n- As user\n## Problem / Why\nNeed"
         )
 
-        changed = ["docs/features/active/test-feature/spec.md"]
+        changed = [".dev/active/test-feature/spec.md"]
         result = gather_feature_excerpts(mem_fs_path, changed)
 
         assert len(result) == 1
@@ -240,8 +240,8 @@ class TestGatherFeatureExcerptsIntegration:
             (feature_dir / "spec.md").write_text("## Overview\nContent")
 
         changed = [
-            "docs/features/active/feat-a/spec.md",
-            "docs/features/active/feat-b/plan.md",
+            ".dev/active/feat-a/spec.md",
+            ".dev/active/feat-b/plan.md",
         ]
         result = gather_feature_excerpts(mem_fs_path, changed)
 
@@ -250,6 +250,6 @@ class TestGatherFeatureExcerptsIntegration:
 
     def test_missing_feature_directory_skipped(self, mem_fs_path: Path) -> None:
         """gather_feature_excerpts skips features with no directory."""
-        changed = ["docs/features/active/nonexistent/spec.md"]
+        changed = [".dev/active/nonexistent/spec.md"]
         result = gather_feature_excerpts(mem_fs_path, changed)
         assert result == []

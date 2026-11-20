@@ -67,7 +67,7 @@ def _envelope() -> HandoffEnvelope:
         ObjectiveIdentity(
             "github:drmoisan/drm-copilot#614",
             614,
-            "docs/features/active/portable-handoff-614",
+            ".dev/active/portable-handoff-614",
             "full-feature",
         ),
         WorkspaceBinding(
@@ -81,7 +81,7 @@ def _envelope() -> HandoffEnvelope:
         "codex",
         "artifacts/orchestration/orchestrator-state.json",
         PlanIdentity(
-            "docs/features/active/portable-handoff-614/plan.md",
+            ".dev/active/portable-handoff-614/plan.md",
             ZERO_SHA256,
             "atomic-plan-v1",
         ),
@@ -128,7 +128,7 @@ def _observed_bindings() -> dict[str, object]:
     [
         "/absolute/plan.md",
         "C:/absolute/plan.md",
-        "docs/features/../plan.md",
+        ".dev/../plan.md",
         "docs\\features\\plan.md",
         "docs//features/plan.md",
     ],
@@ -174,7 +174,7 @@ def test_shared_traversal_fixture_blocks_before_write(
         ("issue_number", 999, "HANDOFF_ISSUE_FEATURE_MISMATCH"),
         (
             "feature_folder",
-            "docs/features/active/other",
+            ".dev/active/other",
             "HANDOFF_ISSUE_FEATURE_MISMATCH",
         ),
     ],

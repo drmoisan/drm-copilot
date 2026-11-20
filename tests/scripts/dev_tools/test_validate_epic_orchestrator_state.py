@@ -298,7 +298,7 @@ def test_validate_accepts_completed_lifecycle_hint_dependency() -> None:
     # path; stripping the prefix must resolve it to the defined feature.
     state = build_valid_epic_state()
     state["features"][1]["depends_on"] = [  # type: ignore[index]
-        "docs/features/completed/2026-07-02-child-a-300"
+        ".dev/completed/2026-07-02-child-a-300"
     ]
 
     # Act

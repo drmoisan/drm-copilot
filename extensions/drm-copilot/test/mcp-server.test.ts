@@ -37,9 +37,9 @@ const INDEPENDENT_CONTEXT_ARGUMENTS = {
   expected_source_head_sha: "0".repeat(40),
   allowed_head_relationship: "equal_or_descendant",
   expected_issue_number: 614,
-  expected_feature_folder: "docs/features/active/portable-handoff-614",
+  expected_feature_folder: ".dev/active/portable-handoff-614",
   expected_work_mode: "full-feature",
-  expected_plan_path: "docs/features/active/portable-handoff-614/plan.md",
+  expected_plan_path: ".dev/active/portable-handoff-614/plan.md",
   expected_plan_sha256: "c".repeat(64),
 } as const;
 
@@ -424,7 +424,7 @@ describe("repo automation MCP server", () => {
     service.resolveExecuteHardLockPrompt.mockResolvedValue({
       tool: "resolve_execute_hard_lock_prompt",
       workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
-      summary: `Resolved the execute hard-lock prompt for '${workspacePath("docs/features/active/feature-123/plan.md")}'.`,
+      summary: `Resolved the execute hard-lock prompt for '${workspacePath(".dev/active/feature-123/plan.md")}'.`,
       artifacts: [workspacePath("artifacts/hard_lock_prompt.txt")],
     });
 
@@ -432,13 +432,13 @@ describe("repo automation MCP server", () => {
       name: "resolve_execute_hard_lock_prompt",
       arguments: {
         workspace_root: VIRTUAL_WORKSPACE_ROOT,
-        target: workspacePath("docs/features/active/feature-123/plan.md"),
+        target: workspacePath(".dev/active/feature-123/plan.md"),
       },
     });
 
     expect(service.resolveExecuteHardLockPrompt).toHaveBeenCalledWith({
       workspaceRoot: VIRTUAL_WORKSPACE_ROOT,
-      target: workspacePath("docs/features/active/feature-123/plan.md"),
+      target: workspacePath(".dev/active/feature-123/plan.md"),
       output: DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH,
       quiet: true,
     });

@@ -251,7 +251,7 @@ class TestPhaseEndQC:
         monkeypatch.setattr(
             cli,
             "resolve_feature_plan",
-            lambda _dir: Mock(path=Path("docs/features/active/README.md")),
+            lambda _dir: Mock(path=Path(".dev/active/README.md")),
         )
         monkeypatch.setattr(cli, "refuse_protected_branch", lambda _workspace: None)
         monkeypatch.setattr(cli, "execute_one_task", lambda **_kwargs: 0)

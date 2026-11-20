@@ -45,7 +45,7 @@ Compares a parallel manifest's expected_conflict_components assertion against
 the derived conflict components and prints an advisory report on stdout.
 
 Options:
-  --manifest  Path to docs/features/parallel/<slug>/parallel.md (required).
+  --manifest  Path to .dev/parallel/<slug>/parallel.md (required).
   --edges     Derived conflict edges as "<a>:<b> <c>:<d>" (optional).
 
 Advisory only: the report never blocks. Every non-usage path exits 0.

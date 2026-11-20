@@ -260,11 +260,11 @@ Describe 'Clock and path converters' {
     }
 
     It 'returns the feature-relative evidence path for a valid stamp' {
-        Get-RegenerationEvidencePath -FeatureFolder 'docs/features/active/x-1' -Timestamp '2026-11-09T22-00' |
-            Should -BeExactly 'docs/features/active/x-1/evidence/qa-gates/regeneration-delta.2026-11-09T22-00.md'
+        Get-RegenerationEvidencePath -FeatureFolder '.dev/active/x-1' -Timestamp '2026-11-09T22-00' |
+            Should -BeExactly '.dev/active/x-1/evidence/qa-gates/regeneration-delta.2026-11-09T22-00.md'
     }
 
     It 'throws for a timestamp outside the yyyy-MM-ddTHH-mm shape' {
-        { Get-RegenerationEvidencePath -FeatureFolder 'docs/features/active/x-1' -Timestamp '2026-11-09T22:00' } | Should -Throw
+        { Get-RegenerationEvidencePath -FeatureFolder '.dev/active/x-1' -Timestamp '2026-11-09T22:00' } | Should -Throw
     }
 }

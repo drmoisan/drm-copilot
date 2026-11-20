@@ -1,7 +1,7 @@
 ---
 name: feature-review
 model: opus
-description: Feature branch review specialist that produces policy-audit, code-review, and feature-audit artifacts restricted to docs/features/active/ write path.
+description: Feature branch review specialist that produces policy-audit, code-review, and feature-audit artifacts restricted to .dev/active/ write path.
 tools:
   - Read
   - Grep
@@ -30,12 +30,12 @@ You are a feature-branch reviewer. Your output is audit artifacts, not code chan
 
 ## Required Outputs
 
-When the active review scope is a selected version folder such as `docs/features/active/<feature>/v2/`, write review artifacts into that selected version folder rather than the parent feature root.
+When the active review scope is a selected version folder such as `.dev/active/<feature>/v2/`, write review artifacts into that selected version folder rather than the parent feature root.
 
-1. `docs/features/active/<feature-or-selected-version>/policy-audit.<timestamp>.md` — policy compliance audit with PASS/PARTIAL/FAIL verdicts and evidence
-2. `docs/features/active/<feature-or-selected-version>/code-review.<timestamp>.md` — code quality review covering best practices
-3. `docs/features/active/<feature-or-selected-version>/feature-audit.<timestamp>.md` — acceptance criteria verification relative to baseline
-4. For every review with at least one blocking finding, including halt (`HALT_NON_REMEDIABLE`) and wait (`AWAITING_CI`) verdicts: `docs/features/active/<feature-or-selected-version>/remediation-inputs.<timestamp>.md` with explicit remediation-required findings and artifact paths. The file carries these line formats:
+1. `.dev/active/<feature-or-selected-version>/policy-audit.<timestamp>.md` — policy compliance audit with PASS/PARTIAL/FAIL verdicts and evidence
+2. `.dev/active/<feature-or-selected-version>/code-review.<timestamp>.md` — code quality review covering best practices
+3. `.dev/active/<feature-or-selected-version>/feature-audit.<timestamp>.md` — acceptance criteria verification relative to baseline
+4. For every review with at least one blocking finding, including halt (`HALT_NON_REMEDIABLE`) and wait (`AWAITING_CI`) verdicts: `.dev/active/<feature-or-selected-version>/remediation-inputs.<timestamp>.md` with explicit remediation-required findings and artifact paths. The file carries these line formats:
    - one line `Review-Verdict: <VERDICT>`, where the verdict is `PASS`, `REMEDIATION_REQUIRED`, `HALT_NON_REMEDIABLE`, or `AWAITING_CI`,
    - inside each blocking finding block, one line `Remediability: <class>`, where the class is `autonomous`, `external_dependency`, `policy_hold`, `awaiting_ci`, or `human_decision_required` (`autonomous` when the line is absent),
    - inside each blocking finding block, one line `Remediability-Evidence: <text>` stating why the class applies.
@@ -51,10 +51,10 @@ Timestamp format: `yyyy-MM-ddTHH-mm` (ISO-8601).
 
 Report the required artifact paths in the final response using these tokens:
 
-- `policy-audit-path: docs/features/active/<feature-or-selected-version>/policy-audit.<timestamp>.md`
-- `code-review-path: docs/features/active/<feature-or-selected-version>/code-review.<timestamp>.md`
-- `feature-audit-path: docs/features/active/<feature-or-selected-version>/feature-audit.<timestamp>.md`
-- When remediation inputs are produced: `remediation-inputs-path: docs/features/active/<feature-or-selected-version>/remediation-inputs.<timestamp>.md`
+- `policy-audit-path: .dev/active/<feature-or-selected-version>/policy-audit.<timestamp>.md`
+- `code-review-path: .dev/active/<feature-or-selected-version>/code-review.<timestamp>.md`
+- `feature-audit-path: .dev/active/<feature-or-selected-version>/feature-audit.<timestamp>.md`
+- When remediation inputs are produced: `remediation-inputs-path: .dev/active/<feature-or-selected-version>/remediation-inputs.<timestamp>.md`
 - Optional: `review-status: <VERDICT>` with the same verdict as the remediation inputs (`PASS` when none were produced). The orchestrator treats the remediation inputs as authoritative and this token as a cross-check.
 
 Validate each review artifact immediately after writing it with `mcp__drm-copilot__validate_orchestration_artifacts`, passing `artifact_path` set to that artifact: use `artifact_type: "policy-audit"` for `policy-audit.<timestamp>.md`, `artifact_type: "code-review"` for `code-review.<timestamp>.md`, and `artifact_type: "feature-audit"` for `feature-audit.<timestamp>.md`. When the validator reports a failure, fix the artifact in the same review and validate it again. Report an artifact path only after its validation passes.

@@ -3,7 +3,7 @@
     Bash command-line segment scanner shared by the Claude and Codex enforcement hooks.
 .DESCRIPTION
     Realizes Piece 1 and Piece 2 of the D2 behavior contract in
-    docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
+    .dev/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
 
     A single left-to-right scan of a raw Bash command line produces an ordered list of
     segment records. Each record carries the segment's raw text, a masked text in which

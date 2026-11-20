@@ -110,7 +110,7 @@ Describe 'PreToolUse deny-schema contract (all 16 hooks)' {
         Mock -CommandName Get-FeatureFolderFileExistence -MockWith { param([string]$Path) $false }
         $toolInput = @{
             tool_name  = 'Write'
-            tool_input = @{ file_path = 'docs/features/active/2026-01-01-example-1/plan.md' }
+            tool_input = @{ file_path = '.dev/active/2026-01-01-example-1/plan.md' }
         } | ConvertTo-Json -Compress -Depth 5
         $decision = Invoke-FeatureFolderOrderDecision -ToolInputRaw $toolInput
         $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'FEATURE_FOLDER_ORDER_BLOCKED'

@@ -47,16 +47,16 @@ Describe 'Gather functions' {
     }
 
     It 'reads a remediation plan named by cycles plan_path from the worktree' {
-        $checkpoint = ConvertFrom-Json -InputObject '{"feature-folder":"docs/features/active/x","remediation_loop":{"cycles":[{"plan_path":"docs/features/active/x/remediation-plan.md"}]}}'
+        $checkpoint = ConvertFrom-Json -InputObject '{"feature-folder":".dev/active/x","remediation_loop":{"cycles":[{"plan_path":".dev/active/x/remediation-plan.md"}]}}'
         $script:files[(Join-Path -Path $script:worktree -ChildPath 'docs/x/plan.md')] = "- [x] [P0-T1] a."
-        $script:files[(Join-Path -Path $script:worktree -ChildPath 'docs/features/active/x/remediation-plan.md')] = "- [ ] [P0-T1] fix."
-        $script:files[(Join-Path -Path $script:worktree -ChildPath 'docs/features/active/x/spec.md')] = '# spec'
+        $script:files[(Join-Path -Path $script:worktree -ChildPath '.dev/active/x/remediation-plan.md')] = "- [ ] [P0-T1] fix."
+        $script:files[(Join-Path -Path $script:worktree -ChildPath '.dev/active/x/spec.md')] = '# spec'
 
         $item = Get-EpicProgressItemInput -Issue '12' -PlanPath 'docs/x/plan.md' -WorktreePath $script:worktree -IntegrationBranch $script:integration -Checkpoint $checkpoint
 
         $item.PlanText | Should -Be '- [x] [P0-T1] a.'
         $item.PlanFile | Should -Be 'plan.md'
-        $item.CycleText['docs/features/active/x/remediation-plan.md'] | Should -Be '- [ ] [P0-T1] fix.'
+        $item.CycleText['.dev/active/x/remediation-plan.md'] | Should -Be '- [ ] [P0-T1] fix.'
         $item.SpecExists | Should -BeTrue
         $item.PreparedPlan | Should -BeFalse
         $item.MergeStatus | Should -Be 'not_started'
@@ -153,8 +153,8 @@ Describe 'Gather functions' {
     }
 
     It 'returns the checkpoint cap, depends_on rows and folder basename of the epic checkpoint' {
-        $checkpoint = ConvertFrom-Json -InputObject '{"feature-folder":"docs/features/active/2026-01-01-alpha-12"}'
-        $epicRow = ConvertFrom-Json -InputObject '{"issue_num":12,"feature_folder":"docs/features/completed/2026-01-01-alpha-12","depends_on":[]}'
+        $checkpoint = ConvertFrom-Json -InputObject '{"feature-folder":".dev/active/2026-01-01-alpha-12"}'
+        $epicRow = ConvertFrom-Json -InputObject '{"issue_num":12,"feature_folder":".dev/completed/2026-01-01-alpha-12","depends_on":[]}'
         $epic = ConvertFrom-Json -InputObject '{"max_parallel_features":3,"features":[{"issue_num":12,"depends_on":[]},{"issue_num":900}]}'
         $item = [pscustomobject]@{
             Issue = '12'; Wave = 1; Band = 'small'; Checkpoint = $checkpoint; EpicRow = $epicRow
@@ -214,7 +214,7 @@ Describe 'Gather functions' {
 
     Context 'manifest and routing-config reads (issue #1153, E5)' {
         BeforeAll {
-            $script:manifestPath = 'docs/features/epics/example-epic/epic.md'
+            $script:manifestPath = '.dev/epics/example-epic/epic.md'
             $script:manifestKey = "$($script:integration):$($script:manifestPath)"
             $script:inlineManifest = @(
                 '---', 'epic: example-epic', '# Manifest DAG.', 'features:',

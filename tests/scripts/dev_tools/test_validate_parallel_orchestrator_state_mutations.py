@@ -107,9 +107,9 @@ def build_state(**overrides: object) -> dict[str, object]:
         "last_updated": "2026-08-08T09-00",
         "route_id": "parallel",
         "parallel_slug": "wave-four",
-        "parallel_manifest_path": "docs/features/parallel/wave-four/parallel.md",
+        "parallel_manifest_path": ".dev/parallel/wave-four/parallel.md",
         "parallel_status_doc_path": (
-            "docs/features/parallel/wave-four/parallel-status.md"
+            ".dev/parallel/wave-four/parallel-status.md"
         ),
         "mode": "closed",
         "max_concurrency": 4,

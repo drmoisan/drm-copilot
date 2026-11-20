@@ -1,6 +1,6 @@
 """Documentation contracts for the legacy discovery and parity capability (issue #980).
 
-The engineering documentation under ``docs/engineering/legacy-discovery-and-parity``
+The engineering documentation under ``.dev/engineering/legacy-discovery-and-parity``
 must let a consumer install and operate the capability without a checkout of this
 repository. These tests pin the page set, resolvable links, the facts the pages assert
 against their sources of truth (console scripts, MCP tools, VS Code commands, schema
@@ -111,7 +111,7 @@ LINK = re.compile(r"\]\(([^)#\s]+)(#[^)]*)?\)")
 MERMAID = re.compile(r"```mermaid\n(.*?)\n```", re.DOTALL)
 SKILL_LINKAGE = (
     "completion_gates.planning_prerequisite",
-    "docs/engineering/legacy-discovery-and-parity/enforcement.md",
+    ".dev/engineering/legacy-discovery-and-parity/enforcement.md",
 )
 
 
@@ -405,10 +405,10 @@ def test_no_checkout_is_required() -> None:
 def test_architecture_document_links_the_planning_prerequisite() -> None:
     """The Claude architecture document describes the discovery controls."""
 
-    text = read("docs/engineering/claude-code-architecture.md")
+    text = read(".dev/engineering/claude-code-architecture.md")
     assert "enforce-discovery-planning-gate.ps1" in text
     assert "completion_gates.planning_prerequisite" in text
-    assert "docs/engineering/legacy-discovery-and-parity/enforcement.md" in text
+    assert ".dev/engineering/legacy-discovery-and-parity/enforcement.md" in text
 
 
 @pytest.mark.parametrize(

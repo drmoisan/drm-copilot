@@ -48,7 +48,7 @@ $CheckpointLiterals = @(
     'artifacts/orchestration/csharp-orchestrator-state.json'
 )
 
-$DocumentationArtifact = 'docs/features/active/2026-08-23-synthetic-feature-516/evidence/other/example.json'
+$DocumentationArtifact = '.dev/active/2026-08-23-synthetic-feature-516/evidence/other/example.json'
 
 $CheckpointAllowCases = @(
     foreach ($literal in $CheckpointLiterals) {
@@ -148,7 +148,7 @@ Describe 'codex enforce-orchestration-preimplementation-gate.ps1 absolute-path c
 
             return @{
                 'issue-num'      = '516'
-                'feature-folder' = 'docs/features/active/2026-08-23-synthetic-feature-516'
+                'feature-folder' = '.dev/active/2026-08-23-synthetic-feature-516'
                 route_id         = ''
                 lifecycle_ready  = $false
             } | ConvertTo-Json -Compress

@@ -3,7 +3,7 @@
   "substitutions": [
     {
       "file": "SKILL.md",
-      "find": "Research output is not an `artifacts/` sub-path. Use `docs/features/<feature>/research/` for feature-associated research or `docs/research/` for one-off research.\n\n",
+      "find": "Research output is not an `artifacts/` sub-path. Use `.dev/<feature>/research/` for feature-associated research or `.dev/research/` for one-off research.\n\n",
       "replace": ""
     },
     {

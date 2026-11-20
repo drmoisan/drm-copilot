@@ -4,12 +4,12 @@
     {
       "file": "SKILL.md",
       "find": "description: Investigate the best implementation approach for a feature or bug by analyzing the codebase and external references, then writing structured findings to the applicable tracked research folder.\n",
-      "replace": "description: Investigate the best implementation approach for a feature or bug by analyzing the codebase and external references, then writing structured findings to the resolved research path under docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off).\nallowed-tools:\n  - Read\n  - Grep\n  - Glob\n  - WebFetch\n"
+      "replace": "description: Investigate the best implementation approach for a feature or bug by analyzing the codebase and external references, then writing structured findings to the resolved research path under .dev/<feature>/research/ (feature-associated) or .dev/research/ (one-off).\nallowed-tools:\n  - Read\n  - Grep\n  - Glob\n  - WebFetch\n"
     },
     {
       "file": "SKILL.md",
-      "find": "Create or update a single research file in the applicable tracked research root:\n\n- Feature-associated path: `docs/features/<feature>/research/<timestamp>-<short-name>-research.md`\n- One-off path: `docs/research/<timestamp>-<short-name>-research.md`\n",
-      "replace": "Create or update a single research file at one of the two tracked research roots:\n\n- Feature-associated research: `docs/features/<feature>/research/<timestamp>-<short-name>-research.md` (for example `docs/features/active/<feature>/research/<timestamp>-<short-name>-research.md`).\n- One-off research not tied to a feature: `docs/research/<timestamp>-<short-name>-research.md`.\n- Routing rule: write to the feature research root when an active feature folder is in scope (the orchestrator supplies the resolved path from `feature-folder` in `orchestrator-state.json`); otherwise write to `docs/research/`. The filename convention `<timestamp>-<short-name>-research.md` is unchanged.\n"
+      "find": "Create or update a single research file in the applicable tracked research root:\n\n- Feature-associated path: `.dev/<feature>/research/<timestamp>-<short-name>-research.md`\n- One-off path: `.dev/research/<timestamp>-<short-name>-research.md`\n",
+      "replace": "Create or update a single research file at one of the two tracked research roots:\n\n- Feature-associated research: `.dev/<feature>/research/<timestamp>-<short-name>-research.md` (for example `.dev/active/<feature>/research/<timestamp>-<short-name>-research.md`).\n- One-off research not tied to a feature: `.dev/research/<timestamp>-<short-name>-research.md`.\n- Routing rule: write to the feature research root when an active feature folder is in scope (the orchestrator supplies the resolved path from `feature-folder` in `orchestrator-state.json`); otherwise write to `.dev/research/`. The filename convention `<timestamp>-<short-name>-research.md` is unchanged.\n"
     },
     {
       "file": "SKILL.md",

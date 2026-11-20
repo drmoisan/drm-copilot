@@ -15,12 +15,12 @@ function buildValidState(): Record<string, unknown> {
     path_selected: "large",
     "promotion-type": "feature",
     "short-name": "short",
-    relativeFile: "docs/features/potential/x.md",
+    relativeFile: ".dev/potential/x.md",
     "long-name": "feature-1",
     "issue-num": "1",
-    "feature-folder": "docs/features/active/feature-1",
+    "feature-folder": ".dev/active/feature-1",
     "work-mode": "full-feature",
-    "plan-path": "docs/features/active/feature-1/plan.md",
+    "plan-path": ".dev/active/feature-1/plan.md",
     completed_steps: [],
     next_step: "done",
     last_updated: "2026-07-04T10:00:00-04:00",
@@ -39,7 +39,7 @@ function buildValidState(): Record<string, unknown> {
         started_at: "2026-07-04T09:00:00-04:00",
         completed_at: "2026-07-04T09:05:00-04:00",
         result_signal: "PREFLIGHT: ALL CLEAR",
-        artifact_paths: ["docs/features/active/feature-1/plan.md"],
+        artifact_paths: [".dev/active/feature-1/plan.md"],
       },
     ],
     blocked_reason: "none",
@@ -71,7 +71,7 @@ describe("validateOrchestratorStateText model-routing existence check", () => {
       started_at: "2026-07-04T09:10:00-04:00",
       completed_at: "2026-07-04T09:15:00-04:00",
       result_signal: "DONE",
-      artifact_paths: ["docs/features/active/feature-1/evidence/x.md"],
+      artifact_paths: [".dev/active/feature-1/evidence/x.md"],
     });
     state["model_routing_receipts"] = [receipt("atomic-planner")];
 

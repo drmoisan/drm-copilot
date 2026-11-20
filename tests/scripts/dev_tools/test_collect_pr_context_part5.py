@@ -163,7 +163,7 @@ def test_collector_reports_unparseable_evidence_without_claiming_completion(
                 excerpt="Feature doc excerpt",
                 issue_refs=[],
                 context_files=[
-                    "docs/features/active/2025-12-18-docs-v3-upgrade/evidence/qa-gates/unparseable.2026-02-22T21-00.md",
+                    ".dev/active/2025-12-18-docs-v3-upgrade/evidence/qa-gates/unparseable.2026-02-22T21-00.md",
                 ],
             )
         ]
@@ -349,7 +349,7 @@ def test_non_pass_readiness_fallback(
                 feature="test",
                 excerpt="Feature doc excerpt",
                 issue_refs=[],
-                context_files=["docs/features/active/test/spec.md"],
+                context_files=[".dev/active/test/spec.md"],
                 primary_issue_ref="#46",
                 readiness_signal="NEEDS REVISION",
             )

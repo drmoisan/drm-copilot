@@ -92,7 +92,7 @@ function Resolve-EpicProgressSetting {
     $branch = $IntegrationBranch
     if ([string]::IsNullOrWhiteSpace($branch)) { $branch = "origin/epic/$EpicFolder-integration" }
     $kickoff = $KickoffPath
-    if ([string]::IsNullOrWhiteSpace($kickoff)) { $kickoff = "docs/features/epics/$EpicFolder/epic-kickoff.md" }
+    if ([string]::IsNullOrWhiteSpace($kickoff)) { $kickoff = ".dev/epics/$EpicFolder/epic-kickoff.md" }
     $checkpoint = $CheckpointPath
     if ([string]::IsNullOrWhiteSpace($checkpoint)) {
         $checkpoint = Join-Path -Path $root -ChildPath 'artifacts' -AdditionalChildPath 'orchestration', 'epic-orchestrator-state.json'

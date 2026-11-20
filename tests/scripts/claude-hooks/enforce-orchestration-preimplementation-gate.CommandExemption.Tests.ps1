@@ -10,7 +10,7 @@
 # checkpoint: no disk I/O, no child process, and no temporary file.
 #
 # The normative contract is the D4 fail-closed rule table in
-# docs/features/active/2026-08-24-preimplementation-gate-blocks-planner-integration-commits-539/spec.md.
+# .dev/active/2026-08-24-preimplementation-gate-blocks-planner-integration-commits-539/spec.md.
 
 Describe 'enforce-orchestration-preimplementation-gate.ps1 command exemption (issue #539)' {
     BeforeAll {
@@ -74,31 +74,31 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 command exemption (is
     Context 'issue #539 orchestration-tree staging exemption allow cases' {
         It 'allows staging an epic document under the epics tree' {
             # Arrange
-            $command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md'
+            $command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md'
 
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $command
 
             # Assert
             $decision.hookSpecificOutput.permissionDecision |
-                Should -Be 'allow' -Because 'every operand resolves inside docs/features/epics/'
+                Should -Be 'allow' -Because 'every operand resolves inside .dev/epics/'
         }
 
         It 'allows staging a parallel manifest and its kickoff in one two-operand invocation' {
             # Arrange
-            $command = 'git add docs/features/parallel/2026-08-24-sample-run/parallel.md docs/features/parallel/2026-08-24-sample-run/parallel-kickoff.md'
+            $command = 'git add .dev/parallel/2026-08-24-sample-run/parallel.md .dev/parallel/2026-08-24-sample-run/parallel-kickoff.md'
 
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $command
 
             # Assert
             $decision.hookSpecificOutput.permissionDecision |
-                Should -Be 'allow' -Because 'both operands resolve inside docs/features/parallel/'
+                Should -Be 'allow' -Because 'both operands resolve inside .dev/parallel/'
         }
 
         It 'allows a quoted operand under the active feature tree' {
             # Arrange
-            $command = 'git add "docs/features/active/2026-08-24-sample-feature-539/plan.md"'
+            $command = 'git add ".dev/active/2026-08-24-sample-feature-539/plan.md"'
 
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $command
@@ -134,7 +134,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 command exemption (is
 
         It 'allows the pathspec-bearing integration form with a message option and a double-dash separator' {
             # Arrange
-            $command = 'git commit -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md'
+            $command = 'git commit -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md'
 
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $command
@@ -146,7 +146,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 command exemption (is
 
         It 'allows a chained two-segment line whose every segment is independently exempt' {
             # Arrange
-            $command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md && git commit -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md'
+            $command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md && git commit -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md'
 
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $command
@@ -158,14 +158,14 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 command exemption (is
 
         It 'allows staging a lifecycle record under the potential feature tree' {
             # Arrange
-            $command = 'git add docs/features/potential/2026-08-24-sample-candidate.md'
+            $command = 'git add .dev/potential/2026-08-24-sample-candidate.md'
 
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $command
 
             # Assert
             $decision.hookSpecificOutput.permissionDecision |
-                Should -Be 'allow' -Because 'docs/features/potential/ is in the five-tree exempt set'
+                Should -Be 'allow' -Because '.dev/potential/ is in the five-tree exempt set'
         }
     }
 
@@ -174,10 +174,10 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 command exemption (is
         # invariant (D4 row 19) denies each pairing, and the deny reason must keep the
         # prefix and both phrases the pre-existing suite already asserts.
         It 'denies an exempt operand paired with a <Extension> production operand' -ForEach @(
-            @{ Extension = '.ps1'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md scripts/powershell/Sample.ps1' }
-            @{ Extension = '.py'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md scripts/dev_tools/sample_module.py' }
-            @{ Extension = '.ts'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md extensions/drm-copilot/src/lib/sample.ts' }
-            @{ Extension = '.cs'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md src/TaskMaster.Domain/Sample.cs' }
+            @{ Extension = '.ps1'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md scripts/powershell/Sample.ps1' }
+            @{ Extension = '.py'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md scripts/dev_tools/sample_module.py' }
+            @{ Extension = '.ts'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md extensions/drm-copilot/src/lib/sample.ts' }
+            @{ Extension = '.cs'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md src/TaskMaster.Domain/Sample.cs' }
         ) {
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $Command
@@ -200,48 +200,48 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 command exemption (is
             @{ Label = 'D4 row 1 - bare staging with zero operands'; Command = 'git add' }
             @{ Label = 'D4 row 2a - the tree-wide short all flag'; Command = 'git add -A' }
             @{ Label = 'D4 row 2b - the tree-wide long all flag'; Command = 'git add --all' }
-            @{ Label = 'D4 row 2c - the update short flag with an exempt operand'; Command = 'git add -u docs/features/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 2c - the update short flag with an exempt operand'; Command = 'git add -u .dev/epics/2026-08-24-sample-epic/epic.md' }
             @{ Label = 'D4 row 2d - the update long flag'; Command = 'git add --update' }
-            @{ Label = 'D4 row 2e - the no-all flag with an exempt operand'; Command = 'git add --no-all docs/features/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 2e - the no-all flag with an exempt operand'; Command = 'git add --no-all .dev/epics/2026-08-24-sample-epic/epic.md' }
             @{ Label = 'D4 row 3a - the dot whole-tree operand'; Command = 'git add .' }
             @{ Label = 'D4 row 3b - the colon-slash whole-tree operand'; Command = 'git add :/' }
             @{ Label = 'D4 row 4 - a pathless message-only integration invocation'; Command = 'git commit -m "epic scaffold"' }
-            @{ Label = 'D4 row 5a - the content-widening short all option'; Command = 'git commit -a -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 5b - the content-widening long all option'; Command = 'git commit --all -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 5c - the include short option'; Command = 'git commit -i -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 5d - the include long option'; Command = 'git commit --include -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 5e - the interactive long option'; Command = 'git commit --interactive -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 5f - the patch short option'; Command = 'git commit -p -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 5g - the history-rewriting amend option'; Command = 'git commit --amend -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5a - the content-widening short all option'; Command = 'git commit -a -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5b - the content-widening long all option'; Command = 'git commit --all -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5c - the include short option'; Command = 'git commit -i -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5d - the include long option'; Command = 'git commit --include -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5e - the interactive long option'; Command = 'git commit --interactive -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5f - the patch short option'; Command = 'git commit -p -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 5g - the history-rewriting amend option'; Command = 'git commit --amend -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
             @{ Label = 'D4 row 6a - pathspecs supplied from a file'; Command = 'git add --pathspec-from-file=stage-list.txt' }
             @{ Label = 'D4 row 6b - the nul-delimited pathspec file option'; Command = 'git add --pathspec-file-nul --pathspec-from-file=stage-list.txt' }
             @{ Label = 'D4 row 7 - a double-dash separator with nothing after it'; Command = 'git add --' }
-            @{ Label = 'D4 row 8 - an unmodeled dash-leading option before the separator'; Command = 'git add --sparse docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 9a - the exclude pathspec magic operand'; Command = 'git add ":(exclude)scripts/" docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 9b - the bang shorthand exclude operand'; Command = 'git add :!scripts/ docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 9c - the top pathspec magic operand'; Command = 'git add ":(top)docs/features/epics/2026-08-24-sample-epic/epic.md"' }
-            @{ Label = 'D4 row 9d - the glob pathspec magic operand'; Command = 'git add ":(glob)docs/features/epics/2026-08-24-sample-epic/epic.md"' }
-            @{ Label = 'D4 row 9e - the icase pathspec magic operand'; Command = 'git add ":(icase)docs/features/epics/2026-08-24-sample-epic/epic.md"' }
+            @{ Label = 'D4 row 8 - an unmodeled dash-leading option before the separator'; Command = 'git add --sparse .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 9a - the exclude pathspec magic operand'; Command = 'git add ":(exclude)scripts/" .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 9b - the bang shorthand exclude operand'; Command = 'git add :!scripts/ .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 9c - the top pathspec magic operand'; Command = 'git add ":(top).dev/epics/2026-08-24-sample-epic/epic.md"' }
+            @{ Label = 'D4 row 9d - the glob pathspec magic operand'; Command = 'git add ":(glob).dev/epics/2026-08-24-sample-epic/epic.md"' }
+            @{ Label = 'D4 row 9e - the icase pathspec magic operand'; Command = 'git add ":(icase).dev/epics/2026-08-24-sample-epic/epic.md"' }
             @{ Label = 'D4 row 10 - a leading-dash operand with no preceding separator'; Command = 'git add -docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 11 - an unbalanced quote around an exempt operand'; Command = 'git add "docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 12a - a dollar-sign interpolation inside an operand'; Command = 'git add docs/features/epics/$slug/epic.md' }
-            @{ Label = 'D4 row 12b - a backtick substitution inside an operand'; Command = 'git add docs/features/epics/`whoami`/epic.md' }
-            @{ Label = 'D4 row 12c - an output redirection in the segment'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md > staged.txt' }
-            @{ Label = 'D4 row 12d - an input redirection in the segment'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md < stage-list.txt' }
-            @{ Label = 'D4 row 13a - a chained line whose second segment is not exempt'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md && poetry run pytest' }
-            @{ Label = 'D4 row 13b - unsplittable text whose quote spans the chain operator'; Command = 'git add "docs/features/epics/2026-08-24-sample-epic/epic.md && git commit -m ok' }
-            @{ Label = 'D4 row 14a - an environment-style prefix relocating the pathspec base'; Command = 'GIT_DIR=../other/.git git add docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 14b - a directory-relocating option before the subcommand'; Command = 'git -C ../other add docs/features/epics/2026-08-24-sample-epic/epic.md && git add docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 14c - a git-dir option before the subcommand'; Command = 'git --git-dir=../other/.git commit -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md && git add docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 14d - a work-tree option before the subcommand'; Command = 'git --work-tree=../other add docs/features/epics/2026-08-24-sample-epic/epic.md && git commit -m "epic scaffold" -- docs/features/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 15a - a glob whose literal prefix stops above the exempt trees'; Command = 'git add docs/features/*' }
+            @{ Label = 'D4 row 11 - an unbalanced quote around an exempt operand'; Command = 'git add ".dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 12a - a dollar-sign interpolation inside an operand'; Command = 'git add .dev/epics/$slug/epic.md' }
+            @{ Label = 'D4 row 12b - a backtick substitution inside an operand'; Command = 'git add .dev/epics/`whoami`/epic.md' }
+            @{ Label = 'D4 row 12c - an output redirection in the segment'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md > staged.txt' }
+            @{ Label = 'D4 row 12d - an input redirection in the segment'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md < stage-list.txt' }
+            @{ Label = 'D4 row 13a - a chained line whose second segment is not exempt'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md && poetry run pytest' }
+            @{ Label = 'D4 row 13b - unsplittable text whose quote spans the chain operator'; Command = 'git add ".dev/epics/2026-08-24-sample-epic/epic.md && git commit -m ok' }
+            @{ Label = 'D4 row 14a - an environment-style prefix relocating the pathspec base'; Command = 'GIT_DIR=../other/.git git add .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 14b - a directory-relocating option before the subcommand'; Command = 'git -C ../other add .dev/epics/2026-08-24-sample-epic/epic.md && git add .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 14c - a git-dir option before the subcommand'; Command = 'git --git-dir=../other/.git commit -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md && git add .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 14d - a work-tree option before the subcommand'; Command = 'git --work-tree=../other add .dev/epics/2026-08-24-sample-epic/epic.md && git commit -m "epic scaffold" -- .dev/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 15a - a glob whose literal prefix stops above the exempt trees'; Command = 'git add .dev/*' }
             @{ Label = 'D4 row 15b - a glob whose wildcard occupies an ancestor segment'; Command = 'git add docs/*/epics/2026-08-24-sample-epic/epic.md' }
-            @{ Label = 'D4 row 15c - a glob carrying a parent-directory segment'; Command = 'git add docs/features/epics/../*.md' }
-            @{ Label = 'D4 row 16a - an absolute operand in the leading-slash spelling'; Command = 'git add /docs/features/epics/2026-08-24-sample-epic/epic.md' }
+            @{ Label = 'D4 row 15c - a glob carrying a parent-directory segment'; Command = 'git add .dev/epics/../*.md' }
+            @{ Label = 'D4 row 16a - an absolute operand in the leading-slash spelling'; Command = 'git add /.dev/epics/2026-08-24-sample-epic/epic.md' }
             @{ Label = 'D4 row 16b - an absolute operand in the drive-letter spelling'; Command = 'git add C:\docs\features\epics\2026-08-24-sample-epic\epic.md' }
             @{ Label = 'D4 row 16c - an absolute operand in the UNC spelling'; Command = 'git add \\server\share\docs\features\epics\2026-08-24-sample-epic\epic.md' }
-            @{ Label = 'D4 row 17 - a parent-directory segment inside an otherwise exempt operand'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/../2026-08-24-other-epic/epic.md' }
-            @{ Label = 'D4 row 19 - a mixed operand set of one exempt and one production path'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic.md scripts/powershell/Sample.ps1' }
+            @{ Label = 'D4 row 17 - a parent-directory segment inside an otherwise exempt operand'; Command = 'git add .dev/epics/2026-08-24-sample-epic/../2026-08-24-other-epic/epic.md' }
+            @{ Label = 'D4 row 19 - a mixed operand set of one exempt and one production path'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic.md scripts/powershell/Sample.ps1' }
         ) {
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $Command
@@ -270,8 +270,8 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1 command exemption (is
             # deny direction is preserved wherever the heredoc feeds a wrapper; the
             # sibling case below pins that.
             $command = @'
-cat <<'NOTE' > docs/features/epics/2026-08-24-sample-epic/notes.md
-Run git add docs/features/epics/2026-08-24-sample-epic/epic.md once the scaffold lands.
+cat <<'NOTE' > .dev/epics/2026-08-24-sample-epic/notes.md
+Run git add .dev/epics/2026-08-24-sample-epic/epic.md once the scaffold lands.
 NOTE
 '@
 
@@ -291,7 +291,7 @@ NOTE
             # the staging command it carries is genuinely executed.
             $command = @'
 bash <<'NOTE'
-git add docs/features/epics/2026-08-24-sample-epic/epic.md
+git add .dev/epics/2026-08-24-sample-epic/epic.md
 NOTE
 '@
 
@@ -310,12 +310,12 @@ NOTE
         # the command name and the subcommand. The selector is absent from D4 rows 1-13
         # and 15-19, so every other constraint still applies to the operands.
         It 'allows <Label>' -ForEach @(
-            @{ Label = 'issue #671 LACS allow 1 - drive-letter absolute selector on the add subcommand'; Command = 'git -C C:/repo/wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS allow 2 - POSIX-rooted absolute selector on the add subcommand'; Command = 'git -C /repo/wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS allow 4 - absolute selector on the message-bearing commit form'; Command = 'git -C C:/repo/wt commit -m "epic scaffold" -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS allow 5 - chained add and commit segments each carrying the same absolute selector'; Command = 'git -C C:/repo/wt add -- docs/features/active/x/spec.md && git -C C:/repo/wt commit -m "epic scaffold" -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS allow 6 - absolute selector naming a sibling item worktree root'; Command = 'git -C C:/repo/wt-sibling add -- docs/features/active/y/spec.md' }
-            @{ Label = 'issue #671 LACS allow 7 - absolute selector naming a directory outside every worktree'; Command = 'git -C C:/elsewhere add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 1 - drive-letter absolute selector on the add subcommand'; Command = 'git -C C:/repo/wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 2 - POSIX-rooted absolute selector on the add subcommand'; Command = 'git -C /repo/wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 4 - absolute selector on the message-bearing commit form'; Command = 'git -C C:/repo/wt commit -m "epic scaffold" -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 5 - chained add and commit segments each carrying the same absolute selector'; Command = 'git -C C:/repo/wt add -- .dev/active/x/spec.md && git -C C:/repo/wt commit -m "epic scaffold" -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 6 - absolute selector naming a sibling item worktree root'; Command = 'git -C C:/repo/wt-sibling add -- .dev/active/y/spec.md' }
+            @{ Label = 'issue #671 LACS allow 7 - absolute selector naming a directory outside every worktree'; Command = 'git -C C:/elsewhere add -- .dev/active/x/spec.md' }
         ) {
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $Command
@@ -330,25 +330,25 @@ NOTE
         # One deny row per LACS condition L1 through L8, plus the must-not-regress rows.
         # Only the decision is asserted; the Write-Debug diagnostic text is not contractual.
         It 'denies <Label>' -ForEach @(
-            @{ Label = 'issue #671 LACS L1a - attached selector spelling'; Command = 'git -CC:/repo/wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L1b - config-injection selector'; Command = 'git -c core.worktree=C:/repo/wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L2 - repeated selector'; Command = 'git -C C:/repo/wt -C C:/repo/other add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L3a - selector with no subcommand after the value'; Command = 'git -C C:/repo/wt && git add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L3b - subcommand not immediately after the selector value'; Command = 'git -C C:/repo/wt --no-pager add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L4a - bare relative selector'; Command = 'git -C subdir add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L4b - UNC selector'; Command = 'git -C //server/share/wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L5a - parent-directory segment in the selector'; Command = 'git -C C:/repo/wt/../other add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L5b - current-directory segment in the selector'; Command = 'git -C C:/repo/./wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L6 - wildcard in the selector'; Command = 'git -C C:/repo/wt-? add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L7 - stray colon in the selector'; Command = 'git -C C:/repo/wt:branch add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #732 LACS allow 3 reversed - backslash-spelled absolute selector'; Command = 'git -C C:\repo\wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L8 - empty selector value'; Command = 'git -C "" add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 selector followed by an unmodelled subcommand'; Command = 'git -C C:/repo/wt status && git add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L1a - attached selector spelling'; Command = 'git -CC:/repo/wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L1b - config-injection selector'; Command = 'git -c core.worktree=C:/repo/wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L2 - repeated selector'; Command = 'git -C C:/repo/wt -C C:/repo/other add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L3a - selector with no subcommand after the value'; Command = 'git -C C:/repo/wt && git add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L3b - subcommand not immediately after the selector value'; Command = 'git -C C:/repo/wt --no-pager add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L4a - bare relative selector'; Command = 'git -C subdir add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L4b - UNC selector'; Command = 'git -C //server/share/wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L5a - parent-directory segment in the selector'; Command = 'git -C C:/repo/wt/../other add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L5b - current-directory segment in the selector'; Command = 'git -C C:/repo/./wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L6 - wildcard in the selector'; Command = 'git -C C:/repo/wt-? add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L7 - stray colon in the selector'; Command = 'git -C C:/repo/wt:branch add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #732 LACS allow 3 reversed - backslash-spelled absolute selector'; Command = 'git -C C:\repo\wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L8 - empty selector value'; Command = 'git -C "" add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 selector followed by an unmodelled subcommand'; Command = 'git -C C:/repo/wt status && git add -- .dev/active/x/spec.md' }
             @{ Label = 'issue #671 selector with a non-exempt pathspec operand'; Command = 'git -C C:/repo/wt add -- scripts/powershell/Sample.ps1' }
             @{ Label = 'issue #671 selector with the tree-wide all flag'; Command = 'git -C C:/repo/wt add -A' }
             @{ Label = 'issue #671 selector with an absolute pathspec operand'; Command = 'git -C C:/repo/wt add -- C:/repo/wt/docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 selector with an output redirection'; Command = 'git -C C:/repo/wt add -- docs/features/active/x/spec.md > staged.txt' }
-            @{ Label = 'issue #671 cd chain into the target worktree'; Command = 'cd C:/repo/wt && git add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 selector with an output redirection'; Command = 'git -C C:/repo/wt add -- .dev/active/x/spec.md > staged.txt' }
+            @{ Label = 'issue #671 cd chain into the target worktree'; Command = 'cd C:/repo/wt && git add -- .dev/active/x/spec.md' }
         ) {
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $Command
@@ -364,7 +364,7 @@ NOTE
         # Remediation R1 (issue #671): an empty quoted token is an ordinary token to the
         # classifier. It is never an exempt operand, and after -m it is the message value.
         It 'allows <Label>' -ForEach @(
-            @{ Label = 'issue #671 empty commit message beside an exempt operand'; Command = 'git commit -m "" -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 empty commit message beside an exempt operand'; Command = 'git commit -m "" -- .dev/active/x/spec.md' }
         ) {
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $Command
@@ -395,8 +395,8 @@ NOTE
         # only that a non-option token follows the selector value; the caller rejects any
         # subcommand other than add or commit, which accept 3 pins.
         It 'accepts <Label>' -ForEach @(
-            @{ Label = 'issue #671 predicate accept 1 - drive-letter selector followed by add'; Token = @('git', '-C', 'C:/repo/wt', 'add', '--', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate accept 2 - rooted selector followed by commit'; Token = @('git', '-C', '/repo/wt', 'commit', '-m', 'msg', '--', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate accept 1 - drive-letter selector followed by add'; Token = @('git', '-C', 'C:/repo/wt', 'add', '--', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate accept 2 - rooted selector followed by commit'; Token = @('git', '-C', '/repo/wt', 'commit', '-m', 'msg', '--', '.dev/active/x/spec.md') }
             @{ Label = 'issue #671 predicate accept 3 - non-option token after the value is left to the caller'; Token = @('git', '-C', 'C:/repo/wt', 'status') }
         ) {
             # Act
@@ -408,17 +408,17 @@ NOTE
 
         It 'rejects <Label>' -ForEach @(
             @{ Label = 'issue #671 predicate L1a - single token segment'; Token = @('git') }
-            @{ Label = 'issue #671 predicate L1b - option other than the selector at index 1'; Token = @('git', '-c', 'core.worktree=C:/repo/wt', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L2 - repeated selector'; Token = @('git', '-C', 'C:/repo/wt', '-C', 'C:/repo/other', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L1b - option other than the selector at index 1'; Token = @('git', '-c', 'core.worktree=C:/repo/wt', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L2 - repeated selector'; Token = @('git', '-C', 'C:/repo/wt', '-C', 'C:/repo/other', 'add', '.dev/active/x/spec.md') }
             @{ Label = 'issue #671 predicate L3a - no token after the selector value'; Token = @('git', '-C', 'C:/repo/wt') }
-            @{ Label = 'issue #671 predicate L3b - option token after the selector value'; Token = @('git', '-C', 'C:/repo/wt', '--no-pager', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L4a - relative selector'; Token = @('git', '-C', 'subdir', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L4b - UNC selector'; Token = @('git', '-C', '//server/share/wt', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L5a - parent-directory segment'; Token = @('git', '-C', 'C:/repo/wt/../other', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L5b - current-directory segment'; Token = @('git', '-C', 'C:/repo/./wt', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L6 - wildcard'; Token = @('git', '-C', 'C:/repo/wt-?', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L7 - stray colon'; Token = @('git', '-C', 'C:/repo/wt:branch', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L8 - empty selector value'; Token = @('git', '-C', '', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L3b - option token after the selector value'; Token = @('git', '-C', 'C:/repo/wt', '--no-pager', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L4a - relative selector'; Token = @('git', '-C', 'subdir', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L4b - UNC selector'; Token = @('git', '-C', '//server/share/wt', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L5a - parent-directory segment'; Token = @('git', '-C', 'C:/repo/wt/../other', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L5b - current-directory segment'; Token = @('git', '-C', 'C:/repo/./wt', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L6 - wildcard'; Token = @('git', '-C', 'C:/repo/wt-?', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L7 - stray colon'; Token = @('git', '-C', 'C:/repo/wt:branch', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L8 - empty selector value'; Token = @('git', '-C', '', 'add', '.dev/active/x/spec.md') }
         ) {
             # Act
             $result = Test-ExemptOrchestrationSelector -Token $Token
@@ -432,7 +432,7 @@ NOTE
             Mock Test-ExemptOrchestrationSegmentToken { throw 'simulated segment classification failure' }
 
             # Act
-            $result = Test-ExemptOrchestrationStagingCommand -CommandText 'git add -- docs/features/active/x/spec.md'
+            $result = Test-ExemptOrchestrationStagingCommand -CommandText 'git add -- .dev/active/x/spec.md'
 
             # Assert
             $result | Should -BeFalse -Because 'an error while classifying a segment is a parse ambiguity and answers false'
@@ -446,8 +446,8 @@ NOTE
         # `$` and backtick stay unresolvable in any quote state, the single-quoted `'\''`
         # apostrophe idiom stays denied, and a pathless commit stays denied (D4 row 4).
         It 'issue #663 exempts <Label>' -ForEach @(
-            @{ Label = 'a double-quoted message carrying a Co-Authored-By trailer and an apostrophe'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic-status.md && git commit -m "docs(epic): refresh status, it''s current. Co-Authored-By: Claude <noreply@anthropic.com>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
-            @{ Label = 'a single-quoted message carrying angle brackets'; Command = 'git commit -m ''Co-Authored-By: Claude <noreply@anthropic.com>'' -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a double-quoted message carrying a Co-Authored-By trailer and an apostrophe'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic-status.md && git commit -m "docs(epic): refresh status, it''s current. Co-Authored-By: Claude <noreply@anthropic.com>" -- .dev/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a single-quoted message carrying angle brackets'; Command = 'git commit -m ''Co-Authored-By: Claude <noreply@anthropic.com>'' -- .dev/epics/2026-08-24-sample-epic/epic-status.md' }
         ) {
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $Command
@@ -458,12 +458,12 @@ NOTE
         }
 
         It 'issue #663 denies <Label>' -ForEach @(
-            @{ Label = 'the single-quoted apostrophe idiom'; Command = 'git commit -m ''it''\''''s done <noreply@anthropic.com>'' -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
-            @{ Label = 'a command substitution inside a double-quoted message'; Command = 'git commit -m "status $(date) <a@b.c>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
-            @{ Label = 'a variable expansion inside a double-quoted message'; Command = 'git commit -m "status $USER <a@b.c>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
-            @{ Label = 'a backtick substitution inside a double-quoted message'; Command = 'git commit -m "status `whoami` <a@b.c>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'the single-quoted apostrophe idiom'; Command = 'git commit -m ''it''\''''s done <noreply@anthropic.com>'' -- .dev/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a command substitution inside a double-quoted message'; Command = 'git commit -m "status $(date) <a@b.c>" -- .dev/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a variable expansion inside a double-quoted message'; Command = 'git commit -m "status $USER <a@b.c>" -- .dev/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a backtick substitution inside a double-quoted message'; Command = 'git commit -m "status `whoami` <a@b.c>" -- .dev/epics/2026-08-24-sample-epic/epic-status.md' }
             @{ Label = 'a pathless commit whose message carries angle brackets'; Command = 'git commit -m "Co-Authored-By: Claude <noreply@anthropic.com>"' }
-            @{ Label = 'an unquoted output redirection after a quoted message carrying angle brackets'; Command = 'git commit -m ''Co-Authored-By: Claude <noreply@anthropic.com>'' -- docs/features/epics/2026-08-24-sample-epic/epic-status.md > out.txt' }
+            @{ Label = 'an unquoted output redirection after a quoted message carrying angle brackets'; Command = 'git commit -m ''Co-Authored-By: Claude <noreply@anthropic.com>'' -- .dev/epics/2026-08-24-sample-epic/epic-status.md > out.txt' }
         ) {
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $Command
@@ -479,12 +479,12 @@ NOTE
         # Backslash escapes are not modelled: a backslash before any quote character, or anywhere
         # inside a double-quoted span, can move a span boundary the scan cannot see (fail closed).
         It 'issue #663 remediation denies <Label>' -ForEach @(
-            @{ Label = 'an escaped double quote hiding an output redirection (CR-1)'; Command = 'git add docs/features/active/x/a.md && git commit -m "a\"" > src/prod.ts "\"" docs/features/active/x/a.md' }
-            @{ Label = 'an escaped double quote hiding an output redirection after a semicolon (CR-1)'; Command = 'git add docs/features/active/x/a.md ; git commit -m "a\"" > src/prod.ts "\"" docs/features/active/x/a.md' }
-            @{ Label = 'an escaped double quote hiding chain operators (CR-3)'; Command = 'git commit -m "x\"" ; touch src/prod.ts ; "\"" -- docs/features/active/x/a.md' }
-            @{ Label = 'an unquoted escaped double quote opening a scan-only span'; Command = 'git commit -m x\" > src/prod.ts \" -- docs/features/active/x/a.md' }
-            @{ Label = 'an unquoted escaped single quote opening a scan-only span'; Command = 'git commit -m x\'' > src/prod.ts \'' -- docs/features/active/x/a.md' }
-            @{ Label = 'a backslash inside a double-quoted message'; Command = 'git commit -m "path a\b" -- docs/features/active/x/a.md' }
+            @{ Label = 'an escaped double quote hiding an output redirection (CR-1)'; Command = 'git add .dev/active/x/a.md && git commit -m "a\"" > src/prod.ts "\"" .dev/active/x/a.md' }
+            @{ Label = 'an escaped double quote hiding an output redirection after a semicolon (CR-1)'; Command = 'git add .dev/active/x/a.md ; git commit -m "a\"" > src/prod.ts "\"" .dev/active/x/a.md' }
+            @{ Label = 'an escaped double quote hiding chain operators (CR-3)'; Command = 'git commit -m "x\"" ; touch src/prod.ts ; "\"" -- .dev/active/x/a.md' }
+            @{ Label = 'an unquoted escaped double quote opening a scan-only span'; Command = 'git commit -m x\" > src/prod.ts \" -- .dev/active/x/a.md' }
+            @{ Label = 'an unquoted escaped single quote opening a scan-only span'; Command = 'git commit -m x\'' > src/prod.ts \'' -- .dev/active/x/a.md' }
+            @{ Label = 'a backslash inside a double-quoted message'; Command = 'git commit -m "path a\b" -- .dev/active/x/a.md' }
         ) {
             # Act
             $decision = Get-ExemptionDecisionForCommand -Command $Command

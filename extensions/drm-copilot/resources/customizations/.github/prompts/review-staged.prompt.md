@@ -13,7 +13,7 @@ Do not ask clarifying questions. Make best-effort inferences, document assumptio
 
 ## Output Format
 
-Write outputs to the **active feature folder** determined by the agent. If no active feature folder can be inferred, use the agent’s fallback (e.g., `docs/features/active/_staged-review/`).
+Write outputs to the **active feature folder** determined by the agent. If no active feature folder can be inferred, use the agent’s fallback (e.g., `.dev/active/_staged-review/`).
 
 ### Required deliverables
 
