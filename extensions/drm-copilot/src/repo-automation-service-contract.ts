@@ -1,4 +1,8 @@
 import { type RepoAutomationToolName } from "./repo-automation-tool-names";
+import type {
+  MigrateDevelopmentDocsInput,
+  MigrateDevelopmentDocsResult,
+} from "./lib/development-docs-migration/migrate-development-docs-service-call";
 import { type RunCodexNativeConverterInput } from "./repo-automation-service-workflows";
 import {
   type PolicyAuditTemplateAssetSelector,
@@ -244,6 +248,10 @@ export interface RepoAutomationService {
   transitionPreparedOrchestration?(
     input: TransitionPreparedOrchestrationRequest,
   ): Promise<TransitionPreparedOrchestrationResult>;
+  /** Issue #1016: optional, so existing full service fakes keep type-checking. */
+  migrateDevelopmentDocs?(
+    input: MigrateDevelopmentDocsInput,
+  ): Promise<MigrateDevelopmentDocsResult>;
   renderSubagentTree(
     input: RenderSubagentTreeServiceInput,
   ): Promise<RepoAutomationExecutionResult>;

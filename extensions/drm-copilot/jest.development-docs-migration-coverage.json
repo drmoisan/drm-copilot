@@ -1,0 +1,48 @@
+{
+  "./src/lib/development-docs-migration/folder-rename-plan.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/development-docs-migration/layout-map.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/development-docs-migration/migrate-development-docs-service-call.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/development-docs-migration/migration-apply.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/development-docs-migration/migration-decisions.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/development-docs-migration/migration-git.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/development-docs-migration/migration-plan.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/development-docs-migration/migration-report.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/development-docs-migration/reference-rewrite.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/mcp-development-docs-tool-definitions.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/mcp-handlers/development-docs-migration-handler.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/mcp-tool-inputs-development-docs.ts": { "lines": 85, "branches": 75 },
+  "./src/migrate-development-docs-cli.ts": { "lines": 85, "branches": 75 }
+}

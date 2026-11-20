@@ -9,6 +9,10 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { createBufferedOutput } from "./command-runtime";
 import {
+  MIGRATE_DEVELOPMENT_DOCS_SUBCOMMAND,
+  runMigrateDevelopmentDocsCli,
+} from "./migrate-development-docs-cli";
+import {
   dispatchRepoAutomationTool,
   isRepoAutomationToolName,
   listRepoAutomationTools,
@@ -115,15 +119,47 @@ export function createRepoAutomationMcpServer(
   return server;
 }
 
+/** Entry points that {@link main} dispatches to; injectable for tests. */
+export interface MainEntryPoints {
+  readonly runCli: (argv: ReadonlyArray<string>) => number;
+  readonly startServer: () => Promise<void>;
+}
+
 /**
  * Runs the stdio MCP server until the parent process terminates.
  *
  * @returns A promise that resolves after the server transport is connected.
  */
-export async function main(): Promise<void> {
+async function startStdioServer(): Promise<void> {
   const server = createRepoAutomationMcpServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
+}
+
+/** Production entry points. */
+export const DEFAULT_MAIN_ENTRY_POINTS: MainEntryPoints = {
+  runCli: (argv) => runMigrateDevelopmentDocsCli(argv),
+  startServer: startStdioServer,
+};
+
+/**
+ * Package bin entry: the `migrate-development-docs` subcommand (issue #1016)
+ * sets the process exit code from the CLI; any other invocation starts the
+ * stdio MCP server unchanged.
+ *
+ * @param argv Process arguments after the script path.
+ * @param entryPoints Entry points; production wiring by default.
+ * @returns A promise that resolves after the CLI ran or the server connected.
+ */
+export async function main(
+  argv: ReadonlyArray<string> = process.argv.slice(2),
+  entryPoints: MainEntryPoints = DEFAULT_MAIN_ENTRY_POINTS,
+): Promise<void> {
+  if (argv[0] === MIGRATE_DEVELOPMENT_DOCS_SUBCOMMAND) {
+    process.exitCode = entryPoints.runCli(argv.slice(1));
+    return;
+  }
+  await entryPoints.startServer();
 }
 
 if (require.main === module) {

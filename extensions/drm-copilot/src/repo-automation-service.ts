@@ -38,6 +38,11 @@ import {
 import { type OrchestrationHandoffMaterializer } from "./lib/validate/orchestration-handoff-materializer";
 import { createProductionHandoffMaterializer } from "./lib/validate/orchestration-handoff-materializer-production";
 import { newPotentialBugEntryServiceCall } from "./lib/new-potential-bug-entry-service-call";
+import {
+  migrateDevelopmentDocsServiceCall,
+  type MigrateDevelopmentDocsInput,
+  type MigrateDevelopmentDocsResult,
+} from "./lib/development-docs-migration/migrate-development-docs-service-call";
 import { collectPrContextServiceCall } from "./lib/pr-context/pr-context-service-call";
 import { potentialToIssueServiceCall } from "./lib/potential-to-issue/potential-to-issue-service-call";
 import { newActiveFeatureFolderServiceCall } from "./lib/new-active-feature-folder/new-active-feature-folder-service-call";
@@ -497,6 +502,16 @@ class DefaultRepoAutomationService
     input: PushDownIntegrationToolInput,
   ): Promise<ValidateIntegrationResult> {
     return validatePushDownIntegrationServiceCall(input, this.pushDownDeps);
+  }
+
+  async migrateDevelopmentDocs(
+    input: MigrateDevelopmentDocsInput,
+  ): Promise<MigrateDevelopmentDocsResult> {
+    return migrateDevelopmentDocsServiceCall({
+      fileSystem: this.fileSystem,
+      runner: this.runner,
+      input,
+    });
   }
 
   private async executeScript(
