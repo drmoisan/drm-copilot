@@ -23,6 +23,7 @@ Research section 2 of `docs/features/active/reduce-feature-cycle-time-with-rever
 - `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md`, a byte-identical bundle copy
 - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`, the `PCW-TASK-TARGET` row
 - `docs/engineering/process-reductions/README.md`, the index row of this entry
+- Issue #1032 retired the Copilot skill copies (the `skills` folder under `.github` and its bundle copy under `extensions/drm-copilot/resources/customizations/`). In the same commit this entry's revert blocks and stored-patch sections for those copies were removed; a revert step that names one of those copies no longer applies.
 
 ## Prior Text
 
@@ -37,16 +38,6 @@ Research section 2 of `docs/features/active/reduce-feature-cycle-time-with-rever
 ````
 
 ### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md
-
-````Current
-- **Task target.** A plan targets 15 to 20 canonical tasks. The target is authoring guidance that no validator checks; the limit the validator enforces is the one the `Size guideline` bullet states.
-
-````
-
-````Prior
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
 
 ````Current
 - **Task target.** A plan targets 15 to 20 canonical tasks. The target is authoring guidance that no validator checks; the limit the validator enforces is the one the `Size guideline` bullet states.

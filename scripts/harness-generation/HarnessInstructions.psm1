@@ -3,7 +3,7 @@ Set-StrictMode -Version Latest
 # Instructions surface (issue #1028), check-only. AGENTS.md is the hand-authored source of repository standing
 # guidance; CLAUDE.md imports it and carries Claude-only text. This module reports, without writing anything:
 #   CONVERTER-HEADING  AGENTS.md carries the Codex native converter heading '# Converted standing guidance'
-#   GENERATED-NOTE     AGENTS.md carries the generated-file note of scripts/dev-tools/sync-agents-from-instructions.ps1
+#   GENERATED-NOTE     AGENTS.md carries the generated-file note of the retired AGENTS.md sync writer (issue #1032)
 #   EMBEDDED-RULE      an H2 body of AGENTS.md equals (whitespace-normalized) an H2 body of a .claude/rules file
 #   MISSING-SKILL      AGENTS.md cites a .agents/skills/<name>/SKILL.md that does not exist
 #   CLAUDE-IMPORT      the first line of CLAUDE.md after its frontmatter is not '@AGENTS.md'
@@ -98,7 +98,7 @@ function Get-HarnessAgentsTextFinding {
     $lines = @($Text.Replace("`r`n", "`n") -split "`n")
     if ($lines -ccontains '# Converted standing guidance') { $findings.Add((New-HarnessFinding -Kind 'CONVERTER-HEADING' -Path $Path -Detail 'carries the Codex native converter heading')) }
     if (@($lines | Where-Object { $_.StartsWith('> NOTE: This file is **generated** from:') }).Count -gt 0) {
-        $findings.Add((New-HarnessFinding -Kind 'GENERATED-NOTE' -Path $Path -Detail 'carries the sync-agents-from-instructions generated-file note'))
+        $findings.Add((New-HarnessFinding -Kind 'GENERATED-NOTE' -Path $Path -Detail 'carries the generated-file note of the retired AGENTS.md sync writer'))
     }
     $cited = @([regex]::Matches($Text, '\.agents/skills/[A-Za-z0-9._-]+/SKILL\.md') | ForEach-Object { $_.Value } | Select-Object -Unique)
     foreach ($skillPath in $cited) {

@@ -25,9 +25,9 @@ and validate its output.
 
 ## The nine canonical workflows
 
-Each workflow is a skill (`.github/skills/<name>/SKILL.md`, mirrored to
-`.claude/skills` and `.agents/skills`) that routes to exactly one role and names its exact
-output boundary.
+Each workflow is a skill (`.agents/skills/<name>/SKILL.md`, mirrored to
+`.claude/skills` by `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface skills`)
+that routes to exactly one role and names its exact output boundary.
 
 | Workflow | Role | Produces |
 |---|---|---|

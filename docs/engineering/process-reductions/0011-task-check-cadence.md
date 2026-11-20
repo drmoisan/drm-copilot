@@ -138,6 +138,7 @@ The reduction narrows the policy rule `## Mandatory Toolchain Loop`: stage 7 int
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c3.toml`, a generated Codex variant
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c4.toml`, a generated Codex variant
 - `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`, a new contract test
+- Issue #1032 retired the Copilot skill copies (the `skills` folder under `.github` and its bundle copy under `extensions/drm-copilot/resources/customizations/`). In the same commit this entry's revert blocks and stored-patch sections for those copies were removed; a revert step that names one of those copies no longer applies.
 
 ## Prior Text
 
@@ -571,7 +572,7 @@ Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract`
 
 ````Current
 - `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`: the light-remediation text of issue #1097 in the review and orchestration surfaces and their mirrors.
-- `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`: the test-cadence wording of issue #1167 in the six `atomic-plan-contract` copies and the referring surfaces, the sweep for per-task full-suite wording, and the byte identity of the edited Copilot files and their bundles.
+- `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`: the test-cadence wording of issue #1167 in the four `atomic-plan-contract` copies and the referring surfaces, the sweep for per-task full-suite wording, and the byte identity of the edited Copilot files and their bundles.
 
 ````
 
@@ -1030,57 +1031,6 @@ Treat these four steps as one **toolchain pass**.
 4) Verify acceptance criteria
 5) Run required toolchains as specified or implied
 6) Check off the task ONLY when verification passes
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-
-Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
-
-## Minimal-Audit Directive Contract (Small Path)
-````
-
-````Prior
-
-## Minimal-Audit Directive Contract (Small Path)
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-
-## Test Cadence (Mandatory)
-
-This section defines when the toolchain runs during plan execution. Other plan-execution surfaces reference this section instead of restating it.
-
-- **Task check (after each task).** After each task, the executor runs a task check: format, lint, and type check scoped to the files the task changed, then the task's test selection. The task's test selection is the mirrored test files under `tests/` of each changed production file, plus every test file that imports, dot-sources, or names a changed module or file; for a changed Markdown or configuration path, it is the contract tests that read that path. Integration and golden suites are never part of the task's test selection. The task's Pester selection runs through the test-execution launcher `pester` suite with `-TestPath` and the selected test files, as the `test-execution-policy` skill states. A task check is not a gate: it measures no coverage and does not replace the phase gate. Its evidence is a new append-only file per task, `<FEATURE>/evidence/other/task-check.P<N>-T<M>.<timestamp>.md`, which records the changed files, the selection and the rule that produced it, and each command with its exit code.
-- **Phase gate (after each phase).** The last task of every phase between Phase 0 and the final QA phase carries the `[phase-gate]` tag, placed after the task ID as `[expect-fail]` is. That task runs stages 1 to 6 of the toolchain loop across the repository: format, lint, type check, architecture-boundary tests, the full unit suite, and contract checks. The unit stage is one `Invoke-PoshQCParallelTest` run, one `pytest -n auto` run, and Jest through its normal parallel workers. On a failure or an auto-fix, fix the cause and restart from step 1; the phase closes only after one clean pass. Its evidence is `<FEATURE>/evidence/qa-gates/phase-gate.P<N>.<timestamp>.md`. Phase 0 needs no gate task, and the loop of the final QA phase is its own gate.
-- **Expect-fail phase.** A phase may end with tests tagged `[expect-fail]` that fail by design until a later phase. Its `[phase-gate]` task still runs the full loop: the unit stage passes when its only failures are the plan's named `[expect-fail]` tests that a later phase makes pass, each confirmed failing, and every other test passes. The gate evidence lists those expected failures by name.
-- **No-change phase.** A phase that changes no tracked file, such as an investigation or reproduction phase that only writes evidence, is a no-change phase and needs no `[phase-gate]` task; the next gate covers it.
-- **Final QA loop (unchanged).** The final QA loop in the next section remains a full run with coverage compared with the `Phase 0 baseline`, and the no-SKIPPED rule is unchanged.
-- **CI-only suites.** Integration and golden suites run in CI only.
-
-## Final QA Loop (Required for Code/Test Changes)
-````
-
-````Prior
-
-## Final QA Loop (Required for Code/Test Changes)
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-
-Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
-
-## No-SKIPPED Rule for Planned Command Tasks
-````
-
-````Prior
-
-## No-SKIPPED Rule for Planned Command Tasks
 ````
 
 ### Revert Block: AGENTS.md

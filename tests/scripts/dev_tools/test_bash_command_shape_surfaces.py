@@ -37,8 +37,6 @@ _BRIEF_COPIES = (
     ".agents/skills/execution-environment/SKILL.md",
     f"{_RESOURCES}/codex-and-agents-customizations/.agents/skills/"
     "execution-environment/SKILL.md",
-    ".github/skills/execution-environment/SKILL.md",
-    f"{_RESOURCES}/customizations/.github/skills/execution-environment/SKILL.md",
 )
 _CODEX_SKILL_BUNDLE = (
     f"{_RESOURCES}/codex-and-agents-customizations/.agents/skills/"

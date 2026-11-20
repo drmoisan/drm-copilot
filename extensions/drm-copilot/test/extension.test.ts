@@ -57,14 +57,6 @@ describe("drm-copilot core command behavior", () => {
     );
   });
 
-  it("activate registers drmCopilotExtension.syncAgentsFromInstructions", () => {
-    activateAndGetHandler("drmCopilotExtension.syncAgentsFromInstructions");
-
-    expect(
-      commandHandlers.has("drmCopilotExtension.syncAgentsFromInstructions"),
-    ).toBe(true);
-  });
-
   it("activate registers drmCopilotExtension.listMcpTools", () => {
     activateAndGetHandler("drmCopilotExtension.listMcpTools");
 

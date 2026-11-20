@@ -72,8 +72,6 @@ STEP_EIGHT_COPIES = (
     CLAUDE_BUNDLE + ".claude/skills/feature-review-workflow/SKILL.md",
     ".agents/skills/feature-review-workflow/SKILL.md",
     CODEX_BUNDLE + ".agents/skills/feature-review-workflow/SKILL.md",
-    ".github/skills/feature-review-workflow/SKILL.md",
-    GITHUB_BUNDLE + ".github/skills/feature-review-workflow/SKILL.md",
 )
 RETIRED_STEP_EIGHT_FIGURES = ("80%", "90%")
 GOVERNING_THRESHOLDS_PHRASE = "governing thresholds"
@@ -85,8 +83,6 @@ FEATURE_REVIEW_TEXT_COPIES = (
     CLAUDE_BUNDLE + ".claude/skills/feature-review-workflow/SKILL.md",
     ".agents/skills/feature-review-workflow/SKILL.md",
     CODEX_BUNDLE + ".agents/skills/feature-review-workflow/SKILL.md",
-    ".github/skills/feature-review-workflow/SKILL.md",
-    GITHUB_BUNDLE + ".github/skills/feature-review-workflow/SKILL.md",
     ".codex/agents/feature-review.toml",
     CODEX_BUNDLE + ".codex/agents/feature-review.toml",
 )
@@ -110,7 +106,7 @@ FALLBACK_COPIES = (
     ".claude/hooks/validate-feature-review-coverage.ps1",
     CLAUDE_BUNDLE + ".claude/hooks/validate-feature-review-coverage.ps1",
 )
-EXPECTED_LISTED_COPY_COUNT = 40
+EXPECTED_LISTED_COPY_COUNT = 38
 
 PUSHED_RULE_AND_SKILL_GLOBS: tuple[tuple[str, str], ...] = (
     (".claude/rules", "*.md"),

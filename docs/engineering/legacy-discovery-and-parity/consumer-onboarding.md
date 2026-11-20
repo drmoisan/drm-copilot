@@ -28,7 +28,7 @@ Neither the extension nor the MCP package contains Python business logic.
    `push_down_claude_customizations` (Claude Code; writes `.claude/` and `config/`),
    `push_down_codex_and_agents_customizations` (Codex; writes `.codex/` and `.agents/`) or
    `push_down_copilot_customizations` (GitHub Copilot; writes `.github/agents`,
-   `.github/hooks`, `.github/instructions`, `.github/prompts`, `.github/skills`). Each is an
+   `.github/hooks`, `.github/instructions`, `.github/prompts`). Each is an
    MCP tool, a VS Code command and a Python module (`scripts/dev_tools/push_down_*.py
    --destination <workspace>`). The discovery assets are in the `core` pack, so a
    `--packs`-scoped push-down still receives them.

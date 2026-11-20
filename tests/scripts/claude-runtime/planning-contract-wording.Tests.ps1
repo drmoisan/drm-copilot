@@ -10,19 +10,15 @@ BeforeDiscovery {
     $script:ContractCopy = @(
         @{ Copy = 'CLAUDE'; Path = '.claude/skills/atomic-plan-contract/SKILL.md' }
         @{ Copy = 'AGENTS'; Path = '.agents/skills/atomic-plan-contract/SKILL.md' }
-        @{ Copy = 'GITHUB'; Path = '.github/skills/atomic-plan-contract/SKILL.md' }
         @{ Copy = 'CLAUDE-BUNDLE'; Path = "$resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md" }
         @{ Copy = 'AGENTS-BUNDLE'; Path = "$resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md" }
-        @{ Copy = 'GITHUB-BUNDLE'; Path = "$resources/customizations/.github/skills/atomic-plan-contract/SKILL.md" }
     )
 
     $briefCopy = @(
         @{ Copy = 'CLAUDE'; Path = '.claude/skills/execution-environment/SKILL.md' }
         @{ Copy = 'AGENTS'; Path = '.agents/skills/execution-environment/SKILL.md' }
-        @{ Copy = 'GITHUB'; Path = '.github/skills/execution-environment/SKILL.md' }
         @{ Copy = 'CLAUDE-BUNDLE'; Path = "$resources/claude-customizations/.claude/skills/execution-environment/SKILL.md" }
         @{ Copy = 'AGENTS-BUNDLE'; Path = "$resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md" }
-        @{ Copy = 'GITHUB-BUNDLE'; Path = "$resources/customizations/.github/skills/execution-environment/SKILL.md" }
     )
     # Deferred brief facts of stages C and D; each is read from its own section only.
     $briefCheck = @(
@@ -44,7 +40,6 @@ BeforeDiscovery {
     $script:ModeSurface = @(
         @{ Id = 'HANDOFF-CLAUDE'; Path = '.claude/skills/remediation-handoff-atomic-planner/SKILL.md' }
         @{ Id = 'HANDOFF-AGENTS'; Path = '.agents/skills/remediation-handoff-atomic-planner/SKILL.md' }
-        @{ Id = 'HANDOFF-GITHUB'; Path = '.github/skills/remediation-handoff-atomic-planner/SKILL.md' }
         @{ Id = 'COPILOT-ORCH'; Path = '.github/agents/orchestrator.agent.md' }
     )
     $script:BriefRow = @(foreach ($check in $briefCheck) {

@@ -47,10 +47,6 @@ describe("drm-copilot workflow command behavior", () => {
     );
   });
 
-  it("activate registers drmCopilotExtension.syncAgentsFromInstructions", () => {
-    activateAndGetHandler("drmCopilotExtension.syncAgentsFromInstructions");
-  });
-
   it("runCodexNativeConverter review mode runs the in-process converter without spawning Python", async () => {
     setExecutablePresence({ python: true });
     showQuickPickMock
@@ -90,23 +86,6 @@ describe("drm-copilot workflow command behavior", () => {
     await handler();
 
     expect(childProcessMock.spawn).not.toHaveBeenCalled();
-  });
-
-  it("syncAgentsFromInstructions runs the bundled PowerShell script with the workspace root", async () => {
-    setExecutablePresence({ pwsh: true, powershell: false });
-    childProcessMock.spawn.mockReturnValue(createMockProcess(0));
-
-    const handler = activateAndGetHandler(
-      "drmCopilotExtension.syncAgentsFromInstructions",
-    );
-    await handler();
-
-    const [, args] = childProcessMock.spawn.mock.calls[0] as [string, string[]];
-    expect(args).toContain(
-      "C:/extension/resources/templates/sync-agents-from-instructions.ps1",
-    );
-    expect(args).toContain("-RepoRoot");
-    expect(args).toContain("C:/workspace");
   });
 
   it("registers newPotentialBugEntry", () => {

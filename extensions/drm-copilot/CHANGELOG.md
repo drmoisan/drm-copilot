@@ -111,6 +111,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   step and does not launch the agent, where previously every line ran regardless of earlier
   failures. Each step prints a progress banner, and the 5-second launch delay is removed.
 
+### Removed
+
+- `Sync AGENTS.md from Instructions` command (issue #1032): the command, its bundled PowerShell
+  script, and its push-down reference rewrite are removed, because `AGENTS.md` is now
+  hand-authored and is no longer generated from the instruction files.
+
 ## [0.0.1] - 2026-05-02
 
 ### Added

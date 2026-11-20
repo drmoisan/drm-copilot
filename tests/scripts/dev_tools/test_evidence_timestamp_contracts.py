@@ -1,8 +1,8 @@
 """Documentation contracts for the issue #903 UTC write-time evidence stamps.
 
-Pins the text that issue #903 adds to the three evidence-and-timestamp-conventions
+Pins the text that issue #903 adds to the two evidence-and-timestamp-conventions
 skills (the UTC ``Timestamp`` source and the ``### Evidence Filename Timestamp``
-subsection) and to the three atomic-plan-contract skills (the ``## Evidence
+subsection) and to the two atomic-plan-contract skills (the ``## Evidence
 Filename Timestamps in Plans`` section), and asserts that each atomic-plan-contract
 copy is byte-identical to its bundled extension mirror.
 
@@ -28,18 +28,15 @@ from tests.scripts.dev_tools.parallel_orchestrator_surface_test_support import (
 EVIDENCE_SKILLS: tuple[tuple[str, Path], ...] = (
     ("claude", Path(".claude/skills/evidence-and-timestamp-conventions/SKILL.md")),
     ("agents", Path(".agents/skills/evidence-and-timestamp-conventions/SKILL.md")),
-    ("github", Path(".github/skills/evidence-and-timestamp-conventions/SKILL.md")),
 )
 
 PLAN_CONTRACT_SKILLS: tuple[tuple[str, Path], ...] = (
     ("claude", Path(".claude/skills/atomic-plan-contract/SKILL.md")),
     ("agents", Path(".agents/skills/atomic-plan-contract/SKILL.md")),
-    ("github", Path(".github/skills/atomic-plan-contract/SKILL.md")),
 )
 
 _CLAUDE_BUNDLE = Path("extensions/drm-copilot/resources/claude-customizations")
 _CODEX_BUNDLE = Path("extensions/drm-copilot/resources/codex-and-agents-customizations")
-_GITHUB_BUNDLE = Path("extensions/drm-copilot/resources/customizations")
 
 # Each root atomic-plan-contract copy paired with its bundled extension mirror.
 PLAN_CONTRACT_MIRROR_PAIRS: tuple[tuple[str, tuple[Path, Path]], ...] = (
@@ -50,10 +47,6 @@ PLAN_CONTRACT_MIRROR_PAIRS: tuple[tuple[str, tuple[Path, Path]], ...] = (
     (
         "agents",
         (PLAN_CONTRACT_SKILLS[1][1], _CODEX_BUNDLE / PLAN_CONTRACT_SKILLS[1][1]),
-    ),
-    (
-        "github",
-        (PLAN_CONTRACT_SKILLS[2][1], _GITHUB_BUNDLE / PLAN_CONTRACT_SKILLS[2][1]),
     ),
 )
 

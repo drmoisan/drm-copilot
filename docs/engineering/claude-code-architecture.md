@@ -16,7 +16,7 @@ The mapping for specialist agents is included alongside each category.
 | `.github/instructions/*.instructions.md` | `.claude/rules/*.md` | Path-scoped via `paths:` YAML frontmatter; activated automatically when matching files are in scope |
 | `.github/prompts/*.prompt.md` | `.claude/skills/<name>/SKILL.md` | User-invocable workflows; Claude skills use `argument-hint:` frontmatter for parameter discovery |
 | `.github/agents/*.agent.md` | `.claude/agents/*.md` | Named specialist personas with `tools:`, `model:`, `hooks:`, and `memory:` boundaries declared in YAML frontmatter |
-| `.github/skills/*/SKILL.md` | `.claude/skills/<name>/SKILL.md` (or preloaded via `skills:` frontmatter in subagents) | Reusable workflow contracts; shared by multiple agents via `skills:` lists |
+| `.agents/skills/<name>/SKILL.md` (shared skill source, read natively by Copilot) | `.claude/skills/<name>/SKILL.md` (or preloaded via `skills:` frontmatter in subagents) | Reusable workflow contracts; shared by multiple agents via `skills:` lists. The separate Copilot skill copies were retired by issue #1032 |
 | `handoffs:` metadata | Named subagents + `context: fork` + `agent:` + checkpoint files + `SubagentStop` hooks | No single direct equivalent; requires a combination of Claude primitives (see Section 2) |
 
 ## 2. Non-Equivalences
@@ -42,7 +42,7 @@ The `.claude/commands/` directory is a backward-compatibility surface for Claude
 
 ## 3. Sync Strategy
 
-The `.github/` directory is the authoritative source for all orchestration assets. The `.claude/` directory contains derived files that adapt those assets for Claude Code consumption. No `.claude/` file replaces a `.github/` file; the `.github/` versions remain canonical.
+The `.github/` directory is the authoritative source for the Copilot-native orchestration assets only: the agents under `.github/agents`, the prompts under `.github/prompts`, and the hooks under `.github/hooks`. Shared skills are authored once in `.agents/skills`, and the `.claude/skills` copies are generated from them by `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface skills`. The `.claude/` directory contains derived files that adapt those assets for Claude Code consumption.
 
 The runtime model uses a main-thread orchestrator because Claude subagents cannot spawn subagents. The `/orchestrate` entrypoint remains user-invocable, but the main session coordinates delegation to worker agents instead of routing orchestration through a nested orchestrator worker.
 
@@ -68,33 +68,35 @@ The committed orchestrator allowlist delegates to the following repository-canon
 | `.claude/` Asset | Authoritative Source | Relationship |
 |---|---|---|
 | `.claude/rules/*.md` | `.github/instructions/*.instructions.md` | Derived: summarized policy content with `paths:` frontmatter added |
-| `.claude/skills/<name>/SKILL.md` | `.github/skills/*/SKILL.md` and `.github/prompts/*.prompt.md` | Derived: workflow body adapted with Claude-specific frontmatter (`context:`, `agent:`, `allowed-tools:`) |
+| `.claude/skills/<name>/SKILL.md` | `.agents/skills/<name>/SKILL.md` and `.github/prompts/*.prompt.md` | Generated from the shared `.agents/skills` source by the skill mirror (per-target substitutions only); direct-use workflows adapted from `.github/prompts` with Claude-specific frontmatter (`context:`, `agent:`, `allowed-tools:`) |
 | `.claude/agents/*.md` | `.github/agents/*.agent.md` | Maintained alongside: manual sync using diff to reconcile tool lists, model settings, and hook declarations |
-| `CLAUDE.md` | `.github/copilot-instructions.md` + `.github/skills/policy-compliance-order/SKILL.md` | Derived: standing instructions composed from tone policy and compliance order |
+| `CLAUDE.md` | `AGENTS.md` (imported) + `.agents/skills/policy-compliance-order/SKILL.md` | Claude-only standing instructions; the shared tone policy and guidance come from the imported `AGENTS.md` |
 | `.claude/settings.json` | No direct `.github/` equivalent | Authored directly: Claude Code-specific permissions, hooks, and default mode |
 
-### Canonical `.github/skills` migration map
+### Retired Copilot skill migration map
 
-| Canonical source | Claude runtime target | Notes |
+The Copilot skill copies under `.github` were retired by issue #1032. Each skill below is authored once in `.agents/skills/<name>/SKILL.md`, which Copilot reads natively. The Claude runtime target is generated from it by the skill mirror, except for the skills that the shared-source generator decision D-14 (issue #1028) keeps hand-maintained in both copies, among them `atomic-plan-contract` and `feature-review-workflow`.
+
+| Shared source | Claude runtime target | Notes |
 |---|---|---|
-| `.github/skills/README.md` | No Claude runtime mirror | Documentation-only; no separate Claude skills README is required |
-| `.github/skills/acceptance-criteria-tracking/SKILL.md` | `.claude/skills/acceptance-criteria-tracking/SKILL.md` | Runtime mirror used by executor, review, and status workers |
-| `.github/skills/atomic-plan-contract/SKILL.md` | `.claude/skills/atomic-plan-contract/SKILL.md` | Runtime mirror used by orchestrator, planner, and executor |
-| `.github/skills/csharp-change-budget-router/SKILL.md` | `.claude/skills/csharp-change-budget-router/SKILL.md` | Runtime mirror for C# routing and budget rules |
-| `.github/skills/csharp-orchestration-state-machine/SKILL.md` | `.claude/skills/csharp-orchestration-state-machine/SKILL.md` | Runtime mirror for C# checkpoint state handling |
-| `.github/skills/evidence-and-timestamp-conventions/SKILL.md` | `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` | Runtime mirror for deterministic evidence artifact naming |
-| `.github/skills/execution-environment/SKILL.md` | `.claude/skills/execution-environment/SKILL.md` | Byte-identical execution-environment brief preloaded by researcher, planner, executor, and orchestrator |
-| `.github/skills/feature-promotion-lifecycle/SKILL.md` | `.claude/skills/feature-promotion-lifecycle/SKILL.md` | Runtime mirror for feature-promotion workflow rules |
-| `.github/skills/feature-review-workflow/SKILL.md` | `.claude/skills/feature-review-workflow/SKILL.md` | Runtime mirror for feature, staged, and epic review workflow rules |
-| `.github/skills/make-skill-template/SKILL.md` | `.claude/skills/make-skill-template/SKILL.md` | Maintenance-only runtime mirror for manual skill-authoring workflows |
-| `.github/skills/policy-audit-template-usage/SKILL.md` | `.claude/skills/policy-audit-template-usage/SKILL.md` | Maintenance-only runtime mirror for policy-audit template usage |
-| `.github/skills/policy-compliance-order/SKILL.md` | `.claude/skills/policy-compliance-order/SKILL.md` | Runtime mirror for mandatory policy-read ordering |
-| `.github/skills/powershell-change-budget-router/SKILL.md` | `.claude/skills/powershell-change-budget-router/SKILL.md` | Runtime mirror for PowerShell routing and budget rules |
-| `.github/skills/powershell-orchestration-state-machine/SKILL.md` | `.claude/skills/powershell-orchestration-state-machine/SKILL.md` | Runtime mirror for PowerShell checkpoint state handling |
-| `.github/skills/pr-base-branch-merge-base/SKILL.md` | `.claude/skills/pr-base-branch-merge-base/SKILL.md` | Runtime mirror for PR base-branch resolution rules |
-| `.github/skills/pr-context-artifacts/SKILL.md` | `.claude/skills/pr-context-artifacts/SKILL.md` | Runtime mirror for PR-context artifact conventions |
-| `.github/skills/remediation-handoff-atomic-planner/SKILL.md` | `.claude/skills/remediation-handoff-atomic-planner/SKILL.md` | Runtime mirror for remediation-to-planner handoff rules |
-| `.github/skills/skill-canonical-location-audit/SKILL.md` | `.claude/skills/skill-canonical-location-audit/SKILL.md` | Maintenance-only runtime mirror for canonical-location audits |
+| `.agents/skills/README.md` | No Claude runtime mirror | Documentation-only; no separate Claude skills README is required |
+| `.agents/skills/acceptance-criteria-tracking/SKILL.md` | `.claude/skills/acceptance-criteria-tracking/SKILL.md` | Runtime mirror used by executor, review, and status workers |
+| `.agents/skills/atomic-plan-contract/SKILL.md` | `.claude/skills/atomic-plan-contract/SKILL.md` | Runtime mirror used by orchestrator, planner, and executor |
+| `.agents/skills/csharp-change-budget-router/SKILL.md` | `.claude/skills/csharp-change-budget-router/SKILL.md` | Runtime mirror for C# routing and budget rules |
+| `.agents/skills/csharp-orchestration-state-machine/SKILL.md` | `.claude/skills/csharp-orchestration-state-machine/SKILL.md` | Runtime mirror for C# checkpoint state handling |
+| `.agents/skills/evidence-and-timestamp-conventions/SKILL.md` | `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` | Runtime mirror for deterministic evidence artifact naming |
+| `.agents/skills/execution-environment/SKILL.md` | `.claude/skills/execution-environment/SKILL.md` | Byte-identical execution-environment brief preloaded by researcher, planner, executor, and orchestrator |
+| `.agents/skills/feature-promotion-lifecycle/SKILL.md` | `.claude/skills/feature-promotion-lifecycle/SKILL.md` | Runtime mirror for feature-promotion workflow rules |
+| `.agents/skills/feature-review-workflow/SKILL.md` | `.claude/skills/feature-review-workflow/SKILL.md` | Runtime mirror for feature, staged, and epic review workflow rules |
+| `.agents/skills/make-skill-template/SKILL.md` | `.claude/skills/make-skill-template/SKILL.md` | Maintenance-only runtime mirror for manual skill-authoring workflows |
+| `.agents/skills/policy-audit-template-usage/SKILL.md` | `.claude/skills/policy-audit-template-usage/SKILL.md` | Maintenance-only runtime mirror for policy-audit template usage |
+| `.agents/skills/policy-compliance-order/SKILL.md` | `.claude/skills/policy-compliance-order/SKILL.md` | Runtime mirror for mandatory policy-read ordering |
+| `.agents/skills/powershell-change-budget-router/SKILL.md` | `.claude/skills/powershell-change-budget-router/SKILL.md` | Runtime mirror for PowerShell routing and budget rules |
+| `.agents/skills/powershell-orchestration-state-machine/SKILL.md` | `.claude/skills/powershell-orchestration-state-machine/SKILL.md` | Runtime mirror for PowerShell checkpoint state handling |
+| `.agents/skills/pr-base-branch-merge-base/SKILL.md` | `.claude/skills/pr-base-branch-merge-base/SKILL.md` | Runtime mirror for PR base-branch resolution rules |
+| `.agents/skills/pr-context-artifacts/SKILL.md` | `.claude/skills/pr-context-artifacts/SKILL.md` | Runtime mirror for PR-context artifact conventions |
+| `.agents/skills/remediation-handoff-atomic-planner/SKILL.md` | `.claude/skills/remediation-handoff-atomic-planner/SKILL.md` | Runtime mirror for remediation-to-planner handoff rules |
+| `.agents/skills/skill-canonical-location-audit/SKILL.md` | `.claude/skills/skill-canonical-location-audit/SKILL.md` | Maintenance-only runtime mirror for canonical-location audits |
 
 ### Canonical `.github/agents` migration map
 
@@ -182,10 +184,10 @@ The repository-canonical bounded workers are the Claude project agents committed
 3. Update the `.claude/rules/<lang>.md` file to incorporate the policy delta while preserving the `paths:` frontmatter and the summarized format.
 4. Repeat for the `*-unit-test.instructions.md` source for each language.
 
-**For `.claude/skills/` files (derived from `.github/skills/` and `.github/prompts/`):**
+**For `.claude/skills/` files (generated from `.agents/skills/`, or adapted from `.github/prompts/`):**
 
-1. Run `diff` between the `.github/skills/<name>/SKILL.md` (or `.github/prompts/<name>.prompt.md`) and the corresponding `.claude/skills/<name>/SKILL.md`.
-2. Update the Claude skill body to reflect any workflow changes while preserving Claude-specific frontmatter fields.
+1. Edit the shared source `.agents/skills/<name>/SKILL.md`, then run `pwsh -NoProfile -File scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface skills` to regenerate the `.claude/skills/<name>/SKILL.md` copy and its bundle copy, and run it again with `-Check` to confirm no drift. A skill the mirror excludes (decision D-14 of issue #1028) is edited in both copies by hand.
+2. For a direct-use workflow, run `diff` between `.github/prompts/<name>.prompt.md` and the corresponding `.claude/skills/<name>/SKILL.md`, and update the Claude skill body to reflect any workflow changes while preserving Claude-specific frontmatter fields.
 
 **For `.claude/agents/` files (maintained alongside `.github/agents/`):**
 
@@ -193,10 +195,10 @@ The repository-canonical bounded workers are the Claude project agents committed
 2. Reconcile differences in tool lists, model declarations, skill references, and hook declarations.
 3. Validate that scoped `Bash(...)` patterns in `.claude/agents/` still match the toolchain commands used by the corresponding `.github/agents/` file.
 
-**For `CLAUDE.md` (derived from `.github/copilot-instructions.md`):**
+**For `CLAUDE.md` (imports `AGENTS.md`):**
 
-1. Review `.github/copilot-instructions.md` for tone or compliance changes.
-2. Update `CLAUDE.md` to reflect any changes without duplicating full policy text (reference the source files instead).
+1. Make shared tone or guidance changes in `AGENTS.md`, which `CLAUDE.md` imports; `.github/copilot-instructions.md` carries Copilot-only text.
+2. Update the Claude-only sections of `CLAUDE.md` without duplicating text that `AGENTS.md` already carries.
 
 ## 4. Validation Walkthrough: Small-Path Orchestration Run
 

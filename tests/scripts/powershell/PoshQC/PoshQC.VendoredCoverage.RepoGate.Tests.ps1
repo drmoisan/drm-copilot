@@ -23,10 +23,8 @@ BeforeDiscovery {
     $script:BriefCopies = @(
         '.claude/skills/execution-environment/SKILL.md'
         '.agents/skills/execution-environment/SKILL.md'
-        '.github/skills/execution-environment/SKILL.md'
         'extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md'
         'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md'
-        'extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md'
     ) | ForEach-Object { @{ RelativePath = $_ } }
     $script:ReadmeCopies = @(
         'scripts/powershell/PoshQC/README.md'

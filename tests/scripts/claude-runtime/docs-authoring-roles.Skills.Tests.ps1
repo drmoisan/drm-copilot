@@ -2,7 +2,7 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 <#
 .SYNOPSIS
-    Tool and subcommand references of the eight documentation skills in all six copies (issue #1037).
+    Tool and subcommand references of the eight documentation skills in all four copies (issue #1037).
 
 .DESCRIPTION
     Membership checks: every docs MCP tool a skill names is one of the six docs tools and is defined in

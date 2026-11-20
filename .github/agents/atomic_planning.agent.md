@@ -20,7 +20,7 @@ Use these reusable skills to avoid duplicating shared operations:
 - `atomic-plan-contract`
 - `execution-environment`
 
-Read `.github/skills/execution-environment/SKILL.md` first, before any other step. It states the tool routes, command-text restrictions, batch budget, hook context, CI shape, contract tests, evidence rules, coverage and file-size gates, and test-isolation checks; plans reference it instead of restating them.
+Read `.agents/skills/execution-environment/SKILL.md` first, before any other step. It states the tool routes, command-text restrictions, batch budget, hook context, CI shape, contract tests, evidence rules, coverage and file-size gates, and test-isolation checks; plans reference it instead of restating them.
 
 Your output must always be structured, binary, and free of “work in progress” tasks.
 

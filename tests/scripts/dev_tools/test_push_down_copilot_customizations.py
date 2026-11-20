@@ -287,7 +287,6 @@ def _seed_scoped_source_files(
         Path(".github/hooks/example-hook.ps1"): "hook content",
         Path(".github/instructions/example.instructions.md"): "instruction content",
         Path(".github/prompts/example.prompt.md"): "prompt content",
-        Path(".github/skills/example/SKILL.md"): "skill content",
     }
 
     # Seed each scoped root so copy tests cover the full push-down surface.
@@ -315,7 +314,7 @@ def test_push_down_copies_scoped_github_trees_to_empty_destination() -> None:
         fs=fs,
     )
 
-    assert summary.created_count == 5
+    assert summary.created_count == 4
     assert fs.read_text(destination_repo / ".github/agents/example.agent.md") == (
         "agent content"
     )
@@ -328,9 +327,6 @@ def test_push_down_copies_scoped_github_trees_to_empty_destination() -> None:
     )
     assert fs.read_text(destination_repo / ".github/prompts/example.prompt.md") == (
         "prompt content"
-    )
-    assert fs.read_text(destination_repo / ".github/skills/example/SKILL.md") == (
-        "skill content"
     )
 
 

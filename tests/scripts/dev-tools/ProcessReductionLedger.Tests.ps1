@@ -448,10 +448,8 @@ Describe 'Review-side standing rule' {
     It 'PRL-RULE-STATED-IN-EVERY-COPY states the rule in <Copy>' -ForEach @(
         @{ Copy = '.claude/skills/feature-review-workflow/SKILL.md' },
         @{ Copy = '.agents/skills/feature-review-workflow/SKILL.md' },
-        @{ Copy = '.github/skills/feature-review-workflow/SKILL.md' },
         @{ Copy = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md' },
-        @{ Copy = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md' },
-        @{ Copy = 'extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md' }
+        @{ Copy = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md' }
     ) {
         $normalized = (Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot $Copy)) -replace '\s+', ' '
 
@@ -462,8 +460,7 @@ Describe 'Review-side standing rule' {
 
     It 'PRL-RULE-BUNDLE-PARITY keeps the bundled copy of <Source> byte-identical' -ForEach @(
         @{ Source = '.claude/skills/feature-review-workflow/SKILL.md'; Bundle = 'claude-customizations' },
-        @{ Source = '.agents/skills/feature-review-workflow/SKILL.md'; Bundle = 'codex-and-agents-customizations' },
-        @{ Source = '.github/skills/feature-review-workflow/SKILL.md'; Bundle = 'customizations' }
+        @{ Source = '.agents/skills/feature-review-workflow/SKILL.md'; Bundle = 'codex-and-agents-customizations' }
     ) {
         $sourceHash = Get-FileHash -LiteralPath (Join-Path $script:RepoRoot $Source)
         $bundleHash = Get-FileHash -LiteralPath (Join-Path $script:RepoRoot "extensions/drm-copilot/resources/$Bundle/$Source")

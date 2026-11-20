@@ -2,7 +2,7 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 <#
 .SYNOPSIS
-    Front matter and body rules of the eight docs-author-page templates in all six skill locations (issue #1037).
+    Front matter and body rules of the eight docs-author-page templates in all four skill locations (issue #1037).
 
 .DESCRIPTION
     Each template's front matter is parsed line by line with every value parsed as JSON. No test
@@ -51,9 +51,9 @@ AfterAll {
 }
 
 Describe 'docs-author-page templates' {
-    It 'covers 48 template files' -TestCases @(@{ RowCount = $script:TemplateRows.Count }) {
+    It 'covers 32 template files' -TestCases @(@{ RowCount = $script:TemplateRows.Count }) {
         # Assert
-        $RowCount | Should -Be 48
+        $RowCount | Should -Be 32
     }
 
     It 'gives <Path> the five front-matter fields with JSON values and diataxis_mode <Mode>' -ForEach $script:TemplateRows {

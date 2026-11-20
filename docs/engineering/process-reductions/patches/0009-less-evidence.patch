@@ -384,52 +384,6 @@ index 6ecd09bf3..9d65b9593 100644
  
  The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
  
-diff --git a/.github/skills/atomic-plan-contract/SKILL.md b/.github/skills/atomic-plan-contract/SKILL.md
-index 3bbae1135..5e905dcea 100644
---- a/.github/skills/atomic-plan-contract/SKILL.md
-+++ b/.github/skills/atomic-plan-contract/SKILL.md
-@@ -62,8 +62,8 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
- 3) Final QC block
- - full language-appropriate QA loop (format → lint → type-check when applicable → test),
- - rerun behavior when any step changes files or fails.
--- one final-QC artifact per QC command step (no aggregate-only final-QC artifact)
--- each final-QC step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
-+- one final-QC static artifact per language records the format, lint, and type-check steps of that language, and each test gate keeps its own final-QC artifact (no aggregate-only final-QC artifact across languages or gates)
-+- the static artifact and each test-gate artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; the static artifact records each step's command, exit code, and finding count
- - final-QC test commands for languages with mandatory coverage policy MUST run in coverage mode and record numeric post-change coverage values from the single gate run in `Output Summary:`, compared with the `Phase 0 baseline` run of the same gate.
- - final-QC command tasks that are present in the approved plan MUST execute their stated commands; `SKIPPED` is invalid unless the task text itself explicitly authorizes a skip condition.
- 
-@@ -153,6 +153,8 @@ For languages with mandatory coverage policy, step 4 must use coverage-enabled t
- 
- If any step fails or changes files, restart the loop from step 1 until a clean pass completes.
- 
-+The format, lint, and type-check results of each language are recorded in one final-QC static artifact per language, with each step's command, exit code, and finding count; reviewers read that artifact and do not re-run format, lint, or type checks.
-+
- ## No-SKIPPED Rule for Planned Command Tasks
- 
- For command-bearing tasks in approved plans (especially Phase 2 final-QC tasks):
-diff --git a/.github/skills/feature-review-workflow/SKILL.md b/.github/skills/feature-review-workflow/SKILL.md
-index 8f2614186..245b22070 100644
---- a/.github/skills/feature-review-workflow/SKILL.md
-+++ b/.github/skills/feature-review-workflow/SKILL.md
-@@ -93,13 +93,14 @@ Always apply:
-   - Use `policy-audit-template-usage` and the MCP `template` asset to drive the artifact structure.
-    - Include exact command references for the checks that were run.
-    - Validate the resulting `policy-audit.<timestamp>.md` immediately after writing it.
-+   - Write a `## CI Cross-check` section after `## 7. Code Quality Checks`: a table `| Check | Claimed outcome | Claimed figure | Head | Source |` with one row per CI check whose result the review relies on, that is, the format, lint, type, and test checks of each changed language and `quality-checks7 / Code Quality & Tests (3.13)` for the Python total. The outcome is `pass` or `fail` from local evidence, and the head is read from `git log` of the reviewed branch. An absent or empty section is a reviewer contract error.
- 
- 5. **Run required checks**
-    - Prefer repo-defined, check-only commands.
-    - Default order:
--     1. formatting check
--     2. lint check
--     3. type check
-+     1. formatting check, read from the language's final-QC static artifact and not re-run
-+     2. lint check, read from the same static artifact and not re-run
-+     3. type check, read from the same static artifact and not re-run
-      4. tests
-    - A focused run of one test file to debug a specific failure is debugging only; a review check does not rest on it.
-    - If a tool cannot run in the environment, mark the affected section unverified or partial with a concrete reason.
 diff --git a/docs/features/templates/policy_audit/AGENTS.md b/docs/features/templates/policy_audit/AGENTS.md
 index 205dfd3b5..3c2bb5f30 100644
 --- a/docs/features/templates/policy_audit/AGENTS.md
@@ -910,52 +864,6 @@ index 6ecd09bf3..9d65b9593 100644
  
  The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
  
-diff --git a/extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md b/extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md
-index 3bbae1135..5e905dcea 100644
---- a/extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md
-+++ b/extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md
-@@ -62,8 +62,8 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
- 3) Final QC block
- - full language-appropriate QA loop (format → lint → type-check when applicable → test),
- - rerun behavior when any step changes files or fails.
--- one final-QC artifact per QC command step (no aggregate-only final-QC artifact)
--- each final-QC step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
-+- one final-QC static artifact per language records the format, lint, and type-check steps of that language, and each test gate keeps its own final-QC artifact (no aggregate-only final-QC artifact across languages or gates)
-+- the static artifact and each test-gate artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; the static artifact records each step's command, exit code, and finding count
- - final-QC test commands for languages with mandatory coverage policy MUST run in coverage mode and record numeric post-change coverage values from the single gate run in `Output Summary:`, compared with the `Phase 0 baseline` run of the same gate.
- - final-QC command tasks that are present in the approved plan MUST execute their stated commands; `SKIPPED` is invalid unless the task text itself explicitly authorizes a skip condition.
- 
-@@ -153,6 +153,8 @@ For languages with mandatory coverage policy, step 4 must use coverage-enabled t
- 
- If any step fails or changes files, restart the loop from step 1 until a clean pass completes.
- 
-+The format, lint, and type-check results of each language are recorded in one final-QC static artifact per language, with each step's command, exit code, and finding count; reviewers read that artifact and do not re-run format, lint, or type checks.
-+
- ## No-SKIPPED Rule for Planned Command Tasks
- 
- For command-bearing tasks in approved plans (especially Phase 2 final-QC tasks):
-diff --git a/extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md b/extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md
-index 8f2614186..245b22070 100644
---- a/extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md
-+++ b/extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md
-@@ -93,13 +93,14 @@ Always apply:
-   - Use `policy-audit-template-usage` and the MCP `template` asset to drive the artifact structure.
-    - Include exact command references for the checks that were run.
-    - Validate the resulting `policy-audit.<timestamp>.md` immediately after writing it.
-+   - Write a `## CI Cross-check` section after `## 7. Code Quality Checks`: a table `| Check | Claimed outcome | Claimed figure | Head | Source |` with one row per CI check whose result the review relies on, that is, the format, lint, type, and test checks of each changed language and `quality-checks7 / Code Quality & Tests (3.13)` for the Python total. The outcome is `pass` or `fail` from local evidence, and the head is read from `git log` of the reviewed branch. An absent or empty section is a reviewer contract error.
- 
- 5. **Run required checks**
-    - Prefer repo-defined, check-only commands.
-    - Default order:
--     1. formatting check
--     2. lint check
--     3. type check
-+     1. formatting check, read from the language's final-QC static artifact and not re-run
-+     2. lint check, read from the same static artifact and not re-run
-+     3. type check, read from the same static artifact and not re-run
-      4. tests
-    - A focused run of one test file to debug a specific failure is debugging only; a review check does not rest on it.
-    - If a tool cannot run in the environment, mark the affected section unverified or partial with a concrete reason.
 diff --git a/extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md b/extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md
 index 205dfd3b5..3c2bb5f30 100644
 --- a/extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md
@@ -1055,7 +963,7 @@ new file mode 100644
 index 000000000..7440c6923
 --- /dev/null
 +++ b/tests/scripts/claude-runtime/less-evidence-contract.Tests.ps1
-@@ -0,0 +1,253 @@
+@@ -0,0 +1,246 @@
 +#Requires -Version 7.0
 +#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 +
@@ -1075,16 +983,13 @@ index 000000000..7440c6923
 +    $resources = 'extensions/drm-copilot/resources'
 +    $claudeBundle = "$resources/claude-customizations"
 +    $agentsBundle = "$resources/codex-and-agents-customizations"
-+    $githubBundle = "$resources/customizations"
 +    $templateBundle = "$resources/templates/policy_audit"
 +
 +    $contract = @(
 +        @{ Id = 'CONTRACT-CLAUDE'; Path = '.claude/skills/atomic-plan-contract/SKILL.md' }
 +        @{ Id = 'CONTRACT-AGENTS'; Path = '.agents/skills/atomic-plan-contract/SKILL.md' }
-+        @{ Id = 'CONTRACT-GITHUB'; Path = '.github/skills/atomic-plan-contract/SKILL.md' }
 +        @{ Id = 'CONTRACT-CLAUDE-BUNDLE'; Path = "$claudeBundle/.claude/skills/atomic-plan-contract/SKILL.md" }
 +        @{ Id = 'CONTRACT-AGENTS-BUNDLE'; Path = "$agentsBundle/.agents/skills/atomic-plan-contract/SKILL.md" }
-+        @{ Id = 'CONTRACT-GITHUB-BUNDLE'; Path = "$githubBundle/.github/skills/atomic-plan-contract/SKILL.md" }
 +    )
 +    $planner = @(
 +        @{ Id = 'PLANNER-CLAUDE'; Path = '.claude/agents/atomic-planner.md' }
@@ -1099,10 +1004,6 @@ index 000000000..7440c6923
 +        @{ Id = 'WORKFLOW-AGENTS'; Path = '.agents/skills/feature-review-workflow/SKILL.md' }
 +        @{ Id = 'WORKFLOW-CLAUDE-BUNDLE'; Path = "$claudeBundle/.claude/skills/feature-review-workflow/SKILL.md" }
 +        @{ Id = 'WORKFLOW-AGENTS-BUNDLE'; Path = "$agentsBundle/.agents/skills/feature-review-workflow/SKILL.md" }
-+    )
-+    $workflowGithub = @(
-+        @{ Id = 'WORKFLOW-GITHUB'; Path = '.github/skills/feature-review-workflow/SKILL.md' }
-+        @{ Id = 'WORKFLOW-GITHUB-BUNDLE'; Path = "$githubBundle/.github/skills/feature-review-workflow/SKILL.md" }
 +    )
 +    $featureReview = @(
 +        @{ Id = 'REVIEWER-CLAUDE'; Path = '.claude/agents/feature-review.md' }
@@ -1147,7 +1048,7 @@ index 000000000..7440c6923
 +    }
 +
 +    $script:StaticArtifactRow = @(Get-LecRow -Row ($contract + $planner + $executor) -Token @('one final-QC static artifact per language'))
-+    $script:CrossCheckRow = @(Get-LecRow -Row ($template + $auditAgents + $workflowFull + $workflowGithub + $featureReview) -Token @('## CI Cross-check'))
++    $script:CrossCheckRow = @(Get-LecRow -Row ($template + $auditAgents + $workflowFull + $featureReview) -Token @('## CI Cross-check'))
 +    $script:CrossCheckSectionRow = @(Get-LecRow -Row $orchestrate -Token @('## CI Cross-check', 'gh pr checks', 'REMEDIATION_REQUIRED', 'autonomous', 'REVIEW_GATE_NOT_PASSED'))
 +    $script:PythonTotalRow = @(Get-LecRow -Row ($workflowFull + $featureReview + $template) -Token @('Enforce Python coverage thresholds'))
 +    $script:ScopeListingRow = @(Get-LecRow -Row $template -Token @('## 9. Summary of Changes'))
@@ -1155,13 +1056,13 @@ index 000000000..7440c6923
 +        Get-LecRow -Row $contract -Token @('Phase 0 baseline', 'no per-file or repo-wide coverage drop')
 +        Get-LecRow -Row $template -Token @('Baseline Coverage Documented', 'No Coverage Regression', 'If any required baseline artifact')
 +        Get-LecRow -Row $auditAgents -Token @('Fill in baseline coverage metrics')
-+        Get-LecRow -Row ($workflowFull + $workflowGithub + $featureReview) -Token @('regression on changed lines', 'Phase 0 baseline')
++        Get-LecRow -Row ($workflowFull + $featureReview) -Token @('regression on changed lines', 'Phase 0 baseline')
 +        Get-LecRow -Row $planner -Token @('one parallel test-suite baseline run per gate')
 +        Get-LecRow -Row $executor -Token @('no per-file or repo-wide coverage drop')
 +    )
 +    $script:KeptRow = @(
 +        Get-LecRow -Row $contract -Token @('preflight-fixes.<timestamp>.md', 'self-review.<timestamp>.md')
-+        Get-LecRow -Row ($workflowFull + $workflowGithub) -Token @('acceptance-criteria-tracking', 'Check off passing criteria')
++        Get-LecRow -Row ($workflowFull) -Token @('acceptance-criteria-tracking', 'Check off passing criteria')
 +    )
 +}
 +

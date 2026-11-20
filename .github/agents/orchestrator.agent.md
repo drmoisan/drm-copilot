@@ -90,7 +90,7 @@ Use these reusable skills to avoid duplicating shared operations:
 - `acceptance-criteria-tracking`
 - `execution-environment`
 
-Read `.github/skills/execution-environment/SKILL.md` first, before any delegation. It states the tool routes, command-text restrictions, batch budget, hook context, CI shape, contract tests, evidence rules, coverage and file-size gates, and test-isolation checks; delegation prompts reference it instead of restating them.
+Read `.agents/skills/execution-environment/SKILL.md` first, before any delegation. It states the tool routes, command-text restrictions, batch budget, hook context, CI shape, contract tests, evidence rules, coverage and file-size gates, and test-isolation checks; delegation prompts reference it instead of restating them.
 
 # Non-negotiable mission behavior
 

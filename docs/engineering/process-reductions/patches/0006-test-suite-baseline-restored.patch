@@ -171,7 +171,7 @@ index ce68a5407..da1caa762 100644
  - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
 -- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
 +- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed serial-run wording.
- - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
+ - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the four `atomic-plan-contract` copies and the other mirrored planning surfaces.
  - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`: the concurrent-review text of issue #1097 in the orchestrate and parallel-orchestrate skills, the orchestrator-state rule, the orchestrator agent, and their mirrors.
  - `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`: the light-remediation text of issue #1097 in the review and orchestration surfaces and their mirrors.
 @@ -145,7 +145,7 @@ These pass every validator rule and are found only by reading the plan against t
@@ -820,7 +820,7 @@ index ce68a5407..da1caa762 100644
  - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
 -- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
 +- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed serial-run wording.
- - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
+ - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the four `atomic-plan-contract` copies and the other mirrored planning surfaces.
  - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`: the concurrent-review text of issue #1097 in the orchestrate and parallel-orchestrate skills, the orchestrator-state rule, the orchestrator agent, and their mirrors.
  - `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`: the light-remediation text of issue #1097 in the review and orchestration surfaces and their mirrors.
 @@ -145,7 +145,7 @@ These pass every validator rule and are found only by reading the plan against t
@@ -3341,131 +3341,11 @@ index 8403f94cf..de2ffef49 100644
  
  2. `code-review.<timestamp>.md`
     - A feature-level code review relative to the base branch, emphasizing strongly typed Python best practices and repo compliance.
-diff --git a/.github/skills/atomic-plan-contract/SKILL.md b/.github/skills/atomic-plan-contract/SKILL.md
-index e96d668a0..26cb4c205 100644
---- a/.github/skills/atomic-plan-contract/SKILL.md
-+++ b/.github/skills/atomic-plan-contract/SKILL.md
-@@ -49,10 +49,11 @@ This section takes precedence over the literal-quoting rules of `## Wrap-Toleran
- When orchestration selects short path, a minimal plan is still mandatory and must include these blocks:
- 
- 1) Baseline capture block
--- static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
-+- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
- - required artifacts:
- 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
- 	- each baseline step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
-+	- baseline test-step artifacts for languages with mandatory coverage policy MUST include the pass and fail counts and numeric coverage headline values in `Output Summary:` (repo-wide percent and the percent of each in-scope file), read from the one parallel gate run.
- 
- 2) Delegated implementation block
- - explicit handoff task to the small-path implementation engineer,
-@@ -63,7 +64,7 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
- - rerun behavior when any step changes files or fails.
- - one final-QC artifact per QC command step (no aggregate-only final-QC artifact)
- - each final-QC step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
--- final-QC test commands for languages with mandatory coverage policy MUST run in coverage mode and record numeric coverage values from the single gate run in `Output Summary:`.
-+- final-QC test commands for languages with mandatory coverage policy MUST run in coverage mode and record numeric post-change coverage values from the single gate run in `Output Summary:`, compared with the `Phase 0 baseline` run of the same gate.
- - final-QC command tasks that are present in the approved plan MUST execute their stated commands; `SKIPPED` is invalid unless the task text itself explicitly authorizes a skip condition.
- 
- 4) Reduced audit block
-@@ -113,7 +114,9 @@ When a fully automated equivalent is unavailable, the plan MUST fail closed by r
- 
- Phase 0 carries no routine policy-read task. Agents still follow the reading order defined in `policy-compliance-order`, and a plan that keeps a policy-read task stays valid.
- 
--Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched, and no test suite runs in it. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
-+Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched and, for each language in scope with coverage policy, one `Phase 0 baseline` run of its test gate: one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, and one Jest coverage run where TypeScript is in scope. Each test-suite baseline artifact records the pass and fail counts, the repo-wide coverage, and the coverage of each in-scope file. The final gate's run of the same gate is compared with it: no new failing test, no per-file or repo-wide coverage drop, the thresholds still apply, and new behavior is tested. A new file has no pre-change run and is judged against the thresholds. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
-+
-+A plan written before this rule that captures static baselines only stays valid: preflight does not return it as a defect, its final gate reads coverage against the thresholds, and its audit records `N/A - no pre-change run`.
- 
- For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these artifacts exist:
- - baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
-@@ -129,9 +132,13 @@ Plans name evidence artifacts `<name>.<timestamp>.md` and never fix a plan-time
- 
- For any language in scope where repository policy requires coverage validation:
- 
--- The approved plan MUST include an explicit final-QC coverage capture task.
--- The final-QC artifact MUST record numeric coverage values (not placeholders such as `UNVERIFIED`).
--- The plan MUST include a threshold task that reports each changed file from the single gate run against the coverage thresholds. New behavior is tested. No earlier figure is compared.
-+- The approved plan MUST include explicit baseline and final-QC coverage capture tasks: the `Phase 0 baseline` run and the final gate run, each one run of the language's parallel gate.
-+- Baseline and final-QC artifacts MUST record numeric coverage values (not placeholders such as `UNVERIFIED`).
-+- Where policy requires no-regression and new-code thresholds, the plan MUST include a delta/threshold verification task that reports, with post-change figures from the single gate run:
-+	- baseline coverage, from the `Phase 0 baseline` artifact,
-+	- post-change coverage,
-+	- new/changed-code coverage.
-+- Each changed file meets the coverage thresholds and shows no drop against the `Phase 0 baseline`; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
- - If required coverage values are unavailable, the plan outcome MUST be remediation-required and MUST NOT be reported as PASS.
- 
- ## Final QA Loop (Required for Code/Test Changes)
-@@ -220,7 +227,7 @@ When a plan is generated or validated from a feature folder, resolve selected mo
- 
- ## Mode-Specific Mandatory Plan Gates
- 
--- `minor-audit` plans MUST include static baseline evidence tasks, targeted verification evidence tasks read from the gate run, and end-state evidence tasks.
-+- `minor-audit` plans MUST include baseline evidence tasks (static baselines and the `Phase 0 baseline` test-suite run), targeted verification evidence tasks read from the gate run, and end-state evidence tasks.
- - `minor-audit` plans MUST require `${feature-folder}/issue.md` to contain an explicit `## Acceptance Criteria` section; do not infer acceptance criteria from other `issue.md` sections.
- - `minor-audit` plans MUST NOT treat missing `spec.md` or `user-story.md` as automatic blockers.
- - `minor-audit` execution/validation/audit MUST fail closed when `spec.md` or `user-story.md` exists unexpectedly in the active folder, when the explicit `## Acceptance Criteria` section is missing from `issue.md`, when required Phase 0 artifacts are missing, or when checklist state contradicts evidence on disk.
-diff --git a/.github/skills/evidence-and-timestamp-conventions/SKILL.md b/.github/skills/evidence-and-timestamp-conventions/SKILL.md
-index 27a80a95d..d84850c71 100644
---- a/.github/skills/evidence-and-timestamp-conventions/SKILL.md
-+++ b/.github/skills/evidence-and-timestamp-conventions/SKILL.md
-@@ -116,6 +116,8 @@ For baseline evidence artifacts stored under `evidence/baseline/`, include an ou
- 
- The summary should be concise, human-readable, and include the most important result signal (e.g., “All checks passed”, “767 passed”, coverage total, or a brief error description).
- 
-+A Phase 0 test-suite baseline artifact's `Output Summary:` records the pass and fail counts and the numeric coverage of its one parallel gate run (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, or one Jest coverage run); the final gate is compared with this `Phase 0 baseline`.
-+
- If a fail-before run is required but impossible, include a short exception dossier with:
- - `WhyFailingRunImpossible: <1–3 sentences>`
- - An alternative proof section (e.g., absence-of-test proof)
-diff --git a/.github/skills/execution-environment/SKILL.md b/.github/skills/execution-environment/SKILL.md
-index ce68a5407..da1caa762 100644
---- a/.github/skills/execution-environment/SKILL.md
-+++ b/.github/skills/execution-environment/SKILL.md
-@@ -111,7 +111,7 @@ Run these after editing any mirrored or bundled file; each is under `tests/scrip
- - `test_push_down_issue_824_follow_ups.py`: pushed rules and skills name no consuming product.
- - `test_typescript_toolchain_instruction_contracts.py`: no reference to another test framework, and every backticked npm script token in the pinned mirrors exists in the root `package.json`.
- - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
--- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
-+- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed serial-run wording.
- - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
- - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`: the concurrent-review text of issue #1097 in the orchestrate and parallel-orchestrate skills, the orchestrator-state rule, the orchestrator agent, and their mirrors.
- - `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`: the light-remediation text of issue #1097 in the review and orchestration surfaces and their mirrors.
-@@ -145,7 +145,7 @@ These pass every validator rule and are found only by reading the plan against t
- - Python: measure a module with `--cov=<dotted.module>`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:<path>`; read branch figures from the JSON report.
- - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
- - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.
--- Per-file figures are read from the single gate run, and no earlier figure is compared.
-+- Per-file figures are read from the single gate run and compared with the `Phase 0 baseline` run of the same gate; a new file has no pre-change run and is judged against the thresholds.
- - File size follows three tiers for production, test, and reusable script files, counted in logical lines (a trailing terminator adds no line): at 500 lines look for a logical split (guidance); at 700 lines split more aggressively, and reviewers report a non-blocking Warning (advisory); above 800 lines a split is enforced regardless of logical separability (hard limit; exactly 800 passes). The hard limit is enforced by `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` in the existing PowerShell shards against `config/file-size-baseline.json`, where legacy files above 800 may shrink (with the entry tightened) or stay equal but may not grow, and by the PreToolUse hook `.claude/hooks/enforce-file-size-limit.ps1` (`.codex/hooks/enforce-file-size-limit.ps1`). New logic in a file near a tier goes into a new module and a new test file. Markdown is exempt.
- 
- ## Test Runtime
-diff --git a/.github/skills/feature-review-workflow/SKILL.md b/.github/skills/feature-review-workflow/SKILL.md
-index d578b9311..60bde6dd3 100644
---- a/.github/skills/feature-review-workflow/SKILL.md
-+++ b/.github/skills/feature-review-workflow/SKILL.md
-@@ -42,7 +42,7 @@ Always apply:
-   - `code-review-template` for `code-review.<timestamp>.md`
-   - `feature-audit-template` for `feature-audit.<timestamp>.md`
- - The MCP-resolved asset is the authoritative template source for review artifacts in this workflow.
--- When an installed template older than this change carries baseline fields, each baseline field is recorded as `N/A - no pre-change run`, and the comparison line reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
-+- Baseline fields are read from the plan's `Phase 0 baseline` artifact. A baseline field is recorded as `N/A - no pre-change run` only for a language or file with no pre-change run (a new file, or an item whose plan predates the `Phase 0 baseline` rule and captured static baselines only), and the comparison line then reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
- 
- ### No silent fixes
- 
-@@ -132,7 +132,7 @@ Always apply:
-      - toolchain checks fail
-      - the code review contains blockers
-      - required acceptance criteria are FAIL or PARTIAL
--     - coverage below the governing thresholds (the root `CLAUDE.md` thresholds when stated, otherwise the defaults: line 85%, branch 75% for branch-capable languages; repo-wide per language, modified files, or new files)
-+     - coverage below the governing thresholds (the root `CLAUDE.md` thresholds when stated, otherwise the defaults: line 85%, branch 75% for branch-capable languages; repo-wide per language, modified files including any regression on changed lines against the `Phase 0 baseline`, or new files)
-    - Choose the remediation path. Write one line `Remediation-Path: light` or `Remediation-Path: full` into the remediation inputs, and inside each blocking finding block one line `Finding-Scope: contained` or `Finding-Scope: design`. A missing path line reads as `full`, and a missing scope line reads as `design`. These lines never contain the substrings the orchestrator counts.
-    - Write `Remediation-Path: light` only when all of these hold: at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`; no change to a spec acceptance criterion, a public interface, or the file inventory beyond the branch diff plus tests and mirrors; no change to a validator contract, hook decision, or production logic beyond the finding's named location; the cycle is opened by a review; and the prior cycle was not light. Otherwise write `Remediation-Path: full`. The orchestrator may move a cycle to a heavier path and never to a lighter one.
-    - With `Remediation-Path: light`, also write a `## Light Fix Tasks` section: one canonical `- [ ] [P0-T1] ...` line per fix, numbered in order, each naming the file and the finding it fixes. Write no checkbox line anywhere else in the file, because the executor stop hook counts every checkbox line of the file it executes.
 diff --git a/docs/engineering/process-reductions/0001-parallel-only-test-gates.md b/docs/engineering/process-reductions/0001-parallel-only-test-gates.md
 index 512640e5f..10e75a12b 100644
 --- a/docs/engineering/process-reductions/0001-parallel-only-test-gates.md
 +++ b/docs/engineering/process-reductions/0001-parallel-only-test-gates.md
-@@ -917,7 +917,7 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
+@@ -908,7 +908,7 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
  
  ## Revert Steps
  
@@ -3474,7 +3354,7 @@ index 512640e5f..10e75a12b 100644
  2. Re-copy mirrors and bundles: copy `.claude/skills/execution-environment/SKILL.md` to its five copies, `.agents/skills/execution-environment/SKILL.md`, `.github/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md`. Copy each `atomic-plan-contract` source to its bundle copy: `extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md`, and `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md`.
  3. Regenerate Codex variants: run `scripts/dev_tools/generate_codex_agent_variants.py` in module form, then run it with `--check`.
  4. Restore pinned hashes: not applicable, because `parallel_orchestrator_surface_expectations.py` is outside the reduction path set.
-@@ -928,3 +928,21 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
+@@ -919,3 +919,21 @@ The `Test isolation` bullet names the isolation runs the plan performs: a seeded
  
  - A leak that `Invoke-PoshQCLeakScan` misses surfaces as a shard-dependent failure.
  - Remediation cycles cite order dependence.
@@ -3500,7 +3380,7 @@ diff --git a/docs/engineering/process-reductions/0005-policy-read-removal.md b/d
 index d04e1cb45..9be2a57e5 100644
 --- a/docs/engineering/process-reductions/0005-policy-read-removal.md
 +++ b/docs/engineering/process-reductions/0005-policy-read-removal.md
-@@ -105,7 +105,7 @@ The review prompt `.github/prompts/review-feature.prompt.md` and its bundle `ext
+@@ -106,7 +106,7 @@ The review prompt `.github/prompts/review-feature.prompt.md` and its bundle `ext
  ````Current
  
  1) Baseline capture block
@@ -3509,7 +3389,7 @@ index d04e1cb45..9be2a57e5 100644
  - required artifacts:
  	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
  	- each baseline step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
-@@ -116,7 +116,7 @@ The review prompt `.github/prompts/review-feature.prompt.md` and its bundle `ext
+@@ -117,7 +117,7 @@ The review prompt `.github/prompts/review-feature.prompt.md` and its bundle `ext
  
  1) Baseline capture block
  - policy reads in required order,
@@ -3518,7 +3398,7 @@ index d04e1cb45..9be2a57e5 100644
  - required artifacts:
  	- a Phase 0 policy-read evidence artifact in the canonical evidence location defined by `evidence-and-timestamp-conventions`
  	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
-@@ -131,7 +131,9 @@ The review prompt `.github/prompts/review-feature.prompt.md` and its bundle `ext
+@@ -132,7 +132,9 @@ The review prompt `.github/prompts/review-feature.prompt.md` and its bundle `ext
  
  Phase 0 carries no routine policy-read task. Agents still follow the reading order defined in `policy-compliance-order`, and a plan that keeps a policy-read task stays valid.
  
@@ -3529,7 +3409,7 @@ index d04e1cb45..9be2a57e5 100644
  
  For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these artifacts exist:
  - baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
-@@ -144,7 +146,9 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these
+@@ -145,7 +147,9 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these
  
  Phase 0 must include tasks to read policy files in the order defined in `policy-compliance-order`.
  
@@ -3540,7 +3420,7 @@ index d04e1cb45..9be2a57e5 100644
  
  For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both artifacts exist:
  - `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
-@@ -199,7 +203,7 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
+@@ -200,7 +204,7 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
  ````Current
  
  1) Baseline capture block
@@ -3549,7 +3429,7 @@ index d04e1cb45..9be2a57e5 100644
  - required artifacts:
  	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
  	- each baseline step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
-@@ -210,7 +214,7 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
+@@ -211,7 +215,7 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
  
  1) Baseline capture block
  - policy reads in required order,
@@ -3558,7 +3438,7 @@ index d04e1cb45..9be2a57e5 100644
  - required artifacts:
  	- a Phase 0 policy-read evidence artifact in the canonical evidence location defined by `evidence-and-timestamp-conventions`
  	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
-@@ -225,7 +229,9 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
+@@ -226,7 +230,9 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
  
  Phase 0 carries no routine policy-read task. Agents still follow the reading order defined in `policy-compliance-order`, and a plan that keeps a policy-read task stays valid.
  
@@ -3569,7 +3449,7 @@ index d04e1cb45..9be2a57e5 100644
  
  For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these artifacts exist:
  - baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
-@@ -238,7 +244,9 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these
+@@ -239,7 +245,9 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these
  
  Phase 0 must include tasks to read policy files in the order defined in `policy-compliance-order`.
  
@@ -3580,25 +3460,7 @@ index d04e1cb45..9be2a57e5 100644
  
  For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both artifacts exist:
  - `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
-@@ -288,7 +296,7 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
- 
- ````Current
- 1) Baseline capture block
--- static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
-+- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
- - required artifacts:
- 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
- 
-@@ -297,7 +305,7 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
- ````Prior
- 1) Baseline capture block
- - policy reads in required order,
--- static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
-+- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
- - required artifacts:
- 	- a Phase 0 policy-read evidence artifact in the canonical evidence location defined by `evidence-and-timestamp-conventions`
- 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
-@@ -341,14 +349,14 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
+@@ -273,14 +281,14 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
  
  ````Current
  - Sequential task numbering within each phase
@@ -3615,7 +3477,7 @@ index d04e1cb45..9be2a57e5 100644
  - Final phase: full QA loop for each applicable language, ending with the self-review task that writes `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`
  
  ````
-@@ -357,14 +365,14 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
+@@ -289,14 +297,14 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
  
  ````Current
  - Sequential task numbering within each phase
@@ -3632,7 +3494,7 @@ index d04e1cb45..9be2a57e5 100644
  - Final phase: full QA loop for each applicable language
  
  ````
-@@ -373,14 +381,14 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
+@@ -305,14 +313,14 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
  
  ````Current
  - Tasks: `- [ ] [P#-T#]` with sequential per-phase IDs.
@@ -3649,7 +3511,7 @@ index d04e1cb45..9be2a57e5 100644
  - Final phase runs the full toolchain QA loop in the order specified by `atomic-plan-contract` and records numeric coverage values where the repository policy requires coverage.
  
  ````
-@@ -406,14 +414,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
+@@ -338,14 +346,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
  ````Current
  - Task numbers are sequential within each phase.
  - Phase 0 exists.
@@ -3666,7 +3528,7 @@ index d04e1cb45..9be2a57e5 100644
  
  ````
  
-@@ -438,14 +446,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
+@@ -370,14 +378,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
  ````Current
  - Task numbers are sequential within each phase.
  - Phase 0 exists.
@@ -3683,7 +3545,7 @@ index d04e1cb45..9be2a57e5 100644
  
  ````
  
-@@ -470,14 +478,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
+@@ -402,14 +410,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
  ````Current
  - Task numbers are sequential within each phase.
  - Phase 0 exists.
@@ -3700,7 +3562,7 @@ index d04e1cb45..9be2a57e5 100644
  
  ````
  
-@@ -502,14 +510,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
+@@ -434,14 +442,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
  ````Current
  - Task numbers are sequential within each phase.
  - Phase 0 exists.
@@ -3717,7 +3579,7 @@ index d04e1cb45..9be2a57e5 100644
  
  ````
  
-@@ -709,14 +717,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
+@@ -641,14 +649,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
  
  ````Current
  - If Phase 0 does not include:
@@ -3734,7 +3596,7 @@ index d04e1cb45..9be2a57e5 100644
  
  ````
  
-@@ -724,14 +732,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
+@@ -656,14 +664,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
  
  ````Current
  - Phase 0 exists and includes:
@@ -3751,7 +3613,7 @@ index d04e1cb45..9be2a57e5 100644
  
  ````
  
-@@ -739,14 +747,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
+@@ -671,14 +679,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
  
  ````Current
  - If Phase 0 does not include:
@@ -3768,7 +3630,7 @@ index d04e1cb45..9be2a57e5 100644
  
  ````
  
-@@ -754,14 +762,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
+@@ -686,14 +694,14 @@ If the plan does not include Phase 0 tasks that cover the above, treat the plan
  
  ````Current
  - Phase 0 exists and includes:
@@ -4434,7 +4296,7 @@ index ce68a5407..da1caa762 100644
  - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
 -- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
 +- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed serial-run wording.
- - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
+ - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the four `atomic-plan-contract` copies and the other mirrored planning surfaces.
  - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`: the concurrent-review text of issue #1097 in the orchestrate and parallel-orchestrate skills, the orchestrator-state rule, the orchestrator agent, and their mirrors.
  - `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`: the light-remediation text of issue #1097 in the review and orchestration surfaces and their mirrors.
 @@ -145,7 +145,7 @@ These pass every validator rule and are found only by reading the plan against t
@@ -5025,7 +4887,7 @@ index ce68a5407..da1caa762 100644
  - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
 -- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
 +- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed serial-run wording.
- - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
+ - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the four `atomic-plan-contract` copies and the other mirrored planning surfaces.
  - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`: the concurrent-review text of issue #1097 in the orchestrate and parallel-orchestrate skills, the orchestrator-state rule, the orchestrator agent, and their mirrors.
  - `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`: the light-remediation text of issue #1097 in the review and orchestration surfaces and their mirrors.
 @@ -145,7 +145,7 @@ These pass every validator rule and are found only by reading the plan against t
@@ -7586,126 +7448,6 @@ index 8403f94cf..de2ffef49 100644
  
  2. `code-review.<timestamp>.md`
     - A feature-level code review relative to the base branch, emphasizing strongly typed Python best practices and repo compliance.
-diff --git a/extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md b/extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md
-index e96d668a0..26cb4c205 100644
---- a/extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md
-+++ b/extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md
-@@ -49,10 +49,11 @@ This section takes precedence over the literal-quoting rules of `## Wrap-Toleran
- When orchestration selects short path, a minimal plan is still mandatory and must include these blocks:
- 
- 1) Baseline capture block
--- static baseline capture (format, lint, type check, and analyzer findings) for each language that has explicit baseline command tasks in the plan; no test suite runs in this block.
-+- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
- - required artifacts:
- 	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
- 	- each baseline step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
-+	- baseline test-step artifacts for languages with mandatory coverage policy MUST include the pass and fail counts and numeric coverage headline values in `Output Summary:` (repo-wide percent and the percent of each in-scope file), read from the one parallel gate run.
- 
- 2) Delegated implementation block
- - explicit handoff task to the small-path implementation engineer,
-@@ -63,7 +64,7 @@ When orchestration selects short path, a minimal plan is still mandatory and mus
- - rerun behavior when any step changes files or fails.
- - one final-QC artifact per QC command step (no aggregate-only final-QC artifact)
- - each final-QC step artifact MUST include: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
--- final-QC test commands for languages with mandatory coverage policy MUST run in coverage mode and record numeric coverage values from the single gate run in `Output Summary:`.
-+- final-QC test commands for languages with mandatory coverage policy MUST run in coverage mode and record numeric post-change coverage values from the single gate run in `Output Summary:`, compared with the `Phase 0 baseline` run of the same gate.
- - final-QC command tasks that are present in the approved plan MUST execute their stated commands; `SKIPPED` is invalid unless the task text itself explicitly authorizes a skip condition.
- 
- 4) Reduced audit block
-@@ -113,7 +114,9 @@ When a fully automated equivalent is unavailable, the plan MUST fail closed by r
- 
- Phase 0 carries no routine policy-read task. Agents still follow the reading order defined in `policy-compliance-order`, and a plan that keeps a policy-read task stays valid.
- 
--Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched, and no test suite runs in it. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
-+Phase 0 must also capture static baselines (format, lint, type check, and analyzer findings) for the languages touched and, for each language in scope with coverage policy, one `Phase 0 baseline` run of its test gate: one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, and one Jest coverage run where TypeScript is in scope. Each test-suite baseline artifact records the pass and fail counts, the repo-wide coverage, and the coverage of each in-scope file. The final gate's run of the same gate is compared with it: no new failing test, no per-file or repo-wide coverage drop, the thresholds still apply, and new behavior is tested. A new file has no pre-change run and is judged against the thresholds. Baseline artifact conventions (location + required fields) are defined in `evidence-and-timestamp-conventions`.
-+
-+A plan written before this rule that captures static baselines only stays valid: preflight does not return it as a defect, its final gate reads coverage against the thresholds, and its audit records `N/A - no pre-change run`.
- 
- For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these artifacts exist:
- - baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
-@@ -129,9 +132,13 @@ Plans name evidence artifacts `<name>.<timestamp>.md` and never fix a plan-time
- 
- For any language in scope where repository policy requires coverage validation:
- 
--- The approved plan MUST include an explicit final-QC coverage capture task.
--- The final-QC artifact MUST record numeric coverage values (not placeholders such as `UNVERIFIED`).
--- The plan MUST include a threshold task that reports each changed file from the single gate run against the coverage thresholds. New behavior is tested. No earlier figure is compared.
-+- The approved plan MUST include explicit baseline and final-QC coverage capture tasks: the `Phase 0 baseline` run and the final gate run, each one run of the language's parallel gate.
-+- Baseline and final-QC artifacts MUST record numeric coverage values (not placeholders such as `UNVERIFIED`).
-+- Where policy requires no-regression and new-code thresholds, the plan MUST include a delta/threshold verification task that reports, with post-change figures from the single gate run:
-+	- baseline coverage, from the `Phase 0 baseline` artifact,
-+	- post-change coverage,
-+	- new/changed-code coverage.
-+- Each changed file meets the coverage thresholds and shows no drop against the `Phase 0 baseline`; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
- - If required coverage values are unavailable, the plan outcome MUST be remediation-required and MUST NOT be reported as PASS.
- 
- ## Final QA Loop (Required for Code/Test Changes)
-@@ -220,7 +227,7 @@ When a plan is generated or validated from a feature folder, resolve selected mo
- 
- ## Mode-Specific Mandatory Plan Gates
- 
--- `minor-audit` plans MUST include static baseline evidence tasks, targeted verification evidence tasks read from the gate run, and end-state evidence tasks.
-+- `minor-audit` plans MUST include baseline evidence tasks (static baselines and the `Phase 0 baseline` test-suite run), targeted verification evidence tasks read from the gate run, and end-state evidence tasks.
- - `minor-audit` plans MUST require `${feature-folder}/issue.md` to contain an explicit `## Acceptance Criteria` section; do not infer acceptance criteria from other `issue.md` sections.
- - `minor-audit` plans MUST NOT treat missing `spec.md` or `user-story.md` as automatic blockers.
- - `minor-audit` execution/validation/audit MUST fail closed when `spec.md` or `user-story.md` exists unexpectedly in the active folder, when the explicit `## Acceptance Criteria` section is missing from `issue.md`, when required Phase 0 artifacts are missing, or when checklist state contradicts evidence on disk.
-diff --git a/extensions/drm-copilot/resources/customizations/.github/skills/evidence-and-timestamp-conventions/SKILL.md b/extensions/drm-copilot/resources/customizations/.github/skills/evidence-and-timestamp-conventions/SKILL.md
-index 27a80a95d..d84850c71 100644
---- a/extensions/drm-copilot/resources/customizations/.github/skills/evidence-and-timestamp-conventions/SKILL.md
-+++ b/extensions/drm-copilot/resources/customizations/.github/skills/evidence-and-timestamp-conventions/SKILL.md
-@@ -116,6 +116,8 @@ For baseline evidence artifacts stored under `evidence/baseline/`, include an ou
- 
- The summary should be concise, human-readable, and include the most important result signal (e.g., “All checks passed”, “767 passed”, coverage total, or a brief error description).
- 
-+A Phase 0 test-suite baseline artifact's `Output Summary:` records the pass and fail counts and the numeric coverage of its one parallel gate run (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, or one Jest coverage run); the final gate is compared with this `Phase 0 baseline`.
-+
- If a fail-before run is required but impossible, include a short exception dossier with:
- - `WhyFailingRunImpossible: <1–3 sentences>`
- - An alternative proof section (e.g., absence-of-test proof)
-diff --git a/extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md b/extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md
-index ce68a5407..da1caa762 100644
---- a/extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md
-+++ b/extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md
-@@ -111,7 +111,7 @@ Run these after editing any mirrored or bundled file; each is under `tests/scrip
- - `test_push_down_issue_824_follow_ups.py`: pushed rules and skills name no consuming product.
- - `test_typescript_toolchain_instruction_contracts.py`: no reference to another test framework, and every backticked npm script token in the pinned mirrors exists in the root `package.json`.
- - `tests/scripts/claude-runtime/claude-architecture-doc.Tests.ps1` and `tests/scripts/claude-runtime/hook-dependency-guard-completeness.Tests.ps1`: agent tool names in the architecture document and the guarded dot-source pattern in hooks.
--- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed test-suite baseline wording.
-+- `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`: per-file required and forbidden gate wording in the mirrored skills, agents, and templates, and the sweep of those surfaces for removed serial-run wording.
- - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the six `atomic-plan-contract` copies and the other mirrored planning surfaces.
- - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`: the concurrent-review text of issue #1097 in the orchestrate and parallel-orchestrate skills, the orchestrator-state rule, the orchestrator agent, and their mirrors.
- - `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`: the light-remediation text of issue #1097 in the review and orchestration surfaces and their mirrors.
-@@ -145,7 +145,7 @@ These pass every validator rule and are found only by reading the plan against t
- - Python: measure a module with `--cov=<dotted.module>`, `--cov-branch`, `--cov-report=term-missing`, and `--cov-report=json:<path>`; read branch figures from the JSON report.
- - TypeScript: a new production file needs its own entry in the `coverageThreshold` map of `extensions/drm-copilot/jest.config.cjs`; Jest runs through `node run-jest.cjs` in `extensions/drm-copilot/`.
- - PowerShell: per-file line coverage is read from `artifacts/pester/powershell-coverage.xml` written by the self-hosted PoshQC module.
--- Per-file figures are read from the single gate run, and no earlier figure is compared.
-+- Per-file figures are read from the single gate run and compared with the `Phase 0 baseline` run of the same gate; a new file has no pre-change run and is judged against the thresholds.
- - File size follows three tiers for production, test, and reusable script files, counted in logical lines (a trailing terminator adds no line): at 500 lines look for a logical split (guidance); at 700 lines split more aggressively, and reviewers report a non-blocking Warning (advisory); above 800 lines a split is enforced regardless of logical separability (hard limit; exactly 800 passes). The hard limit is enforced by `tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1` in the existing PowerShell shards against `config/file-size-baseline.json`, where legacy files above 800 may shrink (with the entry tightened) or stay equal but may not grow, and by the PreToolUse hook `.claude/hooks/enforce-file-size-limit.ps1` (`.codex/hooks/enforce-file-size-limit.ps1`). New logic in a file near a tier goes into a new module and a new test file. Markdown is exempt.
- 
- ## Test Runtime
-diff --git a/extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md b/extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md
-index d578b9311..60bde6dd3 100644
---- a/extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md
-+++ b/extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md
-@@ -42,7 +42,7 @@ Always apply:
-   - `code-review-template` for `code-review.<timestamp>.md`
-   - `feature-audit-template` for `feature-audit.<timestamp>.md`
- - The MCP-resolved asset is the authoritative template source for review artifacts in this workflow.
--- When an installed template older than this change carries baseline fields, each baseline field is recorded as `N/A - no pre-change run`, and the comparison line reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
-+- Baseline fields are read from the plan's `Phase 0 baseline` artifact. A baseline field is recorded as `N/A - no pre-change run` only for a language or file with no pre-change run (a new file, or an item whose plan predates the `Phase 0 baseline` rule and captured static baselines only), and the comparison line then reads `Baseline: N/A - no pre-change run -> Post-change: <percent>. Change: N/A.`
- 
- ### No silent fixes
- 
-@@ -132,7 +132,7 @@ Always apply:
-      - toolchain checks fail
-      - the code review contains blockers
-      - required acceptance criteria are FAIL or PARTIAL
--     - coverage below the governing thresholds (the root `CLAUDE.md` thresholds when stated, otherwise the defaults: line 85%, branch 75% for branch-capable languages; repo-wide per language, modified files, or new files)
-+     - coverage below the governing thresholds (the root `CLAUDE.md` thresholds when stated, otherwise the defaults: line 85%, branch 75% for branch-capable languages; repo-wide per language, modified files including any regression on changed lines against the `Phase 0 baseline`, or new files)
-    - Choose the remediation path. Write one line `Remediation-Path: light` or `Remediation-Path: full` into the remediation inputs, and inside each blocking finding block one line `Finding-Scope: contained` or `Finding-Scope: design`. A missing path line reads as `full`, and a missing scope line reads as `design`. These lines never contain the substrings the orchestrator counts.
-    - Write `Remediation-Path: light` only when all of these hold: at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`; no change to a spec acceptance criterion, a public interface, or the file inventory beyond the branch diff plus tests and mirrors; no change to a validator contract, hook decision, or production logic beyond the finding's named location; the cycle is opened by a review; and the prior cycle was not light. Otherwise write `Remediation-Path: full`. The orchestrator may move a cycle to a heavier path and never to a lighter one.
-    - With `Remediation-Path: light`, also write a `## Light Fix Tasks` section: one canonical `- [ ] [P0-T1] ...` line per fix, numbered in order, each naming the file and the finding it fixes. Write no checkbox line anywhere else in the file, because the executor stop hook counts every checkbox line of the file it executes.
 diff --git a/extensions/drm-copilot/resources/feature-templates/bug/plan.yyyy-MM-ddTHH-mm.md b/extensions/drm-copilot/resources/feature-templates/bug/plan.yyyy-MM-ddTHH-mm.md
 index 22f12cb63..b8ad83acb 100644
 --- a/extensions/drm-copilot/resources/feature-templates/bug/plan.yyyy-MM-ddTHH-mm.md
@@ -7922,16 +7664,14 @@ index 38ee6ccec..aff2e574b 100644
  }
  
  Describe 'Parallel gate wording' {
-@@ -79,20 +81,20 @@
+@@ -79,17 +81,17 @@
      }
  
      It 'PGW-<Id> carries the required wording and no forbidden wording' -ForEach @(
 -        @{ Id = 'PLAN-CLAUDE'; Path = '.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run') + $script:D13Required; Forbidden = $script:ContractForbidden }
 -        @{ Id = 'PLAN-AGENTS'; Path = '.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run') + $script:D13Required; Forbidden = $script:ContractForbidden }
--        @{ Id = 'PLAN-GITHUB'; Path = '.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run') + $script:D13Required; Forbidden = $script:ContractForbidden }
 -        @{ Id = 'PLAN-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run') + $script:D13Required; Forbidden = $script:ContractForbidden }
 -        @{ Id = 'PLAN-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run') + $script:D13Required; Forbidden = $script:ContractForbidden }
--        @{ Id = 'PLAN-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run') + $script:D13Required; Forbidden = $script:ContractForbidden }
 -        @{ Id = 'QA-PS-CLAUDE'; Path = '.claude/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only') + $script:D13Required; Forbidden = $script:PowerShellQaGateForbidden }
 -        @{ Id = 'QA-PS-AGENTS'; Path = '.agents/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only') + $script:D13Required; Forbidden = $script:PowerShellQaGateForbidden }
 -        @{ Id = 'QA-PS-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only') + $script:D13Required; Forbidden = $script:PowerShellQaGateForbidden }
@@ -7942,10 +7682,8 @@ index 38ee6ccec..aff2e574b 100644
 -        @{ Id = 'QA-PY-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only') + $script:D13Required; Forbidden = $script:PythonQaGateForbidden }
 +        @{ Id = 'PLAN-CLAUDE'; Path = '.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:ContractForbidden }
 +        @{ Id = 'PLAN-AGENTS'; Path = '.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:ContractForbidden }
-+        @{ Id = 'PLAN-GITHUB'; Path = '.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:ContractForbidden }
 +        @{ Id = 'PLAN-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:ContractForbidden }
 +        @{ Id = 'PLAN-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:ContractForbidden }
-+        @{ Id = 'PLAN-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md'; Required = @('single gate run', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:ContractForbidden }
 +        @{ Id = 'QA-PS-CLAUDE'; Path = '.claude/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:PowerShellQaGateForbidden }
 +        @{ Id = 'QA-PS-AGENTS'; Path = '.agents/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:PowerShellQaGateForbidden }
 +        @{ Id = 'QA-PS-CLAUDE-BUNDLE'; Path = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md'; Required = @('single gate run', 'Invoke-PoshQCParallelTest', 'debugging only', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:PowerShellQaGateForbidden }
@@ -7956,9 +7694,7 @@ index 38ee6ccec..aff2e574b 100644
 +        @{ Id = 'QA-PY-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md'; Required = @('single gate run', 'poetry run pytest -n auto', 'debugging only', 'Phase 0 baseline') + $script:D13Required; Forbidden = $script:PythonQaGateForbidden }
          @{ Id = 'REVIEW-CLAUDE'; Path = '.claude/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired + $script:D13Required + @('run-test-suite.sh'); Forbidden = $script:ReviewLauncherForbidden }
          @{ Id = 'REVIEW-AGENTS'; Path = '.agents/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired + $script:D13Required + @('run-test-suite.sh'); Forbidden = $script:ReviewLauncherForbidden }
-         @{ Id = 'REVIEW-GITHUB'; Path = '.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
-@@ -101,9 +103,9 @@
-         @{ Id = 'REVIEW-GITHUB-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md'; Required = $script:ReviewRequired; Forbidden = $script:ReviewForbidden }
+@@ -98,8 +100,8 @@
          @{ Id = 'ADAPTER-AGENTS'; Path = '.agents/skills/repo-automation-adapter/SKILL.md'; Required = @('not a validation gate', 'Invoke-PoshQCParallelTest'); Forbidden = @() }
          @{ Id = 'ADAPTER-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/repo-automation-adapter/SKILL.md'; Required = @('not a validation gate', 'Invoke-PoshQCParallelTest'); Forbidden = @() }
 -        @{ Id = 'EXEC-CLAUDE'; Path = '.claude/agents/atomic-executor.md'; Required = @('Invoke-PoshQCParallelTest', 'poetry run pytest -n auto') + @('run-test-suite.sh'); Forbidden = $script:ExecutorRouteForbidden }
@@ -7970,7 +7706,7 @@ index 38ee6ccec..aff2e574b 100644
          @{ Id = 'EXEC-CODEX-POWERSHELL'; Path = '.codex/agents/powershell-atomic-executor.toml'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = @('run_poshqc_test') }
          @{ Id = 'COPILOT-EXEC'; Path = '.github/agents/atomic_executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
          @{ Id = 'COPILOT-EXEC-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/atomic_executor.agent.md'; Required = @('Invoke-PoshQCParallelTest'); Forbidden = $script:CopilotPesterForbidden }
-@@ -131,8 +133,8 @@
+@@ -127,7 +129,7 @@
          @{ Id = 'COPILOT-STAGED-REVIEW-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/staged-review.agent.md'; Required = @('Invoke-PoshQCParallelTest', 'pytest -n auto', 'debugging only'); Forbidden = @() }
          @{ Id = 'AUDIT-TEMPLATE'; Path = 'docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
          @{ Id = 'AUDIT-TEMPLATE-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
@@ -7980,8 +7716,7 @@ index 38ee6ccec..aff2e574b 100644
 +        @{ Id = 'AUDIT-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest', 'Phase 0 baseline'); Forbidden = @() }
          @{ Id = 'BRIEF-CLAUDE'; Path = '.claude/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
          @{ Id = 'BRIEF-AGENTS'; Path = '.agents/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
-         @{ Id = 'BRIEF-GITHUB'; Path = '.github/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
-@@ -180,18 +182,13 @@
+@@ -175,18 +177,13 @@
  
      Context 'Class sweep' {
          BeforeAll {
@@ -8006,7 +7741,7 @@ index 38ee6ccec..aff2e574b 100644
                  'Run the regression to confirm'
              )
  
-@@ -290,7 +287,7 @@
+@@ -285,7 +282,7 @@
                  })
  
              # Assert

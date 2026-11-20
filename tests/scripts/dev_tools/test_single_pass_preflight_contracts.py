@@ -19,7 +19,6 @@ _FT = "extensions/drm-copilot/resources/feature-templates"
 _CONTRACTS = (
     ".claude/skills/atomic-plan-contract/SKILL.md",
     ".agents/skills/atomic-plan-contract/SKILL.md",
-    ".github/skills/atomic-plan-contract/SKILL.md",
 )
 _RESOURCES = "extensions/drm-copilot/resources"
 _CONTRACT_COPIES = (
@@ -27,7 +26,6 @@ _CONTRACT_COPIES = (
     f"{_RESOURCES}/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md",
     f"{_RESOURCES}/codex-and-agents-customizations/.agents/skills/"
     "atomic-plan-contract/SKILL.md",
-    f"{_RESOURCES}/customizations/.github/skills/atomic-plan-contract/SKILL.md",
 )
 _PREFLIGHT_SURFACES = (
     *_CONTRACTS,
@@ -63,7 +61,6 @@ _REMEDIATION_SURFACES = (
     ".claude/agents/orchestrator.md",
     ".claude/skills/remediation-handoff-atomic-planner/SKILL.md",
     ".agents/skills/remediation-handoff-atomic-planner/SKILL.md",
-    ".github/skills/remediation-handoff-atomic-planner/SKILL.md",
     ".codex/prompts/feature-review-remediate.md",
 )
 _COPILOT_BASE_EDITED = (
@@ -71,9 +68,6 @@ _COPILOT_BASE_EDITED = (
     ".github/agents/atomic_planning.agent.md",
     ".github/agents/task-researcher.agent.md",
     ".github/agents/orchestrator.agent.md",
-    ".github/skills/atomic-plan-contract/SKILL.md",
-    ".github/skills/remediation-handoff-atomic-planner/SKILL.md",
-    ".github/skills/execution-environment/SKILL.md",
     ".github/prompts/generate-atomic-plan.prompt.md",
 )
 _COPILOT_LANGUAGE_EXECUTORS = tuple(
@@ -95,8 +89,6 @@ _ROUTER_AND_PROMPT_SURFACES = (
         for root in (".claude", ".agents")
         for lang in ("csharp", "powershell", "python")
     ),
-    ".github/skills/csharp-change-budget-router/SKILL.md",
-    ".github/skills/powershell-change-budget-router/SKILL.md",
     *(
         f".github/prompts/{name}.prompt.md"
         for name in (
@@ -405,7 +397,7 @@ def test_contract_premortem_mirror_parity_requires_brief_update_task() -> None:
     """The contract's Mirror parity label requires a task that updates the brief.
 
     The obligation sits inside the design-level section of every contract
-    copy and names the triggering fact kinds, the six copies, and the bullet.
+    copy and names the triggering fact kinds, the four copies, and the bullet.
     """
 
     # Arrange
@@ -413,7 +405,7 @@ def test_contract_premortem_mirror_parity_requires_brief_update_task() -> None:
         "The `Mirror parity` bullet also covers the execution-environment brief",
         "adds or renames a CI job, changes a required status context, a tool "
         "route, or a batch-budget rule",
-        "includes a task that updates the brief in the same change, in all six "
+        "includes a task that updates the brief in the same change, in all four "
         "byte-identical copies",
         "the bullet names that task",
     )

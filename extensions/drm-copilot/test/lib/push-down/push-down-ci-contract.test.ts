@@ -242,8 +242,6 @@ describe("destination CI contract", () => {
       "extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md",
       ".agents/skills/execution-environment/SKILL.md",
       "extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md",
-      ".github/skills/execution-environment/SKILL.md",
-      "extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md",
     ];
     const token = ".github/drm-copilot/ci-required-checks.json";
 

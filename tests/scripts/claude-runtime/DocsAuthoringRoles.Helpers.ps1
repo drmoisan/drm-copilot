@@ -71,15 +71,13 @@ function Get-DocsAuthoringAgentPath {
 }
 
 function Get-DocsAuthoringSkillRoot {
-    # Returns the six skill roots, keyed by host and bundle.
+    # Returns the four skill roots, keyed by host and bundle; issue #1032 retired the Copilot skill copies.
     $bundle = 'extensions/drm-copilot/resources'
     return [ordered]@{
-        Claude        = '.claude/skills'
-        ClaudeBundle  = "$bundle/claude-customizations/.claude/skills"
-        Copilot       = '.github/skills'
-        CopilotBundle = "$bundle/customizations/.github/skills"
-        Codex         = '.agents/skills'
-        CodexBundle   = "$bundle/codex-and-agents-customizations/.agents/skills"
+        Claude       = '.claude/skills'
+        ClaudeBundle = "$bundle/claude-customizations/.claude/skills"
+        Codex        = '.agents/skills'
+        CodexBundle  = "$bundle/codex-and-agents-customizations/.agents/skills"
     }
 }
 

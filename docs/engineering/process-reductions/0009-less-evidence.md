@@ -77,6 +77,7 @@ Installed assets (decision D9): installed MCP keeps serving the old policy-audit
 - `docs/engineering/process-reductions/patches/0009-less-evidence.patch`: stored patch
 - `docs/engineering/process-reductions/0009-less-evidence.md`: this entry
 - `docs/engineering/process-reductions/README.md`: index row
+- Issue #1032 retired the Copilot skill copies (the `skills` folder under `.github` and its bundle copy under `extensions/drm-copilot/resources/customizations/`). In the same commit this entry's revert blocks and stored-patch sections for those copies were removed; a revert step that names one of those copies no longer applies.
 
 ## Stored Patch
 

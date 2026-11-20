@@ -132,7 +132,6 @@ Customization conversion and publishing:
 - `drmCopilotExtension.pushDownCopilotCustomizations`
 - `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`
 - `drmCopilotExtension.pushDownClaudeCustomizations`
-- `drmCopilotExtension.syncAgentsFromInstructions`
 
 PowerShell quality control (PoshQC):
 
@@ -278,10 +277,6 @@ These lines appear in the summary artifact's `exclusions` object (with `conflict
 
 Limitations: the push-down never deletes destination files, so a file already present at an excluded path is removed by the destination once. Detection of dangling references (an excluded file that other pushed-down content still cites) is a non-goal of this feature and is not reported.
 
-### Sync AGENTS.md from instructions
-
-`drmCopilotExtension.syncAgentsFromInstructions` regenerates `AGENTS.md` in the destination workspace by discovering all `.github/instructions/*.instructions.md` files under the active workspace root, aggregating their content deterministically, and writing the consolidated result. This replaces any manual edits to `AGENTS.md` with a fully generated output derived from the canonical instruction files.
-
 ## Requirements
 
 ### Root toolchain
@@ -304,6 +299,26 @@ Both images also install Git >=2.56.0, GitHub CLI 2.103.3, .NET SDK 10.0.403, uv
 Run `scripts/dev-tools/bootstrap-host.ps1` without `-Apply` to preview missing or below-minimum managed tools. Apply mode installs or upgrades them according to `scripts/host-tools.manifest.json`; equal or newer host versions remain unchanged, and unreadable versions fail explicitly.
 
 Python 3.11/3.12 compatibility jobs, consumer engine requirements, and release-publishing runtime pins remain independent of this development baseline.
+
+### Copilot collision controls
+
+GitHub Copilot in VS Code reads the shared `.agents/skills` source and, by default, also the generated Claude copies under `.claude/`, so each skill, rule, and agent can load twice. Add these keys to your VS Code user settings (user scope; the repository's `.vscode/settings.json` does not carry them) to stop Copilot from loading the Claude copies:
+
+```json
+{
+  "chat.agentSkillsLocations": { ".claude/skills": false },
+  "chat.instructionsFilesLocations": { ".claude/rules": false },
+  "chat.agentFilesLocations": { ".claude/agents": false },
+  "chat.useClaudeMdFile": false
+}
+```
+
+- `chat.agentSkillsLocations` with `".claude/skills": false`: Copilot reads skills from `.agents/skills` only.
+- `chat.instructionsFilesLocations` with `".claude/rules": false`: Copilot reads path-scoped instructions from `.github/instructions` only.
+- `chat.agentFilesLocations` with `".claude/agents": false`: Copilot reads agents from `.github/agents` only, while that folder remains.
+- `chat.useClaudeMdFile` set to `false`: Copilot reads the shared standing instructions from `AGENTS.md` and does not also load `CLAUDE.md`.
+
+Leave `chat.useAgentsMdFile`, `chat.useClaudeHooks`, and `github.copilot.chat.codeGeneration.useInstructionFiles` at their defaults. The Copilot CLI and the Copilot cloud agent do not read these editor settings.
 
 ### Standalone MCP package
 
@@ -446,6 +461,6 @@ The repository uses the following GitHub Actions workflows under [.github/workfl
 
 ## Policy and skills references
 
-- Repository tone and policy: [CLAUDE.md](CLAUDE.md), `.github/copilot-instructions.md`, and `.github/instructions/`.
+- Repository tone and policy: [AGENTS.md](AGENTS.md) (shared tone and guidance), [CLAUDE.md](CLAUDE.md), and `.github/instructions/`; `.github/copilot-instructions.md` holds Copilot-only text.
 - Language-specific rules: [.claude/rules/](.claude/rules/) (Python, PowerShell, TypeScript, C#), scoped by file path.
-- Skills taxonomy: [.github/skills/README.md](.github/skills/README.md), [.claude/skills/](.claude/skills/), and [.agents/skills/](.agents/skills/).
+- Skills taxonomy: [.agents/skills/README.md](.agents/skills/README.md) (the shared skill source), [.claude/skills/](.claude/skills/), and [.agents/skills/](.agents/skills/).

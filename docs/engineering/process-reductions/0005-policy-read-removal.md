@@ -44,6 +44,7 @@ The review prompt `.github/prompts/review-feature.prompt.md` and its bundle `ext
 - `.github/prompts/review-feature.prompt.md`
 - `extensions/drm-copilot/resources/customizations/.github/prompts/review-feature.prompt.md`, a byte-identical bundle copy
 - `docs/engineering/process-reductions/README.md`, the index row of this entry
+- Issue #1032 retired the Copilot skill copies (the `skills` folder under `.github` and its bundle copy under `extensions/drm-copilot/resources/customizations/`). In the same commit this entry's revert blocks and stored-patch sections for those copies were removed; a revert step that names one of those copies no longer applies.
 
 ## Prior Text
 
@@ -273,75 +274,6 @@ For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both a
 - `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
 - baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
 - approved-plan checklist state MUST remain unchecked for any Phase 0 task whose artifact is absent or whose artifact fields are incomplete.
-
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-- Executing plans with strict format requirements.
-- Enforcing Phase 0 baseline capture and final QA loops.
-
-
-````
-
-````Prior
-- Executing plans with strict format requirements.
-- Enforcing Phase 0 policy reading + baseline capture and final QA loops.
-
-
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-1) Baseline capture block
-- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
-- required artifacts:
-	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
-
-````
-
-````Prior
-1) Baseline capture block
-- policy reads in required order,
-- baseline capture for each language that has explicit baseline command tasks in the plan: static baselines (format, lint, type check, and analyzer findings) and, for each language with mandatory coverage policy, one `Phase 0 baseline` run of its test gate (one `Invoke-PoshQCParallelTest`, one `pytest -n auto` with coverage, one Jest coverage run).
-- required artifacts:
-	- a Phase 0 policy-read evidence artifact in the canonical evidence location defined by `evidence-and-timestamp-conventions`
-	- one baseline artifact per baseline command step (no aggregate-only baseline artifact)
-
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-
-Phase 0 carries no routine policy-read task. Agents still follow the reading order defined in `policy-compliance-order`, and a plan that keeps a policy-read task stays valid.
-
-
-````
-
-````Prior
-
-Phase 0 must include tasks to read policy files in the order defined in `policy-compliance-order`.
-
-
-````
-
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-
-For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless these artifacts exist:
-- baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
-
-````
-
-````Prior
-
-For short-path/minimal-audit plans, Phase 0 evidence is incomplete unless both artifacts exist:
-- `phase0-instructions-read.md` with at least: `Timestamp:`, `Policy Order:`, and explicit list of files read.
-- baseline command-step artifacts with at least: `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for each baseline check executed.
 
 ````
 

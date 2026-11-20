@@ -1,6 +1,6 @@
 /**
  * Contract tests of the `push-down-integration` skill (issue #1051, S51 to
- * S54). The six tracked copies are read from the repository tree; the S53 and
+ * S54). The four tracked copies are read from the repository tree; the S53 and
  * S54 negative cases edit an in-memory copy of the bundled Claude text.
  */
 
@@ -19,10 +19,8 @@ const SKILL = "skills/push-down-integration/SKILL.md";
 const COPIES = [
   `.agents/${SKILL}`,
   `.claude/${SKILL}`,
-  `.github/${SKILL}`,
   `${RESOURCES}/codex-and-agents-customizations/.agents/${SKILL}`,
   `${RESOURCES}/claude-customizations/.claude/${SKILL}`,
-  `${RESOURCES}/customizations/.github/${SKILL}`,
 ] as const;
 
 /** Read a tracked repository file. */
@@ -87,7 +85,7 @@ function notCheckedBullets(text: string): string[] {
 }
 
 describe("push-down-integration skill", () => {
-  it("S51 positive: the six copies are byte-identical", () => {
+  it("S51 positive: the four copies are byte-identical", () => {
     const texts = COPIES.map(read);
 
     expect(new Set(texts).size).toBe(1);
@@ -98,7 +96,7 @@ describe("push-down-integration skill", () => {
 
   it("S51 negative: a copy that differs by one byte is detected", () => {
     const texts = [...COPIES.map(read)];
-    texts[5] = `${texts[5] ?? ""} `;
+    texts[3] = `${texts[3] ?? ""} `;
 
     expect(new Set(texts).size).toBe(2);
   });

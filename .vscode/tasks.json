@@ -1275,28 +1275,6 @@
 		},
 		{
 			"args": [
-				"-NoLogo",
-				"-NoProfile",
-				"-ExecutionPolicy",
-				"Bypass",
-				"-File",
-				"${workspaceFolder}/scripts/dev-tools/sync-agents-from-instructions.ps1"
-			],
-			"command": "pwsh",
-			"detail": "Synchronizes AGENTS.md from the canonical instruction files.",
-			"label": "Dev: Sync AGENTS.md from Instructions",
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"presentation": {
-				"panel": "new",
-				"reveal": "always"
-			},
-			"problemMatcher": [],
-			"type": "shell"
-		},
-		{
-			"args": [
 				"run",
 				"format"
 			],

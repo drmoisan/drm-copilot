@@ -72,6 +72,7 @@ Research section 5 of `docs/features/active/reduce-feature-cycle-time-with-rever
 - `docs/engineering/process-reductions/README.md`, the index row of this entry
 
 Deferred wording (K3, K6): the light-cycle paragraph of `### Single-Pass Preflight` in `atomic-plan-contract` and the light route and contract suite in the `execution-environment` brief landed in a later commit, which updated this entry. The same commit added the third mode value `Remediation-Mode: light` of review item N4 to the three `remediation-handoff-atomic-planner` sources and `.github/agents/orchestrator.agent.md`. The `.claude` sentence of `### Single-Pass Preflight` that names proportionate cycles is unchanged.
+- Issue #1032 retired the Copilot skill copies (the `skills` folder under `.github` and its bundle copy under `extensions/drm-copilot/resources/customizations/`). In the same commit this entry's revert blocks and stored-patch sections for those copies were removed; a revert step that names one of those copies no longer applies.
 
 ## Prior Text
 
@@ -451,19 +452,6 @@ function Get-RemediationLightCycleError {
 ````Prior
 ````
 
-### Revert Block: .github/skills/feature-review-workflow/SKILL.md
-
-````Current
-   - Choose the remediation path. Write one line `Remediation-Path: light` or `Remediation-Path: full` into the remediation inputs, and inside each blocking finding block one line `Finding-Scope: contained` or `Finding-Scope: design`. A missing path line reads as `full`, and a missing scope line reads as `design`. These lines never contain the substrings the orchestrator counts.
-   - Write `Remediation-Path: light` only when all of these hold: at most 3 blocking findings, every one `autonomous` with `Finding-Scope: contained`; no change to a spec acceptance criterion, a public interface, or the file inventory beyond the branch diff plus tests and mirrors; no change to a validator contract, hook decision, or production logic beyond the finding's named location; the cycle is opened by a review; and the prior cycle was not light. Otherwise write `Remediation-Path: full`. The orchestrator may move a cycle to a heavier path and never to a lighter one.
-   - With `Remediation-Path: light`, also write a `## Light Fix Tasks` section: one canonical `- [ ] [P0-T1] ...` line per fix, numbered in order, each naming the file and the finding it fixes. Write no checkbox line anywhere else in the file, because the executor stop hook counts every checkbox line of the file it executes.
-   - The remediation plan target stays for both paths, because this review contract requires it.
-
-````
-
-````Prior
-````
-
 ### Revert Block: .claude/agents/feature-review.md
 
 ````Current
@@ -737,17 +725,6 @@ Light cycles. A remediation cycle recorded with `Remediation-Mode: light` has no
 ````Prior
 ````
 
-### Revert Block: .github/skills/atomic-plan-contract/SKILL.md
-
-````Current
-Light cycles. A remediation cycle recorded with `Remediation-Mode: light` has no remediation plan and no preflight; its executor runs the inputs file directly. When that executor stops with `BLOCKED at preflight (before [P0-T1])` before the first task, the cycle converts to the design chain, and the remediation plan it then receives follows this section.
-
-
-````
-
-````Prior
-````
-
 ### Revert Block: .claude/skills/execution-environment/SKILL.md
 
 ````Current
@@ -781,18 +758,6 @@ Light cycles. A remediation cycle recorded with `Remediation-Mode: light` has no
 ````
 
 ### Revert Block: .agents/skills/remediation-handoff-atomic-planner/SKILL.md
-
-````Current
-- Exactly one mode line, `Remediation-Mode: proportionate` or `Remediation-Mode: design`. The cycle is proportionate when every `autonomous` finding can be fixed without changing a spec acceptance criterion, a public interface, or the item's file inventory beyond the files already in the branch diff plus their tests and mirrors; otherwise it is design. CI-failure findings are normally proportionate. `Remediation-Mode: light` is the orchestrate skill's third value: a light cycle has no planner delegation and never reaches this handoff, and a light cycle that falls back to R1 has its line rewritten to `Remediation-Mode: proportionate` or `Remediation-Mode: design` first.
-
-````
-
-````Prior
-- Exactly one mode line, `Remediation-Mode: proportionate` or `Remediation-Mode: design`. The cycle is proportionate when every `autonomous` finding can be fixed without changing a spec acceptance criterion, a public interface, or the item's file inventory beyond the files already in the branch diff plus their tests and mirrors; otherwise it is design. CI-failure findings are normally proportionate.
-
-````
-
-### Revert Block: .github/skills/remediation-handoff-atomic-planner/SKILL.md
 
 ````Current
 - Exactly one mode line, `Remediation-Mode: proportionate` or `Remediation-Mode: design`. The cycle is proportionate when every `autonomous` finding can be fixed without changing a spec acceptance criterion, a public interface, or the item's file inventory beyond the files already in the branch diff plus their tests and mirrors; otherwise it is design. CI-failure findings are normally proportionate. `Remediation-Mode: light` is the orchestrate skill's third value: a light cycle has no planner delegation and never reaches this handoff, and a light cycle that falls back to R1 has its line rewritten to `Remediation-Mode: proportionate` or `Remediation-Mode: design` first.

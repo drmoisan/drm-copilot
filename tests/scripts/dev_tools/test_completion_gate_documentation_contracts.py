@@ -1,8 +1,8 @@
 """Documentation contracts for the issue #744 completion-gate and tooling fixes.
 
 Pins the text that issue #744 adds to the Codex and Claude orchestrate skills,
-the parallel-orchestrate skill and agent, the three acceptance-criteria-tracking
-skills, the Claude feature-review agent, and the three
+the parallel-orchestrate skill and agent, the two acceptance-criteria-tracking
+skills, the Claude feature-review agent, and the two
 evidence-and-timestamp-conventions skills, and asserts that every edited
 surface is byte-identical to its bundled extension mirror.
 
@@ -42,18 +42,15 @@ FEATURE_REVIEW_AGENT = Path(".claude/agents/feature-review.md")
 AC_TRACKING_SKILLS: tuple[tuple[str, Path], ...] = (
     ("claude", Path(".claude/skills/acceptance-criteria-tracking/SKILL.md")),
     ("agents", Path(".agents/skills/acceptance-criteria-tracking/SKILL.md")),
-    ("github", Path(".github/skills/acceptance-criteria-tracking/SKILL.md")),
 )
 
 EVIDENCE_SKILLS: tuple[tuple[str, Path], ...] = (
     ("claude", Path(".claude/skills/evidence-and-timestamp-conventions/SKILL.md")),
     ("agents", Path(".agents/skills/evidence-and-timestamp-conventions/SKILL.md")),
-    ("github", Path(".github/skills/evidence-and-timestamp-conventions/SKILL.md")),
 )
 
 _CLAUDE_BUNDLE = Path("extensions/drm-copilot/resources/claude-customizations")
 _CODEX_BUNDLE = Path("extensions/drm-copilot/resources/codex-and-agents-customizations")
-_GITHUB_BUNDLE = Path("extensions/drm-copilot/resources/customizations")
 
 
 def _mirror(bundle: Path, source: Path) -> tuple[Path, Path]:
@@ -72,7 +69,7 @@ def _mirror(bundle: Path, source: Path) -> tuple[Path, Path]:
     return source, bundle / source
 
 
-# The eleven edited surfaces and their bundled mirrors, keyed by stable ids.
+# The nine edited surfaces and their bundled mirrors, keyed by stable ids.
 MIRROR_PAIRS: tuple[tuple[str, tuple[Path, Path]], ...] = (
     ("agents-orchestrate", _mirror(_CODEX_BUNDLE, CODEX_ORCHESTRATE)),
     ("claude-orchestrate", _mirror(_CLAUDE_BUNDLE, CLAUDE_ORCHESTRATE)),
@@ -83,11 +80,9 @@ MIRROR_PAIRS: tuple[tuple[str, tuple[Path, Path]], ...] = (
     ),
     ("claude-ac-tracking", _mirror(_CLAUDE_BUNDLE, AC_TRACKING_SKILLS[0][1])),
     ("agents-ac-tracking", _mirror(_CODEX_BUNDLE, AC_TRACKING_SKILLS[1][1])),
-    ("github-ac-tracking", _mirror(_GITHUB_BUNDLE, AC_TRACKING_SKILLS[2][1])),
     ("claude-feature-review-agent", _mirror(_CLAUDE_BUNDLE, FEATURE_REVIEW_AGENT)),
     ("claude-evidence", _mirror(_CLAUDE_BUNDLE, EVIDENCE_SKILLS[0][1])),
     ("agents-evidence", _mirror(_CODEX_BUNDLE, EVIDENCE_SKILLS[1][1])),
-    ("github-evidence", _mirror(_GITHUB_BUNDLE, EVIDENCE_SKILLS[2][1])),
 )
 
 TIMESTAMP_SOURCE_BLOCK = (
