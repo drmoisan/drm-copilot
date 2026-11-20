@@ -1012,11 +1012,11 @@ index 000000000..7440c6923
 +        @{ Id = 'REVIEWER-CODEX-BUNDLE'; Path = "$agentsBundle/.codex/agents/feature-review.toml" }
 +    )
 +    $template = @(
-+        @{ Id = 'TEMPLATE'; Path = 'docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md' }
++        @{ Id = 'TEMPLATE'; Path = '.dev/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md' }
 +        @{ Id = 'TEMPLATE-BUNDLE'; Path = "$templateBundle/policy-audit.yyyy-MM-ddTHH-mm.md" }
 +    )
 +    $auditAgents = @(
-+        @{ Id = 'AUDIT-AGENTS'; Path = 'docs/features/templates/policy_audit/AGENTS.md' }
++        @{ Id = 'AUDIT-AGENTS'; Path = '.dev/templates/policy_audit/AGENTS.md' }
 +        @{ Id = 'AUDIT-AGENTS-BUNDLE'; Path = "$templateBundle/AGENTS.md" }
 +    )
 +    $orchestrate = @(
