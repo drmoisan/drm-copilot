@@ -261,6 +261,19 @@ Describe 'Copilot layer retirement (issue #1032)' {
         ($violations -match 'lacks the S6 target') | Should -Not -BeNullOrEmpty
     }
 
+    It 'CLR-BRIEF-COUNT-REJECTS a brief copy that names the retired path' {
+        # Arrange: every count target is present and no source wording, so only the retired-path rule can fire.
+        $brief = [ordered]@{ 'brief.md' = (($script:BriefTargets -join "`n") + "`nSee $($script:RetiredPath)/execution-environment.") }
+        $contract = [ordered]@{ 'contract.md' = 'in all four byte-identical copies' }
+
+        # Act
+        $violations = @(Test-ClrBriefCount -BriefText $brief -ContractText $contract -RetiredPath $script:RetiredPath)
+
+        # Assert
+        $violations.Count | Should -Be 1
+        $violations[0] | Should -Match 'names the retired path'
+    }
+
     It 'CLR-READ-FIRST names the .agents brief in each read-first agent file and bundle copy' {
         # Act
         $violations = @(Test-ClrReadFirst -AgentText (Get-ClrTextMap -RelativePath $script:ReadFirstAgents))
@@ -313,6 +326,18 @@ Describe 'Copilot layer retirement (issue #1032)' {
 
         # Assert
         $violations.Count | Should -Be 3
+    }
+
+    It 'CLR-COLLISION-CONTROLS-REJECTS a complete workspace case with a wrong value' {
+        # Arrange: all four collision keys are present and correct except one location value, so only the value comparison can reject it.
+        $settings = '{ "chat.agentSkillsLocations": { ".claude/skills": true }, "chat.instructionsFilesLocations": { ".claude/rules": false }, "chat.agentFilesLocations": { ".claude/agents": false }, "chat.useClaudeMdFile": false }'
+
+        # Act
+        $violations = @(Test-ClrCollisionControl -ReadmeText "# Readme`n" -SettingsText $settings -RequiredFileExists $false)
+
+        # Assert
+        $violations.Count | Should -Be 1
+        $violations[0] | Should -Match 'exactly one AD-3 case must hold in full'
     }
 
     It 'CLR-AGENT-FILES finds no retired path in any Copilot agent file or bundle copy' {
