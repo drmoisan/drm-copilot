@@ -5,8 +5,9 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`; 
 - Epic issue: #1018
 - Integration branch: `epic/shared-agent-harness-layer-integration`
 - Current wave: 5
-- Checkpoint last updated: 2026-11-20T21:13:12Z
-- Integration-to-main PR: not yet opened
+- Checkpoint last updated: 2026-11-20T21:45:48Z
+- Integration-to-main PR: [#1214](https://github.com/drmoisan/drm-copilot/pull/1214), CI run 44820202409 success on head 8b88c86e1549, merged 2026-11-20T21:45:31Z as 2282799e72db (confirmed 2026-11-20T21:45:48Z)
+- Epic state: complete (all ten features worktree_removed; integration branch merged into main)
 
 | Wave | Issue | Feature folder | Merge status | PR | Merge commit | Worktree created | PR opened | Merge confirmed | Worktree removed |
 |---|---|---|---|---|---|---|---|---|---|
