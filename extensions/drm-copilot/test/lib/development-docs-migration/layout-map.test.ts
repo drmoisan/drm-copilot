@@ -1,6 +1,7 @@
 import { describe, expect, it } from "@jest/globals";
 
 import {
+  isMappedTargetPath,
   LEGACY_LAYOUT_MAP,
   mapLegacyPath,
   rowTarget,
@@ -130,5 +131,55 @@ describe("mapLegacyPath path classes (decision A1)", () => {
 
   it("classifies a path outside docs as outside", () => {
     expect(mapLegacyPath("src/x.ts", TARGET)).toEqual({ kind: "outside" });
+  });
+});
+
+describe("isMappedTargetPath (finding F1)", () => {
+  it.each([
+    ".dev/potential/x.md",
+    ".dev/active/1016-foo/spec.md",
+    ".dev/completed/0012-bar/plan.md",
+    ".dev/archive/f/a.md",
+    ".dev/epics/e/epic.md",
+    ".dev/parallel/p/status.md",
+    ".dev/templates/feature/plan.md",
+    ".dev/research/r.md",
+    ".dev/engineering/x.md",
+    ".dev/discovery/templates/v2/a.json",
+    ".dev/active",
+    ".dev/discovery/templates",
+    ".dev/backlog.md",
+  ])("reports %s as a mapped target path", (path) => {
+    // Act / Assert
+    expect(isMappedTargetPath(path, TARGET)).toBe(true);
+  });
+
+  it("covers the target of every row of the table", () => {
+    // Arrange
+    const samples = LEGACY_LAYOUT_MAP.map((row) => {
+      const target = rowTarget(row, TARGET);
+      return row.kind === "file" ? target : `${target}x.md`;
+    });
+
+    // Assert
+    expect(samples.every((path) => isMappedTargetPath(path, TARGET))).toBe(
+      true,
+    );
+  });
+
+  it("takes the discovery target from the argument", () => {
+    // Act / Assert
+    expect(isMappedTargetPath(".dev/kits/v2/a.json", ".dev/kits/")).toBe(true);
+    expect(isMappedTargetPath(".dev/kits/v2/a.json", TARGET)).toBe(false);
+  });
+
+  it.each([
+    ".dev/other/x.md",
+    "docs/README.md",
+    "README.md",
+    ".dev/activex/a.md",
+  ])("reports %s as not a mapped target path", (path) => {
+    // Act / Assert
+    expect(isMappedTargetPath(path, TARGET)).toBe(false);
   });
 });

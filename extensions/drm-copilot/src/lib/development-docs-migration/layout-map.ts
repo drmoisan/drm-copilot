@@ -116,6 +116,31 @@ export function rowTarget(row: LayoutMapRow, discoveryTarget: string): string {
 }
 
 /**
+ * Report whether a path already lies at a target of the mapping table.
+ *
+ * A record that a previous apply moved keeps its old prefix text under the
+ * `links-only` scope, so a later plan must still treat it as inside the moved
+ * trees (issue #1016, remediation finding F1).
+ *
+ * @param path Repository-relative forward-slash path of a file or directory.
+ * @param discoveryTarget Repository-relative OQ-1 target directory.
+ * @returns True when `path` is under a directory row's target, equals that
+ *     target without its trailing slash, or equals a file row's target.
+ */
+export function isMappedTargetPath(
+  path: string,
+  discoveryTarget: string,
+): boolean {
+  return LEGACY_LAYOUT_MAP.some((row) => {
+    const target = rowTarget(row, discoveryTarget);
+    if (row.kind === "file") {
+      return path === target;
+    }
+    return path.startsWith(target) || path === target.slice(0, -1);
+  });
+}
+
+/**
  * Classify a path and, when mapped, compute its new path.
  *
  * @param path Repository-relative forward-slash path of a file or directory.

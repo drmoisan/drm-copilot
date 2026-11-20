@@ -16,6 +16,7 @@ import {
 import {
   DISCOVERY_TEMPLATES_ALTERNATIVE_TARGET,
   FOLDER_RENAME_AREAS,
+  isMappedTargetPath,
   LEGACY_LAYOUT_MAP,
   mapLegacyPath,
   rowTarget,
@@ -568,7 +569,8 @@ function scanRewrites(
     if (candidate.references + candidate.links === 0) {
       continue;
     }
-    if (sourceNew === path) {
+    // F1: a record already at a mapped target stays in-tree on later runs.
+    if (sourceNew === path && !isMappedTargetPath(path, discoveryTarget)) {
       scan.outside.push(candidate);
       scan.rewrites.push({ path: sourceNew, text: both.text });
       continue;
