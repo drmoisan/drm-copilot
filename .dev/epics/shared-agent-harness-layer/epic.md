@@ -19,34 +19,34 @@ intent:
     - Line coverage >= 85% and branch coverage >= 75% (where measured) for changed code.
 features:
   - issue_num: 1025
-    feature_folder: 2026-10-30-harness-survey-gold-standard-contracts-parity-matrix-1025
+    feature_folder: 1025-harness-survey-gold-standard-contracts-parity-matrix
     depends_on: []
   - issue_num: 1035
-    feature_folder: 2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035
+    feature_folder: 1035-dev-docs-root-resolver-and-feature-folder-name-parser
     depends_on: []
   - issue_num: 1028
-    feature_folder: 2026-10-30-shared-source-generators-skills-rules-mcp-agents-1028
+    feature_folder: 1028-shared-source-generators-skills-rules-mcp-agents
     depends_on: [1025, 1035]
   - issue_num: 1029
-    feature_folder: 2026-10-30-push-down-consolidation-and-ecosystem-packs-1029
+    feature_folder: 1029-push-down-consolidation-and-ecosystem-packs
     depends_on: [1028]
   - issue_num: 1030
-    feature_folder: 2026-10-30-hook-parity-across-claude-codex-copilot-1030
+    feature_folder: 1030-hook-parity-across-claude-codex-copilot
     depends_on: [1028]
   - issue_num: 1032
-    feature_folder: 2026-10-30-retire-github-skills-and-thin-copilot-layer-1032
+    feature_folder: 1032-retire-github-skills-and-thin-copilot-layer
     depends_on: [1030]
   - issue_num: 1049
-    feature_folder: 2026-10-31-pushed-down-vendored-code-coverage-carve-out-1049
+    feature_folder: 1049-pushed-down-vendored-code-coverage-carve-out
     depends_on: [1029]
   - issue_num: 1050
-    feature_folder: 2026-10-31-push-down-ci-workflows-per-ecosystem-pack-1050
+    feature_folder: 1050-push-down-ci-workflows-per-ecosystem-pack
     depends_on: [1028, 1029]
   - issue_num: 1051
-    feature_folder: 2026-10-31-push-down-integration-mcp-tools-and-skill-1051
+    feature_folder: 1051-push-down-integration-mcp-tools-and-skill
     depends_on: [1050]
   - issue_num: 1016
-    feature_folder: 2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production-1016
+    feature_folder: 1016-move-development-docs-to-dev-root-and-reserve-docs-for-production
     depends_on: [1035, 1032, 1049, 1051]
 ---
 

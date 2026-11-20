@@ -3,7 +3,7 @@
 These tests pin the fix for the epic-run entry-gate discovery bug: `/epic-run`
 must not declare the kickoff artifact missing based on the invoking worktree's
 working tree alone, because `epic-plan` commits
-`docs/features/epics/<epic-slug>/epic-kickoff.md` only to the integration branch
+`.dev/epics/<epic-slug>/epic-kickoff.md` only to the integration branch
 `epic/<epic-slug>-integration`. The guarantees are expressed as runtime
 procedure text in the Claude skill/agent Markdown, so the repository's
 text-fragment contract-test convention (see
@@ -54,7 +54,7 @@ def test_epic_run_skill_discovers_kickoff_across_integration_branch() -> None:
     required_fragments = (
         "git fetch origin epic/<epic-slug>-integration",
         "git cat-file -e epic/<epic-slug>-integration:"
-        "docs/features/epics/<epic-slug>/epic-kickoff.md",
+        ".dev/epics/<epic-slug>/epic-kickoff.md",
         "git show <ref>:<path>",
         "absent BOTH locally and on the",
         "must never be checked out onto the integration branch",

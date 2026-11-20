@@ -21,7 +21,8 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-DOC = REPO_ROOT / "docs" / "engineering" / "legacy-discovery-and-parity"
+DOC = REPO_ROOT / ".dev" / "engineering" / "legacy-discovery-and-parity"
+HANDOFF_AREAS: tuple[str, ...] = ("active", "completed", "archive")
 PAGES: tuple[str, ...] = (
     "README.md",
     "architecture.md",
@@ -320,11 +321,27 @@ def test_separated_example_is_the_only_consumer_specific_page() -> None:
     assert example.count("docs/migration/discovery/") >= 2
 
 
+def find_issue_980_handoffs() -> list[Path]:
+    """Locate the issue 980 feature handoff across the development-record areas.
+
+    The feature folder is named issue-first (``0980-<slug>``) under ``.dev`` and may
+    sit in the active, completed, or archive area depending on its lifecycle stage.
+
+    Returns:
+        list[Path]: The sorted handoff paths found; empty when none exists.
+    """
+
+    handoffs: list[Path] = []
+    # Search each lifecycle area so the contract survives completion or archiving.
+    for area in HANDOFF_AREAS:
+        handoffs.extend((REPO_ROOT / ".dev" / area).glob("0980-*/handoff.md"))
+    return sorted(handoffs)
+
+
 def test_handoff_reconciles_the_built_artifacts() -> None:
     """The feature handoff names the three built packages with versions and digests."""
 
-    feature = REPO_ROOT / "docs" / "features" / "active"
-    handoffs = sorted(feature.glob("*-980/handoff.md"))
+    handoffs = find_issue_980_handoffs()
     assert len(handoffs) == 1, [str(path) for path in handoffs]
     text = handoffs[0].read_text("utf-8")
     for artifact in (
@@ -385,8 +402,7 @@ def test_host_principal_path_is_documented() -> None:
 def test_handoff_carries_no_stale_installed_host_limit() -> None:
     """The handoff describes the proven agent path and no receipt-path blocker."""
 
-    feature = REPO_ROOT / "docs" / "features" / "active"
-    text = next(iter(sorted(feature.glob("*-980/handoff.md")))).read_text("utf-8")
+    text = next(iter(find_issue_980_handoffs())).read_text("utf-8")
     assert "## Known installed-host limit" not in text
     assert "## Installed-host agent path" in text
     assert "no completion receipt" not in text
@@ -408,7 +424,7 @@ def test_architecture_document_links_the_planning_prerequisite() -> None:
     text = read(".dev/engineering/claude-code-architecture.md")
     assert "enforce-discovery-planning-gate.ps1" in text
     assert "completion_gates.planning_prerequisite" in text
-    assert ".dev/engineering/legacy-discovery-and-parity/enforcement.md" in text
+    assert "engineering/legacy-discovery-and-parity/enforcement.md" in text
 
 
 @pytest.mark.parametrize(

@@ -28,7 +28,9 @@ if TYPE_CHECKING:
     from drm_copilot_discovery.init_projection import InitializationTemplates
 
 DISALLOWED_TOKEN_PATTERN = re.compile(r"TaskMaster|TMW|Outlook|VSTO", re.IGNORECASE)
-_TEMPLATE_ROOT = Path(__file__).resolve().parents[4] / "docs/discovery/templates"
+_TEMPLATE_ROOT = (
+    Path(__file__).resolve().parents[4] / ".dev" / "discovery" / "templates"
+)
 
 
 def test_domain_neutrality_templates_contain_no_disallowed_tokens() -> None:

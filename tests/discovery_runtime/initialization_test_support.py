@@ -25,6 +25,27 @@ if TYPE_CHECKING:
     from drm_copilot_discovery.profile_models import SystemRole
 
 ROOT = Path(__file__).resolve().parents[2]
+# Package template keys keep the docs/discovery/templates prefix while the
+# committed sources live under the development-docs root (issue #1016).
+TEMPLATE_KEY_PREFIX = "docs/discovery/templates/"
+TEMPLATE_SOURCE_PREFIX = ".dev/discovery/templates/"
+
+
+def read_template_source(path: str) -> bytes:
+    """Read the committed bytes for a package template key.
+
+    Args:
+        path: The repository-relative key the package requests.
+
+    Returns:
+        bytes: The file content, read from ``.dev/discovery/templates/`` for a key
+        under ``docs/discovery/templates/`` and from the key itself otherwise.
+    """
+    source = path
+    # Map only template keys; every other key is a repository path already.
+    if path.startswith(TEMPLATE_KEY_PREFIX):
+        source = TEMPLATE_SOURCE_PREFIX + path.removeprefix(TEMPLATE_KEY_PREFIX)
+    return (ROOT / source).read_bytes()
 
 
 @pytest.fixture(scope="module")
@@ -38,7 +59,7 @@ def initialization_templates() -> InitializationTemplates:
     """
     Load immutable committed fixtures; output operations remain entirely in memory.
     """
-    return InitializationTemplates.load(read=lambda path: (ROOT / path).read_bytes())
+    return InitializationTemplates.load(read=read_template_source)
 
 
 def request_for(role: SystemRole = "legacy-source") -> InitializationRequest:

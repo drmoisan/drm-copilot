@@ -302,7 +302,7 @@ KICKOFF_NEVER_CARRIES_FRAGMENTS: tuple[str, ...] = (
 )
 
 KICKOFF_IDENTITY_FRAGMENTS: tuple[str, ...] = (
-    "written literally as `docs/features/active/<basename>`",
+    "written literally as `.dev/active/<basename>`",
     "The canonical issue number line",
 )
 
