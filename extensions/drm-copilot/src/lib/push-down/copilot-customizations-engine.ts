@@ -3,29 +3,24 @@
  *
  * Purpose:
  *     Port the orchestration core of `push_down_copilot_customizations.py`:
- *     deterministic source enumeration, destination validation, summary-artifact
- *     naming and rendering, and the copy/rewrite loop. The public CLI-facing
- *     surface lives in `copilot-customizations.ts`; this module holds the engine
- *     so each file stays within the 500-line limit.
+ *     deterministic source enumeration, destination validation, and
+ *     summary-artifact naming and rendering. The copy loop was replaced by the
+ *     unified push-down pipeline (`push-down-pipeline.ts` and
+ *     `push-down-apply.ts`, issue #1029), which uses these helpers.
  *
  * Responsibilities:
  *     - Enumerate scoped source files in root-order then path-order.
  *     - Validate the destination (missing dir / destination-equals-source).
  *     - Build the deterministic JSON artifact path.
  *     - Render the summary as 2-space, sorted-key JSON.
- *     - Run the copy/rewrite loop and accumulate counts and unmatched refs.
  *
  * Side effects:
- *     Reads source files and writes destination files plus the summary artifact
- *     through the injected {@link PushDownFileSystem}.
+ *     Reads source files and writes the summary artifact through the injected
+ *     {@link PushDownFileSystem}.
  */
 
 import { compareCodePoint } from "../string-ordering";
 import { type PushDownFileSystem, toPosixPath } from "./filesystem-adapter";
-import {
-  rewriteTextReferences,
-  type RewriteFunction,
-} from "./reference-rewrites";
 
 /** Default artifact directory for the Copilot push-down summary. */
 export const ARTIFACT_DIRECTORY = "artifacts/copilot-customizations";
@@ -40,7 +35,6 @@ export const COPILOT_ROOT_FOLDERS: ReadonlyArray<string> = [
   ".github/hooks",
   ".github/instructions",
   ".github/prompts",
-  ".github/skills",
 ];
 
 /** Clock seam returning the current instant; injected for determinism. */
@@ -58,6 +52,8 @@ export interface PushDownFileResult {
   readonly placeholderRewriteCount: number;
   /** Unknown references left untouched in this file. */
   readonly unmatchedReferences: ReadonlyArray<string>;
+  /** Push-down action of an apply run (issue #1029); absent otherwise. */
+  readonly action?: string;
 }
 
 /** Completed push-down run summary returned to callers. */
@@ -87,19 +83,6 @@ interface PushDownSummaryPayload {
   placeholder_rewrite_count: number;
   unmatched_references: string[];
   files: Array<Record<string, unknown>>;
-}
-
-/** Options for the engine {@link pushDownCustomizations} orchestration. */
-export interface PushDownEngineOptions {
-  readonly repoRoot: string;
-  readonly destinationRoot: string;
-  readonly fs: PushDownFileSystem;
-  readonly sourceRoot?: string;
-  readonly artifactRoot?: string;
-  readonly rootFolders?: ReadonlyArray<string>;
-  readonly artifactDirectory?: string;
-  readonly rewriteReferences?: RewriteFunction;
-  readonly clock?: Clock;
 }
 
 /**
@@ -267,6 +250,7 @@ export function renderPushDownSummary(summary: PushDownSummary): string {
       rewritten_reference_count: result.rewrittenReferenceCount,
       placeholder_rewrite_count: result.placeholderRewriteCount,
       unmatched_references: [...result.unmatchedReferences],
+      ...(result.action === undefined ? {} : { action: result.action }),
     })),
   };
   return stringifySorted(payload, 2);
@@ -327,123 +311,4 @@ export function writeSummaryArtifact(
   fs.ensureDir(parent);
   fs.writeTextFile(artifactPath, renderPushDownSummary(summary));
   return artifactPath;
-}
-
-/**
- * Copy scoped customizations into the destination workspace.
- *
- * Executes validation, deterministic enumeration, text rewriting, overwrite-
- * aware writes, and summary-artifact emission. Mirrors the Python
- * `push_down_customizations` orchestration exactly, including first-seen
- * unmatched-reference accumulation and per-file classification.
- *
- * @param options Engine options (roots, filesystem, rewrite fn, clock).
- * @returns The completed run summary including the written artifact path.
- * @throws Error When destination validation fails.
- */
-export function pushDownCustomizations(
-  options: PushDownEngineOptions,
-): PushDownSummary {
-  const {
-    repoRoot,
-    destinationRoot,
-    fs,
-    sourceRoot,
-    artifactRoot,
-    rootFolders,
-    artifactDirectory,
-    rewriteReferences,
-    clock,
-  } = options;
-
-  const effectiveSource = sourceRoot ?? repoRoot;
-  const effectiveArtifact = artifactRoot ?? repoRoot;
-  const effectiveRoots = rootFolders ?? COPILOT_ROOT_FOLDERS;
-  const effectiveArtifactDir = artifactDirectory ?? ARTIFACT_DIRECTORY;
-  const rewrite = rewriteReferences ?? rewriteTextReferences;
-  const now = clock ?? (() => new Date());
-
-  validateDestination(destinationRoot, repoRoot, fs);
-  const startedAt = now();
-
-  let createdCount = 0;
-  let overwrittenCount = 0;
-  let rewrittenReferenceCount = 0;
-  let placeholderRewriteCount = 0;
-  const unmatchedReferences: string[] = [];
-  const fileResults: PushDownFileResult[] = [];
-
-  // Process files in stable order so artifacts and test expectations reproduce.
-  for (const sourcePath of enumerateSourceFiles(
-    fs,
-    effectiveSource,
-    effectiveRoots,
-  )) {
-    const relativePath = relativeToPosix(sourcePath, effectiveSource);
-    if (relativePath === null) {
-      // The enumerator only yields files under the source root; skip otherwise.
-      continue;
-    }
-    const destinationPath = joinPosix(destinationRoot, relativePath);
-    const destinationStatus: "created" | "overwritten" = fs.isFile(
-      destinationPath,
-    )
-      ? "overwritten"
-      : "created";
-    if (destinationStatus === "created") {
-      createdCount += 1;
-    } else {
-      overwrittenCount += 1;
-    }
-
-    const sourceText = fs.readTextFile(sourcePath);
-    const [rewrittenText, rewrittenDelta, placeholderDelta, unmatched] =
-      rewrite(sourceText);
-    rewrittenReferenceCount += rewrittenDelta;
-    placeholderRewriteCount += placeholderDelta;
-    // Accumulate unmatched references in first-seen order across all files.
-    for (const reference of unmatched) {
-      if (!unmatchedReferences.includes(reference)) {
-        unmatchedReferences.push(reference);
-      }
-    }
-
-    // Create the destination parent first so both write paths share one
-    // deterministic directory-preparation step.
-    const destParent = destinationPath.slice(
-      0,
-      destinationPath.lastIndexOf("/"),
-    );
-    fs.ensureDir(destParent);
-    fs.writeTextFile(destinationPath, rewrittenText);
-    fileResults.push({
-      relativePath,
-      destinationStatus,
-      rewrittenReferenceCount: rewrittenDelta,
-      placeholderRewriteCount: placeholderDelta,
-      unmatchedReferences: unmatched,
-    });
-  }
-
-  const finishedAt = now();
-  const provisionalSummary: PushDownSummary = {
-    repoRoot: toPosixPath(repoRoot),
-    destinationRoot: toPosixPath(destinationRoot),
-    startedAt,
-    finishedAt,
-    createdCount,
-    overwrittenCount,
-    rewrittenReferenceCount,
-    placeholderRewriteCount,
-    unmatchedReferences,
-    files: fileResults,
-    artifactPath: "",
-  };
-  const artifactPath = writeSummaryArtifact(
-    fs,
-    provisionalSummary,
-    effectiveArtifact,
-    effectiveArtifactDir,
-  );
-  return { ...provisionalSummary, artifactPath };
 }

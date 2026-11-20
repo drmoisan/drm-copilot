@@ -1,0 +1,61 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " status-updater"
+      },
+      {
+        "key": "model",
+        "value": " haiku"
+      },
+      {
+        "key": "description",
+        "value": " Project-scoped worker that reconciles plan and issue status and writes status-sync artifacts."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - \"Write(/artifacts/**)\"\n  - \"Write(/docs/features/**)\"\n  - \"Write(/.dev/**)\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - acceptance-criteria-tracking"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      },
+      {
+        "key": "hooks",
+        "value": "\n  SubagentStop:\n    - matcher: \"status-updater\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName status-updater -RequiredArtifact 'status-sync-path|^artifacts/status/status-sync\\.\\d{4}-\\d{2}-\\d{2}T\\d{2}-\\d{2}\\.md$|status sync artifact'"
+      }
+    ],
+    "path": ".claude/agents/status-updater.md",
+    "sections": [
+      "head",
+      "expected-outputs",
+      "output-reporting",
+      "evidence-location-invariant"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"status-updater\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "path": ".codex/agents/status-updater.toml",
+    "sections": [
+      "head-2",
+      "expected-outputs",
+      "evidence-location-invariant-2"
+    ]
+  }
+}

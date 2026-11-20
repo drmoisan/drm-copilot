@@ -16,8 +16,8 @@ from tests.scripts.dev_tools.typescript_twin_test_support import (
 BRANCH = "epic/sample-epic-integration"
 COMMIT = "1" * 40
 HASH = "a" * 40
-PLAN_101 = "docs/features/active/feature-101/plan.md"
-PLAN_102 = "docs/features/active/feature-102/plan.md"
+PLAN_101 = ".dev/active/feature-101/plan.md"
+PLAN_102 = ".dev/active/feature-102/plan.md"
 INDEX_ZERO_COMMIT_ERROR = (
     "Epic planner checkpoint features[0].planning_commit must be hexadecimal."
 )
@@ -65,7 +65,7 @@ def _parsed() -> ParsedEpicKickoff:
     return ParsedEpicKickoff(
         slug="sample-epic",
         invocation_slug="sample-epic",
-        manifest_path="docs/features/epics/sample-epic/epic.md",
+        manifest_path=".dev/epics/sample-epic/epic.md",
         integration_branch=BRANCH,
         features=(),
         planning_commit=None,

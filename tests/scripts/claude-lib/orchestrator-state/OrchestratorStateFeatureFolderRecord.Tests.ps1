@@ -131,6 +131,14 @@ Describe 'feature_folder_record rule 11a' {
         Test-OrchestratorStateFeatureFolderPath -Value $BadPath | Should -BeFalse
     }
 
+    It 'accepts a record and checkpoint naming a .dev/active folder' {
+        $devPath = '.dev/active/2026-09-29-sample-feature-509'
+        $record = Get-FolderRecord -Override @{ path = $devPath }
+        $result = Invoke-FolderAdoption -State (Get-FolderState -Adoption (Get-FolderAdoption -Record $record) -Folder $devPath)
+        Join-Text $result.Errors | Should -BeExactly ''
+        Test-OrchestratorStateFeatureFolderPath -Value $devPath | Should -BeTrue
+    }
+
     It 'rejects a non-string path' {
         $record = Get-FolderRecord -Override @{ path = 509 }
         $result = Invoke-FolderAdoption -State (Get-FolderState -Adoption (Get-FolderAdoption -Record $record))

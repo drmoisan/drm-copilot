@@ -226,7 +226,7 @@ Describe 'validate-orchestrator-output orchestrator-state target worktree (issue
 
     It 'H12 runs the feature-folder probe and the runbook check beneath the item root' {
         # Arrange
-        $folder = 'docs/features/active/2026-11-08-sample-1145'
+        $folder = '.dev/active/2026-11-08-sample-1145'
         $adoption = '"issue_adoption":{"waived_tools":["potential_to_issue","new_active_feature_folder"]}'
         $interaction = '"human_interaction":{"requirements":[{"response":"exception","runbook_path":"docs/runbooks/item.runbook.md"}]}'
         $text = '{"objective":"run","completed_steps":["S1"],"next_step":"complete","last_updated":"2026-11-08T00:00:00Z","feature-folder":"' + $folder + '",' + $adoption + ',' + $interaction + '}'

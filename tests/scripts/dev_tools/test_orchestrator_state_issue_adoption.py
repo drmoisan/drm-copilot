@@ -460,3 +460,22 @@ def test_errors_always_imply_empty_waived_tools_on_fixed_grid() -> None:
     assert (
         observed_valid == 2
     ), f"expected two fully valid combinations, got {observed_valid}"
+
+
+def test_potential_record_under_dev_root_is_accepted() -> None:
+    """A potential record under the .dev potential area satisfies the waiver."""
+
+    # Arrange
+    adoption = build_adoption(
+        waived_tools=["potential_to_issue", "new_potential_entry"],
+        potential_record=VALID_RECORD.replace("docs/features/", ".dev/", 1),
+    )
+
+    # Act
+    result = run_resolver(build_state(adoption))
+
+    # Assert
+    assert result.errors == (), f"unexpected errors: {result.errors}"
+    assert result.waived_tools == frozenset(
+        {"potential_to_issue", "new_potential_entry"}
+    )

@@ -21,10 +21,13 @@ export interface CommandResult {
  * - `cwd`: working directory for the spawned process.
  * - `allowError`: when `false` (default), a non-zero exit code raises an Error;
  *   when `true`, the captured result is returned regardless of exit status.
+ * - `maxBuffer`: largest number of bytes allowed on stdout or stderr; when
+ *   omitted, the `spawnSync` default (1 MiB) applies.
  */
 export interface CommandRunOptions {
   cwd?: string;
   allowError?: boolean;
+  maxBuffer?: number;
 }
 
 /**
@@ -104,10 +107,14 @@ export class SubprocessRunner implements CommandRunner {
 
     const allowError = options?.allowError ?? false;
 
-    const spawnOptions: { cwd?: string; shell: false } =
+    const spawnOptions: { cwd?: string; maxBuffer?: number; shell: false } =
       options?.cwd === undefined
         ? { shell: false }
         : { cwd: options.cwd, shell: false };
+    // Add the buffer limit only when supplied, so existing spawn options stay identical.
+    if (options?.maxBuffer !== undefined) {
+      spawnOptions.maxBuffer = options.maxBuffer;
+    }
 
     const completed = spawnSync(executable, args.slice(1), spawnOptions);
 

@@ -56,7 +56,7 @@ function createFakeFileSystem(files: Readonly<Record<string, string>>): {
 const WORKSPACE = "C:/workspace";
 const TEMPLATE_ROOT = "C:/extension/resources/customizations/.github/codex";
 const TEMPLATE_PATH = `${TEMPLATE_ROOT}/execute-hard-lock.prompt.md`;
-const FOLDER = "docs/features/active/feature-123";
+const FOLDER = ".dev/active/feature-123";
 const TARGET = `${WORKSPACE}/${FOLDER}/plan.md`;
 
 describe("hard-lock-prompt template selection", () => {

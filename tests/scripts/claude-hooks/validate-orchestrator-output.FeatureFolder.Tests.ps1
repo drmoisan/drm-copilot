@@ -29,7 +29,7 @@ BeforeAll {
     Mock Get-WorktreeRunCheckpointText -ModuleName WorktreeRunResolution { $null }
 
     $script:WorktreeRoot = '/synthetic-worktrees/feature-folder-session'
-    $script:FeatureFolder = 'docs/features/active/2026-09-29-sample-feature-509'
+    $script:FeatureFolder = '.dev/active/2026-09-29-sample-feature-509'
     $script:BlockMessage = "ROUTING_CONTRACT_BLOCKED: Checkpoint feature-folder is not committed in HEAD: $($script:FeatureFolder)."
     $script:PassingRouting = { param($Path, $Type) $null = $Path, $Type; [pscustomobject]@{ ExitCode = 0; Output = '' } }
 
@@ -147,7 +147,7 @@ Describe 'validate-orchestrator-output.ps1 adopted feature-folder probe' {
 
         It 'blocks without calling git when feature-folder fails the path pattern' {
             $calls = [System.Collections.Generic.List[object]]::new()
-            $badFolder = 'docs/features/active/../active/2026-09-29-sample-feature-509'
+            $badFolder = '.dev/active/../active/2026-09-29-sample-feature-509'
             $decision = Invoke-ProbeDecision -CheckpointText (Get-ProbeCheckpointText -Folder $badFolder) -GitInvoker (New-ProbeInvoker -Calls $calls -ExitCode 0 -Output 'tree')
             $decision.Ok | Should -BeFalse
             $decision.Message | Should -BeExactly "ROUTING_CONTRACT_BLOCKED: Checkpoint feature-folder is not committed in HEAD: $badFolder."

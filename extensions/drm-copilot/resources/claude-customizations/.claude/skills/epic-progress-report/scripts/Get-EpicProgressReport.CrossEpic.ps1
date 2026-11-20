@@ -159,7 +159,7 @@ function Read-EpicProgressCrossEpicPlanText {
     .SYNOPSIS
         Return the other epic's prepared plan text for a cross-epic edge, read from its epic-kickoff.md; '' when either is unreadable.
     .DESCRIPTION
-        Reads docs/features/epics/<epic>/epic-kickoff.md and then the plan path of the
+        Reads .dev/epics/<epic>/epic-kickoff.md and then the plan path of the
         prerequisite's kickoff row, both only through Read-EpicProgressText on
         origin/<integration branch>. A kickoff without the row, or a kickoff table that does
         not parse, gives ''.
@@ -173,7 +173,7 @@ function Read-EpicProgressCrossEpicPlanText {
     $branch = [string] $Edge.IntegrationBranch
     if (-not $branch) { $branch = "epic/$($Edge.Epic)-integration" }
     $branch = "origin/$branch"
-    $kickoff = Read-EpicProgressText -RelativePath "docs/features/epics/$($Edge.Epic)/epic-kickoff.md" -IntegrationBranch $branch
+    $kickoff = Read-EpicProgressText -RelativePath ".dev/epics/$($Edge.Epic)/epic-kickoff.md" -IntegrationBranch $branch
     if ([string]::IsNullOrWhiteSpace($kickoff)) { return '' }
     try { $rows = @(ConvertFrom-EpicProgressKickoffRow -KickoffText $kickoff) } catch { return '' }
     $row = @($rows | Where-Object { [string] $_.Issue -eq [string] $Edge.IssueNum }) | Select-Object -First 1

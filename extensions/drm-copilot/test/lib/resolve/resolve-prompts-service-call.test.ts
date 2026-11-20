@@ -52,7 +52,7 @@ const HARD_LOCK_TEMPLATE =
   "C:/extension/resources/customizations/.github/codex/execute-hard-lock.prompt.md";
 const ATOMIC_TEMPLATE =
   "C:/extension/resources/customizations/.github/prompts/generate-atomic-plan.prompt.md";
-const FOLDER = "docs/features/active/2026-01-02-port-cmd-240";
+const FOLDER = ".dev/active/2026-01-02-port-cmd-240";
 const TARGET = `${WORKSPACE}/${FOLDER}/plan.md`;
 
 describe("resolveExecuteHardLockPromptServiceCall", () => {

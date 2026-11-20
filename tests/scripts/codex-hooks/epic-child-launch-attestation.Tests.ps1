@@ -24,7 +24,7 @@ BeforeAll {
             expires_at              = '2026-07-11T22:00:00Z'
             launch_id               = 'launch-1'
             delegation_id           = 'delegation-1'
-            feature_folder          = 'docs/features/active/feature-one'
+            feature_folder          = '.dev/active/feature-one'
             deployment_agent        = 'orchestrator-c3-elevated'
             model                   = 'gpt-6-astra'
             model_reasoning_effort  = 'high'

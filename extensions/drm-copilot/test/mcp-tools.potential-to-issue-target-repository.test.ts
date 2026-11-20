@@ -90,7 +90,7 @@ describe("dispatchRepoAutomationTool target-repository projection", () => {
       "potential_to_issue",
       {
         workspace_root: WORKSPACE_ROOT,
-        potential_path: "docs/features/potential/entry.md",
+        potential_path: ".dev/potential/entry.md",
         promotion_type: "feature",
         work_mode: "full-feature",
       },
@@ -112,7 +112,7 @@ describe("dispatchRepoAutomationTool target-repository projection", () => {
       tool: "new_potential_entry",
       workspaceRoot: WORKSPACE_ROOT,
       summary: "Created potential entry.",
-      artifacts: ["docs/features/potential/entry.md"],
+      artifacts: [".dev/potential/entry.md"],
     };
     mockService.newPotentialEntry.mockResolvedValue(executionResult);
 
@@ -131,7 +131,7 @@ describe("dispatchRepoAutomationTool target-repository projection", () => {
       tool: "new_potential_entry",
       workspace_root: WORKSPACE_ROOT,
       summary: "Created potential entry.",
-      artifacts: ["docs/features/potential/entry.md"],
+      artifacts: [".dev/potential/entry.md"],
     });
   });
 });

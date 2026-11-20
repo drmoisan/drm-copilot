@@ -1,0 +1,61 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " staged-review"
+      },
+      {
+        "key": "model",
+        "value": " opus"
+      },
+      {
+        "key": "description",
+        "value": " Project-scoped worker that reviews staged diffs and writes staged-review artifacts."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - \"Bash(git diff *)\"\n  - \"Write(/artifacts/**)\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - acceptance-criteria-tracking"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      },
+      {
+        "key": "hooks",
+        "value": "\n  SubagentStop:\n    - matcher: \"staged-review\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName staged-review -RequiredArtifact 'staged-review-path|^artifacts/reviews/staged-review\\.\\d{4}-\\d{2}-\\d{2}T\\d{2}-\\d{2}\\.md$|staged review artifact'"
+      }
+    ],
+    "path": ".claude/agents/staged-review.md",
+    "sections": [
+      "head",
+      "expected-outputs",
+      "output-reporting",
+      "evidence-location-invariant"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"staged-review\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "path": ".codex/agents/staged-review.toml",
+    "sections": [
+      "head-2",
+      "expected-outputs",
+      "evidence-location-invariant-2"
+    ]
+  }
+}

@@ -4,11 +4,18 @@ import {
   runApplyMode,
   runReviewMode,
 } from "../../../src/lib/codex-native-converter/engine";
+import { STANDING_GUIDANCE_NOT_EMITTED_NOTE } from "../../../src/lib/codex-native-converter/mapping";
 import {
   type RunOptions,
   SourceEcosystem,
 } from "../../../src/lib/codex-native-converter/models";
 import { InMemoryFileSystem } from "./in-memory-file-system";
+
+/** Repo-wide standing-guidance sources of the GitHub Copilot fixture. */
+const STANDING_GUIDANCE_SOURCES: ReadonlyArray<string> = [
+  ".github/copilot-instructions.md",
+  ".github/instructions/general-code-change.instructions.md",
+];
 
 const SOURCE_ROOT = "/repo/github_copilot";
 const ARTIFACT_ROOT = "/virtual/end-to-end/github";
@@ -97,36 +104,67 @@ describe("runReviewMode", () => {
     ).toBe(true);
     expect(
       writtenPaths.some((path) => path.includes("proposed-tree/AGENTS.md")),
-    ).toBe(true);
+    ).toBe(false);
     expect(result.mappingRecords.length).toBeGreaterThanOrEqual(4);
     expect(result.wroteDestination).toBe(false);
   });
 
-  it("merges repo-wide instructions into one generated AGENTS.md", () => {
+  it("does not emit AGENTS.md for repo-wide standing-guidance sources", () => {
     // Arrange & Act
     const result = runReviewMode(fileSystem, runOptions());
 
-    // Assert
-    const agentsPath = [...fileSystem.files.keys()].find((path) =>
-      path.endsWith("proposed-tree/AGENTS.md"),
+    // Assert: no AGENTS.md output key and no merged standing-guidance text.
+    expect(Object.keys(result.generatedOutput)).not.toContain("AGENTS.md");
+    for (const output of Object.values(result.generatedOutput)) {
+      expect(output).not.toContain("Converted standing guidance");
+    }
+    const standingRecords = result.mappingRecords.filter((record) =>
+      STANDING_GUIDANCE_SOURCES.includes(record.sourcePath),
     );
-    expect(agentsPath).toBeDefined();
-    const agentsOutput = fileSystem.readTextFile(agentsPath as string);
-    expect(agentsOutput).toContain("Copilot fixture instructions");
-    expect(agentsOutput).toContain("fixture-general-policy");
-    expect(
-      result.mappingRecords.some(
-        (record) =>
-          record.sourcePath ===
-            ".github/instructions/general-code-change.instructions.md" &&
-          record.targetPath === "AGENTS.md",
-      ),
-    ).toBe(true);
+    expect(standingRecords).toHaveLength(STANDING_GUIDANCE_SOURCES.length);
+    for (const record of standingRecords) {
+      expect(record.targetPath).toBeNull();
+    }
     expect(
       result.validationFindings.some(
         (finding) => finding.code === "duplicate-target-path",
       ),
     ).toBe(false);
+  });
+
+  it("reports each standing-guidance source as not emitted with the hand-authored-source reason", () => {
+    // Arrange & Act
+    const result = runReviewMode(fileSystem, runOptions());
+
+    // Assert: each standing-guidance record carries the reason, and the report
+    // row of each source shows it.
+    const reportPath = `${ARTIFACT_ROOT}/conversion-report.md`;
+    const report = fileSystem.readTextFile(reportPath);
+    for (const sourcePath of STANDING_GUIDANCE_SOURCES) {
+      const record = result.mappingRecords.find(
+        (candidate) => candidate.sourcePath === sourcePath,
+      );
+      expect(record?.notes).toContain(STANDING_GUIDANCE_NOT_EMITTED_NOTE);
+      const row = report
+        .split("\n")
+        .find((line) => line.startsWith(`| \`${sourcePath}\``));
+      expect(row).toContain(STANDING_GUIDANCE_NOT_EMITTED_NOTE);
+    }
+  });
+
+  it("keeps standing-guidance reference rewrites to AGENTS.md in other outputs", () => {
+    // Arrange & Act
+    const result = runReviewMode(fileSystem, runOptions());
+
+    // Assert: the topology agent still cites AGENTS.md in place of the
+    // standing-guidance sources it names.
+    const agentKey = Object.keys(result.generatedOutput).find((key) =>
+      key.endsWith("beast-topology.toml"),
+    );
+    expect(agentKey).toBeDefined();
+    const agentOutput = result.generatedOutput[agentKey as string] ?? "";
+    expect(agentOutput).toContain("AGENTS.md");
+    expect(agentOutput).not.toContain(".github/copilot-instructions.md");
   });
 
   it("accumulates section intents through parsed source artifacts", () => {
@@ -187,6 +225,36 @@ describe("runApplyMode", () => {
       path.startsWith(`${DESTINATION_ROOT}/`),
     );
     expect(destinationFiles.length).toBeGreaterThan(0);
+  });
+
+  it("does not create a destination AGENTS.md in apply mode", () => {
+    // Arrange & Act
+    const result = runApplyMode(
+      fileSystem,
+      runOptions({ mode: "apply", destinationRoot: DESTINATION_ROOT }),
+    );
+
+    // Assert
+    expect(result.wroteDestination).toBe(true);
+    expect(fileSystem.files.has(`${DESTINATION_ROOT}/AGENTS.md`)).toBe(false);
+  });
+
+  it("leaves an existing destination AGENTS.md unchanged in apply mode", () => {
+    // Arrange
+    const handAuthored = "# AGENTS.md\n\nHand-authored guidance.\n";
+    fileSystem.addFile(`${DESTINATION_ROOT}/AGENTS.md`, handAuthored);
+
+    // Act
+    const result = runApplyMode(
+      fileSystem,
+      runOptions({ mode: "apply", destinationRoot: DESTINATION_ROOT }),
+    );
+
+    // Assert
+    expect(result.wroteDestination).toBe(true);
+    expect(fileSystem.readTextFile(`${DESTINATION_ROOT}/AGENTS.md`)).toBe(
+      handAuthored,
+    );
   });
 
   it("does not write a destination when a blocking finding is present", () => {

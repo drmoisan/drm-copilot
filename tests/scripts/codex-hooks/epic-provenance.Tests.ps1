@@ -15,6 +15,49 @@ Describe 'Codex epic provenance and routing attestation hooks' {
         $script:HeadSha = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     }
 
+    # D-P16 (issue #1035): the epic-run kickoff path is resolved from the development-docs root; no
+    # case reads the real routing file.
+    BeforeEach {
+        Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $true; Root = 'docs/features'; Reason = $null } }
+    }
+
+    It 'resolves the kickoff path against -RepositoryRoot (issue #1035)' {
+        # Arrange: a synthetic repository root whose configured development-docs root is .dev.
+        $syntheticRoot = [System.IO.Path]::GetFullPath((Join-Path $script:RepoRoot 'synthetic-roots/epic-root'))
+        Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $true; Root = '.dev'; Reason = $null } }
+        $payload = [pscustomobject]@{ session_id = 'session-1'; turn_id = 'turn-1'; agent_type = 'epic-orchestrator' }
+
+        # Act: both kickoff callers run against the synthetic root.
+        $receipt = Get-RootEpicInvocationReceipt -Payload ([pscustomobject]@{
+                session_id = 'session-1'
+                turn_id    = 'turn-1'
+                prompt     = '/epic-run .dev/epics/sample/epic.md'
+            }) `
+            -Now $script:Now `
+            -RepositoryRoot $syntheticRoot `
+            -HeadSha $script:HeadSha
+        $valid = Test-RootEpicReceipt `
+            -Receipt ($receipt | ConvertTo-Json | ConvertFrom-Json) `
+            -Payload $payload `
+            -RepositoryRoot $syntheticRoot `
+            -CurrentHeadSha $script:HeadSha `
+            -Now $script:Now
+
+        # Assert: the minted and the checked kickoff path come from the root of -RepositoryRoot only.
+        $receipt.kickoff_path | Should -BeExactly '.dev/epics/sample/epic-kickoff.md'
+        $valid | Should -BeTrue
+        Should -Invoke Resolve-DevelopmentDocsRoot -Times 2 -Exactly -ParameterFilter { $WorkspaceRoot -ceq $syntheticRoot }
+        Should -Invoke Resolve-DevelopmentDocsRoot -Times 0 -Exactly -ParameterFilter { $WorkspaceRoot -cne $syntheticRoot }
+    }
+
+    It 'blocks the receipt when the development-docs root cannot be resolved (issue #1035)' {
+        Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $false; Root = $null; Reason = 'synthetic routing failure' } }
+        {
+            Get-RootEpicInvocationReceipt -Payload ([pscustomobject]@{ session_id = 'session-1'; turn_id = 'turn-1'; prompt = '/epic-run sample' }) `
+                -Now $script:Now -RepositoryRoot $script:RepoRoot -HeadSha $script:HeadSha
+        } | Should -Throw '*EPIC_INVOCATION_ORIGIN_BLOCKED: synthetic routing failure*'
+    }
+
     It 'recognizes the three explicit root epic entry skills' -ForEach @(
         @{ Prompt = '/epic-plan deliver the objective'; Persona = 'epic-planner' }
         @{ Prompt = '/epic-run sample-epic'; Persona = 'epic-orchestrator' }

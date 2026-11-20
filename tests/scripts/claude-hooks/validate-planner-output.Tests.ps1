@@ -21,8 +21,8 @@ CITATION-TO-TREE: PASS
 CITATION: .claude/hooks/validate-planner-output.ps1 | planner review parser
 AC-TRACEABILITY: PASS
 AC-INVENTORY: AC1, AC2
-AC-MAPPING: AC1 | IMPLEMENTATION: .claude/hooks/validate-planner-output.ps1 | TESTS: tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 | EVIDENCE: docs/features/active/foo/evidence/qa-gates/pester.md
-AC-MAPPING: AC2 | IMPLEMENTATION: .claude/agents/atomic-planner.md | TESTS: tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py | EVIDENCE: docs/features/active/foo/evidence/qa-gates/contracts.md
+AC-MAPPING: AC1 | IMPLEMENTATION: .claude/hooks/validate-planner-output.ps1 | TESTS: tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 | EVIDENCE: .dev/active/foo/evidence/qa-gates/pester.md
+AC-MAPPING: AC2 | IMPLEMENTATION: .claude/agents/atomic-planner.md | TESTS: tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py | EVIDENCE: .dev/active/foo/evidence/qa-gates/contracts.md
 SCOPE-BOUNDARY: PASS
 UNRESOLVED-GAPS: NONE
 PREFLIGHT: $Preflight
@@ -45,7 +45,7 @@ Describe 'validate-planner-output.ps1' {
 
         It 'blocks when the output is missing an exact preflight signal' {
             Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $true; Lines = @() } }
-            $raw = @{ last_assistant_message = 'plan-path: docs/features/active/foo/plan.md' } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = 'plan-path: .dev/active/foo/plan.md' } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -InputText $raw
 
@@ -80,13 +80,13 @@ Describe 'validate-planner-output.ps1' {
 
         It 'blocks when the markdown-link plan-path form points at a nonexistent file' {
             Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $false; Lines = @() } }
-            $raw = @{ last_assistant_message = "[plan-path](docs/features/active/foo/plan.md)`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "[plan-path](.dev/active/foo/plan.md)`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -InputText $raw
 
             $result.Ok | Should -BeFalse
             $result.Message | Should -Match 'no file exists'
-            $result.Message | Should -Match 'docs/features/active/foo/plan.md'
+            $result.Message | Should -Match '.dev/active/foo/plan.md'
         }
 
         It 'blocks when the markdown-link plan-path form captures a whitespace-only value' {
@@ -138,7 +138,7 @@ Describe 'validate-planner-output.ps1' {
     Context 'plan structure validation' {
         It 'blocks when the advertised plan-path does not exist on disk' {
             Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $false; Lines = @() } }
-            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: .dev/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -InputText $raw
 
@@ -154,11 +154,11 @@ Describe 'validate-planner-output.ps1' {
                         "### Phase 1 `u{2014} Implement",
                         '- [ ] [P1-T1] Update .claude/hooks/validate-planner-output.ps1',
                         "### Phase 2 `u{2014} QA",
-                        '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                        '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
                     )
                 }
             }
-            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: .dev/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -InputText $raw
 
@@ -173,14 +173,14 @@ Describe 'validate-planner-output.ps1' {
                     Lines  = @(
                         "### Phase 0 `u{2014} Baseline",
                         '- [ ] [P0-T1] Read policy files',
-                        '- [ ] [P0-T2] Capture baseline for docs/features/active/foo/issue.md',
+                        '- [ ] [P0-T2] Capture baseline for .dev/active/foo/issue.md',
                         "### Phase 1 `u{2014} QA",
-                        '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                        '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
                     )
                 }
             }
             # Intentional structural negative: review validation is masked by the malformed task path.
-            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord -Preflight 'REVISIONS REQUIRED')" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: .dev/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord -Preflight 'REVISIONS REQUIRED')" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -InputText $raw
 
@@ -199,7 +199,7 @@ Describe 'validate-planner-output.ps1' {
                 }
             }
             # Intentional structural negative: review validation is masked by the malformed phase heading.
-            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: .dev/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -InputText $raw
 
@@ -213,16 +213,16 @@ Describe 'validate-planner-output.ps1' {
                     Exists = $true
                     Lines  = @($script:PreMortemFixture) + @(
                         "### Phase 0 `u{2014} Baseline",
-                        '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record docs/features/active/foo/evidence/baseline/phase0-instructions-read.md',
-                        '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/baseline/pester.md',
+                        '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record .dev/active/foo/evidence/baseline/phase0-instructions-read.md',
+                        '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/baseline/pester.md',
                         "### Phase 1 `u{2014} Implement",
                         '- [ ] [P1-T1] Update .claude/hooks/validate-planner-output.ps1 and tests/scripts/claude-hooks/validate-planner-output.Tests.ps1',
                         "### Phase 2 `u{2014} Final QA",
-                        '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                        '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
                     )
                 }
             }
-            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: .dev/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)" } | ConvertTo-Json -Compress
 
             $result = Invoke-PlannerOutputValidation -InputText $raw
 
@@ -235,10 +235,10 @@ Describe 'validate-planner-output.ps1' {
         It 'reports an error when a task-like line does not match the full task pattern' {
             $lines = @(
                 "### Phase 0 `u{2014} Baseline",
-                '- [ ] [P0-T1] Read policy files and capture baseline for docs/features/active/foo/issue.md',
+                '- [ ] [P0-T1] Read policy files and capture baseline for .dev/active/foo/issue.md',
                 '- [ ] not a real task line',
                 "### Phase 1 `u{2014} QA",
-                '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
             )
 
             $errors = @(Get-PlanStructureValidationReport -Lines $lines)
@@ -260,7 +260,7 @@ Describe 'validate-planner-output.ps1' {
         It 'reports an error when a phase''s first task number skips T1' {
             $lines = @(
                 "### Phase 0 `u{2014} Baseline",
-                '- [ ] [P0-T2] Read policy files and capture baseline for docs/features/active/foo/issue.md'
+                '- [ ] [P0-T2] Read policy files and capture baseline for .dev/active/foo/issue.md'
             )
 
             $errors = @(Get-PlanStructureValidationReport -Lines $lines)
@@ -283,9 +283,9 @@ Describe 'validate-planner-output.ps1' {
             # Issue #1097 removed the routine policy-read requirement; a baseline task alone satisfies Phase 0.
             $lines = @(
                 "### Phase 0 `u{2014} Baseline",
-                '- [ ] [P0-T1] Capture baseline for docs/features/active/foo/issue.md',
+                '- [ ] [P0-T1] Capture baseline for .dev/active/foo/issue.md',
                 "### Phase 1 `u{2014} QA",
-                '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
             )
 
             $errors = @(Get-PlanStructureValidationReport -Lines $lines)
@@ -297,10 +297,10 @@ Describe 'validate-planner-output.ps1' {
             # A plan written before the removal, or one that still reads policy in Phase 0, stays valid.
             $lines = @(
                 "### Phase 0 `u{2014} Baseline",
-                '- [ ] [P0-T1] Read policy files and record docs/features/active/foo/evidence/baseline/phase0-instructions-read.md',
-                '- [ ] [P0-T2] Capture baseline for docs/features/active/foo/issue.md',
+                '- [ ] [P0-T1] Read policy files and record .dev/active/foo/evidence/baseline/phase0-instructions-read.md',
+                '- [ ] [P0-T2] Capture baseline for .dev/active/foo/issue.md',
                 "### Phase 1 `u{2014} QA",
-                '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
             )
 
             $errors = @(Get-PlanStructureValidationReport -Lines $lines)
@@ -311,9 +311,9 @@ Describe 'validate-planner-output.ps1' {
         It 'reports an error when Phase 0 mentions policy but no baseline wording' {
             $lines = @(
                 "### Phase 0 `u{2014} Baseline",
-                '- [ ] [P0-T1] Read policy files for docs/features/active/foo/issue.md',
+                '- [ ] [P0-T1] Read policy files for .dev/active/foo/issue.md',
                 "### Phase 1 `u{2014} QA",
-                '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
             )
 
             $errors = @(Get-PlanStructureValidationReport -Lines $lines)
@@ -324,7 +324,7 @@ Describe 'validate-planner-output.ps1' {
         It 'reports an error when the final phase contains no QA or toolchain wording' {
             $lines = @(
                 "### Phase 0 `u{2014} Baseline",
-                '- [ ] [P0-T1] Read policy files and capture baseline for docs/features/active/foo/issue.md',
+                '- [ ] [P0-T1] Read policy files and capture baseline for .dev/active/foo/issue.md',
                 "### Phase 1 `u{2014} Implement",
                 '- [ ] [P1-T1] Update .claude/hooks/validate-planner-output.ps1'
             )
@@ -337,12 +337,12 @@ Describe 'validate-planner-output.ps1' {
         It 'CORPUS-PLN-1 ignores a non-task checkbox line under a level-2 heading after the final phase' {
             $lines = @(
                 "### Phase 0 `u{2014} Baseline",
-                '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record docs/features/active/foo/evidence/baseline/phase0-instructions-read.md',
-                '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/baseline/pester.md',
+                '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record .dev/active/foo/evidence/baseline/phase0-instructions-read.md',
+                '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/baseline/pester.md',
                 "### Phase 1 `u{2014} Implement",
                 '- [ ] [P1-T1] Update .claude/hooks/validate-planner-output.ps1 and tests/scripts/claude-hooks/validate-planner-output.Tests.ps1',
                 "### Phase 2 `u{2014} Final QA",
-                '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md',
+                '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md',
                 '', '## Preflight Checklist',
                 '- [x] Phase headings follow the required format.'
             )
@@ -360,14 +360,14 @@ Describe 'validate-planner-output.ps1' {
                     Exists = $true
                     Lines  = @($script:PreMortemFixture) + @(
                         "### Phase 0 `u{2014} Baseline",
-                        '- [ ] [P0-T1] Read policy files and capture baseline for docs/features/active/foo/issue.md',
+                        '- [ ] [P0-T1] Read policy files and capture baseline for .dev/active/foo/issue.md',
                         "### Phase 1 `u{2014} QA",
-                        '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                        '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
                     )
                 }
             }
             foreach ($signal in @('ALL CLEAR', 'REVISIONS REQUIRED')) {
-                $output = "Unrelated prose.`nplan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord -Preflight $signal)`nMore unrelated prose."
+                $output = "Unrelated prose.`nplan-path: .dev/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord -Preflight $signal)`nMore unrelated prose."
                 $result = Invoke-PlannerOutputValidation -InputText (@{ last_assistant_message = $output } | ConvertTo-Json -Compress)
 
                 $result.Ok | Should -BeTrue
@@ -391,11 +391,11 @@ Describe 'validate-planner-output.ps1' {
                 @{ Name = 'duplicate inventory-ID fixture'; Text = $valid -replace 'AC-INVENTORY: AC1, AC2', 'AC-INVENTORY: AC1, AC1' },
                 @{ Name = 'duplicate inventory declaration fixture'; Text = $valid -replace 'AC-INVENTORY: AC1, AC2', "AC-INVENTORY: AC1, AC2`nAC-INVENTORY: AC1, AC2" },
                 @{ Name = 'no mapping fixture'; Text = $valid -replace '(?m)^AC-MAPPING:.*\r?\n', '' },
-                @{ Name = 'blank mapping fixture'; Text = $valid -replace 'AC-MAPPING: AC1 \| IMPLEMENTATION: .claude/hooks/validate-planner-output.ps1 \| TESTS: tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 \| EVIDENCE: docs/features/active/foo/evidence/qa-gates/pester.md', 'AC-MAPPING: ' },
+                @{ Name = 'blank mapping fixture'; Text = $valid -replace 'AC-MAPPING: AC1 \| IMPLEMENTATION: .claude/hooks/validate-planner-output.ps1 \| TESTS: tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 \| EVIDENCE: .dev/active/foo/evidence/qa-gates/pester.md', 'AC-MAPPING: ' },
                 @{ Name = 'blank mapping ID fixture'; Text = $valid -replace 'AC-MAPPING: AC1 \|', 'AC-MAPPING:  |' },
                 @{ Name = 'blank implementation fixture'; Text = $valid -replace 'IMPLEMENTATION: .claude/hooks/validate-planner-output.ps1', 'IMPLEMENTATION: ' },
                 @{ Name = 'blank tests fixture'; Text = $valid -replace 'TESTS: tests/scripts/claude-hooks/validate-planner-output.Tests.ps1', 'TESTS: ' },
-                @{ Name = 'blank evidence fixture'; Text = $valid -replace 'EVIDENCE: docs/features/active/foo/evidence/qa-gates/pester.md', 'EVIDENCE: ' },
+                @{ Name = 'blank evidence fixture'; Text = $valid -replace 'EVIDENCE: .dev/active/foo/evidence/qa-gates/pester.md', 'EVIDENCE: ' },
                 @{ Name = 'duplicate mapping ID fixture'; Text = $valid -replace 'AC-MAPPING: AC2', 'AC-MAPPING: AC1' },
                 @{ Name = 'missing mapping ID fixture'; Text = $valid -replace '(?m)^AC-MAPPING: AC2.*\r?\n', '' },
                 @{ Name = 'extra mapping ID fixture'; Text = $valid -replace 'AC-MAPPING: AC2', 'AC-MAPPING: AC3' },
@@ -403,7 +403,7 @@ Describe 'validate-planner-output.ps1' {
                 @{ Name = 'blank unresolved-gap fixture'; Text = $valid -replace 'UNRESOLVED-GAPS: NONE', 'UNRESOLVED-GAPS: ' },
                 @{ Name = 'failed unresolved-gap fixture'; Text = $valid -replace 'UNRESOLVED-GAPS: NONE', 'UNRESOLVED-GAPS: BLOCKED' },
                 @{ Name = 'duplicate unresolved-gap fixture'; Text = $valid -replace 'UNRESOLVED-GAPS: NONE', "UNRESOLVED-GAPS: NONE`nUNRESOLVED-GAPS: NONE" },
-                @{ Name = 'review label before bounded record fixture'; Text = "CITATION: docs/features/active/foo/plan.md | outside`n$valid" },
+                @{ Name = 'review label before bounded record fixture'; Text = "CITATION: .dev/active/foo/plan.md | outside`n$valid" },
                 @{ Name = 'review label after bounded record fixture'; Text = "$valid`nAC-INVENTORY: AC1" }
             )
             foreach ($dimension in $dimensions) {

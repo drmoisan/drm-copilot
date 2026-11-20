@@ -42,7 +42,7 @@ function createFakeFileSystem(files: Readonly<Record<string, string>>): {
 }
 
 const WORKSPACE = "C:/workspace";
-const FOLDER = "docs/features/active/2026-01-02-port-cmd-240";
+const FOLDER = ".dev/active/2026-01-02-port-cmd-240";
 const TARGET = `${WORKSPACE}/${FOLDER}/plan.md`;
 
 describe("file-prompt-core resolvePrompt", () => {

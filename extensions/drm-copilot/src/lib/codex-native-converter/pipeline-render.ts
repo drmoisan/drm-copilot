@@ -2,10 +2,11 @@
  * Native content rendering for the Codex-native converter pipeline.
  *
  * Purpose:
- *     Hold the content-rendering half of the pipeline (per-record, merged
- *     standing-guidance, and section-level emission rendering) ported from
- *     `pipeline.py`, split out of `pipeline.ts` so neither file exceeds the
- *     500-line policy. Source reads flow through the injected {@link FileSystem}.
+ *     Hold the content-rendering half of the pipeline (per-record and
+ *     section-level emission rendering) ported from `pipeline.py`, split out
+ *     of `pipeline.ts` so neither file exceeds the 500-line policy. Source
+ *     reads flow through the injected {@link FileSystem}. Standing guidance is
+ *     never rendered: `AGENTS.md` is a hand-authored source (issue #1028).
  *
  * Invariants:
  *     Rendered content text is preserved verbatim from the Python source. This
@@ -114,6 +115,7 @@ function rewriteText(
  * Wrap rewritten text in the target-role-specific native output shape.
  *
  * Mirrors `_wrap_rendered_target_content`, preserving every literal template.
+ * Standing guidance has no branch because it is never rendered.
  *
  * @param options Target role/path, rewritten text, and rewrite summary.
  * @returns The wrapped native output text.
@@ -125,14 +127,6 @@ function wrapRenderedTargetContent(options: {
   readonly rewriteSummary: string;
 }): string {
   const { targetRole, targetPath, rewrittenText, rewriteSummary } = options;
-
-  if (targetRole === TargetRole.STANDING_GUIDANCE) {
-    return (
-      "# Converted standing guidance\n\n" +
-      `Applied rewrites:\n${rewriteSummary}\n\n` +
-      `${rewrittenText}\n`
-    );
-  }
 
   if (targetRole === TargetRole.SHARED_SKILL) {
     return (
@@ -224,69 +218,6 @@ export function renderTargetContent(
     rewrittenText,
     rewriteSummary,
   });
-}
-
-/**
- * Render one merged `AGENTS.md` output from standing-guidance sources.
- *
- * Mirrors `render_merged_standing_guidance`.
- *
- * @param fileSystem Injected filesystem.
- * @param runOptions Requested run options.
- * @param mappingRecords Standing-guidance mapping records targeting AGENTS.md.
- * @returns One merged `AGENTS.md` output body.
- * @throws Error When a required source file cannot be read.
- */
-export function renderMergedStandingGuidance(
-  fileSystem: FileSystem,
-  runOptions: RunOptions,
-  mappingRecords: ReadonlyArray<MappingRecord>,
-): string {
-  const standingGuidanceSourcePaths = mappingRecords.map(
-    (record) => record.sourcePath,
-  );
-
-  // Pre-rewrite each human-readable source label so header listings cannot
-  // reintroduce a raw source-runtime reference that the validator would flag.
-  const labelFor = (sourcePath: string): string => {
-    const [rewrittenLabel] = rewriteSupportedAutomationReference(
-      posixName(sourcePath),
-      {
-        enableRepoPrompts: runOptions.enableRepoPrompts,
-        standingGuidanceSourcePaths,
-      },
-    );
-    return rewrittenLabel;
-  };
-
-  const renderedSections: string[] = [
-    "# Converted standing guidance",
-    "",
-    "Merged standing-guidance sources:",
-    ...mappingRecords.map((record) => `- \`${labelFor(record.sourcePath)}\``),
-    "",
-  ];
-
-  // Append one rewritten section per standing-guidance source, in order.
-  for (const mappingRecord of mappingRecords) {
-    const renderedText = rstrip(
-      renderTargetContent(
-        fileSystem,
-        runOptions,
-        mappingRecord,
-        standingGuidanceSourcePaths,
-      ),
-    );
-    const sectionLabel = labelFor(mappingRecord.sourcePath);
-    renderedSections.push(
-      `## Source: \`${sectionLabel}\``,
-      "",
-      renderedText,
-      "",
-    );
-  }
-
-  return rstrip(renderedSections.join("\n")) + "\n";
 }
 
 /**

@@ -1,0 +1,4 @@
+  powershell:
+    name: PowerShell
+    uses: __DRM_COPILOT_CI_USES__
+    __DRM_COPILOT_CI_WITH__

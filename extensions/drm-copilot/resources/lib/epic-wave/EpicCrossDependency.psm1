@@ -23,6 +23,7 @@
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+Import-Module (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 $script:CrossKey = 'cross_epic_depends_on'
 $script:EdgeKeys = @('epic', 'integration_branch', 'issue_num')
@@ -346,7 +347,7 @@ function Get-EpicCrossDependencyPrerequisitePr {
         Match the prerequisite's merged pull request in a gh pr list snapshot (D3 as amended by D11).
     .DESCRIPTION
         Main-sync chore PRs (head chore/epic-...-main-sync-...) are excluded. A PR matches when a
-        listed file lies under docs/features/active/<folder>/ or docs/features/completed/<folder>/,
+        listed file lies under the active or completed area of a known development-docs root,
         or when a hyphen-delimited token of the last segment of its head branch equals the
         issue number; a PR matching both rules counts once. Returns Status (match,
         PREREQ_PR_NOT_FOUND, PREREQ_PR_AMBIGUOUS, or PREREQ_SNAPSHOT_INVALID), Number,
@@ -362,7 +363,7 @@ function Get-EpicCrossDependencyPrerequisitePr {
     $prs = ConvertFrom-EpicCrossSnapshot -SnapshotJson $SnapshotJson -RequireFiles
     if ($null -eq $prs) { return [pscustomobject]@{ Status = 'PREREQ_SNAPSHOT_INVALID'; Number = $null; MergeCommitSha = ''; MatchCount = 0 } }
     $prefixes = @()
-    if ($FeatureFolder) { $prefixes = @("docs/features/active/$FeatureFolder/", "docs/features/completed/$FeatureFolder/") }
+    if ($FeatureFolder) { $prefixes = @(foreach ($area in 'active', 'completed') { foreach ($prefix in Get-DevelopmentDocsKnownRootPrefix -Area $area) { "$prefix$FeatureFolder/" } }) }
     $matched = [System.Collections.Generic.List[object]]::new()
     # Apply the main-sync exclusion first, then the file rule or the token rule; a PR is kept once.
     foreach ($pr in $prs) {
@@ -526,11 +527,12 @@ function Read-EpicCrossManifestText {
     <#
     .SYNOPSIS
         Read another epic's epic.md from origin/<integration branch>, else origin/main; returns Text and Source (branch, main, or '').
+        The manifest lies in the epics area of -DevelopmentDocsRoot (issue #1035), the first known root by default.
     #>
     [CmdletBinding()] [OutputType([pscustomobject])]
-    param([Parameter(Mandatory = $true)] [string] $Epic, [Parameter(Mandatory = $true)] [string] $IntegrationBranch)
+    param([Parameter(Mandatory = $true)] [string] $Epic, [Parameter(Mandatory = $true)] [string] $IntegrationBranch, [string] $DevelopmentDocsRoot = @(Get-DevelopmentDocsKnownRoot)[0])
 
-    $path = "docs/features/epics/$Epic/epic.md"
+    $path = (Get-DevelopmentDocsPath -Root $DevelopmentDocsRoot -Area 'epics') + "/$Epic/epic.md"
     # A branch that no longer exists means the epic reached main, so origin/main is the fallback.
     foreach ($candidate in @(@('branch', "origin/$IntegrationBranch"), @('main', 'origin/main'))) {
         $result = Invoke-EpicCrossGitExe -GitArgs @('show', "$($candidate[1]):$path")
@@ -589,7 +591,7 @@ function Get-EpicCrossUtcNow {
 # Private: gather one cross-epic edge's evidence through the adapters; any failure sets AdapterError.
 function Get-EpicCrossFeatureEvidence {
     [CmdletBinding()] [OutputType([hashtable])]
-    param([Parameter(Mandatory = $true)] [hashtable] $Edge, [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $OwnIntegrationBranch)
+    param([Parameter(Mandatory = $true)] [hashtable] $Edge, [Parameter(Mandatory = $true)] [AllowEmptyString()] [string] $OwnIntegrationBranch, [string] $DevelopmentDocsRoot = @(Get-DevelopmentDocsKnownRoot)[0])
 
     $evidence = @{
         Epic = $Edge.Epic; IntegrationBranch = $Edge.IntegrationBranch; IssueNum = $Edge.IssueNum; AdapterError = $false
@@ -598,7 +600,7 @@ function Get-EpicCrossFeatureEvidence {
     try {
         # Resolve the prerequisite's feature folder from the other manifest, match its merged
         # PR, then test ancestry against the other branch (or main) and the own branch.
-        $manifestText = Read-EpicCrossManifestText -Epic $Edge.Epic -IntegrationBranch $Edge.IntegrationBranch
+        $manifestText = Read-EpicCrossManifestText -Epic $Edge.Epic -IntegrationBranch $Edge.IntegrationBranch -DevelopmentDocsRoot $DevelopmentDocsRoot
         $feature = @()
         if ($manifestText.Source) {
             $other = ConvertFrom-EpicCrossDependencyManifest -Text $manifestText.Text
@@ -646,7 +648,7 @@ function Get-EpicCrossMainEvidence {
 # a blank Issue in feature mode evaluates every edge-bearing feature.
 function Get-EpicCrossReadinessResult {
     [CmdletBinding()] [OutputType([pscustomobject])]
-    param([Parameter(Mandatory = $true)] [pscustomobject] $Manifest, [Parameter(Mandatory = $true)] [string] $Mode, [AllowEmptyString()] [string] $Issue = '')
+    param([Parameter(Mandatory = $true)] [pscustomobject] $Manifest, [Parameter(Mandatory = $true)] [string] $Mode, [AllowEmptyString()] [string] $Issue = '', [string] $DevelopmentDocsRoot = @(Get-DevelopmentDocsKnownRoot)[0])
 
     $fetchFailed = $false
     if ($Manifest.HasCrossEdge) {
@@ -671,7 +673,7 @@ function Get-EpicCrossReadinessResult {
     $decisions = [object[]] @(foreach ($feature in $selected) {
             $evidence = foreach ($edge in $feature.CrossEdges) {
                 if ($fetchFailed) { @{ Epic = $edge.Epic; IntegrationBranch = $edge.IntegrationBranch; IssueNum = $edge.IssueNum; AdapterError = $true } }
-                else { Get-EpicCrossFeatureEvidence -Edge $edge -OwnIntegrationBranch $Manifest.IntegrationBranch }
+                else { Get-EpicCrossFeatureEvidence -Edge $edge -OwnIntegrationBranch $Manifest.IntegrationBranch -DevelopmentDocsRoot $DevelopmentDocsRoot }
             }
             Get-EpicCrossDependencyFeatureDecision -Issue $feature.IssueNum -Evidence ([hashtable[]] @($evidence)) -EvaluatedAt $evaluatedAt
         })
@@ -717,6 +719,8 @@ function Invoke-EpicCrossReadinessCommand {
         Wait bound from 0 to 540; 0 is one evaluation.
     .PARAMETER ReadManifestText
         Injectable reader that receives the path and returns the file text.
+    .PARAMETER WorkspaceRoot
+        Checkout whose development-docs root locates the other epics' manifests (issue #1035); resolved once, only for a manifest with a cross edge. A failed resolution exits 1 with the resolver Reason.
     #>
     [CmdletBinding()] [OutputType([pscustomobject])]
     param(
@@ -724,7 +728,8 @@ function Invoke-EpicCrossReadinessCommand {
         [AllowEmptyString()] [string] $ManifestPath = '',
         [AllowEmptyString()] [string] $Issue = '',
         [int] $WaitSeconds = 0,
-        [scriptblock] $ReadManifestText = { param([string] $Path) Get-Content -Raw -LiteralPath $Path }
+        [scriptblock] $ReadManifestText = { param([string] $Path) Get-Content -Raw -LiteralPath $Path },
+        [string] $WorkspaceRoot = (Get-Location).Path
     )
 
     if (@('validate', 'feature', 'main') -cnotcontains $Mode) { return ConvertTo-EpicCrossUsageResult -Message '-Mode must be validate, feature, or main.' }
@@ -736,6 +741,12 @@ function Invoke-EpicCrossReadinessCommand {
     if ($Mode -eq 'feature' -and $Issue -and @($manifest.Features | Where-Object { $_.IssueNum -ceq $Issue }).Count -eq 0) {
         return ConvertTo-EpicCrossUsageResult -Message "-Issue $Issue is not a feature of the manifest."
     }
+    $docsRoot = @(Get-DevelopmentDocsKnownRoot)[0]
+    if ($manifest.HasCrossEdge) {
+        $resolution = Resolve-DevelopmentDocsRoot -WorkspaceRoot $WorkspaceRoot
+        if (-not $resolution.Succeeded) { return [pscustomobject]@{ ExitCode = 1; Stdout = ''; Stderr = [string] $resolution.Reason } }
+        $docsRoot = $resolution.Root
+    }
 
     # Validate mode also reads every referenced manifest so the cross-manifest rules run.
     $others = $null
@@ -743,7 +754,7 @@ function Invoke-EpicCrossReadinessCommand {
         $others = @{}
         foreach ($edge in @($manifest.Features | ForEach-Object { $_.CrossEdges })) {
             if ($others.ContainsKey($edge.Epic) -or $edge.Epic -ceq $manifest.Epic) { continue }
-            $read = Read-EpicCrossManifestText -Epic $edge.Epic -IntegrationBranch $edge.IntegrationBranch
+            $read = Read-EpicCrossManifestText -Epic $edge.Epic -IntegrationBranch $edge.IntegrationBranch -DevelopmentDocsRoot $docsRoot
             $others[$edge.Epic] = $null
             if ($read.Source) { $others[$edge.Epic] = ConvertFrom-EpicCrossDependencyManifest -Text $read.Text }
         }
@@ -758,7 +769,7 @@ function Invoke-EpicCrossReadinessCommand {
     # decision other than hold or until another poll would pass the bound.
     $elapsed = 0
     while ($true) {
-        $result = Get-EpicCrossReadinessResult -Manifest $manifest -Mode $Mode -Issue $Issue
+        $result = Get-EpicCrossReadinessResult -Manifest $manifest -Mode $Mode -Issue $Issue -DevelopmentDocsRoot $docsRoot
         if ($result.Decision -ne 'hold' -or $elapsed + $script:PollSeconds -gt $WaitSeconds) { break }
         Wait-EpicCrossInterval -Seconds $script:PollSeconds
         $elapsed += $script:PollSeconds

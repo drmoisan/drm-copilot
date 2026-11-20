@@ -152,7 +152,7 @@ def write_grant_covers(grant: str, target: str) -> bool:
 
     Args:
         grant (str): A glob body parsed from a ``Write(<glob>)`` entry, for
-            example ``docs/features/parallel/**``.
+            example ``.dev/parallel/**``.
         target (str): A repo-relative path token the procedure prescribes as a
             write destination.
 

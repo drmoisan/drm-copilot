@@ -1,0 +1,72 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**/*.ts\""
+        },
+        {
+          "key": "description",
+          "value": " Pre-authorized ESLint and TypeScript suppression patterns. Applies to TypeScript files."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/typescript-suppressions.md",
+      "sections": [
+        "head",
+        "authorization-requirement",
+        "pre-authorized-patterns",
+        "explicitly-prohibited-patterns",
+        "policy-enforcement-checklist"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "description",
+          "value": " \"Pre-authorized patterns for ESLint and TypeScript suppressions in TypeScript code\""
+        },
+        {
+          "key": "applyTo",
+          "value": " \"**/*.ts\""
+        },
+        {
+          "key": "name",
+          "value": " typescript-suppressions-policy"
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/typescript-suppressions.instructions.md",
+      "sections": [
+        "head-2",
+        "eslint-suppressions",
+        "typescript-suppressions",
+        "non-authorized-patterns-explicitly-prohibited-with",
+        "policy-enforcement"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " typescript-suppressions"
+        },
+        {
+          "key": "description",
+          "value": " TypeScript suppression policy for linting and type-checking exceptions."
+        }
+      ],
+      "kind": "codex",
+      "path": ".agents/skills/typescript-suppressions/SKILL.md",
+      "sections": [
+        "head",
+        "authorization-requirement",
+        "pre-authorized-patterns",
+        "explicitly-prohibited-patterns",
+        "policy-enforcement-checklist"
+      ]
+    }
+  ]
+}

@@ -64,6 +64,9 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.ps
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeItemResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeItemResolution.psm1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/WorktreeRunResolution.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'WorktreeRunResolution.psm1' -ErrorRecord $_ }
+# Development-docs root module (issue #1035): the missing-folder message names the active
+# area of the first known root.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
 $script:ParallelCohortBarrierResolutionImportFailure = $null
 
 # Shared feature-folder resolution (issue #565). Guarded so a failed dot-source denies
@@ -264,7 +267,7 @@ function Invoke-ParallelCohortBarrierDecision {
 
     $candidates = @(Find-ParallelCohortBarrierFeatureFolderFromPrompt -Prompt $prompt)
     if ($candidates.Count -eq 0) {
-        return Get-ParallelCohortBarrierBlockDecision -Reason 'PARALLEL_COHORT_BARRIER_BLOCKED: a parallel-mode orchestrator delegation must reference the target item feature folder path (docs/features/active/<folder>) in the prompt so its conflict edges and cohort position can be verified.'
+        return Get-ParallelCohortBarrierBlockDecision -Reason "PARALLEL_COHORT_BARRIER_BLOCKED: a parallel-mode orchestrator delegation must reference the target item feature folder path ($(@(Get-DevelopmentDocsKnownRootPrefix -Area 'active')[0])<folder>) in the prompt so its conflict edges and cohort position can be verified."
     }
 
     $checkpointRaw = Get-ParallelCohortBarrierCheckpointContent -Path (Get-WorktreeRunCheckpointPath -Kind parallel -WorktreeRoot $target.WorktreeRoot)

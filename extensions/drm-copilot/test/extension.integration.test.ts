@@ -414,24 +414,6 @@ describe("drm-copilot integration behavior", () => {
   // suites. Unrelated spawn-based cases (PowerShell commands and the still-Python
   // `collect_pr_context` command) are unchanged below.
 
-  it("syncAgentsFromInstructions runs the bundled PowerShell template against the active workspace root", async () => {
-    await handlerFor("drmCopilotExtension.syncAgentsFromInstructions")();
-
-    const [executable, args, options] = childProcessMock.spawn.mock
-      .calls[0] as [string, string[], { cwd: string }];
-    const repoRootIndex = args.indexOf("-RepoRoot");
-    const fileIndex = args.indexOf("-File");
-
-    expect(executable).toBe("pwsh");
-    expect(fileIndex).toBeGreaterThan(-1);
-    expect(args[fileIndex + 1]).toBe(
-      "C:/extension/resources/templates/sync-agents-from-instructions.ps1",
-    );
-    expect(repoRootIndex).toBeGreaterThan(-1);
-    expect(args[repoRootIndex + 1]).toBe("C:/workspace");
-    expect(options.cwd).toBe("C:/workspace");
-  });
-
   it("linkParentChild runs the bundled PowerShell template against the active workspace root", async () => {
     showInputBoxMock.mockResolvedValueOnce("12").mockResolvedValueOnce("34");
 
@@ -460,7 +442,7 @@ describe("drm-copilot integration behavior", () => {
     ).toBe(false);
   });
 
-  it("newPotentialEntry succeeds in a workspace without docs/features/templates using bundled templates", async () => {
+  it("newPotentialEntry succeeds in a workspace without .dev/templates using bundled templates", async () => {
     const templateLessWorkspacePath = "C:/workspace/template-less";
     workspaceFoldersState = [
       {
@@ -490,9 +472,7 @@ describe("drm-copilot integration behavior", () => {
     ).toBe(true);
     expect(options.cwd).toBe(templateLessWorkspacePath);
     expect(
-      args.some((arg) =>
-        normalizePath(arg).includes("/docs/features/templates/"),
-      ),
+      args.some((arg) => normalizePath(arg).includes("/.dev/templates/")),
     ).toBe(false);
   });
 });

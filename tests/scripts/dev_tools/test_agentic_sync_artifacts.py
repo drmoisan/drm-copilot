@@ -190,5 +190,4 @@ def test_root_folders_include_published_github_hooks_in_scoped_order() -> None:
         Path(".github/hooks"),
         Path(".github/instructions"),
         Path(".github/prompts"),
-        Path(".github/skills"),
     )

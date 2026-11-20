@@ -19,7 +19,7 @@ origin/feature/expose-commit-script-74
 ## feature/expose-commit-script-74...origin/feature/expose-commit-script-74
 M  scripts/dev_tools/collect_commit_context.py
  M README.md
-?? docs/features/active/2026-03-03-expose-commit-script-74/
+?? .dev/active/2026-03-03-expose-commit-script-74/
 
 ===== Staged files (name-status) =====
 
@@ -49,7 +49,7 @@ index 3333333..4444444 100644
 
 ===== Untracked files =====
 
-docs/features/active/2026-03-03-expose-commit-script-74/notes.md
+.dev/active/2026-03-03-expose-commit-script-74/notes.md
 
 ===== Diff stat (staged + unstaged) =====
 

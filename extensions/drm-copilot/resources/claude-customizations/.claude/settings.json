@@ -14,6 +14,7 @@
       "Bash(pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1*)",
       "Read",
       "Edit(docs/**)",
+      "Edit(.dev/**)",
       "Edit(artifacts/**)",
       "mcp__drm-copilot__run_poshqc_format",
       "mcp__drm-copilot__run_poshqc_analyze",

@@ -15,6 +15,9 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 
 
 try { Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'HookPayload.psm1' -ErrorRecord $_ }
+# Development-docs root module (issue #1035): the known-root matchers of the
+# dot-sourced helpers below read it, so it loads before them.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
 
 # Pure pathspec classifier for the issue #539 orchestration-bookkeeping staging exemption.
 # Extracted to a dot-sourced sibling so this file stays inside the 500-line cap, following
@@ -100,7 +103,8 @@ function Test-FeatureDocumentationOrEvidencePath {
     # -match: String.StartsWith is case-sensitive, so the case-sensitive operator
     # is what preserves the previous semantics exactly. PowerShell -match is
     # case-insensitive and would widen this predicate.
-    return $NormalizedPath -cmatch '(^|/)docs/features/active/'
+    $activeAreas = @(Get-DevelopmentDocsKnownRootPrefix -Area 'active' | ForEach-Object { [regex]::Escape($_) })
+    return $NormalizedPath -cmatch ('(^|/)(?:' + ($activeAreas -join '|') + ')')
 }
 
 function Test-ImplementationPath {
@@ -265,7 +269,7 @@ function Test-OrchestrationReady {
     }
 
     return (
-        $featureFolder.StartsWith('docs/features/active/') -and
+        (@(Get-DevelopmentDocsKnownRootPrefix -Area 'active' | Where-Object { $featureFolder.StartsWith($_, [System.StringComparison]::Ordinal) }).Count -gt 0) -and
         $routeId -and
         $lifecycleReady
     )

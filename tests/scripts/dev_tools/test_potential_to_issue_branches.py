@@ -198,7 +198,7 @@ def test_promote_potential_rejects_empty_content() -> None:
     """Cover branch 414->415: whitespace-only content raises PromotionError."""
     # Arrange: a file that exists but holds only whitespace.
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/blank.md"
+    potential = workspace / ".dev/potential/blank.md"
     fs = FakeFileSystem()
     fs.files[potential] = "   \n\t\n"
     gh = FakeGhClient(mod.GhResult([], 0))
@@ -222,7 +222,7 @@ def test_promote_potential_wraps_invalid_mode_type_combination() -> None:
     """
     # Arrange
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/bug.md"
+    potential = workspace / ".dev/potential/bug.md"
     fs = FakeFileSystem()
     fs.files[potential] = _feature_content("Bug Title")
     gh = FakeGhClient(mod.GhResult(["Created: https://example.com/issues/1"], 0))
@@ -256,7 +256,7 @@ def test_relative_path_falls_back_to_absolute_on_value_error(
     monkeypatch.setattr(mod.os.path, "relpath", _raise_value_error)
 
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/sample.md"
+    potential = workspace / ".dev/potential/sample.md"
     fs = FakeFileSystem()
     fs.files[potential] = _feature_content()
     create_result = mod.GhResult(["Created: https://example.com/issues/700"], 0)
@@ -295,7 +295,7 @@ def test_minor_audit_uses_existing_evidence_checklist() -> None:
     """
     # Arrange
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/audit.md"
+    potential = workspace / ".dev/potential/audit.md"
     fs = FakeFileSystem()
     fs.files[potential] = "\n".join(
         [
@@ -350,7 +350,7 @@ def test_missing_label_failure_without_retry_when_ensure_label_fails() -> None:
     """
     # Arrange
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/sample.md"
+    potential = workspace / ".dev/potential/sample.md"
     fs = FakeFileSystem()
     fs.files[potential] = _feature_content()
     create_result = mod.GhResult(
@@ -386,7 +386,7 @@ def test_create_success_without_issue_number_skips_view_and_metadata() -> None:
     """
     # Arrange
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/sample.md"
+    potential = workspace / ".dev/potential/sample.md"
     fs = FakeFileSystem()
     fs.files[potential] = _feature_content()
     create_result = mod.GhResult(["Issue created but no url present"], 0)

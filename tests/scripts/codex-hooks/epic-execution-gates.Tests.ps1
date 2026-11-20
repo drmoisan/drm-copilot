@@ -67,7 +67,7 @@ exit 0
         It 'allows feature planning document edits' {
             $patchText = [string]::Join([Environment]::NewLine, @(
                     '*** Begin Patch'
-                    '*** Update File: docs/features/active/sample/spec.md'
+                    '*** Update File: .dev/active/sample/spec.md'
                     '*** End Patch'
                 ))
             $payload = @{
@@ -78,7 +78,7 @@ exit 0
             Invoke-EpicPlanningOnlyDecision `
                 -PayloadRaw $payload `
                 -CheckpointRaw $script:Preparation `
-                -StagedPaths @('docs/features/active/sample/spec.md') `
+                -StagedPaths @('.dev/active/sample/spec.md') `
                 -CurrentBranch 'feature/sample' |
                 Should -BeNullOrEmpty
         }
@@ -120,7 +120,7 @@ exit 0
         }
 
         It 'allows explicit planning-artifact staging and an ordinary commit' -ForEach @(
-            @{ Command = 'git add -- docs/features/active/sample/spec.md artifacts/research/sample.md' }
+            @{ Command = 'git add -- .dev/active/sample/spec.md artifacts/research/sample.md' }
             @{ Command = 'git commit -m "docs: prepare sample feature"' }
             @{ Command = 'git push -u origin feature/sample' }
         ) {
@@ -132,7 +132,7 @@ exit 0
             Invoke-EpicPlanningOnlyDecision `
                 -PayloadRaw $payload `
                 -CheckpointRaw $script:Preparation `
-                -StagedPaths @('docs/features/active/sample/spec.md') `
+                -StagedPaths @('.dev/active/sample/spec.md') `
                 -CurrentBranch 'feature/sample' |
                 Should -BeNullOrEmpty
         }
@@ -157,8 +157,8 @@ exit 0
         }
 
         It 'denies path traversal, move destinations, and security receipt writes' -ForEach @(
-            @{ Patch = "*** Begin Patch`n*** Add File: docs/features/active/sample/../../../../src/service.py`n*** End Patch" }
-            @{ Patch = "*** Begin Patch`n*** Update File: docs/features/active/sample/spec.md`n*** Move to: src/service.md`n*** End Patch" }
+            @{ Patch = "*** Begin Patch`n*** Add File: .dev/active/sample/../../../../src/service.py`n*** End Patch" }
+            @{ Patch = "*** Begin Patch`n*** Update File: .dev/active/sample/spec.md`n*** Move to: src/service.md`n*** End Patch" }
             @{ Patch = "*** Begin Patch`n*** Add File: artifacts/orchestration/codex-routing-attestation.fake.json`n*** End Patch" }
         ) {
             $payload = @{
@@ -226,7 +226,7 @@ exit 0
             $decision = Invoke-EpicPlanningOnlyDecision `
                 -PayloadRaw $payload `
                 -CheckpointRaw $script:Preparation `
-                -StagedPaths @('docs/features/active/sample/spec.md', 'src/service.py')
+                -StagedPaths @('.dev/active/sample/spec.md', 'src/service.py')
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }
@@ -319,7 +319,7 @@ exit 0
             @{ Command = 'rg --pre Set-Content pattern .' }
         ) {
             Test-EpicPlanningBashAllowed -Command $Command `
-                -StagedPaths @('docs/features/active/sample/spec.md') `
+                -StagedPaths @('.dev/active/sample/spec.md') `
                 -CurrentBranch 'feature/sample' | Should -BeFalse
         }
     }

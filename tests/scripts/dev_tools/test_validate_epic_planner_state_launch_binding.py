@@ -36,7 +36,7 @@ def _strip_launch_binding(feature: dict[str, Any]) -> None:
 def _feature(issue_num: int) -> dict[str, Any]:
     """Build one prepared feature with complete launch evidence."""
 
-    folder = f"docs/features/active/feature-{issue_num}"
+    folder = f".dev/active/feature-{issue_num}"
     delegation_id = f"prepare-{issue_num}"
     launch_root = "artifacts/orchestration/epic-child-launches/preparation"
     model = dict(
@@ -80,7 +80,7 @@ def _state() -> dict[str, Any]:
     return {
         "objective": "prepare an epic",
         "epic_feature_folder": "sample-epic",
-        "epic_manifest_path": "docs/features/epics/sample-epic/epic.md",
+        "epic_manifest_path": ".dev/epics/sample-epic/epic.md",
         "integration_branch": "epic/sample-epic-integration",
         "max_parallel_features": 4,
         "epic_worthiness": {"verdict": "epic", "rationale": "two features"},

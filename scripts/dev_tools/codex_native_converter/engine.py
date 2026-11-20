@@ -52,7 +52,6 @@ from scripts.dev_tools.codex_native_converter.parser import parse_source_artifac
 from scripts.dev_tools.codex_native_converter.pipeline import (
     build_prompt_translation_traces,
     build_topology_edges,
-    render_merged_standing_guidance,
     render_section_emission_content,
     render_target_content,
 )
@@ -150,11 +149,15 @@ def _render_generated_output(
 
     Purpose:
         Build the full proposed native output tree before validation and report
-        emission.
+        emission. Each concrete target renders from the last record that
+        resolves to it. Standing-guidance records have no target, so they emit
+        nothing; ``AGENTS.md`` is a hand-authored source (issue #1028).
 
     Args:
         run_options (RunOptions): Requested run options.
         mapping_records (tuple[MappingRecord, ...]): Planned mappings.
+        planned_emissions (tuple[PlannedEmission, ...]): Section-level planned
+            emissions rendered for targets no mapping record produced.
 
     Returns:
         dict[str, str]: Generated output keyed by target path.
@@ -167,11 +170,12 @@ def _render_generated_output(
     """
 
     generated_output: dict[str, str] = {}
+    # Standing-guidance records have no target; their source paths, taken from
+    # the role alone, still drive reference rewrites to AGENTS.md elsewhere.
     standing_guidance_source_paths = tuple(
         record.source_path
         for record in mapping_records
         if record.target_role is TargetRole.STANDING_GUIDANCE
-        and record.target_path == "AGENTS.md"
     )
     mapping_records_by_target: dict[str, list[MappingRecord]] = defaultdict(list)
     section_emissions_by_target: dict[str, list[PlannedEmission]] = defaultdict(list)
@@ -192,20 +196,6 @@ def _render_generated_output(
     for target_path in sorted(mapping_records_by_target):
         records_for_target = mapping_records_by_target[target_path]
         if not records_for_target:
-            continue
-        target_records = tuple(records_for_target)
-        if (
-            target_path == "AGENTS.md"
-            and all(
-                record.target_role is TargetRole.STANDING_GUIDANCE
-                for record in target_records
-            )
-            and len(target_records) > 1
-        ):
-            generated_output[target_path] = render_merged_standing_guidance(
-                run_options,
-                target_records,
-            )
             continue
         generated_output[target_path] = render_target_content(
             run_options,

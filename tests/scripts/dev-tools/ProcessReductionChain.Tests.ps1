@@ -444,6 +444,70 @@ Describe 'Read-ProcessReductionChainInput' {
             Should -Invoke Read-ProcessReductionLedger -Times 1 -Exactly -ParameterFilter { $LedgerPath -like 'repo-root*process-reductions' }
         }
     }
+
+    It 'PRC-READ-FALLBACK-MOVED-TEMPLATE reads an absent docs/features/templates path from .dev/templates under the recorded key' {
+        InModuleScope ProcessReductionChain {
+            # Arrange: the recorded template path is absent and its moved location is present
+            Mock Read-ProcessReductionLedger {
+                $fence = '`' * 4
+                $text = "## Prior Text`n`n### Revert Block: docs/features/templates/x.md`n`n${fence}Current`nnew`n${fence}`n`n${fence}Prior`nold`n${fence}`n"
+                [pscustomobject]@{ IndexText = ''; Entries = @([pscustomobject]@{ Name = '0001-a.md'; Text = $text }); PatchNames = @() }
+            }
+            Mock Test-Path { ($LiteralPath -replace '\\', '/') -notlike '*/docs/features/templates/x.md' }
+            Mock Get-Content { 'live ' + ($LiteralPath -replace '\\', '/') }
+
+            # Act
+            $chainInput = Read-ProcessReductionChainInput -RepositoryRoot 'repo-root'
+
+            # Assert
+            $chainInput.LiveText.ContainsKey('docs/features/templates/x.md') | Should -BeTrue -Because 'the key stays the recorded path'
+            $chainInput.LiveText.ContainsKey('.dev/templates/x.md') | Should -BeFalse -Because 'the moved location is never a key'
+            $chainInput.LiveText['docs/features/templates/x.md'] | Should -BeLike 'live repo-root*/.dev/templates/x.md'
+        }
+    }
+
+    It 'PRC-READ-FALLBACK-LEDGER-ROOT reads the ledger from .dev/engineering/process-reductions with entry keys under docs/engineering/process-reductions/' {
+        InModuleScope ProcessReductionChain {
+            # Arrange: every recorded docs/engineering path is absent, so the moved ledger is read
+            Mock Read-ProcessReductionLedger {
+                [pscustomobject]@{ IndexText = ''; Entries = @([pscustomobject]@{ Name = '0001-a.md'; Text = '# 0001' }); PatchNames = @('0001-a.patch') }
+            }
+            Mock Test-Path { ($LiteralPath -replace '\\', '/') -notlike '*/docs/engineering/*' }
+            Mock Get-Content {
+                "diff --git a/docs/a.md b/docs/a.md`n--- a/docs/a.md`n+++ b/docs/a.md`n@@ -1 +1 @@`n-old`n+new"
+            } -ParameterFilter { $LiteralPath -like '*.patch' }
+            Mock Get-Content { 'live ' + ($LiteralPath -replace '\\', '/') } -ParameterFilter { $LiteralPath -notlike '*.patch' }
+
+            # Act
+            $chainInput = Read-ProcessReductionChainInput -RepositoryRoot 'repo-root'
+
+            # Assert
+            Should -Invoke Read-ProcessReductionLedger -Times 1 -Exactly -ParameterFilter { ($LedgerPath -replace '\\', '/') -like 'repo-root*/.dev/engineering/process-reductions' }
+            Should -Invoke Get-Content -Times 1 -Exactly -ParameterFilter { ($LiteralPath -replace '\\', '/') -like '*/.dev/engineering/process-reductions/patches/0001-a.patch' }
+            $chainInput.LedgerPath | Should -BeExactly 'docs/engineering/process-reductions'
+            $chainInput.LiveText['docs/engineering/process-reductions/0001-a.md'] | Should -BeLike 'live repo-root*/.dev/engineering/process-reductions/0001-a.md'
+        }
+    }
+
+    It 'PRC-READ-FALLBACK-BOTH-ABSENT returns $null when the recorded path and its moved location are both absent' {
+        InModuleScope ProcessReductionChain {
+            # Arrange: neither the recorded template path nor its .dev location exists
+            Mock Read-ProcessReductionLedger {
+                $fence = '`' * 4
+                $text = "## Prior Text`n`n### Revert Block: docs/features/templates/x.md`n`n${fence}Current`nnew`n${fence}`n`n${fence}Prior`nold`n${fence}`n"
+                [pscustomobject]@{ IndexText = ''; Entries = @([pscustomobject]@{ Name = '0001-a.md'; Text = $text }); PatchNames = @() }
+            }
+            Mock Test-Path { ($LiteralPath -replace '\\', '/') -notlike '*/templates/x.md' }
+            Mock Get-Content { 'live ' + ($LiteralPath -replace '\\', '/') }
+
+            # Act
+            $chainInput = Read-ProcessReductionChainInput -RepositoryRoot 'repo-root'
+
+            # Assert
+            $chainInput.LiveText.ContainsKey('docs/features/templates/x.md') | Should -BeTrue
+            $chainInput.LiveText['docs/features/templates/x.md'] | Should -BeNullOrEmpty
+        }
+    }
 }
 
 Describe 'Later landings' {

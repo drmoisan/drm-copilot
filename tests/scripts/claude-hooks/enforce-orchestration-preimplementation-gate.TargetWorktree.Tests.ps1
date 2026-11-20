@@ -35,9 +35,9 @@ BeforeAll {
     $script:Listing = "worktree $($script:Session)`nbranch refs/heads/main`n`nworktree $($script:ItemRoot)`nbranch refs/heads/feature/item`n`nworktree $($script:OtherRoot)`nbranch refs/heads/feature/other`n"
     $script:ItemCheckpoint = Get-WorktreeRunCheckpointPath -Kind 'item' -WorktreeRoot $script:ItemRoot
     $script:SessionCheckpoint = Get-WorktreeRunCheckpointPath -Kind 'item' -WorktreeRoot $script:Session
-    $script:ReadyItem = '{"issue-num":"1010","feature-folder":"docs/features/active/sample-1010","route_id":"large","lifecycle_ready":true}'
-    $script:UnreadyItem = '{"issue-num":"1010","feature-folder":"docs/features/active/sample-1010","route_id":"large","lifecycle_ready":false}'
-    $script:StringFalseItem = '{"issue-num":"1010","feature-folder":"docs/features/active/sample-1010","route_id":"large","lifecycle_ready":"false"}'
+    $script:ReadyItem = '{"issue-num":"1010","feature-folder":".dev/active/sample-1010","route_id":"large","lifecycle_ready":true}'
+    $script:UnreadyItem = '{"issue-num":"1010","feature-folder":".dev/active/sample-1010","route_id":"large","lifecycle_ready":false}'
+    $script:StringFalseItem = '{"issue-num":"1010","feature-folder":".dev/active/sample-1010","route_id":"large","lifecycle_ready":"false"}'
 
     function ConvertTo-ToolPayload {
         param([string] $Tool, [string] $FilePath = '', [string] $Command = '')

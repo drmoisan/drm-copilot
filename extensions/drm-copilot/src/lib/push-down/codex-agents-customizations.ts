@@ -14,19 +14,22 @@
 import { type PushDownFileSystem } from "./filesystem-adapter";
 import {
   type Clock,
-  pushDownCustomizations as enginePushDown,
   type PushDownSummary,
 } from "./copilot-customizations-engine";
 import {
-  assertSingleCsharpToolchain,
   type CSharpVariant,
-  computePublishedPaths,
-  loadPackManifests,
   type MemoryMode,
-  type PackManifest,
-  resolveManifestPackNames,
   resolveVariantSourcePath,
 } from "./codex-pack-selection";
+import { RoutingMergeFileSystem } from "./claude-routing-merge";
+import { LAYER_ROOT_FILES, type PushDownLayer } from "./push-down-layer";
+import { resolveLayerPublishedPaths } from "./push-down-pack-resolver";
+import { runPushDownPipeline } from "./push-down-pipeline";
+import { applyPushDownPlan, UNKNOWN_PAYLOAD_VERSION } from "./push-down-apply";
+import {
+  mergedDestinationPaths,
+  WriteIfChangedFileSystem,
+} from "./push-down-write-if-changed";
 
 /** Artifact directory for the Codex/agents push-down summary. */
 export const ARTIFACT_DIRECTORY = "artifacts/codex-and-agents-customizations";
@@ -84,6 +87,7 @@ export const VIRTUAL_RESOURCE_DIRECTORIES: ReadonlyArray<
 > = [
   [".codex/lib/discovery-validation", "lib/discovery-validation"],
   [".codex/lib/epic-wave", "lib/epic-wave"],
+  [".codex/lib/development-docs", "lib/development-docs"],
 ];
 
 /**
@@ -128,6 +132,8 @@ export interface CodexAgentsPushDownOptions {
   readonly csharpVariant?: CSharpVariant;
   readonly memoryMode?: MemoryMode;
   readonly bundleRoot?: string;
+  /** Overwrite `unmanaged-conflict` files (O-4 opt-in, issue #1029). */
+  readonly overwriteUnmanaged?: boolean;
 }
 
 function normalizePosix(value: string): string {
@@ -243,7 +249,7 @@ class CodexFilteringFileSystem implements PushDownFileSystem {
  * only pairs whose resource file exists are listed. `isFile` and
  * `readTextFile` are redirected for mapped paths; every other call delegates.
  */
-class RoutingConfigFileSystem implements PushDownFileSystem {
+export class RoutingConfigFileSystem implements PushDownFileSystem {
   private readonly virtualPaths: ReadonlyMap<string, string>;
   private readonly virtualRoots: ReadonlySet<string>;
 
@@ -324,32 +330,68 @@ class RoutingConfigFileSystem implements PushDownFileSystem {
   }
 }
 
-function resolvePublishedPaths(
-  packs: ReadonlySet<string> | null | undefined,
-  csharpVariant: CSharpVariant,
-  bundleRoot: string,
-  fs: PushDownFileSystem,
-): ReadonlySet<string> | null {
-  const manifestPacks = resolveManifestPackNames(packs ?? null, csharpVariant);
-  if (manifestPacks === null || manifestPacks.size === 0) {
-    return null;
-  }
-  const manifests: Map<string, PackManifest> = loadPackManifests(
-    joinPosix(bundleRoot, PACK_MANIFEST_SUBDIR),
-    manifestPacks,
-    fs,
+/**
+ * Build the Codex layer: the filtering and virtual-resource composition over
+ * the routing merge and the write-if-changed base (issue #1029).
+ *
+ * @param options Entry options (roots, filesystem, pack/variant/memory inputs).
+ * @returns The Codex layer for the push-down pipeline.
+ * @throws ManifestError When a selected manifest is missing or malformed or a
+ *   pack name is unknown.
+ */
+export function buildCodexLayer(
+  options: CodexAgentsPushDownOptions,
+): PushDownLayer {
+  const sourceRoot = options.sourceRoot ?? options.repoRoot;
+  const bundleRoot = options.bundleRoot ?? sourceRoot;
+  const csharpVariant = options.csharpVariant ?? "modern";
+  const resolved = resolveLayerPublishedPaths({
+    ecosystem: "codex",
+    packs:
+      options.packs === undefined || options.packs === null
+        ? null
+        : [...options.packs],
+    csharpVariant,
+    memoryMode: options.memoryMode ?? "overwrite",
+    bundleRoot,
+    fs: options.fs,
+  });
+  // The routing document is merged like the Claude push-down merges it (D2).
+  const merging = new RoutingMergeFileSystem(
+    new WriteIfChangedFileSystem(options.fs, {
+      jsonEquivalentPaths: mergedDestinationPaths(options.destinationRoot, [
+        ROUTING_CONFIG_RELATIVE_PATH,
+      ]),
+    }),
+    options.destinationRoot,
+    ROUTING_CONFIG_RELATIVE_PATH,
   );
-  const published =
-    computePublishedPaths(manifestPacks, manifests) ?? new Set<string>();
-  assertSingleCsharpToolchain(published, manifestPacks);
-  return published;
+  const filteringFs = new CodexFilteringFileSystem(merging, {
+    sourceRoot,
+    bundleRoot,
+    publishedPaths: resolved.publishedPaths,
+    csharpVariant,
+  });
+  return {
+    name: "codex",
+    sourceRoot,
+    resourcesRoot: parentPosix(bundleRoot),
+    rootFolders: PUBLISHED_ROOT_FOLDERS,
+    rootFiles: LAYER_ROOT_FILES.codex,
+    fs: new RoutingConfigFileSystem(filteringFs, { sourceRoot, bundleRoot }),
+    rewrite: passthroughRewrite,
+    mergedPaths: [ROUTING_CONFIG_RELATIVE_PATH],
+    mergedDeliveries: [],
+    ownerPack: resolved.ownerPack,
+    selection: resolved.selection,
+    artifactDirectory: ARTIFACT_DIRECTORY,
+  };
 }
 
 /**
  * Copy Codex trees and the shared routing config into the destination workspace.
  *
- * Delegates to the shared engine with the Codex/agents root folders, artifact
- * directory, and the passthrough rewrite (no command-reference rewriting).
+ * A single-layer adapter over the push-down pipeline (no shared layer).
  *
  * @param options Entry options (roots, filesystem, optional clock).
  * @returns The completed run summary including the written artifact path.
@@ -358,37 +400,18 @@ function resolvePublishedPaths(
 export function pushDownCustomizations(
   options: CodexAgentsPushDownOptions,
 ): PushDownSummary {
-  const sourceRoot = options.sourceRoot ?? options.repoRoot;
-  const bundleRoot = options.bundleRoot ?? sourceRoot;
-  const csharpVariant = options.csharpVariant ?? "modern";
-  const publishedPaths = resolvePublishedPaths(
-    options.packs,
-    csharpVariant,
-    bundleRoot,
-    options.fs,
-  );
-  const filteringFs = new CodexFilteringFileSystem(options.fs, {
-    sourceRoot,
-    bundleRoot,
-    publishedPaths,
-    csharpVariant,
-  });
-  const publishingFs = new RoutingConfigFileSystem(filteringFs, {
-    sourceRoot,
-    bundleRoot,
-  });
-  void options.memoryMode;
-  return enginePushDown({
+  const planned = runPushDownPipeline({
     repoRoot: options.repoRoot,
     destinationRoot: options.destinationRoot,
-    fs: publishingFs,
-    sourceRoot,
-    ...(options.artifactRoot === undefined
-      ? {}
-      : { artifactRoot: options.artifactRoot }),
-    rootFolders: PUBLISHED_ROOT_FOLDERS,
-    artifactDirectory: ARTIFACT_DIRECTORY,
-    rewriteReferences: passthroughRewrite,
+    fs: options.fs,
+    buildLayers: () => [buildCodexLayer(options)],
+    overwriteUnmanaged: options.overwriteUnmanaged === true,
     ...(options.clock === undefined ? {} : { clock: options.clock }),
   });
+  return applyPushDownPlan(planned, {
+    payloadVersion: UNKNOWN_PAYLOAD_VERSION,
+    artifactRoot: options.artifactRoot ?? options.repoRoot,
+    artifactDirectory: ARTIFACT_DIRECTORY,
+    ...(options.clock === undefined ? {} : { clock: options.clock }),
+  }).summary;
 }

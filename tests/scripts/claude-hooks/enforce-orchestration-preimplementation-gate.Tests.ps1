@@ -45,7 +45,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
         function ConvertTo-CheckpointRaw {
             param(
                 [string] $IssueNum = '253',
-                [string] $FeatureFolder = 'docs/features/active/2026-06-26-orchestration-enforcement-hardening-253',
+                [string] $FeatureFolder = '.dev/active/2026-06-26-orchestration-enforcement-hardening-253',
                 [string] $RouteId = 'large',
                 [bool] $LifecycleReady = $true
             )
@@ -92,7 +92,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
         }
 
         It 'allows feature documentation writes' {
-            $json = ConvertTo-ImplementationWriteToolInput -FilePath 'docs/features/active/2026-06-26-orchestration-enforcement-hardening-253/spec.md'
+            $json = ConvertTo-ImplementationWriteToolInput -FilePath '.dev/active/2026-06-26-orchestration-enforcement-hardening-253/spec.md'
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json
 
@@ -100,7 +100,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
         }
 
         It 'allows evidence writes' {
-            $json = ConvertTo-ImplementationWriteToolInput -FilePath 'docs/features/active/2026-06-26-orchestration-enforcement-hardening-253/evidence/qa-gates/example.md'
+            $json = ConvertTo-ImplementationWriteToolInput -FilePath '.dev/active/2026-06-26-orchestration-enforcement-hardening-253/evidence/qa-gates/example.md'
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json
 
@@ -111,7 +111,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
             $json = ConvertTo-ImplementationWriteToolInput
             $checkpoint = @{
                 'issue-num'      = '424'
-                'feature-folder' = 'docs/features/active/some-feature-424'
+                'feature-folder' = '.dev/active/some-feature-424'
                 route_id         = 'large'
                 lifecycle_ready  = $true
             } | ConvertTo-Json -Compress
@@ -173,7 +173,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
 
         It 'allows implementation operations for any ready workflow state regardless of issue number' {
             $json = ConvertTo-ImplementationWriteToolInput -FilePath 'scripts/dev_tools/validate_orchestration_artifacts.py'
-            $checkpoint = ConvertTo-CheckpointRaw -IssueNum '233' -FeatureFolder 'docs/features/active/2026-06-25-other-feature-233'
+            $checkpoint = ConvertTo-CheckpointRaw -IssueNum '233' -FeatureFolder '.dev/active/2026-06-25-other-feature-233'
 
             $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json -CheckpointRaw $checkpoint
 
@@ -211,7 +211,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
         }
 
         It 'allows a non-implementation file write (documentation path) without a checkpoint' {
-            $json = ConvertTo-ImplementationWriteToolInput -FilePath 'docs/features/active/feature-x/notes.md'
+            $json = ConvertTo-ImplementationWriteToolInput -FilePath '.dev/active/feature-x/notes.md'
             (Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
@@ -226,7 +226,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
             $json = ConvertTo-ImplementationWriteToolInput
             $checkpoint = @{
                 'issue-num'      = '500'
-                'feature-folder' = 'docs/features/active/feature-500'
+                'feature-folder' = '.dev/active/feature-500'
                 path_selected    = 'small'
                 lifecycle_ready  = $true
             } | ConvertTo-Json -Compress
@@ -427,7 +427,7 @@ Describe 'enforce-orchestration-preimplementation-gate.ps1' {
         }
 
         It 'returns exit code 0 and emits an allow decision JSON for a documentation write' {
-            $nested = ConvertTo-ImplementationWriteToolInput -FilePath 'docs/features/active/feature-x/notes.md' -Content 'x'
+            $nested = ConvertTo-ImplementationWriteToolInput -FilePath '.dev/active/feature-x/notes.md' -Content 'x'
             $emitted = Invoke-OrchestrationPreimplementationGateEntryPoint -ToolInputRaw $nested
             $emitted[-1] | Should -Be 0
             $emitted[0] | Should -Match '"permissionDecision"\s*:\s*"allow"'

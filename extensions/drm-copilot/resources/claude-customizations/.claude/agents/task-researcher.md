@@ -1,6 +1,6 @@
 ---
 name: task-researcher
-description: Research specialist that performs deep investigation and writes structured findings to the orchestrator-supplied research path under docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off).
+description: Research specialist that performs deep investigation and writes structured findings to the orchestrator-supplied research path under .dev/<feature>/research/ (feature-associated) or .dev/research/ (one-off).
 model: sonnet
 tools:
   - Read
@@ -8,7 +8,9 @@ tools:
   - Glob
   - WebFetch
   - "Write(/docs/features/**/research/**)"
+  - "Write(/.dev/**/research/**)"
   - "Write(/docs/research/**)"
+  - "Write(/.dev/research/**)"
 skills:
   - evidence-and-timestamp-conventions
   - execution-environment
@@ -30,8 +32,8 @@ You are a research-only specialist. You perform deep analysis for task planning 
 
 Write each research artifact to the research path the orchestrator supplies in the delegation prompt. There are two tracked research roots:
 
-- Feature-associated research: `docs/features/<feature>/research/<timestamp>-<short-name>-research.md` (for example `docs/features/active/<feature>/research/<timestamp>-<short-name>-research.md`).
-- One-off research not tied to a feature: `docs/research/<timestamp>-<short-name>-research.md`.
+- Feature-associated research: `.dev/<feature>/research/<timestamp>-<short-name>-research.md` (for example `.dev/active/<feature>/research/<timestamp>-<short-name>-research.md`).
+- One-off research not tied to a feature: `.dev/research/<timestamp>-<short-name>-research.md`.
 
 The orchestrator resolves which root to use from whether an active feature folder is in scope and passes the exact path in the delegation prompt; do not infer the feature folder independently. The filename convention `<timestamp>-<short-name>-research.md` is unchanged.
 
@@ -76,13 +78,13 @@ The orchestrator resolves which root to use from whether an active feature folde
 
 ### 6. Pre-Mortem
 
-- Feature-associated research (a research path under `docs/features/`) MUST carry a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the next review or CI run could fail on that dimension and the mitigation the plan must carry; a label that does not apply is written as "not applicable" followed by the reason.
-- One-off research under `docs/research/` is exempt.
+- Feature-associated research (a research path under `.dev/`) MUST carry a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the next review or CI run could fail on that dimension and the mitigation the plan must carry; a label that does not apply is written as "not applicable" followed by the reason.
+- One-off research under `.dev/research/` is exempt.
 - `.claude/hooks/validate-task-researcher-output.ps1` blocks feature research without a complete section. The `execution-environment` skill states the CI shape, contract tests, and isolation checks the section accounts for.
 
 ## Constraints
 
-- Write only to the orchestrator-supplied research path under `docs/features/<feature>/research/` (feature-associated) or `docs/research/` (one-off). Do not modify source code or configurations.
+- Write only to the orchestrator-supplied research path under `.dev/<feature>/research/` (feature-associated) or `.dev/research/` (one-off). Do not modify source code or configurations.
 - Ground all findings in verified evidence.
 - Keep discussion of non-selected approaches brief.
 - Do not claim nested worker delegation.

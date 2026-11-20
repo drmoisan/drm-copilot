@@ -13,6 +13,34 @@ Use this skill when:
 - Audit findings require remediation.
 - You must create remediation inputs and delegate plan creation to `atomic_planner`.
 
+## Full Handoff Chain
+
+```
+orchestrator
+  -> writes remediation/<entry-ts>/remediation-inputs.md
+  -> delegates to atomic-planner
+     -> atomic-planner authors remediation/<entry-ts>/remediation-plan.md
+        (plan shape per .agents/skills/atomic-plan-contract/SKILL.md)
+     -> orchestrator hands plan to atomic-executor for preflight
+        -> atomic-executor returns one of:
+             PREFLIGHT: ALL CLEAR        -> proceed to execution
+             PREFLIGHT: REVISIONS REQUIRED -> route back to atomic-planner
+                with a precise plan delta; planner revises in place and
+                orchestrator re-runs preflight once (at most one return)
+     -> atomic-executor executes the cleared plan task-by-task
+        (workers are invoked by atomic-executor only)
+     -> orchestrator delegates to feature-review
+        -> feature-review writes audit/<exit-ts>/code-review.md,
+           audit/<exit-ts>/feature-audit.md, and audit/<exit-ts>/policy-audit.md
+  -> orchestrator evaluates exit condition:
+     blocking_count == 0 -> mark exit_condition_met = true, end loop
+     blocking_count > 0  -> begin cycle N+1 with new remediation/<new-ts>/remediation-inputs.md
+```
+
+Every audit (including the initial, non-remediation-triggered `feature-review` pass that first discovers findings) is written under an `audit/<timestamp>/` folder. Every remediation cycle's entry artifacts are written under a `remediation/<timestamp>/` folder. This folder-per-cycle layout is the canonical pattern for multi-cycle remediation: it keeps each cycle's inputs, plan, and reaudit artifacts visually and structurally grouped, rather than relying on filename timestamp suffixes alone to disambiguate cycles sharing a feature folder.
+
+The orchestrator must not call typed-engineer workers directly during any phase of the cycle. The orchestrator must not act on a preflight delta itself; revisions are routed to `atomic-planner`.
+
 ## Trigger Conditions (Generic)
 
 Trigger remediation when any of these are true:
@@ -30,6 +58,73 @@ Create `remediation/<timestamp>/remediation-inputs.md` (one timestamped `remedia
 - Exactly one mode line, `Remediation-Mode: proportionate` or `Remediation-Mode: design`. The cycle is proportionate when every `autonomous` finding can be fixed without changing a spec acceptance criterion, a public interface, or the item's file inventory beyond the files already in the branch diff plus their tests and mirrors; otherwise it is design. CI-failure findings are normally proportionate. `Remediation-Mode: light` is the orchestrate skill's third value: a light cycle has no planner delegation and never reaches this handoff, and a light cycle that falls back to R1 has its line rewritten to `Remediation-Mode: proportionate` or `Remediation-Mode: design` first.
 
 Proportionate cycle: one `atomic_planner` delegation writes a short plan with a `## Pre-Mortem` section and a final self-review task, and one `atomic_executor` delegation runs single-pass preflight with in-place trivial fixes and then executes it; `preflight: {iterations: 1, final_status: "clear"}` is recorded before `execution_status`. A substantive preflight defect stops that run with `BLOCKED at preflight (before [P0-T1])` and no checked task, and the cycle converts to design mode (the mode line is rewritten to `Remediation-Mode: design`) for one planner revision. Design cycle: the handoff below runs with the at-most-one-return rule.
+
+## Required Artifacts
+
+Each remediation cycle produces exactly five artifacts under the active feature folder, grouped into one `remediation/<entry-ts>/` folder and one `audit/<exit-ts>/` folder:
+
+1. `.dev/active/<slug>/remediation/<entry-ts>/remediation-inputs.md` — orchestrator authors at cycle entry.
+2. `.dev/active/<slug>/remediation/<entry-ts>/remediation-plan.md` — `atomic-planner` authors at cycle entry.
+3. `.dev/active/<slug>/audit/<exit-ts>/code-review.md` — `feature-review` authors at cycle exit.
+4. `.dev/active/<slug>/audit/<exit-ts>/feature-audit.md` — `feature-review` authors at cycle exit.
+5. `.dev/active/<slug>/audit/<exit-ts>/policy-audit.md` — `feature-review` authors at cycle exit.
+
+The initial, non-remediation-triggered `feature-review` pass (the audit that first discovers findings and opens cycle 1) also writes its three artifacts under `.dev/active/<slug>/audit/<its-own-timestamp>/`, for the same reason: one timestamped folder per audit event, regardless of whether that audit opens, closes, or does not trigger a remediation cycle.
+
+Timestamp rule:
+
+- `<entry-ts>` is the ISO-8601 timestamp at cycle entry, in the `yyyy-MM-ddTHH-mm` format defined in `.agents/skills/evidence-and-timestamp-conventions/SKILL.md`. It names both the `remediation/<entry-ts>/` folder and, within it, `remediation-inputs.md` and `remediation-plan.md`.
+- `<exit-ts>` is the ISO-8601 timestamp at cycle exit (when `feature-review` runs), in the same `yyyy-MM-ddTHH-mm` format. It names the `audit/<exit-ts>/` folder and, within it, all three reaudit artifacts: `code-review.md`, `feature-audit.md`, and `policy-audit.md`.
+
+A cycle with fewer than five artifacts is malformed. A cycle that uses the same timestamp value for both its `remediation/<ts>/` and `audit/<ts>/` folders is malformed unless entry and exit genuinely ran within the same minute — the two folders remain distinct either way, since one is named `remediation/` and the other `audit/`.
+
+### Cycle-Document Sweep Scope
+
+A comprehensive or final sweep in a remediation cycle covers that cycle's own plan and audit documents — `remediation-plan.md`, `code-review.md`, `feature-audit.md`, and `policy-audit.md` — in addition to production and test code. The failure mechanism a code-only sweep leaves open is self-referential rule violation: a policy-compliance fix whose own descriptive text violates the policy it enforces is written into one of those four documents rather than into code, so a sweep scoped to code only reports no finding and the violation ships with the cycle.
+
+## Plan Shape
+
+`remediation/<entry-ts>/remediation-plan.md` MUST conform to `.agents/skills/atomic-plan-contract/SKILL.md`. In particular:
+
+- Phase headings: `### Phase N — <Title>`.
+- Tasks: `- [ ] [P#-T#]` with sequential per-phase IDs.
+- Phase 0 captures static baseline results and the `Phase 0 baseline` test-suite run per `evidence-and-timestamp-conventions`.
+- Final phase runs the full toolchain QA loop in the order specified by `atomic-plan-contract` and records numeric coverage values where the repository policy requires coverage.
+- Evidence paths resolve to `<FEATURE>/evidence/<kind>/` per the non-overridable evidence path clause.
+- The plan is design-level per `## Design-Level Plan Contract (Mandatory)` in `atomic-plan-contract`, carries a `## Pre-Mortem` section, and ends with the final-phase self-review task. A proportionate plan covers only the listed findings and stays short.
+
+The plan must pass the `mcp__drm-copilot__validate_orchestration_artifacts` MCP tool with `artifact_type: "plan"` and `artifact_path: <plan-path>` before `atomic-executor` runs preflight against it.
+
+## Preflight Sub-Loop
+
+After the plan is authored, `atomic-executor` runs preflight under the directive `DIRECTIVE: PREFLIGHT VALIDATION ONLY`, which the orchestrator places in the delegation prompt and never in the plan file. Preflight is single-pass: trivial defects are fixed in place and recorded as `PREFLIGHT-FIX:` lines with a `preflight-fix-record:` path. The exact signal returned is either:
+
+- `PREFLIGHT: ALL CLEAR` — the plan proceeds to execution.
+- `PREFLIGHT: REVISIONS REQUIRED` — `atomic-executor` returns a precise plan delta with one `PREFLIGHT-DEFECT:` line per substantive defect. The orchestrator routes the full defect list to `atomic-planner` for one revision. `atomic-planner` updates the same plan file in place (per the plan-path continuity contract in `atomic-plan-contract`). The orchestrator then re-runs preflight once.
+
+At most one return. The sub-loop returns to `atomic-planner` at most once per cycle: when the second preflight still reports a substantive defect, the iteration ceiling below applies.
+
+The orchestrator records the preflight outcome in `remediation_loop.cycles[current_cycle].preflight` with `iterations` (counter) and `final_status` (`clear|changes_requested|pending`).
+
+For a well-scoped item where `preflight.iterations > 1`, record a process-defect investigation that identifies the incomplete planner internal-review dimension. Treat excess rounds as a process signal, not routine iteration.
+
+The exhaustive-pass, defect-classification, in-place-fix, and fix-self-check rules that govern how `atomic-executor` conducts preflight are defined in the `## Preflight Validation (Planner ↔ Executor)` section of `.agents/skills/atomic-plan-contract/SKILL.md` and are not restated here.
+
+Alongside `iterations` and `final_status`, the orchestrator also records in `remediation_loop.cycles[current_cycle].preflight` the convergence line `atomic-executor` returned on that round, which is one of `CONVERGENCE: NO FURTHER ROUNDS EXPECTED` or `CONVERGENCE: FURTHER ROUNDS LIKELY`. This convergence field extends the field set already recorded at `remediation_loop.cycles[current_cycle].preflight` rather than replacing it: `iterations` and `final_status` continue to be recorded exactly as stated above, and the convergence field is written in addition to them.
+
+Iteration ceiling. When a cycle's `iterations` would exceed 2, the orchestrator records `final_status: "blocked_preflight_iteration_limit"`, halts the preflight sub-loop, and escalates to the caller. `blocked_preflight_iteration_limit` is a fourth `final_status` value extending the `clear|changes_requested|pending` enumeration stated above. Under the at-most-one-return rule the ceiling is reached after one planner revision: the first preflight and the confirming preflight are the two permitted iterations.
+
+## Execution and Reaudit
+
+When preflight is clear, `atomic-executor` executes the plan task-by-task. The executor invokes workers (`python-typed-engineer`, `typescript-engineer`, `csharp-typed-engineer`, `powershell-typed-engineer`) internally as needed. The orchestrator does not call workers.
+
+Before the reaudit, the orchestrator records `candidate_applied` on the current cycle: `true` only when execution finished with `execution_status: "complete"` and the pre-reaudit commit recorded a non-empty change set, and `false` otherwise (execution not started, execution failed, or an empty staged change set). `remediation_loop.completed_attempts` equals the number of cycles whose `candidate_applied` is `true`, and a cycle with `candidate_applied: false` consumes no attempt number.
+
+When execution is complete, the orchestrator delegates to `feature-review`. `feature-review` produces the three reaudit artifacts under `.dev/active/<slug>/audit/<exit-ts>/` using the exit timestamp.
+
+## Exit Gate
+
+The orchestrator reads the latest cycle's three reaudit artifacts and computes `blocking_count` as the total number of FAIL findings plus material PARTIAL findings flagged as blocking. Only when `blocking_count == 0` does the orchestrator set `exit_condition_met = true` on the current cycle and mark the remediation loop complete. Otherwise, when at least one remaining blocking finding is `autonomous`, the orchestrator opens cycle N+1 with a new `remediation/<new-ts>/remediation-inputs.md` and runs the full chain again. When the remaining blocking findings are all non-remediable, the orchestrator does not open the next cycle: it halts on `HALT_NON_REMEDIABLE` or waits on `AWAITING_CI`.
 
 ## Plan Creation and Handoff
 

@@ -38,10 +38,10 @@ BeforeAll {
     $script:NoTargetCode = Get-WorktreeResolutionNoTargetReasonCode
     $script:AmbiguityCode = Get-WorktreeResolutionAmbiguityReasonCode
     $script:ParallelRelative = 'artifacts/orchestration/parallel-orchestrator-state.json'
-    $script:Prompt = 'Parallel mode: true. parallel_slug: wave-a. docs/features/active/item-b-102'
+    $script:Prompt = 'Parallel mode: true. parallel_slug: wave-a. .dev/active/item-b-102'
     $script:ClearParallel = '{"route_id":"parallel","parallel_slug":"wave-a","recolor_generation":2,"items":[' +
-    '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"merged"},' +
-    '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+    '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"merged"},' +
+    '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
     '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],' +
     '"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
 
@@ -97,7 +97,7 @@ Describe 'parallel cohort barrier target resolution' {
         Set-CohortRunTopology -Live @($script:Session)
 
         # Act
-        $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw (ConvertTo-AgentPayload -Prompt 'Parallel mode: true. docs/features/active/item-b-102')
+        $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw (ConvertTo-AgentPayload -Prompt 'Parallel mode: true. .dev/active/item-b-102')
 
         # Assert
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -172,7 +172,7 @@ Describe 'parallel cohort barrier target resolution' {
         Set-CohortSeamTarget -Status 'SessionRoot' -WorktreeRoot $script:Session
 
         # Act
-        $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw (ConvertTo-AgentPayload -Prompt 'Canonical issue number for this item is 102. docs/features/active/item-b-102')
+        $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw (ConvertTo-AgentPayload -Prompt 'Canonical issue number for this item is 102. .dev/active/item-b-102')
 
         # Assert
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'

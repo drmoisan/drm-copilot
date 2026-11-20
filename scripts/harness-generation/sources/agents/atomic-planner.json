@@ -1,0 +1,72 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " atomic-planner"
+      },
+      {
+        "key": "model",
+        "value": " opus"
+      },
+      {
+        "key": "description",
+        "value": " Planning-only agent that generates deterministic phased implementation plans with atomic P#-T# checkbox tasks, writing output to docs/ and artifacts/ paths only."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - \"Edit(docs/**)\"\n  - \"Edit(.dev/**)\"\n  - \"Edit(artifacts/**)\"\n  - \"Write(docs/**)\"\n  - \"Write(.dev/**)\"\n  - \"Write(artifacts/**)\"\n  - \"mcp__drm-copilot__validate_orchestration_artifacts\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - policy-compliance-order\n  - atomic-plan-contract\n  - evidence-and-timestamp-conventions\n  - execution-environment\n  - owner-directives"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      },
+      {
+        "key": "hooks",
+        "value": "\n  SubagentStop:\n    - matcher: \"atomic-planner\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-planner-output.ps1"
+      }
+    ],
+    "path": ".claude/agents/atomic-planner.md",
+    "sections": [
+      "head",
+      "inputs",
+      "plan-structure",
+      "requirements",
+      "scratch-location",
+      "preflight-validation",
+      "output",
+      "evidence-location-invariant",
+      "test-execution-launcher"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"atomic-planner\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "path": ".codex/agents/atomic-planner.toml",
+    "sections": [
+      "head-2",
+      "inputs",
+      "plan-structure-2",
+      "requirements-2",
+      "scratch-location",
+      "preflight-validation-2",
+      "output",
+      "evidence-location-invariant-2",
+      "test-execution-launcher"
+    ]
+  }
+}

@@ -28,7 +28,7 @@ Describe 'validate-executor-output.ps1 SubagentStop envelope' {
     BeforeAll {
         $script:Hook = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.claude/hooks/validate-executor-output.ps1'))
         $script:MissingPlanText = 'Done. All phases complete.'
-        $script:PassingText = "plan-path: docs/features/active/foo/plan.md`nAC Status Summary`nCommands Run: pwsh tests/foo.Tests.ps1`nPowerShell: PASS"
+        $script:PassingText = "plan-path: .dev/active/foo/plan.md`nAC Status Summary`nCommands Run: pwsh tests/foo.Tests.ps1`nPowerShell: PASS"
 
         function Invoke-HookTail {
             # Runs the hook entry tail with stdin, stderr, and CLAUDE_HOOK_INPUT replaced for one call; all are restored in finally.

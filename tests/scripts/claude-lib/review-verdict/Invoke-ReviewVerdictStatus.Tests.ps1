@@ -22,8 +22,8 @@ BeforeAll {
     $script:Live = 'fedcba9876543210fedcba9876543210fedcba98'
     $script:MainParent = '1111111111111111111111111111111111111111'
     $script:Base = '2222222222222222222222222222222222222222'
-    $script:Folder = 'docs/features/active/item-42'
-    $script:Artifact = 'docs/features/active/item-42/policy-audit.2026-01-01T00-00.md'
+    $script:Folder = '.dev/active/item-42'
+    $script:Artifact = '.dev/active/item-42/policy-audit.2026-01-01T00-00.md'
     $script:Nul = [string][char]0
 
     # Return checkpoint text for pull request 42 whose last outcome has the given verdict.
@@ -199,8 +199,8 @@ Describe 'Invoke-ReviewVerdictCli' {
             $script:Git["diff --name-only -z --no-renames $($script:Reviewed) $($script:Live)"] = [pscustomobject]@{ ExitCode = 0; Output = (Get-ListingText -Path 'src/main.ts') }
             $script:Git["diff --name-only -z --no-renames $($script:MainParent) $($script:Live)"] = [pscustomobject]@{ ExitCode = 0; Output = (Get-ListingText -Path 'src/branch.ts') }
             $script:Git["merge-base origin/main $($script:Live)"] = [pscustomobject]@{ ExitCode = 0; Output = $script:Base }
-            $script:Git["diff --name-only -z --no-renames $($script:Base) $($script:Live)"] = [pscustomobject]@{ ExitCode = 0; Output = (Get-ListingText -Path 'docs/features/active/x/plan.md') }
-            $script:Git["diff --name-status -z --no-renames $($script:Base) $($script:Live)"] = [pscustomobject]@{ ExitCode = 0; Output = (Get-ListingText -Path 'A', 'docs/features/active/thing-77/issue.md') }
+            $script:Git["diff --name-only -z --no-renames $($script:Base) $($script:Live)"] = [pscustomobject]@{ ExitCode = 0; Output = (Get-ListingText -Path '.dev/active/x/plan.md') }
+            $script:Git["diff --name-status -z --no-renames $($script:Base) $($script:Live)"] = [pscustomobject]@{ ExitCode = 0; Output = (Get-ListingText -Path 'A', '.dev/active/thing-77/issue.md') }
         }
 
         It 'posts once for the eligible mode <Mode>' -TestCases @(
@@ -219,8 +219,8 @@ Describe 'Invoke-ReviewVerdictCli' {
 
         It 'exits 3 without a POST on the mixed diff of <Mode>' -TestCases @(
             @{ Mode = 'MainSync'; HeadRef = 'epic/cycle-time-integration'; Key = 'diff --name-only -z --no-renames REVIEWED LIVE'; Paths = @('src/main.ts', 'src/extra.ts'); Code = 'REVIEW_VERDICT_NOT_MAIN_SYNC' }
-            @{ Mode = 'RecordsPr'; HeadRef = 'documentationandmemories'; Key = 'diff --name-only -z --no-renames BASE LIVE'; Paths = @('docs/features/active/x/plan.md', 'scripts/tool.ps1'); Code = 'REVIEW_VERDICT_NOT_RECORDS_ONLY' }
-            @{ Mode = 'PromotionPr'; HeadRef = 'feature/thing-77'; Key = 'diff --name-status -z --no-renames BASE LIVE'; Paths = @('A', 'docs/features/active/thing-77/issue.md', 'M', 'scripts/tool.ps1'); Code = 'REVIEW_VERDICT_NOT_PROMOTION_RECORD' }
+            @{ Mode = 'RecordsPr'; HeadRef = 'documentationandmemories'; Key = 'diff --name-only -z --no-renames BASE LIVE'; Paths = @('.dev/active/x/plan.md', 'scripts/tool.ps1'); Code = 'REVIEW_VERDICT_NOT_RECORDS_ONLY' }
+            @{ Mode = 'PromotionPr'; HeadRef = 'feature/thing-77'; Key = 'diff --name-status -z --no-renames BASE LIVE'; Paths = @('A', '.dev/active/thing-77/issue.md', 'M', 'scripts/tool.ps1'); Code = 'REVIEW_VERDICT_NOT_PROMOTION_RECORD' }
         ) {
             param($Mode, $HeadRef, $Key, $Paths, $Code)
             $script:PullRequestText = Get-PullRequestText -Head $script:Live -HeadRef $HeadRef

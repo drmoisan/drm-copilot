@@ -16,4 +16,4 @@ The output should be a complete PFD in Markdown format, saved to ${file}. There 
 
 ### PFD Structure
 
-You can find a complete template at `docs/features/potential/template.md`
+You can find a complete template at `.dev/potential/template.md`

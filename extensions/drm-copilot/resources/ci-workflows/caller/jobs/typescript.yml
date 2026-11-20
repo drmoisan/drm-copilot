@@ -1,0 +1,4 @@
+  typescript:
+    name: TypeScript
+    uses: __DRM_COPILOT_CI_USES__
+    __DRM_COPILOT_CI_WITH__

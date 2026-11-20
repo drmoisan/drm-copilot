@@ -320,3 +320,54 @@ def test_epic_wave_resources_match_claude_lib_sources() -> None:
         stored = REPO_ROOT / RESOURCES_RELATIVE / "lib" / "epic-wave" / name
         canonical = REPO_ROOT / ".claude" / "lib" / "epic-wave" / name
         assert stored.read_bytes() == canonical.read_bytes(), name
+
+
+DEVELOPMENT_DOCS_DESTINATION_DIR = Path(".codex/lib/development-docs")
+DEVELOPMENT_DOCS_NAMES: tuple[str, ...] = ("DevelopmentDocsRoot.psm1",)
+
+
+def test_development_docs_directory_publishes_stored_resources() -> None:
+    """Each file under `lib/development-docs` publishes at `.codex/lib/`."""
+    # Arrange
+    module = load_module()
+    repo_root = Path("C:/repo")
+    destination_root = Path("C:/dest")
+    fs = _new_file_system(repo_root, destination_root)
+    seeded: dict[str, str] = {}
+    # Seed one distinct text per stored resource of the development-docs library.
+    for name in DEVELOPMENT_DOCS_NAMES:
+        text = f"# development docs {name}\n"
+        fs.files[repo_root / RESOURCES_RELATIVE / "lib" / "development-docs" / name] = (
+            MemoryFile(text)
+        )
+        seeded[name] = text
+
+    # Act
+    summary = module.push_down_customizations(
+        repo_root=repo_root,
+        destination_root=destination_root,
+        fs=fs,
+        source_root=repo_root,
+        artifact_root=destination_root,
+    )
+
+    # Assert
+    # Each seeded resource is written under the published destination directory.
+    for name, text in seeded.items():
+        destination = destination_root / DEVELOPMENT_DOCS_DESTINATION_DIR / name
+        assert fs.read_text(destination) == text
+    published = {result.relative_path for result in summary.files}
+    assert {
+        (DEVELOPMENT_DOCS_DESTINATION_DIR / name).as_posix()
+        for name in DEVELOPMENT_DOCS_NAMES
+    } <= published
+    assert DEVELOPMENT_DOCS_DESTINATION_DIR in module.PUBLISHED_ROOT_FOLDERS
+
+
+def test_development_docs_resources_match_claude_lib_sources() -> None:
+    """The stored development-docs mirror equals `.claude/lib/development-docs`."""
+    # Compare each stored resource with its self-hosted source byte for byte.
+    for name in DEVELOPMENT_DOCS_NAMES:
+        stored = REPO_ROOT / RESOURCES_RELATIVE / "lib" / "development-docs" / name
+        canonical = REPO_ROOT / ".claude" / "lib" / "development-docs" / name
+        assert stored.read_bytes() == canonical.read_bytes(), name

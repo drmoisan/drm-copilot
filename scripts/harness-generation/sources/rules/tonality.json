@@ -1,0 +1,83 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "claudeUnconditional": true,
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**\""
+        },
+        {
+          "key": "description",
+          "value": " Required communication tone policy. Applies to all files and responses."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/tonality.md",
+      "sections": [
+        "head",
+        "required-professional-tone",
+        "humor-and-joking-prohibited",
+        "hyperbole-prohibited",
+        "metaphors-tightly-restricted",
+        "evidence-first-wording",
+        "difficult-messages",
+        "final-rule"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**\""
+        },
+        {
+          "key": "name",
+          "value": " \"tonality-policy\""
+        },
+        {
+          "key": "description",
+          "value": " \"Required communication tone for agent-authored responses, documentation, reviews, and operational guidance in this repository\""
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/tonality.instructions.md",
+      "sections": [
+        "head-2",
+        "1-required-default-tone",
+        "2-humor-and-joking-are-prohibited",
+        "3-hyperbole-is-prohibited",
+        "4-metaphors-are-tightly-restricted",
+        "5-evidence-first-wording",
+        "6-style-guidance-for-difficult-messages",
+        "7-examples",
+        "8-final-rule"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " tonality"
+        },
+        {
+          "key": "description",
+          "value": " Required communication tone policy for all files and responses."
+        }
+      ],
+      "kind": "codex",
+      "path": ".agents/skills/tonality/SKILL.md",
+      "sections": [
+        "head-3",
+        "required-professional-tone",
+        "humor-and-joking-prohibited",
+        "hyperbole-prohibited",
+        "metaphors-tightly-restricted",
+        "evidence-first-wording",
+        "difficult-messages",
+        "final-rule"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+# Task Check [P1-T2] — remediation cycle 1
+
+Timestamp: 2026-11-20T19-22
+Command: sh SCRATCH/issue-1016-ts-write.sh <3 files>; sh SCRATCH/issue-1016-ts-scoped.sh <3 files>; sh <worktree>/.claude/skills/test-execution-policy/scripts/run-test-suite.sh jest-extension "--testPathPatterns=development-docs-migration/(migration-apply|migration-plan|layout-map|migration-report)\.test\.ts"; the same launcher with "--testPathPatterns=(development-docs-migration/|migrate-development-docs-cli|development-docs-migration-handler|mcp-tools\.development-docs|repo-automation-service\.development-docs|development-docs-migration-coverage-contracts)"
+EXIT_CODE: 0
+Output Summary: Prettier write reformatted layout-map.test.ts only; the check then reports all files formatted (exit 0). ESLint exit 0; tsc -p ./ and tsc -p tsconfig.jest.json exit 0. Four-file Jest selection: 4 suites, 80 tests passed, 0 failed, including both [P1-T1] cases. Importer selection: 15 suites, 233 tests passed, 0 failed. migration-plan.ts is 589 lines (below 700); layout-map.ts 181 lines. jest.development-docs-migration-coverage.json and jest.config.cjs are unchanged (empty diff against HEAD).
+
+Changed files: extensions/drm-copilot/src/lib/development-docs-migration/layout-map.ts (new exported `isMappedTargetPath`), extensions/drm-copilot/src/lib/development-docs-migration/migration-plan.ts (`scanRewrites` outside condition), extensions/drm-copilot/test/lib/development-docs-migration/layout-map.test.ts (new describe block).
+Selection: mirrored tests of the two production files plus every test file that imports them (migration-apply, migration-plan, migration-report, service-call, no-vscode-import and the CLI, MCP handler, MCP tools, repo-automation and coverage-contract suites); existing-test dispositions as stated in the plan, all unchanged and passing.

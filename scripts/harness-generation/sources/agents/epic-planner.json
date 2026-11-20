@@ -1,0 +1,79 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " epic-planner"
+      },
+      {
+        "key": "model",
+        "value": " opus"
+      },
+      {
+        "key": "description",
+        "value": " Epic-scale planning agent that fully scopes an epic before any execution. It decomposes the objective into child features, computes the dependency graph and wave layering, assesses per-feature complexity, drives per-feature preparation (promotion, research, spec/user-story, atomic plan, preflight clearance) through parallel preparation-mode Agent(orchestrator) delegations, commits all planning outputs to the epic integration branch, and emits the epic-orchestrator kickoff prompt artifact. Performs no atomic execution. Must not be invoked from an orchestrator agent (enforced by enforce-epic-invocation-origin.ps1)."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - \"Agent(orchestrator)\"\n  - Read\n  - Grep\n  - Glob\n  - \"Write(docs/features/epics/**)\"\n  - \"Write(.dev/epics/**)\"\n  - \"Edit(docs/features/epics/**)\"\n  - \"Edit(.dev/epics/**)\"\n  - \"Write(docs/features/potential/**)\"\n  - \"Write(.dev/potential/**)\"\n  - \"Write(artifacts/orchestration/**)\"\n  - \"Edit(artifacts/orchestration/**)\"\n  - \"Bash(git *)\"\n  - \"Bash(gh *)\"\n  - \"Bash(pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicWave.ps1*)\"\n  - \"mcp__drm-copilot__validate_orchestration_artifacts\"\n  - \"mcp__drm-copilot__potential_to_issue\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - policy-compliance-order\n  - epic-plan\n  - epic-orchestrate\n  - feature-promotion-lifecycle\n  - atomic-plan-contract\n  - evidence-and-timestamp-conventions"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      }
+    ],
+    "path": ".claude/agents/epic-planner.md",
+    "sections": [
+      "head",
+      "skill",
+      "invocation-origin",
+      "startup-protocol",
+      "epic-worthiness-gate",
+      "delegation-model",
+      "integration-branch",
+      "kickoff-prompt-artifact",
+      "checkpoint-persistence",
+      "completion-requirements"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"epic-planner\""
+      },
+      {
+        "key": "description",
+        "value": "\"Root-invoked epic planning coordinator that decomposes an epic, prepares every child through preflight, commits the planning state, and stops before execution.\""
+      },
+      {
+        "key": "model",
+        "value": "\"gpt-6-astra\""
+      },
+      {
+        "key": "model_reasoning_effort",
+        "value": "\"ultra\""
+      },
+      {
+        "key": "default_permissions",
+        "value": "\"orchestrator-workspace\""
+      }
+    ],
+    "path": ".codex/agents/epic-planner.toml",
+    "sections": [
+      "head-2",
+      "root-invocation",
+      "startup",
+      "planning-contract",
+      "checkpoint",
+      "completion"
+    ],
+    "trailer": "\n[skills]\nconfig = [\n    { name = \"policy-compliance-order\", enabled = true },\n    { name = \"codex-model-routing\", enabled = true },\n    { name = \"epic-plan\", enabled = true },\n    { name = \"epic-orchestrate\", enabled = true },\n    { name = \"feature-promotion-lifecycle\", enabled = true },\n    { name = \"atomic-plan-contract\", enabled = true },\n    { name = \"evidence-and-timestamp-conventions\", enabled = true },\n]\n"
+  }
+}

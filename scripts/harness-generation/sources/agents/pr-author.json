@@ -1,0 +1,65 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " pr-author"
+      },
+      {
+        "key": "description",
+        "value": " Project-scoped agent that runs the pr-author skill to produce a GitHub-ready PR body from the canonical PR-context bundle, then opens or updates the pull request. Sole authorized caller of gh pr create and gh pr edit --body*. Writes the PR body to artifacts/pr_body_<N>.md and a sibling artifacts/pr_body_<N>.receipt.json carrying the lowercase-hex SHA-256 of the body bytes, then creates the PR with --body-file."
+      },
+      {
+        "key": "model",
+        "value": " sonnet"
+      },
+      {
+        "key": "skills",
+        "value": "\n  - pr-author"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - \"Bash(git log *)\"\n  - \"Bash(git rev-parse *)\"\n  - \"Bash(gh pr create *)\"\n  - \"Bash(gh pr edit *)\"\n  - \"Bash(gh pr view *)\"\n  - \"Bash(sha256sum *)\"\n  - \"Bash(date *)\"\n  - \"Write(/artifacts/**)\""
+      },
+      {
+        "key": "hooks",
+        "value": "\n  PreToolUse:\n    - matcher: \"Bash\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/enforce-pr-author-command-allowlist.ps1\n  SubagentStop:\n    - matcher: \"pr-author\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-pr-author-output.ps1"
+      }
+    ],
+    "path": ".claude/agents/pr-author.md",
+    "sections": [
+      "head",
+      "skill",
+      "pr-body-and-receipt-write-protocol",
+      "closing-reference-verification",
+      "final-output-requirement",
+      "enforcement-strength-honest-disclosure",
+      "standing-rules",
+      "required-head-on-gh-pr-create-issue-687",
+      "coordinator-session-topology-issue-1011"
+    ]
+  },
+  "codex": {
+    "delimiter": "\"\"\"",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"pr-author\""
+      },
+      {
+        "key": "description",
+        "value": "\"Write a GitHub-ready pull request body from the canonical PR-context bundle and its enumerated additional context files.\""
+      }
+    ],
+    "path": ".codex/agents/pr-author.toml",
+    "sections": [
+      "head-2"
+    ],
+    "separator": "\n"
+  }
+}

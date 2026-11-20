@@ -171,7 +171,7 @@ Describe 'Bundled Codex PreToolUse hooks run from the bundle location (issue #69
         $script:Registrations = @($script:ConfigRegistrations | Where-Object Event -NE 'PreToolUse') + $script:PreToolUseRegistrations
     }
 
-    It 'derives 21 PreToolUse hooks and excludes 5 non-PreToolUse registrations from the bundle config' {
+    It 'derives 21 PreToolUse hooks and excludes 6 non-PreToolUse registrations from the bundle config' {
         # Issue #1159: the counts are derived from the bundle registry and config, not fixed.
         $allHooks = @($script:Registrations | ForEach-Object HookName | Sort-Object -Unique)
         $preToolUseHooks = @($script:PreToolUseRegistrations | ForEach-Object HookName | Sort-Object -Unique)

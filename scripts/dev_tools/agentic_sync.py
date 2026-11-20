@@ -3,9 +3,11 @@ Synchronize shared .github documents between two local repos.
 
 Purpose:
     Ensures that shared governance documents under .github/agents,
-    .github/instructions, .github/prompts, and .github/skills stay aligned
-    between two repository workspaces. The newest content is propagated when
-    files differ, and timestamps are normalized to match when changes are made.
+    .github/hooks, .github/instructions, and .github/prompts stay aligned
+    between two repository workspaces. The Copilot skill copies were retired
+    by issue #1032; shared skills live under .agents/skills. The newest
+    content is propagated when files differ, and timestamps are normalized to
+    match when changes are made.
 """
 
 from __future__ import annotations
@@ -78,7 +80,6 @@ ROOT_FOLDERS: tuple[Path, ...] = (
     Path(".github/hooks"),
     Path(".github/instructions"),
     Path(".github/prompts"),
-    Path(".github/skills"),
 )
 
 

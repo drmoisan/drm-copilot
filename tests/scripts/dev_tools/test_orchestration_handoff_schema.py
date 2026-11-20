@@ -102,7 +102,7 @@ def _valid_envelope(
         "identity": {
             "objective_id": "github:drmoisan/drm-copilot#614",
             "issue_number": 614,
-            "feature_folder": "docs/features/active/portable-handoff-614",
+            "feature_folder": ".dev/active/portable-handoff-614",
             "work_mode": "full-feature",
         },
         "binding": {
@@ -133,7 +133,7 @@ def _valid_envelope(
             "checkpoint_path": "artifacts/orchestration/orchestrator-state.json",
         },
         "plan": {
-            "path": "docs/features/active/portable-handoff-614/plan.md",
+            "path": ".dev/active/portable-handoff-614/plan.md",
             "sha256": ZERO_SHA256,
             "contract_version": "atomic-plan-v1",
         },

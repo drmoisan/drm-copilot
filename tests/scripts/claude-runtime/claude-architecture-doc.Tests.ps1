@@ -6,21 +6,22 @@ Describe "claude-architecture-doc" {
     }
 
     It "requires the architecture document to cover research sufficiency, main-thread orchestration, and full migration tables" {
-        $docPath = Join-Path -Path $script:RepoRoot -ChildPath 'docs' -AdditionalChildPath 'engineering', 'claude-code-architecture.md'
+        $docPath = Join-Path -Path $script:RepoRoot -ChildPath '.dev' -AdditionalChildPath 'engineering', 'claude-code-architecture.md'
         $content = Get-Content -Path $docPath -Raw
 
         $content | Should -Match '20260412-claude-code-github-skills-agents-migration-research\.md'
         $content | Should -Match 'main-thread orchestrator'
-        $content | Should -Match '### Canonical `\.github/skills` migration map'
+        $content | Should -Match '### Retired Copilot skill migration map'
+        $content | Should -Match 'retired by issue #1032'
         $content | Should -Match '### Canonical `\.github/agents` migration map'
         $content | Should -Match '### Direct-use `\.github/prompts` migration map'
     }
 
-    It "requires the architecture document to keep .github/skills/README.md documentation-only and not require .claude/skills/README.md" {
-        $docPath = Join-Path -Path $script:RepoRoot -ChildPath 'docs' -AdditionalChildPath 'engineering', 'claude-code-architecture.md'
+    It "requires the architecture document to keep .agents/skills/README.md documentation-only and not require .claude/skills/README.md" {
+        $docPath = Join-Path -Path $script:RepoRoot -ChildPath '.dev' -AdditionalChildPath 'engineering', 'claude-code-architecture.md'
         $content = Get-Content -Path $docPath -Raw
 
-        $content | Should -Match '\.github/skills/README\.md'
+        $content | Should -Match '\.agents/skills/README\.md'
         $content | Should -Match 'documentation-only'
         $content | Should -Not -Match '\.claude/skills/README\.md'
     }
@@ -47,8 +48,8 @@ Describe "claude-architecture-doc" {
         $atomicExecutorContent | Should -Not -Match 'mcp_drmcopilotext_run_poshqc_test'
     }
 
-    It "requires docs/engineering/claude-code-architecture.md to use the active PowerShell MCP contract" {
-        $docPath = Join-Path -Path $script:RepoRoot -ChildPath 'docs' -AdditionalChildPath 'engineering', 'claude-code-architecture.md'
+    It "requires .dev/engineering/claude-code-architecture.md to use the active PowerShell MCP contract" {
+        $docPath = Join-Path -Path $script:RepoRoot -ChildPath '.dev' -AdditionalChildPath 'engineering', 'claude-code-architecture.md'
         $docContent = Get-Content -Path $docPath -Raw
 
         $docContent | Should -Match 'mcp__drm-copilot__run_poshqc_format'
@@ -59,7 +60,7 @@ Describe "claude-architecture-doc" {
     }
 
     It "requires the architecture document to describe the discovery controls and the planning prerequisite linkage (issue #980)" {
-        $docPath = Join-Path -Path $script:RepoRoot -ChildPath 'docs' -AdditionalChildPath 'engineering', 'claude-code-architecture.md'
+        $docPath = Join-Path -Path $script:RepoRoot -ChildPath '.dev' -AdditionalChildPath 'engineering', 'claude-code-architecture.md'
         $content = Get-Content -Path $docPath -Raw
 
         # The four native discovery hooks are an enforcement boundary and a repository-enforceable control.
@@ -68,7 +69,7 @@ Describe "claude-architecture-doc" {
         }
         $content | Should -Match 'completion_gates\.planning_prerequisite'
         $content | Should -Match 'DISCOVERY_\*_BLOCKED:'
-        $content | Should -Match 'docs/engineering/legacy-discovery-and-parity/enforcement\.md'
+        $content | Should -Match 'engineering/legacy-discovery-and-parity/enforcement\.md'
         # Criteria gate planning; the document must not claim the gate asserts an implementation pass.
         $content | Should -Match 'without asserting any implementation passes'
     }

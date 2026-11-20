@@ -20,7 +20,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
             'enforce-checkpoint-monotonic.ps1',
             'enforce-completion-consistency.ps1'
         )
-        $script:AllHookNames = @($script:PreToolHookNames) + @('validate-feature-review-coverage.ps1')
+        $script:AllHookNames = @($script:PreToolHookNames) + @('validate-feature-review-coverage.ps1', 'validate-pr-author-output.ps1')
 
         # Shared, entrypoint-free modules that the hooks dot-source. They are
         # subject to the same static checks (parse, 500-line cap, root/bundle
@@ -28,7 +28,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         # excluded from the stdin-read assertion and from every process-level
         # invocation loop, because they define functions only and are never
         # executed as a hook process.
-        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1', 'enforce-orchestration-preimplementation-gate-helpers.ps1', 'hook-command-scanner.ps1', 'hook-command-invocation.ps1', 'enforce-batch-budget-route.ps1', 'feature-folder-resolution.ps1', 'hook-command-heredoc.ps1', 'hook-command-payload.ps1', 'hook-command-payload-powershell.ps1', 'hook-command-invocation-operands.ps1', 'enforce-orchestration-preimplementation-gate-targets.ps1', 'hook-dependency-guard.ps1', 'feature-review-coverage-thresholds.ps1', 'file-size-policy.ps1', 'hook-target-worktree.ps1', 'hook-cleanup-context.ps1', 'enforce-orchestration-preimplementation-gate-cleanup.ps1', 'validate-feature-review-coverage-freshness.ps1', 'feature-review-coverage-target.ps1', 'hook-epic-fan-in.ps1', 'hook-planner-worktree-removal.ps1', 'enforce-epic-worktree-removal-gate-planner.ps1', 'hook-docs-estate-context.ps1', 'enforce-orchestration-preimplementation-gate-docs.ps1', 'enforce-orchestration-preimplementation-gate-operands.ps1', 'enforce-orchestration-preimplementation-gate-classify.ps1')
+        $script:SharedModuleNames = @('codex-pretooluse-file-mapping.ps1', 'enforce-orchestration-preimplementation-gate-helpers.ps1', 'hook-command-scanner.ps1', 'hook-command-invocation.ps1', 'enforce-batch-budget-route.ps1', 'feature-folder-resolution.ps1', 'hook-command-heredoc.ps1', 'hook-command-payload.ps1', 'hook-command-payload-powershell.ps1', 'hook-command-invocation-operands.ps1', 'enforce-orchestration-preimplementation-gate-targets.ps1', 'hook-dependency-guard.ps1', 'feature-review-coverage-thresholds.ps1', 'file-size-policy.ps1', 'hook-target-worktree.ps1', 'hook-cleanup-context.ps1', 'enforce-orchestration-preimplementation-gate-cleanup.ps1', 'validate-feature-review-coverage-freshness.ps1', 'feature-review-coverage-target.ps1', 'hook-epic-fan-in.ps1', 'hook-planner-worktree-removal.ps1', 'enforce-epic-worktree-removal-gate-planner.ps1', 'hook-docs-estate-context.ps1', 'enforce-orchestration-preimplementation-gate-docs.ps1', 'enforce-orchestration-preimplementation-gate-operands.ps1', 'enforce-orchestration-preimplementation-gate-classify.ps1', 'subagentstop-envelope.ps1')
         $script:StaticCheckNames = @($script:AllHookNames) + @($script:SharedModuleNames)
         $script:CorePackManifestPath = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/codex-and-agents-customizations/pack-manifests/core.json'
         # Issue #707 (D10): load the gate so its epic-scope read is mocked for every in-process row.
@@ -318,7 +318,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
             $script:CheckpointFreeDirectory = Join-Path $script:RepoRoot 'tests'
             $script:ReadyCheckpointJson = @{
                 'issue-num'      = '415'
-                'feature-folder' = 'docs/features/active/sample'
+                'feature-folder' = '.dev/active/sample'
                 route_id         = 'full-bug'
                 lifecycle_ready  = $true
             } | ConvertTo-Json -Compress
@@ -355,7 +355,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         }
 
         It 'classifies <Label> as implementation path <Expected>' -ForEach @(
-            @{ Label = 'a feature documentation path'; Path = 'docs/features/active/x/spec.md'; Expected = $false }
+            @{ Label = 'a feature documentation path'; Path = '.dev/active/x/spec.md'; Expected = $false }
             @{ Label = 'the orchestrator checkpoint'; Path = 'artifacts/orchestration/orchestrator-state.json'; Expected = $false }
             @{ Label = 'a production script'; Path = 'scripts/a.ps1'; Expected = $true }
             @{ Label = 'a plain text file'; Path = 'notes.txt'; Expected = $false }
@@ -366,7 +366,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         It 'classifies <Label> as implementation command <Expected>' -ForEach @(
             @{ Label = 'an empty command'; Command = '   '; Expected = $false }
             @{ Label = 'an apply_patch add of a script'; Command = '*** Add File: scripts/a.ps1'; Expected = $true }
-            @{ Label = 'an apply_patch add of documentation'; Command = '*** Add File: docs/features/active/x/spec.md'; Expected = $false }
+            @{ Label = 'an apply_patch add of documentation'; Command = '*** Add File: .dev/active/x/spec.md'; Expected = $false }
             @{ Label = 'an apply_patch rename onto a script'; Command = '*** Move to: scripts/b.ps1'; Expected = $true }
             @{ Label = 'a git commit'; Command = 'git commit -m "wip"'; Expected = $true }
             @{ Label = 'a pytest run'; Command = 'poetry run pytest'; Expected = $true }
@@ -398,7 +398,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         It 'treats a checkpoint missing lifecycle readiness as not ready' {
             $payload = @{
                 'issue-num'      = '415'
-                'feature-folder' = 'docs/features/active/sample'
+                'feature-folder' = '.dev/active/sample'
                 path_selected    = 'full-bug'
             } | ConvertTo-Json -Compress | ConvertFrom-Json
 
@@ -439,7 +439,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         }
 
         It 'allows a documentation file path without consulting the checkpoint' {
-            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '{"file_path":"docs/features/active/x/spec.md"}'
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '{"file_path":".dev/active/x/spec.md"}'
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -499,7 +499,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         }
 
         It 'allows a mapped Write of feature documentation through its own entrypoint' {
-            $payload = ConvertTo-CodexPreToolPayload -ToolName 'Write' -ToolInput @{ file_path = 'docs/features/active/x/spec.md'; content = 'body' }
+            $payload = ConvertTo-CodexPreToolPayload -ToolName 'Write' -ToolInput @{ file_path = '.dev/active/x/spec.md'; content = 'body' }
 
             $result = Invoke-GateEntrypoint -PayloadRaw $payload
 

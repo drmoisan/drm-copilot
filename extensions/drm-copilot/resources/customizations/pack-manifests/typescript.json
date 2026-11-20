@@ -1,0 +1,10 @@
+{
+  "name": "typescript",
+  "label": "TypeScript",
+  "paths": [
+    ".github/agents/typescript-engineer.agent.md",
+    ".github/instructions/typescript-code-change.instructions.md",
+    ".github/instructions/typescript-suppressions.instructions.md",
+    ".github/instructions/typescript-unit-test.instructions.md"
+  ]
+}

@@ -132,11 +132,11 @@ Describe 'cross-epic skill contract (issue #1162)' {
     }
 
     It 'CES-TEMPLATES-BYTE-IDENTICAL' {
-        $source = Join-Path $script:RepoRoot 'docs/features/templates/epic/epic.md'
+        $source = Join-Path $script:RepoRoot '.dev/templates/epic/epic.md'
         $bundle = Join-Path $script:RepoRoot 'extensions/drm-copilot/resources/feature-templates/epic/epic.md'
 
         (Get-FileHash -LiteralPath $bundle -Algorithm SHA256).Hash | Should -BeExactly (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash
-        (Get-CrossEpicFileText -RelativePath 'docs/features/templates/epic/epic.md').Contains('cross_epic_depends_on') | Should -BeTrue
+        (Get-CrossEpicFileText -RelativePath '.dev/templates/epic/epic.md').Contains('cross_epic_depends_on') | Should -BeTrue
     }
 
     It 'CES-IDENTIFIER-MATCH-IS-WHOLE' {

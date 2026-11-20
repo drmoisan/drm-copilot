@@ -50,8 +50,8 @@ the gate passes or the user explicitly directs it to.
 
 For an epic-worthy objective:
 
-1. Define the epic slug and epic home `docs/features/epics/<epic-slug>/`.
-2. Author `docs/features/epics/<epic-slug>/epic.md` using the manifest frontmatter schema
+1. Define the epic slug and epic home `.dev/epics/<epic-slug>/`.
+2. Author `.dev/epics/<epic-slug>/epic.md` using the manifest frontmatter schema
    defined in the `epic-orchestrate` skill (that skill is the single schema authority; do not
    redefine it here). The Markdown body carries the epic narrative: goal, scope, non-goals,
    shared design, and decomposition rationale.
@@ -70,7 +70,7 @@ manifest is committed in final, resolved form before the kickoff artifact is wri
 
 ## Epic-Level Issue Promotion
 
-Issue #663. Before the first preparation-mode child delegation, `epic-planner` promotes one epic-level GitHub issue for the epic itself. It authors a potential entry under `docs/features/potential/` describing the epic and promotes it through `mcp__drm-copilot__potential_to_issue` with `promotion_type: epic`; `gh issue create` is not used. It records the resulting number as `epic_issue_num` in the epic planning checkpoint (`artifacts/orchestration/epic-planner-state.json`) and in the kickoff prompt artifact, and `epic-orchestrator` copies it into the epic checkpoint `artifacts/orchestration/epic-orchestrator-state.json` at its first checkpoint write. The integration-to-`main` pull request uses `epic_issue_num` as its canonical issue number.
+Issue #663. Before the first preparation-mode child delegation, `epic-planner` promotes one epic-level GitHub issue for the epic itself. It authors a potential entry under `.dev/potential/` describing the epic and promotes it through `mcp__drm-copilot__potential_to_issue` with `promotion_type: epic`; `gh issue create` is not used. It records the resulting number as `epic_issue_num` in the epic planning checkpoint (`artifacts/orchestration/epic-planner-state.json`) and in the kickoff prompt artifact, and `epic-orchestrator` copies it into the epic checkpoint `artifacts/orchestration/epic-orchestrator-state.json` at its first checkpoint write. The integration-to-`main` pull request uses `epic_issue_num` as its canonical issue number.
 
 ## Complexity Assessment
 
@@ -146,7 +146,7 @@ in place of the merge facts:
 As each child preparation completes:
 
 1. Fetch the child worktree's branch and merge it into `epic/<epic-slug>-integration`. Prepared
-   outputs live in disjoint `docs/features/active/<feature>/` trees, so conflicts indicate a
+   outputs live in disjoint `.dev/active/<feature>/` trees, so conflicts indicate a
    decomposition defect; on conflict, halt fan-in and record blocked state rather than resolving
    ad hoc.
 2. Back-fill the child's `issue_num` (and resolved `feature_folder`) into the epic manifest.
@@ -184,11 +184,21 @@ This is a policy-level control, not a security control: any writer in the sessio
 record, and the git checks bound what a record can authorize. `git worktree remove` deletes
 ignored files in the worktree, including the child's gitignored checkpoint; this is accepted.
 
+## Execution-Readiness Gate
+
+Do not emit a kickoff until the manifest is valid and every child has a promoted issue, active
+folder, `issue.md`, research, `spec.md`, `user-story.md`, approved atomic plan, `PREFLIGHT: ALL
+CLEAR` evidence, and a pushed preparation commit fanned in to the integration branch.
+
+Invoke `mcp__drm-copilot__validate_orchestration_artifacts` for `epic-planner-state` with
+`require_ready_for_execution: true` and the explicit workspace root. Do not write the kickoff
+until this canonical gate succeeds.
+
 ## Kickoff Prompt Artifact
 
 After all features are prepared and committed, write the epic-orchestrator kickoff prompt to
 `artifacts/orchestration/epic-kickoff-<epic-slug>.md`, and commit a durable copy to
-`docs/features/epics/<epic-slug>/epic-kickoff.md` (the `artifacts/` tree is gitignored; the
+`.dev/epics/<epic-slug>/epic-kickoff.md` (the `artifacts/` tree is gitignored; the
 committed copy travels with the integration branch). The artifact contains:
 
 ```markdown
@@ -204,7 +214,7 @@ epic/<epic-slug>-integration).
 Run `/epic-run <epic-slug>` to execute this epic, or paste the prompt below.
 
 Use the epic-orchestrator subagent to execute the prepared epic at
-docs/features/epics/<epic-slug>/epic.md. The integration branch
+.dev/epics/<epic-slug>/epic.md. The integration branch
 epic/<epic-slug>-integration already contains every prepared feature folder and approved atomic
 plan; child features resume at atomic execution from their committed plan-path rather than
 re-planning. Execute per the epic-orchestrate skill: wave-scheduled child orchestrator runs in
@@ -231,10 +241,10 @@ invocation is **pathspec-bearing**: every staging or integration invocation must
 explicit path operand, and every operand must resolve inside one of the five exempt
 orchestration-bookkeeping trees:
 
-- `docs/features/epics/`
-- `docs/features/parallel/`
-- `docs/features/active/`
-- `docs/features/potential/`
+- `.dev/epics/`
+- `.dev/parallel/`
+- `.dev/active/`
+- `.dev/potential/`
 - `artifacts/orchestration/`
 
 Use one of the two pathspec-bearing spellings:

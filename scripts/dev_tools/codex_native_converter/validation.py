@@ -214,7 +214,9 @@ def _validate_duplicate_targets(
     """Validate that planned target paths are unique.
 
     Purpose:
-        Prevent ambiguous or silently overwritten target outputs.
+        Prevent ambiguous or silently overwritten target outputs. No target
+        path is exempt: two records that resolve to ``AGENTS.md`` are a
+        duplicate like any other.
 
     Args:
         mapping_records (tuple[MappingRecord, ...]): Planned mappings for the
@@ -254,16 +256,10 @@ def _validate_duplicate_targets(
         for mapping_record in mapping_records
         if mapping_record.target_path is not None
     )
+    # Any target claimed by more than one mapping record is a duplicate; no
+    # path is exempt, because standing-guidance records have no target.
     duplicated_targets = {
         target_path for target_path, count in target_counter.items() if count > 1
-    }
-    duplicated_targets -= {
-        target_path
-        for target_path, records in mapping_records_by_target.items()
-        if target_path == "AGENTS.md"
-        and all(
-            record.target_role is TargetRole.STANDING_GUIDANCE for record in records
-        )
     }
 
     # Report every record that participates in a duplicate target collision so

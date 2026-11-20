@@ -13,9 +13,9 @@ Use the epic slug or path supplied in the invoking user request.
 
 ## Procedure
 
-1. Resolve a bare slug to `docs/features/epics/<epic-slug>/`; resolve a supplied path to its
+1. Resolve a bare slug to `.dev/epics/<epic-slug>/`; resolve a supplied path to its
    containing epic home.
-2. Require `docs/features/epics/<epic-slug>/epic-kickoff.md`.
+2. Require `.dev/epics/<epic-slug>/epic-kickoff.md`.
    - If it is absent, stop before delegation. Direct the user to run `epic-plan` first or, for a
      manually authored epic, invoke `epic-orchestrate <manifest-path>`.
 3. Validate the kickoff's `## Invocation Prompt`, manifest reference, integration branch,

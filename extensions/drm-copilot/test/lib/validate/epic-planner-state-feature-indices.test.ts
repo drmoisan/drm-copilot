@@ -15,7 +15,7 @@ const SHIFTED_MODEL_RECEIPT_ERROR =
 const SHIFTED_TOPOLOGY_RECEIPT_ERROR =
   "Epic planner checkpoint features[2].topology_receipt must be an object.";
 const DUPLICATE_FOLDER_ERROR =
-  "Epic planner checkpoint features[2].feature_folder must be unique: 'docs/features/active/feature-101'.";
+  "Epic planner checkpoint features[2].feature_folder must be unique: '.dev/active/feature-101'.";
 const DUPLICATE_ISSUE_ERROR =
   "Epic planner checkpoint features[2].issue_num must be unique: 101.";
 const UNRESOLVED_DEPENDENCY_ERROR =
@@ -42,13 +42,13 @@ function claudeFeature(
 ): Record<string, unknown> {
   return {
     issue_num: issueNum,
-    feature_folder: `docs/features/active/feature-${issueNum}`,
+    feature_folder: `.dev/active/feature-${issueNum}`,
     depends_on: [],
     wave: 0,
     complexity_band: "C3",
     preparation_status: "prepared",
     research_path: `artifacts/research/feature-${issueNum}.md`,
-    plan_path: `docs/features/active/feature-${issueNum}/plan.md`,
+    plan_path: `.dev/active/feature-${issueNum}/plan.md`,
     preflight_status: "PREFLIGHT: ALL CLEAR",
     ...overrides,
   };
@@ -59,7 +59,7 @@ function claudeState(features: readonly unknown[]): Record<string, unknown> {
   return {
     objective: "prepare two related features",
     epic_feature_folder: "sample-epic",
-    epic_manifest_path: "docs/features/epics/sample-epic/epic.md",
+    epic_manifest_path: ".dev/epics/sample-epic/epic.md",
     integration_branch: "epic/sample-epic-integration",
     max_parallel_features: 4,
     epic_worthiness: { verdict: "epic", rationale: "two features" },

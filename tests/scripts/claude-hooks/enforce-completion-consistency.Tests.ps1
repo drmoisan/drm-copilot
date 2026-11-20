@@ -441,6 +441,16 @@ Describe 'enforce-completion-consistency.ps1' {
             Test-IsValidFeatureFolder -Value 'docs/other/thing' -FolderExistsCheck { param($p) $true } | Should -BeFalse
         }
 
+        It 'Test-IsValidFeatureFolder returns true for an existing .dev/active folder (issue #1035)' {
+            $probed = [System.Collections.Generic.List[string]]::new()
+            Test-IsValidFeatureFolder -Value '.dev/active/my-feature-233' -FolderExistsCheck { param($p) $probed.Add($p); $true }.GetNewClosure() | Should -BeTrue
+            $probed | Should -Be @('.dev/active/my-feature-233')
+        }
+
+        It 'Test-IsValidFeatureFolder returns false for the bare .dev/active prefix (issue #1035)' {
+            Test-IsValidFeatureFolder -Value '.dev/active/' -FolderExistsCheck { param($p) $true } | Should -BeFalse
+        }
+
         It 'Test-IsValidFeatureFolder returns true for a valid existing folder' {
             Test-IsValidFeatureFolder -Value 'docs/features/active/my-feature-233' -FolderExistsCheck { param($p) $true } | Should -BeTrue
         }

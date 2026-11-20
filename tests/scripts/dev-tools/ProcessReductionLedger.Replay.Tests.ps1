@@ -23,7 +23,7 @@ BeforeAll {
     $script:PolicyReadError = 'Phase 0 must include a policy-read task.'
     $script:MissingPhaseZeroError = 'Plan must include Phase 0 with at least one baseline task.'
 
-    $ledgerPath = Join-Path $script:RepoRoot 'docs/engineering/process-reductions'
+    $ledgerPath = Join-Path $script:RepoRoot '.dev/engineering/process-reductions'
     $script:EntryFile = @(Get-ChildItem -LiteralPath $ledgerPath -File -Filter '*-policy-read-removal.md')
     $script:HookBlock = @()
     if ($script:EntryFile.Count -eq 1) {
@@ -88,15 +88,15 @@ BeforeAll {
 
     $script:BaselineOnlyPlan = @(
         "### Phase 0 `u{2014} Baseline",
-        '- [ ] [P0-T1] Capture baseline for docs/features/active/foo/issue.md',
+        '- [ ] [P0-T1] Capture baseline for .dev/active/foo/issue.md',
         "### Phase 1 `u{2014} QA",
-        '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+        '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
     )
     $script:NoPhaseZeroPlan = @(
         "### Phase 1 `u{2014} Implement",
         '- [ ] [P1-T1] Update .claude/hooks/validate-planner-output.ps1',
         "### Phase 2 `u{2014} QA",
-        '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+        '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
     )
 }
 

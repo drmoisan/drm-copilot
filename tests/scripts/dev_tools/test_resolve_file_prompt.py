@@ -8,6 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from scripts.dev_tools import resolve_file_prompt as resolve_file_prompt_module
 from scripts.dev_tools.resolve_file_prompt import (
     main,
     resolve_prompt,
@@ -551,3 +552,22 @@ def test_main_clipboard_failure_falls_back_to_stdout(
 
     assert "Resolved: src/main.py" in captured_out.getvalue()
     assert "Clipboard copy not available" in captured_err.getvalue()
+
+
+@pytest.mark.parametrize(
+    ("folder_name", "expected"),
+    [
+        ("1016-foo-bar", "foo-bar"),
+        ("2025-12-18-docs-v3-upgrade-42", "docs-v3-upgrade"),
+        ("2025-12-18", "2025-12-18"),
+        ("feature-123", "feature-123"),
+    ],
+)
+def test_resolve_name_from_feature_foldername_delegates_to_parser(
+    folder_name: str, expected: str
+) -> None:
+    """Issue-first and dated names yield the feature; other names stay whole."""
+    result = resolve_file_prompt_module._resolve_name_from_feature_foldername(  # type: ignore[reportPrivateUsage]
+        folder_name
+    )
+    assert result == expected

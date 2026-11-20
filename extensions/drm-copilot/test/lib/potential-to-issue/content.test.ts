@@ -11,6 +11,7 @@ import {
   getFeatureName,
   getFeaturePath,
   getSection,
+  getStatusFolderToken,
   normalizeSmartPunctuation,
   parseIssueReference,
   PLACEHOLDER,
@@ -409,5 +410,54 @@ describe("content helpers — updateMetadataLines", () => {
 describe("content helpers — PLACEHOLDER constant", () => {
   it("is the byte-identical placeholder string", () => {
     expect(PLACEHOLDER).toBe("(not provided in potential file)");
+  });
+});
+
+describe("content helpers — getStatusFolderToken (D-P6)", () => {
+  it("formats 1016-foo from issue 1016 and a date-first stem", () => {
+    // Arrange / Act / Assert
+    expect(getStatusFolderToken("1016", "2026-10-30-foo", "Foo")).toBe(
+      "1016-foo",
+    );
+  });
+
+  it("removes a trailing issue suffix from the stem", () => {
+    // Arrange / Act / Assert
+    expect(getStatusFolderToken("1016", "foo-1016", "Foo")).toBe("1016-foo");
+  });
+
+  it("falls back to the sanitized token when the stem is rejected (N-5)", () => {
+    // Arrange / Act / Assert: an uppercase stem fails the name pattern.
+    expect(getStatusFolderToken("123", "Bad Stem", "Feature_Title")).toBe(
+      "Feature_Title",
+    );
+  });
+
+  it("falls back to the sanitized token for an issue above 9999 (N-4)", () => {
+    // Arrange / Act / Assert
+    expect(getStatusFolderToken("10000", "foo", "Foo")).toBe("Foo");
+  });
+});
+
+describe("content helpers — updateMetadataLines active area", () => {
+  it("names the passed active area in the Status line", () => {
+    // Arrange
+    const lines = ["# Foo", "## Problem / Why"];
+
+    // Act
+    const updated = updateMetadataLines(
+      lines,
+      "Foo",
+      "1016",
+      "https://example.com/issues/1016",
+      null,
+      "1016-foo",
+      ".dev/active",
+    );
+
+    // Assert
+    expect(updated).toContain(
+      "- Status: Promoted -> .dev/active/1016-foo/ (Issue #1016)",
+    );
   });
 });

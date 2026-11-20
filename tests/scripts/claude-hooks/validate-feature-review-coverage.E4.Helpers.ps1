@@ -57,9 +57,9 @@ function Use-E4Fixture {
     return $fixture.Text
 }
 
-$script:E4PolicyPath = 'docs/features/active/foo/policy-audit.2026-05-04T08-00.md'
-$script:E4CodePath = 'docs/features/active/foo/code-review.2026-05-04T08-00.md'
-$script:E4FeaturePath = 'docs/features/active/foo/feature-audit.2026-05-04T08-00.md'
+$script:E4PolicyPath = '.dev/active/foo/policy-audit.2026-05-04T08-00.md'
+$script:E4CodePath = '.dev/active/foo/code-review.2026-05-04T08-00.md'
+$script:E4FeaturePath = '.dev/active/foo/feature-audit.2026-05-04T08-00.md'
 $script:E4Tokens = @(
     "policy-audit-path: $script:E4PolicyPath",
     "code-review-path: $script:E4CodePath",

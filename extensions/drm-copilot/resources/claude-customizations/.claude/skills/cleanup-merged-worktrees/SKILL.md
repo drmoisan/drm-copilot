@@ -313,7 +313,7 @@ specific files or commit SHAs, before step 9 acts on any finding.
 3. **Check for equivalent content already on `main`, by topic, not only by path.** For
    every dirty, untracked, or unmerged file, check `git show main:<path>` at the same
    path, and also grep broadly across the relevant shared namespace (for example
-   `.claude/agent-memory/**` for lesson files, `docs/features/**` for feature docs)
+   `.claude/agent-memory/**` for lesson files, `.dev/**` for feature docs)
    since the same fact is often re-recorded under a different filename on `main`.
 
 4. **For feature-folder doc snapshots** (`issue.md`, `plan.md`, `spec.md`,

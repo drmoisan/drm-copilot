@@ -10,6 +10,9 @@
     ".codex/agents/csharp-typed-engineer-c2.toml",
     ".codex/agents/csharp-typed-engineer-c3.toml",
     ".codex/agents/csharp-typed-engineer-c3-elevated.toml",
-    ".codex/agents/csharp-typed-engineer-c4.toml"
+    ".codex/agents/csharp-typed-engineer-c4.toml",
+    ".codex/agents/csharp-atomic-executor.toml",
+    ".codex/agents/csharp-atomic-planning.toml",
+    ".codex/agents/csharp-orchestrator.toml"
   ]
 }

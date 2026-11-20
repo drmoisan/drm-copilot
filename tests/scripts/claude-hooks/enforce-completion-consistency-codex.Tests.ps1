@@ -50,7 +50,7 @@ Describe 'bundled Codex enforce-completion-consistency.ps1' {
         $toolInput = ConvertTo-CodexCheckpointToolInput -Payload @{
             next_step        = 'complete'
             'issue-num'      = '301'
-            'feature-folder' = 'docs/features/active/2026-07-03-pester-completion-consistency-301'
+            'feature-folder' = '.dev/active/2026-07-03-pester-completion-consistency-301'
             route_id         = 'large'
             ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123def456' }
         }

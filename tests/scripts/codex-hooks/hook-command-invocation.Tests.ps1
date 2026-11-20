@@ -12,7 +12,7 @@
     hook-command-scanner.ps1.
 
     The case inventory asserted here is the one named by spec D2 Piece 3 and D12 in
-    docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md:
+    .dev/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md:
     structural classification of the relocating git spellings, the non-classifying stop case,
     operand retrieval from the matched segment only, flag value and flag presence retrieval,
     the mention inverse, and exact membership of the transparent-wrapper set and the git, gh,

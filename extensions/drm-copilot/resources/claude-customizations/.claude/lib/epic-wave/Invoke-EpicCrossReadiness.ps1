@@ -21,7 +21,7 @@
     Wait bound from 0 to 540 seconds; the default 0 evaluates once.
 
 .EXAMPLE
-    pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1 -Mode feature -ManifestPath docs/features/epics/<slug>/epic.md -Issue 1201
+    pwsh -NoProfile -File .claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1 -Mode feature -ManifestPath .dev/epics/<slug>/epic.md -Issue 1201
 #>
 [CmdletBinding()]
 param(

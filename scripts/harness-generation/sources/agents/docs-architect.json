@@ -1,0 +1,54 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " docs-architect"
+      },
+      {
+        "key": "description",
+        "value": " Inventory the documented surface and plan the information architecture; read-only, uses the docs MCP tools."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - \"mcp__drm-copilot__run_docs_inventory\"\n  - \"mcp__drm-copilot__run_docs_coverage\"\n  - \"mcp__drm-copilot__run_docs_check\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - docs-inventory-surface\n  - docs-plan-ia"
+      }
+    ],
+    "path": ".claude/agents/docs-architect.md",
+    "sections": [
+      "head",
+      "prepared-inputs",
+      "skills",
+      "mcp-tool-inputs",
+      "write-scope",
+      "report"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"docs-architect\""
+      },
+      {
+        "key": "description",
+        "value": "\"Inventory the documented surface and plan the information architecture; read-only, uses the docs MCP tools.\""
+      }
+    ],
+    "path": ".codex/agents/docs-architect.toml",
+    "sections": [
+      "head-2",
+      "prepared-inputs",
+      "skills",
+      "mcp-tool-inputs",
+      "write-scope",
+      "report"
+    ]
+  }
+}

@@ -86,7 +86,7 @@ Describe 'enforce-evidence-locations.ps1' {
 
     Context 'canonical evidence paths' {
         It 'allows writes to <FEATURE>/evidence/baseline/ (canonical evidence path)' {
-            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath 'docs/features/active/my-feature/evidence/baseline/baseline.md'
+            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath '.dev/active/my-feature/evidence/baseline/baseline.md'
 
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw $nested
 
@@ -94,15 +94,15 @@ Describe 'enforce-evidence-locations.ps1' {
         }
 
         It 'allows writes to the docs/features research subfolder (canonical feature research path)' {
-            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath 'docs/features/active/my-feature/research/2026-06-24T13-02-foo-research.md'
+            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath '.dev/active/my-feature/research/2026-06-24T13-02-foo-research.md'
 
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw $nested
 
             $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
-        It 'allows writes to docs/research/ (canonical one-off research path)' {
-            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath 'docs/research/2026-06-24T13-02-foo-research.md'
+        It 'allows writes to .dev/research/ (canonical one-off research path)' {
+            $nested = ConvertTo-EvidenceLocationEnvelope -FilePath '.dev/research/2026-06-24T13-02-foo-research.md'
 
             $result = Invoke-EvidenceLocationDecision -ToolInputRaw $nested
 

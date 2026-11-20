@@ -1,0 +1,6 @@
+# Task Check P4-T4
+
+Timestamp: 2026-11-16T05-19
+Command: sh SCRATCH/issue-1035-pystatic.sh SCRATCH/issue-1035-p4t4.files (black, ruff check, pyright); sh SCRATCH/issue-1035-retry.sh <log> pytest -q -p no:cacheprovider tests/scripts/dev_tools/test_orchestrator_state_issue_adoption_feature_folder.py tests/scripts/dev_tools/test_orchestrator_state_issue_adoption_parity.py tests/scripts/dev_tools/test_orchestrator_state_issue_adoption.py tests/scripts/dev_tools/test_orchestrator_state_issue_adoption_waivers.py
+EXIT_CODE: 0
+Output Summary: Changed files: scripts/dev_tools/_orchestrator_state_feature_folder_record.py (FEATURE_FOLDER_PATH_PATTERN alternation built from KNOWN_DEVELOPMENT_DOCS_ROOTS, accepting docs/features/active/<folder> and .dev/active/<folder>; ERROR_FEATURE_FOLDER_PATH_FORMAT unchanged), tests/scripts/dev_tools/test_orchestrator_state_issue_adoption_feature_folder.py (new in-memory case: record and checkpoint feature-folder .dev/active/2026-09-29-sample-feature-509 yield no error; existing cases unchanged). test_orchestrator_state_issue_adoption_parity.py is unchanged in source (D-P11). Selection rule: mirrored test module of the changed module plus the issue-adoption modules that import it. Static: Black "2 files left unchanged", Ruff "All checks passed!", Pyright 0 errors. pytest: 145 passed.

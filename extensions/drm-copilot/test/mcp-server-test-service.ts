@@ -33,7 +33,7 @@ export const PUSH_DOWN_CODEX_ARTIFACT_PATH = workspacePath(
 );
 
 /**
- * The 49 repo-automation tool names in union order, written out literally so
+ * The 51 repo-automation tool names in union order, written out literally so
  * the server registration test fails on any added, removed or reordered name.
  * It lives here because `mcp-server.test.ts` has little line headroom.
  */
@@ -62,12 +62,15 @@ export const EXPECTED_REPO_AUTOMATION_TOOL_NAMES: ReadonlyArray<string> = [
   "resolve_provider_routing",
   "transition_prepared_orchestration",
   "render_subagent_tree",
+  "migrate_development_docs",
   "run_docs_check",
   "run_docs_inventory",
   "run_docs_coverage",
   "update_docs_ledger",
   "generate_docs_reference",
   "validate_docs_artifacts",
+  "detect_push_down_integration",
+  "validate_push_down_integration",
   "validate_discovery_artifacts",
   "run_discovery_init",
   "run_discovery_repo_inventory",

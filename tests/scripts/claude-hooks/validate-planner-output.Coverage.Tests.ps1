@@ -27,8 +27,8 @@ CITATION-TO-TREE: PASS
 CITATION: .claude/hooks/validate-planner-output.ps1 | planner review parser
 AC-TRACEABILITY: PASS
 AC-INVENTORY: AC1, AC2
-AC-MAPPING: AC1 | IMPLEMENTATION: .claude/hooks/validate-planner-output.ps1 | TESTS: tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 | EVIDENCE: docs/features/active/foo/evidence/qa-gates/pester.md
-AC-MAPPING: AC2 | IMPLEMENTATION: .claude/agents/atomic-planner.md | TESTS: tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py | EVIDENCE: docs/features/active/foo/evidence/qa-gates/contracts.md
+AC-MAPPING: AC1 | IMPLEMENTATION: .claude/hooks/validate-planner-output.ps1 | TESTS: tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 | EVIDENCE: .dev/active/foo/evidence/qa-gates/pester.md
+AC-MAPPING: AC2 | IMPLEMENTATION: .claude/agents/atomic-planner.md | TESTS: tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py | EVIDENCE: .dev/active/foo/evidence/qa-gates/contracts.md
 SCOPE-BOUNDARY: PASS
 UNRESOLVED-GAPS: NONE
 PREFLIGHT: $Preflight
@@ -43,8 +43,8 @@ Describe 'epic-state baseline isolation (issue #1105)' {
 Describe 'validate-planner-output entry point (issues #786 and #903)' {
     BeforeAll {
         $script:Hook = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.claude/hooks/validate-planner-output.ps1'))
-        $script:PlanPathText = 'plan-path: docs/features/active/foo/plan.md'
-        $script:ValidText = "plan-path: docs/features/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)"
+        $script:PlanPathText = 'plan-path: .dev/active/foo/plan.md'
+        $script:ValidText = "plan-path: .dev/active/foo/plan.md`n$(Get-ValidPlannerReviewRecord)"
         # Issue #964: the allowed-plan fixture carries a valid Pre-Mortem section.
         $script:PreMortemFixture = @('## Pre-Mortem', '- Review checklists: walked.', '- Coverage: measured.', '- Mirror parity: copied.', '- File size: measured.', '- Test isolation: shuffled.', '- CI-only behavior: checked.', '- Evidence: recorded.', '## Phases')
 
@@ -95,12 +95,12 @@ Describe 'validate-planner-output entry point (issues #786 and #903)' {
                     Exists = $true
                     Lines  = @($preMortem) + @(
                         "### Phase 0 `u{2014} Baseline",
-                        '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record docs/features/active/foo/evidence/baseline/phase0-instructions-read.md',
-                        '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/baseline/pester.md',
+                        '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record .dev/active/foo/evidence/baseline/phase0-instructions-read.md',
+                        '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/baseline/pester.md',
                         "### Phase 1 `u{2014} Implement",
                         '- [ ] [P1-T1] Update .claude/hooks/validate-planner-output.ps1 and tests/scripts/claude-hooks/validate-planner-output.Tests.ps1',
                         "### Phase 2 `u{2014} Final QA",
-                        '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                        '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
                     )
                 }
             }.GetNewClosure()

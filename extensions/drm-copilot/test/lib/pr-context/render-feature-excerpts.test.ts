@@ -107,6 +107,21 @@ describe("extractFeaturesFromPaths", () => {
   it("handles an empty list", () => {
     expect(extractFeaturesFromPaths([])).toEqual(new Set());
   });
+
+  it("reads a feature folder path with no trailing segment under either root", () => {
+    expect(
+      extractFeaturesFromPaths([
+        "docs/features/active/feature-a",
+        ".dev/active/feature-b",
+      ]),
+    ).toEqual(new Set(["feature-a", "feature-b"]));
+  });
+
+  it("ignores an active-area path with an empty feature segment", () => {
+    expect(
+      extractFeaturesFromPaths(["docs/features/active/", ".dev/active//x.md"]),
+    ).toEqual(new Set());
+  });
 });
 
 describe("extractSpecParts", () => {

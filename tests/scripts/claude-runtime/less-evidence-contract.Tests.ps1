@@ -17,16 +17,13 @@ BeforeDiscovery {
     $resources = 'extensions/drm-copilot/resources'
     $claudeBundle = "$resources/claude-customizations"
     $agentsBundle = "$resources/codex-and-agents-customizations"
-    $githubBundle = "$resources/customizations"
     $templateBundle = "$resources/templates/policy_audit"
 
     $contract = @(
         @{ Id = 'CONTRACT-CLAUDE'; Path = '.claude/skills/atomic-plan-contract/SKILL.md' }
         @{ Id = 'CONTRACT-AGENTS'; Path = '.agents/skills/atomic-plan-contract/SKILL.md' }
-        @{ Id = 'CONTRACT-GITHUB'; Path = '.github/skills/atomic-plan-contract/SKILL.md' }
         @{ Id = 'CONTRACT-CLAUDE-BUNDLE'; Path = "$claudeBundle/.claude/skills/atomic-plan-contract/SKILL.md" }
         @{ Id = 'CONTRACT-AGENTS-BUNDLE'; Path = "$agentsBundle/.agents/skills/atomic-plan-contract/SKILL.md" }
-        @{ Id = 'CONTRACT-GITHUB-BUNDLE'; Path = "$githubBundle/.github/skills/atomic-plan-contract/SKILL.md" }
     )
     $planner = @(
         @{ Id = 'PLANNER-CLAUDE'; Path = '.claude/agents/atomic-planner.md' }
@@ -42,10 +39,6 @@ BeforeDiscovery {
         @{ Id = 'WORKFLOW-CLAUDE-BUNDLE'; Path = "$claudeBundle/.claude/skills/feature-review-workflow/SKILL.md" }
         @{ Id = 'WORKFLOW-AGENTS-BUNDLE'; Path = "$agentsBundle/.agents/skills/feature-review-workflow/SKILL.md" }
     )
-    $workflowGithub = @(
-        @{ Id = 'WORKFLOW-GITHUB'; Path = '.github/skills/feature-review-workflow/SKILL.md' }
-        @{ Id = 'WORKFLOW-GITHUB-BUNDLE'; Path = "$githubBundle/.github/skills/feature-review-workflow/SKILL.md" }
-    )
     $featureReview = @(
         @{ Id = 'REVIEWER-CLAUDE'; Path = '.claude/agents/feature-review.md' }
         @{ Id = 'REVIEWER-CODEX'; Path = '.codex/agents/feature-review.toml' }
@@ -53,11 +46,11 @@ BeforeDiscovery {
         @{ Id = 'REVIEWER-CODEX-BUNDLE'; Path = "$agentsBundle/.codex/agents/feature-review.toml" }
     )
     $template = @(
-        @{ Id = 'TEMPLATE'; Path = 'docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md' }
+        @{ Id = 'TEMPLATE'; Path = '.dev/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md' }
         @{ Id = 'TEMPLATE-BUNDLE'; Path = "$templateBundle/policy-audit.yyyy-MM-ddTHH-mm.md" }
     )
     $auditAgents = @(
-        @{ Id = 'AUDIT-AGENTS'; Path = 'docs/features/templates/policy_audit/AGENTS.md' }
+        @{ Id = 'AUDIT-AGENTS'; Path = '.dev/templates/policy_audit/AGENTS.md' }
         @{ Id = 'AUDIT-AGENTS-BUNDLE'; Path = "$templateBundle/AGENTS.md" }
     )
     $orchestrate = @(
@@ -89,7 +82,7 @@ BeforeDiscovery {
     }
 
     $script:StaticArtifactRow = @(Get-LecRow -Row ($contract + $planner + $executor) -Token @('one final-QC static artifact per language'))
-    $script:CrossCheckRow = @(Get-LecRow -Row ($template + $auditAgents + $workflowFull + $workflowGithub + $featureReview) -Token @('## CI Cross-check'))
+    $script:CrossCheckRow = @(Get-LecRow -Row ($template + $auditAgents + $workflowFull + $featureReview) -Token @('## CI Cross-check'))
     $script:CrossCheckSectionRow = @(Get-LecRow -Row $orchestrate -Token @('## CI Cross-check', 'gh pr checks', 'REMEDIATION_REQUIRED', 'autonomous', 'REVIEW_GATE_NOT_PASSED'))
     $script:PythonTotalRow = @(Get-LecRow -Row ($workflowFull + $featureReview + $template) -Token @('Enforce Python coverage thresholds'))
     $script:ScopeListingRow = @(Get-LecRow -Row $template -Token @('## 9. Summary of Changes'))
@@ -97,13 +90,13 @@ BeforeDiscovery {
         Get-LecRow -Row $contract -Token @('Phase 0 baseline', 'no per-file or repo-wide coverage drop')
         Get-LecRow -Row $template -Token @('Baseline Coverage Documented', 'No Coverage Regression', 'If any required baseline artifact')
         Get-LecRow -Row $auditAgents -Token @('Fill in baseline coverage metrics')
-        Get-LecRow -Row ($workflowFull + $workflowGithub + $featureReview) -Token @('regression on changed lines', 'Phase 0 baseline')
+        Get-LecRow -Row ($workflowFull + $featureReview) -Token @('regression on changed lines', 'Phase 0 baseline')
         Get-LecRow -Row $planner -Token @('one parallel test-suite baseline run per gate')
         Get-LecRow -Row $executor -Token @('no per-file or repo-wide coverage drop')
     )
     $script:KeptRow = @(
         Get-LecRow -Row $contract -Token @('preflight-fixes.<timestamp>.md', 'self-review.<timestamp>.md')
-        Get-LecRow -Row ($workflowFull + $workflowGithub) -Token @('acceptance-criteria-tracking', 'Check off passing criteria')
+        Get-LecRow -Row ($workflowFull) -Token @('acceptance-criteria-tracking', 'Check off passing criteria')
     )
 }
 

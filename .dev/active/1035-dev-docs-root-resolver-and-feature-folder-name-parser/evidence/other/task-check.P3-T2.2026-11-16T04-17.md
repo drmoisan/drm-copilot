@@ -1,0 +1,6 @@
+# Task Check P3-T2
+
+Timestamp: 2026-11-16T04-17
+Command: sh SCRATCH/issue-1035-p3checks.sh P3-T2 (SCRATCH/issue-1035-tscheck.sh: npx prettier --write <changed>; npx eslint <changed>; npx tsc -p ./ --noEmit and tsconfig.jest.json; sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest-extension test/repo-automation test/extension.workflow-commands.test.ts)
+EXIT_CODE: 0
+Output Summary: Changed files: extensions/drm-copilot/src/repo-automation-service.ts (newPotentialEntry resolves the root through the injected fileSystem and appends -DevelopmentDocsRoot <root> only when the root differs from the default, D-P4), new test/repo-automation-service.new-potential-entry-root.test.ts (passes .dev when configured and present; omits the argument by default and when .dev is configured but absent; default argv tail asserted). Unchanged and passing: repo-automation-dispatch.test.ts (exact default argv), newPotentialEntry passes the bundled script path and short-name args in extension.workflow-commands.test.ts; extension.integration.test.ts is in the CI-only integration lane. Selection rule: suites that construct the service and the new suite (test/repo-automation*, extension.workflow-commands). First run: tsc exit 2 from the P3-T3 test edit; rerun: Prettier unchanged, ESLint 0, tsc 0, Jest 21 suites 179 tests passed.

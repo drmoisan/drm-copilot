@@ -25,6 +25,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 Import-Module (Join-Path $PSScriptRoot 'WorktreeResolution.psm1') -ErrorAction Stop
+Import-Module (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 # The four states of a derived target. The set is closed so a caller writes exactly
 # one branch per state; a fifth value would silently fall through every caller.
@@ -47,10 +48,12 @@ $script:SignalLabel = @{
     Branch            = 'branch'
 }
 
-# A feature-folder token: an optional prefix ending in a separator, then
-# docs/features/active/<folder>. The prefix is kept rather than discarded, because
-# an absolute prefix is the only unambiguous placement of the token.
-$script:FeatureFolderPattern = '(?<![^\s"''`(])(?:[^\s"''`]*?[\\/])?docs[\\/]+features[\\/]+active[\\/]+[A-Za-z0-9][A-Za-z0-9._-]*'
+# A feature-folder token: an optional prefix ending in a separator, then the
+# active area of either known development-docs root (docs/features/active or
+# .dev/active) and <folder>. The prefix is kept rather than discarded, because an
+# absolute prefix is the only unambiguous placement of the token.
+$script:KnownRootTokenPattern = '(?:' + ((Get-DevelopmentDocsKnownRoot | ForEach-Object { @($_.Split('/') | ForEach-Object { [regex]::Escape($_) }) -join '[\\/]+' }) -join '|') + ')'
+$script:FeatureFolderPattern = '(?<![^\s"''`(])(?:[^\s"''`]*?[\\/])?' + $script:KnownRootTokenPattern + '[\\/]+active[\\/]+[A-Za-z0-9][A-Za-z0-9._-]*'
 
 # An absolute file path with an extension. Only the absolute form is read from free
 # text, because a relative file path names a file present in every worktree.

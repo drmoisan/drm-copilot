@@ -1,0 +1,54 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " docs-coverage-reviewer"
+      },
+      {
+        "key": "description",
+        "value": " Review documentation coverage and accuracy and validate docs-complete for one revision; read-only."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - \"mcp__drm-copilot__run_docs_coverage\"\n  - \"mcp__drm-copilot__validate_docs_artifacts\"\n  - \"mcp__drm-copilot__run_docs_check\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - docs-review-coverage\n  - docs-validate"
+      }
+    ],
+    "path": ".claude/agents/docs-coverage-reviewer.md",
+    "sections": [
+      "head",
+      "prepared-inputs",
+      "skills",
+      "mcp-tool-inputs",
+      "write-scope",
+      "report"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"docs-coverage-reviewer\""
+      },
+      {
+        "key": "description",
+        "value": "\"Review documentation coverage and accuracy and validate docs-complete for one revision; read-only.\""
+      }
+    ],
+    "path": ".codex/agents/docs-coverage-reviewer.toml",
+    "sections": [
+      "head-2",
+      "prepared-inputs",
+      "skills",
+      "mcp-tool-inputs",
+      "write-scope",
+      "report"
+    ]
+  }
+}

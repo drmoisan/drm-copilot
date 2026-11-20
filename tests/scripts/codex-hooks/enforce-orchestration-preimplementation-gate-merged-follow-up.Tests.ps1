@@ -28,11 +28,11 @@ Describe 'Codex preimplementation gate merged-feature follow-up allowance (issue
         Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
         Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-EpicScopeCheckpointText', 'Get-ParallelCheckpointContent', 'Get-WorktreeResolutionGitFileText' -Surface 'Codex'
 
-        $script:ChildA = 'docs/features/active/2026-09-25-child-a-901'
+        $script:ChildA = '.dev/active/2026-09-25-child-a-901'
         $script:NotReadySingleFeature = '{"issue-num":"1141","route_id":"large","lifecycle_ready":false}'
         $script:SingleFeatureReason = 'PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.'
         $script:FailBeforeCommand = "git commit -F /scratch/msg.txt -- $script:ChildA/evidence/other/x.md"
-        $script:ChildCPatch = "*** Begin Patch`n*** Add File: docs/features/completed/2026-09-25-child-c-903/x.json`n+{}`n*** End Patch"
+        $script:ChildCPatch = "*** Begin Patch`n*** Add File: .dev/completed/2026-09-25-child-c-903/x.json`n+{}`n*** End Patch"
 
         function Get-FollowUpFixtureText {
             # Return the five-feature epic checkpoint text; Kind 'blank-manifest' blanks epic_manifest_path.
@@ -40,12 +40,12 @@ Describe 'Codex preimplementation gate merged-feature follow-up allowance (issue
             $sha40 = 'ab12' * 10
             $sha64 = 'cd34' * 16
             $checkpoint = [ordered]@{
-                route_id = 'epic'; epic_feature_folder = 'sample-epic'; epic_manifest_path = 'docs/features/epics/sample-epic/epic.md'
+                route_id = 'epic'; epic_feature_folder = 'sample-epic'; epic_manifest_path = '.dev/epics/sample-epic/epic.md'
                 integration_branch = 'epic/sample-epic-integration'; epic_issue_num = 900
                 features = @(
                     [ordered]@{ feature_folder = '2026-09-25-child-a-901'; merge_status = 'merged'; merge_commit_sha = $sha40; pr_number = 901 }
                     [ordered]@{ feature_folder = '2026-09-25-child-b-902'; merge_status = 'pr_open'; merge_commit_sha = $sha40; pr_number = 902 }
-                    [ordered]@{ feature_folder = 'docs/features/completed/2026-09-25-child-c-903'; merge_status = 'worktree_removed'; merge_commit_sha = $sha64; pr_number = 903 }
+                    [ordered]@{ feature_folder = '.dev/completed/2026-09-25-child-c-903'; merge_status = 'worktree_removed'; merge_commit_sha = $sha64; pr_number = 903 }
                     [ordered]@{ feature_folder = '2026-09-25-child-d-904'; merge_status = 'merged'; pr_number = 904 }
                     [ordered]@{ feature_folder = '2026-09-25-child-e-905'; merge_status = 'merged'; merge_commit_sha = $sha40 }
                 )
@@ -118,11 +118,11 @@ Describe 'Codex preimplementation gate merged-feature follow-up allowance (issue
         BeforeEach { Set-FollowUpDefaultSeam }
 
         It 'allows <Case>' -ForEach @(
-            @{ Case = 'a file_path Write of a json under the completed root of child-a'; ToolInput = @{ file_path = 'docs/features/completed/2026-09-25-child-a-901/x.json' } }
+            @{ Case = 'a file_path Write of a json under the completed root of child-a'; ToolInput = @{ file_path = '.dev/completed/2026-09-25-child-a-901/x.json' } }
             @{ Case = 'an apply_patch adding a json under the completed root of child-c'; ToolInput = 'child-c-patch' }
-            @{ Case = 'git add of a child-a completed path'; ToolInput = @{ command = 'git add docs/features/completed/2026-09-25-child-a-901/a.md' } }
-            @{ Case = 'git commit --file with a child-c completed pathspec'; ToolInput = @{ command = 'git commit --file /scratch/msg.txt -- docs/features/completed/2026-09-25-child-c-903/c.md' } }
-            @{ Case = 'git commit --file with the epic status document as pathspec'; ToolInput = @{ command = 'git commit --file /scratch/msg.txt -- docs/features/epics/sample-epic/epic-status.md' } }
+            @{ Case = 'git add of a child-a completed path'; ToolInput = @{ command = 'git add .dev/completed/2026-09-25-child-a-901/a.md' } }
+            @{ Case = 'git commit --file with a child-c completed pathspec'; ToolInput = @{ command = 'git commit --file /scratch/msg.txt -- .dev/completed/2026-09-25-child-c-903/c.md' } }
+            @{ Case = 'git commit --file with the epic status document as pathspec'; ToolInput = @{ command = 'git commit --file /scratch/msg.txt -- .dev/epics/sample-epic/epic-status.md' } }
         ) {
             # Act
             $mapped = if ($ToolInput -eq 'child-c-patch') { @{ command = $script:ChildCPatch } } else { $ToolInput }
@@ -138,9 +138,9 @@ Describe 'Codex preimplementation gate merged-feature follow-up allowance (issue
         BeforeEach { Set-FollowUpDefaultSeam }
 
         It 'denies <Case> and names merge-in-progress' -ForEach @(
-            @{ Case = 'a follow-up for child-b whose merge_status is pr_open'; Command = 'git commit -F /scratch/msg.txt -- docs/features/active/2026-09-25-child-b-902/x.md'; Mixed = $false }
-            @{ Case = 'a follow-up for child-d with no merge_commit_sha'; Command = 'git commit -F /scratch/msg.txt -- docs/features/active/2026-09-25-child-d-904/x.md'; Mixed = $false }
-            @{ Case = 'a follow-up for child-e with no pr_number'; Command = 'git commit -F /scratch/msg.txt -- docs/features/active/2026-09-25-child-e-905/x.md'; Mixed = $false }
+            @{ Case = 'a follow-up for child-b whose merge_status is pr_open'; Command = 'git commit -F /scratch/msg.txt -- .dev/active/2026-09-25-child-b-902/x.md'; Mixed = $false }
+            @{ Case = 'a follow-up for child-d with no merge_commit_sha'; Command = 'git commit -F /scratch/msg.txt -- .dev/active/2026-09-25-child-d-904/x.md'; Mixed = $false }
+            @{ Case = 'a follow-up for child-e with no pr_number'; Command = 'git commit -F /scratch/msg.txt -- .dev/active/2026-09-25-child-e-905/x.md'; Mixed = $false }
             @{ Case = 'a Write of scripts/x.ps1'; Command = ''; Mixed = $false }
             @{ Case = 'git commit --amend'; Command = 'git commit --amend -m m'; Mixed = $false }
             @{ Case = 'a pathless commit with a mixed index'; Command = 'git commit -m m'; Mixed = $true }

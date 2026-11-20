@@ -38,6 +38,11 @@ import {
   parseIssueNumber,
 } from "./io";
 import { shouldUseMinorAuditMode, updateFeatureDocs } from "./docs";
+import {
+  type DevelopmentDocsRoot,
+  developmentDocsPath,
+  resolveDevelopmentDocsRoot,
+} from "../development-docs/root";
 
 /** The feature types accepted by {@link createActiveFolder}. */
 const VALID_FEATURE_TYPES = new Set(["feature", "refactor", "epic", "bug"]);
@@ -107,27 +112,26 @@ export function createActiveFolder(
     ((issueNumber: string): IssueMeta | null =>
       defaultIssueFetcher(issueNumber, new SubprocessRunner()));
   const codeLauncher = options.codeLauncher ?? defaultCodeLauncher;
+  const docsRoot = resolveFolderDocsRoot(filesystem, workspacePath);
+  const promotedArea = developmentDocsPath(docsRoot, "potential/promoted");
 
   let resolvedFeatureName = options.featureName;
   let featureNameSource = "manual";
   // When an active-file path is supplied, resolve the feature name from its
-  // stem after validating it is a .md file under docs/features/potential/promoted.
+  // stem after validating it is a .md file under the potential/promoted area.
   if (
     options.activeFileForFeatureName !== undefined &&
     options.activeFileForFeatureName !== null
   ) {
     const autoResolveError =
       "Select a promoted issue markdown file under " +
-      "docs/features/potential/promoted or supply --feature-name directly.";
+      `${promotedArea} or supply --feature-name directly.`;
     let activeFilePath = toPosixPath(options.activeFileForFeatureName);
     if (!isAbsolutePosix(activeFilePath)) {
       activeFilePath = joinPosix(workspacePath, activeFilePath);
     }
 
-    const promotedRoot = joinPosix(
-      workspacePath,
-      "docs/features/potential/promoted",
-    );
+    const promotedRoot = joinPosix(workspacePath, promotedArea);
     const isInPromoted = isRelativeTo(activeFilePath, promotedRoot);
 
     // Reject when the suffix is not .md, the path is outside promoted, or the
@@ -155,11 +159,14 @@ export function createActiveFolder(
   emit(`Feature name source: ${featureNameSource}`);
 
   // Resolve the template directory from the bundled template root when
-  // provided, otherwise fall back to the workspace docs/features/templates tree.
+  // provided, otherwise fall back to the workspace templates area.
   const templateDir =
     options.templateRoot !== undefined && options.templateRoot !== null
       ? joinPosix(options.templateRoot, featureType)
-      : joinPosix(workspacePath, `docs/features/templates/${featureType}`);
+      : joinPosix(
+          workspacePath,
+          `${developmentDocsPath(docsRoot, "templates")}/${featureType}`,
+        );
   if (!filesystem.exists(templateDir)) {
     throw new Error(`Template folder not found: ${templateDir}`);
   }
@@ -168,6 +175,7 @@ export function createActiveFolder(
     resolvedFeatureName,
     workspacePath,
     filesystem,
+    docsRoot,
   );
   const potentialContent = potentialFile
     ? filesystem.readText(potentialFile)
@@ -177,7 +185,7 @@ export function createActiveFolder(
   // any other source is moved.
   const retainsPotentialSource =
     potentialFile !== null &&
-    isPromotedPotentialSource(potentialFile, workspacePath);
+    isRelativeTo(potentialFile, joinPosix(workspacePath, promotedArea));
   const selectedWorkMode = normalizeRequestedWorkMode(workMode, featureType);
   const [useMinorAudit, fallbackReason] = shouldUseMinorAuditMode(
     selectedWorkMode,
@@ -196,20 +204,26 @@ export function createActiveFolder(
     normalizedIssueNumber = parseIssueNumber(potentialContent);
   }
 
-  // Epic scaffolding uses a single stable home under docs/features/epics/ keyed
+  // Epic scaffolding uses a single stable home under the epics area keyed
   // by the bare epic slug, not the date/issue-stamped active-folder basename;
   // this is the single-home layout. All other types keep active/<folder-slug>.
   let targetDir: string;
   if (featureType === "epic") {
     const epicSlug = buildFolderSlug(resolvedFeatureName, null, null);
-    targetDir = joinPosix(workspacePath, `docs/features/epics/${epicSlug}`);
+    targetDir = joinPosix(
+      workspacePath,
+      `${developmentDocsPath(docsRoot, "epics")}/${epicSlug}`,
+    );
   } else {
     const folderSlug = buildFolderSlug(
       resolvedFeatureName,
       potentialFile,
       normalizedIssueNumber,
     );
-    targetDir = joinPosix(workspacePath, `docs/features/active/${folderSlug}`);
+    targetDir = joinPosix(
+      workspacePath,
+      `${developmentDocsPath(docsRoot, "active")}/${folderSlug}`,
+    );
   }
 
   if (filesystem.exists(targetDir) && !force) {
@@ -444,26 +458,28 @@ function isRelativeTo(child: string, root: string): boolean {
 }
 
 /**
- * Return whether a resolved potential file is a promoted record.
+ * Resolve the development-docs root through the folder filesystem seam.
  *
- * A promoted record lives under `docs/features/potential/promoted` and is the
- * durable history of the promotion, so it is copied rather than moved. The
- * decision is taken from the RESOLVED source path, never from the requested
- * feature name. Containment is delegated to {@link isRelativeTo}, so a sibling
- * whose path is only a string prefix of the promoted root (for example
- * `docs/features/potential/promoted-notes.md`) is correctly excluded.
+ * The folder seam has no directory probe, so `exists` serves both probes
+ * (D-P10); a promoted record is copied rather than moved when the resolved
+ * source lies under the resolved `potential/promoted` area.
  *
- * @param potentialPath Resolved potential file path.
+ * @param filesystem Folder filesystem seam.
  * @param workspacePath Workspace root.
- * @returns True when the source lies under the promoted root.
+ * @returns The resolved development-docs root.
+ * @throws Error When the routing file is malformed or names an unknown root.
  */
-function isPromotedPotentialSource(
-  potentialPath: string,
+function resolveFolderDocsRoot(
+  filesystem: FolderFileSystem,
   workspacePath: string,
-): boolean {
-  return isRelativeTo(
-    potentialPath,
-    joinPosix(workspacePath, "docs/features/potential/promoted"),
+): DevelopmentDocsRoot {
+  return resolveDevelopmentDocsRoot(
+    {
+      exists: (path: string): boolean => filesystem.exists(path),
+      isDirectory: (path: string): boolean => filesystem.exists(path),
+      readTextFile: (path: string): string => filesystem.readText(path),
+    },
+    workspacePath,
   );
 }
 

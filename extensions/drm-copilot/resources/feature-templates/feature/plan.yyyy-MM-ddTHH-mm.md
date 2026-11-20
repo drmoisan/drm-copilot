@@ -9,8 +9,8 @@
 
 ## Required References
 
-- General Coding Standards: [`.github/instructions/general-code-change.instructions.md`](../../../../.github/instructions/general-code-change.instructions.md)
-- General Unit Test Policy: [`.github/instructions/general-unit-test.instructions.md`](../../../../.github/instructions/general-unit-test.instructions.md)
+- General Coding Standards: [`.github/instructions/general-code-change.instructions.md`](../../../.github/instructions/general-code-change.instructions.md)
+- General Unit Test Policy: [`.github/instructions/general-unit-test.instructions.md`](../../../.github/instructions/general-unit-test.instructions.md)
 - (Add language-specific policies as needed, e.g. `python-code-change.instructions.md`)
 
 **All work must comply with these policies; do not duplicate their content here.**

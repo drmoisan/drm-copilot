@@ -106,6 +106,8 @@ try { . (Join-Path $PSScriptRoot 'hook-docs-only-diff.ps1') } catch { Add-HookDe
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-green-ci.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-green-ci.ps1' -ErrorRecord $_ }
 # Review guard under review_mode concurrent, byte-identical to the Codex copy (issue #1097).
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-review.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-review.ps1' -ErrorRecord $_ }
+# Development-docs root module (issue #1035), a call-time dependency of the review guard.
+try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-child-ci.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-child-ci.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-regeneration.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-regeneration.ps1' -ErrorRecord $_ }
 

@@ -1,0 +1,54 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " docs-reconciler"
+      },
+      {
+        "key": "description",
+        "value": " Record coverage dispositions, evidence pins and parity dimensions through update_docs_ledger; writes no file directly."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - \"mcp__drm-copilot__run_docs_coverage\"\n  - \"mcp__drm-copilot__update_docs_ledger\"\n  - \"mcp__drm-copilot__validate_docs_artifacts\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - docs-reconcile-behavior"
+      }
+    ],
+    "path": ".claude/agents/docs-reconciler.md",
+    "sections": [
+      "head",
+      "prepared-inputs",
+      "skills",
+      "mcp-tool-inputs",
+      "write-scope",
+      "report"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"docs-reconciler\""
+      },
+      {
+        "key": "description",
+        "value": "\"Record coverage dispositions, evidence pins and parity dimensions through update_docs_ledger; writes no file directly.\""
+      }
+    ],
+    "path": ".codex/agents/docs-reconciler.toml",
+    "sections": [
+      "head-2",
+      "prepared-inputs",
+      "skills",
+      "mcp-tool-inputs",
+      "write-scope",
+      "report"
+    ]
+  }
+}

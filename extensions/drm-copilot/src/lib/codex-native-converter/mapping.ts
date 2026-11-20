@@ -132,12 +132,22 @@ function plannedHelperPath(sourcePath: string): string {
 }
 
 /**
+ * Report note appended to every standing-guidance record. The converter never
+ * emits `AGENTS.md`: it is the hand-authored source of repository standing
+ * guidance (issue #1028, decision H3). Mirrors `STANDING_GUIDANCE_NOT_EMITTED_NOTE`
+ * in `mapping.py`.
+ */
+export const STANDING_GUIDANCE_NOT_EMITTED_NOTE =
+  "Not emitted: AGENTS.md is a hand-authored source maintained outside the converter.";
+
+/**
  * Resolve the approved Codex-native target path for one mapping record.
  *
  * Mirrors `plan_target_paths`, preserving every target-role branch, the
- * `enable_repo_prompts` `.codex/prompts` branch, the `AGENTS.md` standing
- * target, the unsupported-launcher fallthrough, and the null target for
- * unmapped roles.
+ * `enable_repo_prompts` `.codex/prompts` branch, the unsupported-launcher
+ * fallthrough, and the null target for unmapped roles. A standing-guidance
+ * record keeps its role and conversion class, gets a null target, and gains
+ * {@link STANDING_GUIDANCE_NOT_EMITTED_NOTE} after its existing notes.
  *
  * @param mappingRecord Classified mapping record whose target path is unresolved.
  * @param options Run options (`enableRepoPrompts`).
@@ -150,7 +160,11 @@ export function planTargetPaths(
   const { enableRepoPrompts } = options;
 
   if (mappingRecord.targetRole === TargetRole.STANDING_GUIDANCE) {
-    return { ...mappingRecord, targetPath: "AGENTS.md" };
+    return {
+      ...mappingRecord,
+      targetPath: null,
+      notes: [...mappingRecord.notes, STANDING_GUIDANCE_NOT_EMITTED_NOTE],
+    };
   }
 
   if (mappingRecord.targetRole === TargetRole.SHARED_SKILL) {

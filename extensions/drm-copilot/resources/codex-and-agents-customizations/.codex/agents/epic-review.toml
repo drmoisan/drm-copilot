@@ -29,6 +29,7 @@ tools:
   - Grep
   - Glob
   - "Write(/docs/features/**)"
+  - "Write(/.dev/**)"
 skills:
   - acceptance-criteria-tracking
 memory: project
@@ -40,7 +41,7 @@ Review epic-level scope and write the resulting epic-audit artifact.
 
 ## Expected Outputs
 
-- `docs/features/epics/<epic>/epic-audit.<timestamp>.md`
+- `.dev/epics/<epic>/epic-audit.<timestamp>.md`
 
 ## Evidence Location Invariant
 

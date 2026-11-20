@@ -176,6 +176,22 @@ Describe 'Test-MultipleFeatureFolderSpan after relocation (issue #489 behavior p
             # Assert
             $spans | Should -BeFalse
         }
+
+        It 'reports the .dev cross-corpus glob <Token> as <Expected> (issue #1035)' -ForEach @(
+            @{ Token = '.dev/**/plan*.md'; Expected = $true }
+            @{ Token = '.dev/active/*/plan.md'; Expected = $true }
+            @{ Token = '.dev/**'; Expected = $true }
+            @{ Token = '.dev/active/2026-11-17-one-feature-1035/**'; Expected = $false }
+        ) {
+            # Arrange: the .dev root is a documentation corpus root like docs/features.
+            $token = $Token
+
+            # Act
+            $spans = Test-MultipleFeatureFolderSpan -Token $token
+
+            # Assert
+            $spans | Should -Be $Expected -Because "$token spans every .dev feature folder only when its wildcard reaches the folder segment"
+        }
     }
 
     Context 'Module export surface after relocation' {

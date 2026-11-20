@@ -10,7 +10,7 @@
     and no disk read beyond dot-sourcing the file under test.
 
     The rule inventory asserted here is the one named by spec D2 Piece 1 and Piece 2 in
-    docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md:
+    .dev/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md:
     every segment delimiter, quoted-span masking, the tokenizer property that acceptance
     case AT-10 depends on, all seven heredoc rules, the CommandWord determination, the
     IsWrapperLed / HasLiveSubstitution / Unbalanced flags, the three ordered ScanText

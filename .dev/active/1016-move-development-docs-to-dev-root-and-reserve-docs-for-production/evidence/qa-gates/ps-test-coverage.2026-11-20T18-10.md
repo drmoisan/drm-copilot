@@ -1,0 +1,6 @@
+# Final QC Test: Pester with coverage ([P5-T4], stage B)
+
+Timestamp: 2026-11-20T18-10
+Command: sh SCRATCH/issue-1016-g-pester.sh SCRATCH/p5e (launcher: sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester, one Invoke-PoshQCParallelTest from scripts/powershell/PoshQC/PoshQC.psd1; merged artifacts/pester/pester-junit.xml and artifacts/pester/powershell-coverage.xml copied to SCRATCH/p5e.junit.xml and SCRATCH/p5e.coverage.xml), pass 5 of the final QA loop
+EXIT_CODE: 0
+Output Summary: Invoke-PoshQCParallelTest workers=8, wall-clock 711.13 s, ExitCode 0. JUnit: tests 29157, failures 0, errors 0, disabled 22. Line coverage (JaCoCo line records with ci > 0): 47286 of 48827 lines (96.84%). The run includes tests/scripts/ci/FileSizePolicy.RepoGate.Tests.ps1 and tests/scripts/harness-generation/HarnessGeneration.RepoGate.Tests.ps1 and the CONTRACT_TESTS Pester suites (the five ProcessReduction suites, planning-contract-wording, parallel-gate-wording, less-evidence-contract, review-verdict skill contract, hook-docs-estate-context parity, hook-docs-only-diff init-workflow parity, CI_SCOPE_SUITES and the epic-state isolation discovery guard), all passing. Per-file line coverage of the changed PowerShell production files is in coverage-delta.2026-11-20T18-10.md.

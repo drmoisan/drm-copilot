@@ -1,12 +1,17 @@
 import * as vscode from "vscode";
 
-import { executeBundledScript, getWorkspaceRoot } from "./command-runtime";
+import { getWorkspaceRoot } from "./command-runtime";
 import {
   promptForChoice,
   resolveWorkflowInvocation,
 } from "./extension-command-helpers";
-import { EXCLUSION_CONFLICT_LINE_PREFIX } from "./lib/push-down/claude-exclusion-filter";
 import { translateSelectedPackNames } from "./lib/push-down/claude-pack-name-translation";
+import {
+  COPILOT_PUSH_DOWN_PACK_ITEMS,
+  countExclusionConflictLines,
+  countPushDownConflictLines,
+  formatPushDownConflictMessage,
+} from "./push-down-command-support";
 import { listRepoAutomationTools } from "./mcp-tools";
 import {
   discoverPrBaseBranches,
@@ -88,6 +93,23 @@ function registerCollectPrContextCommand(
   );
 }
 
+/**
+ * Show one warning when a push-down result carries push-down conflict lines
+ * (issue #1029); the exclusion-conflict message is separate and unchanged.
+ *
+ * @param result Push-down result, possibly without warnings.
+ */
+async function warnOnPushDownConflicts(
+  result: RepoAutomationExecutionResult | undefined,
+): Promise<void> {
+  const count = countPushDownConflictLines(result?.warnings);
+  if (count > 0) {
+    await vscode.window.showWarningMessage(
+      formatPushDownConflictMessage(count),
+    );
+  }
+}
+
 function registerPushDownCopilotCustomizationsCommand(
   options: RepoAutomationCommandRegistrationOptions,
 ): vscode.Disposable {
@@ -95,10 +117,26 @@ function registerPushDownCopilotCustomizationsCommand(
     "drmCopilotExtension.pushDownCopilotCustomizations",
     async () => {
       const commandId = "drmCopilotExtension.pushDownCopilotCustomizations";
-      await options.service.pushDownCopilotCustomizations({
+      // Pre-picked multi-select of the Copilot packs; cancellation aborts.
+      const packSelection = await vscode.window.showQuickPick(
+        COPILOT_PUSH_DOWN_PACK_ITEMS.map((item) => ({ ...item, picked: true })),
+        {
+          title: "drm-copilot: Push Down Copilot Customizations",
+          placeHolder:
+            "Select the language packs to publish (core is always included).",
+          canPickMany: true,
+          ignoreFocusOut: true,
+        },
+      );
+      if (packSelection === undefined) {
+        return;
+      }
+      const result = await options.service.pushDownCopilotCustomizations({
         workspaceRoot: getWorkspaceRoot(),
         invocationId: commandId,
+        packs: packSelection.map((item) => item.pack),
       });
+      await warnOnPushDownConflicts(result);
     },
   );
 }
@@ -155,13 +193,16 @@ function registerPushDownCodexAndAgentsCustomizationsCommand(
         }
         csharpVariant = variantChoice;
       }
-      await options.service.pushDownCodexAndAgentsCustomizations({
-        workspaceRoot: getWorkspaceRoot(),
-        invocationId: commandId,
-        packs,
-        ...(csharpVariant === undefined ? {} : { csharpVariant }),
-        memoryMode: "overwrite",
-      });
+      const result = await options.service.pushDownCodexAndAgentsCustomizations(
+        {
+          workspaceRoot: getWorkspaceRoot(),
+          invocationId: commandId,
+          packs,
+          ...(csharpVariant === undefined ? {} : { csharpVariant }),
+          memoryMode: "overwrite",
+        },
+      );
+      await warnOnPushDownConflicts(result);
     },
   );
 }
@@ -264,14 +305,13 @@ function registerPushDownClaudeCustomizationsCommand(
 
       // Step 5: a destination file left in place by the exclusion manifest is
       // a conflict the user should see; skips and unmatched entries are not.
-      const conflictCount = (result.warnings ?? []).filter((line) =>
-        line.startsWith(EXCLUSION_CONFLICT_LINE_PREFIX),
-      ).length;
+      const conflictCount = countExclusionConflictLines(result.warnings);
       if (conflictCount > 0) {
         await vscode.window.showWarningMessage(
           `Push-down exclusion conflicts: ${String(conflictCount)}. See the drm-copilot output channel for the affected paths.`,
         );
       }
+      await warnOnPushDownConflicts(result);
     },
   );
 }
@@ -350,26 +390,6 @@ function registerRunCodexNativeConverterCommand(
   );
 }
 
-function registerSyncAgentsFromInstructionsCommand(
-  options: RepoAutomationCommandRegistrationOptions,
-): vscode.Disposable {
-  return vscode.commands.registerCommand(
-    "drmCopilotExtension.syncAgentsFromInstructions",
-    async () => {
-      const commandId = "drmCopilotExtension.syncAgentsFromInstructions";
-      const workspaceRoot = getWorkspaceRoot();
-
-      await executeBundledScript(options.context, options.output, {
-        runtimeKind: "powershell",
-        bundledRelativePath:
-          "resources/templates/sync-agents-from-instructions.ps1",
-        commandId,
-        args: ["-RepoRoot", workspaceRoot],
-      });
-    },
-  );
-}
-
 function registerListMcpToolsCommand(
   options: RepoAutomationCommandRegistrationOptions,
 ): vscode.Disposable {
@@ -414,7 +434,6 @@ export function registerRepoAutomationAdminCommands(
     registerPushDownCodexAndAgentsCustomizationsCommand(options),
     registerPushDownClaudeCustomizationsCommand(options),
     registerRunCodexNativeConverterCommand(options),
-    registerSyncAgentsFromInstructionsCommand(options),
     registerListMcpToolsCommand(options),
   ];
 }

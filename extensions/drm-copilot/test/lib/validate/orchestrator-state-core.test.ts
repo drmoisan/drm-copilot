@@ -13,12 +13,12 @@ function buildValidState(): Record<string, unknown> {
     path_selected: "large",
     "promotion-type": "feature",
     "short-name": "short",
-    relativeFile: "docs/features/potential/x.md",
+    relativeFile: ".dev/potential/x.md",
     "long-name": "feature-1",
     "issue-num": "1",
-    "feature-folder": "docs/features/active/feature-1",
+    "feature-folder": ".dev/active/feature-1",
     "work-mode": "full-feature",
-    "plan-path": "docs/features/active/feature-1/plan.md",
+    "plan-path": ".dev/active/feature-1/plan.md",
     completed_steps: [],
     next_step: "done",
     last_updated: "2026-04-07T10:00:00-04:00",
@@ -37,7 +37,7 @@ function buildValidState(): Record<string, unknown> {
         started_at: "2026-04-07T09:00:00-04:00",
         completed_at: "2026-04-07T09:05:00-04:00",
         result_signal: "PREFLIGHT: ALL CLEAR",
-        artifact_paths: ["docs/features/active/feature-1/plan.md"],
+        artifact_paths: [".dev/active/feature-1/plan.md"],
       },
     ],
     blocked_reason: "none",
@@ -277,9 +277,9 @@ describe("validateOrchestratorStateText delegation receipts", () => {
     const state = buildValidState();
     state["delegation_receipts"] = {
       promotion: {
-        potential_entry: { path: "docs/features/potential/demo.md" },
+        potential_entry: { path: ".dev/potential/demo.md" },
         issue: "https://github.com/x/issues/168",
-        feature_folder: { path: "docs/features/active/feature-1" },
+        feature_folder: { path: ".dev/active/feature-1" },
       },
     };
 

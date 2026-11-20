@@ -7,7 +7,7 @@
 
 .DESCRIPTION
     Fixtures are in-memory strings, and no test creates a file. The committed-ledger tests
-    read docs/engineering/process-reductions/ read-only. The read-seam test mocks the
+    read .dev/engineering/process-reductions/ read-only. The read-seam test mocks the
     filesystem cmdlets inside InModuleScope, so the mocks hold under a PoshQC-hosted run.
 #>
 
@@ -105,7 +105,7 @@ Describe 'Test-ProcessReductionIndex' {
 
 Describe 'Read-ProcessReductionLedger' {
     It 'PRL-READ-THROWS-ON-MISSING-FOLDER throws for a folder that does not exist' {
-        $missing = Join-Path $script:RepoRoot 'docs/engineering/process-reductions/no-such-folder'
+        $missing = Join-Path $script:RepoRoot '.dev/engineering/process-reductions/no-such-folder'
 
         { Read-ProcessReductionLedger -LedgerPath $missing } | Should -Throw '*does not exist*'
     }
@@ -139,7 +139,7 @@ Describe 'Read-ProcessReductionLedger' {
 
 Describe 'Committed ledger' {
     BeforeAll {
-        $script:LedgerPath = Join-Path $script:RepoRoot 'docs/engineering/process-reductions'
+        $script:LedgerPath = Join-Path $script:RepoRoot '.dev/engineering/process-reductions'
     }
 
     It 'PRL-REAL-LEDGER-AGREES finds the committed README and entries in agreement' {

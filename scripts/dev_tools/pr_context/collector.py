@@ -120,6 +120,24 @@ _render_verification_evidence_section = render_verification_evidence_section
 # helper functions moved to summary_helpers and collector_documents
 
 
+def is_docs_bucket_path(path: str) -> bool:
+    """Return whether a changed path belongs to the documentation bucket.
+
+    Args:
+        path: Repository-relative changed path.
+
+    Returns:
+        True for paths under ``docs/`` or the ``.dev/`` development-docs
+        root, under ``.github``, or naming an ``AGENTS`` file.
+    """
+    return (
+        path.startswith("docs/")
+        or path.startswith(".dev/")
+        or path.startswith(".github")
+        or "AGENTS" in path
+    )
+
+
 def write_output(text: str, out_path: Path, append: bool) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     mode = "a" if append else "w"
@@ -313,7 +331,7 @@ def collect_and_write(
             bucket_renames.append((path, stats))
         elif path.endswith(".py") or path.endswith(".ps1"):
             bucket_core.append((path, stats))
-        elif path.startswith("docs/") or path.startswith(".github") or "AGENTS" in path:
+        elif is_docs_bucket_path(path):
             bucket_docs.append((path, stats))
 
     scoping_summary_lines: list[str] = []

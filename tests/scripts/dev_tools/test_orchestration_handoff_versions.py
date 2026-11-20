@@ -75,7 +75,7 @@ def _envelope() -> HandoffEnvelope:
         ObjectiveIdentity(
             "github:drmoisan/drm-copilot#614",
             614,
-            "docs/features/active/portable-handoff-614",
+            ".dev/active/portable-handoff-614",
             "full-feature",
         ),
         WorkspaceBinding(
@@ -89,7 +89,7 @@ def _envelope() -> HandoffEnvelope:
         "codex",
         "artifacts/orchestration/orchestrator-state.json",
         PlanIdentity(
-            "docs/features/active/portable-handoff-614/plan.md",
+            ".dev/active/portable-handoff-614/plan.md",
             ZERO_SHA256,
             "atomic-plan-v1",
         ),

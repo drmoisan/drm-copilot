@@ -13,7 +13,7 @@ function buildValidEpicState(): Record<string, unknown> {
     objective: "deliver epic-orchestrate-275",
     route_id: "epic",
     epic_feature_folder: "epic-orchestrate-275",
-    epic_manifest_path: "docs/features/epics/epic-orchestrate-275/epic-plan.md",
+    epic_manifest_path: ".dev/epics/epic-orchestrate-275/epic-plan.md",
     integration_branch: "epic/epic-orchestrate-275-integration",
     max_parallel_features: 4,
     completed_steps: ["epic_manifest_parsed"],
@@ -366,7 +366,7 @@ describe("validateEpicOrchestratorStateText issue_num-keyed DAG", () => {
     const state = buildValidEpicState();
     const features = state["features"] as Record<string, unknown>[];
     featureAt(features, 1)["depends_on"] = [
-      "docs/features/completed/2026-07-02-child-a-300",
+      ".dev/completed/2026-07-02-child-a-300",
     ];
     // Act
     const errors = validateEpicOrchestratorStateText(JSON.stringify(state));

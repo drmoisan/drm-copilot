@@ -10,19 +10,15 @@ BeforeDiscovery {
     $script:ContractCopy = @(
         @{ Copy = 'CLAUDE'; Path = '.claude/skills/atomic-plan-contract/SKILL.md' }
         @{ Copy = 'AGENTS'; Path = '.agents/skills/atomic-plan-contract/SKILL.md' }
-        @{ Copy = 'GITHUB'; Path = '.github/skills/atomic-plan-contract/SKILL.md' }
         @{ Copy = 'CLAUDE-BUNDLE'; Path = "$resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md" }
         @{ Copy = 'AGENTS-BUNDLE'; Path = "$resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md" }
-        @{ Copy = 'GITHUB-BUNDLE'; Path = "$resources/customizations/.github/skills/atomic-plan-contract/SKILL.md" }
     )
 
     $briefCopy = @(
         @{ Copy = 'CLAUDE'; Path = '.claude/skills/execution-environment/SKILL.md' }
         @{ Copy = 'AGENTS'; Path = '.agents/skills/execution-environment/SKILL.md' }
-        @{ Copy = 'GITHUB'; Path = '.github/skills/execution-environment/SKILL.md' }
         @{ Copy = 'CLAUDE-BUNDLE'; Path = "$resources/claude-customizations/.claude/skills/execution-environment/SKILL.md" }
         @{ Copy = 'AGENTS-BUNDLE'; Path = "$resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md" }
-        @{ Copy = 'GITHUB-BUNDLE'; Path = "$resources/customizations/.github/skills/execution-environment/SKILL.md" }
     )
     # Deferred brief facts of stages C and D; each is read from its own section only.
     $briefCheck = @(
@@ -44,7 +40,6 @@ BeforeDiscovery {
     $script:ModeSurface = @(
         @{ Id = 'HANDOFF-CLAUDE'; Path = '.claude/skills/remediation-handoff-atomic-planner/SKILL.md' }
         @{ Id = 'HANDOFF-AGENTS'; Path = '.agents/skills/remediation-handoff-atomic-planner/SKILL.md' }
-        @{ Id = 'HANDOFF-GITHUB'; Path = '.github/skills/remediation-handoff-atomic-planner/SKILL.md' }
         @{ Id = 'COPILOT-ORCH'; Path = '.github/agents/orchestrator.agent.md' }
     )
     $script:BriefRow = @(foreach ($check in $briefCheck) {
@@ -102,8 +97,8 @@ BeforeDiscovery {
         @{ Id = 'COPILOT-PY-PLANNING'; Path = '.github/agents/python-atomic-planning.agent.md'; Forbidden = $surfaceForbidden }
         @{ Id = 'HARD-LOCK-PROMPT'; Path = '.github/prompts/execute-hard-lock.prompt.md'; Forbidden = $surfaceForbidden }
         @{ Id = 'HARD-LOCK-CODEX'; Path = '.github/codex/execute-hard-lock.prompt.md'; Forbidden = $surfaceForbidden }
-        @{ Id = 'PLAN-TEMPLATE'; Path = 'docs/features/templates/feature/plan.yyyy-MM-ddTHH-mm.md'; Forbidden = $surfaceForbidden }
-        @{ Id = 'ARCHITECTURE-DOC'; Path = 'docs/engineering/claude-code-architecture.md'; Forbidden = $surfaceForbidden + @('Phase 0 policy reads') }
+        @{ Id = 'PLAN-TEMPLATE'; Path = '.dev/templates/feature/plan.yyyy-MM-ddTHH-mm.md'; Forbidden = $surfaceForbidden }
+        @{ Id = 'ARCHITECTURE-DOC'; Path = '.dev/engineering/claude-code-architecture.md'; Forbidden = $surfaceForbidden + @('Phase 0 policy reads') }
         @{ Id = 'REVIEW-PROMPT'; Path = '.github/prompts/review-feature.prompt.md'; Forbidden = $surfaceForbidden }
     )
 }
@@ -174,7 +169,7 @@ Describe 'Planning contract wording' {
     It 'PCW-STANDING-RULE-<Copy> states the process-reduction ledger rule' -ForEach $script:ContractCopy {
         # Arrange
         $required = @(
-            '`docs/engineering/process-reductions/` exists',
+            '`.dev/engineering/process-reductions/` exists',
             'adds its ledger entry in the same commit',
             'One-off waivers for a single item are not entries.'
         )

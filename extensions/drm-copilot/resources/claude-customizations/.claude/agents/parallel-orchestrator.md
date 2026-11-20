@@ -9,7 +9,9 @@ tools:
   - Grep
   - Glob
   - "Write(docs/features/parallel/**)"
+  - "Write(.dev/parallel/**)"
   - "Edit(docs/features/parallel/**)"
+  - "Edit(.dev/parallel/**)"
   - "Write(artifacts/orchestration/**)"
   - "Edit(artifacts/orchestration/**)"
   - "Bash(git *)"
@@ -88,7 +90,7 @@ grants one entry per command-line entry point —
 `"Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"` — the last of which covers it:
 
 ```bash
-bash .claude/lib/bash/validate-parallel-manifest.sh docs/features/parallel/<slug>/parallel.md
+bash .claude/lib/bash/validate-parallel-manifest.sh .dev/parallel/<slug>/parallel.md
 ```
 
 Exit 0 accepts the manifest, exit 1 rejects it with one error per line on stdout, and exit 2 means
@@ -134,7 +136,7 @@ On every invocation:
    truth; where it disagrees with those three commands, the commands win and the checkpoint is
    rewritten from them. Never resume from in-memory notifications.
 5. If no checkpoint exists or the requested run is new, begin at manifest parsing from
-   `docs/features/parallel/<slug>/parallel.md`.
+   `.dev/parallel/<slug>/parallel.md`.
 
 ## Invocation Origin
 
@@ -156,9 +158,9 @@ instruction on your own behavior rather than as a guarantee supplied by the runt
 ## Prepared-Run Execution
 
 A parallel run reaches you already prepared by `parallel-planner`. That handoff supplies the run
-manifest at `docs/features/parallel/<slug>/parallel.md`, the generation-0 cohort table, one pushed
+manifest at `.dev/parallel/<slug>/parallel.md`, the generation-0 cohort table, one pushed
 per-item feature branch carrying that item's prepared feature folder and approved atomic plan, and
-the committed kickoff artifact at `docs/features/parallel/<slug>/parallel-kickoff.md`.
+the committed kickoff artifact at `.dev/parallel/<slug>/parallel-kickoff.md`.
 
 Read that committed kickoff artifact directly from the repository path. Discovery is a single local
 path lookup: there is no integration ref to fetch and no ref-reading fallback to attempt, because
@@ -298,7 +300,7 @@ from it.
 
 ## Documentation Maintenance
 
-Maintain `docs/features/parallel/<slug>/parallel-status.md` as a human-readable projection of the
+Maintain `.dev/parallel/<slug>/parallel-status.md` as a human-readable projection of the
 parallel checkpoint. It is generated and never hand-authored: you regenerate it in full from
 `artifacts/orchestration/parallel-orchestrator-state.json` at each of the boundaries defined in the
 `parallel-orchestrate` skill's `## Documentation Maintenance Boundaries` section, and you never
@@ -306,7 +308,7 @@ edit it by hand or treat it as an input.
 
 It is also never the source of the schedule. The manifest and the checkpoint are authoritative;
 `parallel-status.md` is never the source of the cohort table. The run manifest
-`docs/features/parallel/<slug>/parallel.md` is treated as static input authored by
+`.dev/parallel/<slug>/parallel.md` is treated as static input authored by
 `parallel-planner` and is not rewritten by you.
 
 ## Completion Requirements
@@ -321,7 +323,7 @@ In `closed` mode, do not report completion until:
    A `merged` value is recorded only after the merge is confirmed by polling and ancestry check
    (step 3 of the `parallel-orchestrate` skill's `## Per-Item Merge to Main (Merge-on-Green)`),
    because under a merge queue `gh pr merge` exits 0 before the merge happens.
-2. `docs/features/parallel/<slug>/parallel-status.md` has been regenerated a final time and
+2. `.dev/parallel/<slug>/parallel-status.md` has been regenerated a final time and
    reflects the completed state.
 3. The parallel checkpoint passes validation with `require_complete` (the F3 completion gate for
    `artifact_type: "parallel-orchestrator-state"`).
@@ -360,12 +362,12 @@ substeps, in order:
    `git worktree remove <path>` with no force flag. On success set `merge_status: worktree_removed`
    and `worktree_removed_at`; on refusal leave `merged`, append a `completed_steps` deferral naming
    the path and refusal reason, and continue.
-2. **Final status.** Regenerate `docs/features/parallel/<slug>/parallel-status.md`.
+2. **Final status.** Regenerate `.dev/parallel/<slug>/parallel-status.md`.
 3. **Run documents.** Stage the run folder and the promoted lifecycle files created for the run by
-   literal path, with every `git add` and `git commit` pathspec beginning `docs/features/`. The
+   literal path, with every `git add` and `git commit` pathspec beginning `.dev/`. The
    `artifacts/` tree is gitignored, so Run Closing never stages it. Never use `git add -A` or
    `git add .`, and never stage a
-   `docs/features/active/<item>/` folder. Require that `git diff --name-only origin/main...HEAD`
+   `.dev/active/<item>/` folder. Require that `git diff --name-only origin/main...HEAD`
    lists only `docs/` paths, otherwise stop and report without forcing or splitting the branch.
    Push. Before the delegation, record one `complexity_assessments[]` entry and one pr-author
    `model_routing_receipts[]` entry (`model` from `Resolve-DelegationModel -Agent pr-author`) in the

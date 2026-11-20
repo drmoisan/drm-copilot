@@ -138,6 +138,20 @@ Describe 'OrchestratorStateEpicWaveBarrier port' {
         @($result).Count | Should -Be 0
     }
 
+    It 'U7b strips a .dev lifecycle prefix, so a .dev/active hint resolves to the dependency' {
+        # Arrange: the dependent names its unmerged dependency through the .dev active area.
+        $text = ConvertTo-PortCheckpointText -Feature @(
+            (ConvertTo-PortDependencyText -Property '"merge_status": "pr_open"'),
+            (ConvertTo-PortDependentText -DependsOn '[".dev/active/2026-10-08-alpha-901"]'))
+
+        # Act
+        $result = Get-OrchestratorStateEpicWaveBarrierError -CheckpointText $text
+
+        # Assert: the hint resolves, so the started dependent violates the barrier; the
+        # message names the dependency reference as written.
+        (@($result) -join "`n") | Should -BeExactly 'EPIC_WAVE_BARRIER_VIOLATION: 2026-10-08-bravo-902 is treated as started while dependency .dev/active/2026-10-08-alpha-901 is not merged'
+    }
+
     It 'U8 resolves a false reference to issue_num 0 and renders it as False' {
         # Arrange
         $text = ConvertTo-PortCheckpointText -Feature @(

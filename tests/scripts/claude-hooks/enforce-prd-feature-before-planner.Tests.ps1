@@ -30,7 +30,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         It 'allows when subagent_type is not atomic-planner' {
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'something-else'; prompt = 'docs/features/active/foo' }
+                    tool_input = @{ subagent_type = 'something-else'; prompt = '.dev/active/foo' }
                 } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -69,7 +69,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'See docs/features/active/2026-05-10-foo-1 for details.' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'See .dev/active/2026-05-10-foo-1 for details.' }
                 } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -82,7 +82,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-05-10-foo-1/' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/2026-05-10-foo-1/' }
                 } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -98,7 +98,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-05-10-foo-1' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/2026-05-10-foo-1' }
                 } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -125,11 +125,11 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             Mock -CommandName Get-PrdFeatureIssueContent -MockWith { "- Work Mode: full-feature`n## Overview" }
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith {
                 $Path -in @(
-                    'docs/features/active/2026-05-10-bar-2/spec.md',
-                    'docs/features/active/2026-05-10-bar-2/user-story.md'
+                    '.dev/active/2026-05-10-bar-2/spec.md',
+                    '.dev/active/2026-05-10-bar-2/user-story.md'
                 )
             }
-            Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { 'docs/features/active/2026-05-10-bar-2' }
+            Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { '.dev/active/2026-05-10-bar-2' }
             $json = (@{
                     tool_name  = 'Agent'
                     tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'continue planning' }
@@ -145,10 +145,10 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
                 $script:capturedPaths += $Path
                 return $true
             }
-            Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { 'docs/features/active/checkpoint-folder' }
+            Mock -CommandName Get-PrdFeatureCheckpointFolder -MockWith { '.dev/active/checkpoint-folder' }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'work in docs/features/active/prompt-folder now' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'work in .dev/active/prompt-folder now' }
                 } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
             ($script:capturedPaths -join '|') | Should -Match 'prompt-folder'
@@ -165,7 +165,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'See docs/features/active/2026-05-10-foo-1/spec.md for the spec.' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'See .dev/active/2026-05-10-foo-1/spec.md for the spec.' }
                 } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
             # Parent directory should be checked, not the .md path itself
@@ -197,7 +197,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         It 'emits a block decision JSON when prerequisites are missing (AC-7)' {
             $payload = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/__nonexistent_feature_for_test__' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/__nonexistent_feature_for_test__' }
                 } | ConvertTo-Json -Compress -Depth 5)
 
             $output = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $payload |
@@ -220,14 +220,14 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         It 'returns $null for empty prompt' {
             Find-PrdFeatureFolderFromPrompt -Prompt '' | Should -BeNullOrEmpty
         }
-        It 'returns $null when no docs/features/active path is present' {
+        It 'returns $null when no .dev/active path is present' {
             Find-PrdFeatureFolderFromPrompt -Prompt 'just text here' | Should -BeNullOrEmpty
         }
         It 'returns the folder when one is present' {
-            Find-PrdFeatureFolderFromPrompt -Prompt 'in docs/features/active/abc-1 we have' | Should -Be 'docs/features/active/abc-1'
+            Find-PrdFeatureFolderFromPrompt -Prompt 'in .dev/active/abc-1 we have' | Should -Be '.dev/active/abc-1'
         }
         It 'strips .md suffix to a folder parent' {
-            Find-PrdFeatureFolderFromPrompt -Prompt 'see docs/features/active/abc-1/spec.md' | Should -Be 'docs/features/active/abc-1'
+            Find-PrdFeatureFolderFromPrompt -Prompt 'see .dev/active/abc-1/spec.md' | Should -Be '.dev/active/abc-1'
         }
     }
 
@@ -303,7 +303,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
         It 'returns $null when issue.md exists but Get-Content throws (unreadable)' {
             Mock -CommandName Test-Path -MockWith { $true }
             Mock -CommandName Get-Content -MockWith { throw 'simulated io error' }
-            Get-PrdFeatureIssueContent -FeatureFolder 'docs/features/active/unreadable-case' | Should -BeNullOrEmpty
+            Get-PrdFeatureIssueContent -FeatureFolder '.dev/active/unreadable-case' | Should -BeNullOrEmpty
         }
     }
 
@@ -313,7 +313,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $true }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-full-feature-1' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/2026-08-22-full-feature-1' }
                 } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -326,7 +326,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-full-feature-2' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/2026-08-22-full-feature-2' }
                 } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -342,7 +342,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-full-bug-1' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/2026-08-22-full-bug-1' }
                 } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -352,7 +352,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-full-bug-2' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/2026-08-22-full-bug-2' }
                 } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -365,7 +365,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-minor-audit-1' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/2026-08-22-minor-audit-1' }
                 } | ConvertTo-Json -Compress -Depth 5)
             (Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json).hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -378,7 +378,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-legacy-full-1' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/2026-08-22-legacy-full-1' }
                 } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -400,7 +400,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-marker-absent' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/2026-08-22-marker-absent' }
                 } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -410,7 +410,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             # prerequisite document, because no prerequisite set is knowable when
             # the mode is unknown.
             $decision.hookSpecificOutput.permissionDecisionReason |
-                Should -BeLike '*docs/features/active/2026-08-22-marker-absent/issue.md*'
+                Should -BeLike '*.dev/active/2026-08-22-marker-absent/issue.md*'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Not -Match 'user-story\.md'
         }
 
@@ -420,7 +420,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             Mock -CommandName Get-Content -MockWith { throw 'simulated io error' }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-unreadable' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/2026-08-22-unreadable' }
                 } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -432,7 +432,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/2026-08-22-marker-unrecognized' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/2026-08-22-marker-unrecognized' }
                 } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
@@ -443,7 +443,7 @@ Describe 'enforce-prd-feature-before-planner.ps1' {
             Mock -CommandName Get-PrdFeatureFileExistence -MockWith { $false }
             $json = (@{
                     tool_name  = 'Agent'
-                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = 'docs/features/active/__nonexistent_issue_md_for_test__' }
+                    tool_input = @{ subagent_type = 'atomic-planner'; prompt = '.dev/active/__nonexistent_issue_md_for_test__' }
                 } | ConvertTo-Json -Compress -Depth 5)
             $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'

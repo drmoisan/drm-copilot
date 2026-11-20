@@ -49,6 +49,9 @@ from typing import TYPE_CHECKING, cast
 
 import pytest
 
+from scripts.dev_tools._parallel_orchestrator_state_cohort_barrier import (
+    _normalize_folder_hint,  # pyright: ignore[reportPrivateUsage]
+)
 from scripts.dev_tools.validate_parallel_orchestrator_state import (
     validate_parallel_orchestrator_state_text,
 )
@@ -287,3 +290,11 @@ def test_corpus_document_reproduces_the_expected_barrier_errors(
         f"Corpus case {name} produced barrier messages that differ from its "
         f"expected_barrier_errors block."
     )
+
+
+def test_dev_root_folder_hint_is_normalized_like_docs_features() -> None:
+    """A .dev lifecycle prefix strips to the same hint as the docs/features form."""
+
+    assert _normalize_folder_hint(".dev/active/item-a") == "item-a"
+    assert _normalize_folder_hint(".dev/completed/item-a") == "item-a"
+    assert _normalize_folder_hint("docs/features/active/item-a") == "item-a"

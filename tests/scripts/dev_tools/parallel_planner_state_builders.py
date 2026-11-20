@@ -61,8 +61,8 @@ def build_item(issue_num: int, slug: str) -> dict[str, object]:
         "state": "prepared",
         "blast_radius": build_blast_radius(),
         "preparation_status": "prepared",
-        "research_path": f"docs/features/active/{slug}/research.md",
-        "plan_path": f"docs/features/active/{slug}/plan.md",
+        "research_path": f".dev/active/{slug}/research.md",
+        "plan_path": f".dev/active/{slug}/plan.md",
         "preflight_status": "PREFLIGHT: ALL CLEAR",
         **build_routing_fields(),
     }
@@ -80,7 +80,7 @@ def build_valid_planner_state() -> dict[str, object]:
     return {
         "objective": "prepare parallel run wave-one",
         "parallel_slug": "wave-one",
-        "parallel_manifest_path": "docs/features/parallel/wave-one/parallel.md",
+        "parallel_manifest_path": ".dev/parallel/wave-one/parallel.md",
         "mode": "closed",
         "max_concurrency": 4,
         "items": [

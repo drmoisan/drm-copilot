@@ -10,7 +10,7 @@ Codex-supported repository locations in this repo are:
 - `.codex/agents/*.toml` for subagent definitions
 - `.codex/prompts/*.md` for prompt entrypoints and lightweight workflow launchers
 
-The legacy GitHub Copilot ecosystem under `.github/skills` and `.github/agents` remains as historical source material during migration. New Codex-native runtime behavior should be authored in `.agents/skills` and consumed from `.codex/agents`.
+Issue #1032 retired the GitHub Copilot skill copies: `.agents/skills` is the shared skill source, which GitHub Copilot reads natively, and `.github/agents` stays the Copilot-native agent source. New Codex-native runtime behavior should be authored in `.agents/skills` and consumed from `.codex/agents`.
 
 ## Layering
 

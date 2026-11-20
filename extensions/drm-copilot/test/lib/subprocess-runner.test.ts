@@ -136,4 +136,38 @@ describe("SubprocessRunner", () => {
       expect.objectContaining({ cwd: "/work", shell: false }),
     );
   });
+
+  it("passes maxBuffer through to spawnSync when provided", () => {
+    // Arrange
+    spawnSyncMock.mockReturnValue(
+      spawnResult(0, Buffer.from("ok"), Buffer.from("")),
+    );
+    const runner = new SubprocessRunner();
+
+    // Act
+    runner.run(["git", "ls-files"], { cwd: "/work", maxBuffer: 4096 });
+
+    // Assert
+    expect(spawnSyncMock).toHaveBeenCalledWith("git", ["ls-files"], {
+      cwd: "/work",
+      maxBuffer: 4096,
+      shell: false,
+    });
+  });
+
+  it("omits maxBuffer from spawnSync options when not provided", () => {
+    // Arrange
+    spawnSyncMock.mockReturnValue(
+      spawnResult(0, Buffer.from("ok"), Buffer.from("")),
+    );
+    const runner = new SubprocessRunner();
+
+    // Act
+    runner.run(["git", "status"]);
+
+    // Assert: the options object carries no buffer limit at all.
+    expect(spawnSyncMock).toHaveBeenCalledWith("git", ["status"], {
+      shell: false,
+    });
+  });
 });

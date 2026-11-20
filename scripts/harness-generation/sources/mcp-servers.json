@@ -1,0 +1,112 @@
+{
+  "$schema": "../../../config/harness-generation/mcp-servers.schema.json",
+  "servers": [
+    {
+      "args": [
+        "-y"
+      ],
+      "claude": {
+        "pin_version": false
+      },
+      "codex": {
+        "default_tools_approval_mode": "prompt",
+        "enabled_tools": [
+          "collect_commit_context",
+          "collect_pr_context",
+          "run_codex_native_converter",
+          "push_down_copilot_customizations",
+          "push_down_codex_and_agents_customizations",
+          "push_down_claude_customizations",
+          "new_potential_bug_entry",
+          "new_potential_entry",
+          "link_parent_child",
+          "potential_to_issue",
+          "new_active_feature_folder",
+          "run_poshqc_format",
+          "run_poshqc_analyze",
+          "run_poshqc_test",
+          "run_poshqc_analyze_autofix",
+          "run_poshqc_suite",
+          "resolve_policy_audit_template_asset",
+          "resolve_execute_hard_lock_prompt",
+          "resolve_atomic_plan_prompt",
+          "validate_orchestration_artifacts",
+          "detect_push_down_integration",
+          "validate_push_down_integration"
+        ],
+        "pin_version": true,
+        "required": true,
+        "tool_approval_modes": [
+          {
+            "approval_mode": "approve",
+            "tool": "collect_commit_context"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "collect_pr_context"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "new_potential_bug_entry"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "new_potential_entry"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "link_parent_child"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "potential_to_issue"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "new_active_feature_folder"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "run_poshqc_format"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "run_poshqc_analyze"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "run_poshqc_test"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "run_poshqc_analyze_autofix"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "run_poshqc_suite"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "resolve_policy_audit_template_asset"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "resolve_execute_hard_lock_prompt"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "resolve_atomic_plan_prompt"
+          },
+          {
+            "approval_mode": "approve",
+            "tool": "validate_orchestration_artifacts"
+          }
+        ],
+        "version_source": "packages/mcp-server/package.json"
+      },
+      "command": "npx",
+      "name": "drm-copilot",
+      "package": "@danmoisan/drm-copilot-mcp"
+    }
+  ]
+}

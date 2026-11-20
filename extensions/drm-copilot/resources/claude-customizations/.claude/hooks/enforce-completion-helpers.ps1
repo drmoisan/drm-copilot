@@ -9,7 +9,8 @@
       - Test-IsValidIssueNum: rejects sentinel/placeholder and non-digit issue
         numbers; accepts digits-only strings.
       - Test-IsValidFeatureFolder: rejects sentinel/placeholder feature folders
-        and folders not anchored under docs/features/active/<segment>; optionally
+        and folders not anchored under the active area of a known development-docs
+        root (<root>/active/<segment>, issue #1035); optionally
         verifies on-disk existence through an injectable scriptblock seam.
       - Get-EditReplaceAllFlag: returns the boolean value of the replace_all
         property of an Edit tool input; the string 'true' is honoured and the
@@ -63,13 +64,15 @@ function Test-IsValidIssueNum {
 function Test-IsValidFeatureFolder {
     <#
     .SYNOPSIS
-        Returns $true only for a sentinel-free feature folder anchored under
-        docs/features/active/ with a non-empty trailing segment that exists.
+        Returns $true only for a sentinel-free feature folder anchored under the
+        active area of a known development-docs root with a non-empty trailing
+        segment that exists.
     .DESCRIPTION
         Returns $false when the value is empty, whitespace-only, or a sentinel
-        (n/a, none, tbd; case-insensitive). Requires the value to start with
-        'docs/features/active/' and to carry at least one additional non-empty
-        path segment after that prefix. Invokes the injectable FolderExistsCheck
+        (n/a, none, tbd; case-insensitive). Requires the value to start with one
+        of the Get-DevelopmentDocsKnownRootPrefix -Area active prefixes (issue
+        #1035; no resolver is called) and to carry at least one additional
+        non-empty path segment after that prefix. Invokes the injectable FolderExistsCheck
         scriptblock (default Test-Path -PathType Container) and returns $false
         when it reports the folder does not exist.
     #>
@@ -93,9 +96,9 @@ function Test-IsValidFeatureFolder {
         return $false
     }
 
-    $prefix = 'docs/features/active/'
     $normalized = $trimmed -replace '\\', '/'
-    if (-not $normalized.StartsWith($prefix)) {
+    $prefix = @(Get-DevelopmentDocsKnownRootPrefix -Area 'active' | Where-Object { $normalized.StartsWith($_) }) | Select-Object -First 1
+    if (-not $prefix) {
         return $false
     }
 

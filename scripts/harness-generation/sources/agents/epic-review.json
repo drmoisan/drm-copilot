@@ -1,0 +1,61 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " epic-review"
+      },
+      {
+        "key": "model",
+        "value": " opus"
+      },
+      {
+        "key": "description",
+        "value": " Project-scoped worker that reviews epic folders and writes epic-audit artifacts."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - \"Write(/docs/features/**)\"\n  - \"Write(/.dev/**)\""
+      },
+      {
+        "key": "skills",
+        "value": "\n  - acceptance-criteria-tracking"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      },
+      {
+        "key": "hooks",
+        "value": "\n  SubagentStop:\n    - matcher: \"epic-review\"\n      hooks:\n        - type: command\n          command: pwsh -NoProfile -File .claude/hooks/validate-required-artifact-output.ps1 -AgentName epic-review -RequiredArtifact 'epic-audit-path|^(?:docs/features|\\.dev)/epics/.+/epic-audit\\.\\d{4}-\\d{2}-\\d{2}T\\d{2}-\\d{2}\\.md$|epic audit artifact'"
+      }
+    ],
+    "path": ".claude/agents/epic-review.md",
+    "sections": [
+      "head",
+      "expected-outputs",
+      "output-reporting",
+      "evidence-location-invariant"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"epic-review\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "path": ".codex/agents/epic-review.toml",
+    "sections": [
+      "head-2",
+      "expected-outputs",
+      "evidence-location-invariant-2"
+    ]
+  }
+}

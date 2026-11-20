@@ -79,6 +79,31 @@ Describe 'validate-task-researcher-output Pre-Mortem rule (issue #964)' {
         $result.Ok | Should -BeTrue
     }
 
+    It 'allows one-off research under .dev/research/ without a Pre-Mortem section' {
+        # Arrange: the .dev research area is exempt as docs/research/ is (issue #1035).
+        Mock -CommandName Get-ResearchFileContent -MockWith { Get-ResearchBody }
+        $inputText = ConvertTo-ResearcherInput -ResearchPath '.dev/research/2026-10-16T22-36-foo-research.md'
+
+        # Act
+        $result = Invoke-TaskResearcherOutputValidation -InputText $inputText
+
+        # Assert
+        $result.Ok | Should -BeTrue
+    }
+
+    It 'blocks feature research under .dev/active/ that has no Pre-Mortem section' {
+        # Arrange: feature research under the .dev root carries a Pre-Mortem (issue #1035).
+        Mock -CommandName Get-ResearchFileContent -MockWith { Get-ResearchBody }
+        $inputText = ConvertTo-ResearcherInput -ResearchPath '.dev/active/foo-1/research/research.2026-10-16T22-36.md'
+
+        # Act
+        $result = Invoke-TaskResearcherOutputValidation -InputText $inputText
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        $result.Message | Should -Match 'Pre-Mortem'
+    }
+
     It 'skips the content checks when the file seam returns no content' {
         # Arrange
         Mock -CommandName Get-ResearchFileContent -MockWith { $null }

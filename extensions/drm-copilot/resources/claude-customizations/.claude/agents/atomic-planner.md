@@ -7,8 +7,10 @@ tools:
   - Grep
   - Glob
   - "Edit(docs/**)"
+  - "Edit(.dev/**)"
   - "Edit(artifacts/**)"
   - "Write(docs/**)"
+  - "Write(.dev/**)"
   - "Write(artifacts/**)"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:

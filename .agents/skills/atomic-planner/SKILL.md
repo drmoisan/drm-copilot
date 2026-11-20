@@ -43,7 +43,7 @@ only after the native planning gate verifies the receipt named by the profile's
 `completion_gates.planning_prerequisite`. A plan cites the current acceptance
 specifications as its criteria and keeps implementation test passes as separate,
 executor-verified tasks: a ready criterion is never recorded as a passed test (see
-`docs/engineering/legacy-discovery-and-parity/enforcement.md`).
+`.dev/engineering/legacy-discovery-and-parity/enforcement.md`).
 
 ## Scratch Location
 

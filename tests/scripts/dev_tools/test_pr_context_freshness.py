@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 #: Concrete forty-character fixture SHA supplied by these tests.
 FIXTURE_HEAD_SHA = "0123456789abcdef0123456789abcdef01234567"
 GENERATED_CONTEXT_BANNER = f"===== {GENERATED_CONTEXT_SECTION_TITLE} ====="
-CHANGED_PATH = "docs/features/active/2025-12-18-docs-v3-upgrade/spec.md"
+CHANGED_PATH = ".dev/active/2025-12-18-docs-v3-upgrade/spec.md"
 #: A changed path matching none of the collector's changed-file buckets.
 UNBUCKETED_PATH = "assets/logo.svg"
 

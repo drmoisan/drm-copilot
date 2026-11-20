@@ -28,9 +28,9 @@ Describe 'epic-state baseline isolation (issue #1105)' {
 Describe 'validate-executor-output.ps1 re-entry policy' {
     BeforeAll {
         $script:Hook = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.claude/hooks/validate-executor-output.ps1'))
-        $script:PlanPath = 'plan-path: docs/features/active/foo/plan.md'
+        $script:PlanPath = 'plan-path: .dev/active/foo/plan.md'
         $script:Checked = @('### Phase 0 - Baseline', '- [x] [P0-T1] Update scripts/powershell/Foo.ps1')
-        $script:Preflight = @('DIRECTIVE: PREFLIGHT VALIDATION ONLY', '### Phase 0 - Baseline', '- [ ] [P0-T1] Read docs/features/active/foo/issue.md')
+        $script:Preflight = @('DIRECTIVE: PREFLIGHT VALIDATION ONLY', '### Phase 0 - Baseline', '- [ ] [P0-T1] Read .dev/active/foo/issue.md')
 
         function ConvertTo-ReentryInputText {
             # Builds the envelope text for one call; -Active adds stop_hook_active true.

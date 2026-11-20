@@ -1,5 +1,15 @@
 # Pure validation and profile parsing for the worktree-bound epic-child launcher.
 
+# Development-docs root module (issue #1035): the published .codex/lib copy first, the
+# self-hosted .claude/lib copy otherwise. A load failure propagates to the dot-sourcing
+# caller, whose guarded dot-source reports it as a dependency failure.
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -PathType Leaf) {
+    Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+}
+else {
+    Import-Module (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+}
+
 function ConvertFrom-CodexChildLaunchJson {
     param([Parameter(Mandatory)][string] $Raw, [Parameter(Mandatory)][string] $Name)
     if ([string]::IsNullOrWhiteSpace($Raw)) {
@@ -81,7 +91,7 @@ function Test-CodexChildActiveFeatureFolder {
     param([Parameter(Mandatory)][string] $Path)
     $normalized = $Path.Replace('\', '/')
     if ([System.IO.Path]::IsPathFullyQualified($Path) -or
-        $normalized -notmatch '^docs/features/active/[^/<>]+$') {
+        $normalized -notmatch ('^' + (Get-DevelopmentDocsKnownRootPattern) + '/active/[^/<>]+$')) {
         return $false
     }
     $leaf = ($normalized -split '/')[-1]

@@ -1,0 +1,20 @@
+Timestamp: 2026-11-19T17-31
+Task: [P3-T1]
+Changed files:
+- New skill source `.agents/skills/push-down-integration/SKILL.md` and its contract `.agents/skills/push-down-integration/references/standard.md` (required for a matrix `shared` codex skill by `Get-HarnessSkillContractSetViolation`).
+- Byte-identical copies: `.claude/skills/push-down-integration/SKILL.md` and `extensions/drm-copilot/resources/claude-customizations/.claude/skills/push-down-integration/SKILL.md` (rendered by the #1028 generator, `Invoke-HarnessGeneration.ps1 -Surface skills`), `.github/skills/push-down-integration/SKILL.md`, `extensions/drm-copilot/resources/customizations/.github/skills/push-down-integration/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/push-down-integration/SKILL.md` (plus its `references/standard.md`).
+- Manifests: Claude `pack-manifests/core.json` (anchor (b)), COPILOT-CORE (anchor (h), between pr-context-artifacts and reconcile-parity-matrix), `shared.json` (SKILL.md and references/standard.md, as the shared-layer derivation from the matrix yields them; the Codex `core.json` is not edited because `shared.json` is PRESENT).
+- `config/harness-parity-matrix.json`: the `codex:skill:push-down-integration` entry with disposition `shared`, plus `claude:skill:push-down-integration` (disposition `generated` from the `.agents` source, so the generator renders the Claude copies) and `copilot:skill:push-down-integration` (disposition `dropped`, as for the other shared skills), because the repository gate `committed matrix has no violation against the live inventory` requires one entry per inventoried skill in each tree.
+- New test `extensions/drm-copilot/test/packaging/push-down-integration-skill.test.ts`.
+- SET-PIN tests: all `derived` per [P0-T2]; none updated.
+Selection and rule: the new Jest test, the named #1029 Jest files, the named pytest contract tests, the Codex generator check, the #1028 generator drift check, and the Pester harness and sweep suites that read the changed skill, manifest and matrix paths (atomic-plan-contract Test Cadence: contract tests that read a changed Markdown or configuration path).
+Commands and exit codes:
+- npx prettier --write / --check, npx eslint, npx tsc (both projects) on the new test file: EXIT_CODE 0 each.
+- sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh jest-extension push-down-integration-skill push-down-bundle-manifest-completeness push-down-shared-layer claude-pack-manifest-completeness: EXIT_CODE 0 (Test Suites: 4 passed, 4 total; Tests: 43 passed, 43 total).
+- env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest -q tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py test_push_down_codex_and_agents_resource_contracts.py test_push_down_claude_pack_manifest_completeness.py test_push_down_codex_and_agents_pack_manifest_completeness.py test_push_down_pack_manifest_dependency_closure.py test_push_down_issue_824_follow_ups.py test_push_down_copilot_customizations.py test_codex_core_manifest_closure.py (all under tests/scripts/dev_tools/): EXIT_CODE 0 (116 passed).
+- env -u VIRTUAL_ENV poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check: EXIT_CODE 0.
+- pwsh -NoProfile -File scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Surface all -Check (from a SCRATCH sh script): EXIT_CODE 0 (harness-generation: no drift).
+- sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath tests/scripts/harness tests/scripts/harness-generation tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1 tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1 tests/scripts/claude-runtime/policy-toolchain-naming.Tests.ps1: EXIT_CODE 0 (Invoke-PoshQCParallelTest workers=8, exit code 0; selection JUnit: 647 tests, 647 passed, 0 failures).
+Rule tokens: S51, S52, S53, S54 (positive and negative) in push-down-integration-skill.test.ts.
+EXIT_CODE: 0
+Output Summary: task check passed.

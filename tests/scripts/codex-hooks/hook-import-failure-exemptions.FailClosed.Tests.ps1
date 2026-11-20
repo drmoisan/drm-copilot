@@ -34,13 +34,13 @@ Describe 'preimplementation gate modes handler proof on the codex surface' {
         if (Get-Command Get-EpicScopeCheckpointText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText' -Surface 'Codex' }
         if (Get-Command Get-ParallelCheckpointContent -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-ParallelCheckpointContent' -Surface 'Codex' }
         if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Register-EpicStateBaselineMock -Seam 'Get-WorktreeResolutionGitFileText' -Surface 'Codex' }
-        $script:GateEpicRaw = '{"route_id":"epic","epic_feature_folder":"x-family","epic_manifest_path":"docs/features/epics/x-family/epic.md","integration_branch":"epic/x-integration",' +
-        '"features":[{"feature_folder":"docs/features/active/child-a-300","issue_num":300,"depends_on":[],"merge_status":"merged"},{"feature_folder":"docs/features/active/child-b-301","issue_num":301,"depends_on":[300],"merge_status":"not_started"}]}'
-        $script:GateParallelRaw = '{"route_id":"parallel","parallel_slug":"demo","parallel_manifest_path":"docs/features/parallel/demo/parallel.md",' +
-        '"items":[{"feature_folder":"docs/features/active/child-b-301","issue_num":301,"merge_status":"not_started"}]}'
+        $script:GateEpicRaw = '{"route_id":"epic","epic_feature_folder":"x-family","epic_manifest_path":".dev/epics/x-family/epic.md","integration_branch":"epic/x-integration",' +
+        '"features":[{"feature_folder":".dev/active/child-a-300","issue_num":300,"depends_on":[],"merge_status":"merged"},{"feature_folder":".dev/active/child-b-301","issue_num":301,"depends_on":[300],"merge_status":"not_started"}]}'
+        $script:GateParallelRaw = '{"route_id":"parallel","parallel_slug":"demo","parallel_manifest_path":".dev/parallel/demo/parallel.md",' +
+        '"items":[{"feature_folder":".dev/active/child-b-301","issue_num":301,"merge_status":"not_started"}]}'
         # The flat mapped tool_input the Codex decision seam consumes.
-        $script:GateEpicInput = @{ subagent_type = 'orchestrator'; prompt = 'Epic mode: true. Execute docs/features/active/child-b-301 now' } | ConvertTo-Json -Compress -Depth 3
-        $script:GateParallelInput = @{ subagent_type = 'orchestrator'; prompt = 'Parallel mode: true. Execute docs/features/active/child-b-301 now' } | ConvertTo-Json -Compress -Depth 3
+        $script:GateEpicInput = @{ subagent_type = 'orchestrator'; prompt = 'Epic mode: true. Execute .dev/active/child-b-301 now' } | ConvertTo-Json -Compress -Depth 3
+        $script:GateParallelInput = @{ subagent_type = 'orchestrator'; prompt = 'Parallel mode: true. Execute .dev/active/child-b-301 now' } | ConvertTo-Json -Compress -Depth 3
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Codex' -Seam 'Get-EpicScopeCheckpointText' }

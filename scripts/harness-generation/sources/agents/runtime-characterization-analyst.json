@@ -1,0 +1,54 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " runtime-characterization-analyst"
+      },
+      {
+        "key": "description",
+        "value": " Document selected runtime scenarios and supplied captures with explicit known, unknown, not-run and blocked outcomes."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - \"mcp__drm-copilot__read_discovery_source\"\n  - \"mcp__drm-copilot__create_discovery_artifact\"\n  - \"mcp__drm-copilot__update_discovery_artifact\"\n  - \"mcp__drm-copilot__link_discovery_evidence\"\n  - \"mcp__drm-copilot__finalize_discovery_agent\""
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      }
+    ],
+    "path": ".claude/agents/runtime-characterization-analyst.md",
+    "sections": [
+      "head",
+      "prepared-inputs-and-launch",
+      "selected-reads-and-controlled-operations",
+      "exact-output-boundary",
+      "denied-authority-and-managed-memory",
+      "finalization-and-explicit-result"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"runtime-characterization-analyst\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "path": ".codex/agents/runtime-characterization-analyst.toml",
+    "sections": [
+      "head-2",
+      "prepared-inputs-and-launch",
+      "selected-reads-and-controlled-operations",
+      "exact-output-boundary",
+      "denied-authority-and-managed-memory",
+      "finalization-and-explicit-result"
+    ]
+  }
+}

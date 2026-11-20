@@ -19,8 +19,8 @@ The repository contains four primary deliverables:
 - [.github/](.github/) — GitHub Copilot customization surface: `copilot-instructions.md`, `instructions/`, `prompts/`, `skills/`, `agents/`, `codex/`, and CI workflows.
 - [.claude/](.claude/) — the Claude Code runtime surface: `rules/`, `skills/`, `agents/`, `hooks/`, `agent-memory/`, and `settings.json`.
 - [.codex/](.codex/) and [.agents/](.agents/) — the Codex-native runtime surface: prompts and skills.
-- [docs/features/](docs/features/) — feature, backlog, and planning documents, organized into `potential/`, `active/`, `completed/`, `archive/`, and `research/`. Multi-feature epics use `docs/features/epics/<epic-slug>/epic.md` as their single home once created (see Epic orchestration below).
-- [CLAUDE.md](CLAUDE.md) and [AGENTS.md](AGENTS.md) — generated standing-instruction roots for Claude Code and Codex respectively.
+- [.dev/](.dev/) — feature, backlog, and planning documents, organized into `potential/`, `active/`, `completed/`, `archive/`, and `research/`. Multi-feature epics use `.dev/epics/<epic-slug>/epic.md` as their single home once created (see Epic orchestration below).
+- [AGENTS.md](AGENTS.md) — the hand-authored source of standing guidance shared by every agent; [CLAUDE.md](CLAUDE.md) imports it with `@AGENTS.md` and adds the Claude-only instructions.
 
 ## Agentic runtime architecture
 
@@ -43,7 +43,7 @@ The runtime is orchestrator-driven. The `orchestrator` agent runs in the main th
 
 ### Epic orchestration
 
-The `epic-orchestrate` skill and the `epic-orchestrator` agent schedule a multi-feature epic as a dependency graph of child features, run each child through the standard `orchestrator` lifecycle in parallel, isolated git worktrees, and fan the results back into a shared integration branch before driving the final integration-to-main PR. An epic's dependency manifest and free-text narrative (goal, scope, non-goals, shared design, decomposition) live together in a single home, `docs/features/epics/<epic-slug>/epic.md`, whose YAML frontmatter is the machine-parsed source of truth and whose body is the human-readable narrative and the source for the epic's GitHub issue body.
+The `epic-orchestrate` skill and the `epic-orchestrator` agent schedule a multi-feature epic as a dependency graph of child features, run each child through the standard `orchestrator` lifecycle in parallel, isolated git worktrees, and fan the results back into a shared integration branch before driving the final integration-to-main PR. An epic's dependency manifest and free-text narrative (goal, scope, non-goals, shared design, decomposition) live together in a single home, `.dev/epics/<epic-slug>/epic.md`, whose YAML frontmatter is the machine-parsed source of truth and whose body is the human-readable narrative and the source for the epic's GitHub issue body.
 
 ### Other ecosystem surfaces
 
@@ -77,7 +77,7 @@ Selected CLI entrypoints exposed by Poetry:
 
 ## Codex-native converter
 
-The Codex-native converter is a Python-first workflow that reviews or applies a deterministic migration from GitHub Copilot or Claude runtime customization surfaces into the native Codex layout. The Python CLI is the authoritative converter surface; the VS Code command and MCP tool are thin wrappers over the same bundled Python runner.
+The Codex-native converter reviews or applies a deterministic migration from GitHub Copilot or Claude runtime customization surfaces into the native Codex layout. It has two implementations that are kept in parity: the extension command `drmCopilotExtension.runCodexNativeConverter` and the MCP tool `run_codex_native_converter` run the in-process TypeScript port in [extensions/drm-copilot/src/lib/codex-native-converter/](extensions/drm-copilot/src/lib/codex-native-converter/), and the Poetry script `codex-native-converter` runs the Python package in [scripts/dev_tools/codex_native_converter/](scripts/dev_tools/codex_native_converter/). For the same input, both produce the same mapping, generated output, and report disposition.
 
 ### Review and apply commands
 
@@ -90,7 +90,7 @@ Optional flags:
 - `--artifact-root <artifact-root>` overrides the default report location.
 - `--enable-repo-prompts` allows `.codex/prompts/**` output when repository prompts are intentionally enabled.
 
-Repo-wide GitHub instruction files that declare `applyTo: "**"` are merged into the generated `AGENTS.md`. Narrower `.github/instructions/*.instructions.md` files map to `.agents/skills/**`. GitHub prompt assets under `.github/prompts/*.md` are treated as optional launcher inputs and do not block validation by themselves when prompt output is disabled.
+Standing-guidance sources, such as `.github/copilot-instructions.md` and repo-wide GitHub instruction files that declare `applyTo: "**"`, are reported as not emitted, with the reason that `AGENTS.md` is a hand-authored source maintained outside the converter; the converter never creates or modifies `AGENTS.md`, and references to those sources in other outputs are still rewritten to `AGENTS.md`. Narrower `.github/instructions/*.instructions.md` files map to `.agents/skills/**`. GitHub prompt assets under `.github/prompts/*.md` are treated as optional launcher inputs and do not block validation by themselves when prompt output is disabled.
 
 ### Artifact outputs
 
@@ -105,7 +105,7 @@ The CLI prints the resolved artifact root and the final validation outcome to st
 
 ### Fail-closed validation model
 
-The converter blocks destination writes when it finds unresolved hard-gate mappings, unresolved handoff mappings, unresolved MCP rewrites, duplicate targets, lingering `.github`, `.claude`, or `CLAUDE.md` runtime references in generated native output, malformed artifacts, unsupported ecosystems, or missing required inputs. Review mode still writes the report set so the caller can inspect blocking findings without mutating the destination tree. The converter is implemented in [scripts/dev_tools/codex_native_converter/](scripts/dev_tools/codex_native_converter/), with modules split to satisfy the 500-line file-size policy.
+The converter blocks destination writes when it finds unresolved hard-gate mappings, unresolved handoff mappings, unresolved MCP rewrites, duplicate targets, lingering `.github`, `.claude`, or `CLAUDE.md` runtime references in generated native output, malformed artifacts, unsupported ecosystems, or missing required inputs. Review mode still writes the report set so the caller can inspect blocking findings without mutating the destination tree. Both implementations apply the same validation: the TypeScript port in [extensions/drm-copilot/src/lib/codex-native-converter/](extensions/drm-copilot/src/lib/codex-native-converter/) and the Python package in [scripts/dev_tools/codex_native_converter/](scripts/dev_tools/codex_native_converter/), each with modules split to satisfy the 500-line file-size policy.
 
 ## VS Code extension
 
@@ -132,7 +132,6 @@ Customization conversion and publishing:
 - `drmCopilotExtension.pushDownCopilotCustomizations`
 - `drmCopilotExtension.pushDownCodexAndAgentsCustomizations`
 - `drmCopilotExtension.pushDownClaudeCustomizations`
-- `drmCopilotExtension.syncAgentsFromInstructions`
 
 PowerShell quality control (PoshQC):
 
@@ -278,10 +277,6 @@ These lines appear in the summary artifact's `exclusions` object (with `conflict
 
 Limitations: the push-down never deletes destination files, so a file already present at an excluded path is removed by the destination once. Detection of dangling references (an excluded file that other pushed-down content still cites) is a non-goal of this feature and is not reported.
 
-### Sync AGENTS.md from instructions
-
-`drmCopilotExtension.syncAgentsFromInstructions` regenerates `AGENTS.md` in the destination workspace by discovering all `.github/instructions/*.instructions.md` files under the active workspace root, aggregating their content deterministically, and writing the consolidated result. This replaces any manual edits to `AGENTS.md` with a fully generated output derived from the canonical instruction files.
-
 ## Requirements
 
 ### Root toolchain
@@ -304,6 +299,26 @@ Both images also install Git >=2.56.0, GitHub CLI 2.103.3, .NET SDK 10.0.403, uv
 Run `scripts/dev-tools/bootstrap-host.ps1` without `-Apply` to preview missing or below-minimum managed tools. Apply mode installs or upgrades them according to `scripts/host-tools.manifest.json`; equal or newer host versions remain unchanged, and unreadable versions fail explicitly.
 
 Python 3.11/3.12 compatibility jobs, consumer engine requirements, and release-publishing runtime pins remain independent of this development baseline.
+
+### Copilot collision controls
+
+GitHub Copilot in VS Code reads the shared `.agents/skills` source and, by default, also the generated Claude copies under `.claude/`, so each skill, rule, and agent can load twice. Add these keys to your VS Code user settings (user scope; the repository's `.vscode/settings.json` does not carry them) to stop Copilot from loading the Claude copies:
+
+```json
+{
+  "chat.agentSkillsLocations": { ".claude/skills": false },
+  "chat.instructionsFilesLocations": { ".claude/rules": false },
+  "chat.agentFilesLocations": { ".claude/agents": false },
+  "chat.useClaudeMdFile": false
+}
+```
+
+- `chat.agentSkillsLocations` with `".claude/skills": false`: Copilot reads skills from `.agents/skills` only.
+- `chat.instructionsFilesLocations` with `".claude/rules": false`: Copilot reads path-scoped instructions from `.github/instructions` only.
+- `chat.agentFilesLocations` with `".claude/agents": false`: Copilot reads agents from `.github/agents` only, while that folder remains.
+- `chat.useClaudeMdFile` set to `false`: Copilot reads the shared standing instructions from `AGENTS.md` and does not also load `CLAUDE.md`.
+
+Leave `chat.useAgentsMdFile`, `chat.useClaudeHooks`, and `github.copilot.chat.codeGeneration.useInstructionFiles` at their defaults. The Copilot CLI and the Copilot cloud agent do not read these editor settings.
 
 ### Standalone MCP package
 
@@ -446,6 +461,6 @@ The repository uses the following GitHub Actions workflows under [.github/workfl
 
 ## Policy and skills references
 
-- Repository tone and policy: [CLAUDE.md](CLAUDE.md), `.github/copilot-instructions.md`, and `.github/instructions/`.
+- Repository tone and policy: [AGENTS.md](AGENTS.md) (shared tone and guidance), [CLAUDE.md](CLAUDE.md), and `.github/instructions/`; `.github/copilot-instructions.md` holds Copilot-only text.
 - Language-specific rules: [.claude/rules/](.claude/rules/) (Python, PowerShell, TypeScript, C#), scoped by file path.
-- Skills taxonomy: [.github/skills/README.md](.github/skills/README.md), [.claude/skills/](.claude/skills/), and [.agents/skills/](.agents/skills/).
+- Skills taxonomy: [.agents/skills/README.md](.agents/skills/README.md) (the shared skill source), [.claude/skills/](.claude/skills/), and [.agents/skills/](.agents/skills/).

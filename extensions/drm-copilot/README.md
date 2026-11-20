@@ -26,16 +26,11 @@ The extension continues to contribute these stable command IDs:
 - `drmCopilotExtension.resolvePolicyAuditTemplateAsset`
 - `drmCopilotExtension.resolveExecuteHardLockPrompt`
 - `drmCopilotExtension.resolveAtomicPlanPrompt`
-- `drmCopilotExtension.syncAgentsFromInstructions`
 - `drmCopilotExtension.listMcpTools`
 - `drmCopilotExtension.newClaudeWorktreeSession`
 - `drmCopilotExtension.removeSecondaryWorktrees`
 
 The interactive VS Code flows keep their current prompts and branch/file pickers, but now delegate through the shared repo-automation service used by the MCP bridge.
-
-## Sync AGENTS.md from Instructions
-
-Use the `drm-copilot: Sync AGENTS.md from Instructions` command (command ID: `drmCopilotExtension.syncAgentsFromInstructions`) from the Command Palette to regenerate `AGENTS.md` in the active workspace. The bundled PowerShell script discovers all `.github/instructions/*.instructions.md` files under the active workspace root, aggregates their content in a deterministic order, and writes the consolidated result to `AGENTS.md` at the workspace root. This replaces any manual edits to `AGENTS.md` with a fully generated output derived from the workspace's canonical `.github` instruction files.
 
 ## New Claude Worktree Session
 
@@ -125,14 +120,21 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `run_poshqc_suite`
 - `resolve_policy_audit_template_asset`
 - `validate_orchestration_artifacts`
+- `migrate_development_docs`
 - `run_docs_check`
 - `run_docs_inventory`
 - `run_docs_coverage`
 - `update_docs_ledger`
 - `generate_docs_reference`
 - `validate_docs_artifacts`
+- `detect_push_down_integration`
+- `validate_push_down_integration`
 
 The six docs tools run the workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1` with `pwsh -NoProfile -File <script> -Command <subcommand> -Json`, with the workspace root as working directory. They require PowerShell 7.4 or later on `PATH` (there is no fallback to Windows PowerShell) and the pushed-down `.claude/lib/docs/` library in the target workspace; run `push_down_claude_customizations` first when it is missing. Only `update_docs_ledger` can change files, and only when `write` is `true`; every other docs tool is read-only.
+
+`migrate_development_docs` (issue #1016) plans or applies the move of development records from `docs/` to `.dev/`. The dry run writes nothing outside `report_directory` and reports the planned moves, folder renames, held items, reference rewrites, excluded files, retained production documentation and a `decision_skeleton`. Apply mode moves with `git mv`, renames feature folders, rewrites references and never commits; it refuses without a decision file when the dry run reports held items or open global choices. The same tool runs from the standalone package as `npx -y @danmoisan/drm-copilot-mcp migrate-development-docs`; see `packages/mcp-server/README.md`.
+
+The two push-down integration tools are read-only and deterministic, and neither calls a model. `detect_push_down_integration` reports a destination's harness ecosystems and language packs, its `.github/workflows/` files with their jobs, the structured integration conflicts, and a summary of `.push-down-integration-needed.json`, which an apply-mode push-down writes when it meets a decision it cannot make mechanically. `validate_push_down_integration` returns a `pass` or `fail` verdict over rules V1 to V5 and the fixed `not_checked` list; a completed run is `ok: true` even when the verdict is `fail`. The `push-down-integration` skill describes the read, resolve and validate loop.
 
 ### MCP Runtime Expectations
 
@@ -171,8 +173,9 @@ If the server is launched from a different working directory, pass `workspace_ro
 - `collect_commit_context`: required `workspace_root`
 - `collect_pr_context`: required `workspace_root`, required `base`
 - `run_codex_native_converter`: required `workspace_root`, required `mode`, required `source_ecosystem`, required `source_root`, optional `selected_paths`, optional `destination_root`, optional `artifact_root`, optional `enable_repo_prompts`
-- `push_down_copilot_customizations`: required `workspace_root`
-- `push_down_codex_and_agents_customizations`: required `workspace_root`, optional `packs`, optional `csharp_variant`, optional `memory_mode`
+- `push_down_copilot_customizations`: required `workspace_root`, optional `packs`, optional `dry_run`, optional `overwrite_unmanaged`
+- `push_down_codex_and_agents_customizations`: required `workspace_root`, optional `packs`, optional `csharp_variant`, optional `memory_mode`, optional `dry_run`, optional `overwrite_unmanaged`
+- `push_down_claude_customizations`: required `workspace_root`, optional `packs`, optional `csharp_variant`, optional `memory_mode`, optional `dry_run`, optional `overwrite_unmanaged`
 - `new_potential_bug_entry`: required `workspace_root`, required `short_name`
 - `new_potential_entry`: required `workspace_root`, required `short_name`
 - `link_parent_child`: required `workspace_root`, required `child_issue_number`, required `parent_issue_number`
@@ -187,12 +190,15 @@ If the server is launched from a different working directory, pass `workspace_ro
 - run_poshqc_analyze_autofix: required `workspace_root`, optional `scan_folders`
 - run_poshqc_suite: required `workspace_root`, optional `scan_folders`
 - validate_orchestration_artifacts: required `workspace_root`, required `artifact_type`, required `artifact_path`, optional `require_complete`
+- `migrate_development_docs`: required `workspace_root`, required `mode` (`dry-run` | `apply`), optional `rename_decisions_path` (required by apply when the dry run reports held items or open global choices), optional `report_directory`
 - `run_docs_check`: required `workspace_root`, optional `profile`, optional `paths`
 - `run_docs_inventory`: required `workspace_root`, optional `profile`, optional `analyzers`, optional `revision`
 - `run_docs_coverage`: required `workspace_root`, optional `profile`
 - `update_docs_ledger`: required `workspace_root`, required `operation`, required `actor_kind`, required `actor_id`, optional `profile`, `element` or `limit`, `disposition`, `pages`, `rationale`, `owner`, `target`, `dimension`, `state`, `claim`, and `write` (default `false`, a dry run); the fields each operation requires or permits are checked before launch
 - `generate_docs_reference`: required `workspace_root`, optional `profile`, optional `snapshot`, optional `output_directory` (always a dry run)
 - `validate_docs_artifacts`: required `workspace_root`, required `mode`, required `revision`, optional `profile` (never persists a receipt)
+- `detect_push_down_integration`: required `workspace_root` (no other property)
+- `validate_push_down_integration`: required `workspace_root` (no other property)
 
 ### MCP Result Shape
 
@@ -205,6 +211,7 @@ MCP tool calls return structured JSON with:
 - `summary`
 - `stderr_excerpt` when a subprocess failure surfaces stderr diagnostics
 - `docs` for the docs tools: the `Invoke-DocsCommand.ps1 -Json` envelope (`command`, `exit_code`, `findings`, `ok`, `result`) passed through unchanged; `ok` equals the envelope `ok`, `summary` is `<command>: exit=<n> errors=<n> warnings=<n> infos=<n>`, and `stderr_excerpt` is added only for exit code 3
+- `integration` for the two push-down integration tools: the detect facts (`ecosystems`, `workflows`, `conflicts`, `integration_needed`) or the validate verdict (`verdict`, `rules`, `not_checked`)
 
 A docs tool that fails before or instead of producing a valid envelope returns `ok: false` without `docs`, and its `summary` begins with one of these host failure codes:
 
@@ -272,6 +279,35 @@ The command and MCP tool accept optional Codex language-pack selection. Omitted 
 The optional `csharp_variant` field accepts `modern` or `legacy`. The `modern` value uses the root Codex C# profile. The `legacy` value reads C# content from the bundle-only `.agents-variants/csharp-legacy/` and `.codex-variants/csharp-legacy/` roots and writes it to the canonical `.agents` and `.codex` destination paths. The variant roots are not destination roots.
 
 The optional `memory_mode` field accepts `overwrite`, `merge`, or `skip` for schema parity with Claude push-down. It is inert for the current Codex bundle because no Codex memory subtree is present.
+
+## Push-Down Pipeline
+
+The three push-down tools (`push_down_claude_customizations`, `push_down_codex_and_agents_customizations`, and `push_down_copilot_customizations`) and the three push-down commands share one pipeline. Each tool selects exactly its own ecosystem.
+
+- Shared layer: every run installs the shared layer first: `AGENTS.md`, the shared `.agents/skills/<name>/` files listed by `resources/codex-and-agents-customizations/pack-manifests/shared.json`, and the shared configuration files. `config/orchestration-routing.json` is merged into the destination copy, never overwritten. A run then installs only the selected ecosystem's layer and packs, and writes nothing under another ecosystem's layer.
+- Packs: `packs` is accepted by all three tools; `core` is always included. Copilot packs are `python`, `powershell`, `typescript`, and `csharp`. When `packs` is omitted, the selection recorded in the destination manifest is reused; with no recorded selection the full tree is published.
+- `dry_run` (all three tools, default `false`): plan and return the report without writing any file. A dry run returns no summary-artifact path.
+- `overwrite_unmanaged` (all three tools, default `false`): overwrite destination files that have no manifest entry and differ from the payload.
+- Destination manifest: an apply run writes `.push-down-manifest.json` at the destination root. It records the selection per ecosystem and, per managed file, the layer, the owning pack, and the SHA-256 of the LF-normalized text. It holds no timestamp and no absolute path, and it is rewritten only when its text changes. Destinations commit it.
+- No-overwrite rule: a destination file edited since the last push-down is reported as `conflict` and left in place. A file with no manifest entry that differs from the payload is reported as `unmanaged-conflict` and left in place unless `overwrite_unmanaged` is `true`. Files of a deselected pack are reported as `orphaned` and never deleted. Paths listed in `.push-down-exclusions` are withheld for every ecosystem and reported as `excluded`.
+- `push_down_report`: every call returns the report with `mode` (`dry-run` or `apply`), the selection per ecosystem, every planned, merged, excluded, and orphaned path with its `layer`, `pack`, `action`, and `reason`, and `counts` per action. `conflict`, `unmanaged-conflict`, and `deleted-locally` lines are also returned in `warnings` with the prefix `push-down conflict:`. A second run with no source or destination change writes no file outside `artifacts/`.
+
+## Push-Down CI Workflows
+
+The three push-down tools accept the optional `ci_workflows` input with the values `off` (default), `reference`, and `copy`; when it is omitted, the mode recorded in the destination manifest is reused.
+
+- `off`: no CI file is planned; CI files delivered earlier are reported as `orphaned` and left in place.
+- `reference`: the push-down writes the caller `.github/workflows/drm-copilot-ci.yml` (workflow `CI` with one job per selected language pack and the `CI Required Gate` job) and the data file `.github/drm-copilot/ci-required-checks.json`; each caller job calls `drmoisan/drm-copilot/.github/workflows/harness-<pack>.yml` at the pinned tag.
+- `copy`: the push-down also writes the selected packs' reusable workflows as `.github/workflows/drm-copilot-<pack>.yml`, and the caller jobs use those local copies.
+- Pin: reference mode pins the harness workflows at the release tag `v<payload_version>`, where `payload_version` is the extension version that ran the push-down.
+- Bump process: upgrade the extension and re-run the push-down; an unedited caller is reported `update` and rewritten with the new tag.
+- Risk: an unprotected tag can be moved, because no tag ruleset protects the release tags of the source repository.
+- Risk: a build without a published tag references a missing tag, so reference mode works only with a published extension release.
+- Rule: a private source repository requires copy mode, because a destination cannot call a reusable workflow it cannot read.
+- Limitation: the #1049 vendored-code exemption is unavailable in copy mode, because copy mode runs Pester directly and does not load PoshQC.
+- Requirement: copy mode runs Pester over the top-level tests directory, and the PowerShell job fails with `Copy mode requires a top-level tests directory` when it is absent; reference mode (PoshQC) has no such requirement.
+- No CI file is written over an existing unmanaged file, even with `overwrite_unmanaged`; an edited caller is reported `conflict` and kept; when another destination workflow is already named `CI`, the caller is withheld and a `push-down conflict:` warning names that file.
+- Opt-in branch protection: `.github/drm-copilot/Set-CiRequiredChecks.ps1` (`Set-CiRequiredChecks.ps1`) is delivered with the CI files and never run by the push-down; by default it prints the planned ruleset, and with `-Apply` it creates one ruleset on the default branch that requires `CI Required Gate`, without editing or deleting an existing ruleset.
 
 ## Run PoshQC Suite
 

@@ -45,7 +45,7 @@ Describe 'enforce-completion-consistency route-driven pr_gate evidence' {
                 next_step        = 'complete'
                 route_id         = 'full-bug'
                 'issue-num'      = '415'
-                'feature-folder' = 'docs/features/active/sample'
+                'feature-folder' = '.dev/active/sample'
                 ci_gate          = [ordered]@{ conclusion = 'success'; head_sha = 'abc123' }
             }
             foreach ($key in $Overrides.Keys) {
@@ -108,7 +108,7 @@ Describe 'enforce-completion-consistency route-driven pr_gate evidence' {
         }
 
         It 'reports the whole ci_gate object as missing when the checkpoint has none' {
-            $payload = '{"next_step":"complete","route_id":"full-bug","issue-num":"415","feature-folder":"docs/features/active/sample"}' |
+            $payload = '{"next_step":"complete","route_id":"full-bug","issue-num":"415","feature-folder":".dev/active/sample"}' |
                 ConvertFrom-Json
 
             $missing = @(Get-MissingCompletionEvidence -Payload $payload -FolderExistsCheck $script:FolderPresent -RoutingMatrixReader $script:NoPrGateRoute)
@@ -140,7 +140,7 @@ Describe 'enforce-completion-consistency route-driven pr_gate evidence' {
                 next_step        = 'complete'
                 route_id         = 'full-bug'
                 'issue-num'      = '415'
-                'feature-folder' = 'docs/features/active/sample'
+                'feature-folder' = '.dev/active/sample'
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123' }
             } | ConvertTo-Json -Compress -Depth 10
             $raw = @{ file_path = $script:CheckpointPath; content = $content } | ConvertTo-Json -Compress
@@ -155,7 +155,7 @@ Describe 'enforce-completion-consistency route-driven pr_gate evidence' {
                 next_step        = 'complete'
                 route_id         = 'full-bug'
                 'issue-num'      = '415'
-                'feature-folder' = 'docs/features/active/sample'
+                'feature-folder' = '.dev/active/sample'
                 ci_gate          = @{ conclusion = 'success'; head_sha = 'abc123' }
             } | ConvertTo-Json -Compress -Depth 10
             $raw = @{ file_path = $script:CheckpointPath; content = $content } | ConvertTo-Json -Compress

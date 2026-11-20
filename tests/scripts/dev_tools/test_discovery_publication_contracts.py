@@ -1,7 +1,7 @@
 """Publication contracts for the issue #980 discovery surface across the three bundles.
 
 The canonical sources are the four ``.github/agents`` roles, the sixteen
-``.github/skills`` workflows and aliases, the native hooks and the shared
+``.agents/skills`` workflows and aliases, the native hooks and the shared
 PowerShell helpers. P10-T1 regenerates the Copilot, Claude and Codex bundles
 from those sources, and these tests pin the result: every logical role, skill,
 hook, tool and resource has an exact native representation on every host, every
@@ -61,7 +61,6 @@ COPILOT_ROOTS: tuple[str, ...] = (
     ".github/hooks",
     ".github/instructions",
     ".github/prompts",
-    ".github/skills",
 )
 CLAUDE_HOOKS: tuple[str, ...] = (
     "discovery-capability-probe.ps1",
@@ -260,12 +259,12 @@ def test_roles_carry_stop_and_tool_controls_on_every_host() -> None:
 
 @pytest.mark.parametrize("skill", SKILLS)
 def test_skill_is_represented_on_every_host(skill: str) -> None:
-    """Each workflow or alias is published for all three hosts with resolved links."""
+    """Each workflow or alias is published for Claude and Codex with resolved links.
 
-    canonical = REPO_ROOT / ".github" / "skills" / skill / "SKILL.md"
-    _assert_mirror(
-        canonical, COPILOT_BUNDLE / ".github" / "skills" / skill / "SKILL.md"
-    )
+    Copilot reads the shared ``.agents/skills`` copy natively, so no separate Copilot
+    skill copy is published (issue #1032).
+    """
+
     claude_skill = REPO_ROOT / ".claude" / "skills" / skill / "SKILL.md"
     codex_skill = REPO_ROOT / ".agents" / "skills" / skill / "SKILL.md"
     _assert_mirror(

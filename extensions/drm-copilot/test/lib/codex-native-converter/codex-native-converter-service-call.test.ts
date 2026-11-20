@@ -71,8 +71,10 @@ describe("runCodexNativeConverterServiceCall", () => {
       sourceRoot: SOURCE_ROOT,
     });
 
-    // Assert: the conversion report and proposed tree were written under the
-    // artifact root; no destination output exists for review mode.
+    // Assert: the conversion report and mapping catalog were written under the
+    // artifact root; the proposed tree holds no AGENTS.md because standing
+    // guidance is not emitted (issue #1028), and review mode writes no
+    // destination output.
     const artifactRoot = result.artifacts[0] as string;
     expect(fileSystem.isFile(`${artifactRoot}/conversion-report.md`)).toBe(
       true,
@@ -81,7 +83,7 @@ describe("runCodexNativeConverterServiceCall", () => {
       true,
     );
     expect(fileSystem.isFile(`${artifactRoot}/proposed-tree/AGENTS.md`)).toBe(
-      true,
+      false,
     );
   });
 

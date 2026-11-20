@@ -15,6 +15,7 @@
     ".codex/agents/powershell-typed-engineer-c2.toml",
     ".codex/agents/powershell-typed-engineer-c3.toml",
     ".codex/agents/powershell-typed-engineer-c3-elevated.toml",
-    ".codex/agents/powershell-typed-engineer-c4.toml"
+    ".codex/agents/powershell-typed-engineer-c4.toml",
+    ".codex/agents/powershell-di-unit-test-engineer.toml"
   ]
 }

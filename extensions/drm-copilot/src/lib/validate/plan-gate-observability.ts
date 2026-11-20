@@ -45,7 +45,7 @@ import {
  *
  * All four observability constants are authored at the Warning channel and are
  * re-set from the pre-declared decision rule applied to the counts recorded in
- * `docs/features/active/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`
+ * `.dev/active/2026-08-23-plan-acceptance-gates-miss-unobservable-and-ambient-state-gates-519/evidence/qa-gates/corpus-measurement.2026-08-24T00-00.md`
  * and by nothing else.
  */
 export const G7_SEVERITY: string = "warning";

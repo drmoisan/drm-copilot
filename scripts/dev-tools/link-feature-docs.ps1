@@ -2,7 +2,10 @@
 [CmdletBinding()]
 param(
     [string] $IssueNumber,
-    [string] $FeatureName
+    [string] $FeatureName,
+    # The development-docs root whose active area holds the feature folder (issue #1035).
+    [ValidateSet('docs/features', '.dev')]
+    [string] $DevelopmentDocsRoot = 'docs/features'
 )
 
 function Write-ScriptError {
@@ -36,14 +39,18 @@ function Build-FeatureDocumentationBlock {
     [OutputType([string])]
     param(
         [Parameter(Mandatory = $true)]
-        [string] $FeatureName
+        [string] $FeatureName,
+
+        [ValidateSet('docs/features', '.dev')]
+        [string] $DevelopmentDocsRoot = 'docs/features'
     )
 
+    $active = "$DevelopmentDocsRoot/active"
     return @"
 ## Feature Docs
-- [User Story](docs/features/active/$FeatureName/user-story.md)
-- [Spec](docs/features/active/$FeatureName/spec.md)
-- [Plan](docs/features/active/$FeatureName/plan.md)
+- [User Story]($active/$FeatureName/user-story.md)
+- [Spec]($active/$FeatureName/spec.md)
+- [Plan]($active/$FeatureName/plan.md)
 "@
 }
 
@@ -78,7 +85,9 @@ function Invoke-LinkFeatureDocument {
     param(
         [string] $IssueNumberParam,
         [string] $FeatureNameParam,
-        [scriptblock] $InvokeGh = { param([string[]] $GhArgs) Invoke-GhCli -GhArgs $GhArgs }
+        [scriptblock] $InvokeGh = { param([string[]] $GhArgs) Invoke-GhCli -GhArgs $GhArgs },
+        [ValidateSet('docs/features', '.dev')]
+        [string] $DevelopmentDocsRootParam = 'docs/features'
     )
 
     if ([string]::IsNullOrWhiteSpace($IssueNumberParam)) {
@@ -106,7 +115,7 @@ function Invoke-LinkFeatureDocument {
 
     # Normalize feature name to both underscore and hyphen variants for paths
     $featurePath = $FeatureNameParam
-    $docsBlock = Build-FeatureDocumentationBlock -FeatureName $featurePath
+    $docsBlock = Build-FeatureDocumentationBlock -FeatureName $featurePath -DevelopmentDocsRoot $DevelopmentDocsRootParam
 
     $newBody = Set-OrAppendSection -Content $body -SectionHeading "## Feature Docs" -Replacement $docsBlock
 
@@ -132,4 +141,4 @@ if ($env:POSHQC_SKIP_SCRIPT_EXECUTION) {
     return
 }
 
-Invoke-LinkFeatureDocument -IssueNumberParam $IssueNumber -FeatureNameParam $FeatureName
+Invoke-LinkFeatureDocument -IssueNumberParam $IssueNumber -FeatureNameParam $FeatureName -DevelopmentDocsRootParam $DevelopmentDocsRoot

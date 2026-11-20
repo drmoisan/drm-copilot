@@ -5,6 +5,9 @@
 const discoveryCoverageThresholds = require("./jest.discovery-coverage.json");
 // Issue #1036: the seven docs MCP modules keep their thresholds in jest.docs-coverage.json.
 const docsCoverageThresholds = require("./jest.docs-coverage.json");
+const developmentDocsMigrationCoverageThresholds = require("./jest.development-docs-migration-coverage.json"); // Issue #1016
+// Issue #1029: the push-down pipeline modules keep their thresholds in jest.push-down-coverage.json.
+const pushDownCoverageThresholds = require("./jest.push-down-coverage.json");
 
 /** @type {import('jest').Config} */
 module.exports = {
@@ -33,6 +36,8 @@ module.exports = {
   coverageThreshold: {
     ...discoveryCoverageThresholds,
     ...docsCoverageThresholds,
+    ...developmentDocsMigrationCoverageThresholds,
+    ...pushDownCoverageThresholds,
     // Issue #1162: the three epic validator modules extended with the key-gated
     // cross-epic dependency invariants.
     "./src/lib/validate/epic-orchestrator-state-resolution.ts": {
@@ -589,6 +594,89 @@ module.exports = {
       branches: 75,
     },
     "./src/extension.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #1035: the host-neutral development-docs modules (root resolver,
+    // feature-folder name parser, write-scope contract). Per-file entries only.
+    "./src/lib/development-docs/root.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/development-docs/feature-folder-name.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/development-docs/write-scopes.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #1028: converter files changed by the AGENTS.md redirection (H3)
+    // that had no per-file entry. Per-file entries only.
+    "./src/lib/codex-native-converter/engine-pipeline.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/pipeline.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/codex-native-converter/validation.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #1050: destination CI workflow rendering (pure module).
+    "./src/lib/push-down/push-down-ci-workflows.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #1050: CI contribution to the shared push-down layer.
+    "./src/lib/push-down/push-down-ci-layer.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    // Issue #1051: push-down integration modules (per-file entries; no `global` key).
+    "./src/lib/push-down-integration/workflow-yaml-reader.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down-integration/integration-items.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down-integration/integration-ecosystems.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down-integration/integration-detect.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down-integration/integration-validate.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down-integration/integration-validate-artifacts.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/lib/push-down/push-down-integration-needed.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-push-down-integration-tool-definitions.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-tool-inputs-push-down-integration.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/mcp-handlers/push-down-integration-handlers.ts": {
+      lines: 85,
+      branches: 75,
+    },
+    "./src/repo-automation-service-push-down-integration.ts": {
       lines: 85,
       branches: 75,
     },

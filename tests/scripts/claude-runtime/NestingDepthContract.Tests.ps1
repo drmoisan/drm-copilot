@@ -23,10 +23,8 @@ Describe 'Nesting-depth wording contract (issue #1138)' {
         $script:BriefFiles = @(
             '.claude/skills/execution-environment/SKILL.md'
             '.agents/skills/execution-environment/SKILL.md'
-            '.github/skills/execution-environment/SKILL.md'
             'extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md'
             'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md'
-            'extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md'
         )
         $script:SkillLiterals = @(
             'depth 1', 'depth 2', 'depth 3', '2.1.219', 'CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH', 'at least 3',

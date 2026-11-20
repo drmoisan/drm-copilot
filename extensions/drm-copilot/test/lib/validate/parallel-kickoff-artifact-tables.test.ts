@@ -71,7 +71,7 @@ describe("validateParallelKickoffText item table negative cases", () => {
   it("reports an item row whose cell count is not six", () => {
     // Arrange
     const shortRow =
-      "| 101 | docs/features/active/item-101 | 0 | C3 | feature/item-101 |";
+      "| 101 | .dev/active/item-101 | 0 | C3 | feature/item-101 |";
     const document = kickoff([shortRow]);
 
     // Act / Assert

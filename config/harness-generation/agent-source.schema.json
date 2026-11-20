@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "config/harness-generation/agent-source.schema.json",
+  "title": "Harness generation agent source",
+  "description": "One source per dual-ecosystem agent under scripts/harness-generation/sources/agents/ (issue #1028); its section body is the sibling <name>.md.",
+  "type": "object",
+  "required": ["$schema", "claude", "codex"],
+  "additionalProperties": false,
+  "$defs": {
+    "keyValueList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["key", "value"],
+        "additionalProperties": false,
+        "properties": {
+          "key": { "type": "string", "minLength": 1 },
+          "value": { "type": "string" }
+        }
+      }
+    },
+    "sectionList": { "type": "array", "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" } },
+    "substitutionList": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["find", "replace"],
+        "additionalProperties": false,
+        "properties": {
+          "find": { "type": "string", "minLength": 1 },
+          "replace": { "type": "string" }
+        }
+      }
+    }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "claude": {
+      "type": "object",
+      "required": ["frontmatter", "path", "sections"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "pattern": "^\\.claude/agents/[^/]+\\.md$" },
+        "frontmatter": { "$ref": "#/$defs/keyValueList" },
+        "sections": { "$ref": "#/$defs/sectionList" },
+        "substitutions": { "$ref": "#/$defs/substitutionList" }
+      }
+    },
+    "codex": {
+      "type": "object",
+      "required": ["delimiter", "keys", "path", "sections"],
+      "additionalProperties": false,
+      "properties": {
+        "path": { "type": "string", "pattern": "^\\.codex/agents/[^/]+\\.toml$" },
+        "keys": { "$ref": "#/$defs/keyValueList" },
+        "delimiter": { "enum": ["'''", "\"\"\""] },
+        "sections": { "$ref": "#/$defs/sectionList" },
+        "substitutions": { "$ref": "#/$defs/substitutionList" },
+        "separator": { "type": "string" },
+        "trailer": { "type": "string" }
+      }
+    }
+  }
+}

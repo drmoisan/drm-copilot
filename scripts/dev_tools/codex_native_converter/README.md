@@ -2,7 +2,7 @@
 
 The Codex-native converter reviews or applies a deterministic migration from a supported source runtime surface into the Codex-native layout used by this repository.
 
-This package is the authoritative Python implementation behind the repository CLI, the VS Code wrapper, and the MCP wrapper.
+This package is the Python implementation behind the Poetry script `codex-native-converter`. The VS Code command `drmCopilotExtension.runCodexNativeConverter` and the MCP tool `run_codex_native_converter` run the in-process TypeScript port in `extensions/drm-copilot/src/lib/codex-native-converter/`, which is kept in parity with this package. Neither implementation emits `AGENTS.md`: standing-guidance sources are reported as not emitted because `AGENTS.md` is a hand-authored source.
 
 ## What it does
 

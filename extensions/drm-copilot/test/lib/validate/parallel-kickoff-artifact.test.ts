@@ -97,12 +97,12 @@ describe("parseParallelKickoff", () => {
     expect(result.parsed).toEqual({
       slug: "sample-run",
       invocationSlug: "sample-run",
-      manifestPath: "docs/features/parallel/sample-run/parallel.md",
+      manifestPath: ".dev/parallel/sample-run/parallel.md",
       planHomeBranch: "parallel/sample-run-plan",
       items: [
         {
           issueNum: 101,
-          featureFolder: "docs/features/active/item-101",
+          featureFolder: ".dev/active/item-101",
           cohort: 0,
           complexity: "C3",
           branch: "feature/item-101",
@@ -209,7 +209,7 @@ describe("validateParallelKickoffText structural negative cases", () => {
   it("reports an invocation prompt without the manifest path", () => {
     // Arrange
     const document = kickoff().replace(
-      "docs/features/parallel/sample-run/parallel.md",
+      ".dev/parallel/sample-run/parallel.md",
       "the run manifest",
     );
 

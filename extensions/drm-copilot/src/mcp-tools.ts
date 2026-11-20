@@ -74,7 +74,12 @@ import {
 import { normalizeWorkspaceRoot } from "./workflow-command-arguments";
 import { handlePortableHandoffTool } from "./mcp-handlers/orchestration-handoff-handlers";
 import { handleDocsTool } from "./mcp-handlers/docs-handlers";
+import { handleMigrateDevelopmentDocs } from "./mcp-handlers/development-docs-migration-handler";
 import type { DocsCommandEnvelope } from "./docs-command-envelope";
+import type { PushDownReport } from "./lib/push-down/push-down-report";
+import { handlePushDownIntegrationTool } from "./mcp-handlers/push-down-integration-handlers";
+import type { DetectIntegrationResult } from "./lib/push-down-integration/integration-detect";
+import type { ValidateIntegrationResult } from "./lib/push-down-integration/integration-validate";
 
 export { DEFAULT_HARD_LOCK_PROMPT_OUTPUT_PATH } from "./mcp-handlers/resolve-execute-hard-lock-prompt-handler";
 
@@ -112,6 +117,9 @@ export interface RepoAutomationMcpToolResult extends Record<string, unknown> {
   readonly receipt?: FinalizedReceiptSummary;
   readonly sentinel?: SentinelObservationSummary;
   readonly docs?: DocsCommandEnvelope;
+  readonly push_down_report?: PushDownReport;
+  /** Detect facts or validate verdict of the push-down integration tools. */
+  readonly integration?: DetectIntegrationResult | ValidateIntegrationResult;
 }
 
 function inferWorkspaceRoot(rawInput: unknown): string {
@@ -167,6 +175,9 @@ function toMcpToolResult(
       : { invocation: result.invocation }),
     ...(result.receipt === undefined ? {} : { receipt: result.receipt }),
     ...(result.sentinel === undefined ? {} : { sentinel: result.sentinel }),
+    ...(result.pushDownReport === undefined
+      ? {}
+      : { push_down_report: result.pushDownReport }),
   };
 }
 
@@ -334,6 +345,12 @@ export async function dispatchRepoAutomationTool(
         );
       }
 
+      case "migrate_development_docs": {
+        return toMcpToolResult(
+          await handleMigrateDevelopmentDocs(rawInput, service),
+        );
+      }
+
       case "run_docs_check":
       case "run_docs_inventory":
       case "run_docs_coverage":
@@ -341,6 +358,11 @@ export async function dispatchRepoAutomationTool(
       case "generate_docs_reference":
       case "validate_docs_artifacts": {
         return await handleDocsTool(toolName, rawInput, service);
+      }
+
+      case "detect_push_down_integration":
+      case "validate_push_down_integration": {
+        return await handlePushDownIntegrationTool(toolName, rawInput, service);
       }
 
       case "validate_discovery_artifacts": {

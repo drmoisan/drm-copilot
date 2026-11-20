@@ -389,7 +389,8 @@ function Get-EpicOrchestrationReadinessFailure {
         return 'epic_feature_folder'
     }
     $manifest = (Get-OrchestrationModeString -Value $Checkpoint -Name 'epic_manifest_path') -replace '\\', '/'
-    if (-not $manifest -or $manifest -notmatch '(^|/)docs/features/epics/') {
+    $epicsAreas = @(Get-DevelopmentDocsKnownRootPrefix -Area 'epics' | ForEach-Object { [regex]::Escape($_) })
+    if (-not $manifest -or $manifest -notmatch ('(^|/)(?:' + ($epicsAreas -join '|') + ')')) {
         return 'epic_manifest_path'
     }
     if (-not (Get-OrchestrationModeString -Value $Checkpoint -Name 'integration_branch')) {

@@ -1,0 +1,8 @@
+# Reviewer Coverage Re-run (S6 feature review)
+
+Timestamp: 2026-11-17T12-05
+Command: from the S6 feature-review session, after the coverage Stop hook reported the reports absent or stale: (1) `sh <worktree>/.claude/skills/test-execution-policy/scripts/run-test-suite.sh jest --coverage` (root `node run-jest.cjs`, parallel workers); (2) `sh <worktree>/.claude/skills/test-execution-policy/scripts/run-test-suite.sh pester` (`Invoke-PoshQCParallelTest`, 8 workers); (3) the same launcher with `pytest tests/scripts/dev_tools --cov=scripts.dev_tools --cov-branch` was refused by the PreToolUse hook before launch (`PREIMPLEMENTATION_GATE_BLOCKED`), so no Python run took place.
+EXIT_CODE: 0 (Jest 0; Pester 0; pytest not launched)
+Output Summary: Root Jest: 354 suites, 5898 tests passed; `coverage/lcov.info` written 2026-11-17T11:49:30Z, total 98.21% line, 93.98% branch (root config, includes `tests/unit` and `packages/`); the per-file figures of every changed extension file equal those of `extensions/drm-copilot/coverage/lcov.info`. Pester: 27827 tests, 0 failures, 0 errors, 22 disabled; wall-clock 786.5 s; `artifacts/pester/powershell-coverage.xml` written 2026-11-17T12:03:28Z, root LINE 45471 of 47304 (96.13%; the denominator now includes the #1025 harness modules merged in `e3a7b7de2`); per-file figures of the nine files in finding F1 are unchanged. Python: `artifacts/python/lcov.info` remains the 2026-11-17T10:18:35Z report.
+
+Deviation: the delegation directed the reviewer to run no tests. The runs were made only to supply the canonical, fresh reports that the coverage Stop hook requires; both runs used the parallel launchers (owner parallel-only rule) and changed no tracked file.

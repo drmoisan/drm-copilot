@@ -1,0 +1,37 @@
+{
+  "issue": 1028,
+  "written_at": "2026-11-18T07:07:40Z",
+  "note": "Wall-clock time including queueing; merge stage not captured.",
+  "stage_timing": [
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 1,
+      "started_at": "2026-11-17T17:10:56Z",
+      "ended_at": "2026-11-18T02:24:43Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 1,
+      "started_at": "2026-11-18T02:24:43Z",
+      "ended_at": "2026-11-18T02:41:30Z"
+    },
+    {
+      "stage": "S8_create_pr",
+      "attempt": 1,
+      "started_at": "2026-11-18T02:41:30Z",
+      "ended_at": "2026-11-18T02:46:35Z"
+    },
+    {
+      "stage": "S9_ci_green",
+      "attempt": 1,
+      "started_at": "2026-11-18T02:46:35Z",
+      "ended_at": "2026-11-18T03:13:15Z"
+    },
+    {
+      "stage": "S9_ci_green",
+      "attempt": 2,
+      "started_at": "2026-11-18T06:34:14Z",
+      "ended_at": "2026-11-18T07:07:40Z"
+    }
+  ]
+}

@@ -7,11 +7,19 @@
     "docs/features/epics/",
     "docs/features/parallel/",
     "docs/features/potential/",
-    "docs/research/"
+    "docs/research/",
+    ".dev/active/",
+    ".dev/archive/",
+    ".dev/completed/",
+    ".dev/epics/",
+    ".dev/parallel/",
+    ".dev/potential/",
+    ".dev/research/"
   ],
   "exclude_prefixes": [
     "docs/features/potential/template.md",
-    "docs/features/templates/"
+    "docs/features/templates/",
+    ".dev/potential/template.md"
   ],
   "extensions": [".md", ".txt", ".log", ".json", ".xml"]
 }

@@ -1,7 +1,7 @@
 ---
 name: staged_code_review_agent
 description: Review staged changes before commit. Produce PolicyAudit.md (per policy audit templates) + CodeReview.md (best practices, typed Python emphasis). If remediation is needed, generate remediation inputs and delegate plan creation to atomic_planner to write remediation-plan.md in the active feature folder. No user questions.
-argument-hint: "Stage your changes, then run this agent. It will inspect ONLY staged diffs, run repo-required checks in check-only mode where possible, and generate: (1) docs/features/active/<feature>/policy-audit.<timestamp>.md, (2) docs/features/active/<feature>/code-review.<timestamp>.md, and (3) if needed, docs/features/active/<feature>/remediation-inputs.<timestamp>.md plus an atomic_planner prompt to write remediation-plan.<timestamp>.md in the same folder. Timestamps use ISO-8601 format yyyy-MM-ddTHH-mm."
+argument-hint: "Stage your changes, then run this agent. It will inspect ONLY staged diffs, run repo-required checks in check-only mode where possible, and generate: (1) .dev/active/<feature>/policy-audit.<timestamp>.md, (2) .dev/active/<feature>/code-review.<timestamp>.md, and (3) if needed, .dev/active/<feature>/remediation-inputs.<timestamp>.md plus an atomic_planner prompt to write remediation-plan.<timestamp>.md in the same folder. Timestamps use ISO-8601 format yyyy-MM-ddTHH-mm."
 tools:
    [execute/getTerminalOutput, execute/runTask, execute/runInTerminal, execute/runTests, read/problems, read/readFile, edit/createDirectory, edit/createFile, edit/editFiles, search, web, 'drmcopilotextension/*', todo]
 handoffs:
@@ -53,8 +53,8 @@ Policy Audit templates:
       - `asset: code-review-template` for `code-review.yyyy-MM-ddTHH-mm.md`
       - `asset: feature-audit-template` for `feature-audit.yyyy-MM-ddTHH-mm.md`
       - `asset: agents` for `AGENTS.md`
-  - `docs/features/templates/policy_audit/PolicyAudit.template.md`
-  - `docs/features/templates/policy_audit/README.md` (if present)
+  - `.dev/templates/policy_audit/PolicyAudit.template.md`
+  - `.dev/templates/policy_audit/README.md` (if present)
 
 Constraints:
 - Do NOT modify `.github/instructions/*.instructions.md` policy documents.
@@ -106,20 +106,20 @@ Constraints:
 ## Phase B — Identify the active feature folder (no questions)
 
 Determine `<FEATURE_FOLDER>` using this exact precedence:
-1) If any staged path is under `docs/features/active/<feature>/...`:
+1) If any staged path is under `.dev/active/<feature>/...`:
    - Choose that `<feature>` folder (if multiple, choose the one with the most staged files; document the tie-break).
-2) Else, if branch name suggests a feature folder and it exists under `docs/features/active/`, use it.
-3) Else, inspect `docs/features/active/`:
+2) Else, if branch name suggests a feature folder and it exists under `.dev/active/`, use it.
+3) Else, inspect `.dev/active/`:
    - Choose the most recently modified feature folder (by filesystem timestamps and/or presence of a recent plan/prd).
 4) Else:
-   - Create `docs/features/active/_staged-review/` and use that as `<FEATURE_FOLDER>`.
+   - Create `.dev/active/_staged-review/` and use that as `<FEATURE_FOLDER>`.
 
 Document the rule used inside PolicyAudit.md and CodeReview.md.
 
 ## Phase C — Produce PolicyAudit.md (template-driven)
 
 1) Locate the policy audit template directory:
-   - Prefer: `docs/features/templates/policy_audit/PolicyAudit.template.md`
+   - Prefer: `.dev/templates/policy_audit/PolicyAudit.template.md`
    - If missing, search for `PolicyAudit.template.md` in the repo.
    - If still missing, STOP and mark audit as BLOCKED in a minimal PolicyAudit.md explaining the missing template.
 

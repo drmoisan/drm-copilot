@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "description: Generate a conventional commit message from staged Git changes following the repository's commit message conventions.\n",
+      "replace": "description: Generate a conventional commit message from staged Git changes following the repository's commit message conventions.\nallowed-tools:\n  - Read\n  - \"Bash(git log *)\"\n  - \"Bash(git diff *)\"\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "2. When the `drm-copilot` MCP commit-context tool is available for the workflow, collect commit context through that tool and stop if the MCP call fails.\n3. Otherwise inspect read-only staged Git state only:\n",
+      "replace": "2. Otherwise inspect the staged diff and commit history only:\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "4. Do not infer intent from unstaged files or unrelated commit history.\n",
+      "replace": "3. Do not infer intent from unstaged files or unrelated commit history.\n"
+    }
+  ]
+}

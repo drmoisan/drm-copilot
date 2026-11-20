@@ -24,8 +24,8 @@
     artifacts/orchestration/, artifacts/pr_context, artifacts/reviews/,
     artifacts/status/, artifacts/python/, artifacts/pester/, and
     artifacts/csharp/. Research output is no longer an artifacts/ sub-path; it
-    is written to the tracked roots docs/features/<feature>/research/
-    (feature-associated) or docs/research/ (one-off).
+    is written to the tracked roots .dev/<feature>/research/
+    (feature-associated) or .dev/research/ (one-off).
 
     If the file_path resolves to a forbidden prefix, the script writes a PreToolUse JSON
     response to stdout with hookSpecificOutput.permissionDecision = 'deny' and exits with

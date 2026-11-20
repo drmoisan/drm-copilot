@@ -196,6 +196,10 @@ describe("pushDownCustomizations (codex/agents)", () => {
     expect(VIRTUAL_ROOT_FOLDERS).toContain(".codex/lib/discovery-validation");
   });
 
+  it("publishes the development-docs library directory (issue #1035)", () => {
+    expect(VIRTUAL_ROOT_FOLDERS).toContain(".codex/lib/development-docs");
+  });
+
   it("publishes nothing under the helper directory until resources are stored", () => {
     // Arrange: no helper resources exist under `lib/discovery-validation`.
     const fs = buildInMemoryFileSystem(

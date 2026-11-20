@@ -10,8 +10,9 @@
     stage is not captured. The script throws when the evidence root does not exist.
 
 .PARAMETER EvidenceRoot
-    The folder searched recursively for stage-timing.*.json files. The default is docs/features
-    below the repository root.
+    The folder searched recursively for stage-timing.*.json files. The default is the
+    development-docs root that Resolve-DevelopmentDocsRoot resolves for the repository root
+    (docs/features unless configured otherwise, issue #1035); a failed resolution throws its Reason.
 
 .EXAMPLE
     pwsh -NoProfile -File scripts/dev-tools/Get-StageTimingReport.ps1
@@ -26,7 +27,11 @@ $ErrorActionPreference = 'Stop'
 
 # The default is resolved here rather than in the param block, so the line is measured by coverage.
 if (-not $PSBoundParameters.ContainsKey('EvidenceRoot')) {
-    $EvidenceRoot = Join-Path -Path $PSScriptRoot -ChildPath '../../docs/features'
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '../../.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+    $repositoryRoot = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent
+    $resolution = Resolve-DevelopmentDocsRoot -WorkspaceRoot $repositoryRoot
+    if (-not $resolution.Succeeded) { throw $resolution.Reason }
+    $EvidenceRoot = Join-Path -Path $repositoryRoot -ChildPath $resolution.Root
 }
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'StageTiming.psm1') -Force

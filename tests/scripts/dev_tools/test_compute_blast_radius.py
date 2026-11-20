@@ -9,10 +9,13 @@ built from an observed diff path list. Validation rules live in
 
 from __future__ import annotations
 
+import ast
+import inspect
 from typing import TYPE_CHECKING, cast
 
 import pytest
 
+from scripts.dev_tools import compute_blast_radius
 from scripts.dev_tools.compute_blast_radius import (
     BlastRadius,
     RadiusFinding,
@@ -289,6 +292,42 @@ def test_derivation_trims_separators_from_the_feature_folder() -> None:
     radius = derive_blast_radius("", "", " trimmed/ ", CONFIG, computed_at="t")
 
     assert radius.paths == ("docs/features/active/trimmed/**",)
+
+
+def test_derivation_feature_folder_glob_uses_passed_root() -> None:
+    """Place a bare feature folder under the active area of the passed root."""
+    radius = derive_blast_radius(
+        "", "", "f", CONFIG, computed_at="t", development_docs_root=".dev"
+    )
+
+    assert radius.paths == (".dev/active/f/**",)
+
+
+def test_derivation_rejects_an_unknown_development_docs_root() -> None:
+    """Fail fast with an error naming a root outside the known set."""
+    with pytest.raises(ValueError, match="Unknown development docs root docs/dev"):
+        derive_blast_radius(
+            "", "", "f", CONFIG, computed_at="t", development_docs_root="docs/dev"
+        )
+
+
+def test_derivation_passes_through_a_dev_qualified_feature_folder() -> None:
+    """Keep a .dev-qualified folder as is when no root is passed."""
+    radius = derive_blast_radius("", "", ".dev/active/f", CONFIG, computed_at="t")
+
+    assert radius.paths == (".dev/active/f/**",)
+
+
+def test_compute_blast_radius_calls_no_resolver() -> None:
+    """Keep the derivation module free of development-docs configuration reads."""
+    tree = ast.parse(inspect.getsource(compute_blast_radius))
+
+    # Collect every bare and attribute name the module refers to.
+    names = {node.id for node in ast.walk(tree) if isinstance(node, ast.Name)}
+    names |= {node.attr for node in ast.walk(tree) if isinstance(node, ast.Attribute)}
+
+    assert "development_docs_relative_path" in names
+    assert "resolve_development_docs_root" not in names
 
 
 def test_derivation_records_the_requested_declared_source() -> None:

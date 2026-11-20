@@ -132,7 +132,7 @@ Describe 'Policy toolchain naming' {
         @{ Id = 'GITHUB-AGENTS'; Root = @('.github/agents'); Kind = 'Policy' }
         @{ Id = 'GITHUB-PROMPTS'; Root = @('.github/prompts'); Kind = 'Policy' }
         @{ Id = 'CODEX-AGENTS'; Root = @('.codex/agents'); Kind = 'Policy' }
-        @{ Id = 'TEMPLATES'; Root = @('docs/features/templates'); Kind = 'Policy' }
+        @{ Id = 'TEMPLATES'; Root = @('.dev/templates'); Kind = 'Policy' }
         @{ Id = 'README'; Root = @('README.md'); Kind = 'Policy' }
         @{ Id = 'CLAUDE-BUNDLE'; Root = @("$script:Resources/claude-customizations"); Kind = 'Policy' }
         @{ Id = 'GITHUB-BUNDLE'; Root = @("$script:Resources/customizations"); Kind = 'Policy' }

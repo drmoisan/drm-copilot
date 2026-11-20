@@ -56,7 +56,7 @@ export interface RewriteTarget {
 /**
  * Build the command rewrite catalog for supported script references.
  *
- * Replicates the seven Python catalog entries exactly (key, command id, title,
+ * Replicates the six Python catalog entries exactly (key, command id, title,
  * script reference, placeholder flag), keyed by normalized reference.
  *
  * @returns Catalog keyed by normalized reference.
@@ -103,13 +103,6 @@ export function buildRewriteCatalog(): Map<string, RewriteTarget> {
       commandId: "drmCopilotExtension.pushDownCopilotCustomizations",
       title: "drm-copilot: Push Down Copilot Customizations",
       scriptReference: "scripts.dev_tools.push_down_copilot_customizations",
-      isPlaceholder: false,
-    },
-    {
-      normalizedKey: "scripts/dev_tools/sync-agents-from-instructions.ps1",
-      commandId: "drmCopilotExtension.syncAgentsFromInstructions",
-      title: "drm-copilot: Sync AGENTS.md from Instructions",
-      scriptReference: "scripts/dev-tools/sync-agents-from-instructions.ps1",
       isPlaceholder: false,
     },
   ];

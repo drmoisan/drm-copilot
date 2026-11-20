@@ -3,11 +3,17 @@
 // changed line must be covered).
 import { describe, expect, it } from "@jest/globals";
 
-import { buildTranslationTraces } from "../../../src/lib/codex-native-converter/engine-pipeline";
+import {
+  buildTranslationTraces,
+  renderGeneratedOutput,
+  writeDestinationOutputs,
+} from "../../../src/lib/codex-native-converter/engine-pipeline";
 import {
   ConversionClass,
   type MappingRecord,
+  type PlannedEmission,
   type RunOptions,
+  SectionIntentKind,
   SourceEcosystem,
   SourceKind,
   TargetRole,
@@ -128,5 +134,68 @@ describe("coverage: engine-pipeline.ts", () => {
       "hook",
       "shared-skill",
     ]);
+  });
+
+  it("renders section emissions only for targets no mapping record produced and skips null targets", () => {
+    // Arrange: one mapping record owns skill A; emissions target skill A
+    // (already produced), no target (null), and skill B (new).
+    const fs = new InMemoryFileSystem();
+    fs.addFile(`${SOURCE_ROOT}/.github/skills/a/SKILL.md`, "Skill A body.");
+    fs.addFile(`${SOURCE_ROOT}/${PROMPT_PATH}`, PROMPT_TEXT);
+    const skillRecord: MappingRecord = {
+      ...PROMPT_RECORD,
+      sourcePath: ".github/skills/a/SKILL.md",
+      sourceKind: SourceKind.REUSABLE_SKILL,
+      conversionClass: ConversionClass.DIRECT,
+      targetRole: TargetRole.SHARED_SKILL,
+      targetPath: ".agents/skills/a/SKILL.md",
+    };
+    const emission = (targetPath: string | null): PlannedEmission => ({
+      sourcePath: PROMPT_PATH,
+      sectionId: `${PROMPT_PATH}#workflow-1`,
+      heading: "Workflow",
+      intentKind: SectionIntentKind.SHARED_WORKFLOW,
+      targetRole: TargetRole.SHARED_SKILL,
+      targetPath,
+      notes: [],
+    });
+
+    // Act
+    const output = renderGeneratedOutput(
+      fs,
+      RUN_OPTIONS,
+      [skillRecord],
+      [
+        emission(".agents/skills/a/SKILL.md"),
+        emission(null),
+        emission(".agents/skills/b/SKILL.md"),
+      ],
+    );
+
+    // Assert: skill A keeps its mapping-record rendering, skill B comes from
+    // the emission, and the null-target emission adds no key.
+    expect(Object.keys(output).sort()).toEqual([
+      ".agents/skills/a/SKILL.md",
+      ".agents/skills/b/SKILL.md",
+    ]);
+    expect(output[".agents/skills/a/SKILL.md"]).toContain("Skill A body.");
+    expect(output[".agents/skills/a/SKILL.md"]).not.toContain(
+      "Derived prompt sections:",
+    );
+    expect(output[".agents/skills/b/SKILL.md"]).toContain(
+      "Derived prompt sections:",
+    );
+  });
+
+  it("writes generated files beneath an empty destination root as bare paths", () => {
+    // Arrange
+    const fs = new InMemoryFileSystem();
+
+    // Act
+    writeDestinationOutputs(fs, "", { "b.md": "B\n", "a.md": "A\n" });
+
+    // Assert
+    expect(fs.readTextFile("a.md")).toBe("A\n");
+    expect(fs.readTextFile("b.md")).toBe("B\n");
   });
 });

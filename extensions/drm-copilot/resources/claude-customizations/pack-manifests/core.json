@@ -243,6 +243,7 @@
     ".claude/skills/pr-author/SKILL.md",
     ".claude/skills/pr-base-branch-merge-base/SKILL.md",
     ".claude/skills/pr-context-artifacts/SKILL.md",
+    ".claude/skills/push-down-integration/SKILL.md",
     ".claude/skills/quota-throttling/SKILL.md",
     ".claude/skills/reconcile-parity-matrix/SKILL.md",
     ".claude/skills/remediation-handoff-atomic-planner/SKILL.md",
@@ -332,6 +333,7 @@
     ".claude/lib/epic-wave/Invoke-EpicWave.ps1",
     ".claude/lib/epic-wave/EpicCrossDependency.psm1",
     ".claude/lib/epic-wave/Invoke-EpicCrossReadiness.ps1",
+    ".claude/lib/development-docs/DevelopmentDocsRoot.psm1",
     ".claude/lib/parallel-drift/ParallelDriftHalt.psm1",
     ".claude/lib/parallel-drift/ParallelDrift.psm1",
     ".claude/lib/parallel-drift/ParallelDriftAccess.psm1",
@@ -482,6 +484,20 @@
     ".claude/lib/docs/DocsExtensionShape.psm1",
     ".claude/lib/docs/DocsAnalyzerExtensionImport.psm1",
     ".claude/lib/docs/DocsPythonNativeProtocol.psm1",
-    ".claude/lib/docs/DocsAnalyzerPythonNative.psm1"
+    ".claude/lib/docs/DocsAnalyzerPythonNative.psm1",
+    ".claude/agent-memory/epic-orchestrator/MEMORY.md",
+    ".claude/agent-memory/epic-orchestrator/feedback_commit_push_memory_before_pr.md",
+    ".claude/agent-memory/epic-orchestrator/feedback_no_sendmessage_tool.md",
+    ".claude/agent-memory/epic-orchestrator/feedback_worktree_isolation_branches_from_main.md",
+    ".claude/agent-memory/orchestrator/MEMORY.md",
+    ".claude/agent-memory/orchestrator/feedback_branch_base_check_unmerged_pr_deps.md",
+    ".claude/agent-memory/orchestrator/feedback_commit_push_memory_before_pr.md",
+    ".claude/agent-memory/orchestrator/feedback_every_change_through_lifecycle.md",
+    ".claude/agent-memory/orchestrator/feedback_policy_compliance_not_optional.md",
+    ".claude/agent-memory/orchestrator/feedback_potential_to_issue_creates_github_issue.md",
+    ".claude/agent-memory/orchestrator/feedback_remediation_plan_em_dash_required.md",
+    ".claude/agent-memory/orchestrator/feedback_small_bug_uses_minor_audit.md",
+    ".claude/agent-memory/orchestrator/feedback_test_files_count_against_500_cap.md",
+    ".mcp.json"
   ]
 }

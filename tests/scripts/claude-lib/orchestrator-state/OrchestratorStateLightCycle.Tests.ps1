@@ -59,7 +59,7 @@ BeforeAll {
         )
 
         return '{"review_outcomes":[{"verdict":"REMEDIATION_REQUIRED","findings":' + $Findings + '}],' +
-        '"cycles":[{"plan_path":"docs/features/active/x/remediation-inputs.md","remediation_path":' + $Path +
+        '"cycles":[{"plan_path":".dev/active/x/remediation-inputs.md","remediation_path":' + $Path +
         ',"opened_by_review":0,"execution_status":"complete"}]}'
     }
 }

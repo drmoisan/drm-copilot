@@ -83,7 +83,7 @@ def test_launch_evidence_accepts_sealed_completed_preparation_wave() -> None:
     ("field", "replacement", "expected"),
     [
         ("issue_num", "pending:feature-101", ".issue_num must match the feature"),
-        ("feature_folder", "docs/features/active/other", ".feature_folder"),
+        ("feature_folder", ".dev/active/other", ".feature_folder"),
         ("delegation_id", "other", ".delegation_id"),
         ("deployment_agent", "orchestrator-c1", ".deployment_agent"),
         ("model", "gpt-6-luna", ".model must match"),

@@ -55,6 +55,9 @@ projects:
   - path: ".claude/lib/codex-routing"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
+  - path: ".claude/lib/development-docs"
+    tier: T3
+    rationale: "Runtime library shipped in the `.claude` bundle; development-docs root resolver, area map, and feature-folder name rules"
   - path: ".claude/lib/discovery-validation"
     tier: T3
     rationale: "Runtime library shipped in the `.claude` bundle"
@@ -106,3 +109,9 @@ projects:
   - path: "scripts/ci"
     tier: T4
     rationale: "CI change-scope decision script and its pure helper module (CI scaffolding)"
+  - path: "scripts/harness"
+    tier: T4
+    rationale: "Repository-internal parity-matrix and contract checks run by the PowerShell QC gate; not published by push-down"
+  - path: "scripts/harness-generation"
+    tier: T4
+    rationale: "Repository-internal generators and drift check for the shared harness surfaces (issue #1028); dev tooling run by developers and the PowerShell QC gate; not published by push-down"

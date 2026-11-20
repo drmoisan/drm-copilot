@@ -284,7 +284,7 @@ If an exact signal or required path field is missing, set the relevant step to `
     denial means the discovery criteria are not current: run `validate-all --mode planning`
     through the installed gateway and re-delegate; never bypass the gate. Discovery criteria
     gate planning; they never substitute for the plan's own tests (see
-    `docs/engineering/legacy-discovery-and-parity/enforcement.md`).
+    `.dev/engineering/legacy-discovery-and-parity/enforcement.md`).
 
 ## Small Path
 

@@ -45,10 +45,10 @@ Before proceeding, `parallel-orchestrator` must:
 
 ## Parallel Manifest Consumption
 
-The run manifest is the YAML frontmatter of `docs/features/parallel/<slug>/parallel.md`, authored
+The run manifest is the YAML frontmatter of `.dev/parallel/<slug>/parallel.md`, authored
 by `parallel-planner` on the planner-owned branch `parallel/<slug>-plan`. That branch is not an
 integration branch: no item branch merges into it, it merges into no item branch, and it holds
-only run-level artifacts under `docs/features/parallel/<slug>/`.
+only run-level artifacts under `.dev/parallel/<slug>/`.
 
 **This section is not a schema authority.** The manifest schema, the checkpoint schema, and all
 nine parallel enums are defined once as prose invariants in
@@ -62,8 +62,8 @@ the schema from the rule file and the validators; consume it here and never rede
 Consumption rules:
 
 - `issue_num` is the primary key for every item reference. It is the stable GitHub issue number,
-  so it does not drift when an item's folder moves from `docs/features/active/` to
-  `docs/features/completed/`.
+  so it does not drift when an item's folder moves from `.dev/active/` to
+  `.dev/completed/`.
 - Read `mode` (`closed` or `open`, defaulting to `closed`), `max_concurrency` (an integer from 1
   through 32, defaulting to 4), and each item's identity and state: `feature_folder`, `kind`,
   `state`, and `blast_radius`.
@@ -75,7 +75,7 @@ Consumption rules:
   the checkpoint. Do not guess a repair, do not silently skip the offending item, and do not launch
   a partial cohort. Validate with the destination-runtime bash entry point, which needs no Python
   interpreter and is published by push-down alongside `.claude`:
-  `bash .claude/lib/bash/validate-parallel-manifest.sh docs/features/parallel/<slug>/parallel.md`.
+  `bash .claude/lib/bash/validate-parallel-manifest.sh .dev/parallel/<slug>/parallel.md`.
   Its non-zero exit is the rejection signal and its printed error list, one error per line on
   stdout, is the content of the Blocking finding; exit 1 means the manifest is invalid and exit 2
   means the file is unreadable or uses a YAML construct outside the supported subset. Consume
@@ -268,7 +268,7 @@ carries exactly these five elements.
    `parallel_slug: <slug>` in its first per-feature checkpoint write (issue #997). Both keys are
    unvalidated; the merge gate's green-CI branch declines a checkpoint that carries either, so a
    parallel child that records them cannot merge its own pull request through that branch; the exclusion is best-effort when the keys are omitted.
-2. The item's active feature folder path, written literally as `docs/features/active/<basename>`.
+2. The item's active feature folder path, written literally as `.dev/active/<basename>`.
    The child needs it for its own operation, and F7's Layer 1 hook resolves the target item by
    scanning the prompt for exactly that path shape, so the path is emitted as a bare path token.
 3. The canonical issue number line, which is the item key.
@@ -291,7 +291,7 @@ carries exactly these five elements.
    record its own top-level `issue_adoption` object per `.claude/rules/orchestrator-state.md`,
    with origin `filed_before_orchestration` unless the issue was transferred, waiving
    `potential_to_issue` and the promotion-entry tool for the checkpoint's promotion-type. When a
-   lifecycle record for the item exists under `docs/features/potential/promoted/`, the child cites
+   lifecycle record for the item exists under `.dev/potential/promoted/`, the child cites
    it as `potential_record`. The preparation child already created and committed the item's feature
    folder, so the prompt also instructs the execution child not to call
    `new_active_feature_folder`, to confirm the folder read-only
@@ -463,7 +463,7 @@ Procedure, per item:
    `not_queued` outcome.
 4. Record `merge_commit_sha`, `merged_at`, and `merge_status: merged` only after the merge is
    confirmed by polling and ancestry check, then regenerate
-   `docs/features/parallel/<slug>/parallel-status.md`.
+   `.dev/parallel/<slug>/parallel-status.md`.
 5. On a merge failure caused by a conflict, follow `## Per-Item Merge-Conflict Handling`.
 
 **Merge-gate authorization.** `.claude/hooks/enforce-epic-merge-gate.ps1` is a project-wide
@@ -579,7 +579,7 @@ After the issue #643 resolver escalates, the child applies the regenerate path o
    together with the raw conflict-marker content of each conflicted file. The child's
    `atomic-executor` then writes that evidence as a synthetic Blocking finding to the item's own
    `remediation-inputs.<timestamp>.md` in the item's active feature folder under
-   `docs/features/active/`, not to the run's parallel folder. Assigning both the capture and the
+   `.dev/active/`, not to the run's parallel folder. Assigning both the capture and the
    finding write to the child's chain matches `.claude/skills/epic-orchestrate/SKILL.md`, whose
    equivalent capture and finding write also belong to the child's `atomic-executor`.
 2. The parent re-delegates that item's child orchestration. The child processes the finding through
@@ -627,7 +627,7 @@ After an item reaches `merge_status: merged` and that state is durably confirmed
 substep 1 of `### Run Closing` below, which takes the absolute path from
 `git worktree list --porcelain` rather than from the relative `items[].worktree_path`. On
 success it records `merge_status: worktree_removed` and `worktree_removed_at`, then regenerates
-`docs/features/parallel/<slug>/parallel-status.md`.
+`.dev/parallel/<slug>/parallel-status.md`.
 
 Mechanical gating of this command for parallel worktrees is delivered. Both halves have landed.
 `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` exists and is registered in
@@ -661,16 +661,16 @@ repeat: a substep whose outcome already holds is skipped. The five substeps run 
    force flag. On success, set `merge_status: worktree_removed` and `worktree_removed_at`. On
    refusal, leave `merge_status: merged`, append a `completed_steps` entry naming the path and the
    refusal reason as a deferral, and continue with the next item.
-2. **Final status.** Regenerate `docs/features/parallel/<slug>/parallel-status.md` so it shows the
+2. **Final status.** Regenerate `.dev/parallel/<slug>/parallel-status.md` so it shows the
    closing state.
 3. **Run documents.** Stage the run folder and the promoted lifecycle files created for this run by
    literal path only, in commands of the form
-   `git add -- docs/features/parallel/<slug>/parallel-status.md docs/features/potential/promoted/<promoted-file>.md`
+   `git add -- .dev/parallel/<slug>/parallel-status.md .dev/potential/promoted/<promoted-file>.md`
    and
-   `git commit -m "docs(parallel): close run <slug>" -- docs/features/parallel/<slug>/parallel-status.md docs/features/potential/promoted/<promoted-file>.md`,
-   in which every pathspec begins with `docs/features/`. The `artifacts/` tree is gitignored, so Run
+   `git commit -m "docs(parallel): close run <slug>" -- .dev/parallel/<slug>/parallel-status.md .dev/potential/promoted/<promoted-file>.md`,
+   in which every pathspec begins with `.dev/`. The `artifacts/` tree is gitignored, so Run
    Closing never stages it. Never use
-   `git add -A` or `git add .`, and never stage a `docs/features/active/<item>/` folder: each item
+   `git add -A` or `git add .`, and never stage a `.dev/active/<item>/` folder: each item
    folder lands through that item's own pull request. Before pushing, require that
    `git diff --name-only origin/main...HEAD` lists only `docs/` paths; when it lists any other
    path, stop and report without forcing, rebasing, or splitting the branch. The coordinator holds
@@ -709,11 +709,11 @@ repeat: a substep whose outcome already holds is skipped. The five substeps run 
 
 ## Documentation Maintenance Boundaries
 
-`docs/features/parallel/<slug>/parallel-status.md` is a generated projection of
+`.dev/parallel/<slug>/parallel-status.md` is a generated projection of
 `artifacts/orchestration/parallel-orchestrator-state.json`. It is regenerated in full, is never
 hand-authored, and is never treated as an input. It is never the source of the cohort table and
 never the source of the schedule: the run manifest and the checkpoint are authoritative. Generate it
-from the template `docs/features/templates/parallel/parallel-status.md`.
+from the template `.dev/templates/parallel/parallel-status.md`.
 
 Header block fields: `parallel_slug`, `mode`, `max_concurrency`, `current_cohort`,
 `recolor_generation`, `last_updated`.
@@ -736,7 +736,7 @@ The projection's `## Mergeable Conflicts Resolved` heading renders
 `merged_against` ref, the `merge_commit_sha`, the entries added from each side, and the version
 resolutions. The same resolution is cited in three further places: the body of the resolution
 commit message, the pull-request body, and an evidence artifact at
-`docs/features/parallel/<slug>/evidence/other/mergeable-conflicts.<yyyy-MM-ddTHH-mm>.md` carrying
+`.dev/parallel/<slug>/evidence/other/mergeable-conflicts.<yyyy-MM-ddTHH-mm>.md` carrying
 `Timestamp`, `Command`, `EXIT_CODE`, and the script's JSON output verbatim.
 
 The projection's `## Tolerated Overlaps` heading (issue #1013) renders `tolerated_overlaps[]`: one
@@ -819,7 +819,7 @@ hold:
 
 1. Every non-withdrawn item has `merge_status` of `merged` or `worktree_removed`, each durably
    confirmed by `git` and `gh` rather than by an in-memory completion notification.
-2. `docs/features/parallel/<slug>/parallel-status.md` has been regenerated a final time and reflects
+2. `.dev/parallel/<slug>/parallel-status.md` has been regenerated a final time and reflects
    the completed state.
 3. The parallel checkpoint passes validation with `require_complete` for
    `artifact_type: "parallel-orchestrator-state"`.
@@ -1063,7 +1063,7 @@ denies. Out-of-scope calls allow without reading the checkpoint.
 hook on the `Agent` matcher. It activates only when `subagent_type` is `orchestrator` and the
 serialized delegation prompt carries the marker `Parallel mode: true` (emitted per
 `## Parallel-Mode Kickoff Parameter`). It then resolves the target from the
-`docs/features/active/<folder>` token in the prompt matched against `items[].feature_folder`, reads
+`.dev/active/<folder>` token in the prompt matched against `items[].feature_folder`, reads
 `artifacts/orchestration/parallel-orchestrator-state.json`, projects cohorts to the rows whose
 `generation` equals `recolor_generation`, and denies with a reason prefixed
 `PARALLEL_COHORT_BARRIER_BLOCKED` unless every `conflict_edges[]` neighbour in a strictly prior
@@ -1232,7 +1232,7 @@ on a usage error, such as a missing or non-integer `-ItemKey` or an unrecognized
 
 #### Synthetic Blocking Finding
 
-The finding is written to `docs/features/active/<child-slug>/remediation-inputs.<yyyy-MM-ddTHH-mm>.md`
+The finding is written to `.dev/active/<child-slug>/remediation-inputs.<yyyy-MM-ddTHH-mm>.md`
 — the flat form directly in the item's own active feature-folder root, matching the existing
 merge-conflict finding precedent rather than any folder-per-cycle variant.
 
@@ -1329,7 +1329,7 @@ because a `PreToolUse` hook fires per call with no cross-call state visibility a
 - **Layer 1 — per-call deterrent.** `.claude/hooks/enforce-parallel-drift-gate.ps1`, registered on
   the `PreToolUse` `Agent` matcher. It fires only when `subagent_type == "feature-review"` and the
   prompt carries the `Parallel mode: true` marker, resolves the target item by scanning the prompt
-  for a `docs/features/active/<basename>` path token, reads
+  for a `.dev/active/<basename>` path token, reads
   `artifacts/orchestration/parallel-orchestrator-state.json`, and denies with
   `PARALLEL_DRIFT_GATE_BLOCKED` while the item's latest drift event is unresolved **and** its
   synthetic finding has not been written. Requiring both conditions is what keeps the R4 review of

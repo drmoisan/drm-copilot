@@ -43,8 +43,8 @@ BeforeAll {
     $script:ItemCheckpoint = Get-WorktreeRunCheckpointPath -Kind 'item' -WorktreeRoot $script:ItemRoot
     $script:SessionCheckpoint = Get-WorktreeRunCheckpointPath -Kind 'item' -WorktreeRoot $script:Session
     $script:Bodies = @{
-        Ready   = '{"issue-num":"1188","feature-folder":"docs/features/active/sample-1188","route_id":"large","lifecycle_ready":true}'
-        Unready = '{"issue-num":"1188","feature-folder":"docs/features/active/sample-1188","route_id":"large","lifecycle_ready":false}'
+        Ready   = '{"issue-num":"1188","feature-folder":".dev/active/sample-1188","route_id":"large","lifecycle_ready":true}'
+        Unready = '{"issue-num":"1188","feature-folder":".dev/active/sample-1188","route_id":"large","lifecycle_ready":false}'
         Absent  = ''
     }
 

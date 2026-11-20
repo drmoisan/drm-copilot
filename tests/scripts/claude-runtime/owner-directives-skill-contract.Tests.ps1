@@ -6,7 +6,7 @@
     Contract guard for the owner-directives skill, its pointers, and the orchestrator-state rule (issue #1139).
 
 .DESCRIPTION
-    The owner-directive relay is defined in prose: the six byte-identical copies of the
+    The owner-directive relay is defined in prose: the four byte-identical copies of the
     owner-directives skill, one pointer sentence in each orchestration skill or agent that relays
     directives, and the owner-directive section of the orchestrator-state rule. Prose can be
     deleted or drift between copies without any other test noticing, so these rows assert byte
@@ -23,10 +23,8 @@
 BeforeDiscovery {
     $script:SkillCopy = @(
         @{ Copy = '.agents/skills/owner-directives/SKILL.md' }
-        @{ Copy = '.github/skills/owner-directives/SKILL.md' }
         @{ Copy = 'extensions/drm-copilot/resources/claude-customizations/.claude/skills/owner-directives/SKILL.md' }
         @{ Copy = 'extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/owner-directives/SKILL.md' }
-        @{ Copy = 'extensions/drm-copilot/resources/customizations/.github/skills/owner-directives/SKILL.md' }
     )
     $script:SkillStatement = @(
         @{ Token = 'Owner directives:'; Ac = 'U2' }

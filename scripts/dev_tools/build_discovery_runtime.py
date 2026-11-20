@@ -47,12 +47,52 @@ SOURCE_ROOT = f"{PACKAGE_ROOT}/src/drm_copilot_discovery"
 STAGE_ROOT = f"{SOURCE_ROOT}/{RESOURCE_DIRECTORY}"
 ALLOWLIST_PATH = f"{PACKAGE_ROOT}/resource-manifest.json"
 RESOURCE_ROOTS = ("schemas/discovery", "docs/discovery/templates")
+# Canonical resource keys whose source directory moved to the development-docs
+# root (issue #1016); the keys, staged members and manifest stay unchanged.
+MOVED_RESOURCE_SOURCES: tuple[tuple[str, str], ...] = (
+    ("docs/discovery/templates", ".dev/discovery/templates"),
+)
 DEPENDENCY_IMPORTS = {
     "yaml": "PyYAML",
     "jsonschema": "jsonschema",
     "referencing": "referencing",
     "lxml": "lxml",
 }
+
+
+def source_path_for_resource(key: str) -> str:
+    """Return the repository path that holds the bytes of a canonical resource key.
+
+    Args:
+        key: A validated repository-relative resource key such as
+            ``docs/discovery/templates/v2/x.md``.
+
+    Returns:
+        str: The key with a moved key root replaced by its source root, or the key
+        unchanged when no moved root contains it.
+    """
+    # Replace the first moved key root that equals or contains the key.
+    for key_root, source_root in MOVED_RESOURCE_SOURCES:
+        if key == key_root or key.startswith(key_root + "/"):
+            return source_root + key[len(key_root) :]
+    return key
+
+
+def resource_key_for_source(path: str) -> str:
+    """Return the canonical resource key for a repository source path.
+
+    Args:
+        path: A repository-relative POSIX path found under a source directory.
+
+    Returns:
+        str: The path with a moved source root replaced by its key root, or the path
+        unchanged when no moved source root contains it.
+    """
+    # Invert source_path_for_resource for paths listed under a moved source root.
+    for key_root, source_root in MOVED_RESOURCE_SOURCES:
+        if path == source_root or path.startswith(source_root + "/"):
+            return key_root + path[len(source_root) :]
+    return path
 
 
 @dataclass(frozen=True)
@@ -123,10 +163,14 @@ class DiskBuildFileSystem:
     root: Path
 
     def _path(self, relative: str) -> Path:
-        """Reject lexical and resolved escapes before any filesystem operation."""
+        """Reject lexical and resolved escapes before any filesystem operation.
+
+        The validated key is read from its source directory, which differs from the
+        key for a moved resource root (``MOVED_RESOURCE_SOURCES``).
+        """
         validate_resource_path(relative)
         root = self.root.resolve()
-        path = (root / relative).resolve()
+        path = (root / source_path_for_resource(relative)).resolve()
         if not path.is_relative_to(root):
             raise ResourceError(
                 f"Resource path resolves outside the repository: {relative}"
@@ -166,11 +210,16 @@ class DiskBuildFileSystem:
         target.write_bytes(content)
 
     def list_files(self, root: str) -> tuple[str, ...]:
-        """Return stable paths while rejecting any file that resolves outside root."""
+        """Return stable resource keys while rejecting any file outside the root.
+
+        Files under a moved source directory are reported under their canonical key.
+        """
         directory = self._path(root)
         paths = tuple(
             sorted(
-                path.relative_to(self.root.resolve()).as_posix()
+                resource_key_for_source(
+                    path.relative_to(self.root.resolve()).as_posix()
+                )
                 for path in directory.rglob("*")
                 if path.is_file()
             )

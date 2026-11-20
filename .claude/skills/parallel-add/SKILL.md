@@ -27,7 +27,7 @@ this operation may and may not disturb. Read that section before applying anythi
   tracks its `parallel_slug`. This skill does not start a run; use `/parallel-plan` and
   `/parallel-run` for that.
 - `$ARGUMENTS` names exactly one item: a GitHub issue number or reference, or a path to an entry
-  under `docs/features/potential/`. An argument naming more than one item is rejected; admit one
+  under `.dev/potential/`. An argument naming more than one item is rejected; admit one
   item per invocation so each admission decision and its mutation entry stay attributable. The
   `--after <earlier>` and `--band <Cn>` flags are not items, so the multi-item rejection applies to
   positional items only.
@@ -117,7 +117,7 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    .claude/rules/orchestrator-state.md with origin filed_before_orchestration (or transferred when
    the issue was transferred), waiving potential_to_issue and the promotion-entry tool for the
    checkpoint's promotion-type. When a lifecycle record for the item exists under
-   docs/features/potential/promoted/, cite it as potential_record.` The line is omitted for a
+   .dev/potential/promoted/, cite it as potential_record.` The line is omitted for a
    potential-entry item, whose child promotes it. The preparation child creates and commits the
    item's feature folder, so the item's later execution child records `feature_folder_record` for
    that committed folder instead of calling `new_active_feature_folder` again, per
@@ -286,11 +286,11 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    incorrectly; correct the checkpoint rather than proceeding.
 
 8. **Rewrite the durable scheduling record.** Build the record content with
-   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 record -RunFolder docs/features/parallel/<slug> -Entry <entry-json>`,
+   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 record -RunFolder .dev/parallel/<slug> -Entry <entry-json>`,
    where the entry carries the checkpoint's `conflict_edges`, `tolerated_overlaps`, `precedence`,
    and `items`. The helper prints the content and makes no git write. Write it to
-   `docs/features/parallel/<slug>/parallel-scheduling.json` on `parallel/<slug>-plan` and commit it
-   with a pathspec under `docs/features/parallel/`, so a re-seed from another checkout reads the
+   `.dev/parallel/<slug>/parallel-scheduling.json` on `parallel/<slug>-plan` and commit it
+   with a pathspec under `.dev/parallel/`, so a re-seed from another checkout reads the
    recorded edges and plan hashes by ref.
 
 ## Constraints

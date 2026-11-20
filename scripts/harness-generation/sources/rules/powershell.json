@@ -1,0 +1,103 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**/*.ps1\"\n  - \"**/*.psm1\"\n  - \"**/*.psd1\""
+        },
+        {
+          "key": "description",
+          "value": " PowerShell-specific toolchain and coding standards."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/powershell.md",
+      "sections": [
+        "head",
+        "toolchain",
+        "compatibility",
+        "coding-standards",
+        "change-budget",
+        "design-seams-minimal-di",
+        "testing-standards",
+        "prohibited-behaviors"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**/*.ps1,**/*.psm1,**/*.psd1,**/*.ps1xml\""
+        },
+        {
+          "key": "name",
+          "value": " powershell-code-change-policy"
+        },
+        {
+          "key": "description",
+          "value": " \"PowerShell-specific code change rules layered on top of the general code change policy\""
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/powershell-code-change.instructions.md",
+      "sections": [
+        "head-2",
+        "1-tooling-baseline-for-powershell",
+        "2-powershell-design-safety",
+        "3-structure-naming-and-comments",
+        "4-running-the-toolchain-powershell"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**/*.ps1,**/*.psm1,**/*.psd1,**/*.ps1xml\"   "
+        },
+        {
+          "key": "name",
+          "value": " powershell-unit-test-policy"
+        },
+        {
+          "key": "description",
+          "value": " \"PowerShell-specific unit test rules, layered on top of the general unit test policy\""
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/powershell-unit-test.instructions.md",
+      "sections": [
+        "head-3",
+        "1-framework-and-scope",
+        "2-test-style-and-structure-powershell",
+        "3-naming-and-readability-python",
+        "4-running-the-toolchain-powershell-tests"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " powershell"
+        },
+        {
+          "key": "description",
+          "value": " PowerShell-specific toolchain and coding standards."
+        }
+      ],
+      "kind": "codex",
+      "path": ".agents/skills/powershell/SKILL.md",
+      "sections": [
+        "head",
+        "toolchain",
+        "compatibility",
+        "coding-standards-2",
+        "change-budget-2",
+        "design-seams-minimal-di",
+        "testing-standards-2",
+        "prohibited-behaviors"
+      ]
+    }
+  ]
+}

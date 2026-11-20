@@ -3,7 +3,7 @@
 These tests pin the rule-file text that describes G11 to G13, the corpus
 measurement note, the bundled rule copy, and the design-level contract section
 of every copy of the `atomic-plan-contract` skill (Claude, Codex `.agents`,
-Copilot `.github`, and their bundled copies).
+and their bundled copies; issue #1032 retired the Copilot copies).
 """
 
 from __future__ import annotations
@@ -43,13 +43,6 @@ _ALL_CONTRACT_COPIES = (
     _RESOURCES
     / "codex-and-agents-customizations"
     / ".agents"
-    / "skills"
-    / "atomic-plan-contract"
-    / "SKILL.md",
-    _REPO_ROOT / ".github" / "skills" / "atomic-plan-contract" / "SKILL.md",
-    _RESOURCES
-    / "customizations"
-    / ".github"
     / "skills"
     / "atomic-plan-contract"
     / "SKILL.md",

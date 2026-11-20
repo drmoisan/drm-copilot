@@ -17,7 +17,7 @@ BeforeAll {
 
     $script:SessionRoot = '/synthetic-worktrees/main'
     $script:ItemRoot = '/synthetic-worktrees/main/.claude/worktrees/bug-1105'
-    $script:Relative = 'docs/features/active/sample/plan.2026-11-07T08-48.md'
+    $script:Relative = '.dev/active/sample/plan.2026-11-07T08-48.md'
     $script:ItemPath = "$script:ItemRoot/$script:Relative"
     $script:Envelope = [pscustomobject]@{ agent_transcript_path = 'transcripts/subagents/agent-1105.jsonl' }
     $script:ItemLines = [string[]]@('### Phase 0 - Item plan', '- [ ] [P0-T1] Item task.')
@@ -162,12 +162,12 @@ Describe 'validate-planner-output plan-path target worktree (issue #1105)' {
         Mock Get-PlanFileContent { @{ Exists = $true; Lines = $script:ItemLines } }
 
         # Act
-        $result = Get-PlannerCase -PlanPath 'docs/features/active/../../x/plan.md'
+        $result = Get-PlannerCase -PlanPath '.dev/active/../../x/plan.md'
 
         # Assert
         $result.Ok | Should -BeFalse
         $result.Repairable | Should -BeTrue
-        $result.Message | Should -BeLike "*plan-path 'docs/features/active/../../x/plan.md'*'..' segment*"
+        $result.Message | Should -BeLike "*plan-path '.dev/active/../../x/plan.md'*'..' segment*"
         Should -Invoke Get-PlanFileContent -Times 0 -Exactly
     }
 

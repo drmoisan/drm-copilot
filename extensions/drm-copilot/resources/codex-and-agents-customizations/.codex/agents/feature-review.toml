@@ -23,7 +23,7 @@ Migration contract:
 
 ---
 name: feature-review
-description: Feature branch review specialist that produces policy-audit, code-review, and feature-audit artifacts restricted to docs/features/active/ write path.
+description: Feature branch review specialist that produces policy-audit, code-review, and feature-audit artifacts restricted to .dev/active/ write path.
 tools:
   - Read
   - Grep
@@ -31,6 +31,7 @@ tools:
   - "Bash(git diff *)"
   - "Bash(git log *)"
   - "Write(/docs/features/active/**)"
+  - "Write(/.dev/active/**)"
 skills:
   - policy-compliance-order
   - acceptance-criteria-tracking
@@ -47,12 +48,12 @@ You are a feature-branch reviewer. Your output is audit artifacts, not code chan
 
 ## Required Outputs
 
-When the active review scope is a selected version folder such as `docs/features/active/<feature>/v2/`, write review artifacts into that selected version folder rather than the parent feature root.
+When the active review scope is a selected version folder such as `.dev/active/<feature>/v2/`, write review artifacts into that selected version folder rather than the parent feature root.
 
-1. `docs/features/active/<feature-or-selected-version>/policy-audit.<timestamp>.md` — policy compliance audit with PASS/PARTIAL/FAIL verdicts and evidence
-2. `docs/features/active/<feature-or-selected-version>/code-review.<timestamp>.md` — code quality review covering best practices
-3. `docs/features/active/<feature-or-selected-version>/feature-audit.<timestamp>.md` — acceptance criteria verification relative to baseline
-4. If remediation is needed: `docs/features/active/<feature-or-selected-version>/remediation-inputs.<timestamp>.md` with explicit remediation-required findings and artifact paths
+1. `.dev/active/<feature-or-selected-version>/policy-audit.<timestamp>.md` — policy compliance audit with PASS/PARTIAL/FAIL verdicts and evidence
+2. `.dev/active/<feature-or-selected-version>/code-review.<timestamp>.md` — code quality review covering best practices
+3. `.dev/active/<feature-or-selected-version>/feature-audit.<timestamp>.md` — acceptance criteria verification relative to baseline
+4. If remediation is needed: `.dev/active/<feature-or-selected-version>/remediation-inputs.<timestamp>.md` with explicit remediation-required findings and artifact paths
 
 Timestamp format: `yyyy-MM-ddTHH-mm` (ISO-8601).
 
@@ -128,6 +129,7 @@ For each language that has changed files in the feature branch:
 
 1. Determine which files are new (added) vs modified (changed) using the PR diff.
 2. Check whether the coverage artifact exists for that language.
+   - Vendored push-down exemptions: when `vendored-coverage-exemptions.json` exists beside the coverage output file, read it and confirm that only paths with status `exempt` left the coverage population. Flag any hand-written production-path exclusion (an `exclude`, `omit`, `coveragePathIgnorePatterns`, or kcov `--exclude-path` entry, or an omitted settings-file coverage path) as **Blocking**. Flag a `.push-down-manifest.json` hash change without a push-down run (no `payload_version` change and no push-down summary) as **Blocking**.
 3. If the artifact exists:
    - Parse the repo-wide coverage percentage and report it in the policy audit.
    - If repo-wide coverage is below the governing line threshold, flag as FAIL and add to remediation triggers.

@@ -8,7 +8,9 @@ tools:
   - Grep
   - Glob
   - "Write(docs/features/parallel/**)"
+  - "Write(.dev/parallel/**)"
   - "Edit(docs/features/parallel/**)"
+  - "Edit(.dev/parallel/**)"
   - "Write(artifacts/orchestration/**)"
   - "Edit(artifacts/orchestration/**)"
   - "Bash(git *)"
@@ -42,10 +44,10 @@ Your terminal deliverable is:
 1. One pushed per-item feature branch per item, each carrying that item's prepared feature folder
    and approved atomic plan.
 2. The pushed planner-owned run branch `parallel/<slug>-plan`.
-3. The run manifest `docs/features/parallel/<slug>/parallel.md`, committed to that run branch.
+3. The run manifest `.dev/parallel/<slug>/parallel.md`, committed to that run branch.
 4. The planner checkpoint `artifacts/orchestration/parallel-planner-state.json`.
 5. The kickoff artifact, at the working path `artifacts/orchestration/parallel-kickoff-<slug>.md`
-   and the durable path `docs/features/parallel/<slug>/parallel-kickoff.md`.
+   and the durable path `.dev/parallel/<slug>/parallel-kickoff.md`.
 
 There is no worthiness verdict to render and no dependency graph to author. Ordering is derived
 from computed blast-radius contention, never requested from the operator.
@@ -157,7 +159,7 @@ Do not report completion until:
    procedure, that satisfy ready-gate invariant P10 (P10).
 3. `cohorts[]` is recorded at `generation: 0` covering exactly the prepared item keys, and the
    recomputation-parity check defined in the `parallel-plan` skill passed.
-4. The manifest at `docs/features/parallel/<slug>/parallel.md` is committed to
+4. The manifest at `.dev/parallel/<slug>/parallel.md` is committed to
    `parallel/<slug>-plan` in fully resolved form, with no negative `issue_num` remaining.
 5. The checkpoint validates through `mcp__drm-copilot__validate_orchestration_artifacts` with
    `artifact_type: "parallel-planner-state"`, and `next_step` is exactly

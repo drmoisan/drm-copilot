@@ -38,6 +38,11 @@ import {
 import { type OrchestrationHandoffMaterializer } from "./lib/validate/orchestration-handoff-materializer";
 import { createProductionHandoffMaterializer } from "./lib/validate/orchestration-handoff-materializer-production";
 import { newPotentialBugEntryServiceCall } from "./lib/new-potential-bug-entry-service-call";
+import {
+  migrateDevelopmentDocsServiceCall,
+  type MigrateDevelopmentDocsInput,
+  type MigrateDevelopmentDocsResult,
+} from "./lib/development-docs-migration/migrate-development-docs-service-call";
 import { collectPrContextServiceCall } from "./lib/pr-context/pr-context-service-call";
 import { potentialToIssueServiceCall } from "./lib/potential-to-issue/potential-to-issue-service-call";
 import { newActiveFeatureFolderServiceCall } from "./lib/new-active-feature-folder/new-active-feature-folder-service-call";
@@ -53,6 +58,7 @@ import type {
   CollectPrContextInput,
   PushDownClaudeCustomizationsInput,
   PushDownCodexAndAgentsCustomizationsInput,
+  PushDownCopilotCustomizationsInput,
   RepoAutomationExecutionResult,
   RepoAutomationService,
   WorkspaceExecutionInput,
@@ -75,6 +81,13 @@ import {
   type DocsCommandOutcome,
   type DocsCommandRequest,
 } from "./repo-automation-execute-docs";
+import {
+  detectPushDownIntegrationServiceCall,
+  validatePushDownIntegrationServiceCall,
+} from "./repo-automation-service-push-down-integration";
+import type { DetectIntegrationResult } from "./lib/push-down-integration/integration-detect";
+import type { ValidateIntegrationResult } from "./lib/push-down-integration/integration-validate";
+import type { PushDownIntegrationToolInput } from "./mcp-tool-inputs-push-down-integration";
 
 export type {
   RepoAutomationExecutionResult,
@@ -82,7 +95,12 @@ export type {
   WorkspaceExecutionInput,
   PushDownClaudeCustomizationsInput,
   PushDownCodexAndAgentsCustomizationsInput,
+  PushDownCopilotCustomizationsInput,
 } from "./repo-automation-service-contract";
+import {
+  DEFAULT_DEVELOPMENT_DOCS_ROOT,
+  resolveDevelopmentDocsRoot,
+} from "./lib/development-docs/root";
 
 export interface RepoAutomationServiceOptions {
   readonly extensionRoot: string;
@@ -196,13 +214,10 @@ class DefaultRepoAutomationService
     });
   }
   async pushDownCopilotCustomizations(
-    input: WorkspaceExecutionInput,
+    input: PushDownCopilotCustomizationsInput,
   ): Promise<RepoAutomationExecutionResult> {
-    // In-process TS port (F3): delegate to the push-down helper.
-    return runPushDownCopilotCustomizations(
-      input.workspaceRoot,
-      this.pushDownDeps,
-    );
+    // In-process TS port (F3): the helper forwards packs and run options.
+    return runPushDownCopilotCustomizations(input, this.pushDownDeps);
   }
   async pushDownCodexAndAgentsCustomizations(
     input: PushDownCodexAndAgentsCustomizationsInput,
@@ -233,13 +248,28 @@ class DefaultRepoAutomationService
   async newPotentialEntry(
     input: WorkspaceExecutionInput & { readonly shortName: string },
   ): Promise<RepoAutomationExecutionResult> {
+    const args = [
+      "-ShortName",
+      input.shortName,
+      "-TemplateRoot",
+      this.templateRoot,
+    ];
+    // D-P4: pass the resolved root only when it differs from the default, so
+    // the default argv stays byte-identical.
+    const docsRoot = resolveDevelopmentDocsRoot(
+      this.fileSystem,
+      input.workspaceRoot,
+    );
+    if (docsRoot !== DEFAULT_DEVELOPMENT_DOCS_ROOT) {
+      args.push("-DevelopmentDocsRoot", docsRoot);
+    }
     return this.executeScript({
       tool: "new_potential_entry",
       runtimeKind: "powershell",
       bundledRelativePath: "resources/templates/new-potential-entry.ps1",
       workspaceRoot: input.workspaceRoot,
       invocationId: input.invocationId ?? "new_potential_entry",
-      args: ["-ShortName", input.shortName, "-TemplateRoot", this.templateRoot],
+      args,
       summary: `Created a new potential entry for '${input.shortName}'.`,
       stdoutArtifactPattern: /^Created:\s*(.+)$/im,
     });
@@ -460,6 +490,28 @@ class DefaultRepoAutomationService
         ...this.docsOptions,
       }),
     );
+  }
+
+  async detectPushDownIntegration(
+    input: PushDownIntegrationToolInput,
+  ): Promise<DetectIntegrationResult> {
+    return detectPushDownIntegrationServiceCall(input, this.pushDownDeps);
+  }
+
+  async validatePushDownIntegration(
+    input: PushDownIntegrationToolInput,
+  ): Promise<ValidateIntegrationResult> {
+    return validatePushDownIntegrationServiceCall(input, this.pushDownDeps);
+  }
+
+  async migrateDevelopmentDocs(
+    input: MigrateDevelopmentDocsInput,
+  ): Promise<MigrateDevelopmentDocsResult> {
+    return migrateDevelopmentDocsServiceCall({
+      fileSystem: this.fileSystem,
+      runner: this.runner,
+      input,
+    });
   }
 
   private async executeScript(

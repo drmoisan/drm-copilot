@@ -36,6 +36,13 @@ from scripts.dev_tools.codex_native_converter.models import (
 
 CLAUDE_HELPER_ROOT = ".claude/lib"
 CODEX_HELPER_ROOT = ".codex/lib"
+# Report note appended to every standing-guidance record. The converter never
+# emits AGENTS.md: it is the hand-authored source of repository standing
+# guidance (issue #1028, decision H3). Mirrors the TypeScript constant.
+STANDING_GUIDANCE_NOT_EMITTED_NOTE = (
+    "Not emitted: AGENTS.md is a hand-authored source maintained outside the "
+    "converter."
+)
 
 
 def _normalized_name(source_path: str) -> str:
@@ -128,7 +135,10 @@ def plan_target_paths(
 
     Purpose:
         Attach a concrete target path to a classified mapping record when the
-        approved v1 target surface is known.
+        approved v1 target surface is known. A standing-guidance record keeps
+        its role and conversion class, gets no target path, and gains
+        ``STANDING_GUIDANCE_NOT_EMITTED_NOTE`` after its existing notes,
+        because ``AGENTS.md`` is a hand-authored source.
 
     Args:
         mapping_record (MappingRecord): Classified mapping record whose target
@@ -148,7 +158,11 @@ def plan_target_paths(
     """
 
     if mapping_record.target_role is TargetRole.STANDING_GUIDANCE:
-        return replace(mapping_record, target_path="AGENTS.md")
+        return replace(
+            mapping_record,
+            target_path=None,
+            notes=(*mapping_record.notes, STANDING_GUIDANCE_NOT_EMITTED_NOTE),
+        )
 
     if mapping_record.target_role is TargetRole.SHARED_SKILL:
         skill_name = _planned_skill_name(mapping_record)

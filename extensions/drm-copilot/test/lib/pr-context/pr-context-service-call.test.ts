@@ -119,8 +119,8 @@ class AuthenticatedGhRunner implements CommandRunner {
 function seedWorkspace(): TreeFileSystem {
   const fs = new TreeFileSystem();
   fs.addFile(`${ROOT}/.git`, "");
-  fs.addDir(`${ROOT}/docs/features/active`);
-  fs.addDir(`${ROOT}/docs/features/potential/promoted`);
+  fs.addDir(`${ROOT}/.dev/active`);
+  fs.addDir(`${ROOT}/.dev/potential/promoted`);
   return fs;
 }
 
@@ -151,8 +151,8 @@ class DiscardingFileSystem extends TreeFileSystem {
 /** Seed the `.git` marker and discovery directories on any tree filesystem. */
 function seedInto<T extends TreeFileSystem>(fs: T): T {
   fs.addFile(`${ROOT}/.git`, "");
-  fs.addDir(`${ROOT}/docs/features/active`);
-  fs.addDir(`${ROOT}/docs/features/potential/promoted`);
+  fs.addDir(`${ROOT}/.dev/active`);
+  fs.addDir(`${ROOT}/.dev/potential/promoted`);
   return fs;
 }
 

@@ -53,6 +53,8 @@ Use these semantic MCP tools when the corresponding operation is required:
 - `resolve_orchestration_topology`
 - `resolve_provider_routing`
 - `transition_prepared_orchestration`
+- `detect_push_down_integration`
+- `validate_push_down_integration`
 
 ## Independent Expected Context for Portable Handoff Tools
 

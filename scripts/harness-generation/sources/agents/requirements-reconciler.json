@@ -1,0 +1,54 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " requirements-reconciler"
+      },
+      {
+        "key": "description",
+        "value": " Reconcile pinned source facts with target requirements through parity, proposed decisions and traceable acceptance specifications."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - \"mcp__drm-copilot__read_discovery_source\"\n  - \"mcp__drm-copilot__create_discovery_artifact\"\n  - \"mcp__drm-copilot__update_discovery_artifact\"\n  - \"mcp__drm-copilot__run_discovery_scenario_generation\"\n  - \"mcp__drm-copilot__finalize_discovery_agent\""
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      }
+    ],
+    "path": ".claude/agents/requirements-reconciler.md",
+    "sections": [
+      "head",
+      "prepared-inputs-and-launch",
+      "selected-reads-and-controlled-operations",
+      "exact-output-boundary",
+      "denied-authority-and-managed-memory",
+      "finalization-and-explicit-result"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"requirements-reconciler\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "path": ".codex/agents/requirements-reconciler.toml",
+    "sections": [
+      "head-2",
+      "prepared-inputs-and-launch",
+      "selected-reads-and-controlled-operations",
+      "exact-output-boundary",
+      "denied-authority-and-managed-memory",
+      "finalization-and-explicit-result"
+    ]
+  }
+}

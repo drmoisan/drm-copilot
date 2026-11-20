@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "description: Policy audit template usage and output requirements. Use when creating timestamped policy-audit artifacts from the repository templates.\n",
+      "replace": "description: 'Policy audit template usage and output requirements. Use when creating policy-audit.<timestamp>.md artifacts from the repo templates.'\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- A policy audit that omits the canonical major headings is invalid.\n",
+      "replace": "- A policy audit that omits the canonical major headings is invalid.\n\n"
+    }
+  ]
+}

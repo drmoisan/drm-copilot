@@ -141,7 +141,7 @@ class UnusedGitRepository:
 def _minimal_feature(issue_num: int) -> dict[str, Any]:
     """Build one preparation-child identity for evidence tests."""
 
-    folder = f"docs/features/active/feature-{issue_num}"
+    folder = f".dev/active/feature-{issue_num}"
     delegation_id = f"prepare-{issue_num}"
     launch_root = "artifacts/orchestration/epic-child-launches/preparation"
     return {

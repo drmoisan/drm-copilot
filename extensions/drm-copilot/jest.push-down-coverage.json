@@ -1,0 +1,54 @@
+{
+  "./src/lib/push-down/push-down-destination-manifest.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/push-down-plan-comparator.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/push-down-report.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/push-down-write-if-changed.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/push-down-layer.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/push-down-pack-resolver.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/push-down-pipeline.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/push-down-apply.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/push-down-shared-layer.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/claude-layer.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/push-down-ecosystem-registry.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/lib/push-down/push-down-harness.ts": {
+    "lines": 85,
+    "branches": 75
+  },
+  "./src/push-down-command-support.ts": {
+    "lines": 85,
+    "branches": 75
+  }
+}

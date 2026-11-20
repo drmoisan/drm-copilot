@@ -1,0 +1,116 @@
+# Agent Binding Resolution ([P1-T3])
+
+Timestamp: 2026-11-19T18-20
+Plan: plan-agents-branch-b.md
+Command: sh SCRATCH/issue-1032-r1-run.sh issue-1032-bb-bindings.ps1 (resolves every frontmatter `agent:` value of `.github/prompts/**/*.prompt.md` and every `agent:` under `handoffs:` in `.github/agents/*.agent.md` to a `.github/agents` file by frontmatter `name:` or, when no file has that name, by the file name without `.agent.md`, or to the built-in `agent`; surrounding quotes removed)
+EXIT_CODE: 0
+Output Summary: bindings: 106 unresolved: 0; prompt bindings 27, handoff bindings 79; 18 resolve to the built-in agent.
+
+## Bindings (kind | file | agent value | resolved file)
+
+- prompt | .github/prompts/add-educational-comments.prompt.md | agent | built-in agent
+- prompt | .github/prompts/breakdown-bug-prd.prompt.md | prd_creator | .github/agents/prd.agent.md
+- prompt | .github/prompts/breakdown-epic-arch.prompt.md | agent | built-in agent
+- prompt | .github/prompts/breakdown-epic-pm.prompt.md | agent | built-in agent
+- prompt | .github/prompts/breakdown-feature-implementation.prompt.md | agent | built-in agent
+- prompt | .github/prompts/breakdown-feature-prd.prompt.md | prd_creator | .github/agents/prd.agent.md
+- prompt | .github/prompts/code-exemplars-blueprint-generator.prompt.md | agent | built-in agent
+- prompt | .github/prompts/drafts/create-github-issues-feature-from-implementation-plan.prompt.md | agent | built-in agent
+- prompt | .github/prompts/drafts/create-implementation-plan.prompt.md | prd_creator | .github/agents/prd.agent.md
+- prompt | .github/prompts/drafts/create-technical-spike.prompt.md | agent | built-in agent
+- prompt | .github/prompts/drafts/update-implementation-plan.prompt.md | agent | built-in agent
+- prompt | .github/prompts/export-chat.prompt.md | agent | built-in agent
+- prompt | .github/prompts/fillout-prd-feature.prompt.md | prd_feature | .github/agents/prd-feature.agent.md
+- prompt | .github/prompts/generate-atomic-plan.prompt.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- prompt | .github/prompts/generate-commit-message-repo.prompt.md | commit_steward | .github/agents/commit-steward.agent.md
+- prompt | .github/prompts/generate-pr.prompt.md | pr-author | .github/agents/pr-author.agent.md
+- prompt | .github/prompts/javascript-typescript-jest.prompt.md | agent | built-in agent
+- prompt | .github/prompts/orchestrate-csharp-work.prompt.md | csharp-orchestrator | .github/agents/csharp-orchestrator.agent.md
+- prompt | .github/prompts/orchestrate-powershell-work.prompt.md | powershell-orchestrator | .github/agents/powershell-orchestrator.agent.md
+- prompt | .github/prompts/orchestrate-python-work.prompt.md | python-orchestrator | .github/agents/python-orchestrator.agent.md
+- prompt | .github/prompts/orchestrate-work.prompt.md | orchestrator | .github/agents/orchestrator.agent.md
+- prompt | .github/prompts/remediate-comments.prompt.md | comment_remediator | .github/agents/commentary-remediation.agent.md
+- prompt | .github/prompts/research-issue.prompt.md | Task Researcher Instructions | .github/agents/task-researcher.agent.md
+- prompt | .github/prompts/review-epic.prompt.md | epic_review_agent | .github/agents/epic-review.agent.md
+- prompt | .github/prompts/review-feature.prompt.md | feature_code_review_agent | .github/agents/feature-review.agent.md
+- prompt | .github/prompts/review-staged.prompt.md | staged_code_review_agent | .github/agents/staged-review.agent.md
+- prompt | .github/prompts/update_status.prompt.md | status_updater_agent | .github/agents/status_updater.agent.md
+- handoff | .github/agents/atomic_planning.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md
+- handoff | .github/agents/csharp-atomic-planning.agent.md | csharp-atomic-executor | .github/agents/csharp-atomic-executor.agent.md
+- handoff | .github/agents/csharp-orchestrator.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/csharp-orchestrator.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md
+- handoff | .github/agents/csharp-orchestrator.agent.md | csharp-typed-engineer | .github/agents/csharp-typed-engineer.agent.md
+- handoff | .github/agents/csharp-orchestrator.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md
+- handoff | .github/agents/csharp-orchestrator.agent.md | feature_code_review_agent | .github/agents/feature-review.agent.md
+- handoff | .github/agents/csharp-orchestrator.agent.md | prd_feature | .github/agents/prd-feature.agent.md
+- handoff | .github/agents/csharp-orchestrator.agent.md | Task Researcher Instructions | .github/agents/task-researcher.agent.md
+- handoff | .github/agents/csharp-orchestrator.agent.md | prd_feature | .github/agents/prd-feature.agent.md
+- handoff | .github/agents/csharp-orchestrator.agent.md | csharp-atomic-planning | .github/agents/csharp-atomic-planning.agent.md
+- handoff | .github/agents/csharp-orchestrator.agent.md | csharp-atomic-executor | .github/agents/csharp-atomic-executor.agent.md
+- handoff | .github/agents/csharp-orchestrator.agent.md | feature_code_review_agent | .github/agents/feature-review.agent.md
+- handoff | .github/agents/csharp-typed-engineer.agent.md | csharp-atomic-planning | .github/agents/csharp-atomic-planning.agent.md
+- handoff | .github/agents/csharp-typed-engineer.agent.md | csharp-atomic-executor | .github/agents/csharp-atomic-executor.agent.md
+- handoff | .github/agents/csharp-typed-engineer.agent.md | csharp-atomic-executor | .github/agents/csharp-atomic-executor.agent.md
+- handoff | .github/agents/csharp-typed-engineer.agent.md | feature_code_review_agent | .github/agents/feature-review.agent.md
+- handoff | .github/agents/epic-review.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/feature-review.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/orchestrator.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/orchestrator.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md
+- handoff | .github/agents/orchestrator.agent.md | python-typed-engineer | .github/agents/python-typed-engineer.agent.md
+- handoff | .github/agents/orchestrator.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md
+- handoff | .github/agents/orchestrator.agent.md | feature_code_review_agent | .github/agents/feature-review.agent.md
+- handoff | .github/agents/orchestrator.agent.md | prd_feature | .github/agents/prd-feature.agent.md
+- handoff | .github/agents/orchestrator.agent.md | Task Researcher Instructions | .github/agents/task-researcher.agent.md
+- handoff | .github/agents/orchestrator.agent.md | prd_feature | .github/agents/prd-feature.agent.md
+- handoff | .github/agents/orchestrator.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/orchestrator.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md
+- handoff | .github/agents/orchestrator.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md
+- handoff | .github/agents/orchestrator.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/orchestrator.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md
+- handoff | .github/agents/orchestrator.agent.md | commit_steward | .github/agents/commit-steward.agent.md
+- handoff | .github/agents/orchestrator.agent.md | feature_code_review_agent | .github/agents/feature-review.agent.md
+- handoff | .github/agents/Powershell DI Unit Test Engineer.agent.md | agent | built-in agent
+- handoff | .github/agents/Powershell DI Unit Test Engineer.agent.md | agent | built-in agent
+- handoff | .github/agents/Powershell DI Unit Test Engineer.agent.md | agent | built-in agent
+- handoff | .github/agents/powershell-atomic-planning.agent.md | powershell_atomic_executor | .github/agents/powershell-atomic-executor.agent.md
+- handoff | .github/agents/powershell-orchestrator.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/powershell-orchestrator.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md
+- handoff | .github/agents/powershell-orchestrator.agent.md | powershell-typed-engineer | .github/agents/powershell-typed-engineer.agent.md
+- handoff | .github/agents/powershell-orchestrator.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md
+- handoff | .github/agents/powershell-orchestrator.agent.md | feature_code_review_agent | .github/agents/feature-review.agent.md
+- handoff | .github/agents/powershell-orchestrator.agent.md | prd_feature | .github/agents/prd-feature.agent.md
+- handoff | .github/agents/powershell-orchestrator.agent.md | Task Researcher Instructions | .github/agents/task-researcher.agent.md
+- handoff | .github/agents/powershell-orchestrator.agent.md | prd_feature | .github/agents/prd-feature.agent.md
+- handoff | .github/agents/powershell-orchestrator.agent.md | powershell-atomic-planning | .github/agents/powershell-atomic-planning.agent.md
+- handoff | .github/agents/powershell-orchestrator.agent.md | powershell_atomic_executor | .github/agents/powershell-atomic-executor.agent.md
+- handoff | .github/agents/powershell-orchestrator.agent.md | feature_code_review_agent | .github/agents/feature-review.agent.md
+- handoff | .github/agents/powershell-typed-engineer.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/powershell-typed-engineer.agent.md | powershell_atomic_executor | .github/agents/powershell-atomic-executor.agent.md
+- handoff | .github/agents/powershell-typed-engineer.agent.md | powershell_atomic_executor | .github/agents/powershell-atomic-executor.agent.md
+- handoff | .github/agents/powershell-typed-engineer.agent.md | feature_code_review_agent | .github/agents/feature-review.agent.md
+- handoff | .github/agents/prd-feature.agent.md | Task Researcher Instructions | .github/agents/task-researcher.agent.md
+- handoff | .github/agents/pytest-unit-test-coding.agent.md | agent | built-in agent
+- handoff | .github/agents/pytest-unit-test-coding.agent.md | agent | built-in agent
+- handoff | .github/agents/pytest-unit-test-coding.agent.md | agent | built-in agent
+- handoff | .github/agents/python-atomic-planning.agent.md | python-atomic-executor | .github/agents/python-atomic-executor.agent.md
+- handoff | .github/agents/python-execution-only-typed.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/python-orchestrator.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/python-orchestrator.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md
+- handoff | .github/agents/python-orchestrator.agent.md | python-typed-engineer | .github/agents/python-typed-engineer.agent.md
+- handoff | .github/agents/python-orchestrator.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md
+- handoff | .github/agents/python-orchestrator.agent.md | feature_code_review_agent | .github/agents/feature-review.agent.md
+- handoff | .github/agents/python-orchestrator.agent.md | prd_feature | .github/agents/prd-feature.agent.md
+- handoff | .github/agents/python-orchestrator.agent.md | Task Researcher Instructions | .github/agents/task-researcher.agent.md
+- handoff | .github/agents/python-orchestrator.agent.md | prd_feature | .github/agents/prd-feature.agent.md
+- handoff | .github/agents/python-orchestrator.agent.md | python-atomic-planning | .github/agents/python-atomic-planning.agent.md
+- handoff | .github/agents/python-orchestrator.agent.md | python-atomic-executor | .github/agents/python-atomic-executor.agent.md
+- handoff | .github/agents/python-orchestrator.agent.md | feature_code_review_agent | .github/agents/feature-review.agent.md
+- handoff | .github/agents/python-typed-engineer.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/python-typed-engineer.agent.md | agent | built-in agent
+- handoff | .github/agents/python-typed-engineer.agent.md | agent | built-in agent
+- handoff | .github/agents/staged-review.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/status_updater.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/typescript-engineer.agent.md | TDD Red Phase - Write Failing Tests First | .github/agents/tdd-red.agent.md
+- handoff | .github/agents/typescript-engineer.agent.md | prd_feature | .github/agents/prd-feature.agent.md
+- handoff | .github/agents/typescript-engineer.agent.md | atomic_planner | .github/agents/atomic_planning.agent.md
+- handoff | .github/agents/typescript-engineer.agent.md | atomic_executor | .github/agents/atomic_executor.agent.md

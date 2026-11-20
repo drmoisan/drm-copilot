@@ -1,11 +1,15 @@
 import { describe, expect, it } from "@jest/globals";
 
 import {
+  buildArtifactPath,
   COPILOT_ROOT_FOLDERS,
   enumerateSourceFiles,
-  pushDownCustomizations,
   stringifySorted,
 } from "../../../src/lib/push-down/copilot-customizations-engine";
+import { type PushDownFileSystem } from "../../../src/lib/push-down/filesystem-adapter";
+// Issue #1029 (X1): the engine copy loop moved into the push-down pipeline;
+// the Copilot wrapper takes the identical options, so these cases now drive it.
+import { pushDownCustomizations } from "../../../src/lib/push-down/copilot-customizations";
 import { buildInMemoryFileSystem, fixedClock } from "./push-down.test-helpers";
 
 const CLOCK = fixedClock("2026-06-26T00:15:00.000Z");
@@ -58,7 +62,7 @@ describe("pushDownCustomizations (engine)", () => {
         "/src/.github/prompts/b.prompt.md": "no references here",
         "/src/.github/prompts/a.prompt.md": "also plain",
         "/src/.github/agents/agent.md": "agent body",
-        "/src/.github/skills/s/SKILL.md": "skill body",
+        "/src/.github/instructions/s.instructions.md": "instruction body",
         "/dest/.github/agents/agent.md": "old destination content",
       },
       ["/dest"],
@@ -74,12 +78,12 @@ describe("pushDownCustomizations (engine)", () => {
       clock: CLOCK,
     });
 
-    // Assert: agents root first (overwritten), then prompts sorted a,b, then skills.
+    // Assert: agents root first (overwritten), then instructions, then prompts sorted a,b.
     expect(summary.files.map((f) => f.relativePath)).toEqual([
       ".github/agents/agent.md",
+      ".github/instructions/s.instructions.md",
       ".github/prompts/a.prompt.md",
       ".github/prompts/b.prompt.md",
-      ".github/skills/s/SKILL.md",
     ]);
     expect(summary.files[0]!.destinationStatus).toBe("overwritten");
     expect(summary.files[1]!.destinationStatus).toBe("created");
@@ -93,7 +97,7 @@ describe("pushDownCustomizations (engine)", () => {
       {
         "/src/.github/prompts/a.prompt.md":
           "Run scripts.dev_tools.potential_to_issue here.",
-        "/src/.github/skills/s/SKILL.md":
+        "/src/.github/instructions/s.instructions.md":
           "Use scripts.dev_tools.unknown_x then scripts.dev_tools.unknown_y.",
       },
       ["/dest"],
@@ -170,7 +174,6 @@ describe("pushDownCustomizations (engine)", () => {
       ".github/hooks",
       ".github/instructions",
       ".github/prompts",
-      ".github/skills",
     ]);
   });
 
@@ -242,6 +245,51 @@ describe("enumerateSourceFiles", () => {
       "/src/.github/agents/nested/a.md",
       "/src/.github/agents/z.md",
     ]);
+  });
+});
+
+// Issue #1029: the engine copy loop moved into the push-down pipeline, so the
+// path-helper branches it exercised are covered directly here.
+describe("engine path helpers (issue #1029)", () => {
+  it("builds an artifact path under an empty artifact root", () => {
+    // Act
+    const path = buildArtifactPath(
+      new Date("2026-06-26T00:15:00.000Z"),
+      "",
+      "artifacts/x",
+    );
+
+    // Assert: an empty root yields a relative path with no leading slash.
+    expect(path).toBe("artifacts/x/push-down-20260626T001500Z.json");
+  });
+
+  it("enumerates the source root itself when a scoped root is empty", () => {
+    // Arrange
+    const fs = buildInMemoryFileSystem({ "/src/b.md": "b", "/src/a.md": "a" });
+
+    // Act
+    const result = enumerateSourceFiles(fs, "/src/", [""]);
+
+    // Assert
+    expect(result).toEqual(["/src/a.md", "/src/b.md"]);
+  });
+
+  it("orders a listed path outside or equal to the root by its full path", () => {
+    // Arrange: a stub lists the root itself and a path outside it.
+    const stub: PushDownFileSystem = {
+      listFiles: () => ["/src/r/z.md", "/other/a.md", "/src/r"],
+      isDir: () => true,
+      isFile: () => true,
+      readTextFile: () => "",
+      writeTextFile: () => undefined,
+      ensureDir: () => undefined,
+    };
+
+    // Act
+    const result = enumerateSourceFiles(stub, "/src", ["r"]);
+
+    // Assert: the root itself ("") sorts first, then "/other/a.md", then "z.md".
+    expect(result).toEqual(["/src/r", "/other/a.md", "/src/r/z.md"]);
   });
 });
 

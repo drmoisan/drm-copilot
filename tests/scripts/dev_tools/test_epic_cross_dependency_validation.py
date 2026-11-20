@@ -15,6 +15,7 @@ from typing import Any
 import pytest
 
 from scripts.dev_tools._epic_orchestrator_state_resolution import (
+    build_feature_reference_index,
     is_epic_slug,
     is_positive_int,
     validate_cross_epic_dependency_shape,
@@ -367,3 +368,13 @@ def test_plain_validation_does_not_require_the_main_gate() -> None:
     }
 
     assert _cross(validate_epic_orchestrator_state_text(json.dumps(state))) == []
+
+
+def test_dev_root_folder_reference_resolves_to_the_same_feature() -> None:
+    """A .dev lifecycle prefix normalizes to the same folder hint as docs/features."""
+
+    by_folder_hint, _ = build_feature_reference_index(
+        [{"feature_folder": ".dev/active/child-a", "issue_num": 7}]
+    )
+
+    assert by_folder_hint == {"child-a": ".dev/active/child-a"}

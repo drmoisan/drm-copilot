@@ -60,7 +60,7 @@ Describe 'Codex enforce-epic-wave-barrier coverage (issue #786)' {
         }
 
         $script:Write = '{"tool_name":"Write","tool_input":{"file_path":"a.txt"}}'
-        $script:Epic = '{"features":[null,{"issue_num":"1","feature_folder":"docs/features/active/one","merge_status":"merged"},{"issue_num":"2","feature_folder":"docs/features/active/two","depends_on":["1"]},{"issue_num":"3","feature_folder":"docs/features/active/three","depends_on":["9"]}]}'
+        $script:Epic = '{"features":[null,{"issue_num":"1","feature_folder":".dev/active/one","merge_status":"merged"},{"issue_num":"2","feature_folder":".dev/active/two","depends_on":["1"]},{"issue_num":"3","feature_folder":".dev/active/three","depends_on":["9"]}]}'
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeRunCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot' }
@@ -73,7 +73,7 @@ Describe 'Codex enforce-epic-wave-barrier coverage (issue #786)' {
         }
 
         It 'derives the feature key from the epic context or returns empty' {
-            Get-CodexWaveFeatureKey -LocalCheckpoint ([pscustomobject]@{ epic_context = [pscustomobject]@{ feature_folder = 'docs/features/active/two/' } }) | Should -Be 'two'
+            Get-CodexWaveFeatureKey -LocalCheckpoint ([pscustomobject]@{ epic_context = [pscustomobject]@{ feature_folder = '.dev/active/two/' } }) | Should -Be 'two'
             Get-CodexWaveFeatureKey -LocalCheckpoint ([pscustomobject]@{ other = 1 }) | Should -Be ''
         }
 
@@ -86,7 +86,7 @@ Describe 'Codex enforce-epic-wave-barrier coverage (issue #786)' {
         It 'finds the launch feature by issue and folder' {
             $epic = $script:Epic | ConvertFrom-Json
             Find-CodexWaveLaunchFeature -Checkpoint $null -Receipt ([pscustomobject]@{}) | Should -BeNullOrEmpty
-            (Find-CodexWaveLaunchFeature -Checkpoint $epic -Receipt ([pscustomobject]@{ issue_num = '2'; feature_folder = 'docs/features/active/two' })).issue_num | Should -Be '2'
+            (Find-CodexWaveLaunchFeature -Checkpoint $epic -Receipt ([pscustomobject]@{ issue_num = '2'; feature_folder = '.dev/active/two' })).issue_num | Should -Be '2'
             Find-CodexWaveLaunchFeature -Checkpoint $epic -Receipt ([pscustomobject]@{ issue_num = '7'; feature_folder = 'x' }) | Should -BeNullOrEmpty
         }
 
@@ -128,8 +128,8 @@ Describe 'Codex enforce-epic-wave-barrier coverage (issue #786)' {
         It 'allows a ready launch feature and denies an unready one' {
             Mock Test-CodexEpicChildRoutingLaunchAuthority { $true }
             $environment = [pscustomobject]@{ launch_id = 'l'; execution_context = 'epic_execution_child' }
-            Invoke-CodexEpicWaveDecision -PayloadRaw $script:Write -LocalCheckpointRaw '' -EpicCheckpointRaw $script:Epic -LauncherReceiptRaw '{"issue_num":"2","feature_folder":"docs/features/active/two"}' -LauncherEnvironment $environment -RepositoryRoot '/synthetic-root/repo' | Should -BeNullOrEmpty
-            (Invoke-CodexEpicWaveDecision -PayloadRaw $script:Write -LocalCheckpointRaw '' -EpicCheckpointRaw $script:Epic -LauncherReceiptRaw '{"issue_num":"3","feature_folder":"docs/features/active/three"}' -LauncherEnvironment $environment -RepositoryRoot '/synthetic-root/repo').hookSpecificOutput.permissionDecisionReason | Should -Match 'receipt-bound epic checkpoint'
+            Invoke-CodexEpicWaveDecision -PayloadRaw $script:Write -LocalCheckpointRaw '' -EpicCheckpointRaw $script:Epic -LauncherReceiptRaw '{"issue_num":"2","feature_folder":".dev/active/two"}' -LauncherEnvironment $environment -RepositoryRoot '/synthetic-root/repo' | Should -BeNullOrEmpty
+            (Invoke-CodexEpicWaveDecision -PayloadRaw $script:Write -LocalCheckpointRaw '' -EpicCheckpointRaw $script:Epic -LauncherReceiptRaw '{"issue_num":"3","feature_folder":".dev/active/three"}' -LauncherEnvironment $environment -RepositoryRoot '/synthetic-root/repo').hookSpecificOutput.permissionDecisionReason | Should -Match 'receipt-bound epic checkpoint'
         }
 
         It 'judges a local child by its checkpoint and its epic dependencies' {
@@ -170,7 +170,7 @@ Describe 'Codex enforce-epic-wave-barrier coverage (issue #786)' {
             Mock Test-Path { ([string]$LiteralPath) -like '*r-786.json' -or ([string]$LiteralPath) -like '*epic-786.json' }
             Mock Get-Content { if (([string]$LiteralPath) -like '*r-786.json') { $launchReceiptText } else { $epicText } }
             Mock Test-CodexEpicChildRoutingLaunchAuthority { $true }
-            $result = Invoke-LaunchedWaveEntry -IssueNum '2' -Folder 'docs/features/active/two'
+            $result = Invoke-LaunchedWaveEntry -IssueNum '2' -Folder '.dev/active/two'
             $result.ExitCode | Should -Be 0 -Because $result.Stderr
             $result.Stdout | Should -BeNullOrEmpty
         }
@@ -179,7 +179,7 @@ Describe 'Codex enforce-epic-wave-barrier coverage (issue #786)' {
             Mock Test-Path { ([string]$LiteralPath) -like '*r-786.json' -or ([string]$LiteralPath) -like '*epic-786.json' }
             Mock Get-Content { if (([string]$LiteralPath) -like '*r-786.json') { $launchReceiptText } else { $epicText } }
             Mock Test-CodexEpicChildRoutingLaunchAuthority { $true }
-            $result = Invoke-LaunchedWaveEntry -IssueNum '3' -Folder 'docs/features/active/three'
+            $result = Invoke-LaunchedWaveEntry -IssueNum '3' -Folder '.dev/active/three'
             $result.ExitCode | Should -Be 0 -Because $result.Stderr
             ($result.Stdout | ConvertFrom-Json).hookSpecificOutput.permissionDecision | Should -Be 'deny'
         }

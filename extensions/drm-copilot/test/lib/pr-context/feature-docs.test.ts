@@ -4,9 +4,12 @@ import { TreeFileSystem } from "./tree-file-system";
 import {
   completedPlanTasks,
   extractIssueReferences,
+  latestGlobPath,
+  parseReadinessValue,
   parseSection,
   relativeToPosix,
   resolveFeatureDir,
+  resolveReadinessSignal,
 } from "../../../src/lib/pr-context/feature-docs-parsers";
 import { gatherFeatureExcerpts } from "../../../src/lib/pr-context/feature-docs";
 
@@ -350,5 +353,106 @@ describe("relativeToPosix", () => {
 
     // Assert
     expect(result).toBe("repository/x.md");
+  });
+});
+
+describe("gatherFeatureExcerpts development-docs root", () => {
+  it("reads a .dev active feature when .dev is configured and present", () => {
+    // Arrange
+    const fs = new TreeFileSystem();
+    fs.addFile(
+      `${ROOT}/config/orchestration-routing.json`,
+      '{"development_docs_root": ".dev"}',
+    );
+    const dir = `${ROOT}/.dev/active/1016-foo`;
+    fs.addDir(`${ROOT}/.dev`);
+    fs.addDir(dir);
+    fs.addDir(`${ROOT}/.dev/potential/promoted`);
+    fs.addFile(`${dir}/spec.md`, "## Overview\nDev spec.");
+
+    // Act
+    const excerpts = gatherFeatureExcerpts(fs, ROOT, [
+      ".dev/active/1016-foo/spec.md",
+    ]);
+
+    // Assert
+    expect(excerpts).toHaveLength(1);
+    expect(excerpts[0]!.feature).toBe("1016-foo");
+    expect(excerpts[0]!.excerpt).toContain("Dev spec.");
+  });
+
+  it("recognizes a .dev active path under the default root", () => {
+    // Arrange: the matcher accepts both roots; the reader uses docs/features.
+    const fs = new TreeFileSystem();
+    const dir = `${ROOT}/docs/features/active/1016-foo`;
+    fs.addDir(dir);
+    fs.addDir(`${ROOT}/docs/features/potential/promoted`);
+    fs.addFile(`${dir}/spec.md`, "## Overview\nDefault spec.");
+
+    // Act
+    const excerpts = gatherFeatureExcerpts(fs, ROOT, [
+      ".dev/active/1016-foo/spec.md",
+    ]);
+
+    // Assert
+    expect(excerpts.map((excerpt) => excerpt.feature)).toEqual(["1016-foo"]);
+  });
+
+  it("reads a folder path with no trailing segment and skips an empty segment", () => {
+    // Arrange: one changed path names the folder itself; the other has an empty segment.
+    const fs = new TreeFileSystem();
+    const dir = `${ROOT}/docs/features/active/1016-foo`;
+    fs.addDir(dir);
+    fs.addDir(`${ROOT}/docs/features/potential/promoted`);
+    fs.addFile(`${dir}/spec.md`, "## Overview\nFolder spec.");
+
+    // Act
+    const excerpts = gatherFeatureExcerpts(fs, ROOT, [
+      "docs/features/active/1016-foo",
+      ".dev/active//spec.md",
+    ]);
+
+    // Assert
+    expect(excerpts.map((excerpt) => excerpt.feature)).toEqual(["1016-foo"]);
+  });
+});
+
+describe("feature-docs-parsers glob under the .dev root", () => {
+  it("latestGlobPath finds the newest plan file under a .dev feature folder", () => {
+    // Arrange: the in-memory glob is the production compileGlob matcher.
+    const fs = new TreeFileSystem();
+    const dir = `${ROOT}/.dev/active/1016-foo`;
+    fs.addFile(`${dir}/plan.2026-11-01T10-00.md`, "# Plan A");
+    fs.addFile(`${dir}/plan.2026-11-02T10-00.md`, "# Plan B");
+
+    // Act
+    const latest = latestGlobPath(fs, dir, "plan.*.md");
+
+    // Assert
+    expect(latest).toBe(`${dir}/plan.2026-11-02T10-00.md`);
+  });
+
+  it("resolveReadinessSignal reads a feature audit under a .dev feature folder", () => {
+    // Arrange
+    const fs = new TreeFileSystem();
+    const dir = `${ROOT}/.dev/active/1016-foo`;
+    fs.addFile(`${dir}/feature-audit.2026-11-02T10-00.md`, "Readiness: PASS\n");
+
+    // Act
+    const [readiness, source] = resolveReadinessSignal(fs, dir);
+
+    // Assert
+    expect(readiness).toBe("PASS");
+    expect(source).toBe(`${dir}/feature-audit.2026-11-02T10-00.md`);
+  });
+});
+
+describe("parseReadinessValue", () => {
+  it("returns null when the text has no readiness marker", () => {
+    expect(parseReadinessValue("## Summary\nNo marker here.\n")).toBeNull();
+  });
+
+  it("returns null for a readiness value outside the accepted set", () => {
+    expect(parseReadinessValue("Readiness: MAYBE\n")).toBeNull();
   });
 });

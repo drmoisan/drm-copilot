@@ -20,6 +20,8 @@ BeforeAll {
 
     # The guarded entry-point body does not run under dot-sourcing.
     . $script:EntryScriptPath
+    # D-P16 (issue #1035): assess and reuse-edges resolve the development-docs root; no case reads the routing file.
+    Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $true; Root = 'docs/features'; Reason = $null } }
 
     $script:UsagePrefix = 'parallel admission usage error: '
 
@@ -70,7 +72,6 @@ BeforeAll {
 AfterAll {
     Remove-Module -Name ParallelAdmission, ParallelAdmissionPrecedence, ParallelAdmissionJson -Force -ErrorAction SilentlyContinue
 }
-
 Describe 'Parameter surface' {
     It 'declares no Mandatory parameter' {
         # Arrange: every Parameter attribute in the script and in every function it defines.
@@ -691,5 +692,65 @@ Describe 'reuse-edges' {
         $outcome.ExitCode | Should -Be 1
         $outcome.Stderr | Should -BeLike 'parallel admission failed: Scheduling record*'
         $outcome.Stdout | Should -BeNullOrEmpty
+    }
+}
+
+Describe 'development-docs root (issue #1035)' {
+    BeforeEach {
+        $script:SyntheticLocation = if ($IsWindows) { 'C:/synthetic-checkouts/admission' } else { '/synthetic-checkouts/admission' }
+        $location = $script:SyntheticLocation
+        Mock Get-Location { [pscustomobject]@{ Path = $location } }.GetNewClosure()
+    }
+
+    It 'records a .dev/parallel run folder under its slug' {
+        Mock Invoke-ParallelAdmissionGit { throw 'record runs no git command' }
+        $outcome = Invoke-ParallelAdmissionCli -Subcommand 'record' -RunFolder '.dev/parallel/admission-seed/' -Entry '{"edges": [], "tolerated_overlaps": [], "precedence": [], "items": []}'
+
+        $outcome.ExitCode | Should -Be 0
+        (ConvertFrom-EmittedJson $outcome.Stdout).GetProperty('parallel_slug').GetString() | Should -Be 'admission-seed'
+    }
+
+    It 'rejects a run folder outside both parallel areas with the unchanged usage text' {
+        $outcome = Invoke-ParallelAdmissionCli -Subcommand 'record' -RunFolder '.devx/parallel/admission-seed' -Entry '{}'
+
+        $outcome.ExitCode | Should -Be 2
+        $outcome.Stderr | Should -BeLike "$($script:UsagePrefix)-RunFolder must be docs/features/parallel/<slug>*"
+    }
+
+    It 'PA-DDR-ASSESS-RESOLVES-AGAINST-CURRENT-LOCATION' {
+        # Arrange: the current location resolves the .dev root; every git read is empty.
+        Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $true; Root = '.dev'; Reason = $null } }
+        Mock Invoke-ParallelAdmissionGit { param([string[]] $GitArgs) $null = $GitArgs; [pscustomobject]@{ ExitCode = 0; Output = [string[]]@() } }
+        Mock Get-ParallelAdmissionBlobText { param([string] $Ref, [string] $Path) $null = $Ref, $Path; '' }
+
+        # Act
+        $null = Invoke-ParallelAdmissionCli -Subcommand 'assess' -Branch $script:AssessBranch -FeatureFolder '.dev/active/sample-1101'
+
+        # Assert: the resolver received exactly the current location, and the templates came from the .dev templates area.
+        Should -Invoke Resolve-DevelopmentDocsRoot -Times 1 -Exactly -ParameterFilter { $WorkspaceRoot -ceq $script:SyntheticLocation }
+        Should -Invoke Get-ParallelAdmissionBlobText -Times 1 -Exactly -ParameterFilter { $Path -ceq '.dev/templates/feature/spec.md' }
+        Should -Invoke Get-ParallelAdmissionBlobText -Times 1 -Exactly -ParameterFilter { $Path -ceq '.dev/templates/feature/plan.yyyy-MM-ddTHH-mm.md' }
+    }
+
+    It 'PA-DDR-REUSE-EDGES-USES-RESOLVED-ROOT' {
+        Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $true; Root = '.dev'; Reason = $null } }
+        Mock Invoke-ParallelAdmissionGit { param([string[]] $GitArgs) $null = $GitArgs; [pscustomobject]@{ ExitCode = 128; Output = [string[]]@() } }
+
+        $outcome = Invoke-ParallelAdmissionCli -Subcommand 'reuse-edges' -Slug 'admission-seed' -IssueNum '1102' -PlanHash 'c2c2'
+
+        $outcome.ExitCode | Should -Be 0
+        Should -Invoke Invoke-ParallelAdmissionGit -Times 1 -Exactly -ParameterFilter { ($GitArgs -join ' ') -ceq 'show origin/parallel/admission-seed-plan:.dev/parallel/admission-seed/parallel-scheduling.json' }
+        Should -Invoke Resolve-DevelopmentDocsRoot -Times 1 -Exactly -ParameterFilter { $WorkspaceRoot -ceq $script:SyntheticLocation }
+    }
+
+    It 'PA-DDR-FAILED-RESOLUTION-EXITS-1' {
+        Mock Resolve-DevelopmentDocsRoot { [pscustomobject]@{ Succeeded = $false; Root = $null; Reason = 'config/orchestration-routing.json is not valid JSON, so development_docs_root cannot be read.' } }
+        Mock Invoke-ParallelAdmissionGit { throw 'git must not run after a failed resolution' }
+
+        $outcome = Invoke-ParallelAdmissionCli -Subcommand 'assess' -Branch $script:AssessBranch -FeatureFolder $script:AssessFolder
+
+        $outcome.ExitCode | Should -Be 1
+        $outcome.Stderr | Should -Be 'parallel admission failed: config/orchestration-routing.json is not valid JSON, so development_docs_root cannot be read.'
+        Should -Invoke Invoke-ParallelAdmissionGit -Times 0 -Exactly
     }
 }

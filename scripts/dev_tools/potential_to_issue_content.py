@@ -7,9 +7,15 @@ import re
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from scripts.dev_tools.json_config import (
+    format_feature_folder_name,
+    strip_date_first_prefix,
+)
+
 if TYPE_CHECKING:
     from pathlib import Path
 
+DEFAULT_ACTIVE_AREA = "docs/features/active"
 PLACEHOLDER = "(not provided in potential file)"
 ISSUE_URL_PATTERN = re.compile(r"https?://\S+/issues/(\d+)")
 BUG_SECTION_HEADINGS = [
@@ -54,6 +60,33 @@ def get_feature_path(feature_name: str) -> str:
     """Convert feature name into a safe path token."""
     replaced = re.sub(r"\s+", "_", feature_name)
     return re.sub(r"[^A-Za-z0-9_-]", "", replaced)
+
+
+def get_status_folder_token(
+    issue_number: str, potential_stem: str, fallback_token: str
+) -> str:
+    """Return the folder token that the promotion ``Status`` line names (D-P6).
+
+    The token is the issue-first folder name that folder creation will make,
+    ``format_feature_folder_name(issue, strip_date_first_prefix(stem))``. When
+    the formatter rejects the stem or the issue number (rules N-3 to N-5), the
+    sanitized feature-path token is returned instead, as before.
+
+    Args:
+        issue_number: Created issue number as decimal text.
+        potential_stem: Potential file stem.
+        fallback_token: Sanitized token from ``get_feature_path``.
+
+    Returns:
+        The status folder token.
+    """
+    try:
+        return format_feature_folder_name(
+            int(issue_number), strip_date_first_prefix(potential_stem)
+        )
+    except ValueError:
+        # N-3 to N-5: an unformattable stem keeps the sanitized token.
+        return fallback_token
 
 
 def get_section(content: str, heading: str) -> str:
@@ -195,8 +228,23 @@ def update_metadata_lines(
     issue_url: str,
     last_updated: str | None,
     feature_path: str,
+    active_area: str = DEFAULT_ACTIVE_AREA,
 ) -> list[str]:
-    """Apply issue metadata updates to potential markdown lines."""
+    """Apply issue metadata updates to potential markdown lines.
+
+    Args:
+        lines: Potential-file lines; mutated in place and returned.
+        feature_name: Feature name for the rewritten title.
+        issue_number: Created issue number.
+        issue_url: Created issue URL.
+        last_updated: Issue updated date, or ``None`` to omit the line.
+        feature_path: Folder token for the ``Status`` line.
+        active_area: Active-area text of the resolved root; defaults to
+            ``docs/features/active``.
+
+    Returns:
+        The mutated ``lines`` list.
+    """
     if lines:
         lines[0] = f"# {feature_name} (Issue #{issue_number})"
 
@@ -205,8 +253,6 @@ def update_metadata_lines(
     meta_end = set_line_value(lines, "Issue URL", issue_url, meta_end)
     if last_updated:
         meta_end = set_line_value(lines, "Last Updated", last_updated, meta_end)
-    status_value = (
-        f"Promoted -> docs/features/active/{feature_path}/ (Issue #{issue_number})"
-    )
+    status_value = f"Promoted -> {active_area}/{feature_path}/ (Issue #{issue_number})"
     set_line_value(lines, "Status", status_value, meta_end)
     return lines

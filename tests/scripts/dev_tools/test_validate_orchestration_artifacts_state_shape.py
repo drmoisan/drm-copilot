@@ -36,11 +36,11 @@ def build_namespaced_orchestrator_state() -> dict[str, object]:
     state = build_valid_orchestrator_state()
     state["delegation_receipts"] = {
         "promotion": {
-            "potential_entry": {"path": "docs/features/potential/demo.md"},
+            "potential_entry": {"path": ".dev/potential/demo.md"},
             "issue": "https://github.com/drmoisan/drm-copilot/issues/168",
             "feature_folder": {
                 "path": (
-                    "docs/features/active/2026-04-29-"
+                    ".dev/active/2026-04-29-"
                     "harden-feature-promotion-lifecycle-mcp-only-168"
                 )
             },
@@ -146,7 +146,7 @@ def test_validate_orchestrator_state_rejects_receipt_nonlist_artifact_paths() ->
 
     state = build_valid_orchestrator_state()
     receipt = get_first_receipt(state)
-    receipt["artifact_paths"] = "docs/features/active/feature-1/plan.md"
+    receipt["artifact_paths"] = ".dev/active/feature-1/plan.md"
     state["delegation_receipts"] = [receipt]
 
     errors = validator.validate_orchestrator_state_text(json.dumps(state))

@@ -9,10 +9,19 @@ import subprocess
 import sys
 from pathlib import Path
 
+from scripts.dev_tools.json_config import (
+    DEFAULT_DEVELOPMENT_DOCS_ROOT,
+    development_docs_relative_path,
+)
+
 DEFAULT_PROMPT_TEMPLATE = ".github/prompts/execute-plan-template.md"
 PROTECTED_BRANCHES = {"main", "master", "development"}
 EXECUTOR_LOCK_FILE = ".agent_logs/executor.lock"
 EXECUTOR_LOCK_BYPASS_ENV = "ATOMIC_EXECUTOR_SKIP_LOCK"
+# Help text names the active area of the default development-docs root.
+_ACTIVE_AREA_HELP_PATH = development_docs_relative_path(
+    DEFAULT_DEVELOPMENT_DOCS_ROOT, "active"
+)
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -30,7 +39,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         sp.add_argument(
             "--feature",
             default=None,
-            help="Feature folder name under docs/features/active (optional).",
+            help=f"Feature folder name under {_ACTIVE_AREA_HELP_PATH} (optional).",
         )
         sp.add_argument(
             "--prompt-template",

@@ -5,8 +5,11 @@
 
 .DESCRIPTION
     One resolution rule, implemented once and parameterized per gate. A feature folder is
-    identified structurally, as the single path segment immediately below
-    docs/features/active/, and never by string length or prompt position.
+    identified structurally, as the single path segment immediately below the active area of
+    a known development-docs root (docs/features/active/ or .dev/active/, issue #1035), and
+    never by string length or prompt position. The known-root alternation is the -RootPattern
+    default of the two token readers; it equals Get-DevelopmentDocsKnownRootPattern called
+    without -Area, written as a literal so that this file stays pure.
 
       - Find-FeatureFolderCandidate extracts the distinct cited folder basenames (R1).
       - ConvertTo-FeatureFolderBasename normalizes a record value or token (R2).
@@ -32,13 +35,18 @@ function Find-FeatureFolderCandidate {
         Returns the distinct feature-folder basenames cited in a text, in first-occurrence
         order (R1).
     .DESCRIPTION
-        Scans for docs/features/active/ path tokens with any prefix and either separator.
-        Each token is normalized to forward slashes and split into segments; empty and '.'
-        segments are dropped. A token with fewer than four segments yields no candidate.
-        The fourth segment is the folder, with trailing '.', ',', ';', ':', ')', ']', '>', '*', and '_' trimmed.
-        Duplicates are removed ordinally, keeping the first occurrence.
+        Scans for <root>/active/ path tokens with any prefix and either separator, where
+        <root> is matched by -RootPattern. Each token is normalized to forward slashes and
+        split into segments; empty and '.' segments are dropped. The folder is the segment
+        after the first 'active' segment (the fourth segment under docs/features), with
+        trailing '.', ',', ';', ':', ')', ']', '>', '*', and '_' trimmed; a token without
+        that segment yields no candidate. Duplicates are removed ordinally, keeping the first
+        occurrence.
     .PARAMETER Text
         The prompt or other text to scan. Null or empty text yields no output.
+    .PARAMETER RootPattern
+        Regular expression for the development-docs root (issue #1035). The default is the
+        known-root alternation, so both docs/features and .dev tokens are read.
     .OUTPUTS
         System.String[] (no output when no qualifying token is present)
     #>
@@ -47,7 +55,9 @@ function Find-FeatureFolderCandidate {
     param(
         [AllowNull()]
         [AllowEmptyString()]
-        [string] $Text
+        [string] $Text,
+
+        [string] $RootPattern = '(?:docs[\\/]features|\.dev)'
     )
 
     if ([string]::IsNullOrEmpty($Text)) {
@@ -55,12 +65,13 @@ function Find-FeatureFolderCandidate {
     }
 
     $found = [System.Collections.Generic.List[string]]::new()
-    foreach ($match in [regex]::Matches($Text, 'docs[\\/]+features[\\/]+active[\\/]+[^\s"''`]+')) {
+    foreach ($match in [regex]::Matches($Text, $RootPattern + '[\\/]+active[\\/]+[^\s"''`]+')) {
         $segments = @(($match.Value -replace '\\', '/') -split '/' | Where-Object { $_ -and $_ -ne '.' })
-        if ($segments.Count -lt 4) {
+        $activeIndex = [array]::IndexOf($segments, 'active')
+        if ($activeIndex -lt 0 -or ($activeIndex + 1) -ge $segments.Count) {
             continue
         }
-        $folder = $segments[3].TrimEnd('.', ',', ';', ':', ')', ']', '>', '*', '_')
+        $folder = $segments[$activeIndex + 1].TrimEnd('.', ',', ';', ':', ')', ']', '>', '*', '_')
         if (-not $folder -or $found.Contains($folder)) {
             continue
         }
@@ -75,10 +86,15 @@ function ConvertTo-FeatureFolderBasename {
         Normalizes a feature-folder record value or token to its basename (R2).
     .DESCRIPTION
         Separators are normalized to forward slashes, surrounding whitespace and trailing
-        slashes are trimmed, and one leading docs/features/<lifecycle>/, active/, or
-        completed/ prefix is stripped. The last remaining segment is returned.
+        slashes are trimmed, and one leading <root>/<lifecycle>/, active/, or completed/
+        prefix is stripped, where <root> is matched by -RootPattern. The last remaining
+        segment is returned.
     .PARAMETER Value
         The record value or token to normalize.
+    .PARAMETER RootPattern
+        Regular expression for the development-docs root (issue #1035). The default is the
+        known-root alternation, so docs/features/<lifecycle>/ and .dev/<lifecycle>/ prefixes
+        are both stripped.
     .OUTPUTS
         System.String, or $null when no folder segment remains.
     #>
@@ -87,14 +103,16 @@ function ConvertTo-FeatureFolderBasename {
     param(
         [AllowNull()]
         [AllowEmptyString()]
-        [string] $Value
+        [string] $Value,
+
+        [string] $RootPattern = '(?:docs[\\/]features|\.dev)'
     )
 
     if ([string]::IsNullOrWhiteSpace($Value)) {
         return $null
     }
     $normalized = ($Value -replace '\\', '/').Trim().TrimEnd('/')
-    $normalized = $normalized -replace '^(docs/features/[^/]+(/|$)|active/|completed/)', ''
+    $normalized = $normalized -replace ('^(' + $RootPattern + '/[^/]+(/|$)|active/|completed/)'), ''
     $segment = ($normalized -split '/')[-1]
     if (-not $segment -or $segment -eq '.') {
         return $null

@@ -72,7 +72,7 @@ class FakeGit(GitClient):
         return "## feature/test...origin/feature/test"
 
     def untracked(self) -> str:
-        return "docs/features/active/fix-all-script/spec.md"
+        return ".dev/active/fix-all-script/spec.md"
 
     def diff_name_status(self, *, staged: bool) -> str:
         marker = "A" if staged else "M"
@@ -186,11 +186,11 @@ def test_parse_numstat_detailed_handles_non_numeric_entries():
 
 
 def test_is_scoping_doc_identifies_feature_files():
-    assert _is_scoping_doc("docs/features/active/feat/spec.md")
-    assert _is_scoping_doc("docs/features/active/feat/plan.md")
-    assert _is_scoping_doc("docs/features/active/feat/bug-remediation-plan.md")
-    assert _is_scoping_doc("docs/features/active/feat/user-story.md")
-    assert not _is_scoping_doc("docs/features/ideas/idea.md")
+    assert _is_scoping_doc(".dev/active/feat/spec.md")
+    assert _is_scoping_doc(".dev/active/feat/plan.md")
+    assert _is_scoping_doc(".dev/active/feat/bug-remediation-plan.md")
+    assert _is_scoping_doc(".dev/active/feat/user-story.md")
+    assert not _is_scoping_doc(".dev/ideas/idea.md")
     assert not _is_scoping_doc("src/main.py")
 
 
@@ -217,7 +217,7 @@ def test_collect_and_write_uses_feature_refs_and_scoping(
             return "feature/ABC-10"
 
         def diff_range(self, args: Sequence[str]) -> str:
-            path = "docs/features/active/fix-all-script/spec.md"
+            path = ".dev/active/fix-all-script/spec.md"
             if "--name-status" in args:
                 return f"M\t{path}"
             if "--numstat" in args:
@@ -331,7 +331,7 @@ def test_collect_and_write_uses_feature_refs_and_scoping(
                 feature="fix-all-script",
                 excerpt="Excerpt",
                 issue_refs=["#7"],
-                context_files=["docs/features/active/fix-all-script/spec.md"],
+                context_files=[".dev/active/fix-all-script/spec.md"],
             )
         ]
 

@@ -34,12 +34,12 @@ its duration ledger, its pause spans, and its baseline in a state file. It also 
 
 - PowerShell 7 and `git`. `gh` and `cswap` are optional: without `gh` the pull-request state is empty, and
   without `cswap` (or without parseable output) the weekly quota prints `n/a`.
-- Epic mode: the epic kickoff at `docs/features/epics/<epic-folder>/epic-kickoff.md` on
+- Epic mode: the epic kickoff at `.dev/epics/<epic-folder>/epic-kickoff.md` on
   `origin/epic/<epic-folder>-integration`, with a feature-summary table (header first cell `issue_num` or
   `Issue`) and an `Epic issue: #<n>` line. Pass `-EpicIssue` when the line is missing.
 - The epic checkpoint `artifacts/orchestration/epic-orchestrator-state.json` under the repository root
   (optional; without it every feature is classified from its plan and PR).
-- Optional dependency and cap inputs: `docs/features/epics/<epic-folder>/epic.md` on the integration branch
+- Optional dependency and cap inputs: `.dev/epics/<epic-folder>/epic.md` on the integration branch
   and `config/orchestration-routing.json` under the repository root.
 - Item mode: a live worktree whose `artifacts/orchestration/orchestrator-state.json` carries the item's
   `issue-num` and its `plan-path`.
@@ -50,14 +50,14 @@ its duration ledger, its pause spans, and its baseline in a state file. It also 
 
 | Parameter | Default | Meaning |
 |---|---|---|
-| `-EpicFolder` | (mandatory, Epic set) | Epic folder name under `docs/features/epics/`; also the epic name in the status heading. |
+| `-EpicFolder` | (mandatory, Epic set) | Epic folder name under `.dev/epics/`; also the epic name in the status heading. |
 | `-Issue` | (mandatory, Item set) | Standalone item issue number. The worktree whose checkpoint `issue-num` equals it is reported, with no kickoff, epic checkpoint, or epic-level step. Cannot be combined with `-EpicFolder`. |
 | `-StartUtc` | stored start | Start of the measurement. Resolution: the passed value, else now with `-ResetBaseline`, else the stored start. With none of these the script stops before any git call with an error naming `-StartUtc` and `-ResetBaseline`. |
 | `-BaselineDone` | stored value, else 0 | Steps already complete at the start. With `-ResetBaseline`, or after a migrated state, and no passed value: the current done count. |
 | `-BaselineWeeklyPct` | stored value, else 0 | Weekly quota percentage at the start. `-ResetBaseline` does not change it. |
 | `-EpicIssue` | the kickoff's `Epic issue: #<n>` line | Epic issue number printed in the report. |
 | `-IntegrationBranch` | `origin/epic/<epic-folder>-integration` | Branch that holds the kickoff and the plans; in item mode only a fallback for plan texts, blank by default. |
-| `-KickoffPath` | `docs/features/epics/<epic-folder>/epic-kickoff.md` | Kickoff path on the integration branch. |
+| `-KickoffPath` | `.dev/epics/<epic-folder>/epic-kickoff.md` | Kickoff path on the integration branch. |
 | `-RepositoryRoot` | current location | Repository root in which git runs. |
 | `-CheckpointPath` | `artifacts/orchestration/epic-orchestrator-state.json` | Epic checkpoint under the repository root. |
 | `-StatePath` | `.claude/state/epic-progress-<epic-folder>.json`, or `.claude/state/progress-item-<n>.json` in item mode | State file under the repository root; the directory is created when missing. |

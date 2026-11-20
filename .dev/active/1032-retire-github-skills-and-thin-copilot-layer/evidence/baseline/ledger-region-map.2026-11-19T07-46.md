@@ -1,0 +1,499 @@
+# Ledger Region Map ([P0-T2], REGION-MAP)
+
+Timestamp: 2026-11-19T07-46
+Plan: plan.2026-10-30T18-39.md
+Command: sh SCRATCH/issue-1032-ps.sh issue-1032-regionmap.ps1 (parses every entry's Prior Text with Get-ProcessReductionRevertBlock and every stored patch with Get-ProcessReductionPatchHunk; a row is in-region when the block Current, or the hunk context plus + lines, holds the anchor token)
+EXIT_CODE: 0
+Output Summary: 77 retired-path regions (20 revert blocks across entries 0001, 0003, 0004, 0005, 0006, 0011, 0012; every hunk of every retired-path section of patches 0001, 0006, 0008, 0009); 27 in-region rows for Phase 1 edit anchors; 370 outside rows.
+
+## Findings
+
+- Retired-path revert blocks (P1-T9 removes each): entry 0001 block 4; entry 0003 blocks 20, 40, 45; entry 0004 block 3; entry 0005 blocks 11 to 14; entry 0006 blocks 13 to 18; entry 0011 blocks 64 to 66; entry 0012 block 5.
+- Entry 0012 (`0012-local-lane-exclusion.md`) holds a `### Revert Block: ` block for the retired `atomic-plan-contract` copy although spec `LEDGER-RECORDS` does not list entry 0012. The chain test reports a block whose file is absent, so P1-T9 must also remove it: this run treats entry 0012 as a member of `LEDGER-RECORDS` for P1-T9, P2-T7 and AC22 (mechanically required for `LEDGER-CHAIN-TESTS`; recorded as a non-blocking deviation). Entry 0002 names retired paths only in `## Files Changed` and `## Revert Steps` prose (no block), so it is `outside`.
+- Retired-path stored-patch sections (P1-T9 removes each section whole): patch 0001 (`.github/skills` atomic-plan-contract, execution-environment, feature-review-workflow and their three bundle copies), patch 0006 (atomic-plan-contract, evidence-and-timestamp-conventions, execution-environment, feature-review-workflow and bundle copies), patch 0008 (atomic-plan-contract and bundle copy), patch 0009 (atomic-plan-contract, feature-review-workflow and bundle copies).
+- Patch 0006 hunks on entry files: `0001-parallel-only-test-gates.md` hunks at +917 (`## Revert Steps` step 1) and +928 (`## Partial Revert`); `0005-policy-read-removal.md` hunks at +105, +116, +131, +144 (Current fences of the non-retired contract blocks). None holds a retired-path revert block; the P1-T9 block removals and `## Files Changed` notes move their recorded line positions only, so P1-T9 regenerates their `@@` positions.
+- S4/S5 (`in the six \`atomic-plan-contract\` copies`): in-region in patch 0001 hunk at +109 and patch 0006 hunk at +111 on `.claude` and `.agents` execution-environment, and in entry 0011 block 30 (`.claude/skills/execution-environment/SKILL.md` Current fence).
+- S1, S2, S3: no block or hunk on a remaining brief copy holds them (outside).
+- S6 (`in all six byte-identical copies` in the contract): in-region in patch 0001 hunk at +32 and patch 0008 hunk at +31 on `.claude` and `.agents` atomic-plan-contract.
+- `parallel-gate-wording.Tests.ps1`: patch 0001 create hunk (whole file) and patch 0006 hunks at +81, +103, +133 hold the Copilot rows and sweep root.
+- `less-evidence-contract.Tests.ps1`: patch 0009 create hunk (whole file).
+- `planning-contract-wording.Tests.ps1`: patch 0008 hunk at +34 holds a Copilot row.
+- `test_single_pass_preflight_contracts.py`: patch 0001 hunk at +21 holds Copilot entries.
+- READ-FIRST-AGENTS read-first line, `test_execution_environment_brief_contracts.py`, `test_plan_gate_document_docs.py`, `docs/engineering/claude-code-architecture.md` anchors: outside every block and hunk (see rows).
+
+## Rows (entry or patch | block or hunk header | anchor | status)
+
+- 0001-parallel-only-test-gates.md | block 1 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0001-parallel-only-test-gates.md | block 1 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.md | block 1 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.md | block 1 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0001-parallel-only-test-gates.md | block 1 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0001-parallel-only-test-gates.md | block 1 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0001-parallel-only-test-gates.md | block 2 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.md | block 3 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.md | block 4 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0001-parallel-only-test-gates.md | block 5 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0001-parallel-only-test-gates.md | block 5 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.md | block 5 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.md | block 5 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0001-parallel-only-test-gates.md | block 5 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0001-parallel-only-test-gates.md | block 5 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0002-concurrent-review.md | block 26 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0002-concurrent-review.md | block 26 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0002-concurrent-review.md | block 26 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0002-concurrent-review.md | block 26 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0002-concurrent-review.md | block 26 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0002-concurrent-review.md | block 26 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0002-concurrent-review.md | block 27 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0002-concurrent-review.md | block 27 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0002-concurrent-review.md | block 27 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0002-concurrent-review.md | block 27 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0002-concurrent-review.md | block 27 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0002-concurrent-review.md | block 27 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0002-concurrent-review.md | block 28 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0002-concurrent-review.md | block 28 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0002-concurrent-review.md | block 28 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0002-concurrent-review.md | block 28 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0002-concurrent-review.md | block 28 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0002-concurrent-review.md | block 28 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0002-concurrent-review.md | block 29 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0002-concurrent-review.md | block 29 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0002-concurrent-review.md | block 29 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0002-concurrent-review.md | block 29 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0002-concurrent-review.md | block 29 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0002-concurrent-review.md | block 29 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0002-concurrent-review.md | block 30 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0002-concurrent-review.md | block 30 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0002-concurrent-review.md | block 30 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0002-concurrent-review.md | block 30 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0002-concurrent-review.md | block 30 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0002-concurrent-review.md | block 30 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0003-light-remediation.md | block 20 `### Revert Block: .github/skills/feature-review-workflow/SKILL.md` | retired path | in-region (delete)
+- 0003-light-remediation.md | block 38 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0003-light-remediation.md | block 39 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0003-light-remediation.md | block 40 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0003-light-remediation.md | block 41 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0003-light-remediation.md | block 41 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0003-light-remediation.md | block 41 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0003-light-remediation.md | block 41 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0003-light-remediation.md | block 41 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0003-light-remediation.md | block 41 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0003-light-remediation.md | block 42 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0003-light-remediation.md | block 42 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0003-light-remediation.md | block 42 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0003-light-remediation.md | block 42 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0003-light-remediation.md | block 42 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0003-light-remediation.md | block 42 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0003-light-remediation.md | block 45 `### Revert Block: .github/skills/remediation-handoff-atomic-planner/SKILL.md` | retired path | in-region (delete)
+- 0003-light-remediation.md | block 46 `### Revert Block: .github/agents/orchestrator.agent.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0004-smaller-plans.md | block 1 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0004-smaller-plans.md | block 2 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0004-smaller-plans.md | block 3 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0005-policy-read-removal.md | block 3 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0005-policy-read-removal.md | block 4 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0005-policy-read-removal.md | block 5 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0005-policy-read-removal.md | block 6 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0005-policy-read-removal.md | block 7 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0005-policy-read-removal.md | block 8 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0005-policy-read-removal.md | block 9 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0005-policy-read-removal.md | block 10 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0005-policy-read-removal.md | block 11 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0005-policy-read-removal.md | block 12 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0005-policy-read-removal.md | block 13 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0005-policy-read-removal.md | block 14 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0005-policy-read-removal.md | block 18 `### Revert Block: .github/agents/atomic_executor.agent.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0005-policy-read-removal.md | block 19 `### Revert Block: .github/agents/atomic_executor.agent.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0005-policy-read-removal.md | block 26 `### Revert Block: .github/agents/orchestrator.agent.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0005-policy-read-removal.md | block 27 `### Revert Block: .github/agents/orchestrator.agent.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0005-policy-read-removal.md | block 34 `### Revert Block: .github/agents/atomic_planning.agent.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0005-policy-read-removal.md | block 43 `### Revert Block: docs/engineering/claude-code-architecture.md` | `.github/skills` | outside
+- 0005-policy-read-removal.md | block 43 `### Revert Block: docs/engineering/claude-code-architecture.md` | `migration map` | outside
+- 0005-policy-read-removal.md | block 43 `### Revert Block: docs/engineering/claude-code-architecture.md` | `authoritative` | outside
+- 0005-policy-read-removal.md | block 43 `### Revert Block: docs/engineering/claude-code-architecture.md` | `Manual sync` | outside
+- 0006-test-suite-baseline-restored.md | block 1 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 2 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 3 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 4 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 5 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 6 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 7 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 8 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 9 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 10 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 11 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 12 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 13 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0006-test-suite-baseline-restored.md | block 14 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0006-test-suite-baseline-restored.md | block 15 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0006-test-suite-baseline-restored.md | block 16 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0006-test-suite-baseline-restored.md | block 17 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0006-test-suite-baseline-restored.md | block 18 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0006-test-suite-baseline-restored.md | block 19 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0006-test-suite-baseline-restored.md | block 19 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.md | block 19 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 19 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0006-test-suite-baseline-restored.md | block 19 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0006-test-suite-baseline-restored.md | block 19 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0006-test-suite-baseline-restored.md | block 20 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0006-test-suite-baseline-restored.md | block 20 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.md | block 20 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.md | block 20 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0006-test-suite-baseline-restored.md | block 20 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0006-test-suite-baseline-restored.md | block 20 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0011-task-check-cadence.md | block 2 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0011-task-check-cadence.md | block 3 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0011-task-check-cadence.md | block 4 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0011-task-check-cadence.md | block 25 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0011-task-check-cadence.md | block 26 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0011-task-check-cadence.md | block 27 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0011-task-check-cadence.md | block 29 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0011-task-check-cadence.md | block 29 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0011-task-check-cadence.md | block 29 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0011-task-check-cadence.md | block 29 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0011-task-check-cadence.md | block 29 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0011-task-check-cadence.md | block 29 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0011-task-check-cadence.md | block 30 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0011-task-check-cadence.md | block 30 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0011-task-check-cadence.md | block 30 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0011-task-check-cadence.md | block 30 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0011-task-check-cadence.md | block 30 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0011-task-check-cadence.md | block 30 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | in-region
+- 0011-task-check-cadence.md | block 31 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0011-task-check-cadence.md | block 31 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0011-task-check-cadence.md | block 31 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0011-task-check-cadence.md | block 31 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0011-task-check-cadence.md | block 31 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0011-task-check-cadence.md | block 31 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0011-task-check-cadence.md | block 32 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0011-task-check-cadence.md | block 32 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0011-task-check-cadence.md | block 32 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0011-task-check-cadence.md | block 32 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0011-task-check-cadence.md | block 32 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0011-task-check-cadence.md | block 32 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0011-task-check-cadence.md | block 40 `### Revert Block: .github/agents/atomic_executor.agent.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0011-task-check-cadence.md | block 41 `### Revert Block: .github/agents/atomic_executor.agent.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0011-task-check-cadence.md | block 42 `### Revert Block: .github/agents/atomic_planning.agent.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0011-task-check-cadence.md | block 43 `### Revert Block: .github/agents/atomic_planning.agent.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0011-task-check-cadence.md | block 64 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0011-task-check-cadence.md | block 65 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0011-task-check-cadence.md | block 66 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0012-local-lane-exclusion.md | block 2 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `byte-identical in six locations` | outside
+- 0012-local-lane-exclusion.md | block 2 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0012-local-lane-exclusion.md | block 2 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in all six byte-identical copies` | outside
+- 0012-local-lane-exclusion.md | block 2 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `documentation-workflow` copies` | outside
+- 0012-local-lane-exclusion.md | block 2 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six copies of this brief` | outside
+- 0012-local-lane-exclusion.md | block 2 `### Revert Block: .claude/skills/execution-environment/SKILL.md` | `in the six `atomic-plan-contract` copies` | outside
+- 0012-local-lane-exclusion.md | block 3 `### Revert Block: .claude/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0012-local-lane-exclusion.md | block 4 `### Revert Block: .agents/skills/atomic-plan-contract/SKILL.md` | `in all six byte-identical copies` | outside
+- 0012-local-lane-exclusion.md | block 5 `### Revert Block: .github/skills/atomic-plan-contract/SKILL.md` | retired path | in-region (delete)
+- 0012-local-lane-exclusion.md | block 30 `### Revert Block: .github/agents/atomic_executor.agent.md` | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +32 | `in all six byte-identical copies` | in-region
+- 0001-parallel-only-test-gates.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +43 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +58 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +108 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +140 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +229 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +39 | `byte-identical in six locations` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +39 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +39 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +39 | `in the six `documentation-workflow` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +39 | `in the six copies of this brief` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +39 | `in the six `atomic-plan-contract` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +91 | `byte-identical in six locations` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +91 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +91 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +91 | `in the six `documentation-workflow` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +91 | `in the six copies of this brief` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +91 | `in the six `atomic-plan-contract` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +109 | `byte-identical in six locations` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +109 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +109 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +109 | `in the six `documentation-workflow` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +109 | `in the six copies of this brief` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +109 | `in the six `atomic-plan-contract` copies` | in-region
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +141 | `byte-identical in six locations` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +141 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +141 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +141 | `in the six `documentation-workflow` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +141 | `in the six copies of this brief` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +141 | `in the six `atomic-plan-contract` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +151 | `byte-identical in six locations` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +151 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +151 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +151 | `in the six `documentation-workflow` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +151 | `in the six copies of this brief` | outside
+- 0001-parallel-only-test-gates.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +151 | `in the six `atomic-plan-contract` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +32 | `in all six byte-identical copies` | in-region
+- 0001-parallel-only-test-gates.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +43 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +58 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +95 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +127 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +271 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +39 | `byte-identical in six locations` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +39 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +39 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +39 | `in the six `documentation-workflow` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +39 | `in the six copies of this brief` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +39 | `in the six `atomic-plan-contract` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +91 | `byte-identical in six locations` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +91 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +91 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +91 | `in the six `documentation-workflow` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +91 | `in the six copies of this brief` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +91 | `in the six `atomic-plan-contract` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +109 | `byte-identical in six locations` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +109 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +109 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +109 | `in the six `documentation-workflow` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +109 | `in the six copies of this brief` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +109 | `in the six `atomic-plan-contract` copies` | in-region
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +141 | `byte-identical in six locations` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +141 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +141 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +141 | `in the six `documentation-workflow` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +141 | `in the six copies of this brief` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +141 | `in the six `atomic-plan-contract` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +151 | `byte-identical in six locations` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +151 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +151 | `in all six byte-identical copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +151 | `in the six `documentation-workflow` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +151 | `in the six copies of this brief` | outside
+- 0001-parallel-only-test-gates.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +151 | `in the six `atomic-plan-contract` copies` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/atomic_executor.agent.md` modify hunk at +86 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/atomic_executor.agent.md` modify hunk at +148 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/atomic_executor.agent.md` modify hunk at +252 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/atomic_planning.agent.md` modify hunk at +68 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/atomic_planning.agent.md` modify hunk at +101 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/atomic_planning.agent.md` modify hunk at +400 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/atomic_planning.agent.md` modify hunk at +643 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/orchestrator.agent.md` modify hunk at +14 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/orchestrator.agent.md` modify hunk at +38 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/orchestrator.agent.md` modify hunk at +54 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/orchestrator.agent.md` modify hunk at +253 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/orchestrator.agent.md` modify hunk at +352 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/agents/orchestrator.agent.md` modify hunk at +360 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0001-parallel-only-test-gates.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +32 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +43 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +58 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +108 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +125 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +214 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/execution-environment/SKILL.md` modify hunk at +39 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/execution-environment/SKILL.md` modify hunk at +91 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/execution-environment/SKILL.md` modify hunk at +109 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/execution-environment/SKILL.md` modify hunk at +141 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/execution-environment/SKILL.md` modify hunk at +151 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/feature-review-workflow/SKILL.md` modify hunk at +42 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/feature-review-workflow/SKILL.md` modify hunk at +101 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `.github/skills/feature-review-workflow/SKILL.md` modify hunk at +132 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +32 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +43 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +58 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +108 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +125 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +214 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md` modify hunk at +39 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md` modify hunk at +91 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md` modify hunk at +109 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md` modify hunk at +141 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md` modify hunk at +151 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md` modify hunk at +42 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md` modify hunk at +101 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md` modify hunk at +132 | retired path | in-region (delete section)
+- 0001-parallel-only-test-gates.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` create hunk at +1 | `GITHUB` | in-region
+- 0001-parallel-only-test-gates.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` create hunk at +1 | `.github/skills` | in-region
+- 0001-parallel-only-test-gates.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` create hunk at +1 | `customizations/.github` | in-region
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +94 | `.github` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +94 | `six` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +94 | `"skills"` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +94 | `"customizations"` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +441 | `.github` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +441 | `six` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +441 | `"skills"` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +441 | `"customizations"` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +451 | `.github` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +451 | `six` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +451 | `"skills"` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +451 | `"customizations"` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +466 | `.github` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +466 | `six` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +466 | `"skills"` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +466 | `"customizations"` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_single_pass_preflight_contracts.py` modify hunk at +21 | `.github` | in-region
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_single_pass_preflight_contracts.py` modify hunk at +21 | `six ` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_single_pass_preflight_contracts.py` modify hunk at +21 | `"skills"` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_single_pass_preflight_contracts.py` modify hunk at +21 | `"customizations"` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_single_pass_preflight_contracts.py` modify hunk at +368 | `.github` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_single_pass_preflight_contracts.py` modify hunk at +368 | `six ` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_single_pass_preflight_contracts.py` modify hunk at +368 | `"skills"` | outside
+- 0001-parallel-only-test-gates.patch | `tests/scripts/dev_tools/test_single_pass_preflight_contracts.py` modify hunk at +368 | `"customizations"` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +49 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +64 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +114 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +146 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +241 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +111 | `byte-identical in six locations` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +111 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +111 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +111 | `in the six `documentation-workflow` copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +111 | `in the six copies of this brief` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +111 | `in the six `atomic-plan-contract` copies` | in-region
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +145 | `byte-identical in six locations` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +145 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +145 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +145 | `in the six `documentation-workflow` copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +145 | `in the six copies of this brief` | outside
+- 0006-test-suite-baseline-restored.patch | `.agents/skills/execution-environment/SKILL.md` modify hunk at +145 | `in the six `atomic-plan-contract` copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +49 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +64 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +101 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +133 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +283 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +111 | `byte-identical in six locations` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +111 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +111 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +111 | `in the six `documentation-workflow` copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +111 | `in the six copies of this brief` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +111 | `in the six `atomic-plan-contract` copies` | in-region
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +145 | `byte-identical in six locations` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +145 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +145 | `in all six byte-identical copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +145 | `in the six `documentation-workflow` copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +145 | `in the six copies of this brief` | outside
+- 0006-test-suite-baseline-restored.patch | `.claude/skills/execution-environment/SKILL.md` modify hunk at +145 | `in the six `atomic-plan-contract` copies` | outside
+- 0006-test-suite-baseline-restored.patch | `.github/agents/atomic_executor.agent.md` modify hunk at +86 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.github/agents/atomic_executor.agent.md` modify hunk at +148 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.github/agents/atomic_planning.agent.md` modify hunk at +68 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.github/agents/atomic_planning.agent.md` modify hunk at +101 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.github/agents/atomic_planning.agent.md` modify hunk at +643 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.github/agents/orchestrator.agent.md` modify hunk at +14 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.github/agents/orchestrator.agent.md` modify hunk at +38 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.github/agents/orchestrator.agent.md` modify hunk at +54 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.github/agents/orchestrator.agent.md` modify hunk at +253 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.github/agents/orchestrator.agent.md` modify hunk at +352 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.github/agents/orchestrator.agent.md` modify hunk at +360 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0006-test-suite-baseline-restored.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +49 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +64 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +114 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +132 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +227 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `.github/skills/evidence-and-timestamp-conventions/SKILL.md` modify hunk at +116 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `.github/skills/execution-environment/SKILL.md` modify hunk at +111 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `.github/skills/execution-environment/SKILL.md` modify hunk at +145 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `.github/skills/feature-review-workflow/SKILL.md` modify hunk at +42 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `.github/skills/feature-review-workflow/SKILL.md` modify hunk at +132 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0001-parallel-only-test-gates.md` modify hunk at +917 | `.github/skills` | in-region
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0001-parallel-only-test-gates.md` modify hunk at +917 | `## Files Changed` | in-region
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0001-parallel-only-test-gates.md` modify hunk at +928 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0001-parallel-only-test-gates.md` modify hunk at +928 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +105 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +105 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +116 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +116 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +131 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +131 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +146 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +146 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +203 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +203 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +214 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +214 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +229 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +229 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +244 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +244 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +296 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +296 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +305 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +305 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +349 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +349 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +365 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +365 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +381 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +381 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +414 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +414 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +446 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +446 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +478 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +478 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +510 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +510 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +717 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +717 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +732 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +732 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +747 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +747 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +762 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `docs/engineering/process-reductions/0005-policy-read-removal.md` modify hunk at +762 | `## Files Changed` | outside
+- 0006-test-suite-baseline-restored.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +49 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +64 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +114 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +132 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +227 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `extensions/drm-copilot/resources/customizations/.github/skills/evidence-and-timestamp-conventions/SKILL.md` modify hunk at +116 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md` modify hunk at +111 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `extensions/drm-copilot/resources/customizations/.github/skills/execution-environment/SKILL.md` modify hunk at +145 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md` modify hunk at +42 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md` modify hunk at +132 | retired path | in-region (delete section)
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +1 | `GITHUB` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +1 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +1 | `customizations/.github` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +24 | `GITHUB` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +24 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +24 | `customizations/.github` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +81 | `GITHUB` | in-region
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +81 | `.github/skills` | in-region
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +81 | `customizations/.github` | in-region
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +103 | `GITHUB` | in-region
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +103 | `.github/skills` | in-region
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +103 | `customizations/.github` | in-region
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +133 | `GITHUB` | in-region
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +133 | `.github/skills` | in-region
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +133 | `customizations/.github` | in-region
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +182 | `GITHUB` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +182 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +182 | `customizations/.github` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +287 | `GITHUB` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +287 | `.github/skills` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1` modify hunk at +287 | `customizations/.github` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +517 | `.github` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +517 | `six` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +517 | `"skills"` | outside
+- 0006-test-suite-baseline-restored.patch | `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py` modify hunk at +517 | `"customizations"` | outside
+- 0008-g13-guideline-cutoff.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +31 | `in all six byte-identical copies` | in-region
+- 0008-g13-guideline-cutoff.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +215 | `in all six byte-identical copies` | outside
+- 0008-g13-guideline-cutoff.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +31 | `in all six byte-identical copies` | in-region
+- 0008-g13-guideline-cutoff.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +233 | `in all six byte-identical copies` | outside
+- 0008-g13-guideline-cutoff.patch | `.github/agents/atomic_planning.agent.md` modify hunk at +109 | `.github/skills/execution-environment/SKILL.md` | outside
+- 0008-g13-guideline-cutoff.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +31 | retired path | in-region (delete section)
+- 0008-g13-guideline-cutoff.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +201 | retired path | in-region (delete section)
+- 0008-g13-guideline-cutoff.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +31 | retired path | in-region (delete section)
+- 0008-g13-guideline-cutoff.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +201 | retired path | in-region (delete section)
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1` modify hunk at +34 | `GITHUB` | outside
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1` modify hunk at +34 | `.github` | in-region
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1` modify hunk at +176 | `GITHUB` | outside
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1` modify hunk at +176 | `.github` | outside
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/dev_tools/test_plan_gate_document_docs.py` modify hunk at +8 | `.github` | outside
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/dev_tools/test_plan_gate_document_docs.py` modify hunk at +8 | `Copilot` | outside
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/dev_tools/test_plan_gate_document_docs.py` modify hunk at +8 | `"customizations"` | outside
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/dev_tools/test_plan_gate_document_docs.py` modify hunk at +67 | `.github` | outside
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/dev_tools/test_plan_gate_document_docs.py` modify hunk at +67 | `Copilot` | outside
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/dev_tools/test_plan_gate_document_docs.py` modify hunk at +67 | `"customizations"` | outside
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/dev_tools/test_plan_gate_document_docs.py` modify hunk at +156 | `.github` | outside
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/dev_tools/test_plan_gate_document_docs.py` modify hunk at +156 | `Copilot` | outside
+- 0008-g13-guideline-cutoff.patch | `tests/scripts/dev_tools/test_plan_gate_document_docs.py` modify hunk at +156 | `"customizations"` | outside
+- 0009-less-evidence.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +62 | `in all six byte-identical copies` | outside
+- 0009-less-evidence.patch | `.agents/skills/atomic-plan-contract/SKILL.md` modify hunk at +167 | `in all six byte-identical copies` | outside
+- 0009-less-evidence.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +62 | `in all six byte-identical copies` | outside
+- 0009-less-evidence.patch | `.claude/skills/atomic-plan-contract/SKILL.md` modify hunk at +154 | `in all six byte-identical copies` | outside
+- 0009-less-evidence.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +62 | retired path | in-region (delete section)
+- 0009-less-evidence.patch | `.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +153 | retired path | in-region (delete section)
+- 0009-less-evidence.patch | `.github/skills/feature-review-workflow/SKILL.md` modify hunk at +93 | retired path | in-region (delete section)
+- 0009-less-evidence.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +62 | retired path | in-region (delete section)
+- 0009-less-evidence.patch | `extensions/drm-copilot/resources/customizations/.github/skills/atomic-plan-contract/SKILL.md` modify hunk at +153 | retired path | in-region (delete section)
+- 0009-less-evidence.patch | `extensions/drm-copilot/resources/customizations/.github/skills/feature-review-workflow/SKILL.md` modify hunk at +93 | retired path | in-region (delete section)
+- 0009-less-evidence.patch | `tests/scripts/claude-runtime/less-evidence-contract.Tests.ps1` create hunk at +1 | `GITHUB` | in-region
+- 0009-less-evidence.patch | `tests/scripts/claude-runtime/less-evidence-contract.Tests.ps1` create hunk at +1 | `.github` | in-region

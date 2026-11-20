@@ -110,6 +110,14 @@ Describe 'Codex enforce-epic-merge-gate review guard (issue #1097)' {
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
 
+    It 'RGC-DEV-ROOT accepts a .dev/active feature folder and rejects other forms (issue #1035)' {
+        Test-EpicMergeGateReviewFeatureFolder -Value '.dev/active/x' | Should -BeTrue
+        Test-EpicMergeGateReviewFeatureFolder -Value 'docs/features/active/x' | Should -BeTrue
+        foreach ($value in @('.devx/active/x', '.dev', 'docs/research/x', '.dev/active/../x', '.dev/active/x/')) {
+            Test-EpicMergeGateReviewFeatureFolder -Value $value | Should -BeFalse -Because $value
+        }
+    }
+
     It 'RGC-<Name>' -ForEach $script:ReviewCaseRow {
         # Arrange
         $checkpoint = ConvertTo-EpicMergeGateReviewCheckpointJson -Override $Override -Remove $Remove

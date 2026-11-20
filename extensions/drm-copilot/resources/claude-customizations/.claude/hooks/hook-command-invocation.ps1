@@ -3,7 +3,7 @@
     Structural command-invocation matcher shared by the Claude and Codex enforcement hooks.
 .DESCRIPTION
     Realizes Piece 3 of the D2 behavior contract and the retrieval surface of D12 in
-    docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md,
+    .dev/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md,
     as revised by issue #824.
 
     Answers whether a command line INVOKES a named command word with a named subcommand

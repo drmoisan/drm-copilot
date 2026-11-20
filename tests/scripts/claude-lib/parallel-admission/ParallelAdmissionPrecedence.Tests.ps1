@@ -316,8 +316,8 @@ Describe 'Scheduling record' {
             ToleratedOverlap = @(@{ a = 1101; b = 1102; reasons = @('path_overlap'); cost = 1; benefit = 4; observed_resolution = @{ conflicted = $false } })
             Precedence       = @(@{ before = 1101; after = 1102; source = 'operator'; recorded_at = '2026-11-03T10-00'; note = 'x' })
             Item             = @(
-                @{ issue_num = 1102; branch_name = 'feature/b-1102'; plan_path = 'docs/features/active/b-1102/plan.2026-11-02T09-00.md'; plan_hash = 'bbbb'; base_commit = 'c2'; preparation_status = 'cleared'; complexity_band = 'C2'; state = 'scheduled' }
-                @{ issue_num = 1101; branch_name = 'feature/a-1101'; plan_path = 'docs/features/active/a-1101/plan.2026-11-02T08-00.md'; plan_hash = 'aaaa'; base_commit = 'c1'; preparation_status = 'cleared'; complexity_band = 'C1' }
+                @{ issue_num = 1102; branch_name = 'feature/b-1102'; plan_path = '.dev/active/b-1102/plan.2026-11-02T09-00.md'; plan_hash = 'bbbb'; base_commit = 'c2'; preparation_status = 'cleared'; complexity_band = 'C2'; state = 'scheduled' }
+                @{ issue_num = 1101; branch_name = 'feature/a-1101'; plan_path = '.dev/active/a-1101/plan.2026-11-02T08-00.md'; plan_hash = 'aaaa'; base_commit = 'c1'; preparation_status = 'cleared'; complexity_band = 'C1' }
             )
         }
     }

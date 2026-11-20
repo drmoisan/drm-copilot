@@ -12,7 +12,7 @@ const COMMIT = "1".repeat(40);
 const FINAL_COMMIT = "2".repeat(40);
 const HASH = "a".repeat(40);
 const OTHER_HASH = "b".repeat(40);
-const PLAN = "docs/features/active/feature-101/plan.md";
+const PLAN = ".dev/active/feature-101/plan.md";
 
 class GitStub implements ReadinessGitRepository {
   public ref = true;
@@ -61,7 +61,7 @@ function parsed(overrides: Partial<ParsedEpicKickoff> = {}): ParsedEpicKickoff {
   return {
     slug: "sample-epic",
     invocationSlug: "sample-epic",
-    manifestPath: "docs/features/epics/sample-epic/epic.md",
+    manifestPath: ".dev/epics/sample-epic/epic.md",
     integrationBranch: BRANCH,
     features: [],
     planHashes: {},

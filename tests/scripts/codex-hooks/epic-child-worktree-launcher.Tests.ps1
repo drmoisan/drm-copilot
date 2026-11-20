@@ -21,7 +21,7 @@ Describe 'Codex epic-child worktree launcher and guard' {
         $script:Entry = [pscustomobject]@{
             launch_id              = 'wave-1-child-a'
             delegation_id          = 'delegate-child-a'
-            feature_folder         = 'docs/features/active/child-a'
+            feature_folder         = '.dev/active/child-a'
             issue_num              = 101
             deployment_agent       = 'orchestrator-c3-elevated'
             model                  = 'gpt-6-astra'
@@ -42,12 +42,12 @@ Describe 'Codex epic-child worktree launcher and guard' {
         $script:DelegationReceipt = [pscustomobject]@{
             delegation_id  = 'delegate-child-a'
             agent_name     = 'orchestrator-c3-elevated'
-            feature_folder = 'docs/features/active/child-a'
+            feature_folder = '.dev/active/child-a'
             issue_num      = 101
         }
         $script:Feature = [pscustomobject]@{
             issue_num             = 101
-            feature_folder        = 'docs/features/active/child-a'
+            feature_folder        = '.dev/active/child-a'
             wave_number           = 1
             worktree_path         = $script:RepoRoot
             branch_name           = 'feature/child-a'
@@ -137,7 +137,7 @@ Describe 'Codex epic-child worktree launcher and guard' {
             $entryB.launch_id = 'prepare-child-b'
             $entryB.delegation_id = 'prepare-delegation-b'
             $entryB.issue_num = 102
-            $entryB.feature_folder = 'docs/features/active/child-b'
+            $entryB.feature_folder = '.dev/active/child-b'
             $entryB.worktree_path = $worktreeB
             $entryB.branch_name = 'feature/child-b'
             $entryB.prompt = 'Preparation mode: true. Prepare child-b only.'
@@ -148,19 +148,19 @@ Describe 'Codex epic-child worktree launcher and guard' {
             $modelB.delegation_id = 'prepare-delegation-b'
             $delegationA = [pscustomobject]@{
                 delegation_id = 'prepare-delegation-a'; agent_name = 'orchestrator-c3-elevated'
-                feature_folder = 'docs/features/active/child-a'; issue_num = 101
+                feature_folder = '.dev/active/child-a'; issue_num = 101
             }
             $delegationB = [pscustomobject]@{
                 delegation_id = 'prepare-delegation-b'; agent_name = 'orchestrator-c3-elevated'
-                feature_folder = 'docs/features/active/child-b'; issue_num = 102
+                feature_folder = '.dev/active/child-b'; issue_num = 102
             }
             $featureA = [pscustomobject]@{
-                issue_num = 101; feature_folder = 'docs/features/active/child-a'; wave = 0
+                issue_num = 101; feature_folder = '.dev/active/child-a'; wave = 0
                 worktree_path = $worktreeA; branch_name = 'feature/child-a'
                 model_routing_receipt = $modelA; delegation_receipt = $delegationA
             }
             $featureB = [pscustomobject]@{
-                issue_num = 102; feature_folder = 'docs/features/active/child-b'; wave = 3
+                issue_num = 102; feature_folder = '.dev/active/child-b'; wave = 3
                 worktree_path = $worktreeB; branch_name = 'feature/child-b'
                 model_routing_receipt = $modelB; delegation_receipt = $delegationB
             }
@@ -224,7 +224,7 @@ Describe 'Codex epic-child worktree launcher and guard' {
         It 'rejects a prepared execution prompt without its plan path and atomic-execution resume text' {
             $feature = $script:Feature.PSObject.Copy()
             $feature | Add-Member -NotePropertyName plan_path `
-                -NotePropertyValue 'docs/features/active/child-a/plan.md'
+                -NotePropertyValue '.dev/active/child-a/plan.md'
             $checkpoint = $script:Checkpoint.PSObject.Copy()
             $checkpoint.features = @($feature)
 

@@ -73,13 +73,13 @@ Design cycle. The full chain above runs with the preflight sub-loop below, bound
 
 Each remediation cycle produces exactly five artifacts under the active feature folder, grouped into one `remediation/<entry-ts>/` folder and one `audit/<exit-ts>/` folder:
 
-1. `docs/features/active/<slug>/remediation/<entry-ts>/remediation-inputs.md` — orchestrator authors at cycle entry.
-2. `docs/features/active/<slug>/remediation/<entry-ts>/remediation-plan.md` — `atomic-planner` authors at cycle entry.
-3. `docs/features/active/<slug>/audit/<exit-ts>/code-review.md` — `feature-review` authors at cycle exit.
-4. `docs/features/active/<slug>/audit/<exit-ts>/feature-audit.md` — `feature-review` authors at cycle exit.
-5. `docs/features/active/<slug>/audit/<exit-ts>/policy-audit.md` — `feature-review` authors at cycle exit.
+1. `.dev/active/<slug>/remediation/<entry-ts>/remediation-inputs.md` — orchestrator authors at cycle entry.
+2. `.dev/active/<slug>/remediation/<entry-ts>/remediation-plan.md` — `atomic-planner` authors at cycle entry.
+3. `.dev/active/<slug>/audit/<exit-ts>/code-review.md` — `feature-review` authors at cycle exit.
+4. `.dev/active/<slug>/audit/<exit-ts>/feature-audit.md` — `feature-review` authors at cycle exit.
+5. `.dev/active/<slug>/audit/<exit-ts>/policy-audit.md` — `feature-review` authors at cycle exit.
 
-The initial, non-remediation-triggered `feature-review` pass (the audit that first discovers findings and opens cycle 1) also writes its three artifacts under `docs/features/active/<slug>/audit/<its-own-timestamp>/`, for the same reason: one timestamped folder per audit event, regardless of whether that audit opens, closes, or does not trigger a remediation cycle.
+The initial, non-remediation-triggered `feature-review` pass (the audit that first discovers findings and opens cycle 1) also writes its three artifacts under `.dev/active/<slug>/audit/<its-own-timestamp>/`, for the same reason: one timestamped folder per audit event, regardless of whether that audit opens, closes, or does not trigger a remediation cycle.
 
 Timestamp rule:
 
@@ -130,7 +130,7 @@ When preflight is clear, `atomic-executor` executes the plan task-by-task. The e
 
 Before the reaudit, the orchestrator records `candidate_applied` on the current cycle: `true` only when execution finished with `execution_status: "complete"` and the pre-reaudit commit recorded a non-empty change set, and `false` otherwise (execution not started, execution failed, or an empty staged change set). `remediation_loop.completed_attempts` equals the number of cycles whose `candidate_applied` is `true`, and a cycle with `candidate_applied: false` consumes no attempt number.
 
-When execution is complete, the orchestrator delegates to `feature-review`. `feature-review` produces the three reaudit artifacts under `docs/features/active/<slug>/audit/<exit-ts>/` using the exit timestamp.
+When execution is complete, the orchestrator delegates to `feature-review`. `feature-review` produces the three reaudit artifacts under `.dev/active/<slug>/audit/<exit-ts>/` using the exit timestamp.
 
 ## Exit Gate
 

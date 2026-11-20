@@ -20,8 +20,9 @@ class FeatureResolver:
     Resolve feature folders from args/branch heuristics.
 
     Purpose:
-        Automatically determines which feature folder under docs/features/active
-        should be used for plan execution, based on CLI arguments or git branch.
+        Automatically determines which feature folder under the active area of
+        the development-docs root should be used for plan execution, based on
+        CLI arguments or git branch.
 
     Usage:
         resolver = FeatureResolver(workspace, active_dir)
@@ -47,7 +48,8 @@ class FeatureResolver:
 
         Args:
             workspace (Path): Repository root directory.
-            active_dir (Path): docs/features/active directory.
+            active_dir (Path): Active area of the development-docs root; the
+                not-found message names this resolved path.
 
         Raises:
             FileNotFoundError: If active_dir does not exist.

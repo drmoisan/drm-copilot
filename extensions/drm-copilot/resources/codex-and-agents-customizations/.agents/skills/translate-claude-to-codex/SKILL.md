@@ -21,7 +21,7 @@ Use this skill when:
 
 ## Authoritative Inputs
 
-This skill consumes the Codex ecosystem mapping recorded in `docs/research/20260616-codex-native-ecosystem.2026-06-16T13-32.md`. That artifact is the source of truth for Codex primitive behavior, discovery order, and enforceability. Do not restate Codex documentation from memory; cite the research artifact.
+This skill consumes the Codex ecosystem mapping recorded in `.dev/research/20260616-codex-native-ecosystem.2026-06-16T13-32.md`. That artifact is the source of truth for Codex primitive behavior, discovery order, and enforceability. Do not restate Codex documentation from memory; cite the research artifact.
 
 Required source paths under `.claude/` (one or more). Accepted types:
 
@@ -172,7 +172,7 @@ Plan structure:
 
 Generated: <timestamp>
 Mode: <plan-only | apply>
-Research basis: docs/research/20260616-codex-native-ecosystem.2026-06-16T13-32.md
+Research basis: .dev/research/20260616-codex-native-ecosystem.2026-06-16T13-32.md
 
 ## Inputs
 - <source path 1>

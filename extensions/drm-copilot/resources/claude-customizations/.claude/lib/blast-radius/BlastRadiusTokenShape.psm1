@@ -67,6 +67,8 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+Import-Module (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
+
 # Placeholder and interpolation markers. A token carrying any of these was
 # written to document a shape, not to name a file, so it can never be a write
 # claim.
@@ -90,10 +92,11 @@ $script:PlaceholderMarker = [string[]]@(
     '%'
 )
 
-# Documentation-corpus root and the index, counted after that prefix, of the
-# segment that names one feature folder. A glob whose wildcard reaches this
-# segment or any earlier one claims every feature folder in the corpus.
-$script:FeatureCorpusPrefix = 'docs/features/'
+# Documentation-corpus roots (every known development-docs root, issue #1035) and
+# the index, counted after that prefix, of the segment that names one feature
+# folder. A glob whose wildcard reaches this segment or any earlier one claims
+# every feature folder in the corpus.
+$script:FeatureCorpusPrefix = [string[]]@(Get-DevelopmentDocsKnownRoot | ForEach-Object { "$_/" })
 $script:FeatureFolderSegmentIndex = 1
 
 # File-shape extension pattern (issue #797). A final component names a file when
@@ -187,7 +190,8 @@ function Test-MultipleFeatureFolderSpan {
 
     .DESCRIPTION
         Port of spans_multiple_feature_folders. The documentation corpus is laid
-        out as docs/features/<bucket>/<feature-folder>/..., so a glob whose
+        out as <root>/<bucket>/<feature-folder>/... under each known
+        development-docs root (issue #1035), so a glob whose
         wildcard occupies or truncates the feature-folder segment claims every
         feature folder in the corpus. That made two unrelated work items contend
         purely because both wrote documentation (issue #489). A glob carrying a
@@ -210,12 +214,14 @@ function Test-MultipleFeatureFolderSpan {
         [string] $Token
     )
 
-    if (-not $Token.StartsWith($script:FeatureCorpusPrefix,
-            [System.StringComparison]::Ordinal)) {
+    # The token must start with one corpus root; the segments are counted after it.
+    $corpusPrefix = @($script:FeatureCorpusPrefix | Where-Object {
+            $Token.StartsWith($_, [System.StringComparison]::Ordinal) })
+    if ($corpusPrefix.Count -eq 0) {
         return $false
     }
 
-    $segment = @($Token.Substring($script:FeatureCorpusPrefix.Length) -split '/')
+    $segment = @($Token.Substring($corpusPrefix[0].Length) -split '/')
 
     # A token that stops at or before the feature-folder segment has had that
     # segment truncated away by the wildcard, so it spans the whole corpus.

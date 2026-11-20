@@ -123,8 +123,15 @@ export function createInProcessSeamInstaller(
     });
 
     // The potential file exists and holds feature content; metadata writes and
-    // the move are recorded by the fs mock (no real disk access).
-    fsMock.existsSync.mockReturnValue(true);
+    // the move are recorded by the fs mock (no real disk access). The routing
+    // file is absent from this fake, so the development-docs root resolves the
+    // default (rule R-1, D-P5).
+    fsMock.existsSync.mockImplementation(
+      (filePath: string) =>
+        !filePath
+          .replace(/\\/g, "/")
+          .endsWith("config/orchestration-routing.json"),
+    );
     fsMock.readFileSync.mockReturnValue(FEATURE_CONTENT);
     fsMock.writeFileSync.mockReturnValue(undefined);
     fsMock.mkdirSync.mockReturnValue(undefined);

@@ -51,7 +51,7 @@ class FakeGit(GitClient):
         return "## feature/test...origin/feature/test"
 
     def untracked(self) -> str:
-        return "docs/features/active/fix-all-script/spec.md"
+        return ".dev/active/fix-all-script/spec.md"
 
     def diff_name_status(self, *, staged: bool) -> str:
         marker = "A" if staged else "M"
@@ -290,7 +290,7 @@ def test_collect_and_write_renders_non_material_scoping(
     def fake_scoping_doc_changes(
         **kwargs: object,
     ) -> list[tuple[str, bool, list[str], None]]:
-        return [("docs/features/active/feat/spec.md", False, ["links only"], None)]
+        return [(".dev/active/feat/spec.md", False, ["links only"], None)]
 
     monkeypatch.setattr(
         "scripts.dev_tools.pr_context.collector.gather_feature_excerpts",

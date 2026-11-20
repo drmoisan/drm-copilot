@@ -1,0 +1,108 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**/*.ts\""
+        },
+        {
+          "key": "description",
+          "value": " TypeScript-specific toolchain and coding standards."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/typescript.md",
+      "sections": [
+        "head",
+        "toolchain",
+        "coding-standards",
+        "eslint-stack",
+        "testing-standards",
+        "architecture-boundaries",
+        "property-based-and-mutation-testing",
+        "golden-tests",
+        "runtime-determinism"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "description",
+          "value": " \"TypeScript-specific code change rules layered on top of the general code change policy\""
+        },
+        {
+          "key": "applyTo",
+          "value": " \"**/*.ts\""
+        },
+        {
+          "key": "name",
+          "value": " typescript-code-change-policy"
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/typescript-code-change.instructions.md",
+      "sections": [
+        "head-2",
+        "1-tooling-baseline-for-typescript",
+        "2-typescript-design-typing-principles",
+        "3-imports-modules-and-dependencies",
+        "4-error-handling-and-logging",
+        "5-suppressions-and-escape-hatches",
+        "6-public-apis-and-compatibility",
+        "7-project-organization-naming-and-documentation",
+        "8-security-configuration-and-external-integrations",
+        "9-ui-ux-and-lifecycle-hygiene-vs-code-extension-co",
+        "10-performance-and-reliability"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "description",
+          "value": " \"TypeScript-specific unit test rules, layered on top of the general unit test policy\""
+        },
+        {
+          "key": "applyTo",
+          "value": " \"**/*.ts\""
+        },
+        {
+          "key": "name",
+          "value": " typescript-unit-test-policy"
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/typescript-unit-test.instructions.md",
+      "sections": [
+        "head-3",
+        "1-framework-and-scope",
+        "2-test-layout-and-naming",
+        "3-test-style-and-structure-typescript",
+        "4-mocking-and-isolation",
+        "5-assertions-and-diagnostics",
+        "6-required-commands"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " typescript"
+        },
+        {
+          "key": "description",
+          "value": " TypeScript-specific toolchain and coding standards."
+        }
+      ],
+      "kind": "codex",
+      "path": ".agents/skills/typescript/SKILL.md",
+      "sections": [
+        "head",
+        "toolchain",
+        "coding-standards-2",
+        "testing-standards-2"
+      ]
+    }
+  ]
+}

@@ -17,7 +17,7 @@
 
 # ALLOWLIST - ONE ENTRY. Read "ALLOWLIST POLICY" above before touching it.
 $script:PythonInvocationAllowlist = @(
-    # Owner decision D3, epic Q11 and docs/features/active/2026-10-30-docs-surface-analyzer-python-native-1031/spec.md:
+    # Owner decision D3, epic Q11 and .dev/active/1031-docs-surface-analyzer-python-native/spec.md:
     # the only interpreter-start function of the Python-native docs analyzers (three seam calls).
     @{ Path = '.claude/lib/docs/DocsAnalyzerPythonNative.psm1'; Function = 'Invoke-DocsPythonNativeInterpreter' }
 )

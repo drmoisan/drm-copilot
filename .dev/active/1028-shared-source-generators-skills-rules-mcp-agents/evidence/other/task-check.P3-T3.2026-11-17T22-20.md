@@ -1,0 +1,9 @@
+# Task Check — [P3-T3]
+
+Timestamp: 2026-11-17T22-20
+Command: sh SCRATCH/issue-1028-retry.sh pytest tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py tests/scripts/dev_tools/test_epic_orchestrate_main_sync_contract.py tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py tests/scripts/dev_tools/test_epic_orchestrator_permission_contracts.py tests/scripts/dev_tools/test_epic_skill_script_citations_shipped.py tests/scripts/dev_tools/test_completion_gate_documentation_contracts.py tests/scripts/dev_tools/test_orchestrator_state_remediation_docs.py tests/scripts/dev_tools/test_claude_rules_frontmatter.py tests/scripts/dev_tools/test_skill_bundle_contract_repo.py; the launcher pytest suite with the node `test_parallel_orchestrator_surface_contracts.py::test_frozen_epic_surface_matches_pinned_baseline_digest` (-v); sh SCRATCH/issue-1028-retry.sh pester -TestPath tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1 tests/scripts/claude-runtime/{early-start,regeneration-path,owner-directives,cross-epic,checkpoint-hygiene}-skill-contract.Tests.ps1 tests/scripts/claude-runtime/NestingDepthContract.Tests.ps1 tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1
+EXIT_CODE: 0
+Output Summary: pytest selection: 156 passed. Frozen-surface digest: 2 passed (both pinned entries). Pester selection: 248 passed, 0 failed, including the four `PRC-LEDGER` tests and `ESS-KICKOFF-LITERAL-INTACT` in all four copies. Some launcher attempts ended with exit 75 (machine lock held by another worktree), which are queue timeouts, re-run by the retry wrapper.
+
+Changed files: none. The write run produced no change, so this task commits evidence only.
+Selection rule: `## Test Cadence (Mandatory)`. The task changes no tracked file, so the selection is the acceptance suites the plan names for [P3-T3].

@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Push-down integration (issue #1051): an apply-mode push-down writes `.push-down-integration-needed.json` at the destination root when it meets a decision it cannot make mechanically (an existing `ci.yml`, another workflow named like the pushed caller, a missing required check, a different tool version, or an edited, unmanaged or deleted managed file), and every push-down returns the items in `push_down_report.integration_needed`; the new read-only MCP tools `detect_push_down_integration` and `validate_push_down_integration` report the destination's facts and structured conflicts and a deterministic verdict over rules V1 to V5; the shared `push-down-integration` skill describes the read, resolve and validate loop. Codex enables both tools through `enabled_tools` with prompt approval. No component calls a model or uses MCP sampling.
+- Push-down CI workflows (issue #1050): the three push-down tools accept the optional `ci_workflows` input (`off` default, `reference`, `copy`; omitted reuses the recorded mode); `reference` delivers the caller `.github/workflows/drm-copilot-ci.yml` (workflow `CI`, one job per selected language pack plus `CI Required Gate`) and the data file `.github/drm-copilot/ci-required-checks.json`, with caller jobs pinned to the new `harness-<pack>.yml` reusable workflows at the release tag `v<payload_version>`; `copy` also delivers the selected `.github/workflows/drm-copilot-<pack>.yml` copies; to bump, upgrade the extension and re-run the push-down, and an unedited caller is reported `update` and rewritten; risks: an unprotected tag can be moved, and a build without a published tag references a missing tag; a private source repository requires copy mode; the #1049 vendored-code exemption is unavailable in copy mode; the opt-in `.github/drm-copilot/Set-CiRequiredChecks.ps1` creates the `CI Required Gate` ruleset only when run with `-Apply`.
+- Unified push-down pipeline (issue #1029): the Claude, Codex, and Copilot push-down tools
+  and commands run one pipeline that installs the shared layer (`AGENTS.md`, the shared
+  `.agents/skills`, and the shared configuration) on every run, then only the selected
+  ecosystem's layer and packs. Every call plans before its first write and returns
+  `push_down_report`. All three tools accept optional `dry_run` and `overwrite_unmanaged`;
+  `push_down_copilot_customizations` accepts `packs`, backed by new Copilot pack manifests,
+  and the Copilot command offers a pack selection. Apply runs write the destination manifest
+  `.push-down-manifest.json` (SHA-256 per managed file, selection per ecosystem).
+  Behavior changes: a destination file edited since the last push-down is reported as a
+  conflict and kept; a destination file with no manifest entry that differs from the payload
+  is reported as `unmanaged-conflict` and kept unless `overwrite_unmanaged` is `true` (it was
+  overwritten before); and the Codex push-down now merges `config/orchestration-routing.json`
+  into the destination copy, as the Claude push-down does, instead of overwriting it.
+
 - Release-commit allowance leg (issue #1201): the Claude and Codex preimplementation gates
   allow a checkpoint-free `git add` and `git commit` of the paths that a repository lists in
   `.claude/release-commit-allowance.json`, on a branch that matches one of its patterns.
@@ -94,6 +110,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   probe of `.venv/Scripts` and `.venv/bin`. Setup is now fail-fast: it stops at the first failed
   step and does not launch the agent, where previously every line ran regardless of earlier
   failures. Each step prints a progress banner, and the 5-second launch delay is removed.
+
+### Removed
+
+- `Sync AGENTS.md from Instructions` command (issue #1032): the command, its bundled PowerShell
+  script, and its push-down reference rewrite are removed, because `AGENTS.md` is now
+  hand-authored and is no longer generated from the instruction files.
 
 ## [0.0.1] - 2026-05-02
 

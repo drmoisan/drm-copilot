@@ -35,7 +35,7 @@
     dependencies: Test-OrchestrationCommandTextUnresolvable, Split-OrchestrationCommandLine,
     and ConvertTo-OrchestrationCommandToken (helpers file) and
     Get-HookTargetWorktreeRelativePath (HookTargetWorktree.psm1 on Claude,
-    hook-target-worktree.ps1 on Codex). Byte-identical at .claude/hooks/, .codex/hooks/, and
+    hook-target-worktree.ps1 on Codex), and the development-docs module (issue #1035). Byte-identical at .claude/hooks/, .codex/hooks/, and
     both bundle mirrors under extensions/drm-copilot/resources/. The allowance is a
     policy-level control, not a security control.
     AUTHORITY: PowerShell-authoritative. This hook file starts no interpreter process.
@@ -120,9 +120,9 @@ function Get-EpicFanInStatusDocRelativePath {
     .SYNOPSIS
         Return the epic status document path of a checkpoint, or $null.
     .DESCRIPTION
-        Derives docs/features/epics/<epic_feature_folder>/epic-status.md. Returns $null when
-        the slug is blank or not one plain segment, or when a non-blank epic_status_doc_path
-        disagrees with the derived path after backslash normalisation.
+        Derives docs/features/epics/<epic_feature_folder>/epic-status.md; a declared .dev/epics form of the
+        same slug is returned as declared (issue #1035). Returns $null when the slug is blank or not one
+        plain segment, or when a non-blank epic_status_doc_path matches neither form after normalisation.
     .PARAMETER Checkpoint
         The parsed epic checkpoint object, or $null.
     .OUTPUTS
@@ -136,8 +136,11 @@ function Get-EpicFanInStatusDocRelativePath {
     if ([string]::IsNullOrWhiteSpace($slug) -or $slug -cnotmatch $script:EpicFanInSlugPattern) { return $null }
     $derived = "docs/features/epics/$slug/epic-status.md"
     $declared = Get-EpicFanInPropertyText -InputObject $Checkpoint -Name 'epic_status_doc_path'
-    if (-not [string]::IsNullOrWhiteSpace($declared) -and ($declared -replace '\\', '/') -cne $derived) { return $null }
-    return $derived
+    if ([string]::IsNullOrWhiteSpace($declared)) { return $derived }
+    # A declared path may name the epics area of any known root (call-time module dependency, D-P16).
+    $normalized = $declared -replace '\\', '/'
+    if (@(Get-DevelopmentDocsKnownRootPrefix -Area 'epics' | ForEach-Object { "$_$slug/epic-status.md" }) -ccontains $normalized) { return $normalized }
+    return $null
 }
 
 function Test-EpicFanInWriteRelativePath {
@@ -396,12 +399,14 @@ function Get-EpicMergedFeatureRoots {
     param([AllowNull()][object] $Checkpoint)
 
     $roots = [System.Collections.Generic.List[string]]::new()
+    # One optional active or completed prefix of any known development-docs root (issue #1035).
+    $lifecyclePrefix = '^(?:' + (@(@('active', 'completed') | ForEach-Object { Get-DevelopmentDocsKnownRootPrefix -Area $_ } | ForEach-Object { [regex]::Escape($_) }) -join '|') + ')'
     $property = if ($null -ne $Checkpoint) { $Checkpoint.PSObject.Properties['features'] }
     $features = @(if ($null -ne $property -and $null -ne $property.Value) { $property.Value })
     foreach ($feature in $features) {
         if ($null -eq $feature) { continue }
         $status = Get-EpicFanInPropertyText -InputObject $feature -Name 'merge_status'
-        $basename = [string](Get-EpicFanInPropertyText -InputObject $feature -Name 'feature_folder') -creplace '^docs/features/(active|completed)/', ''
+        $basename = [string](Get-EpicFanInPropertyText -InputObject $feature -Name 'feature_folder') -creplace $lifecyclePrefix, ''
         $sha = $feature.PSObject.Properties['merge_commit_sha']
         $pr = $feature.PSObject.Properties['pr_number']
         if ($script:EpicFanInTerminalMergeStatuses -cnotcontains $status -or $basename -cnotmatch $script:EpicFanInSlugPattern) { continue }
@@ -422,7 +427,8 @@ function Test-EpicMergedFeaturePath {
     .DESCRIPTION
         False for a blank path, a backslash, a glob character, a leading slash, or a . or ..
         segment. A root ending in / admits a path that starts with it and has a non-empty
-        remainder; any other root admits only an equal path. Matching is case-sensitive.
+        remainder; any other root admits only an equal path. Matching is case-sensitive. A .dev/<area>/...
+        path is also judged in its docs/features/<area>/... form (issue #1035).
     .OUTPUTS
         System.Boolean
     #>
@@ -436,12 +442,18 @@ function Test-EpicMergedFeaturePath {
     if ([string]::IsNullOrWhiteSpace($RelativePath) -or $RelativePath.StartsWith('/', [StringComparison]::Ordinal)) { return $false }
     if ($RelativePath.IndexOfAny([char[]]@([char]92, '*', '?', '[')) -ge 0) { return $false }
     if (@($RelativePath.Split('/') | Where-Object { $_ -ceq '.' -or $_ -ceq '..' }).Count -gt 0) { return $false }
-    foreach ($candidate in @($Root)) {
-        if ([string]::IsNullOrEmpty($candidate)) { continue }
-        if (-not $candidate.EndsWith('/', [StringComparison]::Ordinal)) {
-            if ($RelativePath -ceq $candidate) { return $true }
-        } elseif ($RelativePath.Length -gt $candidate.Length -and $RelativePath.StartsWith($candidate, [StringComparison]::Ordinal)) {
-            return $true
+    # The path itself, plus its default-root form when it lies under another known root.
+    $knownRoots = @(Get-DevelopmentDocsKnownRoot)
+    $forms = @($RelativePath) + @($knownRoots | Select-Object -Skip 1 | Where-Object { $RelativePath.StartsWith("$_/", [StringComparison]::Ordinal) } |
+            ForEach-Object { $knownRoots[0] + $RelativePath.Substring($_.Length) })
+    foreach ($form in $forms) {
+        foreach ($candidate in @($Root)) {
+            if ([string]::IsNullOrEmpty($candidate)) { continue }
+            if (-not $candidate.EndsWith('/', [StringComparison]::Ordinal)) {
+                if ($form -ceq $candidate) { return $true }
+            } elseif ($form.Length -gt $candidate.Length -and $form.StartsWith($candidate, [StringComparison]::Ordinal)) {
+                return $true
+            }
         }
     }
     return $false

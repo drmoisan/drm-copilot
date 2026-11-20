@@ -149,6 +149,16 @@ function escapeRegExp(value: string): string {
 }
 
 /**
+ * Whether the compiled glob matches dot entries.
+ *
+ * `**` and `*` compile to `.*` and `[^/]*`, which match a segment that begins
+ * with `.`, so a `.dev` folder is matched like any other folder (spec D-13).
+ * Consumers of {@link RealFileSystem.glob} rely on this; the constant names
+ * the property so a change to it is deliberate.
+ */
+export const GLOB_MATCHES_DOT_ENTRIES = true;
+
+/**
  * Compile a glob pattern into an anchored RegExp matching a relative path.
  *
  * Supported tokens (sufficient for the governed/exclude patterns and Python
@@ -163,7 +173,7 @@ function escapeRegExp(value: string): string {
  * @param pattern Glob pattern using forward-slash separators.
  * @returns A RegExp anchored to the full relative path.
  */
-function compileGlob(pattern: string): RegExp {
+export function compileGlob(pattern: string): RegExp {
   const normalized = toPosixPath(pattern);
   let regex = "";
   let index = 0;

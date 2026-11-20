@@ -1,0 +1,8 @@
+# Reviewer Coverage Check (feature review, head f744ce9e0)
+
+Timestamp: 2026-11-20T18-28
+Command: sh SCRATCH/r1016-rootjest.sh (node run-jest.cjs --coverage --coverageReporters=lcov --coverageReporters=json-summary --coverageReporters=text-summary at the worktree root); wsl -d Ubuntu bats --jobs 4 tests/shell/report_lane_assertion_dispatch.bats; wsl -d Ubuntu kcov --include-pattern=<worktree>/.claude/lib/bash/report-lane-assertion.sh <SCRATCH>/r1016-kcov bats tests/shell/report_lane_assertion_dispatch.bats; node SCRATCH/r1016-cov.cjs (parse of artifacts/python/lcov.info and artifacts/pester/powershell-coverage.xml)
+EXIT_CODE: 0
+Output Summary: The root Jest run wrote the canonical coverage/lcov.info (absent before the review): 419 suites, 6717 tests passed; root totals lines 98.52% (81621/82839), branches 94.61% (12729/13454). Per-file figures of every changed TypeScript production file equal the executor's coverage-delta.2026-11-20T18-10.md figures. Bats: 14 of 14 passed. kcov: report-lane-assertion.sh line rate 89.8%; changed line 48 is heredoc body text and is not an instrumented line; the usage heredoc is executed by test 1. Python artifact (written after the last code commit): lines 96.66% (17720/18332), branches 92.53% (6194/6694). Pester artifact (written after the last code commit): root LINE 96.84% (47286/48827).
+
+Departure disclosed: the review ran one root Jest coverage run and one bats/kcov run because the canonical TypeScript artifact was absent and no bash coverage figure was recorded. No production or test file was changed by these runs; outputs are gitignored or in the session scratchpad.

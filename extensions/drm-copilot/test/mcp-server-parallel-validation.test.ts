@@ -170,7 +170,7 @@ describe("repo automation MCP parallel validation", () => {
 
   // The rejection probe below was `parallel-kickoff` until that type was
   // added to the allow-list. The addition is adjudicated in
-  // `docs/features/epics/parallel-orchestration/epic.md`, section "Planner
+  // `.dev/epics/parallel-orchestration/epic.md`, section "Planner
   // Adjudication: the kickoff-contract boundary (F3 / F4)", which assigns the
   // `parallel-kickoff` artifact type to the parallel-planner-surface feature.
   // `parallel-status-doc` is a genuinely unregistered name, so the rejection
@@ -182,7 +182,7 @@ describe("repo automation MCP parallel validation", () => {
       arguments: {
         workspace_root: "C:/workspace",
         artifact_type: "parallel-status-doc",
-        artifact_path: "docs/features/parallel/demo/status.md",
+        artifact_path: ".dev/parallel/demo/status.md",
       },
     });
 

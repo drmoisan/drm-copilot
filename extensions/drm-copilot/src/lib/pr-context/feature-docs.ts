@@ -33,6 +33,11 @@ import {
   verificationText,
 } from "./feature-docs-parsers";
 import { discoverCanonicalEvidenceFiles } from "./verification-evidence";
+import {
+  developmentDocsPath,
+  knownRootPrefixes,
+  resolveDevelopmentDocsRoot,
+} from "../development-docs/root";
 
 /** Spec headings extracted into the excerpt, in fixed order. */
 const SPEC_HEADINGS = [
@@ -48,7 +53,8 @@ const SPEC_HEADINGS = [
 ] as const;
 
 /**
- * Extract feature directory names from `docs/features/active/**` paths.
+ * Extract feature directory names from paths under the active area of
+ * either known development-docs root.
  *
  * Mirrors the Python set-comprehension over `Path(raw).parts`.
  *
@@ -57,16 +63,11 @@ const SPEC_HEADINGS = [
  */
 function extractFeatures(changedFiles: Iterable<string>): Set<string> {
   const features = new Set<string>();
-  // Collect the feature segment from any docs/features/active/<feature>/... path.
+  // Collect the feature segment from any <active area>/<feature>/... path.
   for (const raw of changedFiles) {
-    const parts = toPosixPath(raw).split("/");
-    if (
-      parts.length >= 4 &&
-      parts[0] === "docs" &&
-      parts[1] === "features" &&
-      parts[2] === "active"
-    ) {
-      features.add(parts[3]!);
+    const feature = activeFeatureSegment(toPosixPath(raw));
+    if (feature !== null) {
+      features.add(feature);
     }
   }
   return features;
@@ -92,8 +93,9 @@ export function gatherFeatureExcerpts(
   const normalizedRoot = toPosixPath(root).replace(/\/+$/u, "");
   const features = extractFeatures(changedFiles);
   const excerpts: FeatureDocExcerpt[] = [];
-  const baseDir = `${normalizedRoot}/docs/features/active`;
-  const promotedDir = `${normalizedRoot}/docs/features/potential/promoted`;
+  const docsRoot = resolveDevelopmentDocsRoot(fs, normalizedRoot);
+  const baseDir = `${normalizedRoot}/${developmentDocsPath(docsRoot, "active")}`;
+  const promotedDir = `${normalizedRoot}/${developmentDocsPath(docsRoot, "potential/promoted")}`;
 
   // Process features in sorted order for deterministic output.
   for (const feature of [...features].sort(compareCodePoint)) {
@@ -305,4 +307,25 @@ function buildContextFiles(params: {
   return [...new Set([...contextFiles, ...evidenceContextFiles])].sort(
     compareCodePoint,
   );
+}
+
+/**
+ * Return the feature segment of a path under the `active` area of either
+ * known development-docs root (matchers accept the union).
+ *
+ * @param posixPath Repo-relative forward-slash path.
+ * @returns The segment after the active area, or `null` when the path is not
+ *   under an active area.
+ */
+function activeFeatureSegment(posixPath: string): string | null {
+  for (const prefix of knownRootPrefixes("active")) {
+    if (posixPath.startsWith(prefix)) {
+      // The segment runs to the next separator, or to the end of the path.
+      const rest = posixPath.slice(prefix.length);
+      const end = rest.indexOf("/");
+      const segment = end < 0 ? rest : rest.slice(0, end);
+      return segment === "" ? null : segment;
+    }
+  }
+  return null;
 }

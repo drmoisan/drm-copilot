@@ -389,7 +389,7 @@ function ConvertTo-PythonReprText {
         Renderer for the inventory templates that interpolate {value!r}. Only
         strings differ from str(): repr() quotes them and escapes backslashes and
         the quote character. Known divergence, recorded repo-wide at
-        docs/features/potential/2026-08-07-python-repr-quote-selection-divergence.md:
+        .dev/potential/2026-08-07-python-repr-quote-selection-divergence.md:
         this renderer always selects single quotes, whereas CPython switches to
         double quotes when the string contains a single quote and no double quote.
     .PARAMETER Value

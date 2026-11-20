@@ -5,9 +5,8 @@
     evidence.
 
 .DESCRIPTION
-    Invoked by the Codex PreToolUse hook on apply_patch operations. The hook
-    reads one JSON object from stdin and activates only when the target path normalizes to
-    artifacts/orchestration/orchestrator-state.json.
+    Invoked by the Codex PreToolUse hook on apply_patch operations. The hook reads one JSON object
+    from stdin and activates only when the target path normalizes to artifacts/orchestration/orchestrator-state.json.
 
     A written checkpoint asserts completion when any of the following hold:
 
@@ -47,18 +46,21 @@
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
-# Reuse the adjacent hook's shared checkpoint policy logic. This dot-source is by
-# design, not a copy-paste defect, so the hook is not renamed.
+# Reuse the adjacent hook's shared checkpoint policy logic (by design, so the hook is not renamed).
 try { . (Join-Path $PSScriptRoot 'enforce-checkpoint-monotonic.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-checkpoint-monotonic.ps1' -ErrorRecord $_ }
 
-# Shared Codex PreToolUse transport. Dot-sourced explicitly rather than relying on
-# the transitive load above, so this hook's transport does not depend on its
-# neighbour's internals. Every transport error it raises names this hook, because
-# the shared parser is called with -HookName 'enforce-completion-consistency'.
+# Shared Codex PreToolUse transport, dot-sourced explicitly; -HookName makes its errors name this hook.
 try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
 
-# Dot-source the shared validation helpers. Guarded so a missing file produces a
-# clear error and so dot-sourcing this hook in tests loads the helpers too.
+# Development-docs root module (issue #1035): the published .codex/lib copy first, the self-hosted .claude/lib copy otherwise.
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -PathType Leaf) {
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+}
+else {
+    try { Import-Module (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+}
+
+# Dot-source the shared validation helpers (guarded; dot-sourcing this hook in tests loads them too).
 try { . (Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-completion-helpers.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'agent-target-worktree.ps1') } catch { Add-HookDependencyFailure -Name 'agent-target-worktree.ps1' -ErrorRecord $_ }
 
@@ -223,7 +225,7 @@ function Get-MissingCompletionEvidence {
         $featureFolder = Get-CheckpointStringValue -Payload $Payload.variables -Name 'feature-folder'
     }
     if (-not (Test-IsValidFeatureFolder -Value $featureFolder -FolderExistsCheck $FolderExistsCheck)) {
-        $missing += "feature-folder value '$featureFolder' is not a valid feature folder (must be under docs/features/active/ and exist)"
+        $missing += "feature-folder value '$featureFolder' is not a valid feature folder (must be under $(@(Get-DevelopmentDocsKnownRootPrefix -Area 'active')[0]) and exist)"
     }
 
     $ciGate = $null
@@ -244,9 +246,8 @@ function Get-MissingCompletionEvidence {
         }
     }
 
-    # PR-gate evidence is required only when the checkpoint's selected route
-    # opts into it via requires_pr_gate in the routing matrix. This replaces the
-    # former issue-number special-casing with route-driven enforcement.
+    # PR-gate evidence is required only when the selected route opts in via requires_pr_gate in the
+    # routing matrix (route-driven enforcement in place of the former issue-number special-casing).
     $prGateArgs = @{ Payload = $Payload }
     if ($PSBoundParameters.ContainsKey('RoutingMatrixReader') -and $null -ne $RoutingMatrixReader) {
         $prGateArgs['RoutingMatrixReader'] = $RoutingMatrixReader
@@ -410,10 +411,9 @@ function Invoke-CompletionConsistencyDecision {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    # Write tool: a present content property is validated directly, and empty
-    # content is denied. Edit tool: no content property is supplied, so read the
-    # targeted checkpoint through the injectable seam and apply the old_string ->
-    # new_string patch in memory (read-then-validate). Any failure cause denies.
+    # Write tool: present content is validated directly; empty content is denied. Edit tool: read the
+    # targeted checkpoint through the injectable seam and apply the old_string -> new_string patch in
+    # memory (read-then-validate). Any failure cause denies.
     $cause = $null
     if ($toolInput.PSObject.Properties.Name -contains 'content') {
         $content = $toolInput.content
@@ -478,9 +478,8 @@ $dependencyDecision = Get-HookDependencyFailureDecision -HookEvent PreToolUse -R
 if ($null -ne $dependencyDecision) { $dependencyDecision | ConvertTo-Json -Compress -Depth 5 | Write-Output; exit 0 }
 
 try {
-    # -HookName makes every transport error name this hook rather than the
-    # neighbour it dot-sources. Update reconstruction is scoped to the governed
-    # checkpoint path for the same reason as in enforce-checkpoint-monotonic.
+    # -HookName makes every transport error name this hook; update reconstruction is scoped to the
+    # governed checkpoint path, as in enforce-checkpoint-monotonic.
     $payload = ConvertFrom-CodexPreToolUsePayload -PayloadRaw ([Console]::In.ReadToEnd()) -HookName 'enforce-completion-consistency'
     $mappedInputs = @(
         ConvertTo-CodexFileEditInput -Payload $payload -ResolveUpdateContent -GovernedPath $script:GovernedCheckpointPath

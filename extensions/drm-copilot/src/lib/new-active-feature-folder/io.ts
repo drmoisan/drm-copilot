@@ -26,6 +26,12 @@ import {
   PLAN_TIMESTAMP_TEMPLATE_NAME,
 } from "./models";
 import { setHeaderPlaceholder } from "./markdown";
+import {
+  DEFAULT_DEVELOPMENT_DOCS_ROOT,
+  type DevelopmentDocsRoot,
+  developmentDocsPath,
+} from "../development-docs/root";
+import { formatFeatureFolderName } from "../development-docs/feature-folder-name";
 import { defaultWhichLookup } from "./io-launcher";
 
 export {
@@ -85,25 +91,28 @@ function stem(path: string): string {
 /**
  * Find the best matching potential file for a feature name.
  *
- * Mirrors Python `find_potential_file`: searches `docs/features/potential` then
- * `docs/features/potential/promoted`; in each, collects `.md` files whose name
- * contains the underscore-normalized feature name and is not excluded; returns
- * the name-descending winner from the first directory that has candidates.
+ * Mirrors Python `find_potential_file`: searches the `potential` area then the
+ * `potential/promoted` area of the development-docs root; in each, collects
+ * `.md` files whose name contains the underscore-normalized feature name and is
+ * not excluded; returns the name-descending winner from the first directory
+ * that has candidates.
  *
  * @param featureName Feature name to match.
  * @param workspace Workspace root.
  * @param fs Filesystem seam.
+ * @param root Resolved development-docs root; defaults to `docs/features`.
  * @returns The matching potential file path, or `null` when none match.
  */
 export function findPotentialFile(
   featureName: string,
   workspace: string,
   fs: FolderFileSystem,
+  root: DevelopmentDocsRoot = DEFAULT_DEVELOPMENT_DOCS_ROOT,
 ): string | null {
   const normalized = featureName.replace(/_/g, "-");
   const potentialDirs = [
-    joinPosix(workspace, "docs/features/potential"),
-    joinPosix(workspace, "docs/features/potential/promoted"),
+    joinPosix(workspace, developmentDocsPath(root, "potential")),
+    joinPosix(workspace, developmentDocsPath(root, "potential/promoted")),
   ];
 
   // Scan each candidate directory in order and stop at the first one that has
@@ -146,14 +155,17 @@ export function parseIssueNumber(content: string): string | null {
  * Build the canonical active-folder slug.
  *
  * Mirrors Python `build_folder_slug`: normalizes underscores, prefers the
- * potential-file stem, appends the issue number when not already a suffix, and
- * validates the result against {@link NAME_PATTERN}.
+ * potential-file stem, and validates it against {@link NAME_PATTERN}. When an
+ * issue number is supplied, the folder is the issue-first name
+ * `<NNNN>-<feature>` from {@link formatFeatureFolderName} (spec D-18); without
+ * one, the slug is kept (OQ-4).
  *
  * @param featureName Feature name.
  * @param potentialFile Matched potential file path, or `null`.
  * @param issueNumber Resolved issue number, or `null`.
- * @returns The validated folder slug.
- * @throws Error When the slug fails the anchored full-match validation.
+ * @returns The validated folder name.
+ * @throws Error When the slug fails the anchored full-match validation, or the
+ *   issue-first name cannot be formatted.
  */
 export function buildFolderSlug(
   featureName: string,
@@ -164,14 +176,14 @@ export function buildFolderSlug(
   if (potentialFile) {
     slug = stem(potentialFile);
   }
-  if (issueNumber && !slug.endsWith(String(issueNumber))) {
-    slug = `${slug}-${issueNumber}`;
-  }
   if (!NAME_PATTERN.test(slug)) {
     throw new Error(
       `Aborted: '${slug}' is invalid. Use kebab/underscore-case letters/numbers ` +
         "(e.g., notes-feature or notes_feature).",
     );
+  }
+  if (issueNumber) {
+    return formatFeatureFolderName(Number(issueNumber), slug);
   }
   return slug;
 }

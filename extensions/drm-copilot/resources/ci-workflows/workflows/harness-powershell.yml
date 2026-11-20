@@ -1,0 +1,101 @@
+# Destination-generic PowerShell quality workflow delivered by the drm-copilot
+# push-down (issue #1050). With poshqc true (reference mode) it loads PoshQC
+# from a side checkout of the harness source at the caller's pinned ref; with
+# poshqc false (copy mode) it runs Pester 6 directly.
+name: Harness PowerShell
+
+on:
+  workflow_call:
+    inputs:
+      poshqc:
+        description: Load PoshQC from the harness source; false runs Pester directly.
+        type: boolean
+        default: true
+      harness_repository:
+        description: Repository that holds PoshQC (owner/name); required when poshqc is true.
+        type: string
+        default: ""
+      harness_ref:
+        description: Ref of the harness repository to load PoshQC from; required when poshqc is true.
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  powershell:
+    name: PowerShell QC
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Require harness source inputs
+        if: ${{ inputs.poshqc }}
+        shell: pwsh
+        env:
+          HARNESS_REPOSITORY: ${{ inputs.harness_repository }}
+          HARNESS_REF: ${{ inputs.harness_ref }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:HARNESS_REPOSITORY) -or [string]::IsNullOrWhiteSpace($env:HARNESS_REF)) {
+            Write-Error 'harness_repository and harness_ref are required when poshqc is true.' -ErrorAction Continue
+            exit 1
+          }
+
+      - name: Check out harness PoshQC
+        if: ${{ inputs.poshqc }}
+        uses: actions/checkout@v7
+        with:
+          repository: ${{ inputs.harness_repository }}
+          ref: ${{ inputs.harness_ref }}
+          path: .drm-copilot-harness
+
+      - name: Install Pester and PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module -Name Pester -RequiredVersion 6.2.0 -Scope CurrentUser -Force -SkipPublisherCheck
+          Install-Module -Name PSScriptAnalyzer -RequiredVersion 1.25.0 -Scope CurrentUser -Force
+
+      - name: Run PoshQC tests with coverage
+        if: ${{ inputs.poshqc }}
+        shell: pwsh
+        run: |
+          Import-Module ./.drm-copilot-harness/scripts/powershell/PoshQC/PoshQC.psd1 -Force
+          New-Item -ItemType Directory -Force -Path artifacts/pester | Out-Null
+          $excluded = @('.git', '.venv', 'venv', 'node_modules', 'dist', 'build', '.pytest_cache', '__pycache__', '.mypy_cache', '.ruff_cache', '.vscode', '.idea', 'artifacts', '.vscode-test', '.drm-copilot-harness')
+          Invoke-PoshQCTest -Root $PWD.Path -ExcludeDirs $excluded -TestResultPath artifacts/pester/pester-junit.xml -CoverageOutputPath artifacts/pester/powershell-coverage.xml
+
+      - name: Run Pester tests with coverage
+        if: ${{ !inputs.poshqc }}
+        shell: pwsh
+        run: |
+          if (-not (Test-Path -LiteralPath tests -PathType Container)) {
+            Write-Error 'Copy mode requires a top-level tests directory.' -ErrorAction Continue
+            exit 1
+          }
+          Import-Module Pester -RequiredVersion 6.2.0
+          New-Item -ItemType Directory -Force -Path artifacts/pester | Out-Null
+          $sources = @(Get-ChildItem -Path . -Recurse -File -Include '*.ps1', '*.psm1' |
+            Where-Object { $_.FullName -notmatch '[\\/](tests|artifacts|node_modules|\.git)[\\/]' -and $_.Name -notlike '*.Tests.ps1' } |
+            ForEach-Object { $_.FullName })
+          $configuration = New-PesterConfiguration
+          $configuration.Run.Path = 'tests'
+          $configuration.Run.Exit = $true
+          $configuration.TestResult.Enabled = $true
+          $configuration.TestResult.OutputFormat = 'JUnitXml'
+          $configuration.TestResult.OutputPath = 'artifacts/pester/pester-junit.xml'
+          $configuration.CodeCoverage.Enabled = $sources.Count -gt 0
+          $configuration.CodeCoverage.Path = $sources
+          $configuration.CodeCoverage.OutputFormat = 'JaCoCo'
+          $configuration.CodeCoverage.OutputPath = 'artifacts/pester/powershell-coverage.xml'
+          Invoke-Pester -Configuration $configuration
+
+      - name: Upload Pester reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: powershell-coverage
+          path: artifacts/pester/
+          if-no-files-found: ignore

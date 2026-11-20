@@ -48,13 +48,13 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
 
     Context 'allow (no-op) when the call is out of scope' {
         It 'allows a non-orchestrator subagent delegation' {
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"parallel-planner","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"parallel-planner","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
 
         It 'allows an orchestrator delegation whose prompt lacks the Parallel mode: true marker' {
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Canonical issue number for this item is 102. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Canonical issue number for this item is 102. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -70,11 +70,11 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'allows when the conflicting prior-cohort neighbor has merge_status merged' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"merged"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"merged"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -82,11 +82,11 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'allows when the conflicting prior-cohort neighbor has merge_status worktree_removed' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"worktree_removed"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"worktree_removed"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -94,11 +94,11 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'allows a cohort-0 target whose only conflicting neighbor sits in a later cohort' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"not_started"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"not_started"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-a-101"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-a-101"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -106,11 +106,11 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'allows a target that has no conflict edges at all' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"pr_open"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"pr_open"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -118,11 +118,11 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'allows when a same-cohort conflicting neighbor is not terminal (not a Layer 1 concern)' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"pr_open"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"pr_open"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101,102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -130,13 +130,13 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'ignores a superseded-generation cohort row when projecting the current coloring' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"merged"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"merged"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":9,"generation":1,"item_keys":[102]},' +
                 '{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],' +
                 '"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -146,11 +146,11 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'denies when the conflicting prior-cohort neighbor has merge_status pr_open' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"pr_open"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"pr_open"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -159,11 +159,11 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'denies when the conflicting prior-cohort neighbor has merge_status ci_green' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"ci_green"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"ci_green"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -172,11 +172,11 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'denies when the conflicting prior-cohort neighbor has merge_status not_started' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"not_started"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"not_started"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -185,11 +185,11 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'denies when the conflicting prior-cohort neighbor has merge_status blocked_drift' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"blocked_drift"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"blocked_drift"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -198,11 +198,11 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'denies when the conflicting prior-cohort neighbor record has no merge_status key' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -211,10 +211,10 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'denies when the conflicting prior-cohort neighbor has no items[] record' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -223,12 +223,12 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'denies when the conflict edge names the target as endpoint a' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"pr_open"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"pr_open"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],' +
                 '"conflict_edges":[{"a":102,"b":101,"reason":"module_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -238,7 +238,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
     Context 'deny fail-closed on an unusable checkpoint or an unresolvable target' {
         It 'denies when the parallel checkpoint file is absent' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith { $null }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -246,7 +246,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
 
         It 'denies when the parallel checkpoint content is malformed JSON' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith { '{ broken json' }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -262,10 +262,10 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'denies when no items[] record matches the resolved feature folder' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"merged"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"merged"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]}],"conflict_edges":[]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -274,10 +274,10 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'denies when the target has no current-generation cohort assignment' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":1,"item_keys":[102]}],"conflict_edges":[]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -286,10 +286,10 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'denies when the target items[] record carries no issue_num' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[102]}],"conflict_edges":[]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             $decision.hookSpecificOutput.permissionDecisionReason | Should -Match 'PARALLEL_COHORT_BARRIER_BLOCKED'
@@ -300,18 +300,18 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         # Item 102 must start after item 101 by operator precedence (issue #1047). The two
         # items share no conflict edge, so only the precedence rule can deny the delegation.
         BeforeAll {
-            $script:PrecedencePrompt = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $script:PrecedencePrompt = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $script:PrecedenceTail = '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[],' +
             '"precedence":[{"before":101,"after":102,"source":"operator","recorded_at":"2026-11-03T10-00"}]}'
         }
 
         It 'allows when the predecessor is <Label>' -ForEach @(
-            @{ Label = 'merged'; Predecessor = '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","state":"merged","merge_status":"merged"},' }
-            @{ Label = 'worktree_removed'; Predecessor = '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","state":"merged","merge_status":"worktree_removed"},' }
-            @{ Label = 'withdrawn'; Predecessor = '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","state":"withdrawn","merge_status":"not_started"},' }
+            @{ Label = 'merged'; Predecessor = '{"issue_num":101,"feature_folder":".dev/active/item-a-101","state":"merged","merge_status":"merged"},' }
+            @{ Label = 'worktree_removed'; Predecessor = '{"issue_num":101,"feature_folder":".dev/active/item-a-101","state":"merged","merge_status":"worktree_removed"},' }
+            @{ Label = 'withdrawn'; Predecessor = '{"issue_num":101,"feature_folder":".dev/active/item-a-101","state":"withdrawn","merge_status":"not_started"},' }
         ) {
             $script:PrecedenceCheckpoint = '{"recolor_generation":2,"items":[' + $Predecessor +
-            '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","state":"scheduled","merge_status":"not_started"}' + $script:PrecedenceTail
+            '{"issue_num":102,"feature_folder":".dev/active/item-b-102","state":"scheduled","merge_status":"not_started"}' + $script:PrecedenceTail
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith { $script:PrecedenceCheckpoint }
 
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $script:PrecedencePrompt
@@ -322,8 +322,8 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'allows a checkpoint that carries no precedence key' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"pr_open"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"pr_open"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[]}'
             }
 
@@ -333,12 +333,12 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         }
 
         It 'denies when the predecessor merge_status is <Label>' -ForEach @(
-            @{ Label = 'pr_open'; Predecessor = '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","state":"in_flight","merge_status":"pr_open"},' }
-            @{ Label = 'ci_green'; Predecessor = '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","state":"in_flight","merge_status":"ci_green"},' }
-            @{ Label = 'blocked_ci_loop_limit'; Predecessor = '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","state":"blocked","merge_status":"blocked_ci_loop_limit"},' }
+            @{ Label = 'pr_open'; Predecessor = '{"issue_num":101,"feature_folder":".dev/active/item-a-101","state":"in_flight","merge_status":"pr_open"},' }
+            @{ Label = 'ci_green'; Predecessor = '{"issue_num":101,"feature_folder":".dev/active/item-a-101","state":"in_flight","merge_status":"ci_green"},' }
+            @{ Label = 'blocked_ci_loop_limit'; Predecessor = '{"issue_num":101,"feature_folder":".dev/active/item-a-101","state":"blocked","merge_status":"blocked_ci_loop_limit"},' }
         ) {
             $script:PrecedenceCheckpoint = '{"recolor_generation":2,"items":[' + $Predecessor +
-            '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","state":"scheduled","merge_status":"not_started"}' + $script:PrecedenceTail
+            '{"issue_num":102,"feature_folder":".dev/active/item-b-102","state":"scheduled","merge_status":"not_started"}' + $script:PrecedenceTail
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith { $script:PrecedenceCheckpoint }
 
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $script:PrecedencePrompt
@@ -349,7 +349,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
 
         It 'denies when the predecessor has no items[] record' {
             $script:PrecedenceCheckpoint = '{"recolor_generation":2,"items":[' +
-            '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","state":"scheduled","merge_status":"not_started"}' + $script:PrecedenceTail
+            '{"issue_num":102,"feature_folder":".dev/active/item-b-102","state":"scheduled","merge_status":"not_started"}' + $script:PrecedenceTail
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith { $script:PrecedenceCheckpoint }
 
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $script:PrecedencePrompt
@@ -370,11 +370,11 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'calls the read seam exactly once and allows when the seam reports a merged neighbor' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"merged"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"merged"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
             Should -Invoke -CommandName Get-ParallelCohortBarrierCheckpointContent -Times 1 -Exactly
@@ -383,11 +383,11 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         It 'calls the read seam exactly once and denies for the identical payload when the seam reports ci_green' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith {
                 '{"recolor_generation":2,"items":[' +
-                '{"issue_num":101,"feature_folder":"docs/features/active/item-a-101","merge_status":"ci_green"},' +
-                '{"issue_num":102,"feature_folder":"docs/features/active/item-b-102","merge_status":"not_started"}' +
+                '{"issue_num":101,"feature_folder":".dev/active/item-a-101","merge_status":"ci_green"},' +
+                '{"issue_num":102,"feature_folder":".dev/active/item-b-102","merge_status":"not_started"}' +
                 '],"cohorts":[{"index":0,"generation":2,"item_keys":[101]},{"index":1,"generation":2,"item_keys":[102]}],"conflict_edges":[{"a":101,"b":102,"reason":"path_overlap"}]}'
             }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $decision = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
             Should -Invoke -CommandName Get-ParallelCohortBarrierCheckpointContent -Times 1 -Exactly
@@ -395,7 +395,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
 
         It 'does not call the read seam when the call is out of scope' {
             Mock -CommandName Get-ParallelCohortBarrierCheckpointContent -MockWith { $null }
-            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"atomic-planner","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $json = '{"tool_name":"Agent","tool_input":{"subagent_type":"atomic-planner","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $null = Invoke-ParallelCohortBarrierDecision -ToolInputRaw $json
             Should -Invoke -CommandName Get-ParallelCohortBarrierCheckpointContent -Times 0 -Exactly
         }
@@ -407,7 +407,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
         }
 
         It 'reduces a full docs path to its basename' {
-            Get-ParallelCohortBarrierFolderBasename -FolderPath 'docs/features/active/item-b-102' |
+            Get-ParallelCohortBarrierFolderBasename -FolderPath '.dev/active/item-b-102' |
                 Should -Be 'item-b-102'
         }
 
@@ -422,8 +422,8 @@ Describe 'enforce-parallel-cohort-barrier.ps1' {
             Find-ParallelCohortBarrierFeatureFolderFromPrompt -Prompt '' | Should -BeNullOrEmpty
         }
 
-        It 'resolves a bare docs/features/active token to its basename' {
-            Find-ParallelCohortBarrierFeatureFolderFromPrompt -Prompt 'target docs/features/active/item-b-102 now' |
+        It 'resolves a bare .dev/active token to its basename' {
+            Find-ParallelCohortBarrierFeatureFolderFromPrompt -Prompt 'target .dev/active/item-b-102 now' |
                 Should -Be 'item-b-102'
         }
 

@@ -36,7 +36,7 @@
 
     The normative contract is the D2 behaviour contract and the D3 fail-closed table
     in
-    docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
+    .dev/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
 
     Determinism: every decision is driven through the pure seam with a literal
     checkpoint string. No disk I/O, no child process, no live executable, and no
@@ -107,8 +107,8 @@ Describe 'Codex enforce-orchestration-preimplementation-gate trigger scoping (is
 
         It 'allows a heredoc body that quotes the staging invocation in prose' {
             $command = @'
-cat <<'NOTE' > docs/features/active/sample/notes.md
-Run git add docs/features/active/sample/spec.md once the scaffold lands.
+cat <<'NOTE' > .dev/active/sample/notes.md
+Run git add .dev/active/sample/spec.md once the scaffold lands.
 NOTE
 '@
 
@@ -135,7 +135,7 @@ JSON
         }
 
         It 'allows prose containing the English word black' {
-            $command = 'echo "the background is black and the text is white" >> docs/features/active/sample/notes.md'
+            $command = 'echo "the background is black and the text is white" >> .dev/active/sample/notes.md'
 
             $decision = Get-CodexTriggerScopingDecisionForCommand -Command $command
 
@@ -321,7 +321,7 @@ EOF
         It 'still declines to classify an apply_patch add of feature documentation' {
             $command = @'
 *** Begin Patch
-*** Add File: docs/features/active/sample/spec.md
+*** Add File: .dev/active/sample/spec.md
 +# Spec
 *** End Patch
 '@
@@ -345,7 +345,7 @@ EOF
         It 'still declines to classify an apply_patch update of feature documentation' {
             $command = @'
 *** Begin Patch
-*** Update File: docs/features/active/sample/spec.md
+*** Update File: .dev/active/sample/spec.md
 +more text
 *** End Patch
 '@

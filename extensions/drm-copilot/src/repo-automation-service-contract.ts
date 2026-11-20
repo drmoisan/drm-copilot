@@ -1,4 +1,8 @@
 import { type RepoAutomationToolName } from "./repo-automation-tool-names";
+import type {
+  MigrateDevelopmentDocsInput,
+  MigrateDevelopmentDocsResult,
+} from "./lib/development-docs-migration/migrate-development-docs-service-call";
 import { type RunCodexNativeConverterInput } from "./repo-automation-service-workflows";
 import {
   type PolicyAuditTemplateAssetSelector,
@@ -21,6 +25,10 @@ import type {
   TransitionPreparedOrchestrationResult,
 } from "./mcp-repo-automation-tool-definitions-handoff";
 import type { DiscoveryServiceResult } from "./discovery-service-types";
+import type { PushDownReport } from "./lib/push-down/push-down-report";
+import type { DetectIntegrationResult } from "./lib/push-down-integration/integration-detect";
+import type { ValidateIntegrationResult } from "./lib/push-down-integration/integration-validate";
+import type { PushDownIntegrationToolInput } from "./mcp-tool-inputs-push-down-integration";
 import type {
   DocsCommandOutcome,
   DocsCommandRequest,
@@ -90,6 +98,8 @@ export interface RepoAutomationExecutionResult {
   readonly receipt?: FinalizedReceiptSummary;
   /** Sentinel tool observation; evidence for the capability probe only. */
   readonly sentinel?: SentinelObservationSummary;
+  /** Dry-run or apply report; present only on the push-down tools (#1029). */
+  readonly pushDownReport?: PushDownReport;
 }
 
 export interface WorkspaceExecutionInput {
@@ -102,13 +112,30 @@ export interface CollectPrContextInput extends WorkspaceExecutionInput {
   readonly targetRef?: string;
 }
 
-export interface PushDownClaudeCustomizationsInput extends WorkspaceExecutionInput {
+/** Optional push-down run options shared by the three tools (#1029). */
+export interface PushDownRunOptions {
+  /** Plan and report only; write nothing. */
+  readonly dryRun?: boolean;
+  /** Overwrite `unmanaged-conflict` files (O-4 opt-in). */
+  readonly overwriteUnmanaged?: boolean;
+  /** Destination CI mode (#1050); omitted reuses the recorded mode. */
+  readonly ciWorkflows?: "off" | "reference" | "copy";
+}
+
+export interface PushDownCopilotCustomizationsInput
+  extends WorkspaceExecutionInput, PushDownRunOptions {
+  readonly packs?: ReadonlyArray<string>;
+}
+
+export interface PushDownClaudeCustomizationsInput
+  extends WorkspaceExecutionInput, PushDownRunOptions {
   readonly packs?: ReadonlyArray<string>;
   readonly csharpVariant?: "modern" | "legacy";
   readonly memoryMode?: "overwrite" | "merge" | "skip";
 }
 
-export interface PushDownCodexAndAgentsCustomizationsInput extends WorkspaceExecutionInput {
+export interface PushDownCodexAndAgentsCustomizationsInput
+  extends WorkspaceExecutionInput, PushDownRunOptions {
   readonly packs?: ReadonlyArray<string>;
   readonly csharpVariant?: "modern" | "legacy";
   readonly memoryMode?: "overwrite" | "merge" | "skip";
@@ -125,7 +152,7 @@ export interface RepoAutomationService {
     input: RunCodexNativeConverterInput,
   ): Promise<RepoAutomationExecutionResult>;
   pushDownCopilotCustomizations(
-    input: WorkspaceExecutionInput,
+    input: PushDownCopilotCustomizationsInput,
   ): Promise<RepoAutomationExecutionResult>;
   pushDownCodexAndAgentsCustomizations(
     input: PushDownCodexAndAgentsCustomizationsInput,
@@ -221,6 +248,10 @@ export interface RepoAutomationService {
   transitionPreparedOrchestration?(
     input: TransitionPreparedOrchestrationRequest,
   ): Promise<TransitionPreparedOrchestrationResult>;
+  /** Issue #1016: optional, so existing full service fakes keep type-checking. */
+  migrateDevelopmentDocs?(
+    input: MigrateDevelopmentDocsInput,
+  ): Promise<MigrateDevelopmentDocsResult>;
   renderSubagentTree(
     input: RenderSubagentTreeServiceInput,
   ): Promise<RepoAutomationExecutionResult>;
@@ -304,4 +335,12 @@ export interface RepoAutomationService {
    * `Invoke-DocsCommand.ps1` and return the parsed envelope (issue #1036).
    */
   runDocsCommand?(request: DocsCommandRequest): Promise<DocsCommandOutcome>;
+  /** Detect a push-down destination's integration facts (issue #1051). */
+  detectPushDownIntegration?(
+    input: PushDownIntegrationToolInput,
+  ): Promise<DetectIntegrationResult>;
+  /** Validate an integrated push-down destination (issue #1051). */
+  validatePushDownIntegration?(
+    input: PushDownIntegrationToolInput,
+  ): Promise<ValidateIntegrationResult>;
 }

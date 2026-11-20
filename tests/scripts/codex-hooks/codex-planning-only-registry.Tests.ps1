@@ -140,7 +140,7 @@ Describe 'enforce-epic-planning-only.ps1 loads the semantic MCP registry lazily 
     }
 
     It 'returns the committed-registry decision for apply_patch <Label> with a missing registry' -ForEach @(
-        @{ Label = 'planning document edit (allow)'; Patch = "*** Begin Patch`n*** Update File: docs/features/active/sample/spec.md`n*** End Patch"; ExpectAllow = $true }
+        @{ Label = 'planning document edit (allow)'; Patch = "*** Begin Patch`n*** Update File: .dev/active/sample/spec.md`n*** End Patch"; ExpectAllow = $true }
         @{ Label = 'production edit (deny)'; Patch = "*** Begin Patch`n*** Update File: src/service.py`n*** End Patch"; ExpectAllow = $false }
         @{ Label = 'checkpoint delete (deny)'; Patch = "*** Begin Patch`n*** Delete File: artifacts/orchestration/orchestrator-state.json`n*** End Patch"; ExpectAllow = $false }
     ) {
@@ -253,7 +253,7 @@ Describe 'enforce-epic-planning-only.ps1 loads the semantic MCP registry lazily 
     }
 
     It 'exits 0 through the entrypoint for a benign Edit payload' {
-        $payload = ConvertTo-PlanningPayload -ToolName 'Edit' -ToolInput @{ file_path = 'docs/features/active/sample/spec.md' } -Cwd $script:RepoRoot
+        $payload = ConvertTo-PlanningPayload -ToolName 'Edit' -ToolInput @{ file_path = '.dev/active/sample/spec.md' } -Cwd $script:RepoRoot
 
         $result = Invoke-PlanningOnlyEntrypoint -PayloadRaw $payload
 

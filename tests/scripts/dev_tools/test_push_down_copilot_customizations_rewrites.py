@@ -356,13 +356,13 @@ def test_push_down_reports_unmatched_script_references_without_rewrite() -> None
     fs = InMemoryPushDownFileSystem()
     fs.ensure_dir(source_repo)
     fs.ensure_dir(destination_repo)
-    skill_path = source_repo / ".github/skills/example/SKILL.md"
-    fs.ensure_dir(skill_path.parent)
+    instruction_path = source_repo / ".github/instructions/example.instructions.md"
+    fs.ensure_dir(instruction_path.parent)
     original_text = (
         "Run poetry run python -m "
         "scripts.dev_tools.unknown_future_tool before continuing."
     )
-    fs.write_text(skill_path, original_text)
+    fs.write_text(instruction_path, original_text)
 
     summary = module.push_down_customizations(
         repo_root=source_repo,
@@ -370,7 +370,9 @@ def test_push_down_reports_unmatched_script_references_without_rewrite() -> None
         fs=fs,
     )
 
-    copied_text = fs.read_text(destination_repo / ".github/skills/example/SKILL.md")
+    copied_text = fs.read_text(
+        destination_repo / ".github/instructions/example.instructions.md"
+    )
     assert copied_text == original_text
     assert summary.unmatched_references == [
         "scripts.dev_tools.unknown_future_tool",
@@ -417,45 +419,3 @@ def test_rewrite_known_push_down_reference_to_real_command() -> None:
         in rewritten_text
     )
     assert "scripts.dev_tools.push_down_copilot_customizations" not in rewritten_text
-
-
-def test_sync_agents_script_reference_rewrites_to_live_command() -> None:
-    """Rewrite a sync-agents script reference to the live extension command."""
-    module = importlib.import_module(
-        "scripts.dev_tools.push_down_copilot_customizations"
-    )
-    source_repo = Path("/source-repo")
-    destination_repo = Path("/destination-repo")
-    fs = InMemoryPushDownFileSystem()
-    fs.ensure_dir(source_repo)
-    fs.ensure_dir(destination_repo)
-    instruction_path = source_repo / ".github/instructions/agents.instructions.md"
-    fs.ensure_dir(instruction_path.parent)
-    fs.write_text(
-        instruction_path,
-        (
-            "Run ${workspaceFolder}/scripts/dev-tools/"
-            "sync-agents-from-instructions.ps1 "
-            "to regenerate AGENTS.md."
-        ),
-    )
-
-    summary = module.push_down_customizations(
-        repo_root=source_repo,
-        destination_root=destination_repo,
-        fs=fs,
-    )
-
-    rewritten_text = fs.read_text(
-        destination_repo / ".github/instructions/agents.instructions.md"
-    )
-    assert summary.rewritten_reference_count == 1
-    assert summary.placeholder_rewrite_count == 0
-    assert (
-        "VS Code command: `drm-copilot: Sync AGENTS.md from Instructions`"
-        in rewritten_text
-    )
-    assert (
-        "command ID: `drmCopilotExtension.syncAgentsFromInstructions`" in rewritten_text
-    )
-    assert "sync-agents-from-instructions.ps1" not in rewritten_text

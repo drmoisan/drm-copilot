@@ -11,6 +11,14 @@
 param()
 $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot 'hook-dependency-guard.ps1') } catch { $script:HookDependencyGuardLoadFailed = $true }
 
+# Development-docs root module (issue #1035): the published .codex/lib copy first, the self-hosted .claude/lib copy otherwise.
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -PathType Leaf) {
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+}
+else {
+    try { Import-Module (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+}
+
 $script:AllowedPreparationMcpTools = @(
     'mcp__drm-copilot__new_potential_entry',
     'mcp__drm-copilot__new_potential_bug_entry',
@@ -127,7 +135,8 @@ function Test-EpicPlanningArtifactPath {
         return $false
     }
     $normalized = $normalized -replace '^\./', ''
-    if ($normalized -match '(^|/)docs/features/(?:active|potential)/') {
+    # The active and potential areas of either known development-docs root (issue #1035).
+    if ($normalized -match ('(^|/)' + (Get-DevelopmentDocsKnownRootPattern) + '/(?:active|potential)/')) {
         return $normalized -match '\.(?:md|json|txt)$'
     }
     if ($normalized -match '(^|/)artifacts/(?:orchestration|research)/') {

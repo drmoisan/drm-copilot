@@ -150,10 +150,8 @@ def build_checkpoint(
         "last_updated": "2026-08-07T10-00",
         "route_id": "parallel",
         "parallel_slug": "wave-four",
-        "parallel_manifest_path": "docs/features/parallel/wave-four/parallel.md",
-        "parallel_status_doc_path": (
-            "docs/features/parallel/wave-four/parallel-status.md"
-        ),
+        "parallel_manifest_path": ".dev/parallel/wave-four/parallel.md",
+        "parallel_status_doc_path": (".dev/parallel/wave-four/parallel-status.md"),
         "mode": "closed",
         "max_concurrency": 4,
         "current_cohort": current_cohort,

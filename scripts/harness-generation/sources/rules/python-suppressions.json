@@ -1,0 +1,75 @@
+{
+  "$schema": "../../../../config/harness-generation/rule-source.schema.json",
+  "targets": [
+    {
+      "frontmatter": [
+        {
+          "key": "paths",
+          "value": "\n  - \"**/*.py\""
+        },
+        {
+          "key": "description",
+          "value": " Pre-authorized Python Ruff and Pyright suppression patterns. Applies to Python files."
+        }
+      ],
+      "kind": "claude",
+      "path": ".claude/rules/python-suppressions.md",
+      "sections": [
+        "head",
+        "authorization-requirement",
+        "pre-authorized-noqa-patterns",
+        "pre-authorized-type-ignore-patterns",
+        "explicitly-not-authorized-with-required-workaround",
+        "policy-enforcement-checklist"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "applyTo",
+          "value": " \"**/*.py\""
+        },
+        {
+          "key": "name",
+          "value": " python-suppressions-policy"
+        },
+        {
+          "key": "description",
+          "value": " \"Pre-authorized patterns for # noqa and # type: ignore suppressions in Python code\""
+        }
+      ],
+      "kind": "copilot",
+      "path": ".github/instructions/python-suppressions.instructions.md",
+      "sections": [
+        "head-2",
+        "ruff-suppressions",
+        "pyright-suppressions",
+        "non-authorized-patterns-explicitly-prohibited-with",
+        "policy-enforcement",
+        "non-authorized-patterns-explicitly-prohibited"
+      ]
+    },
+    {
+      "frontmatter": [
+        {
+          "key": "name",
+          "value": " python-suppressions"
+        },
+        {
+          "key": "description",
+          "value": " Python suppression policy for linting and type-checking exceptions."
+        }
+      ],
+      "kind": "codex",
+      "path": ".agents/skills/python-suppressions/SKILL.md",
+      "sections": [
+        "head",
+        "authorization-requirement",
+        "pre-authorized-noqa-patterns",
+        "pre-authorized-type-ignore-patterns",
+        "explicitly-not-authorized-with-required-workaround",
+        "policy-enforcement-checklist"
+      ]
+    }
+  ]
+}

@@ -6,17 +6,85 @@ import {
   asToolArgumentObject,
   type WorkspaceToolInput,
 } from "./mcp-tool-inputs";
+import {
+  type CiWorkflowsMode,
+  parseCiWorkflowsMode,
+} from "./lib/push-down/push-down-ci-workflows";
 
-export interface PushDownClaudeCustomizationsToolInput extends WorkspaceToolInput {
+/** Optional run options of every push-down tool input (issues #1029, #1050). */
+export interface PushDownRunToolInput {
+  readonly dryRun?: boolean;
+  readonly overwriteUnmanaged?: boolean;
+  readonly ciWorkflows?: CiWorkflowsMode;
+}
+
+export interface PushDownCopilotCustomizationsToolInput
+  extends WorkspaceToolInput, PushDownRunToolInput {
+  readonly packs?: ReadonlyArray<string>;
+}
+
+export interface PushDownClaudeCustomizationsToolInput
+  extends WorkspaceToolInput, PushDownRunToolInput {
   readonly packs?: ReadonlyArray<string>;
   readonly csharpVariant?: "modern" | "legacy";
   readonly memoryMode?: "overwrite" | "merge" | "skip";
 }
 
-export interface PushDownCodexAndAgentsCustomizationsToolInput extends WorkspaceToolInput {
+export interface PushDownCodexAndAgentsCustomizationsToolInput
+  extends WorkspaceToolInput, PushDownRunToolInput {
   readonly packs?: ReadonlyArray<string>;
   readonly csharpVariant?: "modern" | "legacy";
   readonly memoryMode?: "overwrite" | "merge" | "skip";
+}
+
+/**
+ * Resolve an optional boolean field.
+ *
+ * @param rawValue Raw argument value.
+ * @param field Field name used in the error.
+ * @returns The boolean, or `undefined` when absent.
+ * @throws Error When the value is present and not a boolean.
+ */
+function resolveBooleanField(
+  rawValue: unknown,
+  field: "dry_run" | "overwrite_unmanaged",
+): boolean | undefined {
+  if (rawValue === undefined) {
+    return undefined;
+  }
+  if (typeof rawValue !== "boolean") {
+    throw new Error(`Field '${field}' must be a boolean when provided.`);
+  }
+  return rawValue;
+}
+
+/**
+ * Resolve `dry_run`, `overwrite_unmanaged`, and `ci_workflows`, each only
+ * when present.
+ *
+ * @param args Tool argument object.
+ * @returns The present run options.
+ * @throws Error When a boolean field is not a boolean, or `ci_workflows` is
+ *   not `off`, `reference`, or `copy` (the error names the value).
+ */
+function resolveRunOptions(
+  args: Readonly<Record<string, unknown>>,
+): PushDownRunToolInput {
+  const dryRun = resolveBooleanField(args["dry_run"], "dry_run");
+  const overwriteUnmanaged = resolveBooleanField(
+    args["overwrite_unmanaged"],
+    "overwrite_unmanaged",
+  );
+  const rawCiWorkflows = args["ci_workflows"];
+  const ciWorkflows =
+    rawCiWorkflows === undefined
+      ? undefined
+      : parseCiWorkflowsMode(rawCiWorkflows);
+  return {
+    ...(dryRun === undefined ? {} : { dryRun }),
+    ...(overwriteUnmanaged === undefined ? {} : { overwriteUnmanaged }),
+    ...(ciWorkflows === undefined ? {} : { ciWorkflows }),
+  };
 }
 
 function resolvePacksField(
@@ -84,6 +152,23 @@ export function resolvePushDownClaudeCustomizationsToolInput(
     ...(packs === undefined ? {} : { packs }),
     ...(csharpVariant === undefined ? {} : { csharpVariant }),
     ...(memoryMode === undefined ? {} : { memoryMode }),
+    ...resolveRunOptions(args),
+  };
+}
+
+export function resolvePushDownCopilotCustomizationsToolInput(
+  rawInput: unknown,
+  fallbackWorkspaceRoot?: string,
+): PushDownCopilotCustomizationsToolInput {
+  const args = asToolArgumentObject(rawInput);
+  const packs = resolvePacksField(args["packs"]);
+  return {
+    workspaceRoot: normalizeWorkspaceRoot(
+      args["workspace_root"],
+      fallbackWorkspaceRoot,
+    ),
+    ...(packs === undefined ? {} : { packs }),
+    ...resolveRunOptions(args),
   };
 }
 
@@ -103,5 +188,6 @@ export function resolvePushDownCodexAndAgentsCustomizationsToolInput(
     ...(packs === undefined ? {} : { packs }),
     ...(csharpVariant === undefined ? {} : { csharpVariant }),
     ...(memoryMode === undefined ? {} : { memoryMode }),
+    ...resolveRunOptions(args),
   };
 }

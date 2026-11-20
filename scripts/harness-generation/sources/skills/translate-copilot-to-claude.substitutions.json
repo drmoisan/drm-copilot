@@ -1,0 +1,90 @@
+{
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "description: Translate GitHub Copilot native files, including instructions, agents, prompts, and skills, into the native Claude runtime. Classify each section, diff against existing Claude state, produce a translation plan for approval, then apply it.\n",
+      "replace": "description: Translate one or more GitHub Copilot native files (.github/copilot-instructions.md, .github/instructions/*.instructions.md, .github/agents/*.agent.md, .github/prompts/*.prompt.md, .github/skills/<name>/SKILL.md) into the native Claude runtime. Classify each section into agent/rule/skill/hook surfaces, diff against existing .claude/ state, produce a translation plan for user approval, and then apply the plan.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "  - `AGENTS.md`\n  - `.agents/skills/<name>.instructions.md`\n  - `.codex/agents/<name>.agent.md`\n  - `.agents/skills/<name>.prompt.md`\n  - `.agents/skills/<name>/SKILL.md`\n",
+      "replace": "  - `.github/copilot-instructions.md`\n  - `.github/instructions/<name>.instructions.md`\n  - `.github/agents/<name>.agent.md`\n  - `.github/prompts/<name>.prompt.md`\n  - `.github/skills/<name>/SKILL.md`\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "### 2.1 Enforceable (hard gate / hard stop) -> `.codex/hooks/`\n",
+      "replace": "### 2.1 Enforceable (hard gate / hard stop) -> `.claude/hooks/`\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- A new or updated script under `.codex/hooks/<name>.ps1`.\n- Registration in `.codex/config.toml` under `hooks.PreToolUse` or `hooks.SubagentStop` with a `matcher` that targets the affected tools (`Bash`, `Write|Edit`, specific agent names).\n",
+      "replace": "- A new or updated script under `.claude/hooks/<name>.ps1`.\n- Registration in `.claude/settings.json` under `hooks.PreToolUse` or `hooks.SubagentStop` with a `matcher` that targets the affected tools (`Bash`, `Write|Edit`, specific agent names).\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "### 2.2 Declarative standards (always-on for matching files) -> `.agents/skills/`\n",
+      "replace": "### 2.2 Declarative standards (always-on for matching files) -> `.claude/rules/`\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- An existing rule file under `.agents/skills/` that already covers the same path scope, merged into place.\n- A new rule file under `.agents/skills/<language-or-topic>.md` with frontmatter:\n",
+      "replace": "- An existing rule file under `.claude/rules/` that already covers the same path scope, merged into place.\n- A new rule file under `.claude/rules/<language-or-topic>.md` with frontmatter:\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "### 2.3 Reusable procedures -> `.agents/skills/<name>/SKILL.md`\n",
+      "replace": "### 2.3 Reusable procedures -> `.claude/skills/<name>/SKILL.md`\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- An existing skill under `.agents/skills/` when one already covers the same concept (check `.agents/skills/<name>/SKILL.md` by name and description).\n- A new skill at `.agents/skills/<name>/SKILL.md` when no coverage exists. Use the `make-skill-template` skill as the scaffold if needed. Frontmatter must include `name` and `description`.\n\nCopilot `.agents/skills/*.prompt.md` and `.agents/skills/<name>/SKILL.md` default to this target. Preserve the original name when it does not collide with an existing Claude skill.\n\n### 2.4 Identity and preload manifest -> `.codex/agents/<name>.md`\n",
+      "replace": "- An existing skill under `.claude/skills/` when one already covers the same concept (check `.claude/skills/<name>/SKILL.md` by name and description).\n- A new skill at `.claude/skills/<name>/SKILL.md` when no coverage exists. Use the `make-skill-template` skill as the scaffold if needed. Frontmatter must include `name` and `description`.\n\nCopilot `.github/prompts/*.prompt.md` and `.github/skills/<name>/SKILL.md` default to this target. Preserve the original name when it does not collide with an existing Claude skill.\n\n### 2.4 Identity and preload manifest -> `.claude/agents/<name>.md`\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- An existing agent file under `.codex/agents/<name>.md`. Update only the preload list, tools, description, and stop conditions. Keep the body thin.\n",
+      "replace": "- An existing agent file under `.claude/agents/<name>.md`. Update only the preload list, tools, description, and stop conditions. Keep the body thin.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "### 2.6 Repo-wide tone / policy precedence -> `AGENTS.md`\n\nSections that state cross-cutting repository defaults (tone, policy reading order, architectural overview) belong in `AGENTS.md` and should be cross-referenced from `.agents/skills/` rather than restated.\n",
+      "replace": "### 2.6 Repo-wide tone / policy precedence -> `CLAUDE.md`\n\nSections that state cross-cutting repository defaults (tone, policy reading order, architectural overview) belong in `CLAUDE.md` and should be cross-referenced from `.claude/rules/` rather than restated.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "1. **Hook**: `.codex/hooks/<verb-noun>.ps1` where the verb is `check|enforce|validate` and the noun is the concern (for example, `check-python-test-purity.ps1`, `enforce-python-batch-budget.ps1`).\n2. **Rule**: `.agents/skills/<topic>.md` where topic is the language (`python.md`, `csharp.md`, `powershell.md`, `typescript.md`) or cross-cutting concern (`tonality.md`, `general-code-change.md`, `general-unit-test.md`).\n3. **Skill**: `.agents/skills/<kebab-case-name>/SKILL.md`. Prefer verb-first names for action skills (`review-feature`, `implement-python`, `invoke-python-engineer`) and topic names for contract skills (`python-qa-gate`, `atomic-plan-contract`).\n4. **Agent**: `.codex/agents/<kebab-case-name>.md`. Normalize underscores to hyphens (`python_typed_engineer` -> `python-typed-engineer`).\n5. **AGENTS.md**: single repo-wide file at the workspace root.\n6. **settings.json**: `.codex/config.toml` sections `hooks` and `permissions`.\n",
+      "replace": "1. **Hook**: `.claude/hooks/<verb-noun>.ps1` where the verb is `check|enforce|validate` and the noun is the concern (for example, `check-python-test-purity.ps1`, `enforce-python-batch-budget.ps1`).\n2. **Rule**: `.claude/rules/<topic>.md` where topic is the language (`python.md`, `csharp.md`, `powershell.md`, `typescript.md`) or cross-cutting concern (`tonality.md`, `general-code-change.md`, `general-unit-test.md`).\n3. **Skill**: `.claude/skills/<kebab-case-name>/SKILL.md`. Prefer verb-first names for action skills (`review-feature`, `implement-python`, `invoke-python-engineer`) and topic names for contract skills (`python-qa-gate`, `atomic-plan-contract`).\n4. **Agent**: `.claude/agents/<kebab-case-name>.md`. Normalize underscores to hyphens (`python_typed_engineer` -> `python-typed-engineer`).\n5. **CLAUDE.md**: single repo-wide file at the workspace root.\n6. **settings.json**: `.claude/settings.json` sections `hooks` and `permissions`.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "3. For `.codex/config.toml`, compute add-only updates to `hooks.*` arrays and `permissions.allow`. Never remove existing permissions without explicit instruction.\n",
+      "replace": "3. For `.claude/settings.json`, compute add-only updates to `hooks.*` arrays and `permissions.allow`. Never remove existing permissions without explicit instruction.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "| <source#section-anchor> | rule | .agents/skills/python/SKILL.md#pytest-rules | merge |\n| <source#section-anchor> | hook | .codex/hooks/check-python-test-purity.ps1 | add |\n| <source#section-anchor> | skill | .agents/skills/python-qa-gate/SKILL.md | add |\n| <source#section-anchor> | agent | .codex/agents/python-typed-engineer.toml | merge |\n| <source#section-anchor> | settings | .codex/config.toml | add |\n",
+      "replace": "| <source#section-anchor> | rule | .claude/rules/python.md#pytest-rules | merge |\n| <source#section-anchor> | hook | .claude/hooks/check-python-test-purity.ps1 | add |\n| <source#section-anchor> | skill | .claude/skills/python-qa-gate/SKILL.md | add |\n| <source#section-anchor> | agent | .claude/agents/python-typed-engineer.md | merge |\n| <source#section-anchor> | settings | .claude/settings.json | add |\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "1. **Rules** \u2014 add or merge rule files under `.agents/skills/`.\n2. **Skills** \u2014 add or merge skill files under `.agents/skills/<name>/SKILL.md`.\n3. **Hooks** \u2014 add hook scripts under `.codex/hooks/` and parse-check them with `pwsh -NoProfile -Command \"[System.Management.Automation.Language.Parser]::ParseFile(..., [ref]$null, [ref]$errors)\"`.\n4. **Agent personas** \u2014 update `.codex/agents/<name>.md` frontmatter (tools, skills, memory) and trim the body to identity + workflow index.\n5. **settings.json** \u2014 append hook registrations and `Skill(...)` permissions. Never rewrite the file; use targeted edits.\n6. **AGENTS.md** \u2014 append cross-references only; never overwrite existing sections.\n",
+      "replace": "1. **Rules** \u2014 add or merge rule files under `.claude/rules/`.\n2. **Skills** \u2014 add or merge skill files under `.claude/skills/<name>/SKILL.md`.\n3. **Hooks** \u2014 add hook scripts under `.claude/hooks/` and parse-check them with `pwsh -NoProfile -Command \"[System.Management.Automation.Language.Parser]::ParseFile(..., [ref]$null, [ref]$errors)\"`.\n4. **Agent personas** \u2014 update `.claude/agents/<name>.md` frontmatter (tools, skills, memory) and trim the body to identity + workflow index.\n5. **settings.json** \u2014 append hook registrations and `Skill(...)` permissions. Never rewrite the file; use targeted edits.\n6. **CLAUDE.md** \u2014 append cross-references only; never overwrite existing sections.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- Parse-check every new or changed `.ps1` under `.codex/hooks/`.\n- JSON-parse `.codex/config.toml` to confirm validity.\n",
+      "replace": "- Parse-check every new or changed `.ps1` under `.claude/hooks/`.\n- JSON-parse `.claude/settings.json` to confirm validity.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "| `AGENTS.md` | `AGENTS.md` + `AGENTS.md` | Tone and precedence only. |\n| `.agents/skills/*.instructions.md` (applyTo) | `.agents/skills/<topic>.md` (paths) | Direct frontmatter rewrite. |\n| `.codex/agents/*.agent.md` identity frontmatter | `.codex/agents/<name>.md` frontmatter | Convert `tools:` to Claude tool names. |\n| `.codex/agents/*.agent.md` \"Absolute guardrails / hard gate\" | `.codex/hooks/*.ps1` + `settings.json` | Hooks enforce; rules merely document. |\n| `.codex/agents/*.agent.md` \"Workflow / Phase X\" | `.agents/skills/<workflow>/SKILL.md` | Split per phase when phases are independent. |\n| `.codex/agents/*.agent.md` \"Design rules / Testing rules\" | `.agents/skills/<language>.md` | Merge under Design Rules / Pytest Rules subheadings. |\n| `.codex/agents/*.agent.md` \"Handoffs\" | Reference existing routing skills | Do not duplicate. |\n| `.codex/agents/*.agent.md` \"Reporting requirements\" | `.agents/skills/<name>-qa-gate/SKILL.md` or the QA gate skill | Procedure, not identity. |\n| `.agents/skills/*.prompt.md` | `.agents/skills/<action-name>/SKILL.md` | One skill per prompt. |\n| `.agents/skills/<name>/SKILL.md` | `.agents/skills/<name>/SKILL.md` | Near-1:1; reconcile frontmatter schema. |\n",
+      "replace": "| `.github/copilot-instructions.md` | `CLAUDE.md` + `.claude/rules/tonality.md` | Tone and precedence only. |\n| `.github/instructions/*.instructions.md` (applyTo) | `.claude/rules/<topic>.md` (paths) | Direct frontmatter rewrite. |\n| `.github/agents/*.agent.md` identity frontmatter | `.claude/agents/<name>.md` frontmatter | Convert `tools:` to Claude tool names. |\n| `.github/agents/*.agent.md` \"Absolute guardrails / hard gate\" | `.claude/hooks/*.ps1` + `settings.json` | Hooks enforce; rules merely document. |\n| `.github/agents/*.agent.md` \"Workflow / Phase X\" | `.claude/skills/<workflow>/SKILL.md` | Split per phase when phases are independent. |\n| `.github/agents/*.agent.md` \"Design rules / Testing rules\" | `.claude/rules/<language>.md` | Merge under Design Rules / Pytest Rules subheadings. |\n| `.github/agents/*.agent.md` \"Handoffs\" | Reference existing routing skills | Do not duplicate. |\n| `.github/agents/*.agent.md` \"Reporting requirements\" | `.claude/skills/<name>-qa-gate/SKILL.md` or the QA gate skill | Procedure, not identity. |\n| `.github/prompts/*.prompt.md` | `.claude/skills/<action-name>/SKILL.md` | One skill per prompt. |\n| `.github/skills/<name>/SKILL.md` | `.claude/skills/<name>/SKILL.md` | Near-1:1; reconcile frontmatter schema. |\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "  `translate-copilot-to-claude .codex/agents/python-typed-engineer.toml`\n- Translate a set of instruction files and apply:\n  `translate-copilot-to-claude .agents/skills/python-code-change/SKILL.md .agents/skills/python-unit-test/SKILL.md mode=apply`\n- Translate an entire agent bundle (persona + its referenced instructions):\n  `translate-copilot-to-claude .codex/agents/csharp-typed-engineer.toml .agents/skills/csharp-code-change/SKILL.md .agents/skills/csharp-unit-test/SKILL.md target-scope=all`\n",
+      "replace": "  `translate-copilot-to-claude .github/agents/python-typed-engineer.agent.md`\n- Translate a set of instruction files and apply:\n  `translate-copilot-to-claude .github/instructions/python-code-change.instructions.md .github/instructions/python-unit-test.instructions.md mode=apply`\n- Translate an entire agent bundle (persona + its referenced instructions):\n  `translate-copilot-to-claude .github/agents/csharp-typed-engineer.agent.md .github/instructions/csharp-code-change.instructions.md .github/instructions/csharp-unit-test.instructions.md target-scope=all`\n"
+    }
+  ]
+}

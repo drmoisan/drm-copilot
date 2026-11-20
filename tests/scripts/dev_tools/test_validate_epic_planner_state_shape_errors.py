@@ -66,13 +66,13 @@ def _feature(number: int, /, **overrides: object) -> dict[str, Any]:
 
     feature: dict[str, Any] = {
         "issue_num": number,
-        "feature_folder": f"docs/features/active/feature-{number}",
+        "feature_folder": f".dev/active/feature-{number}",
         "depends_on": [],
         "wave": 0,
         "complexity_band": "C3",
         "preparation_status": "prepared",
         "research_path": f"artifacts/research/feature-{number}.md",
-        "plan_path": f"docs/features/active/feature-{number}/plan.md",
+        "plan_path": f".dev/active/feature-{number}/plan.md",
         "preflight_status": "PREFLIGHT: ALL CLEAR",
     }
     feature.update(overrides)
@@ -85,7 +85,7 @@ def _state(features: list[object], **overrides: object) -> dict[str, Any]:
     state: dict[str, Any] = {
         "objective": "prepare two related features",
         "epic_feature_folder": "sample-epic",
-        "epic_manifest_path": "docs/features/epics/sample-epic/epic.md",
+        "epic_manifest_path": ".dev/epics/sample-epic/epic.md",
         "integration_branch": "epic/sample-epic-integration",
         "max_parallel_features": 4,
         "epic_worthiness": {"verdict": "epic", "rationale": "two features"},

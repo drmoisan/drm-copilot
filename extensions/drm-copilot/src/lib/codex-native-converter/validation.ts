@@ -166,8 +166,10 @@ function validateMappingRecords(
 /**
  * Validate that planned target paths are unique.
  *
- * Mirrors `_validate_duplicate_targets`, including the `AGENTS.md`
- * standing-guidance exemption and the section-emission conflict detection.
+ * Mirrors `_validate_duplicate_targets`, including the section-emission
+ * conflict detection. No target path is exempt: standing-guidance records have
+ * a null target and are skipped, and two records that resolve to `AGENTS.md`
+ * are a duplicate like any other.
  *
  * @param mappingRecords Planned mappings for the current run.
  * @param plannedEmissions Section-level planned emissions.
@@ -217,18 +219,6 @@ function validateDuplicateTargets(
       duplicatedTargets.add(targetPath);
     }
   }
-  // AGENTS.md is exempt when every record targeting it is standing guidance.
-  for (const [targetPath, records] of mappingRecordsByTarget) {
-    if (
-      targetPath === "AGENTS.md" &&
-      records.every(
-        (record) => record.targetRole === TargetRole.STANDING_GUIDANCE,
-      )
-    ) {
-      duplicatedTargets.delete(targetPath);
-    }
-  }
-
   // Report every record participating in a duplicate target collision.
   for (const mappingRecord of mappingRecords) {
     if (

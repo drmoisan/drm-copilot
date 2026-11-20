@@ -27,13 +27,53 @@ const codexMemoryModeProperty = {
     "Optional inert Codex memory parity field: 'overwrite' (default), 'merge', or 'skip'.",
 } as const;
 
+/** Optional dry-run flag shared by the three push-down tools (issue #1029). */
+const dryRunProperty = {
+  type: "boolean",
+  description:
+    "Optional. When true, plan the push-down and return push_down_report without writing any file (default false).",
+} as const;
+
+/** Optional O-4 opt-in shared by the three push-down tools (issue #1029). */
+const overwriteUnmanagedProperty = {
+  type: "boolean",
+  description:
+    "Optional. When true, overwrite destination files that have no manifest entry and differ from the payload (default false).",
+} as const;
+
+/** Optional destination CI mode shared by the three push-down tools (issue #1050). */
+const ciWorkflowsProperty = {
+  type: "string",
+  enum: ["off", "reference", "copy"],
+  description:
+    "Optional destination CI workflows: 'off' (default) plans no CI file, 'reference' delivers the caller and data file pinned to the harness workflows at the release tag, 'copy' also delivers the selected packs' workflow copies. When omitted, the mode recorded in the destination manifest is reused.",
+} as const;
+
+/** Run options added to every push-down tool schema. */
+const pushDownRunProperties = {
+  dry_run: dryRunProperty,
+  overwrite_unmanaged: overwriteUnmanagedProperty,
+  ci_workflows: ciWorkflowsProperty,
+} as const;
+
 export const codexPushDownSelectionProperties = {
   packs: codexPacksProperty,
   csharp_variant: codexCsharpVariantProperty,
   memory_mode: codexMemoryModeProperty,
+  ...pushDownRunProperties,
 } as const;
 
-export const copilotPushDownSelectionProperties = {} as const;
+export const copilotPushDownSelectionProperties = {
+  packs: {
+    type: "array",
+    items: {
+      type: "string",
+    },
+    description:
+      "Optional Copilot pack names to publish ('python', 'powershell', 'typescript', 'csharp'). When omitted, the recorded selection is reused, else the full tree is published. 'core' is always included.",
+  },
+  ...pushDownRunProperties,
+} as const;
 
 export const claudePushDownSelectionProperties = {
   packs: {
@@ -56,4 +96,5 @@ export const claudePushDownSelectionProperties = {
     description:
       "Optional agent-memory handling mode: 'overwrite' (default), 'merge', or 'skip'.",
   },
+  ...pushDownRunProperties,
 } as const;

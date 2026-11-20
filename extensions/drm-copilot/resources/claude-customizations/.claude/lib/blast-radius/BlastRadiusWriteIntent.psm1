@@ -53,6 +53,7 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusExtraction.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') -Force -ErrorAction Stop
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConfig.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop
 
 # Truth-table keys read by this module.
 $script:WriteIntentKey = 'write_intent_extraction'
@@ -173,14 +174,16 @@ function Test-ReadTaskTitle {
     return -not $script:WriteVerbPattern.IsMatch($Title)
 }
 
-# Report whether an entry is a feature-folder glob, which is never dropped.
+# Report whether an entry is a feature-folder glob under any known
+# development-docs root (issue #1035), which is never dropped.
 function Test-FeatureFolderGlob {
     [CmdletBinding()]
     [OutputType([bool])]
     param([Parameter(Mandatory = $true)] [string] $Entry)
 
-    if (-not ($Entry.StartsWith('docs/features/', [System.StringComparison]::Ordinal) -and
-            $Entry.EndsWith('/**', [System.StringComparison]::Ordinal))) {
+    $rooted = @(Get-DevelopmentDocsKnownRoot | Where-Object {
+            $Entry.StartsWith("$_/", [System.StringComparison]::Ordinal) }).Count -gt 0
+    if (-not ($rooted -and $Entry.EndsWith('/**', [System.StringComparison]::Ordinal))) {
         return $false
     }
     $body = $Entry.Substring(0, $Entry.Length - 3)

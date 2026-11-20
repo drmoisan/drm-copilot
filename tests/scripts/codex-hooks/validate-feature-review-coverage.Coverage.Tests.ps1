@@ -196,6 +196,9 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
         BeforeEach {
             # Issue #1114: no entry row may run git; a row that reaches a wrapper mocks that wrapper.
             Mock Invoke-CodexReviewCoverageGitExe { param([string[]] $GitArgs) throw "unexpected git call: $($GitArgs -join ' ')" }
+            # D-P16 (issue #1035): the entry's development-docs module probe sees no published .codex/lib copy, so
+            # the self-hosted copy loads whatever a row's unfiltered Test-Path mock returns.
+            Mock Test-Path { $false } -ParameterFilter { ("$Path$LiteralPath" -replace '\\', '/') -like '*lib/development-docs/DevelopmentDocsRoot.psm1' }
         }
 
         It "1114: judges the audit named by the reviewer when another item's audit is newer" {

@@ -15,6 +15,7 @@ export const GOVERNED_GLOBS = [
   "scripts/**/*.json",
   "docs/**/*.json",
   "examples/**/*.json",
+  ".dev/**/*.json",
 ] as const;
 
 /** Globs for large/generated data and artifacts excluded from governance. */

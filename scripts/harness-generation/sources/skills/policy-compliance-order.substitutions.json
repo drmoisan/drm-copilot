@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../../config/harness-generation/skill-substitutions.schema.json",
+  "substitutions": [
+    {
+      "file": "SKILL.md",
+      "find": "Claude Code auto-loads rules via path-scoped frontmatter in `.agents/skills/`. This ordering documents precedence when policies conflict:\n\n1) `AGENTS.md` (standing instructions, always loaded)\n2) `AGENTS.md` (cross-language code change policy)\n3) `AGENTS.md` (cross-language unit test policy)\n4) Language- or domain-specific rules based on files in scope:\n   - Python: `.agents/skills/python/SKILL.md`, `.agents/skills/python-suppressions/SKILL.md`\n   - PowerShell: `.agents/skills/powershell/SKILL.md`\n   - TypeScript: `.agents/skills/typescript/SKILL.md`, `.agents/skills/typescript-suppressions/SKILL.md`\n   - C#: `.agents/skills/csharp/SKILL.md`\n",
+      "replace": "Claude Code auto-loads rules via path-scoped frontmatter in `.claude/rules/`. This ordering documents precedence when policies conflict:\n\n1) `CLAUDE.md` (standing instructions, always loaded)\n2) `.claude/rules/general-code-change.md` (cross-language code change policy)\n3) `.claude/rules/general-unit-test.md` (cross-language unit test policy)\n4) Language- or domain-specific rules based on files in scope:\n   - Python: `.claude/rules/python.md`, `.claude/rules/python-suppressions.md`\n   - PowerShell: `.claude/rules/powershell.md`\n   - TypeScript: `.claude/rules/typescript.md`, `.claude/rules/typescript-suppressions.md`\n   - C#: `.claude/rules/csharp.md`\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "- Do NOT modify policy documents under `.agents/skills/` or `.agents/skills/`.\n",
+      "replace": "- Do NOT modify policy documents under `.claude/rules/` or `.github/instructions/`.\n"
+    },
+    {
+      "file": "SKILL.md",
+      "find": "Agents may append additional requirements that are unique to their role (e.g., policy audit templates or epic docs), but should not duplicate the baseline order above.\n",
+      "replace": "Agents may append additional requirements that are unique to their role (e.g., policy audit templates or epic docs), but should not duplicate the baseline order above.\n\n"
+    }
+  ]
+}

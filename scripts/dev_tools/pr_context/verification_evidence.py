@@ -16,6 +16,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
 
+from scripts.dev_tools.json_config import development_docs_path
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -79,15 +81,19 @@ def discover_canonical_evidence_files(root: Path, feature: str) -> list[Path]:
 
     Args:
         root: Repository root path.
-        feature: Active feature directory name under `docs/features/active`.
+        feature: Active feature directory name under the active area of the
+            resolved development-docs root.
 
     Returns:
         Sorted, deduplicated repository-relative paths for canonical evidence files.
 
+    Raises:
+        ValueError: When the routing file is malformed or names an unknown root.
+
     Side Effects:
-        Reads filesystem metadata through globbing.
+        Reads the routing file and filesystem metadata through globbing.
     """
-    feature_root = root / "docs" / "features" / "active" / feature
+    feature_root = development_docs_path(root, "active") / feature
     if not feature_root.exists() or not feature_root.is_dir():
         return []
 

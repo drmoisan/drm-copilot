@@ -42,13 +42,13 @@ Describe 'validate-executor-output.ps1' {
                     Lines  = @(
                         'DIRECTIVE: PREFLIGHT VALIDATION ONLY',
                         '### Phase 0 - Baseline',
-                        '- [ ] [P0-T1] Read docs/features/active/foo/issue.md and write docs/features/active/foo/evidence/baseline/phase0.md',
+                        '- [ ] [P0-T1] Read .dev/active/foo/issue.md and write .dev/active/foo/evidence/baseline/phase0.md',
                         '### Phase 1 - QA',
-                        '- [ ] [P1-T1] Run pwsh ./tests/foo.Tests.ps1 and update docs/features/active/foo/evidence/qa-gates/qa.md'
+                        '- [ ] [P1-T1] Run pwsh ./tests/foo.Tests.ps1 and update .dev/active/foo/evidence/qa-gates/qa.md'
                     )
                 }
             }
-            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: .dev/active/foo/plan.md`nPREFLIGHT: ALL CLEAR" } | ConvertTo-Json -Compress
 
             $result = Invoke-ExecutorOutputValidation -InputText $raw
 
@@ -62,11 +62,11 @@ Describe 'validate-executor-output.ps1' {
                     Lines  = @(
                         'DIRECTIVE: PREFLIGHT VALIDATION ONLY',
                         '### Phase 0 - Baseline',
-                        '- [ ] [P0-T1] Read docs/features/active/foo/issue.md and write docs/features/active/foo/evidence/baseline/phase0.md'
+                        '- [ ] [P0-T1] Read .dev/active/foo/issue.md and write .dev/active/foo/evidence/baseline/phase0.md'
                     )
                 }
             }
-            $raw = @{ last_assistant_message = 'plan-path: docs/features/active/foo/plan.md' } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = 'plan-path: .dev/active/foo/plan.md' } | ConvertTo-Json -Compress
 
             $result = Invoke-ExecutorOutputValidation -InputText $raw
 
@@ -81,11 +81,11 @@ Describe 'validate-executor-output.ps1' {
                     Lines  = @(
                         'DIRECTIVE: PREFLIGHT VALIDATION ONLY',
                         '### Phase 0 - Baseline',
-                        '- [ ] [P0-T1] Read docs/features/active/foo/issue.md and write docs/features/active/foo/evidence/baseline/phase0.md'
+                        '- [ ] [P0-T1] Read .dev/active/foo/issue.md and write .dev/active/foo/evidence/baseline/phase0.md'
                     )
                 }
             }
-            $raw = @{ last_assistant_message = 'plan-path: docs/features/active/foo/plan.md BLOCKED during preflight without delta' } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = 'plan-path: .dev/active/foo/plan.md BLOCKED during preflight without delta' } | ConvertTo-Json -Compress
 
             $result = Invoke-ExecutorOutputValidation -InputText $raw
 
@@ -101,18 +101,18 @@ Describe 'validate-executor-output.ps1' {
                     Exists = $true
                     Lines  = @(
                         '### Phase 0 - Baseline',
-                        '- [x] [P0-T1] Read docs/features/active/foo/issue.md and write docs/features/active/foo/evidence/baseline/phase0.md',
+                        '- [x] [P0-T1] Read .dev/active/foo/issue.md and write .dev/active/foo/evidence/baseline/phase0.md',
                         '### Phase 1 - Implement',
                         '- [x] [P1-T1] Update .claude/hooks/validate-executor-output.ps1 and tests/scripts/claude-hooks/validate-executor-output.Tests.ps1',
                         '### Phase 2 - QA',
-                        '- [x] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-executor-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                        '- [x] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-executor-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
                     )
                 }
             }
         }
 
         It 'blocks non-preflight output that claims a blocked state' {
-            $raw = @{ last_assistant_message = 'plan-path: docs/features/active/foo/plan.md BLOCKED at preflight (before [P0-T1])' } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = 'plan-path: .dev/active/foo/plan.md BLOCKED at preflight (before [P0-T1])' } | ConvertTo-Json -Compress
 
             $result = Invoke-ExecutorOutputValidation -InputText $raw
 
@@ -121,7 +121,7 @@ Describe 'validate-executor-output.ps1' {
         }
 
         It 'blocks when AC Status Summary is missing' {
-            $raw = @{ last_assistant_message = 'plan-path: docs/features/active/foo/plan.md Commands Run: pwsh tests/scripts/claude-hooks/validate-executor-output.Tests.ps1 PowerShell PASS' } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = 'plan-path: .dev/active/foo/plan.md Commands Run: pwsh tests/scripts/claude-hooks/validate-executor-output.Tests.ps1 PowerShell PASS' } | ConvertTo-Json -Compress
 
             $result = Invoke-ExecutorOutputValidation -InputText $raw
 
@@ -130,7 +130,7 @@ Describe 'validate-executor-output.ps1' {
         }
 
         It 'blocks when command/status reporting is missing' {
-            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`nAC Status Summary`nPowerShell PASS" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: .dev/active/foo/plan.md`nAC Status Summary`nPowerShell PASS" } | ConvertTo-Json -Compress
 
             $result = Invoke-ExecutorOutputValidation -InputText $raw
 
@@ -141,7 +141,7 @@ Describe 'validate-executor-output.ps1' {
         It 'blocks when a touched language lacks an explicit PASS or FAIL status line' {
             $raw = @{
                 last_assistant_message = @"
-plan-path: docs/features/active/foo/plan.md
+plan-path: .dev/active/foo/plan.md
 AC Status Summary
 Commands Run:
 - pwsh tests/scripts/claude-hooks/validate-executor-output.Tests.ps1
@@ -159,7 +159,7 @@ Results:
         It 'allows termination when checklist, AC summary, commands, and language status lines are present' {
             $raw = @{
                 last_assistant_message = @"
-plan-path: docs/features/active/foo/plan.md
+plan-path: .dev/active/foo/plan.md
 AC Status Summary
 Commands Run:
 - pwsh tests/scripts/claude-hooks/validate-executor-output.Tests.ps1
@@ -177,8 +177,8 @@ Results:
 
     Context 'path parsing helpers' {
         It 'extracts a quoted plan-path value' {
-            Get-PlanPathFromOutput -AgentOutput 'plan-path: "docs/features/active/foo/plan.md"' |
-                Should -Be 'docs/features/active/foo/plan.md'
+            Get-PlanPathFromOutput -AgentOutput 'plan-path: ".dev/active/foo/plan.md"' |
+                Should -Be '.dev/active/foo/plan.md'
         }
 
         It 'detects preflight plans from the directive line' {
@@ -231,9 +231,9 @@ Results:
             Mock -CommandName Get-Content -MockWith { $null }
 
             # Act
-            $nullFile = Get-PlanFileContent -Path 'docs/features/active/foo/plan.md'
+            $nullFile = Get-PlanFileContent -Path '.dev/active/foo/plan.md'
             Mock -CommandName Get-Content -MockWith { 'single line' }
-            $scalarFile = Get-PlanFileContent -Path 'docs/features/active/foo/plan.md'
+            $scalarFile = Get-PlanFileContent -Path '.dev/active/foo/plan.md'
 
             # Assert
             $nullFile.Exists | Should -BeTrue
@@ -245,7 +245,7 @@ Results:
         It 'X4 blocks when the advertised plan does not exist' {
             # Arrange
             Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $false; Lines = @() } }
-            $raw = @{ last_assistant_message = 'plan-path: docs/features/active/foo/plan.md' } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = 'plan-path: .dev/active/foo/plan.md' } | ConvertTo-Json -Compress
 
             # Act
             $result = Invoke-ExecutorOutputValidation -InputText $raw
@@ -258,7 +258,7 @@ Results:
         It 'X5 blocks when the plan contains no task checkboxes' {
             # Arrange
             Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $true; Lines = @('### Phase 0 - Baseline', 'No tasks here.') } }
-            $raw = @{ last_assistant_message = 'plan-path: docs/features/active/foo/plan.md' } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = 'plan-path: .dev/active/foo/plan.md' } | ConvertTo-Json -Compress
 
             # Act
             $result = Invoke-ExecutorOutputValidation -InputText $raw
@@ -270,8 +270,8 @@ Results:
 
         It 'X6 reports only the first five unchecked lines when more than five remain' {
             # Arrange
-            Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $true; Lines = @(1..7 | ForEach-Object { "- [ ] [P1-T$_] Update docs/features/active/foo/file$_.md" }) } }
-            $raw = @{ last_assistant_message = 'plan-path: docs/features/active/foo/plan.md' } | ConvertTo-Json -Compress
+            Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $true; Lines = @(1..7 | ForEach-Object { "- [ ] [P1-T$_] Update .dev/active/foo/file$_.md" }) } }
+            $raw = @{ last_assistant_message = 'plan-path: .dev/active/foo/plan.md' } | ConvertTo-Json -Compress
 
             # Act
             $result = Invoke-ExecutorOutputValidation -InputText $raw
@@ -284,8 +284,8 @@ Results:
 
         It 'X7 allows a preflight stop that carries the canonical blocked text and a plan delta' {
             # Arrange
-            Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $true; Lines = @('DIRECTIVE: PREFLIGHT VALIDATION ONLY', '### Phase 0 - Baseline', '- [ ] [P0-T1] Read docs/features/active/foo/issue.md') } }
-            $raw = @{ last_assistant_message = 'plan-path: docs/features/active/foo/plan.md BLOCKED at preflight (before [P0-T1]) plan delta: add a path to [P1-T2]' } | ConvertTo-Json -Compress
+            Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $true; Lines = @('DIRECTIVE: PREFLIGHT VALIDATION ONLY', '### Phase 0 - Baseline', '- [ ] [P0-T1] Read .dev/active/foo/issue.md') } }
+            $raw = @{ last_assistant_message = 'plan-path: .dev/active/foo/plan.md BLOCKED at preflight (before [P0-T1]) plan delta: add a path to [P1-T2]' } | ConvertTo-Json -Compress
 
             # Act
             $result = Invoke-ExecutorOutputValidation -InputText $raw
@@ -311,7 +311,7 @@ Results:
         It 'X11 accepts poetry run command evidence' {
             # Arrange
             Mock -CommandName Get-PlanFileContent -MockWith { @{ Exists = $true; Lines = @('### Phase 1 - Implement', '- [x] [P1-T1] Update .claude/hooks/validate-executor-output.ps1') } }
-            $raw = @{ last_assistant_message = "plan-path: docs/features/active/foo/plan.md`nAC Status Summary`npoetry run pytest`nPowerShell PASS" } | ConvertTo-Json -Compress
+            $raw = @{ last_assistant_message = "plan-path: .dev/active/foo/plan.md`nAC Status Summary`npoetry run pytest`nPowerShell PASS" } | ConvertTo-Json -Compress
 
             # Act
             $result = Invoke-ExecutorOutputValidation -InputText $raw

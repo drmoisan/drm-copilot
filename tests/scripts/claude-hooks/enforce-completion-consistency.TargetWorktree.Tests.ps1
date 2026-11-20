@@ -131,4 +131,27 @@ Describe 'enforce-completion-consistency.ps1 item-worktree checkpoint (issue #11
         $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         $calls.Count | Should -Be 0
     }
+
+    It 'probes a .dev/active feature folder under the enclosing worktree root' {
+        # Arrange (issue #1035): the checkpoint names a .dev/active folder; the probe records every path.
+        $probed = [System.Collections.Generic.List[string]]::new()
+        $recordingCheck = { param($p) $probed.Add([string]$p); $p -eq '/repo/.claude/worktrees/item/.dev/active/2026-11-09-sample-1163' }.GetNewClosure()
+        $devContent = ([ordered]@{
+                'issue-num'      = '1163'
+                'feature-folder' = '.dev/active/2026-11-09-sample-1163'
+                next_step        = 'complete'
+                ci_gate          = [ordered]@{ conclusion = 'success'; head_sha = 'abc123def456' }
+            } | ConvertTo-Json -Compress -Depth 5)
+        $arguments = Get-CompletionTargetArgument -FilePath "$script:ItemRoot/artifacts/orchestration/orchestrator-state.json" -Content $devContent -Invoker $script:ListInvoker
+        $arguments['FolderExistsCheck'] = $recordingCheck
+
+        # Act
+        $result = Invoke-CompletionConsistencyDecision @arguments
+
+        # Assert
+        $result.hookSpecificOutput.permissionDecision | Should -Be 'allow'
+        $probed | Should -Contain '/repo/.claude/worktrees/item/.dev/active/2026-11-09-sample-1163'
+        $probed | Should -Not -Contain '/repo/.dev/active/2026-11-09-sample-1163'
+        $probed | Should -Not -Contain '.dev/active/2026-11-09-sample-1163'
+    }
 }

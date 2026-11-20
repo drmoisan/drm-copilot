@@ -17,6 +17,15 @@ $script:HookDependencyGuardLoadFailed = $false; try { . (Join-Path $PSScriptRoot
 # Shared Codex PreToolUse transport: stdin payload parsing and tool_input-to-file
 # mapping for every tool name the ^(apply_patch|Edit|Write)$ matcher admits.
 try { . (Join-Path $PSScriptRoot 'codex-pretooluse-file-mapping.ps1') } catch { Add-HookDependencyFailure -Name 'codex-pretooluse-file-mapping.ps1' -ErrorRecord $_ }
+# Development-docs root module (issue #1035): the published .codex/lib copy first,
+# the self-hosted .claude/lib copy otherwise. The known-root matchers of the
+# dot-sourced helpers below read it, so it loads before them.
+if (Test-Path -LiteralPath (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -PathType Leaf) {
+    try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+}
+else {
+    try { Import-Module (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
+}
 
 # Pure pathspec classifier for the issue #539 orchestration-bookkeeping staging exemption.
 # Extracted to a dot-sourced sibling so this file stays inside the 500-line cap, following
@@ -95,7 +104,8 @@ function Test-FeatureDocumentationOrEvidencePath {
     # -match: String.StartsWith is case-sensitive, so the case-sensitive operator
     # is what preserves the previous semantics exactly. PowerShell -match is
     # case-insensitive and would widen this predicate.
-    return $NormalizedPath -cmatch '(^|/)docs/features/active/'
+    $activeAreas = @(Get-DevelopmentDocsKnownRootPrefix -Area 'active' | ForEach-Object { [regex]::Escape($_) })
+    return $NormalizedPath -cmatch ('(^|/)(?:' + ($activeAreas -join '|') + ')')
 }
 
 function Test-ImplementationPath {
@@ -284,7 +294,7 @@ function Test-OrchestrationReady {
     }
 
     return (
-        $featureFolder.StartsWith('docs/features/active/') -and
+        (@(Get-DevelopmentDocsKnownRootPrefix -Area 'active' | Where-Object { $featureFolder.StartsWith($_, [System.StringComparison]::Ordinal) }).Count -gt 0) -and
         $routeId -and
         $lifecycleReady
     )

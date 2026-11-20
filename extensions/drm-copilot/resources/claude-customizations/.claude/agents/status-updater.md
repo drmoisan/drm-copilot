@@ -8,6 +8,7 @@ tools:
   - Glob
   - "Write(/artifacts/**)"
   - "Write(/docs/features/**)"
+  - "Write(/.dev/**)"
 skills:
   - acceptance-criteria-tracking
 memory: project

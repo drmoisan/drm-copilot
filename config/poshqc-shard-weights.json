@@ -782,7 +782,6 @@
     "tests/scripts/dev-tools/publish-sideloaded-extension.Tests.ps1": 538,
     "tests/scripts/dev-tools/run-actionlint.EnvironmentIsolation.Tests.ps1": 3703,
     "tests/scripts/dev-tools/run-actionlint.Tests.ps1": 1171,
-    "tests/scripts/dev-tools/sync-agents-from-instructions.Tests.ps1": 614,
     "tests/scripts/dev-tools/tree.Tests.ps1": 430,
     "tests/scripts/dev-tools/verify-host.Tests.ps1": 314,
     "tests/scripts/host-tools.manifest.Tests.ps1": 291,

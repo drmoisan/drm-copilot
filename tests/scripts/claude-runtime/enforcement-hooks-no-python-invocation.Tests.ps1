@@ -513,7 +513,7 @@ function Invoke-Seam {
                     -not (Test-GuardedPathUnderScanRoot -RelativePath $_.Relative)
                 })
             $outsideRoots.Count | Should -Be 0 -Because (
-                'enumerated paths outside the three scan roots: ' + (($outsideRoots | ForEach-Object { $_.Relative }) -join ', '))
+                'enumerated paths outside the scan roots: ' +(($outsideRoots | ForEach-Object { $_.Relative }) -join ', '))
 
             $bashPaths = @($files | Where-Object { $_.Relative -like '.claude/lib/bash/*' })
             $bashPaths.Count | Should -Be 0 -Because 'the bash library is shell, not PowerShell'
@@ -576,6 +576,22 @@ function Invoke-Seam {
             $files = Get-GuardedPowerShellFile
             @($files | Where-Object { $_.Relative -like '.codex/hooks/*' }).Count |
                 Should -BeGreaterThan 0 -Because 'the Codex hooks directory is enumerated'
+        }
+
+        It 'AC-15 copilot hooks path is under a scan root' {
+            Test-GuardedPathUnderScanRoot -RelativePath '.github/hooks/discovery-pre-tool.ps1' |
+                Should -BeTrue -Because 'the Copilot hooks directory is a scan root (issue #1030)'
+        }
+
+        It 'AC-15 enumeration includes at least one copilot hooks file' {
+            $files = Get-GuardedPowerShellFile
+            @($files | Where-Object { $_.Relative -like '.github/hooks/*' }).Count |
+                Should -BeGreaterThan 0 -Because 'the Copilot hooks directory is enumerated'
+        }
+
+        It 'AC-15 scans exactly the four hook roots' {
+            $relativeRoots = @($script:ScanRoot | ForEach-Object { $_.Substring($script:RepoRoot.Length).TrimStart('\', '/') -replace '\\', '/' })
+            $relativeRoots | Should -Be @('.claude/hooks', '.claude/lib', '.codex/hooks', '.github/hooks')
         }
     }
 

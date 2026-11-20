@@ -6,6 +6,8 @@ import re
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
+from scripts.dev_tools.json_config import KNOWN_DEVELOPMENT_DOCS_ROOTS
+
 from .models import (
     IssueDetails,
     PullRequestDetails,
@@ -249,7 +251,8 @@ def parse_name_status_map(name_status_text: str) -> dict[str, str]:
 def is_scoping_doc(path: str) -> bool:
     lowered = path.lower()
     return bool(
-        lowered.startswith("docs/features/")
+        # Scoping docs live under either known development-docs root.
+        any(lowered.startswith(f"{root}/") for root in KNOWN_DEVELOPMENT_DOCS_ROOTS)
         and (
             lowered.endswith("/spec.md")
             or lowered.endswith("/plan.md")

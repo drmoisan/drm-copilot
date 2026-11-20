@@ -15,9 +15,9 @@ const INDEPENDENT_CONTEXT_ARGUMENTS = {
   expected_source_head_sha: "0".repeat(40),
   allowed_head_relationship: "equal_or_descendant",
   expected_issue_number: 614,
-  expected_feature_folder: "docs/features/active/portable-handoff-614",
+  expected_feature_folder: ".dev/active/portable-handoff-614",
   expected_work_mode: "full-feature",
-  expected_plan_path: "docs/features/active/portable-handoff-614/plan.md",
+  expected_plan_path: ".dev/active/portable-handoff-614/plan.md",
   expected_plan_sha256: "c".repeat(64),
 } as const;
 

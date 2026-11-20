@@ -14,11 +14,11 @@ This direct-use wrapper delegates review work to the `feature-review` worker.
 
 ## Output Paths
 
-When the active review scope is a selected version folder such as `docs/features/active/<feature>/v2/`, write the review artifacts into that selected version folder rather than the parent feature root.
+When the active review scope is a selected version folder such as `.dev/active/<feature>/v2/`, write the review artifacts into that selected version folder rather than the parent feature root.
 
-- `docs/features/active/<feature-or-selected-version>/policy-audit.<timestamp>.md`
-- `docs/features/active/<feature-or-selected-version>/code-review.<timestamp>.md`
-- `docs/features/active/<feature-or-selected-version>/feature-audit.<timestamp>.md`
+- `.dev/active/<feature-or-selected-version>/policy-audit.<timestamp>.md`
+- `.dev/active/<feature-or-selected-version>/code-review.<timestamp>.md`
+- `.dev/active/<feature-or-selected-version>/feature-audit.<timestamp>.md`
 
 ## Worker Routing
 

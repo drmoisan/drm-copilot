@@ -132,6 +132,14 @@ Describe 'Issue adoption accepts valid records (AC-6)' {
         Join-Sorted $result.WaivedTools | Should -BeExactly 'new_potential_entry,potential_to_issue'
     }
 
+    It 'accepts a potential record under the .dev potential area' {
+        $devRecord = '.dev/potential/promoted/2026-08-22-promotion-gate-lacks-preexisting-issue-branch.md'
+        $adoption = Get-AdoptionRecord -Override @{ waived_tools = @('potential_to_issue', 'new_potential_entry'); potential_record = $devRecord }
+        $result = Invoke-Adoption -State (Get-AdoptionState -Adoption $adoption)
+        Join-Text $result.Errors | Should -BeExactly ''
+        Join-Sorted $result.WaivedTools | Should -BeExactly 'new_potential_entry,potential_to_issue'
+    }
+
     It 'accepts a bug checkpoint waiving the bug entry tool with a record' {
         $adoption = Get-AdoptionRecord -Override @{ waived_tools = @('potential_to_issue', 'new_potential_bug_entry'); potential_record = $script:ValidRecord }
         $result = Invoke-Adoption -State (Get-AdoptionState -Adoption $adoption -PromotionType 'bug') -Required $script:LargeBugTools

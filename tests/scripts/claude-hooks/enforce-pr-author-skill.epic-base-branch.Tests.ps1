@@ -162,7 +162,7 @@ Describe 'enforce-pr-author-skill.ps1 - Test-EpicBaseBranchOverride' {
                 return '/synthetic-worktrees/epic-coordinator'
             }
             Mock -CommandName Get-EpicScopeCheckpointText -ModuleName EpicScopeResolution -MockWith {
-                '{"route_id":"epic","epic_feature_folder":"sample-epic","epic_manifest_path":"docs/features/epics/sample-epic/epic.md","integration_branch":"epic/sample-epic-integration","epic_issue_num":900,"features":[{"feature_folder":"2026-09-25-child-a-901","merge_status":"merged"},{"feature_folder":"2026-09-25-child-b-902","merge_status":"worktree_removed"}],"model_routing_receipts":[{"agent":"pr-author"}]}'
+                '{"route_id":"epic","epic_feature_folder":"sample-epic","epic_manifest_path":".dev/epics/sample-epic/epic.md","integration_branch":"epic/sample-epic-integration","epic_issue_num":900,"features":[{"feature_folder":"2026-09-25-child-a-901","merge_status":"merged"},{"feature_folder":"2026-09-25-child-b-902","merge_status":"worktree_removed"}],"model_routing_receipts":[{"agent":"pr-author"}]}'
             }
         }
 

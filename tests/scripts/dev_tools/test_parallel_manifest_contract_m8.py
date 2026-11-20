@@ -26,7 +26,7 @@ CONTEXT = "Parallel manifest"
 
 # One well-formed item block per declared key, indented for the items sequence.
 ITEM_TEMPLATE = """  - issue_num: {key}
-    feature_folder: docs/features/active/alpha-{key}
+    feature_folder: .dev/active/alpha-{key}
     kind: feature
     state: proposed
     blast_radius:

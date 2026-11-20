@@ -1,0 +1,66 @@
+{
+  "$schema": "../../../../config/harness-generation/agent-source.schema.json",
+  "claude": {
+    "frontmatter": [
+      {
+        "key": "name",
+        "value": " powershell-typed-engineer"
+      },
+      {
+        "key": "model",
+        "value": " sonnet"
+      },
+      {
+        "key": "description",
+        "value": " Project-scoped worker that implements and verifies PowerShell changes within typed repository boundaries. Applies PoshQC format -> PSScriptAnalyzer -> Pester toolchain, the 1-3 production-file direct-mode budget with routing to the orchestrated large path above it, and zero-regression quality gates read from the single gate run and compared with the `Phase 0 baseline`."
+      },
+      {
+        "key": "tools",
+        "value": "\n  - Read\n  - Grep\n  - Glob\n  - \"Bash(pwsh *)\"\n  - mcp__drm-copilot__.*\n  - Write\n  - Edit"
+      },
+      {
+        "key": "skills",
+        "value": "\n  - policy-compliance-order\n  - powershell-change-budget-router\n  - powershell-orchestration-state-machine\n  - atomic-plan-contract\n  - powershell-qa-gate\n  - acceptance-criteria-tracking\n  - feature-promotion-lifecycle\n  - remediation-handoff-atomic-planner\n  - evidence-and-timestamp-conventions\n  - owner-directives"
+      },
+      {
+        "key": "memory",
+        "value": " project"
+      }
+    ],
+    "path": ".claude/agents/powershell-typed-engineer.md",
+    "sections": [
+      "head",
+      "standing-rules",
+      "workflow",
+      "invocation-modes",
+      "mode-marker-resolution",
+      "stop-conditions",
+      "evidence-location-invariant",
+      "test-execution-launcher"
+    ]
+  },
+  "codex": {
+    "delimiter": "'''",
+    "keys": [
+      {
+        "key": "name",
+        "value": "\"powershell-typed-engineer\""
+      },
+      {
+        "key": "description",
+        "value": "\"Converted subagent\""
+      }
+    ],
+    "path": ".codex/agents/powershell-typed-engineer.toml",
+    "sections": [
+      "head-2",
+      "standing-rules-2",
+      "workflow-2",
+      "invocation-modes-2",
+      "mode-marker-resolution",
+      "stop-conditions-2",
+      "evidence-location-invariant-2",
+      "test-execution-launcher"
+    ]
+  }
+}

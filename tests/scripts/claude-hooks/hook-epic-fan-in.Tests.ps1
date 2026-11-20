@@ -21,6 +21,8 @@ Describe 'hook-epic-fan-in.ps1 <Surface> copy (issue #1136)' -ForEach @(
 ) {
     BeforeAll {
         $script:RepoRoot = (Resolve-Path "$PSScriptRoot/../../..").Path
+        # The dot-sourced file reads the development-docs root module that its gate imports (D-P16).
+        Import-Module (Join-Path $script:RepoRoot '.claude/lib/development-docs/DevelopmentDocsRoot.psm1') -Force
         . (Join-Path $script:RepoRoot "$HookDirectory/enforce-orchestration-preimplementation-gate-helpers.ps1")
         if ($Surface -eq 'Claude') {
             Import-Module (Join-Path $script:RepoRoot '.claude/lib/worktree-resolution/HookTargetWorktree.psm1')
@@ -132,6 +134,17 @@ Describe 'hook-epic-fan-in.ps1 <Surface> copy (issue #1136)' -ForEach @(
             @{ Case = 'epic_status_doc_path disagrees'; Override = @{ epic_status_doc_path = 'docs/features/epics/other-epic/epic-status.md' } }
         ) {
             Get-EpicFanInStatusDocRelativePath -Checkpoint (Get-FanInCheckpoint -Override $Override) | Should -BeNullOrEmpty -Because $Case
+        }
+
+        It 'returns a declared .dev/epics status document as declared (<Case>, issue #1035)' -ForEach @(
+            @{ Case = 'forward slashes'; Declared = '.dev/epics/sample-epic/epic-status.md' }
+            @{ Case = 'backslashes'; Declared = '.dev\epics\sample-epic\epic-status.md' }
+        ) {
+            Get-EpicFanInStatusDocRelativePath -Checkpoint (Get-FanInCheckpoint -Override @{ epic_status_doc_path = $Declared }) | Should -BeExactly '.dev/epics/sample-epic/epic-status.md'
+        }
+
+        It 'returns null for a declared .dev status document of another slug (issue #1035)' {
+            Get-EpicFanInStatusDocRelativePath -Checkpoint (Get-FanInCheckpoint -Override @{ epic_status_doc_path = '.dev/epics/other-epic/epic-status.md' }) | Should -BeNullOrEmpty
         }
     }
 
@@ -261,6 +274,8 @@ Describe 'hook-epic-fan-in.ps1 <Surface> copy (issue #1136)' -ForEach @(
             @{ Case = 'bare'; Folder = 'child-a' }
             @{ Case = 'active-prefixed'; Folder = 'docs/features/active/child-a' }
             @{ Case = 'completed-prefixed'; Folder = 'docs/features/completed/child-a' }
+            @{ Case = '.dev active-prefixed (issue #1035)'; Folder = '.dev/active/child-a' }
+            @{ Case = '.dev completed-prefixed (issue #1035)'; Folder = '.dev/completed/child-a' }
         ) {
             $roots = @(Get-EpicMergedFeatureRoots -Checkpoint (Get-RootsCheckpoint -Feature @{ feature_folder = $Folder }))
             $roots | Should -Be @('docs/features/active/child-a/', 'docs/features/completed/child-a/', 'docs/features/epics/sample-epic/epic-status.md')
@@ -334,6 +349,24 @@ Describe 'hook-epic-fan-in.ps1 <Surface> copy (issue #1136)' -ForEach @(
             @{ Case = 'a case difference'; Path = 'Docs/features/active/child-a/x.md' }
             @{ Case = 'a blank path'; Path = '' }
             @{ Case = 'code outside every root'; Path = 'scripts/x.ps1' }
+        ) {
+            Test-EpicMergedFeaturePath -RelativePath $Path -Root $script:FollowUpRoots | Should -BeFalse -Because $Case
+        }
+
+        It 'admits the .dev form <Path> whose docs/features form a root admits (issue #1035)' -ForEach @(
+            @{ Path = '.dev/active/child-a/x.md' }
+            @{ Path = '.dev/completed/child-a/x.md' }
+            @{ Path = '.dev/epics/sample-epic/epic-status.md' }
+        ) {
+            Test-EpicMergedFeaturePath -RelativePath $Path -Root $script:FollowUpRoots | Should -BeTrue
+        }
+
+        It 'refuses the .dev form <Case> (issue #1035)' -ForEach @(
+            @{ Case = 'of a sibling-prefix folder'; Path = '.dev/active/child-a-x/y.md' }
+            @{ Case = 'with a .. segment'; Path = '.dev/active/child-a/../x.md' }
+            @{ Case = 'of the bare root'; Path = '.dev/active/child-a/' }
+            @{ Case = 'under a .devx directory'; Path = '.devx/active/child-a/x.md' }
+            @{ Case = 'nested below another directory'; Path = 'x/.dev/active/child-a/x.md' }
         ) {
             Test-EpicMergedFeaturePath -RelativePath $Path -Root $script:FollowUpRoots | Should -BeFalse -Because $Case
         }

@@ -336,6 +336,7 @@ export function collectPrContext(
       bucketCore.push([path, stats]);
     } else if (
       path.startsWith("docs/") ||
+      path.startsWith(".dev/") ||
       path.startsWith(".github") ||
       path.includes("AGENTS")
     ) {

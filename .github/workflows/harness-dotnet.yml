@@ -1,0 +1,139 @@
+# Destination-generic .NET quality workflow delivered by the drm-copilot
+# push-down (issue #1050). The modern variant builds with the .NET SDK on
+# ubuntu-latest; the legacy variant builds with msbuild and tests with vstest
+# on windows-latest. Both write JaCoCo totals to artifacts/csharp/coverage.xml.
+name: Harness .NET
+
+on:
+  workflow_call:
+    inputs:
+      variant:
+        description: C# toolchain variant, modern or legacy.
+        type: string
+        default: modern
+
+permissions:
+  contents: read
+
+jobs:
+  dotnet-modern:
+    name: .NET QC (modern)
+    if: ${{ inputs.variant == 'modern' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.403
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Check formatting
+        run: dotnet format --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test with coverage
+        run: >-
+          dotnet test --no-build --configuration Release
+          --collect:"XPlat Code Coverage"
+          --results-directory artifacts/csharp/raw
+
+      - name: Convert Cobertura totals to JaCoCo
+        shell: pwsh
+        run: |
+          $files = @(Get-ChildItem -Path artifacts/csharp/raw -Recurse -File -Filter 'coverage.cobertura.xml')
+          if ($files.Count -eq 0) { Write-Error 'No Cobertura report was collected.' -ErrorAction Continue; exit 1 }
+          $linesValid = 0; $linesCovered = 0; $branchesValid = 0; $branchesCovered = 0
+          foreach ($file in $files) {
+            [xml] $doc = Get-Content -Raw -LiteralPath $file.FullName
+            $root = $doc.coverage
+            $linesValid += [int] $root.'lines-valid'
+            $linesCovered += [int] $root.'lines-covered'
+            $branchesValid += [int] $root.'branches-valid'
+            $branchesCovered += [int] $root.'branches-covered'
+          }
+          $text = @(
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<report name="dotnet">'
+            ('  <counter type="LINE" missed="{0}" covered="{1}"/>' -f ($linesValid - $linesCovered), $linesCovered)
+            ('  <counter type="BRANCH" missed="{0}" covered="{1}"/>' -f ($branchesValid - $branchesCovered), $branchesCovered)
+            '</report>'
+          ) -join "`n"
+          Set-Content -LiteralPath artifacts/csharp/coverage.xml -Value $text -Encoding utf8
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dotnet-coverage
+          path: artifacts/csharp/coverage.xml
+          if-no-files-found: ignore
+
+  dotnet-legacy:
+    name: .NET QC (legacy)
+    if: ${{ inputs.variant == 'legacy' }}
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up msbuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore
+        shell: pwsh
+        run: msbuild -t:Restore -p:RestorePackagesConfig=true
+
+      - name: Build
+        shell: pwsh
+        run: msbuild -p:Configuration=Release
+
+      - name: Test with vstest and coverage
+        shell: pwsh
+        run: |
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+          $vstest = & $vswhere -latest -products * -find '**/vstest.console.exe' | Select-Object -First 1
+          if (-not $vstest) { Write-Error 'vstest.console.exe was not found.' -ErrorAction Continue; exit 1 }
+          $assemblies = @(Get-ChildItem -Path . -Recurse -File -Filter '*Tests.dll' |
+            Where-Object { $_.FullName -match '[\\/]bin[\\/]Release[\\/]' -and $_.FullName -notmatch '[\\/]obj[\\/]' } |
+            ForEach-Object { $_.FullName })
+          if ($assemblies.Count -eq 0) { Write-Error 'No test assembly was found.' -ErrorAction Continue; exit 1 }
+          & $vstest @assemblies '/Collect:Code Coverage;Format=Cobertura' '/ResultsDirectory:artifacts/csharp/raw'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Convert Cobertura totals to JaCoCo
+        shell: pwsh
+        run: |
+          $files = @(Get-ChildItem -Path artifacts/csharp/raw -Recurse -File -Filter '*.cobertura.xml')
+          if ($files.Count -eq 0) { Write-Error 'No Cobertura report was collected.' -ErrorAction Continue; exit 1 }
+          $linesValid = 0; $linesCovered = 0; $branchesValid = 0; $branchesCovered = 0
+          foreach ($file in $files) {
+            [xml] $doc = Get-Content -Raw -LiteralPath $file.FullName
+            $root = $doc.coverage
+            $linesValid += [int] $root.'lines-valid'
+            $linesCovered += [int] $root.'lines-covered'
+            $branchesValid += [int] $root.'branches-valid'
+            $branchesCovered += [int] $root.'branches-covered'
+          }
+          $text = @(
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<report name="dotnet">'
+            ('  <counter type="LINE" missed="{0}" covered="{1}"/>' -f ($linesValid - $linesCovered), $linesCovered)
+            ('  <counter type="BRANCH" missed="{0}" covered="{1}"/>' -f ($branchesValid - $branchesCovered), $branchesCovered)
+            '</report>'
+          ) -join "`n"
+          Set-Content -LiteralPath artifacts/csharp/coverage.xml -Value $text -Encoding utf8
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dotnet-coverage
+          path: artifacts/csharp/coverage.xml
+          if-no-files-found: ignore

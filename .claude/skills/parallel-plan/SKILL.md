@@ -57,7 +57,7 @@ identical forms.
 - **Fully resolved before kickoff.** The manifest is committed in fully resolved form — no negative
   `issue_num` remaining — before the kickoff artifact is written.
 - **`feature_folder`.** Recorded at intake as a resolvable-hint basename, then resolved to a
-  concrete `docs/features/active/<basename>` path after promotion with any lifecycle prefix
+  concrete `.dev/active/<basename>` path after promotion with any lifecycle prefix
   stripped, per the `epic-orchestrate` convention. The concrete location is additionally fixed by
   the per-item `branch_name` recorded in the checkpoint.
 - **`kind`.** Record `kind: feature | bug` at intake from the item source (issue labels, or the
@@ -138,7 +138,7 @@ preparation-resume line, and the preparation-receipt line:
 >
 > `model_budget.fable_policy: <disabled|available|preferred>.`
 >
-> `Issue adoption: this item's GitHub issue already exists. Verify it read-only (gh issue view), do not call potential_to_issue or the promotion-entry tool, and record a top-level issue_adoption object in the checkpoint per .claude/rules/orchestrator-state.md with origin filed_before_orchestration (or transferred when the issue was transferred), waiving potential_to_issue and the promotion-entry tool for the checkpoint's promotion-type. When a lifecycle record for the item exists under docs/features/potential/promoted/, cite it as potential_record.`
+> `Issue adoption: this item's GitHub issue already exists. Verify it read-only (gh issue view), do not call potential_to_issue or the promotion-entry tool, and record a top-level issue_adoption object in the checkpoint per .claude/rules/orchestrator-state.md with origin filed_before_orchestration (or transferred when the issue was transferred), waiving potential_to_issue and the promotion-entry tool for the checkpoint's promotion-type. When a lifecycle record for the item exists under .dev/potential/promoted/, cite it as potential_record.`
 >
 > `Preparation resume: stage <stage>. Existing artifacts: <paths>. Do not repeat a completed stage; supersede with new timestamped files.`
 >
@@ -209,11 +209,11 @@ unchanged `route_id: preparation` terminal step, pushed to `origin` before its w
 and reused unchanged as the item's execution branch. Record `branch_name` and `worktree_path` per
 item in the checkpoint.
 
-**Run-level artifacts.** `docs/features/parallel/<slug>/parallel.md` (the run manifest) and
-`docs/features/parallel/<slug>/parallel-kickoff.md` (the durable kickoff copy) live on the
+**Run-level artifacts.** `.dev/parallel/<slug>/parallel.md` (the run manifest) and
+`.dev/parallel/<slug>/parallel-kickoff.md` (the durable kickoff copy) live on the
 planner-owned branch `parallel/<slug>-plan`, created off `origin/main` and pushed. That branch is
 explicitly not an integration branch: no item branch ever merges into it, it never merges into any
-item branch, and it holds only `docs/features/parallel/<slug>/**`, a subtree no item's blast radius
+item branch, and it holds only `.dev/parallel/<slug>/**`, a subtree no item's blast radius
 may include. Each item opens its own pull request against `main`.
 
 **Plan-home checkout.** After the last preparation child has terminated (the re-plan delegations
@@ -326,7 +326,7 @@ paths is evidence that the author obeyed the reading order, not evidence that th
 the file, so `derive_blast_radius` drops it from the harvest and `validate_blast_radius` drops it
 from its plan-side extraction, which keeps V1 and V2 self-consistent. The extractor likewise rejects
 five token shapes that were never write claims: a wildcard-free token naming a directory rather
-than a file, a `docs/features/` glob whose wildcard occupies or truncates the feature-folder
+than a file, a `.dev/` glob whose wildcard occupies or truncates the feature-folder
 segment, a contract token carrying no ASCII letter, a token containing a placeholder or
 interpolation marker, and a contract token that is a default spreadsheet sheet name. These
 exclusions are part of the landed contract, so the prohibition now
@@ -519,7 +519,7 @@ The library returns the partition; the planner supplies the record fields.
    hashtable whose emptiness is not expressible at all.
 2. Immediately after the conflict-edge set is derived and before anything consumes it, run the
    lane-assertion diagnostic:
-   `bash .claude/lib/bash/report-lane-assertion.sh --manifest docs/features/parallel/<slug>/parallel.md --edges "<a>:<b> ..."`
+   `bash .claude/lib/bash/report-lane-assertion.sh --manifest .dev/parallel/<slug>/parallel.md --edges "<a>:<b> ..."`
    (a bash invocation against the published payload; it requires no Python interpreter at the
    destination runtime). It compares the manifest's
    optional `expected_conflict_components` assertion (invariant M8) against the connected
@@ -557,10 +557,10 @@ The library returns the partition; the planner supplies the record fields.
    slots in ascending item-key order. Recoloring under add, remove, or drift mutation is F6 and F8
    scope. This skill performs seeding only.
 7. **Durable scheduling record.** Build the record content with
-   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 record -RunFolder docs/features/parallel/<slug> -Entry <entry-json>`
+   `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 record -RunFolder .dev/parallel/<slug> -Entry <entry-json>`
    from the recorded `conflict_edges`, `tolerated_overlaps`, `precedence`, and `items`; the helper
    prints the content and makes no git write. Write it to
-   `docs/features/parallel/<slug>/parallel-scheduling.json` and commit it on `parallel/<slug>-plan`
+   `.dev/parallel/<slug>/parallel-scheduling.json` and commit it on `parallel/<slug>-plan`
    with the manifest. A re-seed applies the reuse rule per item with
    `pwsh -NoProfile -NonInteractive -File .claude/lib/parallel-admission/Invoke-ParallelAdmission.ps1 reuse-edges -Slug <slug> -IssueNum <issue> -PlanHash <plan_hash>`,
    where `<plan_hash>` is the item's `plan_hash` from its `assess` output. The helper reads the
@@ -595,7 +595,7 @@ No production module is added for this check; it is a re-invocation of the lande
 
 ## Manifest Authoring
 
-Write `docs/features/parallel/<slug>/parallel.md` conforming to the F3-owned frontmatter schema
+Write `.dev/parallel/<slug>/parallel.md` conforming to the F3-owned frontmatter schema
 recorded in `.claude/rules/parallel-orchestration.md` (manifest invariants M1-M9):
 
 - `parallel` — the run slug, a non-empty string.
@@ -729,7 +729,7 @@ checkpoint.
 ## Kickoff Artifact
 
 Write the working copy to `artifacts/orchestration/parallel-kickoff-<slug>.md` (a gitignored tree)
-and commit a byte-identical durable copy to `docs/features/parallel/<slug>/parallel-kickoff.md` on
+and commit a byte-identical durable copy to `.dev/parallel/<slug>/parallel-kickoff.md` on
 `parallel/<slug>-plan`.
 
 ```markdown
@@ -745,7 +745,7 @@ artifacts/orchestration/parallel-planner-state.json (run branch: parallel/<slug>
 Run `/parallel-run <slug>` to execute this run, or paste the prompt below.
 
 Use the parallel-orchestrator subagent to execute the prepared run whose manifest is
-docs/features/parallel/<slug>/parallel.md on the plan-home branch parallel/<slug>-plan. Each item
+.dev/parallel/<slug>/parallel.md on the plan-home branch parallel/<slug>-plan. Each item
 resumes at atomic execution from its committed plan-path on its own pushed feature branch rather
 than re-planning, and each item opens its own pull request against main.
 
@@ -769,7 +769,7 @@ Structural requirements enforced by the contract module:
 - The first line is exactly `# Parallel Kickoff: <slug>`, with the slug matching
   `[a-z0-9][a-z0-9-]*`.
 - `## Invocation Prompt` must name `` Run `/parallel-run <slug>` ``, the manifest path
-  `docs/features/parallel/<slug>/parallel.md`, the plan-home branch `parallel/<slug>-plan`, and the
+  `.dev/parallel/<slug>/parallel.md`, the plan-home branch `parallel/<slug>-plan`, and the
   resume-boundary sentence stating that each item resumes at atomic execution from its committed
   plan-path on its own pushed feature branch.
 - `## Item Summary` is a strict pipe table with the exact ordered headers
@@ -791,18 +791,18 @@ Validate the artifact through `mcp__drm-copilot__validate_orchestration_artifact
 ### Integration Commit Form (issue #539)
 
 The parallel planner's own version-control operations — committing the run manifest
-`docs/features/parallel/<slug>/parallel.md`, each item's prepared feature folder and approved
-plan-path, and the durable kickoff copy `docs/features/parallel/<slug>/parallel-kickoff.md` — are
+`.dev/parallel/<slug>/parallel.md`, each item's prepared feature folder and approved
+plan-path, and the durable kickoff copy `.dev/parallel/<slug>/parallel-kickoff.md` — are
 orchestration bookkeeping, not implementation. The preimplementation gate
 (`.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`) exempts them only when the
 invocation is **pathspec-bearing**: every staging or integration invocation must name at least one
 explicit path operand, and every operand must resolve inside one of the five exempt
 orchestration-bookkeeping trees:
 
-- `docs/features/epics/`
-- `docs/features/parallel/`
-- `docs/features/active/`
-- `docs/features/potential/`
+- `.dev/epics/`
+- `.dev/parallel/`
+- `.dev/active/`
+- `.dev/potential/`
 - `artifacts/orchestration/`
 
 Use one of the two pathspec-bearing spellings:
@@ -831,7 +831,7 @@ Not admitted: heredoc-fed messages, including `git commit -m "$(cat <<'EOF' ... 
 
 The final report to the operator must include:
 
-- The manifest path `docs/features/parallel/<slug>/parallel.md` and the run branch
+- The manifest path `.dev/parallel/<slug>/parallel.md` and the run branch
   `parallel/<slug>-plan`.
 - Per item: one `plan-path:` line, the branch name, the preflight status, and the
   radius-validation result, including any V3 Advisory findings.
@@ -842,7 +842,7 @@ The final report to the operator must include:
   found nothing, so its silence is never ambiguous. Report it as advisory information: it does not
   gate the report, does not change the cohort table, and no finding is escalated to Blocking.
 - Both kickoff artifact paths: `artifacts/orchestration/parallel-kickoff-<slug>.md` and
-  `docs/features/parallel/<slug>/parallel-kickoff.md`.
+  `.dev/parallel/<slug>/parallel-kickoff.md`.
 - The combination listing (issue #1013): each combination with its members, primary, qualifying
   pairs with cost and benefit, the `combination_threshold_percent` applied, and
   `estimated_savings`; and each qualifying pair that was not combined, with the reason.

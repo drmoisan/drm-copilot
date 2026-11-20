@@ -51,7 +51,7 @@ Always apply:
 
 ### Process-reduction ledger
 
-- This rule applies only when `docs/engineering/process-reductions/` exists, so a repository without that folder is unaffected.
+- This rule applies only when `.dev/engineering/process-reductions/` exists, so a repository without that folder is unaffected.
 - A change that reduces evidence, plan tasks, gates, or review process adds its ledger entry in the same commit, in the format of that folder's `README.md`.
 - A branch diff that makes such a reduction with no entry is a Blocking finding.
 - The reviewer confirms from the branch log that each reduction is its own commit, with the `reduction: NNNN` token in its subject.
@@ -98,7 +98,7 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
    - Prefer the active feature folder that corresponds to the primary changed scoping docs.
    - If multiple active folders are present, prefer the one whose suffix matches the issue number in the branch name.
    - Otherwise choose the folder with the most material scoping-doc changes.
-   - If no active feature folder exists, create `docs/features/active/<today>-feature-review/` and document the assumption.
+   - If no active feature folder exists, create `.dev/active/<today>-feature-review/` and document the assumption.
 
 4. **Produce the policy audit**
   - Use `policy-audit-template-usage` and the MCP `template` asset to drive the artifact structure.

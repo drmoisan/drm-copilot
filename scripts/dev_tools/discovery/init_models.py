@@ -27,6 +27,7 @@ def resolve_default_template_root() -> Path:
 
     This no-argument compatibility resolver performs no template I/O. Installed
     resource lookup belongs to the package resource boundary; only the existing
-    repository initializer still needs this checkout-specific location.
+    repository initializer still needs this checkout-specific location, which is
+    the development-docs root ``.dev/discovery/templates`` (issue #1016).
     """
-    return Path(__file__).resolve().parents[3] / "docs" / "discovery" / "templates"
+    return Path(__file__).resolve().parents[3] / ".dev" / "discovery" / "templates"
