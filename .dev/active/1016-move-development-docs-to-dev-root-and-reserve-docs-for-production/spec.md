@@ -442,7 +442,7 @@ Recorded as questions only; the 2026-11-14 answers are in `## Autonomous Decisio
 - [x] A Phase 0 evidence artifact under `<FEATURE>/evidence/baseline/` records the stage B gate: preconditions re-checked, no open pull request touching `docs/features/**` or the overlap files, and a fresh dry-run `source_digest` equal to the decision file's.
 - [x] After apply, `.dev/` holds the development records in the target layout (with discovery templates at `global_decisions.discovery_templates_target`), `docs/` contains `docs/README.md` stating that `docs/` holds production documentation only and no mapped source remains under `docs/`, and the moves were made with `git mv` (the commit shows renames for unchanged files).
 - [x] Every folder renamed under `.dev/active`, `.dev/completed` and `.dev/archive` matches either the mechanical rule or its decision-file entry, every `keep` folder retains its name, and potential records, epics, parallel runs and research keep their names; a mechanical comparison of the post-apply folder list with the dry-run plan and decision file is stored under `<FEATURE>/evidence/other/`.
-- [ ] A second dry run after apply reports an empty plan (no moves, renames or rewrites), stored under `<FEATURE>/evidence/other/`.
+- [x] A second dry run after apply reports an empty plan (no moves, renames or rewrites), stored under `<FEATURE>/evidence/other/`.
 - [x] `development_docs_root` is `.dev` in `config/orchestration-routing.json`, `extensions/drm-copilot/resources/config/orchestration-routing.json` and `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json`, and `tests/scripts/dev_tools/test_orchestration_routing_config_parity.py` passes.
 - [x] The self-hosted `config/blast-radius.json` lists `.dev` in `path_roots` and `PINNED_SELF_HOSTED_PATH_ROOTS` matches it; the bundle copy keeps its empty Class 2 `path_roots` (ruling R1); and the blast-radius tests pass.
 - [x] Both feature plan template copies link to `.github/instructions/` with the depth that resolves from `.dev/active/<folder>/`, and a link check over a plan created from the template after the flip finds no broken link.
@@ -460,7 +460,7 @@ Recorded as questions only; the 2026-11-14 answers are in `## Autonomous Decisio
 ### Epic-level criteria owned by this child (promoted record)
 
 - [x] `.dev/` holds all development records in the target layout, and `docs/` holds only production documentation plus a README stating its purpose.
-- [ ] The TypeScript migration command moves a repository's folders with `git mv`, rewrites references, and a second run changes nothing (the `migration-apply.test.ts` second-apply case and the post-apply dry run).
+- [x] The TypeScript migration command moves a repository's folders with `git mv`, rewrites references, and a second run changes nothing (the `migration-apply.test.ts` second-apply case and the post-apply dry run).
 - [x] The migration command and its tests need no Python.
 - [ ] With `development_docs_root` set to `.dev`, the full toolchain passes.
 - [x] Historical fixtures stay frozen and still pass through the fallback.
