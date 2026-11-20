@@ -435,7 +435,7 @@ Recorded as questions only; the 2026-11-14 answers are in `## Autonomous Decisio
 
 ### Owner stop
 
-- [ ] `<FEATURE>/evidence/other/folder-rename-decisions.<UTC>.json` exists, follows the "Decision File" schema, names the dry-run JSON it answers, carries its `source_digest`, has a decision for every held item in that report, and records an answer in `global_decisions` for every owner question that affects execution.
+- [x] `<FEATURE>/evidence/other/folder-rename-decisions.<UTC>.json` exists, follows the "Decision File" schema, names the dry-run JSON it answers, carries its `source_digest`, has a decision for every held item in that report, and records an answer in `global_decisions` for every owner question that affects execution.
 
 ### Stage B — move, rename and flip
 
