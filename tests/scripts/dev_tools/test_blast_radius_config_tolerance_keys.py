@@ -63,7 +63,7 @@ COPILOT_INSTRUCTIONS = ".github/copilot-instructions.md"
 # directory list recorded at P0-T28 of the issue #722 plan.
 PINNED_SELF_HOSTED_PATH_ROOTS: tuple[str, ...] = tuple(
     (
-        ".agents .cache .claude .codex .devcontainer .github .vscode config docs "
+        ".agents .cache .claude .codex .dev .devcontainer .github .vscode config docs "
         "examples extensions packages schemas scripts src tests virtual"
     ).split()
 )

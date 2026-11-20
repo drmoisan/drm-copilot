@@ -362,4 +362,4 @@ class TestParseArgs:
         args = plan_progress_report_module._parse_args(  # type: ignore[reportPrivateUsage]
             []
         )
-        assert args.active_root == Path("docs/features/active")
+        assert args.active_root == Path(".dev/active")
