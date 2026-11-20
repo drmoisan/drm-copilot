@@ -83,7 +83,7 @@
 - [x] A plan created from the feature plan template after the flip has working `.github/instructions/` links, and both template copies carry the same link depth.
 - [x] Historical JSON fixtures under `tests/fixtures/` are unchanged and their tests pass through the fallback with the key at `.dev`.
 - [x] Child 2's write-scope checker, every generator `--check`, and the contract tests listed in `spec.md` "Contract Tests" pass.
-- [ ] The full seven-stage toolchain passes for TypeScript, Python and PowerShell with the key at `.dev`, recorded under `<FEATURE>/evidence/qa-gates/`.
+- [x] The full seven-stage toolchain passes for TypeScript, Python and PowerShell with the key at `.dev`, recorded under `<FEATURE>/evidence/qa-gates/`.
 - [x] A post-apply dry run reports an empty plan, recorded under `<FEATURE>/evidence/other/`.
 - [x] No new Python file is added by this child.
 

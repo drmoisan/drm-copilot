@@ -430,7 +430,7 @@ Recorded as questions only; the 2026-11-14 answers are in `## Autonomous Decisio
 - [x] `packages/mcp-server/README.md` and `extensions/drm-copilot/README.md` document the tool inputs, the `npx` subcommand and the decision-file requirement for apply mode.
 - [x] A dry run against this repository from a branch build writes `<FEATURE>/evidence/other/dev-docs-migration-dry-run.<UTC>.md` and `.json`, the JSON contains a `source_digest` and a `decision_skeleton`, and `git status` after the run shows no change outside `<FEATURE>/evidence/other/`.
 - [x] The stage A change adds no Python file, no PowerShell hook and no bash script, recorded by a name-status diff against the merge base of the integration branch and `HEAD` (ruling R6) stored under `<FEATURE>/evidence/qa-gates/`.
-- [ ] The seven-stage toolchain passes in a single pass for the changed TypeScript, and no changed production file exceeds 800 lines.
+- [x] The seven-stage toolchain passes in a single pass for the changed TypeScript, and no changed production file exceeds 800 lines.
 - [x] A Phase 0 evidence artifact under `<FEATURE>/evidence/baseline/` records that the parallel run `bugs-1001-1002-1003-1006` and epic children 1 to 6 have merged, and that each named file, symbol and heading was re-checked against `origin/main` and the integration branch before any edit.
 
 ### Owner stop
@@ -453,7 +453,7 @@ Recorded as questions only; the 2026-11-14 answers are in `## Autonomous Decisio
 - [x] Every mirrored and bundled copy, pack manifest and Codex counterpart touched by the change has the text its contract requires, every generator `--check` reports no drift, and the tests in "Contract Tests" pass.
 - [x] A recorded search over production roots (`.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts`, `extensions/drm-copilot/src`) for `docs/features`, `docs/research`, `docs/engineering` and `docs/discovery` returns only child 2's resolver constants, its matcher unions and recorded Stay or exclusion entries; a link check over moved Markdown reports no link broken by the move; command, output and allowlist are stored under `<FEATURE>/evidence/other/`.
 - [x] The orchestrator checkpoint records the post-move `<FEATURE>` path, and every stage B evidence artifact written after the move is under that path.
-- [ ] The seven-stage toolchain passes in a single pass for TypeScript, Python and PowerShell with the key at `.dev`, recorded under `<FEATURE>/evidence/qa-gates/`, and no changed production file exceeds 800 lines.
+- [x] The seven-stage toolchain passes in a single pass for TypeScript, Python and PowerShell with the key at `.dev`, recorded under `<FEATURE>/evidence/qa-gates/`, and no changed production file exceeds 800 lines.
 - [x] The stage B change adds no Python file; any Python change is an in-place edit of an existing file, recorded by a name-status diff against the merge base of the integration branch and `HEAD` (ruling R6) stored under `<FEATURE>/evidence/qa-gates/`.
 - [x] Each `global_decisions` answer that implies a stage B task (OQ-3, OQ-4, OQ-5, OQ-6, OQ-8, OQ-9, OQ-10, OQ-11) is either implemented with a named test or evidence artifact, or recorded as requiring no change, in the stage B completion evidence.
 
@@ -462,7 +462,7 @@ Recorded as questions only; the 2026-11-14 answers are in `## Autonomous Decisio
 - [x] `.dev/` holds all development records in the target layout, and `docs/` holds only production documentation plus a README stating its purpose.
 - [x] The TypeScript migration command moves a repository's folders with `git mv`, rewrites references, and a second run changes nothing (the `migration-apply.test.ts` second-apply case and the post-apply dry run).
 - [x] The migration command and its tests need no Python.
-- [ ] With `development_docs_root` set to `.dev`, the full toolchain passes.
+- [x] With `development_docs_root` set to `.dev`, the full toolchain passes.
 - [x] Historical fixtures stay frozen and still pass through the fallback.
 - [x] Mirrored and bundled files, pack manifests, Codex counterparts and contract tests pass.
 
