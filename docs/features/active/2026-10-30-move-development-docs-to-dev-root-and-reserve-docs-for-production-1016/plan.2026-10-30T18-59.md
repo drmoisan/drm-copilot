@@ -130,9 +130,9 @@ All new suites use the in-memory fakes of `EXT/test/lib/development-docs-migrati
 
 No tracked file changes in this phase; it writes evidence only, so it carries no `[phase-gate]` task.
 
-- [ ] [P3-T1] Build the standalone package from the branch (`npm --prefix packages/mcp-server ci`, then its `build` script).
+- [x] [P3-T1] Build the standalone package from the branch (`npm --prefix packages/mcp-server ci`, then its `build` script).
   - Acceptance: `<FEATURE>/evidence/other/mcp-server-branch-build.<timestamp>.md` records exit 0 for both steps and that `packages/mcp-server/out/mcp-server.js` exists; `git status --porcelain` captured before and after the build is identical.
-- [ ] [P3-T2] Run the dry run from the branch build: a `sh` launcher under `SCRATCH` runs `node packages/mcp-server/out/mcp-server.js migrate-development-docs --workspace . --mode dry-run --report-dir <FEATURE>/evidence/other` from the repository root, with no decision file.
+- [x] [P3-T2] Run the dry run from the branch build: a `sh` launcher under `SCRATCH` runs `node packages/mcp-server/out/mcp-server.js migrate-development-docs --workspace . --mode dry-run --report-dir <FEATURE>/evidence/other` from the repository root, with no decision file.
   - Acceptance: exit 0; `<FEATURE>/evidence/other/dev-docs-migration-dry-run.<timestamp>.md` and `.json` are written; the newest JSON parses with a string `source_digest`, an object `decision_skeleton`, a retained-documentation list and held items carrying `reason` and `candidate`; `git status --porcelain` captured before and after shows every added or changed path under `<FEATURE>/evidence/other/`; `<FEATURE>/evidence/other/dev-docs-migration-dry-run-command.<timestamp>.md` records the command, exit code, both captures and the category counts. No move, rename or flip occurs.
 
 ### Phase 4 — Final QA Loop, Self-Review and Handoff
