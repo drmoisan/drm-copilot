@@ -51,19 +51,19 @@
 
 ### (a) Maintainer dry run and rename review
 
-- [ ] A dry run of `migrate_development_docs` against this repository from a branch build writes `dev-docs-migration-dry-run.<UTC>.md` and `.json` under `<FEATURE>/evidence/other/`, and `git status` after the run shows no change outside that directory.
-- [ ] The dry-run report lists planned directory moves, mechanical renames, held items with their candidates (non-matching folders, multi-folder issue numbers, formatter errors, case-insensitive collisions), unmapped entries, files to rewrite with occurrence counts, excluded files, protected occurrences, mapping-record candidates, broken links, backslash-separated occurrences, untracked files, a `source_digest` and a `decision_skeleton`, as asserted by `migration-report.test.ts`.
-- [ ] Counts in the report are derived mechanically from the tracked-file listing at run time; no count is taken from the research snapshot.
-- [ ] Without a decision file, the dry run reports the OQ-1 discovery-templates target from `developmentDocsPath(".dev", "discovery-templates")` and reports the OQ-2 and OQ-12 alternatives separately, applying nothing, as asserted by `migration-plan.test.ts`.
+- [x] A dry run of `migrate_development_docs` against this repository from a branch build writes `dev-docs-migration-dry-run.<UTC>.md` and `.json` under `<FEATURE>/evidence/other/`, and `git status` after the run shows no change outside that directory.
+- [x] The dry-run report lists planned directory moves, mechanical renames, held items with their candidates (non-matching folders, multi-folder issue numbers, formatter errors, case-insensitive collisions), unmapped entries, files to rewrite with occurrence counts, excluded files, protected occurrences, mapping-record candidates, broken links, backslash-separated occurrences, untracked files, a `source_digest` and a `decision_skeleton`, as asserted by `migration-report.test.ts`.
+- [x] Counts in the report are derived mechanically from the tracked-file listing at run time; no count is taken from the research snapshot.
+- [x] Without a decision file, the dry run reports the OQ-1 discovery-templates target from `developmentDocsPath(".dev", "discovery-templates")` and reports the OQ-2 and OQ-12 alternatives separately, applying nothing, as asserted by `migration-plan.test.ts`.
 
 ### (b) Destination migration via `npx` without the extension
 
-- [ ] `npx -y @danmoisan/drm-copilot-mcp migrate-development-docs --workspace <path> --mode dry-run|apply [--decisions <path>] [--report-dir <path>]` runs the same planner and applier as the MCP tool, with exit codes `0` (success), `1` (refusal or error) and `2` (usage error), as asserted by the CLI Jest suite.
-- [ ] `packages/mcp-server/package.json` `bin` and `files` are unchanged, and `discovery-resources.test.ts` passes.
-- [ ] Apply mode refuses and changes nothing when the decision file is missing while the report has a held item or an open global choice, when a required decision is unset, when `source_digest` differs, when a move target is non-empty, when targets collide case-insensitively, when an unmapped entry exists, when tracked files have uncommitted changes, or when the workspace is not a git work tree, as asserted by `migration-plan.test.ts` and `migration-decisions.test.ts`.
-- [ ] Applying to an in-memory fixture repository moves the trees with `git mv` calls, renames folders, rewrites references, recomputes relative links and creates `docs/README.md`, and a second apply issues no `move` call and writes no file, as asserted by `migration-apply.test.ts`.
-- [ ] The migration tool, its CLI entry and its tests contain no Python and do not import `vscode`.
-- [ ] `packages/mcp-server/README.md` documents the `npx` subcommand, its flags and the decision-file requirement for apply mode.
+- [x] `npx -y @danmoisan/drm-copilot-mcp migrate-development-docs --workspace <path> --mode dry-run|apply [--decisions <path>] [--report-dir <path>]` runs the same planner and applier as the MCP tool, with exit codes `0` (success), `1` (refusal or error) and `2` (usage error), as asserted by the CLI Jest suite.
+- [x] `packages/mcp-server/package.json` `bin` and `files` are unchanged, and `discovery-resources.test.ts` passes.
+- [x] Apply mode refuses and changes nothing when the decision file is missing while the report has a held item or an open global choice, when a required decision is unset, when `source_digest` differs, when a move target is non-empty, when targets collide case-insensitively, when an unmapped entry exists, when tracked files have uncommitted changes, or when the workspace is not a git work tree, as asserted by `migration-plan.test.ts` and `migration-decisions.test.ts`.
+- [x] Applying to an in-memory fixture repository moves the trees with `git mv` calls, renames folders, rewrites references, recomputes relative links and creates `docs/README.md`, and a second apply issues no `move` call and writes no file, as asserted by `migration-apply.test.ts`.
+- [x] The migration tool, its CLI entry and its tests contain no Python and do not import `vscode`.
+- [x] `packages/mcp-server/README.md` documents the `npx` subcommand, its flags and the decision-file requirement for apply mode.
 
 ### (c) Owner decisions on held items
 

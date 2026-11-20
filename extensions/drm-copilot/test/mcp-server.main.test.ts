@@ -8,6 +8,12 @@ import {
 } from "@jest/globals";
 
 jest.mock("vscode", () => ({}), { virtual: true });
+// The stdio transport would bind the Jest process streams; a stub stands in.
+jest.mock("@modelcontextprotocol/sdk/server/stdio.js", () => ({
+  StdioServerTransport: class StubStdioServerTransport {},
+}));
+
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 
 import {
   DEFAULT_MAIN_ENTRY_POINTS,
@@ -72,6 +78,20 @@ describe("main", () => {
 
     // Assert
     expect(fake.startServer).toHaveBeenCalledTimes(1);
+  });
+
+  it("connects the repo-automation server to the stdio transport through the default startServer", async () => {
+    // Arrange
+    const connect = jest
+      .spyOn(Server.prototype, "connect")
+      .mockResolvedValue(undefined);
+
+    // Act
+    await DEFAULT_MAIN_ENTRY_POINTS.startServer();
+
+    // Assert
+    expect(connect).toHaveBeenCalledTimes(1);
+    connect.mockRestore();
   });
 
   it("routes the subcommand to the real CLI through the default entry points", async () => {

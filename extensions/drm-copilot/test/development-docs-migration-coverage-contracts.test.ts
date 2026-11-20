@@ -6,6 +6,7 @@
  */
 
 import * as fs from "node:fs";
+import { createRequire } from "node:module";
 import * as path from "node:path";
 
 import { describe, expect, it } from "@jest/globals";
@@ -46,8 +47,9 @@ function loadThresholdMap(): Record<string, ThresholdEntry> {
 }
 
 function loadJestCoverageThreshold(): Record<string, unknown> {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports -- the Jest configuration is a CommonJS module
-  const config = require(path.join(EXTENSION_ROOT, "jest.config.cjs")) as {
+  // The Jest configuration is a CommonJS module, loaded through createRequire.
+  const loadCommonJs = createRequire(__filename);
+  const config = loadCommonJs(path.join(EXTENSION_ROOT, "jest.config.cjs")) as {
     coverageThreshold: Record<string, unknown>;
   };
   return config.coverageThreshold;
