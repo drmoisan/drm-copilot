@@ -30,7 +30,11 @@ Describe 'Get-StageTimingReport.ps1 entry' {
         # Issues 9001 and 9002: S4 totals 600 and 1000 seconds (median 0:13:20); S5 totals 1500 and 900
         # seconds (median 0:20:00). A run without a parameter also prints the labels from the default root.
         $lines = @(& $script:entryPath -EvidenceRoot $script:fixtureRoot)
+        # F3 (issue #1016): the default root is not read from the real checkout, which a clean CI checkout lacks.
+        Mock Read-StageTimingEvidence { @() }
         $defaultLines = @(& $script:entryPath)
+
+        Should -Invoke Read-StageTimingEvidence -Times 1 -Exactly -ParameterFilter { (Split-Path -Path $Root -Leaf) -ceq 'features' }
 
         $lines | Should -Contain $script:wallClockLabel
         $lines | Should -Contain $script:mergeLabel
