@@ -57,9 +57,7 @@ def build_valid_parallel_state() -> dict[str, object]:
         "route_id": "parallel",
         "parallel_slug": "wave-one",
         "parallel_manifest_path": ".dev/parallel/wave-one/parallel.md",
-        "parallel_status_doc_path": (
-            ".dev/parallel/wave-one/parallel-status.md"
-        ),
+        "parallel_status_doc_path": (".dev/parallel/wave-one/parallel-status.md"),
         "mode": "closed",
         "max_concurrency": 4,
         "current_cohort": 0,

@@ -379,8 +379,7 @@ def test_kickoff_contract_requires_all_execution_handoff_sections() -> None:
             "## Invocation Prompt",
             "Run `/epic-run sample-epic` to execute this epic.",
             "Use the epic-orchestrator subagent to execute the prepared epic at",
-            ".dev/epics/sample-epic/epic.md. "
-            "Reuse epic/sample-epic-integration.",
+            ".dev/epics/sample-epic/epic.md. " "Reuse epic/sample-epic-integration.",
             "Every child resumes at atomic execution from its committed plan-path;",
             "do not repeat planning or preflight.",
             "## Feature Summary",

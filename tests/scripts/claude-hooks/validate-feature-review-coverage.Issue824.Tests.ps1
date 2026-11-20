@@ -141,8 +141,8 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
             # Arrange
             Set-ReviewArtifactMap -Override @{
                 '.dev/active/foo/policy-audit.2026-05-04T08-00.md' = 'PowerShell coverage PASS'
-                'artifacts/pr_context.summary.txt'                          = '- scripts/foo.ps1 (+1/-0)'
-                'artifacts/pester/powershell-coverage.xml'                  = '<report><counter type="LINE" missed="20" covered="80"/></report>'
+                'artifacts/pr_context.summary.txt'                 = '- scripts/foo.ps1 (+1/-0)'
+                'artifacts/pester/powershell-coverage.xml'         = '<report><counter type="LINE" missed="20" covered="80"/></report>'
             }
 
             # Act
@@ -157,8 +157,8 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
             # Arrange
             Set-ReviewArtifactMap -Override @{
                 '.dev/active/foo/policy-audit.2026-05-04T08-00.md' = 'PowerShell coverage PASS'
-                'artifacts/pr_context.summary.txt'                          = '- scripts/foo.ps1 (+1/-0)'
-                'artifacts/pester/powershell-coverage.xml'                  = '<report><counter type="LINE" missed="10" covered="90"/><counter type="BRANCH" missed="40" covered="60"/></report>'
+                'artifacts/pr_context.summary.txt'                 = '- scripts/foo.ps1 (+1/-0)'
+                'artifacts/pester/powershell-coverage.xml'         = '<report><counter type="LINE" missed="10" covered="90"/><counter type="BRANCH" missed="40" covered="60"/></report>'
             }
 
             # Act
@@ -173,7 +173,7 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
             # Arrange
             Set-ReviewArtifactMap -Override @{
                 '.dev/active/foo/policy-audit.2026-05-04T08-00.md' = 'Python coverage N/A PASS'
-                'artifacts/pr_context.summary.txt'                          = '- src/foo.py (+1/-0)'
+                'artifacts/pr_context.summary.txt'                 = '- src/foo.py (+1/-0)'
             }
 
             # Act
@@ -202,7 +202,7 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
             # Arrange
             Set-ReviewArtifactMap -Override @{
                 '.dev/active/foo/policy-audit.2026-05-04T08-00.md' = 'C# notes PASS'
-                'artifacts/pr_context.summary.txt'                          = '- src/A.cs (+1/-0)'
+                'artifacts/pr_context.summary.txt'                 = '- src/A.cs (+1/-0)'
             }
 
             # Act

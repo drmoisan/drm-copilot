@@ -472,9 +472,7 @@ describe("drm-copilot integration behavior", () => {
     ).toBe(true);
     expect(options.cwd).toBe(templateLessWorkspacePath);
     expect(
-      args.some((arg) =>
-        normalizePath(arg).includes("/.dev/templates/"),
-      ),
+      args.some((arg) => normalizePath(arg).includes("/.dev/templates/")),
     ).toBe(false);
   });
 });

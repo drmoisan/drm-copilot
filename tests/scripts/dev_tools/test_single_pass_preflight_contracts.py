@@ -236,8 +236,7 @@ def test_plan_templates_carry_premortem_skeleton() -> None:
     # Arrange
     tokens = ("## Pre-Mortem", *(f"- {label}:" for label in _LABELS))
     paths = tuple(
-        f".dev/templates/{kind}/plan.yyyy-MM-ddTHH-mm.md"
-        for kind in _TEMPLATES
+        f".dev/templates/{kind}/plan.yyyy-MM-ddTHH-mm.md" for kind in _TEMPLATES
     )
 
     # Act
@@ -245,9 +244,7 @@ def test_plan_templates_carry_premortem_skeleton() -> None:
     differing = [
         kind
         for kind in _TEMPLATES
-        if (
-            _REPO_ROOT / f".dev/templates/{kind}/plan.yyyy-MM-ddTHH-mm.md"
-        ).read_bytes()
+        if (_REPO_ROOT / f".dev/templates/{kind}/plan.yyyy-MM-ddTHH-mm.md").read_bytes()
         != (_REPO_ROOT / f"{_FT}/{kind}/plan.yyyy-MM-ddTHH-mm.md").read_bytes()
     ]
 

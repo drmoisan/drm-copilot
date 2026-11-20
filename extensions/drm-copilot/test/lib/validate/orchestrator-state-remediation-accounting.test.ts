@@ -72,10 +72,8 @@ function baseState(): Record<string, unknown> {
 function vc(changes: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     entry_timestamp: "2026-09-29T00-00",
-    inputs_path:
-      ".dev/active/example/remediation-inputs.2026-09-29T00-00.md",
-    plan_path:
-      ".dev/active/example/remediation-plan.2026-09-29T00-00.md",
+    inputs_path: ".dev/active/example/remediation-inputs.2026-09-29T00-00.md",
+    plan_path: ".dev/active/example/remediation-plan.2026-09-29T00-00.md",
     preflight: { iterations: 1, final_status: "clear" },
     execution_status: "complete",
     audit_paths: [],

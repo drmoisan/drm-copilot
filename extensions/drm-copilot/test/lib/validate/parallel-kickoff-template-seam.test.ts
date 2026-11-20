@@ -61,8 +61,7 @@ const PARALLEL_PLAN_SKILL_PATH = path.join(
 const SLUG = "bugfix-batch";
 const ISO8601 = "2026-08-08T15:15:00Z";
 const PLANNING_COMMIT_HEX = "4a7f1c9e2b8d3a6f0c5e91b47d28a3f6c0e5b91d";
-const PLAN_PATH =
-  ".dev/active/2026-08-07-parallel-planner-surface-443/plan.md";
+const PLAN_PATH = ".dev/active/2026-08-07-parallel-planner-surface-443/plan.md";
 const PLAN_HASH_HEX = "9f2e4c7a1b5d8e0f3a6c9b2d5e8f1a4c7b0d3e6f";
 const ITEM_ROW =
   "| 443 | .dev/active/2026-08-07-parallel-planner-surface-443 " +

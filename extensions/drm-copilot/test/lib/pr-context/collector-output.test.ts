@@ -317,9 +317,7 @@ describe("renderVerificationEvidenceSection", () => {
         feature: "f",
         excerpt: "",
         issueRefs: [],
-        contextFiles: [
-          ".dev/active/f/evidence/qa-gates/absence-gate.md",
-        ],
+        contextFiles: [".dev/active/f/evidence/qa-gates/absence-gate.md"],
         primaryIssueRef: null,
         readinessSignal: null,
       },
@@ -349,9 +347,7 @@ describe("renderVerificationEvidenceSection", () => {
           feature: "f",
           excerpt: "",
           issueRefs: [],
-          contextFiles: [
-            ".dev/active/f/evidence/qa-gates/zero-gate.md",
-          ],
+          contextFiles: [".dev/active/f/evidence/qa-gates/zero-gate.md"],
           primaryIssueRef: null,
           readinessSignal: null,
         },
