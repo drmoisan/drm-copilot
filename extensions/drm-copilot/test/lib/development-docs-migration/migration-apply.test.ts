@@ -40,11 +40,12 @@ function fixture(extra: Record<string, string> = {}): InMemoryFileSystem {
 function decisions(
   fs: InMemoryFileSystem,
   split: CommitSplit,
+  scope = "references-and-links",
 ): MigrationDecisions {
   const folders = plan(fs, null).candidateFolders;
   const globals: Record<string, unknown> = {
     discovery_templates_target: ".dev/discovery/templates",
-    in_tree_rewrite_scope: "references-and-links",
+    in_tree_rewrite_scope: scope,
     commit_split: split,
   };
   for (const key of RECORD_ONLY_KEYS) {
@@ -170,6 +171,38 @@ describe("applyMigrationPlan", () => {
       rewritten: 0,
       readmeCreated: false,
     });
+  });
+
+  it("yields an empty plan on a second links-only apply when a moved record keeps an old prefix", () => {
+    // Arrange: a moved record names an old prefix and holds no link, so the
+    // links-only scope leaves its text unchanged on the first apply.
+    const fs = fixture({
+      [`${FOO}/notes.md`]: "see docs/features/templates/feature/plan.md\n",
+    });
+    const git = new FakeMigrationGit(fs, { root: ROOT });
+    applyMigrationPlan(plan(fs, decisions(fs, "single", "links-only")), {
+      git,
+      fileSystem: fs,
+      workspaceRoot: ROOT,
+    });
+    const notesBefore = fs.files.get("repo/.dev/active/1016-foo/notes.md");
+    const movesBefore = git.moves.length;
+    const writesBefore = fs.writes.length;
+
+    // Act
+    const second = plan(fs, decisions(fs, "single", "links-only"));
+    applyMigrationPlan(second, { git, fileSystem: fs, workspaceRoot: ROOT });
+
+    // Assert
+    expect(second.moves).toEqual([]);
+    expect(second.renames).toEqual([]);
+    expect(second.rewrites).toEqual([]);
+    expect(git.moves).toHaveLength(movesBefore);
+    expect(fs.writes).toHaveLength(writesBefore);
+    expect(notesBefore).toBe("see docs/features/templates/feature/plan.md\n");
+    expect(fs.files.get("repo/.dev/active/1016-foo/notes.md")).toBe(
+      notesBefore,
+    );
   });
 
   it("performs moves on the first moves-then-rewrites call and rewrites on the second", () => {

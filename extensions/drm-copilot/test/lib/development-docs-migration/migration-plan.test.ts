@@ -377,6 +377,33 @@ describe("buildMigrationPlan behavior", () => {
       { path: "README.md", references: 1, links: 1 },
     ]);
   });
+
+  it("classifies a record at a mapped target as in-tree on a post-move dry run", () => {
+    // Arrange: the tree is already moved; one record keeps an old prefix.
+    const moved = ".dev/completed/0012-bar/plan.md";
+    const files = {
+      [moved]: "see docs/features/active/x/plan.md\n",
+      "README.md": "plain",
+    };
+
+    // Act
+    const dry = buildMigrationPlan(inputs(files)).plan;
+    const applied = apply(
+      files,
+      decisionsFor(
+        files,
+        { decisions: [] },
+        { in_tree_rewrite_scope: "links-only" },
+      ),
+    ).plan;
+
+    // Assert
+    expect(dry.inTreeReferencesAndLinks.map((item) => item.path)).toEqual([
+      moved,
+    ]);
+    expect(dry.outsideRewrites.map((item) => item.path)).not.toContain(moved);
+    expect(applied.rewrites.map((item) => item.path)).not.toContain(moved);
+  });
 });
 
 describe("buildMigrationPlan decisions", () => {
