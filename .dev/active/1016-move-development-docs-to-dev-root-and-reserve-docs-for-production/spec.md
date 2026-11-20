@@ -440,18 +440,18 @@ Recorded as questions only; the 2026-11-14 answers are in `## Autonomous Decisio
 ### Stage B — move, rename and flip
 
 - [x] A Phase 0 evidence artifact under `<FEATURE>/evidence/baseline/` records the stage B gate: preconditions re-checked, no open pull request touching `docs/features/**` or the overlap files, and a fresh dry-run `source_digest` equal to the decision file's.
-- [ ] After apply, `.dev/` holds the development records in the target layout (with discovery templates at `global_decisions.discovery_templates_target`), `docs/` contains `docs/README.md` stating that `docs/` holds production documentation only and no mapped source remains under `docs/`, and the moves were made with `git mv` (the commit shows renames for unchanged files).
-- [ ] Every folder renamed under `.dev/active`, `.dev/completed` and `.dev/archive` matches either the mechanical rule or its decision-file entry, every `keep` folder retains its name, and potential records, epics, parallel runs and research keep their names; a mechanical comparison of the post-apply folder list with the dry-run plan and decision file is stored under `<FEATURE>/evidence/other/`.
+- [x] After apply, `.dev/` holds the development records in the target layout (with discovery templates at `global_decisions.discovery_templates_target`), `docs/` contains `docs/README.md` stating that `docs/` holds production documentation only and no mapped source remains under `docs/`, and the moves were made with `git mv` (the commit shows renames for unchanged files).
+- [x] Every folder renamed under `.dev/active`, `.dev/completed` and `.dev/archive` matches either the mechanical rule or its decision-file entry, every `keep` folder retains its name, and potential records, epics, parallel runs and research keep their names; a mechanical comparison of the post-apply folder list with the dry-run plan and decision file is stored under `<FEATURE>/evidence/other/`.
 - [ ] A second dry run after apply reports an empty plan (no moves, renames or rewrites), stored under `<FEATURE>/evidence/other/`.
 - [x] `development_docs_root` is `.dev` in `config/orchestration-routing.json`, `extensions/drm-copilot/resources/config/orchestration-routing.json` and `extensions/drm-copilot/resources/claude-customizations/config/orchestration-routing.json`, and `tests/scripts/dev_tools/test_orchestration_routing_config_parity.py` passes.
 - [x] The self-hosted `config/blast-radius.json` lists `.dev` in `path_roots` and `PINNED_SELF_HOSTED_PATH_ROOTS` matches it; the bundle copy keeps its empty Class 2 `path_roots` (ruling R1); and the blast-radius tests pass.
 - [x] Both feature plan template copies link to `.github/instructions/` with the depth that resolves from `.dev/active/<folder>/`, and a link check over a plan created from the template after the flip finds no broken link.
 - [x] The epic manifest `feature_folder` for child 2 names the renamed folder, and the epic manifest validation passes.
 - [x] `PINNED_FROZEN_SURFACE_HASHES` is re-baselined with a dated comment for each pinned file whose text changed, `KICKOFF_IDENTITY_FRAGMENTS` matches the rewritten pinned text, and the parallel-orchestrator surface tests and `test_parallel_planner_surface_contracts.py` pass.
-- [ ] Historical JSON fixtures under `tests/fixtures/` and `tests/fixtures/blast_radius/historical-runs/` are unchanged by the stage B change (empty diff for those paths), and the tests that read them pass through child 2's matchers with the key at `.dev`.
+- [x] Historical JSON fixtures under `tests/fixtures/` and `tests/fixtures/blast_radius/historical-runs/` are unchanged by the stage B change (empty diff for those paths), and the tests that read them pass through child 2's matchers with the key at `.dev`.
 - [ ] Child 2's write-scope checker suite passes all three directions with the key at `.dev`, and every `Write(`/`Edit(` literal keeps both root forms during the fallback release (unless the owner's OQ-6 answer removes the fallback, in which case the checker passes with `.dev` literals only).
 - [x] Every mirrored and bundled copy, pack manifest and Codex counterpart touched by the change has the text its contract requires, every generator `--check` reports no drift, and the tests in "Contract Tests" pass.
-- [ ] A recorded search over production roots (`.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts`, `extensions/drm-copilot/src`) for `docs/features`, `docs/research`, `docs/engineering` and `docs/discovery` returns only child 2's resolver constants, its matcher unions and recorded Stay or exclusion entries; a link check over moved Markdown reports no link broken by the move; command, output and allowlist are stored under `<FEATURE>/evidence/other/`.
+- [x] A recorded search over production roots (`.claude/hooks`, `.claude/lib`, `.codex/hooks`, `.codex/scripts`, `scripts`, `extensions/drm-copilot/src`) for `docs/features`, `docs/research`, `docs/engineering` and `docs/discovery` returns only child 2's resolver constants, its matcher unions and recorded Stay or exclusion entries; a link check over moved Markdown reports no link broken by the move; command, output and allowlist are stored under `<FEATURE>/evidence/other/`.
 - [x] The orchestrator checkpoint records the post-move `<FEATURE>` path, and every stage B evidence artifact written after the move is under that path.
 - [ ] The seven-stage toolchain passes in a single pass for TypeScript, Python and PowerShell with the key at `.dev`, recorded under `<FEATURE>/evidence/qa-gates/`, and no changed production file exceeds 800 lines.
 - [ ] The stage B change adds no Python file; any Python change is an in-place edit of an existing file, recorded by a name-status diff against the merge base of the integration branch and `HEAD` (ruling R6) stored under `<FEATURE>/evidence/qa-gates/`.
@@ -459,11 +459,11 @@ Recorded as questions only; the 2026-11-14 answers are in `## Autonomous Decisio
 
 ### Epic-level criteria owned by this child (promoted record)
 
-- [ ] `.dev/` holds all development records in the target layout, and `docs/` holds only production documentation plus a README stating its purpose.
+- [x] `.dev/` holds all development records in the target layout, and `docs/` holds only production documentation plus a README stating its purpose.
 - [ ] The TypeScript migration command moves a repository's folders with `git mv`, rewrites references, and a second run changes nothing (the `migration-apply.test.ts` second-apply case and the post-apply dry run).
 - [ ] The migration command and its tests need no Python.
 - [ ] With `development_docs_root` set to `.dev`, the full toolchain passes.
-- [ ] Historical fixtures stay frozen and still pass through the fallback.
+- [x] Historical fixtures stay frozen and still pass through the fallback.
 - [ ] Mirrored and bundled files, pack manifests, Codex counterparts and contract tests pass.
 
 ## Risks and Pre-Mortem
