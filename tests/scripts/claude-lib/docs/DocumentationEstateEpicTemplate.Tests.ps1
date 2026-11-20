@@ -218,9 +218,9 @@ Describe 'documentation-estate epic template positive controls' {
 
         # Assert
         foreach ($statement in @(
-                'Copy `epic.md` to `docs/features/epics/<slug>/epic.md`',
+                'Copy `epic.md` to `.dev/epics/<slug>/epic.md`',
                 'change `epic` and `integration_branch` together',
-                'Run `/epic-plan docs/features/epics/<slug>/epic.md`',
+                'Run `/epic-plan .dev/epics/<slug>/epic.md`',
                 'No command copies the template'
             )) {
             $normalized.Contains($statement) | Should -BeTrue -Because "the template README states '$statement'"

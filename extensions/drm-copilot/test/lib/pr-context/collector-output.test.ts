@@ -155,27 +155,27 @@ describe("buildSummaryText", () => {
             feature: "feat-x",
             excerpt: "EXCERPT-X",
             issueRefs: [],
-            contextFiles: ["docs/features/active/feat-x/spec.md"],
+            contextFiles: [".dev/active/feat-x/spec.md"],
             primaryIssueRef: null,
             readinessSignal: null,
           },
         ],
-        additionalContextFiles: ["docs/features/active/feat-x/spec.md"],
+        additionalContextFiles: [".dev/active/feat-x/spec.md"],
         materialScoping: [
           {
-            path: "docs/features/active/feat-x/spec.md",
+            path: ".dev/active/feat-x/spec.md",
             reasons: ["new scoping doc"],
             excerpt: "EXCERPT-MATERIAL",
           },
           {
-            path: "docs/features/active/feat-x/plan.md",
+            path: ".dev/active/feat-x/plan.md",
             reasons: [],
             excerpt: null,
           },
         ],
         nonMaterialScoping: [
           {
-            path: "docs/features/active/feat-x/readme.md",
+            path: ".dev/active/feat-x/readme.md",
             reasons: ["link/whitespace-only changes"],
           },
         ],
@@ -309,7 +309,7 @@ describe("renderVerificationEvidenceSection", () => {
   it("renders the expectation line for a non-zero declared expectation", () => {
     const fs = new TreeFileSystem();
     fs.addFile(
-      `${ROOT}/docs/features/active/f/evidence/qa-gates/absence-gate.md`,
+      `${ROOT}/.dev/active/f/evidence/qa-gates/absence-gate.md`,
       "Timestamp: 2026-08-20T09-53\nCommand: git grep -n forbidden-token\nEXIT_CODE: 1\nExpectedExitCode: 1",
     );
     const section = renderVerificationEvidenceSection(fs, ROOT, [
@@ -317,9 +317,7 @@ describe("renderVerificationEvidenceSection", () => {
         feature: "f",
         excerpt: "",
         issueRefs: [],
-        contextFiles: [
-          "docs/features/active/f/evidence/qa-gates/absence-gate.md",
-        ],
+        contextFiles: [".dev/active/f/evidence/qa-gates/absence-gate.md"],
         primaryIssueRef: null,
         readinessSignal: null,
       },
@@ -341,7 +339,7 @@ describe("renderVerificationEvidenceSection", () => {
     ({ expectationRow }) => {
       const fs = new TreeFileSystem();
       fs.addFile(
-        `${ROOT}/docs/features/active/f/evidence/qa-gates/zero-gate.md`,
+        `${ROOT}/.dev/active/f/evidence/qa-gates/zero-gate.md`,
         `Timestamp: 2026-08-20T09-53\nCommand: npm test\nEXIT_CODE: 0${expectationRow}`,
       );
       const section = renderVerificationEvidenceSection(fs, ROOT, [
@@ -349,9 +347,7 @@ describe("renderVerificationEvidenceSection", () => {
           feature: "f",
           excerpt: "",
           issueRefs: [],
-          contextFiles: [
-            "docs/features/active/f/evidence/qa-gates/zero-gate.md",
-          ],
+          contextFiles: [".dev/active/f/evidence/qa-gates/zero-gate.md"],
           primaryIssueRef: null,
           readinessSignal: null,
         },
@@ -359,7 +355,7 @@ describe("renderVerificationEvidenceSection", () => {
       expect(section).not.toContain("Expected EXIT_CODE");
       expect(section.split("\n")).toEqual([
         "- Feature: f",
-        "  - Source: docs/features/active/f/evidence/qa-gates/zero-gate.md",
+        "  - Source: .dev/active/f/evidence/qa-gates/zero-gate.md",
         "  - Timestamp: 2026-08-20T09-53",
         "  - Command: npm test",
         "  - EXIT_CODE: 0",
@@ -371,7 +367,7 @@ describe("renderVerificationEvidenceSection", () => {
   it("renders rows for parseable evidence sorted by source", () => {
     const fs = new TreeFileSystem();
     fs.addFile(
-      `${ROOT}/docs/features/active/f/evidence/qa-gates/a.md`,
+      `${ROOT}/.dev/active/f/evidence/qa-gates/a.md`,
       "Timestamp: 2026-01-01T00-00\nCommand: npm test\nEXIT_CODE: 0",
     );
     const section = renderVerificationEvidenceSection(fs, ROOT, [
@@ -379,7 +375,7 @@ describe("renderVerificationEvidenceSection", () => {
         feature: "f",
         excerpt: "",
         issueRefs: [],
-        contextFiles: ["docs/features/active/f/evidence/qa-gates/a.md"],
+        contextFiles: [".dev/active/f/evidence/qa-gates/a.md"],
         primaryIssueRef: null,
         readinessSignal: null,
       },
@@ -401,8 +397,8 @@ describe("renderVerificationEvidenceSection", () => {
           excerpt: "",
           issueRefs: [],
           contextFiles: [
-            "docs/features/active/f/spec.md",
-            "docs/features/active/f/evidence/qa-gates/missing.md",
+            ".dev/active/f/spec.md",
+            ".dev/active/f/evidence/qa-gates/missing.md",
           ],
           primaryIssueRef: null,
           readinessSignal: null,
@@ -415,11 +411,11 @@ describe("renderVerificationEvidenceSection", () => {
   it("sorts multiple evidence rows by source path", () => {
     const fs = new TreeFileSystem();
     fs.addFile(
-      `${ROOT}/docs/features/active/f/evidence/qa-gates/b.md`,
+      `${ROOT}/.dev/active/f/evidence/qa-gates/b.md`,
       "Timestamp: t\nCommand: c\nEXIT_CODE: 1",
     );
     fs.addFile(
-      `${ROOT}/docs/features/active/f/evidence/qa-gates/a.md`,
+      `${ROOT}/.dev/active/f/evidence/qa-gates/a.md`,
       "Timestamp: t\nCommand: c\nEXIT_CODE: 0",
     );
     const section = renderVerificationEvidenceSection(fs, ROOT, [
@@ -428,8 +424,8 @@ describe("renderVerificationEvidenceSection", () => {
         excerpt: "",
         issueRefs: [],
         contextFiles: [
-          "docs/features/active/f/evidence/qa-gates/b.md",
-          "docs/features/active/f/evidence/qa-gates/a.md",
+          ".dev/active/f/evidence/qa-gates/b.md",
+          ".dev/active/f/evidence/qa-gates/a.md",
         ],
         primaryIssueRef: null,
         readinessSignal: null,
@@ -451,7 +447,7 @@ describe("renderVerificationEvidenceSection", () => {
           feature: "f",
           excerpt: "",
           issueRefs: [],
-          contextFiles: ["docs/features/active/f/spec.md"],
+          contextFiles: [".dev/active/f/spec.md"],
           primaryIssueRef: null,
           readinessSignal: null,
         },

@@ -1,7 +1,7 @@
 ---
 name: epic_review_agent
 description: Review an epic documentation root folder (initiative + orchestration + constituent features) with a delivery-first audit for a single-developer, multi-feature initiative. Derive feature folders and latest versions/plans from the epic root input, validate acceptance criteria against current code, reconcile plan checklists, and produce EpicAudit + FeatureDeliveryInventory + PolicyAudit (plus pre-execution OrchestrationReview when applicable). If remediation is needed, generate remediation inputs and automatically hand off plan creation to atomic_planner to write remediation-plan.<timestamp>.md in the epic root. No user questions.
-argument-hint: "Provide EpicRootFolder (absolute or workspace-relative path, e.g., docs/features/active/2026-02-02-some-epic-47). Run this agent to: (1) read initiative.md, issue.md, orchestration.md; (2) enumerate all feature subfolders; (3) select the current version per feature (highest vN if present, otherwise root); (4) select latest plan.<timestamp>.md per feature (max ISO timestamp); (5) validate acceptance criteria in spec.md/user-story.md against current code/tests; (6) reconcile plan checklists (auto-check delivered items); then produce: docs/features/active/<epic>/epic-audit.<timestamp>.md, feature-delivery-inventory.<timestamp>.md, policy-audit.<timestamp>.md, and if needed remediation-inputs.<timestamp>.md plus remediation-plan.<timestamp>.md (via atomic_planner). If pre-execution, also produce orchestration-review.<timestamp>.md. Timestamps use ISO-8601 format yyyy-MM-ddTHH-mm."
+argument-hint: "Provide EpicRootFolder (absolute or workspace-relative path, e.g., .dev/active/2026-02-02-some-epic-47). Run this agent to: (1) read initiative.md, issue.md, orchestration.md; (2) enumerate all feature subfolders; (3) select the current version per feature (highest vN if present, otherwise root); (4) select latest plan.<timestamp>.md per feature (max ISO timestamp); (5) validate acceptance criteria in spec.md/user-story.md against current code/tests; (6) reconcile plan checklists (auto-check delivered items); then produce: .dev/active/<epic>/epic-audit.<timestamp>.md, feature-delivery-inventory.<timestamp>.md, policy-audit.<timestamp>.md, and if needed remediation-inputs.<timestamp>.md plus remediation-plan.<timestamp>.md (via atomic_planner). If pre-execution, also produce orchestration-review.<timestamp>.md. Timestamps use ISO-8601 format yyyy-MM-ddTHH-mm."
 tools:
   ['vscode/getProjectSetupInfo', 'vscode/runCommand', 'vscode/vscodeAPI', 'execute/testFailure', 'execute/getTerminalOutput', 'execute/runTask', 'execute/createAndRunTask', 'execute/runInTerminal', 'execute/runTests', 'read/problems', 'read/readFile', 'read/terminalSelection', 'read/terminalLastCommand', 'read/getTaskOutput', 'edit/createDirectory', 'edit/createFile', 'edit/editFiles', 'search', 'web', 'drmcopilotextension/*', 'agent', 'todo']
 handoffs:
@@ -26,7 +26,7 @@ An epic is defined here as:
 Your output is audit artifacts plus minimal checklist reconciliation in plan files. Your output is:
 1) **epic-audit.<timestamp>.md** — Epic-level audit against single-developer work-planning clarity + scope/sequence expectations
 2) **feature-delivery-inventory.<timestamp>.md** — Combined inventory + per-feature acceptance criteria delivery status with evidence and requirement counts
-3) **policy-audit.<timestamp>.md** — Repo-wide policy audit using `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`
+3) **policy-audit.<timestamp>.md** — Repo-wide policy audit using `.dev/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`
 4) **orchestration-review.<timestamp>.md** — Pre-execution dependency/sequence/integration review of orchestration.md (only when applicable)
 5) If needed: **remediation-inputs.<timestamp>.md** + **remediation-plan.<timestamp>.md** created via **automatic atomic_planner handoff**
 
@@ -43,7 +43,7 @@ Use these reusable skills to avoid duplicating shared operations:
 # Epic-specific policy extensions
 
 In addition to the shared policy order, read:
-- Epic/initiative templates under `docs/features/templates/epic/**` (if present)
+- Epic/initiative templates under `.dev/templates/epic/**` (if present)
 - Any relevant `docs/**/README.md` and `docs/**/templates/**` files
 
 Constraints:
@@ -111,7 +111,7 @@ Follow the issue update mirroring requirements and canonical locations in `evide
 
 ## 2) Folder structure assumptions (derive; don’t require)
 Given an epic root like:
-`docs/features/active/<daystamp>-<epic name>-<issue number>/`
+`.dev/active/<daystamp>-<epic name>-<issue number>/`
 
 Expect:
 - `initiative.md`

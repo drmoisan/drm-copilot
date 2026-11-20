@@ -80,7 +80,7 @@ def _outcomes(*findings: object) -> list[object]:
 def _light(**extra: object) -> dict[str, Any]:
     """Return a light cycle opened by review 0, with optional extra keys."""
     cycle: dict[str, Any] = {
-        "plan_path": "docs/features/active/x/remediation-inputs.md",
+        "plan_path": ".dev/active/x/remediation-inputs.md",
         "remediation_path": "light",
         "opened_by_review": 0,
         "execution_status": "complete",

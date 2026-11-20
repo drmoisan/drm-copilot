@@ -265,3 +265,66 @@ class TestRunCopilot:
         assert proc is not None
         assert getattr(proc, "killed", False) is True
         stdout_stream.close()
+
+
+class TestStreamCopilotOutput:
+    """Tests for the polling loop of _stream_copilot_output()."""
+
+    def test_stream_keeps_polling_without_idle_timeout_until_exit(self) -> None:
+        """The loop continues while the process runs and no idle timeout is set.
+
+        The fake process reports running on its first poll and exited afterwards, so
+        the first iteration always reaches the idle check with no timeout configured
+        and loops again, whatever the reader thread's timing; the second iteration
+        sees end of output and the exit and returns.
+        """
+        import codecs
+        import io
+
+        from scripts.dev_tools.atomic_executor.cli_copilot_runtime import (
+            _stream_copilot_output,
+        )
+
+        class EmptyStdout:
+            """Report end of output on the first read."""
+
+            def read(self, size: int = -1) -> bytes:
+                """Return no bytes, which the reader treats as end of output."""
+                return b""
+
+        class RunningThenExitedProcess:
+            """Report running on the first poll and exit code 0 afterwards."""
+
+            def __init__(self) -> None:
+                """Start with no poll calls and an open stdout fake."""
+                self.stdout = EmptyStdout()
+                self.returncode: int | None = None
+                self.poll_calls = 0
+
+            def poll(self) -> int | None:
+                """Return None on the first call and 0 on every later call."""
+                self.poll_calls += 1
+                if self.poll_calls > 1:
+                    self.returncode = 0
+                return self.returncode
+
+            def wait(self, timeout: float | None = None) -> int:
+                """Return the exit code without blocking."""
+                return 0
+
+        process = RunningThenExitedProcess()
+        log_file = io.StringIO()
+
+        exit_code, output_tail = _stream_copilot_output(
+            process=process,
+            decoder=codecs.getincrementaldecoder("utf-8")(),
+            log_file=log_file,
+            task_id="P1-T1",
+            idle_timeout_seconds=None,
+            output_tail_bytes=None,
+        )
+
+        assert exit_code == 0
+        assert output_tail == ""
+        assert process.poll_calls >= 2
+        assert log_file.getvalue() == ""

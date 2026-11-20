@@ -17,7 +17,7 @@
 BeforeAll {
     $script:HookRoot = Join-Path -Path $PSScriptRoot -ChildPath '../../../.claude/hooks'
     $script:StatusPost = "gh api --method POST repos/{owner}/{repo}/statuses/abcdef0123456789abcdef0123456789abcdef01 -f state=success -f context=review/verdict -f description='feature-review PASS: policy-audit.2026-01-01T00-00.md'"
-    $script:EntryPoint = 'pwsh -NoProfile -File .claude/lib/review-verdict/Invoke-ReviewVerdictStatus.ps1 -Mode Review -PrNumber 42 -ReviewArtifact docs/features/active/item-42/policy-audit.2026-01-01T00-00.md'
+    $script:EntryPoint = 'pwsh -NoProfile -File .claude/lib/review-verdict/Invoke-ReviewVerdictStatus.ps1 -Mode Review -PrNumber 42 -ReviewArtifact .dev/active/item-42/policy-audit.2026-01-01T00-00.md'
 
     # Return the statuses POST or the entry-point invocation by key.
     function Get-ReviewVerdictCommand {

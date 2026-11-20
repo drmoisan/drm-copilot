@@ -18,7 +18,7 @@ BeforeAll {
 
     $script:SessionRoot = '/synthetic-worktrees/main'
     $script:ItemRoot = '/synthetic-worktrees/main/.claude/worktrees/bug-1105'
-    $script:Relative = 'docs/features/active/sample/research/research.2026-11-07T13-55.md'
+    $script:Relative = '.dev/active/sample/research/research.2026-11-07T13-55.md'
     $script:ItemPath = "$script:ItemRoot/$script:Relative"
     $porcelainText = @(
         'worktree /synthetic-worktrees/main', 'branch refs/heads/main', '',
@@ -69,11 +69,11 @@ Describe 'validate-task-researcher-output research-path target worktree (issue #
         Mock Test-ResearchFile { $true }
 
         # Act
-        $result = Invoke-ResearcherCase -ResearchPath 'docs/research/../../x/2026-11-07T13-55-sample-research.md'
+        $result = Invoke-ResearcherCase -ResearchPath '.dev/research/../../x/2026-11-07T13-55-sample-research.md'
 
         # Assert
         $result.Ok | Should -BeFalse
-        $result.Message | Should -BeLike "task-researcher hook: research-path 'docs/research/../../x/2026-11-07T13-55-sample-research.md'*'..' segment*"
+        $result.Message | Should -BeLike "task-researcher hook: research-path '.dev/research/../../x/2026-11-07T13-55-sample-research.md'*'..' segment*"
         $result.Message | Should -Not -BeLike '*not repairable*'
         Should -Invoke Test-ResearchFile -Times 0 -Exactly
     }

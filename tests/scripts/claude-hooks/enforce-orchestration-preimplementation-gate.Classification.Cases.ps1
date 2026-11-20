@@ -54,7 +54,7 @@ $script:ClassificationExistingDenialCase = @(
     @{ Id = 'ED-21'; Command = 'npx prettier --check .'; Expected = $true }
     @{ Id = 'ED-22'; Command = 'git add src/feature.ps1'; Expected = $true }
     @{ Id = 'ED-23'; Command = 'bash -c "git add src/feature.ps1"'; Expected = $true }
-    @{ Id = 'ED-24'; Command = 'git add docs/features/epics/sample/epic.md && poetry run pytest'; Expected = $true }
+    @{ Id = 'ED-24'; Command = 'git add .dev/epics/sample/epic.md && poetry run pytest'; Expected = $true }
     @{ Id = 'ED-25'; Command = 'env -u VIRTUAL_ENV poetry run pytest'; Expected = $true }
     @{ Id = 'ED-26'; Command = 'timeout 60 pytest'; Expected = $true }
     @{ Id = 'ED-27'; Command = 'FOO=1 pytest'; Expected = $true }
@@ -227,10 +227,10 @@ $script:ClassificationBookkeepingLegCase = @(
 # with an issue #539 tree path; the deny rows carry no declared-root path or a rejected -C
 # selector, and keep the generic deny text with no suffix.
 $script:ClassificationD5D14Case = @(
-    @{ Id = 'DW-01'; Command = 'git add -- .claude/agent-memory/r/a.md docs/features/active/x/plan.md'; Expected = 'allow'; Root = $false; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'DW-01'; Command = 'git add -- .claude/agent-memory/r/a.md .dev/active/x/plan.md'; Expected = 'allow'; Root = $false; IndexExitCode = 0; IndexOutput = '' }
     @{ Id = 'DW-02'; Command = 'git commit -m m'; Expected = 'allow'; Root = $true; IndexExitCode = 0; IndexOutput = ".claude/agent-memory/r/a.md`0docs/features/active/x/plan.md`0" }
-    @{ Id = 'DW-03'; Command = 'git commit -m m'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = "docs/features/active/x/plan.md`0docs/features/epics/e/epic.md`0" }
-    @{ Id = 'DW-04'; Command = 'git commit -F msg.txt -- docs/features/active/x/plan.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
-    @{ Id = 'DW-05'; Command = 'git commit --file msg.txt -- docs/features/active/x/plan.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'DW-03'; Command = 'git commit -m m'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = ".dev/active/x/plan.md`0docs/features/epics/e/epic.md`0" }
+    @{ Id = 'DW-04'; Command = 'git commit -F msg.txt -- .dev/active/x/plan.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
+    @{ Id = 'DW-05'; Command = 'git commit --file msg.txt -- .dev/active/x/plan.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
     @{ Id = 'DW-06'; Command = 'git -C //server/share/wt add -- .claude/agent-memory/r/a.md'; Expected = 'deny'; Root = $true; IndexExitCode = 0; IndexOutput = '' }
 )

@@ -181,7 +181,7 @@ def test_human_interaction_well_formed_produces_no_errors() -> None:
                 "id": "r2",
                 "response": "exception",
                 "runbook_path": (
-                    "docs/features/active/feature-1/runbooks/admin-consent.runbook.md"
+                    ".dev/active/feature-1/runbooks/admin-consent.runbook.md"
                 ),
             },
         ]

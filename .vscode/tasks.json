@@ -52,7 +52,7 @@
 		},
 		{
 		"default": "",
-		"description": "Feature folder under docs/features/active (leave blank to auto-detect)",
+		"description": "Feature folder under .dev/active (leave blank to auto-detect)",
 		"id": "ExecutePlanFeatureFolder",
 		"type": "promptString"
 		},
@@ -142,7 +142,7 @@
 		"type": "pickString"
 		},
 		{
-		"default": "docs/features/active/",
+		"default": ".dev/active/",
 		"description": "Path to feature folder or plan file (relative or absolute)",
 		"id": "AtomicFeaturePath",
 		"type": "promptString"
@@ -954,7 +954,7 @@
 				"${input:ActiveWorkMode}"
 			],
 			"command": "poetry",
-			"detail": "Creates docs/features/active/<name>/ by auto-resolving feature name from the active promoted markdown file.",
+			"detail": "Creates .dev/active/<name>/ by auto-resolving feature name from the active promoted markdown file.",
 			"label": "Dev: 3 Auto Create Folder",
 			"options": {
 				"cwd": "${workspaceFolder}"
@@ -1080,7 +1080,7 @@
 				"${input:ActiveWorkMode}"
 			],
 			"command": "poetry",
-			"detail": "Creates docs/features/active/<name>/ from the selected template (feature/refactor/epic/bug) and opens the relevant files.",
+			"detail": "Creates .dev/active/<name>/ from the selected template (feature/refactor/epic/bug) and opens the relevant files.",
 			"label": "Dev: 3 Create Active Folder",
 			"options": {
 				"cwd": "${workspaceFolder}"

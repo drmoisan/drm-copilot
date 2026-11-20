@@ -47,9 +47,9 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
             param([string[]] $ExtraLine = @())
 
             $outputLines = @(
-                'policy-audit-path: docs/features/active/foo/policy-audit.2026-05-04T08-00.md'
-                'code-review-path: docs/features/active/foo/code-review.2026-05-04T08-00.md'
-                'feature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md'
+                'policy-audit-path: .dev/active/foo/policy-audit.2026-05-04T08-00.md'
+                'code-review-path: .dev/active/foo/code-review.2026-05-04T08-00.md'
+                'feature-audit-path: .dev/active/foo/feature-audit.2026-05-04T08-00.md'
             ) + $ExtraLine
             return ([ordered]@{ session_id = 'f824'; hook_event_name = 'SubagentStop'; agent_type = 'feature-review'; stop_hook_active = $false; last_assistant_message = ($outputLines -join "`n") } | ConvertTo-Json -Compress)
         }
@@ -69,9 +69,9 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
             param([hashtable] $Override = @{})
 
             $map = @{
-                'docs/features/active/foo/policy-audit.2026-05-04T08-00.md'  = 'Python coverage PASS'
-                'docs/features/active/foo/code-review.2026-05-04T08-00.md'   = 'code'
-                'docs/features/active/foo/feature-audit.2026-05-04T08-00.md' = 'feature'
+                '.dev/active/foo/policy-audit.2026-05-04T08-00.md'  = 'Python coverage PASS'
+                '.dev/active/foo/code-review.2026-05-04T08-00.md'   = 'code'
+                '.dev/active/foo/feature-audit.2026-05-04T08-00.md' = 'feature'
             }
             foreach ($key in $Override.Keys) { $map[$key] = $Override[$key] }
             if ($PSCmdlet.ShouldProcess('ReviewArtifactMap', 'Set')) { $script:ReviewArtifactMap = $map }
@@ -140,9 +140,9 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
         It 'F824-4 reads PowerShell line coverage from the JaCoCo report' -Tag 'Issue824' {
             # Arrange
             Set-ReviewArtifactMap -Override @{
-                'docs/features/active/foo/policy-audit.2026-05-04T08-00.md' = 'PowerShell coverage PASS'
-                'artifacts/pr_context.summary.txt'                          = '- scripts/foo.ps1 (+1/-0)'
-                'artifacts/pester/powershell-coverage.xml'                  = '<report><counter type="LINE" missed="20" covered="80"/></report>'
+                '.dev/active/foo/policy-audit.2026-05-04T08-00.md' = 'PowerShell coverage PASS'
+                'artifacts/pr_context.summary.txt'                 = '- scripts/foo.ps1 (+1/-0)'
+                'artifacts/pester/powershell-coverage.xml'         = '<report><counter type="LINE" missed="20" covered="80"/></report>'
             }
 
             # Act
@@ -156,9 +156,9 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
         It 'F824-5 reads branch coverage from the JaCoCo report' -Tag 'Issue824' {
             # Arrange
             Set-ReviewArtifactMap -Override @{
-                'docs/features/active/foo/policy-audit.2026-05-04T08-00.md' = 'PowerShell coverage PASS'
-                'artifacts/pr_context.summary.txt'                          = '- scripts/foo.ps1 (+1/-0)'
-                'artifacts/pester/powershell-coverage.xml'                  = '<report><counter type="LINE" missed="10" covered="90"/><counter type="BRANCH" missed="40" covered="60"/></report>'
+                '.dev/active/foo/policy-audit.2026-05-04T08-00.md' = 'PowerShell coverage PASS'
+                'artifacts/pr_context.summary.txt'                 = '- scripts/foo.ps1 (+1/-0)'
+                'artifacts/pester/powershell-coverage.xml'         = '<report><counter type="LINE" missed="10" covered="90"/><counter type="BRANCH" missed="40" covered="60"/></report>'
             }
 
             # Act
@@ -172,8 +172,8 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
         It 'F824-6 rejects a coverage row that narrows scope' -Tag 'Issue824' {
             # Arrange
             Set-ReviewArtifactMap -Override @{
-                'docs/features/active/foo/policy-audit.2026-05-04T08-00.md' = 'Python coverage N/A PASS'
-                'artifacts/pr_context.summary.txt'                          = '- src/foo.py (+1/-0)'
+                '.dev/active/foo/policy-audit.2026-05-04T08-00.md' = 'Python coverage N/A PASS'
+                'artifacts/pr_context.summary.txt'                 = '- src/foo.py (+1/-0)'
             }
 
             # Act
@@ -201,8 +201,8 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
         It 'F824-8 rejects a language mention with no coverage-scoped row' -Tag 'Issue824' {
             # Arrange
             Set-ReviewArtifactMap -Override @{
-                'docs/features/active/foo/policy-audit.2026-05-04T08-00.md' = 'C# notes PASS'
-                'artifacts/pr_context.summary.txt'                          = '- src/A.cs (+1/-0)'
+                '.dev/active/foo/policy-audit.2026-05-04T08-00.md' = 'C# notes PASS'
+                'artifacts/pr_context.summary.txt'                 = '- src/A.cs (+1/-0)'
             }
 
             # Act
@@ -222,7 +222,7 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
 
         It 'F824-9 reads a tracked file and reports a missing one' -Tag 'Issue824' {
             # Arrange: this test file is the tracked file that is read.
-            $absentPath = 'docs/features/active/__absent__/none.md'
+            $absentPath = '.dev/active/__absent__/none.md'
 
             # Act
             $present = Get-ArtifactFileContent -Path $PSCommandPath
@@ -239,7 +239,7 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
         BeforeEach {
             Mock -CommandName Get-ArtifactFileContent -MockWith {
                 param([string]$Path)
-                if ($Path -match '^docs/features/active/foo/(policy-audit|code-review|feature-audit)\.2026-05-04T08-00\.md$') {
+                if ($Path -match '^.dev/active/foo/(policy-audit|code-review|feature-audit)\.2026-05-04T08-00\.md$') {
                     return @{ Exists = $true; Text = 'ok'; Lines = @('ok') }
                 }
                 return @{ Exists = $false; Text = $null; Lines = @() }
@@ -250,11 +250,11 @@ Describe 'validate-feature-review-coverage.ps1 (issue #824)' {
             @{ Id = 1; Label = 'an empty payload'; InputText = ''; Pattern = 'payload anomaly' }
             @{ Id = 2; Label = 'a malformed payload'; InputText = '{not json'; Pattern = 'payload anomaly' }
             @{ Id = 3; Label = 'an empty agent output'; InputText = '{"session_id":"f824","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":""}'; Pattern = '^validate-feature-review-coverage:' }
-            @{ Id = 4; Label = 'an artifact outside the active-feature location'; InputText = '{"session_id":"f824","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":"policy-audit-path: docs/other/policy-audit.2026-05-04T08-00.md\ncode-review-path: docs/features/active/foo/code-review.2026-05-04T08-00.md\nfeature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md"}'; Pattern = 'outside the required' }
-            @{ Id = 5; Label = 'an advertised artifact that does not exist'; InputText = '{"session_id":"f824","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":"policy-audit-path: docs/features/active/foo/policy-audit.2026-05-04T08-00.md\ncode-review-path: docs/features/active/foo/code-review.2026-05-04T09-00.md\nfeature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md"}'; Pattern = 'no file exists at that location' }
-            @{ Id = 6; Label = 'a remediation-inputs path outside the location'; InputText = '{"session_id":"f824","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":"policy-audit-path: docs/features/active/foo/policy-audit.2026-05-04T08-00.md\ncode-review-path: docs/features/active/foo/code-review.2026-05-04T08-00.md\nfeature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md\nremediation-inputs-path: docs/other/remediation-inputs.2026-05-04T08-00.md"}'; Pattern = 'remediation-inputs-path .+ is outside' }
-            @{ Id = 7; Label = 'a remediation-inputs timestamp that differs'; InputText = '{"session_id":"f824","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":"policy-audit-path: docs/features/active/foo/policy-audit.2026-05-04T08-00.md\ncode-review-path: docs/features/active/foo/code-review.2026-05-04T08-00.md\nfeature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md\nremediation-inputs-path: docs/features/active/foo/remediation-inputs.2026-05-04T08-01.md"}'; Pattern = 'remediation-inputs artifact must share' }
-            @{ Id = 8; Label = 'a remediation-inputs file that does not exist'; InputText = '{"session_id":"f824","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":"policy-audit-path: docs/features/active/foo/policy-audit.2026-05-04T08-00.md\ncode-review-path: docs/features/active/foo/code-review.2026-05-04T08-00.md\nfeature-audit-path: docs/features/active/foo/feature-audit.2026-05-04T08-00.md\nremediation-inputs-path: docs/features/active/foo/remediation-inputs.2026-05-04T08-00.md"}'; Pattern = 'was advertised but no file exists' }
+            @{ Id = 4; Label = 'an artifact outside the active-feature location'; InputText = '{"session_id":"f824","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":"policy-audit-path: docs/other/policy-audit.2026-05-04T08-00.md\ncode-review-path: .dev/active/foo/code-review.2026-05-04T08-00.md\nfeature-audit-path: .dev/active/foo/feature-audit.2026-05-04T08-00.md"}'; Pattern = 'outside the required' }
+            @{ Id = 5; Label = 'an advertised artifact that does not exist'; InputText = '{"session_id":"f824","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":"policy-audit-path: .dev/active/foo/policy-audit.2026-05-04T08-00.md\ncode-review-path: .dev/active/foo/code-review.2026-05-04T09-00.md\nfeature-audit-path: .dev/active/foo/feature-audit.2026-05-04T08-00.md"}'; Pattern = 'no file exists at that location' }
+            @{ Id = 6; Label = 'a remediation-inputs path outside the location'; InputText = '{"session_id":"f824","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":"policy-audit-path: .dev/active/foo/policy-audit.2026-05-04T08-00.md\ncode-review-path: .dev/active/foo/code-review.2026-05-04T08-00.md\nfeature-audit-path: .dev/active/foo/feature-audit.2026-05-04T08-00.md\nremediation-inputs-path: docs/other/remediation-inputs.2026-05-04T08-00.md"}'; Pattern = 'remediation-inputs-path .+ is outside' }
+            @{ Id = 7; Label = 'a remediation-inputs timestamp that differs'; InputText = '{"session_id":"f824","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":"policy-audit-path: .dev/active/foo/policy-audit.2026-05-04T08-00.md\ncode-review-path: .dev/active/foo/code-review.2026-05-04T08-00.md\nfeature-audit-path: .dev/active/foo/feature-audit.2026-05-04T08-00.md\nremediation-inputs-path: .dev/active/foo/remediation-inputs.2026-05-04T08-01.md"}'; Pattern = 'remediation-inputs artifact must share' }
+            @{ Id = 8; Label = 'a remediation-inputs file that does not exist'; InputText = '{"session_id":"f824","hook_event_name":"SubagentStop","agent_type":"feature-review","stop_hook_active":false,"last_assistant_message":"policy-audit-path: .dev/active/foo/policy-audit.2026-05-04T08-00.md\ncode-review-path: .dev/active/foo/code-review.2026-05-04T08-00.md\nfeature-audit-path: .dev/active/foo/feature-audit.2026-05-04T08-00.md\nremediation-inputs-path: .dev/active/foo/remediation-inputs.2026-05-04T08-00.md"}'; Pattern = 'was advertised but no file exists' }
         ) {
             # Arrange: the row supplies InputText and the expected message Pattern.
 

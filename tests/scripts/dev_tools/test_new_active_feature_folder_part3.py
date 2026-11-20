@@ -391,7 +391,7 @@ def test_minor_audit_preserves_issue_frontmatter_and_spacing() -> None:
                 "- Date captured: 2026-02-20",
                 "- Author: Dan Moisan",
                 "- Status: Promoted -> "
-                "docs/features/active/bootstrap-typescript/ (Issue #33)",
+                ".dev/active/bootstrap-typescript/ (Issue #33)",
                 "- Risk: low",
                 "",
                 "- Issue: #33",

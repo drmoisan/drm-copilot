@@ -19,7 +19,7 @@ const ROOT = "/repo";
 const GH_PATH = "/usr/bin/gh";
 const SUMMARY_OUT = "/repo/artifacts/pr_context.summary.txt";
 const APPENDIX_OUT = "/repo/artifacts/pr_context.appendix.txt";
-const CHANGED = "docs/features/active/2025-12-18-docs-v3-upgrade/spec.md";
+const CHANGED = ".dev/active/2025-12-18-docs-v3-upgrade/spec.md";
 const FIXED_CLOCK = (): Date => new Date(Date.UTC(2026, 5, 26, 10, 2, 3));
 
 const ok = (stdout: string): CommandResult => ({ stdout, stderr: "", code: 0 });
@@ -117,9 +117,9 @@ function gitHandler(args: readonly string[]): CommandResult {
 /** Seed an in-memory repo with one active feature and a `.git` marker. */
 function seedRepo(): TreeFileSystem {
   const fs = new TreeFileSystem();
-  const dir = `${ROOT}/docs/features/active/2025-12-18-docs-v3-upgrade`;
+  const dir = `${ROOT}/.dev/active/2025-12-18-docs-v3-upgrade`;
   fs.addDir(dir);
-  fs.addDir(`${ROOT}/docs/features/potential/promoted`);
+  fs.addDir(`${ROOT}/.dev/potential/promoted`);
   fs.addFile(`${dir}/spec.md`, "- Issue: #42\n## Context\nContext\n");
   fs.addFile(`${dir}/plan.md`, "## Tasks\n- [x] done\n");
   fs.addFile(`${dir}/user-story.md`, "## Story Statement\n- Story\n");

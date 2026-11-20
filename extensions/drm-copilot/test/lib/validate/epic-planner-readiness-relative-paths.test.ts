@@ -3,11 +3,11 @@ import { describe, expect, it } from "@jest/globals";
 import { validateEpicReadinessIntegrity } from "../../../src/lib/validate/epic-planner-readiness-integrity";
 import { launchEvidenceFixture } from "./epic-planner-launch-evidence-test-support";
 
-const FOLDER = "docs/features/active/feature-101";
-const PLAN = "docs/features/active/feature-101/plan.md";
+const FOLDER = ".dev/active/feature-101";
+const PLAN = ".dev/active/feature-101/plan.md";
 const RESEARCH = "artifacts/research/feature-101.md";
 const FOLDER_REQUIRED_ERROR =
-  "Execution readiness requires feature folder: docs/features/active/feature-101";
+  "Execution readiness requires feature folder: .dev/active/feature-101";
 const ROOT_FOLDER_REQUIRED_ERROR =
   "Execution readiness requires feature folder: .";
 const FOLDER_ESCAPE_ERROR =
@@ -52,12 +52,12 @@ const normalizedCases: ReadonlyArray<{
   },
   {
     label: "dot-segment",
-    folder: "docs/features/active/./feature-101",
+    folder: ".dev/active/./feature-101",
     expected: FOLDER_REQUIRED_ERROR,
   },
   {
     label: "double-slash",
-    folder: "docs/features/active//feature-101",
+    folder: ".dev/active//feature-101",
     expected: FOLDER_REQUIRED_ERROR,
   },
   {
@@ -83,12 +83,12 @@ const rejectedCases: ReadonlyArray<{
   { label: "blank", folder: "   ", expected: FOLDER_EMPTY_ERROR },
   {
     label: "drive-letter",
-    folder: "C:/docs/features/active/feature-101",
+    folder: "C:/.dev/active/feature-101",
     expected: FOLDER_ESCAPE_ERROR,
   },
   {
     label: "drive-relative",
-    folder: "c:docs/features/active/feature-101",
+    folder: "c:.dev/active/feature-101",
     expected: FOLDER_ESCAPE_ERROR,
   },
 ];

@@ -9,13 +9,13 @@ const VALID_KICKOFF = `# Epic Kickoff: sample-epic
 ## Invocation Prompt
 Run \`/epic-run sample-epic\` to execute this epic.
 Use the epic-orchestrator subagent to execute the prepared epic at
-docs/features/epics/sample-epic/epic.md. Reuse epic/sample-epic-integration.
+.dev/epics/sample-epic/epic.md. Reuse epic/sample-epic-integration.
 Every child resumes at atomic execution from its committed plan-path;
 do not repeat planning or preflight.
 ## Feature Summary
 | issue_num | feature_folder | wave | complexity | plan-path |
 | --- | --- | --- | --- | --- |
-| 101 | docs/features/active/feature-101 | 0 | C3 | docs/features/active/feature-101/plan.md |
+| 101 | .dev/active/feature-101 | 0 | C3 | .dev/active/feature-101/plan.md |
 `;
 
 describe("validateEpicKickoffText", () => {
@@ -36,10 +36,10 @@ describe("validateEpicKickoffText", () => {
 
   it("accepts the merged Claude invocation wording", () => {
     const claudeBaseline = VALID_KICKOFF.replace(
-      "docs/features/epics/sample-epic/epic.md. " +
+      ".dev/epics/sample-epic/epic.md. " +
         "Reuse epic/sample-epic-integration.\n" +
         "Every child resumes at atomic execution from its committed plan-path;",
-      "docs/features/epics/sample-epic/epic.md. The integration branch\n" +
+      ".dev/epics/sample-epic/epic.md. The integration branch\n" +
         "epic/sample-epic-integration already contains every prepared feature " +
         "folder and approved atomic plan; child features resume at atomic " +
         "execution from their committed plan-path rather than re-planning.",
@@ -59,7 +59,7 @@ describe("validateEpicKickoffText", () => {
     [VALID_KICKOFF.replace("| --- |", "| bad |"), "separator row"],
     [
       VALID_KICKOFF.replace(
-        "| 101 | docs/features/active/feature-101 | 0 | C3 |",
+        "| 101 | .dev/active/feature-101 | 0 | C3 |",
         "not a table row",
       ),
       "table row is invalid",
@@ -67,8 +67,8 @@ describe("validateEpicKickoffText", () => {
     [VALID_KICKOFF.replace("| 101 |", "| issue |"), "issue_num"],
     [
       VALID_KICKOFF.replace(
-        "docs/features/active/feature-101 | 0 |",
-        "docs/features/active/feature-101 | wave |",
+        ".dev/active/feature-101 | 0 |",
+        ".dev/active/feature-101 | wave |",
       ),
       "wave must be an integer",
     ],
@@ -85,7 +85,7 @@ describe("validateEpicKickoffText", () => {
         `planning_commit: ${"a".repeat(40)}`,
         "| plan-path | plan-hash |",
         "| --- | --- |",
-        `| docs/features/active/feature-101/plan.md | ${"b".repeat(40)} |`,
+        `| .dev/active/feature-101/plan.md | ${"b".repeat(40)} |`,
       ].join("\n");
 
     const parsed = parseEpicKickoff(validIntegrity);
@@ -93,7 +93,7 @@ describe("validateEpicKickoffText", () => {
     expect(parsed.errors).toEqual([]);
     expect(parsed.parsed?.planningCommit).toBe("a".repeat(40));
     expect(parsed.parsed?.planHashes).toEqual({
-      "docs/features/active/feature-101/plan.md": "b".repeat(40),
+      ".dev/active/feature-101/plan.md": "b".repeat(40),
     });
 
     const invalidIntegrity = validIntegrity

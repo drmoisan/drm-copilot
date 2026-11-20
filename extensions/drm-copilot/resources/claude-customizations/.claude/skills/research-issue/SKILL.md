@@ -1,6 +1,6 @@
 ---
 name: research-issue
-description: Investigate the best implementation approach for a feature or bug by analyzing the codebase and external references, then writing structured findings to the resolved research path under docs/features/<feature>/research/ (feature-associated) or docs/research/ (one-off).
+description: Investigate the best implementation approach for a feature or bug by analyzing the codebase and external references, then writing structured findings to the resolved research path under .dev/<feature>/research/ (feature-associated) or .dev/research/ (one-off).
 allowed-tools:
   - Read
   - Grep
@@ -16,17 +16,17 @@ Research the best implementation approach for a feature or bug described in the 
 
 Accept one or more feature documents as context:
 
-- `docs/features/active/<feature>/issue.md` (primary)
-- `docs/features/active/<feature>/user-story.md` (when present)
-- `docs/features/active/<feature>/spec.md` (when present)
+- `.dev/active/<feature>/issue.md` (primary)
+- `.dev/active/<feature>/user-story.md` (when present)
+- `.dev/active/<feature>/spec.md` (when present)
 
 ## Output
 
 Create or update a single research file at one of the two tracked research roots:
 
-- Feature-associated research: `docs/features/<feature>/research/<timestamp>-<short-name>-research.md` (for example `docs/features/active/<feature>/research/<timestamp>-<short-name>-research.md`).
-- One-off research not tied to a feature: `docs/research/<timestamp>-<short-name>-research.md`.
-- Routing rule: write to the feature research root when an active feature folder is in scope (the orchestrator supplies the resolved path from `feature-folder` in `orchestrator-state.json`); otherwise write to `docs/research/`. The filename convention `<timestamp>-<short-name>-research.md` is unchanged.
+- Feature-associated research: `.dev/<feature>/research/<timestamp>-<short-name>-research.md` (for example `.dev/active/<feature>/research/<timestamp>-<short-name>-research.md`).
+- One-off research not tied to a feature: `.dev/research/<timestamp>-<short-name>-research.md`.
+- Routing rule: write to the feature research root when an active feature folder is in scope (the orchestrator supplies the resolved path from `feature-folder` in `orchestrator-state.json`); otherwise write to `.dev/research/`. The filename convention `<timestamp>-<short-name>-research.md` is unchanged.
 - Use the Task Researcher template from the repository exactly.
 - Place rejected-alternatives summaries inside `## Recommended Approach`, not as a separate top-level header.
 
@@ -65,8 +65,8 @@ Create or update a single research file at one of the two tracked research roots
 
 ### 6. Pre-Mortem
 
-- Feature-associated research (a research path under `docs/features/`) MUST carry a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the next review or CI run could fail on that dimension and the mitigation the plan must carry; a label that does not apply is written as "not applicable" followed by the reason.
-- One-off research under `docs/research/` is exempt.
+- Feature-associated research (a research path under `.dev/`) MUST carry a `## Pre-Mortem` section with one bullet beginning with each of the seven labels `Review checklists`, `Coverage`, `Mirror parity`, `File size`, `Test isolation`, `CI-only behavior`, and `Evidence`. Each bullet states how the next review or CI run could fail on that dimension and the mitigation the plan must carry; a label that does not apply is written as "not applicable" followed by the reason.
+- One-off research under `.dev/research/` is exempt.
 - The researcher SubagentStop hook blocks feature research without a complete section. The `execution-environment` skill states the CI shape, contract tests, and isolation checks the section accounts for.
 
 ## Constraints

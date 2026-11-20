@@ -122,7 +122,7 @@ Describe 'New-DocsStarterProfile' {
         (New-DocsStarterProfile)['repository']['id'] | Should -BeExactly 'repository'
     }
 
-    It 'defaults the documentation root to docs/guide with id guide and the source root to src, and holds no root under docs/features/ (issue #1173 B6, B7)' {
+    It 'defaults the documentation root to docs/guide with id guide and the source root to src, and holds no root under .dev/ (issue #1173 B6, B7)' {
         # Act
         $starter = New-DocsStarterProfile
 

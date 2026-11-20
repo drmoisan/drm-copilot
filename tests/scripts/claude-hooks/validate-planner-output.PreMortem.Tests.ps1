@@ -20,7 +20,7 @@ BeforeAll {
         $phases = @(
             "### Phase 0 `u{2014} Baseline",
             '- [ ] [P0-T1] Read policy files in `.claude/rules/general-code-change.md`.',
-            '- [ ] [P0-T2] Capture baseline tests in `docs/features/active/foo/evidence/baseline/`.',
+            '- [ ] [P0-T2] Capture baseline tests in `.dev/active/foo/evidence/baseline/`.',
             "### Phase 1 `u{2014} Final QA",
             '- [ ] [P1-T1] Run the test toolchain for `tests/scripts/claude-hooks/`.'
         )
@@ -36,13 +36,13 @@ BeforeAll {
         # Returns a valid internal-review record whose CITATION locator is supplied.
         param([string] $Locator = 'Get-PlannerInternalReviewValidation')
         @"
-plan-path: docs/features/active/foo/plan.md
+plan-path: .dev/active/foo/plan.md
 PLANNER-INTERNAL-REVIEW: PASS
 CITATION-TO-TREE: PASS
 CITATION: .claude/hooks/validate-planner-output.ps1 | $Locator
 AC-TRACEABILITY: PASS
 AC-INVENTORY: AC1
-AC-MAPPING: AC1 | IMPLEMENTATION: .claude/hooks/validate-planner-output.ps1 | TESTS: tests/scripts/claude-hooks/validate-planner-output.PreMortem.Tests.ps1 | EVIDENCE: docs/features/active/foo/evidence/qa-gates/pester.md
+AC-MAPPING: AC1 | IMPLEMENTATION: .claude/hooks/validate-planner-output.ps1 | TESTS: tests/scripts/claude-hooks/validate-planner-output.PreMortem.Tests.ps1 | EVIDENCE: .dev/active/foo/evidence/qa-gates/pester.md
 SCOPE-BOUNDARY: PASS
 UNRESOLVED-GAPS: NONE
 PREFLIGHT: ALL CLEAR

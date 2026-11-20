@@ -1,0 +1,6 @@
+# Task Check [P2-T4]
+
+Timestamp: 2026-11-20T07-33
+Command: sh SCRATCH/issue-1016-fmtwrite.sh <files>; sh SCRATCH/issue-1016-taskcheck.sh (prettier --check, eslint, npm run typecheck, run-test-suite.sh jest-extension "--testPathPatterns=(migrate-development-docs-cli|mcp-server\.main|packaging/discovery-resources|packaging/mcp-server-prepack|mcp-server\.test)"); git -C <worktree> diff --stat origin/epic/shared-agent-harness-layer-integration -- packages/mcp-server/package.json
+EXIT_CODE: 0
+Output Summary: changed files `src/migrate-development-docs-cli.ts` (new), `src/mcp-server.ts` (`main(argv, entryPoints)`; the stdio start moved into `startStdioServer`), `test/migrate-development-docs-cli.test.ts` (new), `test/mcp-server.main.test.ts` (new). Prettier `All matched files use Prettier code style!`, ESLint exit 0, typecheck exit 0, Jest `Test Suites: 5 passed, 5 total`, `Tests: 46 passed, 46 total` (the two new suites, `packaging/discovery-resources.test.ts`, `packaging/mcp-server-prepack.test.ts`, `mcp-server.test.ts`). `packages/mcp-server/package.json` diff against BASE (the merge base equals the INTEGRATION tip): empty, so `bin` and `files` are unchanged. Each `main` case restores `process.exitCode` in `afterEach`.

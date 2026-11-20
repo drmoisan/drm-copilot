@@ -26,7 +26,7 @@ export const RESOLVED_SLUG = "drmoisan/drm-copilot";
 export const DIFFERING_WORKSPACE = "/other-checkout";
 
 /** Potential record living under {@link DIFFERING_WORKSPACE}. */
-export const DIFFERING_POTENTIAL = `${DIFFERING_WORKSPACE}/docs/features/potential/sample.md`;
+export const DIFFERING_POTENTIAL = `${DIFFERING_WORKSPACE}/.dev/potential/sample.md`;
 
 /**
  * Workspace root equal to the process working directory.
@@ -38,7 +38,7 @@ export const DIFFERING_POTENTIAL = `${DIFFERING_WORKSPACE}/docs/features/potenti
 export const PROCESS_ROOT = process.cwd().replace(/\\/g, "/");
 
 /** Potential record living under {@link PROCESS_ROOT}. */
-export const PROCESS_POTENTIAL = `${PROCESS_ROOT}/docs/features/potential/sample.md`;
+export const PROCESS_POTENTIAL = `${PROCESS_ROOT}/.dev/potential/sample.md`;
 
 /** Repository-view resolution words, following the executable token. */
 const REPO_VIEW_WORDS: readonly string[] = [

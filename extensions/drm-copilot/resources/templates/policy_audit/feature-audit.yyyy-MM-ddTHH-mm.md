@@ -23,7 +23,7 @@
 ---
 
 **Audit Date:** [YYYY-MM-DD]
-**Feature Folder:** `[docs/features/active/or/archive/path]`
+**Feature Folder:** `[.dev/active/or/archive/path]`
 **Base Branch:** `[branch-name]`
 **Head Branch:** `[branch-name or working-tree scope]`
 **Work Mode:** `[minor-audit / full-feature / full-bug / legacy full]`

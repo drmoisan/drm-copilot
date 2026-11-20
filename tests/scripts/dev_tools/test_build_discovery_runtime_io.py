@@ -91,6 +91,40 @@ def test_disk_boundary_reads_lists_and_writes_only_generated_paths(
     assert filesystem.read_bytes(build.BUILD_MANIFEST_PATH) == b"{}\n"
 
 
+def test_canonical_template_inputs_read_from_moved_source_directory(
+    mem_fs_path: Path,
+) -> None:
+    """Template keys under docs/discovery/templates read from .dev/discovery/templates.
+
+    The canonical key, the listed key and the bytes stay those of the key while the
+    source file lives under the moved directory; schema keys keep their own path.
+    """
+    source = mem_fs_path / ".dev" / "discovery" / "templates" / "v2" / "x.md"
+    source.parent.mkdir(parents=True, exist_ok=True)
+    source.write_bytes(b"template\n")
+    schema = mem_fs_path / "schemas" / "discovery" / "v1" / "a.json"
+    schema.parent.mkdir(parents=True, exist_ok=True)
+    schema.write_bytes(b"{}\n")
+    filesystem = build.DiskBuildFileSystem(mem_fs_path)
+
+    key = "docs/discovery/templates/v2/x.md"
+    assert filesystem.read_bytes(key) == b"template\n"
+    assert filesystem.list_files("docs/discovery/templates") == (key,)
+    assert filesystem.list_files("schemas/discovery") == (
+        "schemas/discovery/v1/a.json",
+    )
+    assert build.source_path_for_resource("docs/discovery/templates") == (
+        ".dev/discovery/templates"
+    )
+    assert build.source_path_for_resource("schemas/discovery/v1/a.json") == (
+        "schemas/discovery/v1/a.json"
+    )
+    assert build.resource_key_for_source(".dev/discovery/templates") == (
+        "docs/discovery/templates"
+    )
+    assert build.resource_key_for_source("schemas/discovery") == "schemas/discovery"
+
+
 def test_resolved_path_escape_is_rejected(
     mem_fs_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

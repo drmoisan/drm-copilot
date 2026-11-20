@@ -73,7 +73,7 @@ Describe 'Resolve-EpicProgressSetting' {
     It 'defaults the kickoff path from the epic folder' {
         $setting = Resolve-EpicProgressSetting -EpicFolder 'example-epic' -CurrentLocation $script:fixtureRoot
 
-        $setting.KickoffPath | Should -Be 'docs/features/epics/example-epic/epic-kickoff.md'
+        $setting.KickoffPath | Should -Be '.dev/epics/example-epic/epic-kickoff.md'
     }
 
     It 'defaults the checkpoint path under the repository root' {

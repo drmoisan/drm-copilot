@@ -10,15 +10,15 @@ agent: epic-orchestrator
 
 A user invocation (`/epic-run <epic-slug>`) forks the `epic-orchestrator` agent to execute an
 epic that `epic-planner` has already prepared. The epic slug (or a path under
-`docs/features/epics/`) for this run is:
+`.dev/epics/`) for this run is:
 
 $ARGUMENTS
 
 ## Procedure
 
-1. Resolve the epic home. A bare slug resolves to `docs/features/epics/<epic-slug>/`; a path
+1. Resolve the epic home. A bare slug resolves to `.dev/epics/<epic-slug>/`; a path
    argument resolves to its containing epic folder.
-2. Resolve the committed kickoff artifact `docs/features/epics/<epic-slug>/epic-kickoff.md`. It
+2. Resolve the committed kickoff artifact `.dev/epics/<epic-slug>/epic-kickoff.md`. It
    may exist only on the epic integration branch: `epic-plan` commits it to
    `epic/<epic-slug>-integration` (worked in a separate integration worktree), so the worktree
    that invokes `/epic-run` is not guaranteed to have it checked out. Discover it across both
@@ -28,7 +28,7 @@ $ARGUMENTS
      the local check rather than treating the fetch failure as fatal.
    - Treat the artifact as present when EITHER the plain local path exists in the invoking
      worktree, OR it exists on the fetched integration ref, tested with
-     `git cat-file -e epic/<epic-slug>-integration:docs/features/epics/<epic-slug>/epic-kickoff.md`
+     `git cat-file -e epic/<epic-slug>-integration:.dev/epics/<epic-slug>/epic-kickoff.md`
      (equivalently `origin/epic/<epic-slug>-integration:<path>`).
    - When the artifact is present only on the integration ref, read its content with
      `git show <ref>:<path>`. That is sufficient to extract the `## Invocation Prompt` text

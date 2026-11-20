@@ -127,9 +127,9 @@ Describe 'Parallel gate wording' {
         @{ Id = 'COPILOT-TS-ENGINEER-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/typescript-engineer.agent.md'; Required = @('debugging only'); Forbidden = @() }
         @{ Id = 'COPILOT-STAGED-REVIEW'; Path = '.github/agents/staged-review.agent.md'; Required = @('Invoke-PoshQCParallelTest', 'pytest -n auto', 'debugging only'); Forbidden = @() }
         @{ Id = 'COPILOT-STAGED-REVIEW-BUNDLE'; Path = 'extensions/drm-copilot/resources/customizations/.github/agents/staged-review.agent.md'; Required = @('Invoke-PoshQCParallelTest', 'pytest -n auto', 'debugging only'); Forbidden = @() }
-        @{ Id = 'AUDIT-TEMPLATE'; Path = 'docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
+        @{ Id = 'AUDIT-TEMPLATE'; Path = '.dev/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
         @{ Id = 'AUDIT-TEMPLATE-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Required = $script:AuditRequired; Forbidden = $script:AuditForbidden }
-        @{ Id = 'AUDIT-AGENTS'; Path = 'docs/features/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest', 'Phase 0 baseline'); Forbidden = @() }
+        @{ Id = 'AUDIT-AGENTS'; Path = '.dev/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest', 'Phase 0 baseline'); Forbidden = @() }
         @{ Id = 'AUDIT-AGENTS-BUNDLE'; Path = 'extensions/drm-copilot/resources/templates/policy_audit/AGENTS.md'; Required = @('pytest -n auto', 'Invoke-PoshQCParallelTest', 'Phase 0 baseline'); Forbidden = @() }
         @{ Id = 'BRIEF-CLAUDE'; Path = '.claude/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
         @{ Id = 'BRIEF-AGENTS'; Path = '.agents/skills/execution-environment/SKILL.md'; Required = $script:D13Required + @('run-test-suite.sh'); Forbidden = @() }
@@ -189,7 +189,7 @@ Describe 'Parallel gate wording' {
             $resources = 'extensions/drm-copilot/resources'
             $script:SweepRoot = @(
                 '.claude/skills', '.claude/agents', '.agents/skills', '.github/agents', '.github/prompts',
-                '.github/codex', '.codex/agents', 'docs/features/templates',
+                '.github/codex', '.codex/agents', '.dev/templates',
                 "$resources/claude-customizations", "$resources/codex-and-agents-customizations", "$resources/customizations",
                 "$resources/templates/policy_audit", "$resources/feature-templates"
             )

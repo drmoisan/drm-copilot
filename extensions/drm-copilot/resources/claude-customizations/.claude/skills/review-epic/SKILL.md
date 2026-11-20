@@ -14,7 +14,7 @@ This direct-use wrapper delegates review work to the `epic-review` worker.
 
 ## Output Paths
 
-- `docs/features/epics/<epic>/epic-audit.<timestamp>.md`
+- `.dev/epics/<epic>/epic-audit.<timestamp>.md`
 
 ## Worker Routing
 

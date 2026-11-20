@@ -45,7 +45,7 @@ def _delegation(agent: str, step: str = "7") -> dict[str, object]:
         "started_at": "2026-07-04T09:00:00-04:00",
         "completed_at": "2026-07-04T09:05:00-04:00",
         "result_signal": "PREFLIGHT: ALL CLEAR",
-        "artifact_paths": ["docs/features/active/feature-1/plan.md"],
+        "artifact_paths": [".dev/active/feature-1/plan.md"],
     }
 
 

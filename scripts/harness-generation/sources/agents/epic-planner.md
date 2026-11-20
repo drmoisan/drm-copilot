@@ -80,7 +80,7 @@ defined in the `epic-plan` skill.
 
 At completion you write the epic-orchestrator kickoff prompt to
 `artifacts/orchestration/epic-kickoff-<epic-slug>.md` and commit a durable copy at
-`docs/features/epics/<epic-slug>/epic-kickoff.md` (the `artifacts/` tree is gitignored). The
+`.dev/epics/<epic-slug>/epic-kickoff.md` (the `artifacts/` tree is gitignored). The
 artifact contains the exact prompt the user replays to launch `Agent(epic-orchestrator)` against
 the prepared epic, per the template in the `epic-plan` skill.
 
@@ -108,7 +108,7 @@ same `features[]` entry as `cross_epic_depends_on`; the validator checks its sha
 
 Do not report completion until:
 
-1. The epic manifest at `docs/features/epics/<epic-slug>/epic.md` parses against the
+1. The epic manifest at `.dev/epics/<epic-slug>/epic.md` parses against the
    `epic-orchestrate` schema with a cycle-free dependency graph.
 2. Every child feature has an issue, an active feature folder, research, `spec.md`,
    `user-story.md`, an approved atomic plan, and a recorded `PREFLIGHT: ALL CLEAR`.

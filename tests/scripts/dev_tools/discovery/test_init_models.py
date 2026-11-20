@@ -98,10 +98,10 @@ def test_expected_template_relative_paths_has_eight_entries() -> None:
 
 
 def test_resolve_default_template_root_returns_expected_path() -> None:
-    """The default template root ends in `docs/discovery/templates`."""
+    """The default template root ends in `.dev/discovery/templates`."""
     result = resolve_default_template_root()
     repository = Path(__file__).resolve().parents[4]
-    assert result == repository / "docs" / "discovery" / "templates"
+    assert result == repository / ".dev" / "discovery" / "templates"
 
 
 def test_v2_template_layout_is_separate_from_frozen_legacy_constants() -> None:

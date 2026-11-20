@@ -103,7 +103,7 @@ describe("parallel validation MCP definitions", () => {
 
   // This case previously asserted that neither tool definition advertised a
   // `parallel-kickoff` artifact type. That expectation became false by design:
-  // `docs/features/epics/parallel-orchestration/epic.md`, section "Planner
+  // `.dev/epics/parallel-orchestration/epic.md`, section "Planner
   // Adjudication: the kickoff-contract boundary (F3 / F4)", assigns the
   // `parallel-kickoff` artifact type to the parallel-planner-surface feature by
   // producer ownership, so both surfaces must now advertise it.

@@ -57,7 +57,7 @@ def _seed_evidence(root: Path, *, name: str, markdown: str) -> str:
     Side Effects:
         Creates directories and one file inside the in-memory filesystem.
     """
-    relative = Path("docs/features/active") / FEATURE / "evidence/qa-gates" / name
+    relative = Path(".dev/active") / FEATURE / "evidence/qa-gates" / name
     target = root / relative
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(markdown, encoding="utf-8")

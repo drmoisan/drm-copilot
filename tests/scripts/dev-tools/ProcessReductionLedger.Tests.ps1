@@ -453,7 +453,7 @@ Describe 'Review-side standing rule' {
     ) {
         $normalized = (Get-Content -Raw -LiteralPath (Join-Path $script:RepoRoot $Copy)) -replace '\s+', ' '
 
-        $normalized.Contains('`docs/engineering/process-reductions/` exists') | Should -BeTrue
+        $normalized.Contains('`.dev/engineering/process-reductions/` exists') | Should -BeTrue
         $normalized.Contains('One-off waivers for a single item are not entries.') | Should -BeTrue
         $normalized.Contains('reduction: NNNN') | Should -BeTrue
     }

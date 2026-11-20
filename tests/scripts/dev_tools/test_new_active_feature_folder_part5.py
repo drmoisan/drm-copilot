@@ -1,6 +1,6 @@
 """Tests for the promoted-record disposition rule in new_active_feature_folder.
 
-A potential file resolved from ``docs/features/potential/promoted/`` is COPIED
+A potential file resolved from ``.dev/potential/promoted/`` is COPIED
 into the active folder as ``issue.md`` so the promoted record is retained; a
 source resolved from anywhere else is still MOVED. Both arms of the emitted-line
 wording are covered here so the Python cluster stays in parity with the
@@ -60,7 +60,7 @@ def test_create_feature_folder_moves_unpromoted_potential(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Verify a source outside promoted/ is still moved and reports a move."""
-    # Arrange: the potential file sits directly under docs/features/potential/.
+    # Arrange: the potential file sits directly under .dev/potential/.
     fs = FakeFileSystem()
     workspace = Path("/workspace")
     _seed_feature_template(fs, workspace)

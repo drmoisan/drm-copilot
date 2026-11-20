@@ -6,7 +6,7 @@
     Documentation contract tests for the documentation-estate onboarding pages (issue #1038).
 
 .DESCRIPTION
-    Reads the five pages under docs/engineering/documentation-estate/ once. The expected subcommand
+    Reads the five pages under .dev/engineering/documentation-estate/ once. The expected subcommand
     set comes from Get-DocsCommandTable of the dot-sourced entry script and the expected docs MCP
     tool set from extensions/drm-copilot/src/mcp-docs-tool-definitions.ts read as text, so a new
     subcommand or tool without a heading and a fenced example fails the suite. Statement checks
@@ -20,7 +20,7 @@ BeforeAll {
     $script:RepositoryRootPath = [System.IO.Path]::GetFullPath((Join-Path -Path $PSScriptRoot -ChildPath '../../../..'))
     . (Join-Path -Path $script:RepositoryRootPath -ChildPath '.claude/lib/docs/Invoke-DocsCommand.ps1')
 
-    $script:PageRoot = 'docs/engineering/documentation-estate'
+    $script:PageRoot = '.dev/engineering/documentation-estate'
     $script:PageName = @('README.md', 'architecture.md', 'consumer-onboarding.md', 'command-reference.md', 'workflow.md')
     $script:PageText = @{}
     foreach ($name in $script:PageName) {

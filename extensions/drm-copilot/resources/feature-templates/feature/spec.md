@@ -61,6 +61,6 @@ Performance, compatibility, security, rollout constraints.
 - [ ] Behavior matches acceptance criteria in all documented environments
 - [ ] Tests updated/added (unit/integration as applicable)
 - [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (README, docs/features/active/... links)
+- [ ] Docs updated (README, .dev/active/... links)
 - [ ] Telemetry/logging added or updated (if applicable)
 - [ ] Toolchain pass completed (format → lint → type-check → test)

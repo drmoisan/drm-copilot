@@ -120,6 +120,7 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `run_poshqc_suite`
 - `resolve_policy_audit_template_asset`
 - `validate_orchestration_artifacts`
+- `migrate_development_docs`
 - `run_docs_check`
 - `run_docs_inventory`
 - `run_docs_coverage`
@@ -130,6 +131,8 @@ Downstream Codex skills should depend on the MCP server name `drmCopilotExtensio
 - `validate_push_down_integration`
 
 The six docs tools run the workspace's `.claude/lib/docs/Invoke-DocsCommand.ps1` with `pwsh -NoProfile -File <script> -Command <subcommand> -Json`, with the workspace root as working directory. They require PowerShell 7.4 or later on `PATH` (there is no fallback to Windows PowerShell) and the pushed-down `.claude/lib/docs/` library in the target workspace; run `push_down_claude_customizations` first when it is missing. Only `update_docs_ledger` can change files, and only when `write` is `true`; every other docs tool is read-only.
+
+`migrate_development_docs` (issue #1016) plans or applies the move of development records from `docs/` to `.dev/`. The dry run writes nothing outside `report_directory` and reports the planned moves, folder renames, held items, reference rewrites, excluded files, retained production documentation and a `decision_skeleton`. Apply mode moves with `git mv`, renames feature folders, rewrites references and never commits; it refuses without a decision file when the dry run reports held items or open global choices. The same tool runs from the standalone package as `npx -y @danmoisan/drm-copilot-mcp migrate-development-docs`; see `packages/mcp-server/README.md`.
 
 The two push-down integration tools are read-only and deterministic, and neither calls a model. `detect_push_down_integration` reports a destination's harness ecosystems and language packs, its `.github/workflows/` files with their jobs, the structured integration conflicts, and a summary of `.push-down-integration-needed.json`, which an apply-mode push-down writes when it meets a decision it cannot make mechanically. `validate_push_down_integration` returns a `pass` or `fail` verdict over rules V1 to V5 and the fixed `not_checked` list; a completed run is `ok: true` even when the verdict is `fail`. The `push-down-integration` skill describes the read, resolve and validate loop.
 
@@ -187,6 +190,7 @@ If the server is launched from a different working directory, pass `workspace_ro
 - run_poshqc_analyze_autofix: required `workspace_root`, optional `scan_folders`
 - run_poshqc_suite: required `workspace_root`, optional `scan_folders`
 - validate_orchestration_artifacts: required `workspace_root`, required `artifact_type`, required `artifact_path`, optional `require_complete`
+- `migrate_development_docs`: required `workspace_root`, required `mode` (`dry-run` | `apply`), optional `rename_decisions_path` (required by apply when the dry run reports held items or open global choices), optional `report_directory`
 - `run_docs_check`: required `workspace_root`, optional `profile`, optional `paths`
 - `run_docs_inventory`: required `workspace_root`, optional `profile`, optional `analyzers`, optional `revision`
 - `run_docs_coverage`: required `workspace_root`, optional `profile`

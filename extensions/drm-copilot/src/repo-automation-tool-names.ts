@@ -23,6 +23,7 @@ export const REPO_AUTOMATION_TOOLS = [
   "resolve_provider_routing",
   "transition_prepared_orchestration",
   "render_subagent_tree",
+  "migrate_development_docs",
   "run_docs_check",
   "run_docs_inventory",
   "run_docs_coverage",

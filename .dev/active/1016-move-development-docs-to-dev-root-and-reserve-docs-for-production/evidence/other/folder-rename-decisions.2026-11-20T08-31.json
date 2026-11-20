@@ -1,0 +1,317 @@
+{
+  "version": 1,
+  "dry_run_report": "dev-docs-migration-dry-run.2026-11-20T07-40.json",
+  "source_digest": "2f33c96522d776b174bff9370652a8a676c6d03dedc2758570e7f6e87b936a75",
+  "global_decisions": {
+    "discovery_templates_target": ".dev/discovery/templates",
+    "in_tree_rewrite_scope": "links-only",
+    "commit_split": "single",
+    "absent_key_resolves": "docs/features",
+    "discovery_runtime_resource_key": "keep",
+    "rules_mirrors_editable": "no",
+    "remove_fallback": "no",
+    "run_source": "branch-build",
+    "allow_list_tool": "none",
+    "extension_command": "no",
+    "file_size_excluded_segment": "no",
+    "plan_template_link_depth": "three-level"
+  },
+  "rewrite_exclusions": [
+    "tests/fixtures/**",
+    "**/evidence/**",
+    "docs/engineering/process-reductions/**",
+    "docs/features/potential/promoted/2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production.md",
+    "docs/features/active/2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production-1016/spec.md",
+    "docs/features/active/2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production-1016/user-story.md",
+    "docs/features/active/2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production-1016/research/**",
+    "docs/features/active/2026-10-30-move-development-docs-to-dev-root-and-reserve-docs-for-production-1016/plan.*.md",
+    "docs/features/active/2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035/spec.md",
+    "docs/features/active/2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035/research/**",
+    "docs/features/active/2026-10-30-dev-docs-root-resolver-and-feature-folder-name-parser-1035/plan.*.md",
+    "**/.claude/lib/development-docs/**",
+    "extensions/drm-copilot/resources/lib/development-docs/**",
+    "extensions/drm-copilot/src/lib/development-docs/**",
+    "extensions/drm-copilot/test/lib/development-docs/**",
+    "extensions/drm-copilot/test/lib/validate/development-docs-matchers.test.ts",
+    "tests/scripts/claude-lib/development-docs/**",
+    "config/ci-docs-only-paths.json",
+    "tests/scripts/ci/CiDocsOnlyPathsConfig.Tests.ps1",
+    "tests/scripts/ci/CiChangeScope.Tests.ps1",
+    "tests/scripts/ci/Invoke-CiChangeScope.Tests.ps1",
+    "tests/scripts/ci/Invoke-CiChangeScopeMergeBase.Tests.ps1",
+    "tests/scripts/workflows/CiChangeScopeWorkflow.Tests.ps1",
+    "**/.claude/rules/*.md",
+    "**/.github/instructions/*.md",
+    "scripts/harness-generation/sources/rules/**",
+    "**/skills/execution-environment/SKILL.md",
+    "scripts/harness-generation/sources/skills/execution-environment*",
+    "scripts/harness-generation/sources/skills/execution-environment/**",
+    ".github/workflows/README.md",
+    "packages/discovery-runtime/**",
+    "scripts/dev_tools/build_discovery_runtime.py",
+    "scripts/dev-tools/ProcessReductionChain.psm1",
+    "scripts/dev-tools/ProcessReductionLedger.psm1",
+    "tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1",
+    "**/.claude/agents/epic-orchestrator.md",
+    "**/skills/epic-orchestrate/SKILL.md",
+    "scripts/harness-generation/sources/agents/epic-orchestrator.md",
+    "scripts/harness-generation/sources/skills/epic-orchestrate*",
+    "scripts/harness-generation/sources/skills/epic-orchestrate/**",
+    "tests/scripts/claude-runtime/less-evidence-contract.Tests.ps1",
+    "tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1",
+    "**/skills/atomic-plan-contract/SKILL.md",
+    "scripts/harness-generation/sources/skills/atomic-plan-contract*",
+    "scripts/harness-generation/sources/skills/atomic-plan-contract/**",
+    "**/.claude/lib/orchestrator-state/OrchestratorStateFeatureFolderRecord.psm1",
+    "scripts/dev_tools/_orchestrator_state_feature_folder_record.py",
+    "extensions/drm-copilot/src/lib/validate/orchestrator-state-feature-folder-record.ts",
+    "scripts/dev-tools/Get-StageTimingReport.ps1",
+    "scripts/dev-tools/StageTiming.psm1",
+    "scripts/dev_tools/discovery/init_models.py",
+    "**/.claude/lib/docs/DocsProfile.psm1",
+    "**/.claude/lib/docs/DocsFinding.psm1",
+    "**/.claude/lib/file-size-policy/FileSizePolicy.psm1",
+    "**/.codex/hooks/file-size-policy.ps1",
+    "scripts/dev_tools/pr_context/models.py",
+    "extensions/drm-copilot/src/lib/pr-context/models.ts",
+    "scripts/dev_tools/push_down_claude_blast_radius_derive_manifests.py",
+    "extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-manifests.ts",
+    "scripts/dev_tools/plan_progress_report.py",
+    "**/.claude/hooks/enforce-prd-feature-before-planner.ps1",
+    "**/.claude/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1",
+    "**/.codex/hooks/enforce-orchestration-preimplementation-gate-helpers.ps1",
+    "**/.claude/lib/blast-radius/BlastRadius.psm1",
+    "scripts/dev_tools/compute_blast_radius.py",
+    "scripts/dev_tools/pr_context/render.py,cover",
+    "extensions/drm-copilot/src/repo-automation-service.ts",
+    "extensions/drm-copilot/resources/feature-templates/epic/epic.md",
+    "extensions/drm-copilot/resources/feature-templates/bug/plan.yyyy-MM-ddTHH-mm.md",
+    "extensions/drm-copilot/resources/feature-templates/feature/plan.yyyy-MM-ddTHH-mm.md",
+    "extensions/drm-copilot/resources/feature-templates/refactor/plan.yyyy-MM-ddTHH-mm.md",
+    "**/.codex/agents/epic-orchestrator.toml",
+    "scripts/harness-generation/sources/agents/epic-orchestrator.json",
+    "extensions/drm-copilot/test/lib/validate/policy-audit-artifact.test.ts",
+    "tests/scripts/dev_tools/test_validate_policy_audit_artifact.py",
+    "extensions/drm-copilot/test/lib/validate/plan-gate-guideline-cutoff.test.ts",
+    "tests/scripts/dev_tools/test_plan_gate_guideline_cutoff.py",
+    "tests/scripts/claude-hooks/EpicWaveEarlyStart.Cases.Helpers.ps1",
+    "tests/scripts/claude-hooks/enforce-epic-wave-barrier.EarlyStart.Tests.ps1",
+    "tests/scripts/codex-hooks/enforce-epic-wave-barrier.EarlyStart.Tests.ps1",
+    "tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py"
+  ],
+  "decisions": [
+    {
+      "source": "docs/features/active/2026-11-06-docs-tokenizer-scaling-1019",
+      "action": "keep"
+    },
+    {
+      "source": "docs/features/active/2026-11-06-execution-env-test-worktree-filter-1019",
+      "action": "keep"
+    },
+    {
+      "source": "docs/features/active/cd-chained-command-recurring-deny-1165",
+      "action": "rename",
+      "target": "1165-cd-chained-command-recurring-deny"
+    },
+    {
+      "source": "docs/features/active/cleanup-worktrees-workflow-blocked-by-checkpoint-gates-1026",
+      "action": "rename",
+      "target": "1026-cleanup-worktrees-workflow-blocked-by-checkpoint-gates"
+    },
+    {
+      "source": "docs/features/active/epic-1019-main-sync-4",
+      "action": "rename",
+      "target": "0004-epic-1019-main-sync"
+    },
+    {
+      "source": "docs/features/active/owner-directive-pass-down-1157",
+      "action": "rename",
+      "target": "1157-owner-directive-pass-down"
+    },
+    {
+      "source": "docs/features/active/parallel-add-and-plan-resume-prepared-items-without-replanning-1047",
+      "action": "rename",
+      "target": "1047-parallel-add-and-plan-resume-prepared-items-without-replanning"
+    },
+    {
+      "source": "docs/features/active/parallel-planner-time-based-edge-rule-1164",
+      "action": "rename",
+      "target": "1164-parallel-planner-time-based-edge-rule"
+    },
+    {
+      "source": "docs/features/active/reduce-feature-cycle-time-with-revertible-ledger-1097",
+      "action": "rename",
+      "target": "1097-reduce-feature-cycle-time-with-revertible-ledger"
+    },
+    {
+      "source": "docs/features/active/regenerate-after-integration-merge-1156",
+      "action": "rename",
+      "target": "1156-regenerate-after-integration-merge"
+    },
+    {
+      "source": "docs/features/archive/2026-08-24-epic-planner-ready-gate-demands-codex-only-launch-binding-543",
+      "action": "keep"
+    },
+    {
+      "source": "docs/features/archive/2026-10-03-issue-823-tier-rule-adoption-follow-ups-824",
+      "action": "keep"
+    },
+    {
+      "source": "docs/features/archive/2026-10-08-epic-planner-topology-receipt-gate-543",
+      "action": "keep"
+    },
+    {
+      "source": "docs/features/archive/2026-10-11-compute-concurrency-batches-coverage-884",
+      "action": "keep"
+    },
+    {
+      "source": "docs/features/archive/2026-10-11-epic-planner-field-list-remainder-543",
+      "action": "keep"
+    },
+    {
+      "source": "docs/features/archive/2026-10-11-round-2-review-nits-and-evidence-timestamps-903",
+      "action": "keep"
+    },
+    {
+      "source": "docs/features/archive/dependabot-bumps-types-vscode-past-engines-940",
+      "action": "rename",
+      "target": "0940-dependabot-bumps-types-vscode-past-engines"
+    },
+    {
+      "source": "docs/features/archive/epic-planner-receipt-checks-key-gate-543",
+      "action": "keep"
+    },
+    {
+      "source": "docs/features/archive/exempt-operand-unc-path-leg-937",
+      "action": "rename",
+      "target": "0937-exempt-operand-unc-path-leg"
+    },
+    {
+      "source": "docs/features/archive/promotion-hook-raw-containment-false-positive-deny-824",
+      "action": "keep"
+    },
+    {
+      "source": "docs/features/archive/promotion-receipt-destination-unverified-623",
+      "action": "rename",
+      "target": "0623-promotion-receipt-destination-unverified"
+    },
+    {
+      "source": "docs/features/archive/subagentstop-artifact-gates-review-notes-929",
+      "action": "rename",
+      "target": "0929-subagentstop-artifact-gates-review-notes"
+    },
+    {
+      "source": "docs/features/archive/subagentstop-envelope-artifact-gates-905",
+      "action": "rename",
+      "target": "0905-subagentstop-envelope-artifact-gates"
+    },
+    {
+      "source": "docs/features/archive/subagentstop-envelope-core-897",
+      "action": "rename",
+      "target": "0897-subagentstop-envelope-core"
+    },
+    {
+      "source": "docs/features/archive/subagentstop-envelope-feature-review-coverage-896",
+      "action": "rename",
+      "target": "0896-subagentstop-envelope-feature-review-coverage"
+    },
+    {
+      "source": "docs/features/archive/subagentstop-envelope-orchestrator-family-903",
+      "action": "keep"
+    },
+    {
+      "source": "docs/features/archive/untouched-files-coverage-verification-884",
+      "action": "keep"
+    },
+    {
+      "source": "docs/features/completed/blast-radius-over-reports-and-zero-overlap-tolerance-722",
+      "action": "rename",
+      "target": "0722-blast-radius-over-reports-and-zero-overlap-tolerance"
+    },
+    {
+      "source": "docs/features/completed/cleanup-report-registration-lost-false-positive-706",
+      "action": "rename",
+      "target": "0706-cleanup-report-registration-lost-false-positive"
+    },
+    {
+      "source": "docs/features/completed/cleanup-worktrees-bats-vacuous-t9-and-stale-citation-715",
+      "action": "rename",
+      "target": "0715-cleanup-worktrees-bats-vacuous-t9-and-stale-citation"
+    },
+    {
+      "source": "docs/features/completed/cleanup-worktrees-test-suite-blind-spots-660",
+      "action": "rename",
+      "target": "0660-cleanup-worktrees-test-suite-blind-spots"
+    },
+    {
+      "source": "docs/features/completed/codex-gates-4-5-lack-epic-scope-707",
+      "action": "rename",
+      "target": "0707-codex-gates-4-5-lack-epic-scope"
+    },
+    {
+      "source": "docs/features/completed/collect-pr-context-fabricates-auto-close-issues-622",
+      "action": "rename",
+      "target": "0622-collect-pr-context-fabricates-auto-close-issues"
+    },
+    {
+      "source": "docs/features/completed/collector-core-no-whichgh-branch-untested-714",
+      "action": "rename",
+      "target": "0714-collector-core-no-whichgh-branch-untested"
+    },
+    {
+      "source": "docs/features/completed/compare-code-point-helper-duplicated-716",
+      "action": "rename",
+      "target": "0716-compare-code-point-helper-duplicated"
+    },
+    {
+      "source": "docs/features/completed/completion-consistency-edit-reads-relative-checkpoint-708",
+      "action": "rename",
+      "target": "0708-completion-consistency-edit-reads-relative-checkpoint"
+    },
+    {
+      "source": "docs/features/completed/enforcement-gates-lack-epic-level-checkpoint-seam-663",
+      "action": "rename",
+      "target": "0663-enforcement-gates-lack-epic-level-checkpoint-seam"
+    },
+    {
+      "source": "docs/features/completed/gate-suites-read-unmocked-local-epic-state-709",
+      "action": "rename",
+      "target": "0709-gate-suites-read-unmocked-local-epic-state"
+    },
+    {
+      "source": "docs/features/completed/parallel-worktree-gate-epic-awareness-688",
+      "action": "rename",
+      "target": "0688-parallel-worktree-gate-epic-awareness"
+    },
+    {
+      "source": "docs/features/completed/planner-hook-em-dash-mismatch-357",
+      "action": "rename",
+      "target": "0357-planner-hook-em-dash-mismatch"
+    },
+    {
+      "source": "docs/features/completed/preimplementation-gate-blocks-attribution-trailers-713",
+      "action": "rename",
+      "target": "0713-preimplementation-gate-blocks-attribution-trailers"
+    },
+    {
+      "source": "docs/features/completed/preimplementation-gate-blocks-epic-execution-554",
+      "action": "rename",
+      "target": "0554-preimplementation-gate-blocks-epic-execution"
+    },
+    {
+      "source": "docs/features/completed/preimplementation-helpers-backslash-chain-operator-710",
+      "action": "rename",
+      "target": "0710-preimplementation-helpers-backslash-chain-operator"
+    },
+    {
+      "source": "docs/features/completed/separate-version-bump-from-publish-214",
+      "action": "rename",
+      "target": "0214-separate-version-bump-from-publish"
+    },
+    {
+      "source": "docs/features/completed/unused-npm-token-secret-712",
+      "action": "rename",
+      "target": "0712-unused-npm-token-secret"
+    }
+  ]
+}

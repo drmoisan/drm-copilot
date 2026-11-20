@@ -18,8 +18,8 @@ BeforeAll {
 
     $script:SessionRoot = '/synthetic-worktrees/main'
     $script:ItemRoot = '/synthetic-worktrees/main/.claude/worktrees/bug-1105'
-    $script:SpecRelative = 'docs/features/active/sample/spec.md'
-    $script:ResearchRelative = 'docs/features/active/sample/research/research.2026-11-07T13-55.md'
+    $script:SpecRelative = '.dev/active/sample/spec.md'
+    $script:ResearchRelative = '.dev/active/sample/research/research.2026-11-07T13-55.md'
     $script:SpecItem = "$script:ItemRoot/$script:SpecRelative"
     $script:ResearchItem = "$script:ItemRoot/$script:ResearchRelative"
     $script:NumericSpec = "## Acceptance Criteria`n- [ ] All 12 agent files contain the marker."
@@ -61,11 +61,11 @@ Describe 'validate-prd-feature-output spec-path and research-path target worktre
         Mock Test-PrdFeatureArtifactFile { $true }
 
         # Act
-        $result = Invoke-PrdFeatureCase -Output 'spec-path: docs/features/active/../../x/spec.md'
+        $result = Invoke-PrdFeatureCase -Output 'spec-path: .dev/active/../../x/spec.md'
 
         # Assert
         $result.Ok | Should -BeFalse
-        $result.Message | Should -BeLike "prd-feature hook: spec-path 'docs/features/active/../../x/spec.md'*'..' segment*"
+        $result.Message | Should -BeLike "prd-feature hook: spec-path '.dev/active/../../x/spec.md'*'..' segment*"
         $result.Message | Should -Not -BeLike '*not repairable*'
         Should -Invoke Test-PrdFeatureArtifactFile -Times 0 -Exactly
     }
@@ -77,11 +77,11 @@ Describe 'validate-prd-feature-output spec-path and research-path target worktre
         Mock Test-SpecNumericCriterion { $true }
 
         # Act
-        $result = Invoke-PrdFeatureCase -Output "spec-path: $script:SpecRelative`nresearch-path: docs/features/active/../../x/research.md"
+        $result = Invoke-PrdFeatureCase -Output "spec-path: $script:SpecRelative`nresearch-path: .dev/active/../../x/research.md"
 
         # Assert
         $result.Ok | Should -BeFalse
-        $result.Message | Should -BeLike "prd-feature hook: research-path 'docs/features/active/../../x/research.md'*'..' segment*"
+        $result.Message | Should -BeLike "prd-feature hook: research-path '.dev/active/../../x/research.md'*'..' segment*"
         $result.Message | Should -Not -BeLike '*not repairable*'
         Should -Invoke Test-PrdFeatureArtifactFile -Times 1 -Exactly
         Should -Invoke Test-PrdFeatureArtifactFile -Times 1 -Exactly -ParameterFilter { $Path -eq $script:SpecItem }

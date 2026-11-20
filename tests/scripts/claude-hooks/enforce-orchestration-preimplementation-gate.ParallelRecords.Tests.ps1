@@ -211,7 +211,7 @@ Describe 'Claude preimplementation gate parallel records leg (issue #1182)' {
 
         It '(f) never reaches the parallel leg for a command payload' {
             # Act
-            $decision = Get-ParallelRecordsGateDecision -Payload (ConvertTo-ParallelRecordsPayload -Tool 'Bash' -Command 'git add -- docs/features/parallel/demo-run/parallel-status.md')
+            $decision = Get-ParallelRecordsGateDecision -Payload (ConvertTo-ParallelRecordsPayload -Tool 'Bash' -Command 'git add -- .dev/parallel/demo-run/parallel-status.md')
 
             # Assert
             [string]$decision.hookSpecificOutput.permissionDecisionReason | Should -Not -BeLike '*Parallel records leg*'

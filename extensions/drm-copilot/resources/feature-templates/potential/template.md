@@ -30,4 +30,4 @@ List notable constraints (performance, compatibility, scope) or risks.
 ## Next Step
 
 - [ ] Promote to GitHub issue (feature request template)
-- [ ] Create `docs/features/active/<feature-name>/` folder from the template
+- [ ] Create `.dev/active/<feature-name>/` folder from the template

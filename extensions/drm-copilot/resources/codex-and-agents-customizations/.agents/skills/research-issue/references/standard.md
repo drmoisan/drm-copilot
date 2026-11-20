@@ -6,8 +6,8 @@ Investigate the best implementation approach for a feature or bug by analyzing t
 
 ## Observable Behaviors
 
-- **OB-1** Inputs: The skill accepts one or more feature documents as context, `docs/features/active/<feature>/issue.md` as the primary document and `docs/features/active/<feature>/user-story.md` and `docs/features/active/<feature>/spec.md` when present.
-- **OB-2** Output: The skill creates or updates a single research file in the applicable tracked research root, at the feature-associated path `docs/features/<feature>/research/<timestamp>-<short-name>-research.md` or the one-off path `docs/research/<timestamp>-<short-name>-research.md`, uses the repository's Task Researcher template exactly, and places rejected-alternatives summaries inside `## Recommended Approach` rather than as a separate top-level header.
+- **OB-1** Inputs: The skill accepts one or more feature documents as context, `.dev/active/<feature>/issue.md` as the primary document and `.dev/active/<feature>/user-story.md` and `.dev/active/<feature>/spec.md` when present.
+- **OB-2** Output: The skill creates or updates a single research file in the applicable tracked research root, at the feature-associated path `.dev/<feature>/research/<timestamp>-<short-name>-research.md` or the one-off path `.dev/research/<timestamp>-<short-name>-research.md`, uses the repository's Task Researcher template exactly, and places rejected-alternatives summaries inside `## Recommended Approach` rather than as a separate top-level header.
 - **OB-3** Investigation Areas: Identify implementation targets from the feature docs.
 - **OB-4** Constraints: Do not implement changes.
 

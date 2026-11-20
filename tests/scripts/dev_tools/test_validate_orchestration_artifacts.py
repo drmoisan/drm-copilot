@@ -59,7 +59,7 @@ def test_validate_policy_audit_text_requires_checklist_lines() -> None:
     errors = validator.validate_policy_audit_text(
         build_valid_policy_audit_text().replace(
             "- PowerShell post-change coverage artifact: "
-            "docs/features/active/example/evidence/qa-gates/powershell.md\n",
+            ".dev/active/example/evidence/qa-gates/powershell.md\n",
             "",
         )
     )

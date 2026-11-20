@@ -5,7 +5,7 @@ import { validateRemediationLoop } from "../../../src/lib/validate/orchestrator-
 /** Return a single well-formed remediation cycle for mutation. */
 function buildCycle(): Record<string, unknown> {
   return {
-    plan_path: "docs/features/active/feature-1/remediation-1.plan.md",
+    plan_path: ".dev/active/feature-1/remediation-1.plan.md",
     execution_status: "complete",
     preflight: { final_status: "clear" },
     exit_condition_met: true,

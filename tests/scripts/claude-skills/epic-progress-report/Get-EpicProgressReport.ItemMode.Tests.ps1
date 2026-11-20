@@ -12,8 +12,8 @@ Describe 'Invoke-EpicProgressReport in item mode' {
     BeforeAll {
         $script:worktree = '/fixture-repo-wt/item'
         $script:checkpointPath = Join-Path -Path $script:worktree -ChildPath 'artifacts/orchestration/orchestrator-state.json'
-        $script:planPath = Join-Path -Path $script:worktree -ChildPath 'docs/features/active/x/plan.md'
-        $script:specPath = Join-Path -Path $script:worktree -ChildPath 'docs/features/active/x/spec.md'
+        $script:planPath = Join-Path -Path $script:worktree -ChildPath '.dev/active/x/plan.md'
+        $script:specPath = Join-Path -Path $script:worktree -ChildPath '.dev/active/x/spec.md'
         # Research 09:00-09:10, spec 09:10-09:15, planning 09:15-09:25, preflight 09:25-09:35,
         # execution 09:35-10:35 (four tasks, all checked), and an open review since 11:50.
         $script:stageTiming = '{"stage":"research","attempt":1,"started_at":"2026-01-05T09:00:00Z","ended_at":"2026-01-05T09:10:00Z"},' +
@@ -22,7 +22,7 @@ Describe 'Invoke-EpicProgressReport in item mode' {
         '{"stage":"preflight","attempt":1,"started_at":"2026-01-05T09:25:00Z","ended_at":"2026-01-05T09:35:00Z"},' +
         '{"stage":"execution","attempt":1,"started_at":"2026-01-05T09:35:00Z","ended_at":"2026-01-05T10:35:00Z"}'
         $script:openReview = '{"stage":"review","attempt":1,"started_at":"2026-01-05T11:50:00Z","ended_at":null}'
-        $script:itemCheckpoint = '{"issue-num":"1118","feature-folder":"docs/features/active/x","plan-path":"docs/features/active/x/plan.md","next_step":"S7_feature_review","stage_timing":[' + $script:stageTiming + ',' + $script:openReview + ']}'
+        $script:itemCheckpoint = '{"issue-num":"1118","feature-folder":".dev/active/x","plan-path":".dev/active/x/plan.md","next_step":"S7_feature_review","stage_timing":[' + $script:stageTiming + ',' + $script:openReview + ']}'
         $script:startUtc = [datetime]::new(2026, 1, 5, 9, 0, 0, [System.DateTimeKind]::Utc)
         # 2026-01-05T12:00:00Z.
         $script:noon = [datetime]::new(2026, 1, 5, 12, 0, 0, [System.DateTimeKind]::Utc)
@@ -127,7 +127,7 @@ Describe 'Invoke-EpicProgressReport in item mode' {
         '{"stage":"pr","attempt":1,"started_at":"2026-01-05T10:55:00Z","ended_at":"2026-01-05T11:00:00Z"},' +
         '{"stage":"ci","attempt":1,"started_at":"2026-01-05T11:00:00Z","ended_at":"2026-01-05T11:20:00Z"},' +
         '{"stage":"ci","attempt":2,"started_at":"2026-01-05T11:40:00Z","ended_at":null}'
-        $script:fileText[$script:checkpointPath] = '{"issue-num":"1118","plan-path":"docs/features/active/x/plan.md","stage_timing":[' + $script:stageTiming + ',' + $ci + ']}'
+        $script:fileText[$script:checkpointPath] = '{"issue-num":"1118","plan-path":".dev/active/x/plan.md","stage_timing":[' + $script:stageTiming + ',' + $ci + ']}'
 
         $lines = Get-TestItemLine
 
@@ -164,7 +164,7 @@ Describe 'Invoke-EpicProgressReport in item mode' {
             '{"stage":"S4_preflight","attempt":1,"started_at":"2026-01-05T09:25:00Z","ended_at":"2026-01-05T09:35:00Z"},' +
             '{"stage":"atomic_execution","attempt":1,"started_at":"2026-01-05T09:35:00Z","ended_at":"2026-01-05T10:35:00Z"},' +
             '{"stage":"feature_review","attempt":1,"started_at":"2026-01-05T11:50:00Z","ended_at":null}'
-            $script:liveCheckpoint = '{"issue-num":"1118","feature-folder":"docs/features/active/x","plan-path":"docs/features/active/x/plan.md","next_step":"S7_feature_review","stage_timing":[' + $script:liveTiming + ']}'
+            $script:liveCheckpoint = '{"issue-num":"1118","feature-folder":".dev/active/x","plan-path":".dev/active/x/plan.md","next_step":"S7_feature_review","stage_timing":[' + $script:liveTiming + ']}'
         }
 
         BeforeEach {

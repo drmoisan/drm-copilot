@@ -14,7 +14,7 @@
 #>
 
 $script:NotReadyCheckpoint = '{"issue-num":"","feature-folder":"","route_id":"","lifecycle_ready":false}'
-$script:ReadyCheckpoint = '{"issue-num":"737","feature-folder":"docs/features/active/2026-09-27-x-737","route_id":"small","lifecycle_ready":true}'
+$script:ReadyCheckpoint = '{"issue-num":"737","feature-folder":".dev/active/2026-09-27-x-737","route_id":"small","lifecycle_ready":true}'
 
 $script:PathCases = @(
     @{ Name = 'a repository-relative implementation path'; Input = 'src/module/service.py'; Expected = $true }
@@ -23,8 +23,8 @@ $script:PathCases = @(
     @{ Name = 'a case-variant feature documentation path with a json extension'; Input = 'Docs/Features/Active/x/spec.json'; Expected = $true }
     @{ Name = 'a checkpoint file name'; Input = 'artifacts/orchestration/orchestrator-state.json'; Expected = $false }
     @{ Name = 'an absolute checkpoint file name'; Input = '/synthetic-worktrees/item-a/artifacts/orchestration/orchestrator-state.json'; Expected = $false }
-    @{ Name = 'a feature documentation path'; Input = 'docs/features/active/2026-10-01-x-1/plan.md'; Expected = $false }
-    @{ Name = 'an evidence path with a json extension'; Input = 'docs/features/active/x/evidence/qa-gates/result.json'; Expected = $false }
+    @{ Name = 'a feature documentation path'; Input = '.dev/active/2026-10-01-x-1/plan.md'; Expected = $false }
+    @{ Name = 'an evidence path with a json extension'; Input = '.dev/active/x/evidence/qa-gates/result.json'; Expected = $false }
     @{ Name = 'a non-implementation extension'; Input = 'README.md'; Expected = $false }
     @{ Name = 'an empty string'; Input = ''; Expected = 'THROWS' }
 )
@@ -36,7 +36,7 @@ $script:CommandCases = @(
     @{ Name = 'git status'; Input = 'git status'; Expected = $false }
     @{ Name = 'a formatter invocation through poetry'; Input = 'poetry run black src/'; Expected = $true }
     @{ Name = 'a formatter invocation through npx'; Input = 'npx prettier --check .'; Expected = $true }
-    @{ Name = 'a documentation-only git commit'; Input = 'git commit -m x -- docs/features/active/x/plan.md'; Expected = $false }
+    @{ Name = 'a documentation-only git commit'; Input = 'git commit -m x -- .dev/active/x/plan.md'; Expected = $false }
     @{ Name = 'a read-only file listing'; Input = 'Get-Content README.md'; Expected = $false }
     @{ Name = 'an empty string'; Input = ''; Expected = 'THROWS' }
 )
@@ -85,25 +85,25 @@ $script:DelegationCases = @(
 )
 
 $script:ReadinessCases = @(
-    @{ Name = 'a ready checkpoint'; Raw = '{"issue-num":"737","feature-folder":"docs/features/active/x","route_id":"small","lifecycle_ready":true}'; Expected = $true }
-    @{ Name = 'a ready checkpoint that names its route as path_selected'; Raw = '{"issue-num":"737","feature-folder":"docs/features/active/x","path_selected":"small","lifecycle_ready":true}'; Expected = $true }
-    @{ Name = 'a not-ready checkpoint'; Raw = '{"issue-num":"737","feature-folder":"docs/features/active/x","route_id":"small","lifecycle_ready":false}'; Expected = $false }
+    @{ Name = 'a ready checkpoint'; Raw = '{"issue-num":"737","feature-folder":".dev/active/x","route_id":"small","lifecycle_ready":true}'; Expected = $true }
+    @{ Name = 'a ready checkpoint that names its route as path_selected'; Raw = '{"issue-num":"737","feature-folder":".dev/active/x","path_selected":"small","lifecycle_ready":true}'; Expected = $true }
+    @{ Name = 'a not-ready checkpoint'; Raw = '{"issue-num":"737","feature-folder":".dev/active/x","route_id":"small","lifecycle_ready":false}'; Expected = $false }
     @{ Name = 'an empty checkpoint object'; Raw = '{}'; Expected = $false }
     @{ Name = 'an empty checkpoint text'; Raw = ''; Expected = $false }
     @{ Name = 'a checkpoint whose feature folder is outside the active tree'; Raw = '{"issue-num":"737","feature-folder":"elsewhere/x","route_id":"small","lifecycle_ready":true}'; Expected = $false }
     @{ Name = 'an unparseable checkpoint'; Raw = '{not-json'; Expected = $false }
     # Issue #1010: lifecycle_ready counts as ready only when it is the JSON boolean true.
-    @{ Name = 'a checkpoint whose lifecycle_ready is the string false'; Raw = '{"issue-num":"737","feature-folder":"docs/features/active/x","route_id":"small","lifecycle_ready":"false"}'; Expected = $false }
-    @{ Name = 'a checkpoint whose lifecycle_ready is the string true'; Raw = '{"issue-num":"737","feature-folder":"docs/features/active/x","route_id":"small","lifecycle_ready":"true"}'; Expected = $false }
-    @{ Name = 'a checkpoint whose lifecycle_ready is the number 1'; Raw = '{"issue-num":"737","feature-folder":"docs/features/active/x","route_id":"small","lifecycle_ready":1}'; Expected = $false }
-    @{ Name = 'a checkpoint whose lifecycle_ready is null'; Raw = '{"issue-num":"737","feature-folder":"docs/features/active/x","route_id":"small","lifecycle_ready":null}'; Expected = $false }
+    @{ Name = 'a checkpoint whose lifecycle_ready is the string false'; Raw = '{"issue-num":"737","feature-folder":".dev/active/x","route_id":"small","lifecycle_ready":"false"}'; Expected = $false }
+    @{ Name = 'a checkpoint whose lifecycle_ready is the string true'; Raw = '{"issue-num":"737","feature-folder":".dev/active/x","route_id":"small","lifecycle_ready":"true"}'; Expected = $false }
+    @{ Name = 'a checkpoint whose lifecycle_ready is the number 1'; Raw = '{"issue-num":"737","feature-folder":".dev/active/x","route_id":"small","lifecycle_ready":1}'; Expected = $false }
+    @{ Name = 'a checkpoint whose lifecycle_ready is null'; Raw = '{"issue-num":"737","feature-folder":".dev/active/x","route_id":"small","lifecycle_ready":null}'; Expected = $false }
 )
 
 $script:DecisionCases = @(
     @{
         Name       = 'allow for a documentation path'
         Kind       = 'file_path'
-        Fields     = @{ file_path = 'docs/features/active/x/plan.md' }
+        Fields     = @{ file_path = '.dev/active/x/plan.md' }
         Checkpoint = $script:NotReadyCheckpoint
         Expected   = 'allow'
     }

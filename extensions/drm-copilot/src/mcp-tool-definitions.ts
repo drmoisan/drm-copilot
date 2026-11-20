@@ -7,6 +7,7 @@ import {
 } from "./mcp-push-down-schema-properties";
 import { POLICY_AUDIT_TEMPLATE_ASSET_SELECTORS } from "./workflow-command-arguments";
 import { DISCOVERY_TOOL_DEFINITIONS } from "./mcp-discovery-tool-definitions";
+import { DEVELOPMENT_DOCS_TOOL_DEFINITIONS } from "./mcp-development-docs-tool-definitions";
 import { DOCS_TOOL_DEFINITIONS } from "./mcp-docs-tool-definitions";
 import { PUSH_DOWN_INTEGRATION_TOOL_DEFINITIONS } from "./mcp-push-down-integration-tool-definitions";
 import { HANDOFF_TOOL_DEFINITIONS } from "./mcp-repo-automation-tool-definitions-handoff";
@@ -467,6 +468,7 @@ export const toolDefinitions: ReadonlyArray<ToolDefinition> = [
     },
   },
   ...HANDOFF_TOOL_DEFINITIONS,
+  ...DEVELOPMENT_DOCS_TOOL_DEFINITIONS,
   ...DOCS_TOOL_DEFINITIONS,
   ...PUSH_DOWN_INTEGRATION_TOOL_DEFINITIONS,
   ...DISCOVERY_TOOL_DEFINITIONS,

@@ -1,0 +1,6 @@
+# Task check [P2-T2]
+
+Timestamp: 2026-11-20T13-32
+Command: sh SCRATCH/issue-1016-p2t2.sh (worktree root: node packages/mcp-server/out/mcp-server.js migrate-development-docs --workspace . --mode apply --decisions <OLD_FEATURE>/evidence/other/folder-rename-decisions.2026-11-20T12-24.json --report-dir SCRATCH/apply-1); cp -n of the report pair into NEW_FEATURE/evidence/other/
+EXIT_CODE: 0
+Output Summary: Apply exit 0: 37 moves, 404 renames, 527 applied rewrites, docs/README.md created, 0 untracked files, 0 formatter errors, 0 collisions; source_digest 2f33c96522d776b174bff9370652a8a676c6d03dedc2758570e7f6e87b936a75. NEW_FEATURE/plan.2026-10-30T23-35.md exists and OLD_FEATURE does not; git ls-files docs lists nothing tracked and docs/README.md is the only file under docs/ (untracked until [P2-T3]). The report pair dev-docs-migration-dry-run.2026-11-20T13-31.json and .md was copied into NEW_FEATURE/evidence/other/ with its names unchanged; it lists the 37 moves, the 404 renames, the rewritten files with occurrence counts (475 outside moved trees, 52 in-tree links-only), 76 protected-occurrence entries and 0 untracked files. Task check: the tool's changes are tested by the [P2-T4] phase gate against REHEARSAL; no hand edit was made, so no separate selection runs here.

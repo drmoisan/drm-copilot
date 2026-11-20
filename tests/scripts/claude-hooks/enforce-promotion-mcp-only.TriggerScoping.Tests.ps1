@@ -14,7 +14,7 @@
 
       1. The over-match allow case (1). A heredoc body whose JSON names promotion
          tools as receipt VALUES. This is the live reproduction recorded at
-         docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/evidence/other/live-reproduction-promotion-hook-overmatch.2026-09-06T23-35.md,
+         .dev/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/evidence/other/live-reproduction-promotion-hook-overmatch.2026-09-06T23-35.md,
          in which a checkpoint write was denied with PROMOTION_MCP_ONLY_BLOCKED
          although no promotion script was invoked. `cat` is not a member of the
          wrapper carve-out set, so the body is masked and the names are mentions.
@@ -31,7 +31,7 @@
 
     The normative contract is the D2 behaviour contract, the D3 fail-closed table,
     and D10 in
-    docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
+    .dev/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
 
     Determinism: every decision is driven through the pure seam
     `Invoke-PromotionMcpOnlyDecision` with a literal envelope string. The seam reads

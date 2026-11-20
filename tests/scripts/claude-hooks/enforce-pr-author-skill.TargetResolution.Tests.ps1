@@ -138,7 +138,7 @@ Describe 'enforce-pr-author-skill.ps1 target resolution' {
         BeforeAll {
             Import-Module (Resolve-Path (Join-Path $PSScriptRoot '../../../.claude/lib/worktree-resolution/HookTargetWorktree.psm1')).Path -ErrorAction Stop
             $script:HeadCommand = 'gh pr create --head feature/item-701 --body-file artifacts/pr_body_701.md'
-            $script:FeatureFolderRoot = "$($script:SeamRoot)/docs/features/active/item-701"
+            $script:FeatureFolderRoot = "$($script:SeamRoot)/.dev/active/item-701"
             $script:IdentityNoTarget = New-WorktreeResolutionTargetResult -Status NoTarget -SessionRoot $script:SessionRootPath -Detail 'identity resolution found no target.'
 
             # Build a resolver result with the six RESOLVER_CONTRACT properties.

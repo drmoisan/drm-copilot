@@ -50,7 +50,7 @@ BeforeAll {
     $script:RecordsPr = 88
     $script:Head = '0123456789abcdef0123456789abcdef01234567'
     $script:BaseCommit = 'fedcba9876543210fedcba9876543210fedcba98'
-    $script:RecordsPaths = "docs/features/parallel/demo-run/parallel-status.md$([char]0)docs/features/parallel/demo-run/parallel.md$([char]0)"
+    $script:RecordsPaths = ".dev/parallel/demo-run/parallel-status.md$([char]0).dev/parallel/demo-run/parallel.md$([char]0)"
     $resolved = Resolve-DelegationModel -Agent 'pr-author' -Band 'C2' -FablePolicy 'disabled'
     $script:CheckpointText = [ordered]@{
         route_id               = 'parallel'

@@ -16,9 +16,9 @@
 export const ITEM_HEADER_ROW =
   "| issue_num | feature_folder | cohort | complexity | branch | plan-path |";
 export const ITEM_SEPARATOR_ROW = "| --- | --- | --- | --- | --- | --- |";
-export const PLAN_PATH_101 = "docs/features/active/item-101/plan.md";
+export const PLAN_PATH_101 = ".dev/active/item-101/plan.md";
 export const ITEM_ROW_101 =
-  "| 101 | docs/features/active/item-101 | 0 | C3 | feature/item-101 | " +
+  "| 101 | .dev/active/item-101 | 0 | C3 | feature/item-101 | " +
   `${PLAN_PATH_101} |`;
 export const HASH_40 = "a".repeat(40);
 export const HASH_64 = "b".repeat(64);
@@ -27,7 +27,7 @@ const INVOCATION_BLOCK = [
   "## Invocation Prompt",
   "Run `/parallel-run sample-run` to execute this parallel run.",
   "Use the parallel-orchestrator subagent to execute the prepared run at",
-  "docs/features/parallel/sample-run/parallel.md. The plan-home branch",
+  ".dev/parallel/sample-run/parallel.md. The plan-home branch",
   "parallel/sample-run-plan already contains every approved atomic plan;",
   "items resume at atomic execution from their committed plan-path on",
   "their own pushed feature branch rather than re-planning.",

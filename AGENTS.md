@@ -49,7 +49,7 @@ as explicit entry points:
 - `epic-plan` delegates master scoping and complete preparation through preflight
   to the `epic-planner` agent.
 - `epic-run` executes a prepared epic from the committed
-  `docs/features/epics/<slug>/epic-kickoff.md` artifact.
+  `.dev/epics/<slug>/epic-kickoff.md` artifact.
 - `epic-orchestrate` executes a valid manually authored epic manifest.
 
 The ordinary `orchestrator` must not invoke either epic persona. Both epic

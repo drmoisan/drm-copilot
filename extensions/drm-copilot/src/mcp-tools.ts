@@ -74,6 +74,7 @@ import {
 import { normalizeWorkspaceRoot } from "./workflow-command-arguments";
 import { handlePortableHandoffTool } from "./mcp-handlers/orchestration-handoff-handlers";
 import { handleDocsTool } from "./mcp-handlers/docs-handlers";
+import { handleMigrateDevelopmentDocs } from "./mcp-handlers/development-docs-migration-handler";
 import type { DocsCommandEnvelope } from "./docs-command-envelope";
 import type { PushDownReport } from "./lib/push-down/push-down-report";
 import { handlePushDownIntegrationTool } from "./mcp-handlers/push-down-integration-handlers";
@@ -341,6 +342,12 @@ export async function dispatchRepoAutomationTool(
       case "render_subagent_tree": {
         return toMcpToolResult(
           await handleRenderSubagentTree(rawInput, service),
+        );
+      }
+
+      case "migrate_development_docs": {
+        return toMcpToolResult(
+          await handleMigrateDevelopmentDocs(rawInput, service),
         );
       }
 

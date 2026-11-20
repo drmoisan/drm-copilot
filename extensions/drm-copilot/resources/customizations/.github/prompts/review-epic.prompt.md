@@ -17,7 +17,7 @@ Do not ask clarifying questions. Make best-effort inferences, document assumptio
 ## Inputs (required)
 
 - **Epic root folder (required):** `${input:EpicRootFolder}`
-  - Example: `docs/features/active/2026-02-02-some-epic-47`
+  - Example: `.dev/active/2026-02-02-some-epic-47`
 
 ## What you must derive from the epic root
 
@@ -75,7 +75,7 @@ All filenames must include a timestamp in ISO-8601 format `yyyy-MM-ddTHH-mm` (e.
    - Plan reconciliation notes (auto-checked items with evidence)
 
 3. `policy-audit.<timestamp>.md`
-   - Repo-wide policy audit using `docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`
+   - Repo-wide policy audit using `.dev/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md`
 
 ### Conditional deliverables (only if remediation is required)
 

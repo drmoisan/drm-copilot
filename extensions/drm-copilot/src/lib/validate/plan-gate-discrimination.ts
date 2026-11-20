@@ -85,7 +85,7 @@ export {
  * G5's severity channel, mirroring the Python constant exactly.
  *
  * The value is fixed by the pre-declared corpus measurement recorded in
- * `docs/features/active/2026-08-17-reject-unfalsifiable-acceptance-gates-in-atomic-plans-486/evidence/qa-gates/g5-corpus-measurement.2026-08-20T12-02.md`
+ * `.dev/active/2026-08-17-reject-unfalsifiable-acceptance-gates-in-atomic-plans-486/evidence/qa-gates/g5-corpus-measurement.2026-08-20T12-02.md`
  * and by nothing else. That run scanned 166 plan files, evaluated 100 candidate
  * literals, and produced a total G5 finding count of 0, so the zero
  * false-positive count measures nothing and does not license Blocking.

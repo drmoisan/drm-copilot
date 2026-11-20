@@ -266,7 +266,7 @@ def test_skill_names_the_planner_checkpoint_and_manifest_paths() -> None:
     skill_text = read_repo_text(PARALLEL_PLAN_SKILL_RELATIVE)
 
     assert "artifacts/orchestration/parallel-planner-state.json" in skill_text
-    assert "docs/features/parallel/<slug>/parallel.md" in skill_text
+    assert ".dev/parallel/<slug>/parallel.md" in skill_text
 
 
 def test_skill_names_both_kickoff_artifact_paths() -> None:
@@ -279,23 +279,23 @@ def test_skill_names_both_kickoff_artifact_paths() -> None:
     skill_text = read_repo_text(PARALLEL_PLAN_SKILL_RELATIVE)
 
     assert "artifacts/orchestration/parallel-kickoff-<slug>.md" in skill_text
-    assert "docs/features/parallel/<slug>/parallel-kickoff.md" in skill_text
+    assert ".dev/parallel/<slug>/parallel-kickoff.md" in skill_text
 
 
 def test_agent_frontmatter_declares_no_epic_docs_scope() -> None:
     """Forbid any epic-tree write or edit grant on the parallel persona.
 
-    The parallel surface owns ``docs/features/parallel/**`` only. An epic-tree
+    The parallel surface owns ``.dev/parallel/**`` only. An epic-tree
     grant would let this persona edit the epic surface it must leave alone.
     """
 
     frontmatter = read_frontmatter(PARALLEL_PLANNER_AGENT_RELATIVE)
 
     assert (
-        "docs/features/epics" not in frontmatter
+        ".dev/epics" not in frontmatter
     ), "parallel-planner.md frontmatter must not scope the epic docs tree"
     assert (
-        "docs/features/active" not in frontmatter
+        ".dev/active" not in frontmatter
     ), "parallel-planner.md frontmatter must not scope the active docs tree"
 
 

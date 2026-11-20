@@ -71,7 +71,7 @@ def test_minor_audit_customization_mirrors_match_root_contracts() -> None:
 
 def test_minor_audit_template_readme_documents_explicit_issue_section() -> None:
     """Require template guidance to document the explicit issue AC section."""
-    template_readme = read_repo_text("docs/features/templates/README.md")
+    template_readme = read_repo_text(".dev/templates/README.md")
 
     assert "`minor-audit`: `issue.md` and `plan.md`" in template_readme
     assert "explicit `## Acceptance Criteria` section" in template_readme

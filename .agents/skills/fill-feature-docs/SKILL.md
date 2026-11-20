@@ -14,8 +14,8 @@ This direct-use wrapper delegates feature-document work to the `prd-feature` wor
 
 ## Output Paths
 
-- `docs/features/active/<feature>/spec.md`
-- `docs/features/active/<feature>/user-story.md`
+- `.dev/active/<feature>/spec.md`
+- `.dev/active/<feature>/user-story.md`
 
 ## Worker Routing
 

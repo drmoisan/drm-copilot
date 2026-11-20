@@ -187,7 +187,7 @@ def test_normalize_declared_radius_drops_every_rejected_entry_class() -> None:
             ".claude/rules/**",
             "artifacts/pr_context.summary.txt",
             "config/blast-radius.json",
-            "docs/features/**/plan*.md",
+            ".dev/**/plan*.md",
             "quality-tiers.yml",
             "scripts/dev_tools",
         ],
@@ -316,7 +316,7 @@ def test_placeholder_only_overlap_stops_conflicting_after_normalization() -> Non
     radius_a = declared_radius(
         paths=[
             placeholder,
-            "docs/features/active/2026-08-23-alpha-item-9001/plan.md",
+            ".dev/active/2026-08-23-alpha-item-9001/plan.md",
             "scripts/dev_tools/alpha_only_module.py",
         ],
         modules=["alpha"],
@@ -326,7 +326,7 @@ def test_placeholder_only_overlap_stops_conflicting_after_normalization() -> Non
     radius_b = declared_radius(
         paths=[
             placeholder,
-            "docs/features/active/2026-08-23-beta-item-9002/plan.md",
+            ".dev/active/2026-08-23-beta-item-9002/plan.md",
             "scripts/dev_tools/beta_only_module.py",
         ],
         modules=["beta"],

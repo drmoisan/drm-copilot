@@ -14,7 +14,7 @@ from tests.scripts.dev_tools.potential_to_issue_test_support import (
 def test_promote_potential_bug_builds_issue_body_from_bug_sections() -> None:
     """Verify bug promotion renders all bug sections into the created issue body."""
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/sample-bug.md"
+    potential = workspace / ".dev/potential/sample-bug.md"
     fs = FakeFileSystem()
     fs.files[potential] = "\n".join(
         [
@@ -65,13 +65,13 @@ def test_promote_potential_bug_builds_issue_body_from_bug_sections() -> None:
     assert "## Actual Behavior\nactual results" in body
     assert "## Impact / Severity\nmedium" in body
     assert "## Logs / Screenshots\nscreenshot attached" in body
-    assert "## Source\nFrom: docs/features/potential/sample-bug.md" in body
+    assert "## Source\nFrom: .dev/potential/sample-bug.md" in body
 
 
 def test_promote_potential_bug_missing_sections_use_placeholders() -> None:
     """Verify missing bug sections are filled with placeholder text."""
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/placeholder-bug.md"
+    potential = workspace / ".dev/potential/placeholder-bug.md"
     fs = FakeFileSystem()
     fs.files[potential] = "\n".join(["# Placeholder Bug", "## Summary", "only summary"])
 
@@ -101,7 +101,7 @@ def test_promote_potential_normalizes_smart_punctuation_in_issue_body_and_title(
 ):
     """Verify smart punctuation is normalized in generated issue title/body."""
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/smart.md"
+    potential = workspace / ".dev/potential/smart.md"
     fs = FakeFileSystem()
     fs.files[potential] = "\n".join(
         [
@@ -156,7 +156,7 @@ def test_promote_potential_normalizes_smart_punctuation_in_issue_body_and_title(
 def test_promote_potential_bug_honors_explicit_minor_audit() -> None:
     """Verify bug promotions honor explicit minor-audit selection."""
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/bug-minor.md"
+    potential = workspace / ".dev/potential/bug-minor.md"
     fs = FakeFileSystem()
     fs.files[potential] = "\n".join(
         [
@@ -200,7 +200,7 @@ def test_promote_potential_bug_honors_explicit_minor_audit() -> None:
 def test_promote_potential_bug_minor_audit_uses_bug_body() -> None:
     """Verify a bug potential in minor-audit mode renders the bug-headed body (AC-3)."""
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/minor-bug.md"
+    potential = workspace / ".dev/potential/minor-bug.md"
     fs = FakeFileSystem()
     fs.files[potential] = "\n".join(
         [
@@ -255,7 +255,7 @@ def test_promote_potential_bug_minor_audit_uses_bug_body() -> None:
 def test_promote_potential_full_alias_normalizes_bug_to_full_bug() -> None:
     """Verify legacy full alias normalizes to full-bug for bug promotions."""
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/full-bug-mode.md"
+    potential = workspace / ".dev/potential/full-bug-mode.md"
     fs = FakeFileSystem()
     fs.files[potential] = "\n".join(
         [

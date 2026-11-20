@@ -103,8 +103,8 @@ class RecordingRunner implements CommandRunner {
 function seedWorkspace(): TreeFileSystem {
   const fs = new TreeFileSystem();
   fs.addFile(`${ROOT}/.git`, "");
-  fs.addDir(`${ROOT}/docs/features/active`);
-  fs.addDir(`${ROOT}/docs/features/potential/promoted`);
+  fs.addDir(`${ROOT}/.dev/active`);
+  fs.addDir(`${ROOT}/.dev/potential/promoted`);
   return fs;
 }
 

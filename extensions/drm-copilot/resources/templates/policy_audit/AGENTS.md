@@ -25,7 +25,7 @@ When performing a policy audit:
 
 2. Use the policy audit template  
    - Use [policy-audit.yyyy-MM-ddTHH-mm.md](./policy-audit.yyyy-MM-ddTHH-mm.md) as the structural starting point for the audit document.
-   - Create a working copy (for example: `docs/features/active/<feature>/policy-audit.2026-01-08T14-30.md`) rather than editing the template in place.
+   - Create a working copy (for example: `.dev/active/<feature>/policy-audit.2026-01-08T14-30.md`) rather than editing the template in place.
 
 3. Use the canonical policy documents for evaluation (read-only)  
    - General code change policy: `.github/instructions/general-code-change.instructions.md`

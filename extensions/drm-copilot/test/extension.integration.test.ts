@@ -442,7 +442,7 @@ describe("drm-copilot integration behavior", () => {
     ).toBe(false);
   });
 
-  it("newPotentialEntry succeeds in a workspace without docs/features/templates using bundled templates", async () => {
+  it("newPotentialEntry succeeds in a workspace without .dev/templates using bundled templates", async () => {
     const templateLessWorkspacePath = "C:/workspace/template-less";
     workspaceFoldersState = [
       {
@@ -472,9 +472,7 @@ describe("drm-copilot integration behavior", () => {
     ).toBe(true);
     expect(options.cwd).toBe(templateLessWorkspacePath);
     expect(
-      args.some((arg) =>
-        normalizePath(arg).includes("/docs/features/templates/"),
-      ),
+      args.some((arg) => normalizePath(arg).includes("/.dev/templates/")),
     ).toBe(false);
   });
 });

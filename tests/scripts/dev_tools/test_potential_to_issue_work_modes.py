@@ -14,7 +14,7 @@ from tests.scripts.dev_tools.potential_to_issue_test_support import (
 def test_promote_potential_minor_audit_adds_required_issue_sections() -> None:
     """Verify minor-audit mode emits required issue section headings."""
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/minor.md"
+    potential = workspace / ".dev/potential/minor.md"
     fs = FakeFileSystem()
     fs.files[potential] = "\n".join(
         [
@@ -55,7 +55,7 @@ def test_promote_potential_minor_audit_adds_required_issue_sections() -> None:
 def test_work_mode_marker_minor_audit() -> None:
     """Verify minor-audit issue bodies persist marker above first section heading."""
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/minor-marker.md"
+    potential = workspace / ".dev/potential/minor-marker.md"
     fs = FakeFileSystem()
     fs.files[potential] = "\n".join(
         [
@@ -92,7 +92,7 @@ def test_work_mode_marker_minor_audit() -> None:
 def test_work_mode_marker_honors_explicit_minor_audit() -> None:
     """Verify explicit minor-audit requests persist a minor-audit marker."""
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/fallback-marker.md"
+    potential = workspace / ".dev/potential/fallback-marker.md"
     fs = FakeFileSystem()
     fs.files[potential] = "\n".join(
         [
@@ -136,7 +136,7 @@ def test_promote_potential_persists_explicit_selected_work_mode() -> None:
 def test_promote_potential_minor_audit_honors_explicit_user_selection() -> None:
     """Verify explicit minor-audit selection is honored."""
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/not-eligible.md"
+    potential = workspace / ".dev/potential/not-eligible.md"
     fs = FakeFileSystem()
     fs.files[potential] = "\n".join(
         [
@@ -172,7 +172,7 @@ def test_promote_potential_minor_audit_honors_explicit_user_selection() -> None:
 def test_promote_potential_full_mode_preserves_existing_body_contract() -> None:
     """Verify legacy full alias preserves the full-feature body contract."""
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/full-mode.md"
+    potential = workspace / ".dev/potential/full-mode.md"
     fs = FakeFileSystem()
     fs.files[potential] = "\n".join(
         [
@@ -209,7 +209,7 @@ def test_promote_potential_full_mode_preserves_existing_body_contract() -> None:
 def test_promote_potential_body_omits_token_like_secret_strings() -> None:
     """Verify generated issue bodies do not include token-like secret substrings."""
     workspace = Path("/workspace")
-    potential = workspace / "docs/features/potential/security.md"
+    potential = workspace / ".dev/potential/security.md"
     fs = FakeFileSystem()
     fs.files[potential] = (
         "# Security\n"

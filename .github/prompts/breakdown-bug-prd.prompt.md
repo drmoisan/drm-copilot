@@ -13,7 +13,7 @@ If information is missing, ask concise clarifying questions before finalizing th
 
 ## Output Format
 
-Update the partially filled template at the path provided after this prompt. The path pattern is `/docs/features/active/{date-created}-{bug-name}-{issue-number}/spec.md`. Edit the template in place; do not emit the full file to stdout. Preserve the section headings from the template.
+Update the partially filled template at the path provided after this prompt. The path pattern is `/.dev/active/{date-created}-{bug-name}-{issue-number}/spec.md`. Edit the template in place; do not emit the full file to stdout. Preserve the section headings from the template.
 
 ## Inputs Available at Runtime
 

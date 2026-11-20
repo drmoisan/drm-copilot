@@ -37,7 +37,7 @@ BeforeAll {
     Import-Module (Join-Path $script:HookRoot 'lib/worktree-resolution/WorktreeTargetResolution.psm1')
     . (Join-Path $PSScriptRoot 'WorktreeResolutionFixture.Helpers.ps1')
 
-    $script:ReadyEpicJson = '{"route_id":"epic","epic_feature_folder":"sample-epic","epic_manifest_path":"docs/features/epics/sample-epic/epic.md","integration_branch":"epic/sample-epic-integration","epic_issue_num":900,"features":[{"feature_folder":"2026-09-25-child-a-901","merge_status":"merged"},{"feature_folder":"2026-09-25-child-b-902","merge_status":"worktree_removed"}],"model_routing_receipts":[{"agent":"pr-author"}]}'
+    $script:ReadyEpicJson = '{"route_id":"epic","epic_feature_folder":"sample-epic","epic_manifest_path":".dev/epics/sample-epic/epic.md","integration_branch":"epic/sample-epic-integration","epic_issue_num":900,"features":[{"feature_folder":"2026-09-25-child-a-901","merge_status":"merged"},{"feature_folder":"2026-09-25-child-b-902","merge_status":"worktree_removed"}],"model_routing_receipts":[{"agent":"pr-author"}]}'
     $script:EpicCommand = 'gh pr create --head epic/sample-epic-integration --base main --title "Integrate sample epic" --body-file artifacts/pr_body_1.md'
     $script:StandaloneCommand = 'gh pr create --head feature/standalone-item --base main --title "Standalone item" --body-file artifacts/pr_body_1.md'
 

@@ -8,7 +8,7 @@ Scope and prepare a multi-feature epic end-to-end before execution for the epic-
 
 - **OB-1** Prerequisites: Before proceeding, the epic planner reads the repository standing instructions, the applicable language policies, `config/orchestration-routing.json`, and any existing `artifacts/orchestration/epic-planner-state.json` checkpoint.
 - **OB-2** Epic-Worthiness Gate: The objective warrants an epic only when it decomposes into at least two independently mergeable child features, each with its own issue, active feature folder and eventual PR, and at least one child, or the combined work, clearly exceeds one practical large-path feature budget; otherwise the planner records `epic_worthiness.verdict: "non_epic"`, states the feature-count and change-budget rationale, offers a single root-session orchestrator delegation, and creates no epic scaffolding unless the user explicitly overrides the verdict.
-- **OB-3** Decomposition and Wave Design: Define `docs/features/epics/<epic-slug>/` and author `epic.md` using the manifest schema in `epic-orchestrate`.
+- **OB-3** Decomposition and Wave Design: Define `.dev/epics/<epic-slug>/` and author `epic.md` using the manifest schema in `epic-orchestrate`.
 - **OB-4** Preparation Worktree Records: Each completed preparation child is recorded in `planner_worktrees` keyed by branch, and its `path`, when recorded, is repository-relative to the main checkout; an absolute path is never recorded.
 
 ## Acceptance Checks

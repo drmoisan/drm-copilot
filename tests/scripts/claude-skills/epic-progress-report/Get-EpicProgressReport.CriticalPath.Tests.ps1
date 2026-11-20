@@ -44,7 +44,7 @@ BeforeAll {
         $row103 = '{"issue_num":103,"merge_status":"not_started"}'
         if ($AllKeyed) { $row103 = '{"issue_num":103,"merge_status":"not_started","depends_on":[101]}' }
         '{' + $CapText + '"features":[{"issue_num":101,"merge_status":"not_started","depends_on":[]},' +
-        '{"issue_num":102,"merge_status":"not_started","feature_folder":"docs/features/active/2026-01-01-beta-102","depends_on":[]},' +
+        '{"issue_num":102,"merge_status":"not_started","feature_folder":".dev/active/2026-01-01-beta-102","depends_on":[]},' +
         $row103 + ',{"issue_num":104,"merge_status":"' + $MergeStatus104 + '","depends_on":[101,"2026-01-01-beta-102"]}]}'
     }
 
@@ -195,7 +195,7 @@ Describe 'Invoke-EpicProgressReport critical-path wiring (issue #1153)' {
             "**Weekly quota (active account):** n/a used, n/a points since the epic started. This pool also covers the other runs in this session, so it is not the epic's cost alone."
         )
         ($lines -join "`n") | Should -Be ($expected -join "`n")
-        $fixture.Git | Should -Contain "show $($script:integration):docs/features/epics/example-epic/epic.md"
+        $fixture.Git | Should -Contain "show $($script:integration):.dev/epics/example-epic/epic.md"
     }
 
     It 'reads no epic.md when every kickoff feature carries a checkpoint depends_on key (E5)' {

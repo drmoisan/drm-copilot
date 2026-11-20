@@ -19,7 +19,7 @@ The repository contains four primary deliverables:
 - [.github/](.github/) — GitHub Copilot customization surface: `copilot-instructions.md`, `instructions/`, `prompts/`, `skills/`, `agents/`, `codex/`, and CI workflows.
 - [.claude/](.claude/) — the Claude Code runtime surface: `rules/`, `skills/`, `agents/`, `hooks/`, `agent-memory/`, and `settings.json`.
 - [.codex/](.codex/) and [.agents/](.agents/) — the Codex-native runtime surface: prompts and skills.
-- [docs/features/](docs/features/) — feature, backlog, and planning documents, organized into `potential/`, `active/`, `completed/`, `archive/`, and `research/`. Multi-feature epics use `docs/features/epics/<epic-slug>/epic.md` as their single home once created (see Epic orchestration below).
+- [.dev/](.dev/) — feature, backlog, and planning documents, organized into `potential/`, `active/`, `completed/`, `archive/`, and `research/`. Multi-feature epics use `.dev/epics/<epic-slug>/epic.md` as their single home once created (see Epic orchestration below).
 - [AGENTS.md](AGENTS.md) — the hand-authored source of standing guidance shared by every agent; [CLAUDE.md](CLAUDE.md) imports it with `@AGENTS.md` and adds the Claude-only instructions.
 
 ## Agentic runtime architecture
@@ -43,7 +43,7 @@ The runtime is orchestrator-driven. The `orchestrator` agent runs in the main th
 
 ### Epic orchestration
 
-The `epic-orchestrate` skill and the `epic-orchestrator` agent schedule a multi-feature epic as a dependency graph of child features, run each child through the standard `orchestrator` lifecycle in parallel, isolated git worktrees, and fan the results back into a shared integration branch before driving the final integration-to-main PR. An epic's dependency manifest and free-text narrative (goal, scope, non-goals, shared design, decomposition) live together in a single home, `docs/features/epics/<epic-slug>/epic.md`, whose YAML frontmatter is the machine-parsed source of truth and whose body is the human-readable narrative and the source for the epic's GitHub issue body.
+The `epic-orchestrate` skill and the `epic-orchestrator` agent schedule a multi-feature epic as a dependency graph of child features, run each child through the standard `orchestrator` lifecycle in parallel, isolated git worktrees, and fan the results back into a shared integration branch before driving the final integration-to-main PR. An epic's dependency manifest and free-text narrative (goal, scope, non-goals, shared design, decomposition) live together in a single home, `.dev/epics/<epic-slug>/epic.md`, whose YAML frontmatter is the machine-parsed source of truth and whose body is the human-readable narrative and the source for the epic's GitHub issue body.
 
 ### Other ecosystem surfaces
 

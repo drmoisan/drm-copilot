@@ -284,7 +284,7 @@ Describe 'Codex PreToolUse hooks honour the native stdin transport contract' {
                 $base = [ordered]@{
                     next_step        = 'complete'
                     'issue-num'      = '415'
-                    'feature-folder' = 'docs/features/active/sample'
+                    'feature-folder' = '.dev/active/sample'
                     ci_gate          = [ordered]@{ conclusion = 'success'; head_sha = 'abc123' }
                 }
                 foreach ($key in $Overrides.Keys) {
@@ -438,7 +438,7 @@ Describe 'Codex PreToolUse hooks honour the native stdin transport contract' {
         }
 
         It 'reads issue-num and feature-folder from variables and reports ci_gate gaps' {
-            $payload = '{"variables":{"issue-num":"415","feature-folder":"docs/features/active/absent"},"ci_gate":{"conclusion":"failure"}}' |
+            $payload = '{"variables":{"issue-num":"415","feature-folder":".dev/active/absent"},"ci_gate":{"conclusion":"failure"}}' |
                 ConvertFrom-Json
 
             $missing = @(Get-MissingCompletionEvidence -Payload $payload)

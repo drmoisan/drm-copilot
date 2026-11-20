@@ -40,7 +40,7 @@ BeforeAll {
     $script:AmbiguityCode = Get-WorktreeResolutionAmbiguityReasonCode
     $script:EpicRelative = 'artifacts/orchestration/epic-orchestrator-state.json'
     $script:Prompt = 'Epic mode: true. epic_feature_folder: repro. integration_branch: epic/repro-integration. ' +
-    'Upstream context for 2026-07-02-child-b-301: docs/features/active/2026-07-02-child-b-301/spec.md'
+    'Upstream context for 2026-07-02-child-b-301: .dev/active/2026-07-02-child-b-301/spec.md'
     $script:MergedEpic = '{"route_id":"epic","epic_feature_folder":"repro","integration_branch":"epic/repro-integration","features":[' +
     '{"feature_folder":"2026-07-02-child-a-300","depends_on":[],"merge_status":"merged"},' +
     '{"feature_folder":"2026-07-02-child-b-301","depends_on":["2026-07-02-child-a-300"],"merge_status":"not_started"}]}'
@@ -208,7 +208,7 @@ Describe 'epic wave barrier target resolution' {
         Set-BarrierSeamTarget -Status 'SessionRoot' -WorktreeRoot $script:Session
 
         # Act
-        $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw (ConvertTo-AgentPayload -Prompt 'Canonical issue number for this feature is 300. docs/features/active/child-a-300/spec.md')
+        $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw (ConvertTo-AgentPayload -Prompt 'Canonical issue number for this feature is 300. .dev/active/child-a-300/spec.md')
 
         # Assert
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'

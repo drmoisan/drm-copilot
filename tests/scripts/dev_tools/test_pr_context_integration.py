@@ -156,8 +156,8 @@ class OfflineGh(OnlineGh):
                     excerpt="Feature doc excerpt",
                     issue_refs=["#42", "#5"],
                     context_files=[
-                        "docs/features/active/2025-12-18-docs-v3-upgrade/spec.md",
-                        "docs/features/active/2025-12-18-docs-v3-upgrade/plan.md",
+                        ".dev/active/2025-12-18-docs-v3-upgrade/spec.md",
+                        ".dev/active/2025-12-18-docs-v3-upgrade/plan.md",
                     ],
                 )
             ],
@@ -183,7 +183,7 @@ def test_collect_and_write_end_to_end_scenarios(
     def fake_write_output(text: str, out_path: Path, append: bool) -> None:
         outputs.append((out_path, text))
 
-    changed_path = "docs/features/active/2025-12-18-docs-v3-upgrade/spec.md"
+    changed_path = ".dev/active/2025-12-18-docs-v3-upgrade/spec.md"
     repo_root = Path(__file__).resolve().parents[3]
 
     def fake_build_pr_context(

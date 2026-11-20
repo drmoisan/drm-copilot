@@ -93,8 +93,8 @@ function buildPlannerItem(issueNum: number, slug: string): JsonRecord {
     state: "prepared",
     blast_radius: buildBlastRadius(),
     preparation_status: "prepared",
-    research_path: `docs/features/active/${slug}/research.md`,
-    plan_path: `docs/features/active/${slug}/plan.md`,
+    research_path: `.dev/active/${slug}/research.md`,
+    plan_path: `.dev/active/${slug}/plan.md`,
     preflight_status: "PREFLIGHT: ALL CLEAR",
     ...buildPlannerRoutingFields(),
   };
@@ -110,7 +110,7 @@ function buildValidPlannerState(): JsonRecord {
   return {
     objective: "prepare parallel run wave-one",
     parallel_slug: "wave-one",
-    parallel_manifest_path: "docs/features/parallel/wave-one/parallel.md",
+    parallel_manifest_path: ".dev/parallel/wave-one/parallel.md",
     mode: "closed",
     max_concurrency: 4,
     items: [

@@ -318,7 +318,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
             $script:CheckpointFreeDirectory = Join-Path $script:RepoRoot 'tests'
             $script:ReadyCheckpointJson = @{
                 'issue-num'      = '415'
-                'feature-folder' = 'docs/features/active/sample'
+                'feature-folder' = '.dev/active/sample'
                 route_id         = 'full-bug'
                 lifecycle_ready  = $true
             } | ConvertTo-Json -Compress
@@ -355,7 +355,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         }
 
         It 'classifies <Label> as implementation path <Expected>' -ForEach @(
-            @{ Label = 'a feature documentation path'; Path = 'docs/features/active/x/spec.md'; Expected = $false }
+            @{ Label = 'a feature documentation path'; Path = '.dev/active/x/spec.md'; Expected = $false }
             @{ Label = 'the orchestrator checkpoint'; Path = 'artifacts/orchestration/orchestrator-state.json'; Expected = $false }
             @{ Label = 'a production script'; Path = 'scripts/a.ps1'; Expected = $true }
             @{ Label = 'a plain text file'; Path = 'notes.txt'; Expected = $false }
@@ -366,7 +366,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         It 'classifies <Label> as implementation command <Expected>' -ForEach @(
             @{ Label = 'an empty command'; Command = '   '; Expected = $false }
             @{ Label = 'an apply_patch add of a script'; Command = '*** Add File: scripts/a.ps1'; Expected = $true }
-            @{ Label = 'an apply_patch add of documentation'; Command = '*** Add File: docs/features/active/x/spec.md'; Expected = $false }
+            @{ Label = 'an apply_patch add of documentation'; Command = '*** Add File: .dev/active/x/spec.md'; Expected = $false }
             @{ Label = 'an apply_patch rename onto a script'; Command = '*** Move to: scripts/b.ps1'; Expected = $true }
             @{ Label = 'a git commit'; Command = 'git commit -m "wip"'; Expected = $true }
             @{ Label = 'a pytest run'; Command = 'poetry run pytest'; Expected = $true }
@@ -398,7 +398,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         It 'treats a checkpoint missing lifecycle readiness as not ready' {
             $payload = @{
                 'issue-num'      = '415'
-                'feature-folder' = 'docs/features/active/sample'
+                'feature-folder' = '.dev/active/sample'
                 path_selected    = 'full-bug'
             } | ConvertTo-Json -Compress | ConvertFrom-Json
 
@@ -439,7 +439,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         }
 
         It 'allows a documentation file path without consulting the checkpoint' {
-            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '{"file_path":"docs/features/active/x/spec.md"}'
+            $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw '{"file_path":".dev/active/x/spec.md"}'
 
             $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow'
         }
@@ -499,7 +499,7 @@ Describe 'Legacy Codex hooks use native lifecycle contracts' {
         }
 
         It 'allows a mapped Write of feature documentation through its own entrypoint' {
-            $payload = ConvertTo-CodexPreToolPayload -ToolName 'Write' -ToolInput @{ file_path = 'docs/features/active/x/spec.md'; content = 'body' }
+            $payload = ConvertTo-CodexPreToolPayload -ToolName 'Write' -ToolInput @{ file_path = '.dev/active/x/spec.md'; content = 'body' }
 
             $result = Invoke-GateEntrypoint -PayloadRaw $payload
 

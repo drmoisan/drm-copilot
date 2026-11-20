@@ -27,7 +27,7 @@ BeforeAll {
     . (Resolve-Path "$PSScriptRoot/../../../.codex/hooks/enforce-completion-consistency.ps1").Path
     Mock Get-CheckpointFileContent { $null }
 
-    $script:FeatureFolder = 'docs/features/active/2026-11-09-sample-1163'
+    $script:FeatureFolder = '.dev/active/2026-11-09-sample-1163'
     $script:ItemRoot = '/repo/.claude/worktrees/item'
     $script:ItemFolder = "$script:ItemRoot/$script:FeatureFolder"
     $porcelain = "worktree /repo`nbranch refs/heads/main`n`nworktree /repo/.claude/worktrees/item`nbranch refs/heads/bug/item`n"

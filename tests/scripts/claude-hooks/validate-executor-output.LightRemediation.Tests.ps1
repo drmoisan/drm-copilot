@@ -53,7 +53,7 @@ BeforeAll {
             ) + $Extra)
     }
 
-    $script:PlanPath = 'plan-path: docs/features/active/foo/remediation-inputs.2026-11-07T10-00.md'
+    $script:PlanPath = 'plan-path: .dev/active/foo/remediation-inputs.2026-11-07T10-00.md'
     $script:TranscriptPath = 'transcripts/subagents/agent-1.jsonl'
     $script:CompleteOutput = "$script:PlanPath`nCommands Run: Invoke-PoshQCParallelTest`nPowerShell toolchain: PASS`n### AC Status Summary`n- Total AC items: 0"
     $script:StopOutput = "$script:PlanPath`nBLOCKED at preflight (before [P0-T1])`nPlan delta: the fix needs a new file outside its named location."

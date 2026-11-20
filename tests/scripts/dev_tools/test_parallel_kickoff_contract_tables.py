@@ -26,7 +26,7 @@ EXPECTED_HEADER_ERROR = (
     "Parallel kickoff item table headers must be: "
     "issue_num | feature_folder | cohort | complexity | branch | plan-path"
 )
-PLAN_PATH_101 = "docs/features/active/item-101/plan.md"
+PLAN_PATH_101 = ".dev/active/item-101/plan.md"
 
 
 def test_item_table_with_wrong_header_text_is_reported() -> None:
@@ -88,7 +88,7 @@ def test_item_row_with_the_wrong_cell_count_is_reported() -> None:
     """A row whose cell count differs from six is reported and skipped."""
 
     # Arrange
-    short_row = "| 101 | docs/features/active/item-101 | 0 | C3 | feature/item-101 |"
+    short_row = "| 101 | .dev/active/item-101 | 0 | C3 | feature/item-101 |"
     document = kickoff(rows=(short_row,))
 
     # Act

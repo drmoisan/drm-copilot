@@ -28,7 +28,7 @@ Describe 'epic-state baseline isolation (issue #1105)' {
 Describe 'validate-planner-output.ps1 re-entry policy' {
     BeforeAll {
         $script:Hook = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../.claude/hooks/validate-planner-output.ps1'))
-        $script:PlanText = "plan-path: docs/features/active/foo/plan.md`nPREFLIGHT: ALL CLEAR"
+        $script:PlanText = "plan-path: .dev/active/foo/plan.md`nPREFLIGHT: ALL CLEAR"
         # Issue #964: the structurally valid plan fixture carries a valid Pre-Mortem section.
         $script:PreMortemFixture = @('## Pre-Mortem', '- Review checklists: walked.', '- Coverage: measured.', '- Mirror parity: copied.', '- File size: measured.', '- Test isolation: shuffled.', '- CI-only behavior: checked.', '- Evidence: recorded.', '## Phases')
 
@@ -78,8 +78,8 @@ Describe 'validate-planner-output.ps1 re-entry policy' {
     }
 
     It 'P-3 missing preflight signal blocks always' {
-        $first = Invoke-PlannerOutputValidation -InputText (ConvertTo-ReentryInputText -Text 'plan-path: docs/features/active/foo/plan.md')
-        $second = Invoke-PlannerOutputValidation -InputText (ConvertTo-ReentryInputText -Text 'plan-path: docs/features/active/foo/plan.md' -Active)
+        $first = Invoke-PlannerOutputValidation -InputText (ConvertTo-ReentryInputText -Text 'plan-path: .dev/active/foo/plan.md')
+        $second = Invoke-PlannerOutputValidation -InputText (ConvertTo-ReentryInputText -Text 'plan-path: .dev/active/foo/plan.md' -Active)
         Assert-ReentryRow -First $first -Second $second -Token 'agent output must include' -Behavior BlockAlways
     }
 
@@ -106,12 +106,12 @@ Describe 'validate-planner-output.ps1 re-entry policy' {
     It 'P-7 planner internal review violations block always' {
         Set-ReentryPlan -Lines (@($script:PreMortemFixture) + @(
                 "### Phase 0 `u{2014} Baseline",
-                '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record docs/features/active/foo/evidence/baseline/phase0-instructions-read.md',
-                '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/baseline/pester.md',
+                '- [ ] [P0-T1] Read AGENTS.md and .agents/skills/powershell/SKILL.md and record .dev/active/foo/evidence/baseline/phase0-instructions-read.md',
+                '- [ ] [P0-T2] Capture baseline with pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/baseline/pester.md',
                 "### Phase 1 `u{2014} Implement",
                 '- [ ] [P1-T1] Update .claude/hooks/validate-planner-output.ps1 and tests/scripts/claude-hooks/validate-planner-output.Tests.ps1',
                 "### Phase 2 `u{2014} Final QA",
-                '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+                '- [ ] [P2-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
             ))
         $first = Invoke-PlannerOutputValidation -InputText (ConvertTo-ReentryInputText -Text $script:PlanText)
         $second = Invoke-PlannerOutputValidation -InputText (ConvertTo-ReentryInputText -Text $script:PlanText -Active)
@@ -121,9 +121,9 @@ Describe 'validate-planner-output.ps1 re-entry policy' {
     It 'P-8 a missing Pre-Mortem section blocks always (issue #964)' {
         Set-ReentryPlan -Lines @(
             "### Phase 0 `u{2014} Baseline",
-            '- [ ] [P0-T1] Read policy files and capture baseline for docs/features/active/foo/issue.md',
+            '- [ ] [P0-T1] Read policy files and capture baseline for .dev/active/foo/issue.md',
             "### Phase 1 `u{2014} QA",
-            '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write docs/features/active/foo/evidence/qa-gates/pester.md'
+            '- [ ] [P1-T1] Run pwsh tests/scripts/claude-hooks/validate-planner-output.Tests.ps1 and write .dev/active/foo/evidence/qa-gates/pester.md'
         )
         $first = Invoke-PlannerOutputValidation -InputText (ConvertTo-ReentryInputText -Text $script:PlanText)
         $second = Invoke-PlannerOutputValidation -InputText (ConvertTo-ReentryInputText -Text $script:PlanText -Active)

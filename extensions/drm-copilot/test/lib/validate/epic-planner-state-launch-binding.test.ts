@@ -31,7 +31,7 @@ function record(value: unknown): Record<string, unknown> {
 }
 
 function feature(issueNum: number): Record<string, unknown> {
-  const folder = `docs/features/active/feature-${issueNum}`;
+  const folder = `.dev/active/feature-${issueNum}`;
   const delegationId = `prepare-${issueNum}`;
   const deploymentAgent = "orchestrator-c3-elevated";
   return {
@@ -79,7 +79,7 @@ function state(): Record<string, unknown> {
   return {
     objective: "prepare an epic",
     epic_feature_folder: "sample-epic",
-    epic_manifest_path: "docs/features/epics/sample-epic/epic.md",
+    epic_manifest_path: ".dev/epics/sample-epic/epic.md",
     integration_branch: "epic/sample-epic-integration",
     max_parallel_features: 4,
     epic_worthiness: { verdict: "epic", rationale: "two features" },

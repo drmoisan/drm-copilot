@@ -18,9 +18,9 @@ BeforeAll {
 
     $script:SessionRoot = '/synthetic-worktrees/main'
     $script:ItemRoot = '/synthetic-worktrees/main/.claude/worktrees/bug-1105'
-    $script:Relative = 'docs/features/active/sample/spec.md'
+    $script:Relative = '.dev/active/sample/spec.md'
     $script:ItemPath = "$script:ItemRoot/$script:Relative"
-    $script:SpecString = 'spec-path|^docs/features/active/.+/spec\.md$|feature spec artifact'
+    $script:SpecString = 'spec-path|^.dev/active/.+/spec\.md$|feature spec artifact'
     $script:Envelope = [pscustomobject]@{ agent_transcript_path = 'transcripts/subagents/agent-1105.jsonl' }
     $porcelainText = @(
         'worktree /synthetic-worktrees/main', 'branch refs/heads/main', '',
@@ -52,12 +52,12 @@ Describe 'validate-required-artifact-output prd-feature spec-path target worktre
         Mock Test-ArtifactFile { $true }
 
         # Act
-        $result = Get-RequiredArtifactCase -SpecPath 'docs/features/active/../../x/spec.md'
+        $result = Get-RequiredArtifactCase -SpecPath '.dev/active/../../x/spec.md'
 
         # Assert
         $result.Ok | Should -BeFalse
         $result.Repairable | Should -BeTrue
-        $result.Message | Should -BeLike "prd-feature hook:*spec-path 'docs/features/active/../../x/spec.md' is rejected*'..' segment*"
+        $result.Message | Should -BeLike "prd-feature hook:*spec-path '.dev/active/../../x/spec.md' is rejected*'..' segment*"
         Should -Invoke Test-ArtifactFile -Times 0 -Exactly
     }
 

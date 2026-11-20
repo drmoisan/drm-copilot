@@ -16,7 +16,7 @@ Your output must be actionable for an engineer/agent to implement, and must be g
 
 ## Scope and operating rules
 
-Follow the operating rules in your agent definition (research-only; write to the orchestrator-supplied research root under `docs/features/<feature>/research/` for feature-associated research or `docs/research/` for one-off research; evidence-based). Do not restate those rules in the research notes; apply them.
+Follow the operating rules in your agent definition (research-only; write to the orchestrator-supplied research root under `.dev/<feature>/research/` for feature-associated research or `.dev/research/` for one-off research; evidence-based). Do not restate those rules in the research notes; apply them.
 
 ## Inputs / Context (authoritative)
 
@@ -24,19 +24,19 @@ After this kickoff prompt, you will be given one or more feature documents. Trea
  
 Common examples (not exhaustive):
 
-- `docs/features/active/<feature>/issue.md` (usually)
-- `docs/features/active/<feature>/user-story.md` (sometimes)
+- `.dev/active/<feature>/issue.md` (usually)
+- `.dev/active/<feature>/user-story.md` (sometimes)
 
 Also identify (from the feature docs) the **implementation target files** in the repo (e.g., the script/module to change), and treat those as primary technical context.
 
 ## Research Outputs (required)
 
-Create (or update) a single research file under the orchestrator-supplied research root using the Task Researcher template exactly. The two tracked research roots are `docs/features/<feature>/research/` (feature-associated; for example `docs/features/active/<feature>/research/`) and `docs/research/` (one-off, not tied to a feature). Routing rule: use the feature research root when an active feature folder is in scope (the orchestrator supplies the resolved path from `feature-folder` in `orchestrator-state.json`); otherwise use `docs/research/`.
+Create (or update) a single research file under the orchestrator-supplied research root using the Task Researcher template exactly. The two tracked research roots are `.dev/<feature>/research/` (feature-associated; for example `.dev/active/<feature>/research/`) and `.dev/research/` (one-off, not tied to a feature). Routing rule: use the feature research root when an active feature folder is in scope (the orchestrator supplies the resolved path from `feature-folder` in `orchestrator-state.json`); otherwise use `.dev/research/`.
 
 Filename convention:
 
-- `docs/features/<feature>/research/YYYYMMDD-<short-feature-name>-implementation-research.md` (feature-associated), or
-- `docs/research/YYYYMMDD-<short-feature-name>-implementation-research.md` (one-off)
+- `.dev/<feature>/research/YYYYMMDD-<short-feature-name>-implementation-research.md` (feature-associated), or
+- `.dev/research/YYYYMMDD-<short-feature-name>-implementation-research.md` (one-off)
 
 In the research file, keep any discussion of non-selected approaches *brief and non-exhaustive*. After selecting a recommendation, remove detailed notes for other approaches and keep only a short “Rejected alternatives” summary (what was rejected and why).
 

@@ -5,6 +5,7 @@
 const discoveryCoverageThresholds = require("./jest.discovery-coverage.json");
 // Issue #1036: the seven docs MCP modules keep their thresholds in jest.docs-coverage.json.
 const docsCoverageThresholds = require("./jest.docs-coverage.json");
+const developmentDocsMigrationCoverageThresholds = require("./jest.development-docs-migration-coverage.json"); // Issue #1016
 // Issue #1029: the push-down pipeline modules keep their thresholds in jest.push-down-coverage.json.
 const pushDownCoverageThresholds = require("./jest.push-down-coverage.json");
 
@@ -35,6 +36,7 @@ module.exports = {
   coverageThreshold: {
     ...discoveryCoverageThresholds,
     ...docsCoverageThresholds,
+    ...developmentDocsMigrationCoverageThresholds,
     ...pushDownCoverageThresholds,
     // Issue #1162: the three epic validator modules extended with the key-gated
     // cross-epic dependency invariants.

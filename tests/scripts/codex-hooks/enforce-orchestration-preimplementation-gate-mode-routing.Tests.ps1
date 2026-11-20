@@ -39,11 +39,11 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode routing (issue
         # The delegation prompts. Each carries its mode marker, the synthetic target
         # folder token the folder resolver reads, and the bare-hash issue number.
         $script:EpicPrompt = 'Epic mode: true. epic_feature_folder: quickfiler-bug-family. ' +
-        'Execute the approved plan in docs/features/active/child-b-301 for issue #301.'
+        'Execute the approved plan in .dev/active/child-b-301 for issue #301.'
         $script:ParallelPrompt = 'Parallel mode: true. parallel_slug: critical-bug-fixes. ' +
-        'Execute the approved plan in docs/features/active/child-b-301 for issue #301.'
+        'Execute the approved plan in .dev/active/child-b-301 for issue #301.'
         $script:RogueEpicPrompt = 'Epic mode: true. epic_checkpoint_path: artifacts/orchestration/rogue-epic-state.json. ' +
-        'Execute the approved plan in docs/features/active/child-b-301 for issue #301.'
+        'Execute the approved plan in .dev/active/child-b-301 for issue #301.'
 
         function ConvertTo-CodexDelegationToolInput {
             <#
@@ -64,11 +64,11 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode routing (issue
             param(
                 [string] $RouteId = 'epic',
                 [string] $EpicFeatureFolder = 'quickfiler-bug-family',
-                [string] $EpicManifestPath = 'docs/features/epics/quickfiler-bug-family/epic.md',
+                [string] $EpicManifestPath = '.dev/epics/quickfiler-bug-family/epic.md',
                 [string] $IntegrationBranch = 'epic/quickfiler-bug-family-integration'
             )
 
-            $features = '[{"feature_folder":"docs/features/active/child-b-301","issue_num":301,"merge_status":"not_started"}]'
+            $features = '[{"feature_folder":".dev/active/child-b-301","issue_num":301,"merge_status":"not_started"}]'
             return '{"route_id":"' + $RouteId + '","epic_feature_folder":"' + $EpicFeatureFolder +
             '","epic_manifest_path":"' + $EpicManifestPath + '","integration_branch":"' +
             $IntegrationBranch + '","features":' + $features + '}'
@@ -79,10 +79,10 @@ Describe 'Codex enforce-orchestration-preimplementation-gate mode routing (issue
             param(
                 [string] $RouteId = 'parallel',
                 [string] $ParallelSlug = 'critical-bug-fixes',
-                [string] $ParallelManifestPath = 'docs/features/parallel/critical-bug-fixes/parallel.md'
+                [string] $ParallelManifestPath = '.dev/parallel/critical-bug-fixes/parallel.md'
             )
 
-            $items = '[{"feature_folder":"docs/features/active/child-b-301","issue_num":301,' +
+            $items = '[{"feature_folder":".dev/active/child-b-301","issue_num":301,' +
             '"state":"in_flight","merge_status":"not_started"}]'
             return '{"route_id":"' + $RouteId + '","parallel_slug":"' + $ParallelSlug +
             '","parallel_manifest_path":"' + $ParallelManifestPath + '","items":' + $items + '}'

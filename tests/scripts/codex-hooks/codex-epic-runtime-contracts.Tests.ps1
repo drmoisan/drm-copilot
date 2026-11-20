@@ -136,7 +136,7 @@ Describe 'Codex epic runtime configuration and distribution contracts' {
         $content | Should -Match 'Do not use native `spawn_agent`'
         $content | Should -Match 'There is no additional approval pause|There is no mid-planning approval pause|no mid-planning approval'
         $content | Should -Match 'artifacts/orchestration/epic-kickoff-<epic-slug>\.md'
-        $content | Should -Match 'docs/features/epics/<epic-slug>/epic-kickoff\.md'
+        $content | Should -Match '\.dev/epics/<epic-slug>/epic-kickoff\.md'
         $content | Should -Match 'S5_atomic_execution'
     }
 

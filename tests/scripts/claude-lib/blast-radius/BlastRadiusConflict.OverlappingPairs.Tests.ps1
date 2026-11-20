@@ -36,7 +36,7 @@ BeforeAll {
     # sibling-prefix entries, ending with a repeat of an earlier entry (17 entries).
     function Get-OverlapPairMatrix {
         return @('', '/', 'a', 'a/', 'a/1.py', 'a/1.py/', 'a//', 'a//*', 'x/y', 'x/y/z.md', 'x/**', 'x/*/z.md',
-            'scripts/dev_tools', 'scripts/dev_toolsX/a.py', 'docs/features/active/alpha', 'docs/features/active/beta/**', 'a/1.py')
+            'scripts/dev_tools', 'scripts/dev_toolsX/a.py', '.dev/active/alpha', '.dev/active/beta/**', 'a/1.py')
     }
 }
 

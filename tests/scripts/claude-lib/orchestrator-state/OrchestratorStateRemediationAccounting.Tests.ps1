@@ -40,7 +40,7 @@ $specHalt = @('external_dependency', 'policy_hold', 'human_decision_required')
 
 # Valid legacy cycle JSON with extra members spliced in.
 function Get-CycleJson([string] $Extra = '') {
-    $base = '"plan_path": "docs/features/active/example/remediation-plan.2026-09-29T00-00.md", "preflight": {"iterations": 1, "final_status": "clear"}, "execution_status": "complete", "blocking_count": 1, "exit_condition_met": false'
+    $base = '"plan_path": ".dev/active/example/remediation-plan.2026-09-29T00-00.md", "preflight": {"iterations": 1, "final_status": "clear"}, "execution_status": "complete", "blocking_count": 1, "exit_condition_met": false'
     if ($Extra) { return '{' + $base + ', ' + $Extra + '}' }
     return '{' + $base + '}'
 }

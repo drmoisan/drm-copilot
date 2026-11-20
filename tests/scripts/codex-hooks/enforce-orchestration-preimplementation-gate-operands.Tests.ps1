@@ -38,8 +38,8 @@ Describe 'Codex gate command-operand resolution (issue #1188)' {
         $script:ItemCheckpoint = "$($script:ItemRoot)/artifacts/orchestration/orchestrator-state.json"
         $script:SessionCheckpoint = "$($script:Session)/artifacts/orchestration/orchestrator-state.json"
         $script:Bodies = @{
-            Ready   = '{"issue-num":"1188","feature-folder":"docs/features/active/sample-1188","route_id":"large","lifecycle_ready":true}'
-            Unready = '{"issue-num":"1188","feature-folder":"docs/features/active/sample-1188","route_id":"large","lifecycle_ready":false}'
+            Ready   = '{"issue-num":"1188","feature-folder":".dev/active/sample-1188","route_id":"large","lifecycle_ready":true}'
+            Unready = '{"issue-num":"1188","feature-folder":".dev/active/sample-1188","route_id":"large","lifecycle_ready":false}'
             Absent  = ''
         }
 

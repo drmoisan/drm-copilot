@@ -22,9 +22,9 @@ COMMIT = "1" * 40
 FINAL_COMMIT = "2" * 40
 HASH = "a" * 40
 OTHER_HASH = "b" * 40
-PLAN = "docs/features/active/feature-101/plan.md"
+PLAN = ".dev/active/feature-101/plan.md"
 PLAN_HASH_ERROR = (
-    "Optional plan hash for docs/features/active/feature-101/plan.md "
+    "Optional plan hash for .dev/active/feature-101/plan.md "
     "must be 40-64 hexadecimal characters."
 )
 
@@ -73,7 +73,7 @@ def _parsed(
     return ParsedEpicKickoff(
         slug="sample-epic",
         invocation_slug="sample-epic",
-        manifest_path="docs/features/epics/sample-epic/epic.md",
+        manifest_path=".dev/epics/sample-epic/epic.md",
         integration_branch=BRANCH,
         features=(),
         planning_commit=planning_commit,

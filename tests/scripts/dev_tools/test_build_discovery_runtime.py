@@ -264,7 +264,7 @@ def test_schema_closure_resolves_local_urns_and_ignores_template_payloads() -> N
         f"{ROOT}/caller.schema.json": (
             b'{"$id":"urn:caller","$ref":"urn:example#/$defs/value"}'
         ),
-        "docs/discovery/templates/example.yaml": b"draft: true\n",
+        ".dev/discovery/templates/example.yaml": b"draft: true\n",
     }
     assert build.verify_schema_closure(inputs) is None
 

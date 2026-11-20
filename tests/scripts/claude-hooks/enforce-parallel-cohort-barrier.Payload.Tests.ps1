@@ -61,7 +61,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1 payload envelope' {
         }
 
         It 'returns exit code 0 and emits a deny for the legacy flat root shape' {
-            $flat = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}'
+            $flat = '{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}'
             $emitted = Invoke-ParallelCohortBarrierEntryPoint -ToolInputRaw $flat
             $emitted[-1] | Should -Be 0
             ($emitted[0] | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason |
@@ -76,7 +76,7 @@ Describe 'enforce-parallel-cohort-barrier.ps1 payload envelope' {
         }
 
         It 'denies the nested envelope end-to-end when no checkpoint resolves the target (AC-7)' {
-            $nested = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. docs/features/active/item-b-102"}}'
+            $nested = '{"tool_name":"Agent","tool_input":{"subagent_type":"orchestrator","prompt":"Parallel mode: true. .dev/active/item-b-102"}}'
             $emitted = Invoke-ParallelCohortBarrierEntryPoint -ToolInputRaw $nested
             $emitted[-1] | Should -Be 0
             $parsed = $emitted[0] | ConvertFrom-Json

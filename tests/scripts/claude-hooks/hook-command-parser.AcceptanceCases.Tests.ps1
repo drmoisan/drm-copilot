@@ -13,7 +13,7 @@
     subcommand is not adjacent to its command name.
 
     Every case in this file is drawn from the Test Strategy table of
-    docs/features/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
+    .dev/active/2026-08-25-enforcement-hook-trigger-matches-whole-command-text-545/spec.md.
     They are deliberately kept in ONE file rather than split per hook, because AT-6
     is the deny-preservation pin: it passes today and it is the assertion that
     breaks if the issue #539 D8 fail-open objection is answered wrongly. Keeping it

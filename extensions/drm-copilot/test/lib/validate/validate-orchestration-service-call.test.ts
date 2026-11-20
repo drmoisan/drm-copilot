@@ -161,13 +161,13 @@ describe("validateOrchestrationServiceCall", () => {
     // Arrange: a prepared feature that carries no launch-binding key.
     const feature = {
       issue_num: 101,
-      feature_folder: "docs/features/active/feature-101",
+      feature_folder: ".dev/active/feature-101",
       depends_on: [],
       wave: 0,
       complexity_band: "C3",
       preparation_status: "prepared",
       research_path: "artifacts/research/feature-101.md",
-      plan_path: "docs/features/active/feature-101/plan.md",
+      plan_path: ".dev/active/feature-101/plan.md",
       preflight_status: "PREFLIGHT: ALL CLEAR",
     };
     const fileSystem = new VirtualFileSystem({

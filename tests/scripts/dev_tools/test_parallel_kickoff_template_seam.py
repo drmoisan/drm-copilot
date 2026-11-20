@@ -45,10 +45,10 @@ VALID_KICKOFF_FIXTURE_RELATIVE = Path(
 SLUG = "bugfix-batch"
 ISO8601 = "2026-08-08T15:15:00Z"
 PLANNING_COMMIT_HEX = "4a7f1c9e2b8d3a6f0c5e91b47d28a3f6c0e5b91d"
-PLAN_PATH = "docs/features/active/2026-08-07-parallel-planner-surface-443/plan.md"
+PLAN_PATH = ".dev/active/2026-08-07-parallel-planner-surface-443/plan.md"
 PLAN_HASH_HEX = "9f2e4c7a1b5d8e0f3a6c9b2d5e8f1a4c7b0d3e6f"
 ITEM_ROW = (
-    "| 443 | docs/features/active/2026-08-07-parallel-planner-surface-443 "
+    "| 443 | .dev/active/2026-08-07-parallel-planner-surface-443 "
     f"| 0 | C3 | feature/parallel-planner-surface-443 | {PLAN_PATH} |"
 )
 HASH_ROW = f"| {PLAN_PATH} | {PLAN_HASH_HEX} |"

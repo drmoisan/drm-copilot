@@ -417,7 +417,7 @@ $script:RecordItemKey = @('issue_num', 'branch_name', 'plan_path', 'plan_hash', 
 function New-ParallelSchedulingRecord {
     <#
     .SYNOPSIS
-        Build the durable scheduling record docs/features/parallel/<slug>/parallel-scheduling.json.
+        Build the durable scheduling record .dev/parallel/<slug>/parallel-scheduling.json.
 
     .DESCRIPTION
         The record carries exactly schema_version, parallel_slug, edges,

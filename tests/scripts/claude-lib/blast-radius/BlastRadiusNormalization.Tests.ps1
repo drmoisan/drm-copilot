@@ -362,7 +362,7 @@ Describe 'Placeholder-only overlap after normalization (issue #502)' {
             $radiusA = @{
                 paths           = @(
                     $script:PairPlaceholder,
-                    'docs/features/active/2026-08-23-alpha-item-9001/plan.md',
+                    '.dev/active/2026-08-23-alpha-item-9001/plan.md',
                     'scripts/dev_tools/alpha_only_module.py'
                 )
                 modules         = @('alpha')
@@ -374,7 +374,7 @@ Describe 'Placeholder-only overlap after normalization (issue #502)' {
             $radiusB = @{
                 paths           = @(
                     $script:PairPlaceholder,
-                    'docs/features/active/2026-08-23-beta-item-9002/plan.md',
+                    '.dev/active/2026-08-23-beta-item-9002/plan.md',
                     'scripts/dev_tools/beta_only_module.py'
                 )
                 modules         = @('beta')

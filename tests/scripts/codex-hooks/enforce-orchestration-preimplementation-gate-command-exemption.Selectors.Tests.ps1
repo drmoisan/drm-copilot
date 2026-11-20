@@ -33,12 +33,12 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
         # and 15-19, so every other constraint still applies to the operands. Labels are
         # byte-identical to the Claude-side sibling suite.
         It 'allows <Label>' -ForEach @(
-            @{ Label = 'issue #671 LACS allow 1 - drive-letter absolute selector on the add subcommand'; Command = 'git -C C:/repo/wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS allow 2 - POSIX-rooted absolute selector on the add subcommand'; Command = 'git -C /repo/wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS allow 4 - absolute selector on the message-bearing commit form'; Command = 'git -C C:/repo/wt commit -m "epic scaffold" -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS allow 5 - chained add and commit segments each carrying the same absolute selector'; Command = 'git -C C:/repo/wt add -- docs/features/active/x/spec.md && git -C C:/repo/wt commit -m "epic scaffold" -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS allow 6 - absolute selector naming a sibling item worktree root'; Command = 'git -C C:/repo/wt-sibling add -- docs/features/active/y/spec.md' }
-            @{ Label = 'issue #671 LACS allow 7 - absolute selector naming a directory outside every worktree'; Command = 'git -C C:/elsewhere add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 1 - drive-letter absolute selector on the add subcommand'; Command = 'git -C C:/repo/wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 2 - POSIX-rooted absolute selector on the add subcommand'; Command = 'git -C /repo/wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 4 - absolute selector on the message-bearing commit form'; Command = 'git -C C:/repo/wt commit -m "epic scaffold" -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 5 - chained add and commit segments each carrying the same absolute selector'; Command = 'git -C C:/repo/wt add -- .dev/active/x/spec.md && git -C C:/repo/wt commit -m "epic scaffold" -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS allow 6 - absolute selector naming a sibling item worktree root'; Command = 'git -C C:/repo/wt-sibling add -- .dev/active/y/spec.md' }
+            @{ Label = 'issue #671 LACS allow 7 - absolute selector naming a directory outside every worktree'; Command = 'git -C C:/elsewhere add -- .dev/active/x/spec.md' }
         ) {
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $Command
@@ -53,25 +53,25 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
         # One deny row per LACS condition L1 through L8, plus the must-not-regress rows.
         # Only the decision is asserted; the Write-Debug diagnostic text is not contractual.
         It 'denies <Label>' -ForEach @(
-            @{ Label = 'issue #671 LACS L1a - attached selector spelling'; Command = 'git -CC:/repo/wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L1b - config-injection selector'; Command = 'git -c core.worktree=C:/repo/wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L2 - repeated selector'; Command = 'git -C C:/repo/wt -C C:/repo/other add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L3a - selector with no subcommand after the value'; Command = 'git -C C:/repo/wt && git add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L3b - subcommand not immediately after the selector value'; Command = 'git -C C:/repo/wt --no-pager add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L4a - bare relative selector'; Command = 'git -C subdir add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L4b - UNC selector'; Command = 'git -C //server/share/wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L5a - parent-directory segment in the selector'; Command = 'git -C C:/repo/wt/../other add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L5b - current-directory segment in the selector'; Command = 'git -C C:/repo/./wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L6 - wildcard in the selector'; Command = 'git -C C:/repo/wt-? add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L7 - stray colon in the selector'; Command = 'git -C C:/repo/wt:branch add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #732 LACS allow 3 reversed - backslash-spelled absolute selector'; Command = 'git -C C:\repo\wt add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 LACS L8 - empty selector value'; Command = 'git -C "" add -- docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 selector followed by an unmodelled subcommand'; Command = 'git -C C:/repo/wt status && git add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L1a - attached selector spelling'; Command = 'git -CC:/repo/wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L1b - config-injection selector'; Command = 'git -c core.worktree=C:/repo/wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L2 - repeated selector'; Command = 'git -C C:/repo/wt -C C:/repo/other add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L3a - selector with no subcommand after the value'; Command = 'git -C C:/repo/wt && git add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L3b - subcommand not immediately after the selector value'; Command = 'git -C C:/repo/wt --no-pager add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L4a - bare relative selector'; Command = 'git -C subdir add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L4b - UNC selector'; Command = 'git -C //server/share/wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L5a - parent-directory segment in the selector'; Command = 'git -C C:/repo/wt/../other add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L5b - current-directory segment in the selector'; Command = 'git -C C:/repo/./wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L6 - wildcard in the selector'; Command = 'git -C C:/repo/wt-? add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L7 - stray colon in the selector'; Command = 'git -C C:/repo/wt:branch add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #732 LACS allow 3 reversed - backslash-spelled absolute selector'; Command = 'git -C C:\repo\wt add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 LACS L8 - empty selector value'; Command = 'git -C "" add -- .dev/active/x/spec.md' }
+            @{ Label = 'issue #671 selector followed by an unmodelled subcommand'; Command = 'git -C C:/repo/wt status && git add -- .dev/active/x/spec.md' }
             @{ Label = 'issue #671 selector with a non-exempt pathspec operand'; Command = 'git -C C:/repo/wt add -- scripts/powershell/Sample.ps1' }
             @{ Label = 'issue #671 selector with the tree-wide all flag'; Command = 'git -C C:/repo/wt add -A' }
             @{ Label = 'issue #671 selector with an absolute pathspec operand'; Command = 'git -C C:/repo/wt add -- C:/repo/wt/docs/features/active/x/spec.md' }
-            @{ Label = 'issue #671 selector with an output redirection'; Command = 'git -C C:/repo/wt add -- docs/features/active/x/spec.md > staged.txt' }
-            @{ Label = 'issue #671 cd chain into the target worktree'; Command = 'cd C:/repo/wt && git add -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 selector with an output redirection'; Command = 'git -C C:/repo/wt add -- .dev/active/x/spec.md > staged.txt' }
+            @{ Label = 'issue #671 cd chain into the target worktree'; Command = 'cd C:/repo/wt && git add -- .dev/active/x/spec.md' }
         ) {
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $Command
@@ -87,7 +87,7 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
         # Remediation R1 (issue #671): an empty quoted token is an ordinary token to the
         # classifier. It is never an exempt operand, and after -m it is the message value.
         It 'allows <Label>' -ForEach @(
-            @{ Label = 'issue #671 empty commit message beside an exempt operand'; Command = 'git commit -m "" -- docs/features/active/x/spec.md' }
+            @{ Label = 'issue #671 empty commit message beside an exempt operand'; Command = 'git commit -m "" -- .dev/active/x/spec.md' }
         ) {
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $Command
@@ -118,8 +118,8 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
         # only that a non-option token follows the selector value; the caller rejects any
         # subcommand other than add or commit, which accept 3 pins.
         It 'accepts <Label>' -ForEach @(
-            @{ Label = 'issue #671 predicate accept 1 - drive-letter selector followed by add'; Token = @('git', '-C', 'C:/repo/wt', 'add', '--', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate accept 2 - rooted selector followed by commit'; Token = @('git', '-C', '/repo/wt', 'commit', '-m', 'msg', '--', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate accept 1 - drive-letter selector followed by add'; Token = @('git', '-C', 'C:/repo/wt', 'add', '--', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate accept 2 - rooted selector followed by commit'; Token = @('git', '-C', '/repo/wt', 'commit', '-m', 'msg', '--', '.dev/active/x/spec.md') }
             @{ Label = 'issue #671 predicate accept 3 - non-option token after the value is left to the caller'; Token = @('git', '-C', 'C:/repo/wt', 'status') }
         ) {
             # Act
@@ -131,17 +131,17 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
 
         It 'rejects <Label>' -ForEach @(
             @{ Label = 'issue #671 predicate L1a - single token segment'; Token = @('git') }
-            @{ Label = 'issue #671 predicate L1b - option other than the selector at index 1'; Token = @('git', '-c', 'core.worktree=C:/repo/wt', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L2 - repeated selector'; Token = @('git', '-C', 'C:/repo/wt', '-C', 'C:/repo/other', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L1b - option other than the selector at index 1'; Token = @('git', '-c', 'core.worktree=C:/repo/wt', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L2 - repeated selector'; Token = @('git', '-C', 'C:/repo/wt', '-C', 'C:/repo/other', 'add', '.dev/active/x/spec.md') }
             @{ Label = 'issue #671 predicate L3a - no token after the selector value'; Token = @('git', '-C', 'C:/repo/wt') }
-            @{ Label = 'issue #671 predicate L3b - option token after the selector value'; Token = @('git', '-C', 'C:/repo/wt', '--no-pager', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L4a - relative selector'; Token = @('git', '-C', 'subdir', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L4b - UNC selector'; Token = @('git', '-C', '//server/share/wt', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L5a - parent-directory segment'; Token = @('git', '-C', 'C:/repo/wt/../other', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L5b - current-directory segment'; Token = @('git', '-C', 'C:/repo/./wt', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L6 - wildcard'; Token = @('git', '-C', 'C:/repo/wt-?', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L7 - stray colon'; Token = @('git', '-C', 'C:/repo/wt:branch', 'add', 'docs/features/active/x/spec.md') }
-            @{ Label = 'issue #671 predicate L8 - empty selector value'; Token = @('git', '-C', '', 'add', 'docs/features/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L3b - option token after the selector value'; Token = @('git', '-C', 'C:/repo/wt', '--no-pager', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L4a - relative selector'; Token = @('git', '-C', 'subdir', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L4b - UNC selector'; Token = @('git', '-C', '//server/share/wt', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L5a - parent-directory segment'; Token = @('git', '-C', 'C:/repo/wt/../other', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L5b - current-directory segment'; Token = @('git', '-C', 'C:/repo/./wt', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L6 - wildcard'; Token = @('git', '-C', 'C:/repo/wt-?', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L7 - stray colon'; Token = @('git', '-C', 'C:/repo/wt:branch', 'add', '.dev/active/x/spec.md') }
+            @{ Label = 'issue #671 predicate L8 - empty selector value'; Token = @('git', '-C', '', 'add', '.dev/active/x/spec.md') }
         ) {
             # Act
             $result = Test-ExemptOrchestrationSelector -Token $Token
@@ -155,7 +155,7 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
             Mock Test-ExemptOrchestrationSegmentToken { throw 'simulated segment classification failure' }
 
             # Act
-            $result = Test-ExemptOrchestrationStagingCommand -CommandText 'git add -- docs/features/active/x/spec.md'
+            $result = Test-ExemptOrchestrationStagingCommand -CommandText 'git add -- .dev/active/x/spec.md'
 
             # Assert
             $result | Should -BeFalse -Because 'an error while classifying a segment is a parse ambiguity and answers false'
@@ -169,8 +169,8 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
         # unresolvable in any quote state, the single-quoted `'\''` apostrophe idiom stays
         # denied, and a pathless commit stays denied (D4 row 4).
         It 'issue #663 exempts <Label>' -ForEach @(
-            @{ Label = 'a double-quoted message carrying a Co-Authored-By trailer and an apostrophe'; Command = 'git add docs/features/epics/2026-08-24-sample-epic/epic-status.md && git commit -m "docs(epic): refresh status, it''s current. Co-Authored-By: Claude <noreply@anthropic.com>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
-            @{ Label = 'a single-quoted message carrying angle brackets'; Command = 'git commit -m ''Co-Authored-By: Claude <noreply@anthropic.com>'' -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a double-quoted message carrying a Co-Authored-By trailer and an apostrophe'; Command = 'git add .dev/epics/2026-08-24-sample-epic/epic-status.md && git commit -m "docs(epic): refresh status, it''s current. Co-Authored-By: Claude <noreply@anthropic.com>" -- .dev/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a single-quoted message carrying angle brackets'; Command = 'git commit -m ''Co-Authored-By: Claude <noreply@anthropic.com>'' -- .dev/epics/2026-08-24-sample-epic/epic-status.md' }
         ) {
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $Command
@@ -181,12 +181,12 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
         }
 
         It 'issue #663 denies <Label>' -ForEach @(
-            @{ Label = 'the single-quoted apostrophe idiom'; Command = 'git commit -m ''it''\''''s done <noreply@anthropic.com>'' -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
-            @{ Label = 'a command substitution inside a double-quoted message'; Command = 'git commit -m "status $(date) <a@b.c>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
-            @{ Label = 'a variable expansion inside a double-quoted message'; Command = 'git commit -m "status $USER <a@b.c>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
-            @{ Label = 'a backtick substitution inside a double-quoted message'; Command = 'git commit -m "status `whoami` <a@b.c>" -- docs/features/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'the single-quoted apostrophe idiom'; Command = 'git commit -m ''it''\''''s done <noreply@anthropic.com>'' -- .dev/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a command substitution inside a double-quoted message'; Command = 'git commit -m "status $(date) <a@b.c>" -- .dev/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a variable expansion inside a double-quoted message'; Command = 'git commit -m "status $USER <a@b.c>" -- .dev/epics/2026-08-24-sample-epic/epic-status.md' }
+            @{ Label = 'a backtick substitution inside a double-quoted message'; Command = 'git commit -m "status `whoami` <a@b.c>" -- .dev/epics/2026-08-24-sample-epic/epic-status.md' }
             @{ Label = 'a pathless commit whose message carries angle brackets'; Command = 'git commit -m "Co-Authored-By: Claude <noreply@anthropic.com>"' }
-            @{ Label = 'an unquoted output redirection after a quoted message carrying angle brackets'; Command = 'git commit -m ''Co-Authored-By: Claude <noreply@anthropic.com>'' -- docs/features/epics/2026-08-24-sample-epic/epic-status.md > out.txt' }
+            @{ Label = 'an unquoted output redirection after a quoted message carrying angle brackets'; Command = 'git commit -m ''Co-Authored-By: Claude <noreply@anthropic.com>'' -- .dev/epics/2026-08-24-sample-epic/epic-status.md > out.txt' }
         ) {
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $Command
@@ -202,12 +202,12 @@ Describe 'Codex enforce-orchestration-preimplementation-gate command exemption (
         # Backslash escapes are not modelled: a backslash before any quote character, or anywhere
         # inside a double-quoted span, can move a span boundary the scan cannot see (fail closed).
         It 'issue #663 remediation denies <Label>' -ForEach @(
-            @{ Label = 'an escaped double quote hiding an output redirection (CR-1)'; Command = 'git add docs/features/active/x/a.md && git commit -m "a\"" > src/prod.ts "\"" docs/features/active/x/a.md' }
-            @{ Label = 'an escaped double quote hiding an output redirection after a semicolon (CR-1)'; Command = 'git add docs/features/active/x/a.md ; git commit -m "a\"" > src/prod.ts "\"" docs/features/active/x/a.md' }
-            @{ Label = 'an escaped double quote hiding chain operators (CR-3)'; Command = 'git commit -m "x\"" ; touch src/prod.ts ; "\"" -- docs/features/active/x/a.md' }
-            @{ Label = 'an unquoted escaped double quote opening a scan-only span'; Command = 'git commit -m x\" > src/prod.ts \" -- docs/features/active/x/a.md' }
-            @{ Label = 'an unquoted escaped single quote opening a scan-only span'; Command = 'git commit -m x\'' > src/prod.ts \'' -- docs/features/active/x/a.md' }
-            @{ Label = 'a backslash inside a double-quoted message'; Command = 'git commit -m "path a\b" -- docs/features/active/x/a.md' }
+            @{ Label = 'an escaped double quote hiding an output redirection (CR-1)'; Command = 'git add .dev/active/x/a.md && git commit -m "a\"" > src/prod.ts "\"" .dev/active/x/a.md' }
+            @{ Label = 'an escaped double quote hiding an output redirection after a semicolon (CR-1)'; Command = 'git add .dev/active/x/a.md ; git commit -m "a\"" > src/prod.ts "\"" .dev/active/x/a.md' }
+            @{ Label = 'an escaped double quote hiding chain operators (CR-3)'; Command = 'git commit -m "x\"" ; touch src/prod.ts ; "\"" -- .dev/active/x/a.md' }
+            @{ Label = 'an unquoted escaped double quote opening a scan-only span'; Command = 'git commit -m x\" > src/prod.ts \" -- .dev/active/x/a.md' }
+            @{ Label = 'an unquoted escaped single quote opening a scan-only span'; Command = 'git commit -m x\'' > src/prod.ts \'' -- .dev/active/x/a.md' }
+            @{ Label = 'a backslash inside a double-quoted message'; Command = 'git commit -m "path a\b" -- .dev/active/x/a.md' }
         ) {
             # Act
             $decision = Get-CodexExemptionDecisionForCommand -Command $Command

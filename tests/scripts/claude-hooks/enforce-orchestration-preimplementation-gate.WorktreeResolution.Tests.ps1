@@ -38,13 +38,13 @@ BeforeAll {
     $script:EpicRelative = 'artifacts/orchestration/epic-orchestrator-state.json'
     $script:IssueLine = 'Canonical issue number for this feature is 301. All artifact content, file paths, and cross-references must use this number.'
     $script:EpicPrompt = 'Epic mode: true. epic_feature_folder: repro. integration_branch: epic/repro-integration. ' +
-    'epic_checkpoint_path: artifacts/orchestration/epic-orchestrator-state.json. Execute docs/features/active/child-b-301. ' + $script:IssueLine
-    $script:ParallelPrompt = 'Parallel mode: true. parallel_slug: wave-a. Execute docs/features/active/child-b-301.'
-    $script:ReadyEpic = '{"route_id":"epic","epic_feature_folder":"repro","epic_manifest_path":"docs/features/epics/repro/epic.md",' +
-    '"integration_branch":"epic/repro-integration","features":[{"feature_folder":"docs/features/active/child-b-301","issue_num":301,"merge_status":"not_started"}]}'
-    $script:ReadyParallel = '{"route_id":"parallel","parallel_slug":"wave-a","parallel_manifest_path":"docs/features/parallel/wave-a/parallel.md",' +
-    '"items":[{"feature_folder":"docs/features/active/child-b-301","issue_num":301,"state":"in_flight","merge_status":"not_started"}]}'
-    $script:ReadyItem = '{"issue-num":"301","feature-folder":"docs/features/active/child-b-301","route_id":"large","lifecycle_ready":true}'
+    'epic_checkpoint_path: artifacts/orchestration/epic-orchestrator-state.json. Execute .dev/active/child-b-301. ' + $script:IssueLine
+    $script:ParallelPrompt = 'Parallel mode: true. parallel_slug: wave-a. Execute .dev/active/child-b-301.'
+    $script:ReadyEpic = '{"route_id":"epic","epic_feature_folder":"repro","epic_manifest_path":".dev/epics/repro/epic.md",' +
+    '"integration_branch":"epic/repro-integration","features":[{"feature_folder":".dev/active/child-b-301","issue_num":301,"merge_status":"not_started"}]}'
+    $script:ReadyParallel = '{"route_id":"parallel","parallel_slug":"wave-a","parallel_manifest_path":".dev/parallel/wave-a/parallel.md",' +
+    '"items":[{"feature_folder":".dev/active/child-b-301","issue_num":301,"state":"in_flight","merge_status":"not_started"}]}'
+    $script:ReadyItem = '{"issue-num":"301","feature-folder":".dev/active/child-b-301","route_id":"large","lifecycle_ready":true}'
 
     # An Agent delegation envelope as JSON.
     function ConvertTo-AgentPayload {
@@ -179,7 +179,7 @@ Describe 'preimplementation gate parallel-mode resolution' {
         Set-GateRunTopology -Live @($script:Session)
 
         # Act
-        $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw (ConvertTo-AgentPayload -SubagentType 'orchestrator' -Prompt 'Parallel mode: true. Execute docs/features/active/child-b-301.')
+        $decision = Invoke-OrchestrationPreimplementationGateDecision -ToolInputRaw (ConvertTo-AgentPayload -SubagentType 'orchestrator' -Prompt 'Parallel mode: true. Execute .dev/active/child-b-301.')
 
         # Assert
         $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'

@@ -13,7 +13,7 @@ describe("renderVerificationEvidenceSection ordering", () => {
   it("issue #796 renders a U+E000 evidence source before a supplementary-character evidence source", () => {
     // Arrange: two parseable evidence files whose names differ only by a
     // supplementary character versus U+E000.
-    const evidenceDir = "docs/features/active/f/evidence/qa-gates";
+    const evidenceDir = ".dev/active/f/evidence/qa-gates";
     const supplementaryPath = `${evidenceDir}/\u{1F600}.md`;
     const privateUsePath = `${evidenceDir}/\uE000.md`;
     const content =
@@ -38,8 +38,8 @@ describe("renderVerificationEvidenceSection ordering", () => {
       .split("\n")
       .filter((line) => line.startsWith("  - Source: "));
     expect(sourceLines).toEqual([
-      "  - Source: docs/features/active/f/evidence/qa-gates/\uE000.md",
-      "  - Source: docs/features/active/f/evidence/qa-gates/\u{1F600}.md",
+      "  - Source: .dev/active/f/evidence/qa-gates/\uE000.md",
+      "  - Source: .dev/active/f/evidence/qa-gates/\u{1F600}.md",
     ]);
   });
 });

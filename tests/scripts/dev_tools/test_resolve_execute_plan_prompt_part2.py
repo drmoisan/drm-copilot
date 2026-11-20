@@ -461,7 +461,7 @@ def test_prompt_excludes_instructions_md_content() -> None:
 def test_resolve_mode_context_mode_minor_audit(monkeypatch: pytest.MonkeyPatch) -> None:
     """Resolve mode context from issue.md marker when minor-audit is present."""
     workspace = Path("/workspace")
-    folderpath = "docs/features/active/feature-x"
+    folderpath = ".dev/active/feature-x"
     issue_path = workspace / folderpath / "issue.md"
 
     def _exists(self: Path) -> bool:
@@ -487,7 +487,7 @@ def test_resolve_mode_context_mode_fails_closed_when_marker_missing(
 ) -> None:
     """Fail closed to full-feature mode when issue marker is missing."""
     workspace = Path("/workspace")
-    folderpath = "docs/features/active/feature-x"
+    folderpath = ".dev/active/feature-x"
     issue_path = workspace / folderpath / "issue.md"
 
     def _exists(self: Path) -> bool:
@@ -513,7 +513,7 @@ def test_resolve_mode_context_mode_fails_closed_when_issue_missing(
 ) -> None:
     """Fail closed to full-feature when issue.md file does not exist."""
     workspace = Path("/workspace")
-    folderpath = "docs/features/active/feature-x"
+    folderpath = ".dev/active/feature-x"
 
     def _exists(_self: Path) -> bool:
         return False
@@ -531,7 +531,7 @@ def test_resolve_mode_context_mode_fails_closed_when_issue_unreadable(
 ) -> None:
     """Fail closed to full-feature with unreadable reason when issue.md read fails."""
     workspace = Path("/workspace")
-    folderpath = "docs/features/active/feature-x"
+    folderpath = ".dev/active/feature-x"
     issue_path = workspace / folderpath / "issue.md"
 
     def _exists(self: Path) -> bool:

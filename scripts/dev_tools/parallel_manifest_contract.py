@@ -2,7 +2,7 @@
 
 Purpose:
     Enforce the repository contract for the frontmatter of
-    ``docs/features/parallel/<slug>/parallel.md`` -- spec invariants M1 through
+    ``.dev/parallel/<slug>/parallel.md`` -- spec invariants M1 through
     M9 -- and expose the two default-resolving accessors that every consumer of
     the manifest uses instead of reading ``mode`` and ``max_concurrency``
     directly.

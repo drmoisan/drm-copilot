@@ -20,7 +20,7 @@ const EXTENSION_ROOT = "C:/extension";
 const WORKSPACE = "C:/workspace";
 const ATOMIC_TEMPLATE =
   "C:/extension/resources/customizations/.github/prompts/generate-atomic-plan.prompt.md";
-const FOLDER = "docs/features/active/feature-152";
+const FOLDER = ".dev/active/feature-152";
 const TARGET = `${WORKSPACE}/${FOLDER}/plan.2026-04-17T19-54.md`;
 
 /**

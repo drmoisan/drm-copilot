@@ -25,13 +25,13 @@ Review epic-level scope and write the resulting epic-audit artifact.
 
 ## Expected Outputs
 
-- `docs/features/epics/<epic>/epic-audit.<timestamp>.md`
+- `.dev/epics/<epic>/epic-audit.<timestamp>.md`
 
 ## Output Reporting
 
 Report the final artifact path as:
 
-- `epic-audit-path: docs/features/epics/<epic>/epic-audit.<timestamp>.md`
+- `epic-audit-path: .dev/epics/<epic>/epic-audit.<timestamp>.md`
 
 ## Evidence Location Invariant
 

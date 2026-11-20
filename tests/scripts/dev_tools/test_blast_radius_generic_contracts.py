@@ -152,7 +152,7 @@ def test_normalize_declared_radius_drops_a_recorded_generic_contract() -> None:
     """A previously recorded ``Sheet1`` contract is dropped on recompute."""
     # Arrange: a declared radius recorded by the pre-change extractor.
     recorded = BlastRadius(
-        paths=("docs/features/active/2026-10-30-recorded-item/**",),
+        paths=(".dev/active/2026-10-30-recorded-item/**",),
         modules=(),
         shared_surfaces=(),
         contracts=("ParseLedger", "Sheet1"),
