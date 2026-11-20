@@ -18,13 +18,19 @@
 BeforeAll {
     . (Resolve-Path "$PSScriptRoot/../../../.claude/hooks/enforce-orchestration-preimplementation-gate.ps1").Path
     . (Join-Path $PSScriptRoot 'EpicStateIsolation.Baseline.Helpers.ps1')
+    if (Get-Command Get-WorktreeResolutionGitFileText -ErrorAction SilentlyContinue) { Mock Get-WorktreeResolutionGitFileText { $null } }
     Register-EpicStateBaselineMock -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' -Surface 'Claude'
     Register-EpicStateBaselineMock -Seam 'Get-CheckpointContent', 'Get-EpicCheckpointContent', 'Get-ParallelCheckpointContent' -Surface 'Codex'
+    # The parallel records leg calls these from hook scope, where the module-scoped baseline mocks do not reach.
+    Mock Get-EpicScopeWorktreeHeadBranch { $null }
+    Mock Get-WorktreeRunCheckpointText { $null }
     $script:Command = 'git -C /synthetic-worktrees/documentationandmemories add -- docs/research/y.md'
     $script:RelativeRoot = 'synthetic/relative-session'
 }
 
 Describe 'Claude cleanup consolidation command leg: unresolved target (issue #1016)' {
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-EpicScopeCheckpointText', 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }
+
     It 'resolves no target for a cleanup-shaped command under a relative session root' {
         # Arrange
         $command = $script:Command

@@ -26,6 +26,8 @@ Describe 'Codex cleanup consolidation command leg: unresolved target (issue #101
         $script:RelativeRoot = 'synthetic/relative-session'
     }
 
+    It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Codex' -Seam 'Get-EpicScopeCheckpointText' }
+
     It 'resolves no target for a cleanup-shaped command under a relative session root' {
         # Arrange
         $command = $script:Command
