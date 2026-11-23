@@ -41,6 +41,7 @@ BeforeDiscovery {
             @{ Copy = $key; Path = "$($roots[$key])/docs-inventory-surface/SKILL.md"; Heading = 'Steps'; Tokens = @('`__pycache__`', '`node_modules`', '`.pyc` or `.pyo`', 'before the profile `exclusions`') }
         }
     )
+    $script:FamilyRows = @(foreach ($key in $roots.Keys) { @{ Copy = $key; Path = "$($roots[$key])/docs-init/SKILL.md" } })
     $batchTokens = @('`operations`', '`-Operations', '`bind-page-refs`', 'all-or-nothing', 'sync-refs is not a batch item', 'item index', '`pin` must precede `set-dimension` with `dimension: accurate` and `state: pass` for the same element and page')
     $script:BatchRows = @(
         foreach ($key in $roots.Keys) {
@@ -130,6 +131,28 @@ Describe 'update-ledger batch, bind-page-refs and pin ordering in the reconcile 
         # Assert
         $section | Should -Not -BeNullOrEmpty -Because "$Path has a ## $Heading section"
         foreach ($token in $Tokens) { $section.Contains($token, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "$Path states '$token'" }
+    }
+}
+
+Describe 'docs-init Documentation Families section (issue 1218)' {
+    It 'places the Documentation Families section between Steps and Linter Configuration in <Path>' -ForEach $script:FamilyRows {
+        # Arrange
+        $text = Read-DocsAuthoringText -RelativePath $Path
+        $familyIds = @('product-overview', 'getting-started', 'user-guides', 'administration', 'security', 'operations', 'service-management', 'architecture', 'adr', 'reference')
+        $templateIds = @('product-overview', 'onboarding', 'how-to', 'security', 'runbook', 'service-management', 'architecture-overview', 'adr', 'api-reference')
+        $tokens = @(foreach ($id in @($familyIds + $templateIds + @('exclusion', 'reason', 'recorded_at', 'legacy_exclusions'))) { '`' + $id + '`' })
+
+        # Act
+        $steps = [regex]::Match($text, '(?m)^## Steps[ \t]*\r?$').Index
+        $families = [regex]::Match($text, '(?m)^## Documentation Families[ \t]*\r?$')
+        $linter = [regex]::Match($text, '(?m)^## Linter Configuration[ \t]*\r?$').Index
+        $section = Get-DocsWorkflowSectionText -Text $text -Heading 'Documentation Families'
+
+        # Assert
+        $families.Success | Should -BeTrue -Because "$Path has a ## Documentation Families section"
+        $families.Index | Should -BeGreaterThan $steps -Because "$Path places the section after ## Steps"
+        $families.Index | Should -BeLessThan $linter -Because "$Path places the section before ## Linter Configuration"
+        foreach ($token in $tokens) { $section.Contains($token, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "$Path states '$token'" }
     }
 }
 

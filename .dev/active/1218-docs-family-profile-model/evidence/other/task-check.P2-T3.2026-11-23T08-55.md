@@ -1,0 +1,17 @@
+# Task Check P2-T3 (Issue #1218)
+
+Timestamp: 2026-11-23T08-55
+Changed files: .claude/lib/docs/DocsProfile.psm1 (259 lines); fixture updates in tests/scripts/claude-lib/docs/DocsValidation.Tests.ps1, tests/scripts/claude-lib/docs/DocsValidateCommands.Tests.ps1, tests/scripts/claude-lib/docs/DocsValidation.Properties.Tests.ps1 (deviation below)
+Selection rule: every test file that imports DocsProfile.psm1 or DocsProfileCommands.psm1, or names New-DocsStarterProfile, Invoke-DocsInitCommand, New-DocsLedgerTestProfile, DocsLedger.TestSupport, or DocsLedgerBatch.TestSupport (repository search over tests/): 39 files under tests/scripts/claude-lib/docs plus tests/scripts/claude-hooks/hook-docs-only-diff.InitWorkflowParity.Tests.ps1. The run selected the folder tests/scripts/claude-lib/docs and that hook test file, which includes every suite P2-T3 names.
+Command: sh SCRATCH/issue-1218-qc.sh format-check / analyze over the four changed files; sh SCRATCH/issue-1218-check.sh check-p2t3 tests/scripts/claude-lib/docs tests/scripts/claude-hooks/hook-docs-only-diff.InitWorkflowParity.Tests.ps1 (run 1), then the same selection as check-p2t3b after the fixture update (run 2: attempt 1 exit 75 queue timeout, attempt 2 ran)
+EXIT_CODE: 1
+ExpectedExitCode: 1
+Output Summary:
+- Format: 0 changes. PSScriptAnalyzer: 0 findings on all four files. DocsProfile.psm1 is 259 lines (below 300). DocsProfileCommands.psm1 is unchanged (absent from `git diff --stat`).
+- Run 1: 7 failures. Four in tests/scripts/claude-lib/docs/Docs.Manifest.Tests.ps1 (DocsProfileFamilies.psm1 not yet in core.json and not yet bundled; fixed by P2-T5). Three were fixture conflicts: `Invoke-DocsValidation profile and ledger layers.profile mode returns ConvertFrom-DocsProfileText findings`, `...returns a schema-valid receipt pinned to the revision in profile and ledger modes on pass and fail` (DocsValidation.Tests.ps1), and `validate.exits 1 with null result when the profile does not load` (DocsValidateCommands.Tests.ps1).
+- Run 2: 2555 passed, 4 failed. The four failures are exactly the Docs.Manifest.Tests.ps1 Its `lists every filtered docs file exactly once in core.json paths`, `reports a path absent from an in-memory manifest (positive control)`, `ships a bundled counterpart for every filtered docs file`, and `ships byte-identical bundled counterparts`, which P2-T5 resolves and P2-T5's task check asserts. Not gate evidence.
+
+## Deviation: fixture updates outside the P2-T3 file set
+
+- Cause: the three failing tests, and one seeded branch of the property test `property Invoke-DocsValidation: finding codes of each mode include those of the previous mode; every receipt validates`, build a profile from New-DocsLedgerTestProfile (which wraps New-DocsStarterProfile) and set `documentation_roots[0].audience_ids` to `maintainers`, `operators` to produce DOCS_PROFILE_AUDIENCE_UNKNOWN. AC16 adds `operators` to the starter audiences, so that reference is now declared and the finding no longer occurs. The plan listed these consumers as unchanged.
+- Disposition: updated, reason recorded. In each of the four sites the undeclared id `operators` is replaced by `auditors`, which the starter does not declare, so each test asserts the same behavior (an undeclared audience reference yields DOCS_PROFILE_AUDIENCE_UNKNOWN) as before. No assertion was weakened. The tests that read the committed example profile (DocsProfile.Tests.ps1 and DocsProfileCommands.Tests.ps1) still use `operators`, which the example does not declare, and are unchanged.

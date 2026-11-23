@@ -125,7 +125,7 @@ Describe 'Invoke-DocsValidation profile and ledger layers' {
     It 'profile mode returns ConvertFrom-DocsProfileText findings' {
         # Arrange
         $broken = New-DocsLedgerTestProfile
-        $broken['documentation_roots'][0]['audience_ids'] = @('maintainers', 'operators')
+        $broken['documentation_roots'][0]['audience_ids'] = @('maintainers', 'auditors')
 
         # Act
         $result = Invoke-TestValidation -Mode 'profile' -Artifact (Get-TestArtifact -ProfileDocument $broken) -ProfileDocument $broken
@@ -261,7 +261,7 @@ Describe 'Invoke-DocsValidation profile and ledger layers' {
     It 'returns a schema-valid receipt pinned to the revision in profile and ledger modes on pass and fail' {
         # Arrange
         $broken = New-DocsLedgerTestProfile
-        $broken['documentation_roots'][0]['audience_ids'] = @('maintainers', 'operators')
+        $broken['documentation_roots'][0]['audience_ids'] = @('maintainers', 'auditors')
         $incomplete = New-DocsLedgerTestLedger -SnapshotSha256 ('a' * 64) -Entry @()
         $revision = 'f' * 64
 

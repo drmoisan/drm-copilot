@@ -138,7 +138,7 @@ Describe 'DocsValidation properties' {
             if ($random.Next(2) -eq 0) { $set.Matrix['rows'] = [object[]]@($set.Matrix['rows'] | Select-Object -Skip 1) }
             if ($random.Next(2) -eq 0) { $set.Matrix['rows'][0]['dimensions']['exists']['state'] = 'fail'; $set.Matrix['rows'][0]['dimensions']['exists']['rationale'] = 'The page is missing.' }
             $document = New-DocsLedgerTestProfile -AllowDeferred ($random.Next(2) -eq 0) -MaxStalePages $random.Next(2)
-            if ($random.Next(3) -eq 0) { $document['documentation_roots'][0]['audience_ids'] = @('maintainers', 'operators') }
+            if ($random.Next(3) -eq 0) { $document['documentation_roots'][0]['audience_ids'] = @('maintainers', 'auditors') }
             $artifact = [ordered]@{
                 'docs-profile'               = @{ Path = $script:ProfilePath; Bytes = (Get-TestByte -Document $document) }
                 'surface-inventory-snapshot' = @{ Path = 'estate/surface-inventory-snapshot.json'; Bytes = (Get-TestByte -Document $snapshot) }

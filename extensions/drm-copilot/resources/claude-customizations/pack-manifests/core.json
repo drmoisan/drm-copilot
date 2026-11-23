@@ -399,6 +399,7 @@
     ".claude/lib/docs/DocsSchemaWalk.psm1",
     ".claude/lib/docs/DocsAnalyzerRegistry.psm1",
     ".claude/lib/docs/DocsProfile.psm1",
+    ".claude/lib/docs/DocsProfileFamilies.psm1",
     ".claude/lib/docs/DocsProfileCommands.psm1",
     ".claude/lib/docs/DocsProfileSourceRoot.psm1",
     ".claude/lib/docs/Invoke-DocsCommand.ps1",
