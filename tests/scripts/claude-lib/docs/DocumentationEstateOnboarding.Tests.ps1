@@ -171,12 +171,12 @@ Describe 'documentation-estate onboarding pages' {
         $text.Contains('records `analysis_method: scanner`') | Should -BeTrue
     }
 
-    It 'states that linting is optional and check is the required page gate' {
+    It 'states that lint steps are part of the written workflow and check is the required page gate' {
         # Arrange
         $text = Get-NormalizedText -Text $script:PageText['consumer-onboarding.md']
 
         # Assert
-        $text.Contains('Linting is optional') | Should -BeTrue
+        $text.Contains('Lint steps are part of the written workflow') | Should -BeTrue
         $text.Contains('`check` is the required page gate') | Should -BeTrue
     }
 

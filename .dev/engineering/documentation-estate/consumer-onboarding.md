@@ -30,7 +30,7 @@ nothing for a repository that has no Python.
 
 ## Linting
 
-Linting is optional. `init -Write` writes linter configuration as data under
+Lint steps are part of the written workflow. `init -Write` writes linter configuration as data under
 `docs/documentation-estate/`: `docs/documentation-estate/.markdownlint.json`,
 `docs/documentation-estate/.vale.ini`,
 `docs/documentation-estate/.vale/styles/DocsBase/HeadingPunctuation.yml`,
