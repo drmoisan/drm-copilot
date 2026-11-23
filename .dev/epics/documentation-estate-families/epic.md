@@ -31,8 +31,8 @@ features:
   - issue_num: 1221
     feature_folder: 1221-docs-family-gate-and-ia
     depends_on: [1218-docs-family-profile-model]
-  - issue_num: 90005
-    feature_folder: docs-review-cadence
+  - issue_num: 1220
+    feature_folder: 1220-docs-review-cadence
     depends_on: [1218-docs-family-profile-model, 1221-docs-family-gate-and-ia, 1222-docs-family-page-templates]
   - issue_num: 1223
     feature_folder: 1223-docs-epic-scale-routing
