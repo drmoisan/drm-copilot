@@ -28,15 +28,15 @@ features:
   - issue_num: 90003
     feature_folder: docs-prose-markdown-lint
     depends_on: []
-  - issue_num: 90004
-    feature_folder: docs-family-gate-and-ia
+  - issue_num: 1221
+    feature_folder: 1221-docs-family-gate-and-ia
     depends_on: [1218-docs-family-profile-model]
   - issue_num: 90005
     feature_folder: docs-review-cadence
-    depends_on: [1218-docs-family-profile-model, docs-family-gate-and-ia, 1222-docs-family-page-templates]
+    depends_on: [1218-docs-family-profile-model, 1221-docs-family-gate-and-ia, 1222-docs-family-page-templates]
   - issue_num: 1223
     feature_folder: 1223-docs-epic-scale-routing
-    depends_on: [1218-docs-family-profile-model, docs-family-gate-and-ia]
+    depends_on: [1218-docs-family-profile-model, 1221-docs-family-gate-and-ia]
 ---
 
 # documentation-estate-families - Epic
@@ -101,6 +101,12 @@ These contracts are fixed here so the wave-0 children can be prepared and execut
   front-matter mode matches its template; the executing child of docs-family-profile-model (or
   docs-family-gate-and-ia) resolves this with a more specific directory entry or by treating the
   family mode as a default rather than a constraint.
+- **Family check location (decided by #1221 preparation).** The family check is implemented in
+  the docs-complete validation step (`DocsValidation.psm1`, `DocsValidateCommands.psm1`) through
+  a new `DocsFamilyCheck.psm1`; `DocsCompleteGate.psm1` is unchanged because it only reads the
+  saved validation result. docs-review-cadence places its overdue-blocking option in the same
+  validation step, not in `DocsCompleteGate.psm1`, and reconciles its plan against #1221's merged
+  modules before its first task.
 - **Legacy exclusion list (owned by docs-family-profile-model; reported by
   docs-family-gate-and-ia).** A profile `legacy_exclusions[]` of repository-relative page paths,
   each with a `reason`; it is reported on every docs-complete run and expected to shrink to empty.
@@ -119,8 +125,8 @@ These contracts are fixed here so the wave-0 children can be prepared and execut
 | 0 | docs-family-page-templates | none | C2 | Markdown templates and docs-author-page skill text across surfaces; no library logic. |
 | 0 | docs-prose-markdown-lint | none | C3 | CI template steps with pinned download verification, Vale styles, placeholder counter in PowerShell. |
 | 1 | docs-family-gate-and-ia | docs-family-profile-model | C3 | Consumes the family record and legacy list in DocsCompleteGate, receipt, coverage report, docs-plan-ia, MCP tools. |
-| 2 | docs-review-cadence | docs-family-profile-model, docs-family-gate-and-ia, docs-family-page-templates | C3 | Reads review_interval_days, adds a docs-complete option after the family check lands, and edits the new templates' front matter. |
-| 2 | docs-epic-scale-routing | docs-family-profile-model, docs-family-gate-and-ia | C2 | Skill guidance that cites family ids and docs-complete family semantics. |
+| 2 | docs-review-cadence | docs-family-profile-model, 1221-docs-family-gate-and-ia, docs-family-page-templates | C3 | Reads review_interval_days, adds a docs-complete option after the family check lands, and edits the new templates' front matter. |
+| 2 | docs-epic-scale-routing | docs-family-profile-model, 1221-docs-family-gate-and-ia | C2 | Skill guidance that cites family ids and docs-complete family semantics. |
 
 Edges follow consumed contracts only. docs-review-cadence depends on docs-family-gate-and-ia
 because both edit `DocsCompleteGate.psm1`, and on docs-family-page-templates because it adds
