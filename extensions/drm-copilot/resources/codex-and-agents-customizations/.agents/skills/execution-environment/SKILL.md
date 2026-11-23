@@ -172,7 +172,7 @@ Run these after editing any mirrored or bundled file; each is under `tests/scrip
 - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`: per-copy planning-contract wording of issue #1097 in the four `atomic-plan-contract` copies and the other mirrored planning surfaces.
 - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`: the concurrent-review text of issue #1097 in the orchestrate and parallel-orchestrate skills, the orchestrator-state rule, the orchestrator agent, and their mirrors.
 - `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`: the light-remediation text of issue #1097 in the review and orchestration surfaces and their mirrors.
-- `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`: the test-cadence wording of issue #1167 in the four `atomic-plan-contract` copies and the referring surfaces, the sweep for per-task full-suite wording, and the byte identity of the edited Copilot files and their bundles.
+- `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`: the test-cadence wording of issue #1167 in the four `atomic-plan-contract` copies and the referring surfaces, the sweep for per-task full-suite wording, the issue #1228 sweep for full-suite wording outside the `Phase 0 baseline` and the final QA loop, and the byte identity of the edited Copilot files and their bundles.
 
 ## Preflight Defect Classes the Validator Cannot See
 
@@ -228,6 +228,7 @@ These pass every validator rule and are found only by reading the plan against t
 - Each gate reaches zero failures and is re-run only after a fix.
 - A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence.
 - A task check under `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill runs the task's test selection; its selection and results are recorded as task-check evidence, never as a gate result or coverage evidence.
+- The unit stage of a phase gate, a remediation gate, and a sync check (the local gate after a merge) runs over a test selection through the same launcher, as `## Test Cadence (Mandatory)` states; the full test suite runs only at the `Phase 0 baseline` and in the final QA loop.
 - Serial tasks remain for debugging one failure and are not gates.
 - A leak found by a gate is fixed on both sides: the suite that leaves state behind (globals, functions, environment variables, mocks, imported modules, script-scope state) and the suite that assumes prior state.
 - The parallel gates govern where a policy file names a toolchain test command.

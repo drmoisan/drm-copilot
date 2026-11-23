@@ -113,7 +113,27 @@ BeforeDiscovery {
         'expected failures', 'confirmed failing', 'every other test passes',
         'no-change phase', 'changes no tracked file', 'the next gate covers it'
     )
-    $script:CanonicalCheck = Get-TcwCheck -Heading $anchor -Required ($canonicalRequired + $script:CanonicalD15Token) -Forbidden ($runClassForbidden + $script:PerTaskSweepToken) -NextHeading '## Final QA Loop (Required for Code/Test Changes)'
+    # Issue #1228: the full suite runs only at the Phase 0 baseline and in the final QA loop;
+    # the phase gate, remediation gate, and sync check run a test selection.
+    $script:CanonicalSelectionToken = @(
+        'runs only at the `Phase 0 baseline` and in the final QA loop', 'union of the test selections',
+        'phase gate measures no coverage', 'no selected tests', 'remediation gate', 'coverage mode',
+        'local gate', 'paths the merge changed'
+    )
+    # Issue #1228: the full-suite prescriptions outside the Phase 0 baseline and the final QA loop.
+    $script:CadenceSweepToken = @(
+        'and the full toolchain loop at each phase gate',
+        'the full unit suite',
+        'runs the full toolchain loop instead',
+        'still runs the full loop',
+        'as the full loop at each phase gate',
+        'the standard parallel unit gates',
+        'Run the full toolchain loop (stages 1 to 6)',
+        'a phase gate or the final QA loop',
+        'the standard parallel gates pass',
+        'Final phase runs the full toolchain QA loop'
+    )
+    $script:CanonicalCheck = Get-TcwCheck -Heading $anchor -Required ($canonicalRequired + $script:CanonicalD15Token + $script:CanonicalSelectionToken) -Forbidden ($runClassForbidden + $script:PerTaskSweepToken + $script:CadenceSweepToken) -NextHeading '## Final QA Loop (Required for Code/Test Changes)'
     $script:WordingRow = @(
         Get-TcwRow -Group 'CANONICAL' -Base $contractBase -Check @($script:CanonicalCheck)
         Get-TcwRow -Group 'CANONICAL-REF' -Base $contractBase -Check @(
