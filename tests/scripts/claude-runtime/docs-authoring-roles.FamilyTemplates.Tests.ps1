@@ -230,7 +230,7 @@ Describe 'docs-author-page family templates' {
         }
     }
 
-    It 'lists <Id> with the mode <Mode> in a table row of the skill at <Path> [expect-fail]' -ForEach $script:SkillRow {
+    It 'lists <Id> with the mode <Mode> in a table row of the skill at <Path>' -ForEach $script:SkillRow {
         # Arrange
         $text = Read-DocsAuthoringText -RelativePath $Path
         $pattern = '(?m)^\| \[' + [regex]::Escape($Id) + '\.md\]\(templates/' + [regex]::Escape($Id) + '\.md\) \| `' + [regex]::Escape($Mode) + '` \| \S.* \|$'
