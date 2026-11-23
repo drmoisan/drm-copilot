@@ -22,8 +22,8 @@ features:
   - issue_num: 90001
     feature_folder: docs-family-profile-model
     depends_on: []
-  - issue_num: 90002
-    feature_folder: docs-family-page-templates
+  - issue_num: 1222
+    feature_folder: 1222-docs-family-page-templates
     depends_on: []
   - issue_num: 90003
     feature_folder: docs-prose-markdown-lint
@@ -33,7 +33,7 @@ features:
     depends_on: [docs-family-profile-model]
   - issue_num: 90005
     feature_folder: docs-review-cadence
-    depends_on: [docs-family-profile-model, docs-family-gate-and-ia, docs-family-page-templates]
+    depends_on: [docs-family-profile-model, docs-family-gate-and-ia, 1222-docs-family-page-templates]
   - issue_num: 1223
     feature_folder: 1223-docs-epic-scale-routing
     depends_on: [docs-family-profile-model, docs-family-gate-and-ia]
@@ -94,6 +94,13 @@ These contracts are fixed here so the wave-0 children can be prepared and execut
   `runbook.md`, `playbook.md`, `adr.md`, `security.md`, `service-management.md`,
   `alerts-catalog.md`; `architecture-overview.md` gains data-flow and trust-boundary sections.
   The family record's `template` value is the template file basename without `.md`.
+- **Mixed-mode family directories (raised by #1222 preparation).** `alerts-catalog` pages are
+  Diataxis reference mode but live in the `operations` family directory, whose pages are mostly
+  how-to. If the profile derives an expected page mode from the family record's
+  `diataxis_mode`, the page checker must not report a mode mismatch for a page whose own
+  front-matter mode matches its template; the executing child of docs-family-profile-model (or
+  docs-family-gate-and-ia) resolves this with a more specific directory entry or by treating the
+  family mode as a default rather than a constraint.
 - **Legacy exclusion list (owned by docs-family-profile-model; reported by
   docs-family-gate-and-ia).** A profile `legacy_exclusions[]` of repository-relative page paths,
   each with a `reason`; it is reported on every docs-complete run and expected to shrink to empty.
