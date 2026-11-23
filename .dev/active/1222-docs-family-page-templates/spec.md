@@ -85,38 +85,38 @@ No runtime data or state changes. Template text is static Markdown.
 
 Template content
 
-- [ ] The new template files named `product-overview.md`, `onboarding.md`, `runbook.md`, `playbook.md`, `adr.md`, `security.md`, `service-management.md`, and `alerts-catalog.md` exist under `.claude/skills/docs-author-page/templates/`. Proved by `tests/scripts/claude-runtime/docs-authoring-roles.FamilyTemplates.Tests.ps1`.
-- [ ] Each new template declares the `diataxis_mode` in the Behavior table (`product-overview`, `adr`, `security`, `service-management`: explanation; `onboarding`, `runbook`, `playbook`: how-to; `alerts-catalog`: reference) and contains the H2 sections listed for it in the Behavior table, in that order. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1` using the `FamilyTemplateModes` helper key.
-- [ ] Each new template has front matter with exactly the keys `owner`, `last_reviewed`, `audience`, `diataxis_mode`, and `surface_refs`, one per line, each value a JSON value, and `surface_refs: []`. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1` (parsed with `ConvertFrom-DocsPageFrontMatter`).
-- [ ] `onboarding.md`, `runbook.md`, and `playbook.md` each contain at least one literal ordered-list line (`^ {0,3}[0-9]{1,9}[.)] +\S`) outside fenced code and HTML comments. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1`.
-- [ ] No heading in any `explanation` or `reference` family template starts with `How to ` (case-insensitive) or matches `^Step\s+[0-9]+\b`. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1`.
-- [ ] `alerts-catalog.md` contains no `docs:generated:start` or `docs:generated:end` marker. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1`.
-- [ ] `architecture-overview.md` contains `## Data Flow`, `## Trust Boundaries`, and `## Failure Domains` between `## Interactions` and `## Boundaries and Constraints`, and its `diataxis_mode` remains `explanation`. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1`.
-- [ ] No template carries a `review_due` key, the token `SME input required`, or the `diataxis:` key name. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1`.
+- [x] The new template files named `product-overview.md`, `onboarding.md`, `runbook.md`, `playbook.md`, `adr.md`, `security.md`, `service-management.md`, and `alerts-catalog.md` exist under `.claude/skills/docs-author-page/templates/`. Proved by `tests/scripts/claude-runtime/docs-authoring-roles.FamilyTemplates.Tests.ps1`.
+- [x] Each new template declares the `diataxis_mode` in the Behavior table (`product-overview`, `adr`, `security`, `service-management`: explanation; `onboarding`, `runbook`, `playbook`: how-to; `alerts-catalog`: reference) and contains the H2 sections listed for it in the Behavior table, in that order. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1` using the `FamilyTemplateModes` helper key.
+- [x] Each new template has front matter with exactly the keys `owner`, `last_reviewed`, `audience`, `diataxis_mode`, and `surface_refs`, one per line, each value a JSON value, and `surface_refs: []`. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1` (parsed with `ConvertFrom-DocsPageFrontMatter`).
+- [x] `onboarding.md`, `runbook.md`, and `playbook.md` each contain at least one literal ordered-list line (`^ {0,3}[0-9]{1,9}[.)] +\S`) outside fenced code and HTML comments. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1`.
+- [x] No heading in any `explanation` or `reference` family template starts with `How to ` (case-insensitive) or matches `^Step\s+[0-9]+\b`. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1`.
+- [x] `alerts-catalog.md` contains no `docs:generated:start` or `docs:generated:end` marker. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1`.
+- [x] `architecture-overview.md` contains `## Data Flow`, `## Trust Boundaries`, and `## Failure Domains` between `## Interactions` and `## Boundaries and Constraints`, and its `diataxis_mode` remains `explanation`. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1`.
+- [x] No template carries a `review_due` key, the token `SME input required`, or the `diataxis:` key name. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1`.
 
 Checker acceptance
 
-- [ ] For every template file in the template directory (the existing templates, the new templates named in Behavior, and the extended `architecture-overview.md`), a page rendered by in-memory placeholder substitution yields zero findings of severity `error` from `Get-DocsPageCheckFinding` in `.claude/lib/docs/DocsPageCheck.psm1`. The test enumerates the directory at discovery, so a later template is covered automatically. Proved by `tests/scripts/claude-lib/docs/DocsAuthorPageTemplates.Acceptance.Tests.ps1`.
-- [ ] Negative case 1: a `how-to` template rendered with its ordered-list lines removed yields `DOCS_PAGE_MODE_STEPS_MISSING`. Proved by `DocsAuthorPageTemplates.Acceptance.Tests.ps1`.
-- [ ] Negative case 2: an `explanation` template rendered with an added `## How to ...` heading yields `DOCS_PAGE_MODE_INSTRUCTION_HEADING`. Proved by `DocsAuthorPageTemplates.Acceptance.Tests.ps1`.
+- [x] For every template file in the template directory (the existing templates, the new templates named in Behavior, and the extended `architecture-overview.md`), a page rendered by in-memory placeholder substitution yields zero findings of severity `error` from `Get-DocsPageCheckFinding` in `.claude/lib/docs/DocsPageCheck.psm1`. The test enumerates the directory at discovery, so a later template is covered automatically. Proved by `tests/scripts/claude-lib/docs/DocsAuthorPageTemplates.Acceptance.Tests.ps1`.
+- [x] Negative case 1: a `how-to` template rendered with its ordered-list lines removed yields `DOCS_PAGE_MODE_STEPS_MISSING`. Proved by `DocsAuthorPageTemplates.Acceptance.Tests.ps1`.
+- [x] Negative case 2: an `explanation` template rendered with an added `## How to ...` heading yields `DOCS_PAGE_MODE_INSTRUCTION_HEADING`. Proved by `DocsAuthorPageTemplates.Acceptance.Tests.ps1`.
 
 Skill documentation and generation
 
-- [ ] `.agents/skills/docs-author-page/SKILL.md` lists every template in the template directory with its `diataxis_mode` and a `Use when` statement, states that a family page without a surface element uses `surface_refs: []`, and states that `alerts-catalog` pages are `reference` and may need their own `directory_modes` entry. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1` (every template id appears in a table row of each SKILL.md copy with its mode).
-- [ ] `.claude/skills/docs-author-page/SKILL.md` is produced by `scripts/harness-generation/Invoke-HarnessGeneration.ps1` from the `.agents` source (no hand edit), and `Invoke-HarnessGeneration.ps1 -Check` reports no drift. Proved by running `-Check` and by `tests/scripts/harness-generation/HarnessGeneration.RepoGate.Tests.ps1`.
-- [ ] The bundle copies of SKILL.md under `extensions/drm-copilot/resources/` are byte-identical to their source copies. Proved by `tests/scripts/claude-runtime/docs-authoring-roles.Mirrors.Tests.ps1` and the push-down resource contract tests.
+- [x] `.agents/skills/docs-author-page/SKILL.md` lists every template in the template directory with its `diataxis_mode` and a `Use when` statement, states that a family page without a surface element uses `surface_refs: []`, and states that `alerts-catalog` pages are `reference` and may need their own `directory_modes` entry. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1` (every template id appears in a table row of each SKILL.md copy with its mode).
+- [x] `.claude/skills/docs-author-page/SKILL.md` is produced by `scripts/harness-generation/Invoke-HarnessGeneration.ps1` from the `.agents` source (no hand edit), and `Invoke-HarnessGeneration.ps1 -Check` reports no drift. Proved by running `-Check` and by `tests/scripts/harness-generation/HarnessGeneration.RepoGate.Tests.ps1`.
+- [x] The bundle copies of SKILL.md under `extensions/drm-copilot/resources/` are byte-identical to their source copies. Proved by `tests/scripts/claude-runtime/docs-authoring-roles.Mirrors.Tests.ps1` and the push-down resource contract tests.
 
 Parity and manifests
 
-- [ ] Each new and extended template is byte-identical at `.claude/skills/docs-author-page/templates/`, `.agents/skills/docs-author-page/templates/`, and the `extensions/drm-copilot/resources/` bundle roots named in Behavior. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1` (SHA-256 comparison).
-- [ ] Each new template path is listed exactly once in each pack manifest named in Behavior. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1` and the pack-manifest completeness tests.
+- [x] Each new and extended template is byte-identical at `.claude/skills/docs-author-page/templates/`, `.agents/skills/docs-author-page/templates/`, and the `extensions/drm-copilot/resources/` bundle roots named in Behavior. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1` (SHA-256 comparison).
+- [x] Each new template path is listed exactly once in each pack manifest named in Behavior. Proved by `docs-authoring-roles.FamilyTemplates.Tests.ps1` and the pack-manifest completeness tests.
 
 Regression and contract tests
 
-- [ ] `docs-authoring-roles.Templates.Tests.ps1`, `docs-authoring-roles.Mirrors.Tests.ps1`, and `docs-authoring-roles.WorkflowText.Tests.ps1` pass with no edit to their assertions or counts.
-- [ ] The push-down contract tests pass: `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, and `test_push_down_codex_and_agents_pack_manifest_completeness.py`, together with `generate_codex_agent_variants.py --check`.
-- [ ] No file under `.claude/lib/docs/` changes (production modules untouched). Proved by the branch diff in the feature review.
-- [ ] Each new test file is under 500 lines, creates no temporary file, and passes in a parallel Pester run. Proved by the launcher `pester` suite run and the file-size check.
+- [x] `docs-authoring-roles.Templates.Tests.ps1`, `docs-authoring-roles.Mirrors.Tests.ps1`, and `docs-authoring-roles.WorkflowText.Tests.ps1` pass with no edit to their assertions or counts.
+- [x] The push-down contract tests pass: `test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, and `test_push_down_codex_and_agents_pack_manifest_completeness.py`, together with `generate_codex_agent_variants.py --check`.
+- [x] No file under `.claude/lib/docs/` changes (production modules untouched). Proved by the branch diff in the feature review.
+- [x] Each new test file is under 500 lines, creates no temporary file, and passes in a parallel Pester run. Proved by the launcher `pester` suite run and the file-size check.
 
 ## Decisions
 
