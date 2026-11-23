@@ -80,6 +80,30 @@ Describe 'Get-DocsInitTemplate' {
             $row.Source | Should -BeLike '.claude/lib/docs/templates/*'
         }
     }
+
+    It 'places the 1219 anchor rows after the 1034 workflow row and keeps one workflow row' {
+        # Arrange
+        $lines = @(Get-Content -LiteralPath $script:ModulePath | ForEach-Object { $_.Trim() })
+        $anchor1034 = [array]::IndexOf([string[]] $lines, '# --- 1034: docs workflow ---')
+        $anchor1219 = [array]::IndexOf([string[]] $lines, '# --- 1219: tonality styles ---')
+        $names = @('Certainty', 'Exclamation', 'Filler', 'Hyperbole', 'Intensifiers')
+
+        # Act
+        $rows = Get-DocsInitTemplate
+        $workflowIndex = @(for ($index = 0; $index -lt $rows.Count; $index++) { if (([string] $rows[$index].Destination).StartsWith('.github/workflows/', [System.StringComparison]::Ordinal)) { $index } })
+        $tail = @($rows | Select-Object -Skip ($workflowIndex[0] + 1))
+
+        # Assert
+        $anchor1034 | Should -BeGreaterThan -1
+        $anchor1219 | Should -Be ($anchor1034 + 2) -Because 'the 1219 anchor follows the single 1034 workflow row'
+        $workflowIndex.Count | Should -Be 1
+        $rows[$workflowIndex[0]].Destination | Should -BeExactly '.github/workflows/_docs-quality.yml'
+        $rows[$workflowIndex[0]].Source | Should -BeExactly '.claude/lib/docs/templates/_docs-quality.yml'
+        @($tail | ForEach-Object { $_.Source }) | Should -Be @($names | ForEach-Object { ".claude/lib/docs/templates/page-check/vale/DocsTonality/$_.yml" })
+        @($tail | ForEach-Object { $_.Destination }) | Should -Be @($names | ForEach-Object { "docs/documentation-estate/.vale/styles/DocsTonality/$_.yml" })
+        @($rows | Select-Object -First $workflowIndex[0] | ForEach-Object { $_.Destination }) | Should -Be @('docs/documentation-estate/.markdownlint.json', 'docs/documentation-estate/.vale.ini', 'docs/documentation-estate/.vale/styles/DocsBase/HeadingPunctuation.yml', 'docs/documentation-estate/.vale/styles/DocsBase/Placeholders.yml', 'docs/documentation-estate/.vale/styles/config/vocabularies/Project/accept.txt')
+        (Get-Help -Name Get-DocsInitTemplate).Synopsis | Should -Match '1219'
+    }
 }
 
 Describe 'Invoke-DocsInitCommand' {

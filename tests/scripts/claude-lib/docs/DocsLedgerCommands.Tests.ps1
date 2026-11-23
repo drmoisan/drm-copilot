@@ -322,7 +322,10 @@ Describe 'coverage' {
         # Assert
         $run.Outcome.ExitCode | Should -Be 0
         $result = $run.Envelope['result']
-        @($result.Keys | Sort-Object) | Should -Be @('deferred', 'parity', 'precision_limits', 'stale_pages', 'totals', 'undocumented')
+        @($result.Keys | Sort-Object) | Should -Be @('deferred', 'parity', 'placeholders', 'precision_limits', 'stale_pages', 'totals', 'undocumented')
+        $direct = @((Invoke-DocsCoverageCommand -Argument @{} -Context $test.Context).Result.Keys)
+        [array]::IndexOf([string[]] $direct, 'placeholders') | Should -Be ([array]::IndexOf([string[]] $direct, 'parity') + 1) -Because 'placeholders follows parity in the result'
+        $result['placeholders']['total'] | Should -Be 0
         $result['totals']['elements_total'] | Should -Be 6
         $result['totals']['undocumented'] | Should -Be 1
         $result['totals']['by_disposition']['documented'] | Should -Be 4
@@ -518,6 +521,50 @@ Describe 'coverage' {
         $failLines[0] | Should -Match '^error DOCS_INPUT_UNREADABLE estate/surface-inventory-snapshot.json: '
         $failLines[-1] | Should -BeExactly 'coverage: exit=1 errors=1 warnings=0 infos=0'
         $pass.Outcome.Stdout.Contains('{', [System.StringComparison]::Ordinal) | Should -BeFalse
+    }
+
+    It 'reports placeholder counts for pages that contain the token' {
+        # Arrange: two pages under the profile root docs hold the token; the second wraps it across one line break.
+        $files = New-TestEstate -Snapshot $script:Snapshot -Set $script:Complete
+        $files['docs/guides/Alpha.md'] = (@('# Alpha', '', 'SME input required') -join "`n")
+        $files['docs/guides/Setup.md'] = (@('# Setup', '', 'SME input required here.', '', 'Ask for SME input', 'required before release.') -join "`n")
+
+        # Act
+        $json = Invoke-TestCli -Command 'coverage' -Test (New-DocsLedgerTestContext -File $files) -Json
+        $text = Invoke-TestCli -Command 'coverage' -Test (New-DocsLedgerTestContext -File $files)
+        $placeholders = $json.Envelope['result']['placeholders']
+        $lines = @($text.Outcome.Stdout.TrimEnd("`n") -split "`n")
+
+        # Assert
+        $json.Outcome.ExitCode | Should -Be 0
+        $placeholders['token'] | Should -BeExactly 'SME input required'
+        $placeholders['total'] | Should -Be 3
+        @($placeholders['pages'] | ForEach-Object { $_['page_path'] }) | Should -Be @('docs/guides/Alpha.md', 'docs/guides/Setup.md')
+        @($placeholders['pages'] | ForEach-Object { $_['count'] }) | Should -Be @(1, 2)
+        $lines[-1] | Should -BeExactly 'coverage: exit=0 errors=0 warnings=0 infos=0'
+        $lines[-4] | Should -BeExactly 'placeholders: token="SME input required" total=3 pages=2'
+        $lines[-3] | Should -BeExactly 'placeholder docs/guides/Alpha.md count=1'
+        $lines[-2] | Should -BeExactly 'placeholder docs/guides/Setup.md count=2'
+        $lines[-5] | Should -Match '^parity '
+        $lines[0] | Should -Match '^coverage: elements=6 '
+    }
+
+    It 'keeps the exit code when pages contain the token' {
+        # Arrange
+        $files = New-TestEstate -Snapshot $script:Snapshot -Set $script:Complete
+        $files['docs/guides/Alpha.md'] = (@('# Alpha', '', 'SME input required') -join "`n")
+        $files['docs/guides/Setup.md'] = (@('# Setup', '', 'SME input required here.', '', 'Ask for SME input', 'required before release.') -join "`n")
+        $without = Invoke-TestCli -Command 'coverage' -Test (New-DocsLedgerTestContext -File (New-TestEstate -Snapshot $script:Snapshot -Set $script:Complete)) -Json
+
+        # Act
+        $run = Invoke-TestCli -Command 'coverage' -Test (New-DocsLedgerTestContext -File $files) -Json
+
+        # Assert
+        $run.Outcome.ExitCode | Should -Be 0
+        $run.Outcome.ExitCode | Should -Be $without.Outcome.ExitCode
+        $run.Envelope['ok'] | Should -BeTrue
+        $run.Envelope['findings'].Count | Should -Be 0
+        $run.Envelope['result']['placeholders']['total'] | Should -Be 3
     }
 }
 
