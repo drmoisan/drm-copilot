@@ -19,8 +19,8 @@ intent:
     - Bundle copies under extensions/drm-copilot/resources/ and the Codex, Claude, and Copilot surfaces stay in parity per config/harness-parity-matrix.json and the harness generator.
     - Line coverage >= 85% on new PowerShell (no branch gate) and line >= 85% / branch >= 75% on new TypeScript; files stay within the 500/700/800 line tiers.
 features:
-  - issue_num: 90001
-    feature_folder: docs-family-profile-model
+  - issue_num: 1218
+    feature_folder: 1218-docs-family-profile-model
     depends_on: []
   - issue_num: 1222
     feature_folder: 1222-docs-family-page-templates
@@ -30,13 +30,13 @@ features:
     depends_on: []
   - issue_num: 90004
     feature_folder: docs-family-gate-and-ia
-    depends_on: [docs-family-profile-model]
+    depends_on: [1218-docs-family-profile-model]
   - issue_num: 90005
     feature_folder: docs-review-cadence
-    depends_on: [docs-family-profile-model, docs-family-gate-and-ia, 1222-docs-family-page-templates]
+    depends_on: [1218-docs-family-profile-model, docs-family-gate-and-ia, 1222-docs-family-page-templates]
   - issue_num: 1223
     feature_folder: 1223-docs-epic-scale-routing
-    depends_on: [docs-family-profile-model, docs-family-gate-and-ia]
+    depends_on: [1218-docs-family-profile-model, docs-family-gate-and-ia]
 ---
 
 # documentation-estate-families - Epic
