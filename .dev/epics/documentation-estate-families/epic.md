@@ -2,9 +2,9 @@
 epic: documentation-estate-families
 integration_branch: epic/documentation-estate-families-integration
 created_at: 2026-11-23T05:33:36Z
-# PLANNING MANIFEST. issue_num values 90001-90006 are placeholders and depends_on uses
-# feature_folder short names; both are back-filled with real issue numbers and resolved
-# folder basenames as each child preparation fans in.
+# FINAL RESOLVED MANIFEST (2026-11-23). All issue_num values are real issues; every child
+# cleared preflight; depends_on uses issue_num values. Kickoff: epic-kickoff.md in
+# this folder.
 intent:
   epic_type: enabler
   business_outcome_hypothesis: A consumer repository can plan, author, lint, review on a cadence, and prove completeness of a full production documentation estate (families such as onboarding, administration, security, operations, service management, architecture and ADRs, in addition to surface reference) through the drm-copilot documentation workflow, without bespoke per-repository tooling.
@@ -25,18 +25,18 @@ features:
   - issue_num: 1222
     feature_folder: 1222-docs-family-page-templates
     depends_on: []
-  - issue_num: 90003
-    feature_folder: docs-prose-markdown-lint
+  - issue_num: 1219
+    feature_folder: 1219-docs-prose-markdown-lint
     depends_on: []
   - issue_num: 1221
     feature_folder: 1221-docs-family-gate-and-ia
-    depends_on: [1218-docs-family-profile-model]
+    depends_on: [1218]
   - issue_num: 1220
     feature_folder: 1220-docs-review-cadence
-    depends_on: [1218-docs-family-profile-model, 1221-docs-family-gate-and-ia, 1222-docs-family-page-templates]
+    depends_on: [1218, 1221, 1222]
   - issue_num: 1223
     feature_folder: 1223-docs-epic-scale-routing
-    depends_on: [1218-docs-family-profile-model, 1221-docs-family-gate-and-ia]
+    depends_on: [1218, 1221]
 ---
 
 # documentation-estate-families - Epic
