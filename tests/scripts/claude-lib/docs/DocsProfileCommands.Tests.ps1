@@ -54,7 +54,7 @@ BeforeAll {
 
 AfterAll {
     Remove-Item -Path Function:\Join-TestFile -ErrorAction SilentlyContinue
-    Remove-Module -Name DocsProfileCommands, DocsProfileSourceRoot, DocsTomlKeys, DocsSourceText, DocsProfile, DocsAnalyzerRegistry, DocsSurface, DocsSchema, DocsSchemaWalk, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
+    Remove-Module -Name DocsProfileCommands, DocsProfileSourceRoot, DocsTomlKeys, DocsSourceText, DocsProfile, DocsProfileFamilies, DocsAnalyzerRegistry, DocsSurface, DocsSchema, DocsSchemaWalk, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
 }
 
 Describe 'Get-DocsInitTemplate' {
@@ -156,6 +156,30 @@ Describe 'Invoke-DocsInitCommand' {
         $test.WriteLog.Count | Should -Be (1 + $script:DefaultTemplateFiles.Count)
         $test.WriteLog[0].RelativePath | Should -BeExactly $script:ProfilePath
         $test.WriteLog[0].Mode | Should -BeExactly 'create'
+    }
+
+    It 'seeds the ten documentation families with their template ids in the dry run and -Write profile and writes the unchanged path set (issue #1218 AC18)' {
+        # Arrange
+        $expectedId = @('product-overview', 'getting-started', 'user-guides', 'administration', 'security', 'operations', 'service-management', 'architecture', 'adr', 'reference')
+        $expectedTemplate = @('product-overview', 'onboarding', 'how-to', 'how-to', 'security', 'runbook', 'service-management', 'architecture-overview', 'adr', 'api-reference')
+        $expectedPath = [string[]] ((@($script:ProfilePath) + @(foreach ($row in (Get-DocsInitTemplate)) { [string] $row.Destination })) | Sort-Object -CaseSensitive)
+        $dry = New-DocsTestContext -File (Join-TestFile -Map @($script:DefaultTemplateFiles, $script:SourceFile))
+        $written = New-DocsTestContext -File (Join-TestFile -Map @($script:DefaultTemplateFiles, $script:SourceFile))
+
+        # Act
+        $dryResult = Invoke-DocsInitCommand -Argument @{} -Context $dry.Context
+        $writeResult = Invoke-DocsInitCommand -Argument @{ Write = $true } -Context $written.Context
+        $writtenProfile = (ConvertFrom-DocsJsonText -Text $written.Files[$script:ProfilePath]).Value
+
+        # Assert
+        $dryResult.ExitCode | Should -Be 0
+        $writeResult.ExitCode | Should -Be 0
+        foreach ($profileValue in @($dryResult.Result.profile, $writtenProfile)) {
+            [string[]] @(foreach ($family in $profileValue['required_families']) { [string] $family['id'] }) | Should -BeExactly $expectedId
+            [string[]] @(foreach ($family in $profileValue['required_families']) { [string] $family['template'] }) | Should -BeExactly $expectedTemplate
+        }
+        [string[]] (@(foreach ($entry in $written.WriteLog) { [string] $entry.RelativePath }) | Sort-Object -CaseSensitive) | Should -BeExactly $expectedPath
+        [string[]] (@(foreach ($entry in $dryResult.Result.planned_writes) { [string] $entry.path }) | Sort-Object -CaseSensitive) | Should -BeExactly $expectedPath
     }
 
     It 'exits 1 with DOCS_INIT_TARGET_EXISTS and writes nothing when the target exists' {

@@ -245,7 +245,7 @@ Describe 'validate' {
         $broken = New-DocsLedgerTestProfile
         $broken.Remove('audiences')
         $semantic = New-DocsLedgerTestProfile
-        $semantic['documentation_roots'][0]['audience_ids'] = @('maintainers', 'operators')
+        $semantic['documentation_roots'][0]['audience_ids'] = @('maintainers', 'auditors')
 
         # Act
         $missing = Invoke-TestValidate -Argument @('-Mode', 'profile', '-Revision', $script:Revision) -Test (New-DocsLedgerTestContext -RevisionMap $script:HeadMap -File (New-TestEstate -NoProfile))
