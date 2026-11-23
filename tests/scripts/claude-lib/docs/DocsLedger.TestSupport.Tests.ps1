@@ -167,6 +167,30 @@ Describe 'Fixture documents' {
         $result.Profile['page_owners'][0]['owner'] | Should -BeExactly 'docs-team'
     }
 
+    It 'returns empty required_families and legacy_exclusions unless the opt-in parameters supply them' {
+        # Arrange (issue #1221)
+        $family = [ordered]@{ id = 'operations'; directory = 'docs/operations'; diataxis_mode = 'how-to'; template = 'runbook'; audience = @('maintainers'); review_interval_days = 90L; required = $true }
+        $legacy = [ordered]@{ path = 'docs/legacy/old.md'; reason = 'Kept for history.' }
+
+        # Act
+        $default = New-DocsLedgerTestProfile
+        $supplied = New-DocsLedgerTestProfile -RequiredFamily @($family) -LegacyExclusion @($legacy)
+        $loaded = ConvertFrom-DocsProfileText -Text (ConvertTo-DocsJsonText -Value $supplied) -ArtifactPath 'docs-profile.json' -ComposedSchemaSet $script:Composed
+
+        # Assert
+        $default.Contains('required_families') | Should -BeTrue
+        @($default['required_families']).Count | Should -Be 0
+        $default.Contains('legacy_exclusions') | Should -BeTrue
+        @($default['legacy_exclusions']).Count | Should -Be 0
+        @($supplied['required_families']).Count | Should -Be 1
+        [object]::ReferenceEquals($supplied['required_families'][0], $family) | Should -BeTrue -Because 'the supplied family is returned unchanged'
+        [object]::ReferenceEquals($supplied['legacy_exclusions'][0], $legacy) | Should -BeTrue -Because 'the supplied legacy entry is returned unchanged'
+        $loaded.Ok | Should -BeTrue
+        @($loaded.Findings | Where-Object { $_['severity'] -ceq 'error' }).Count | Should -Be 0
+        $loaded.Profile['required_families'][0]['id'] | Should -BeExactly 'operations'
+        $loaded.Profile['legacy_exclusions'][0]['path'] | Should -BeExactly 'docs/legacy/old.md'
+    }
+
     It 'fixture ledger, matrix and pin collection produce no finding from Test-DocsArtifactText' {
         # Arrange
         $element = New-DocsLedgerTestElement -Kind 'cli-command'

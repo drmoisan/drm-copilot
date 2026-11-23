@@ -230,7 +230,7 @@ Not edited: `DocsCompleteGate.psm1`, `DocsReceipt.psm1`, `DocsReceiptRevision.ps
 
 ### Fixtures (Risk R1)
 
-- [ ] AC-16: `New-DocsLedgerTestProfile` returns a profile with empty `required_families` and empty `legacy_exclusions` unless the opt-in parameters `-RequiredFamily` or `-LegacyExclusion` supply them, and every suite that uses it keeps its existing pass and fail assertions unchanged.
+- [x] AC-16: `New-DocsLedgerTestProfile` returns a profile with empty `required_families` and empty `legacy_exclusions` unless the opt-in parameters `-RequiredFamily` or `-LegacyExclusion` supply them, and every suite that uses it keeps its existing pass and fail assertions unchanged.
 - [ ] AC-17: Every end-to-end docs-complete fixture built from `New-DocsStarterProfile` or `docs-init` outside that helper (at minimum `DocsCompleteIntegration.Tests.ps1`, `EndToEndDocumentationEstate.Tests.ps1`, and `tests/scripts/claude-hooks/docs-estate-workflow.EndToEnd.Tests.ps1`, plus any other found by a repository search for docs-complete runs, such as `DocsHashLineEnding.Tests.ps1`) either provides a `.md` page in each required family directory together with root `SECURITY.md` and `CODEOWNERS`, or records an `exclusion` per family, and its existing pass assertions keep passing without being removed or weakened. The plan lists each fixture found with its disposition.
 
 ### docs-plan-ia skill

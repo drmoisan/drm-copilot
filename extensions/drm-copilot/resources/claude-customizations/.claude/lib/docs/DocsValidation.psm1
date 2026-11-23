@@ -35,6 +35,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsParity.psm1')
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsEvidencePins.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsStaleness.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsReceipt.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsFamilyCheck.psm1') -ErrorAction Stop
 
 $script:DocsValidationModeList = [string[]]@('profile', 'ledger', 'matrix', 'docs-complete')
 $script:DocsValidationPagePathKind = 'page-path-set'
@@ -262,6 +263,10 @@ function Invoke-DocsValidation {
         Get-DocsCompletionGateFinding. Ok and validation_result come from the unbounded finding
         set. The built receipt is validated against its schema; a failure throws
         DOCS_RECEIPT_INVALID.
+        Issue #1221: in docs-complete mode only, and whether or not the snapshot and ledger
+        loaded, the documentation family findings of Get-DocsFamilyFinding over FamilyEvidence
+        (Read-DocsFamilyEvidence output) join the finding set; a $null FamilyEvidence reads every
+        family directory as empty and every root file as absent.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -274,7 +279,8 @@ function Invoke-DocsValidation {
         [AllowNull()] [System.Collections.IDictionary] $Artifact,
         [AllowNull()] [AllowEmptyCollection()] [string[]] $PagePath,
         [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $ComposedSchemaSet,
-        [AllowNull()] [AllowEmptyCollection()] [string[]] $AnalyzerId
+        [AllowNull()] [AllowEmptyCollection()] [string[]] $AnalyzerId,
+        [AllowNull()] [System.Collections.IDictionary] $FamilyEvidence = $null
     )
 
     $index = Get-DocsValidationModeIndex -Mode $Mode
@@ -349,6 +355,9 @@ function Invoke-DocsValidation {
                 foreach ($finding in (Get-DocsStalenessFinding -StalePage $stalePages -Element $view['Element'] -Severity 'warning' -PinSet $pinSet -ArtifactPath $pinRead.Path)) { $findings.Add($finding) }
             }
         }
+    }
+    if ($Mode -ceq 'docs-complete') {
+        foreach ($finding in (Get-DocsFamilyFinding -Profile $profileDocument -Evidence $FamilyEvidence -ProfilePath $ProfilePath)) { $findings.Add($finding) }
     }
 
     $ordered = Get-DocsValidationOrderedFinding -Finding $findings.ToArray()

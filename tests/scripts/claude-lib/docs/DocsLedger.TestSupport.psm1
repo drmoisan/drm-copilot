@@ -352,6 +352,10 @@ function New-DocsLedgerTestProfile {
     <#
     .SYNOPSIS
         Returns the fixture profile: starter profile with fixture roots, owners, gate and paths.
+    .DESCRIPTION
+        Issue #1221: required_families and legacy_exclusions are empty arrays, so the fixture
+        declares no documentation family, unless RequiredFamily or LegacyExclusion supplies the
+        entries, which are returned unchanged.
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Test fixture factory that builds in-memory objects only.')]
     [CmdletBinding()]
@@ -360,10 +364,14 @@ function New-DocsLedgerTestProfile {
         [bool] $AllowDeferred = $true,
         [long] $MaxStalePages = 0,
         [string[]] $RequiredParityDimension = @('exists', 'accurate', 'owner_assigned'),
-        [string] $RepositoryId = $script:DocsLedgerTestRepositoryId
+        [string] $RepositoryId = $script:DocsLedgerTestRepositoryId,
+        [AllowEmptyCollection()] [object[]] $RequiredFamily = @(),
+        [AllowEmptyCollection()] [object[]] $LegacyExclusion = @()
     )
 
     $document = New-DocsStarterProfile -RepositoryId $RepositoryId
+    $document['required_families'] = [object[]] @($RequiredFamily)
+    $document['legacy_exclusions'] = [object[]] @($LegacyExclusion)
     $document['documentation_roots'] = @([ordered]@{ id = 'docs-root'; path = 'docs'; audience_ids = @('maintainers') })
     $document['page_owners'] = @(
         [ordered]@{ path_or_glob = 'docs/reference/**'; owner = 'docs-team' }
