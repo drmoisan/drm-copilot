@@ -50,14 +50,14 @@ The docs profile (`docs-profile.json`) describes a documentation estate only thr
 
 ## Acceptance Criteria
 
-- [ ] US1. Running `docs-init` writes a profile that holds exactly the default families `product-overview`, `getting-started`, `user-guides`, `administration`, `security`, `operations`, `service-management`, `architecture`, `adr`, `reference`, in that order, each with the directory, Diataxis mode, template id, audience, review interval, and `required` value stated in the spec `## Data & State` table, and that profile validates with zero findings.
-- [ ] US2. A maintainer who passes a different documentation root to the starter receives family directories beneath that root, and the profile still validates with zero findings.
-- [ ] US3. A documentation owner can record a family as not applicable by adding an `exclusion` with a non-empty `reason` and a UTC `recorded_at`, and the profile validates; an `exclusion` missing either field is rejected with a specific schema finding.
-- [ ] US4. A documentation owner can list legacy pages in `legacy_exclusions` with a `path` and `reason`; a repeated path is rejected with `DOCS_PROFILE_LEGACY_DUPLICATE`, and a path with a `..` segment is rejected by the schema.
-- [ ] US5. A malformed family entry (missing field, unknown key, wrong type, non-positive interval, duplicate id or directory, undeclared audience, mode outside policy, or directory outside every documentation root) is rejected with the specific code and pointer stated in the spec, and each semantic finding carries a next action.
-- [ ] US6. An existing profile without `required_families` or `legacy_exclusions`, including the committed example profile, validates exactly as before.
-- [ ] US7. The docs-init skill text on the Codex `.agents` source, the generated Claude copy, and every bundle copy describes the families, the `exclusion` object, and `legacy_exclusions`, and the generator check and bundle parity checks pass.
-- [ ] US8. The docs profile schema copies `schemas/docs/v1/docs-profile.schema.json`, `.claude/lib/docs/schemas/v1/docs-profile.schema.json`, and `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/schemas/v1/docs-profile.schema.json` stay byte-identical, and the surface and bundle parity checks pass.
+- [x] US1. Running `docs-init` writes a profile that holds exactly the default families `product-overview`, `getting-started`, `user-guides`, `administration`, `security`, `operations`, `service-management`, `architecture`, `adr`, `reference`, in that order, each with the directory, Diataxis mode, template id, audience, review interval, and `required` value stated in the spec `## Data & State` table, and that profile validates with zero findings.
+- [x] US2. A maintainer who passes a different documentation root to the starter receives family directories beneath that root, and the profile still validates with zero findings.
+- [x] US3. A documentation owner can record a family as not applicable by adding an `exclusion` with a non-empty `reason` and a UTC `recorded_at`, and the profile validates; an `exclusion` missing either field is rejected with a specific schema finding.
+- [x] US4. A documentation owner can list legacy pages in `legacy_exclusions` with a `path` and `reason`; a repeated path is rejected with `DOCS_PROFILE_LEGACY_DUPLICATE`, and a path with a `..` segment is rejected by the schema.
+- [x] US5. A malformed family entry (missing field, unknown key, wrong type, non-positive interval, duplicate id or directory, undeclared audience, mode outside policy, or directory outside every documentation root) is rejected with the specific code and pointer stated in the spec, and each semantic finding carries a next action.
+- [x] US6. An existing profile without `required_families` or `legacy_exclusions`, including the committed example profile, validates exactly as before.
+- [x] US7. The docs-init skill text on the Codex `.agents` source, the generated Claude copy, and every bundle copy describes the families, the `exclusion` object, and `legacy_exclusions`, and the generator check and bundle parity checks pass.
+- [x] US8. The docs profile schema copies `schemas/docs/v1/docs-profile.schema.json`, `.claude/lib/docs/schemas/v1/docs-profile.schema.json`, and `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/schemas/v1/docs-profile.schema.json` stay byte-identical, and the surface and bundle parity checks pass.
 
 ## Non-Goals
 

@@ -437,6 +437,16 @@ These rules apply only to a repository that commits `.claude/release-commit-allo
 
 Honest disclosure: the leg is a policy-level control, not a security control. Whoever can commit the allowance file decides which paths an agent may commit on a matching branch without a checkpoint.
 
+Release pull-request legs (issue #1231): the same file also admits opening the release pull request without a checkpoint, through three Claude-only allow-side legs that read it beneath the resolved worktree root R with the #1201 parser and branch matcher. None of them changes the #1201 command leg above, which still applies to Bash `git add` and `git commit` lines only.
+
+- **`gh pr create` (`RELEASE_EXEMPTION_*`).** `Get-PrAuthorReleaseExemption` in `enforce-pr-author-skill.release.ps1` runs inside the preflight exemption of `enforce-pr-author-skill.ps1` after the docs-only and cleanup exemptions, in the non-epic branch only. It exempts a structural `gh pr create` with exactly one `--head <branch>` and one `--base <base>` when the branch matches one allowance, `refs/remotes/origin/<branch>` equals `HEAD`, and every path of the `origin/<base>...HEAD` diff is listed by that allowance. A failure appends `; release exemption not applied: <CODE>: <detail>`; the receipt checks still run after an exemption.
+- **`Agent(pr-author)` (`RELEASE_DELEGATION_*`).** `Get-ModelRoutingReleaseDecision` in `enforce-model-routing-receipt-release.ps1` runs in the model-routing gate after the docs-estate leg for a checkpoint-free delegation whose prompt carries exactly one `branch:` and one `base:` line, with the same branch and diff rule. A failure appends ` Release delegation leg not applied: <CODE>: <detail>` after the docs-estate suffix.
+- **Receipt Write (`RELEASE_RECEIPT_*`).** `Get-OrchestrationReleaseReceiptResult` in `enforce-orchestration-preimplementation-gate-release-receipt.ps1` runs in the Claude preimplementation gate after the parallel records leg and before the #1201 command leg, for a Write of `artifacts/pr_body_<N>.receipt.json` beneath R when no checkpoint exists there and the HEAD branch of R matches one allowance. A failure appends ` Release receipt leg not applied: <CODE>: <detail>` immediately before the #1201 suffix.
+
+Without the file, every deny text of the three gates is unchanged. An unexpected error in a leg declines with an empty suffix and a `Write-Debug` record, so the deny stands. Merging the release pull request is not covered and stays with the merge gate.
+
+Honest disclosure: the release pull-request legs are a policy-level control, not a security control. Whoever can commit the allowance file decides which paths may reach a pull request without an orchestration checkpoint. The legs compare local tracking refs and never fetch, so a push from another clone after the local push can leave `refs/remotes/origin/<branch>` stale; run `git push` immediately before `gh pr create`.
+
 <!-- harness-section: enforcement -->
 ## Enforcement
 
