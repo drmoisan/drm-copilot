@@ -1,0 +1,223 @@
+# Cadence Search - Issue #1228 ([P1-T11]; AC-04)
+
+Timestamp: 2026-11-24T04-48
+Command: `sh <item worktree>/artifacts/issue-1228/search-t11.sh` (runs `git grep --untracked -I -i -F -o` at the item worktree root with one `-e` per pattern below and the pathspec `-- . ':!.dev' ':!.claude/worktrees' ':!node_modules' ':!.venv'`), then `perl <item worktree>/artifacts/issue-1228/t11-classify.pl` over the per-path pattern table
+EXIT_CODE: 0
+Output Summary:
+- 406 matched occurrences in 202 files (the last run, after the fixes below). Every hit is classified below; after the fixes, no hit requires a full-suite run outside the `Phase 0 baseline` and the final QA loop.
+- The ten PD5 tokens occur only in `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`, as the sweep token list and its planted-sentence test data.
+- Classification counts: R1 and final QA loop 56; final QA loop (typed engineers, with the D4 sentence) 47; R1 or canonical rule statement 54 (28 generic, 14 policy references to the toolchain loop, 4 canonical-section copies, 4 brief copies, 4 review-workflow copies); final QA loop (QA-gate toolchain sequence) 12; D10 10; developer documentation 4; D5 4; test fixture 7 (4 test files, 3 tracked `virtual/` fixture files); D6 3; final QA loop (template checklist and audit row) 2; developer documentation and final QA loop (legacy C# QA gate) 2; CI 1.
+- Verification of the classification: each of the 157 files labelled R1 or final QA loop was checked for the R1 sentence; the files without R1 are the typed engineers (each checked to hold the D4 token `leaves the full gate to the plan's final QA loop`), the review workflow copies (selection re-run wording of [P1-T9]), and the TypeScript instructions (references to the general code change policy, which carries R1).
+
+Fixes made in this task (hits that required a full-suite run outside the two points):
+1. `.claude/skills/csharp-qa-gate/SKILL.md` step 5 read "(full unit-test pass with coverage)". Because [P1-T7] applies the QA-gate skills to a remediation gate as well, it now reads "(unit-test pass with coverage: the full suite in the final QA loop, the cycle's test selection in a remediation gate)". Bundle copy updated.
+2. The toolchain-sequence paragraph ("Run the full toolchain in this exact order. ...") of all eight QA-gate copies (`.claude/skills/{python,powershell,csharp}-qa-gate/SKILL.md`, `.agents/skills/{python,powershell,csharp}-qa-gate/SKILL.md`, and the two bundle-only `csharp-legacy` variants) gains: "In a remediation gate, the test step runs the cycle's test selection in coverage mode (the selected test files appended to the test command, or `-TestPath` for the launcher `pester` suite); the full suite runs only in the final QA loop." The six base copies were copied byte-for-byte to their bundles.
+3. The bundle-only legacy engineers `extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/agents/csharp-typed-engineer.md` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex-variants/csharp-legacy/agents/csharp-typed-engineer.toml` lacked the D4 sentence that [P1-T3] added to the generated base engineers; item 5 (`**Final QA gate**`) of each now carries it verbatim.
+No fix touched a generated target: `Invoke-HarnessGeneration.ps1 -Check`, `-Surface instructions -Check`, and the Codex generator `--check` report no drift after the fixes (see `evidence/other/task-check.P1-T11.<timestamp>.md`).
+
+SearchScope: the item worktree (tracked and untracked, non-ignored files), excluding `node_modules/`, `.venv/`, `.git/`, `.claude/worktrees/`, and `.dev/`; gitignored paths such as `artifacts/` are excluded by `git grep --untracked`.
+SearchPatterns: case-insensitive fixed strings: `and the full toolchain loop at each phase gate`, `the full unit suite`, `runs the full toolchain loop instead`, `still runs the full loop`, `as the full loop at each phase gate`, `the standard parallel unit gates`, `Run the full toolchain loop (stages 1 to 6)`, `a phase gate or the final QA loop`, `the standard parallel gates pass`, `Final phase runs the full toolchain QA loop`, `full suite`, `full test suite`, `full toolchain`, `full loop`, `full unit`, `local gate`.
+SearchResult: the 202 paths below, each with the patterns it matched (lower-cased) and one classification.
+
+- `.agents/skills/atomic-executor/SKILL.md` (full test suite): R1 and final QA loop
+- `.agents/skills/atomic-plan-contract/SKILL.md` (full suite, full test suite, full toolchain, local gate): R1 or canonical rule statement (the canonical section, its R1 references, and the final QA loop section)
+- `.agents/skills/atomic-planner/SKILL.md` (full test suite): R1 and final QA loop
+- `.agents/skills/csharp-qa-gate/SKILL.md` (full suite, full test suite, full toolchain): final QA loop (QA-gate toolchain sequence; the remediation gate runs the cycle's selection)
+- `.agents/skills/csharp/SKILL.md` (full test suite): R1 or canonical rule statement
+- `.agents/skills/epic-orchestrate/SKILL.md` (local gate): D5 (frozen epic surface; its "re-run the local gate" step is defined by the `Sync check` bullet)
+- `.agents/skills/execution-environment/SKILL.md` (full suite, full test suite, local gate): R1 or canonical rule statement (brief: selection-only gates; `## Test Runtime` full-suite duration guidance)
+- `.agents/skills/feature-review-workflow/SKILL.md` (full suite): R1 or canonical rule statement (review re-runs coverage over the branch's test selection, not the full suite)
+- `.agents/skills/general-code-change/SKILL.md` (full test suite): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `.agents/skills/orchestrate/SKILL.md` (full test suite): R1 or canonical rule statement
+- `.agents/skills/powershell-qa-gate/SKILL.md` (full suite, full test suite, full toolchain): final QA loop (QA-gate toolchain sequence; the remediation gate runs the cycle's selection)
+- `.agents/skills/powershell/SKILL.md` (full test suite): R1 or canonical rule statement
+- `.agents/skills/python-qa-gate/SKILL.md` (full suite, full test suite, full toolchain): final QA loop (QA-gate toolchain sequence; the remediation gate runs the cycle's selection)
+- `.agents/skills/python/SKILL.md` (full test suite): R1 or canonical rule statement
+- `.agents/skills/typescript/SKILL.md` (full test suite): R1 or canonical rule statement
+- `.claude/agents/atomic-executor.md` (full test suite): R1 and final QA loop
+- `.claude/agents/atomic-planner.md` (full test suite): R1 and final QA loop
+- `.claude/agents/csharp-typed-engineer.md` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.claude/agents/powershell-typed-engineer.md` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.claude/agents/python-typed-engineer.md` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.claude/rules/csharp.md` (full test suite): R1 or canonical rule statement
+- `.claude/rules/general-code-change.md` (full test suite): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `.claude/rules/powershell.md` (full test suite): R1 or canonical rule statement
+- `.claude/rules/python.md` (full test suite): R1 or canonical rule statement
+- `.claude/rules/shell.md` (full test suite): R1 or canonical rule statement
+- `.claude/rules/typescript.md` (full test suite): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `.claude/skills/atomic-plan-contract/SKILL.md` (full suite, full test suite, full toolchain, local gate): R1 or canonical rule statement (the canonical section, its R1 references, and the final QA loop section)
+- `.claude/skills/csharp-qa-gate/SKILL.md` (full suite, full test suite, full toolchain): final QA loop (QA-gate toolchain sequence; the remediation gate runs the cycle's selection)
+- `.claude/skills/epic-orchestrate/SKILL.md` (local gate): D5 (frozen epic surface; its "re-run the local gate" step is defined by the `Sync check` bullet)
+- `.claude/skills/execution-environment/SKILL.md` (full suite, full test suite, local gate): R1 or canonical rule statement (brief: selection-only gates; `## Test Runtime` full-suite duration guidance)
+- `.claude/skills/feature-review-workflow/SKILL.md` (full suite): R1 or canonical rule statement (review re-runs coverage over the branch's test selection, not the full suite)
+- `.claude/skills/orchestrate/SKILL.md` (full test suite): R1 or canonical rule statement
+- `.claude/skills/powershell-qa-gate/SKILL.md` (full suite, full test suite, full toolchain): final QA loop (QA-gate toolchain sequence; the remediation gate runs the cycle's selection)
+- `.claude/skills/python-qa-gate/SKILL.md` (full suite, full test suite, full toolchain): final QA loop (QA-gate toolchain sequence; the remediation gate runs the cycle's selection)
+- `.codex/agents/atomic-executor-c1.toml` (full test suite): R1 and final QA loop
+- `.codex/agents/atomic-executor-c2.toml` (full test suite): R1 and final QA loop
+- `.codex/agents/atomic-executor-c3-elevated.toml` (full test suite): R1 and final QA loop
+- `.codex/agents/atomic-executor-c3.toml` (full test suite): R1 and final QA loop
+- `.codex/agents/atomic-executor-c4.toml` (full test suite): R1 and final QA loop
+- `.codex/agents/atomic-executor.toml` (full test suite): R1 and final QA loop
+- `.codex/agents/atomic-planner-c1.toml` (full test suite): R1 and final QA loop
+- `.codex/agents/atomic-planner-c2.toml` (full test suite): R1 and final QA loop
+- `.codex/agents/atomic-planner-c3-elevated.toml` (full test suite): R1 and final QA loop
+- `.codex/agents/atomic-planner-c3.toml` (full test suite): R1 and final QA loop
+- `.codex/agents/atomic-planner-c4.toml` (full test suite): R1 and final QA loop
+- `.codex/agents/atomic-planner.toml` (full test suite): R1 and final QA loop
+- `.codex/agents/csharp-typed-engineer-c1.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/csharp-typed-engineer-c2.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/csharp-typed-engineer-c3-elevated.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/csharp-typed-engineer-c3.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/csharp-typed-engineer-c4.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/csharp-typed-engineer.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/powershell-typed-engineer-c1.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/powershell-typed-engineer-c2.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/powershell-typed-engineer-c3-elevated.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/powershell-typed-engineer-c3.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/powershell-typed-engineer-c4.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/powershell-typed-engineer.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/python-typed-engineer-c1.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/python-typed-engineer-c2.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/python-typed-engineer-c3-elevated.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/python-typed-engineer-c3.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/python-typed-engineer-c4.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.codex/agents/python-typed-engineer.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `.devcontainer/CODESPACES-SETUP.md` (full test suite): developer documentation
+- `.github/agents/Powershell DI Unit Test Engineer.agent.md` (full toolchain): D10 (standalone Copilot agent or prompt, unchanged)
+- `.github/agents/atomic_executor.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `.github/agents/atomic_planning.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `.github/agents/commentary-remediation.agent.md` (full toolchain): D10 (standalone Copilot agent or prompt, unchanged)
+- `.github/agents/csharp-atomic-executor.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `.github/agents/csharp-atomic-planning.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `.github/agents/powershell-atomic-executor.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `.github/agents/powershell-atomic-planning.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `.github/agents/pytest-unit-test-coding.agent.md` (full toolchain): D10 (standalone Copilot agent or prompt, unchanged)
+- `.github/agents/python-atomic-executor.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `.github/agents/python-atomic-planning.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `.github/agents/python-execution-only-typed.agent.md` (full toolchain): D10 (standalone Copilot agent or prompt, unchanged)
+- `.github/agents/python-typed-engineer.agent.md` (full toolchain): D10 (standalone Copilot agent or prompt, unchanged)
+- `.github/codex/execute-hard-lock.prompt.md` (full test suite, full toolchain): R1 and final QA loop
+- `.github/codex/resume-hard-lock.prompt.md` (full test suite): R1 and final QA loop
+- `.github/instructions/general-code-change.instructions.md` (full test suite, full toolchain): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `.github/instructions/typescript-code-change.instructions.md` (full toolchain): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `.github/instructions/typescript-unit-test.instructions.md` (full toolchain): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `.github/prompts/execute-hard-lock.prompt.md` (full test suite, full toolchain): R1 and final QA loop
+- `AGENTS.md` (full test suite): R1 or canonical rule statement
+- `README.md` (full suite): developer documentation
+- `extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/agents/csharp-typed-engineer.md` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/rules/csharp.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md` (full suite, full test suite, full toolchain, local gate): developer documentation (MSBuild build-target note for the local gate; no test run) and final QA loop (QA-gate toolchain sequence)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-planner.md` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/csharp-typed-engineer.md` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/powershell-typed-engineer.md` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/python-typed-engineer.md` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/rules/csharp.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-code-change.md` (full test suite): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/rules/powershell.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/claude-customizations/.claude/rules/python.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/claude-customizations/.claude/rules/typescript.md` (full test suite): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md` (full suite, full test suite, full toolchain, local gate): R1 or canonical rule statement (the canonical section, its R1 references, and the final QA loop section)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/csharp-qa-gate/SKILL.md` (full suite, full test suite, full toolchain): final QA loop (QA-gate toolchain sequence; the remediation gate runs the cycle's selection)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md` (local gate): D5 (frozen epic surface; its "re-run the local gate" step is defined by the `Sync check` bullet)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md` (full suite, full test suite, local gate): R1 or canonical rule statement (brief: selection-only gates; `## Test Runtime` full-suite duration guidance)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md` (full suite): R1 or canonical rule statement (review re-runs coverage over the branch's test selection, not the full suite)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md` (full suite, full test suite, full toolchain): final QA loop (QA-gate toolchain sequence; the remediation gate runs the cycle's selection)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md` (full suite, full test suite, full toolchain): final QA loop (QA-gate toolchain sequence; the remediation gate runs the cycle's selection)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md` (full suite, full test suite, full toolchain, local gate): developer documentation (MSBuild build-target note for the local gate; no test run) and final QA loop (QA-gate toolchain sequence)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp/SKILL.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-executor/SKILL.md` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md` (full suite, full test suite, full toolchain, local gate): R1 or canonical rule statement (the canonical section, its R1 references, and the final QA loop section)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-planner/SKILL.md` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp-qa-gate/SKILL.md` (full suite, full test suite, full toolchain): final QA loop (QA-gate toolchain sequence; the remediation gate runs the cycle's selection)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp/SKILL.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md` (local gate): D5 (frozen epic surface; its "re-run the local gate" step is defined by the `Sync check` bullet)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md` (full suite, full test suite, local gate): R1 or canonical rule statement (brief: selection-only gates; `## Test Runtime` full-suite duration guidance)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md` (full suite): R1 or canonical rule statement (review re-runs coverage over the branch's test selection, not the full suite)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/general-code-change/SKILL.md` (full test suite): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrate/SKILL.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/SKILL.md` (full suite, full test suite, full toolchain): final QA loop (QA-gate toolchain sequence; the remediation gate runs the cycle's selection)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell/SKILL.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md` (full suite, full test suite, full toolchain): final QA loop (QA-gate toolchain sequence; the remediation gate runs the cycle's selection)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python/SKILL.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/typescript/SKILL.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex-variants/csharp-legacy/agents/csharp-typed-engineer.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c1.toml` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c2.toml` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3-elevated.toml` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3.toml` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c4.toml` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor.toml` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c1.toml` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c2.toml` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c3-elevated.toml` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c3.toml` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c4.toml` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner.toml` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c1.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c2.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c3-elevated.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c3.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c4.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c1.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c2.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3-elevated.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c4.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c1.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c2.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c3-elevated.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c3.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c4.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer.toml` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/AGENTS.md` (full test suite): R1 or canonical rule statement
+- `extensions/drm-copilot/resources/customizations/.github/agents/Powershell DI Unit Test Engineer.agent.md` (full toolchain): D10 (standalone Copilot agent or prompt, unchanged)
+- `extensions/drm-copilot/resources/customizations/.github/agents/atomic_executor.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `extensions/drm-copilot/resources/customizations/.github/agents/atomic_planning.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `extensions/drm-copilot/resources/customizations/.github/agents/commentary-remediation.agent.md` (full toolchain): D10 (standalone Copilot agent or prompt, unchanged)
+- `extensions/drm-copilot/resources/customizations/.github/agents/csharp-atomic-executor.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `extensions/drm-copilot/resources/customizations/.github/agents/csharp-atomic-planning.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `extensions/drm-copilot/resources/customizations/.github/agents/powershell-atomic-executor.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `extensions/drm-copilot/resources/customizations/.github/agents/powershell-atomic-planning.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `extensions/drm-copilot/resources/customizations/.github/agents/pytest-unit-test-coding.agent.md` (full toolchain): D10 (standalone Copilot agent or prompt, unchanged)
+- `extensions/drm-copilot/resources/customizations/.github/agents/python-atomic-executor.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `extensions/drm-copilot/resources/customizations/.github/agents/python-atomic-planning.agent.md` (full test suite, full toolchain): R1 and final QA loop
+- `extensions/drm-copilot/resources/customizations/.github/agents/python-execution-only-typed.agent.md` (full toolchain): D10 (standalone Copilot agent or prompt, unchanged)
+- `extensions/drm-copilot/resources/customizations/.github/agents/python-typed-engineer.agent.md` (full toolchain): D10 (standalone Copilot agent or prompt, unchanged)
+- `extensions/drm-copilot/resources/customizations/.github/codex/execute-hard-lock.prompt.md` (full test suite, full toolchain): R1 and final QA loop
+- `extensions/drm-copilot/resources/customizations/.github/codex/resume-hard-lock.prompt.md` (full test suite): R1 and final QA loop
+- `extensions/drm-copilot/resources/customizations/.github/instructions/general-code-change.instructions.md` (full test suite, full toolchain): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `extensions/drm-copilot/resources/customizations/.github/instructions/typescript-code-change.instructions.md` (full toolchain): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `extensions/drm-copilot/resources/customizations/.github/instructions/typescript-unit-test.instructions.md` (full toolchain): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `extensions/drm-copilot/resources/customizations/.github/prompts/execute-hard-lock.prompt.md` (full test suite, full toolchain): R1 and final QA loop
+- `extensions/drm-copilot/resources/feature-templates/bug/spec.md` (full toolchain): final QA loop (template checklist or audit row for the final QA loop)
+- `extensions/drm-copilot/resources/powershell/PoshQC/README.md` (full suite): developer documentation
+- `extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md` (full toolchain): final QA loop (template checklist or audit row for the final QA loop)
+- `pyproject.toml` (local gate): CI (lane markers: integration and golden lanes are excluded from local gates)
+- `scripts/dev_tools/atomic_executor/cli.py` (full toolchain): D6 (Python atomic executor CLI, unchanged)
+- `scripts/dev_tools/atomic_executor/cli_preflight.py` (full suite): D6 (Python atomic executor CLI, unchanged)
+- `scripts/dev_tools/atomic_executor/qc_runner.py` (full test suite, full toolchain): D6 (Python atomic executor CLI, unchanged)
+- `scripts/harness-generation/sources/agents/atomic-executor.md` (full test suite): R1 and final QA loop
+- `scripts/harness-generation/sources/agents/atomic-planner.md` (full test suite): R1 and final QA loop
+- `scripts/harness-generation/sources/agents/csharp-typed-engineer.md` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `scripts/harness-generation/sources/agents/powershell-typed-engineer.md` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `scripts/harness-generation/sources/agents/python-typed-engineer.md` (full toolchain): final QA loop (engineer's own final QA gate for standalone use; the D4 sentence covers orchestrated use)
+- `scripts/harness-generation/sources/rules/csharp.md` (full test suite): R1 or canonical rule statement
+- `scripts/harness-generation/sources/rules/general-code-change.md` (full test suite, full toolchain): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `scripts/harness-generation/sources/rules/powershell.md` (full test suite): R1 or canonical rule statement
+- `scripts/harness-generation/sources/rules/python.md` (full test suite): R1 or canonical rule statement
+- `scripts/harness-generation/sources/rules/shell.md` (full test suite): R1 or canonical rule statement
+- `scripts/harness-generation/sources/rules/typescript.md` (full test suite, full toolchain): R1 or canonical rule statement (the policy references the toolchain loop that carries R1)
+- `scripts/powershell/PoshQC/README.md` (full suite): developer documentation
+- `tests/discovery_runtime/test_gateway_local.py` (local gate): test fixture (contract-test tokens or test data)
+- `tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1` (full toolchain): test fixture (contract-test tokens or test data)
+- `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1` (a phase gate or the final qa loop, and the full toolchain loop at each phase gate, as the full loop at each phase gate, final phase runs the full toolchain qa loop, full suite, local gate, run the full toolchain loop (stages 1 to 6), runs the full toolchain loop instead, still runs the full loop, the full unit suite, the standard parallel gates pass, the standard parallel unit gates): test fixture (contract-test tokens or test data)
+- `tests/scripts/dev_tools/codex_native_converter/test_section_intent.py` (full toolchain): test fixture (contract-test tokens or test data)
+- `virtual/debug-artifacts-2/proposed-tree/AGENTS.md` (full toolchain): test fixture (tracked conversion fixture tree)
+- `virtual/debug-artifacts-3/proposed-tree/AGENTS.md` (full toolchain): test fixture (tracked conversion fixture tree)
+- `virtual/debug-artifacts/proposed-tree/AGENTS.md` (full toolchain): test fixture (tracked conversion fixture tree)

@@ -1,10 +1,10 @@
 <#
 .SYNOPSIS
-    Codex twin of the feature-review coverage freshness functions (issue #1114).
+    Codex twin of the feature-review coverage freshness and run-scope functions (issues #1114 and #1228).
 
 .DESCRIPTION
-    Source: .claude/hooks/validate-feature-review-coverage-freshness.ps1 (issue #1105). This file
-    carries the four functions of that file with byte-identical function text, because Codex hooks
+    Source: .claude/hooks/validate-feature-review-coverage-freshness.ps1 (issues #1105 and #1228). This
+    file carries the seven functions of that file with byte-identical function text, because Codex hooks
     cannot dot-source .claude paths: a consumer repository receives the .codex runtime without the
     Claude hooks. tests/scripts/codex-hooks/validate-feature-review-coverage-freshness.Tests.ps1
     holds the function names and each function's text equal to the Claude file and runs the
@@ -142,4 +142,84 @@ function Get-FeatureReviewCoverageFreshnessDecision {
     if ($reasons.Count -eq 0) { return $null }
     $repairableCount = $reasons.Count - @($reasons | Where-Object { $_.Contains('the gate fails closed') }).Count
     return @{ Reasons = [string[]]$reasons.ToArray(); HasRepairable = ($repairableCount -gt 0); HasNonRepairable = $hasNonRepairable }
+}
+
+function Get-FeatureReviewRunScopeSuite {
+    # Returns the test-execution launcher suite whose run-scope record describes a language's report, or $null (issue #1228).
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [string] $Language)
+
+    switch ($Language) {
+        'PowerShell' { return 'pester' }
+        'Python' { return 'pytest' }
+        'TypeScript' { return 'jest' }
+    }
+    return $null
+}
+
+function Get-FeatureReviewRunScopeRecordPath {
+    # Returns the repository-relative run-scope record path of a language's suite, or $null (issue #1228).
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory = $true)] [string] $Language)
+
+    $suite = Get-FeatureReviewRunScopeSuite -Language $Language
+    if ($null -eq $suite) { return $null }
+    return "artifacts/test-execution/run-scope.$suite.json"
+}
+
+function Get-FeatureReviewCoverageReportScope {
+    <#
+    .SYNOPSIS
+        Decides whether a language's coverage report came from a selection run or a full run (issue #1228).
+    .DESCRIPTION
+        Returns 'selection' only when RecordText parses as a JSON object with schema_version 1, suite
+        equal to the language's launcher suite, scope 'selection', and started_utc and completed_utc
+        that are UTC instants with started not after completed, and when GetReportWriteUtc, invoked
+        only after the record passes, returns a write time inside that window, bounds included.
+        Every other case returns 'full', so the repository-wide floors keep applying: an absent,
+        unparseable, mismatched, or non-covering record, an absent report, and a language with no
+        launcher suite (CSharp), for which the seam is not invoked.
+    .PARAMETER Language
+        The changed language.
+    .PARAMETER RecordText
+        The text of artifacts/test-execution/run-scope.<suite>.json, or $null when it is absent.
+    .PARAMETER GetReportWriteUtc
+        { } returning the UTC last-write time of the language's coverage report, or $null.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)] [string] $Language,
+        [AllowNull()] [AllowEmptyString()] [string] $RecordText,
+        [Parameter(Mandatory = $true)] [scriptblock] $GetReportWriteUtc
+    )
+
+    $suite = Get-FeatureReviewRunScopeSuite -Language $Language
+    if ($null -eq $suite -or [string]::IsNullOrWhiteSpace($RecordText)) { return 'full' }
+    $record = $null
+    try { $record = ConvertFrom-Json -InputObject $RecordText -AsHashtable -NoEnumerate -ErrorAction Stop } catch { return 'full' }
+    if ($record -isnot [System.Collections.IDictionary]) { return 'full' }
+    $version = $record['schema_version']
+    if (-not ($version -is [int] -or $version -is [long]) -or $version -ne 1) { return 'full' }
+    if ($record['suite'] -isnot [string] -or -not [string]::Equals($record['suite'], $suite, [System.StringComparison]::Ordinal)) { return 'full' }
+    if ($record['scope'] -isnot [string] -or -not [string]::Equals($record['scope'], 'selection', [System.StringComparison]::Ordinal)) { return 'full' }
+
+    # ConvertFrom-Json may already have turned an ISO 8601 string into a DateTime; both forms must be UTC.
+    $culture = [System.Globalization.CultureInfo]::InvariantCulture
+    $window = [System.Collections.Generic.List[datetime]]::new()
+    foreach ($key in @('started_utc', 'completed_utc')) {
+        $value = $record[$key]
+        $parsed = [datetime]::MinValue
+        if ($value -is [datetime] -and $value.Kind -eq [System.DateTimeKind]::Utc) { $window.Add($value) }
+        elseif ($value -is [string] -and [datetime]::TryParseExact($value, 'o', $culture, [System.Globalization.DateTimeStyles]::AdjustToUniversal, [ref] $parsed) -and $parsed.Kind -eq [System.DateTimeKind]::Utc) { $window.Add($parsed) }
+    }
+    if ($window.Count -ne 2 -or $window[0] -gt $window[1]) { return 'full' }
+
+    $writeTime = & $GetReportWriteUtc
+    if ($writeTime -isnot [datetime]) { return 'full' }
+    if ($writeTime.Kind -eq [System.DateTimeKind]::Local) { $writeTime = $writeTime.ToUniversalTime() }
+    if ($writeTime -ge $window[0] -and $writeTime -le $window[1]) { return 'selection' }
+    return 'full'
 }

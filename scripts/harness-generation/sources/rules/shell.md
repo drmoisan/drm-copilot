@@ -25,7 +25,7 @@ Run the toolchain in this order and restart from step 1 if any step fails or rew
 Do not stop the loop until formatting, linting, and testing complete without errors in a
 single pass. Do not substitute the VS Code task wrappers for the native command in automation.
 
-Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: the full test suite runs only at the `Phase 0 baseline` and in the final QA loop, a task check runs its test selection after each task, and each phase gate runs its unit stage over the union of the test selections of the phase's tasks.
 
 <!-- harness-section: native-invocation-and-environment -->
 ## Native Invocation and Environment

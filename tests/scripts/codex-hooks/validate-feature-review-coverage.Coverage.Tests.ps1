@@ -295,6 +295,51 @@ Describe 'Codex validate-feature-review-coverage coverage (issue #786)' {
             $continuation.reason | Should -BeLike '*is stale*'
         }
 
+        It 'RSCOPE-CODEX-<Case>' -ForEach @(
+            @{ Case = 'SELECTION-ACCEPTED: a 50 percent Python report covered by a selection record passes with a PASS row'; Summary = '- src/a.py (+1/-0)'; Report = 'lcov.info'; Scope = 'selection'; Blocked = $false }
+            @{ Case = 'FULL-REJECTED: the same Python report under a full record blocks on the repo-wide floor'; Summary = '- src/a.py (+1/-0)'; Report = 'lcov.info'; Scope = 'full'; Blocked = $true }
+            @{ Case = 'CSHARP-FULL: a below-floor C# report blocks although a selection record exists for every suite'; Summary = '- src/A.cs (+1/-0)'; Report = 'coverage.xml'; Scope = 'selection'; Blocked = $true }
+        ) {
+            # Arrange: the audit is relative, so the item root is the session root and no git call runs (issue #1228).
+            $recordScope = $Scope
+            $reportLeaf = $Report
+            $summaryLine = $Summary
+            $writeTime = [datetime]::new(2026, 11, 24, 12, 1, 0, [System.DateTimeKind]::Utc)
+            Mock Test-Path { $true }
+            Mock Get-Content {
+                param($Path)
+                $p = [string]$Path
+                if ($p -match 'run-scope\.(\w+)\.json$') { return ([ordered]@{ schema_version = 1; suite = $Matches[1]; runner = $Matches[1]; scope = $recordScope; started_utc = '2026-11-24T12:00:00.0000000Z'; completed_utc = '2026-11-24T12:03:00.0000000Z' } | ConvertTo-Json -Compress) }
+                if ($p.EndsWith('pr_context.summary.txt')) { return @($summaryLine) }
+                if ($p.EndsWith('lcov.info')) { return @('LF:100', 'LH:50') }
+                if ($p.EndsWith('coverage.xml')) { return '<report name="csharp"><counter type="LINE" missed="90" covered="10"/></report>' }
+                if ($p.EndsWith('CLAUDE.md')) { return 'Project notes without coverage figures.' }
+                return 'Python and C# coverage PASS'
+            }.GetNewClosure()
+            Mock Get-FeatureReviewReportLastWriteUtc { param([string] $Path) if ($Path.EndsWith($reportLeaf)) { $writeTime } else { $null } }.GetNewClosure()
+
+            # Act
+            $result = Invoke-CodexReviewEntry -Stdin $script:ReviewStopNamed
+
+            # Assert
+            $result.ExitCode | Should -Be 0 -Because $result.Stderr
+            if ($Blocked) {
+                $continuation = $result.Stdout | ConvertFrom-Json
+                $continuation.decision | Should -Be 'block'
+                $continuation.reason | Should -BeLike '*repo-wide coverage is*'
+            }
+            else {
+                $result.Stdout | Should -BeNullOrEmpty -Because 'a selection report carries no repo-wide floor'
+            }
+            if ($Report -eq 'coverage.xml') {
+                Should -Invoke Get-Content -Times 0 -Exactly -ParameterFilter { "$Path" -like '*run-scope*' }
+                Should -Invoke Get-FeatureReviewReportLastWriteUtc -Times 0 -Exactly
+            }
+            else {
+                Should -Invoke Get-Content -Times 1 -Exactly -ParameterFilter { "$Path" -like '*run-scope.pytest.json' }
+            }
+        }
+
         It 'exits 2 for <Case>' -ForEach @(
             @{ Case = 'empty stdin'; Stdin = ''; Pattern = 'hook input is empty' },
             @{ Case = 'malformed stdin'; Stdin = '{bad'; Pattern = 'malformed JSON' },

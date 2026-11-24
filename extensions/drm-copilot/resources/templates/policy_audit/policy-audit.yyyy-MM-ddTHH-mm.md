@@ -326,7 +326,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
 | Requirement | Status | Evidence |
 |------------|--------|----------|
 | **Use Pytest** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe use of Pytest. Note any fixtures or plugins used.] |
-| **Coverage expectation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report coverage metrics. Confirm new code has >= 90% coverage and repo-wide >= 80%. For the Python repo-wide total, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing it; a local artifact that shows the total below a threshold is still FAIL.] |
+| **Coverage expectation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report coverage metrics. Confirm new code has >= 90% coverage and repo-wide >= 80%. Read every repo-wide total from the final-QC artifact and `## CI Cross-check`, because a local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only; for the Python repo-wide total, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing it.] |
 
 #### 4A.2 Test Style and Structure
 
