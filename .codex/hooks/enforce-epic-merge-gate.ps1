@@ -32,6 +32,11 @@
     repository root. Any stage failure denies with EPIC_CHILD_CI_NOT_VERIFIED and never falls
     through to the epic, standalone, or docs-only branches.
 
+    Child CI opt-out (issue #1233): under child_ci integration_only the same helper verifies the
+    local final-QC evidence in place of a CI run (stages B, R, L1, L2, and L3), with gh and git in
+    the repository root because -GitRoot defaults to -GhRoot, and a failure denies with
+    EPIC_CHILD_LOCAL_QC_NOT_VERIFIED. The call below is unchanged.
+
     Release merge leg (issue #1234): after the docs-only branch declines an explicit PR number, the
     gate calls Get-EpicMergeGateReleaseDecision (enforce-epic-merge-gate-release.ps1, byte-identical
     to the Claude copy) with the repository root and the docs-only no-checkpoint rule. When the

@@ -346,6 +346,8 @@ CI-dependent acceptance criteria: when the item has acceptance criteria whose ve
 
 DONE is not written while `step9_status` is anything other than `passed`.
 
+Child CI opt-out (issue #1233): a child records `child_ci: "integration_only"` at its first checkpoint write when its delegation prompt carries the separate line `Child CI: integration_only.`. Under `epic_mode: true` and that key, S9 resolves the live head and base with `gh pr view --json headRefOid,baseRefName`. When the base is not exactly `epic_context.integration_branch`, or is `main`, the opt-out does not apply and steps 1 to 6 run unchanged. Otherwise S9 does not query checks as a gate and never dispatches `CI` for the child head: it writes `<feature-folder>/evidence/qa-gates/local-qc-gate.<timestamp>.md` from the final QA artifacts (a `Timestamp:` line, the line `Head: <reviewed head>`, and an `EXIT_CODE:` line whose first occurrence is `0`), commits and pushes it on the PR branch, records `local_qc_gate` and `step9_status: "passed"` with `ci_gate` absent, and step 6 merges; the merge gate verifies the record and the file at the live head and denies a failure with `EPIC_CHILD_LOCAL_QC_NOT_VERIFIED`. The opt-out requires `review_mode: "concurrent"`; a resumed sequential run stays `per_child`. Under the opt-out, `local_qc_gate` meets the CI conditions of item 5 of `## Concurrent Review and CI (review_mode)`, and item 11 compares the cross-check rows with the local final-QC evidence instead of `gh pr checks`. CI-dependent acceptance criteria are listed as pending integration CI and do not block the child's DONE.
+
 ## Checkpoint Schema — CI Gate Fields
 
 The orchestrator checkpoint (`artifacts/orchestration/orchestrator-state.json`) is extended with:
@@ -369,6 +371,8 @@ The orchestrator checkpoint (`artifacts/orchestration/orchestrator-state.json`) 
   - `merged_at` — ISO-8601 timestamp of when S9 step 7 recorded the confirmed merge.
 
   Like `epic_merge`, `pr_merge` is not read by any validator; it is an unvalidated record.
+
+Child CI opt-out (issue #1233): an epic child adds the top-level `child_ci` (`per_child` or `integration_only`; absent means `per_child`) and, under `integration_only`, records in place of `ci_gate` a top-level `local_qc_gate` object containing `conclusion` (`success`), `head_sha` (the reviewed head), `evidence_path` (the repository-relative path of the committed local-QC evidence file), and `verified_at` (ISO-8601 UTC time at which S9 recorded the result).
 
 Illustrative shape:
 
@@ -449,6 +453,7 @@ The orchestrator must not create a PR, push a branch for PR purposes, or report 
 4. The checkpoint `next_step` is `S8_create_pr` (precondition to entering S9).
 5. PR body produced via the pr-author handoff: `artifacts/pr_body_<N>.md` exists with a matching `artifacts/pr_body_<N>.receipt.json`, created with `--body-file`.
 6. `ci_gate.conclusion == "success"` AND `ci_gate.head_sha == current head SHA of the PR branch`. DONE is not written while either sub-condition is false.
+   Child CI opt-out (issue #1233): under `child_ci` `integration_only`, the condition is met by `local_qc_gate` with `conclusion` `success` and `head_sha` equal to the reviewed head of the last `review_outcomes[]` entry, which the merge gate proves current, in place of `ci_gate`.
 7. `epic_mode` is `false`, OR (`epic_mode` is `true` AND the integration-branch merge (`gh pr merge --merge`) has completed and `epic_merge.merge_commit_sha` is recorded in the checkpoint). `epic_merge.merge_commit_sha` is recorded only after the merge is confirmed by polling and ancestry check (S9 step 6). In a standalone run whose route requires S9 (issue #997), DONE additionally requires `pr_merge.merge_commit_sha`, recorded only after the S9 step 7 merge is confirmed; the `preparation` route never merges.
 
 This gate is non-negotiable. Each condition is independently verified before PR creation proceeds. Conditions 1-4 are unchanged from the prior contract; conditions 5-7 (receipt handoff, CI-green gate, and epic-mode merge-on-green gate, with the standalone merge of S9 step 7 for a standalone run) are additive.

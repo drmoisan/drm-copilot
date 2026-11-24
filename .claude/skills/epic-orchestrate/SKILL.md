@@ -69,6 +69,9 @@ features:
 - The optional per-feature key `cross_epic_depends_on` names prerequisites in other epics; it
   never enters `depends_on` and moves no wave
   (`## Cross-Epic Dependencies (cross_epic_depends_on)`).
+- Child CI opt-out (issue #1233): the optional epic-level key `child_ci` takes the value
+  `per_child` or `integration_only`, and an absent key means `per_child`. Any other value is a
+  malformed manifest and is rejected before epic kickoff as a synthetic Blocking finding.
 
 ## Wave Assignment
 
@@ -135,6 +138,12 @@ function of the DAG.
    `pwsh -NoProfile -File .claude/lib/ci-gate/Invoke-MergeConfirmationParser.ps1 -PrJson <snapshot-json> -AsJson`
    (issue #952).
 
+Child CI opt-out (issue #1233): under `child_ci: integration_only` the integration pull request
+of step 6 still requires a green `CI` run through the same S9 procedure; only child pull requests
+into the integration branch skip their own `CI` run. Child acceptance criteria that depend on CI
+are checked off in the integration worktree after integration CI is green, under the
+merged-feature follow-up allowance (issue #1141).
+
 When a feature carries `cross_epic_depends_on`, `epic-orchestrator` runs
 `Invoke-EpicCrossReadiness.ps1` with `-Mode main` before step 6 opens the integration-to-main PR;
 on release the main sync runs first (step 3), and the check is re-run immediately before
@@ -155,6 +164,12 @@ recording `epic_merge: { merge_commit_sha, target_branch, merged_at }`. The chil
 `origin/<integration_branch>` (S9 step 6). Standalone (non-epic)
 orchestration is unchanged: `epic_mode` absent or `false` makes S9 step 6 a no-op.
 
+Child CI opt-out (issue #1233): when the epic checkpoint records `child_ci: integration_only`,
+the prompt carries the separate line `Child CI: integration_only.` after the epic-mode kickoff
+line, which stays unchanged. The child records `child_ci: "integration_only"` at its first
+checkpoint write and follows the `Child CI opt-out (issue #1233)` paragraph of S9 in
+`.claude/skills/orchestrate/SKILL.md`.
+
 Epic-child CI verification (issue #1130): the child verifies CI on its own head before S9 step 6
 merges. When no check whose `workflow` is `CI` exists on the child head, for example because the
 repository's `CI` workflow does not list `epic/**` in its `pull_request` branches, the child runs
@@ -165,6 +180,13 @@ on its head, `epic-orchestrator` dispatches `CI` once on the child branch
 the run. A child merge into the integration branch is never accepted without a green `CI` run on
 the child head SHA: `enforce-epic-merge-gate-child-ci.ps1` denies it with
 `EPIC_CHILD_CI_NOT_VERIFIED`.
+
+Child CI opt-out (issue #1233): for a child whose epic records `child_ci: integration_only`,
+`epic-orchestrator` never dispatches `CI` on the child branch, and the child merges on its
+committed local final-QC evidence and a current concurrent review, which the same helper verifies
+(`EPIC_CHILD_LOCAL_QC_NOT_VERIFIED`). The child's `features[]` entry moves from `pr_open` to
+`merged` and is never recorded as `ci_green`. A child pull request still starts the automatic
+`CI` run that the repository workflow triggers on `epic/**`; that run is not a merge condition.
 
 The run gates `enforce-orchestration-preimplementation-gate.ps1` and `enforce-epic-wave-barrier.ps1` locate the epic checkpoint by the `integration_branch:` value of this line. They select the live worktree whose `artifacts/orchestration/epic-orchestrator-state.json` records `route_id` `epic` and that integration branch, prefer the worktree that has the branch checked out when more than one records it, and deny the delegation with `TARGET_WORKTREE_NOT_DERIVABLE` or `TARGET_WORKTREE_AMBIGUOUS` when none or more than one remains. A stale copy of the epic checkpoint is moved to `artifacts/orchestration/handoff/` rather than left at a worktree root. The child run's own delegations to implementation agents carry the canonical issue-number line and `branch:` label defined in `.claude/skills/orchestrate/SKILL.md` `## Issue Number Consistency`.
 
@@ -598,6 +620,10 @@ that same call at the completion gate. The validation is implemented in
 When a feature carries `cross_epic_depends_on`, the checkpoint also carries the D7 hold records on
 that feature and the top-level `cross_epic_main_gate`, both key-gated
 (`## Cross-Epic Dependencies (cross_epic_depends_on)`).
+
+Child CI opt-out (issue #1233): `epic-orchestrator` copies `child_ci` from the manifest to the
+top level of the epic checkpoint at kickoff; an absent manifest key records nothing and means
+`per_child`. The epic checkpoint validators tolerate the key.
 
 **Checkpoint hygiene (issue #673).** The coordinating session never holds a per-feature checkpoint at its own root. Before the first child delegation of a run it moves any `artifacts/orchestration/orchestrator-state.json` at its root to `artifacts/orchestration/handoff/orchestrator-state.issue-<issue-num>.<yyyy-MM-ddTHH-mm>.json`, and writes none there for the rest of the run, because each item's checkpoint lives in that item's worktree. A gated call the coordinator issues on an item's behalf is resolved by the item's issue number and branch, never by the coordinator root.
 

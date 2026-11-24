@@ -1,0 +1,13 @@
+{
+  "issue-num": "1233",
+  "stage_timing": [
+    { "stage": "S2_research", "attempt": 1, "started_at": "2026-11-24T03:43:00Z", "ended_at": "2026-11-24T04:06:02Z" },
+    { "stage": "S3b_feature_documents", "attempt": 1, "started_at": "2026-11-24T04:06:02Z", "ended_at": "2026-11-24T04:11:24Z" },
+    { "stage": "S4_atomic_planning", "attempt": 1, "started_at": "2026-11-24T04:11:24Z", "ended_at": "2026-11-24T05:07:54Z" },
+    { "stage": "S5_atomic_execution", "attempt": 1, "started_at": "2026-11-24T05:07:54Z", "ended_at": "2026-11-24T13:43:02Z" },
+    { "stage": "S7_feature_review", "attempt": 1, "started_at": "2026-11-24T13:43:02Z", "ended_at": "2026-11-24T19:23:41Z" },
+    { "stage": "S8_create_pr", "attempt": 1, "started_at": "2026-11-24T19:23:41Z", "ended_at": "2026-11-24T19:27:17Z" },
+    { "stage": "S9_ci_green", "attempt": 1, "started_at": "2026-11-24T19:27:17Z", "ended_at": "2026-11-24T19:48:36Z" },
+    { "stage": "S9_ci_green", "attempt": 2, "started_at": "2026-11-24T19:48:36Z", "ended_at": null }
+  ]
+}

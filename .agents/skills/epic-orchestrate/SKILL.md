@@ -51,6 +51,10 @@ an inline flow sequence of flow mappings with exactly the keys `epic`, `integrat
 `depends_on` are rejected. Cross-epic edges move no wave; see
 `## Cross-Epic Dependencies (cross_epic_depends_on)`.
 
+Child CI opt-out (issue #1233): the optional epic-level key `child_ci` takes the value
+`per_child` or `integration_only`, and an absent key means `per_child`. Any other value is a
+malformed manifest and is rejected before kickoff as a synthetic Blocking finding.
+
 ## Wave Computation
 
 Use longest-path layering:
@@ -91,6 +95,12 @@ model-routing receipt with the same `delegation_id`, then select the generated d
 C3 epic children use the elevated Astra/High profile. The child prompt contains:
 
 > `Epic mode: true. epic_feature_folder: <epic-slug>. integration_branch: epic/<epic-slug>-integration. epic_checkpoint_path: artifacts/orchestration/epic-orchestrator-state.json. PR base branch MUST be <integration_branch>, not main; pass --base <integration_branch> to gh pr create.`
+
+Child CI opt-out (issue #1233): when the epic checkpoint records `child_ci: integration_only`,
+the prompt carries the separate line `Child CI: integration_only.` after the literal above, which
+stays unchanged. The child records `child_ci: "integration_only"` at its first checkpoint write
+and follows the `Child CI opt-out (issue #1233)` paragraph of the `orchestrate` skill's CI Green
+Gate.
 
 For prepared epics, also provide the committed `plan-path` and state that the child resumes at
 atomic execution. For each dependency, include its concrete spec, plan, PR, merge SHA, and target
@@ -337,6 +347,13 @@ run exists, `epic-orchestrator` dispatches `CI` once on the child branch
 `enforce-epic-merge-gate-child-ci.ps1` denies an unverified child merge with
 `EPIC_CHILD_CI_NOT_VERIFIED`, and a resolved conflict needs a green `CI` run on its new head.
 
+Child CI opt-out (issue #1233): for a child whose epic records `child_ci: integration_only`,
+`epic-orchestrator` never dispatches `CI` on the child branch, and the child merges on its
+committed local final-QC evidence and a current concurrent review, which the same helper verifies
+(`EPIC_CHILD_LOCAL_QC_NOT_VERIFIED`). The child's `features[]` entry moves from `pr_open` to
+`merged` and is never recorded as `ci_green`. A child pull request still starts the automatic
+`CI` run that the repository workflow triggers on `epic/**`; that run is not a merge condition.
+
 ## Worktree Cleanup
 
 After the child merge SHA is recorded and the epic checkpoint mirrors `merge_status: "merged"`,
@@ -397,6 +414,10 @@ timestamps, final PR, complexity/model receipts, and required agent/skill/MCP re
 launched feature records issue/folder, unique branch/worktree, delegation receipt/id,
 delegation-bound model receipt, and launch receipt/status paths.
 
+Child CI opt-out (issue #1233): `epic-orchestrator` copies `child_ci` from the manifest to the
+top level of the epic checkpoint at kickoff; an absent manifest key records nothing and means
+`per_child`. The epic checkpoint validators tolerate the key.
+
 On resume, reconcile the checkpoint against `git worktree list --porcelain`, branch state, and
 `gh pr view --json state,mergedAt,headRefOid` before continuing.
 
@@ -413,6 +434,12 @@ record the current head SHA and successful conclusion, and merge the integration
 only after the merge is confirmed by polling and ancestry check. When the 90 minutes are
 exhausted, report `awaiting_merge_queue` and do not record a merge; never re-issue the merge in
 a loop (issue #952).
+
+Child CI opt-out (issue #1233): under `child_ci: integration_only` the final integration PR still
+requires a green `CI` run through the same CI-green procedure; only child pull requests into the
+integration branch skip their own `CI` run. Child acceptance criteria that depend on CI are checked
+off in the integration worktree after integration CI is green, under the merged-feature follow-up
+allowance (issue #1141).
 
 ## Completion
 

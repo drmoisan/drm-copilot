@@ -1,0 +1,31 @@
+{
+  "name": "local-qc-gate-null-heads",
+  "notes": "A local_qc_gate head_sha and a last review outcome head_sha that are both JSON null report the missing field and fail the head binding.",
+  "checkpoint": {
+    "route_id": "large",
+    "epic_mode": true,
+    "child_ci": "integration_only",
+    "review_mode": "concurrent",
+    "epic_context": {
+      "integration_branch": "epic/example-integration"
+    },
+    "remediation_loop": {
+      "review_outcomes": [
+        {
+          "verdict": "PASS",
+          "head_sha": null
+        }
+      ]
+    },
+    "local_qc_gate": {
+      "conclusion": "success",
+      "head_sha": null,
+      "evidence_path": ".dev/active/example-feature/evidence/qa-gates/local-qc-gate.2026-11-24T05-00.md",
+      "verified_at": "2026-11-24T05:00:00Z"
+    }
+  },
+  "expected_errors": [
+    "Checkpoint completion validation failed: local_qc_gate missing required fields: head_sha.",
+    "Checkpoint completion validation failed: local_qc_gate.head_sha must match the head_sha of the last review_outcomes entry."
+  ]
+}

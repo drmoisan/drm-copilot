@@ -58,6 +58,11 @@ backfill the final positive `issue_num` and active `feature_folder`, commit and 
 manifest, and persist the promotion receipts. Launch specifications and their immutable receipts
 must never use placeholders.
 
+- Child CI opt-out (issue #1233): write `child_ci: integration_only` in the manifest frontmatter
+  only when the owner chose to opt the epic out of per-child CI; otherwise omit the key, which
+  means `per_child`. Under the opt-out, avoid child acceptance criteria that depend on CI, or
+  mark each such criterion pending integration CI.
+
 ## Epic-Level Issue Promotion
 
 Issue #663. Before the first preparation-mode child delegation, `epic-planner` promotes one epic-level GitHub issue for the epic itself. It authors a potential entry under `.dev/potential/` describing the epic and promotes it through `mcp__drm-copilot__potential_to_issue` with `promotion_type: epic`; `gh issue create` is not used. It records the resulting number as `epic_issue_num` in the epic planning checkpoint (`artifacts/orchestration/epic-planner-state.json`) and in the kickoff prompt artifact, and `epic-orchestrator` copies it into the epic checkpoint `artifacts/orchestration/epic-orchestrator-state.json` at its first checkpoint write. The integration-to-`main` pull request uses `epic_issue_num` as its canonical issue number.

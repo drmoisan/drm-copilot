@@ -201,3 +201,51 @@ Describe 'Invoke-SingleOccurrenceEdit (Codex helpers)' {
         $result.Failure | Should -BeNullOrEmpty
     }
 }
+
+Describe 'Test-CompletionChildCiIntegrationOnly (Codex helpers, issue #1233)' {
+    It 'returns true only for the JSON boolean epic_mode and the exact integration_only value' {
+        $payload = '{"epic_mode":true,"child_ci":"integration_only"}' | ConvertFrom-Json
+        Test-CompletionChildCiIntegrationOnly -Payload $payload | Should -BeTrue
+    }
+
+    It 'returns false for the default variant <Label>' -ForEach @(
+        @{ Label = 'child_ci absent'; Json = '{"epic_mode":true}' }
+        @{ Label = 'child_ci per_child'; Json = '{"epic_mode":true,"child_ci":"per_child"}' }
+        @{ Label = 'a case variant'; Json = '{"epic_mode":true,"child_ci":"Integration_Only"}' }
+        @{ Label = 'a non-string child_ci'; Json = '{"epic_mode":true,"child_ci":true}' }
+        @{ Label = 'epic_mode the string true'; Json = '{"epic_mode":"true","child_ci":"integration_only"}' }
+        @{ Label = 'epic_mode false'; Json = '{"epic_mode":false,"child_ci":"integration_only"}' }
+        @{ Label = 'epic_mode absent'; Json = '{"child_ci":"integration_only"}' }
+    ) {
+        Test-CompletionChildCiIntegrationOnly -Payload ($Json | ConvertFrom-Json) | Should -BeFalse
+    }
+
+    It 'returns false for a null payload' {
+        Test-CompletionChildCiIntegrationOnly -Payload $null | Should -BeFalse
+    }
+}
+
+Describe 'Get-CompletionLocalQcGateMissing (Codex helpers, issue #1233)' {
+    It 'returns no missing evidence for a valid local_qc_gate' {
+        $payload = '{"local_qc_gate":{"conclusion":"success","head_sha":"3f2a9c1e5b7d4a6f8e0c2b4d6a8f0e1c3b5d7a9f","evidence_path":".dev/active/f/evidence/qa-gates/local-qc-gate.md","verified_at":"2026-11-24T05:00:00Z"}}' | ConvertFrom-Json
+        @(Get-CompletionLocalQcGateMissing -Payload $payload).Count | Should -Be 0
+    }
+
+    It 'names the object for <Label>' -ForEach @(
+        @{ Label = 'an absent local_qc_gate'; Json = '{}' }
+        @{ Label = 'a non-object local_qc_gate'; Json = '{"local_qc_gate":"success"}' }
+    ) {
+        @(Get-CompletionLocalQcGateMissing -Payload ($Json | ConvertFrom-Json)) | Should -Be @('local_qc_gate (object with conclusion == "success" and non-empty head_sha and evidence_path)')
+    }
+
+    It 'names <Expected> for <Label>' -ForEach @(
+        @{ Label = 'an absent conclusion'; Json = '{"local_qc_gate":{"head_sha":"h","evidence_path":"p"}}'; Expected = 'local_qc_gate.conclusion == "success"' }
+        @{ Label = 'a failure conclusion'; Json = '{"local_qc_gate":{"conclusion":"failure","head_sha":"h","evidence_path":"p"}}'; Expected = 'local_qc_gate.conclusion == "success"' }
+        @{ Label = 'an absent head_sha'; Json = '{"local_qc_gate":{"conclusion":"success","evidence_path":"p"}}'; Expected = 'local_qc_gate.head_sha' }
+        @{ Label = 'an empty head_sha'; Json = '{"local_qc_gate":{"conclusion":"success","head_sha":"","evidence_path":"p"}}'; Expected = 'local_qc_gate.head_sha' }
+        @{ Label = 'an absent evidence_path'; Json = '{"local_qc_gate":{"conclusion":"success","head_sha":"h"}}'; Expected = 'local_qc_gate.evidence_path' }
+        @{ Label = 'an empty evidence_path'; Json = '{"local_qc_gate":{"conclusion":"success","head_sha":"h","evidence_path":""}}'; Expected = 'local_qc_gate.evidence_path' }
+    ) {
+        @(Get-CompletionLocalQcGateMissing -Payload ($Json | ConvertFrom-Json)) | Should -Be @($Expected)
+    }
+}

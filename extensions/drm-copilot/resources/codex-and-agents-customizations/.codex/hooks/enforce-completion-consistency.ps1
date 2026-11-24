@@ -232,7 +232,8 @@ function Get-MissingCompletionEvidence {
     if ($null -ne $Payload -and ($Payload.PSObject.Properties.Name -contains 'ci_gate')) {
         $ciGate = $Payload.ci_gate
     }
-    if ($null -eq $ciGate -or $ciGate -isnot [System.Management.Automation.PSCustomObject]) {
+    if (Test-CompletionChildCiIntegrationOnly -Payload $Payload) { $missing += @(Get-CompletionLocalQcGateMissing -Payload $Payload) } # Child CI opt-out (issue #1233)
+    elseif ($null -eq $ciGate -or $ciGate -isnot [System.Management.Automation.PSCustomObject]) {
         $missing += 'ci_gate (object with conclusion == "success" and non-empty head_sha)'
     }
     else {
@@ -268,7 +269,7 @@ function Get-MissingCompletionEvidence {
             }
             $prHeadSha = Get-CheckpointStringValue -Payload $prGate -Name 'head_sha'
             $ciHeadSha = Get-CheckpointStringValue -Payload $ciGate -Name 'head_sha'
-            if ($prHeadSha -and $ciHeadSha -and $prHeadSha -ne $ciHeadSha) {
+            if (-not (Test-CompletionChildCiIntegrationOnly -Payload $Payload) -and $prHeadSha -and $ciHeadSha -and $prHeadSha -ne $ciHeadSha) {
                 $missing += 'ci_gate.head_sha matching pr_gate.head_sha'
             }
         }
@@ -459,7 +460,7 @@ function Invoke-CompletionConsistencyDecision {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    $reason = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha; routes whose requires_pr_gate is true must also include pr_gate evidence with a matching head_sha. Supply the missing evidence or remove the completion assertion."
+    $reason = if (Test-CompletionChildCiIntegrationOnly -Payload $payload) { "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint of an epic child with child_ci integration_only must include a non-empty issue-num, a non-empty feature-folder, and a local_qc_gate object with conclusion == 'success' and non-empty head_sha and evidence_path in place of a ci_gate object; routes whose requires_pr_gate is true must also include pr_gate evidence. Supply the missing evidence or remove the completion assertion." } else { "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha; routes whose requires_pr_gate is true must also include pr_gate evidence with a matching head_sha. Supply the missing evidence or remove the completion assertion." }
     return [ordered]@{
         hookSpecificOutput = [ordered]@{
             hookEventName            = 'PreToolUse'

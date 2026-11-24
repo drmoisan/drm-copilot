@@ -7,7 +7,6 @@ import { validateConcurrentReviewCompletion } from "./orchestrator-state-concurr
 import {
   PROMOTION_RECEIPT_KEYS,
   PROMOTION_RECEIPT_NAMESPACE_KEY,
-  validateCompletionCiGate,
   validateCompletionPrGate,
 } from "./orchestrator-state-completion";
 import {
@@ -26,6 +25,7 @@ import {
   validatePhaseCompleteness,
   validateRoutingContract,
 } from "./orchestrator-state-routing";
+import { validateCompletionGateEvidence } from "./orchestrator-state-child-ci";
 
 // Re-export the completion-gate constants the core ports historically carried so
 // callers and tests can continue to import them from this module.
@@ -426,7 +426,7 @@ export function validateOrchestratorStateText(
     const routingMatrix = resolveRoutingMatrix(options);
     errors.push(...validateCompletionPrGate(stateMap, { routingMatrix }));
     if (routeRequiresCiGate(stateMap, { routingMatrix })) {
-      errors.push(...validateCompletionCiGate(stateMap));
+      errors.push(...validateCompletionGateEvidence(stateMap));
     }
     errors.push(...validatePhaseCompleteness(stateMap));
     errors.push(...validatePreparationTerminalContract(stateMap));

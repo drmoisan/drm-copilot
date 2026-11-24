@@ -64,6 +64,12 @@ is governed by `## Cross-Epic Dependencies (cross_epic_depends_on)` of the same 
 halted with `blocked_reason: "external_dependency"` resumes by running this skill again on the
 same epic slug.
 
+Child CI opt-out (issue #1233): under `child_ci: integration_only` the per-child green-`CI`
+requirement is replaced by verified local final-QC evidence and a current concurrent review, as
+the `Child CI opt-out (issue #1233)` paragraphs of `## Merge-on-Green Kickoff Parameter` in the
+`epic-orchestrate` skill state, and the integration pull request into `main` still requires a
+green `CI` run.
+
 ## Nesting Depth
 
 This chain runs three levels of subagents below the main session: the coordinator at depth 1, each per-feature `orchestrator` at depth 2, and the specialists that orchestrator delegates to at depth 3. Only the depth-2 orchestrator needs the `Agent` tool below the coordinator; specialists do not delegate.

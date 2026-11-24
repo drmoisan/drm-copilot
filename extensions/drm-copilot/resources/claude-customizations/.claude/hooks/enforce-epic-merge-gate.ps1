@@ -13,7 +13,8 @@
          epic_mode == true (the JSON boolean only, issue #1001), step9_status == "passed",
          and Get-EpicMergeGateChildCiDecision (enforce-epic-merge-gate-child-ci.ps1, issue
          #1130) verifies a green CI run on the live PR head. Any stage failure denies with
-         EPIC_CHILD_CI_NOT_VERIFIED and never falls through to the later branches.
+         EPIC_CHILD_CI_NOT_VERIFIED and never falls through to the later branches. The #1233 opt-out
+         checks local final-QC evidence (-GitRoot); a failure denies EPIC_CHILD_LOCAL_QC_NOT_VERIFIED.
       2. Epic-integration path: artifacts/orchestration/epic-orchestrator-state.json exists,
          epic_merge_pr.ci_gate.conclusion == "success", and, when the command names an
          explicit PR number, that number matches epic_merge_pr.pr_number.
@@ -27,11 +28,10 @@
          checkpoint records step9_status == "passed", ci_gate.conclusion == "success", and a
          pr_gate.pr_number equal to it, and the live PR head equals ci_gate.head_sha. The
          dot-sourced enforce-epic-merge-gate-green-ci.ps1 implements this branch.
-      4. Standalone path (issue #670), evaluated last: the command names an explicit PR
-         number and one of the three checkpoints above carries a
-         standalone_merge_authorizations record whose pr_number equals it, whose fields are
-         well formed, and whose session_id equals the live envelope's session_id. The
-         dot-sourced helpers file implements this branch.
+      4. Standalone path (issue #670), evaluated last: the command names an explicit PR number and
+         one of the three checkpoints above carries a standalone_merge_authorizations record whose
+         pr_number equals it, whose fields are well formed, and whose session_id equals the live
+         envelope's session_id. The dot-sourced helpers file implements this branch.
 
     Otherwise the command is denied with reason EPIC_MERGE_GATE_BLOCKED; a denial from
     condition 4 also carries a standalone reason code after that token. A missing or
@@ -389,7 +389,7 @@ function Invoke-EpicMergeGateDecision {
 
     if ((Test-ChildCheckpointAllowsEpicMerge -Checkpoint $childCheckpoint) -and
         (Test-ChildCheckpointPrGateBinding -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber)) {
-        $childCi = Get-EpicMergeGateChildCiDecision -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber -GhRoot $sessionRoot
+        $childCi = Get-EpicMergeGateChildCiDecision -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber -GhRoot $sessionRoot -GitRoot $childRoot
         if ($childCi.Verified) { return Get-EpicMergeGateAllowDecision }
         return Get-EpicMergeGateBlockDecision -Reason $childCi.Reason
     }

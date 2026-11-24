@@ -106,6 +106,8 @@ PROMOTION_RECEIPT_KEYS = (
     "feature_folder",
 )
 CI_GATE_KEYS = ("conclusion", "head_sha", "verified_at")
+LOCAL_QC_GATE_KEYS = ("conclusion", "head_sha", "evidence_path", "verified_at")
+CHILD_CI_INTEGRATION_ONLY = "integration_only"
 
 
 def _missing_object_keys(value: object, keys: tuple[str, ...]) -> list[str]:
@@ -152,6 +154,107 @@ def _validate_completion_ci_gate(state: dict[str, Any]) -> list[str]:
             "pr_gate.head_sha."
         )
     return errors
+
+
+def _child_ci_integration_only(state: dict[str, Any]) -> bool:
+    """Report whether a checkpoint opts its epic child out of per-child CI.
+
+    Args:
+        state (dict[str, Any]): Parsed checkpoint state.
+
+    Returns:
+        bool: True only when `epic_mode` is the JSON boolean true and
+        `child_ci` is the exact string `integration_only` (issue #1233).
+    """
+    child_ci = state.get("child_ci")
+    return (
+        state.get("epic_mode") is True
+        and isinstance(child_ci, str)
+        and child_ci == CHILD_CI_INTEGRATION_ONLY
+    )
+
+
+def _last_review_head_sha(state: dict[str, Any]) -> object:
+    """Return the `head_sha` of the final `review_outcomes` entry, or None.
+
+    Args:
+        state (dict[str, Any]): Parsed checkpoint state.
+
+    Returns:
+        object: The recorded value, or None when the loop, the list, or the
+        last object entry is absent.
+    """
+    loop = state.get("remediation_loop")
+    if not isinstance(loop, dict):
+        return None
+    outcomes = cast("dict[str, object]", loop).get("review_outcomes")
+    if not isinstance(outcomes, list) or not outcomes:
+        return None
+    last = cast("list[object]", outcomes)[-1]
+    if not isinstance(last, dict):
+        return None
+    return cast("dict[str, object]", last).get("head_sha")
+
+
+def _validate_completion_local_qc_gate(state: dict[str, Any]) -> list[str]:
+    """Validate the local final-QC gate of an opted-out epic child.
+
+    Args:
+        state (dict[str, Any]): Parsed checkpoint state under the opt-out.
+
+    Returns:
+        list[str]: The ordered completion errors: the object-shape error
+        alone, otherwise the missing fields, the conclusion, and then either
+        the review-mode error or, under concurrent review, the head binding.
+    """
+    gate = state.get("local_qc_gate")
+    if not isinstance(gate, dict):
+        return [
+            "Checkpoint completion validation failed: child_ci integration_only "
+            "requires local_qc_gate to be an object with keys: "
+            f"{', '.join(LOCAL_QC_GATE_KEYS)}."
+        ]
+    errors: list[str] = []
+    gate_map = cast("dict[str, object]", gate)
+    missing = _missing_object_keys(gate_map, LOCAL_QC_GATE_KEYS)
+    if missing:
+        errors.append(
+            "Checkpoint completion validation failed: local_qc_gate missing "
+            f"required fields: {', '.join(missing)}."
+        )
+    if gate_map.get("conclusion") != "success":
+        errors.append(
+            "Checkpoint completion validation failed: local_qc_gate.conclusion "
+            "must be success."
+        )
+    if state.get("review_mode") != "concurrent":
+        errors.append(
+            "Checkpoint completion validation failed: child_ci integration_only "
+            "requires review_mode concurrent."
+        )
+        return errors
+    last_head = _last_review_head_sha(state)
+    if not isinstance(last_head, str) or gate_map.get("head_sha") != last_head:
+        errors.append(
+            "Checkpoint completion validation failed: local_qc_gate.head_sha must "
+            "match the head_sha of the last review_outcomes entry."
+        )
+    return errors
+
+
+def validate_completion_gate_evidence(state: dict[str, Any]) -> list[str]:
+    """Select the completion gate check for a CI-gated route (issue #1233).
+
+    Args:
+        state (dict[str, Any]): Parsed checkpoint state.
+
+    Returns:
+        list[str]: The local-QC errors when the checkpoint opts its epic child
+        out of per-child CI, otherwise the existing `ci_gate` errors.
+    """
+    if _child_ci_integration_only(state):
+        return _validate_completion_local_qc_gate(state)
+    return _validate_completion_ci_gate(state)
 
 
 def _validate_list_delegation_receipts(receipts: list[object]) -> list[str]:
@@ -404,7 +507,7 @@ def validate_orchestrator_state_text(
         # routes never open a PR, so no CI run exists to verify). An absent
         # flag keeps the gate required, preserving prior behavior.
         if route_requires_ci_gate(state_map):
-            errors.extend(_validate_completion_ci_gate(state_map))
+            errors.extend(validate_completion_gate_evidence(state_map))
         errors.extend(validate_phase_completeness(state_map))
         errors.extend(validate_routing_contract(state_map))
         errors.extend(validate_preparation_terminal_contract(state_map))
