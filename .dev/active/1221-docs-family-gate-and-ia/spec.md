@@ -219,7 +219,7 @@ Not edited: `DocsCompleteGate.psm1`, `DocsReceipt.psm1`, `DocsReceiptRevision.ps
 - [x] AC-8: The family check runs in docs-complete mode even when the snapshot or ledger is absent, and does not run in other validation modes.
 - [x] AC-9: `Invoke-DocsValidation` with `-FamilyEvidence $null` and a profile declaring a required, non-excluded family fails closed with `DOCS_FAMILY_PAGE_MISSING`.
 - [x] AC-10: A profile with no `required_families` and no `legacy_exclusions` produces findings and `validation_result` identical to the pre-change behavior, and `Read-DocsFamilyEvidence` makes no `ListFile` or `TestFile` call for it.
-- [ ] AC-11: A failing family check produces a receipt with `validation_result` `fail`, which the unchanged `enforce-docs-complete-gate.ps1` hook denies as `RECEIPT_FAILING`; `DocsCompleteGate.psm1`, the receipt schema, and the envelope schema are byte-identical to the base branch.
+- [x] AC-11: A failing family check produces a receipt with `validation_result` `fail`, which the unchanged `enforce-docs-complete-gate.ps1` hook denies as `RECEIPT_FAILING`; `DocsCompleteGate.psm1`, the receipt schema, and the envelope schema are byte-identical to the base branch.
 
 ### Coverage report
 
@@ -241,24 +241,24 @@ Not edited: `DocsCompleteGate.psm1`, `DocsReceipt.psm1`, `DocsReceiptRevision.ps
 ### MCP tools
 
 - [x] AC-20: Jest cases in `docs-handlers.test.ts` show that a `run_docs_coverage` envelope with a `families` result and a `validate_docs_artifacts` envelope with `DOCS_FAMILY_PAGE_MISSING` (error) and `DOCS_FAMILY_NOT_APPLICABLE` (info) pass through unchanged in `docs`, with summary counts reflecting the error and info findings.
-- [ ] AC-21: The `run_docs_coverage` description in `mcp-docs-tool-definitions.ts` names the `families` section and the `validate_docs_artifacts` description names the family findings, asserted by a Jest case; no new TypeScript file is added; Jest per-file thresholds for `mcp-docs-tool-definitions.ts` and `docs-handlers.ts` remain 85% line and 75% branch and pass.
+- [x] AC-21: The `run_docs_coverage` description in `mcp-docs-tool-definitions.ts` names the `families` section and the `validate_docs_artifacts` description names the family findings, asserted by a Jest case; no new TypeScript file is added; Jest per-file thresholds for `mcp-docs-tool-definitions.ts` and `docs-handlers.ts` remain 85% line and 75% branch and pass.
 
 ### Parity and quality gates
 
-- [ ] AC-22: `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Check` reports no drift, and `HarnessGeneration.RepoGate.Tests.ps1` passes.
-- [ ] AC-23: Each new or edited `.claude/lib/docs` module has a byte-identical bundle copy, the new module is listed in `pack-manifests/core.json`, and `Docs.Manifest.Tests.ps1`, `ClaudeLibModuleConvention.Tests.ps1`, `DocsNeutrality.Tests.ps1`, `FileSizePolicy.RepoGate.Tests.ps1`, and the push-down contract suites (`test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`) pass.
-- [ ] AC-24: `.claude/lib/docs/DocsFamilyCheck.psm1` reaches at least 85% line coverage in `artifacts/pester/powershell-coverage.xml` from the launcher Pester run, and changed lines in `DocsValidation.psm1`, `DocsValidateCommands.psm1`, `DocsCoverageReport.psm1`, and `DocsLedgerCommands.psm1` do not regress against the pre-change baseline.
-- [ ] AC-25: Every touched file is at or below 800 logical lines, `DocsLedgerCommands.psm1` grows by no more than about three lines, and no new or edited test creates a temporary file.
+- [x] AC-22: `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Check` reports no drift, and `HarnessGeneration.RepoGate.Tests.ps1` passes.
+- [x] AC-23: Each new or edited `.claude/lib/docs` module has a byte-identical bundle copy, the new module is listed in `pack-manifests/core.json`, and `Docs.Manifest.Tests.ps1`, `ClaudeLibModuleConvention.Tests.ps1`, `DocsNeutrality.Tests.ps1`, `FileSizePolicy.RepoGate.Tests.ps1`, and the push-down contract suites (`test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`) pass.
+- [x] AC-24: `.claude/lib/docs/DocsFamilyCheck.psm1` reaches at least 85% line coverage in `artifacts/pester/powershell-coverage.xml` from the launcher Pester run, and changed lines in `DocsValidation.psm1`, `DocsValidateCommands.psm1`, `DocsCoverageReport.psm1`, and `DocsLedgerCommands.psm1` do not regress against the pre-change baseline.
+- [x] AC-25: Every touched file is at or below 800 logical lines, `DocsLedgerCommands.psm1` grows by no more than about three lines, and no new or edited test creates a temporary file.
 - [ ] AC-26: The full toolchain loop (format, lint, type check, architecture, unit, contract, integration in CI) passes in one clean pass through the parallel launcher, and the architecture document `.dev/engineering/documentation-estate/architecture.md` carries one bullet describing the family check.
 
 ## Definition of Done
 
 - [ ] All acceptance criteria above checked off with evidence under `.dev/active/1221-docs-family-gate-and-ia/evidence/<kind>/`.
-- [ ] Decisions recorded in this spec applied; any deviation recorded in the feature folder.
+- [x] Decisions recorded in this spec applied; any deviation recorded in the feature folder.
 - [ ] Toolchain pass completed (format, lint, type check, architecture, unit, contract; integration in CI).
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Pester unit coverage for the family check, the security root-file check, exclusion reporting, and legacy reporting.
-- [ ] Jest coverage for the MCP tool output shape.
-- [ ] Contract and parity tests for mirrored skill text.
+- [x] Pester unit coverage for the family check, the security root-file check, exclusion reporting, and legacy reporting.
+- [x] Jest coverage for the MCP tool output shape.
+- [x] Contract and parity tests for mirrored skill text.

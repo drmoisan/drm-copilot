@@ -545,7 +545,8 @@ Describe 'coverage' {
         $lines[-4] | Should -BeExactly 'placeholders: token="SME input required" total=3 pages=2'
         $lines[-3] | Should -BeExactly 'placeholder docs/guides/Alpha.md count=1'
         $lines[-2] | Should -BeExactly 'placeholder docs/guides/Setup.md count=2'
-        $lines[-5] | Should -Match '^parity '
+        $lines[-5] | Should -BeExactly 'families: required=0 present=0 missing=0 not_applicable=0 legacy_exclusions=0' -Because 'the family lines of ConvertTo-DocsCoverageReportLine (issue #1221) end the coverage lines, before the placeholder lines'
+        $lines[-6] | Should -Match '^parity '
         $lines[0] | Should -Match '^coverage: elements=6 '
     }
 
