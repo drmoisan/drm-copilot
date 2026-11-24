@@ -27,7 +27,7 @@ Decisions taken by the orchestrator in autonomous mode, following the recommende
 - **D4 — Integration-tip regeneration unchanged.** The config-gated integration-tip regeneration CI dispatch (`## Integration-Tip Regeneration`) is unchanged.
 - **D5 — Gate input is the item checkpoint.** The gate reads `child_ci` from the item checkpoint, verified inside the existing byte-identical child-CI helper (research approach A). Reading the epic checkpoint at the gate (approach B) and encoding the opt-out in `ci_gate.conclusion` (approach C) are rejected.
 - **D6 — Codex launch contract unchanged.** `.codex/scripts/epic-child-launch-contract.ps1` tolerates the extra prompt line; the Codex child records `child_ci` from the prompt.
-- **D7 — Ledger number confirmed at write time.** The ledger entry takes the next free number in `.dev/engineering/process-reductions/README.md` at the time it is written (`0014` at research time).
+- **D7 — Ledger number confirmed at write time.** The ledger entry takes the next free number in `.dev/engineering/process-reductions/README.md` at the time it is written (`0014` at research time; renumbered to `0015` on 2026-11-24 after #1228 merged its entry `0014-targeted-test-cadence.md` to main).
 
 ## Behavior
 

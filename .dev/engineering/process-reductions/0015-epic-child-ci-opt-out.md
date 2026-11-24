@@ -1,8 +1,8 @@
-# 0014: Epic child CI opt-out
+# 0015: Epic child CI opt-out
 
 ## Summary
 
-reduction: 0014
+reduction: 0015
 Date: 2026-11-24
 Issue: #1233
 Merge commit: pending (PR #1233)
@@ -80,7 +80,7 @@ Self-declared key (decision D10): `child_ci` is written by the item checkpoint, 
 - `extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md` and `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md`: byte-identical mirrors of the brief
 - `tests/scripts/claude-runtime/child-ci-opt-out-skill-contract.Tests.ps1`: created contract test, the labeled opt-out units in every copy
 - `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`: pinned hashes, the `.claude/skills/epic-orchestrate/SKILL.md` digest of `PINNED_FROZEN_SURFACE_HASHES` and the `RE-BASELINED by issue #1233` comment paragraph; the agent digest is unchanged
-- `.dev/engineering/process-reductions/0014-epic-child-ci-opt-out.md`: this entry
+- `.dev/engineering/process-reductions/0015-epic-child-ci-opt-out.md`: this entry
 - `.dev/engineering/process-reductions/README.md`: index row
 
 ## Prior Text
@@ -1036,6 +1036,23 @@ function Get-EpicMergeGateChildLocalQcResult {
         $childCi = Get-EpicMergeGateChildCiDecision -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber -GhRoot $sessionRoot
 ````
 
+### Revert Block: .claude/hooks/enforce-epic-merge-gate.ps1
+
+````Current
+      4. Standalone path (issue #670), evaluated last: the command names an explicit PR number and
+         one of the three checkpoints above carries a standalone_merge_authorizations record whose
+         pr_number equals it, whose fields are well formed, and whose session_id equals the live
+         envelope's session_id. The dot-sourced helpers file implements this branch.
+````
+
+````Prior
+      4. Standalone path (issue #670), evaluated last: the command names an explicit PR
+         number and one of the three checkpoints above carries a
+         standalone_merge_authorizations record whose pr_number equals it, whose fields are
+         well formed, and whose session_id equals the live envelope's session_id. The
+         dot-sourced helpers file implements this branch.
+````
+
 ### Revert Block: .codex/hooks/enforce-epic-merge-gate.ps1
 
 ````Current
@@ -1794,7 +1811,7 @@ An epic whose manifest records `child_ci: integration_only` opts its children ou
 - L2 (binding): `local_qc_gate.head_sha` equals the `head_sha` of the last `remediation_loop.review_outcomes[]` entry.
 - L3 (evidence): one bounded `git cat-file -p <live head>:<evidence_path>` in the item worktree (`-GitRoot`); the first `EXIT_CODE:` line is `0`, and the file holds a `Timestamp:` line and the line `Head: <head_sha>`.
 
-Under `require_complete`, the Python, TypeScript, and PowerShell validators select the `local_qc_gate` check in place of the `ci_gate` check under the predicate and report byte-identical errors, pinned by the corpus `tests/fixtures/orchestrator_state_child_ci/`; both completion-consistency hooks accept `local_qc_gate` in place of `ci_gate` under the same predicate. The integration pull request into `main` still requires a green `CI` run, and a child pull request still starts the automatic `CI` run that `.github/workflows/ci.yml` triggers on `epic/**`; the opt-out removes it as a merge condition only. The reduction is recorded in process-reduction ledger entry 0014.
+Under `require_complete`, the Python, TypeScript, and PowerShell validators select the `local_qc_gate` check in place of the `ci_gate` check under the predicate and report byte-identical errors, pinned by the corpus `tests/fixtures/orchestrator_state_child_ci/`; both completion-consistency hooks accept `local_qc_gate` in place of `ci_gate` under the same predicate. The integration pull request into `main` still requires a green `CI` run, and a child pull request still starts the automatic `CI` run that `.github/workflows/ci.yml` triggers on `epic/**`; the opt-out removes it as a merge condition only. The reduction is recorded in process-reduction ledger entry 0015.
 
 Honest disclosure: `child_ci` is self-declared by the item checkpoint, and a writer in the same session can set it; like every gate key, this is a policy-level control, not a security control (decision D10). The reduction is bounded by the live base read through `baseRefName`, which never admits a merge into `main`, by the `review_mode: "concurrent"` requirement, and by the evidence file at the live head with its `Head:` line.
 
@@ -1839,7 +1856,7 @@ An epic whose manifest records `child_ci: integration_only` opts its children ou
 - L2 (binding): `local_qc_gate.head_sha` equals the `head_sha` of the last `remediation_loop.review_outcomes[]` entry.
 - L3 (evidence): one bounded `git cat-file -p <live head>:<evidence_path>` in the item worktree (`-GitRoot`); the first `EXIT_CODE:` line is `0`, and the file holds a `Timestamp:` line and the line `Head: <head_sha>`.
 
-Under `require_complete`, the Python, TypeScript, and PowerShell validators select the `local_qc_gate` check in place of the `ci_gate` check under the predicate and report byte-identical errors, pinned by the corpus `tests/fixtures/orchestrator_state_child_ci/`; both completion-consistency hooks accept `local_qc_gate` in place of `ci_gate` under the same predicate. The integration pull request into `main` still requires a green `CI` run, and a child pull request still starts the automatic `CI` run that `.github/workflows/ci.yml` triggers on `epic/**`; the opt-out removes it as a merge condition only. The reduction is recorded in process-reduction ledger entry 0014.
+Under `require_complete`, the Python, TypeScript, and PowerShell validators select the `local_qc_gate` check in place of the `ci_gate` check under the predicate and report byte-identical errors, pinned by the corpus `tests/fixtures/orchestrator_state_child_ci/`; both completion-consistency hooks accept `local_qc_gate` in place of `ci_gate` under the same predicate. The integration pull request into `main` still requires a green `CI` run, and a child pull request still starts the automatic `CI` run that `.github/workflows/ci.yml` triggers on `epic/**`; the opt-out removes it as a merge condition only. The reduction is recorded in process-reduction ledger entry 0015.
 
 Honest disclosure: `child_ci` is self-declared by the item checkpoint, and a writer in the same session can set it; like every gate key, this is a policy-level control, not a security control (decision D10). The reduction is bounded by the live base read through `baseRefName`, which never admits a merge into `main`, by the `review_mode: "concurrent"` requirement, and by the evidence file at the live head with its `Head:` line.
 
