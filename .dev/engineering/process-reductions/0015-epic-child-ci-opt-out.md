@@ -26,8 +26,10 @@ Self-declared key (decision D10): `child_ci` is written by the item checkpoint, 
 - `tests/scripts/dev_tools/test_validate_orchestrator_state_completion.py`: extended test
 - `extensions/drm-copilot/src/lib/validate/orchestrator-state-child-ci.ts`: created source, the TypeScript port of the selection
 - `extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts`: source, the `routeRequiresCiGate` branch calls the selection
+- `extensions/drm-copilot/src/lib/validate/orchestrator-state-completion.ts`: source, `missingObjectKeys` counts JSON `null` as missing
 - `extensions/drm-copilot/jest.config.cjs`: source, the `coverageThreshold` entry of the created source
 - `extensions/drm-copilot/test/lib/validate/orchestrator-state-child-ci.test.ts`: created test
+- `extensions/drm-copilot/test/lib/validate/orchestrator-state-core.completion.test.ts`: extended test
 - `.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`: source, the selection inside `Get-OrchestratorStateCompletionCiGateError` and three private helpers, including the ordinal presence check `Get-MissingOrdinalGateKey`; the local-QC check reads every key through `Get-CheckpointObjectOrdinalMember`
 - `extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`: byte-identical mirror of `.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`
 - `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateChildCi.Tests.ps1`: created test
@@ -71,7 +73,7 @@ Self-declared key (decision D10): `child_ci` is written by the item checkpoint, 
 - `.claude/skills/epic-plan/SKILL.md`: generated output of `.agents/skills/epic-plan/SKILL.md` (text differs from its source)
 - `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-plan/SKILL.md`: byte-identical mirror of `.claude/skills/epic-plan/SKILL.md`
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-plan/SKILL.md`: byte-identical mirror of `.agents/skills/epic-plan/SKILL.md`
-- `scripts/harness-generation/sources/rules/orchestrator-state.md`: generator source, the section `epic-child-ci-opt-out-issue-1233` and one `## Enforcement` list item
+- `scripts/harness-generation/sources/rules/orchestrator-state.md`: generator source, the section `epic-child-ci-opt-out-issue-1233` (including its `Known limitation:` paragraph on the whitespace sets) and one `## Enforcement` list item
 - `scripts/harness-generation/sources/rules/orchestrator-state.json`: generator source, the section id in the Claude target `sections` list
 - `.claude/rules/orchestrator-state.md`: generated output of the rule source
 - `extensions/drm-copilot/resources/claude-customizations/.claude/rules/orchestrator-state.md`: byte-identical mirror of `.claude/rules/orchestrator-state.md`
@@ -417,6 +419,76 @@ import { validateCompletionGateEvidence } from "./orchestrator-state-child-ci";
 ````Prior
     if (routeRequiresCiGate(stateMap, { routingMatrix })) {
       errors.push(...validateCompletionCiGate(stateMap));
+````
+
+### Revert Block: extensions/drm-copilot/src/lib/validate/orchestrator-state-completion.ts
+
+````Current
+ * missing when absent, JSON `null`, or a whitespace-only string.
+````
+
+````Prior
+ * missing when absent, or present as a whitespace-only string.
+````
+
+### Revert Block: extensions/drm-copilot/src/lib/validate/orchestrator-state-completion.ts
+
+````Current
+  // A key is missing when absent, JSON null, or present only as whitespace.
+  for (const key of keys) {
+    const item = value[key];
+    if (
+      item === undefined ||
+      item === null ||
+````
+
+````Prior
+  // A key is missing when absent or present only as whitespace.
+  for (const key of keys) {
+    const item = value[key];
+    if (
+      item === undefined ||
+````
+
+### Revert Block: extensions/drm-copilot/test/lib/validate/orchestrator-state-core.completion.test.ts
+
+````Current
+
+  it("rejects a ci_gate whose required fields are null", () => {
+    // Arrange: JSON null counts as missing, matching Python.
+    const state = buildValidState();
+    state["pr_gate"] = PR_GATE;
+    state["ci_gate"] = { ...CI_GATE, head_sha: null, verified_at: null };
+
+    // Act
+    const errors = validateComplete(state);
+
+    // Assert
+    expect(errors).toContain(
+      "Checkpoint completion validation failed: ci_gate missing required " +
+        "fields: head_sha, verified_at.",
+    );
+  });
+
+  it("rejects a pr_gate whose required fields are null", () => {
+    // Arrange: JSON null counts as missing, matching Python.
+    const state = buildValidState();
+    state["pr_gate"] = { ...PR_GATE, pr_url: null, head_sha: null };
+    state["ci_gate"] = CI_GATE;
+
+    // Act
+    const errors = validateComplete(state);
+
+    // Assert
+    expect(errors).toContain(
+      "Checkpoint completion validation failed: pr_gate missing required " +
+        "fields: pr_url, head_sha.",
+    );
+  });
+
+````
+
+````Prior
 ````
 
 ### Revert Block: extensions/drm-copilot/jest.config.cjs
@@ -1815,6 +1887,8 @@ Under `require_complete`, the Python, TypeScript, and PowerShell validators sele
 
 Honest disclosure: `child_ci` is self-declared by the item checkpoint, and a writer in the same session can set it; like every gate key, this is a policy-level control, not a security control (decision D10). The reduction is bounded by the live base read through `baseRefName`, which never admits a merge into `main`, by the `review_mode: "concurrent"` requirement, and by the evidence file at the live head with its `Head:` line.
 
+Known limitation: the three blank-string tests use different whitespace sets. Python uses `str.strip`, TypeScript uses `trim`, and PowerShell uses `IsNullOrWhiteSpace`, so `U+0085` is blank in Python and PowerShell only, `U+001C` is blank in Python only, and `U+FEFF` is blank in TypeScript only. A required field that holds only such characters can be reported as missing by one validator and accepted by another. These characters do not occur in clock-read timestamps, object ids, or evidence paths. Unifying the sets would change the blank-string semantics of every gate in the three validators and is outside the scope of issue #1233.
+
 ````
 
 ````Prior
@@ -1859,6 +1933,8 @@ An epic whose manifest records `child_ci: integration_only` opts its children ou
 Under `require_complete`, the Python, TypeScript, and PowerShell validators select the `local_qc_gate` check in place of the `ci_gate` check under the predicate and report byte-identical errors, pinned by the corpus `tests/fixtures/orchestrator_state_child_ci/`; both completion-consistency hooks accept `local_qc_gate` in place of `ci_gate` under the same predicate. The integration pull request into `main` still requires a green `CI` run, and a child pull request still starts the automatic `CI` run that `.github/workflows/ci.yml` triggers on `epic/**`; the opt-out removes it as a merge condition only. The reduction is recorded in process-reduction ledger entry 0015.
 
 Honest disclosure: `child_ci` is self-declared by the item checkpoint, and a writer in the same session can set it; like every gate key, this is a policy-level control, not a security control (decision D10). The reduction is bounded by the live base read through `baseRefName`, which never admits a merge into `main`, by the `review_mode: "concurrent"` requirement, and by the evidence file at the live head with its `Head:` line.
+
+Known limitation: the three blank-string tests use different whitespace sets. Python uses `str.strip`, TypeScript uses `trim`, and PowerShell uses `IsNullOrWhiteSpace`, so `U+0085` is blank in Python and PowerShell only, `U+001C` is blank in Python only, and `U+FEFF` is blank in TypeScript only. A required field that holds only such characters can be reported as missing by one validator and accepted by another. These characters do not occur in clock-read timestamps, object ids, or evidence paths. Unifying the sets would change the blank-string semantics of every gate in the three validators and is outside the scope of issue #1233.
 
 ````
 
@@ -1927,7 +2003,7 @@ Honest disclosure: `child_ci` is self-declared by the item checkpoint, and a wri
 3. Regenerate Codex variants: not applicable; run `scripts/dev_tools/generate_codex_agent_variants.py` in module form with `--check` to confirm no variant changed.
 4. Restore pinned hashes: the revert block of `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` restores the prior `.claude/skills/epic-orchestrate/SKILL.md` digest in `PINNED_FROZEN_SURFACE_HASHES` and removes the `RE-BASELINED by issue #1233` paragraph; this block is reverted before the hunk of `patches/0010-early-dependent-starts.patch` on the same file.
 5. Restore contract-test literals: not applicable.
-6. Run the contract tests: `tests/scripts/harness-generation/HarnessGeneration.RepoGate.Tests.ps1`, `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py`, `tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1`, `tests/scripts/dev-tools/ProcessReductionLedger.Tests.ps1`, `tests/scripts/dev-tools/ProcessReductionLedger.Index.Tests.ps1`, `tests/scripts/codex-hooks/cross-tree-helper-identity.Tests.ps1`, the push-down resource and pack-manifest contract tests under `tests/scripts/dev_tools/`, and `tests/scripts/dev_tools/test_validate_orchestrator_state_completion.py`.
+6. Run the contract tests: `extensions/drm-copilot/test/lib/validate/orchestrator-state-core.completion.test.ts`, `tests/scripts/harness-generation/HarnessGeneration.RepoGate.Tests.ps1`, `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py`, `tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1`, `tests/scripts/dev-tools/ProcessReductionLedger.Tests.ps1`, `tests/scripts/dev-tools/ProcessReductionLedger.Index.Tests.ps1`, `tests/scripts/codex-hooks/cross-tree-helper-identity.Tests.ps1`, the push-down resource and pack-manifest contract tests under `tests/scripts/dev_tools/`, and `tests/scripts/dev_tools/test_validate_orchestrator_state_completion.py`.
 
 ## Revert Signals
 

@@ -308,6 +308,8 @@ Under `require_complete`, the Python, TypeScript, and PowerShell validators sele
 
 Honest disclosure: `child_ci` is self-declared by the item checkpoint, and a writer in the same session can set it; like every gate key, this is a policy-level control, not a security control (decision D10). The reduction is bounded by the live base read through `baseRefName`, which never admits a merge into `main`, by the `review_mode: "concurrent"` requirement, and by the evidence file at the live head with its `Head:` line.
 
+Known limitation: the three blank-string tests use different whitespace sets. Python uses `str.strip`, TypeScript uses `trim`, and PowerShell uses `IsNullOrWhiteSpace`, so `U+0085` is blank in Python and PowerShell only, `U+001C` is blank in Python only, and `U+FEFF` is blank in TypeScript only. A required field that holds only such characters can be reported as missing by one validator and accepted by another. These characters do not occur in clock-read timestamps, object ids, or evidence paths. Unifying the sets would change the blank-string semantics of every gate in the three validators and is outside the scope of issue #1233.
+
 <!-- harness-section: issue-adoption-scope-and-backward-compatibility -->
 ## Issue-Adoption Scope and Backward Compatibility
 

@@ -52,7 +52,7 @@ function isObject(value: unknown): value is Record<string, unknown> {
  * Return the required keys missing (or empty-string) from an object value.
  *
  * Mirrors Python `_missing_object_keys`: a non-object yields all keys; a key is
- * missing when absent, or present as a whitespace-only string.
+ * missing when absent, JSON `null`, or a whitespace-only string.
  *
  * @param value Candidate object value.
  * @param keys Keys that must be present and non-empty.
@@ -66,11 +66,12 @@ export function missingObjectKeys(
     return [...keys];
   }
   const missing: string[] = [];
-  // A key is missing when absent or present only as whitespace.
+  // A key is missing when absent, JSON null, or present only as whitespace.
   for (const key of keys) {
     const item = value[key];
     if (
       item === undefined ||
+      item === null ||
       (typeof item === "string" && item.trim() === "")
     ) {
       missing.push(key);

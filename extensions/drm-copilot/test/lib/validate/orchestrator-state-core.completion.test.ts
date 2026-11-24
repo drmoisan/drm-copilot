@@ -163,6 +163,38 @@ describe("validateOrchestratorStateText completion gates", () => {
     ).toBe(true);
   });
 
+  it("rejects a ci_gate whose required fields are null", () => {
+    // Arrange: JSON null counts as missing, matching Python.
+    const state = buildValidState();
+    state["pr_gate"] = PR_GATE;
+    state["ci_gate"] = { ...CI_GATE, head_sha: null, verified_at: null };
+
+    // Act
+    const errors = validateComplete(state);
+
+    // Assert
+    expect(errors).toContain(
+      "Checkpoint completion validation failed: ci_gate missing required " +
+        "fields: head_sha, verified_at.",
+    );
+  });
+
+  it("rejects a pr_gate whose required fields are null", () => {
+    // Arrange: JSON null counts as missing, matching Python.
+    const state = buildValidState();
+    state["pr_gate"] = { ...PR_GATE, pr_url: null, head_sha: null };
+    state["ci_gate"] = CI_GATE;
+
+    // Act
+    const errors = validateComplete(state);
+
+    // Assert
+    expect(errors).toContain(
+      "Checkpoint completion validation failed: pr_gate missing required " +
+        "fields: pr_url, head_sha.",
+    );
+  });
+
   it("skips the PR gate for a route that does not require it", () => {
     // Arrange
     const state = buildValidState();

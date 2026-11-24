@@ -1,0 +1,30 @@
+{
+  "name": "local-qc-gate-null-fields",
+  "notes": "A local_qc_gate whose evidence_path and verified_at are JSON null reports both fields as missing.",
+  "checkpoint": {
+    "route_id": "large",
+    "epic_mode": true,
+    "child_ci": "integration_only",
+    "review_mode": "concurrent",
+    "epic_context": {
+      "integration_branch": "epic/example-integration"
+    },
+    "remediation_loop": {
+      "review_outcomes": [
+        {
+          "verdict": "PASS",
+          "head_sha": "3f2a9c1e5b7d4a6f8e0c2b4d6a8f0e1c3b5d7a9f"
+        }
+      ]
+    },
+    "local_qc_gate": {
+      "conclusion": "success",
+      "head_sha": "3f2a9c1e5b7d4a6f8e0c2b4d6a8f0e1c3b5d7a9f",
+      "evidence_path": null,
+      "verified_at": null
+    }
+  },
+  "expected_errors": [
+    "Checkpoint completion validation failed: local_qc_gate missing required fields: evidence_path, verified_at."
+  ]
+}

@@ -84,11 +84,15 @@ BeforeDiscovery {
         @{ Case = 'X-SECTION [claude]'; File = $rule }
         @{ Case = 'X-SECTION [claude-bundle]'; File = $claudeBundle + $rule }
     )
+    $script:LimitRow = @(
+        @{ Case = 'X-LIMIT [claude]'; File = $rule }
+        @{ Case = 'X-LIMIT [claude-bundle]'; File = $claudeBundle + $rule }
+    )
     $script:TemplateRow = @(
         @{ Case = 'T-TEMPLATE [source]'; File = '.dev/templates/epic/epic.md' }
         @{ Case = 'T-TEMPLATE [bundle]'; File = 'extensions/drm-copilot/resources/feature-templates/epic/epic.md' }
     )
-    $script:CaseCount = @(@{ Cases = @($script:UnitRow.Case + $script:RuleSectionRow.Case + $script:TemplateRow.Case) })
+    $script:CaseCount = @(@{ Cases = @($script:UnitRow.Case + $script:RuleSectionRow.Case + $script:LimitRow.Case + $script:TemplateRow.Case) })
 }
 
 BeforeAll {
@@ -198,6 +202,18 @@ Describe 'child CI opt-out skill, rule, brief, and template text (issue #1233)' 
 
         # Act
         $missing = @(@('self-declared', 'policy-level', 'D10', 'baseRefName', 'review_mode: "concurrent"', 'Head:') | Where-Object { -not $section.Contains($_) })
+
+        # Assert
+        $section.Length | Should -BeGreaterThan 0 -Because 'the rule carries the issue #1233 section'
+        $missing.Count | Should -Be 0 -Because "missing: $($missing -join ' | ')"
+    }
+
+    It 'CCO <Case> states the whitespace-set known limitation in its own section' -ForEach $script:LimitRow {
+        # Arrange
+        $section = (@(Get-CcoSection -Text (Get-CcoText -RelativePath $File) -Heading '## Epic-child CI opt-out (issue #1233)') -join ' ') -replace '\s+', ' '
+
+        # Act
+        $missing = @(@('Known limitation:', 'str.strip', 'IsNullOrWhiteSpace', 'U+0085', 'U+001C', 'U+FEFF') | Where-Object { -not $section.Contains($_) })
 
         # Assert
         $section.Length | Should -BeGreaterThan 0 -Because 'the rule carries the issue #1233 section'
