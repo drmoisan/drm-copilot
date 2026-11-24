@@ -39,6 +39,13 @@
       - When repo-wide line coverage for an available artifact is below the governing
         line threshold, the policy audit must carry a FAIL verdict for that language;
         branch coverage below the governing branch threshold blocks termination.
+      - Run scope (issue #1228): a report whose write time falls inside a selection
+        record artifacts/test-execution/run-scope.<suite>.json of its suite, written by
+        the test-execution launcher, is per-file evidence, so neither the repo-wide line
+        floor nor the branch floor applies to it (Get-FeatureReviewCoverageReportScope in
+        validate-feature-review-coverage-freshness.ps1). An absent, invalid, or
+        non-covering record, and every CSharp report, keeps both checks. The verdict,
+        narrowing, and freshness checks apply to both kinds of report.
 
 .NOTES
     Reads the SubagentStop envelope from stdin through Read-SubagentStopEnvelope
@@ -224,8 +231,24 @@ function Invoke-FeatureReviewCoverageValidation {
             $thresholds = Get-FeatureReviewCoverageThreshold -ClaudeMdText $claudeMd.Text
             $coverageFailures = [System.Collections.Generic.List[hashtable]]::new()
             foreach ($lang in $changedLanguages.Keys) {
-                $repoPct = if ($itemRoot) { Get-LanguageRepoCoverage -Language $lang -Root $itemRoot } else { Get-LanguageRepoCoverage -Language $lang }
-                $branchPct = if ($itemRoot) { Get-LanguageBranchCoverage -Language $lang -Root $itemRoot } else { Get-LanguageBranchCoverage -Language $lang }
+                # Issue #1228: a report written inside a selection run of its suite is per-file evidence, so no repo-wide floor applies.
+                $reportScope = 'full'
+                $runScopeRecordPath = Get-FeatureReviewRunScopeRecordPath -Language $lang
+                if ($null -ne $runScopeRecordPath) {
+                    $runScopeRecord = if ($itemRoot) { Get-ArtifactFileContent -Path $runScopeRecordPath -Root $itemRoot } else { Get-ArtifactFileContent -Path $runScopeRecordPath }
+                    $runScopeRecordText = if ($null -ne $runScopeRecord -and $runScopeRecord.Exists) { [string]$runScopeRecord.Text } else { $null }
+                    $runScopeReportPath = Get-FeatureReviewCoverageReportPath -Language $lang
+                    if ($itemRoot) { $runScopeReportPath = "$itemRoot/$runScopeReportPath" }
+                    $reportScope = Get-FeatureReviewCoverageReportScope -Language $lang -RecordText $runScopeRecordText -GetReportWriteUtc { Get-FeatureReviewReportLastWriteUtc -Path $runScopeReportPath }
+                }
+                if ($reportScope -eq 'selection') {
+                    $repoPct = $null
+                    $branchPct = $null
+                }
+                else {
+                    $repoPct = if ($itemRoot) { Get-LanguageRepoCoverage -Language $lang -Root $itemRoot } else { Get-LanguageRepoCoverage -Language $lang }
+                    $branchPct = if ($itemRoot) { Get-LanguageBranchCoverage -Language $lang -Root $itemRoot } else { Get-LanguageBranchCoverage -Language $lang }
+                }
                 $result = Test-LanguageCoverageRow -AuditText $policyAuditText -Language $lang -RepoWidePct $repoPct -BranchPct $branchPct -LineFloor $thresholds.Line -BranchFloor $thresholds.Branch -LineSource $thresholds.LineSource -BranchSource $thresholds.BranchSource
                 if (-not $result.Ok) {
                     $coverageFailures.Add($result)

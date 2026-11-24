@@ -50,6 +50,12 @@
         is below the governing line floor and the audit does not carry a FAIL verdict on
         a coverage row for that language, validation fails. The Codex hook enforces the
         line floor only.
+      - Run scope (issue #1228): a report whose write time falls inside a selection record
+        artifacts/test-execution/run-scope.<suite>.json of its suite, written by the
+        test-execution launcher beneath the item root, is per-file evidence, so the
+        repo-wide line floor does not apply to it (Get-FeatureReviewCoverageReportScope of
+        validate-feature-review-coverage-freshness.ps1). An absent, invalid, or
+        non-covering record, and every CSharp report, keeps the line floor check.
 
     Coverage artifact paths by language:
         TypeScript  coverage/lcov.info                          (LCOV text)
@@ -361,7 +367,16 @@ try {
     $failures = [System.Collections.Generic.List[string]]::new()
 
     foreach ($lang in $changedLanguages.Keys) {
-        $repoPct = Get-LanguageRepoCoverage -RepoRoot $itemRoot -Language $lang
+        # Issue #1228: a report written inside a selection run of its suite is per-file evidence, so no repo-wide floor applies.
+        $reportScope = 'full'
+        $runScopeRecordPath = Get-FeatureReviewRunScopeRecordPath -Language $lang
+        if ($null -ne $runScopeRecordPath) {
+            $runScopeRecordFile = Join-Path $itemRoot $runScopeRecordPath
+            $runScopeRecordText = if (Test-Path -Path $runScopeRecordFile) { Get-Content -Path $runScopeRecordFile -Raw } else { $null }
+            $runScopeReportPath = "$itemRoot/$(Get-FeatureReviewCoverageReportPath -Language $lang)"
+            $reportScope = Get-FeatureReviewCoverageReportScope -Language $lang -RecordText $runScopeRecordText -GetReportWriteUtc { Get-FeatureReviewReportLastWriteUtc -Path $runScopeReportPath }
+        }
+        $repoPct = if ($reportScope -eq 'selection') { $null } else { Get-LanguageRepoCoverage -RepoRoot $itemRoot -Language $lang }
         $result = Test-LanguageCoverageRow -AuditText $auditText -Language $lang -RepoWidePct $repoPct -LineFloor $thresholds.Line
         if (-not $result.Ok) {
             $failures.Add($result.Reason)

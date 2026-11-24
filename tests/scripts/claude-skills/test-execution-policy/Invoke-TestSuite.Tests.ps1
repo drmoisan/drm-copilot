@@ -50,7 +50,7 @@ BeforeAll {
         $state = @{
             Imported = [System.Collections.Generic.List[string]]::new(); Events = [System.Collections.Generic.List[string]]::new()
             Starts = [System.Collections.Generic.List[object]]::new(); Errors = [System.Collections.Generic.List[string]]::new()
-            Sleeps = [System.Collections.Generic.List[int]]::new(); Written = [System.Collections.Generic.List[string]]::new()
+            Sleeps = [System.Collections.Generic.List[int]]::new(); Written = [System.Collections.Generic.List[string]]::new(); RunScopes = [System.Collections.Generic.List[string]]::new()
             Classified = $null; ProbeCount = 0; HelperFolder = $HelperFolder; Repo = $script:RepoRoot
             Now = [datetime]::new(2026, 1, 1, 0, 0, 0, [System.DateTimeKind]::Utc)
         }
@@ -90,6 +90,7 @@ BeforeAll {
             Sleep                 = { param([int] $Milliseconds) $state.Sleeps.Add($Milliseconds); $state.Now = $state.Now.AddMilliseconds($Milliseconds) }.GetNewClosure()
             WriteStandardError    = { param([string] $Line) $state.Errors.Add($Line) }.GetNewClosure()
             RecordClassifierInput = { param([string[]] $ExtraArgument) $state.Classified = @($ExtraArgument) }.GetNewClosure()
+            WriteRunScope         = { param([string] $Path, [string] $Text) $state.RunScopes.Add("$Path|$Text") }.GetNewClosure()
             StartSuiteProcess     = {
                 param([string] $FilePath, [string[]] $ArgumentList, [string] $WorkingDirectory)
                 $state.Events.Add('start')

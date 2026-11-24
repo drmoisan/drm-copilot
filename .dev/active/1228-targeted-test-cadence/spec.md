@@ -4,9 +4,9 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Branch:** `feature/targeted-test-cadence-1228`
-- **Last Updated:** 2026-11-23
+- **Last Updated:** 2026-11-24
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 - **Research:** `.dev/active/1228-targeted-test-cadence/research/research.2026-11-23T12-00.md`
 
 ## Owner Objective (verbatim)
@@ -17,7 +17,7 @@
 
 The orchestration rules currently run the full unit suite at every `[phase-gate]` task. Some skills also require a full run for remediation cycles, for the regenerate path of a merge conflict, and for post-merge sync checks; the typed engineers run a full QA gate that the plan's final QC block repeats; and the feature-review coverage step can force a full coverage run at each review. On large destination repositories this repeats a multi-minute full run many times per orchestration.
 
-This feature changes the policy text on every surface so that the full test suite runs only at the `Phase 0 baseline` and in the final QA loop. Every other test run within an orchestration uses a test selection. The change is wording-only on rules, skills, agents, prompts, instructions, plan templates, and their generated and bundle copies, plus the contract tests that pin that wording and a process-reduction ledger entry. No hook, validator, CI workflow, or Python tool changes.
+This feature changes the policy text on every surface so that the full test suite runs only at the `Phase 0 baseline` and in the final QA loop. Every other test run within an orchestration uses a test selection. The change is wording-only on rules, skills, agents, prompts, instructions, plan templates, and their generated and bundle copies, plus the contract tests that pin that wording and a process-reduction ledger entry. The only non-wording changes are the feature-review coverage hook (`.claude/hooks/validate-feature-review-coverage.ps1`), its Codex twin, and the run-scope record that the test-execution launcher writes and those hooks read (D11); no validator, CI workflow, or Python tool changes.
 
 ## Behavior
 
@@ -59,7 +59,7 @@ Each decision adopts the recommended option of the research record.
 |---|---|---|
 | D1 | The phase-gate unit stage is the union of the phase's task test selections, run in parallel through the launcher, with no coverage measurement. | States the owner rule directly and reuses the existing selection rule and the launcher `-TestPath` route. Repository-wide static, architecture, and contract stages stay at every phase gate. |
 | D2 | A remediation cycle ends with one remediation gate in phase-gate form, run in coverage mode for each changed language so per-file coverage of the files the cycle changed is recorded. The remediation plan's Phase 0 captures static baselines only and cites the orchestration's `Phase 0 baseline` artifact; it does not re-run the full suite. Light cycles are unchanged (task checks only). | The owner objective lists remediation cycles as non-full runs. Changed-file coverage is still measured; the repository-wide backstop is the final-QC artifact and CI. A full QA loop per cycle was rejected. |
-| D3 | When the review coverage report is absent or stale for a changed language, the reviewer re-runs coverage over the branch's test selection, not the full suite. The repository-wide total comes from the final-QC artifact and the CI result recorded in `## CI Cross-check`. No hook code changes. | A selection run refreshes the report files that `.claude/hooks/validate-feature-review-coverage-freshness.ps1` reads (`artifacts/python/lcov.info`, `artifacts/pester/powershell-coverage.xml`, `coverage/lcov.info`), so the freshness hook is satisfied without a full run and no PowerShell production file is edited. |
+| D3 | When the review coverage report is absent or stale for a changed language, the reviewer re-runs coverage over the branch's test selection, not the full suite. The repository-wide total comes from the final-QC artifact and the CI result recorded in `## CI Cross-check`. The feature-review coverage hook grades a local report as repository-wide only when no covering `selection` record of its suite exists (D11); a report covered by such a record is per-file evidence. | A selection run refreshes the report files that `.claude/hooks/validate-feature-review-coverage-freshness.ps1` reads (`artifacts/python/lcov.info`, `artifacts/pester/powershell-coverage.xml`, `coverage/lcov.info`), so the freshness hook is satisfied without a full run. The earlier text of this decision accounted for the freshness hook but not the metrics check, which graded a selection report against the repository-wide floors (finding F3, remediation cycle 2, decided in autonomous mode). |
 | D4 | `## Workflow` item 5 of the three typed-engineer agent sources (Python, PowerShell, C#) states that, when the delegation comes from an orchestration whose plan carries a `Phase 0 baseline` and a final QC block, the engineer runs the task check and leaves the full gate to the plan's final QA loop. Standalone direct use keeps its own Phase 0 and final QA gate. | Removes the duplicate full run in the small path. Standalone use already brackets its own run with a beginning and a QC run. |
 | D5 | The epic surfaces frozen by `PINNED_FROZEN_SURFACE_HASHES` (`.claude/skills/epic-orchestrate/SKILL.md`, `.claude/agents/epic-orchestrator.md`) are not edited, and the `.agents` epic-orchestrate copy is left unchanged with them. "Local gate" for sync checks is defined in `## Test Cadence (Mandatory)` and in the execution-environment brief as the phase-gate form over the merge's changed-path selection. | A definition at the canonical location makes the existing "re-run the local gate" step non-full without a hash re-baseline of the frozen surfaces. |
 | D6 | The Python atomic executor CLI (`scripts/dev_tools/atomic_executor/`) is unchanged. The ledger entry records it as unchanged. | It is a repository-local developer tool that is not pushed down; editing it would add Python changes outside the owner's scope. The brief's `## Test Runtime` description of it ("its phase-gate QC loop", pinned) stays accurate. |
@@ -67,6 +67,7 @@ Each decision adopts the recommended option of the research record.
 | D8 | The ledger record is a new entry `.dev/engineering/process-reductions/0014-targeted-test-cadence.md` with a `## Stored Patch` section naming `patches/0014-targeted-test-cadence.patch` (precedent `0009`). | The restated cadence sentence occurs more than once in several files, so a `Current` fence would need contextual disambiguation; a stored patch avoids that class of revert-chain failure. |
 | D9 | Item 5 of `## Merge-Conflict Remediation` in `.claude/skills/orchestrate/SKILL.md` replaces "the standard parallel unit gates" with the phase-gate unit stage over the test selection of the paths the merge changed. `config/orchestration-regeneration.json` `unit_gate` stays repository-owned and unchanged. | Brings the regenerate-path fallback gate under the owner rule without a configuration change. |
 | D10 | The standalone Copilot agents and prompts (`staged-review`, `commentary-remediation`, `remediate-comments` prompt, the Copilot typed engineers, `pytest-unit-test-coding`, `Powershell DI Unit Test Engineer`, `python-execution-only-typed`) are unchanged. | They are not orchestrator steps; each brackets its own standalone run, and several rows are pinned by `parallel-gate-wording.Tests.ps1` to `poetry run pytest -n auto`. |
+| D11 | After each suite run the test-execution launcher writes `artifacts/test-execution/run-scope.<suite>.json` with the keys `schema_version` (1), `suite`, `runner`, `scope` (`selection` or `full`), `started_utc`, and `completed_utc`. The feature-review coverage hook and its Codex twin grade a coverage report as a selection report only when a valid `selection` record of the language's suite covers the report's write time; neither the repo-wide line floor nor the branch floor then applies, while the freshness, verdict, and narrowing checks still apply. An absent, unparseable, mismatched, or non-covering record, and every C# report, means a full report, so the repo-wide check keeps its current behavior. CI does not run the launcher and is unchanged. | The launcher is the one route every local suite takes. Rejected: reading totals from the final-QC artifact named in the policy audit (free text chosen by the reviewer, with no machine-readable field); a marker in `Invoke-PoshQCParallelTest` (PowerShell only, and it changes `scripts/powershell/PoshQC/`); inference from the report alone (a selection report and a full report have the same line population). The fail-safe direction keeps the repo-wide check whenever the record does not positively identify a selection report (finding F3, remediation cycle 2, decided in autonomous mode). |
 
 ## Inputs / Outputs
 
@@ -77,7 +78,7 @@ Each decision adopts the recommended option of the research record.
 
 ## API / CLI Surface
 
-No command, flag, or schema changes. The commands used to produce and verify the change:
+No command or flag changes; the one new file format is the D11 run-scope record. The commands used to produce and verify the change:
 
 - `scripts/harness-generation/Invoke-HarnessGeneration.ps1` (write), then with `-Check`, then `-Surface instructions -Check`. In an agent worktree these run from a `sh <SCRATCH>/<file>.sh` launcher, as the execution-environment brief requires.
 - `env -u VIRTUAL_ENV poetry run python -m scripts.dev_tools.generate_codex_agent_variants`, then with `--check`.
@@ -85,7 +86,7 @@ No command, flag, or schema changes. The commands used to produce and verify the
 
 ## Data & State
 
-- No runtime data, checkpoint field, or persisted state changes.
+- One new runtime file: the test-execution launcher writes the run-scope record `artifacts/test-execution/run-scope.<suite>.json` after each suite run (D11). No checkpoint field or other persisted state changes.
 - Invariant: every surface restates the cadence as a pointer to `## Test Cadence (Mandatory)`; the canonical section is the single definition.
 - Invariant: the `AGENTS.md` `## Mandatory Toolchain Loop` section does not become whitespace-equal to the same section of `.claude/rules/general-code-change.md` (`EMBEDDED-RULE` check in `HarnessInstructions.psm1`).
 
@@ -111,7 +112,7 @@ No command, flag, or schema changes. The commands used to produce and verify the
 - The Python atomic executor CLI under `scripts/dev_tools/atomic_executor/` (D6).
 - The frozen epic surfaces `.claude/skills/epic-orchestrate/SKILL.md` and `.claude/agents/epic-orchestrator.md`, their pinned digests in `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, and the `.agents` epic-orchestrate copy (D5).
 - The standalone Copilot agents and prompts listed in D10.
-- Hooks and validators; none pins the phase-gate cadence (research section 1.3).
+- Validators, and every hook other than `.claude/hooks/validate-feature-review-coverage.ps1`, `.codex/hooks/validate-feature-review-coverage.ps1`, and their freshness twin `validate-feature-review-coverage-freshness.ps1` (D11); none pins the phase-gate cadence (research section 1.3).
 - The docs estate owned by epic #1217.
 
 ## Implementation Strategy
@@ -122,7 +123,8 @@ No command, flag, or schema changes. The commands used to produce and verify the
 - Regenerate generated targets and Codex variants; hand-copy bundles of hand-authored files.
 - Extend `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1` and update the `RSC-REGENERATE` literals in `tests/scripts/claude-runtime/regeneration-path-skill-contract.Tests.ps1`.
 - Record ledger entry `0014` with its stored patch and README index row.
-- New classes, functions, or commands: none. Dependency changes: none. Logging or telemetry: none. Rollout: delivered to destination repositories through push-down.
+- Add the run-scope record (D11): `Get-TestSuiteRunScope`, `New-TestSuiteRunScopeRecord`, and `Write-TestSuiteRunScopeRecord` in the `.agents` launcher source (generated into the `.claude` copy), and `Get-FeatureReviewRunScopeSuite`, `Get-FeatureReviewRunScopeRecordPath`, and `Get-FeatureReviewCoverageReportScope` in both freshness files, called by both feature-review coverage hooks.
+- New classes, functions, or commands: only the D11 functions above. Dependency changes: none. Logging or telemetry: none. Rollout: delivered to destination repositories through push-down.
 
 ## Acceptance Criteria
 
@@ -145,6 +147,10 @@ No command, flag, or schema changes. The commands used to produce and verify the
 - [x] AC-17: The `Final QA loop` bullet of `## Test Cadence (Mandatory)` in both copies still requires a full run of each language gate with coverage compared with the `Phase 0 baseline`, and the `Phase 0 baseline` remains a full run with coverage. Verified by the `CANONICAL-*` rows and by this item's own `Phase 0 baseline` and final QA artifacts under `evidence/baseline/` and `evidence/qa-gates/`, the final QA artifact recording the coverage comparison.
 - [x] AC-18: CI is unchanged: `git diff --name-only <merge-base>...HEAD` recorded under `.dev/active/1228-targeted-test-cadence/evidence/other/` lists no path under `.github/workflows/`.
 - [x] AC-19: Out-of-scope and protected paths are unchanged: the AC-18 diff lists no path under `scripts/dev_tools/atomic_executor/`, no `.claude/skills/epic-orchestrate/SKILL.md`, `.agents/skills/epic-orchestrate/SKILL.md`, `.claude/agents/epic-orchestrator.md`, or `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`, no D10 standalone Copilot agent or prompt, no path under `.claude/lib/docs/`, `docs-*` skills, or `documentation-workflow` (any surface or bundle), and no new `.py` file; and `test_frozen_epic_surface_matches_pinned_baseline_digest` passes.
+- [x] AC-20: The feature-review coverage hook and its Codex twin grade a coverage report covered by a valid `selection` run-scope record of its suite as per-file evidence, with no repo-wide line or branch floor, and grade every other report, including every C# report, against the repo-wide floors as before; freshness, verdict, and narrowing checks apply to both. Verified by the `RSCOPE-READ-*`, `RSCOPE-HOOK-*`, `RSCOPE-CODEX-*`, and `RSCOPE-CONTRACT-LAUNCHER-RECORD` rows passing.
+  Evidence: `.dev/active/1228-targeted-test-cadence/evidence/qa-gates/remediation-gate.2026-11-24T15-14.md` ([P1-T8], remediation cycle 2): the `RSCOPE-READ-*` rows of both `validate-feature-review-coverage-freshness.Tests.ps1` suites, the `RSCOPE-HOOK-*` and `RSCOPE-CONTRACT-LAUNCHER-RECORD` rows of `validate-feature-review-coverage.RunScope.Tests.ps1`, and the `RSCOPE-CODEX-*` rows of `tests/scripts/codex-hooks/validate-feature-review-coverage.Coverage.Tests.ps1` passed in the 47-file union run (3998 tests, 0 failures).
+- [x] AC-21: The test-execution launcher writes `artifacts/test-execution/run-scope.<suite>.json` after each suite run with scope `selection` or `full` by the per-runner selection rules, writes nothing on a refusal, a queue timeout, or a thrown suite, and reports a write failure with a `TEST_EXECUTION_RUN_SCOPE_UNWRITTEN:` line without changing the exit code; the execution-environment brief and the `test-execution-policy` skill state the record in all copies. Verified by the `RSCOPE-LAUNCH-*` and `RSCOPE-DOC-*` rows passing.
+  Evidence: `.dev/active/1228-targeted-test-cadence/evidence/qa-gates/remediation-gate.2026-11-24T15-14.md` ([P1-T8], remediation cycle 2): the `RSCOPE-LAUNCH-*` rows of `Invoke-TestSuite.RunScope.Tests.ps1` and the `RSCOPE-DOC-*` rows of `validate-feature-review-coverage.RunScope.Tests.ps1` passed in the 47-file union run (3998 tests, 0 failures), and that run's own `artifacts/test-execution/run-scope.pester.json` recorded scope `selection` with a window containing the coverage report's write time.
 
 ## Definition of Done
 

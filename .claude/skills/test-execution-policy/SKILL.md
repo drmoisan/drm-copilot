@@ -37,6 +37,17 @@ The `pester` suite runs `pwsh -NoProfile -NonInteractive -File` with the launche
 
 A task check, a fail-before proof, a consumer-suite check, and the unit stage of a phase gate, a remediation gate, and a sync check run their Pester selection through the launcher `pester` suite followed by `-TestPath` and the test files or folders, for example `sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath tests/scripts/powershell/PoshQC tests/scripts/claude-hooks/enforce-test-execution-policy.Tests.ps1`. The suite passes `-TestPath` to `Invoke-PoshQCParallelTest`, which resolves the selection to its test files and runs them under the machine test-suite lock with the integration and golden lanes excluded, starting at most one shard per file. The hook denies a lane path in that list. The merged files under `artifacts/pester/` then cover the selection only, so full-suite coverage comes from the `Phase 0 baseline` and the final QA loop. Such a run replaces a direct one-process Pester run.
 
+### Run-scope record
+
+After a suite returns, whatever its exit code, the launcher writes `artifacts/test-execution/run-scope.<suite>.json` beneath the repository root (#1228). The record is one JSON object with the keys `schema_version` (1), `suite`, `runner`, `scope`, `started_utc`, and `completed_utc`; the two instants are UTC clock readings taken immediately before and after the suite runs. `scope` is `selection` when the caller's words select part of the suite and `full` otherwise:
+
+- pester: a word equal to `-TestPath`, ignoring case.
+- pytest: a word not starting with `-` that ends with `.py` or contains `::`; a word `-k` or starting with `-k`; a word `--deselect` or starting with `--deselect=`.
+- jest: a word starting with `--testPathPattern` or `--testNamePattern`; a word `-t`, `-o`, `--findRelatedTests`, or `--onlyChanged`, or starting with `--changedSince`; a word not starting with `-` that names a `.test.` or `.spec.` JavaScript or TypeScript file.
+- Every other word list, and every other runner, gives `full`.
+
+A refusal, a queue timeout, and a suite that throws write no record. A write failure prints one stderr line starting `TEST_EXECUTION_RUN_SCOPE_UNWRITTEN:` and leaves the exit code unchanged. The feature-review coverage hooks (`.claude/hooks/validate-feature-review-coverage.ps1` and its Codex twin) read the record: a coverage report whose write time falls inside a `selection` record of its suite is per-file evidence and is not held to the repository-wide floors, while an absent, invalid, or non-covering record keeps the repository-wide check. CI does not run the launcher, so every CI report is graded as a full report.
+
 ## Exit Codes and Messages
 
 | Code | Meaning |

@@ -13,6 +13,15 @@
     or unknown suite, a lane selection, or a worker-reduction token; 75 with TEST_EXECUTION_QUEUE_TIMEOUT:
     when the lock stays busy; a suite's own 75 is reported as 1 with a TEST_EXECUTION_SUITE_EXIT: line.
 
+    Run-scope record (issue #1228, spec D11): after a suite returns, whatever its exit code, the launcher
+    writes artifacts/test-execution/run-scope.<suite>.json beneath the repository root with the keys
+    schema_version, suite, runner, scope, started_utc, and completed_utc; scope is 'selection' when the
+    caller's words select part of the suite (Get-TestSuiteRunScope) and 'full' otherwise, and the two
+    instants are clock readings taken immediately before and after the suite runs. A refusal, a queue
+    timeout, and a thrown suite write no record. A write failure prints one stderr line starting
+    TEST_EXECUTION_RUN_SCOPE_UNWRITTEN: and leaves the exit code unchanged. The feature-review coverage
+    hook reads the record to tell a selection report from a full report.
+
     The script-file entry runs only when the script is not dot-sourced; it reads the optional hashtable
     variable TestSuiteLauncherSeams from the caller's scope and splats it onto Invoke-TestSuiteLauncher.
     Through pwsh -File, PowerShell splits a word that starts with '-' and contains ':' into two $args
@@ -80,10 +89,102 @@ function New-TestSuiteProcessStartInfo {
     return $info
 }
 
+function Get-TestSuiteRunScope {
+    <#
+    .SYNOPSIS
+        Return 'selection' when the caller's words select part of a suite, otherwise 'full' (issue #1228).
+    .DESCRIPTION
+        pester: a word equal to -TestPath, ignoring case. pytest: a word not starting with '-' that ends
+        with .py or contains ::, a word -k or starting with -k, or a word --deselect or starting with
+        --deselect=. jest: a word starting with --testPathPattern or --testNamePattern; a word -t, -o,
+        --findRelatedTests, or --onlyChanged, or starting with --changedSince; or a word not starting with
+        '-' that names a .test. or .spec. JavaScript or TypeScript file. Every other word list and every
+        other runner is 'full'.
+    .PARAMETER Runner
+        The suite's runner.
+    .PARAMETER ArgumentList
+        The caller's extra words.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $Runner,
+        [AllowEmptyCollection()][AllowEmptyString()][string[]] $ArgumentList = @()
+    )
+
+    $ordinal = [System.StringComparison]::Ordinal
+    foreach ($word in @($ArgumentList)) {
+        $operand = -not $word.StartsWith('-', $ordinal)
+        $selects = switch -CaseSensitive ($Runner) {
+            'pester' { [string]::Equals($word, '-TestPath', [System.StringComparison]::OrdinalIgnoreCase) }
+            'pytest' {
+                ($operand -and ($word.EndsWith('.py', $ordinal) -or $word.Contains('::'))) -or
+                $word.StartsWith('-k', $ordinal) -or $word -ceq '--deselect' -or $word.StartsWith('--deselect=', $ordinal)
+            }
+            'jest' {
+                $word.StartsWith('--testPathPattern', $ordinal) -or $word.StartsWith('--testNamePattern', $ordinal) -or
+                $word.StartsWith('--changedSince', $ordinal) -or @('-t', '-o', '--findRelatedTests', '--onlyChanged') -ccontains $word -or
+                ($operand -and $word -cmatch '\.(test|spec)\.[cm]?[jt]sx?$')
+            }
+            default { $false }
+        }
+        if ($selects) { return 'selection' }
+    }
+    return 'full'
+}
+
+function New-TestSuiteRunScopeRecord {
+    <#
+    .SYNOPSIS
+        Return the compact JSON run-scope record of one suite run (issue #1228).
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory builder that writes no file.')]
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $Suite,
+        [Parameter(Mandatory)][string] $Runner,
+        [Parameter(Mandatory)][ValidateSet('selection', 'full')][string] $Scope,
+        [Parameter(Mandatory)][datetime] $StartedUtc,
+        [Parameter(Mandatory)][datetime] $CompletedUtc
+    )
+
+    $culture = [System.Globalization.CultureInfo]::InvariantCulture
+    $record = [ordered]@{
+        schema_version = 1
+        suite          = $Suite
+        runner         = $Runner
+        scope          = $Scope
+        started_utc    = $StartedUtc.ToUniversalTime().ToString('o', $culture)
+        completed_utc  = $CompletedUtc.ToUniversalTime().ToString('o', $culture)
+    }
+    return ($record | ConvertTo-Json -Compress)
+}
+
+function Write-TestSuiteRunScopeRecord {
+    <#
+    .SYNOPSIS
+        Write a run-scope record as UTF-8 text without a byte-order mark, creating its folder (issue #1228).
+    .PARAMETER Path
+        The record path beneath the repository root.
+    .PARAMETER Text
+        The record text.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string] $Path,
+        [Parameter(Mandatory)][string] $Text
+    )
+
+    $folder = Split-Path -Parent $Path
+    if (-not (Test-Path -LiteralPath $folder -PathType Container)) { $null = New-Item -ItemType Directory -Path $folder -Force -ErrorAction Stop }
+    Set-Content -LiteralPath $Path -Value $Text -NoNewline -Encoding utf8NoBOM -ErrorAction Stop
+}
+
 function Invoke-TestSuiteLauncher {
     <#
     .SYNOPSIS
-        Run launcher steps 1 through 6 and return the exit code.
+        Run launcher steps 1 through 7 and return the exit code.
     .PARAMETER ArgumentList
         The suite name followed by the extra arguments.
     .PARAMETER RepositoryRoot
@@ -119,6 +220,8 @@ function Invoke-TestSuiteLauncher {
         Seam that writes one line to standard error.
     .PARAMETER RecordClassifierInput
         Seam that receives the extra arguments exactly as the classifier receives them.
+    .PARAMETER WriteRunScope
+        Seam that writes the run-scope record text to a path (issue #1228).
     #>
     [CmdletBinding()]
     [OutputType([int])]
@@ -143,7 +246,8 @@ function Invoke-TestSuiteLauncher {
         [scriptblock] $Clock = { [datetime]::UtcNow },
         [scriptblock] $Sleep = { param([int] $Milliseconds) Start-Sleep -Milliseconds $Milliseconds },
         [scriptblock] $WriteStandardError = { param([string] $Line) [Console]::Error.WriteLine($Line) },
-        [scriptblock] $RecordClassifierInput = { param([string[]] $ExtraArgument) [void] $ExtraArgument }
+        [scriptblock] $RecordClassifierInput = { param([string[]] $ExtraArgument) [void] $ExtraArgument },
+        [scriptblock] $WriteRunScope = { param([string] $Path, [string] $Text) Write-TestSuiteRunScopeRecord -Path $Path -Text $Text }
     )
 
     # Step 0 (spec D32): load the helpers from .claude/hooks, else .codex/hooks.
@@ -237,7 +341,9 @@ function Invoke-TestSuiteLauncher {
             $writeSeam = & $seamOf 'WriteHolderText'
             Write-TestExecutionHolderRecord -Directory $lockState.Directory -Text $holderText @writeSeam
         }
+        $startedUtc = [datetime](& $Clock)
         $exitCode = [int](& $StartSuiteProcess $words[0] ([string[]]@($words | Select-Object -Skip 1)) $workingDirectory)
+        $completedUtc = [datetime](& $Clock)
     } finally {
         if ($null -ne $lockState.Stream) {
             # Remove the record before releasing the lock, so a waiter that acquires next never loses its own record.
@@ -245,6 +351,15 @@ function Invoke-TestSuiteLauncher {
             Remove-TestExecutionHolderRecord -Directory $lockState.Directory @removeSeam
             $lockState.Stream.Dispose()
         }
+    }
+
+    # Step 7 (issue #1228): record whether this run covered the whole suite or a selection of it.
+    $runScopePath = Join-Path $RepositoryRoot "artifacts/test-execution/run-scope.$suiteName.json"
+    $runScopeText = New-TestSuiteRunScopeRecord -Suite $suiteName -Runner $runner -Scope (Get-TestSuiteRunScope -Runner $runner -ArgumentList $extras) -StartedUtc $startedUtc -CompletedUtc $completedUtc
+    try {
+        & $WriteRunScope $runScopePath $runScopeText
+    } catch {
+        & $WriteStandardError "TEST_EXECUTION_RUN_SCOPE_UNWRITTEN: the run-scope record '$runScopePath' was not written ($(([string]$_.Exception.Message -split "`r?`n")[0])); the suite exit code is unchanged (test-execution policy)."
     }
     if ($exitCode -eq 75) {
         & $WriteStandardError "TEST_EXECUTION_SUITE_EXIT: suite '$suiteName' exited with code 75, reported as 1 because 75 is reserved for the queue timeout (test-execution policy)."
