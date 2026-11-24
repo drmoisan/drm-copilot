@@ -249,13 +249,13 @@ Not edited: `DocsCompleteGate.psm1`, `DocsReceipt.psm1`, `DocsReceiptRevision.ps
 - [x] AC-23: Each new or edited `.claude/lib/docs` module has a byte-identical bundle copy, the new module is listed in `pack-manifests/core.json`, and `Docs.Manifest.Tests.ps1`, `ClaudeLibModuleConvention.Tests.ps1`, `DocsNeutrality.Tests.ps1`, `FileSizePolicy.RepoGate.Tests.ps1`, and the push-down contract suites (`test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`) pass.
 - [x] AC-24: `.claude/lib/docs/DocsFamilyCheck.psm1` reaches at least 85% line coverage in `artifacts/pester/powershell-coverage.xml` from the launcher Pester run, and changed lines in `DocsValidation.psm1`, `DocsValidateCommands.psm1`, `DocsCoverageReport.psm1`, and `DocsLedgerCommands.psm1` do not regress against the pre-change baseline.
 - [x] AC-25: Every touched file is at or below 800 logical lines, `DocsLedgerCommands.psm1` grows by no more than about three lines, and no new or edited test creates a temporary file.
-- [ ] AC-26: The full toolchain loop (format, lint, type check, architecture, unit, contract, integration in CI) passes in one clean pass through the parallel launcher, and the architecture document `.dev/engineering/documentation-estate/architecture.md` carries one bullet describing the family check.
+- [x] AC-26: The full toolchain loop (format, lint, type check, architecture, unit, contract, integration in CI) passes in one clean pass through the parallel launcher, and the architecture document `.dev/engineering/documentation-estate/architecture.md` carries one bullet describing the family check.
 
 ## Definition of Done
 
-- [ ] All acceptance criteria above checked off with evidence under `.dev/active/1221-docs-family-gate-and-ia/evidence/<kind>/`.
+- [x] All acceptance criteria above checked off with evidence under `.dev/active/1221-docs-family-gate-and-ia/evidence/<kind>/`.
 - [x] Decisions recorded in this spec applied; any deviation recorded in the feature folder.
-- [ ] Toolchain pass completed (format, lint, type check, architecture, unit, contract; integration in CI).
+- [x] Toolchain pass completed (format, lint, type check, architecture, unit, contract; integration in CI).
 
 ## Seeded Test Conditions (from potential)
 
