@@ -41,7 +41,7 @@
     extensions/drm-copilot/resources/. Never throws: an unexpected error declines with an empty
     Suffix and a Write-Debug record carrying EPIC_MERGE_GATE_RELEASE_LEG_ERROR, so the deny stands.
     Process calls: none for steps 1 to 5, one gh pr view for steps 6 to 12, and one gh run list for
-    steps 13 to 16, each through the bounded Invoke-DocsOnlyGhExe; the leg never fetches and runs no
+    steps 13 to 17, each through the bounded Invoke-DocsOnlyGhExe; the leg never fetches and runs no
     git command. Call-time dependencies loaded by the gates: Get-DocsOnlyMergeShapeViolation and
     Invoke-DocsOnlyGhExe (hook-docs-only-diff.ps1), Test-CommandLineFlag and Get-CommandLineFlagValue
     (hook-command-invocation.ps1), and Get-EpicMergeGateChildCiRunList, Select-EpicMergeGateChildCiRun,
