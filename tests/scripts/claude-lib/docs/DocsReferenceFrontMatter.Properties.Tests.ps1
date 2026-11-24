@@ -22,7 +22,7 @@ BeforeAll {
 
     $script:ComposedSet = New-DocsReferenceComposedSchemaSet
     $script:PagePath = 'docs/reference/api-reference.md'
-    $script:FieldOrder = @('owner', 'last_reviewed', 'audience', 'diataxis_mode', 'surface_refs', 'title', 'extensions')
+    $script:FieldOrder = @('owner', 'last_reviewed', 'review_due', 'audience', 'diataxis_mode', 'surface_refs', 'title', 'extensions')
 
     function Get-TestAudienceId {
         param([System.Collections.IDictionary] $Drawn)

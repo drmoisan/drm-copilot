@@ -2,10 +2,12 @@
 #Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 <#
 .SYNOPSIS
-    Front matter and body rules of the eight docs-author-page templates in all four skill locations (issue #1037).
+    Front matter and body rules of the docs-author-page templates in all four skill locations (issues #1037, #1220).
 
 .DESCRIPTION
-    Each template's front matter is parsed line by line with every value parsed as JSON. No test
+    Each template's front matter is parsed line by line with every value parsed as JSON. The template
+    set is the union of the Templates and FamilyTemplateModes members of Get-DocsAuthoringNamedSet
+    (issue #1220), so the family templates of issue #1222 carry the same front-matter rules. No test
     writes a file.
 #>
 
@@ -13,9 +15,16 @@ BeforeDiscovery {
     . (Join-Path $PSScriptRoot 'DocsAuthoringRoles.Helpers.ps1')
     $set = Get-DocsAuthoringNamedSet
     $roots = Get-DocsAuthoringSkillRoot
+    $modeOf = [ordered]@{}
+    foreach ($template in $set.Templates) { $modeOf[$template] = $set.TemplateModes[$template] }
+    foreach ($template in $set.FamilyTemplateModes.Keys) { $modeOf[$template] = $set.FamilyTemplateModes[$template] }
     $script:TemplateRows = @(foreach ($key in $roots.Keys) {
-            foreach ($template in $set.Templates) { @{ Template = $template; Mode = $set.TemplateModes[$template]; Path = "$($roots[$key])/docs-author-page/templates/$template.md" } }
+            foreach ($template in $modeOf.Keys) { @{ Template = $template; Mode = $modeOf[$template]; Path = "$($roots[$key])/docs-author-page/templates/$template.md" } }
         })
+    # Issue #1220: the body rules stay on the eight Templates members; the family body rules are pinned in
+    # docs-authoring-roles.FamilyTemplates.Tests.ps1 (alerts-catalog is a reference template without a generated marker).
+    $script:BodyRuleRows = @($script:TemplateRows | Where-Object { $set.Templates -contains $_.Template })
+    $script:SkillRows = @(foreach ($key in $roots.Keys) { @{ Path = "$($roots[$key])/docs-author-page/SKILL.md" } })
 }
 
 BeforeAll {
@@ -28,11 +37,14 @@ BeforeAll {
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '../claude-lib/docs/Docs.TestSupport.psm1') -Force -ErrorAction Stop
     $script:ComposedSchema = (Get-DocsComposedSchemaSet -SchemaSet (Get-DocsTestSchemaText)).Schemas
     $script:Substitution = [ordered]@{
-        '<owner-id>'    = 'team-docs'
-        '<yyyy-mm-dd>'  = '2026-11-14'
-        '<audience-id>' = 'developers'
-        '<element-id>'  = 'cli-command-' + ('0123456789abcdef' * 4)
+        '<owner-id>'              = 'team-docs'
+        '<review-due-yyyy-mm-dd>' = '2027-05-14'
+        '<yyyy-mm-dd>'            = '2026-11-14'
+        '<audience-id>'           = 'developers'
+        '<element-id>'            = 'cli-command-' + ('0123456789abcdef' * 4)
     }
+    $set = Get-DocsAuthoringNamedSet
+    $script:TemplateName = @(@($set.Templates) + @($set.FamilyTemplateModes.Keys))
 
     function Get-TemplatePart {
         # Splits a template into its front-matter lines and its body.
@@ -51,30 +63,39 @@ AfterAll {
 }
 
 Describe 'docs-author-page templates' {
-    It 'covers 32 template files' -TestCases @(@{ RowCount = $script:TemplateRows.Count }) {
+    It 'covers every template file at the four skill roots' -TestCases @(@{ RowCount = $script:TemplateRows.Count }) {
+        # Arrange: the expected count is the four skill roots times the .md files of the template folder.
+        $roots = Get-DocsAuthoringSkillRoot
+        $folder = Join-Path (Get-DocsAuthoringRepoRoot) '.agents/skills/docs-author-page/templates'
+        [string[]] $listed = @(Get-ChildItem -LiteralPath $folder -Filter '*.md' -File | ForEach-Object { $_.BaseName } | Sort-Object)
+
         # Assert
-        $RowCount | Should -Be 32
+        $RowCount | Should -Be ($roots.Count * $listed.Count)
+        @($script:TemplateName | Sort-Object) | Should -Be $listed -Because 'the Templates and FamilyTemplateModes union equals the template folder listing'
     }
 
-    It 'gives <Path> the five front-matter fields with JSON values and diataxis_mode <Mode>' -ForEach $script:TemplateRows {
+    It 'gives <Path> the six front-matter fields with JSON values, review_due after last_reviewed and diataxis_mode <Mode>' -ForEach $script:TemplateRows {
         # Arrange
         $part = Get-TemplatePart -Text (Read-DocsAuthoringText -RelativePath $Path)
 
         # Act
         $fields = @{}
+        $keys = [System.Collections.Generic.List[string]]::new()
         foreach ($line in $part.FrontMatter) {
             $match = [regex]::Match($line, '^(?<key>[a-z_]+): (?<value>.+)$')
             $match.Success | Should -BeTrue -Because "front-matter line '$line'"
+            $keys.Add($match.Groups['key'].Value)
             $fields[$match.Groups['key'].Value] = ConvertFrom-Json -InputObject $match.Groups['value'].Value -NoEnumerate
         }
 
         # Assert
         $part.StartsWithFence | Should -BeTrue
-        @($fields.Keys | Sort-Object) | Should -Be @('audience', 'diataxis_mode', 'last_reviewed', 'owner', 'surface_refs')
+        @($fields.Keys | Sort-Object) | Should -Be @('audience', 'diataxis_mode', 'last_reviewed', 'owner', 'review_due', 'surface_refs')
+        $keys[$keys.IndexOf('last_reviewed') + 1] | Should -BeExactly 'review_due' -Because 'review_due is on the line directly after last_reviewed'
         $fields['diataxis_mode'] | Should -BeExactly $Mode
     }
 
-    It 'passes the page front-matter checker with no DOCS_PAGE_AUDIENCE_INVALID after placeholder substitution in <Path> (issue #1173)' -ForEach $script:TemplateRows {
+    It 'passes the page front-matter checker with no DOCS_PAGE_AUDIENCE_INVALID and no DOCS_PAGE_REVIEW_DUE_ code after placeholder substitution in <Path> (issues #1173, #1220)' -ForEach $script:TemplateRows {
         # Arrange: substitute the front-matter placeholders in memory.
         $text = Read-DocsAuthoringText -RelativePath $Path
         foreach ($placeholder in $script:Substitution.Keys) { $text = $text.Replace($placeholder, $script:Substitution[$placeholder]) }
@@ -87,9 +108,10 @@ Describe 'docs-author-page templates' {
         # Assert
         $parsed.Findings.Count | Should -Be 0 -Because "the substituted front matter of $Path parses"
         $codes | Should -Not -Contain 'DOCS_PAGE_AUDIENCE_INVALID' -Because ($codes -join ', ')
+        @($codes | Where-Object { $_ -like 'DOCS_PAGE_REVIEW_DUE_*' }).Count | Should -Be 0 -Because ($codes -join ', ')
     }
 
-    It 'gives <Path> the body rules of the <Mode> mode' -ForEach $script:TemplateRows {
+    It 'gives <Path> the body rules of the <Mode> mode' -ForEach $script:BodyRuleRows {
         # Arrange
         $body = (Get-TemplatePart -Text (Read-DocsAuthoringText -RelativePath $Path)).Body
 
@@ -102,5 +124,18 @@ Describe 'docs-author-page templates' {
         # Assert
         if ($Mode -in 'tutorial', 'how-to') { $hasStep | Should -BeTrue } else { $instructionalHeading | Should -BeFalse }
         if ($Mode -eq 'reference') { $starts | Should -Be 1; $ends | Should -Be 1 } else { $starts + $ends | Should -Be 0 }
+    }
+
+    It 'names review_due and review_interval_days in step 1 of <Path> (issue #1220)' -ForEach $script:SkillRows {
+        # Arrange
+        $text = (Read-DocsAuthoringText -RelativePath $Path) -replace "`r`n", "`n"
+
+        # Act
+        $step = [regex]::Match($text, '(?ms)^## Steps\n\n(?<step>1\. .*?)(?=^2\. )').Groups['step'].Value
+
+        # Assert
+        $step | Should -Not -BeNullOrEmpty -Because 'step 1 of ## Steps is present'
+        $step | Should -Match 'review_due'
+        $step | Should -Match 'review_interval_days'
     }
 }

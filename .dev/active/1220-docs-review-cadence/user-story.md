@@ -49,7 +49,7 @@ The docs library detects staleness only through evidence pins (`DOCS_STALE_PAGE`
 ## Acceptance Criteria
 
 - [x] A page with `last_reviewed: "2026-01-10"` and `review_due: "2026-04-10"` passes the page checker with no finding for either date field, and a profile may list `review_due` in `diataxis_policy.required_front_matter`.
-- [ ] Every `docs-author-page` page template on the integration tip, including the family templates from docs-family-page-templates, contains `review_due: "<review-due-yyyy-mm-dd>"` directly after `last_reviewed`, and passes the page checker after placeholder substitution.
+- [x] Every `docs-author-page` page template on the integration tip, including the family templates from docs-family-page-templates, contains `review_due: "<review-due-yyyy-mm-dd>"` directly after `last_reviewed`, and passes the page checker after placeholder substitution.
 - [x] A page whose `review_due` equals or precedes `last_reviewed` produces `DOCS_PAGE_REVIEW_DUE_NOT_AFTER_LAST_REVIEWED` (severity `error`) from `check`; a malformed or non-existent `review_due` produces `DOCS_PAGE_REVIEW_DUE_INVALID` or `DOCS_PAGE_REVIEW_DUE_NOT_A_DATE` respectively; `check` reads no clock.
 - [x] A page without `review_due` whose path falls under a family `directory` uses `last_reviewed` plus that family's `review_interval_days` as its due date (2026-01-10 plus 90 days yields 2026-04-10); a page with `review_due` uses the explicit value.
 - [x] A page with no covering family, a family without a positive integer `review_interval_days`, a profile without `required_families`, or a page listed in `legacy_exclusions[].path` produces no `DOCS_REVIEW_OVERDUE` finding.
@@ -57,7 +57,7 @@ The docs library detects staleness only through evidence pins (`DOCS_STALE_PAGE`
 - [x] With `completion_gates.docs_complete.block_overdue_review` absent or `false`, `DOCS_REVIEW_OVERDUE` is a `warning` and does not fail the receipt; with `true` it is an `error`, the receipt records `validation_result: fail`, the command exits 1, and `Test-DocsCompleteGateReceipt` returns `Reason = 'RECEIPT_FAILING'`.
 - [ ] Existing profiles without `block_overdue_review` and existing pages without `review_due` validate as before, and the starter profile is unchanged.
 - [ ] `DOCS_STALE_PAGE` behavior is unchanged: `DocsStaleness.psm1` has no diff and its existing tests pass unmodified.
-- [ ] Regenerating a reference page keeps its `review_due` value.
+- [x] Regenerating a reference page keeps its `review_due` value.
 - [ ] Claude, Codex, and bundle copies stay in parity per `config/harness-parity-matrix.json` (the Copilot `docs-author-page` entry is `dropped`): `Invoke-HarnessGeneration.ps1 -Check` reports no drift, docs lib and schema copies are byte-identical, and `core.json` lists `DocsReviewCadence.psm1`.
 
 ## Non-Goals

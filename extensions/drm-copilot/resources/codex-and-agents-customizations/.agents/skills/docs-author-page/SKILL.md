@@ -46,9 +46,12 @@ documentation root, so `run_docs_check` does not scan them.
    element uses `surface_refs: []`. An `alerts-catalog` page is a `reference` page
    and may need its own `directory_modes` entry in the docs profile when its
    directory holds pages of another mode. Replace every
-   placeholder in the front matter: `owner`, `last_reviewed`, `audience`,
-   `diataxis_mode` and `surface_refs` (the element ids the page covers). Each value
-   is a JSON value on its own line.
+   placeholder in the front matter: `owner`, `last_reviewed`, `review_due`,
+   `audience`, `diataxis_mode` and `surface_refs` (the element ids the page covers).
+   Each value is a JSON value on its own line. `review_due` is the date the next
+   review is due and must be later than `last_reviewed`; remove the line when the
+   page's documentation family defines `review_interval_days`, because the due date
+   is then `last_reviewed` plus that interval.
 2. For a reference page, call `generate_docs_reference` with `workspace_root`,
    `profile` and optionally `snapshot` and `output_directory`. The tool plans the
    generated blocks as a dry run and never writes pages. When the generated blocks
