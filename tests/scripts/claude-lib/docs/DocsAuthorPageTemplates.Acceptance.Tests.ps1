@@ -36,14 +36,15 @@ BeforeAll {
     $script:Composed = (Get-DocsComposedSchemaSet -SchemaSet (Get-DocsTestSchemaText)).Schemas
     $script:ProfilePath = 'docs/documentation-estate/docs-profile.json'
     $script:Substitution = [ordered]@{
-        '<owner-id>'    = 'team-docs'
-        '<yyyy-mm-dd>'  = '2026-11-14'
-        '<audience-id>' = 'developers'
-        '<element-id>'  = 'cli-command-' + ('0123456789abcdef' * 4)
+        '<owner-id>'              = 'team-docs'
+        '<review-due-yyyy-mm-dd>' = '2027-05-14'
+        '<yyyy-mm-dd>'            = '2026-11-14'
+        '<audience-id>'           = 'developers'
+        '<element-id>'            = 'cli-command-' + ('0123456789abcdef' * 4)
     }
 
     function Get-RenderedTemplate {
-        # Returns the committed template text with the four placeholder tokens replaced in memory.
+        # Returns the committed template text with the placeholder tokens replaced in memory.
         param([Parameter(Mandatory)] [string] $Name)
         $text = [System.IO.File]::ReadAllText((Join-Path -Path $script:TemplateRoot -ChildPath $Name))
         foreach ($placeholder in $script:Substitution.Keys) { $text = $text.Replace($placeholder, $script:Substitution[$placeholder]) }

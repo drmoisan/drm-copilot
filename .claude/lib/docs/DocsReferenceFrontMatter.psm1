@@ -14,8 +14,8 @@
     front-matter field, because every field constraint comes from the page-metadata schema.
 
     The rendered block is '---', one '<key>: <JSON value>' line per field in the order owner,
-    last_reviewed, audience, diataxis_mode, surface_refs, title, extensions, then '---'. JSON
-    values are canonical JSON without the trailing LF, with U+0085, U+2028 and U+2029 written as
+    last_reviewed, review_due, audience, diataxis_mode, surface_refs, title, extensions, then
+    '---'. JSON values are canonical JSON without the trailing LF, with U+0085, U+2028 and U+2029 written as
     \u escapes so that every value stays on one line. The one exception is an extensions value
     that holds a number canonical JSON rejects (a non-integral number or one beyond the
     safe-integer bound): that value is written by ConvertTo-DocsJsonText. A canonical-serializer
@@ -173,8 +173,9 @@ function Resolve-DocsReferenceFrontMatterValue {
     .DESCRIPTION
         Existing is the validated front matter of the page, or $null. PagePlan is a page record
         of Get-DocsReferencePagePlan (Path, Title, Owner, Audience). diataxis_mode is reference;
-        surface_refs is the ordinal-sorted SurfaceRef list. owner, audience, last_reviewed, title
-        and extensions are preserved when present; a missing owner comes from PagePlan.Owner
+        surface_refs is the ordinal-sorted SurfaceRef list. owner, audience, last_reviewed,
+        review_due (issue #1220), title and extensions are preserved when present; a missing
+        review_due stays absent; a missing owner comes from PagePlan.Owner
         (REFERENCE_OWNER_UNRESOLVED when absent), a missing audience from PagePlan.Audience
         (REFERENCE_AUDIENCE_MISSING when empty), a missing last_reviewed from the first ten
         characters of CapturedAt, and a missing title from PagePlan.Title on a new page only. An
@@ -201,6 +202,8 @@ function Resolve-DocsReferenceFrontMatterValue {
         $value['owner'] = [string] $owner
     }
     $value['last_reviewed'] = if ($current.Contains('last_reviewed')) { [string] $current['last_reviewed'] } else { $CapturedAt.Substring(0, [math]::Min(10, $CapturedAt.Length)) }
+    # Issue #1220: an existing review_due is kept; the generator never derives one.
+    if ($current.Contains('review_due')) { $value['review_due'] = [string] $current['review_due'] }
     [string[]] $audience = @($PagePlan['Audience'] | Where-Object { $null -ne $_ })
     if ($current.Contains('audience')) { $audience = @($current['audience'] | ForEach-Object { [string] $_ }) }
     if ($audience.Count -eq 0) {
@@ -258,8 +261,8 @@ function ConvertTo-DocsReferenceFrontMatterText {
     .SYNOPSIS
         Returns the canonical front-matter block of Value, LF-terminated.
     .DESCRIPTION
-        Fields present in Value are written in the fixed order owner, last_reviewed, audience,
-        diataxis_mode, surface_refs, title, extensions as '<key>: <JSON value>'. Only an
+        Fields present in Value are written in the fixed order owner, last_reviewed, review_due,
+        audience, diataxis_mode, surface_refs, title, extensions as '<key>: <JSON value>'. Only an
         extensions value holding a number that canonical JSON rejects (non-integral, or above the
         safe-integer bound; see Test-DocsReferenceCanonicalNumberRejected) is written with
         ConvertTo-DocsJsonText. Every other value is written with ConvertTo-DocsCanonicalJson,
@@ -270,7 +273,7 @@ function ConvertTo-DocsReferenceFrontMatterText {
     param([Parameter(Mandatory = $true)] [System.Collections.IDictionary] $Value)
 
     $builder = [System.Text.StringBuilder]::new("---`n")
-    foreach ($key in @('owner', 'last_reviewed', 'audience', 'diataxis_mode', 'surface_refs', 'title', 'extensions')) {
+    foreach ($key in @('owner', 'last_reviewed', 'review_due', 'audience', 'diataxis_mode', 'surface_refs', 'title', 'extensions')) {
         if (-not $Value.Contains($key)) { continue }
         $field = $Value[$key]
         $json = if ($key -ceq 'extensions' -and (Test-DocsReferenceCanonicalNumberRejected -Value $field)) {

@@ -90,7 +90,8 @@
             "required_dispositions_complete": {"const": true},
             "allow_deferred": {"type": "boolean"},
             "max_stale_pages": {"type": "integer", "minimum": 0},
-            "required_parity_dimensions": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/parity-dimension"}}
+            "required_parity_dimensions": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/parity-dimension"}},
+            "block_overdue_review": {"type": "boolean"}
           }
         },
         "integration_pr_gate": {

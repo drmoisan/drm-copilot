@@ -59,7 +59,7 @@ BeforeAll {
     $script:DocsLibrary = Join-Path -Path $PSScriptRoot -ChildPath '../../../.claude/lib/docs'
     Import-Module -Name (Join-Path -Path $script:DocsLibrary -ChildPath 'DocsPageFrontMatter.psm1') -Force -ErrorAction Stop
     $script:TemplateDirectory = '.claude/skills/docs-author-page/templates'
-    $script:BannedToken = @('drm-copilot', 'ALR-', 'Sev1', 'Sev2', 'Sev3', 'src/', 'tests/', 'docs/architecture/adr', 'review_due', 'SME input required', 'diataxis:')
+    $script:BannedToken = @('drm-copilot', 'ALR-', 'Sev1', 'Sev2', 'Sev3', 'src/', 'tests/', 'docs/architecture/adr', 'SME input required', 'diataxis:')
 
     function Get-TemplateText {
         # Returns the text of one template from the Claude skill root.
@@ -120,7 +120,7 @@ Describe 'docs-author-page family templates' {
         $text.Contains("`r") | Should -BeFalse
     }
 
-    It 'gives <Id> five JSON-valued front-matter keys, surface_refs [] and the mode <Mode>' -ForEach $script:FamilyRow {
+    It 'gives <Id> six JSON-valued front-matter keys, surface_refs [] and the mode <Mode>' -ForEach $script:FamilyRow {
         # Arrange
         $text = Get-TemplateText -Id $Id
 
@@ -129,12 +129,12 @@ Describe 'docs-author-page family templates' {
 
         # Assert
         $parsed.Findings.Count | Should -Be 0 -Because 'the front matter parses with the page checker parser'
-        @($parsed.Value.Keys | Sort-Object) | Should -Be @('audience', 'diataxis_mode', 'last_reviewed', 'owner', 'surface_refs')
+        @($parsed.Value.Keys | Sort-Object) | Should -Be @('audience', 'diataxis_mode', 'last_reviewed', 'owner', 'review_due', 'surface_refs')
         $parsed.Value['diataxis_mode'] | Should -BeExactly $Mode
         @($parsed.Value['surface_refs']).Count | Should -Be 0
         $text | Should -Match '(?m)^surface_refs: \[\]$'
         $text | Should -Match '(?m)^owner: "<owner-id>"$'
-        $text | Should -Match '(?m)^last_reviewed: "<yyyy-mm-dd>"$'
+        $text | Should -Match '(?m)^last_reviewed: "<yyyy-mm-dd>"\nreview_due: "<review-due-yyyy-mm-dd>"$' -Because 'issue #1220: review_due is the line directly after last_reviewed'
         $text | Should -Match '(?m)^audience: \["<audience-id>"\]$'
     }
 

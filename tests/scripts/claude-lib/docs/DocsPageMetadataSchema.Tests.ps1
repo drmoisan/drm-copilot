@@ -7,7 +7,7 @@
 
 .DESCRIPTION
     Reads the committed canonical and runtime schema files (read-only) and asserts their byte
-    identity, the schema identity and root shape, the seven property names, the audience item
+    identity, the schema identity and root shape, the eight property names, the audience item
     pattern resolved through the composed docs common audience-id definition, the absence of
     discovery or file references, composition through Join-DocsSchemaText, and Test-Json results
     for a valid instance and for the audience item Dev_Ops. No file is written.
@@ -78,13 +78,13 @@ Describe 'page-metadata schema files' {
         $script:Schema.Contains('required') | Should -BeFalse
     }
 
-    It 'defines exactly the seven page-metadata properties and no artifact header' {
+    It 'defines exactly the eight page-metadata properties and no artifact header' {
         # Arrange
         [string[]] $names = @($script:Schema['properties'].Keys)
         [Array]::Sort($names, [System.StringComparer]::Ordinal)
 
         # Assert
-        $names | Should -Be @('audience', 'diataxis_mode', 'extensions', 'last_reviewed', 'owner', 'surface_refs', 'title')
+        $names | Should -Be @('audience', 'diataxis_mode', 'extensions', 'last_reviewed', 'owner', 'review_due', 'surface_refs', 'title')
     }
 
     It 'references only docs common definitions, never a discovery URN or a file' {
