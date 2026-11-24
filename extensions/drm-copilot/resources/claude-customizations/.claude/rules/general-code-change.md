@@ -42,7 +42,7 @@ Run the full seven-stage toolchain in this exact order and repeat until all stag
 
 **Restart from step 1** if any stage fails or auto-fixes any files. Do not stop the loop until every stage it runs completes without errors in a single pass; at phase gates and in the final QA loop, stage 7 runs in CI.
 
-This loop is the phase-gate and final-QA requirement; integration tests (stage 7) run in CI for phase gates and the final QA loop. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+This loop is the phase-gate and final-QA requirement; integration tests (stage 7) run in CI for phase gates and the final QA loop. At a phase gate, stage 5 runs the union of the test selections of the phase's tasks. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: the full test suite runs only at the `Phase 0 baseline` and in the final QA loop, a task check runs its test selection after each task, and each phase gate runs its unit stage over the union of the test selections of the phase's tasks.
 
 Mutation testing and golden tests run in pre-merge or nightly pipelines, not the per-commit loop.
 
