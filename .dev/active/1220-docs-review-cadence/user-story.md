@@ -55,10 +55,10 @@ The docs library detects staleness only through evidence pins (`DOCS_STALE_PAGE`
 - [x] A page with no covering family, a family without a positive integer `review_interval_days`, a profile without `required_families`, or a page listed in `legacy_exclusions[].path` produces no `DOCS_REVIEW_OVERDUE` finding.
 - [x] `validate -Mode docs-complete` reports `DOCS_REVIEW_OVERDUE` for a page due 2026-04-10 when the injected command instant falls on 2026-04-11 (UTC) and reports none when it falls on 2026-04-10; tests supply these fixed instants and no tested code reads the wall clock.
 - [x] With `completion_gates.docs_complete.block_overdue_review` absent or `false`, `DOCS_REVIEW_OVERDUE` is a `warning` and does not fail the receipt; with `true` it is an `error`, the receipt records `validation_result: fail`, the command exits 1, and `Test-DocsCompleteGateReceipt` returns `Reason = 'RECEIPT_FAILING'`.
-- [ ] Existing profiles without `block_overdue_review` and existing pages without `review_due` validate as before, and the starter profile is unchanged.
-- [ ] `DOCS_STALE_PAGE` behavior is unchanged: `DocsStaleness.psm1` has no diff and its existing tests pass unmodified.
+- [x] Existing profiles without `block_overdue_review` and existing pages without `review_due` validate as before, and the starter profile is unchanged.
+- [x] `DOCS_STALE_PAGE` behavior is unchanged: `DocsStaleness.psm1` has no diff and its existing tests pass unmodified.
 - [x] Regenerating a reference page keeps its `review_due` value.
-- [ ] Claude, Codex, and bundle copies stay in parity per `config/harness-parity-matrix.json` (the Copilot `docs-author-page` entry is `dropped`): `Invoke-HarnessGeneration.ps1 -Check` reports no drift, docs lib and schema copies are byte-identical, and `core.json` lists `DocsReviewCadence.psm1`.
+- [x] Claude, Codex, and bundle copies stay in parity per `config/harness-parity-matrix.json` (the Copilot `docs-author-page` entry is `dropped`): `Invoke-HarnessGeneration.ps1 -Check` reports no drift, docs lib and schema copies are byte-identical, and `core.json` lists `DocsReviewCadence.psm1`.
 
 ## Non-Goals
 
