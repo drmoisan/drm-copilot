@@ -122,6 +122,7 @@
     ".claude/hooks/hook-release-allowance-context.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate-release.ps1",
     ".claude/hooks/hook-release-pull-request-context.ps1",
+    ".claude/hooks/enforce-epic-merge-gate-release.ps1",
     ".claude/hooks/enforce-orchestration-preimplementation-gate-release-receipt.ps1",
     ".claude/hooks/enforce-pr-author-skill.release.ps1",
     ".claude/hooks/enforce-model-routing-receipt-release.ps1",
