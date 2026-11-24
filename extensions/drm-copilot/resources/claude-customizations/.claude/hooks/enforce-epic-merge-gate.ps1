@@ -41,7 +41,7 @@
     non-parallel) run never satisfies conditions 1-3; it merges through the green-CI branch
     3b or through an explicit, PR-specific, session-bound record under condition 4. A bare
     command with no PR number satisfies neither, and a blanket flag is rejected rather than
-    read. A 3b decline after its live-head lookup appends a GREEN_CI_* code to the deny.
+    read. A 3b decline appends GREEN_CI_*; enforce-epic-merge-gate-release.ps1 (#1234) runs last.
     Trigger scope (issue #952): every merge method (--merge/-m, --squash/-s, --rebase/-r), --auto,
     --admin, and a bare gh pr merge are gated alike, because under a merge queue each spelling
     enqueues the pull request; only a pure --disable-auto is out of scope. The predicate and the
@@ -112,6 +112,7 @@ try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-review.ps1') } catch {
 try { Import-Module (Join-Path $PSScriptRoot '../lib/development-docs/DevelopmentDocsRoot.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'DevelopmentDocsRoot.psm1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-child-ci.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-child-ci.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-regeneration.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-regeneration.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-release.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-release.ps1' -ErrorRecord $_ }
 
 function ConvertFrom-EpicMergeGateJson {
     <#
@@ -439,11 +440,12 @@ function Invoke-EpicMergeGateDecision {
             }
             $docsOnlySuffix = ' (docs-only exemption not applied: ' + $docsOnly.Reason + ')'
         }
+        $release = Get-EpicMergeGateReleaseDecision -CommandText $commandText -PrNumber $commandPrNumber -WorktreeRoot $sessionRoot -NoRecordingTarget (Test-EpicMergeGateNoRecordingTarget -ItemTarget $itemTarget -EpicTarget $epicTarget -ParallelTarget $parallelTarget); if ($release.Allowed) { return Get-EpicMergeGateAllowDecision }
         # When neither the item target nor a run branch resolved, the reason code and the
         # three details precede the standalone reason (issue #850).
         $unresolved = Get-EpicMergeGateUnresolvedReason -ItemTarget $itemTarget -EpicTarget $epicTarget -ParallelTarget $parallelTarget
         $prefix = if ($unresolved) { $unresolved + '; ' } else { '' }
-        return Get-EpicMergeGateBlockDecision -Reason ('EPIC_MERGE_GATE_BLOCKED: ' + $prefix + $standalone.ReasonCode + ': ' + $standalone.Message + $docsOnlySuffix + $greenCi.Suffix)
+        return Get-EpicMergeGateBlockDecision -Reason ('EPIC_MERGE_GATE_BLOCKED: ' + $prefix + $standalone.ReasonCode + ': ' + $standalone.Message + $docsOnlySuffix + $greenCi.Suffix + $release.Suffix)
     }
 
     return Get-EpicMergeGateBlockDecision -Reason 'EPIC_MERGE_GATE_BLOCKED: a pull-request merge or merge-queue enqueue (gh pr merge with any method, --auto, or --admin, or a gh api merge or enqueue mutation) requires either a per-feature checkpoint with epic_mode == true and step9_status == "passed", an epic checkpoint with epic_merge_pr.ci_gate.conclusion == "success" and a matching pr_number, a parallel-orchestrator checkpoint with route_id == "parallel" whose target item (matched by pr_number) has merge_status == "ci_green", or a standalone per-feature checkpoint (epic_mode absent or false, no parallel marker) with step9_status == "passed", ci_gate.conclusion == "success", pr_gate.pr_number equal to the explicit PR number, and ci_gate.head_sha equal to the live pull-request head. No checkpoint satisfied this gate.'

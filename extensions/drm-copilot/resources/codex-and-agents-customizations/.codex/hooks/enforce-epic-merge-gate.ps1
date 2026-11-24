@@ -36,6 +36,14 @@
     local final-QC evidence in place of a CI run (stages B, R, L1, L2, and L3), with gh and git in
     the repository root because -GitRoot defaults to -GhRoot, and a failure denies with
     EPIC_CHILD_LOCAL_QC_NOT_VERIFIED. The call below is unchanged.
+    Release merge leg (issue #1234): after the docs-only branch declines an explicit PR number, the
+    gate calls Get-EpicMergeGateReleaseDecision (enforce-epic-merge-gate-release.ps1, byte-identical
+    to the Claude copy) with the repository root and the docs-only no-checkpoint rule. When the
+    repository commits .claude/release-commit-allowance.json, the leg admits a checkpoint-free
+    gh pr merge <N> --match-head-commit <sha> whose changed paths that file lists and whose newest
+    CI run on the head is a successful pull_request run; otherwise the deny gains
+    " (release merge not applied: <CODE>: <detail>)" as its last term. Without the file the leg
+    adds nothing and starts no process. A policy-level control, not a security control.
 #>
 [CmdletBinding()]
 param()
@@ -63,6 +71,7 @@ else {
 # Epic-child CI verification, byte-identical to the Claude copy (issue #1130).
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-child-ci.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-child-ci.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-regeneration.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-regeneration.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-epic-merge-gate-release.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-epic-merge-gate-release.ps1' -ErrorRecord $_ }
 
 # Reason codes for the standalone-merge authorization branch (issue #670), spelled
 # byte-identically to the Claude helpers file. Each of the four assignments below is the only
@@ -240,11 +249,12 @@ function Invoke-CodexEpicMergeDecision {
             }
             $docsOnlySuffix = ' (docs-only exemption not applied: ' + $docsOnly.Reason + ')'
         }
+        $release = Get-EpicMergeGateReleaseDecision -CommandText $command -PrNumber $prNumber -WorktreeRoot $RepositoryRoot -NoRecordingTarget ([string]::IsNullOrWhiteSpace($ChildCheckpointRaw) -and [string]::IsNullOrWhiteSpace($EpicCheckpointRaw)); if ($release.Allowed) { return $null }
         return [ordered]@{
             hookSpecificOutput = [ordered]@{
                 hookEventName            = 'PreToolUse'
                 permissionDecision       = 'deny'
-                permissionDecisionReason = 'EPIC_MERGE_GATE_BLOCKED: ' + $verdict.ReasonCode + ': ' + $verdict.Message + $docsOnlySuffix
+                permissionDecisionReason = 'EPIC_MERGE_GATE_BLOCKED: ' + $verdict.ReasonCode + ': ' + $verdict.Message + $docsOnlySuffix + $release.Suffix
             }
         }
     }

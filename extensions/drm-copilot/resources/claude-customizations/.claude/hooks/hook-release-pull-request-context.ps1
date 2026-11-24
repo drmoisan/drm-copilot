@@ -23,8 +23,11 @@
     PathNotAllowed (the first unlisted path of the first candidate).
 
 .NOTES
-    PowerShell 7+. Claude only; mirrored byte-identically under
-    extensions/drm-copilot/resources/claude-customizations/. Call-time dependencies loaded by the
+    PowerShell 7+. Byte-identical at .claude/hooks and .codex/hooks and mirrored under
+    extensions/drm-copilot/resources/claude-customizations/ and
+    extensions/drm-copilot/resources/codex-and-agents-customizations/. The release merge leg
+    enforce-epic-merge-gate-release.ps1 (issue #1234), dot-sourced by the Claude and Codex epic
+    merge gates, is a further consumer. Call-time dependencies loaded by the
     callers: ConvertFrom-ReleaseAllowanceConfig and Test-ReleaseAllowanceBranchMatch
     (hook-release-allowance-context.ps1). Script-scope names use the prefix ReleasePullRequest.
     This hook file starts no interpreter process. A policy-level control, not a security control.
