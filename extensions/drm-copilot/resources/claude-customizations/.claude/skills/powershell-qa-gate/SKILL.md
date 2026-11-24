@@ -41,7 +41,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
 - **PSScriptAnalyzer delta**: 0 new findings across the repository.
 - **Pester delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
 - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
+- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
+- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
 - **New modules, classes, or methods**: line coverage >= 85% per the uniform tier rule (`.claude/rules/quality-tiers.md`). No tier-specific lower thresholds. No regression on changed lines. Pester measures command (instruction) coverage and line coverage only; branch coverage is not measurable for PowerShell, so no branch-coverage gate applies here (see `.claude/rules/powershell.md`). Command coverage is informational and carries no threshold.
 
 If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
@@ -71,9 +72,9 @@ The evidence paths must be referenced in the agent's completion message to satis
 
 ## Prohibited Shortcuts
 
-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
+- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
 - Do not add PSScriptAnalyzer rule suppressions (`[Diagnostics.CodeAnalysis.SuppressMessageAttribute]` or `PSScriptAnalyzer` suppression comments) or Pester `-Skip` / `-Pending` to mask new findings introduced by the change.
-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
+- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
 - Do not mock `git`, `gh`, `actionlint`, or other executables directly; mock the wrapper function (for example `Invoke-GitExe`) per `.claude/rules/powershell.md`.
 
 ## Test-Execution Launcher

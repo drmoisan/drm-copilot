@@ -222,6 +222,14 @@ BeforeDiscovery {
         @{ Id = 'AGENTS-CSHARP-LEGACY'; Path = "$resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp/SKILL.md"; Bundle = $false }
     ) -Check @((Get-TcwCheck -Heading '## Toolchain' -Required @($anchor)), $fileForbidden)
 
+    # Issue #1228 (F1): the overall delta binds only the final QA loop, and the remediation
+    # gate's selection run is its gate run, not a forbidden partial run.
+    $script:QaGateDeltaCheck = Get-TcwCheck -Heading '## Delta Requirements (Zero-Regression Hard Gate)' -Required @(
+        '(final QA loop only, when the repo enforces it)', 'applies to the files the cycle changed', "the orchestration's final-QC artifact and CI"
+    ) -Forbidden @('Overall coverage delta** (when the repo enforces it)')
+    $script:QaGateShortcutCheck = Get-TcwCheck -Heading '## Prohibited Shortcuts' -Required @(
+        'is not a narrowing', 'The gate run of a remediation gate is the selection run'
+    ) -Forbidden @('based on partial or targeted runs')
     $script:WordingRow += Get-TcwRow -Group 'QAGATE' -Base @(
         foreach ($name in 'python', 'powershell', 'csharp') {
             @{ Id = "CLAUDE-$($name.ToUpperInvariant())"; Path = ".claude/skills/$name-qa-gate/SKILL.md" }
@@ -233,6 +241,8 @@ BeforeDiscovery {
         # Issue #1228 (PD2): a QA-gate skill applies to the final QA loop and to a remediation gate only.
         (Get-TcwCheck -Heading '## When to Use This Skill' -Required @($anchor, 'the final QA loop or a remediation gate') -Forbidden @('a phase gate or the final QA loop'))
         (Get-TcwCheck -Forbidden ($runClassForbidden + @('planned batch')))
+        $script:QaGateDeltaCheck
+        $script:QaGateShortcutCheck
     )
 
     $promptBase = @(
@@ -268,10 +278,43 @@ BeforeDiscovery {
             foreach ($suffix in $codexSuffix) { @{ Id = "CODEX-$($name.ToUpperInvariant())$($suffix.ToUpperInvariant())"; Path = ".codex/agents/$name-typed-engineer$suffix.toml" } }
         }
     ) -Check @((Get-TcwCheck -Heading '## Workflow' -Required @("leaves the full gate to the plan's final QA loop")))
+    # Issue #1228 (F2): a local coverage file written by a selection run supplies per-file
+    # figures only; repository-wide totals come from the final-QC artifact and CI.
+    $script:ReviewCheck = Get-TcwCheck -Heading '## Ordered Procedure' -Required @(
+        "over the branch's test selection", 'from the final-QC artifact and', 'supplies per-file figures only', 'a full-suite final-QC artifact'
+    ) -Forbidden @('local artifact that shows the')
     $script:WordingRow += Get-TcwRow -Group 'REVIEW' -Base @(
         @{ Id = 'CLAUDE'; Path = '.claude/skills/feature-review-workflow/SKILL.md' }
         @{ Id = 'AGENTS'; Path = '.agents/skills/feature-review-workflow/SKILL.md' }
-    ) -Check @((Get-TcwCheck -Heading '## Ordered Procedure' -Required @("over the branch's test selection", 'from the final-QC artifact and')))
+    ) -Check @($script:ReviewCheck)
+    $script:ReviewAgentCheck = Get-TcwCheck -Heading '## Coverage Verification' -Required @(
+        'supplies per-file figures only', 'from the final-QC artifact and', "over the branch's test selection", 'never runs the full suite', 'a full-suite final-QC artifact'
+    ) -Forbidden @('does NOT rerun coverage generation', 'rather than rerunning coverage generation', 'local artifact that shows the')
+    $script:WordingRow += Get-TcwRow -Group 'REVIEW-AGENT' -Base @(
+        @{ Id = 'CLAUDE'; Path = '.claude/agents/feature-review.md' }
+        @{ Id = 'CODEX'; Path = '.codex/agents/feature-review.toml' }
+    ) -Check @($script:ReviewAgentCheck)
+    $script:ReviewTemplateCheck = Get-TcwCheck -Heading '#### 4A.1 Framework and Scope' -Required @(
+        'supplies per-file figures only', 'from the final-QC artifact and'
+    ) -Forbidden @('local artifact that shows the')
+    $script:WordingRow += Get-TcwRow -Group 'REVIEW-TEMPLATE' -Base @(
+        @{ Id = 'BASE'; Path = '.dev/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Bundle = $false }
+        @{ Id = 'BUNDLE'; Path = "$resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md"; Bundle = $false }
+    ) -Check @($script:ReviewTemplateCheck)
+    # Each removed coverage-source sentence, held in memory under its heading.
+    $script:CoverageSourceCase = @(
+        @{ Check = $script:QaGateDeltaCheck; Line = @('## Delta Requirements (Zero-Regression Hard Gate)', '- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.') }
+        @{ Check = $script:QaGateShortcutCheck; Line = @('## Prohibited Shortcuts', '- Do not report success based on partial or targeted runs.') }
+        @{ Check = $script:ReviewCheck; Line = @('## Ordered Procedure', '- Python repo-wide total: a local artifact that shows the Python total below a threshold is still FAIL.') }
+        @{ Check = $script:ReviewAgentCheck; Line = @(
+                '## Coverage Verification'
+                'The agent verifies coverage by inspecting pre-existing coverage artifacts rather than rerunning coverage generation.'
+                '- For Python, a local artifact that shows the Python total below a threshold is still FAIL.'
+                'The agent does NOT rerun coverage generation.'
+            )
+        }
+        @{ Check = $script:ReviewTemplateCheck; Line = @('#### 4A.1 Framework and Scope', '| **Coverage expectation** | a local artifact that shows the total below a threshold is still FAIL. |') }
+    )
     $script:WordingRow += Get-TcwRow -Group 'SCOPED' -Base @(
         @{ Id = 'CLAUDE'; Path = '.claude/skills/test-execution-policy/SKILL.md' }
         @{ Id = 'AGENTS'; Path = '.agents/skills/test-execution-policy/SKILL.md' }
@@ -478,6 +521,22 @@ Describe 'Test cadence wording' {
         # Assert
         $Token.Count | Should -Be 6 -Because 'decision D15 adds six canonical tokens'
         $unreported | Should -BeNullOrEmpty -Because 'the canonical row must fail when the D15 wording is removed'
+    }
+
+    It 'TCW-COVERAGE-SOURCE-DISCRIMINATES reports each forbidden coverage-source token once the removed sentences return' -ForEach @(@{ Case = $script:CoverageSourceCase }) {
+        # Arrange: the five checks and their distinct forbidden tokens; the lines are in memory only.
+        $expected = @($Case | ForEach-Object { $_.Check.Forbidden } | Sort-Object -Unique)
+
+        # Act
+        $problem = @(foreach ($item in $Case) { Get-TcwCheckProblem -Line $item.Line -Check $item.Check })
+        $unreported = @(foreach ($token in $expected) {
+                $reported = @($problem | Where-Object { $_.StartsWith("forbidden '$token' in ", [System.StringComparison]::Ordinal) })
+                if ($reported.Count -eq 0) { $token }
+            })
+
+        # Assert
+        $expected.Count | Should -Be 5 -Because 'the coverage-source checks forbid five distinct removed tokens'
+        $unreported | Should -BeNullOrEmpty -Because 'each check must fail when its removed sentence returns'
     }
 
     It 'TCW-TEMPLATE-<Id> ends each gated phase with its phase gate' -ForEach $script:TemplateRow {

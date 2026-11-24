@@ -63,7 +63,7 @@ index 0063bcc07..3ba887923 100644
  In a workspace with an active discovery activation, the planner launch itself is admitted
  only after the native planning gate verifies the receipt named by the profile's
 diff --git a/.agents/skills/csharp-qa-gate/SKILL.md b/.agents/skills/csharp-qa-gate/SKILL.md
-index 54fda084f..896ccef11 100644
+index 54fda084f..cf4a58abc 100644
 --- a/.agents/skills/csharp-qa-gate/SKILL.md
 +++ b/.agents/skills/csharp-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every C# change must
@@ -84,6 +84,28 @@ index 54fda084f..896ccef11 100644
  
  1. `dotnet tool run csharpier .`
  2. `msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+@@ -42,7 +42,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **Compiler / nullable delta**: 0 new diagnostics across the repository.
+ - **MSTest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -72,9 +73,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add analyzer suppressions, `#pragma warning disable`, `#nullable disable`, or test `[Ignore]` attributes to suppress new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ 
+ ## Test-Execution Launcher
+ 
 diff --git a/.agents/skills/csharp/SKILL.md b/.agents/skills/csharp/SKILL.md
 index e41eb1108..9f9914cf2 100644
 --- a/.agents/skills/csharp/SKILL.md
@@ -119,7 +141,7 @@ index 06ce020ba..ac96907e7 100644
  - A leak found by a gate is fixed on both sides: the suite that leaves state behind (globals, functions, environment variables, mocks, imported modules, script-scope state) and the suite that assumes prior state.
  - The parallel gates govern where a policy file names a toolchain test command.
 diff --git a/.agents/skills/feature-review-workflow/SKILL.md b/.agents/skills/feature-review-workflow/SKILL.md
-index e6f11faf6..37cd3dc25 100644
+index e6f11faf6..60dc64a45 100644
 --- a/.agents/skills/feature-review-workflow/SKILL.md
 +++ b/.agents/skills/feature-review-workflow/SKILL.md
 @@ -118,10 +118,10 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
@@ -127,10 +149,11 @@ index e6f11faf6..37cd3dc25 100644
          - PowerShell: one `Invoke-PoshQCParallelTest` run through the launcher `pester` suite (`sh .agents/skills/test-execution-policy/scripts/run-test-suite.sh pester`) → artifact: `artifacts/pester/powershell-coverage.xml`
          - C#: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` → artifact: `artifacts/csharp/coverage.xml`
 -        - Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured), read from the single gate run, and new behavior is tested; modified files must also show no regression on changed lines against the `Phase 0 baseline`. Repo-wide coverage per language must meet the governing thresholds. Flag as FAIL otherwise.
-+        - Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured), read from the single gate run, and new behavior is tested; modified files must also show no regression on changed lines against the `Phase 0 baseline`. Repo-wide coverage per language, read from the final-QC artifact and `## CI Cross-check` rather than from a local re-run, must meet the governing thresholds. Flag as FAIL otherwise.
-         - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a local artifact that shows the Python total below a threshold is still FAIL.
+-        - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a local artifact that shows the Python total below a threshold is still FAIL.
 -        - If coverage artifacts already exist from the executor run, inspect them instead of re-running. A launcher exit 75 means the machine test-suite lock was busy: re-run after the holder finishes and record a queue timeout, not a failure.
 -        - If no coverage artifact exists beneath the item worktree for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
++        - Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured), read from the single gate run, and new behavior is tested; modified files must also show no regression on changed lines against the `Phase 0 baseline`. Repo-wide coverage per language, read from the final-QC artifact and `## CI Cross-check` rather than from a local re-run, must meet the governing thresholds. Flag as FAIL otherwise.
++        - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a Python total below a threshold in a full-suite final-QC artifact is still FAIL. A local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only and is never read as a repository-wide figure.
 +        - If coverage artifacts already exist from the executor run, inspect them instead of re-running. When a coverage report is absent or stale for a changed language, re-run coverage over the branch's test selection through the launcher, not the full suite: the union of the plan's task test selections for the initial review, and the cycle's test selection for an R4 re-audit, appended to the launcher command above (with `-TestPath` for Pester). Repository-wide totals come from the final-QC artifact and `## CI Cross-check`. A launcher exit 75 means the machine test-suite lock was busy: re-run after the holder finishes and record a queue timeout, not a failure.
 +        - If no coverage artifact exists beneath the item worktree for a language that has changed files after that re-run, flag as FAIL — coverage verification is mandatory for all languages with changed files.
     - A focused run of one test file to debug a specific failure is debugging only; a review check does not rest on it.
@@ -172,7 +195,7 @@ index f28f80d9b..07161d826 100644
  - **R4 — Re-audit:** Refresh PR context via MCP tool `collect_pr_context`, then delegate to `feature-reviewer` with the same inputs as the original review (resolved base branch, feature folder, refreshed PR context artifacts, acceptance-criteria source). No scope narrowing. The canonical issue number line must be included.
  - **R5 — Loop-exit decision:** Evaluate the re-audit per Post-Review Outcome Evaluation. If it returns `REVIEW_STATUS: PASS`, exit the loop and advance to the PR creation gate. If it returns `REVIEW_STATUS: HALT_NON_REMEDIABLE` or `REVIEW_STATUS: AWAITING_CI`, follow the halt or wait branch instead of opening the next cycle. Otherwise, record the cycle's `candidate_applied` value and the resulting `completed_attempts` in the checkpoint and return to R1.
 diff --git a/.agents/skills/powershell-qa-gate/SKILL.md b/.agents/skills/powershell-qa-gate/SKILL.md
-index d764f7bb1..62f6798c7 100644
+index d764f7bb1..478a01b19 100644
 --- a/.agents/skills/powershell-qa-gate/SKILL.md
 +++ b/.agents/skills/powershell-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every PowerShell cha
@@ -193,6 +216,28 @@ index d764f7bb1..62f6798c7 100644
  
  1. `mcp__drm-copilot__run_poshqc_format`
  2. `mcp__drm-copilot__run_poshqc_analyze`
+@@ -41,7 +41,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **PSScriptAnalyzer delta**: 0 new findings across the repository.
+ - **Pester delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -71,9 +72,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add PSScriptAnalyzer rule suppressions (`[Diagnostics.CodeAnalysis.SuppressMessageAttribute]` or `PSScriptAnalyzer` suppression comments) or Pester `-Skip` / `-Pending` to mask new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ - Do not mock `git`, `gh`, `actionlint`, or other executables directly; mock the wrapper function (for example `Invoke-GitExe`) per `.agents/skills/powershell/SKILL.md`.
+ 
+ ## Test-Execution Launcher
 diff --git a/.agents/skills/powershell/SKILL.md b/.agents/skills/powershell/SKILL.md
 index 244063ac7..bd1727d69 100644
 --- a/.agents/skills/powershell/SKILL.md
@@ -207,7 +252,7 @@ index 244063ac7..bd1727d69 100644
  ## Compatibility
  
 diff --git a/.agents/skills/python-qa-gate/SKILL.md b/.agents/skills/python-qa-gate/SKILL.md
-index 373b4a270..73b790446 100644
+index 373b4a270..a5a6926b9 100644
 --- a/.agents/skills/python-qa-gate/SKILL.md
 +++ b/.agents/skills/python-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every Python change
@@ -228,6 +273,28 @@ index 373b4a270..73b790446 100644
  
  1. `poetry run black .`
  2. `poetry run ruff check .`
+@@ -42,7 +42,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **Pyright delta**: 0 new diagnostics across the repository.
+ - **Pytest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -72,9 +73,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add Ruff `noqa`, Pyright `# type: ignore`, or test skips to suppress new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ 
+ ## Test-Execution Launcher
+ 
 diff --git a/.agents/skills/python/SKILL.md b/.agents/skills/python/SKILL.md
 index 843fc5b45..b9b77447d 100644
 --- a/.agents/skills/python/SKILL.md
@@ -330,6 +397,38 @@ index b4ce65933..15b3d02c9 100644
  6. **Evidence and handoff** — store baseline and post-change evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when deltas fail.
  
  ## Mode Marker Resolution
+diff --git a/.claude/agents/feature-review.md b/.claude/agents/feature-review.md
+index 4d048fca5..a0c8bf94c 100644
+--- a/.claude/agents/feature-review.md
++++ b/.claude/agents/feature-review.md
+@@ -108,7 +108,7 @@ Coverage verdicts for every language with changed files in the branch diff must
+ 
+ ## Coverage Verification
+ 
+-Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting pre-existing coverage artifacts produced during execution rather than rerunning coverage generation.
++Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting the coverage artifacts produced during execution, and it never runs the full suite for a review.
+ 
+ ### Coverage Artifact Paths by Language
+ 
+@@ -141,15 +141,15 @@ For each language that has changed files in the feature branch:
+ 2. Check whether the coverage artifact exists for that language.
+    - Vendored push-down exemptions: when `vendored-coverage-exemptions.json` exists beside the coverage output file, read it and confirm that only paths with status `exempt` left the coverage population. Flag any hand-written production-path exclusion (an `exclude`, `omit`, `coveragePathIgnorePatterns`, or kcov `--exclude-path` entry, or an omitted settings-file coverage path) as **Blocking**. Flag a `.push-down-manifest.json` hash change without a push-down run (no `payload_version` change and no push-down summary) as **Blocking**.
+ 3. If the artifact exists:
+-   - Parse the repo-wide coverage percentage and report it in the policy audit.
++   - Read the repo-wide coverage percentage of each language from the final-QC artifact and `## CI Cross-check`, and report it in the policy audit. A local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only and is never read as a repository-wide figure.
+    - If repo-wide line or branch coverage is below the governing repo-wide thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+-   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a local artifact that shows the Python total below a threshold is still FAIL.
++   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a Python total below a threshold in a full-suite final-QC artifact is still FAIL.
+    - For each new file: if line or branch coverage is below the governing new-file thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+    - For each modified file: if coverage on changed lines has regressed from the `Phase 0 baseline`, or line or branch coverage, read from the single gate run, is below the governing modified-file thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+ 4. If no coverage artifact is found for a language that has changed files, flag as **FAIL** with reason: "coverage artifact absent for [language]; coverage verification is mandatory for all languages with changed files." Add to remediation triggers.
+ 5. Write `## CI Cross-check` into the policy audit after `## 7. Code Quality Checks`: one row per CI check whose result the review relies on, with the columns `Check | Claimed outcome | Claimed figure | Head | Source`, the outcome `pass` or `fail` from local evidence, and the head from `git log` of the reviewed branch.
+ 
+-The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
++Evidence verification from existing artifacts is the required model. When a coverage report is absent or stale for a changed language, the agent re-runs coverage over the branch's test selection through the test-execution launcher, never the full suite, as step 5 of the `feature-review-workflow` skill states.
+ 
+ ## File Size Advisory
+ 
 diff --git a/.claude/agents/powershell-typed-engineer.md b/.claude/agents/powershell-typed-engineer.md
 index 9fe890116..84e04784d 100644
 --- a/.claude/agents/powershell-typed-engineer.md
@@ -473,7 +572,7 @@ index 687fef952..3cb05f721 100644
  ## No-SKIPPED Rule for Planned Command Tasks
  
 diff --git a/.claude/skills/csharp-qa-gate/SKILL.md b/.claude/skills/csharp-qa-gate/SKILL.md
-index 64783879f..ba60dffa7 100644
+index 64783879f..61e1f02d3 100644
 --- a/.claude/skills/csharp-qa-gate/SKILL.md
 +++ b/.claude/skills/csharp-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every C# change must
@@ -503,6 +602,28 @@ index 64783879f..ba60dffa7 100644
  6. Emit canonical coverage artifact: after `dotnet test` completes, copy the newest `TestResults/*/coverage.cobertura.xml` to `artifacts/csharp/coverage.xml` so local runs produce the same canonical artifact as CI. PowerShell sketch:
  
     ```pwsh
+@@ -57,7 +57,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **MSTest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Architecture-test delta**: zero failures and 0 new failing facts in the `*.ArchitectureTests` project.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -87,9 +88,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add analyzer suppressions, `#pragma warning disable`, `#nullable disable`, or test `[Ignore]` attributes to suppress new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ 
+ ## Test-Execution Launcher
+ 
 diff --git a/.claude/skills/execution-environment/SKILL.md b/.claude/skills/execution-environment/SKILL.md
 index 06ce020ba..ac96907e7 100644
 --- a/.claude/skills/execution-environment/SKILL.md
@@ -525,7 +646,7 @@ index 06ce020ba..ac96907e7 100644
  - A leak found by a gate is fixed on both sides: the suite that leaves state behind (globals, functions, environment variables, mocks, imported modules, script-scope state) and the suite that assumes prior state.
  - The parallel gates govern where a policy file names a toolchain test command.
 diff --git a/.claude/skills/feature-review-workflow/SKILL.md b/.claude/skills/feature-review-workflow/SKILL.md
-index 24991336a..07088d35d 100644
+index 24991336a..a825d9aae 100644
 --- a/.claude/skills/feature-review-workflow/SKILL.md
 +++ b/.claude/skills/feature-review-workflow/SKILL.md
 @@ -121,10 +121,10 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
@@ -533,10 +654,11 @@ index 24991336a..07088d35d 100644
            - New code files (added in this feature): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages. Flag as FAIL otherwise.
            - Modified files (changed but previously existing): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages, read from the single gate run, new behavior is tested, and no regression on changed lines relative to the `Phase 0 baseline`. Flag as FAIL otherwise.
 -          - Repo-wide per language: line coverage >= 85%, and branch coverage >= 75% for branch-capable languages. Flag as FAIL otherwise.
-+          - Repo-wide per language: line coverage >= 85%, and branch coverage >= 75% for branch-capable languages, read from the final-QC artifact and `## CI Cross-check` rather than from a local re-run. Flag as FAIL otherwise.
-           - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a local artifact that shows the Python total below a threshold is still FAIL.
+-          - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a local artifact that shows the Python total below a threshold is still FAIL.
 -        - If coverage artifacts already exist from the executor run, inspect them instead of re-running. A launcher exit 75 means the machine test-suite lock was busy: re-run after the holder finishes and record a queue timeout, not a failure.
 -        - If no coverage artifact exists beneath the item worktree for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
++          - Repo-wide per language: line coverage >= 85%, and branch coverage >= 75% for branch-capable languages, read from the final-QC artifact and `## CI Cross-check` rather than from a local re-run. Flag as FAIL otherwise.
++          - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a Python total below a threshold in a full-suite final-QC artifact is still FAIL. A local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only and is never read as a repository-wide figure.
 +        - If coverage artifacts already exist from the executor run, inspect them instead of re-running. When a coverage report is absent or stale for a changed language, re-run coverage over the branch's test selection through the launcher, not the full suite: the union of the plan's task test selections for the initial review, and the cycle's test selection for an R4 re-audit, appended to the launcher command above (with `-TestPath` for Pester). Repository-wide totals come from the final-QC artifact and `## CI Cross-check`. A launcher exit 75 means the machine test-suite lock was busy: re-run after the holder finishes and record a queue timeout, not a failure.
 +        - If no coverage artifact exists beneath the item worktree for a language that has changed files after that re-run, flag as FAIL — coverage verification is mandatory for all languages with changed files.
          - Tier classification findings: report a missing or incomplete `quality-tiers.yml` only when the repository has adopted tiers, that is, when `quality-tiers.yml` exists at the repository root on the resolved base branch or the repository's CI runs a tier-classification check. Otherwise record tier classification as not applicable; it is not a finding.
@@ -576,7 +698,7 @@ index 94eed906f..4da45c05a 100644
     The evidence file keeps evidence_text unchanged, including unit_gate=not_run.
     It commits with `git commit -F <message file>`, pushes the merge commit, appends the event to regeneration_events[] and the review outcome, whose review_kind is `regeneration_delta`, to remediation_loop.review_outcomes[], each with head_sha equal to the pushed head, and re-runs S9 on the new head.
 diff --git a/.claude/skills/powershell-qa-gate/SKILL.md b/.claude/skills/powershell-qa-gate/SKILL.md
-index 91da1c0d0..29b779ba3 100644
+index 91da1c0d0..c33ff7d65 100644
 --- a/.claude/skills/powershell-qa-gate/SKILL.md
 +++ b/.claude/skills/powershell-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every PowerShell cha
@@ -597,8 +719,30 @@ index 91da1c0d0..29b779ba3 100644
  
  1. `mcp__drm-copilot__run_poshqc_format`
  2. `mcp__drm-copilot__run_poshqc_analyze`
+@@ -41,7 +41,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **PSScriptAnalyzer delta**: 0 new findings across the repository.
+ - **Pester delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: line coverage >= 85% per the uniform tier rule (`.claude/rules/quality-tiers.md`). No tier-specific lower thresholds. No regression on changed lines. Pester measures command (instruction) coverage and line coverage only; branch coverage is not measurable for PowerShell, so no branch-coverage gate applies here (see `.claude/rules/powershell.md`). Command coverage is informational and carries no threshold.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -71,9 +72,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add PSScriptAnalyzer rule suppressions (`[Diagnostics.CodeAnalysis.SuppressMessageAttribute]` or `PSScriptAnalyzer` suppression comments) or Pester `-Skip` / `-Pending` to mask new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ - Do not mock `git`, `gh`, `actionlint`, or other executables directly; mock the wrapper function (for example `Invoke-GitExe`) per `.claude/rules/powershell.md`.
+ 
+ ## Test-Execution Launcher
 diff --git a/.claude/skills/python-qa-gate/SKILL.md b/.claude/skills/python-qa-gate/SKILL.md
-index 283acf4c8..79252fd34 100644
+index 283acf4c8..a2afc248d 100644
 --- a/.claude/skills/python-qa-gate/SKILL.md
 +++ b/.claude/skills/python-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every Python change
@@ -619,6 +763,28 @@ index 283acf4c8..79252fd34 100644
  
  1. `poetry run black .`
  2. `poetry run ruff check .`
+@@ -42,7 +42,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **Pyright delta**: 0 new diagnostics across the repository.
+ - **Pytest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: line coverage >= 85% and branch coverage >= 75% per the uniform tier rule (`.claude/rules/quality-tiers.md`). No tier-specific lower thresholds. No regression on changed lines.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -72,9 +73,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add Ruff `noqa`, Pyright `# type: ignore`, or test skips to suppress new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ 
+ ## Test-Execution Launcher
+ 
 diff --git a/.claude/skills/remediation-handoff-atomic-planner/SKILL.md b/.claude/skills/remediation-handoff-atomic-planner/SKILL.md
 index 9cb38e053..57de16b6c 100644
 --- a/.claude/skills/remediation-handoff-atomic-planner/SKILL.md
@@ -935,6 +1101,38 @@ index b9bd60d8a..c9049eb69 100644
  6. **Evidence and handoff** — store baseline and post-change evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when deltas fail.
  
  ## Mode Marker Resolution
+diff --git a/.codex/agents/feature-review.toml b/.codex/agents/feature-review.toml
+index dc0a74ba3..113551739 100644
+--- a/.codex/agents/feature-review.toml
++++ b/.codex/agents/feature-review.toml
+@@ -106,7 +106,7 @@ Coverage verdicts for every language with changed files in the branch diff must
+ 
+ ## Coverage Verification
+ 
+-Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting pre-existing coverage artifacts produced during execution rather than rerunning coverage generation.
++Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting the coverage artifacts produced during execution, and it never runs the full suite for a review.
+ 
+ ### Coverage Artifact Paths by Language
+ 
+@@ -131,15 +131,15 @@ For each language that has changed files in the feature branch:
+ 2. Check whether the coverage artifact exists for that language.
+    - Vendored push-down exemptions: when `vendored-coverage-exemptions.json` exists beside the coverage output file, read it and confirm that only paths with status `exempt` left the coverage population. Flag any hand-written production-path exclusion (an `exclude`, `omit`, `coveragePathIgnorePatterns`, or kcov `--exclude-path` entry, or an omitted settings-file coverage path) as **Blocking**. Flag a `.push-down-manifest.json` hash change without a push-down run (no `payload_version` change and no push-down summary) as **Blocking**.
+ 3. If the artifact exists:
+-   - Parse the repo-wide coverage percentage and report it in the policy audit.
++   - Read the repo-wide coverage percentage of each language from the final-QC artifact and `## CI Cross-check`, and report it in the policy audit. A local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only and is never read as a repository-wide figure.
+    - If repo-wide coverage is below the governing line threshold, flag as FAIL and add to remediation triggers.
+-   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a local artifact that shows the Python total below a threshold is still FAIL.
++   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a Python total below a threshold in a full-suite final-QC artifact is still FAIL.
+    - For each new file: if line coverage is below the governing line threshold, flag as FAIL and add to remediation triggers.
+    - For each modified file: if line coverage has regressed from the `Phase 0 baseline` or, read from the single gate run, is below the governing line threshold, flag as FAIL and add to remediation triggers.
+ 4. If no coverage artifact is found for a language that has changed files, flag as **FAIL** with reason: "coverage artifact absent for [language]; coverage verification is mandatory for all languages with changed files." Add to remediation triggers.
+ 5. Write `## CI Cross-check` into the policy audit after `## 7. Code Quality Checks`: one row per CI check whose result the review relies on, with the columns `Check | Claimed outcome | Claimed figure | Head | Source`, the outcome `pass` or `fail` from local evidence, and the head from `git log` of the reviewed branch.
+ 
+-The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
++Evidence verification from existing artifacts is the required model. When a coverage report is absent or stale for a changed language, the agent re-runs coverage over the branch's test selection through the test-execution launcher, never the full suite, as step 5 of the `feature-review-workflow` skill states.
+ 
+ ## File Size Advisory
+ 
 diff --git a/.codex/agents/powershell-typed-engineer-c1.toml b/.codex/agents/powershell-typed-engineer-c1.toml
 index a565c99b1..3daa0b637 100644
 --- a/.codex/agents/powershell-typed-engineer-c1.toml
@@ -1122,6 +1320,19 @@ index efa5673e4..078c14003 100644
  
  ### Phase 2: <Phase Name>
  - [ ] [P2-T1] <Atomic task>
+diff --git a/docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md b/docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
+index 446759f46..f3667246e 100644
+--- a/docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
++++ b/docs/features/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
+@@ -326,7 +326,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
+ | Requirement | Status | Evidence |
+ |------------|--------|----------|
+ | **Use Pytest** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe use of Pytest. Note any fixtures or plugins used.] |
+-| **Coverage expectation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report coverage metrics. Confirm new code has >= 90% coverage and repo-wide >= 80%. For the Python repo-wide total, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing it; a local artifact that shows the total below a threshold is still FAIL.] |
++| **Coverage expectation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report coverage metrics. Confirm new code has >= 90% coverage and repo-wide >= 80%. Read every repo-wide total from the final-QC artifact and `## CI Cross-check`, because a local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only; for the Python repo-wide total, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing it.] |
+ 
+ #### 4A.2 Test Style and Structure
+ 
 diff --git a/docs/features/templates/refactor/plan.yyyy-MM-ddTHH-mm.md b/docs/features/templates/refactor/plan.yyyy-MM-ddTHH-mm.md
 index 276301618..a006d9109 100644
 --- a/docs/features/templates/refactor/plan.yyyy-MM-ddTHH-mm.md
@@ -1403,7 +1614,7 @@ index 36b6b63ee..b7bfab4b1 100644
  ## Coding Standards
  
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md
-index d952ab8e2..47fd36da6 100644
+index d952ab8e2..61edfa0b4 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every C# change must
@@ -1424,6 +1635,28 @@ index d952ab8e2..47fd36da6 100644
  
  1. `dotnet tool restore` (when the manifest tool has not been restored), then `dotnet tool run csharpier format .` to apply formatting and `dotnet tool run csharpier check .` to verify read-only.
  2. `msbuild <solution>.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+@@ -44,7 +44,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **Compiler / nullable delta**: 0 new diagnostics across the repository.
+ - **MSTest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -74,9 +75,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add analyzer suppressions, `#pragma warning disable`, `#nullable disable`, or test `[Ignore]` attributes to suppress new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ 
+ ## Test-Execution Launcher
+ 
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md
 index fc8833627..7ee4aa793 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md
@@ -1472,6 +1705,38 @@ index b4ce65933..15b3d02c9 100644
  6. **Evidence and handoff** — store baseline and post-change evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when deltas fail.
  
  ## Mode Marker Resolution
+diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md
+index 4d048fca5..a0c8bf94c 100644
+--- a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md
++++ b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/feature-review.md
+@@ -108,7 +108,7 @@ Coverage verdicts for every language with changed files in the branch diff must
+ 
+ ## Coverage Verification
+ 
+-Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting pre-existing coverage artifacts produced during execution rather than rerunning coverage generation.
++Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting the coverage artifacts produced during execution, and it never runs the full suite for a review.
+ 
+ ### Coverage Artifact Paths by Language
+ 
+@@ -141,15 +141,15 @@ For each language that has changed files in the feature branch:
+ 2. Check whether the coverage artifact exists for that language.
+    - Vendored push-down exemptions: when `vendored-coverage-exemptions.json` exists beside the coverage output file, read it and confirm that only paths with status `exempt` left the coverage population. Flag any hand-written production-path exclusion (an `exclude`, `omit`, `coveragePathIgnorePatterns`, or kcov `--exclude-path` entry, or an omitted settings-file coverage path) as **Blocking**. Flag a `.push-down-manifest.json` hash change without a push-down run (no `payload_version` change and no push-down summary) as **Blocking**.
+ 3. If the artifact exists:
+-   - Parse the repo-wide coverage percentage and report it in the policy audit.
++   - Read the repo-wide coverage percentage of each language from the final-QC artifact and `## CI Cross-check`, and report it in the policy audit. A local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only and is never read as a repository-wide figure.
+    - If repo-wide line or branch coverage is below the governing repo-wide thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+-   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a local artifact that shows the Python total below a threshold is still FAIL.
++   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a Python total below a threshold in a full-suite final-QC artifact is still FAIL.
+    - For each new file: if line or branch coverage is below the governing new-file thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+    - For each modified file: if coverage on changed lines has regressed from the `Phase 0 baseline`, or line or branch coverage, read from the single gate run, is below the governing modified-file thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+ 4. If no coverage artifact is found for a language that has changed files, flag as **FAIL** with reason: "coverage artifact absent for [language]; coverage verification is mandatory for all languages with changed files." Add to remediation triggers.
+ 5. Write `## CI Cross-check` into the policy audit after `## 7. Code Quality Checks`: one row per CI check whose result the review relies on, with the columns `Check | Claimed outcome | Claimed figure | Head | Source`, the outcome `pass` or `fail` from local evidence, and the head from `git log` of the reviewed branch.
+ 
+-The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
++Evidence verification from existing artifacts is the required model. When a coverage report is absent or stale for a changed language, the agent re-runs coverage over the branch's test selection through the test-execution launcher, never the full suite, as step 5 of the `feature-review-workflow` skill states.
+ 
+ ## File Size Advisory
+ 
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/powershell-typed-engineer.md b/extensions/drm-copilot/resources/claude-customizations/.claude/agents/powershell-typed-engineer.md
 index 9fe890116..84e04784d 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/agents/powershell-typed-engineer.md
@@ -1615,7 +1880,7 @@ index 687fef952..3cb05f721 100644
  ## No-SKIPPED Rule for Planned Command Tasks
  
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/csharp-qa-gate/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/csharp-qa-gate/SKILL.md
-index 64783879f..ba60dffa7 100644
+index 64783879f..61e1f02d3 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/csharp-qa-gate/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/csharp-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every C# change must
@@ -1645,6 +1910,28 @@ index 64783879f..ba60dffa7 100644
  6. Emit canonical coverage artifact: after `dotnet test` completes, copy the newest `TestResults/*/coverage.cobertura.xml` to `artifacts/csharp/coverage.xml` so local runs produce the same canonical artifact as CI. PowerShell sketch:
  
     ```pwsh
+@@ -57,7 +57,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **MSTest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Architecture-test delta**: zero failures and 0 new failing facts in the `*.ArchitectureTests` project.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -87,9 +88,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add analyzer suppressions, `#pragma warning disable`, `#nullable disable`, or test `[Ignore]` attributes to suppress new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ 
+ ## Test-Execution Launcher
+ 
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md
 index 06ce020ba..ac96907e7 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md
@@ -1667,7 +1954,7 @@ index 06ce020ba..ac96907e7 100644
  - A leak found by a gate is fixed on both sides: the suite that leaves state behind (globals, functions, environment variables, mocks, imported modules, script-scope state) and the suite that assumes prior state.
  - The parallel gates govern where a policy file names a toolchain test command.
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md
-index 24991336a..07088d35d 100644
+index 24991336a..a825d9aae 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md
 @@ -121,10 +121,10 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
@@ -1675,10 +1962,11 @@ index 24991336a..07088d35d 100644
            - New code files (added in this feature): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages. Flag as FAIL otherwise.
            - Modified files (changed but previously existing): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages, read from the single gate run, new behavior is tested, and no regression on changed lines relative to the `Phase 0 baseline`. Flag as FAIL otherwise.
 -          - Repo-wide per language: line coverage >= 85%, and branch coverage >= 75% for branch-capable languages. Flag as FAIL otherwise.
-+          - Repo-wide per language: line coverage >= 85%, and branch coverage >= 75% for branch-capable languages, read from the final-QC artifact and `## CI Cross-check` rather than from a local re-run. Flag as FAIL otherwise.
-           - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a local artifact that shows the Python total below a threshold is still FAIL.
+-          - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a local artifact that shows the Python total below a threshold is still FAIL.
 -        - If coverage artifacts already exist from the executor run, inspect them instead of re-running. A launcher exit 75 means the machine test-suite lock was busy: re-run after the holder finishes and record a queue timeout, not a failure.
 -        - If no coverage artifact exists beneath the item worktree for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
++          - Repo-wide per language: line coverage >= 85%, and branch coverage >= 75% for branch-capable languages, read from the final-QC artifact and `## CI Cross-check` rather than from a local re-run. Flag as FAIL otherwise.
++          - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a Python total below a threshold in a full-suite final-QC artifact is still FAIL. A local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only and is never read as a repository-wide figure.
 +        - If coverage artifacts already exist from the executor run, inspect them instead of re-running. When a coverage report is absent or stale for a changed language, re-run coverage over the branch's test selection through the launcher, not the full suite: the union of the plan's task test selections for the initial review, and the cycle's test selection for an R4 re-audit, appended to the launcher command above (with `-TestPath` for Pester). Repository-wide totals come from the final-QC artifact and `## CI Cross-check`. A launcher exit 75 means the machine test-suite lock was busy: re-run after the holder finishes and record a queue timeout, not a failure.
 +        - If no coverage artifact exists beneath the item worktree for a language that has changed files after that re-run, flag as FAIL — coverage verification is mandatory for all languages with changed files.
          - Tier classification findings: report a missing or incomplete `quality-tiers.yml` only when the repository has adopted tiers, that is, when `quality-tiers.yml` exists at the repository root on the resolved base branch or the repository's CI runs a tier-classification check. Otherwise record tier classification as not applicable; it is not a finding.
@@ -1718,7 +2006,7 @@ index 94eed906f..4da45c05a 100644
     The evidence file keeps evidence_text unchanged, including unit_gate=not_run.
     It commits with `git commit -F <message file>`, pushes the merge commit, appends the event to regeneration_events[] and the review outcome, whose review_kind is `regeneration_delta`, to remediation_loop.review_outcomes[], each with head_sha equal to the pushed head, and re-runs S9 on the new head.
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md
-index 91da1c0d0..29b779ba3 100644
+index 91da1c0d0..c33ff7d65 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every PowerShell cha
@@ -1739,8 +2027,30 @@ index 91da1c0d0..29b779ba3 100644
  
  1. `mcp__drm-copilot__run_poshqc_format`
  2. `mcp__drm-copilot__run_poshqc_analyze`
+@@ -41,7 +41,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **PSScriptAnalyzer delta**: 0 new findings across the repository.
+ - **Pester delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: line coverage >= 85% per the uniform tier rule (`.claude/rules/quality-tiers.md`). No tier-specific lower thresholds. No regression on changed lines. Pester measures command (instruction) coverage and line coverage only; branch coverage is not measurable for PowerShell, so no branch-coverage gate applies here (see `.claude/rules/powershell.md`). Command coverage is informational and carries no threshold.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -71,9 +72,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add PSScriptAnalyzer rule suppressions (`[Diagnostics.CodeAnalysis.SuppressMessageAttribute]` or `PSScriptAnalyzer` suppression comments) or Pester `-Skip` / `-Pending` to mask new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ - Do not mock `git`, `gh`, `actionlint`, or other executables directly; mock the wrapper function (for example `Invoke-GitExe`) per `.claude/rules/powershell.md`.
+ 
+ ## Test-Execution Launcher
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md
-index 283acf4c8..79252fd34 100644
+index 283acf4c8..a2afc248d 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every Python change
@@ -1761,6 +2071,28 @@ index 283acf4c8..79252fd34 100644
  
  1. `poetry run black .`
  2. `poetry run ruff check .`
+@@ -42,7 +42,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **Pyright delta**: 0 new diagnostics across the repository.
+ - **Pytest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: line coverage >= 85% and branch coverage >= 75% per the uniform tier rule (`.claude/rules/quality-tiers.md`). No tier-specific lower thresholds. No regression on changed lines.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -72,9 +73,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add Ruff `noqa`, Pyright `# type: ignore`, or test skips to suppress new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ 
+ ## Test-Execution Launcher
+ 
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/remediation-handoff-atomic-planner/SKILL.md b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/remediation-handoff-atomic-planner/SKILL.md
 index 9cb38e053..57de16b6c 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/remediation-handoff-atomic-planner/SKILL.md
@@ -1790,7 +2122,7 @@ index f5f082a39..236ffd847 100644
  ## Exit Codes and Messages
  
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md
-index ab73ab8a3..323035645 100644
+index ab73ab8a3..91174bd2d 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md
 @@ -14,7 +14,7 @@ Canonical procedure for the Phase D final quality gate that every C# change must
@@ -1811,6 +2143,28 @@ index ab73ab8a3..323035645 100644
  
  1. `dotnet tool restore` (when the manifest tool has not been restored), then `dotnet tool run csharpier format .` to apply formatting and `dotnet tool run csharpier check .` to verify read-only.
  2. `msbuild <solution>.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+@@ -46,7 +46,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **Compiler / nullable delta**: 0 new diagnostics across the repository.
+ - **MSTest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -76,9 +77,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add analyzer suppressions, `#pragma warning disable`, `#nullable disable`, or test `[Ignore]` attributes to suppress new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ 
+ ## Test-Execution Launcher
+ 
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp/SKILL.md
 index d7fe59010..eaddaa720 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp/SKILL.md
@@ -1889,7 +2243,7 @@ index 0063bcc07..3ba887923 100644
  In a workspace with an active discovery activation, the planner launch itself is admitted
  only after the native planning gate verifies the receipt named by the profile's
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp-qa-gate/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp-qa-gate/SKILL.md
-index 54fda084f..896ccef11 100644
+index 54fda084f..cf4a58abc 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp-qa-gate/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every C# change must
@@ -1910,6 +2264,28 @@ index 54fda084f..896ccef11 100644
  
  1. `dotnet tool run csharpier .`
  2. `msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+@@ -42,7 +42,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **Compiler / nullable delta**: 0 new diagnostics across the repository.
+ - **MSTest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -72,9 +73,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add analyzer suppressions, `#pragma warning disable`, `#nullable disable`, or test `[Ignore]` attributes to suppress new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ 
+ ## Test-Execution Launcher
+ 
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp/SKILL.md
 index e41eb1108..9f9914cf2 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp/SKILL.md
@@ -1945,7 +2321,7 @@ index 06ce020ba..ac96907e7 100644
  - A leak found by a gate is fixed on both sides: the suite that leaves state behind (globals, functions, environment variables, mocks, imported modules, script-scope state) and the suite that assumes prior state.
  - The parallel gates govern where a policy file names a toolchain test command.
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md
-index e6f11faf6..37cd3dc25 100644
+index e6f11faf6..60dc64a45 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md
 @@ -118,10 +118,10 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
@@ -1953,10 +2329,11 @@ index e6f11faf6..37cd3dc25 100644
          - PowerShell: one `Invoke-PoshQCParallelTest` run through the launcher `pester` suite (`sh .agents/skills/test-execution-policy/scripts/run-test-suite.sh pester`) → artifact: `artifacts/pester/powershell-coverage.xml`
          - C#: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` → artifact: `artifacts/csharp/coverage.xml`
 -        - Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured), read from the single gate run, and new behavior is tested; modified files must also show no regression on changed lines against the `Phase 0 baseline`. Repo-wide coverage per language must meet the governing thresholds. Flag as FAIL otherwise.
-+        - Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured), read from the single gate run, and new behavior is tested; modified files must also show no regression on changed lines against the `Phase 0 baseline`. Repo-wide coverage per language, read from the final-QC artifact and `## CI Cross-check` rather than from a local re-run, must meet the governing thresholds. Flag as FAIL otherwise.
-         - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a local artifact that shows the Python total below a threshold is still FAIL.
+-        - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a local artifact that shows the Python total below a threshold is still FAIL.
 -        - If coverage artifacts already exist from the executor run, inspect them instead of re-running. A launcher exit 75 means the machine test-suite lock was busy: re-run after the holder finishes and record a queue timeout, not a failure.
 -        - If no coverage artifact exists beneath the item worktree for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
++        - Coverage thresholds: when the repository's root `CLAUDE.md` states a line or branch coverage threshold, that threshold governs; otherwise the defaults govern (line 85%, branch 75% for branch-capable languages). Each metric falls back independently. New files and modified files must meet the governing line threshold (and the branch threshold where measured), read from the single gate run, and new behavior is tested; modified files must also show no regression on changed lines against the `Phase 0 baseline`. Repo-wide coverage per language, read from the final-QC artifact and `## CI Cross-check` rather than from a local re-run, must meet the governing thresholds. Flag as FAIL otherwise.
++        - Python repo-wide total: record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing the total locally; a Python total below a threshold in a full-suite final-QC artifact is still FAIL. A local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only and is never read as a repository-wide figure.
 +        - If coverage artifacts already exist from the executor run, inspect them instead of re-running. When a coverage report is absent or stale for a changed language, re-run coverage over the branch's test selection through the launcher, not the full suite: the union of the plan's task test selections for the initial review, and the cycle's test selection for an R4 re-audit, appended to the launcher command above (with `-TestPath` for Pester). Repository-wide totals come from the final-QC artifact and `## CI Cross-check`. A launcher exit 75 means the machine test-suite lock was busy: re-run after the holder finishes and record a queue timeout, not a failure.
 +        - If no coverage artifact exists beneath the item worktree for a language that has changed files after that re-run, flag as FAIL — coverage verification is mandatory for all languages with changed files.
     - A focused run of one test file to debug a specific failure is debugging only; a review check does not rest on it.
@@ -1998,7 +2375,7 @@ index f28f80d9b..07161d826 100644
  - **R4 — Re-audit:** Refresh PR context via MCP tool `collect_pr_context`, then delegate to `feature-reviewer` with the same inputs as the original review (resolved base branch, feature folder, refreshed PR context artifacts, acceptance-criteria source). No scope narrowing. The canonical issue number line must be included.
  - **R5 — Loop-exit decision:** Evaluate the re-audit per Post-Review Outcome Evaluation. If it returns `REVIEW_STATUS: PASS`, exit the loop and advance to the PR creation gate. If it returns `REVIEW_STATUS: HALT_NON_REMEDIABLE` or `REVIEW_STATUS: AWAITING_CI`, follow the halt or wait branch instead of opening the next cycle. Otherwise, record the cycle's `candidate_applied` value and the resulting `completed_attempts` in the checkpoint and return to R1.
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/SKILL.md
-index d764f7bb1..62f6798c7 100644
+index d764f7bb1..478a01b19 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every PowerShell cha
@@ -2019,6 +2396,28 @@ index d764f7bb1..62f6798c7 100644
  
  1. `mcp__drm-copilot__run_poshqc_format`
  2. `mcp__drm-copilot__run_poshqc_analyze`
+@@ -41,7 +41,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **PSScriptAnalyzer delta**: 0 new findings across the repository.
+ - **Pester delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -71,9 +72,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add PSScriptAnalyzer rule suppressions (`[Diagnostics.CodeAnalysis.SuppressMessageAttribute]` or `PSScriptAnalyzer` suppression comments) or Pester `-Skip` / `-Pending` to mask new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ - Do not mock `git`, `gh`, `actionlint`, or other executables directly; mock the wrapper function (for example `Invoke-GitExe`) per `.agents/skills/powershell/SKILL.md`.
+ 
+ ## Test-Execution Launcher
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell/SKILL.md
 index 244063ac7..bd1727d69 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell/SKILL.md
@@ -2033,7 +2432,7 @@ index 244063ac7..bd1727d69 100644
  ## Compatibility
  
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md
-index 373b4a270..73b790446 100644
+index 373b4a270..a5a6926b9 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md
 @@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every Python change
@@ -2054,6 +2453,28 @@ index 373b4a270..73b790446 100644
  
  1. `poetry run black .`
  2. `poetry run ruff check .`
+@@ -42,7 +42,8 @@ Compare the final results to the Phase A baseline (the `Phase 0 baseline`), read
+ - **Pyright delta**: 0 new diagnostics across the repository.
+ - **Pytest delta**: zero failures in the single gate run and 0 new failing tests against the baseline.
+ - **Per-file coverage delta**: every changed file meets the coverage thresholds, read from the single gate run, and coverage for every touched file is greater than or equal to the baseline for that file; a new file has no pre-change run and is judged against the thresholds. New behavior is tested.
+-- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Overall coverage delta** (final QA loop only, when the repo enforces it): overall coverage is greater than or equal to the baseline.
++- **Remediation gate coverage**: in a remediation gate, the per-file coverage delta applies to the files the cycle changed, read from the remediation gate run against the thresholds and the `Phase 0 baseline`; the repository-wide figure comes from the orchestration's final-QC artifact and CI, not from the remediation gate run.
+ - **New modules, classes, or methods**: coverage >= 90% for each new unit introduced in the batch.
+ 
+ If any delta check fails, the agent must revert or fix immediately and rerun the full toolchain. Do not proceed to reporting until all deltas are clean.
+@@ -72,9 +73,9 @@ The evidence paths must be referenced in the agent's completion message to satis
+ 
+ ## Prohibited Shortcuts
+ 
+-- Do not disable, skip, or narrow any step of the toolchain to reach a clean result.
++- Do not disable, skip, or narrow any step of the toolchain to reach a clean result. The remediation gate's test selection, defined by `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill, is not a narrowing.
+ - Do not add Ruff `noqa`, Pyright `# type: ignore`, or test skips to suppress new findings introduced by the change.
+-- Do not report success based on partial or targeted runs. A focused run of one test file to debug a specific failure is debugging only; it is never a gate or evidence, and the final gate is the single gate run.
++- The gate run of a remediation gate is the selection run that `## Test Cadence (Mandatory)` defines, and the final QA loop is the single gate run of the full suite. Any other partial or focused run, such as a run of one test file to debug a specific failure, is debugging only; it is never a gate or evidence.
+ 
+ ## Test-Execution Launcher
+ 
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python/SKILL.md b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python/SKILL.md
 index 843fc5b45..b9b77447d 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python/SKILL.md
@@ -2409,6 +2830,38 @@ index b9bd60d8a..c9049eb69 100644
  6. **Evidence and handoff** — store baseline and post-change evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when deltas fail.
  
  ## Mode Marker Resolution
+diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-review.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-review.toml
+index dc0a74ba3..113551739 100644
+--- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-review.toml
++++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/feature-review.toml
+@@ -106,7 +106,7 @@ Coverage verdicts for every language with changed files in the branch diff must
+ 
+ ## Coverage Verification
+ 
+-Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting pre-existing coverage artifacts produced during execution rather than rerunning coverage generation.
++Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting the coverage artifacts produced during execution, and it never runs the full suite for a review.
+ 
+ ### Coverage Artifact Paths by Language
+ 
+@@ -131,15 +131,15 @@ For each language that has changed files in the feature branch:
+ 2. Check whether the coverage artifact exists for that language.
+    - Vendored push-down exemptions: when `vendored-coverage-exemptions.json` exists beside the coverage output file, read it and confirm that only paths with status `exempt` left the coverage population. Flag any hand-written production-path exclusion (an `exclude`, `omit`, `coveragePathIgnorePatterns`, or kcov `--exclude-path` entry, or an omitted settings-file coverage path) as **Blocking**. Flag a `.push-down-manifest.json` hash change without a push-down run (no `payload_version` change and no push-down summary) as **Blocking**.
+ 3. If the artifact exists:
+-   - Parse the repo-wide coverage percentage and report it in the policy audit.
++   - Read the repo-wide coverage percentage of each language from the final-QC artifact and `## CI Cross-check`, and report it in the policy audit. A local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only and is never read as a repository-wide figure.
+    - If repo-wide coverage is below the governing line threshold, flag as FAIL and add to remediation triggers.
+-   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a local artifact that shows the Python total below a threshold is still FAIL.
++   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a Python total below a threshold in a full-suite final-QC artifact is still FAIL.
+    - For each new file: if line coverage is below the governing line threshold, flag as FAIL and add to remediation triggers.
+    - For each modified file: if line coverage has regressed from the `Phase 0 baseline` or, read from the single gate run, is below the governing line threshold, flag as FAIL and add to remediation triggers.
+ 4. If no coverage artifact is found for a language that has changed files, flag as **FAIL** with reason: "coverage artifact absent for [language]; coverage verification is mandatory for all languages with changed files." Add to remediation triggers.
+ 5. Write `## CI Cross-check` into the policy audit after `## 7. Code Quality Checks`: one row per CI check whose result the review relies on, with the columns `Check | Claimed outcome | Claimed figure | Head | Source`, the outcome `pass` or `fail` from local evidence, and the head from `git log` of the reviewed branch.
+ 
+-The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
++Evidence verification from existing artifacts is the required model. When a coverage report is absent or stale for a changed language, the agent re-runs coverage over the branch's test selection through the test-execution launcher, never the full suite, as step 5 of the `feature-review-workflow` skill states.
+ 
+ ## File Size Advisory
+ 
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c1.toml b/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c1.toml
 index a565c99b1..3daa0b637 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c1.toml
@@ -2850,6 +3303,19 @@ index 276301618..a006d9109 100644
  
  ### Phase 3: Verification & Cleanup [0%]
  - [ ] Run tests/type checks; fix fallout
+diff --git a/extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md b/extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
+index 446759f46..f3667246e 100644
+--- a/extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
++++ b/extensions/drm-copilot/resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md
+@@ -326,7 +326,7 @@ Repeat one bullet per in-scope language that has coverage requirements. Keep the
+ | Requirement | Status | Evidence |
+ |------------|--------|----------|
+ | **Use Pytest** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Describe use of Pytest. Note any fixtures or plugins used.] |
+-| **Coverage expectation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report coverage metrics. Confirm new code has >= 90% coverage and repo-wide >= 80%. For the Python repo-wide total, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing it; a local artifact that shows the total below a threshold is still FAIL.] |
++| **Coverage expectation** | [✅/❌/N/A] [PASS/FAIL/N/A] | [Report coverage metrics. Confirm new code has >= 90% coverage and repo-wide >= 80%. Read every repo-wide total from the final-QC artifact and `## CI Cross-check`, because a local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only; for the Python repo-wide total, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` instead of computing it.] |
+ 
+ #### 4A.2 Test Style and Structure
+ 
 diff --git a/scripts/harness-generation/sources/agents/atomic-executor.md b/scripts/harness-generation/sources/agents/atomic-executor.md
 index 5724e2983..c80b24742 100644
 --- a/scripts/harness-generation/sources/agents/atomic-executor.md
@@ -2916,6 +3382,66 @@ index 2466fff04..1bcc755f6 100644
  6. **Evidence and handoff** — store baseline and post-change evidence per `evidence-and-timestamp-conventions`. Trigger remediation via `remediation-handoff-atomic-planner` when deltas fail.
  
  <!-- harness-section: evidence-location-invariant-2 -->
+diff --git a/scripts/harness-generation/sources/agents/feature-review.md b/scripts/harness-generation/sources/agents/feature-review.md
+index 10079a9cd..ef6837d01 100644
+--- a/scripts/harness-generation/sources/agents/feature-review.md
++++ b/scripts/harness-generation/sources/agents/feature-review.md
+@@ -91,7 +91,7 @@ Coverage verdicts for every language with changed files in the branch diff must
+ <!-- harness-section: coverage-verification -->
+ ## Coverage Verification
+ 
+-Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting pre-existing coverage artifacts produced during execution rather than rerunning coverage generation.
++Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting the coverage artifacts produced during execution, and it never runs the full suite for a review.
+ 
+ ### Coverage Artifact Paths by Language
+ 
+@@ -124,15 +124,15 @@ For each language that has changed files in the feature branch:
+ 2. Check whether the coverage artifact exists for that language.
+    - Vendored push-down exemptions: when `vendored-coverage-exemptions.json` exists beside the coverage output file, read it and confirm that only paths with status `exempt` left the coverage population. Flag any hand-written production-path exclusion (an `exclude`, `omit`, `coveragePathIgnorePatterns`, or kcov `--exclude-path` entry, or an omitted settings-file coverage path) as **Blocking**. Flag a `.push-down-manifest.json` hash change without a push-down run (no `payload_version` change and no push-down summary) as **Blocking**.
+ 3. If the artifact exists:
+-   - Parse the repo-wide coverage percentage and report it in the policy audit.
++   - Read the repo-wide coverage percentage of each language from the final-QC artifact and `## CI Cross-check`, and report it in the policy audit. A local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only and is never read as a repository-wide figure.
+    - If repo-wide line or branch coverage is below the governing repo-wide thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+-   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a local artifact that shows the Python total below a threshold is still FAIL.
++   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a Python total below a threshold in a full-suite final-QC artifact is still FAIL.
+    - For each new file: if line or branch coverage is below the governing new-file thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+    - For each modified file: if coverage on changed lines has regressed from the `Phase 0 baseline`, or line or branch coverage, read from the single gate run, is below the governing modified-file thresholds defined in Coverage Thresholds, flag as FAIL and add to remediation triggers.
+ 4. If no coverage artifact is found for a language that has changed files, flag as **FAIL** with reason: "coverage artifact absent for [language]; coverage verification is mandatory for all languages with changed files." Add to remediation triggers.
+ 5. Write `## CI Cross-check` into the policy audit after `## 7. Code Quality Checks`: one row per CI check whose result the review relies on, with the columns `Check | Claimed outcome | Claimed figure | Head | Source`, the outcome `pass` or `fail` from local evidence, and the head from `git log` of the reviewed branch.
+ 
+-The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
++Evidence verification from existing artifacts is the required model. When a coverage report is absent or stale for a changed language, the agent re-runs coverage over the branch's test selection through the test-execution launcher, never the full suite, as step 5 of the `feature-review-workflow` skill states.
+ 
+ <!-- harness-section: file-size-advisory -->
+ ## File Size Advisory
+@@ -227,7 +227,7 @@ Timestamp format: `yyyy-MM-ddTHH-mm` (ISO-8601).
+ <!-- harness-section: coverage-verification-2 -->
+ ## Coverage Verification
+ 
+-Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting pre-existing coverage artifacts produced during execution rather than rerunning coverage generation.
++Coverage metrics are mandatory for every language that has changed files in the feature branch. The agent verifies coverage by inspecting the coverage artifacts produced during execution, and it never runs the full suite for a review.
+ 
+ ### Coverage Artifact Paths by Language
+ 
+@@ -252,15 +252,15 @@ For each language that has changed files in the feature branch:
+ 2. Check whether the coverage artifact exists for that language.
+    - Vendored push-down exemptions: when `vendored-coverage-exemptions.json` exists beside the coverage output file, read it and confirm that only paths with status `exempt` left the coverage population. Flag any hand-written production-path exclusion (an `exclude`, `omit`, `coveragePathIgnorePatterns`, or kcov `--exclude-path` entry, or an omitted settings-file coverage path) as **Blocking**. Flag a `.push-down-manifest.json` hash change without a push-down run (no `payload_version` change and no push-down summary) as **Blocking**.
+ 3. If the artifact exists:
+-   - Parse the repo-wide coverage percentage and report it in the policy audit.
++   - Read the repo-wide coverage percentage of each language from the final-QC artifact and `## CI Cross-check`, and report it in the policy audit. A local coverage file written by a selection run (a task check, a phase gate, a remediation gate, or a review re-run) supplies per-file figures only and is never read as a repository-wide figure.
+    - If repo-wide coverage is below the governing line threshold, flag as FAIL and add to remediation triggers.
+-   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a local artifact that shows the Python total below a threshold is still FAIL.
++   - For Python, record the CI result of `Enforce Python coverage thresholds` in `## CI Cross-check` of the policy audit instead of computing the repo-wide total; a Python total below a threshold in a full-suite final-QC artifact is still FAIL.
+    - For each new file: if line coverage is below the governing line threshold, flag as FAIL and add to remediation triggers.
+    - For each modified file: if line coverage has regressed from the `Phase 0 baseline` or, read from the single gate run, is below the governing line threshold, flag as FAIL and add to remediation triggers.
+ 4. If no coverage artifact is found for a language that has changed files, flag as **FAIL** with reason: "coverage artifact absent for [language]; coverage verification is mandatory for all languages with changed files." Add to remediation triggers.
+ 5. Write `## CI Cross-check` into the policy audit after `## 7. Code Quality Checks`: one row per CI check whose result the review relies on, with the columns `Check | Claimed outcome | Claimed figure | Head | Source`, the outcome `pass` or `fail` from local evidence, and the head from `git log` of the reviewed branch.
+ 
+-The agent does NOT rerun coverage generation. Evidence verification from existing artifacts is the required model.
++Evidence verification from existing artifacts is the required model. When a coverage report is absent or stale for a changed language, the agent re-runs coverage over the branch's test selection through the test-execution launcher, never the full suite, as step 5 of the `feature-review-workflow` skill states.
+ 
+ <!-- harness-section: file-size-advisory-2 -->
+ ## File Size Advisory
 diff --git a/scripts/harness-generation/sources/agents/powershell-typed-engineer.md b/scripts/harness-generation/sources/agents/powershell-typed-engineer.md
 index 4b5268c54..ee373a96c 100644
 --- a/scripts/harness-generation/sources/agents/powershell-typed-engineer.md
@@ -3094,7 +3620,7 @@ index 46d595161..9044a5db2 100644
          @{ Id = 'RSC-FALLBACK'; File = $orchestrate; Heading = $remediation; Literal = @('appends a regeneration_events[] entry with outcome fell_back', "today's procedure runs unchanged from its first step") }
          @{ Id = 'RSC-ACCOUNTING'; File = $orchestrate; Heading = $remediation; Literal = @('consumes no remediation attempt', 'writes no remediation_loop.cycles[] entry', 'leaves completed_attempts unchanged on success or fallback') }
 diff --git a/tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1 b/tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1
-index ce5ad5e7e..825f25585 100644
+index ce5ad5e7e..6295f045b 100644
 --- a/tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1
 +++ b/tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1
 @@ -113,7 +113,27 @@ BeforeDiscovery {
@@ -3126,7 +3652,22 @@ index ce5ad5e7e..825f25585 100644
      $script:WordingRow = @(
          Get-TcwRow -Group 'CANONICAL' -Base $contractBase -Check @($script:CanonicalCheck)
          Get-TcwRow -Group 'CANONICAL-REF' -Base $contractBase -Check @(
-@@ -210,7 +230,8 @@ BeforeDiscovery {
+@@ -202,6 +222,14 @@ BeforeDiscovery {
+         @{ Id = 'AGENTS-CSHARP-LEGACY'; Path = "$resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp/SKILL.md"; Bundle = $false }
+     ) -Check @((Get-TcwCheck -Heading '## Toolchain' -Required @($anchor)), $fileForbidden)
+ 
++    # Issue #1228 (F1): the overall delta binds only the final QA loop, and the remediation
++    # gate's selection run is its gate run, not a forbidden partial run.
++    $script:QaGateDeltaCheck = Get-TcwCheck -Heading '## Delta Requirements (Zero-Regression Hard Gate)' -Required @(
++        '(final QA loop only, when the repo enforces it)', 'applies to the files the cycle changed', "the orchestration's final-QC artifact and CI"
++    ) -Forbidden @('Overall coverage delta** (when the repo enforces it)')
++    $script:QaGateShortcutCheck = Get-TcwCheck -Heading '## Prohibited Shortcuts' -Required @(
++        'is not a narrowing', 'The gate run of a remediation gate is the selection run'
++    ) -Forbidden @('based on partial or targeted runs')
+     $script:WordingRow += Get-TcwRow -Group 'QAGATE' -Base @(
+         foreach ($name in 'python', 'powershell', 'csharp') {
+             @{ Id = "CLAUDE-$($name.ToUpperInvariant())"; Path = ".claude/skills/$name-qa-gate/SKILL.md" }
+@@ -210,8 +238,11 @@ BeforeDiscovery {
          @{ Id = 'CLAUDE-CSHARP-LEGACY'; Path = "$resources/claude-customizations/.claude-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md"; Bundle = $false }
          @{ Id = 'AGENTS-CSHARP-LEGACY'; Path = "$resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md"; Bundle = $false }
      ) -Check @(
@@ -3134,9 +3675,12 @@ index ce5ad5e7e..825f25585 100644
 +        # Issue #1228 (PD2): a QA-gate skill applies to the final QA loop and to a remediation gate only.
 +        (Get-TcwCheck -Heading '## When to Use This Skill' -Required @($anchor, 'the final QA loop or a remediation gate') -Forbidden @('a phase gate or the final QA loop'))
          (Get-TcwCheck -Forbidden ($runClassForbidden + @('planned batch')))
++        $script:QaGateDeltaCheck
++        $script:QaGateShortcutCheck
      )
  
-@@ -227,13 +248,44 @@ BeforeDiscovery {
+     $promptBase = @(
+@@ -227,13 +258,77 @@ BeforeDiscovery {
          @{ Id = 'CLAUDE'; Path = '.claude/skills/execution-environment/SKILL.md' }
          @{ Id = 'AGENTS'; Path = '.agents/skills/execution-environment/SKILL.md' }
      ) -Check @(
@@ -3161,10 +3705,43 @@ index ce5ad5e7e..825f25585 100644
 +            foreach ($suffix in $codexSuffix) { @{ Id = "CODEX-$($name.ToUpperInvariant())$($suffix.ToUpperInvariant())"; Path = ".codex/agents/$name-typed-engineer$suffix.toml" } }
 +        }
 +    ) -Check @((Get-TcwCheck -Heading '## Workflow' -Required @("leaves the full gate to the plan's final QA loop")))
++    # Issue #1228 (F2): a local coverage file written by a selection run supplies per-file
++    # figures only; repository-wide totals come from the final-QC artifact and CI.
++    $script:ReviewCheck = Get-TcwCheck -Heading '## Ordered Procedure' -Required @(
++        "over the branch's test selection", 'from the final-QC artifact and', 'supplies per-file figures only', 'a full-suite final-QC artifact'
++    ) -Forbidden @('local artifact that shows the')
 +    $script:WordingRow += Get-TcwRow -Group 'REVIEW' -Base @(
 +        @{ Id = 'CLAUDE'; Path = '.claude/skills/feature-review-workflow/SKILL.md' }
 +        @{ Id = 'AGENTS'; Path = '.agents/skills/feature-review-workflow/SKILL.md' }
-+    ) -Check @((Get-TcwCheck -Heading '## Ordered Procedure' -Required @("over the branch's test selection", 'from the final-QC artifact and')))
++    ) -Check @($script:ReviewCheck)
++    $script:ReviewAgentCheck = Get-TcwCheck -Heading '## Coverage Verification' -Required @(
++        'supplies per-file figures only', 'from the final-QC artifact and', "over the branch's test selection", 'never runs the full suite', 'a full-suite final-QC artifact'
++    ) -Forbidden @('does NOT rerun coverage generation', 'rather than rerunning coverage generation', 'local artifact that shows the')
++    $script:WordingRow += Get-TcwRow -Group 'REVIEW-AGENT' -Base @(
++        @{ Id = 'CLAUDE'; Path = '.claude/agents/feature-review.md' }
++        @{ Id = 'CODEX'; Path = '.codex/agents/feature-review.toml' }
++    ) -Check @($script:ReviewAgentCheck)
++    $script:ReviewTemplateCheck = Get-TcwCheck -Heading '#### 4A.1 Framework and Scope' -Required @(
++        'supplies per-file figures only', 'from the final-QC artifact and'
++    ) -Forbidden @('local artifact that shows the')
++    $script:WordingRow += Get-TcwRow -Group 'REVIEW-TEMPLATE' -Base @(
++        @{ Id = 'BASE'; Path = '.dev/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md'; Bundle = $false }
++        @{ Id = 'BUNDLE'; Path = "$resources/templates/policy_audit/policy-audit.yyyy-MM-ddTHH-mm.md"; Bundle = $false }
++    ) -Check @($script:ReviewTemplateCheck)
++    # Each removed coverage-source sentence, held in memory under its heading.
++    $script:CoverageSourceCase = @(
++        @{ Check = $script:QaGateDeltaCheck; Line = @('## Delta Requirements (Zero-Regression Hard Gate)', '- **Overall coverage delta** (when the repo enforces it): overall coverage is greater than or equal to the baseline.') }
++        @{ Check = $script:QaGateShortcutCheck; Line = @('## Prohibited Shortcuts', '- Do not report success based on partial or targeted runs.') }
++        @{ Check = $script:ReviewCheck; Line = @('## Ordered Procedure', '- Python repo-wide total: a local artifact that shows the Python total below a threshold is still FAIL.') }
++        @{ Check = $script:ReviewAgentCheck; Line = @(
++                '## Coverage Verification'
++                'The agent verifies coverage by inspecting pre-existing coverage artifacts rather than rerunning coverage generation.'
++                '- For Python, a local artifact that shows the Python total below a threshold is still FAIL.'
++                'The agent does NOT rerun coverage generation.'
++            )
++        }
++        @{ Check = $script:ReviewTemplateCheck; Line = @('#### 4A.1 Framework and Scope', '| **Coverage expectation** | a local artifact that shows the total below a threshold is still FAIL. |') }
++    )
 +    $script:WordingRow += Get-TcwRow -Group 'SCOPED' -Base @(
 +        @{ Id = 'CLAUDE'; Path = '.claude/skills/test-execution-policy/SKILL.md' }
 +        @{ Id = 'AGENTS'; Path = '.agents/skills/test-execution-policy/SKILL.md' }
@@ -3182,7 +3759,30 @@ index ce5ad5e7e..825f25585 100644
      # Gate layout per template under decision D15: the bug template gates its expect-fail
      # Phase 2 and its fix Phase 3, and its Phase 1 is a no-change phase without a gate.
      $templateLayout = @{
-@@ -538,5 +590,40 @@ Describe 'Test cadence wording' {
+@@ -428,6 +523,22 @@ Describe 'Test cadence wording' {
+         $unreported | Should -BeNullOrEmpty -Because 'the canonical row must fail when the D15 wording is removed'
+     }
+ 
++    It 'TCW-COVERAGE-SOURCE-DISCRIMINATES reports each forbidden coverage-source token once the removed sentences return' -ForEach @(@{ Case = $script:CoverageSourceCase }) {
++        # Arrange: the five checks and their distinct forbidden tokens; the lines are in memory only.
++        $expected = @($Case | ForEach-Object { $_.Check.Forbidden } | Sort-Object -Unique)
++
++        # Act
++        $problem = @(foreach ($item in $Case) { Get-TcwCheckProblem -Line $item.Line -Check $item.Check })
++        $unreported = @(foreach ($token in $expected) {
++                $reported = @($problem | Where-Object { $_.StartsWith("forbidden '$token' in ", [System.StringComparison]::Ordinal) })
++                if ($reported.Count -eq 0) { $token }
++            })
++
++        # Assert
++        $expected.Count | Should -Be 5 -Because 'the coverage-source checks forbid five distinct removed tokens'
++        $unreported | Should -BeNullOrEmpty -Because 'each check must fail when its removed sentence returns'
++    }
++
+     It 'TCW-TEMPLATE-<Id> ends each gated phase with its phase gate' -ForEach $script:TemplateRow {
+         # Arrange
+         $fileLine = Get-TcwFileLine -RelativePath $Path
+@@ -538,5 +649,40 @@ Describe 'Test cadence wording' {
              $tokens.Count | Should -Be 7 -Because 'the plan names 7 per-task sweep tokens'
              $missed | Should -BeNullOrEmpty -Because 'a reintroduced token must fail the sweep'
          }
