@@ -28,10 +28,10 @@ Self-declared key (decision D10): `child_ci` is written by the item checkpoint, 
 - `extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts`: source, the `routeRequiresCiGate` branch calls the selection
 - `extensions/drm-copilot/jest.config.cjs`: source, the `coverageThreshold` entry of the created source
 - `extensions/drm-copilot/test/lib/validate/orchestrator-state-child-ci.test.ts`: created test
-- `.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`: source, the selection inside `Get-OrchestratorStateCompletionCiGateError` and two private helpers
+- `.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`: source, the selection inside `Get-OrchestratorStateCompletionCiGateError` and three private helpers, including the ordinal presence check `Get-MissingOrdinalGateKey`; the local-QC check reads every key through `Get-CheckpointObjectOrdinalMember`
 - `extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`: byte-identical mirror of `.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`
 - `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateChildCi.Tests.ps1`: created test
-- `.claude/hooks/enforce-epic-merge-gate-child-ci.ps1`: source, opt-out stages B, R, L1, L2, and L3, the `EPIC_CHILD_LOCAL_QC_NOT_VERIFIED` prefix, the seam `Get-EpicMergeGateChildCiLivePullRequest`, and `-GitRoot`
+- `.claude/hooks/enforce-epic-merge-gate-child-ci.ps1`: source, opt-out stages B, R, L1, L2, and L3, the `EPIC_CHILD_LOCAL_QC_NOT_VERIFIED` prefix, the seam `Get-EpicMergeGateChildCiLivePullRequest`, `-GitRoot`, and the ordinal accessors `Get-EpicMergeGateChildCiOrdinalProperty` and `Get-EpicMergeGateChildLocalQcReviewedHead` through which the opt-out reads its keys
 - `.codex/hooks/enforce-epic-merge-gate-child-ci.ps1`: byte-identical twin of `.claude/hooks/enforce-epic-merge-gate-child-ci.ps1`
 - `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate-child-ci.ps1`: byte-identical mirror of `.claude/hooks/enforce-epic-merge-gate-child-ci.ps1`
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate-child-ci.ps1`: byte-identical mirror of `.codex/hooks/enforce-epic-merge-gate-child-ci.ps1`
@@ -46,6 +46,7 @@ Self-declared key (decision D10): `child_ci` is written by the item checkpoint, 
 - `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-helpers.ps1`: byte-identical mirror of `.claude/hooks/enforce-completion-helpers.ps1`
 - `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-helpers.ps1`: byte-identical mirror of `.codex/hooks/enforce-completion-helpers.ps1`
 - `tests/scripts/codex-hooks/enforce-completion-helpers.Tests.ps1`: extended test
+- `tests/scripts/codex-hooks/enforce-completion-helpers.OrdinalKeys.Tests.ps1`: created test
 - `.claude/hooks/enforce-completion-consistency.ps1`: source, `Get-MissingCompletionEvidence` and the deny reason branch on the opt-out
 - `.codex/hooks/enforce-completion-consistency.ps1`: source, the same change (not identical to the Claude hook)
 - `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-consistency.ps1`: byte-identical mirror of `.claude/hooks/enforce-completion-consistency.ps1`
@@ -473,6 +474,43 @@ function Test-OrchestratorStateChildCiIntegrationOnly {
     return (($epicMode -is [bool]) -and $epicMode -and ($childCi -is [string]) -and ($childCi -ceq 'integration_only'))
 }
 
+function Get-MissingOrdinalGateKey {
+    <#
+    .SYNOPSIS
+        Return the gate keys absent or blank in a gate object, matched by ordinal name (issue #1233).
+    .DESCRIPTION
+        Private helper with the contract of Get-MissingGateKey, except that a key is present only
+        when a property name equals it ordinally, as a Python dict lookup does. A non-object value
+        reports every key as missing, because the ordinal accessor reads no member from it; a
+        present key holding null or a blank string is also missing.
+    .PARAMETER Value
+        The candidate gate value from the checkpoint. May be $null.
+    .PARAMETER GateKey
+        The required key names, in message order.
+    .OUTPUTS
+        System.String[] - the missing key names, in the given order.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [object] $Value,
+
+        [Parameter(Mandatory = $true)]
+        [string[]] $GateKey
+    )
+
+    $missing = [System.Collections.Generic.List[string]]::new()
+    foreach ($key in $GateKey) {
+        $item = (Get-CheckpointObjectOrdinalMember -Owner $Value -Name $key).Value
+        if ($null -eq $item -or (($item -is [string]) -and [string]::IsNullOrWhiteSpace([string]$item))) {
+            $missing.Add($key)
+        }
+    }
+    return $missing.ToArray()
+}
+
 function Get-OrchestratorStateCompletionLocalQcGateError {
     <#
     .SYNOPSIS
@@ -500,11 +538,11 @@ function Get-OrchestratorStateCompletionLocalQcGateError {
     }
 
     $errors = [System.Collections.Generic.List[string]]::new()
-    $missing = @(Get-MissingGateKey -Value $gate -GateKey $script:LOCAL_QC_GATE_KEYS)
+    $missing = @(Get-MissingOrdinalGateKey -Value $gate -GateKey $script:LOCAL_QC_GATE_KEYS)
     if ($missing.Count -gt 0) {
         $errors.Add("Checkpoint completion validation failed: local_qc_gate missing required fields: $($missing -join ', ').")
     }
-    $conclusion = (Get-CheckpointObjectMember -Owner $gate -Name 'conclusion').Value
+    $conclusion = (Get-CheckpointObjectOrdinalMember -Owner $gate -Name 'conclusion').Value
     if (-not (Test-PythonValueEqual -Actual $conclusion -Expected 'success')) {
         $errors.Add('Checkpoint completion validation failed: local_qc_gate.conclusion must be success.')
     }
@@ -517,13 +555,13 @@ function Get-OrchestratorStateCompletionLocalQcGateError {
 
     # A missing loop, a non-list value, an empty list, and a non-object last entry leave no head.
     $last = $null
-    $loop = (Get-CheckpointObjectMember -Owner $State -Name 'remediation_loop').Value
-    $outcomes = (Get-CheckpointObjectMember -Owner $loop -Name 'review_outcomes').Value
+    $loop = (Get-CheckpointObjectOrdinalMember -Owner $State -Name 'remediation_loop').Value
+    $outcomes = (Get-CheckpointObjectOrdinalMember -Owner $loop -Name 'review_outcomes').Value
     if ((Test-CheckpointListValue -Value $outcomes) -and $outcomes.Count -gt 0) {
         $last = $outcomes[$outcomes.Count - 1]
     }
-    $lastHead = (Get-CheckpointObjectMember -Owner $last -Name 'head_sha').Value
-    $gateHead = (Get-CheckpointObjectMember -Owner $gate -Name 'head_sha').Value
+    $lastHead = (Get-CheckpointObjectOrdinalMember -Owner $last -Name 'head_sha').Value
+    $gateHead = (Get-CheckpointObjectOrdinalMember -Owner $gate -Name 'head_sha').Value
     if (-not (($lastHead -is [string]) -and ($gateHead -is [string]) -and ($gateHead -ceq $lastHead))) {
         $errors.Add('Checkpoint completion validation failed: local_qc_gate.head_sha must match the head_sha of the last review_outcomes entry.')
     }
@@ -544,7 +582,7 @@ function Get-OrchestratorStateCompletionLocalQcGateError {
         return [string[]]@(Get-OrchestratorStateCompletionLocalQcGateError -State $State)
     }
 
-    $ciGate =(Get-CheckpointObjectMember -Owner $State -Name 'ci_gate').Value
+    $ciGate = (Get-CheckpointObjectMember -Owner $State -Name 'ci_gate').Value
 ````
 
 ````Prior
@@ -579,6 +617,7 @@ function Get-OrchestratorStateCompletionLocalQcGateError {
     "EPIC_MERGE_GATE_BLOCKED: EPIC_CHILD_LOCAL_QC_NOT_VERIFIED: " and does not fall through. Without the
     predicate the helper is unchanged and the opt-out seam is never called. child_ci is self-declared by
     the item checkpoint; the live base, the concurrent review, and the evidence file bound it.
+    The opt-out reads its keys by ordinal name, as the validators and the completion hooks do.
 #>
 
 $script:EpicMergeGateChildCiReasonPrefix = 'EPIC_MERGE_GATE_BLOCKED: EPIC_CHILD_CI_NOT_VERIFIED: '
@@ -597,6 +636,54 @@ $script:EpicMergeGateChildCiReasonPrefix = 'EPIC_MERGE_GATE_BLOCKED: EPIC_CHILD_
 
 ````Current
 
+function Get-EpicMergeGateChildCiOrdinalProperty {
+    <#
+    .SYNOPSIS
+        Read a named property off a parsed JSON object by ordinal name, or $null when absent (issue #1233).
+    .DESCRIPTION
+        Same contract as Get-EpicMergeGateChildCiProperty, except that a property matches only when its
+        name equals Name ordinally (-ceq), as a Python dict and a TypeScript property lookup do.
+    .PARAMETER InputObject
+        The parsed value.
+    .PARAMETER Name
+        The property name, compared ordinally.
+    .OUTPUTS
+        System.Object
+    #>
+    [CmdletBinding()]
+    [OutputType([object], [object[]])]
+    param([AllowNull()] $InputObject, [Parameter(Mandatory)][string] $Name)
+
+    if ($InputObject -isnot [System.Management.Automation.PSCustomObject]) { return $null }
+    foreach ($property in $InputObject.PSObject.Properties) {
+        if ($property.Name -ceq $Name) { return , $property.Value }
+    }
+    return $null
+}
+
+function Get-EpicMergeGateChildLocalQcReviewedHead {
+    <#
+    .SYNOPSIS
+        Return the head_sha of the last remediation_loop.review_outcomes entry, read by ordinal names (pure).
+    .DESCRIPTION
+        A missing loop, a value that is not a list, an empty list, and a last entry that is not an object
+        all return $null; only the final list element counts.
+    .PARAMETER Checkpoint
+        The parsed child checkpoint.
+    .OUTPUTS
+        System.Object or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([object], [object[]])]
+    param([AllowNull()] $Checkpoint)
+
+    $loop = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'remediation_loop'
+    $outcomes = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $loop -Name 'review_outcomes'
+    if ($outcomes -isnot [System.Array] -or $outcomes.Count -eq 0) { return $null }
+    $head = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $outcomes[$outcomes.Count - 1] -Name 'head_sha'
+    return , $head
+}
+
 function Test-EpicMergeGateChildCiOptOut {
     <#
     .SYNOPSIS
@@ -613,12 +700,12 @@ function Test-EpicMergeGateChildCiOptOut {
     [OutputType([bool])]
     param([AllowNull()] $Checkpoint)
 
-    $epicMode = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'epic_mode'
+    $epicMode = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'epic_mode'
     if (-not ($epicMode -is [bool] -and $epicMode)) { return $false }
-    $childCi = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'child_ci'
+    $childCi = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'child_ci'
     if (-not ($childCi -is [string] -and $childCi -ceq 'integration_only')) { return $false }
-    $context = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'epic_context'
-    $branch = Get-EpicMergeGateChildCiProperty -InputObject $context -Name 'integration_branch'
+    $context = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'epic_context'
+    $branch = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $context -Name 'integration_branch'
     return ($branch -is [string] -and $branch -cmatch $script:EpicMergeGateChildCiIntegrationBranchPattern)
 }
 
@@ -649,8 +736,8 @@ function Get-EpicMergeGateChildCiLivePullRequest {
         # Unreadable gh output is a lookup failure; the opt-out fails closed on $null.
         return $null
     }
-    $head = Get-EpicMergeGateChildCiProperty -InputObject $pr -Name 'headRefOid'
-    $base = Get-EpicMergeGateChildCiProperty -InputObject $pr -Name 'baseRefName'
+    $head = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $pr -Name 'headRefOid'
+    $base = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $pr -Name 'baseRefName'
     if (-not (Test-EpicMergeGateChildCiObjectId -Value $head)) { return $null }
     if (-not ($base -is [string]) -or [string]::IsNullOrWhiteSpace($base)) { return $null }
     return [ordered]@{ HeadSha = [string]$head; BaseRef = [string]$base }
@@ -775,7 +862,7 @@ function Get-EpicMergeGateChildLocalQcResult {
     if ($null -eq $live) {
         return ConvertTo-EpicMergeGateChildLocalQcResult -Detail "stage B (base): the live head and base of pull request $PrNumber could not be resolved." -LiveHead $null
     }
-    $integration = [string](Get-EpicMergeGateChildCiProperty -InputObject (Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'epic_context') -Name 'integration_branch')
+    $integration = [string](Get-EpicMergeGateChildCiOrdinalProperty -InputObject (Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'epic_context') -Name 'integration_branch')
     if ($live.BaseRef -cne $integration -or $live.BaseRef -ceq 'main') {
         return [ordered]@{ Applies = $false; Detail = $null; LiveHead = $live.HeadSha }
     }
@@ -784,25 +871,24 @@ function Get-EpicMergeGateChildLocalQcResult {
         return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage R (review): child_ci integration_only requires review_mode "concurrent".' -LiveHead $live.HeadSha
     }
 
-    $gate = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'local_qc_gate'
+    $gate = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'local_qc_gate'
     if ($gate -isnot [System.Management.Automation.PSCustomObject]) { return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage L1 (record): the checkpoint records no local_qc_gate object.' -LiveHead $live.HeadSha }
-    $conclusion = Get-EpicMergeGateChildCiProperty -InputObject $gate -Name 'conclusion'
+    $conclusion = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $gate -Name 'conclusion'
     if (-not ($conclusion -is [string] -and $conclusion -ceq 'success')) { return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage L1 (record): local_qc_gate.conclusion is not "success".' -LiveHead $live.HeadSha }
-    $recordedHead = Get-EpicMergeGateChildCiProperty -InputObject $gate -Name 'head_sha'
+    $recordedHead = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $gate -Name 'head_sha'
     if (-not (Test-EpicMergeGateChildCiObjectId -Value $recordedHead)) {
         return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage L1 (record): local_qc_gate.head_sha is not a lowercase 40- or 64-character object id.' -LiveHead $live.HeadSha
     }
-    $featureFolder = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'feature-folder'
+    $featureFolder = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'feature-folder'
     if (-not (Test-EpicMergeGateReviewFeatureFolder -Value $featureFolder)) {
         return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage L1 (record): the checkpoint feature-folder is absent or not a clean development-docs path.' -LiveHead $live.HeadSha
     }
-    $evidencePath = Get-EpicMergeGateChildCiProperty -InputObject $gate -Name 'evidence_path'
+    $evidencePath = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $gate -Name 'evidence_path'
     if (-not (Test-EpicMergeGateChildCiEvidencePath -Path $evidencePath -FeatureFolder ([string]$featureFolder))) {
         return ConvertTo-EpicMergeGateChildLocalQcResult -Detail "stage L1 (record): local_qc_gate.evidence_path is not a clean relative path under $featureFolder/evidence/qa-gates/ that ends in .md." -LiveHead $live.HeadSha
     }
 
-    $outcome = Get-EpicMergeGateLastReviewOutcome -Checkpoint $Checkpoint
-    $reviewedHead = Get-EpicMergeGateChildCiProperty -InputObject $outcome -Name 'head_sha'
+    $reviewedHead = Get-EpicMergeGateChildLocalQcReviewedHead -Checkpoint $Checkpoint
     if (-not ($reviewedHead -is [string] -and $reviewedHead -ceq $recordedHead)) {
         return ConvertTo-EpicMergeGateChildLocalQcResult -Detail "stage L2 (binding): local_qc_gate.head_sha $recordedHead differs from the head_sha of the last review_outcomes entry." -LiveHead $live.HeadSha
     }
@@ -1819,7 +1905,7 @@ Honest disclosure: `child_ci` is self-declared by the item checkpoint, and a wri
 
 ## Revert Steps
 
-1. Apply the blocks: replace each `Current` fence with its `Prior` fence in the named file, and delete the files this change created: `tests/fixtures/orchestrator_state_child_ci/` (every file), `extensions/drm-copilot/src/lib/validate/orchestrator-state-child-ci.ts`, `extensions/drm-copilot/test/lib/validate/orchestrator-state-child-ci.test.ts`, `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateChildCi.Tests.ps1`, `tests/scripts/codex-hooks/enforce-epic-merge-gate-child-ci-opt-out.Tests.ps1`, `tests/scripts/claude-hooks/enforce-epic-merge-gate.ChildCiOptOut.Tests.ps1`, and `tests/scripts/claude-runtime/child-ci-opt-out-skill-contract.Tests.ps1`.
+1. Apply the blocks: replace each `Current` fence with its `Prior` fence in the named file, and delete the files this change created: `tests/fixtures/orchestrator_state_child_ci/` (every file), `extensions/drm-copilot/src/lib/validate/orchestrator-state-child-ci.ts`, `extensions/drm-copilot/test/lib/validate/orchestrator-state-child-ci.test.ts`, `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateChildCi.Tests.ps1`, `tests/scripts/codex-hooks/enforce-epic-merge-gate-child-ci-opt-out.Tests.ps1`, `tests/scripts/claude-hooks/enforce-epic-merge-gate.ChildCiOptOut.Tests.ps1`, `tests/scripts/codex-hooks/enforce-completion-helpers.OrdinalKeys.Tests.ps1`, and `tests/scripts/claude-runtime/child-ci-opt-out-skill-contract.Tests.ps1`.
 2. Re-copy mirrors and bundles: copy `.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1` to `extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`; copy `.claude/hooks/enforce-epic-merge-gate-child-ci.ps1` to `.codex/hooks/enforce-epic-merge-gate-child-ci.ps1`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate-child-ci.ps1`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate-child-ci.ps1`; copy `.claude/hooks/enforce-epic-merge-gate.ps1` to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate.ps1` and `.codex/hooks/enforce-epic-merge-gate.ps1` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate.ps1`; copy `.claude/hooks/enforce-completion-helpers.ps1` to `.codex/hooks/enforce-completion-helpers.ps1`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-helpers.ps1`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-helpers.ps1`; copy `.claude/hooks/enforce-completion-consistency.ps1` to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-consistency.ps1` and `.codex/hooks/enforce-completion-consistency.ps1` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-consistency.ps1`; copy `.claude/skills/orchestrate/SKILL.md` to `extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md` and `.agents/skills/orchestrate/SKILL.md` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrate/SKILL.md`; copy `.claude/skills/epic-orchestrate/SKILL.md` to `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-orchestrate/SKILL.md` and `.agents/skills/epic-orchestrate/SKILL.md` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-orchestrate/SKILL.md`; copy `.claude/skills/epic-run/SKILL.md` to `extensions/drm-copilot/resources/claude-customizations/.claude/skills/epic-run/SKILL.md` and `.agents/skills/epic-run/SKILL.md` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-run/SKILL.md`; copy `.dev/templates/epic/epic.md` to `extensions/drm-copilot/resources/feature-templates/epic/epic.md`; copy `.agents/skills/epic-plan/SKILL.md` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/epic-plan/SKILL.md` and `.agents/skills/execution-environment/SKILL.md` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md`; then run `scripts/harness-generation/Invoke-HarnessGeneration.ps1` to regenerate `.claude/skills/epic-plan/SKILL.md`, `.claude/skills/execution-environment/SKILL.md`, `.claude/rules/orchestrator-state.md`, and their `claude-customizations` bundle copies, and run it again with `-Check`.
 3. Regenerate Codex variants: not applicable; run `scripts/dev_tools/generate_codex_agent_variants.py` in module form with `--check` to confirm no variant changed.
 4. Restore pinned hashes: the revert block of `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py` restores the prior `.claude/skills/epic-orchestrate/SKILL.md` digest in `PINNED_FROZEN_SURFACE_HASHES` and removes the `RE-BASELINED by issue #1233` paragraph; this block is reverted before the hunk of `patches/0010-early-dependent-starts.patch` on the same file.

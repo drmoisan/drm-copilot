@@ -48,6 +48,7 @@
     "EPIC_MERGE_GATE_BLOCKED: EPIC_CHILD_LOCAL_QC_NOT_VERIFIED: " and does not fall through. Without the
     predicate the helper is unchanged and the opt-out seam is never called. child_ci is self-declared by
     the item checkpoint; the live base, the concurrent review, and the evidence file bound it.
+    The opt-out reads its keys by ordinal name, as the validators and the completion hooks do.
 #>
 
 $script:EpicMergeGateChildCiReasonPrefix = 'EPIC_MERGE_GATE_BLOCKED: EPIC_CHILD_CI_NOT_VERIFIED: '
@@ -248,6 +249,54 @@ function Select-EpicMergeGateChildCiRun {
     return $newest.Run
 }
 
+function Get-EpicMergeGateChildCiOrdinalProperty {
+    <#
+    .SYNOPSIS
+        Read a named property off a parsed JSON object by ordinal name, or $null when absent (issue #1233).
+    .DESCRIPTION
+        Same contract as Get-EpicMergeGateChildCiProperty, except that a property matches only when its
+        name equals Name ordinally (-ceq), as a Python dict and a TypeScript property lookup do.
+    .PARAMETER InputObject
+        The parsed value.
+    .PARAMETER Name
+        The property name, compared ordinally.
+    .OUTPUTS
+        System.Object
+    #>
+    [CmdletBinding()]
+    [OutputType([object], [object[]])]
+    param([AllowNull()] $InputObject, [Parameter(Mandatory)][string] $Name)
+
+    if ($InputObject -isnot [System.Management.Automation.PSCustomObject]) { return $null }
+    foreach ($property in $InputObject.PSObject.Properties) {
+        if ($property.Name -ceq $Name) { return , $property.Value }
+    }
+    return $null
+}
+
+function Get-EpicMergeGateChildLocalQcReviewedHead {
+    <#
+    .SYNOPSIS
+        Return the head_sha of the last remediation_loop.review_outcomes entry, read by ordinal names (pure).
+    .DESCRIPTION
+        A missing loop, a value that is not a list, an empty list, and a last entry that is not an object
+        all return $null; only the final list element counts.
+    .PARAMETER Checkpoint
+        The parsed child checkpoint.
+    .OUTPUTS
+        System.Object or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([object], [object[]])]
+    param([AllowNull()] $Checkpoint)
+
+    $loop = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'remediation_loop'
+    $outcomes = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $loop -Name 'review_outcomes'
+    if ($outcomes -isnot [System.Array] -or $outcomes.Count -eq 0) { return $null }
+    $head = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $outcomes[$outcomes.Count - 1] -Name 'head_sha'
+    return , $head
+}
+
 function Test-EpicMergeGateChildCiOptOut {
     <#
     .SYNOPSIS
@@ -264,12 +313,12 @@ function Test-EpicMergeGateChildCiOptOut {
     [OutputType([bool])]
     param([AllowNull()] $Checkpoint)
 
-    $epicMode = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'epic_mode'
+    $epicMode = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'epic_mode'
     if (-not ($epicMode -is [bool] -and $epicMode)) { return $false }
-    $childCi = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'child_ci'
+    $childCi = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'child_ci'
     if (-not ($childCi -is [string] -and $childCi -ceq 'integration_only')) { return $false }
-    $context = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'epic_context'
-    $branch = Get-EpicMergeGateChildCiProperty -InputObject $context -Name 'integration_branch'
+    $context = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'epic_context'
+    $branch = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $context -Name 'integration_branch'
     return ($branch -is [string] -and $branch -cmatch $script:EpicMergeGateChildCiIntegrationBranchPattern)
 }
 
@@ -300,8 +349,8 @@ function Get-EpicMergeGateChildCiLivePullRequest {
         # Unreadable gh output is a lookup failure; the opt-out fails closed on $null.
         return $null
     }
-    $head = Get-EpicMergeGateChildCiProperty -InputObject $pr -Name 'headRefOid'
-    $base = Get-EpicMergeGateChildCiProperty -InputObject $pr -Name 'baseRefName'
+    $head = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $pr -Name 'headRefOid'
+    $base = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $pr -Name 'baseRefName'
     if (-not (Test-EpicMergeGateChildCiObjectId -Value $head)) { return $null }
     if (-not ($base -is [string]) -or [string]::IsNullOrWhiteSpace($base)) { return $null }
     return [ordered]@{ HeadSha = [string]$head; BaseRef = [string]$base }
@@ -426,7 +475,7 @@ function Get-EpicMergeGateChildLocalQcResult {
     if ($null -eq $live) {
         return ConvertTo-EpicMergeGateChildLocalQcResult -Detail "stage B (base): the live head and base of pull request $PrNumber could not be resolved." -LiveHead $null
     }
-    $integration = [string](Get-EpicMergeGateChildCiProperty -InputObject (Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'epic_context') -Name 'integration_branch')
+    $integration = [string](Get-EpicMergeGateChildCiOrdinalProperty -InputObject (Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'epic_context') -Name 'integration_branch')
     if ($live.BaseRef -cne $integration -or $live.BaseRef -ceq 'main') {
         return [ordered]@{ Applies = $false; Detail = $null; LiveHead = $live.HeadSha }
     }
@@ -435,25 +484,24 @@ function Get-EpicMergeGateChildLocalQcResult {
         return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage R (review): child_ci integration_only requires review_mode "concurrent".' -LiveHead $live.HeadSha
     }
 
-    $gate = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'local_qc_gate'
+    $gate = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'local_qc_gate'
     if ($gate -isnot [System.Management.Automation.PSCustomObject]) { return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage L1 (record): the checkpoint records no local_qc_gate object.' -LiveHead $live.HeadSha }
-    $conclusion = Get-EpicMergeGateChildCiProperty -InputObject $gate -Name 'conclusion'
+    $conclusion = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $gate -Name 'conclusion'
     if (-not ($conclusion -is [string] -and $conclusion -ceq 'success')) { return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage L1 (record): local_qc_gate.conclusion is not "success".' -LiveHead $live.HeadSha }
-    $recordedHead = Get-EpicMergeGateChildCiProperty -InputObject $gate -Name 'head_sha'
+    $recordedHead = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $gate -Name 'head_sha'
     if (-not (Test-EpicMergeGateChildCiObjectId -Value $recordedHead)) {
         return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage L1 (record): local_qc_gate.head_sha is not a lowercase 40- or 64-character object id.' -LiveHead $live.HeadSha
     }
-    $featureFolder = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'feature-folder'
+    $featureFolder = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $Checkpoint -Name 'feature-folder'
     if (-not (Test-EpicMergeGateReviewFeatureFolder -Value $featureFolder)) {
         return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage L1 (record): the checkpoint feature-folder is absent or not a clean development-docs path.' -LiveHead $live.HeadSha
     }
-    $evidencePath = Get-EpicMergeGateChildCiProperty -InputObject $gate -Name 'evidence_path'
+    $evidencePath = Get-EpicMergeGateChildCiOrdinalProperty -InputObject $gate -Name 'evidence_path'
     if (-not (Test-EpicMergeGateChildCiEvidencePath -Path $evidencePath -FeatureFolder ([string]$featureFolder))) {
         return ConvertTo-EpicMergeGateChildLocalQcResult -Detail "stage L1 (record): local_qc_gate.evidence_path is not a clean relative path under $featureFolder/evidence/qa-gates/ that ends in .md." -LiveHead $live.HeadSha
     }
 
-    $outcome = Get-EpicMergeGateLastReviewOutcome -Checkpoint $Checkpoint
-    $reviewedHead = Get-EpicMergeGateChildCiProperty -InputObject $outcome -Name 'head_sha'
+    $reviewedHead = Get-EpicMergeGateChildLocalQcReviewedHead -Checkpoint $Checkpoint
     if (-not ($reviewedHead -is [string] -and $reviewedHead -ceq $recordedHead)) {
         return ConvertTo-EpicMergeGateChildLocalQcResult -Detail "stage L2 (binding): local_qc_gate.head_sha $recordedHead differs from the head_sha of the last review_outcomes entry." -LiveHead $live.HeadSha
     }

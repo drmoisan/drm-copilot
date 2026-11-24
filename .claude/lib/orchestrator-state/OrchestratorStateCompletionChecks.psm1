@@ -150,6 +150,43 @@ function Test-OrchestratorStateChildCiIntegrationOnly {
     return (($epicMode -is [bool]) -and $epicMode -and ($childCi -is [string]) -and ($childCi -ceq 'integration_only'))
 }
 
+function Get-MissingOrdinalGateKey {
+    <#
+    .SYNOPSIS
+        Return the gate keys absent or blank in a gate object, matched by ordinal name (issue #1233).
+    .DESCRIPTION
+        Private helper with the contract of Get-MissingGateKey, except that a key is present only
+        when a property name equals it ordinally, as a Python dict lookup does. A non-object value
+        reports every key as missing, because the ordinal accessor reads no member from it; a
+        present key holding null or a blank string is also missing.
+    .PARAMETER Value
+        The candidate gate value from the checkpoint. May be $null.
+    .PARAMETER GateKey
+        The required key names, in message order.
+    .OUTPUTS
+        System.String[] - the missing key names, in the given order.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [object] $Value,
+
+        [Parameter(Mandatory = $true)]
+        [string[]] $GateKey
+    )
+
+    $missing = [System.Collections.Generic.List[string]]::new()
+    foreach ($key in $GateKey) {
+        $item = (Get-CheckpointObjectOrdinalMember -Owner $Value -Name $key).Value
+        if ($null -eq $item -or (($item -is [string]) -and [string]::IsNullOrWhiteSpace([string]$item))) {
+            $missing.Add($key)
+        }
+    }
+    return $missing.ToArray()
+}
+
 function Get-OrchestratorStateCompletionLocalQcGateError {
     <#
     .SYNOPSIS
@@ -177,11 +214,11 @@ function Get-OrchestratorStateCompletionLocalQcGateError {
     }
 
     $errors = [System.Collections.Generic.List[string]]::new()
-    $missing = @(Get-MissingGateKey -Value $gate -GateKey $script:LOCAL_QC_GATE_KEYS)
+    $missing = @(Get-MissingOrdinalGateKey -Value $gate -GateKey $script:LOCAL_QC_GATE_KEYS)
     if ($missing.Count -gt 0) {
         $errors.Add("Checkpoint completion validation failed: local_qc_gate missing required fields: $($missing -join ', ').")
     }
-    $conclusion = (Get-CheckpointObjectMember -Owner $gate -Name 'conclusion').Value
+    $conclusion = (Get-CheckpointObjectOrdinalMember -Owner $gate -Name 'conclusion').Value
     if (-not (Test-PythonValueEqual -Actual $conclusion -Expected 'success')) {
         $errors.Add('Checkpoint completion validation failed: local_qc_gate.conclusion must be success.')
     }
@@ -194,13 +231,13 @@ function Get-OrchestratorStateCompletionLocalQcGateError {
 
     # A missing loop, a non-list value, an empty list, and a non-object last entry leave no head.
     $last = $null
-    $loop = (Get-CheckpointObjectMember -Owner $State -Name 'remediation_loop').Value
-    $outcomes = (Get-CheckpointObjectMember -Owner $loop -Name 'review_outcomes').Value
+    $loop = (Get-CheckpointObjectOrdinalMember -Owner $State -Name 'remediation_loop').Value
+    $outcomes = (Get-CheckpointObjectOrdinalMember -Owner $loop -Name 'review_outcomes').Value
     if ((Test-CheckpointListValue -Value $outcomes) -and $outcomes.Count -gt 0) {
         $last = $outcomes[$outcomes.Count - 1]
     }
-    $lastHead = (Get-CheckpointObjectMember -Owner $last -Name 'head_sha').Value
-    $gateHead = (Get-CheckpointObjectMember -Owner $gate -Name 'head_sha').Value
+    $lastHead = (Get-CheckpointObjectOrdinalMember -Owner $last -Name 'head_sha').Value
+    $gateHead = (Get-CheckpointObjectOrdinalMember -Owner $gate -Name 'head_sha').Value
     if (-not (($lastHead -is [string]) -and ($gateHead -is [string]) -and ($gateHead -ceq $lastHead))) {
         $errors.Add('Checkpoint completion validation failed: local_qc_gate.head_sha must match the head_sha of the last review_outcomes entry.')
     }
@@ -362,7 +399,7 @@ function Get-OrchestratorStateCompletionCiGateError {
         return [string[]]@(Get-OrchestratorStateCompletionLocalQcGateError -State $State)
     }
 
-    $ciGate =(Get-CheckpointObjectMember -Owner $State -Name 'ci_gate').Value
+    $ciGate = (Get-CheckpointObjectMember -Owner $State -Name 'ci_gate').Value
     $missing = @(Get-MissingGateKey -Value $ciGate -GateKey $script:CI_GATE_KEYS)
 
     if (-not (Test-CheckpointObjectValue -Value $ciGate)) {

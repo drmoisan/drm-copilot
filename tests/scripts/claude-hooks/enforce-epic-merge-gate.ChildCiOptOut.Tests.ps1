@@ -72,6 +72,16 @@ BeforeDiscovery {
         return ($lines -join "`n")
     }
 
+    function Get-OrdinalLiteralJson {
+        <#
+        .SYNOPSIS
+            Build the default opt-out checkpoint as a literal JSON string with chosen head_sha key spellings.
+        #>
+        param([string] $ReviewHeadKey = 'head_sha', [string] $GateHeadKey = 'head_sha')
+
+        return '{"epic_mode":true,"step9_status":"passed","pr_gate":{"pr_number":42},"child_ci":"integration_only","review_mode":"concurrent","feature-folder":"' + $folder + '","epic_context":{"integration_branch":"' + $integration + '"},"remediation_loop":{"review_outcomes":[{"verdict":"PASS","' + $ReviewHeadKey + '":"' + $head + '"}]},"local_qc_gate":{"conclusion":"success","' + $GateHeadKey + '":"' + $head + '","evidence_path":"' + $evidencePath + '","verified_at":"2026-11-24T05:00:00Z"}}'
+    }
+
     $prView = '{"headRefOid":"' + $head + '","baseRefName":"' + $integration + '"}'
     $evidence = Get-EvidenceText
     $base = @{ PrView = $prView; PrViewExit = 0; Evidence = $evidence; EvidenceExit = 0 }
@@ -119,6 +129,15 @@ BeforeDiscovery {
         Get-DenyRow @{ Name = 'CLAUDE-OPT-L3-HEAD-MISMATCH'; Stage = 'L3 (evidence)'; Checkpoint = (Get-OptOutJson); Evidence = (Get-EvidenceText -HeadLine "Head: $other") }
         Get-DenyRow @{ Name = 'CLAUDE-OPT-L3-HEAD-CASE'; Stage = 'L3 (evidence)'; Checkpoint = (Get-OptOutJson); Evidence = (Get-EvidenceText -HeadLine "Head: $($head.ToUpperInvariant())") }
         Get-DenyRow @{ Name = 'CLAUDE-OPT-L3-NO-TIMESTAMP'; Stage = 'L3 (evidence)'; Checkpoint = (Get-OptOutJson); Evidence = (Get-EvidenceText -NoTimestamp) }
+        # Case-variant keys: the opt-out reads every #1233 key by ordinal name (issue #1233 remediation).
+        Get-DenyRow @{ Name = 'CLAUDE-OPT-ORD-L1-LOCAL-QC-GATE-KEY'; Stage = 'L1 (record)'; Checkpoint = ((Get-OptOutJson) -creplace '"local_qc_gate"', '"Local_QC_Gate"') }
+        Get-DenyRow @{ Name = 'CLAUDE-OPT-ORD-L1-CONCLUSION-KEY'; Stage = 'L1 (record)'; Checkpoint = ((Get-OptOutJson) -creplace '"conclusion"', '"Conclusion"') }
+        Get-DenyRow @{ Name = 'CLAUDE-OPT-ORD-L1-HEAD-SHA-KEY'; Stage = 'L1 (record)'; Checkpoint = (Get-OrdinalLiteralJson -GateHeadKey 'Head_Sha') }
+        Get-DenyRow @{ Name = 'CLAUDE-OPT-ORD-L1-EVIDENCE-PATH-KEY'; Stage = 'L1 (record)'; Checkpoint = ((Get-OptOutJson) -creplace '"evidence_path"', '"Evidence_Path"') }
+        Get-DenyRow @{ Name = 'CLAUDE-OPT-ORD-L1-FEATURE-FOLDER-KEY'; Stage = 'L1 (record)'; Checkpoint = ((Get-OptOutJson) -creplace '"feature-folder"', '"Feature-Folder"') }
+        Get-DenyRow @{ Name = 'CLAUDE-OPT-ORD-L2-REMEDIATION-LOOP-KEY'; Stage = 'L2 (binding)'; Checkpoint = ((Get-OptOutJson) -creplace '"remediation_loop"', '"Remediation_Loop"') }
+        Get-DenyRow @{ Name = 'CLAUDE-OPT-ORD-L2-REVIEW-OUTCOMES-KEY'; Stage = 'L2 (binding)'; Checkpoint = ((Get-OptOutJson) -creplace '"review_outcomes"', '"Review_Outcomes"') }
+        Get-DenyRow @{ Name = 'CLAUDE-OPT-ORD-L2-REVIEW-HEAD-SHA-KEY'; Stage = 'L2 (binding)'; Checkpoint = (Get-OrdinalLiteralJson -ReviewHeadKey 'Head_Sha') }
     )
 
     $script:AllowRows = @(
@@ -141,6 +160,8 @@ BeforeDiscovery {
         @{ Name = 'CLAUDE-OPT-FALLBACK-INTEGRATION-ABSENT'; Bare = (Get-OptOutJson -Remove 'epic_context'); Green = (Get-OptOutJson -Remove 'epic_context' -Set $green) }
         @{ Name = 'CLAUDE-OPT-FALLBACK-INTEGRATION-MALFORMED'; Bare = (Get-OptOutJson -Set @{ epic_context = @{ integration_branch = 'main' } }); Green = (Get-OptOutJson -Set (@{ epic_context = @{ integration_branch = 'main' } } + $green)) }
         @{ Name = 'CLAUDE-OPT-FALLBACK-INTEGRATION-NO-SUFFIX'; Bare = (Get-OptOutJson -Set @{ epic_context = @{ integration_branch = 'epic/opt-out-example' } }); Green = (Get-OptOutJson -Set (@{ epic_context = @{ integration_branch = 'epic/opt-out-example' } } + $green)) }
+        @{ Name = 'CLAUDE-OPT-ORD-FALLBACK-EPIC-CONTEXT-KEY'; Bare = ((Get-OptOutJson) -creplace '"epic_context"', '"Epic_Context"'); Green = ((Get-OptOutJson -Set $green) -creplace '"epic_context"', '"Epic_Context"') }
+        @{ Name = 'CLAUDE-OPT-ORD-FALLBACK-INTEGRATION-BRANCH-KEY'; Bare = ((Get-OptOutJson) -creplace '"integration_branch"', '"Integration_Branch"'); Green = ((Get-OptOutJson -Set $green) -creplace '"integration_branch"', '"Integration_Branch"') }
     )
     $script:DefaultRows = @(
         @{ Name = 'CLAUDE-OPT-DEFAULT-KEY-ABSENT'; Checkpoint = (Get-OptOutJson -Remove 'child_ci'); Control = (Get-OptOutJson -Remove 'child_ci', 'local_qc_gate') }
@@ -149,6 +170,8 @@ BeforeDiscovery {
         @{ Name = 'CLAUDE-OPT-DEFAULT-NON-STRING'; Checkpoint = (Get-OptOutJson -Set @{ child_ci = $true }); Control = (Get-OptOutJson -Remove 'child_ci', 'local_qc_gate') }
         @{ Name = 'CLAUDE-OPT-DEFAULT-EPIC-MODE-STRING'; Checkpoint = (Get-OptOutJson -Set @{ epic_mode = 'true' }); Control = (Get-OptOutJson -Set @{ epic_mode = 'true' } -Remove 'child_ci', 'local_qc_gate') }
         @{ Name = 'CLAUDE-OPT-DEFAULT-EPIC-MODE-FALSE'; Checkpoint = (Get-OptOutJson -Set @{ epic_mode = $false }); Control = (Get-OptOutJson -Set @{ epic_mode = $false } -Remove 'child_ci', 'local_qc_gate') }
+        @{ Name = 'CLAUDE-OPT-ORD-PREDICATE-CHILD-CI-KEY'; Checkpoint = ((Get-OptOutJson) -creplace '"child_ci"', '"Child_CI"'); Control = (Get-OptOutJson -Remove 'child_ci', 'local_qc_gate') }
+        @{ Name = 'CLAUDE-OPT-ORD-PREDICATE-EPIC-MODE-KEY'; Checkpoint = ((Get-OptOutJson) -creplace '"epic_mode"', '"Epic_Mode"'); Control = ((Get-OptOutJson -Remove 'child_ci', 'local_qc_gate') -creplace '"epic_mode"', '"Epic_Mode"') }
     )
 }
 

@@ -1,0 +1,32 @@
+{
+  "name": "local-qc-gate-field-key-case-variant",
+  "notes": "The local_qc_gate field keys are read by ordinal name, so Conclusion, Head_Sha, Evidence_Path, and Verified_At satisfy no required field.",
+  "checkpoint": {
+    "route_id": "large",
+    "epic_mode": true,
+    "child_ci": "integration_only",
+    "review_mode": "concurrent",
+    "epic_context": {
+      "integration_branch": "epic/example-integration"
+    },
+    "remediation_loop": {
+      "review_outcomes": [
+        {
+          "verdict": "PASS",
+          "head_sha": "3f2a9c1e5b7d4a6f8e0c2b4d6a8f0e1c3b5d7a9f"
+        }
+      ]
+    },
+    "local_qc_gate": {
+      "Conclusion": "success",
+      "Head_Sha": "3f2a9c1e5b7d4a6f8e0c2b4d6a8f0e1c3b5d7a9f",
+      "Evidence_Path": ".dev/active/example-feature/evidence/qa-gates/local-qc-gate.2026-11-24T05-00.md",
+      "Verified_At": "2026-11-24T05:00:00Z"
+    }
+  },
+  "expected_errors": [
+    "Checkpoint completion validation failed: local_qc_gate missing required fields: conclusion, head_sha, evidence_path, verified_at.",
+    "Checkpoint completion validation failed: local_qc_gate.conclusion must be success.",
+    "Checkpoint completion validation failed: local_qc_gate.head_sha must match the head_sha of the last review_outcomes entry."
+  ]
+}
