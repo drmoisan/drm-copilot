@@ -169,3 +169,34 @@ Preconditions, each checked by the leg before it allows the delegation:
 
 When the worktree holds a checkpoint, this leg does not apply and the routing receipt in that
 checkpoint governs.
+
+## Checkpoint-Free Release Delegation (issue #1231)
+
+A destination repository that commits `.claude/release-commit-allowance.json` can open a release
+pull request without an orchestration checkpoint. Three allow-side legs read that file beneath the
+worktree root, and each stands in for the checkpoint at one step:
+
+- the delegation of pr-author (`RELEASE_DELEGATION_*` codes),
+- the Write of `artifacts/pr_body_<N>.receipt.json` (`RELEASE_RECEIPT_*` codes),
+- the `gh pr create` command (`RELEASE_EXEMPTION_*` codes).
+
+The delegation prompt carries exactly one `branch: <branch>` line and exactly one `base: <base>`
+line. The pull request is created with this command form, immediately after the branch is pushed to
+origin:
+
+```text
+gh pr create --head <branch> --base <base> --body-file artifacts/pr_body_<N>.md
+```
+
+Preconditions, each checked by the legs:
+
+1. The release branch matches a `branch_patterns` entry of one allowance.
+2. Every path of the `origin/<base>...HEAD` diff is listed in that same allowance's `allowed_paths`;
+   paths are matched case-sensitively and are never combined across allowances.
+3. `refs/remotes/origin/<branch>` equals `HEAD` when `gh pr create` runs.
+4. No orchestration checkpoint exists in the worktree.
+
+`-H`, `--head=`, `owner:branch`, `-R`, `--repo`, and `GH_REPO=` are not accepted, and `gh pr edit`
+is not exempt. The receipt checks still run after the exemption. When a precondition fails, the
+deny names the release code after the existing exemption reasons. Merging the release pull request
+is not covered by these legs.

@@ -45,14 +45,14 @@ Today a release pull request is opened only because `scripts/dev-tools/Invoke-Fu
 
 ## Acceptance Criteria
 
-- [ ] US-AC-01: On a branch matching an allowance, with a diff entirely within that allowance's `allowed_paths` and no checkpoint, the agent can delegate to pr-author, write the PR body receipt, and run `gh pr create`, and the receipt checks still apply (spec AC-01, AC-05, AC-07).
-- [ ] US-AC-02: When any release precondition fails, the gate still denies, and the deny reason names the specific release sub-code after the existing exemption reasons (spec AC-02, AC-03, AC-06, AC-08).
-- [ ] US-AC-03: In a repository without `.claude/release-commit-allowance.json`, every deny text of the changed gates is byte-identical to its text before this feature (spec AC-10).
-- [ ] US-AC-04: An unexpected error in a release leg leaves the original deny in place (spec AC-11).
-- [ ] US-AC-05: The release legs reuse the #1201 allowance parser, branch matcher, and file seams, and the allowance schema is unchanged (spec AC-12).
-- [ ] US-AC-06: The hook changes are mirrored byte-identically into the Claude bundle, new files are listed in `core.json`, and the rule, brief, skill, and agent documentation describe the legs through their generator sources (spec AC-15, AC-17, AC-18).
-- [ ] US-AC-07: Pester suites cover every allow and deny case, new hook files reach at least 85% line coverage, and no enforcement hook invokes Python (spec AC-13, AC-20, AC-21).
-- [ ] US-AC-08: The documentation states that the exemption is a policy-level control, not a security control: whoever can commit the allowance file decides which paths may reach a pull request without a checkpoint (spec AC-18).
+- [x] US-AC-01: On a branch matching an allowance, with a diff entirely within that allowance's `allowed_paths` and no checkpoint, the agent can delegate to pr-author, write the PR body receipt, and run `gh pr create`, and the receipt checks still apply (spec AC-01, AC-05, AC-07).
+- [x] US-AC-02: When any release precondition fails, the gate still denies, and the deny reason names the specific release sub-code after the existing exemption reasons (spec AC-02, AC-03, AC-06, AC-08).
+- [x] US-AC-03: In a repository without `.claude/release-commit-allowance.json`, every deny text of the changed gates is byte-identical to its text before this feature (spec AC-10).
+- [x] US-AC-04: An unexpected error in a release leg leaves the original deny in place (spec AC-11).
+- [x] US-AC-05: The release legs reuse the #1201 allowance parser, branch matcher, and file seams, and the allowance schema is unchanged (spec AC-12).
+- [x] US-AC-06: The hook changes are mirrored byte-identically into the Claude bundle, new files are listed in `core.json`, and the rule, brief, skill, and agent documentation describe the legs through their generator sources (spec AC-15, AC-17, AC-18).
+- [x] US-AC-07: Pester suites cover every allow and deny case, new hook files reach at least 85% line coverage, and no enforcement hook invokes Python (spec AC-13, AC-20, AC-21).
+- [x] US-AC-08: The documentation states that the exemption is a policy-level control, not a security control: whoever can commit the allowance file decides which paths may reach a pull request without a checkpoint (spec AC-18).
 
 ## Non-Goals
 

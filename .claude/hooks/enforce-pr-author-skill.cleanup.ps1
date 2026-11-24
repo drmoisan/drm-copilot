@@ -39,6 +39,13 @@
     consolidation branch receives the docs-only result unchanged, so its denial text is the
     text it is today.
 
+    Release exemption (issue #1231): when the docs-only and cleanup result is not exempt, the
+    wrapper calls Get-PrAuthorReleaseExemption (enforce-pr-author-skill.release.ps1). An exempt
+    result returns Exempt $true; a non-null release reason is appended after the existing
+    reason as '; release exemption not applied: <CODE>: <detail>'. Without
+    .claude/release-commit-allowance.json beneath the artifact root the release reason is $null,
+    so the result and its denial text are unchanged.
+
 .NOTES
     PowerShell 7+. Call-time dependencies from the docs-only sibling and the parsers the helpers
     load: Get-PrAuthorDocsOnlyExemption, Test-PrAuthorDocsOnlyCheckpointPresence,
@@ -51,6 +58,7 @@
 param()
 try { . (Join-Path $PSScriptRoot 'hook-cleanup-context.ps1') } catch { Add-HookDependencyFailure -Name 'hook-cleanup-context.ps1' -ErrorRecord $_ }
 try { Import-Module (Join-Path $PSScriptRoot '../lib/cleanup-manifest/CleanupWorktreeManifest.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'CleanupWorktreeManifest.psm1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-pr-author-skill.release.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-pr-author-skill.release.ps1' -ErrorRecord $_ }
 
 function Get-PrAuthorCleanupSegmentToken {
     <#
@@ -212,11 +220,14 @@ function Get-PrAuthorCleanupExemptionFailure {
 function Get-PrAuthorPreflightExemption {
     <#
     .SYNOPSIS
-        Decide whether a failed preflight is exempt as docs-only or as a cleanup consolidation PR.
+        Decide whether a failed preflight is exempt as docs-only, as a cleanup consolidation PR, or
+        as a release PR.
     .DESCRIPTION
-        Returns the docs-only result unchanged when it is exempt or when the command names no
-        consolidation branch. Otherwise evaluates the cleanup exemption and, on failure, returns
-        the docs-only reason followed by '; cleanup exemption not applied: ' and the sub-code.
+        Returns the docs-only result unchanged when it is exempt. When the command names a
+        consolidation branch, evaluates the cleanup exemption and, on failure, takes the docs-only
+        reason followed by '; cleanup exemption not applied: ' and the sub-code. When that result
+        is not exempt, evaluates the release exemption (issue #1231): an exempt result is
+        returned, and a non-null release reason is appended as '; release exemption not applied: '.
     .PARAMETER CommandText
         The Bash command text under evaluation.
     .PARAMETER WorktreeRoot
@@ -235,12 +246,23 @@ function Get-PrAuthorPreflightExemption {
     )
 
     $docsOnly = Get-PrAuthorDocsOnlyExemption -CommandText $CommandText -WorktreeRoot $WorktreeRoot -CheckpointPath $CheckpointPath
-    if ($docsOnly.Exempt -or -not (Test-PrAuthorCleanupContextCommand -CommandText $CommandText)) {
+    if ($docsOnly.Exempt) {
         return $docsOnly
     }
-    $failure = Get-PrAuthorCleanupExemptionFailure -CommandText $CommandText -WorktreeRoot $WorktreeRoot -CheckpointPath $CheckpointPath
-    if ($null -eq $failure) {
+    $result = $docsOnly
+    if (Test-PrAuthorCleanupContextCommand -CommandText $CommandText) {
+        $failure = Get-PrAuthorCleanupExemptionFailure -CommandText $CommandText -WorktreeRoot $WorktreeRoot -CheckpointPath $CheckpointPath
+        if ($null -eq $failure) {
+            return [ordered]@{ Exempt = $true; Reason = $null }
+        }
+        $result = [ordered]@{ Exempt = $false; Reason = "$($docsOnly.Reason); cleanup exemption not applied: $failure" }
+    }
+    $release = Get-PrAuthorReleaseExemption -CommandText $CommandText -WorktreeRoot $WorktreeRoot -CheckpointPath $CheckpointPath
+    if ($release.Exempt) {
         return [ordered]@{ Exempt = $true; Reason = $null }
     }
-    return [ordered]@{ Exempt = $false; Reason = "$($docsOnly.Reason); cleanup exemption not applied: $failure" }
+    if ($null -ne $release.Reason) {
+        return [ordered]@{ Exempt = $false; Reason = "$($result.Reason); release exemption not applied: $($release.Reason)" }
+    }
+    return $result
 }
