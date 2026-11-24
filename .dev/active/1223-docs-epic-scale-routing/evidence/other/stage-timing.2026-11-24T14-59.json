@@ -1,0 +1,5 @@
+[
+  { "stage": "S5_atomic_execution", "attempt": 1, "started_at": "2026-11-24T11:45:43Z", "ended_at": "2026-11-24T14:50:01Z" },
+  { "stage": "S6_feature_review", "attempt": 1, "started_at": "2026-11-24T14:52:00Z", "ended_at": "2026-11-24T14:59:34Z" },
+  { "stage": "S7_commit", "attempt": 1, "started_at": "2026-11-24T14:59:34Z", "ended_at": "2026-11-24T14:59:34Z" }
+]
