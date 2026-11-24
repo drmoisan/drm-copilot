@@ -34,14 +34,14 @@ The `documentation-workflow` skill assumes one run, one pull request, and docs-o
 
 ## Acceptance Criteria
 
-- [ ] The skill places `## Epic-Scale Routing` after `## Rules` and before `## Commit, Receipt and Pull Request` in every copy, and the contract test fails otherwise.
-- [ ] The skill states the routing condition (a first full estate, or a planned page count above the default threshold recorded in the spec decision D2), that `epic-plan` is started from the main session, that the epic-worthiness verdict can return the work to the single-run route, and that deviating from the default is a recorded decision.
-- [ ] The skill states the default waves in order with each default family id in its own wave without repetition, names docs-family-profile-model as the owner of the ids, and contains no family-record field names.
-- [ ] The skill states that each child runs the dispatch order for its families only, and that the docs-complete receipt is written on the integration branch at its head by the final integration step only before the integration pull request, with no receipt from a wave child.
-- [ ] The skill qualifies the existing single-run statements (When to Use, Commit/Receipt/Pull Request stage, docs path set rule, Refresh) so that none contradicts the epic route.
-- [ ] `references/standard.md` gains a new behavior and check for epic-scale routing and passes the skill contract shape rules.
-- [ ] A parallel Pester contract test, `documentation-workflow.EpicRouting.Tests.ps1`, pins these statements in every copy, creates no temporary files, and reads no clock.
-- [ ] All surface and bundle copies are in parity, the harness generator check passes, the push-down contract tests and pack-manifest completeness tests pass, and the new suite is listed in the execution-environment brief copies.
+- [x] The skill places `## Epic-Scale Routing` after `## Rules` and before `## Commit, Receipt and Pull Request` in every copy, and the contract test fails otherwise.
+- [x] The skill states the routing condition (a first full estate, or a planned page count above the default threshold recorded in the spec decision D2), that `epic-plan` is started from the main session, that the epic-worthiness verdict can return the work to the single-run route, and that deviating from the default is a recorded decision.
+- [x] The skill states the default waves in order with each default family id in its own wave without repetition, names docs-family-profile-model as the owner of the ids, and contains no family-record field names.
+- [x] The skill states that each child runs the dispatch order for its families only, and that the docs-complete receipt is written on the integration branch at its head by the final integration step only before the integration pull request, with no receipt from a wave child.
+- [x] The skill qualifies the existing single-run statements (When to Use, Commit/Receipt/Pull Request stage, docs path set rule, Refresh) so that none contradicts the epic route.
+- [x] `references/standard.md` gains a new behavior and check for epic-scale routing and passes the skill contract shape rules.
+- [x] A parallel Pester contract test, `documentation-workflow.EpicRouting.Tests.ps1`, pins these statements in every copy, creates no temporary files, and reads no clock.
+- [x] All surface and bundle copies are in parity, the harness generator check passes, the push-down contract tests and pack-manifest completeness tests pass, and the new suite is listed in the execution-environment brief copies.
 
 ## Non-Goals
 

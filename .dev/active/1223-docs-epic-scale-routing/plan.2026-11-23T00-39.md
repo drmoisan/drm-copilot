@@ -78,17 +78,17 @@ After each task the executor runs the task check of `## Test Cadence (Mandatory)
 
 ### Phase 3 — Final QA
 
-- [ ] [P3-T1] Run the final static loop for PowerShell and record `<FEATURE>/evidence/qa-gates/final-qc-static-powershell.<timestamp>.md`
+- [x] [P3-T1] Run the final static loop for PowerShell and record `<FEATURE>/evidence/qa-gates/final-qc-static-powershell.<timestamp>.md`
   - Acceptance: PoshQC format (observation: `git status --porcelain` shows no rewrite by the format run), PoshQC analyze, and the direct `Invoke-ScriptAnalyzer` run each report zero findings, with command, exit code, and finding count per step; the finding count is compared with `static-powershell.*.md` of Phase 0.
-- [ ] [P3-T2] Run the final Pester gate (one `Invoke-PoshQCParallelTest` run) and record `<FEATURE>/evidence/qa-gates/final-qc-pester.<timestamp>.md`
+- [x] [P3-T2] Run the final Pester gate (one `Invoke-PoshQCParallelTest` run) and record `<FEATURE>/evidence/qa-gates/final-qc-pester.<timestamp>.md`
   - Acceptance: zero failures; the pass count equals the Phase 0 pass count plus the count of expanded `It` rows (`testcase` elements) of the new suite file, with no skipped test, read from `artifacts/pester/pester-junit.xml`; the summary states that the PowerShell line threshold applies to production `.ps1` files only and none changed.
-- [ ] [P3-T3] Run the final pytest gate (one `pytest -n auto` run) and record `<FEATURE>/evidence/qa-gates/final-qc-pytest.<timestamp>.md`
+- [x] [P3-T3] Run the final pytest gate (one `pytest -n auto` run) and record `<FEATURE>/evidence/qa-gates/final-qc-pytest.<timestamp>.md`
   - Acceptance: zero failures and no pass-count drop against `pytest-gate.*.md` of Phase 0; the artifact names the push-down resource contract tests, both pack-manifest completeness tests, and `test_execution_environment_brief_contracts.py` as passing (AC-11, AC-12).
-- [ ] [P3-T4] Run `Invoke-HarnessGeneration.ps1 -Surface skills -Check` and the scope guard, recording `<FEATURE>/evidence/qa-gates/final-qc-parity.<timestamp>.md`
+- [x] [P3-T4] Run `Invoke-HarnessGeneration.ps1 -Surface skills -Check` and the scope guard, recording `<FEATURE>/evidence/qa-gates/final-qc-parity.<timestamp>.md`
   - Acceptance: `-Check` exits 0; `git diff --name-only` against the merge-base derivation of `origin/main` and `HEAD`, paired with `git status --porcelain`, lists no `.py` file, no `.ps1` file other than the new test, no `.ts` file, none of `.claude/agents/epic-orchestrator.md`, `.claude/skills/epic-orchestrate/SKILL.md`, `docs-plan-ia`, or the substitutions file (AC-10, AC-13).
-- [ ] [P3-T5] Check off the satisfied acceptance criteria in `.dev/active/1223-docs-epic-scale-routing/spec.md` and `user-story.md` per `acceptance-criteria-tracking`, each with a pointer to its evidence artifact
+- [x] [P3-T5] Check off the satisfied acceptance criteria in `.dev/active/1223-docs-epic-scale-routing/spec.md` and `user-story.md` per `acceptance-criteria-tracking`, each with a pointer to its evidence artifact
   - Acceptance: AC-1 to AC-13 of spec.md are `[x]` only where the test or artifact named in the inventory below passes; an AC with no passing evidence stays unchecked and the task is not checked.
-- [ ] [P3-T6] Self-review: walk the templates under `.dev/templates/policy_audit/` against the branch diff from the merge base and write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`
+- [x] [P3-T6] Self-review: walk the templates under `.dev/templates/policy_audit/` against the branch diff from the merge base and write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md`
   - Acceptance: one PASS, FAIL, or N/A row per checklist item; a FAIL row is fixed and the QA loop re-run before the file is rewritten; the plan does not complete with a FAIL row. The artifact also records the open risk below as out of scope.
 
 ## Pre-Mortem
