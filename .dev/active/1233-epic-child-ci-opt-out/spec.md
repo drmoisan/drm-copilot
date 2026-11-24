@@ -189,7 +189,7 @@ Under `require_complete`, inside the existing `route_requires_ci_gate` branch, t
 - [x] `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Check` reports no drift, and the Codex generator `--check` passes.
 - [x] A new process-reduction ledger entry `.dev/engineering/process-reductions/<NNNN>-epic-child-ci-opt-out.md` and its README index row record the reduction with `## Prior Text` and/or a stored patch, the fixed `## Revert Steps` labels, `## Revert Signals`, the residual automatic `CI` run on child PRs (D1), and the self-declared-key disclosure, and no region recorded by an existing ledger entry is edited. Verified by `ProcessReductionChain.Ledger.Tests.ps1` and `ProcessReductionLedger*.Tests.ps1` run on the committed tree.
 - [x] No edited file exceeds the file-size hard limit stated in `.claude/rules/general-code-change.md`, and `.github/workflows/ci.yml`, `enforce-epic-merge-gate-review.ps1`, `.claude/lib/docs`, and the docs skills are unchanged. Verified by `FileSizePolicy.RepoGate.Tests.ps1` and diff review.
-- [ ] The mandatory toolchain loop passes for PowerShell, Python, and TypeScript in scope, and the pull request's own `CI` run is green.
+- [x] The mandatory toolchain loop passes for PowerShell, Python, and TypeScript in scope, and the pull request's own `CI` run is green.
 
 ## Definition of Done
 
