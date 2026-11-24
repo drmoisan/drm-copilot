@@ -48,9 +48,9 @@ The docs library detects staleness only through evidence pins (`DOCS_STALE_PAGE`
 
 ## Acceptance Criteria
 
-- [ ] A page with `last_reviewed: "2026-01-10"` and `review_due: "2026-04-10"` passes the page checker with no finding for either date field, and a profile may list `review_due` in `diataxis_policy.required_front_matter`.
+- [x] A page with `last_reviewed: "2026-01-10"` and `review_due: "2026-04-10"` passes the page checker with no finding for either date field, and a profile may list `review_due` in `diataxis_policy.required_front_matter`.
 - [ ] Every `docs-author-page` page template on the integration tip, including the family templates from docs-family-page-templates, contains `review_due: "<review-due-yyyy-mm-dd>"` directly after `last_reviewed`, and passes the page checker after placeholder substitution.
-- [ ] A page whose `review_due` equals or precedes `last_reviewed` produces `DOCS_PAGE_REVIEW_DUE_NOT_AFTER_LAST_REVIEWED` (severity `error`) from `check`; a malformed or non-existent `review_due` produces `DOCS_PAGE_REVIEW_DUE_INVALID` or `DOCS_PAGE_REVIEW_DUE_NOT_A_DATE` respectively; `check` reads no clock.
+- [x] A page whose `review_due` equals or precedes `last_reviewed` produces `DOCS_PAGE_REVIEW_DUE_NOT_AFTER_LAST_REVIEWED` (severity `error`) from `check`; a malformed or non-existent `review_due` produces `DOCS_PAGE_REVIEW_DUE_INVALID` or `DOCS_PAGE_REVIEW_DUE_NOT_A_DATE` respectively; `check` reads no clock.
 - [ ] A page without `review_due` whose path falls under a family `directory` uses `last_reviewed` plus that family's `review_interval_days` as its due date (2026-01-10 plus 90 days yields 2026-04-10); a page with `review_due` uses the explicit value.
 - [ ] A page with no covering family, a family without a positive integer `review_interval_days`, a profile without `required_families`, or a page listed in `legacy_exclusions[].path` produces no `DOCS_REVIEW_OVERDUE` finding.
 - [ ] `validate -Mode docs-complete` reports `DOCS_REVIEW_OVERDUE` for a page due 2026-04-10 when the injected command instant falls on 2026-04-11 (UTC) and reports none when it falls on 2026-04-10; tests supply these fixed instants and no tested code reads the wall clock.
