@@ -38,13 +38,13 @@ After each task the executor runs the task check of `## Test Cadence (Mandatory)
 
 ### Phase 0 — Baselines
 
-- [ ] [P0-T1] Capture the PowerShell static baseline into `<FEATURE>/evidence/baseline/static-powershell.<timestamp>.md`
+- [x] [P0-T1] Capture the PowerShell static baseline into `<FEATURE>/evidence/baseline/static-powershell.<timestamp>.md`
   - Acceptance: the artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` for the PoshQC format step (observation: `git status --porcelain` lists no modified tracked file after the format run) and the repository analyzer run with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, with the finding count read from a direct `Invoke-ScriptAnalyzer` run. Formatting and analysis of the new test file are not applicable before it exists; the baseline is the repository result.
-- [ ] [P0-T2] Capture the `Phase 0 baseline` of the parallel Pester gate into `<FEATURE>/evidence/baseline/pester-gate.<timestamp>.md`
+- [x] [P0-T2] Capture the `Phase 0 baseline` of the parallel Pester gate into `<FEATURE>/evidence/baseline/pester-gate.<timestamp>.md`
   - Acceptance: one launcher `pester` suite run (one `Invoke-PoshQCParallelTest`); `Output Summary:` records pass and fail counts read from `artifacts/pester/pester-junit.xml`. Markdown has no coverage; the PowerShell line threshold of 85% applies to production `.ps1` files only, and this plan changes none, so no per-file coverage comparison applies and the summary states `no production .ps1 file changed`.
-- [ ] [P0-T3] Capture the `Phase 0 baseline` of the pytest gate into `<FEATURE>/evidence/baseline/pytest-gate.<timestamp>.md`
+- [x] [P0-T3] Capture the `Phase 0 baseline` of the pytest gate into `<FEATURE>/evidence/baseline/pytest-gate.<timestamp>.md`
   - Acceptance: one launcher `pytest` suite run (`pytest -n auto`); `Output Summary:` records pass and fail counts; no Python file is changed, so coverage is not compared.
-- [ ] [P0-T4] Capture the generator baseline into `<FEATURE>/evidence/baseline/generator-check.<timestamp>.md`
+- [x] [P0-T4] Capture the generator baseline into `<FEATURE>/evidence/baseline/generator-check.<timestamp>.md`
   - Acceptance: `Invoke-HarnessGeneration.ps1 -Surface skills -Check` before any edit reports no drift (`EXIT_CODE: 0`); a nonzero result is recorded and fixed in its own task before Phase 2 starts.
 
 ### Phase 1 — Contract Suite (fails before the skill edit)
