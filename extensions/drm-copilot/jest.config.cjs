@@ -152,6 +152,11 @@ module.exports = {
       lines: 85,
       branches: 75,
     },
+    // Issue #1233: the completion gate selection under child_ci integration_only.
+    "./src/lib/validate/orchestrator-state-child-ci.ts": {
+      lines: 85,
+      branches: 75,
+    },
     // Issue #405: the pure promotion-type tool resolver used by the routing
     // validator. This map carries no `global` key, so a new production file
     // without its own entry here would be completely ungated.

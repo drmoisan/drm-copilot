@@ -71,6 +71,7 @@ $script:COMPLETION_BLOCKING_STEP_STATUS = @(
 # The gate object key sets, in the order the error messages join them.
 $script:PR_GATE_KEYS = @('pr_number', 'pr_url', 'head_branch', 'head_sha')
 $script:CI_GATE_KEYS = @('conclusion', 'head_sha', 'verified_at')
+$script:LOCAL_QC_GATE_KEYS = @('conclusion', 'head_sha', 'evidence_path', 'verified_at')
 
 # The mandatory canonical phases per route. Static in the Python reference, so no
 # matrix lookup is involved; a route absent from this map imposes no requirement.
@@ -122,6 +123,88 @@ function Get-MissingGateKey {
         }
     }
     return $missing.ToArray()
+}
+
+function Test-OrchestratorStateChildCiIntegrationOnly {
+    <#
+    .SYNOPSIS
+        Report whether a checkpoint opts its epic child out of per-child CI (issue #1233).
+    .DESCRIPTION
+        Private predicate mirroring _child_ci_integration_only: epic_mode must be the JSON
+        boolean true and child_ci the exact string integration_only. Both keys are read by
+        ordinal name, as a Python dict lookup does.
+    .PARAMETER State
+        The parsed checkpoint object.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [psobject] $State
+    )
+
+    $epicMode = (Get-CheckpointObjectOrdinalMember -Owner $State -Name 'epic_mode').Value
+    $childCi = (Get-CheckpointObjectOrdinalMember -Owner $State -Name 'child_ci').Value
+    return (($epicMode -is [bool]) -and $epicMode -and ($childCi -is [string]) -and ($childCi -ceq 'integration_only'))
+}
+
+function Get-OrchestratorStateCompletionLocalQcGateError {
+    <#
+    .SYNOPSIS
+        Return the local final-QC gate errors of an opted-out epic child (issue #1233).
+    .DESCRIPTION
+        Private check mirroring _validate_completion_local_qc_gate. A non-object local_qc_gate
+        reports the object-shape error alone; otherwise the missing fields, the success
+        conclusion, and then either the review-mode error or, under review_mode concurrent,
+        the binding to the head_sha of the last review_outcomes entry, in that order.
+    .PARAMETER State
+        The parsed checkpoint object.
+    .OUTPUTS
+        System.String[] - zero or more error strings.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [psobject] $State
+    )
+
+    $gate = (Get-CheckpointObjectOrdinalMember -Owner $State -Name 'local_qc_gate').Value
+    if (-not (Test-CheckpointObjectValue -Value $gate)) {
+        return [string[]]@("Checkpoint completion validation failed: child_ci integration_only requires local_qc_gate to be an object with keys: $($script:LOCAL_QC_GATE_KEYS -join ', ').")
+    }
+
+    $errors = [System.Collections.Generic.List[string]]::new()
+    $missing = @(Get-MissingGateKey -Value $gate -GateKey $script:LOCAL_QC_GATE_KEYS)
+    if ($missing.Count -gt 0) {
+        $errors.Add("Checkpoint completion validation failed: local_qc_gate missing required fields: $($missing -join ', ').")
+    }
+    $conclusion = (Get-CheckpointObjectMember -Owner $gate -Name 'conclusion').Value
+    if (-not (Test-PythonValueEqual -Actual $conclusion -Expected 'success')) {
+        $errors.Add('Checkpoint completion validation failed: local_qc_gate.conclusion must be success.')
+    }
+
+    $mode = (Get-CheckpointObjectOrdinalMember -Owner $State -Name 'review_mode').Value
+    if (-not (($mode -is [string]) -and ($mode -ceq 'concurrent'))) {
+        $errors.Add('Checkpoint completion validation failed: child_ci integration_only requires review_mode concurrent.')
+        return $errors.ToArray()
+    }
+
+    # A missing loop, a non-list value, an empty list, and a non-object last entry leave no head.
+    $last = $null
+    $loop = (Get-CheckpointObjectMember -Owner $State -Name 'remediation_loop').Value
+    $outcomes = (Get-CheckpointObjectMember -Owner $loop -Name 'review_outcomes').Value
+    if ((Test-CheckpointListValue -Value $outcomes) -and $outcomes.Count -gt 0) {
+        $last = $outcomes[$outcomes.Count - 1]
+    }
+    $lastHead = (Get-CheckpointObjectMember -Owner $last -Name 'head_sha').Value
+    $gateHead = (Get-CheckpointObjectMember -Owner $gate -Name 'head_sha').Value
+    if (-not (($lastHead -is [string]) -and ($gateHead -is [string]) -and ($gateHead -ceq $lastHead))) {
+        $errors.Add('Checkpoint completion validation failed: local_qc_gate.head_sha must match the head_sha of the last review_outcomes entry.')
+    }
+    return $errors.ToArray()
 }
 
 function Get-OrchestratorStateCompletionStepStatusError {
@@ -274,7 +357,12 @@ function Get-OrchestratorStateCompletionCiGateError {
         return $errors.ToArray()
     }
 
-    $ciGate = (Get-CheckpointObjectMember -Owner $State -Name 'ci_gate').Value
+    # Child CI opt-out (issue #1233): local_qc_gate replaces ci_gate for an opted-out epic child.
+    if (Test-OrchestratorStateChildCiIntegrationOnly -State $State) {
+        return [string[]]@(Get-OrchestratorStateCompletionLocalQcGateError -State $State)
+    }
+
+    $ciGate =(Get-CheckpointObjectMember -Owner $State -Name 'ci_gate').Value
     $missing = @(Get-MissingGateKey -Value $ciGate -GateKey $script:CI_GATE_KEYS)
 
     if (-not (Test-CheckpointObjectValue -Value $ciGate)) {

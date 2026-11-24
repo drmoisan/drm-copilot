@@ -1,0 +1,29 @@
+{
+  "name": "review-mode-absent-head-mismatch",
+  "notes": "Without review_mode concurrent the review-mode error is reported and the head binding is not evaluated.",
+  "checkpoint": {
+    "route_id": "large",
+    "epic_mode": true,
+    "child_ci": "integration_only",
+    "epic_context": {
+      "integration_branch": "epic/example-integration"
+    },
+    "remediation_loop": {
+      "review_outcomes": [
+        {
+          "verdict": "PASS",
+          "head_sha": "3f2a9c1e5b7d4a6f8e0c2b4d6a8f0e1c3b5d7a9f"
+        }
+      ]
+    },
+    "local_qc_gate": {
+      "conclusion": "success",
+      "head_sha": "9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d",
+      "evidence_path": ".dev/active/example-feature/evidence/qa-gates/local-qc-gate.2026-11-24T05-00.md",
+      "verified_at": "2026-11-24T05:00:00Z"
+    }
+  },
+  "expected_errors": [
+    "Checkpoint completion validation failed: child_ci integration_only requires review_mode concurrent."
+  ]
+}
