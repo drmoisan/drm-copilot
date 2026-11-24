@@ -266,6 +266,15 @@ FILLED_RESERVED_HEADINGS: tuple[str, ...] = (
 # `tools:` list after `Edit(docs/features/epics/**)`. Only the `tools:` list
 # changed, so only the agent digest moved; the skill digest is unchanged and the
 # pin stays live for both entries.
+#
+# RE-BASELINED by issue #1233. That change added the child CI opt-out
+# (`child_ci: integration_only`) paragraphs to the epic skill: a list item of
+# `## Epic Dependency Manifest`, a paragraph after item 6 of
+# `## Epic Integration Branch Lifecycle`, a kickoff paragraph and a paragraph
+# after `Epic-child CI verification (issue #1130)` in
+# `## Merge-on-Green Kickoff Parameter`, and a paragraph of
+# `## Epic-Level Checkpoint`. Only the skill digest moved; the agent digest is
+# unchanged and the pin stays live for both entries.
 PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     (
         ".claude/agents/epic-orchestrator.md",
@@ -273,7 +282,7 @@ PINNED_FROZEN_SURFACE_HASHES: tuple[tuple[str, str], ...] = (
     ),
     (
         ".claude/skills/epic-orchestrate/SKILL.md",
-        "e334237b27c2188d2aafd0dc6d4f97c6493ba3f59a0b72772d86f74830e77e80",
+        "6fa8f3d30ede95af7431741d434212d66beeefb83ab70185a8e31c3ff29b44ce",
     ),
 )
 

@@ -37,6 +37,7 @@
         "invariants-standalone-merge-authorizations-array",
         "green-ci-standalone-merge-issue-997",
         "epic-child-ci-verification-issue-1130",
+        "epic-child-ci-opt-out-issue-1233",
         "issue-adoption-scope-and-backward-compatibility",
         "invariants-issue-adoption-object",
         "concurrent-review-scope-and-backward-compatibility",

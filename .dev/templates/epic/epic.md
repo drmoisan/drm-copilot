@@ -13,6 +13,12 @@ epic: <epic-slug>
 integration_branch: epic/<epic-slug>-integration
 created_at: <iso8601>
 
+# Optional epic-level child CI policy (issue #1233). Omit the key for the default
+# `per_child`, under which every child merges only on a green CI run of its own head.
+# Set `integration_only` only when the owner chose to run CI on the integration pull
+# request into main alone; children then merge on local final-QC evidence.
+# child_ci: <per_child | integration_only>
+
 # Optional additive SAFe-style intent block. Omit the whole `intent` block when
 # not used; when present, `epic_type` and `business_outcome_hypothesis` are
 # required, and `leading_indicators` / `nfrs` are optional lists of strings.

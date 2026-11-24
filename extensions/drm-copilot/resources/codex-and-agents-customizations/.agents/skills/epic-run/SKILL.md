@@ -47,3 +47,9 @@ field runs exactly as described above. A cross-epic dependency (manifest key `cr
 is governed by `## Cross-Epic Dependencies (cross_epic_depends_on)` of the same skill, and a run
 halted with `blocked_reason: "external_dependency"` resumes by running this skill again on the
 same epic slug.
+
+Child CI opt-out (issue #1233): under `child_ci: integration_only` the per-child green-`CI`
+requirement is replaced by verified local final-QC evidence and a current concurrent review, as
+the `Child CI opt-out (issue #1233)` paragraphs of `## Fan-In and Conflict Handling` in the
+`epic-orchestrate` skill state, and the final integration PR into `main` still requires a green
+`CI` run.
