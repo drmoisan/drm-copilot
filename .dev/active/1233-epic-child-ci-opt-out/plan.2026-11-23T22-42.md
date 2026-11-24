@@ -136,23 +136,23 @@ Label rule for Phase 3: every paragraph or list item this feature adds to a skil
 
 ### Phase 5 — Final QA Loop
 
-- [ ] [P5-T1] Run the PowerShell static loop (format check, PSScriptAnalyzer, `Invoke-PoshQCLeakScan`) and record `<FEATURE>/evidence/qa-gates/final-qc-powershell-static.<timestamp>.md`.
+- [x] [P5-T1] Run the PowerShell static loop (format check, PSScriptAnalyzer, `Invoke-PoshQCLeakScan`) and record `<FEATURE>/evidence/qa-gates/final-qc-powershell-static.<timestamp>.md`.
   - Acceptance: each step's command, exit code, and finding count; zero new findings against `baseline-powershell-static`; format reports no file changed (the non-writing `-WriteFile` seam of P0-T1 prints no `Formatted:` line for a changed file, and `git status --porcelain` is unchanged before and after). A failure or rewrite restarts the loop from P5-T1.
-- [ ] [P5-T2] Run Black check, Ruff, and Pyright and record `<FEATURE>/evidence/qa-gates/final-qc-python-static.<timestamp>.md`.
+- [x] [P5-T2] Run Black check, Ruff, and Pyright and record `<FEATURE>/evidence/qa-gates/final-qc-python-static.<timestamp>.md`.
   - Acceptance: each step's command, exit code, and finding count; zero findings.
-- [ ] [P5-T3] Run Prettier check, ESLint, and `tsc --noEmit` for `extensions/drm-copilot`, and the architecture-boundary stage, and record `<FEATURE>/evidence/qa-gates/final-qc-typescript-static.<timestamp>.md`.
+- [x] [P5-T3] Run Prettier check, ESLint, and `tsc --noEmit` for `extensions/drm-copilot`, and the architecture-boundary stage, and record `<FEATURE>/evidence/qa-gates/final-qc-typescript-static.<timestamp>.md`.
   - Acceptance: each step's command, exit code, and finding count; zero findings. No `.dependency-cruiser.cjs` exists in the repository, so the architecture-boundary stage is recorded as the search for that file with its command, exit code, and result, not as `SKIPPED`.
-- [ ] [P5-T4] Run the full Pester gate once through the launcher `pester` suite and record `<FEATURE>/evidence/qa-gates/final-qc-pester.<timestamp>.md`.
+- [x] [P5-T4] Run the full Pester gate once through the launcher `pester` suite and record `<FEATURE>/evidence/qa-gates/final-qc-pester.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0` from the returned `ExitCode`; pass and fail counts from the merged JUnit; repo-wide and per-file line coverage from `artifacts/pester/powershell-coverage.xml` for every in-scope file of P0-T4.
-- [ ] [P5-T5] Run the full pytest gate once through the launcher `pytest` suite with coverage and record `<FEATURE>/evidence/qa-gates/final-qc-pytest.<timestamp>.md`.
+- [x] [P5-T5] Run the full pytest gate once through the launcher `pytest` suite with coverage and record `<FEATURE>/evidence/qa-gates/final-qc-pytest.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`; pass and fail counts; line and branch coverage of `scripts/dev_tools/validate_orchestrator_state.py` from the JSON report under SCRATCH.
-- [ ] [P5-T6] Run the full Jest gate once through the launcher `jest-extension` suite with coverage and record `<FEATURE>/evidence/qa-gates/final-qc-jest.<timestamp>.md`.
+- [x] [P5-T6] Run the full Jest gate once through the launcher `jest-extension` suite with coverage and record `<FEATURE>/evidence/qa-gates/final-qc-jest.<timestamp>.md`.
   - Acceptance: `EXIT_CODE: 0`; the per-file thresholds pass, including the new `orchestrator-state-child-ci.ts` entry; its line and branch figures are recorded.
-- [ ] [P5-T7] Write `<FEATURE>/evidence/qa-gates/coverage-comparison.<timestamp>.md` comparing P5-T4 to P5-T6 with P0-T4 to P0-T6.
+- [x] [P5-T7] Write `<FEATURE>/evidence/qa-gates/coverage-comparison.<timestamp>.md` comparing P5-T4 to P5-T6 with P0-T4 to P0-T6.
   - Acceptance: per changed file, baseline, post-change, and changed-line coverage; every changed PowerShell file at least 85% line, every changed Python and TypeScript file at least 85% line and 75% branch; no per-file or repo-wide drop; the new TypeScript module judged against its thresholds; no new failing test. A shortfall is remediated and P5-T1 to P5-T7 re-run.
-- [ ] [P5-T8] Write `<FEATURE>/evidence/qa-gates/scope-check.<timestamp>.md` from `git diff --name-only origin/main...HEAD` with `git status --porcelain`.
+- [x] [P5-T8] Write `<FEATURE>/evidence/qa-gates/scope-check.<timestamp>.md` from `git diff --name-only origin/main...HEAD` with `git status --porcelain`.
   - Acceptance: no path under `.github/workflows/`, `.claude/lib/docs/`, a docs skill, an agent source, or an `atomic-plan-contract` copy; `.claude/hooks/enforce-epic-merge-gate-review.ps1` and `.codex/scripts/epic-child-launch-contract.ps1` unchanged; no new `.py` file; the generator `-Check` and the Codex generator `--check` re-run clean; `FileSizePolicy.RepoGate.Tests.ps1` passes and no changed file exceeds 800 lines.
-- [ ] [P5-T9] Walk the policy-audit, code-review, and feature-audit templates under `.dev/templates/policy_audit/` against the diff from the merge base of `origin/main` and `HEAD`, write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item and a row per spec and user-story acceptance criterion naming its evidence, then the O6 pre-push note, commit, and push.
+- [x] [P5-T9] Walk the policy-audit, code-review, and feature-audit templates under `.dev/templates/policy_audit/` against the diff from the merge base of `origin/main` and `HEAD`, write `<FEATURE>/evidence/qa-gates/self-review.<timestamp>.md` with one PASS, FAIL, or N/A row per checklist item and a row per spec and user-story acceptance criterion naming its evidence, then the O6 pre-push note, commit, and push.
   - Acceptance: no FAIL row; a FAIL is fixed, the QA loop re-run from P5-T1, and the self-review rewritten as a new file. The spec criterion on the pull request's own `CI` run is recorded as orchestrator-owned (S9).
 
 ## Pre-Mortem

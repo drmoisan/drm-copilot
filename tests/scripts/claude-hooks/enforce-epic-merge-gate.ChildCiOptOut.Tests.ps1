@@ -186,7 +186,7 @@ Describe 'enforce-epic-merge-gate child CI opt-out through branch 1 (issue #1233
         $script:RowLiveHead = $script:Head
         $script:RowEvidence = ''
         $script:RowEvidenceExit = 0
-        Mock Get-ChildOrchestratorCheckpointContent { $script:RowCheckpoint }
+        Mock Get-ChildOrchestratorCheckpointContent { $null }
         Mock Invoke-DocsOnlyGhExe { [pscustomobject]@{ ExitCode = 1; Output = '' } }
         Mock Invoke-DocsOnlyGhExe -ParameterFilter { $GhArgs[0] -ceq 'pr' -and $GhArgs[-1] -ceq 'headRefOid,baseRefName' } -MockWith { [pscustomobject]@{ ExitCode = $script:RowPrViewExit; Output = $script:RowPrView } }
         Mock Invoke-DocsOnlyGhExe -ParameterFilter { $GhArgs[0] -ceq 'pr' -and $GhArgs[-1] -ceq 'headRefOid' } -MockWith { [pscustomobject]@{ ExitCode = 0; Output = ('{"headRefOid":"' + $script:RowLiveHead + '"}') } }
@@ -229,6 +229,12 @@ Describe 'enforce-epic-merge-gate child CI opt-out through branch 1 (issue #1233
             if ($null -eq $Decision -or $null -eq $Decision.hookSpecificOutput) { return '' }
             return [string]$Decision.hookSpecificOutput.permissionDecisionReason
         }
+    }
+
+    BeforeEach {
+        # The outermost BeforeAll keeps the $null baseline mock of the closure seam; each row reads
+        # its checkpoint through this per-test mock.
+        Mock Get-ChildOrchestratorCheckpointContent { $script:RowCheckpoint }
     }
 
     It 'baseline mock interception probe' { Invoke-EpicStateInterceptionProbe -Surface 'Claude' -Seam 'Get-WorktreeItemCheckpointText', 'Get-WorktreeItemLiveRoot', 'Get-WorktreeRunCheckpointText' }

@@ -14,9 +14,8 @@
          and Get-EpicMergeGateChildCiDecision (enforce-epic-merge-gate-child-ci.ps1, issue
          #1130) verifies a green CI run on the live PR head. Any stage failure denies with
          EPIC_CHILD_CI_NOT_VERIFIED and never falls through to the later branches. Under the
-         child CI opt-out (child_ci integration_only, issue #1233) the helper verifies the
-         local final-QC evidence instead, with git in the item worktree (-GitRoot), and a
-         failure denies with EPIC_CHILD_LOCAL_QC_NOT_VERIFIED.
+         child CI opt-out (issue #1233) the helper checks local final-QC evidence with git in
+         the item worktree (-GitRoot); a failure denies with EPIC_CHILD_LOCAL_QC_NOT_VERIFIED.
       2. Epic-integration path: artifacts/orchestration/epic-orchestrator-state.json exists,
          epic_merge_pr.ci_gate.conclusion == "success", and, when the command names an
          explicit PR number, that number matches epic_merge_pr.pr_number.
