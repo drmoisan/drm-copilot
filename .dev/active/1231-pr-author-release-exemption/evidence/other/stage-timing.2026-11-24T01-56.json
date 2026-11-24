@@ -1,0 +1,59 @@
+{
+  "issue-num": "1231",
+  "stage_timing": [
+    {
+      "stage": "S2_research",
+      "attempt": 1,
+      "started_at": "2026-11-23T22:59:02Z",
+      "ended_at": "2026-11-23T23:08:42Z"
+    },
+    {
+      "attempt": 1,
+      "stage": "S3_promotion_feature_documents",
+      "started_at": "2026-11-23T23:08:42Z",
+      "ended_at": "2026-11-23T23:11:45Z"
+    },
+    {
+      "ended_at": "2026-11-23T23:33:21Z",
+      "attempt": 1,
+      "started_at": "2026-11-23T23:11:45Z",
+      "stage": "S4_atomic_planning"
+    },
+    {
+      "started_at": "2026-11-23T23:33:21Z",
+      "ended_at": "2026-11-24T01:32:55Z",
+      "attempt": 1,
+      "stage": "S5_atomic_execution"
+    },
+    {
+      "stage": "S6_commit",
+      "attempt": 1,
+      "started_at": "2026-11-24T01:32:55Z",
+      "ended_at": "2026-11-24T01:33:39Z"
+    },
+    {
+      "stage": "S8_pr_creation",
+      "attempt": 1,
+      "started_at": "2026-11-24T01:33:39Z",
+      "ended_at": "2026-11-24T01:36:28Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 1,
+      "started_at": "2026-11-24T01:36:28Z",
+      "ended_at": "2026-11-24T01:43:57Z"
+    },
+    {
+      "stage": "S9_ci_gate",
+      "attempt": 1,
+      "started_at": "2026-11-24T01:36:28Z",
+      "ended_at": "2026-11-24T01:56:14Z"
+    },
+    {
+      "stage": "S9_ci_gate",
+      "attempt": 2,
+      "started_at": "2026-11-24T01:56:14Z",
+      "ended_at": null
+    }
+  ]
+}
