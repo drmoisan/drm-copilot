@@ -25,6 +25,27 @@ The owner directed on 2026-11-23: "for the epic run, do not run CI on each featu
 - `.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`: source, the selection inside `Get-OrchestratorStateCompletionCiGateError` and two private helpers
 - `extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`: byte-identical mirror of `.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`
 - `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateChildCi.Tests.ps1`: created test
+- `.claude/hooks/enforce-epic-merge-gate-child-ci.ps1`: source, opt-out stages B, R, L1, L2, and L3, the `EPIC_CHILD_LOCAL_QC_NOT_VERIFIED` prefix, the seam `Get-EpicMergeGateChildCiLivePullRequest`, and `-GitRoot`
+- `.codex/hooks/enforce-epic-merge-gate-child-ci.ps1`: byte-identical twin of `.claude/hooks/enforce-epic-merge-gate-child-ci.ps1`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate-child-ci.ps1`: byte-identical mirror of `.claude/hooks/enforce-epic-merge-gate-child-ci.ps1`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate-child-ci.ps1`: byte-identical mirror of `.codex/hooks/enforce-epic-merge-gate-child-ci.ps1`
+- `tests/scripts/codex-hooks/enforce-epic-merge-gate-child-ci-opt-out.Tests.ps1`: created test
+- `.claude/hooks/enforce-epic-merge-gate.ps1`: source, branch 1 passes `-GitRoot $childRoot` and header condition 1 names the opt-out
+- `.codex/hooks/enforce-epic-merge-gate.ps1`: source, header comment only (not identical to the Claude gate)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate.ps1`: byte-identical mirror of `.claude/hooks/enforce-epic-merge-gate.ps1`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate.ps1`: byte-identical mirror of `.codex/hooks/enforce-epic-merge-gate.ps1`
+- `tests/scripts/claude-hooks/enforce-epic-merge-gate.ChildCiOptOut.Tests.ps1`: created test
+- `.claude/hooks/enforce-completion-helpers.ps1`: source, `Test-CompletionChildCiIntegrationOnly` and `Get-CompletionLocalQcGateMissing`
+- `.codex/hooks/enforce-completion-helpers.ps1`: byte-identical twin of `.claude/hooks/enforce-completion-helpers.ps1`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-helpers.ps1`: byte-identical mirror of `.claude/hooks/enforce-completion-helpers.ps1`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-helpers.ps1`: byte-identical mirror of `.codex/hooks/enforce-completion-helpers.ps1`
+- `tests/scripts/codex-hooks/enforce-completion-helpers.Tests.ps1`: extended test
+- `.claude/hooks/enforce-completion-consistency.ps1`: source, `Get-MissingCompletionEvidence` and the deny reason branch on the opt-out
+- `.codex/hooks/enforce-completion-consistency.ps1`: source, the same change (not identical to the Claude hook)
+- `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-consistency.ps1`: byte-identical mirror of `.claude/hooks/enforce-completion-consistency.ps1`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-consistency.ps1`: byte-identical mirror of `.codex/hooks/enforce-completion-consistency.ps1`
+- `tests/scripts/claude-hooks/enforce-completion-consistency.Tests.ps1`: extended test
+- `tests/scripts/codex-hooks/codex-completion-consistency-hook.Tests.ps1`: extended test
 - `.dev/engineering/process-reductions/0014-epic-child-ci-opt-out.md`: this entry
 - `.dev/engineering/process-reductions/README.md`: index row
 
@@ -498,14 +519,838 @@ function Get-OrchestratorStateCompletionLocalQcGateError {
     $ciGate = (Get-CheckpointObjectMember -Owner $State -Name 'ci_gate').Value
 ````
 
+### Revert Block: .claude/hooks/enforce-epic-merge-gate-child-ci.ps1
+
+````Current
+    live-head lookup can change the head; like the rest of the gate this is a policy-level control.
+
+    Child CI opt-out (issue #1233): when the checkpoint records epic_mode as the JSON boolean true,
+    child_ci as the exact string integration_only, and an epic_context.integration_branch that matches
+    ^epic/[A-Za-z0-9][A-Za-z0-9._-]*-integration$, stages B, R, L1, L2, and L3 run after stage 1 in
+    place of stages 2 to 6:
+
+      B.  One bounded gh pr view <PR> --json headRefOid,baseRefName (Get-EpicMergeGateChildCiLivePullRequest).
+          A failed lookup denies. A live base that is not exactly the recorded integration branch, or that
+          is main, does not apply the opt-out: stages 2 to 6 run unchanged, and stage 3 reuses the head
+          read here, so no second gh pr view is made.
+      R.  review_mode is exactly concurrent. The review guard runs before this helper under that key, so
+          reaching stage R proves a PASS review at a current head.
+      L1. local_qc_gate is an object whose conclusion is exactly success, whose head_sha is a lowercase
+          object id, and whose evidence_path is a clean relative path under
+          <feature-folder>/evidence/qa-gates/ that ends in .md.
+      L2. local_qc_gate.head_sha equals the head_sha of the last remediation_loop.review_outcomes entry.
+      L3. One bounded git cat-file -p <live head>:<evidence_path> at GitRoot: the file exists, its first
+          EXIT_CODE: line has value 0, and it holds a Timestamp: line and the line Head: <head_sha>.
+
+    Every opt-out failure returns a Reason that begins
+    "EPIC_MERGE_GATE_BLOCKED: EPIC_CHILD_LOCAL_QC_NOT_VERIFIED: " and does not fall through. Without the
+    predicate the helper is unchanged and the opt-out seam is never called. child_ci is self-declared by
+    the item checkpoint; the live base, the concurrent review, and the evidence file bound it.
+#>
+
+$script:EpicMergeGateChildCiReasonPrefix = 'EPIC_MERGE_GATE_BLOCKED: EPIC_CHILD_CI_NOT_VERIFIED: '
+$script:EpicMergeGateChildLocalQcReasonPrefix = 'EPIC_MERGE_GATE_BLOCKED: EPIC_CHILD_LOCAL_QC_NOT_VERIFIED: '
+$script:EpicMergeGateChildCiIntegrationBranchPattern = '\Aepic/[A-Za-z0-9][A-Za-z0-9._-]*-integration\z'
+````
+
+````Prior
+    live-head lookup can change the head; like the rest of the gate this is a policy-level control.
+#>
+
+$script:EpicMergeGateChildCiReasonPrefix = 'EPIC_MERGE_GATE_BLOCKED: EPIC_CHILD_CI_NOT_VERIFIED: '
+````
+
+### Revert Block: .claude/hooks/enforce-epic-merge-gate-child-ci.ps1
+
+````Current
+
+function Test-EpicMergeGateChildCiOptOut {
+    <#
+    .SYNOPSIS
+        Report whether the child-CI opt-out predicate of issue #1233 holds for a parsed checkpoint (pure).
+    .DESCRIPTION
+        True only when epic_mode is the JSON boolean true, child_ci is the exact string integration_only
+        (ordinal), and epic_context.integration_branch is a string matching the integration-branch pattern.
+    .PARAMETER Checkpoint
+        The parsed child checkpoint.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([AllowNull()] $Checkpoint)
+
+    $epicMode = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'epic_mode'
+    if (-not ($epicMode -is [bool] -and $epicMode)) { return $false }
+    $childCi = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'child_ci'
+    if (-not ($childCi -is [string] -and $childCi -ceq 'integration_only')) { return $false }
+    $context = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'epic_context'
+    $branch = Get-EpicMergeGateChildCiProperty -InputObject $context -Name 'integration_branch'
+    return ($branch -is [string] -and $branch -cmatch $script:EpicMergeGateChildCiIntegrationBranchPattern)
+}
+
+function Get-EpicMergeGateChildCiLivePullRequest {
+    <#
+    .SYNOPSIS
+        Return the live head and base of a pull request, or $null on any failure (the opt-out seam).
+    .DESCRIPTION
+        Makes exactly one Invoke-DocsOnlyGhExe call, gh pr view <PR> --json headRefOid,baseRefName. A
+        non-zero exit, output that does not parse to a JSON object, a malformed head, and an absent or
+        blank base all return $null.
+    .PARAMETER PrNumber
+        The pull request number.
+    .PARAMETER WorktreeRoot
+        The directory gh runs in.
+    .OUTPUTS
+        System.Collections.Specialized.OrderedDictionary with HeadSha and BaseRef, or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param([Parameter(Mandatory)][int] $PrNumber, [AllowNull()][AllowEmptyString()][string] $WorktreeRoot)
+
+    $lookup = Invoke-DocsOnlyGhExe -WorkingRoot $WorktreeRoot -GhArgs @('pr', 'view', [string]$PrNumber, '--json', 'headRefOid,baseRefName')
+    if ($null -eq $lookup -or $lookup.ExitCode -ne 0) { return $null }
+    try {
+        $pr = ConvertFrom-Json -InputObject ([string]$lookup.Output) -ErrorAction Stop
+    } catch {
+        # Unreadable gh output is a lookup failure; the opt-out fails closed on $null.
+        return $null
+    }
+    $head = Get-EpicMergeGateChildCiProperty -InputObject $pr -Name 'headRefOid'
+    $base = Get-EpicMergeGateChildCiProperty -InputObject $pr -Name 'baseRefName'
+    if (-not (Test-EpicMergeGateChildCiObjectId -Value $head)) { return $null }
+    if (-not ($base -is [string]) -or [string]::IsNullOrWhiteSpace($base)) { return $null }
+    return [ordered]@{ HeadSha = [string]$head; BaseRef = [string]$base }
+}
+
+function Test-EpicMergeGateChildCiEvidencePath {
+    <#
+    .SYNOPSIS
+        Report whether an evidence path is a clean relative .md path under <feature-folder>/evidence/qa-gates/ (pure).
+    .PARAMETER Path
+        The candidate local_qc_gate.evidence_path value, of any type.
+    .PARAMETER FeatureFolder
+        The validated feature-folder value.
+    .OUTPUTS
+        System.Boolean
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param([AllowNull()] $Path, [Parameter(Mandatory)][string] $FeatureFolder)
+
+    if ($Path -isnot [string] -or $Path.Length -eq 0) { return $false }
+    if ($Path.IndexOf([char]92) -ge 0) { return $false }
+    foreach ($segment in $Path.Split('/')) {
+        if ($segment.Length -eq 0 -or $segment -ceq '.' -or $segment -ceq '..') { return $false }
+    }
+    if (-not $Path.StartsWith("$FeatureFolder/evidence/qa-gates/", [System.StringComparison]::Ordinal)) { return $false }
+    return $Path.EndsWith('.md', [System.StringComparison]::Ordinal)
+}
+
+function Get-EpicMergeGateChildLocalQcEvidenceDetail {
+    <#
+    .SYNOPSIS
+        Stage L3: read the evidence file at the live head and return a failure detail, or $null when it passes.
+    .DESCRIPTION
+        Makes exactly one Invoke-DocsOnlyGitExe call, git cat-file -p <head>:<path>, at GitRoot. The file
+        must exist, its first EXIT_CODE: line must have value 0, and it must hold a Timestamp: line and the
+        line Head: <head_sha>, compared ordinally.
+    .PARAMETER LiveHead
+        The live head commit of the pull request.
+    .PARAMETER EvidencePath
+        The validated local_qc_gate.evidence_path.
+    .PARAMETER RecordedHead
+        The validated local_qc_gate.head_sha.
+    .PARAMETER GitRoot
+        The directory git runs in.
+    .OUTPUTS
+        System.String or $null
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $LiveHead,
+        [Parameter(Mandatory)][string] $EvidencePath,
+        [Parameter(Mandatory)][string] $RecordedHead,
+        [AllowNull()][AllowEmptyString()][string] $GitRoot
+    )
+
+    $read = Invoke-DocsOnlyGitExe -WorktreeRoot $GitRoot -GitArgs @('cat-file', '-p', "${LiveHead}:$EvidencePath")
+    if ($null -eq $read -or $read.ExitCode -ne 0) { return "stage L3 (evidence): $EvidencePath could not be read at the live head $LiveHead." }
+    $lines = @(([string]$read.Output) -split "`n" | ForEach-Object { $_.TrimEnd("`r") })
+    $exitLine = @($lines | Where-Object { $_.StartsWith('EXIT_CODE:', [System.StringComparison]::Ordinal) } | Select-Object -First 1)
+    if ($exitLine.Count -eq 0) { return "stage L3 (evidence): $EvidencePath has no EXIT_CODE: line." }
+    if ($exitLine[0].Substring('EXIT_CODE:'.Length).Trim() -cne '0') { return "stage L3 (evidence): the first EXIT_CODE: line of $EvidencePath is not 0." }
+    if (@($lines | Where-Object { $_.StartsWith('Timestamp:', [System.StringComparison]::Ordinal) }).Count -eq 0) {
+        return "stage L3 (evidence): $EvidencePath has no Timestamp: line."
+    }
+    if (@($lines | Where-Object { $_.TrimEnd() -ceq "Head: $RecordedHead" }).Count -eq 0) {
+        return "stage L3 (evidence): $EvidencePath has no line Head: $RecordedHead."
+    }
+    return $null
+}
+
+function ConvertTo-EpicMergeGateChildLocalQcResult {
+    <#
+    .SYNOPSIS
+        Build an applied opt-out result with a detail and the live head (pure).
+    .PARAMETER Detail
+        The failure detail, or $null when every stage passed.
+    .PARAMETER LiveHead
+        The live head read by stage B, or $null when stage B failed.
+    .OUTPUTS
+        System.Collections.Specialized.OrderedDictionary with Applies, Detail, and LiveHead.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param([AllowNull()][AllowEmptyString()][string] $Detail, [AllowNull()][AllowEmptyString()][string] $LiveHead)
+
+    $detailValue = if ([string]::IsNullOrEmpty($Detail)) { $null } else { $Detail }
+    $headValue = if ([string]::IsNullOrEmpty($LiveHead)) { $null } else { $LiveHead }
+    return [ordered]@{ Applies = $true; Detail = $detailValue; LiveHead = $headValue }
+}
+
+function Get-EpicMergeGateChildLocalQcResult {
+    <#
+    .SYNOPSIS
+        Evaluate opt-out stages B, R, L1, L2, and L3 (issue #1233).
+    .DESCRIPTION
+        Applies is $false only when the live base is not exactly the recorded integration branch or is
+        main; LiveHead then carries the head read by stage B, for reuse by stage 3. Otherwise Applies is
+        $true and Detail holds the first failure detail, or $null when every stage passes.
+    .PARAMETER Checkpoint
+        The parsed child checkpoint, for which Test-EpicMergeGateChildCiOptOut holds.
+    .PARAMETER PrNumber
+        The resolved pull request number.
+    .PARAMETER GhRoot
+        The directory gh runs in.
+    .PARAMETER GitRoot
+        The directory git runs in.
+    .OUTPUTS
+        System.Collections.Specialized.OrderedDictionary with Applies, Detail, and LiveHead.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [AllowNull()] $Checkpoint,
+        [Parameter(Mandatory)][int] $PrNumber,
+        [AllowNull()][AllowEmptyString()][string] $GhRoot,
+        [AllowNull()][AllowEmptyString()][string] $GitRoot
+    )
+
+    $live = Get-EpicMergeGateChildCiLivePullRequest -PrNumber $PrNumber -WorktreeRoot $GhRoot
+    if ($null -eq $live) {
+        return ConvertTo-EpicMergeGateChildLocalQcResult -Detail "stage B (base): the live head and base of pull request $PrNumber could not be resolved." -LiveHead $null
+    }
+    $integration = [string](Get-EpicMergeGateChildCiProperty -InputObject (Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'epic_context') -Name 'integration_branch')
+    if ($live.BaseRef -cne $integration -or $live.BaseRef -ceq 'main') {
+        return [ordered]@{ Applies = $false; Detail = $null; LiveHead = $live.HeadSha }
+    }
+
+    if (-not (Test-EpicMergeGateReviewModeConcurrent -Checkpoint $Checkpoint)) {
+        return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage R (review): child_ci integration_only requires review_mode "concurrent".' -LiveHead $live.HeadSha
+    }
+
+    $gate = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'local_qc_gate'
+    if ($gate -isnot [System.Management.Automation.PSCustomObject]) { return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage L1 (record): the checkpoint records no local_qc_gate object.' -LiveHead $live.HeadSha }
+    $conclusion = Get-EpicMergeGateChildCiProperty -InputObject $gate -Name 'conclusion'
+    if (-not ($conclusion -is [string] -and $conclusion -ceq 'success')) { return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage L1 (record): local_qc_gate.conclusion is not "success".' -LiveHead $live.HeadSha }
+    $recordedHead = Get-EpicMergeGateChildCiProperty -InputObject $gate -Name 'head_sha'
+    if (-not (Test-EpicMergeGateChildCiObjectId -Value $recordedHead)) {
+        return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage L1 (record): local_qc_gate.head_sha is not a lowercase 40- or 64-character object id.' -LiveHead $live.HeadSha
+    }
+    $featureFolder = Get-EpicMergeGateChildCiProperty -InputObject $Checkpoint -Name 'feature-folder'
+    if (-not (Test-EpicMergeGateReviewFeatureFolder -Value $featureFolder)) {
+        return ConvertTo-EpicMergeGateChildLocalQcResult -Detail 'stage L1 (record): the checkpoint feature-folder is absent or not a clean development-docs path.' -LiveHead $live.HeadSha
+    }
+    $evidencePath = Get-EpicMergeGateChildCiProperty -InputObject $gate -Name 'evidence_path'
+    if (-not (Test-EpicMergeGateChildCiEvidencePath -Path $evidencePath -FeatureFolder ([string]$featureFolder))) {
+        return ConvertTo-EpicMergeGateChildLocalQcResult -Detail "stage L1 (record): local_qc_gate.evidence_path is not a clean relative path under $featureFolder/evidence/qa-gates/ that ends in .md." -LiveHead $live.HeadSha
+    }
+
+    $outcome = Get-EpicMergeGateLastReviewOutcome -Checkpoint $Checkpoint
+    $reviewedHead = Get-EpicMergeGateChildCiProperty -InputObject $outcome -Name 'head_sha'
+    if (-not ($reviewedHead -is [string] -and $reviewedHead -ceq $recordedHead)) {
+        return ConvertTo-EpicMergeGateChildLocalQcResult -Detail "stage L2 (binding): local_qc_gate.head_sha $recordedHead differs from the head_sha of the last review_outcomes entry." -LiveHead $live.HeadSha
+    }
+
+    $evidenceDetail = Get-EpicMergeGateChildLocalQcEvidenceDetail -LiveHead $live.HeadSha -EvidencePath ([string]$evidencePath) -RecordedHead ([string]$recordedHead) -GitRoot $GitRoot
+    return ConvertTo-EpicMergeGateChildLocalQcResult -Detail $evidenceDetail -LiveHead $live.HeadSha
+}
+
+````
+
+````Prior
+````
+
+### Revert Block: .claude/hooks/enforce-epic-merge-gate-child-ci.ps1
+
+````Current
+        The directory gh runs in: the session root on Claude, the repository root on Codex.
+    .PARAMETER GitRoot
+        The directory git runs in for opt-out stage L3: the item worktree on Claude. Omitted or empty, it
+        defaults to GhRoot.
+````
+
+````Prior
+        The directory gh runs in: the session root on Claude, the repository root on Codex.
+````
+
+### Revert Block: .claude/hooks/enforce-epic-merge-gate-child-ci.ps1
+
+````Current
+        [AllowNull()][Nullable[int]] $CommandPrNumber,
+        [AllowNull()][AllowEmptyString()][string] $GhRoot,
+        [AllowNull()][AllowEmptyString()][string] $GitRoot
+    )
+
+    $gitDirectory = if ([string]::IsNullOrEmpty($GitRoot)) { $GhRoot } else { $GitRoot }
+    try {
+        $detail = Get-EpicMergeGateChildCiFailureDetail -Checkpoint $Checkpoint -CommandPrNumber $CommandPrNumber -GhRoot $GhRoot -GitRoot $gitDirectory
+````
+
+````Prior
+        [AllowNull()][Nullable[int]] $CommandPrNumber,
+        [AllowNull()][AllowEmptyString()][string] $GhRoot
+    )
+
+    try {
+        $detail = Get-EpicMergeGateChildCiFailureDetail -Checkpoint $Checkpoint -CommandPrNumber $CommandPrNumber -GhRoot $GhRoot
+````
+
+### Revert Block: .claude/hooks/enforce-epic-merge-gate-child-ci.ps1
+
+````Current
+    if ($null -eq $detail) { return [ordered]@{ Verified = $true; Reason = '' } }
+    # An opt-out failure already carries its own prefix; every other detail takes the CI prefix.
+    if ($detail.StartsWith($script:EpicMergeGateChildLocalQcReasonPrefix, [System.StringComparison]::Ordinal)) {
+        return [ordered]@{ Verified = $false; Reason = $detail }
+    }
+````
+
+````Prior
+    if ($null -eq $detail) { return [ordered]@{ Verified = $true; Reason = '' } }
+````
+
+### Revert Block: .claude/hooks/enforce-epic-merge-gate-child-ci.ps1
+
+````Current
+        The directory gh runs in.
+    .PARAMETER GitRoot
+        The directory git runs in for opt-out stage L3.
+````
+
+````Prior
+        The directory gh runs in.
+````
+
+### Revert Block: .claude/hooks/enforce-epic-merge-gate-child-ci.ps1
+
+````Current
+    [OutputType([string])]
+    param(
+        [AllowNull()] $Checkpoint,
+        [AllowNull()][Nullable[int]] $CommandPrNumber,
+        [AllowNull()][AllowEmptyString()][string] $GhRoot,
+        [AllowNull()][AllowEmptyString()][string] $GitRoot
+    )
+
+    $pr = Get-EpicMergeGateChildCiPrNumber -Checkpoint $Checkpoint -CommandPrNumber $CommandPrNumber
+    if ($null -eq $pr.PrNumber) { return 'stage 1 (PR number): ' + $pr.Detail }
+
+    # Child CI opt-out (issue #1233): stages B to L3 replace stages 2 to 6 unless the live base falls back.
+    $knownLiveHead = $null
+    if (Test-EpicMergeGateChildCiOptOut -Checkpoint $Checkpoint) {
+        $localQc = Get-EpicMergeGateChildLocalQcResult -Checkpoint $Checkpoint -PrNumber $pr.PrNumber -GhRoot $GhRoot -GitRoot $GitRoot
+        if ($localQc.Applies) {
+            if ($null -eq $localQc.Detail) { return $null }
+            return $script:EpicMergeGateChildLocalQcReasonPrefix + $localQc.Detail
+        }
+        $knownLiveHead = $localQc.LiveHead
+    }
+
+````
+
+````Prior
+    [OutputType([string])]
+    param([AllowNull()] $Checkpoint, [AllowNull()][Nullable[int]] $CommandPrNumber, [AllowNull()][AllowEmptyString()][string] $GhRoot)
+
+    $pr = Get-EpicMergeGateChildCiPrNumber -Checkpoint $Checkpoint -CommandPrNumber $CommandPrNumber
+    if ($null -eq $pr.PrNumber) { return 'stage 1 (PR number): ' + $pr.Detail }
+
+````
+
+### Revert Block: .claude/hooks/enforce-epic-merge-gate-child-ci.ps1
+
+````Current
+
+    $liveHead = if ($null -ne $knownLiveHead) { $knownLiveHead } else { Get-EpicMergeGateChildCiLiveHeadSha -PrNumber $pr.PrNumber -WorktreeRoot $GhRoot }
+````
+
+````Prior
+
+    $liveHead = Get-EpicMergeGateChildCiLiveHeadSha -PrNumber $pr.PrNumber -WorktreeRoot $GhRoot
+````
+
+### Revert Block: .claude/hooks/enforce-epic-merge-gate.ps1
+
+````Current
+         #1130) verifies a green CI run on the live PR head. Any stage failure denies with
+         EPIC_CHILD_CI_NOT_VERIFIED and never falls through to the later branches. Under the
+         child CI opt-out (child_ci integration_only, issue #1233) the helper verifies the
+         local final-QC evidence instead, with git in the item worktree (-GitRoot), and a
+         failure denies with EPIC_CHILD_LOCAL_QC_NOT_VERIFIED.
+````
+
+````Prior
+         #1130) verifies a green CI run on the live PR head. Any stage failure denies with
+         EPIC_CHILD_CI_NOT_VERIFIED and never falls through to the later branches.
+````
+
+### Revert Block: .claude/hooks/enforce-epic-merge-gate.ps1
+
+````Current
+        (Test-ChildCheckpointPrGateBinding -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber)) {
+        $childCi = Get-EpicMergeGateChildCiDecision -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber -GhRoot $sessionRoot -GitRoot $childRoot
+````
+
+````Prior
+        (Test-ChildCheckpointPrGateBinding -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber)) {
+        $childCi = Get-EpicMergeGateChildCiDecision -Checkpoint $childCheckpoint -CommandPrNumber $commandPrNumber -GhRoot $sessionRoot
+````
+
+### Revert Block: .codex/hooks/enforce-epic-merge-gate.ps1
+
+````Current
+    through to the epic, standalone, or docs-only branches.
+
+    Child CI opt-out (issue #1233): under child_ci integration_only the same helper verifies the
+    local final-QC evidence in place of a CI run (stages B, R, L1, L2, and L3), with gh and git in
+    the repository root because -GitRoot defaults to -GhRoot, and a failure denies with
+    EPIC_CHILD_LOCAL_QC_NOT_VERIFIED. The call below is unchanged.
+````
+
+````Prior
+    through to the epic, standalone, or docs-only branches.
+````
+
+### Revert Block: .claude/hooks/enforce-completion-helpers.ps1
+
+````Current
+        absent, or ambiguous.
+      - Test-CompletionChildCiIntegrationOnly and Get-CompletionLocalQcGateMissing:
+        the child CI opt-out (issue #1233) predicate and its local_qc_gate
+        evidence check, used in place of the ci_gate check under the opt-out.
+````
+
+````Prior
+        absent, or ambiguous.
+````
+
+### Revert Block: .claude/hooks/enforce-completion-helpers.ps1
+
+````Current
+
+function Test-CompletionChildCiIntegrationOnly {
+    <#
+    .SYNOPSIS
+        Returns $true when a checkpoint opts its epic child out of per-child CI (issue #1233).
+    .DESCRIPTION
+        Pure predicate: epic_mode must be the JSON boolean true and child_ci the exact string
+        integration_only (ordinal). An absent key, a case variant, a non-string child_ci, and an
+        epic_mode that is not a boolean all return $false, so every other checkpoint keeps the
+        ci_gate evidence check.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)]
+        [AllowNull()]
+        $Payload
+    )
+
+    if ($Payload -isnot [System.Management.Automation.PSCustomObject]) {
+        return $false
+    }
+    $names = @($Payload.PSObject.Properties.Name)
+    if ($names -cnotcontains 'epic_mode' -or $names -cnotcontains 'child_ci') {
+        return $false
+    }
+    $epicMode = $Payload.epic_mode
+    $childCi = $Payload.child_ci
+    return ($epicMode -is [bool] -and $epicMode -and $childCi -is [string] -and $childCi -ceq 'integration_only')
+}
+
+function Get-CompletionLocalQcGateMissing {
+    <#
+    .SYNOPSIS
+        Returns the missing local_qc_gate evidence of an opted-out epic child (issue #1233).
+    .DESCRIPTION
+        Pure check used in place of the ci_gate evidence check: local_qc_gate must be an object
+        whose conclusion is exactly success and whose head_sha and evidence_path are non-empty
+        strings. An empty list means the evidence is present.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory)]
+        [AllowNull()]
+        $Payload
+    )
+
+    $gate = $null
+    if ($Payload -is [System.Management.Automation.PSCustomObject] -and (@($Payload.PSObject.Properties.Name) -ccontains 'local_qc_gate')) {
+        $gate = $Payload.local_qc_gate
+    }
+    if ($gate -isnot [System.Management.Automation.PSCustomObject]) {
+        return [string[]]@('local_qc_gate (object with conclusion == "success" and non-empty head_sha and evidence_path)')
+    }
+
+    $missing = [System.Collections.Generic.List[string]]::new()
+    $names = @($gate.PSObject.Properties.Name)
+    $conclusion = if ($names -ccontains 'conclusion') { $gate.conclusion } else { $null }
+    if (-not ($conclusion -is [string] -and $conclusion -ceq 'success')) {
+        $missing.Add('local_qc_gate.conclusion == "success"')
+    }
+    foreach ($field in @('head_sha', 'evidence_path')) {
+        $value = if ($names -ccontains $field) { $gate.$field } else { $null }
+        if ($null -eq $value -or [string]::IsNullOrWhiteSpace([string]$value)) {
+            $missing.Add("local_qc_gate.$field")
+        }
+    }
+    return [string[]]$missing.ToArray()
+}
+
+````
+
+````Prior
+````
+
+### Revert Block: tests/scripts/codex-hooks/enforce-completion-helpers.Tests.ps1
+
+````Current
+}
+
+Describe 'Test-CompletionChildCiIntegrationOnly (Codex helpers, issue #1233)' {
+    It 'returns true only for the JSON boolean epic_mode and the exact integration_only value' {
+        $payload = '{"epic_mode":true,"child_ci":"integration_only"}' | ConvertFrom-Json
+        Test-CompletionChildCiIntegrationOnly -Payload $payload | Should -BeTrue
+    }
+
+    It 'returns false for the default variant <Label>' -ForEach @(
+        @{ Label = 'child_ci absent'; Json = '{"epic_mode":true}' }
+        @{ Label = 'child_ci per_child'; Json = '{"epic_mode":true,"child_ci":"per_child"}' }
+        @{ Label = 'a case variant'; Json = '{"epic_mode":true,"child_ci":"Integration_Only"}' }
+        @{ Label = 'a non-string child_ci'; Json = '{"epic_mode":true,"child_ci":true}' }
+        @{ Label = 'epic_mode the string true'; Json = '{"epic_mode":"true","child_ci":"integration_only"}' }
+        @{ Label = 'epic_mode false'; Json = '{"epic_mode":false,"child_ci":"integration_only"}' }
+        @{ Label = 'epic_mode absent'; Json = '{"child_ci":"integration_only"}' }
+    ) {
+        Test-CompletionChildCiIntegrationOnly -Payload ($Json | ConvertFrom-Json) | Should -BeFalse
+    }
+
+    It 'returns false for a null payload' {
+        Test-CompletionChildCiIntegrationOnly -Payload $null | Should -BeFalse
+    }
+}
+
+Describe 'Get-CompletionLocalQcGateMissing (Codex helpers, issue #1233)' {
+    It 'returns no missing evidence for a valid local_qc_gate' {
+        $payload = '{"local_qc_gate":{"conclusion":"success","head_sha":"3f2a9c1e5b7d4a6f8e0c2b4d6a8f0e1c3b5d7a9f","evidence_path":".dev/active/f/evidence/qa-gates/local-qc-gate.md","verified_at":"2026-11-24T05:00:00Z"}}' | ConvertFrom-Json
+        @(Get-CompletionLocalQcGateMissing -Payload $payload).Count | Should -Be 0
+    }
+
+    It 'names the object for <Label>' -ForEach @(
+        @{ Label = 'an absent local_qc_gate'; Json = '{}' }
+        @{ Label = 'a non-object local_qc_gate'; Json = '{"local_qc_gate":"success"}' }
+    ) {
+        @(Get-CompletionLocalQcGateMissing -Payload ($Json | ConvertFrom-Json)) | Should -Be @('local_qc_gate (object with conclusion == "success" and non-empty head_sha and evidence_path)')
+    }
+
+    It 'names <Expected> for <Label>' -ForEach @(
+        @{ Label = 'an absent conclusion'; Json = '{"local_qc_gate":{"head_sha":"h","evidence_path":"p"}}'; Expected = 'local_qc_gate.conclusion == "success"' }
+        @{ Label = 'a failure conclusion'; Json = '{"local_qc_gate":{"conclusion":"failure","head_sha":"h","evidence_path":"p"}}'; Expected = 'local_qc_gate.conclusion == "success"' }
+        @{ Label = 'an absent head_sha'; Json = '{"local_qc_gate":{"conclusion":"success","evidence_path":"p"}}'; Expected = 'local_qc_gate.head_sha' }
+        @{ Label = 'an empty head_sha'; Json = '{"local_qc_gate":{"conclusion":"success","head_sha":"","evidence_path":"p"}}'; Expected = 'local_qc_gate.head_sha' }
+        @{ Label = 'an absent evidence_path'; Json = '{"local_qc_gate":{"conclusion":"success","head_sha":"h"}}'; Expected = 'local_qc_gate.evidence_path' }
+        @{ Label = 'an empty evidence_path'; Json = '{"local_qc_gate":{"conclusion":"success","head_sha":"h","evidence_path":""}}'; Expected = 'local_qc_gate.evidence_path' }
+    ) {
+        @(Get-CompletionLocalQcGateMissing -Payload ($Json | ConvertFrom-Json)) | Should -Be @($Expected)
+    }
+}
+````
+
+````Prior
+}
+````
+
+### Revert Block: .claude/hooks/enforce-completion-consistency.ps1
+
+````Current
+    }
+    if (Test-CompletionChildCiIntegrationOnly -Payload $Payload) { $missing += @(Get-CompletionLocalQcGateMissing -Payload $Payload) } # Child CI opt-out (issue #1233)
+    elseif ($null -eq $ciGate -or $ciGate -isnot [System.Management.Automation.PSCustomObject]) {
+````
+
+````Prior
+    }
+    if ($null -eq $ciGate -or $ciGate -isnot [System.Management.Automation.PSCustomObject]) {
+````
+
+### Revert Block: .claude/hooks/enforce-completion-consistency.ps1
+
+````Current
+            $ciHeadSha = Get-CheckpointStringValue -Payload $ciGate -Name 'head_sha'
+            if (-not (Test-CompletionChildCiIntegrationOnly -Payload $Payload) -and $prHeadSha -and $ciHeadSha -and $prHeadSha -ne $ciHeadSha) {
+````
+
+````Prior
+            $ciHeadSha = Get-CheckpointStringValue -Payload $ciGate -Name 'head_sha'
+            if ($prHeadSha -and $ciHeadSha -and $prHeadSha -ne $ciHeadSha) {
+````
+
+### Revert Block: .claude/hooks/enforce-completion-consistency.ps1
+
+````Current
+
+    $reason = if (Test-CompletionChildCiIntegrationOnly -Payload $payload) { "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint of an epic child with child_ci integration_only must include a non-empty issue-num, a non-empty feature-folder, and a local_qc_gate object with conclusion == 'success' and non-empty head_sha and evidence_path in place of a ci_gate object; routes whose requires_pr_gate is true must also include pr_gate evidence. Supply the missing evidence or remove the completion assertion." } else { "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha; routes whose requires_pr_gate is true must also include pr_gate evidence with a matching head_sha. Supply the missing evidence or remove the completion assertion." }
+````
+
+````Prior
+
+    $reason = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha; routes whose requires_pr_gate is true must also include pr_gate evidence with a matching head_sha. Supply the missing evidence or remove the completion assertion."
+````
+
+### Revert Block: .codex/hooks/enforce-completion-consistency.ps1
+
+````Current
+    }
+    if (Test-CompletionChildCiIntegrationOnly -Payload $Payload) { $missing += @(Get-CompletionLocalQcGateMissing -Payload $Payload) } # Child CI opt-out (issue #1233)
+    elseif ($null -eq $ciGate -or $ciGate -isnot [System.Management.Automation.PSCustomObject]) {
+````
+
+````Prior
+    }
+    if ($null -eq $ciGate -or $ciGate -isnot [System.Management.Automation.PSCustomObject]) {
+````
+
+### Revert Block: .codex/hooks/enforce-completion-consistency.ps1
+
+````Current
+            $ciHeadSha = Get-CheckpointStringValue -Payload $ciGate -Name 'head_sha'
+            if (-not (Test-CompletionChildCiIntegrationOnly -Payload $Payload) -and $prHeadSha -and $ciHeadSha -and $prHeadSha -ne $ciHeadSha) {
+````
+
+````Prior
+            $ciHeadSha = Get-CheckpointStringValue -Payload $ciGate -Name 'head_sha'
+            if ($prHeadSha -and $ciHeadSha -and $prHeadSha -ne $ciHeadSha) {
+````
+
+### Revert Block: .codex/hooks/enforce-completion-consistency.ps1
+
+````Current
+
+    $reason = if (Test-CompletionChildCiIntegrationOnly -Payload $payload) { "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint of an epic child with child_ci integration_only must include a non-empty issue-num, a non-empty feature-folder, and a local_qc_gate object with conclusion == 'success' and non-empty head_sha and evidence_path in place of a ci_gate object; routes whose requires_pr_gate is true must also include pr_gate evidence. Supply the missing evidence or remove the completion assertion." } else { "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha; routes whose requires_pr_gate is true must also include pr_gate evidence with a matching head_sha. Supply the missing evidence or remove the completion assertion." }
+````
+
+````Prior
+
+    $reason = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: $($missing -join ', '). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha; routes whose requires_pr_gate is true must also include pr_gate evidence with a matching head_sha. Supply the missing evidence or remove the completion assertion."
+````
+
+### Revert Block: tests/scripts/claude-hooks/enforce-completion-consistency.Tests.ps1
+
+````Current
+    }
+
+    Context 'child CI opt-out (issue #1233)' {
+        BeforeAll {
+            $script:optOutHead = '3f2a9c1e5b7d4a6f8e0c2b4d6a8f0e1c3b5d7a9f'
+            $script:optOutPrGateMatrix = {
+                [pscustomobject]@{ routes = [pscustomobject]@{ large = [pscustomobject]@{ requires_pr_gate = $true } } }
+            }
+            $script:preChangeReason = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: ci_gate (object with conclusion == `"success`" and non-empty head_sha). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha; routes whose requires_pr_gate is true must also include pr_gate evidence with a matching head_sha. Supply the missing evidence or remove the completion assertion."
+
+            # Builds an opted-out completion payload; Gate replaces local_qc_gate, and RemoveGate drops it.
+            function ConvertTo-OptOutCompletionPayload {
+                param([hashtable] $Gate, [switch] $RemoveGate)
+
+                $payload = @{
+                    next_step        = 'complete'
+                    'issue-num'      = '1233'
+                    'feature-folder' = 'docs/features/active/feature-1233'
+                    path_selected    = 'large'
+                    epic_mode        = $true
+                    child_ci         = 'integration_only'
+                    pr_gate          = @{ pr_number = '42'; pr_url = 'https://github.com/o/r/pull/42'; head_branch = 'feature/x'; head_sha = 'ffffffffffffffffffffffffffffffffffffffff' }
+                    local_qc_gate    = @{ conclusion = 'success'; head_sha = $script:optOutHead; evidence_path = 'docs/features/active/feature-1233/evidence/qa-gates/local-qc-gate.2026-11-24T05-00.md'; verified_at = '2026-11-24T05:00:00Z' }
+                }
+                if ($Gate) { $payload['local_qc_gate'] = $Gate }
+                if ($RemoveGate) { $payload.Remove('local_qc_gate') }
+                return $payload
+            }
+        }
+
+        It 'allows DONE with a valid local_qc_gate, no ci_gate, and a pr_gate head that differs from the local head' {
+            # Arrange
+            $json = ConvertTo-CheckpointToolInput -Payload (ConvertTo-OptOutCompletionPayload)
+
+            # Act
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck { param($p) $true } -RoutingMatrixReader $script:optOutPrGateMatrix
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow' -Because ([string]$decision.hookSpecificOutput.permissionDecisionReason)
+        }
+
+        It 'denies DONE naming <Missing> for <Label>' -ForEach @(
+            @{ Label = 'an absent local_qc_gate'; Gate = $null; Remove = $true; Missing = 'local_qc_gate (object with' }
+            @{ Label = 'a failure conclusion'; Gate = @{ conclusion = 'failure'; head_sha = 'h'; evidence_path = 'p' }; Remove = $false; Missing = 'local_qc_gate.conclusion == "success"' }
+            @{ Label = 'an empty head_sha'; Gate = @{ conclusion = 'success'; head_sha = ''; evidence_path = 'p' }; Remove = $false; Missing = 'local_qc_gate.head_sha' }
+            @{ Label = 'an absent evidence_path'; Gate = @{ conclusion = 'success'; head_sha = 'h' }; Remove = $false; Missing = 'local_qc_gate.evidence_path' }
+        ) {
+            # Arrange
+            $json = ConvertTo-CheckpointToolInput -Payload (ConvertTo-OptOutCompletionPayload -Gate $Gate -RemoveGate:$Remove)
+
+            # Act
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck { param($p) $true } -RoutingMatrixReader $script:optOutPrGateMatrix
+
+            # Assert
+            $reason = [string]$decision.hookSpecificOutput.permissionDecisionReason
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $reason.Contains($Missing) | Should -BeTrue -Because $reason
+        }
+
+        It 'names the local_qc_gate alternative in the opt-out deny reason' {
+            # Arrange
+            $json = ConvertTo-CheckpointToolInput -Payload (ConvertTo-OptOutCompletionPayload -RemoveGate)
+
+            # Act
+            $reason = [string](Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck { param($p) $true } -RoutingMatrixReader $script:optOutPrGateMatrix).hookSpecificOutput.permissionDecisionReason
+
+            # Assert
+            $reason | Should -BeLike 'COMPLETION_CONSISTENCY_BLOCKED:*local_qc_gate object with conclusion*in place of a ci_gate object*'
+        }
+
+        It 'keeps the pre-change deny reason byte-unchanged for a keyless checkpoint' {
+            # Arrange
+            $json = ConvertTo-CheckpointToolInput -Payload @{
+                next_step        = 'complete'
+                'issue-num'      = '1233'
+                'feature-folder' = 'docs/features/active/feature-1233'
+                path_selected    = 'small'
+            }
+
+            # Act
+            $reason = [string](Invoke-CompletionConsistencyDecision -ToolInputRaw $json -FolderExistsCheck { param($p) $true } -RoutingMatrixReader $script:optOutPrGateMatrix).hookSpecificOutput.permissionDecisionReason
+
+            # Assert
+            $reason | Should -BeExactly $script:preChangeReason
+        }
+    }
+````
+
+````Prior
+    }
+````
+
+### Revert Block: tests/scripts/codex-hooks/codex-completion-consistency-hook.Tests.ps1
+
+````Current
+    }
+
+    Context 'child CI opt-out (issue #1233)' {
+        BeforeAll {
+            $script:PreChangeReason = "COMPLETION_CONSISTENCY_BLOCKED: the checkpoint asserts completion but is missing required completion evidence: ci_gate (object with conclusion == `"success`" and non-empty head_sha). A completion-asserting checkpoint must include a non-empty issue-num, a non-empty feature-folder, and a ci_gate object with conclusion == 'success' and a non-empty head_sha; routes whose requires_pr_gate is true must also include pr_gate evidence with a matching head_sha. Supply the missing evidence or remove the completion assertion."
+
+            function ConvertTo-OptOutContent {
+                <#
+                    Builds the JSON content of an opted-out completion checkpoint; Gate replaces
+                    local_qc_gate and RemoveGate drops it.
+                #>
+                param([hashtable] $Gate, [switch] $RemoveGate)
+
+                $base = [ordered]@{
+                    next_step        = 'complete'
+                    route_id         = 'full-bug'
+                    'issue-num'      = '1233'
+                    'feature-folder' = '.dev/active/sample'
+                    epic_mode        = $true
+                    child_ci         = 'integration_only'
+                    pr_gate          = [ordered]@{ pr_number = 42; pr_url = 'https://github.com/o/r/pull/42'; head_branch = 'feature/x'; head_sha = 'ffffffffffffffffffffffffffffffffffffffff' }
+                    local_qc_gate    = [ordered]@{ conclusion = 'success'; head_sha = '3f2a9c1e5b7d4a6f8e0c2b4d6a8f0e1c3b5d7a9f'; evidence_path = '.dev/active/sample/evidence/qa-gates/local-qc-gate.2026-11-24T05-00.md'; verified_at = '2026-11-24T05:00:00Z' }
+                }
+                if ($Gate) { $base['local_qc_gate'] = $Gate }
+                if ($RemoveGate) { $base.Remove('local_qc_gate') }
+                return ($base | ConvertTo-Json -Compress -Depth 10)
+            }
+        }
+
+        It 'allows DONE with a valid local_qc_gate, no ci_gate, and a pr_gate head that differs from the local head' {
+            # Arrange
+            $raw = @{ file_path = $script:CheckpointPath; content = (ConvertTo-OptOutContent) } | ConvertTo-Json -Compress
+
+            # Act
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $raw -FolderExistsCheck $script:FolderPresent -RoutingMatrixReader $script:PrGateRoute
+
+            # Assert
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'allow' -Because ([string]$decision.hookSpecificOutput.permissionDecisionReason)
+        }
+
+        It 'denies DONE naming <Missing> for <Label>' -ForEach @(
+            @{ Label = 'an absent local_qc_gate'; Gate = $null; Remove = $true; Missing = 'local_qc_gate (object with' }
+            @{ Label = 'a failure conclusion'; Gate = @{ conclusion = 'failure'; head_sha = 'h'; evidence_path = 'p' }; Remove = $false; Missing = 'local_qc_gate.conclusion == "success"' }
+            @{ Label = 'an empty head_sha'; Gate = @{ conclusion = 'success'; head_sha = ''; evidence_path = 'p' }; Remove = $false; Missing = 'local_qc_gate.head_sha' }
+            @{ Label = 'an empty evidence_path'; Gate = @{ conclusion = 'success'; head_sha = 'h'; evidence_path = '' }; Remove = $false; Missing = 'local_qc_gate.evidence_path' }
+        ) {
+            # Arrange
+            $raw = @{ file_path = $script:CheckpointPath; content = (ConvertTo-OptOutContent -Gate $Gate -RemoveGate:$Remove) } | ConvertTo-Json -Compress
+
+            # Act
+            $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $raw -FolderExistsCheck $script:FolderPresent -RoutingMatrixReader $script:PrGateRoute
+
+            # Assert
+            $reason = [string]$decision.hookSpecificOutput.permissionDecisionReason
+            $decision.hookSpecificOutput.permissionDecision | Should -Be 'deny'
+            $reason.Contains($Missing) | Should -BeTrue -Because $reason
+        }
+
+        It 'names the local_qc_gate alternative in the opt-out deny reason' {
+            # Arrange
+            $raw = @{ file_path = $script:CheckpointPath; content = (ConvertTo-OptOutContent -RemoveGate) } | ConvertTo-Json -Compress
+
+            # Act
+            $reason = [string](Invoke-CompletionConsistencyDecision -ToolInputRaw $raw -FolderExistsCheck $script:FolderPresent -RoutingMatrixReader $script:PrGateRoute).hookSpecificOutput.permissionDecisionReason
+
+            # Assert
+            $reason | Should -BeLike 'COMPLETION_CONSISTENCY_BLOCKED:*local_qc_gate object with conclusion*in place of a ci_gate object*'
+        }
+
+        It 'keeps the pre-change deny reason byte-unchanged for a keyless checkpoint' {
+            # Arrange
+            $content = '{"next_step":"complete","route_id":"full-bug","issue-num":"1233","feature-folder":".dev/active/sample"}'
+            $raw = @{ file_path = $script:CheckpointPath; content = $content } | ConvertTo-Json -Compress
+
+            # Act
+            $reason = [string](Invoke-CompletionConsistencyDecision -ToolInputRaw $raw -FolderExistsCheck $script:FolderPresent -RoutingMatrixReader $script:NoPrGateRoute).hookSpecificOutput.permissionDecisionReason
+
+            # Assert
+            $reason | Should -BeExactly $script:PreChangeReason
+        }
+    }
+````
+
+````Prior
+    }
+````
+
 ## Revert Steps
 
-1. Apply the blocks: replace each `Current` fence with its `Prior` fence in the named file, and delete the files this change created: `tests/fixtures/orchestrator_state_child_ci/` (every file), `extensions/drm-copilot/src/lib/validate/orchestrator-state-child-ci.ts`, `extensions/drm-copilot/test/lib/validate/orchestrator-state-child-ci.test.ts`, and `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateChildCi.Tests.ps1`.
-2. Re-copy mirrors and bundles: copy `.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1` to `extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`.
+1. Apply the blocks: replace each `Current` fence with its `Prior` fence in the named file, and delete the files this change created: `tests/fixtures/orchestrator_state_child_ci/` (every file), `extensions/drm-copilot/src/lib/validate/orchestrator-state-child-ci.ts`, `extensions/drm-copilot/test/lib/validate/orchestrator-state-child-ci.test.ts`, `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateChildCi.Tests.ps1`, `tests/scripts/codex-hooks/enforce-epic-merge-gate-child-ci-opt-out.Tests.ps1`, and `tests/scripts/claude-hooks/enforce-epic-merge-gate.ChildCiOptOut.Tests.ps1`.
+2. Re-copy mirrors and bundles: copy `.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1` to `extensions/drm-copilot/resources/claude-customizations/.claude/lib/orchestrator-state/OrchestratorStateCompletionChecks.psm1`; copy `.claude/hooks/enforce-epic-merge-gate-child-ci.ps1` to `.codex/hooks/enforce-epic-merge-gate-child-ci.ps1`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate-child-ci.ps1`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate-child-ci.ps1`; copy `.claude/hooks/enforce-epic-merge-gate.ps1` to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-epic-merge-gate.ps1` and `.codex/hooks/enforce-epic-merge-gate.ps1` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-epic-merge-gate.ps1`; copy `.claude/hooks/enforce-completion-helpers.ps1` to `.codex/hooks/enforce-completion-helpers.ps1`, `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-helpers.ps1`, and `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-helpers.ps1`; copy `.claude/hooks/enforce-completion-consistency.ps1` to `extensions/drm-copilot/resources/claude-customizations/.claude/hooks/enforce-completion-consistency.ps1` and `.codex/hooks/enforce-completion-consistency.ps1` to `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/hooks/enforce-completion-consistency.ps1`.
 3. Regenerate Codex variants: not applicable; run `scripts/dev_tools/generate_codex_agent_variants.py` in module form with `--check` to confirm no variant changed.
 4. Restore pinned hashes: not applicable.
 5. Restore contract-test literals: not applicable.
-6. Run the contract tests: `tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1`, `tests/scripts/dev-tools/ProcessReductionLedger.Tests.ps1`, `tests/scripts/dev-tools/ProcessReductionLedger.Index.Tests.ps1`, and `tests/scripts/dev_tools/test_validate_orchestrator_state_completion.py`.
+6. Run the contract tests: `tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1`, `tests/scripts/dev-tools/ProcessReductionLedger.Tests.ps1`, `tests/scripts/dev-tools/ProcessReductionLedger.Index.Tests.ps1`, `tests/scripts/codex-hooks/cross-tree-helper-identity.Tests.ps1`, the push-down resource and pack-manifest contract tests under `tests/scripts/dev_tools/`, and `tests/scripts/dev_tools/test_validate_orchestrator_state_completion.py`.
 
 ## Revert Signals
 

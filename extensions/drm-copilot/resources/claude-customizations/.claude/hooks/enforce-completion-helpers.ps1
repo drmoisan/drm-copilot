@@ -18,6 +18,9 @@
       - Invoke-SingleOccurrenceEdit: pure single-occurrence patch of a text;
         reports a failure cause instead of replacing when old_string is empty,
         absent, or ambiguous.
+      - Test-CompletionChildCiIntegrationOnly and Get-CompletionLocalQcGateMissing:
+        the child CI opt-out (issue #1233) predicate and its local_qc_gate
+        evidence check, used in place of the ci_gate check under the opt-out.
 
     This script is dot-sourced by enforce-completion-consistency.ps1. It contains
     no entrypoint logic, so dot-sourcing it in tests has no side effects.
@@ -169,6 +172,76 @@ function Test-RouteRequiresPrGate {
         return $false
     }
     return ([bool]$route.requires_pr_gate -eq $true)
+}
+
+function Test-CompletionChildCiIntegrationOnly {
+    <#
+    .SYNOPSIS
+        Returns $true when a checkpoint opts its epic child out of per-child CI (issue #1233).
+    .DESCRIPTION
+        Pure predicate: epic_mode must be the JSON boolean true and child_ci the exact string
+        integration_only (ordinal). An absent key, a case variant, a non-string child_ci, and an
+        epic_mode that is not a boolean all return $false, so every other checkpoint keeps the
+        ci_gate evidence check.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)]
+        [AllowNull()]
+        $Payload
+    )
+
+    if ($Payload -isnot [System.Management.Automation.PSCustomObject]) {
+        return $false
+    }
+    $names = @($Payload.PSObject.Properties.Name)
+    if ($names -cnotcontains 'epic_mode' -or $names -cnotcontains 'child_ci') {
+        return $false
+    }
+    $epicMode = $Payload.epic_mode
+    $childCi = $Payload.child_ci
+    return ($epicMode -is [bool] -and $epicMode -and $childCi -is [string] -and $childCi -ceq 'integration_only')
+}
+
+function Get-CompletionLocalQcGateMissing {
+    <#
+    .SYNOPSIS
+        Returns the missing local_qc_gate evidence of an opted-out epic child (issue #1233).
+    .DESCRIPTION
+        Pure check used in place of the ci_gate evidence check: local_qc_gate must be an object
+        whose conclusion is exactly success and whose head_sha and evidence_path are non-empty
+        strings. An empty list means the evidence is present.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory)]
+        [AllowNull()]
+        $Payload
+    )
+
+    $gate = $null
+    if ($Payload -is [System.Management.Automation.PSCustomObject] -and (@($Payload.PSObject.Properties.Name) -ccontains 'local_qc_gate')) {
+        $gate = $Payload.local_qc_gate
+    }
+    if ($gate -isnot [System.Management.Automation.PSCustomObject]) {
+        return [string[]]@('local_qc_gate (object with conclusion == "success" and non-empty head_sha and evidence_path)')
+    }
+
+    $missing = [System.Collections.Generic.List[string]]::new()
+    $names = @($gate.PSObject.Properties.Name)
+    $conclusion = if ($names -ccontains 'conclusion') { $gate.conclusion } else { $null }
+    if (-not ($conclusion -is [string] -and $conclusion -ceq 'success')) {
+        $missing.Add('local_qc_gate.conclusion == "success"')
+    }
+    foreach ($field in @('head_sha', 'evidence_path')) {
+        $value = if ($names -ccontains $field) { $gate.$field } else { $null }
+        if ($null -eq $value -or [string]::IsNullOrWhiteSpace([string]$value)) {
+            $missing.Add("local_qc_gate.$field")
+        }
+    }
+    return [string[]]$missing.ToArray()
 }
 
 function Get-EditReplaceAllFlag {

@@ -31,6 +31,11 @@
     byte-identical to the Claude copy) verifies a green CI run on the live PR head, with gh in the
     repository root. Any stage failure denies with EPIC_CHILD_CI_NOT_VERIFIED and never falls
     through to the epic, standalone, or docs-only branches.
+
+    Child CI opt-out (issue #1233): under child_ci integration_only the same helper verifies the
+    local final-QC evidence in place of a CI run (stages B, R, L1, L2, and L3), with gh and git in
+    the repository root because -GitRoot defaults to -GhRoot, and a failure denies with
+    EPIC_CHILD_LOCAL_QC_NOT_VERIFIED. The call below is unchanged.
 #>
 [CmdletBinding()]
 param()

@@ -1,0 +1,20 @@
+# Task check: P2-T1
+
+Timestamp: 2026-11-24T07-51
+Command: see the command list below (each run from the item worktree root)
+EXIT_CODE: 0
+Output Summary: Invoke-Formatter reports no drift and PSScriptAnalyzer 0 findings on the helper and the new suite; the new Codex suite passed alone (57 tests) and inside the selection (Set H, the new suite, and Set L: 1987 tests, 0 failures); the four helper copies are byte-identical (cmp, and cross-tree-helper-identity.Tests.ps1 in the selection); the helper has 581 lines (below 700); the 0014 revert of every block restores the merge-base bytes.
+
+Changed files:
+- .claude/hooks/enforce-epic-merge-gate-child-ci.ps1: prefix constant `$script:EpicMergeGateChildLocalQcReasonPrefix` (`EPIC_MERGE_GATE_BLOCKED: EPIC_CHILD_LOCAL_QC_NOT_VERIFIED: `) beside `$script:EpicMergeGateChildCiReasonPrefix`; integration-branch pattern constant; `Test-EpicMergeGateChildCiOptOut` (spec `## Activation Predicate`); seam `Get-EpicMergeGateChildCiLivePullRequest` (one bounded `gh pr view <PR> --json headRefOid,baseRefName` through `Invoke-DocsOnlyGhExe`); `Test-EpicMergeGateChildCiEvidencePath`; `Get-EpicMergeGateChildLocalQcEvidenceDetail` (stage L3, one bounded `git cat-file -p <head>:<path>` through `Invoke-DocsOnlyGitExe` at GitRoot); `ConvertTo-EpicMergeGateChildLocalQcResult`; `Get-EpicMergeGateChildLocalQcResult` (stages B, R, L1, L2, L3); `Get-EpicMergeGateChildCiFailureDetail` runs them after stage 1 under the predicate and, on a base mismatch or a base of main, runs stages 2 to 6 with stage 3 reusing the stage B head; `Get-EpicMergeGateChildCiDecision` gains `-GitRoot` (defaults to GhRoot when omitted or empty) and keeps the CI prefix for every non-opt-out detail. No new dot-source; no Python.
+- .codex/hooks/enforce-epic-merge-gate-child-ci.ps1 and both bundle copies: byte-identical copies (cp through SCRATCH/issue-1233-copy.sh).
+- tests/scripts/codex-hooks/enforce-epic-merge-gate-child-ci-opt-out.Tests.ps1 (created): table T allow rows (40- and 64-character heads) through `Invoke-CodexEpicMergeDecision`, an entry-point deny row with an allowing epic checkpoint (no fall-through), 32 deny rows (stages B, R, L1, L2, L3 per the task text), base fallback rows (main, another base, case variant), pattern fallback rows (integration branch absent, `main`, missing `-integration` suffix), default rows (key absent, per_child, case variant, non-string, epic_mode string, epic_mode false) asserting zero opt-out seam calls and the pre-change stage 2 deny text, call-count rows (allow: one gh call in total and one cat-file; L2 mismatch: no git call; base-mismatch allow: exactly one pr view and one run list), and `-GitRoot` default and explicit rows.
+- .dev/engineering/process-reductions/0014-epic-child-ci-opt-out.md: blocks for the helper appended; Files Changed and Revert Steps steps 1, 2, and 6 extended.
+
+Selection and rule: the new suite, Set H as the plan lists it (every enforce-epic-merge-gate.* suite in tests/scripts/claude-hooks, every enforce-epic-merge-gate-* suite in tests/scripts/codex-hooks, hook-dependency-failure.SpecialCases/Claude/Codex, legacy-codex-hook-contracts, enforcement-hooks-no-python-invocation, epic-execution-gates, codex-epic-runtime-contracts, cross-tree-helper-identity, and every other suite naming the edited helper file by grep), and Set L.
+
+Commands and exit codes:
+- sh SCRATCH/issue-1233-ps-files.sh write <helper>,<new suite> -> 0 (format drift=0 pssa findings=0). A first pass reported 5 PSUseShouldProcessForStateChangingFunctions findings on helper names with the New-/Set- verbs; they were renamed (ConvertTo-, Get-, Initialize-) before the copies were made.
+- sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath tests/scripts/codex-hooks/enforce-epic-merge-gate-child-ci-opt-out.Tests.ps1 -> 0 (57 passed)
+- sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath <Set H list, 35 files> <Set L> -> 0 (1987 passed, 0 failed)
+- sh SCRATCH/issue-1233-ledger-verify.sh -> 0 (blocks=21 files=6 problems=0)
