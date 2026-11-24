@@ -69,7 +69,7 @@ In this repository `ci.yml` already triggers on pull requests into `epic/**`, so
 - [x] Given a completed opted-out child checkpoint without `ci_gate`, when it is validated by the Python, TypeScript, and PowerShell validators, then each validator accepts it, each reports the same byte-identical error strings for each failing local-QC condition, and each reports the existing `ci_gate` errors when the opt-out is removed. Verified by the shared corpus `tests/fixtures/orchestrator_state_child_ci/` in the Python, TypeScript, and PowerShell suites.
 - [x] Given the integration PR into `main`, when it reaches S9 and the merge gate, then a full green `CI` run is still required and the integration-to-`main` branch of the merge gate is unchanged. Verified by the unchanged existing merge-gate suites and the skill-text contract test.
 - [x] Given an epic without `child_ci` or with `child_ci: per_child`, when any child runs, then hooks, validators, and skills behave as today. Verified by the default rows of the new suites and the unchanged existing suites.
-- [ ] Given the opt-out is adopted, when the owner reviews the reduction, then a process-reduction ledger entry records the prior text, the revert steps, the residual automatic `CI` run on child PRs, and the self-declared-key disclosure. Verified by `ProcessReductionChain.Ledger.Tests.ps1`.
+- [x] Given the opt-out is adopted, when the owner reviews the reduction, then a process-reduction ledger entry records the prior text, the revert steps, the residual automatic `CI` run on child PRs, and the self-declared-key disclosure. Verified by `ProcessReductionChain.Ledger.Tests.ps1`.
 
 ## Non-Goals
 
