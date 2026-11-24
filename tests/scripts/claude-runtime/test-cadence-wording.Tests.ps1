@@ -230,7 +230,8 @@ BeforeDiscovery {
         @{ Id = 'CLAUDE-CSHARP-LEGACY'; Path = "$resources/claude-customizations/.claude-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md"; Bundle = $false }
         @{ Id = 'AGENTS-CSHARP-LEGACY'; Path = "$resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md"; Bundle = $false }
     ) -Check @(
-        (Get-TcwCheck -Heading '## When to Use This Skill' -Required @($anchor, 'a phase gate or the final QA loop'))
+        # Issue #1228 (PD2): a QA-gate skill applies to the final QA loop and to a remediation gate only.
+        (Get-TcwCheck -Heading '## When to Use This Skill' -Required @($anchor, 'the final QA loop or a remediation gate') -Forbidden @('a phase gate or the final QA loop'))
         (Get-TcwCheck -Forbidden ($runClassForbidden + @('planned batch')))
     )
 
@@ -247,11 +248,42 @@ BeforeDiscovery {
         @{ Id = 'CLAUDE'; Path = '.claude/skills/execution-environment/SKILL.md' }
         @{ Id = 'AGENTS'; Path = '.agents/skills/execution-environment/SKILL.md' }
     ) -Check @(
-        (Get-TcwCheck -Heading '## Test Isolation Checks' -Required @('task-check evidence', 'never as a gate result or coverage evidence', $anchor, '-TestPath'))
+        # Issue #1228: the phase gate, remediation gate, and sync check (local gate) run a test selection.
+        (Get-TcwCheck -Heading '## Test Isolation Checks' -Required @('task-check evidence', 'never as a gate result or coverage evidence', $anchor, '-TestPath', 'a phase gate, a remediation gate, and a sync check', 'local gate'))
         (Get-TcwCheck -Heading '## Test Runtime' -Required @('its phase-gate QC loop') -Forbidden @('its full QC loop'))
         (Get-TcwCheck -Heading '## Contract Tests That Pin Mirrored Files' -Required @('test-cadence-wording.Tests.ps1'))
         # Issue #1158 (C1): a task check runs its Pester selection through the launcher pester suite with -TestPath.
         (Get-TcwCheck -Heading '## PowerShell Route and PoshQC MCP Limits' -Required @('-TestPath', 'run-test-suite.sh pester'))
+    )
+
+    # Issue #1228: the remediation handoff, the typed engineers, the review workflow, and the
+    # scoped Pester runs state the selection-only cadence.
+    $script:WordingRow += Get-TcwRow -Group 'HANDOFF' -Base @(
+        @{ Id = 'CLAUDE'; Path = '.claude/skills/remediation-handoff-atomic-planner/SKILL.md' }
+        @{ Id = 'AGENTS'; Path = '.agents/skills/remediation-handoff-atomic-planner/SKILL.md' }
+    ) -Check @((Get-TcwCheck -Heading '## Plan Shape' -Required @("cites the orchestration's", 'remediation gate', 'coverage mode')))
+    $script:WordingRow += Get-TcwRow -Group 'ENGINEER' -Base @(
+        foreach ($name in 'python', 'powershell', 'csharp') {
+            @{ Id = "CLAUDE-$($name.ToUpperInvariant())"; Path = ".claude/agents/$name-typed-engineer.md" }
+            foreach ($suffix in $codexSuffix) { @{ Id = "CODEX-$($name.ToUpperInvariant())$($suffix.ToUpperInvariant())"; Path = ".codex/agents/$name-typed-engineer$suffix.toml" } }
+        }
+    ) -Check @((Get-TcwCheck -Heading '## Workflow' -Required @("leaves the full gate to the plan's final QA loop")))
+    $script:WordingRow += Get-TcwRow -Group 'REVIEW' -Base @(
+        @{ Id = 'CLAUDE'; Path = '.claude/skills/feature-review-workflow/SKILL.md' }
+        @{ Id = 'AGENTS'; Path = '.agents/skills/feature-review-workflow/SKILL.md' }
+    ) -Check @((Get-TcwCheck -Heading '## Ordered Procedure' -Required @("over the branch's test selection", 'from the final-QC artifact and')))
+    $script:WordingRow += Get-TcwRow -Group 'SCOPED' -Base @(
+        @{ Id = 'CLAUDE'; Path = '.claude/skills/test-execution-policy/SKILL.md' }
+        @{ Id = 'AGENTS'; Path = '.agents/skills/test-execution-policy/SKILL.md' }
+    ) -Check @((Get-TcwCheck -Heading '### Scoped Pester runs' -Required @('a phase gate, a remediation gate, and a sync check')))
+
+    # Issue #1228 (D5, D10): the frozen epic surfaces and the standalone Copilot agents and
+    # prompts keep their own full-run wording; a path-suffix match also excludes their bundles.
+    $script:CadenceSweepExclusion = @(
+        'skills/epic-orchestrate/SKILL.md', 'agents/epic-orchestrator.md',
+        'agents/staged-review.agent.md', 'agents/commentary-remediation.agent.md', 'prompts/remediate-comments.prompt.md',
+        'agents/python-typed-engineer.agent.md', 'agents/powershell-typed-engineer.agent.md', 'agents/csharp-typed-engineer.agent.md',
+        'agents/pytest-unit-test-coding.agent.md', 'agents/Powershell DI Unit Test Engineer.agent.md', 'agents/python-execution-only-typed.agent.md'
     )
 
     # Gate layout per template under decision D15: the bug template gates its expect-fail
@@ -556,6 +588,41 @@ Describe 'Test cadence wording' {
 
             # Assert
             $tokens.Count | Should -Be 7 -Because 'the plan names 7 per-task sweep tokens'
+            $missed | Should -BeNullOrEmpty -Because 'a reintroduced token must fail the sweep'
+        }
+
+        It 'TCW-CADENCE-SWEEP-SURFACES finds no full-suite run outside the Phase 0 baseline and the final QA loop' -ForEach @(@{ SweepToken = $script:CadenceSweepToken; Exclusion = $script:CadenceSweepExclusion }) {
+            # Arrange: every swept surface except the D5 and D10 files and their bundle copies.
+            $files = @(foreach ($file in Get-TcwSweepFile) {
+                    $excluded = @($Exclusion | Where-Object { $file.EndsWith($_, [System.StringComparison]::Ordinal) })
+                    if ($excluded.Count -eq 0) { $file }
+                })
+
+            # Act
+            $offending = @(foreach ($file in $files) {
+                    $text = [System.IO.File]::ReadAllText((Join-Path -Path $script:RepoRoot -ChildPath $file)) -replace '\s+', ' '
+                    $hits = @(Get-TcwTokenHit -Content $text -SearchToken $SweepToken)
+                    if ($hits.Count -gt 0) { '{0}: {1}' -f $file, ($hits -join ', ') }
+                })
+
+            # Assert
+            $Exclusion.Count | Should -Be 11 -Because 'decisions D5 and D10 name 11 excluded files'
+            $files.Count | Should -BeGreaterThan 0 -Because 'the sweep must read the surfaces'
+            $offending | Should -BeNullOrEmpty -Because 'the full suite runs only at the Phase 0 baseline and in the final QA loop'
+        }
+
+        It 'TCW-CADENCE-SWEEP-HELPER finds each cadence sweep token in in-memory text' -ForEach @(@{ SweepToken = $script:CadenceSweepToken }) {
+            # Arrange
+            $tokens = $SweepToken
+
+            # Act
+            $missed = @(foreach ($token in $tokens) {
+                    $hits = @(Get-TcwTokenHit -Content "A surface that states $($token.ToUpperInvariant()) in prose." -SearchToken $tokens)
+                    if ($hits -cnotcontains $token) { $token }
+                })
+
+            # Assert
+            $tokens.Count | Should -Be 10 -Because 'the plan names 10 cadence sweep tokens (PD5)'
             $missed | Should -BeNullOrEmpty -Because 'a reintroduced token must fail the sweep'
         }
     }

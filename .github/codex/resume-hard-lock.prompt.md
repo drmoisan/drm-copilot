@@ -70,7 +70,7 @@ For each task:
 1) Announce execution of the current task only.
 2) Perform only work required by the task.
 3) Verify acceptance criteria.
-4) Run the task check; a `[phase-gate]` task runs the full toolchain loop instead. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+4) Run the task check; a `[phase-gate]` task runs the phase gate of `## Test Cadence (Mandatory)`. Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: the full test suite runs only at the `Phase 0 baseline` and in the final QA loop, a task check runs its test selection after each task, and each phase gate runs its unit stage over the union of the test selections of the phase's tasks.
 5) Check off the task ONLY when verification passes.
 
 BLOCKING RULE

@@ -12,7 +12,7 @@ Canonical procedure for the Phase D final quality gate that every C# change must
 Use this skill when:
 
 - `csharp-typed-engineer` is about to declare a change complete.
-- An executor has reached a phase gate or the final QA loop and must verify zero regressions in the single gate run against the baseline captured in Phase A (the `Phase 0 baseline`). Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: a task check after each task, and the full toolchain loop at each phase gate and in the final QA loop.
+- An executor has reached the final QA loop or a remediation gate and must verify zero regressions in the single gate run against the baseline captured in Phase A (the `Phase 0 baseline`). Test cadence follows `## Test Cadence (Mandatory)` in the `atomic-plan-contract` skill: the full test suite runs only at the `Phase 0 baseline` and in the final QA loop, a task check runs its test selection after each task, and each phase gate runs its unit stage over the union of the test selections of the phase's tasks.
 - A reviewer needs to confirm the toolchain was actually run and produced a clean pass.
 
 ## Required Inputs
@@ -25,7 +25,7 @@ Before invoking this gate, the agent must have:
 
 ## Toolchain Execution Sequence
 
-Run the full toolchain in this exact order. If any step fails or modifies files, fix the issue and restart from step 1. Do not stop the loop until all five steps complete without errors in a single pass.
+Run the full toolchain in this exact order. If any step fails or modifies files, fix the issue and restart from step 1. Do not stop the loop until all five steps complete without errors in a single pass. In a remediation gate, the test step runs the cycle's test selection in coverage mode (the selected test files appended to the test command, or `-TestPath` for the launcher `pester` suite); the full suite runs only in the final QA loop.
 
 Analyzer settings (`AnalysisLevel`, `AnalysisMode`, `TreatWarningsAsErrors`, `Nullable`) are centralized in `Directory.Build.props` and apply to every project automatically. Per-project analyzer-enablement properties are not used — central settings are authoritative.
 
@@ -33,7 +33,7 @@ Analyzer settings (`AnalysisLevel`, `AnalysisMode`, `TreatWarningsAsErrors`, `Nu
 2. `dotnet csharpier check .`
 3. `dotnet build` (analyzers and nullable analysis enforced via `Directory.Build.props`; `TreatWarningsAsErrors=true` fails the build on any warning)
 4. `dotnet test tests/*.ArchitectureTests/*.csproj --no-build` (architecture tests against the `*.ArchitectureTests` project)
-5. `dotnet test --collect:"XPlat Code Coverage"` (full unit-test pass with coverage)
+5. `dotnet test --collect:"XPlat Code Coverage"` (unit-test pass with coverage: the full suite in the final QA loop, the cycle's test selection in a remediation gate)
 6. Emit canonical coverage artifact: after `dotnet test` completes, copy the newest `TestResults/*/coverage.cobertura.xml` to `artifacts/csharp/coverage.xml` so local runs produce the same canonical artifact as CI. PowerShell sketch:
 
    ```pwsh

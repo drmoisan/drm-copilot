@@ -19,6 +19,7 @@ This ledger records every reduction of evidence, plan tasks, gates, or review pr
 | [0011](0011-task-check-cadence.md) | Task-check cadence | 2026-11-12 | #1167 | Active |
 | [0012](0012-local-lane-exclusion.md) | Local lane exclusion | 2026-11-14 | #1158 | Active |
 | [0013](0013-npm-audit-advisory-exception.md) | npm audit advisory exception | 2026-11-18 | #1204 | Active |
+| [0014](0014-targeted-test-cadence.md) | Targeted test cadence | 2026-11-24 | #1228 | Active |
 
 A data row's ID cell is a link such as `[0001](0001-short-name.md)`, and its label equals the number of the linked file. Every entry file has one row, and every row has one entry file.
 
