@@ -314,12 +314,19 @@ function Test-DocsContextFile {
 function Get-DocsContextFileList {
     <#
     .SYNOPSIS
-        ListFile operation: sorted repository-relative POSIX paths under RelativeRoot (private helper).
+        ListFile operation: sorted repository-relative POSIX paths under RelativeRoot; an empty
+        RelativeRoot returns the file names of the repository root only (top directory) (private helper).
     #>
     [CmdletBinding()]
     [OutputType([string[]], [object[]])]
     param([string] $Root, [AllowNull()] [AllowEmptyString()] [string] $RelativeRoot)
 
+    if ([string]::IsNullOrEmpty($RelativeRoot)) {
+        # Issue #1221: the names as stored on disk, so a caller can match them ordinally on every host.
+        [string[]] $names = @([System.IO.Directory]::EnumerateFiles($Root, '*', [System.IO.SearchOption]::TopDirectoryOnly) | ForEach-Object { [System.IO.Path]::GetFileName($_) })
+        [Array]::Sort($names, [System.StringComparer]::Ordinal)
+        return , $names
+    }
     $directory = Get-DocsContextFullPath -Root $Root -RelativePath $RelativeRoot
     [string[]] $paths = @(if ([System.IO.Directory]::Exists($directory)) { [System.IO.Directory]::EnumerateFiles($directory, '*', [System.IO.SearchOption]::AllDirectories) | ForEach-Object { [System.IO.Path]::GetRelativePath($Root, $_).Replace('\', '/') } })
     [Array]::Sort($paths, [System.StringComparer]::Ordinal)
@@ -467,7 +474,8 @@ function New-DocsCommandContext {
         InvokeProcess, ReadStdin, ResolveRevision, ReadRevisionText, TestAncestor, ListChangedPath. Relative paths are checked with Test-DocsRelativePath before any access.
         ReadStdin (issue #1173) returns the whole standard input as text (update-ledger -Operations -).
         ReadText decodes through ConvertFrom-DocsUtf8Bytes and throws an item-not-found error for
-        an absent file. WriteText forwards the full path, text and mode to Write-DocsFileText;
+        an absent file. ListFile returns the sorted repository-relative paths under a directory, or
+        for an empty path the file names of the repository root only (issue #1221). WriteText forwards the full path, text and mode to Write-DocsFileText;
         InvokeProcess forwards its four arguments to Invoke-DocsProcess with the repository root
         as the working directory.
         ResolveRevision and ReadRevisionText (issue #1034) run git through InvokeProcess with a

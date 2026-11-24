@@ -95,10 +95,11 @@ Describe 'documentation skill references' {
     It 'states the linter locations, the --config usage, and the workflow-path policy note in <Path> (issue #1169)' -ForEach $script:DocsInitCopyRows {
         # Arrange
         $text = (Read-DocsAuthoringText -RelativePath $Path) -replace '\s+', ' '
-        $tokens = @('--config docs/documentation-estate/.vale.ini', 'VALE_CONFIG_PATH', 'docs/documentation-estate/.markdownlint.json', 'No workflow step runs Vale or markdownlint', 'policy-level control')
+        $tokens = @('--config docs/documentation-estate/.vale.ini', 'VALE_CONFIG_PATH', 'docs/documentation-estate/.markdownlint.json', 'The written workflow runs markdownlint', 'DocsTonality', 'policy-level control')
 
         # Assert
         foreach ($token in $tokens) { $text.Contains($token, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "docs-init states '$token'" }
+        $text.Contains('No workflow step runs Vale or markdownlint', [System.StringComparison]::Ordinal) | Should -BeFalse -Because 'the workflow runs the linters (issue #1219)'
     }
 
     It 'lists the seven skills in dispatch order in documentation-workflow' {

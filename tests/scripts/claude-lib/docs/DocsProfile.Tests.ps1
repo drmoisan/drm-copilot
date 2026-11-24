@@ -17,6 +17,8 @@ BeforeAll {
     Import-Module -Name (Join-Path -Path $script:LibraryRoot -ChildPath 'docs/DocsProfile.psm1') -Force -ErrorAction Stop
     Import-Module -Name (Join-Path -Path $script:LibraryRoot -ChildPath 'docs/DocsSchema.psm1') -Force -ErrorAction Stop
     Import-Module -Name (Join-Path -Path $script:LibraryRoot -ChildPath 'docs/DocsJson.psm1') -Force -ErrorAction Stop
+    Import-Module -Name (Join-Path -Path $script:LibraryRoot -ChildPath 'docs/DocsFinding.psm1') -Force -ErrorAction Stop
+    Import-Module -Name (Join-Path -Path $script:LibraryRoot -ChildPath 'docs/DocsProfileFamilies.psm1') -Force -ErrorAction Stop
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'Docs.TestSupport.psm1') -Force -ErrorAction Stop
 
     $script:Composed = (Get-DocsComposedSchemaSet -SchemaSet (Get-DocsTestSchemaText)).Schemas
@@ -37,7 +39,7 @@ BeforeAll {
 }
 
 AfterAll {
-    Remove-Module -Name DocsProfile, DocsAnalyzerRegistry, DocsSurface, DocsSchema, DocsSchemaWalk, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
+    Remove-Module -Name DocsProfile, DocsProfileFamilies, DocsAnalyzerRegistry, DocsSurface, DocsSchema, DocsSchemaWalk, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
 }
 
 Describe 'Get-DocsDefaultProfilePath' {
@@ -104,6 +106,43 @@ Describe 'ConvertFrom-DocsProfileText' {
     }
 }
 
+Describe 'Test-DocsProfileSemantic with documentation families (issue #1218)' {
+    It 'returns a documentation family finding together with existing findings in Get-DocsOrderedFinding order (AC14)' {
+        # Arrange (existing findings at /documentation_roots/1/path and /surface_selection/analyzers/0; the family finding sorts between them)
+        $value = Get-TestProfile
+        $value['documentation_roots'] = @($value['documentation_roots'][0], [ordered]@{ id = 'other-root'; path = 'docs'; audience_ids = @('maintainers') })
+        $value['surface_selection']['analyzers'] = @('unregistered-analyzer')
+        $value['required_families'] = @([ordered]@{ id = 'security'; directory = 'outside/security'; diataxis_mode = 'how-to'; template = 'security'; audience = @('maintainers'); review_interval_days = 90L; required = $true })
+
+        # Act
+        $findings = Test-DocsProfileSemantic -Profile $value -AnalyzerId @() -ArtifactPath 'docs/documentation-estate/docs-profile.json'
+
+        # Assert
+        $keys = [string[]] @(foreach ($finding in $findings) { "$($finding.code) $($finding.pointer)" })
+        $keys | Should -BeExactly @(
+            'DOCS_PROFILE_ROOT_DUPLICATE /documentation_roots/1/path'
+            'DOCS_PROFILE_FAMILY_DIRECTORY_OUTSIDE_ROOT /required_families/0/directory'
+            'DOCS_ANALYZER_UNKNOWN /surface_selection/analyzers/0'
+        )
+        $ordered = [string[]] @(foreach ($finding in (Get-DocsOrderedFinding -Finding $findings)) { "$($finding.code) $($finding.pointer)" })
+        $keys | Should -BeExactly $ordered
+        @($findings | Where-Object { $_.severity -ne 'error' }).Count | Should -Be 0
+    }
+
+    It 'reports a documentation family finding through ConvertFrom-DocsProfileText at its pointer' {
+        # Arrange
+        $value = Get-TestProfile
+        $value['required_families'] = @([ordered]@{ id = 'security'; directory = 'docs/security'; diataxis_mode = 'how-to'; template = 'security'; audience = @('maintainers', 'auditors'); review_interval_days = 90L; required = $true })
+
+        # Act
+        $result = Invoke-TestProfile -Value $value
+
+        # Assert
+        $result.Ok | Should -BeFalse
+        @($result.Findings | ForEach-Object { "$($_.code) $($_.pointer)" }) | Should -BeExactly @('DOCS_PROFILE_AUDIENCE_UNKNOWN /required_families/0/audience/1')
+    }
+}
+
 Describe 'New-DocsStarterProfile' {
     It 'returns a profile accepted with no finding for repository id <_>' -ForEach @('repository', 'example-repo', 'a', 'docs.site_2') {
         # Act
@@ -145,6 +184,54 @@ Describe 'New-DocsStarterProfile' {
         $starter['documentation_roots'][0]['id'] | Should -BeExactly 'guide'
         $result.Ok | Should -BeTrue
         $result.Findings.Count | Should -Be 0
+    }
+
+    It 'declares the default documentation families, an empty legacy_exclusions, and the five starter audiences (AC16)' {
+        # Arrange
+        $expectedAudience = @(
+            , @('maintainers', 'People who change and release this repository.')
+            , @('end-users', 'People who use the product to accomplish their tasks.')
+            , @('operators', 'People who deploy, configure, and run the product.')
+            , @('security-reviewers', 'People who assess the security posture of the product.')
+            , @('product-owners', 'People who decide the scope and direction of the product.')
+        )
+
+        # Act
+        $starter = New-DocsStarterProfile -DocumentationRoot 'handbook/user'
+
+        # Assert
+        (ConvertTo-DocsJsonText -Value @($starter['required_families'])) | Should -BeExactly (ConvertTo-DocsJsonText -Value (Get-DocsDefaultFamilySet -DocumentationRoot 'handbook/user'))
+        @($starter['required_families']).Count | Should -Be 10
+        , $starter['legacy_exclusions'] | Should -BeOfType [object[]]
+        @($starter['legacy_exclusions']).Count | Should -Be 0
+        $audiences = @($starter['audiences'])
+        $audiences.Count | Should -Be $expectedAudience.Count
+        for ($index = 0; $index -lt $expectedAudience.Count; $index++) {
+            [string]::Equals($audiences[$index]['id'], $expectedAudience[$index][0], [System.StringComparison]::Ordinal) | Should -BeTrue -Because "audience $index is $($expectedAudience[$index][0])"
+            [string]::Equals($audiences[$index]['description'], $expectedAudience[$index][1], [System.StringComparison]::Ordinal) | Should -BeTrue -Because "audience $index has the spec description"
+        }
+        @($starter['documentation_roots'][0]['audience_ids']) | Should -BeExactly @('maintainers')
+    }
+
+    It 'validates the indented starter text with no finding for <Case> (AC17)' -ForEach @(
+        @{ Case = 'the default arguments'; Parameters = @{}; Root = 'docs/guide' }
+        @{ Case = 'the documentation root handbook/user'; Parameters = @{ DocumentationRoot = 'handbook/user' }; Root = 'handbook/user' }
+        @{ Case = 'the repository id sample'; Parameters = @{ RepositoryId = 'sample' }; Root = 'docs/guide' }
+        @{ Case = 'the repository id other-repo'; Parameters = @{ RepositoryId = 'other-repo' }; Root = 'docs/guide' }
+    ) {
+        # Arrange
+        $starter = New-DocsStarterProfile @Parameters
+        $text = ConvertTo-DocsJsonText -Value $starter -Indented
+
+        # Act
+        $result = Invoke-TestProfile -Value $text
+
+        # Assert
+        $result.Ok | Should -BeTrue
+        $result.Findings.Count | Should -Be 0
+        foreach ($family in @($result.Profile['required_families'])) {
+            ([string] $family['directory']).StartsWith("$Root/", [System.StringComparison]::Ordinal) | Should -BeTrue -Because "$($family['id']) lies under $Root"
+        }
     }
 }
 

@@ -45,14 +45,20 @@ function Get-DocsAuthoringNamedSet {
         'tutorial' = 'tutorial'; 'how-to' = 'how-to'; 'explanation' = 'explanation'; 'architecture-overview' = 'explanation'
         'cli-reference' = 'reference'; 'http-reference' = 'reference'; 'config-reference' = 'reference'; 'api-reference' = 'reference'
     }
+    # Issue #1222: the eight family templates, kept apart from the Templates key so its pinned counts hold.
+    $familyTemplateModes = [ordered]@{
+        'product-overview' = 'explanation'; 'onboarding' = 'how-to'; 'runbook' = 'how-to'; 'playbook' = 'how-to'
+        'adr' = 'explanation'; 'security' = 'explanation'; 'service-management' = 'explanation'; 'alerts-catalog' = 'reference'
+    }
     return @{
-        Roles         = @($roleTable.Keys)
-        Skills        = @($skillTable.Keys)
-        Templates     = @($templateModes.Keys)
-        McpTools      = @('run_docs_check', 'run_docs_inventory', 'run_docs_coverage', 'update_docs_ledger', 'generate_docs_reference', 'validate_docs_artifacts')
-        RoleTable     = $roleTable
-        SkillTable    = $skillTable
-        TemplateModes = $templateModes
+        FamilyTemplateModes = $familyTemplateModes
+        Roles               = @($roleTable.Keys)
+        Skills              = @($skillTable.Keys)
+        Templates           = @($templateModes.Keys)
+        McpTools            = @('run_docs_check', 'run_docs_inventory', 'run_docs_coverage', 'update_docs_ledger', 'generate_docs_reference', 'validate_docs_artifacts')
+        RoleTable           = $roleTable
+        SkillTable          = $skillTable
+        TemplateModes       = $templateModes
     }
 }
 

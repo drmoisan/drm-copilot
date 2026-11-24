@@ -384,9 +384,10 @@ function Test-DocsPageFrontMatter {
     .DESCRIPTION
         ComposedSchemaSet is the Schemas map of Get-DocsComposedSchemaSet. Order: required
         fields; the schema gate Test-DocsArtifactText -ArtifactKind 'page-metadata'; the
-        constraint evaluator; the last_reviewed calendar check; audience declaration; mapping of
-        schema findings to per-field codes by the first pointer segment; and the fail-closed
-        rule for DOCS_SCHEMA_INVALID. Returns ordered findings.
+        constraint evaluator; the review-date calendar and ordering checks (last_reviewed, and
+        review_due, which must be later than last_reviewed; issue #1220); audience declaration;
+        mapping of schema findings to per-field codes by the first pointer segment; and the
+        fail-closed rule for DOCS_SCHEMA_INVALID. Returns ordered findings. No check reads a clock.
     #>
     [CmdletBinding()]
     [OutputType([object[]])]

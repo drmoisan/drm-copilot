@@ -54,7 +54,7 @@ BeforeAll {
 
 AfterAll {
     Remove-Item -Path Function:\Join-TestFile -ErrorAction SilentlyContinue
-    Remove-Module -Name DocsProfileCommands, DocsProfileSourceRoot, DocsTomlKeys, DocsSourceText, DocsProfile, DocsAnalyzerRegistry, DocsSurface, DocsSchema, DocsSchemaWalk, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
+    Remove-Module -Name DocsProfileCommands, DocsProfileSourceRoot, DocsTomlKeys, DocsSourceText, DocsProfile, DocsProfileFamilies, DocsAnalyzerRegistry, DocsSurface, DocsSchema, DocsSchemaWalk, DocsFinding, DocsJson, DiscoveryEncoding, Docs.TestSupport -Force -ErrorAction SilentlyContinue
 }
 
 Describe 'Get-DocsInitTemplate' {
@@ -79,6 +79,30 @@ Describe 'Get-DocsInitTemplate' {
             Test-DocsRelativePath -Path $row.Source | Should -BeTrue
             $row.Source | Should -BeLike '.claude/lib/docs/templates/*'
         }
+    }
+
+    It 'places the 1219 anchor rows after the 1034 workflow row and keeps one workflow row' {
+        # Arrange
+        $lines = @(Get-Content -LiteralPath $script:ModulePath | ForEach-Object { $_.Trim() })
+        $anchor1034 = [array]::IndexOf([string[]] $lines, '# --- 1034: docs workflow ---')
+        $anchor1219 = [array]::IndexOf([string[]] $lines, '# --- 1219: tonality styles ---')
+        $names = @('Certainty', 'Exclamation', 'Filler', 'Hyperbole', 'Intensifiers')
+
+        # Act
+        $rows = Get-DocsInitTemplate
+        $workflowIndex = @(for ($index = 0; $index -lt $rows.Count; $index++) { if (([string] $rows[$index].Destination).StartsWith('.github/workflows/', [System.StringComparison]::Ordinal)) { $index } })
+        $tail = @($rows | Select-Object -Skip ($workflowIndex[0] + 1))
+
+        # Assert
+        $anchor1034 | Should -BeGreaterThan -1
+        $anchor1219 | Should -Be ($anchor1034 + 2) -Because 'the 1219 anchor follows the single 1034 workflow row'
+        $workflowIndex.Count | Should -Be 1
+        $rows[$workflowIndex[0]].Destination | Should -BeExactly '.github/workflows/_docs-quality.yml'
+        $rows[$workflowIndex[0]].Source | Should -BeExactly '.claude/lib/docs/templates/_docs-quality.yml'
+        @($tail | ForEach-Object { $_.Source }) | Should -Be @($names | ForEach-Object { ".claude/lib/docs/templates/page-check/vale/DocsTonality/$_.yml" })
+        @($tail | ForEach-Object { $_.Destination }) | Should -Be @($names | ForEach-Object { "docs/documentation-estate/.vale/styles/DocsTonality/$_.yml" })
+        @($rows | Select-Object -First $workflowIndex[0] | ForEach-Object { $_.Destination }) | Should -Be @('docs/documentation-estate/.markdownlint.json', 'docs/documentation-estate/.vale.ini', 'docs/documentation-estate/.vale/styles/DocsBase/HeadingPunctuation.yml', 'docs/documentation-estate/.vale/styles/DocsBase/Placeholders.yml', 'docs/documentation-estate/.vale/styles/config/vocabularies/Project/accept.txt')
+        (Get-Help -Name Get-DocsInitTemplate).Synopsis | Should -Match '1219'
     }
 }
 
@@ -156,6 +180,30 @@ Describe 'Invoke-DocsInitCommand' {
         $test.WriteLog.Count | Should -Be (1 + $script:DefaultTemplateFiles.Count)
         $test.WriteLog[0].RelativePath | Should -BeExactly $script:ProfilePath
         $test.WriteLog[0].Mode | Should -BeExactly 'create'
+    }
+
+    It 'seeds the ten documentation families with their template ids in the dry run and -Write profile and writes the unchanged path set (issue #1218 AC18)' {
+        # Arrange
+        $expectedId = @('product-overview', 'getting-started', 'user-guides', 'administration', 'security', 'operations', 'service-management', 'architecture', 'adr', 'reference')
+        $expectedTemplate = @('product-overview', 'onboarding', 'how-to', 'how-to', 'security', 'runbook', 'service-management', 'architecture-overview', 'adr', 'api-reference')
+        $expectedPath = [string[]] ((@($script:ProfilePath) + @(foreach ($row in (Get-DocsInitTemplate)) { [string] $row.Destination })) | Sort-Object -CaseSensitive)
+        $dry = New-DocsTestContext -File (Join-TestFile -Map @($script:DefaultTemplateFiles, $script:SourceFile))
+        $written = New-DocsTestContext -File (Join-TestFile -Map @($script:DefaultTemplateFiles, $script:SourceFile))
+
+        # Act
+        $dryResult = Invoke-DocsInitCommand -Argument @{} -Context $dry.Context
+        $writeResult = Invoke-DocsInitCommand -Argument @{ Write = $true } -Context $written.Context
+        $writtenProfile = (ConvertFrom-DocsJsonText -Text $written.Files[$script:ProfilePath]).Value
+
+        # Assert
+        $dryResult.ExitCode | Should -Be 0
+        $writeResult.ExitCode | Should -Be 0
+        foreach ($profileValue in @($dryResult.Result.profile, $writtenProfile)) {
+            [string[]] @(foreach ($family in $profileValue['required_families']) { [string] $family['id'] }) | Should -BeExactly $expectedId
+            [string[]] @(foreach ($family in $profileValue['required_families']) { [string] $family['template'] }) | Should -BeExactly $expectedTemplate
+        }
+        [string[]] (@(foreach ($entry in $written.WriteLog) { [string] $entry.RelativePath }) | Sort-Object -CaseSensitive) | Should -BeExactly $expectedPath
+        [string[]] (@(foreach ($entry in $dryResult.Result.planned_writes) { [string] $entry.path }) | Sort-Object -CaseSensitive) | Should -BeExactly $expectedPath
     }
 
     It 'exits 1 with DOCS_INIT_TARGET_EXISTS and writes nothing when the target exists' {

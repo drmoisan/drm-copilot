@@ -9,7 +9,9 @@ description: 'Run the documentation estate workflow from initialization to docs-
 
 Use this skill from the root session to run the whole documentation workflow, or
 to resume it at a named step. It is an alias: it adds no tool call, receipt or
-write authority of its own and dispatches to the seven skills below.
+write authority of its own and dispatches to the seven skills below. The seven skills run in a
+single run. An estate that meets the routing condition of `## Epic-Scale Routing` takes the estate
+route through `epic-plan` instead.
 
 ## Prerequisites
 
@@ -39,9 +41,34 @@ runs in the root session.
   `update_docs_ledger`; no role writes the profile, the ledger, the matrix, the
   pins or a receipt directly.
 
+## Epic-Scale Routing
+
+This section applies when one run cannot author and review the whole estate.
+
+- Routing: a first full estate, or an estate of more than 40 planned pages, routes through
+  `epic-plan` started from the main session. Otherwise the single-run route applies. The
+  epic-worthiness verdict of `epic-plan` can return the work to the single-run route. The page
+  value is a default, and deviating from it is a recorded decision.
+- Default waves, in this order:
+  - Wave 0, foundation: the profile and `docs-init`, the `docs-plan-ia` information architecture
+    and family plan, templates, docs CI, and the root inventory. This wave owns no family id.
+  - Wave 1: `architecture`, `adr`, `reference`, `product-overview`, `getting-started`.
+  - Wave 2: `user-guides`, `administration`, `security` (with repository-root `SECURITY.md` and
+    `CODEOWNERS`).
+  - Wave 3: `operations`, `service-management`.
+- Ownership: the family ids are owned by docs-family-profile-model, and the family list of the
+  profile is authoritative. This skill does not restate the family record.
+- Dispatch: each child runs the `## Dispatch Order` for its families only. `docs-init` and the
+  root inventory step run in the foundation child.
+- Receipt: the docs-complete receipt is written once on the integration branch at its head, by the
+  final integration step only, before the integration pull request; no wave child writes or commits
+  a receipt. Docs-complete family semantics are owned by docs-family-gate-and-ia and are cited here,
+  not restated.
+
 ## Commit, Receipt and Pull Request
 
-The root session runs this stage itself after the dispatch order. It is not a dispatch row and
+The root session runs this stage itself after the dispatch order on the single-run route. Epic
+children use the orchestrator pull request stages instead. It is not a dispatch row and
 writes no orchestration checkpoint; the repository hooks admit it through their docs-estate legs.
 
 1. Commit: after `docs-init`, and again after `docs-complete` validation passes, stage the changed
@@ -74,14 +101,17 @@ Rules:
 - A session root that holds another item's checkpoint makes every docs leg decline. This is
   intended fail-closed behavior: decline to run the stage there, and run it from a root that holds
   no checkpoint.
-- Only docs path set changes may be on the branch: paths under `docs/` that lie under the
-  profile's documentation roots or artifact directories, and the docs-init workflow file. Any
-  other path is denied at commit, PR creation, and merge.
+- In a checkpoint-free single run, only docs path set changes may be on the branch: paths under
+  `docs/` that lie under the profile's documentation roots or artifact directories, and the
+  docs-init workflow file. Any
+  other path is denied at commit, PR creation, and merge. The security-wave child of an epic may
+  carry `SECURITY.md` and `CODEOWNERS` as an orchestrated child.
 
 ## Refresh After Rebase or Source Change
 
 After a rebase, or after a source path under `surface_selection.source_roots` changes, the receipt
-revision rule denies the existing receipt. Run these steps in order before the stage above:
+revision rule denies the existing receipt. In the epic route, the refresh runs on the integration
+branch before the final receipt. Run these steps in order before the stage above:
 
 1. Re-inventory at the new revision.
 2. Regenerate the reference pages.

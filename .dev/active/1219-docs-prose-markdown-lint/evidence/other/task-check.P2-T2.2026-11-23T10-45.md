@@ -1,0 +1,14 @@
+# Task Check P2-T2
+
+Timestamp: 2026-11-23T10-45
+Command: (1) sh SCRATCH/issue-1219-static.sh -FolderList tests/scripts/claude-lib/docs (format check and PSScriptAnalyzer); (2) sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath <17 files: every tests/**/*.Tests.ps1 naming _docs-quality (integration lane excluded), hook-docs-only-diff.InitWorkflowParity.Tests.ps1, Docs.Manifest.Tests.ps1, DocsNeutrality.Tests.ps1, test-name-uniqueness.Tests.ps1>; (3) env -u VIRTUAL_ENV sh .claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py tests/scripts/dev_tools/test_push_down_claude_pack_manifest_completeness.py tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py; (4) @(Get-Content).Count line counts
+EXIT_CODE: 0
+Output Summary:
+- Changed files: .claude/lib/docs/templates/_docs-quality.yml (rewritten per spec `### Workflow template` and `### Workflow pins`: SHA-pinned checkout v7.0.1, upload-artifact v7.0.2 and markdownlint-cli2-action v25.0.0; lint-scope step `id: docs-lint-scope`; Markdown lint; Vale install with VALE_VERSION 3.25.1, VALE_SHA256, lower-cased Get-FileHash line, `-cne $env:VALE_SHA256` comparison and VALE_SHA256_MISMATCH throw before the single `tar ... vale` line, then `--version`; Vale run with one call over `@valeRoots` and `exit $LASTEXITCODE`); its bundle copy (cmp identical); tests/scripts/claude-lib/docs/DocsInitTemplate.DocsWorkflow.Tests.ps1 (updated and new tests as the task states).
+- Selection rule: every test file that names the workflow template, plus the disk-discovery suites and the name-uniqueness guard; pytest push-down contract tests for the bundle copy.
+- Pester run 1 (2026-11-23T10-24 to 10-28, after 1 queue timeout): EXIT_CODE 1; 595 passed, 1 failed: 'grants only contents: read at the workflow and job levels' (its negative regex `^\s*permissions:\s*\S` crossed a line break). Fixed to `^[ \t]*permissions:[ \t]*\S`. The lint-scope behavior test passed on run 1.
+- Pester run 2 (2026-11-23T10-42 to 10-45): EXIT_CODE 0; 597 test cases, 597 passed, 0 failed (includes the lint-scope behavior test: exactly the eight records for two roots, DOCS_LINT_SCOPE_EMPTY throw and zero Add-Content calls for zero roots; the header-comment test; the tar member, --version, --output line, lower-cased hash and -cne assertions; the single Vale call over @valeRoots with the IsNullOrWhiteSpace filter and no loop; `contains no <_> token` unchanged and passing).
+- pytest: EXIT_CODE 0; 34 passed.
+- Static after the fix: EXIT_CODE 0; 133 files already formatted; 0 findings.
+- Line counts: _docs-quality.yml 112; DocsInitTemplate.DocsWorkflow.Tests.ps1 438.
+- Sanity runs (not task evidence; P4 artifacts follow): actionlint 1.7.12 on the template exit 0 with no findings.

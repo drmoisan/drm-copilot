@@ -39,7 +39,7 @@ $script:DocsCommandIdentifierPattern = '^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)*$(?![\
 function Get-DocsInitTemplate {
     <#
     .SYNOPSIS
-        Returns the init template table (rows under the 1021 and 1034 anchors).
+        Returns the init template table (rows under the 1021, 1034 and 1219 anchors).
     #>
     [CmdletBinding()]
     [OutputType([object[]])]
@@ -54,6 +54,12 @@ function Get-DocsInitTemplate {
         [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/Project/accept.txt'; Destination = 'docs/documentation-estate/.vale/styles/config/vocabularies/Project/accept.txt' }
         # --- 1034: docs workflow ---
         [pscustomobject]@{ Source = '.claude/lib/docs/templates/_docs-quality.yml'; Destination = '.github/workflows/_docs-quality.yml' }
+        # --- 1219: tonality styles ---
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/DocsTonality/Certainty.yml'; Destination = 'docs/documentation-estate/.vale/styles/DocsTonality/Certainty.yml' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/DocsTonality/Exclamation.yml'; Destination = 'docs/documentation-estate/.vale/styles/DocsTonality/Exclamation.yml' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/DocsTonality/Filler.yml'; Destination = 'docs/documentation-estate/.vale/styles/DocsTonality/Filler.yml' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/DocsTonality/Hyperbole.yml'; Destination = 'docs/documentation-estate/.vale/styles/DocsTonality/Hyperbole.yml' }
+        [pscustomobject]@{ Source = '.claude/lib/docs/templates/page-check/vale/DocsTonality/Intensifiers.yml'; Destination = 'docs/documentation-estate/.vale/styles/DocsTonality/Intensifiers.yml' }
     )
     return , [object[]]$rows
 }

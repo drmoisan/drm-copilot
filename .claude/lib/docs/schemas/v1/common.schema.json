@@ -48,7 +48,7 @@
     "parity-dimension": {"enum": ["exists", "accurate", "example_present", "owner_assigned", "diataxis_mode"]},
     "parity-state": {"enum": ["pass", "fail", "not-assessed", "not-applicable"]},
     "diataxis-mode": {"enum": ["tutorial", "how-to", "reference", "explanation"]},
-    "front-matter-field": {"enum": ["owner", "last_reviewed", "audience", "diataxis_mode", "surface_refs"]},
+    "front-matter-field": {"enum": ["owner", "last_reviewed", "review_due", "audience", "diataxis_mode", "surface_refs"]},
     "review-date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
     "docs-artifact-kind": {"enum": ["docs-profile", "surface-inventory-snapshot", "docs-coverage-ledger", "docs-parity-matrix", "docs-evidence-pin", "docs-validation-receipt"]},
     "artifact-pin": {
