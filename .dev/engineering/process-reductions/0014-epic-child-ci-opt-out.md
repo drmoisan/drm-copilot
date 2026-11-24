@@ -13,6 +13,12 @@ Adds the epic-level opt-out `child_ci: integration_only`. Under the opt-out an e
 
 The owner directed on 2026-11-23: "for the epic run, do not run CI on each feature. only run it on the final epic merge to main", and chose to change the gate rather than bypass it. An epic with N children paid for N full CI runs plus the integration run, and each child waited for its own run before it merged. The specification is `.dev/active/1233-epic-child-ci-opt-out/spec.md`; the research is `.dev/active/1233-epic-child-ci-opt-out/research/research.2026-11-24T04-02.md`. This entry is created by the first task that edits a file carrying a recorded region and is extended by every later editing task of the change.
 
+Backstop: the integration pull request into `main` (merge-gate branch 2, `epic_merge_pr.ci_gate`) is unchanged and still requires a full green `CI` run, so every opted-out child is verified by CI before it reaches `main`. A defect that only CI would catch is found at the integration pull request instead of at the child.
+
+Residual automatic run (spec decision D1): `.github/workflows/ci.yml` triggers on `pull_request` into `epic/**`, and this change does not edit any workflow, so a child pull request still starts an automatic `CI` run. Under the opt-out that run is neither waited for nor dispatched and is not a merge condition; the saving is the per-child wait and the dispatch fallback, not the compute of the automatic run.
+
+Self-declared key (decision D10): `child_ci` is written by the item checkpoint, and a writer in the same session can set it; like every gate key, the opt-out is a policy-level control, not a security control. The reduction is bounded by the live pull-request base read through `baseRefName` (the base must equal the recorded `epic/<slug>-integration` branch and is never `main`, otherwise per-child CI verification decides), by the `review_mode: "concurrent"` requirement (the review guard proves a `PASS` review at a current head before the helper runs), and by the committed local-QC evidence file at the live head, whose first `EXIT_CODE:` is `0` and whose `Head:` line equals `local_qc_gate.head_sha`. Every checkpoint without the key, and every other value, keeps the previous behavior, which the default rows of both merge-gate suites, the unchanged existing suites, and the corpus default cases prove.
+
 ## Files Changed
 
 - `scripts/dev_tools/validate_orchestrator_state.py`: source, the key-gated local-QC selection inside the `route_requires_ci_gate` block
