@@ -8,7 +8,8 @@
 .DESCRIPTION
     Reads the committed templates under .claude/lib/docs/templates/page-check/ and the module
     text of DocsProfileCommands.psm1 read-only. Covers the rows under the 1021 anchor, the
-    zero-byte consumer-owned vocabulary, the Vale rule kinds, repository-name neutrality, the
+    zero-byte consumer-owned vocabulary, the Vale rule kinds, the DocsTonality styles of the 1219
+    anchor (issue #1219), repository-name neutrality, the
     markdownlint object, and init dry-run and -Write behavior through the in-memory command
     context of Docs.TestSupport.psm1. No file is written.
 #>
@@ -30,11 +31,13 @@ BeforeAll {
         '.claude/lib/docs/templates/page-check/vale/DocsBase/Placeholders.yml'       = 'docs/documentation-estate/.vale/styles/DocsBase/Placeholders.yml'
         '.claude/lib/docs/templates/page-check/vale/Project/accept.txt'              = 'docs/documentation-estate/.vale/styles/config/vocabularies/Project/accept.txt'
     }
+    $script:TonalityName = @('Certainty', 'Exclamation', 'Filler', 'Hyperbole', 'Intensifiers')
+    $script:TonalitySource = [ordered]@{}
+    foreach ($name in $script:TonalityName) { $script:TonalitySource[".claude/lib/docs/templates/page-check/vale/DocsTonality/$name.yml"] = "docs/documentation-estate/.vale/styles/DocsTonality/$name.yml" }
     $script:TemplateFile = @(Get-ChildItem -LiteralPath $script:TemplateRoot -File -Recurse)
+    # The committed text of every init template source (1021, 1034 and 1219 rows), so init -Write reads no absent source.
     $script:SourceText = @{}
-    foreach ($source in $script:Expected.Keys) { $script:SourceText[$source] = [System.IO.File]::ReadAllText((Join-Path -Path $script:RepositoryRoot -ChildPath $source)) }
-    # The 1034 docs workflow row makes init -Write read its template source too.
-    $script:SourceText['.claude/lib/docs/templates/_docs-quality.yml'] = [System.IO.File]::ReadAllText((Join-Path -Path $script:RepositoryRoot -ChildPath '.claude/lib/docs/templates/_docs-quality.yml'))
+    foreach ($row in (Get-DocsInitTemplate)) { $script:SourceText[[string] $row.Source] = [System.IO.File]::ReadAllText((Join-Path -Path $script:RepositoryRoot -ChildPath $row.Source)) }
     # Issue #1173 B6: init exits 0 only when the starter source root lists a file.
     $script:SourceText['src/app.py'] = "value = 1`n"
 
@@ -70,7 +73,7 @@ Describe 'page-check template rows' {
             $row.Count | Should -Be 1
             $row[0].Destination | Should -BeExactly $script:Expected[$source]
         }
-        $script:TemplateFile.Count | Should -Be $script:Expected.Count
+        $script:TemplateFile.Count | Should -Be ($script:Expected.Count + $script:TonalitySource.Count) -Because 'the page-check folder holds the 1021 templates and the 1219 DocsTonality styles'
     }
 }
 
@@ -84,7 +87,7 @@ Describe 'page-check template content' {
         $styles = @($script:TemplateFile | Where-Object { $_.Extension -eq '.yml' })
 
         # Assert
-        $styles.Count | Should -Be 2
+        $styles.Count | Should -Be 7
         foreach ($style in $styles) {
             $text = [System.IO.File]::ReadAllText($style.FullName)
             $text | Should -Match '(?m)^extends: existence$'
@@ -117,13 +120,85 @@ Describe 'page-check template content' {
         $text | Should -Match '(?m)^MinAlertLevel = warning$'
         $text | Should -Match '(?m)^Vocab = Project$'
         $text | Should -Match '(?m)^\[\*\.md\]$'
-        $text | Should -Match '(?m)^BasedOnStyles = Vale, DocsBase$'
+        $text | Should -Match '(?m)^BasedOnStyles = Vale, DocsBase, DocsTonality$'
+        $text | Should -Match '(?ms)^\[\*\.md\]$(?:(?!^\[).)*^Vale\.Spelling = warning$' -Because 'Vale.Spelling = warning is set under [*.md]'
         $text | Should -Not -Match '(?m)^Packages'
     }
 
     It 'lists TODO, TBD and FIXME as placeholder tokens and scopes the punctuation rule to headings' {
         $script:SourceText['.claude/lib/docs/templates/page-check/vale/DocsBase/Placeholders.yml'] | Should -Match '(?s)tokens:\s*- TODO\s*- TBD\s*- FIXME'
         $script:SourceText['.claude/lib/docs/templates/page-check/vale/DocsBase/HeadingPunctuation.yml'] | Should -Match '(?m)^scope: heading$'
+    }
+}
+
+Describe 'DocsTonality styles' {
+    BeforeDiscovery {
+        $script:TonalityCase = @(
+            @{ Name = 'Certainty'; Level = 'error' }
+            @{ Name = 'Exclamation'; Level = 'error' }
+            @{ Name = 'Filler'; Level = 'error' }
+            @{ Name = 'Hyperbole'; Level = 'error' }
+            @{ Name = 'Intensifiers'; Level = 'warning' }
+        )
+    }
+
+    It 'writes the five DocsTonality styles with their template text under -Write' {
+        # Arrange
+        $test = New-DocsTestContext -File $script:SourceText
+
+        # Act
+        $result = Invoke-DocsInitCommand -Argument @{ Write = $true } -Context $test.Context
+
+        # Assert
+        $result.ExitCode | Should -Be 0
+        foreach ($source in $script:TonalitySource.Keys) {
+            $write = @($test.WriteLog | Where-Object { $_.RelativePath -ceq $script:TonalitySource[$source] })
+            $write.Count | Should -Be 1 -Because $source
+            $write[0].Mode | Should -BeExactly 'create'
+            $write[0].Text | Should -BeExactly $script:SourceText[$source] -Because $source
+            $write[0].Text.Length | Should -BeGreaterThan 0
+        }
+    }
+
+    It 'declares existence, ignorecase, scope and level in <Name>' -ForEach $script:TonalityCase {
+        # Arrange
+        $text = $script:SourceText[".claude/lib/docs/templates/page-check/vale/DocsTonality/$Name.yml"]
+
+        # Assert
+        $text | Should -Match '(?m)^extends: existence$'
+        $text | Should -Match '(?m)^ignorecase: true$'
+        $text | Should -Match '(?m)^scope: ~blockquote$'
+        $text | Should -Match ('(?m)^level: ' + $Level + '$')
+        $text | Should -Match '(?m)^tokens:$'
+    }
+
+    It 'carries the tonality policy comment and no repository name in <Name>' -ForEach $script:TonalityCase {
+        # Arrange: the leading comment block is the # lines before the first non-comment line.
+        $text = $script:SourceText[".claude/lib/docs/templates/page-check/vale/DocsTonality/$Name.yml"]
+        $lines = @($text -split "`r?`n")
+        $first = [array]::FindIndex([string[]] $lines, [Predicate[string]] { param($line) -not $line.StartsWith('#', [System.StringComparison]::Ordinal) })
+        $comment = (@($lines | Select-Object -First $first) -join "`n")
+
+        # Assert
+        $first | Should -BeGreaterThan 0
+        $comment.Contains('.claude/rules/tonality.md', [System.StringComparison]::Ordinal) | Should -BeTrue
+        if ($Name -ceq 'Intensifiers') {
+            foreach ($word in 'just', 'very', 'easy', 'easily', 'absent') { $comment | Should -Match "\b$word\b" -Because "the Intensifiers comment names '$word'" }
+        }
+        foreach ($token in 'drm-copilot', 'rgf', 'Rgf') { $text.Contains($token, [System.StringComparison]::Ordinal) | Should -BeFalse -Because "$Name names no repository ('$token')" }
+    }
+
+    It 'lists perfect and world-class in Hyperbole and the nonword exclamation tokens' {
+        # Arrange
+        $hyperbole = $script:SourceText['.claude/lib/docs/templates/page-check/vale/DocsTonality/Hyperbole.yml']
+        $exclamation = $script:SourceText['.claude/lib/docs/templates/page-check/vale/DocsTonality/Exclamation.yml']
+
+        # Assert
+        $hyperbole | Should -Match '(?m)^  - perfect$'
+        $hyperbole | Should -Match '(?m)^  - world-class$'
+        $exclamation | Should -Match '(?m)^nonword: true$'
+        $exclamation.Contains('  - ''!\s*$''', [System.StringComparison]::Ordinal) | Should -BeTrue
+        $exclamation.Contains('  - ''!\s+[A-Z]''', [System.StringComparison]::Ordinal) | Should -BeTrue
     }
 }
 

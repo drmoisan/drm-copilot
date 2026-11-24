@@ -7,8 +7,8 @@
     structural walk of DocsSchema.psm1 does not evaluate pattern, minLength or uniqueItems, and
     Test-Json cannot name a failure behind an inline $ref, so Get-DocsPageConstraintFinding
     evaluates those three keywords over the composed schema value; no pattern constant is
-    duplicated here. Get-DocsPageValueFinding adds the last_reviewed calendar check and the
-    audience declaration check. ConvertTo-DocsPageFieldFinding maps schema findings to the
+    duplicated here. Get-DocsPageValueFinding adds the last_reviewed and review_due calendar
+    checks, the review_due ordering check (issue #1220) and the audience declaration check. ConvertTo-DocsPageFieldFinding maps schema findings to the
     per-field page codes by the first pointer segment. Test-DocsPageFrontMatter in
     DocsPageFrontMatter.psm1 orchestrates these functions.
 
@@ -30,6 +30,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsFinding.psm1'
 $script:DocsPageFieldCode = @{
     'owner'         = 'DOCS_PAGE_OWNER_INVALID'
     'last_reviewed' = 'DOCS_PAGE_LAST_REVIEWED_INVALID'
+    'review_due'    = 'DOCS_PAGE_REVIEW_DUE_INVALID'
     'audience'      = 'DOCS_PAGE_AUDIENCE_INVALID'
     'diataxis_mode' = 'DOCS_PAGE_MODE_INVALID'
     'surface_refs'  = 'DOCS_PAGE_SURFACE_REFS_INVALID'
@@ -37,18 +38,21 @@ $script:DocsPageFieldCode = @{
     'extensions'    = 'DOCS_PAGE_EXTENSIONS_INVALID'
 }
 $script:DocsPageFieldNextAction = @{
-    'DOCS_PAGE_FIELD_MISSING'               = 'Add the field to the page front matter; the docs profile lists it in diataxis_policy.required_front_matter.'
-    'DOCS_PAGE_FIELD_UNKNOWN'               = 'Remove the field, or move consumer-defined data under extensions with a namespaced key.'
-    'DOCS_PAGE_OWNER_INVALID'               = 'Set owner to an identifier such as team-docs.'
-    'DOCS_PAGE_LAST_REVIEWED_INVALID'       = 'Set last_reviewed to a YYYY-MM-DD date string.'
-    'DOCS_PAGE_LAST_REVIEWED_NOT_A_DATE'    = 'Set last_reviewed to a calendar date that exists.'
-    'DOCS_PAGE_AUDIENCE_INVALID'            = 'Set audience to a non-empty list of distinct audience identifiers matching ^[a-z0-9][a-z0-9-]*$.'
-    'DOCS_PAGE_AUDIENCE_UNDECLARED'         = 'Declare the audience in the docs profile audiences, or use a declared audience identifier.'
-    'DOCS_PAGE_MODE_INVALID'                = 'Set diataxis_mode to tutorial, how-to, reference or explanation.'
-    'DOCS_PAGE_SURFACE_REFS_INVALID'        = 'Set surface_refs to a list of distinct element identifiers.'
-    'DOCS_PAGE_TITLE_INVALID'               = 'Set title to non-blank text.'
-    'DOCS_PAGE_EXTENSIONS_INVALID'          = 'Use an object whose keys are namespaced identifiers such as vendor.note.'
-    'DOCS_PAGE_FRONT_MATTER_SCHEMA_INVALID' = 'Correct the front matter so it conforms to the page-metadata schema.'
+    'DOCS_PAGE_FIELD_MISSING'                      = 'Add the field to the page front matter; the docs profile lists it in diataxis_policy.required_front_matter.'
+    'DOCS_PAGE_FIELD_UNKNOWN'                      = 'Remove the field, or move consumer-defined data under extensions with a namespaced key.'
+    'DOCS_PAGE_OWNER_INVALID'                      = 'Set owner to an identifier such as team-docs.'
+    'DOCS_PAGE_LAST_REVIEWED_INVALID'              = 'Set last_reviewed to a YYYY-MM-DD date string.'
+    'DOCS_PAGE_LAST_REVIEWED_NOT_A_DATE'           = 'Set last_reviewed to a calendar date that exists.'
+    'DOCS_PAGE_REVIEW_DUE_INVALID'                 = 'Set review_due to a YYYY-MM-DD date string.'
+    'DOCS_PAGE_REVIEW_DUE_NOT_A_DATE'              = 'Set review_due to a calendar date that exists.'
+    'DOCS_PAGE_REVIEW_DUE_NOT_AFTER_LAST_REVIEWED' = 'Set review_due to a date later than last_reviewed.'
+    'DOCS_PAGE_AUDIENCE_INVALID'                   = 'Set audience to a non-empty list of distinct audience identifiers matching ^[a-z0-9][a-z0-9-]*$.'
+    'DOCS_PAGE_AUDIENCE_UNDECLARED'                = 'Declare the audience in the docs profile audiences, or use a declared audience identifier.'
+    'DOCS_PAGE_MODE_INVALID'                       = 'Set diataxis_mode to tutorial, how-to, reference or explanation.'
+    'DOCS_PAGE_SURFACE_REFS_INVALID'               = 'Set surface_refs to a list of distinct element identifiers.'
+    'DOCS_PAGE_TITLE_INVALID'                      = 'Set title to non-blank text.'
+    'DOCS_PAGE_EXTENSIONS_INVALID'                 = 'Use an object whose keys are namespaced identifiers such as vendor.note.'
+    'DOCS_PAGE_FRONT_MATTER_SCHEMA_INVALID'        = 'Correct the front matter so it conforms to the page-metadata schema.'
 }
 
 function Get-DocsPagePointerField {
@@ -211,15 +215,55 @@ function Get-DocsPageFieldPattern {
     return $null
 }
 
+function Get-DocsPageReviewDateFinding {
+    <#
+    .SYNOPSIS
+        Returns the review_due calendar finding and the review_due ordering finding (private helper).
+    .DESCRIPTION
+        Issue #1220: a review_due string that matches the review-date pattern of the composed
+        schema but is not a calendar date yields DOCS_PAGE_REVIEW_DUE_NOT_A_DATE. When review_due
+        and last_reviewed both match the pattern and are calendar dates, a review_due that is not
+        later than last_reviewed yields DOCS_PAGE_REVIEW_DUE_NOT_AFTER_LAST_REVIEWED. Both
+        findings are errors at /review_due. A review_due that does not match the pattern is
+        reported as DOCS_PAGE_REVIEW_DUE_INVALID by the schema mapping, not here.
+    #>
+    [CmdletBinding()]
+    [OutputType([object[]])]
+    param(
+        [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $FrontMatter,
+        [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $Schema,
+        [Parameter(Mandatory = $true)] [string] $PagePath,
+        [AllowNull()] [System.Collections.IDictionary] $FieldLine
+    )
+
+    $findings = [System.Collections.Generic.List[object]]::new()
+    $pattern = Get-DocsPageFieldPattern -RootSchema $Schema -Field 'review_due'
+    if ($null -eq $pattern -or -not $FrontMatter.Contains('review_due') -or $FrontMatter['review_due'] -isnot [string]) { return , $findings.ToArray() }
+    $due = [string] $FrontMatter['review_due']
+    if (-not [regex]::IsMatch($due, $pattern)) { return , $findings.ToArray() }
+    if (-not (Test-DocsPageReviewDate -Value $due)) {
+        $findings.Add((New-DocsPageFieldFinding -Code 'DOCS_PAGE_REVIEW_DUE_NOT_A_DATE' -Pointer '/review_due' -Message "front matter field 'review_due' value '$due' is not a calendar date" -PagePath $PagePath -FieldLine $FieldLine))
+        return , $findings.ToArray()
+    }
+    $reviewed = if ($FrontMatter.Contains('last_reviewed') -and $FrontMatter['last_reviewed'] -is [string]) { [string] $FrontMatter['last_reviewed'] } else { $null }
+    # Both values are yyyy-MM-dd calendar dates here, so ordinal string order is date order.
+    if ($null -ne $reviewed -and [regex]::IsMatch($reviewed, $pattern) -and (Test-DocsPageReviewDate -Value $reviewed) -and [string]::CompareOrdinal($due, $reviewed) -le 0) {
+        $findings.Add((New-DocsPageFieldFinding -Code 'DOCS_PAGE_REVIEW_DUE_NOT_AFTER_LAST_REVIEWED' -Pointer '/review_due' -Message "front matter field 'review_due' value '$due' is not later than last_reviewed '$reviewed'" -PagePath $PagePath -FieldLine $FieldLine))
+    }
+    return , $findings.ToArray()
+}
+
 function Get-DocsPageValueFinding {
     <#
     .SYNOPSIS
-        Returns the last_reviewed calendar finding and the audience declaration findings.
+        Returns the last_reviewed and review_due calendar findings, the review_due ordering finding and the audience declaration findings.
     .DESCRIPTION
         Validation steps 4 and 5: a last_reviewed string that matches the review-date pattern of
         the composed schema but is not a calendar date yields DOCS_PAGE_LAST_REVIEWED_NOT_A_DATE;
-        each audience item that matches the audience-id pattern and is not in AudienceId yields
-        DOCS_PAGE_AUDIENCE_UNDECLARED at /audience/<i>. Both patterns are read from Schema.
+        the review_due calendar and ordering findings of Get-DocsPageReviewDateFinding follow
+        (issue #1220); each audience item that matches the audience-id pattern and is not in
+        AudienceId yields DOCS_PAGE_AUDIENCE_UNDECLARED at /audience/<i>. The patterns are read
+        from Schema.
     #>
     [CmdletBinding()]
     [OutputType([object[]])]
@@ -239,6 +283,7 @@ function Get-DocsPageValueFinding {
             $findings.Add((New-DocsPageFieldFinding -Code 'DOCS_PAGE_LAST_REVIEWED_NOT_A_DATE' -Pointer '/last_reviewed' -Message "front matter field 'last_reviewed' value '$reviewed' is not a calendar date" -PagePath $PagePath -FieldLine $FieldLine))
         }
     }
+    $findings.AddRange([object[]] (Get-DocsPageReviewDateFinding -FrontMatter $FrontMatter -Schema $Schema -PagePath $PagePath -FieldLine $FieldLine))
     $audiencePattern = Get-DocsPageFieldPattern -RootSchema $Schema -Field 'audience' -Items
     if ($FrontMatter.Contains('audience') -and $FrontMatter['audience'] -is [System.Collections.IList] -and $null -ne $audiencePattern) {
         $declared = [System.Collections.Generic.HashSet[string]]::new([string[]] @($AudienceId), [System.StringComparer]::Ordinal)

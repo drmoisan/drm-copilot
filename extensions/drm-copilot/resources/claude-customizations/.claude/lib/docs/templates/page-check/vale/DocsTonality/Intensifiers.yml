@@ -1,0 +1,15 @@
+# Enforces .claude/rules/tonality.md "Hyperbole — Prohibited" (use measured
+# alternatives). The words just, very, easy, and easily are absent because
+# technical documentation uses them in technical senses.
+extends: existence
+message: "Consider removing the intensifier '%s' (tonality policy: measured wording)."
+level: warning
+ignorecase: true
+scope: ~blockquote
+tokens:
+  - really
+  - extremely
+  - hugely
+  - massively
+  - dramatically
+  - actually

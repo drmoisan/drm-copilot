@@ -8,7 +8,9 @@
     Test-DocsProfileSemantic, each of which names the offending field by JSON pointer.
     New-DocsStarterProfile returns a neutral profile that passes those checks with the committed
     analyzer registry, whatever rows it holds; its source roots default to src and its one
-    documentation root defaults to docs/guide (id guide), each overridable by a parameter.
+    documentation root defaults to docs/guide (id guide), each overridable by a parameter. The
+    starter declares the default documentation families of Get-DocsDefaultFamilySet under that
+    root and an empty legacy_exclusions list (issue #1218).
 
     Every function is pure apart from the built-in Test-Json call made by Test-DocsArtifactText.
 
@@ -25,6 +27,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsJson.psm1') -
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSchema.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsFinding.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsAnalyzerRegistry.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsProfileFamilies.psm1') -ErrorAction Stop
 
 function Get-DocsDefaultProfilePath {
     <#
@@ -82,7 +85,13 @@ function Test-DocsProfileSemantic {
         (/documentation_roots/<n>/id or /path), DOCS_PROFILE_AUDIENCE_UNKNOWN
         (/documentation_roots/<n>/audience_ids/<m>), DOCS_PROFILE_MODE_NOT_IN_POLICY
         (/diataxis_policy/directory_modes/<n>/mode) and DOCS_ANALYZER_UNKNOWN
-        (/surface_selection/analyzers/<n>).
+        (/surface_selection/analyzers/<n>). The documentation family findings of
+        Test-DocsProfileFamilySemantic are appended before ordering: DOCS_PROFILE_FAMILY_DUPLICATE
+        (/required_families/<n>/id or /directory), DOCS_PROFILE_AUDIENCE_UNKNOWN
+        (/required_families/<n>/audience/<m>), DOCS_PROFILE_MODE_NOT_IN_POLICY
+        (/required_families/<n>/diataxis_mode), DOCS_PROFILE_FAMILY_DIRECTORY_OUTSIDE_ROOT
+        (/required_families/<n>/directory) and DOCS_PROFILE_LEGACY_DUPLICATE
+        (/legacy_exclusions/<n>/path).
     #>
     [CmdletBinding()]
     [OutputType([object[]])]
@@ -138,6 +147,7 @@ function Test-DocsProfileSemantic {
             $findings.Add((New-DocsProfileFinding -Code 'DOCS_ANALYZER_UNKNOWN' -Pointer "/surface_selection/analyzers/$index" -ArtifactPath $ArtifactPath -Message "Field analyzers selects the analyzer $($analyzers[$index]), which is not registered." -NextAction 'Select a registered analyzer identifier or remove the entry.'))
         }
     }
+    foreach ($familyFinding in (Test-DocsProfileFamilySemantic -Profile $Profile -ArtifactPath $ArtifactPath)) { $findings.Add($familyFinding) }
     return Get-DocsOrderedFinding -Finding $findings.ToArray()
 }
 
@@ -185,6 +195,10 @@ function New-DocsStarterProfile {
         root detected by Get-DocsProfileSourceRootDefault. DocumentationRoot (default
         'docs/guide', issue #1173) becomes the path of the one documentation root, whose id is
         'guide', so a starter profile never selects planning trees such as docs/features/.
+        The audiences are maintainers, end-users, operators, security-reviewers, and
+        product-owners; the documentation root keeps maintainers as its only audience.
+        required_families holds Get-DocsDefaultFamilySet for DocumentationRoot, and
+        legacy_exclusions is empty (issue #1218).
     #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Pure in-memory factory that changes no system state; the exported name is fixed by the issue #1020 contract.')]
     [CmdletBinding()]
@@ -203,7 +217,13 @@ function New-DocsStarterProfile {
         id                  = "$RepositoryId.docs-profile"
         extensions          = [ordered]@{}
         repository          = [ordered]@{ id = $RepositoryId }
-        audiences           = @([ordered]@{ id = 'maintainers'; description = 'People who change and release this repository.' })
+        audiences           = @(
+            [ordered]@{ id = 'maintainers'; description = 'People who change and release this repository.' }
+            [ordered]@{ id = 'end-users'; description = 'People who use the product to accomplish their tasks.' }
+            [ordered]@{ id = 'operators'; description = 'People who deploy, configure, and run the product.' }
+            [ordered]@{ id = 'security-reviewers'; description = 'People who assess the security posture of the product.' }
+            [ordered]@{ id = 'product-owners'; description = 'People who decide the scope and direction of the product.' }
+        )
         documentation_roots = @([ordered]@{ id = 'guide'; path = $DocumentationRoot; audience_ids = @('maintainers') })
         surface_selection   = [ordered]@{
             element_kinds = @('cli-command', 'cli-option', 'http-route', 'config-key', 'public-symbol', 'architecture-component')
@@ -227,6 +247,8 @@ function New-DocsStarterProfile {
             evidence_pins      = "$estate/docs-evidence-pins.json"
             validation_receipt = "$estate/docs-validation-receipt.json"
         }
+        required_families   = Get-DocsDefaultFamilySet -DocumentationRoot $DocumentationRoot
+        legacy_exclusions   = @()
     }
 }
 

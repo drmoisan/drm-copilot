@@ -1,0 +1,12 @@
+{
+  "issue": 1221,
+  "note": "Wall-clock times from the orchestrator checkpoint, including queueing. The merge stage is not captured. S1-S4 ran in the epic-planner preparation run and are not timed here.",
+  "stage_timing": [
+    {"stage": "S5_atomic_execution", "attempt": 1, "started_at": "2026-11-23T12:49:46Z", "ended_at": "2026-11-23T14:32:45Z"},
+    {"stage": "S5_atomic_execution", "attempt": 2, "started_at": "2026-11-24T03:37:17Z", "ended_at": "2026-11-24T07:43:59Z"},
+    {"stage": "S6_feature_review", "attempt": 1, "started_at": "2026-11-24T07:43:59Z", "ended_at": "2026-11-24T08:31:00Z"},
+    {"stage": "remediation_cycle", "attempt": 1, "started_at": "2026-11-24T08:33:00Z", "ended_at": "2026-11-24T11:06:00Z"},
+    {"stage": "S8_pr_creation", "attempt": 1, "started_at": "2026-11-24T11:08:38Z", "ended_at": "2026-11-24T11:13:22Z"},
+    {"stage": "S9_ci_gate", "attempt": 1, "started_at": "2026-11-24T11:13:22Z", "ended_at": null}
+  ]
+}

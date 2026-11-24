@@ -194,6 +194,36 @@ Describe 'Resolve-DocsReferenceFrontMatterValue' {
         $result.Value['extensions']['acme.note'] | Should -BeExactly 'kept'
     }
 
+    It 'keeps an existing review_due value at the third key position on regeneration (issue #1220)' {
+        # Arrange
+        $existing = (Get-TestConverted -Text (Get-TestPageText -Field @('owner: "page-owner"', 'last_reviewed: "2026-01-10"', 'review_due: "2026-04-10"', 'audience: ["admins"]', 'surface_refs: []'))).Value
+
+        # Act
+        $result = Resolve-DocsReferenceFrontMatterValue -Existing $existing -PagePlan (Get-TestPagePlan) -SurfaceRef @() -CapturedAt '2026-05-01T00:00:00Z' -IsNewPage $false
+        $text = ConvertTo-DocsReferenceFrontMatterText -Value $result.Value
+
+        # Assert
+        $result.Finding.Count | Should -Be 0
+        $result.Value['review_due'] | Should -BeExactly '2026-04-10'
+        $lines = @($text.TrimEnd("`n").Split("`n"))
+        $lines[3] | Should -BeExactly 'review_due: "2026-04-10"' -Because 'the order is owner, last_reviewed, review_due, audience'
+        $lines[2] | Should -BeExactly 'last_reviewed: "2026-01-10"'
+        $lines[4] | Should -BeExactly 'audience: ["admins"]'
+    }
+
+    It 'writes a page without review_due without the key (issue #1220)' {
+        # Arrange
+        $existing = (Get-TestConverted -Text (Get-TestPageText -Field @('owner: "page-owner"', 'last_reviewed: "2026-01-10"', 'audience: ["admins"]', 'surface_refs: []'))).Value
+
+        # Act
+        $result = Resolve-DocsReferenceFrontMatterValue -Existing $existing -PagePlan (Get-TestPagePlan) -SurfaceRef @() -CapturedAt '2026-05-01T00:00:00Z' -IsNewPage $false
+        $text = ConvertTo-DocsReferenceFrontMatterText -Value $result.Value
+
+        # Assert
+        $result.Value.Contains('review_due') | Should -BeFalse
+        $text | Should -Not -Match 'review_due'
+    }
+
     It 'fills missing values from the page plan and the snapshot capture date, and sorts surface_refs' {
         # Act
         $result = Resolve-DocsReferenceFrontMatterValue -Existing $null -PagePlan (Get-TestPagePlan -Audience @('users', 'admins')) -SurfaceRef @(('public-symbol-' + ('b' * 64)), ('config-key-' + ('a' * 64))) -CapturedAt '2026-01-02T03:04:05Z' -IsNewPage $true

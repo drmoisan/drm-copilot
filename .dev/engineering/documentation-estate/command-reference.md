@@ -76,6 +76,15 @@ read-only.
 & ./.claude/lib/docs/Invoke-DocsCommand.ps1 -Command coverage -Json
 ```
 
+The result also carries the `placeholders` key, after `parity`: the placeholder token
+`SME input required`, its `total` over the Markdown pages of the documentation roots, and `pages`,
+one `page_path` and `count` per page with a count above zero, sorted by page path. The token is
+counted case-sensitively in the page body, with one line break allowed between its words;
+occurrences in front matter, fenced code, inline code spans and HTML comments are not counted. The
+text output adds the line `placeholders: token="SME input required" total=<n> pages=<m>` and one
+line `placeholder <page_path> count=<n>` per listed page, before the summary line. The placeholder
+count does not change the exit code.
+
 ### `update-ledger`
 
 Changes the coverage ledger, the parity matrix or the evidence pins with one `-Operation`:

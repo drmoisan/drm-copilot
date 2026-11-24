@@ -22,7 +22,9 @@
     "page_owners": {"type": "array", "items": {"$ref": "#/$defs/page-owner"}},
     "diataxis_policy": {"$ref": "#/$defs/diataxis-policy"},
     "completion_gates": {"$ref": "#/$defs/completion-gates"},
-    "artifact_paths": {"$ref": "#/$defs/artifact-paths"}
+    "artifact_paths": {"$ref": "#/$defs/artifact-paths"},
+    "required_families": {"type": "array", "items": {"$ref": "#/$defs/documentation-family"}},
+    "legacy_exclusions": {"type": "array", "items": {"$ref": "#/$defs/legacy-exclusion"}}
   },
   "$defs": {
     "audience": {
@@ -88,7 +90,8 @@
             "required_dispositions_complete": {"const": true},
             "allow_deferred": {"type": "boolean"},
             "max_stale_pages": {"type": "integer", "minimum": 0},
-            "required_parity_dimensions": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/parity-dimension"}}
+            "required_parity_dimensions": {"type": "array", "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/parity-dimension"}},
+            "block_overdue_review": {"type": "boolean"}
           }
         },
         "integration_pr_gate": {
@@ -107,6 +110,36 @@
         "parity_matrix": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
         "evidence_pins": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
         "validation_receipt": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"}
+      }
+    },
+    "documentation-family": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "directory", "diataxis_mode", "template", "audience", "review_interval_days", "required"],
+      "properties": {
+        "id": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+        "directory": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
+        "diataxis_mode": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/diataxis-mode"},
+        "template": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
+        "audience": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/audience-ids", "minItems": 1},
+        "review_interval_days": {"type": "integer", "minimum": 1},
+        "required": {"type": "boolean"},
+        "exclusion": {"$ref": "#/$defs/family-exclusion"}
+      }
+    },
+    "family-exclusion": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reason", "recorded_at"],
+      "properties": {
+        "reason": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"},
+        "recorded_at": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/timestamp"}
+      }
+    },
+    "legacy-exclusion": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "reason"],
+      "properties": {
+        "path": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/relative-path"},
+        "reason": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/text"}
       }
     }
   }

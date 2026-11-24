@@ -1,0 +1,12 @@
+# Executor Decisions (resume run) - Issue #1221
+
+Timestamp: 2026-11-24T05-07
+Command: autonomous-mode decision record (no command)
+EXIT_CODE: 0
+Output Summary: Three decisions taken under autonomous mode on the resume run, each with the recommended option applied. The earlier record `decisions.2026-11-23T13-10.md` is unchanged.
+
+## Decisions
+
+1. Integration-branch advance. `origin/epic/documentation-estate-families-integration` advanced after this branch's last merge: it now holds the merge of #1219 (docs-prose-markdown-lint, PR #1235), which edits `DocsCoverageReport.psm1` and `DocsLedgerCommands.Tests.ps1` in other sections. A `git merge-tree --write-tree` preview of `HEAD` with the new tip reports no conflict. Recommended option applied: after the Phase 2 gate commit and before Phase 3, merge the integration tip into this branch (a plain merge, no rebase), so that the final format, lint, type check, and full Pester, Jest, and pytest gates measure the tree this child merges into. Any conflict is resolved by keeping both sides, with the family section confined to its own functions. The final gates compare against the Phase 0 baseline and record any per-file figure that the merged #1219 code changes.
+2. Scope set for P3-T5. The merge-base diff lists `.dev/potential/promoted/2026-11-23-docs-findings-limit-envelope-schema.md`, the promotion record of the out-of-scope `FINDINGS_LIMIT` envelope defect (spec Decision 13; filed as #1230 by the earlier executor run). Recommended option applied: treat it as inside the plan's file set, because spec Decision 13 requires the defect to be "recorded for a separate issue" and this file is that record; P3-T5 lists it with this reason. After the integration merge, the scope comparison uses the merge base of the new integration tip and `HEAD`, so files that #1219 brought in are not attributed to this item.
+3. Analyzer route. The in-process route of `SCRATCH/issue-1221-static-ps.ps1` (PoshQC imported with `-Force`, then PSScriptAnalyzer) threw a null-reference error and then stalled on `DocsFamilyCheck.psm1`; one pwsh importing only PSScriptAnalyzer analyzes the same file in about one second. Recommended option applied: analyzer steps use `SCRATCH/issue-1221-pssa-one.sh` (one file) or `SCRATCH/issue-1221-pssa-batch.sh` (folders), both with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`. A stale analyzer process left by the stopped earlier run (started 2026-11-23, not this run's process) was not stopped.

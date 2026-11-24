@@ -8,6 +8,7 @@
   "properties": {
     "owner": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/identifier"},
     "last_reviewed": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/review-date"},
+    "review_due": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/review-date"},
     "audience": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/audience-id"}},
     "diataxis_mode": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/diataxis-mode"},
     "surface_refs": {"$ref": "urn:drm-copilot:docs:1.0.0:common#/$defs/element-ids"},

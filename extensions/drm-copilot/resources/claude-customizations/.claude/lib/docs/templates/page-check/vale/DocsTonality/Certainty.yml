@@ -1,0 +1,19 @@
+# Enforces .claude/rules/tonality.md "Evidence-First Wording" (no overstated
+# certainty beyond the verified evidence).
+extends: existence
+message: "Avoid overstated certainty: '%s' (tonality policy: evidence-first wording)."
+level: error
+ignorecase: true
+scope: ~blockquote
+tokens:
+  - '100%\s'
+  - definitely
+  - certainly
+  - absolutely
+  - undoubtedly
+  - without a doubt
+  - foolproof
+  - cannot fail
+  - will never fail
+  - fully secure
+  - completely safe

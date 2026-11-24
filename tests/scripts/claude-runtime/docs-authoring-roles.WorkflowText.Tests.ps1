@@ -41,6 +41,15 @@ BeforeDiscovery {
             @{ Copy = $key; Path = "$($roots[$key])/docs-inventory-surface/SKILL.md"; Heading = 'Steps'; Tokens = @('`__pycache__`', '`node_modules`', '`.pyc` or `.pyo`', 'before the profile `exclusions`') }
         }
     )
+    $script:FamilyRows = @(foreach ($key in $roots.Keys) { @{ Copy = $key; Path = "$($roots[$key])/docs-init/SKILL.md" } })
+    $script:FamilyPlanRows = @(foreach ($key in $roots.Keys) { @{ Copy = $key; Path = "$($roots[$key])/docs-plan-ia/SKILL.md" } })
+    $familyStepTokens = @('`required_families`', '`families`', '`SECURITY.md`', '`CODEOWNERS`', '`exclusion`', '`legacy_exclusions`')
+    $script:FamilyPlanTokenRows = @(
+        foreach ($key in $roots.Keys) {
+            @{ Copy = $key; Path = "$($roots[$key])/docs-plan-ia/SKILL.md"; Heading = 'Steps'; Tokens = $familyStepTokens }
+            @{ Copy = $key; Path = "$($roots[$key])/docs-plan-ia/SKILL.md"; Heading = 'Result'; Tokens = @('`required_families`') }
+        }
+    )
     $batchTokens = @('`operations`', '`-Operations', '`bind-page-refs`', 'all-or-nothing', 'sync-refs is not a batch item', 'item index', '`pin` must precede `set-dimension` with `dimension: accurate` and `state: pass` for the same element and page')
     $script:BatchRows = @(
         foreach ($key in $roots.Keys) {
@@ -130,6 +139,66 @@ Describe 'update-ledger batch, bind-page-refs and pin ordering in the reconcile 
         # Assert
         $section | Should -Not -BeNullOrEmpty -Because "$Path has a ## $Heading section"
         foreach ($token in $Tokens) { $section.Contains($token, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "$Path states '$token'" }
+    }
+}
+
+Describe 'docs-init Documentation Families section (issue 1218)' {
+    It 'places the Documentation Families section between Steps and Linter Configuration in <Path>' -ForEach $script:FamilyRows {
+        # Arrange
+        $text = Read-DocsAuthoringText -RelativePath $Path
+        $familyIds = @('product-overview', 'getting-started', 'user-guides', 'administration', 'security', 'operations', 'service-management', 'architecture', 'adr', 'reference')
+        $templateIds = @('product-overview', 'onboarding', 'how-to', 'security', 'runbook', 'service-management', 'architecture-overview', 'adr', 'api-reference')
+        $tokens = @(foreach ($id in @($familyIds + $templateIds + @('exclusion', 'reason', 'recorded_at', 'legacy_exclusions'))) { '`' + $id + '`' })
+
+        # Act
+        $steps = [regex]::Match($text, '(?m)^## Steps[ \t]*\r?$').Index
+        $families = [regex]::Match($text, '(?m)^## Documentation Families[ \t]*\r?$')
+        $linter = [regex]::Match($text, '(?m)^## Linter Configuration[ \t]*\r?$').Index
+        $section = Get-DocsWorkflowSectionText -Text $text -Heading 'Documentation Families'
+
+        # Assert
+        $families.Success | Should -BeTrue -Because "$Path has a ## Documentation Families section"
+        $families.Index | Should -BeGreaterThan $steps -Because "$Path places the section after ## Steps"
+        $families.Index | Should -BeLessThan $linter -Because "$Path places the section before ## Linter Configuration"
+        foreach ($token in $tokens) { $section.Contains($token, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "$Path states '$token'" }
+    }
+}
+
+Describe 'docs-plan-ia family-planning step (issue 1221)' {
+    It 'states the family-planning tokens in the <Heading> section of <Path>' -ForEach $script:FamilyPlanTokenRows {
+        # Arrange
+        $section = Get-DocsWorkflowSectionText -Text (Read-DocsAuthoringText -RelativePath $Path) -Heading $Heading
+
+        # Assert
+        $section | Should -Not -BeNullOrEmpty -Because "$Path has a ## $Heading section"
+        foreach ($token in $Tokens) { $section.Contains($token, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "$Path states '$token'" }
+    }
+
+    It 'places the family step after the element-assignment step in the Steps of <Path>' -ForEach $script:FamilyPlanRows {
+        # Arrange
+        $section = Get-DocsWorkflowSectionText -Text (Read-DocsAuthoringText -RelativePath $Path) -Heading 'Steps'
+
+        # Act
+        $assign = if ($null -eq $section) { -1 } else { $section.IndexOf('Assign each uncovered element', [System.StringComparison]::Ordinal) }
+        $family = if ($null -eq $section) { -1 } else { $section.IndexOf('`required_families`', [System.StringComparison]::Ordinal) }
+
+        # Assert
+        $assign | Should -BeGreaterOrEqual 0 -Because "$Path keeps the element-assignment step"
+        $family | Should -BeGreaterThan $assign -Because "$Path places the family-planning step after the element-assignment step"
+    }
+
+    It 'names no runtime-specific path in the Steps and Result of <Path>' -ForEach $script:FamilyPlanRows {
+        # Arrange
+        $text = Read-DocsAuthoringText -RelativePath $Path
+
+        foreach ($heading in 'Steps', 'Result') {
+            # Act
+            $section = Get-DocsWorkflowSectionText -Text $text -Heading $heading
+
+            # Assert
+            $section | Should -Not -BeNullOrEmpty -Because "$Path has a ## $heading section"
+            foreach ($runtimePath in '.claude/', '.agents/') { $section.Contains($runtimePath, [System.StringComparison]::Ordinal) | Should -BeFalse -Because "the $heading section of $Path names no $runtimePath path" }
+        }
     }
 }
 

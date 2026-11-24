@@ -126,7 +126,7 @@ export const DOCS_TOOL_DEFINITIONS: ReadonlyArray<DocsToolDefinition> = [
   ),
   definition(
     "run_docs_coverage",
-    "Report documentation coverage through Invoke-DocsCommand.ps1 -Command coverage -Json.",
+    "Report documentation coverage through Invoke-DocsCommand.ps1 -Command coverage -Json. The result includes a families section with one entry per required documentation family (status present, missing or not-applicable) and the legacy_exclusions list.",
     true,
   ),
   definition(
@@ -141,7 +141,7 @@ export const DOCS_TOOL_DEFINITIONS: ReadonlyArray<DocsToolDefinition> = [
   ),
   definition(
     "validate_docs_artifacts",
-    "Validate docs artifacts through Invoke-DocsCommand.ps1 -Command validate -Json for one mode and revision; never persists a receipt.",
+    "Validate docs artifacts through Invoke-DocsCommand.ps1 -Command validate -Json for one mode and revision; never persists a receipt. In docs-complete mode the findings include the documentation family findings DOCS_FAMILY_PAGE_MISSING and DOCS_FAMILY_ROOT_FILE_MISSING (errors) and DOCS_FAMILY_NOT_APPLICABLE and DOCS_LEGACY_EXCLUSIONS_REPORTED (info).",
     true,
   ),
 ];

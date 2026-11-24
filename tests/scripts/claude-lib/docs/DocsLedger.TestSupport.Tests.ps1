@@ -54,6 +54,20 @@ Describe 'New-DocsLedgerTestContext' {
         @($test.Context.PSObject.Properties | ForEach-Object { $_.Name }) | Should -Be @('RepositoryRoot', 'ReadText', 'ReadBytes', 'TestFile', 'ListFile', 'WriteText', 'UtcNow', 'InvokeProcess', 'ResolveRevision', 'ReadRevisionText', 'TestAncestor', 'ListChangedPath')
     }
 
+    It 'lists only the top-level files for the empty relative root' {
+        # Arrange (issue #1221 remediation cycle 1)
+        $test = New-DocsLedgerTestContext -File @{ 'SECURITY.md' = '# s'; 'CODEOWNERS' = '* @team'; 'docs/a.md' = '# a'; '.github/CODEOWNERS' = '* @team' }
+
+        # Act
+        $listed = & $test.Context.ListFile ''
+
+        # Assert
+        @($listed) | Should -BeExactly @('CODEOWNERS', 'SECURITY.md') -Because 'only paths without a / are repository-root files, in ordinal order'
+        $test.CallLog.Count | Should -Be 1
+        $test.CallLog[0].Member | Should -BeExactly 'ListFile'
+        $test.CallLog[0].RelativePath | Should -BeExactly ''
+    }
+
     It 'answers the revision members from the in-memory maps and $null for an unmapped key (issue #1169)' {
         # Arrange
         $one = '1111111111111111111111111111111111111111'
@@ -165,6 +179,30 @@ Describe 'Fixture documents' {
         $result.Profile['completion_gates']['docs_complete']['allow_deferred'] | Should -BeFalse
         $result.Profile['completion_gates']['docs_complete']['max_stale_pages'] | Should -Be 2
         $result.Profile['page_owners'][0]['owner'] | Should -BeExactly 'docs-team'
+    }
+
+    It 'returns empty required_families and legacy_exclusions unless the opt-in parameters supply them' {
+        # Arrange (issue #1221)
+        $family = [ordered]@{ id = 'operations'; directory = 'docs/operations'; diataxis_mode = 'how-to'; template = 'runbook'; audience = @('maintainers'); review_interval_days = 90L; required = $true }
+        $legacy = [ordered]@{ path = 'docs/legacy/old.md'; reason = 'Kept for history.' }
+
+        # Act
+        $default = New-DocsLedgerTestProfile
+        $supplied = New-DocsLedgerTestProfile -RequiredFamily @($family) -LegacyExclusion @($legacy)
+        $loaded = ConvertFrom-DocsProfileText -Text (ConvertTo-DocsJsonText -Value $supplied) -ArtifactPath 'docs-profile.json' -ComposedSchemaSet $script:Composed
+
+        # Assert
+        $default.Contains('required_families') | Should -BeTrue
+        @($default['required_families']).Count | Should -Be 0
+        $default.Contains('legacy_exclusions') | Should -BeTrue
+        @($default['legacy_exclusions']).Count | Should -Be 0
+        @($supplied['required_families']).Count | Should -Be 1
+        [object]::ReferenceEquals($supplied['required_families'][0], $family) | Should -BeTrue -Because 'the supplied family is returned unchanged'
+        [object]::ReferenceEquals($supplied['legacy_exclusions'][0], $legacy) | Should -BeTrue -Because 'the supplied legacy entry is returned unchanged'
+        $loaded.Ok | Should -BeTrue
+        @($loaded.Findings | Where-Object { $_['severity'] -ceq 'error' }).Count | Should -Be 0
+        $loaded.Profile['required_families'][0]['id'] | Should -BeExactly 'operations'
+        $loaded.Profile['legacy_exclusions'][0]['path'] | Should -BeExactly 'docs/legacy/old.md'
     }
 
     It 'fixture ledger, matrix and pin collection produce no finding from Test-DocsArtifactText' {

@@ -34,6 +34,8 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsParity.psm1')
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsEvidencePins.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsStaleness.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsReceipt.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsFamilyCheck.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsReviewCadence.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsValidation.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerMutation.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsCoverageReport.psm1') -ErrorAction Stop
@@ -179,6 +181,13 @@ function Invoke-DocsValidateCommand {
         ResolveRevision, TestAncestor, and ListChangedPath; a member that is absent or throws
         supplies $null); a denial returns exit 1 with a DOCS_RECEIPT_REVISION_REJECTED error
         finding whose message begins with the reason code, a null result, and no receipt write.
+        Issue #1221: in docs-complete mode the documentation family evidence of the loaded profile
+        is read with Read-DocsFamilyEvidence over the TestFile and ListFile members and passed to
+        Invoke-DocsValidation as FamilyEvidence; a profile without families makes no extra call.
+        Issue #1220: in docs-complete mode each listed .md page is read once through the ReadText
+        member (Get-DocsReviewPageFrontMatter) and the parsed front matter is passed to
+        Invoke-DocsValidation as PageFrontMatter for the DOCS_REVIEW_OVERDUE check; a page read
+        failure is a runtime failure (exit 3).
     #>
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -202,11 +211,17 @@ function Invoke-DocsValidateCommand {
         $profileText = ConvertFrom-DocsUtf8Bytes -Bytes $profileRead.Bytes
         $artifact = [ordered]@{ 'docs-profile' = @{ Path = $profilePath; Bytes = $profileRead.Bytes } }
         $pagePath = [string[]]@()
+        $familyEvidence = $null
+        $pageFrontMatter = $null
         $loaded = (ConvertFrom-DocsProfileText -Text $profileText -ArtifactPath $profilePath -ComposedSchemaSet $schemas).Profile
         if ($null -ne $loaded) {
             $inputs = Read-DocsLedgerInputSet -Profile $loaded -Need (Get-DocsValidationInputKind -Mode $mode) -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -ListFile $Context.ListFile
             foreach ($kind in @($inputs.Artifact.Keys)) { $artifact[$kind] = $inputs.Artifact[$kind] }
             $pagePath = $inputs.PagePath
+            # Issue #1221: docs-complete reads the documentation family evidence through the context seams.
+            if ($mode -ceq 'docs-complete') { $familyEvidence = Read-DocsFamilyEvidence -Profile $loaded -TestFile $Context.TestFile -ListFile $Context.ListFile }
+            # Issue #1220: docs-complete reads the page front matter for the review-cadence check; a read failure reaches the catch below.
+            if ($mode -ceq 'docs-complete') { $pageFrontMatter = Get-DocsReviewPageFrontMatter -PagePath $pagePath -ReadText $Context.ReadText }
         }
         # Issue #1169: under -WriteReceipt in docs-complete mode -Revision defaults to the snapshot revision.
         $snapshotRevision = Get-DocsValidateSnapshotRevision -Entry $(if ($artifact.Contains('surface-inventory-snapshot')) { $artifact['surface-inventory-snapshot'] } else { $null })
@@ -217,7 +232,7 @@ function Invoke-DocsValidateCommand {
             }
             $revision = $snapshotRevision
         }
-        $validation = Invoke-DocsValidation -Mode $mode -Revision $revision -IssuedAt $issuedAt -ProfileText $profileText -ProfilePath $profilePath -Artifact $artifact -PagePath $pagePath -ComposedSchemaSet $schemas
+        $validation = Invoke-DocsValidation -Mode $mode -Revision $revision -IssuedAt $issuedAt -ProfileText $profileText -ProfilePath $profilePath -Artifact $artifact -PagePath $pagePath -ComposedSchemaSet $schemas -FamilyEvidence $familyEvidence -PageFrontMatter $pageFrontMatter
         if ($null -eq $validation.Receipt) { return New-DocsCommandResult -Command $command -ExitCode 1 -Finding $validation.Findings }
         $receipt = $validation.Receipt
         if ($mode -ceq 'docs-complete' -and $validation.Ok) {
