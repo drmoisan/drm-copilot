@@ -18,7 +18,7 @@ Set-StrictMode -Version Latest
 
 BeforeDiscovery {
     $script:IdenticalHelpers = @(
-        'enforce-batch-budget-route.ps1', 'enforce-completion-helpers.ps1', 'enforce-epic-merge-gate-child-ci.ps1',
+        'enforce-batch-budget-route.ps1', 'enforce-completion-helpers.ps1', 'enforce-epic-merge-gate-child-ci.ps1', 'enforce-epic-merge-gate-release.ps1',
         'enforce-epic-merge-gate-command.ps1', 'enforce-epic-merge-gate-regeneration.ps1', 'enforce-epic-merge-gate-review.ps1',
         'enforce-orchestration-preimplementation-gate-bookkeeping.ps1', 'enforce-orchestration-preimplementation-gate-classify.ps1',
         'enforce-orchestration-preimplementation-gate-cleanup.ps1', 'enforce-orchestration-preimplementation-gate-commands.ps1',
@@ -29,6 +29,7 @@ BeforeDiscovery {
         'hook-command-invocation-operands.ps1', 'hook-command-payload.ps1', 'hook-command-payload-powershell.ps1', 'hook-command-scanner.ps1',
         'hook-dependency-guard.ps1', 'hook-docs-estate-context.ps1', 'hook-docs-only-diff.ps1', 'hook-epic-fan-in.ps1',
         'hook-epic-regeneration.ps1', 'hook-planner-worktree-removal.ps1', 'hook-release-allowance-context.ps1',
+        'hook-release-pull-request-context.ps1',
         'test-execution-command-form.ps1', 'test-execution-lock.ps1', 'test-execution-lock-decision.ps1', 'test-execution-policy.ps1',
         'worktree-poetry-venv-policy.ps1'
     ) | ForEach-Object { @{ Helper = $_ } }

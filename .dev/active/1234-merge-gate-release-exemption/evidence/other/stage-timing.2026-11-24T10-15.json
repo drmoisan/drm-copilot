@@ -1,0 +1,53 @@
+{
+  "issue-num": "1234",
+  "stage_timing": [
+    {
+      "stage": "S2_research",
+      "attempt": 1,
+      "started_at": "2026-11-24T03:55:22Z",
+      "ended_at": "2026-11-24T04:03:59Z"
+    },
+    {
+      "stage": "S3_promotion_feature_documents",
+      "attempt": 1,
+      "started_at": "2026-11-24T04:03:59Z",
+      "ended_at": "2026-11-24T04:08:12Z"
+    },
+    {
+      "stage": "S4_atomic_planning",
+      "attempt": 1,
+      "started_at": "2026-11-24T04:08:12Z",
+      "ended_at": "2026-11-24T04:43:07Z"
+    },
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 1,
+      "started_at": "2026-11-24T04:43:07Z",
+      "ended_at": "2026-11-24T09:50:54Z"
+    },
+    {
+      "stage": "S6_commit",
+      "attempt": 1,
+      "started_at": "2026-11-24T09:50:54Z",
+      "ended_at": "2026-11-24T09:52:59Z"
+    },
+    {
+      "stage": "S8_pr_creation",
+      "attempt": 1,
+      "started_at": "2026-11-24T09:52:59Z",
+      "ended_at": "2026-11-24T09:55:33Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 1,
+      "started_at": "2026-11-24T09:55:33Z",
+      "ended_at": "2026-11-24T10:15:04Z"
+    },
+    {
+      "stage": "S9_ci_gate",
+      "attempt": 1,
+      "started_at": "2026-11-24T09:55:33Z",
+      "ended_at": null
+    }
+  ]
+}

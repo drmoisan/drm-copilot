@@ -186,4 +186,8 @@ Preconditions, each checked by the legs:
 `-H`, `--head=`, `owner:branch`, `-R`, `--repo`, and `GH_REPO=` are not accepted, and `gh pr edit`
 is not exempt. The receipt checks still run after the exemption. When a precondition fails, the
 deny names the release code after the existing exemption reasons. Merging the release pull request
-is not covered by these legs.
+is admitted by the release merge leg of the merge gates (issue #1234):
+`Get-EpicMergeGateReleaseDecision` accepts a merge that names the pull request number, a merge
+method, and `--match-head-commit` with the head commit, when the same allowance lists every
+changed path and the newest `CI` run on that head succeeded on a `pull_request` event; a failure
+names a `RELEASE_MERGE_*` code. The merge is outside the pr-author role.
