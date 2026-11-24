@@ -281,6 +281,19 @@ Describe 'New-DocsCommandContext (read-only against committed files)' {
         $absent.Count | Should -Be 0
     }
 
+    It 'lists only the top-level repository-root files for the empty relative root' {
+        # Act (issue #1221 remediation cycle 1: the root listing confirms the exact root-file names)
+        $listed = & $script:RealContext.ListFile ''
+
+        # Assert
+        $listed -ccontains 'README.md' | Should -BeTrue -Because 'README.md is a committed repository-root file'
+        $listed -ccontains 'AGENTS.md' | Should -BeTrue -Because 'AGENTS.md is a committed repository-root file'
+        @($listed | Where-Object { $_.Contains('/') }).Count | Should -Be 0 -Because 'only the top directory is listed'
+        [string[]] $sorted = @($listed)
+        [Array]::Sort($sorted, [System.StringComparer]::Ordinal)
+        $listed | Should -Be $sorted
+    }
+
     It 'returns a UTC DateTime from UtcNow' {
         $now = & $script:RealContext.UtcNow
         $now | Should -BeOfType ([datetime])

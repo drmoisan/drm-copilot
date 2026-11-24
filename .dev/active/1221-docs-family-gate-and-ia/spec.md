@@ -25,7 +25,7 @@ The run is autonomous. Each decision below is recorded here so that the planner,
 4. **D4 — Listing.** Each distinct family `directory` is listed through the context `ListFile` seam, not derived from the `documentation_roots` page set, so family directories outside `documentation_roots` are evaluated.
 5. **D5 — Family page.** A family page is any listed path that starts with `<directory>/`, ends with `.md` (ordinal comparison), and is not a `legacy_exclusions[].path`. `README.md` and `index.md` count. A page with `surface_refs: []` is accepted with no change to page checks.
 6. **D6 — Legacy reporting.** All legacy entries are reported as one info finding whose `related_paths` names every entry path and whose message lists each path with its reason and the entry count. This keeps the command result below the 100-finding limit. The coverage section lists every entry with its reason.
-7. **D7 — Root files.** The root-file rule applies to the family whose `id` is `security` when it is not excluded. It probes `SECURITY.md` and `CODEOWNERS` at the repository root only. `.github/CODEOWNERS` and `docs/CODEOWNERS` do not satisfy it.
+7. **D7 — Root files.** The root-file rule applies to the family whose `id` is `security` when it is not excluded. It probes `SECURITY.md` and `CODEOWNERS` at the repository root only. `.github/CODEOWNERS` and `docs/CODEOWNERS` do not satisfy it. The names `SECURITY.md` and `CODEOWNERS` are compared ordinally (case-sensitive) on every host, so a root `security.md` or `codeowners` does not satisfy the rule.
 8. **D8 — Exclusion and `required: false`.** A family with an `exclusion` is `not-applicable` whether `required` is true or false. A `required: false` family without an exclusion produces no finding and appears only in the coverage section.
 9. **D9 — Coverage section.** A `families` key (`entries`, `legacy_exclusions`) is always added to the coverage result by `Get-DocsCoverageFamilySection`, assigned in `Invoke-DocsCoverageCommand` after the `Get-DocsCoverageReport` call, and rendered by `ConvertTo-DocsCoverageFamilyLine`, called by one line at the end of `ConvertTo-DocsCoverageReportLine`. `Get-DocsCoverageReport` (signature and return literal) is unchanged, to coexist with the docs-prose-markdown-lint placeholder-count section.
 10. **D10 — TypeScript.** No TypeScript logic change and no new TypeScript file. The `run_docs_coverage` and `validate_docs_artifacts` descriptions in `extensions/drm-copilot/src/mcp-docs-tool-definitions.ts` are updated, and Jest pass-through cases are added. `jest.config.cjs` and `jest.docs-coverage.json` are unchanged.
@@ -48,7 +48,7 @@ The run is autonomous. Each decision below is recorded here so that the planner,
 
 - Makes no context call when the profile has an empty or absent `required_families` and an empty or absent `legacy_exclusions`.
 - For each distinct `directory` of `required_families[]` (trailing `/` trimmed, duplicates collapsed, ordinal comparison), calls `ListFile` once and keeps the listing.
-- When an entry with `id` `security` exists, calls `TestFile` for `SECURITY.md` and `CODEOWNERS` at the repository root.
+- When an entry with `id` `security` exists, calls `TestFile` for `SECURITY.md` and `CODEOWNERS` at the repository root; when either probe is positive, calls `ListFile` once with the empty path (the repository-root file names) and keeps a name only when that listing contains it under an ordinal (exact) match (remediation cycle 1).
 - Returns `@{ PagePath = <ordinal map directory -> string[]>; RootFile = <ordinal map name -> bool> }`.
 
 ### Family status
@@ -192,7 +192,7 @@ The run is autonomous. Each decision below is recorded here so that the planner,
 | `tests/scripts/claude-runtime/docs-authoring-roles.WorkflowText.Tests.ps1` | family-step token rows |
 | `.dev/engineering/documentation-estate/architecture.md` | one bullet |
 
-Not edited: `DocsCompleteGate.psm1`, `DocsReceipt.psm1`, `DocsReceiptRevision.psm1`, receipt and envelope schemas, `DocsPageMetadata.psm1`, `DocsPageFrontMatter.psm1`, `Invoke-DocsCommand.ps1`, the docs profile schema, `DocsProfile.psm1`, `DocsProfileFamilies.psm1`, `docs-handlers.ts`, `docs-command-envelope.ts`, `jest.config.cjs`, `jest.docs-coverage.json`.
+Not edited: `DocsCompleteGate.psm1`, `DocsReceipt.psm1`, `DocsReceiptRevision.psm1`, receipt and envelope schemas, `DocsPageMetadata.psm1`, `DocsPageFrontMatter.psm1`, the docs profile schema, `DocsProfile.psm1`, `DocsProfileFamilies.psm1`, `docs-handlers.ts`, `docs-command-envelope.ts`, `jest.config.cjs`, `jest.docs-coverage.json`. Remediation cycle 1 edits `Get-DocsContextFileList` in `Invoke-DocsCommand.ps1` so that an empty path lists the repository-root file names.
 
 ## Out of Scope
 
@@ -209,56 +209,56 @@ Not edited: `DocsCompleteGate.psm1`, `DocsReceipt.psm1`, `DocsReceiptRevision.ps
 
 ### Family check (validation layer)
 
-- [ ] AC-1: In docs-complete mode, a profile with a `required: true` family that has no `.md` page under its `directory` and no `exclusion` produces `validation_result` `fail` and a finding with code `DOCS_FAMILY_PAGE_MISSING`, severity `error`, pointer `/required_families/<i>/directory`, `related_ids` containing the family `id`, and `related_paths` containing the family `directory`; `validate -Mode docs-complete` exits non-zero.
-- [ ] AC-2: The same profile produces no `DOCS_FAMILY_PAGE_MISSING` finding for that family after a `.md` page is added under the family directory, and produces `validation_result` `pass` when no other error exists.
-- [ ] AC-3: The same profile with an `exclusion {reason, recorded_at}` recorded on the family produces no error for that family and one `DOCS_FAMILY_NOT_APPLICABLE` finding with severity `info`, pointer `/required_families/<i>/exclusion`, and `related_ids` containing the family `id`; `validation_result` stays `pass` when no other error exists.
-- [ ] AC-4: With the `security` family `required: true` and not excluded, an absent repository-root `SECURITY.md` or `CODEOWNERS` produces one `DOCS_FAMILY_ROOT_FILE_MISSING` finding per absent file, severity `error`, pointer `/required_families/<i>`, `related_ids` `["security"]`, and `related_paths` naming the file; a `.github/CODEOWNERS` file does not satisfy the check; an excluded `security` family produces no root-file finding.
-- [ ] AC-5: A profile with a non-empty `legacy_exclusions` produces exactly one `DOCS_LEGACY_EXCLUSIONS_REPORTED` finding on every docs-complete run, severity `info`, pointer `/legacy_exclusions`, `related_paths` equal to every legacy `path` in ordinal order, and a message that names each path with its reason; an empty `legacy_exclusions` produces no such finding.
-- [ ] AC-6: A family page whose front matter has `surface_refs: []` produces no page finding and counts toward the family `page_count`.
-- [ ] AC-7: A `required: false` family without an exclusion produces no finding; a legacy-excluded path inside a family directory does not count as a family page; `docs/securityx/a.md` is not a page of `docs/security`; non-`.md` files are not pages; nested family directories each count a page under the nested directory; duplicate directories are listed once.
-- [ ] AC-8: The family check runs in docs-complete mode even when the snapshot or ledger is absent, and does not run in other validation modes.
-- [ ] AC-9: `Invoke-DocsValidation` with `-FamilyEvidence $null` and a profile declaring a required, non-excluded family fails closed with `DOCS_FAMILY_PAGE_MISSING`.
-- [ ] AC-10: A profile with no `required_families` and no `legacy_exclusions` produces findings and `validation_result` identical to the pre-change behavior, and `Read-DocsFamilyEvidence` makes no `ListFile` or `TestFile` call for it.
-- [ ] AC-11: A failing family check produces a receipt with `validation_result` `fail`, which the unchanged `enforce-docs-complete-gate.ps1` hook denies as `RECEIPT_FAILING`; `DocsCompleteGate.psm1`, the receipt schema, and the envelope schema are byte-identical to the base branch.
+- [x] AC-1: In docs-complete mode, a profile with a `required: true` family that has no `.md` page under its `directory` and no `exclusion` produces `validation_result` `fail` and a finding with code `DOCS_FAMILY_PAGE_MISSING`, severity `error`, pointer `/required_families/<i>/directory`, `related_ids` containing the family `id`, and `related_paths` containing the family `directory`; `validate -Mode docs-complete` exits non-zero.
+- [x] AC-2: The same profile produces no `DOCS_FAMILY_PAGE_MISSING` finding for that family after a `.md` page is added under the family directory, and produces `validation_result` `pass` when no other error exists.
+- [x] AC-3: The same profile with an `exclusion {reason, recorded_at}` recorded on the family produces no error for that family and one `DOCS_FAMILY_NOT_APPLICABLE` finding with severity `info`, pointer `/required_families/<i>/exclusion`, and `related_ids` containing the family `id`; `validation_result` stays `pass` when no other error exists.
+- [x] AC-4: With the `security` family `required: true` and not excluded, an absent repository-root `SECURITY.md` or `CODEOWNERS` produces one `DOCS_FAMILY_ROOT_FILE_MISSING` finding per absent file, severity `error`, pointer `/required_families/<i>`, `related_ids` `["security"]`, and `related_paths` naming the file; a `.github/CODEOWNERS` file does not satisfy the check; an excluded `security` family produces no root-file finding.
+- [x] AC-5: A profile with a non-empty `legacy_exclusions` produces exactly one `DOCS_LEGACY_EXCLUSIONS_REPORTED` finding on every docs-complete run, severity `info`, pointer `/legacy_exclusions`, `related_paths` equal to every legacy `path` in ordinal order, and a message that names each path with its reason; an empty `legacy_exclusions` produces no such finding.
+- [x] AC-6: A family page whose front matter has `surface_refs: []` produces no page finding and counts toward the family `page_count`.
+- [x] AC-7: A `required: false` family without an exclusion produces no finding; a legacy-excluded path inside a family directory does not count as a family page; `docs/securityx/a.md` is not a page of `docs/security`; non-`.md` files are not pages; nested family directories each count a page under the nested directory; duplicate directories are listed once.
+- [x] AC-8: The family check runs in docs-complete mode even when the snapshot or ledger is absent, and does not run in other validation modes.
+- [x] AC-9: `Invoke-DocsValidation` with `-FamilyEvidence $null` and a profile declaring a required, non-excluded family fails closed with `DOCS_FAMILY_PAGE_MISSING`.
+- [x] AC-10: A profile with no `required_families` and no `legacy_exclusions` produces findings and `validation_result` identical to the pre-change behavior, and `Read-DocsFamilyEvidence` makes no `ListFile` or `TestFile` call for it.
+- [x] AC-11: A failing family check produces a receipt with `validation_result` `fail`, which the unchanged `enforce-docs-complete-gate.ps1` hook denies as `RECEIPT_FAILING`; `DocsCompleteGate.psm1`, the receipt schema, and the envelope schema are byte-identical to the base branch.
 
 ### Coverage report
 
-- [ ] AC-12: The `coverage` command result always contains a `families` key with members `entries` and `legacy_exclusions`, produced by `Get-DocsCoverageFamilySection`; `Get-DocsCoverageReport` returns the same six keys as before (`totals`, `undocumented`, `deferred`, `precision_limits`, `stale_pages`, `parity`).
-- [ ] AC-13: Each `entries` item has the keys `id`, `directory`, `required`, `template`, `status`, `page_count`, `missing_root_files`, `exclusion`, with `status` one of `present`, `missing`, `not-applicable`, in profile order; `legacy_exclusions` items have `path` and `reason`, sorted ordinally by `path`.
-- [ ] AC-14: Coverage lines produced by `ConvertTo-DocsCoverageFamilyLine` (called from `ConvertTo-DocsCoverageReportLine`) are `families: required=<n> present=<n> missing=<n> not_applicable=<n> legacy_exclusions=<n>`, then `family <id> <status> pages=<n> <directory>` per entry with ` missing_root_files=<a,b>` appended when non-empty, then `legacy-exclusion <path>: <reason>` per legacy entry.
-- [ ] AC-15: `tests/scripts/claude-lib/docs/DocsLedgerCommands.Tests.ps1` expects the sorted coverage result keys `deferred, families, parity, precision_limits, stale_pages, totals, undocumented` and passes.
+- [x] AC-12: The `coverage` command result always contains a `families` key with members `entries` and `legacy_exclusions`, produced by `Get-DocsCoverageFamilySection`; `Get-DocsCoverageReport` returns the same six keys as before (`totals`, `undocumented`, `deferred`, `precision_limits`, `stale_pages`, `parity`).
+- [x] AC-13: Each `entries` item has the keys `id`, `directory`, `required`, `template`, `status`, `page_count`, `missing_root_files`, `exclusion`, with `status` one of `present`, `missing`, `not-applicable`, in profile order; `legacy_exclusions` items have `path` and `reason`, sorted ordinally by `path`.
+- [x] AC-14: Coverage lines produced by `ConvertTo-DocsCoverageFamilyLine` (called from `ConvertTo-DocsCoverageReportLine`) are `families: required=<n> present=<n> missing=<n> not_applicable=<n> legacy_exclusions=<n>`, then `family <id> <status> pages=<n> <directory>` per entry with ` missing_root_files=<a,b>` appended when non-empty, then `legacy-exclusion <path>: <reason>` per legacy entry.
+- [x] AC-15: `tests/scripts/claude-lib/docs/DocsLedgerCommands.Tests.ps1` expects the sorted coverage result keys `deferred, families, parity, precision_limits, stale_pages, totals, undocumented` and passes.
 
 ### Fixtures (Risk R1)
 
-- [ ] AC-16: `New-DocsLedgerTestProfile` returns a profile with empty `required_families` and empty `legacy_exclusions` unless the opt-in parameters `-RequiredFamily` or `-LegacyExclusion` supply them, and every suite that uses it keeps its existing pass and fail assertions unchanged.
-- [ ] AC-17: Every end-to-end docs-complete fixture built from `New-DocsStarterProfile` or `docs-init` outside that helper (at minimum `DocsCompleteIntegration.Tests.ps1`, `EndToEndDocumentationEstate.Tests.ps1`, and `tests/scripts/claude-hooks/docs-estate-workflow.EndToEnd.Tests.ps1`, plus any other found by a repository search for docs-complete runs, such as `DocsHashLineEnding.Tests.ps1`) either provides a `.md` page in each required family directory together with root `SECURITY.md` and `CODEOWNERS`, or records an `exclusion` per family, and its existing pass assertions keep passing without being removed or weakened. The plan lists each fixture found with its disposition.
+- [x] AC-16: `New-DocsLedgerTestProfile` returns a profile with empty `required_families` and empty `legacy_exclusions` unless the opt-in parameters `-RequiredFamily` or `-LegacyExclusion` supply them, and every suite that uses it keeps its existing pass and fail assertions unchanged.
+- [x] AC-17: Every end-to-end docs-complete fixture built from `New-DocsStarterProfile` or `docs-init` outside that helper (at minimum `DocsCompleteIntegration.Tests.ps1`, `EndToEndDocumentationEstate.Tests.ps1`, and `tests/scripts/claude-hooks/docs-estate-workflow.EndToEnd.Tests.ps1`, plus any other found by a repository search for docs-complete runs, such as `DocsHashLineEnding.Tests.ps1`) either provides a `.md` page in each required family directory together with root `SECURITY.md` and `CODEOWNERS`, or records an `exclusion` per family, and its existing pass assertions keep passing without being removed or weakened. The plan lists each fixture found with its disposition.
 
 ### docs-plan-ia skill
 
-- [ ] AC-18: The docs-plan-ia skill text exists in exactly 4 committed copies (`.agents/skills/docs-plan-ia/SKILL.md`, `.claude/skills/docs-plan-ia/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/docs-plan-ia/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/docs-plan-ia/SKILL.md`), and each copy contains, in its `Steps` section, a family-planning step that names `required_families`, the coverage `families` section, `SECURITY.md`, `CODEOWNERS`, `exclusion`, and `legacy_exclusions`, placed after the element-assignment steps; each `## Result` section contains family lines.
-- [ ] AC-19: `tests/scripts/claude-runtime/docs-authoring-roles.WorkflowText.Tests.ps1` gains token rows for the family-planning step over all four roots of `Get-DocsAuthoringSkillRoot` and passes; the new skill text contains no runtime-specific path.
+- [x] AC-18: The docs-plan-ia skill text exists in exactly 4 committed copies (`.agents/skills/docs-plan-ia/SKILL.md`, `.claude/skills/docs-plan-ia/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/docs-plan-ia/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/docs-plan-ia/SKILL.md`), and each copy contains, in its `Steps` section, a family-planning step that names `required_families`, the coverage `families` section, `SECURITY.md`, `CODEOWNERS`, `exclusion`, and `legacy_exclusions`, placed after the element-assignment steps; each `## Result` section contains family lines.
+- [x] AC-19: `tests/scripts/claude-runtime/docs-authoring-roles.WorkflowText.Tests.ps1` gains token rows for the family-planning step over all four roots of `Get-DocsAuthoringSkillRoot` and passes; the new skill text contains no runtime-specific path.
 
 ### MCP tools
 
-- [ ] AC-20: Jest cases in `docs-handlers.test.ts` show that a `run_docs_coverage` envelope with a `families` result and a `validate_docs_artifacts` envelope with `DOCS_FAMILY_PAGE_MISSING` (error) and `DOCS_FAMILY_NOT_APPLICABLE` (info) pass through unchanged in `docs`, with summary counts reflecting the error and info findings.
-- [ ] AC-21: The `run_docs_coverage` description in `mcp-docs-tool-definitions.ts` names the `families` section and the `validate_docs_artifacts` description names the family findings, asserted by a Jest case; no new TypeScript file is added; Jest per-file thresholds for `mcp-docs-tool-definitions.ts` and `docs-handlers.ts` remain 85% line and 75% branch and pass.
+- [x] AC-20: Jest cases in `docs-handlers.test.ts` show that a `run_docs_coverage` envelope with a `families` result and a `validate_docs_artifacts` envelope with `DOCS_FAMILY_PAGE_MISSING` (error) and `DOCS_FAMILY_NOT_APPLICABLE` (info) pass through unchanged in `docs`, with summary counts reflecting the error and info findings.
+- [x] AC-21: The `run_docs_coverage` description in `mcp-docs-tool-definitions.ts` names the `families` section and the `validate_docs_artifacts` description names the family findings, asserted by a Jest case; no new TypeScript file is added; Jest per-file thresholds for `mcp-docs-tool-definitions.ts` and `docs-handlers.ts` remain 85% line and 75% branch and pass.
 
 ### Parity and quality gates
 
-- [ ] AC-22: `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Check` reports no drift, and `HarnessGeneration.RepoGate.Tests.ps1` passes.
-- [ ] AC-23: Each new or edited `.claude/lib/docs` module has a byte-identical bundle copy, the new module is listed in `pack-manifests/core.json`, and `Docs.Manifest.Tests.ps1`, `ClaudeLibModuleConvention.Tests.ps1`, `DocsNeutrality.Tests.ps1`, `FileSizePolicy.RepoGate.Tests.ps1`, and the push-down contract suites (`test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`) pass.
-- [ ] AC-24: `.claude/lib/docs/DocsFamilyCheck.psm1` reaches at least 85% line coverage in `artifacts/pester/powershell-coverage.xml` from the launcher Pester run, and changed lines in `DocsValidation.psm1`, `DocsValidateCommands.psm1`, `DocsCoverageReport.psm1`, and `DocsLedgerCommands.psm1` do not regress against the pre-change baseline.
-- [ ] AC-25: Every touched file is at or below 800 logical lines, `DocsLedgerCommands.psm1` grows by no more than about three lines, and no new or edited test creates a temporary file.
-- [ ] AC-26: The full toolchain loop (format, lint, type check, architecture, unit, contract, integration in CI) passes in one clean pass through the parallel launcher, and the architecture document `.dev/engineering/documentation-estate/architecture.md` carries one bullet describing the family check.
+- [x] AC-22: `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Check` reports no drift, and `HarnessGeneration.RepoGate.Tests.ps1` passes.
+- [x] AC-23: Each new or edited `.claude/lib/docs` module has a byte-identical bundle copy, the new module is listed in `pack-manifests/core.json`, and `Docs.Manifest.Tests.ps1`, `ClaudeLibModuleConvention.Tests.ps1`, `DocsNeutrality.Tests.ps1`, `FileSizePolicy.RepoGate.Tests.ps1`, and the push-down contract suites (`test_push_down_claude_resource_contracts.py`, `test_push_down_codex_and_agents_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`) pass.
+- [x] AC-24: `.claude/lib/docs/DocsFamilyCheck.psm1` reaches at least 85% line coverage in `artifacts/pester/powershell-coverage.xml` from the launcher Pester run, and changed lines in `DocsValidation.psm1`, `DocsValidateCommands.psm1`, `DocsCoverageReport.psm1`, and `DocsLedgerCommands.psm1` do not regress against the pre-change baseline.
+- [x] AC-25: Every touched file is at or below 800 logical lines, `DocsLedgerCommands.psm1` grows by no more than about three lines, and no new or edited test creates a temporary file.
+- [x] AC-26: The full toolchain loop (format, lint, type check, architecture, unit, contract, integration in CI) passes in one clean pass through the parallel launcher, and the architecture document `.dev/engineering/documentation-estate/architecture.md` carries one bullet describing the family check.
 
 ## Definition of Done
 
-- [ ] All acceptance criteria above checked off with evidence under `.dev/active/1221-docs-family-gate-and-ia/evidence/<kind>/`.
-- [ ] Decisions recorded in this spec applied; any deviation recorded in the feature folder.
-- [ ] Toolchain pass completed (format, lint, type check, architecture, unit, contract; integration in CI).
+- [x] All acceptance criteria above checked off with evidence under `.dev/active/1221-docs-family-gate-and-ia/evidence/<kind>/`.
+- [x] Decisions recorded in this spec applied; any deviation recorded in the feature folder.
+- [x] Toolchain pass completed (format, lint, type check, architecture, unit, contract; integration in CI).
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Pester unit coverage for the family check, the security root-file check, exclusion reporting, and legacy reporting.
-- [ ] Jest coverage for the MCP tool output shape.
-- [ ] Contract and parity tests for mirrored skill text.
+- [x] Pester unit coverage for the family check, the security root-file check, exclusion reporting, and legacy reporting.
+- [x] Jest coverage for the MCP tool output shape.
+- [x] Contract and parity tests for mirrored skill text.

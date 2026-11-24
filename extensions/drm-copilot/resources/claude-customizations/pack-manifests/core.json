@@ -432,6 +432,7 @@
     ".claude/lib/docs/DocsReceiptRevision.psm1",
     ".claude/lib/docs/DocsValidateCommands.psm1",
     ".claude/lib/docs/DocsLedgerMutation.psm1",
+    ".claude/lib/docs/DocsFamilyCheck.psm1",
     ".claude/lib/docs/DocsValidation.psm1",
     ".claude/lib/docs/DocsCoverageReport.psm1",
     ".claude/lib/docs/DocsLedgerCommands.psm1",
