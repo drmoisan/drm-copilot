@@ -40,6 +40,7 @@ try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-d
 try { . (Join-Path $PSScriptRoot 'hook-parallel-records-context.ps1') } catch { Add-HookDependencyFailure -Name 'hook-parallel-records-context.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-parallel-records.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-parallel-records.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-release.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-release.ps1' -ErrorRecord $_ }
+try { . (Join-Path $PSScriptRoot 'enforce-orchestration-preimplementation-gate-release-receipt.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-orchestration-preimplementation-gate-release-receipt.ps1' -ErrorRecord $_ }
 
 # Shared command-line parser (issue #545): per-segment scan text and structural matching.
 try { . (Join-Path $PSScriptRoot 'hook-command-scanner.ps1') } catch { Add-HookDependencyFailure -Name 'hook-command-scanner.ps1' -ErrorRecord $_ }
@@ -438,8 +439,9 @@ function Invoke-OrchestrationPreimplementationGateDecision {
     if (($bookkeeping = Get-OrchestrationBookkeepingStagingResult -Command $command -CheckpointPath $checkpointPath).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Bookkeeping staging leg (issue #1160).
     if (($docs = Get-OrchestrationDocsEstateContextResult -FilePath $filePath -Command $command).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Docs-estate leg (issue #1169).
     if (($parallel = Get-OrchestrationParallelRecordsResult -ToolInput $toolInput -FilePath $filePath).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Parallel records leg (issue #1182).
+    if (($receipt = Get-OrchestrationReleaseReceiptResult -FilePath $filePath -CheckpointPath $checkpointPath).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Release receipt leg (issue #1231).
     if (($release = Get-OrchestrationReleaseAllowanceResult -Command $command -CheckpointPath $checkpointPath).Allowed) { return Get-OrchestrationPreimplementationGateAllowDecision } # Release-commit allowance leg (issue #1201).
-    return Get-OrchestrationPreimplementationGateBlockDecision -Reason ('PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.' + $cleanup.DenySuffix + $bookkeeping.DenySuffix + $docs.DenySuffix + $parallel.DenySuffix + $release.DenySuffix)
+    return Get-OrchestrationPreimplementationGateBlockDecision -Reason ('PREIMPLEMENTATION_GATE_BLOCKED: Implementation operations require artifacts/orchestration/orchestrator-state.json to contain issue number, feature folder, route metadata, lifecycle readiness, and checkpoint state before implementation begins.' + $cleanup.DenySuffix + $bookkeeping.DenySuffix + $docs.DenySuffix + $parallel.DenySuffix + $receipt.DenySuffix + $release.DenySuffix)
 }
 
 function Invoke-OrchestrationPreimplementationGateEntryPoint {

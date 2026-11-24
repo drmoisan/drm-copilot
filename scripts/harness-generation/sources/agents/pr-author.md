@@ -14,6 +14,9 @@ and recorded the result under `pr_author_preflight`. This is a local preconditio
 `enforce-pr-author-skill.ps1` PreToolUse hook independently re-validates the same checkpoint before
 allowing `gh pr create --body-file`/`gh pr edit --body-file` to proceed, and blocks with
 `ORCHESTRATOR_STATE_PREFLIGHT_FAILED` when the checkpoint is missing or fails `--require-pr-creation-ready`.
+Without a checkpoint, only three exemptions let `gh pr create` proceed to the receipt checks: the
+docs-only exemption (issue #901), the cleanup consolidation exemption (issue #1026), and the release
+exemption (issue #1231, `RELEASE_EXEMPTION_*` codes), which requires `.claude/release-commit-allowance.json`.
 
 <!-- harness-section: skill -->
 ## Skill
