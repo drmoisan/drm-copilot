@@ -66,10 +66,10 @@ The docs profile gains a `required_families[]` record and a `legacy_exclusions[]
 - [x] A family page with `surface_refs: []` is accepted and counted as a family page.
 - [x] A profile without families or legacy entries behaves exactly as before the change.
 - [ ] A failing family check reaches the merge hook as a failing receipt; `DocsCompleteGate.psm1` is unchanged.
-- [ ] The docs coverage result carries a `families` section produced by `Get-DocsCoverageFamilySection`, and the coverage lines include the `families:` summary line, one `family` line per entry, and one `legacy-exclusion` line per legacy entry.
+- [x] The docs coverage result carries a `families` section produced by `Get-DocsCoverageFamilySection`, and the coverage lines include the `families:` summary line, one `family` line per entry, and one `legacy-exclusion` line per legacy entry.
 - [x] Existing docs-complete pass fixtures, including the end-to-end fixtures, keep passing after the starter profile seeds required families, through the opt-in test-helper parameters or through family pages, root files, or exclusions in each fixture.
-- [ ] All 4 docs-plan-ia skill copies (the `.agents` source, the generated `.claude` copy, and the two bundle copies) describe the family-planning step after the element-assignment steps and list family lines in `## Result`.
-- [ ] The `validate_docs_artifacts` and `run_docs_coverage` MCP tools return the family findings and the `families` section unchanged, and their descriptions name them.
+- [x] All 4 docs-plan-ia skill copies (the `.agents` source, the generated `.claude` copy, and the two bundle copies) describe the family-planning step after the element-assignment steps and list family lines in `## Result`.
+- [x] The `validate_docs_artifacts` and `run_docs_coverage` MCP tools return the family findings and the `families` section unchanged, and their descriptions name them.
 - [ ] The harness generator `-Check`, the parity and push-down contract suites, and the docs manifest test pass.
 - [ ] `DocsFamilyCheck.psm1` has at least 85% line coverage, changed lines in edited modules do not regress, and Jest per-file thresholds stay at 85% line and 75% branch.
 

@@ -37,6 +37,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsStaleness.psm
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsReceipt.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsValidation.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerMutation.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsFamilyCheck.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsCoverageReport.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerBindRefs.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerBatch.psm1') -ErrorAction Stop
@@ -453,6 +454,7 @@ function Invoke-DocsCoverageCommand {
         $documents = Read-DocsLedgerCommandDocumentSet -Command $command -Profile $profileRead.Profile -ComposedSchemaSet $schemas -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -ListFile $Context.ListFile
         if ($null -ne $documents.Result) { return $documents.Result }
         $report = Get-DocsCoverageReport -SnapshotView $documents.View -Ledger $documents.Ledger -Matrix $documents.Matrix -PinSet $documents.PinSet
+        $report['families'] = Get-DocsCoverageFamilySection -Profile $profileRead.Profile -Evidence (Read-DocsFamilyEvidence -Profile $profileRead.Profile -TestFile $Context.TestFile -ListFile $Context.ListFile)
         return New-DocsCommandResult -Command $command -ExitCode 0 -Finding @() -Result $report -Line (ConvertTo-DocsCoverageReportLine -Report $report)
     } catch {
         return New-DocsLedgerCommandRuntimeResult -Command $command -Message "The command failed: $($_.Exception.Message)"

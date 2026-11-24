@@ -69,6 +69,14 @@ changes, which is how a page that documents the element becomes stale.
   `docs-complete`). In `docs-complete` mode it applies the completion gates of the profile and
   returns a validation receipt whose `validation_result` is `pass` or `fail`; `-WriteReceipt`
   persists it.
+- The documentation family check (issue #1221) lives in the docs-complete validation layer:
+  `.claude/lib/docs/DocsFamilyCheck.psm1`, called from `Invoke-DocsValidation` and fed by
+  `Invoke-DocsValidateCommand`, which lists each `required_families` directory and probes the
+  repository-root `SECURITY.md` and `CODEOWNERS` through the command context. It runs only in
+  `docs-complete` mode and reports four codes: `DOCS_FAMILY_PAGE_MISSING` and
+  `DOCS_FAMILY_ROOT_FILE_MISSING` (errors), `DOCS_FAMILY_NOT_APPLICABLE` and
+  `DOCS_LEGACY_EXCLUSIONS_REPORTED` (info). An error makes the receipt `fail`, which the
+  unchanged merge hook `enforce-docs-complete-gate.ps1` denies as `RECEIPT_FAILING`.
 
 ## Generated Blocks
 

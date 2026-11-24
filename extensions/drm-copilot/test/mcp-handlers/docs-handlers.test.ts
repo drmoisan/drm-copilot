@@ -302,4 +302,95 @@ describe("handleDocsTool", () => {
       expect.objectContaining({ subcommand: "generate-reference" }),
     );
   });
+
+  it("passes a coverage result with a families section through unchanged (issue #1221)", async () => {
+    // Arrange
+    const families = {
+      entries: [
+        {
+          id: "operations",
+          directory: "docs/operations",
+          required: true,
+          template: "runbook",
+          status: "missing",
+          page_count: 0,
+          missing_root_files: [],
+          exclusion: null,
+        },
+      ],
+      legacy_exclusions: [{ path: "docs/old/a.md", reason: "Moved." }],
+    };
+    const outcome = envelope("coverage", 0, { families });
+    const service = serviceReturning(outcome);
+
+    // Act
+    const result = await handleDocsTool(
+      "run_docs_coverage",
+      CHECK_INPUT,
+      service,
+    );
+
+    // Assert
+    expect(result.ok).toBe(true);
+    expect(result.docs).toBe(outcome);
+    expect(result.docs?.result).toEqual({ families });
+    expect(result.summary).toBe("coverage: exit=0 errors=0 warnings=0 infos=0");
+  });
+
+  it("passes the family findings of a docs-complete validation through unchanged with summary counts (issue #1221)", async () => {
+    // Arrange
+    const outcome: DocsCommandEnvelope = {
+      command: "validate",
+      exit_code: 1,
+      findings: [
+        {
+          code: "DOCS_FAMILY_PAGE_MISSING",
+          severity: "error",
+          artifact_path: "docs/documentation-estate/docs-profile.json",
+          pointer: "/required_families/0/directory",
+          related_ids: ["operations"],
+          related_paths: ["docs/operations"],
+          message:
+            "The required documentation family operations has no Markdown page under docs/operations.",
+          next_action:
+            "Add a .md page under docs/operations, or record an exclusion with a reason on the documentation family operations.",
+        },
+        {
+          code: "DOCS_FAMILY_NOT_APPLICABLE",
+          severity: "info",
+          artifact_path: "docs/documentation-estate/docs-profile.json",
+          pointer: "/required_families/1/exclusion",
+          related_ids: ["security"],
+          related_paths: [],
+          message:
+            "The documentation family security is not applicable: Platform owned.",
+          next_action:
+            "Remove the exclusion of the documentation family security when the family applies to the repository.",
+        },
+      ],
+      ok: false,
+      result: { mode: "docs-complete", validation_result: "fail" },
+    };
+    const service = serviceReturning(outcome);
+
+    // Act
+    const result = await handleDocsTool(
+      "validate_docs_artifacts",
+      {
+        workspace_root: VIRTUAL_WORKSPACE_ROOT,
+        mode: "docs-complete",
+        revision: "0123456789abcdef0123456789abcdef01234567",
+      },
+      service,
+    );
+
+    // Assert
+    expect(result.ok).toBe(false);
+    expect(result.docs).toBe(outcome);
+    expect(result.docs?.findings.map((finding) => finding.code)).toEqual([
+      "DOCS_FAMILY_PAGE_MISSING",
+      "DOCS_FAMILY_NOT_APPLICABLE",
+    ]);
+    expect(result.summary).toBe("validate: exit=1 errors=1 warnings=0 infos=1");
+  });
 });

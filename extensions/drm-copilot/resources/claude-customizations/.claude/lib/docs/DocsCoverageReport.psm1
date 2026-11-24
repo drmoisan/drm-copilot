@@ -6,7 +6,9 @@
 .DESCRIPTION
     Get-DocsCoverageReport builds {totals, undocumented, deferred, precision_limits, stale_pages,
     parity} over a snapshot view, a ledger, a parity matrix and a pin collection;
-    ConvertTo-DocsCoverageReportLine renders it as text lines. The report is split from
+    ConvertTo-DocsCoverageReportLine renders it as text lines. Get-DocsCoverageFamilySection and
+    ConvertTo-DocsCoverageFamilyLine build and render the families section (issue #1221), which
+    the coverage command adds to the report. The report is split from
     DocsLedgerCommands.psm1 under the file-size guidance. Identifier and path comparisons are
     ordinal and case-sensitive; every sort is ordinal.
 
@@ -28,6 +30,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsSurface.psm1'
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsParity.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsStaleness.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsReceipt.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsFamilyCheck.psm1') -ErrorAction Stop
 
 $script:DocsCoverageReportMarkerKey = 'docs.precision-limit'
 
@@ -155,9 +158,67 @@ function ConvertTo-DocsCoverageReportLine {
         $score = if ($null -eq $counts['score_basis_points']) { 'null' } else { [string] $counts['score_basis_points'] }
         $lines.Add("parity $name pass=$($counts['pass']) fail=$($counts['fail']) not_assessed=$($counts['not_assessed']) not_applicable=$($counts['not_applicable']) score_basis_points=$score")
     }
+    if ($Report.Contains('families')) { $lines.AddRange([string[]] (ConvertTo-DocsCoverageFamilyLine -Section $Report['families'])) }
+    return , [string[]] $lines.ToArray()
+}
+
+function Get-DocsCoverageFamilySection {
+    <#
+    .SYNOPSIS
+        Returns the families section of the coverage result: { entries, legacy_exclusions }.
+    .DESCRIPTION
+        Issue #1221. entries are the Get-DocsFamilyStatus status entries of the profile in profile
+        order and legacy_exclusions the { path, reason } list sorted ordinally by path; both are
+        empty arrays for a profile without required_families and legacy_exclusions. A $null
+        Evidence reads every family directory as empty and every root file as absent.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
+    param(
+        [Parameter(Mandatory = $true)] [System.Collections.IDictionary] $Profile,
+        [AllowNull()] [System.Collections.IDictionary] $Evidence
+    )
+
+    $status = Get-DocsFamilyStatus -Profile $Profile -Evidence $Evidence
+    return [ordered]@{ entries = [object[]] @($status['entries']); legacy_exclusions = [object[]] @($status['legacy_exclusions']) }
+}
+
+function ConvertTo-DocsCoverageFamilyLine {
+    <#
+    .SYNOPSIS
+        Returns the coverage text lines of a families section: the summary line, one line per family, one line per legacy exclusion.
+    .DESCRIPTION
+        Issue #1221. The summary line is 'families: required=<n> present=<n> missing=<n>
+        not_applicable=<n> legacy_exclusions=<n>', where required counts the entries with required
+        true and present, missing and not_applicable count the entries of each status across every
+        entry. Each family line is 'family <id> <status> pages=<n> <directory>', followed by
+        ' missing_root_files=<a,b>' when that list is not empty. Each legacy line is
+        'legacy-exclusion <path>: <reason>'.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]], [object[]])]
+    param([Parameter(Mandatory = $true)] [System.Collections.IDictionary] $Section)
+
+    $entries = @(Get-DocsCoverageReportMember -Table $Section -Name 'entries' | Where-Object { $_ -is [System.Collections.IDictionary] })
+    $legacy = @(Get-DocsCoverageReportMember -Table $Section -Name 'legacy_exclusions' | Where-Object { $_ -is [System.Collections.IDictionary] })
+    $required = @($entries | Where-Object { $_['required'] -eq $true }).Count
+    $present = @($entries | Where-Object { [string] $_['status'] -ceq 'present' }).Count
+    $missing = @($entries | Where-Object { [string] $_['status'] -ceq 'missing' }).Count
+    $notApplicable = @($entries | Where-Object { [string] $_['status'] -ceq 'not-applicable' }).Count
+    $lines = [System.Collections.Generic.List[string]]::new()
+    $lines.Add("families: required=$required present=$present missing=$missing not_applicable=$notApplicable legacy_exclusions=$($legacy.Count)")
+    foreach ($entry in $entries) {
+        $line = "family $($entry['id']) $($entry['status']) pages=$($entry['page_count']) $($entry['directory'])"
+        [string[]] $missingRoot = @($entry['missing_root_files'] | Where-Object { $_ -is [string] })
+        if ($missingRoot.Count -gt 0) { $line += " missing_root_files=$($missingRoot -join ',')" }
+        $lines.Add($line)
+    }
+    foreach ($item in $legacy) { $lines.Add("legacy-exclusion $($item['path']): $($item['reason'])") }
     return , [string[]] $lines.ToArray()
 }
 
 Export-ModuleMember -Function `
     Get-DocsCoverageReport, `
-    ConvertTo-DocsCoverageReportLine
+    ConvertTo-DocsCoverageReportLine, `
+    Get-DocsCoverageFamilySection, `
+    ConvertTo-DocsCoverageFamilyLine

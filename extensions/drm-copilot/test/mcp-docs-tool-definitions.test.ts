@@ -184,6 +184,34 @@ describe("DOCS_TOOL_DEFINITIONS", () => {
   });
 });
 
+describe("documentation family descriptions (issue #1221)", () => {
+  it("names the families section and the family findings in the coverage and validate descriptions", () => {
+    // Arrange
+    const descriptionOf = (name: string): string =>
+      DOCS_TOOL_DEFINITIONS.find((entry) => entry.name === name)?.description ??
+      "";
+
+    // Act
+    const coverage = descriptionOf("run_docs_coverage");
+    const validate = descriptionOf("validate_docs_artifacts");
+
+    // Assert
+    expect(coverage).toContain("families");
+    expect(coverage).toContain("legacy_exclusions");
+    for (const code of [
+      "DOCS_FAMILY_PAGE_MISSING",
+      "DOCS_FAMILY_ROOT_FILE_MISSING",
+      "DOCS_FAMILY_NOT_APPLICABLE",
+      "DOCS_LEGACY_EXCLUSIONS_REPORTED",
+    ]) {
+      expect({ code, named: validate.includes(code) }).toEqual({
+        code,
+        named: true,
+      });
+    }
+  });
+});
+
 describe("update_docs_ledger operations schema (issue #1173 B2.5)", () => {
   it("advertises operations as an array of objects with a description", () => {
     // Act

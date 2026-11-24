@@ -322,7 +322,7 @@ Describe 'coverage' {
         # Assert
         $run.Outcome.ExitCode | Should -Be 0
         $result = $run.Envelope['result']
-        @($result.Keys | Sort-Object) | Should -Be @('deferred', 'parity', 'precision_limits', 'stale_pages', 'totals', 'undocumented')
+        @($result.Keys | Sort-Object) | Should -Be @('deferred', 'families', 'parity', 'precision_limits', 'stale_pages', 'totals', 'undocumented')
         $result['totals']['elements_total'] | Should -Be 6
         $result['totals']['undocumented'] | Should -Be 1
         $result['totals']['by_disposition']['documented'] | Should -Be 4

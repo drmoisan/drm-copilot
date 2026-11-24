@@ -223,10 +223,10 @@ Not edited: `DocsCompleteGate.psm1`, `DocsReceipt.psm1`, `DocsReceiptRevision.ps
 
 ### Coverage report
 
-- [ ] AC-12: The `coverage` command result always contains a `families` key with members `entries` and `legacy_exclusions`, produced by `Get-DocsCoverageFamilySection`; `Get-DocsCoverageReport` returns the same six keys as before (`totals`, `undocumented`, `deferred`, `precision_limits`, `stale_pages`, `parity`).
-- [ ] AC-13: Each `entries` item has the keys `id`, `directory`, `required`, `template`, `status`, `page_count`, `missing_root_files`, `exclusion`, with `status` one of `present`, `missing`, `not-applicable`, in profile order; `legacy_exclusions` items have `path` and `reason`, sorted ordinally by `path`.
-- [ ] AC-14: Coverage lines produced by `ConvertTo-DocsCoverageFamilyLine` (called from `ConvertTo-DocsCoverageReportLine`) are `families: required=<n> present=<n> missing=<n> not_applicable=<n> legacy_exclusions=<n>`, then `family <id> <status> pages=<n> <directory>` per entry with ` missing_root_files=<a,b>` appended when non-empty, then `legacy-exclusion <path>: <reason>` per legacy entry.
-- [ ] AC-15: `tests/scripts/claude-lib/docs/DocsLedgerCommands.Tests.ps1` expects the sorted coverage result keys `deferred, families, parity, precision_limits, stale_pages, totals, undocumented` and passes.
+- [x] AC-12: The `coverage` command result always contains a `families` key with members `entries` and `legacy_exclusions`, produced by `Get-DocsCoverageFamilySection`; `Get-DocsCoverageReport` returns the same six keys as before (`totals`, `undocumented`, `deferred`, `precision_limits`, `stale_pages`, `parity`).
+- [x] AC-13: Each `entries` item has the keys `id`, `directory`, `required`, `template`, `status`, `page_count`, `missing_root_files`, `exclusion`, with `status` one of `present`, `missing`, `not-applicable`, in profile order; `legacy_exclusions` items have `path` and `reason`, sorted ordinally by `path`.
+- [x] AC-14: Coverage lines produced by `ConvertTo-DocsCoverageFamilyLine` (called from `ConvertTo-DocsCoverageReportLine`) are `families: required=<n> present=<n> missing=<n> not_applicable=<n> legacy_exclusions=<n>`, then `family <id> <status> pages=<n> <directory>` per entry with ` missing_root_files=<a,b>` appended when non-empty, then `legacy-exclusion <path>: <reason>` per legacy entry.
+- [x] AC-15: `tests/scripts/claude-lib/docs/DocsLedgerCommands.Tests.ps1` expects the sorted coverage result keys `deferred, families, parity, precision_limits, stale_pages, totals, undocumented` and passes.
 
 ### Fixtures (Risk R1)
 
@@ -235,12 +235,12 @@ Not edited: `DocsCompleteGate.psm1`, `DocsReceipt.psm1`, `DocsReceiptRevision.ps
 
 ### docs-plan-ia skill
 
-- [ ] AC-18: The docs-plan-ia skill text exists in exactly 4 committed copies (`.agents/skills/docs-plan-ia/SKILL.md`, `.claude/skills/docs-plan-ia/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/docs-plan-ia/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/docs-plan-ia/SKILL.md`), and each copy contains, in its `Steps` section, a family-planning step that names `required_families`, the coverage `families` section, `SECURITY.md`, `CODEOWNERS`, `exclusion`, and `legacy_exclusions`, placed after the element-assignment steps; each `## Result` section contains family lines.
-- [ ] AC-19: `tests/scripts/claude-runtime/docs-authoring-roles.WorkflowText.Tests.ps1` gains token rows for the family-planning step over all four roots of `Get-DocsAuthoringSkillRoot` and passes; the new skill text contains no runtime-specific path.
+- [x] AC-18: The docs-plan-ia skill text exists in exactly 4 committed copies (`.agents/skills/docs-plan-ia/SKILL.md`, `.claude/skills/docs-plan-ia/SKILL.md`, `extensions/drm-copilot/resources/claude-customizations/.claude/skills/docs-plan-ia/SKILL.md`, `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/docs-plan-ia/SKILL.md`), and each copy contains, in its `Steps` section, a family-planning step that names `required_families`, the coverage `families` section, `SECURITY.md`, `CODEOWNERS`, `exclusion`, and `legacy_exclusions`, placed after the element-assignment steps; each `## Result` section contains family lines.
+- [x] AC-19: `tests/scripts/claude-runtime/docs-authoring-roles.WorkflowText.Tests.ps1` gains token rows for the family-planning step over all four roots of `Get-DocsAuthoringSkillRoot` and passes; the new skill text contains no runtime-specific path.
 
 ### MCP tools
 
-- [ ] AC-20: Jest cases in `docs-handlers.test.ts` show that a `run_docs_coverage` envelope with a `families` result and a `validate_docs_artifacts` envelope with `DOCS_FAMILY_PAGE_MISSING` (error) and `DOCS_FAMILY_NOT_APPLICABLE` (info) pass through unchanged in `docs`, with summary counts reflecting the error and info findings.
+- [x] AC-20: Jest cases in `docs-handlers.test.ts` show that a `run_docs_coverage` envelope with a `families` result and a `validate_docs_artifacts` envelope with `DOCS_FAMILY_PAGE_MISSING` (error) and `DOCS_FAMILY_NOT_APPLICABLE` (info) pass through unchanged in `docs`, with summary counts reflecting the error and info findings.
 - [ ] AC-21: The `run_docs_coverage` description in `mcp-docs-tool-definitions.ts` names the `families` section and the `validate_docs_artifacts` description names the family findings, asserted by a Jest case; no new TypeScript file is added; Jest per-file thresholds for `mcp-docs-tool-definitions.ts` and `docs-handlers.ts` remain 85% line and 75% branch and pass.
 
 ### Parity and quality gates
