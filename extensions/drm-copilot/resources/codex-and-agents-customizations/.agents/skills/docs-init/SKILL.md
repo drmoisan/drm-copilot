@@ -75,14 +75,20 @@ path (`DOCS_PROFILE_LEGACY_DUPLICATE`), each with the JSON pointer of the field.
 ## Linter Configuration
 
 `init -Write` writes the Vale configuration to `docs/documentation-estate/.vale.ini`, the Vale
-styles and vocabulary under `docs/documentation-estate/.vale/styles/`, and the markdownlint
-configuration to `docs/documentation-estate/.markdownlint.json`. No workflow step runs Vale or
-markdownlint: the written `.github/workflows/_docs-quality.yml` runs the documentation commands
-only. To lint, pass `--config docs/documentation-estate/.vale.ini` to Vale, or set
-`VALE_CONFIG_PATH` to that path, and pass `docs/documentation-estate/.markdownlint.json` to
-markdownlint as its configuration file. Vale resolves `StylesPath = .vale/styles` relative to the
-`.vale.ini` that sets it. An estate initialized earlier keeps its root-level linter files; they are
-not migrated.
+styles (`DocsBase` and the tonality style `DocsTonality`) and vocabulary under
+`docs/documentation-estate/.vale/styles/`, and the markdownlint configuration to
+`docs/documentation-estate/.markdownlint.json`. The written workflow runs markdownlint after the
+documentation commands: the written `.github/workflows/_docs-quality.yml` runs the pinned
+markdownlint-cli2 action with `docs/documentation-estate/.markdownlint.json` over the Markdown
+pages of the profile `documentation_roots`, then installs the pinned, checksum-verified Vale
+release and runs it with `--config docs/documentation-estate/.vale.ini`, which loads the
+`DocsTonality` style. An error-level Vale alert fails the Vale step. To lint locally, pass
+`--config docs/documentation-estate/.vale.ini` to Vale, or set `VALE_CONFIG_PATH` to that path,
+and pass `docs/documentation-estate/.markdownlint.json` to markdownlint as its configuration file.
+Vale resolves `StylesPath = .vale/styles` relative to the `.vale.ini` that sets it. An estate
+initialized earlier receives the new workflow, `.vale.ini`, and `DocsTonality` files only through
+`init -Write -Force` or by copying them; it is not migrated, and it keeps its root-level linter
+files.
 
 The docs-only exemptions of the pull-request and merge gates admit
 `.github/workflows/_docs-quality.yml` as their one path outside `docs/`. The admission applies to

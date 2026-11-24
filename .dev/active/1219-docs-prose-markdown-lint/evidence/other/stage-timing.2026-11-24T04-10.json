@@ -1,0 +1,43 @@
+{
+  "issue": 1219,
+  "written_at": "2026-11-24T04:10:09Z",
+  "note": "wall-clock times including queueing; merge stage not captured",
+  "stage_timing": [
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 1,
+      "started_at": "2026-11-23T07:10:23Z",
+      "ended_at": "2026-11-23T12:21:25Z"
+    },
+    {
+      "stage": "S6_pre_review_commit",
+      "attempt": 1,
+      "started_at": "2026-11-23T12:21:25Z",
+      "ended_at": "2026-11-23T12:26:18Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 1,
+      "started_at": "2026-11-23T12:26:18Z",
+      "ended_at": "2026-11-24T04:10:09Z"
+    },
+    {
+      "stage": "remediation.cycle_3.execute",
+      "attempt": 2,
+      "started_at": "2026-11-24T03:36:20Z",
+      "ended_at": "2026-11-24T03:59:01Z"
+    },
+    {
+      "stage": "remediation.cycle_3.reaudit",
+      "attempt": 1,
+      "started_at": "2026-11-24T03:59:01Z",
+      "ended_at": "2026-11-24T04:10:09Z"
+    },
+    {
+      "stage": "S8_pr_creation",
+      "attempt": 1,
+      "started_at": "2026-11-24T04:10:09Z",
+      "ended_at": null
+    }
+  ]
+}

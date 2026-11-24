@@ -47,17 +47,17 @@ The workflow template that docs init writes copies `.vale.ini` and `.markdownlin
 
 ## Acceptance Criteria
 
-- [ ] The init-written `_docs-quality.yml` runs `DavidAnson/markdownlint-cli2-action`, pinned by commit, with `config: docs/documentation-estate/.markdownlint.json` over globs derived from the profile `documentation_roots`, as asserted by a passing Pester content test.
-- [ ] The init-written `_docs-quality.yml` downloads Vale 3.25.1, compares its SHA-256 with the pinned value, and throws `VALE_SHA256_MISMATCH` before extraction on a mismatch, as asserted by a passing Pester content test and shown by recorded mismatch-run evidence.
-- [ ] The init-written `_docs-quality.yml` runs Vale with `--config docs/documentation-estate/.vale.ini` and fails the step on an error-level alert, as asserted by a passing Pester content test.
-- [ ] Every `uses:` reference in the template is pinned to a full commit SHA with a version comment, permissions are `contents: read` at the workflow and job levels, and no `run:` block contains `${{`, as asserted by passing Pester content tests.
-- [ ] Docs init writes the five `DocsTonality` rule files (Certainty, Exclamation, Filler, Hyperbole, Intensifiers) with error level for the first four and warning level for Intensifiers, and the written `.vale.ini` contains `BasedOnStyles = Vale, DocsBase, DocsTonality` and `Vale.Spelling = warning`, as asserted by passing Pester tests.
-- [ ] A page containing the word `perfect` produces a `DocsTonality.Hyperbole` error and Vale exit code 1, shown by recorded live Vale evidence under the feature `evidence/other/` folder.
-- [ ] The docs `coverage` command reports a `placeholders` section with the token, the total, and one line per page with a non-zero count sorted by page path; occurrences in front matter, fenced code, inline code, and HTML comments are not counted; wrong-case text is not counted; one line break between the words is tolerated; and the exit code is unchanged, as asserted by passing Pester tests.
-- [ ] `DocsCoverageReport.psm1` is unchanged on the branch, and the new `DocsPagePlaceholder.psm1` reaches at least 85% line coverage, recorded as QA evidence.
-- [ ] The docs-init skill on every surface and the consumer onboarding page describe the workflow as running markdownlint and Vale, and contain no statement that no workflow step runs the linters, as asserted by passing Pester content tests.
-- [ ] Bundle copies are byte-identical, `core.json` lists the new files, the push-down contract tests pass, and `Invoke-HarnessGeneration.ps1 -Check` exits 0.
-- [ ] `DocsLedgerCommands.psm1` grows by at most 4 logical lines, and every new or changed code and test file stays at or below 800 logical lines, shown by recorded evidence.
+- [x] The init-written `_docs-quality.yml` runs `DavidAnson/markdownlint-cli2-action`, pinned by commit, with `config: docs/documentation-estate/.markdownlint.json` over globs derived from the profile `documentation_roots`, as asserted by a passing Pester content test.
+- [x] The init-written `_docs-quality.yml` downloads Vale 3.25.1, compares its SHA-256 with the pinned value, and throws `VALE_SHA256_MISMATCH` before extraction on a mismatch, as asserted by a passing Pester content test and shown by recorded mismatch-run evidence.
+- [x] The init-written `_docs-quality.yml` runs Vale with `--config docs/documentation-estate/.vale.ini` and fails the step on an error-level alert, as asserted by a passing Pester content test.
+- [x] Every `uses:` reference in the template is pinned to a full commit SHA with a version comment, permissions are `contents: read` at the workflow and job levels, and no `run:` block contains `${{`, as asserted by passing Pester content tests.
+- [x] Docs init writes the five `DocsTonality` rule files (Certainty, Exclamation, Filler, Hyperbole, Intensifiers) with error level for the first four and warning level for Intensifiers, and the written `.vale.ini` contains `BasedOnStyles = Vale, DocsBase, DocsTonality` and `Vale.Spelling = warning`, as asserted by passing Pester tests.
+- [x] A page containing the word `perfect` produces a `DocsTonality.Hyperbole` error and Vale exit code 1, shown by recorded live Vale evidence under the feature `evidence/other/` folder.
+- [x] The docs `coverage` command reports a `placeholders` section with the token, the total, and one line per page with a non-zero count sorted by page path; occurrences in front matter, fenced code, inline code, and HTML comments are not counted; wrong-case text is not counted; one line break between the words is tolerated; and the exit code is unchanged, as asserted by passing Pester tests.
+- [x] `DocsCoverageReport.psm1` is unchanged on the branch, and the new `DocsPagePlaceholder.psm1` reaches at least 85% line coverage, recorded as QA evidence.
+- [x] The docs-init skill on every surface and the consumer onboarding page describe the workflow as running markdownlint and Vale, and contain no statement that no workflow step runs the linters, as asserted by passing Pester content tests.
+- [x] Bundle copies are byte-identical, `core.json` lists the new files, the push-down contract tests pass, and `Invoke-HarnessGeneration.ps1 -Check` exits 0.
+- [x] `DocsLedgerCommands.psm1` grows by at most 4 logical lines, and every new or changed code and test file stays at or below 800 logical lines, shown by recorded evidence.
 
 ## Non-Goals
 

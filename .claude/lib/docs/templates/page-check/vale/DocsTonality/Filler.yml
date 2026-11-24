@@ -1,0 +1,16 @@
+# Enforces .claude/rules/tonality.md "Humor and Joking — Prohibited" (casual
+# filler that weakens a formal or operational message).
+extends: existence
+message: "Remove filler: '%s' (tonality policy: clear, direct, factual language)."
+level: error
+ignorecase: true
+scope: ~blockquote
+tokens:
+  - simply
+  - obviously
+  - of course
+  - needless to say
+  - it goes without saying
+  - as you can see
+  - basically
+  - trivially
