@@ -36,12 +36,12 @@ BeforeDiscovery {
         @{ Id = 'RSC-INVOKE'; File = $orchestrate; Heading = $remediation; Literal = @('does not invoke the entry point', '-Mode Merge', '-MergeRef', '-Trigger integration_sync', '-Trigger main_sync', "config_errors are recorded under the checkpoint's artifact_errors", 'config/orchestration-regeneration.json') }
         @{ Id = 'RSC-CLASSIFY'; File = $orchestrate; Heading = $remediation; Literal = @('captures the conflicted-file list', 'all_match', 'unmatched_path', 'multiple_merge_bases', 'empty_set') }
         @{ Id = 'RSC-REGENERATE'; File = $orchestrate; Heading = $remediation; Literal = @(
-                'runs the standard parallel unit gates when unit_gate is not_run', 'never edits an existing evidence file', 'evidence/qa-gates/regeneration-delta.',
+                'runs the phase-gate unit stage over the test selection of the paths the merge changed when unit_gate is not_run', 'never edits an existing evidence file', 'evidence/qa-gates/regeneration-delta.',
                 'Get-RegenerationEvidencePath', 'Get-RegenerationEvidencePath -FeatureFolder', 'git commit -F', 'pushes the merge commit', 'head_sha equal to the pushed head',
                 're-runs S9 on the new head', 'regeneration_delta', 'a failure after the entry point exits runs git merge --abort',
                 'returns head_sha null and evidence_path null in event and review_outcome', 'evidence_path to the Get-RegenerationEvidencePath value on both objects',
                 'writes evidence_text as the evidence file content', 'appends the returned event with outcome fell_back, head_sha null, and evidence_path null',
-                "When the entry point reports unit_gate not_run and the standard parallel gates pass, the orchestrator sets the event's unit_gate to pass before appending it.",
+                "When the entry point reports unit_gate not_run and that unit stage passes, the orchestrator sets the event's unit_gate to pass before appending it.",
                 'The evidence file keeps evidence_text unchanged, including unit_gate=not_run.') }
         @{ Id = 'RSC-FALLBACK'; File = $orchestrate; Heading = $remediation; Literal = @('appends a regeneration_events[] entry with outcome fell_back', "today's procedure runs unchanged from its first step") }
         @{ Id = 'RSC-ACCOUNTING'; File = $orchestrate; Heading = $remediation; Literal = @('consumes no remediation attempt', 'writes no remediation_loop.cycles[] entry', 'leaves completed_attempts unchanged on success or fallback') }

@@ -1,0 +1,312 @@
+# Scope Diff - Issue #1228 ([P2-T6]; AC-13, AC-18, AC-19)
+
+Timestamp: 2026-11-24T06-59
+Command: `sh <item worktree>/artifacts/issue-1228/scope.sh` (at the item worktree root: `git merge-base origin/main HEAD`; `git diff --name-only <merge-base>` of the working tree; `git status --porcelain`; `sha256sum AGENTS.md extensions/drm-copilot/resources/codex-and-agents-customizations/AGENTS.md`; `grep -E` checks of the union of the two lists for the out-of-scope paths; `git diff --name-only --diff-filter=A <merge-base> -- '*.py'` and the `??` entries of the porcelain list for added `.py` files); and `git -C <item worktree> diff --name-only <merge-base>...HEAD`
+EXIT_CODE: 0
+Output Summary:
+- Merge base of `origin/main` and `HEAD`: a4ebf96688106d9bcd0baf51d237a6b77c055560 (`origin/main` was fetched at [P1-T12] and had not moved).
+- `git diff --name-only <merge-base>` (working tree, the superset of the committed list while the change is uncommitted): 202 paths. `git diff --name-only <merge-base>...HEAD` (the committed part: the promotion, spec, plan, and work-in-progress commits): 147 paths, all of which are in the working-tree list. `git status --porcelain`: 80 entries (57 modified tracked files, 23 untracked files: evidence files of the feature folder and the two ledger files).
+- SHA-256: `AGENTS.md` 6cf891cb5a4514efabba40d611fa328eade07a0fc27d1f2c0fdb4adf75ffcd84; `extensions/drm-copilot/resources/codex-and-agents-customizations/AGENTS.md` 6cf891cb5a4514efabba40d611fa328eade07a0fc27d1f2c0fdb4adf75ffcd84. Equal (AC-13).
+- Out-of-scope checks over both lists, each with no match: no path under `.github/workflows/` (AC-18); none under `scripts/dev_tools/atomic_executor/` or `.claude/lib/docs/`; no `.claude/skills/epic-orchestrate/SKILL.md`, `.agents/skills/epic-orchestrate/SKILL.md`, `.claude/agents/epic-orchestrator.md`, or `tests/scripts/dev_tools/parallel_orchestrator_surface_expectations.py`; no D10 standalone Copilot agent or prompt; no `docs-*` or `documentation-workflow` path on any surface or bundle; no hook, `.claude/lib/`, `.codex/hooks/`, or `config/` path; no added `.py` file (AC-19). `test_frozen_epic_surface_matches_pinned_baseline_digest` passed in the [P2-T3]/[P2-T4] gates (`evidence/qa-gates/pytest.2026-11-24T06-43.md`).
+
+Acceptance criteria check-off (spec.md AC-01 to AC-19; evidence of record):
+- AC-01, AC-02: `TCW-CANONICAL-*`, `TCW-CANONICAL-REF-*`, `TCW-CANONICAL-DISCRIMINATES` pass (`evidence/qa-gates/pester.2026-11-24T06-30.md`; `task-check.P1-T1.2026-11-24T03-43.md`).
+- AC-03: `$script:CadenceSweepToken` (10 tokens) with `TCW-CADENCE-SWEEP-SURFACES` and `TCW-CADENCE-SWEEP-HELPER` (count 10) pass (`task-check.P1-T10.2026-11-24T04-39.md`; Pester gate).
+- AC-04: `evidence/other/cadence-search.2026-11-24T04-48.md` (SearchScope, SearchPatterns, SearchResult; 202 classified paths; three fixes).
+- AC-05: `TCW-HANDOFF-*` pass. AC-06: `RSC-*` (30) pass, both `RSC-REGENERATE` literals updated. AC-07: `TCW-ENGINEER-*` (42) pass. AC-08: `TCW-REVIEW-*`, `PGW-REVIEW-*`, `less-evidence-contract.Tests.ps1` pass. AC-09: `TCW-QAGATE-*` and `PGW-QA-*` pass. AC-10: `TCW-BRIEF-*`, `TCW-SCOPED-*`, `PGW-SCOPED-*` pass (all in the Pester gate).
+- AC-11: `evidence/qa-gates/generators.2026-11-24T04-05.md`, `evidence/qa-gates/powershell-static.2026-11-24T06-02.md` (both `-Check` runs no drift) and `HarnessGeneration.RepoGate.Tests.ps1` passing in the Pester gate.
+- AC-12: `evidence/qa-gates/generators.2026-11-24T04-05.md` and `evidence/qa-gates/python-static.2026-11-24T06-07.md` (Codex `--check` exit 0).
+- AC-13: push-down resource contracts pass (`evidence/qa-gates/pytest.2026-11-24T06-43.md`), `TCW-BUNDLE-*` pass, equal digests above.
+- AC-14: `runClassForbidden` rows, `PGW-SWEEP-SURFACES`, `PGW-SWEEP-HELPER` pass; `parallel-gate-wording.Tests.ps1` is not in the changed-path list, so its token list and count are unchanged.
+- AC-15: `TCW-EXECUTOR-*`, `TCW-PLANNER-*`, `TCW-POLICY-*`, `TCW-TEMPLATE-*` pass with the gate counts unchanged.
+- AC-16: `.dev/engineering/process-reductions/0014-targeted-test-cadence.md`, its patch, and the README row; `ProcessReductionChain.Ledger.Tests.ps1` and `ProcessReductionLedger.Index.Tests.ps1` pass (`task-check.P1-T12.2026-11-24T05-03.md`; Pester gate `PRC-*` 61, `PRL-*` 84).
+- AC-17: `TCW-CANONICAL-*` pass; `evidence/baseline/{pester,pytest,jest}.*.md` and `evidence/qa-gates/{pester,pytest,jest}.*.md` record full runs with coverage, compared (Pester 96.84% to 96.85%; pytest lines 98.01% and branches 95.47% unchanged; Jest unchanged).
+- AC-18, AC-19: the checks above.
+
+Working-tree list, `git diff --name-only <merge-base>` (202 paths):
+- `.agents/skills/atomic-executor/SKILL.md`
+- `.agents/skills/atomic-plan-contract/SKILL.md`
+- `.agents/skills/atomic-planner/SKILL.md`
+- `.agents/skills/csharp-qa-gate/SKILL.md`
+- `.agents/skills/csharp/SKILL.md`
+- `.agents/skills/execution-environment/SKILL.md`
+- `.agents/skills/feature-review-workflow/SKILL.md`
+- `.agents/skills/general-code-change/SKILL.md`
+- `.agents/skills/orchestrate/SKILL.md`
+- `.agents/skills/powershell-qa-gate/SKILL.md`
+- `.agents/skills/powershell/SKILL.md`
+- `.agents/skills/python-qa-gate/SKILL.md`
+- `.agents/skills/python/SKILL.md`
+- `.agents/skills/remediation-handoff-atomic-planner/SKILL.md`
+- `.agents/skills/test-execution-policy/SKILL.md`
+- `.agents/skills/typescript/SKILL.md`
+- `.claude/agents/atomic-executor.md`
+- `.claude/agents/atomic-planner.md`
+- `.claude/agents/csharp-typed-engineer.md`
+- `.claude/agents/powershell-typed-engineer.md`
+- `.claude/agents/python-typed-engineer.md`
+- `.claude/rules/csharp.md`
+- `.claude/rules/general-code-change.md`
+- `.claude/rules/powershell.md`
+- `.claude/rules/python.md`
+- `.claude/rules/shell.md`
+- `.claude/rules/typescript.md`
+- `.claude/skills/atomic-plan-contract/SKILL.md`
+- `.claude/skills/csharp-qa-gate/SKILL.md`
+- `.claude/skills/execution-environment/SKILL.md`
+- `.claude/skills/feature-review-workflow/SKILL.md`
+- `.claude/skills/orchestrate/SKILL.md`
+- `.claude/skills/powershell-qa-gate/SKILL.md`
+- `.claude/skills/python-qa-gate/SKILL.md`
+- `.claude/skills/remediation-handoff-atomic-planner/SKILL.md`
+- `.claude/skills/test-execution-policy/SKILL.md`
+- `.codex/agents/atomic-executor-c1.toml`
+- `.codex/agents/atomic-executor-c2.toml`
+- `.codex/agents/atomic-executor-c3-elevated.toml`
+- `.codex/agents/atomic-executor-c3.toml`
+- `.codex/agents/atomic-executor-c4.toml`
+- `.codex/agents/atomic-executor.toml`
+- `.codex/agents/atomic-planner-c1.toml`
+- `.codex/agents/atomic-planner-c2.toml`
+- `.codex/agents/atomic-planner-c3-elevated.toml`
+- `.codex/agents/atomic-planner-c3.toml`
+- `.codex/agents/atomic-planner-c4.toml`
+- `.codex/agents/atomic-planner.toml`
+- `.codex/agents/csharp-typed-engineer-c1.toml`
+- `.codex/agents/csharp-typed-engineer-c2.toml`
+- `.codex/agents/csharp-typed-engineer-c3-elevated.toml`
+- `.codex/agents/csharp-typed-engineer-c3.toml`
+- `.codex/agents/csharp-typed-engineer-c4.toml`
+- `.codex/agents/csharp-typed-engineer.toml`
+- `.codex/agents/powershell-typed-engineer-c1.toml`
+- `.codex/agents/powershell-typed-engineer-c2.toml`
+- `.codex/agents/powershell-typed-engineer-c3-elevated.toml`
+- `.codex/agents/powershell-typed-engineer-c3.toml`
+- `.codex/agents/powershell-typed-engineer-c4.toml`
+- `.codex/agents/powershell-typed-engineer.toml`
+- `.codex/agents/python-typed-engineer-c1.toml`
+- `.codex/agents/python-typed-engineer-c2.toml`
+- `.codex/agents/python-typed-engineer-c3-elevated.toml`
+- `.codex/agents/python-typed-engineer-c3.toml`
+- `.codex/agents/python-typed-engineer-c4.toml`
+- `.codex/agents/python-typed-engineer.toml`
+- `.dev/active/1228-targeted-test-cadence/evidence/baseline/jest.2026-11-23T13-33.md`
+- `.dev/active/1228-targeted-test-cadence/evidence/baseline/pester.2026-11-23T13-26.md`
+- `.dev/active/1228-targeted-test-cadence/evidence/baseline/powershell-static.2026-11-23T13-05.md`
+- `.dev/active/1228-targeted-test-cadence/evidence/baseline/pytest.2026-11-23T13-32.md`
+- `.dev/active/1228-targeted-test-cadence/evidence/baseline/python-static.2026-11-23T12-58.md`
+- `.dev/active/1228-targeted-test-cadence/evidence/other/preflight-fixes.2026-11-23T12-49.md`
+- `.dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T1.2026-11-23T13-56.md`
+- `.dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T2.2026-11-23T14-07.md`
+- `.dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T3.2026-11-23T14-10.md`
+- `.dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T4.2026-11-23T14-13.md`
+- `.dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T5.2026-11-23T14-20.md`
+- `.dev/active/1228-targeted-test-cadence/evidence/qa-gates/generators.2026-11-23T14-20.md`
+- `.dev/active/1228-targeted-test-cadence/issue.md`
+- `.dev/active/1228-targeted-test-cadence/plan.2026-11-23T06-50.md`
+- `.dev/active/1228-targeted-test-cadence/research/research.2026-11-23T12-00.md`
+- `.dev/active/1228-targeted-test-cadence/spec.md`
+- `.dev/active/1228-targeted-test-cadence/user-story.md`
+- `.dev/engineering/process-reductions/README.md`
+- `.dev/potential/promoted/2026-11-23-targeted-test-cadence.md`
+- `.dev/templates/bug/plan.yyyy-MM-ddTHH-mm.md`
+- `.dev/templates/feature/plan.yyyy-MM-ddTHH-mm.md`
+- `.dev/templates/refactor/plan.yyyy-MM-ddTHH-mm.md`
+- `.github/agents/atomic_executor.agent.md`
+- `.github/agents/atomic_planning.agent.md`
+- `.github/agents/csharp-atomic-executor.agent.md`
+- `.github/agents/csharp-atomic-planning.agent.md`
+- `.github/agents/powershell-atomic-executor.agent.md`
+- `.github/agents/powershell-atomic-planning.agent.md`
+- `.github/agents/python-atomic-executor.agent.md`
+- `.github/agents/python-atomic-planning.agent.md`
+- `.github/codex/execute-hard-lock.prompt.md`
+- `.github/codex/resume-hard-lock.prompt.md`
+- `.github/instructions/general-code-change.instructions.md`
+- `.github/prompts/execute-hard-lock.prompt.md`
+- `AGENTS.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/agents/csharp-typed-engineer.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/rules/csharp.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-executor.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/atomic-planner.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/csharp-typed-engineer.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/powershell-typed-engineer.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/agents/python-typed-engineer.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/rules/csharp.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/rules/general-code-change.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/rules/powershell.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/rules/python.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/rules/shell.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/rules/typescript.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/atomic-plan-contract/SKILL.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/csharp-qa-gate/SKILL.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/execution-environment/SKILL.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/orchestrate/SKILL.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/remediation-handoff-atomic-planner/SKILL.md`
+- `extensions/drm-copilot/resources/claude-customizations/.claude/skills/test-execution-policy/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-executor/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-plan-contract/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-planner/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp-qa-gate/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/execution-environment/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/general-code-change/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/orchestrate/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/remediation-handoff-atomic-planner/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/test-execution-policy/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/typescript/SKILL.md`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex-variants/csharp-legacy/agents/csharp-typed-engineer.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c1.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c2.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3-elevated.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c3.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor-c4.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-executor.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c1.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c2.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c3-elevated.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c3.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner-c4.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/atomic-planner.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c1.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c2.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c3-elevated.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c3.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer-c4.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/csharp-typed-engineer.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c1.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c2.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3-elevated.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c3.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer-c4.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/powershell-typed-engineer.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c1.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c2.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c3-elevated.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c3.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer-c4.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/.codex/agents/python-typed-engineer.toml`
+- `extensions/drm-copilot/resources/codex-and-agents-customizations/AGENTS.md`
+- `extensions/drm-copilot/resources/customizations/.github/agents/atomic_executor.agent.md`
+- `extensions/drm-copilot/resources/customizations/.github/agents/atomic_planning.agent.md`
+- `extensions/drm-copilot/resources/customizations/.github/agents/csharp-atomic-executor.agent.md`
+- `extensions/drm-copilot/resources/customizations/.github/agents/csharp-atomic-planning.agent.md`
+- `extensions/drm-copilot/resources/customizations/.github/agents/powershell-atomic-executor.agent.md`
+- `extensions/drm-copilot/resources/customizations/.github/agents/powershell-atomic-planning.agent.md`
+- `extensions/drm-copilot/resources/customizations/.github/agents/python-atomic-executor.agent.md`
+- `extensions/drm-copilot/resources/customizations/.github/agents/python-atomic-planning.agent.md`
+- `extensions/drm-copilot/resources/customizations/.github/codex/execute-hard-lock.prompt.md`
+- `extensions/drm-copilot/resources/customizations/.github/codex/resume-hard-lock.prompt.md`
+- `extensions/drm-copilot/resources/customizations/.github/instructions/general-code-change.instructions.md`
+- `extensions/drm-copilot/resources/customizations/.github/prompts/execute-hard-lock.prompt.md`
+- `extensions/drm-copilot/resources/feature-templates/bug/plan.yyyy-MM-ddTHH-mm.md`
+- `extensions/drm-copilot/resources/feature-templates/feature/plan.yyyy-MM-ddTHH-mm.md`
+- `extensions/drm-copilot/resources/feature-templates/refactor/plan.yyyy-MM-ddTHH-mm.md`
+- `scripts/harness-generation/sources/agents/atomic-executor.md`
+- `scripts/harness-generation/sources/agents/atomic-planner.md`
+- `scripts/harness-generation/sources/agents/csharp-typed-engineer.md`
+- `scripts/harness-generation/sources/agents/powershell-typed-engineer.md`
+- `scripts/harness-generation/sources/agents/python-typed-engineer.md`
+- `scripts/harness-generation/sources/rules/csharp.md`
+- `scripts/harness-generation/sources/rules/general-code-change.md`
+- `scripts/harness-generation/sources/rules/powershell.md`
+- `scripts/harness-generation/sources/rules/python.md`
+- `scripts/harness-generation/sources/rules/shell.md`
+- `scripts/harness-generation/sources/rules/typescript.md`
+- `tests/scripts/claude-runtime/regeneration-path-skill-contract.Tests.ps1`
+- `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`
+
+Committed list, `git diff --name-only <merge-base>...HEAD` (147 paths): every path is in the working-tree list above (a `comm` check finds 0 paths outside it).
+
+`git status --porcelain` (80 entries):
+- ` M .agents/skills/atomic-executor/SKILL.md`
+- ` M .agents/skills/atomic-planner/SKILL.md`
+- ` M .agents/skills/csharp-qa-gate/SKILL.md`
+- ` M .agents/skills/feature-review-workflow/SKILL.md`
+- ` M .agents/skills/powershell-qa-gate/SKILL.md`
+- ` M .agents/skills/python-qa-gate/SKILL.md`
+- ` M .claude/skills/csharp-qa-gate/SKILL.md`
+- ` M .claude/skills/feature-review-workflow/SKILL.md`
+- ` M .claude/skills/powershell-qa-gate/SKILL.md`
+- ` M .claude/skills/python-qa-gate/SKILL.md`
+- ` M .dev/active/1228-targeted-test-cadence/plan.2026-11-23T06-50.md`
+- ` M .dev/engineering/process-reductions/README.md`
+- ` M .dev/templates/bug/plan.yyyy-MM-ddTHH-mm.md`
+- ` M .dev/templates/feature/plan.yyyy-MM-ddTHH-mm.md`
+- ` M .dev/templates/refactor/plan.yyyy-MM-ddTHH-mm.md`
+- ` M .github/agents/atomic_executor.agent.md`
+- ` M .github/agents/atomic_planning.agent.md`
+- ` M .github/agents/csharp-atomic-executor.agent.md`
+- ` M .github/agents/csharp-atomic-planning.agent.md`
+- ` M .github/agents/powershell-atomic-executor.agent.md`
+- ` M .github/agents/powershell-atomic-planning.agent.md`
+- ` M .github/agents/python-atomic-executor.agent.md`
+- ` M .github/agents/python-atomic-planning.agent.md`
+- ` M .github/codex/execute-hard-lock.prompt.md`
+- ` M .github/codex/resume-hard-lock.prompt.md`
+- ` M .github/prompts/execute-hard-lock.prompt.md`
+- ` M extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/agents/csharp-typed-engineer.md`
+- ` M extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/rules/csharp.md`
+- ` M extensions/drm-copilot/resources/claude-customizations/.claude-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md`
+- ` M extensions/drm-copilot/resources/claude-customizations/.claude/skills/csharp-qa-gate/SKILL.md`
+- ` M extensions/drm-copilot/resources/claude-customizations/.claude/skills/feature-review-workflow/SKILL.md`
+- ` M extensions/drm-copilot/resources/claude-customizations/.claude/skills/powershell-qa-gate/SKILL.md`
+- ` M extensions/drm-copilot/resources/claude-customizations/.claude/skills/python-qa-gate/SKILL.md`
+- ` M extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp-qa-gate/SKILL.md`
+- ` M extensions/drm-copilot/resources/codex-and-agents-customizations/.agents-variants/csharp-legacy/skills/csharp/SKILL.md`
+- ` M extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-executor/SKILL.md`
+- ` M extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/atomic-planner/SKILL.md`
+- ` M extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/csharp-qa-gate/SKILL.md`
+- ` M extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/feature-review-workflow/SKILL.md`
+- ` M extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/powershell-qa-gate/SKILL.md`
+- ` M extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/python-qa-gate/SKILL.md`
+- ` M extensions/drm-copilot/resources/codex-and-agents-customizations/.codex-variants/csharp-legacy/agents/csharp-typed-engineer.toml`
+- ` M extensions/drm-copilot/resources/customizations/.github/agents/atomic_executor.agent.md`
+- ` M extensions/drm-copilot/resources/customizations/.github/agents/atomic_planning.agent.md`
+- ` M extensions/drm-copilot/resources/customizations/.github/agents/csharp-atomic-executor.agent.md`
+- ` M extensions/drm-copilot/resources/customizations/.github/agents/csharp-atomic-planning.agent.md`
+- ` M extensions/drm-copilot/resources/customizations/.github/agents/powershell-atomic-executor.agent.md`
+- ` M extensions/drm-copilot/resources/customizations/.github/agents/powershell-atomic-planning.agent.md`
+- ` M extensions/drm-copilot/resources/customizations/.github/agents/python-atomic-executor.agent.md`
+- ` M extensions/drm-copilot/resources/customizations/.github/agents/python-atomic-planning.agent.md`
+- ` M extensions/drm-copilot/resources/customizations/.github/codex/execute-hard-lock.prompt.md`
+- ` M extensions/drm-copilot/resources/customizations/.github/codex/resume-hard-lock.prompt.md`
+- ` M extensions/drm-copilot/resources/customizations/.github/prompts/execute-hard-lock.prompt.md`
+- ` M extensions/drm-copilot/resources/feature-templates/bug/plan.yyyy-MM-ddTHH-mm.md`
+- ` M extensions/drm-copilot/resources/feature-templates/feature/plan.yyyy-MM-ddTHH-mm.md`
+- ` M extensions/drm-copilot/resources/feature-templates/refactor/plan.yyyy-MM-ddTHH-mm.md`
+- ` M tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/cadence-search.2026-11-24T04-48.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T1.2026-11-24T03-43.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T10.2026-11-24T04-39.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T11.2026-11-24T04-48.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T12.2026-11-24T05-03.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T2.2026-11-24T03-54.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T3.2026-11-24T03-54.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T4.2026-11-24T04-00.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T5.2026-11-24T04-05.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T6.2026-11-24T04-13.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T7.2026-11-24T04-19.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T8.2026-11-24T04-28.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/other/task-check.P1-T9.2026-11-24T04-33.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/qa-gates/generators.2026-11-24T04-05.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/qa-gates/jest.2026-11-24T06-58.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/qa-gates/pester.2026-11-24T06-30.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/qa-gates/phase-gate.P1.2026-11-24T05-51.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/qa-gates/powershell-static.2026-11-24T06-02.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/qa-gates/pytest.2026-11-24T06-43.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/qa-gates/python-static.2026-11-24T06-05.md`
+- `?? .dev/active/1228-targeted-test-cadence/evidence/qa-gates/python-static.2026-11-24T06-07.md`
+- `?? .dev/engineering/process-reductions/0014-targeted-test-cadence.md`
+- `?? .dev/engineering/process-reductions/patches/0014-targeted-test-cadence.patch`

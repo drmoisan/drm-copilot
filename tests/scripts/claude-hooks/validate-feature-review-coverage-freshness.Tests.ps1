@@ -206,3 +206,132 @@ Describe 'freshness lookup helpers (issue #1105)' {
         Get-FeatureReviewReportLastWriteUtc -Path '/synthetic-worktrees/main/present.xml' | Should -Be $script:CommitTime
     }
 }
+
+Describe 'Get-FeatureReviewCoverageReportScope (issue #1228)' {
+    BeforeAll {
+        $script:WindowStart = [datetime]::new(2026, 11, 24, 12, 0, 0, [System.DateTimeKind]::Utc)
+        $script:WindowEnd = $script:WindowStart.AddMinutes(3)
+
+        function Get-RunScopeText {
+            # Returns a run-scope record text; Override replaces or adds keys of the covering pester selection record.
+            param([hashtable] $Override = @{})
+            $record = [ordered]@{ schema_version = 1; suite = 'pester'; runner = 'pester'; scope = 'selection'; started_utc = '2026-11-24T12:00:00.0000000Z'; completed_utc = '2026-11-24T12:03:00.0000000Z' }
+            foreach ($key in $Override.Keys) { $record[$key] = $Override[$key] }
+            return ($record | ConvertTo-Json -Compress)
+        }
+
+        function Get-WriteTimeSeam {
+            # Returns a GetReportWriteUtc seam that counts its calls in the given list and returns Value.
+            param([AllowNull()] [object] $Value, [System.Collections.Generic.List[int]] $Calls)
+            $time = $Value
+            $log = $Calls
+            return { $log.Add(1); $time }.GetNewClosure()
+        }
+    }
+
+    It 'RSCOPE-READ-ABSENT-TEXT: an absent record is full and the write-time seam is not invoked' {
+        # Arrange
+        $calls = [System.Collections.Generic.List[int]]::new()
+
+        # Act
+        $scope = Get-FeatureReviewCoverageReportScope -Language 'PowerShell' -RecordText $null -GetReportWriteUtc (Get-WriteTimeSeam -Value $script:WindowStart.AddMinutes(1) -Calls $calls)
+
+        # Assert
+        $scope | Should -BeExactly 'full'
+        $calls.Count | Should -Be 0
+    }
+
+    It 'RSCOPE-READ-NON-JSON: non-JSON text is full and the write-time seam is not invoked' {
+        # Arrange
+        $calls = [System.Collections.Generic.List[int]]::new()
+
+        # Act
+        $scope = Get-FeatureReviewCoverageReportScope -Language 'PowerShell' -RecordText 'scope: selection {' -GetReportWriteUtc (Get-WriteTimeSeam -Value $script:WindowStart.AddMinutes(1) -Calls $calls)
+
+        # Assert
+        $scope | Should -BeExactly 'full'
+        $calls.Count | Should -Be 0
+    }
+
+    It 'RSCOPE-READ-<Name>: a record with <Name> is full' -ForEach @(
+        @{ Name = 'JSON-ARRAY'; Text = "[$('{"schema_version":1,"suite":"pester","runner":"pester","scope":"selection","started_utc":"2026-11-24T12:00:00.0000000Z","completed_utc":"2026-11-24T12:03:00.0000000Z"}')]" }
+        @{ Name = 'SCHEMA-VERSION-2'; Override = @{ schema_version = 2 } }
+        @{ Name = 'SCHEMA-VERSION-STRING'; Override = @{ schema_version = '1' } }
+        @{ Name = 'SUITE-MISMATCH'; Override = @{ suite = 'pytest' } }
+        @{ Name = 'SCOPE-FULL'; Override = @{ scope = 'full' } }
+        @{ Name = 'UNPARSEABLE-INSTANT'; Override = @{ started_utc = 'yesterday' } }
+        @{ Name = 'NON-UTC-INSTANT'; Override = @{ started_utc = '2026-11-24T12:00:00.0000000+02:00' } }
+        @{ Name = 'STARTED-AFTER-COMPLETED'; Override = @{ started_utc = '2026-11-24T12:04:00.0000000Z' } }
+    ) {
+        # Arrange
+        $text = if ($Text) { $Text } else { Get-RunScopeText -Override $Override }
+
+        # Act
+        $scope = Get-FeatureReviewCoverageReportScope -Language 'PowerShell' -RecordText $text -GetReportWriteUtc { $script:WindowStart.AddMinutes(1) }
+
+        # Assert
+        $scope | Should -BeExactly 'full'
+    }
+
+    It 'RSCOPE-READ-WRITE-<Name>: a report write time <Name> gives <Expected>' -ForEach @(
+        @{ Name = 'NULL'; Offset = $null; Expected = 'full' }
+        @{ Name = 'BEFORE-WINDOW'; Offset = -1; Expected = 'full' }
+        @{ Name = 'AFTER-WINDOW'; Offset = 181; Expected = 'full' }
+        @{ Name = 'ON-START-BOUND'; Offset = 0; Expected = 'selection' }
+        @{ Name = 'ON-END-BOUND'; Offset = 180; Expected = 'selection' }
+        @{ Name = 'INSIDE-WINDOW'; Offset = 90; Expected = 'selection' }
+    ) {
+        # Arrange
+        $write = if ($null -eq $Offset) { $null } else { $script:WindowStart.AddSeconds($Offset) }
+        $calls = [System.Collections.Generic.List[int]]::new()
+
+        # Act
+        $scope = Get-FeatureReviewCoverageReportScope -Language 'PowerShell' -RecordText (Get-RunScopeText) -GetReportWriteUtc (Get-WriteTimeSeam -Value $write -Calls $calls)
+
+        # Assert
+        $scope | Should -BeExactly $Expected
+        $calls.Count | Should -Be 1
+    }
+
+    It 'RSCOPE-READ-COVERING-<Language>: a covering <Suite> selection record is selection' -ForEach @(
+        @{ Language = 'PowerShell'; Suite = 'pester' }
+        @{ Language = 'Python'; Suite = 'pytest' }
+        @{ Language = 'TypeScript'; Suite = 'jest' }
+    ) {
+        # Act
+        $scope = Get-FeatureReviewCoverageReportScope -Language $Language -RecordText (Get-RunScopeText -Override @{ suite = $Suite; runner = $Suite }) -GetReportWriteUtc { $script:WindowStart.AddMinutes(1) }
+
+        # Assert
+        $scope | Should -BeExactly 'selection'
+    }
+
+    It 'RSCOPE-READ-NO-SUITE-<Language>: <Language> is full and the write-time seam is not invoked' -ForEach @(
+        @{ Language = 'CSharp' }
+        @{ Language = 'Rust' }
+    ) {
+        # Arrange
+        $calls = [System.Collections.Generic.List[int]]::new()
+
+        # Act
+        $scope = Get-FeatureReviewCoverageReportScope -Language $Language -RecordText (Get-RunScopeText) -GetReportWriteUtc (Get-WriteTimeSeam -Value $script:WindowStart.AddMinutes(1) -Calls $calls)
+
+        # Assert
+        $scope | Should -BeExactly 'full'
+        $calls.Count | Should -Be 0
+    }
+
+    It 'RSCOPE-READ-SUITE-MAP: maps each language to its launcher suite' {
+        Get-FeatureReviewRunScopeSuite -Language 'PowerShell' | Should -BeExactly 'pester'
+        Get-FeatureReviewRunScopeSuite -Language 'Python' | Should -BeExactly 'pytest'
+        Get-FeatureReviewRunScopeSuite -Language 'TypeScript' | Should -BeExactly 'jest'
+        Get-FeatureReviewRunScopeSuite -Language 'CSharp' | Should -BeNullOrEmpty
+        Get-FeatureReviewRunScopeSuite -Language 'Rust' | Should -BeNullOrEmpty
+    }
+
+    It 'RSCOPE-READ-RECORD-PATH-MAP: maps each language to its run-scope record path' {
+        Get-FeatureReviewRunScopeRecordPath -Language 'PowerShell' | Should -BeExactly 'artifacts/test-execution/run-scope.pester.json'
+        Get-FeatureReviewRunScopeRecordPath -Language 'Python' | Should -BeExactly 'artifacts/test-execution/run-scope.pytest.json'
+        Get-FeatureReviewRunScopeRecordPath -Language 'TypeScript' | Should -BeExactly 'artifacts/test-execution/run-scope.jest.json'
+        Get-FeatureReviewRunScopeRecordPath -Language 'CSharp' | Should -BeNullOrEmpty
+    }
+}

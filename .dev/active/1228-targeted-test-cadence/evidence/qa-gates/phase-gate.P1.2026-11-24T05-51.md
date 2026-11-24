@@ -1,0 +1,141 @@
+# Phase Gate P1 - Issue #1228 ([P1-T13])
+
+Timestamp: 2026-11-24T05-51
+Command: `sh <item worktree>/artifacts/issue-1228/gate-p1.sh g1`, which runs in order: `sh SCRATCH/issue-1228-pstatic.sh g1` (pwsh 7 at the item worktree root: `Invoke-PoshQCFormat -Root <worktree root>` with `git status --porcelain` captured before and after, `Invoke-PoshQCAnalyze -Root <worktree root>` with `scripts/powershell/PoshQC/settings/pssa.settings.psd1`, `Invoke-PoshQCLeakScan -Root <worktree root>`, `scripts/harness-generation/Invoke-HarnessGeneration.ps1 -Check`, and `-Surface instructions -Check`); `sh SCRATCH/issue-1228-pystatic.sh g1` (with VIRTUAL_ENV unset at the item worktree root: `poetry run black --check .`, `poetry run ruff check .`, `poetry run pyright`, `poetry run python -m scripts.dev_tools.generate_codex_agent_variants --check`); `sh <item worktree>/.claude/skills/test-execution-policy/scripts/run-test-suite.sh pester -TestPath <the 57 union Pester files>`; `sh <item worktree>/.claude/skills/test-execution-policy/scripts/run-test-suite.sh pytest <the 63 union pytest files>` (launcher calls through the exit-75 retry wrapper)
+EXIT_CODE: 0
+Output Summary:
+- One pass; every stage exited 0 with zero failing tests; no restart was needed. Run window 2026-11-24T05-04-54 to 05-51-40 (UTC), most of it spent in the machine test-suite lock queue.
+- Stage 1, format: `Invoke-PoshQCFormat` EXIT_CODE 0, 1879 files visited, 0 reformatted; `git status --porcelain` identical before and after the format step (True). `black --check` EXIT_CODE 0, "1071 files would be left unchanged."
+- Stage 2, lint: `Invoke-PoshQCAnalyze` EXIT_CODE 0 (no exception; the function throws on any finding), finding count 0. `Invoke-PoshQCLeakScan` EXIT_CODE 0, "Leak scan: 907 files, 80 findings, 78 exempt, 2 allowlisted, 0 failures." `ruff check .` EXIT_CODE 0, "All checks passed!".
+- Stage 3, type check: `pyright` EXIT_CODE 0, "0 errors, 0 warnings, 0 informations". PowerShell has no type checker. TypeScript: recorded with no changed file; the item changes no `.ts`, `.tsx`, `.js`, `.cjs`, `.mjs`, or `.py` file (search of the item's path set), so the TypeScript static stage has nothing in scope.
+- Stage 4, architecture-boundary tests: not applicable; the repository defines no architecture-boundary check.
+- Stage 5, unit stage over the union of the [P1-T1] to [P1-T12] task-check selections, with no coverage (the phase gate measures no coverage):
+  - Pester: one launcher `pester -TestPath` run over 57 files (`Invoke-PoshQCParallelTest`, workers=8, wall-clock 212.75 s, exit code 0); JUnit 2270 tests, 0 failed, 0 skipped. One attempt exited 75 (queue timeout) before the pass.
+  - pytest: one launcher `pytest` run over 63 files (`pytest -n auto`); EXIT_CODE 0; 1197 passed. 21 attempts exited 75 (queue timeout; the lock was held by Pester suites of other worktrees) before the pass.
+  - Jest: no selected tests (no task selection named a Jest test file).
+- Stage 6, contract checks: `Invoke-HarnessGeneration.ps1 -Check` EXIT_CODE 0 and `-Surface instructions -Check` EXIT_CODE 0, both "harness-generation: no drift"; Codex generator `--check` EXIT_CODE 0. These re-run the [P1-T5] generator checks on the tree after the `origin/main` merge, as the resume brief requires.
+- Union rule: the union of the task-check selection lists `artifacts/issue-1228/r-p1t<M>-pester.txt` and `r-p1t<M>-pytest.txt` for M = 1 to 12, de-duplicated, with integration and golden suites removed. Each list was produced by its task's selection rule (the contract tests that read each changed path, found by searching `tests/` for the path, the file name, and the pinned literals, plus the suites named in the task text). Window (a) is closed since [P1-T12], so `ProcessReductionChain.Ledger.Tests.ps1` is in the union and passes.
+
+Union, Pester (57 files):
+  - `tests/scripts/claude-hooks/enforce-epic-merge-gate.Regeneration.Tests.ps1`
+  - `tests/scripts/claude-hooks/enforce-epic-wave-barrier.FolderResolution.Tests.ps1`
+  - `tests/scripts/claude-hooks/enforce-evidence-locations.Tests.ps1`
+  - `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.DevRoot.Tests.ps1`
+  - `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate.Tests.ps1`
+  - `tests/scripts/claude-hooks/enforce-orchestration-preimplementation-gate-mode-resolution.TargetFolder.Tests.ps1`
+  - `tests/scripts/claude-hooks/enforce-parallel-drift-gate.FolderResolution.Tests.ps1`
+  - `tests/scripts/claude-hooks/enforce-parallel-drift-gate.Tests.ps1`
+  - `tests/scripts/claude-hooks/hook-release-allowance-context.Parity.Tests.ps1`
+  - `tests/scripts/claude-hooks/validate-executor-output.Tests.ps1`
+  - `tests/scripts/claude-hooks/validate-feature-review-coverage.Tests.ps1`
+  - `tests/scripts/claude-hooks/validate-planner-output.Coverage.Tests.ps1`
+  - `tests/scripts/claude-hooks/validate-planner-output.PreMortem.Tests.ps1`
+  - `tests/scripts/claude-hooks/validate-planner-output.Reentry.Tests.ps1`
+  - `tests/scripts/claude-hooks/validate-planner-output.Tests.ps1`
+  - `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateCompletion.Tests.ps1`
+  - `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateIssueAdoption.Tests.ps1`
+  - `tests/scripts/claude-lib/orchestrator-state/OrchestratorStateRoutingContract.Tests.ps1`
+  - `tests/scripts/claude-lib/parallel-admission/Invoke-ParallelAdmission.Tests.ps1`
+  - `tests/scripts/claude-lib/regeneration/RegenerationDelta.Tests.ps1`
+  - `tests/scripts/claude-runtime/checkpoint-hygiene-skill-contract.Tests.ps1`
+  - `tests/scripts/claude-runtime/claude-runtime-structure.Tests.ps1`
+  - `tests/scripts/claude-runtime/concurrent-review-skill-contract.Tests.ps1`
+  - `tests/scripts/claude-runtime/cross-epic-skill-contract.Tests.ps1`
+  - `tests/scripts/claude-runtime/early-start-skill-contract.Tests.ps1`
+  - `tests/scripts/claude-runtime/less-evidence-contract.Tests.ps1`
+  - `tests/scripts/claude-runtime/light-remediation-skill-contract.Tests.ps1`
+  - `tests/scripts/claude-runtime/NestingDepthContract.Tests.ps1`
+  - `tests/scripts/claude-runtime/owner-directives-skill-contract.Tests.ps1`
+  - `tests/scripts/claude-runtime/parallel-gate-wording.Tests.ps1`
+  - `tests/scripts/claude-runtime/parallel-orchestrate-run-closing.Tests.ps1`
+  - `tests/scripts/claude-runtime/parallel-scheduling-rule-wording.Tests.ps1`
+  - `tests/scripts/claude-runtime/planner-worktree-removal-contract.Tests.ps1`
+  - `tests/scripts/claude-runtime/planning-contract-wording.Tests.ps1`
+  - `tests/scripts/claude-runtime/pr-author-coordinator-topology-contract.Tests.ps1`
+  - `tests/scripts/claude-runtime/pr-author-issue-link-contract.Tests.ps1`
+  - `tests/scripts/claude-runtime/regeneration-path-skill-contract.Tests.ps1`
+  - `tests/scripts/claude-runtime/review-verdict-skill-contract.Tests.ps1`
+  - `tests/scripts/claude-runtime/test-cadence-wording.Tests.ps1`
+  - `tests/scripts/codex-hooks/codex-epic-runtime-contracts.Tests.ps1`
+  - `tests/scripts/codex-hooks/codex-evidence-and-checkpoint-hooks.Tests.ps1`
+  - `tests/scripts/codex-hooks/codex-planning-only-hook.Tests.ps1`
+  - `tests/scripts/codex-hooks/codex-worktree-binding-hook.Tests.ps1`
+  - `tests/scripts/codex-hooks/enforce-epic-merge-gate-regeneration.Tests.ps1`
+  - `tests/scripts/codex-hooks/enforce-orchestration-preimplementation-gate-dev-root.Tests.ps1`
+  - `tests/scripts/codex-hooks/epic-child-launch-contract.Tests.ps1`
+  - `tests/scripts/codex-hooks/epic-child-worktree-launcher.Tests.ps1`
+  - `tests/scripts/dev-tools/ProcessReductionChain.Ledger.Tests.ps1`
+  - `tests/scripts/dev-tools/ProcessReductionChain.Tests.ps1`
+  - `tests/scripts/dev-tools/ProcessReductionLedger.Index.Tests.ps1`
+  - `tests/scripts/dev-tools/ProcessReductionLedger.Replay.Tests.ps1`
+  - `tests/scripts/dev-tools/ProcessReductionLedger.Tests.ps1`
+  - `tests/scripts/dev-tools/StageTimingDocumentation.Tests.ps1`
+  - `tests/scripts/harness/HarnessInventory.Tests.ps1`
+  - `tests/scripts/harness/HarnessParityMatrix.Tests.ps1`
+  - `tests/scripts/harness/HarnessSkillContract.Tests.ps1`
+  - `tests/scripts/harness-generation/HarnessGeneration.RepoGate.Tests.ps1`
+
+Union, pytest (63 files):
+  - `tests/scripts/dev_tools/pr_context/test_verification_evidence.py`
+  - `tests/scripts/dev_tools/pr_context/test_verification_evidence_first_occurrence.py`
+  - `tests/scripts/dev_tools/test_bash_command_shape_surfaces.py`
+  - `tests/scripts/dev_tools/test_ci_gate_all_checks_contracts.py`
+  - `tests/scripts/dev_tools/test_ci_gate_epic_child_contracts.py`
+  - `tests/scripts/dev_tools/test_claude_planning_integrity_contracts.py`
+  - `tests/scripts/dev_tools/test_claude_rules_frontmatter.py`
+  - `tests/scripts/dev_tools/test_codex_agent_wrapper_contracts.py`
+  - `tests/scripts/dev_tools/test_codex_handoff_contract_parity.py`
+  - `tests/scripts/dev_tools/test_collect_pr_context.py`
+  - `tests/scripts/dev_tools/test_collect_pr_context_expected_exit.py`
+  - `tests/scripts/dev_tools/test_collect_pr_context_part4.py`
+  - `tests/scripts/dev_tools/test_collect_pr_context_part5.py`
+  - `tests/scripts/dev_tools/test_completion_gate_documentation_contracts.py`
+  - `tests/scripts/dev_tools/test_discovery_documentation_contracts.py`
+  - `tests/scripts/dev_tools/test_epic_bounded_child_return_contract.py`
+  - `tests/scripts/dev_tools/test_epic_orchestrate_main_sync_contract.py`
+  - `tests/scripts/dev_tools/test_epic_orchestrator_permission_contracts.py`
+  - `tests/scripts/dev_tools/test_epic_skill_script_citations_shipped.py`
+  - `tests/scripts/dev_tools/test_evidence_timestamp_contracts.py`
+  - `tests/scripts/dev_tools/test_execution_environment_brief_contracts.py`
+  - `tests/scripts/dev_tools/test_json_config.py`
+  - `tests/scripts/dev_tools/test_new_active_feature_folder.py`
+  - `tests/scripts/dev_tools/test_new_active_feature_folder_bug_template_preserved.py`
+  - `tests/scripts/dev_tools/test_new_active_feature_folder_part2.py`
+  - `tests/scripts/dev_tools/test_new_active_feature_folder_part3.py`
+  - `tests/scripts/dev_tools/test_new_active_feature_folder_part4.py`
+  - `tests/scripts/dev_tools/test_new_active_feature_folder_part5.py`
+  - `tests/scripts/dev_tools/test_new_potential_bug_entry.py`
+  - `tests/scripts/dev_tools/test_orchestrator_state_remediation_docs.py`
+  - `tests/scripts/dev_tools/test_orchestrator_state_required_keys_docs.py`
+  - `tests/scripts/dev_tools/test_parallel_complexity_routing_contracts.py`
+  - `tests/scripts/dev_tools/test_parallel_issue_adoption_skill_contracts.py`
+  - `tests/scripts/dev_tools/test_parallel_issue_combination_contracts.py`
+  - `tests/scripts/dev_tools/test_parallel_mutation_admission.py`
+  - `tests/scripts/dev_tools/test_parallel_orchestrator_surface_contracts.py`
+  - `tests/scripts/dev_tools/test_plan_gate_document_docs.py`
+  - `tests/scripts/dev_tools/test_plan_gate_guideline_cutoff.py`
+  - `tests/scripts/dev_tools/test_push_down_claude_pack_end_to_end.py`
+  - `tests/scripts/dev_tools/test_push_down_claude_pack_selection.py`
+  - `tests/scripts/dev_tools/test_push_down_claude_resource_contracts.py`
+  - `tests/scripts/dev_tools/test_push_down_codex_and_agents_customizations.py`
+  - `tests/scripts/dev_tools/test_push_down_codex_and_agents_resource_contracts.py`
+  - `tests/scripts/dev_tools/test_push_down_codex_and_agents_variant_packs.py`
+  - `tests/scripts/dev_tools/test_push_down_codex_pack_selection.py`
+  - `tests/scripts/dev_tools/test_push_down_issue_824_follow_ups.py`
+  - `tests/scripts/dev_tools/test_push_down_pack_manifest_dependency_closure.py`
+  - `tests/scripts/dev_tools/test_push_down_tier_rule_adoption_gate.py`
+  - `tests/scripts/dev_tools/test_resolve_hard_lock_prompt.py`
+  - `tests/scripts/dev_tools/test_resolve_hard_lock_prompt_output.py`
+  - `tests/scripts/dev_tools/test_resolve_hard_lock_prompt_part2.py`
+  - `tests/scripts/dev_tools/test_scratch_location_contracts.py`
+  - `tests/scripts/dev_tools/test_single_pass_preflight_contracts.py`
+  - `tests/scripts/dev_tools/test_skill_bundle_contract_repo.py`
+  - `tests/scripts/dev_tools/test_typescript_toolchain_instruction_contracts.py`
+  - `tests/scripts/dev_tools/test_validate_orchestration_artifacts.py`
+  - `tests/scripts/dev_tools/test_validate_orchestrator_state_codex_model_routing.py`
+  - `tests/scripts/dev_tools/test_validate_orchestrator_state_codex_topology.py`
+  - `tests/scripts/dev_tools/test_validate_orchestrator_state_issue_adoption.py`
+  - `tests/scripts/dev_tools/test_validate_orchestrator_state_preparation_route.py`
+  - `tests/scripts/dev_tools/test_validate_orchestrator_state_routing_contract.py`
+  - `tests/scripts/dev_tools/test_validate_orchestrator_state_step_status_extras.py`
+  - `tests/scripts/dev_tools/test_validate_policy_audit_artifact.py`
