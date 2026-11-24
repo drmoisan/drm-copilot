@@ -170,15 +170,17 @@ function Write-TestSuiteRunScopeRecord {
     .PARAMETER Text
         The record text.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][string] $Path,
         [Parameter(Mandatory)][string] $Text
     )
 
-    $folder = Split-Path -Parent $Path
-    if (-not (Test-Path -LiteralPath $folder -PathType Container)) { $null = New-Item -ItemType Directory -Path $folder -Force -ErrorAction Stop }
-    Set-Content -LiteralPath $Path -Value $Text -NoNewline -Encoding utf8NoBOM -ErrorAction Stop
+    if ($PSCmdlet.ShouldProcess($Path, 'Write the test-suite run-scope record')) {
+        $folder = Split-Path -Parent $Path
+        if (-not (Test-Path -LiteralPath $folder -PathType Container)) { $null = New-Item -ItemType Directory -Path $folder -Force -ErrorAction Stop }
+        Set-Content -LiteralPath $Path -Value $Text -NoNewline -Encoding utf8NoBOM -ErrorAction Stop
+    }
 }
 
 function Invoke-TestSuiteLauncher {

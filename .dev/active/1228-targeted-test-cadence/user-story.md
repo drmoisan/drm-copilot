@@ -54,4 +54,4 @@ The orchestration rules run the full unit suite at every `[phase-gate]` task, an
 - Changing the Python atomic executor CLI.
 - Editing the epic surfaces frozen by `PINNED_FROZEN_SURFACE_HASHES`.
 - Changing the standalone Copilot agents and prompts that bracket their own runs.
-- Adding or changing hooks, validators, or configuration.
+- Adding or changing hooks, validators, or configuration, except the spec D11 exception: the launcher run-scope record `artifacts/test-execution/run-scope.<suite>.json` and the coverage-hook selection rule in the Claude and Codex feature-review coverage hooks and their freshness twins.

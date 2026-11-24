@@ -366,7 +366,7 @@ index f5f082a39..21a4c9469 100644
  ## Exit Codes and Messages
  
 diff --git a/.agents/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1 b/.agents/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1
-index a424f75da..1a91598f2 100644
+index a424f75da..762437c23 100644
 --- a/.agents/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1
 +++ b/.agents/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1
 @@ -13,6 +13,15 @@
@@ -385,7 +385,7 @@ index a424f75da..1a91598f2 100644
      The script-file entry runs only when the script is not dot-sourced; it reads the optional hashtable
      variable TestSuiteLauncherSeams from the caller's scope and splats it onto Invoke-TestSuiteLauncher.
      Through pwsh -File, PowerShell splits a word that starts with '-' and contains ':' into two $args
-@@ -80,10 +89,102 @@ function New-TestSuiteProcessStartInfo {
+@@ -80,10 +89,104 @@ function New-TestSuiteProcessStartInfo {
      return $info
  }
  
@@ -470,15 +470,17 @@ index a424f75da..1a91598f2 100644
 +    .PARAMETER Text
 +        The record text.
 +    #>
-+    [CmdletBinding()]
++    [CmdletBinding(SupportsShouldProcess)]
 +    param(
 +        [Parameter(Mandatory)][string] $Path,
 +        [Parameter(Mandatory)][string] $Text
 +    )
 +
-+    $folder = Split-Path -Parent $Path
-+    if (-not (Test-Path -LiteralPath $folder -PathType Container)) { $null = New-Item -ItemType Directory -Path $folder -Force -ErrorAction Stop }
-+    Set-Content -LiteralPath $Path -Value $Text -NoNewline -Encoding utf8NoBOM -ErrorAction Stop
++    if ($PSCmdlet.ShouldProcess($Path, 'Write the test-suite run-scope record')) {
++        $folder = Split-Path -Parent $Path
++        if (-not (Test-Path -LiteralPath $folder -PathType Container)) { $null = New-Item -ItemType Directory -Path $folder -Force -ErrorAction Stop }
++        Set-Content -LiteralPath $Path -Value $Text -NoNewline -Encoding utf8NoBOM -ErrorAction Stop
++    }
 +}
 +
  function Invoke-TestSuiteLauncher {
@@ -489,7 +491,7 @@ index a424f75da..1a91598f2 100644
      .PARAMETER ArgumentList
          The suite name followed by the extra arguments.
      .PARAMETER RepositoryRoot
-@@ -119,6 +220,8 @@ function Invoke-TestSuiteLauncher {
+@@ -119,6 +222,8 @@ function Invoke-TestSuiteLauncher {
          Seam that writes one line to standard error.
      .PARAMETER RecordClassifierInput
          Seam that receives the extra arguments exactly as the classifier receives them.
@@ -498,7 +500,7 @@ index a424f75da..1a91598f2 100644
      #>
      [CmdletBinding()]
      [OutputType([int])]
-@@ -143,7 +246,8 @@ function Invoke-TestSuiteLauncher {
+@@ -143,7 +248,8 @@ function Invoke-TestSuiteLauncher {
          [scriptblock] $Clock = { [datetime]::UtcNow },
          [scriptblock] $Sleep = { param([int] $Milliseconds) Start-Sleep -Milliseconds $Milliseconds },
          [scriptblock] $WriteStandardError = { param([string] $Line) [Console]::Error.WriteLine($Line) },
@@ -508,7 +510,7 @@ index a424f75da..1a91598f2 100644
      )
  
      # Step 0 (spec D32): load the helpers from .claude/hooks, else .codex/hooks.
-@@ -237,7 +341,9 @@ function Invoke-TestSuiteLauncher {
+@@ -237,7 +343,9 @@ function Invoke-TestSuiteLauncher {
              $writeSeam = & $seamOf 'WriteHolderText'
              Write-TestExecutionHolderRecord -Directory $lockState.Directory -Text $holderText @writeSeam
          }
@@ -518,7 +520,7 @@ index a424f75da..1a91598f2 100644
      } finally {
          if ($null -ne $lockState.Stream) {
              # Remove the record before releasing the lock, so a waiter that acquires next never loses its own record.
-@@ -246,6 +352,15 @@ function Invoke-TestSuiteLauncher {
+@@ -246,6 +354,15 @@ function Invoke-TestSuiteLauncher {
              $lockState.Stream.Dispose()
          }
      }
@@ -1196,7 +1198,7 @@ index f5f082a39..21a4c9469 100644
  ## Exit Codes and Messages
  
 diff --git a/.claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1 b/.claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1
-index a424f75da..1a91598f2 100644
+index a424f75da..762437c23 100644
 --- a/.claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1
 +++ b/.claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1
 @@ -13,6 +13,15 @@
@@ -1215,7 +1217,7 @@ index a424f75da..1a91598f2 100644
      The script-file entry runs only when the script is not dot-sourced; it reads the optional hashtable
      variable TestSuiteLauncherSeams from the caller's scope and splats it onto Invoke-TestSuiteLauncher.
      Through pwsh -File, PowerShell splits a word that starts with '-' and contains ':' into two $args
-@@ -80,10 +89,102 @@ function New-TestSuiteProcessStartInfo {
+@@ -80,10 +89,104 @@ function New-TestSuiteProcessStartInfo {
      return $info
  }
  
@@ -1300,15 +1302,17 @@ index a424f75da..1a91598f2 100644
 +    .PARAMETER Text
 +        The record text.
 +    #>
-+    [CmdletBinding()]
++    [CmdletBinding(SupportsShouldProcess)]
 +    param(
 +        [Parameter(Mandatory)][string] $Path,
 +        [Parameter(Mandatory)][string] $Text
 +    )
 +
-+    $folder = Split-Path -Parent $Path
-+    if (-not (Test-Path -LiteralPath $folder -PathType Container)) { $null = New-Item -ItemType Directory -Path $folder -Force -ErrorAction Stop }
-+    Set-Content -LiteralPath $Path -Value $Text -NoNewline -Encoding utf8NoBOM -ErrorAction Stop
++    if ($PSCmdlet.ShouldProcess($Path, 'Write the test-suite run-scope record')) {
++        $folder = Split-Path -Parent $Path
++        if (-not (Test-Path -LiteralPath $folder -PathType Container)) { $null = New-Item -ItemType Directory -Path $folder -Force -ErrorAction Stop }
++        Set-Content -LiteralPath $Path -Value $Text -NoNewline -Encoding utf8NoBOM -ErrorAction Stop
++    }
 +}
 +
  function Invoke-TestSuiteLauncher {
@@ -1319,7 +1323,7 @@ index a424f75da..1a91598f2 100644
      .PARAMETER ArgumentList
          The suite name followed by the extra arguments.
      .PARAMETER RepositoryRoot
-@@ -119,6 +220,8 @@ function Invoke-TestSuiteLauncher {
+@@ -119,6 +222,8 @@ function Invoke-TestSuiteLauncher {
          Seam that writes one line to standard error.
      .PARAMETER RecordClassifierInput
          Seam that receives the extra arguments exactly as the classifier receives them.
@@ -1328,7 +1332,7 @@ index a424f75da..1a91598f2 100644
      #>
      [CmdletBinding()]
      [OutputType([int])]
-@@ -143,7 +246,8 @@ function Invoke-TestSuiteLauncher {
+@@ -143,7 +248,8 @@ function Invoke-TestSuiteLauncher {
          [scriptblock] $Clock = { [datetime]::UtcNow },
          [scriptblock] $Sleep = { param([int] $Milliseconds) Start-Sleep -Milliseconds $Milliseconds },
          [scriptblock] $WriteStandardError = { param([string] $Line) [Console]::Error.WriteLine($Line) },
@@ -1338,7 +1342,7 @@ index a424f75da..1a91598f2 100644
      )
  
      # Step 0 (spec D32): load the helpers from .claude/hooks, else .codex/hooks.
-@@ -237,7 +341,9 @@ function Invoke-TestSuiteLauncher {
+@@ -237,7 +343,9 @@ function Invoke-TestSuiteLauncher {
              $writeSeam = & $seamOf 'WriteHolderText'
              Write-TestExecutionHolderRecord -Directory $lockState.Directory -Text $holderText @writeSeam
          }
@@ -1348,7 +1352,7 @@ index a424f75da..1a91598f2 100644
      } finally {
          if ($null -ne $lockState.Stream) {
              # Remove the record before releasing the lock, so a waiter that acquires next never loses its own record.
-@@ -246,6 +352,15 @@ function Invoke-TestSuiteLauncher {
+@@ -246,6 +354,15 @@ function Invoke-TestSuiteLauncher {
              $lockState.Stream.Dispose()
          }
      }
@@ -2994,7 +2998,7 @@ index f5f082a39..21a4c9469 100644
  ## Exit Codes and Messages
  
 diff --git a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1 b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1
-index a424f75da..1a91598f2 100644
+index a424f75da..762437c23 100644
 --- a/extensions/drm-copilot/resources/claude-customizations/.claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1
 +++ b/extensions/drm-copilot/resources/claude-customizations/.claude/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1
 @@ -13,6 +13,15 @@
@@ -3013,7 +3017,7 @@ index a424f75da..1a91598f2 100644
      The script-file entry runs only when the script is not dot-sourced; it reads the optional hashtable
      variable TestSuiteLauncherSeams from the caller's scope and splats it onto Invoke-TestSuiteLauncher.
      Through pwsh -File, PowerShell splits a word that starts with '-' and contains ':' into two $args
-@@ -80,10 +89,102 @@ function New-TestSuiteProcessStartInfo {
+@@ -80,10 +89,104 @@ function New-TestSuiteProcessStartInfo {
      return $info
  }
  
@@ -3098,15 +3102,17 @@ index a424f75da..1a91598f2 100644
 +    .PARAMETER Text
 +        The record text.
 +    #>
-+    [CmdletBinding()]
++    [CmdletBinding(SupportsShouldProcess)]
 +    param(
 +        [Parameter(Mandatory)][string] $Path,
 +        [Parameter(Mandatory)][string] $Text
 +    )
 +
-+    $folder = Split-Path -Parent $Path
-+    if (-not (Test-Path -LiteralPath $folder -PathType Container)) { $null = New-Item -ItemType Directory -Path $folder -Force -ErrorAction Stop }
-+    Set-Content -LiteralPath $Path -Value $Text -NoNewline -Encoding utf8NoBOM -ErrorAction Stop
++    if ($PSCmdlet.ShouldProcess($Path, 'Write the test-suite run-scope record')) {
++        $folder = Split-Path -Parent $Path
++        if (-not (Test-Path -LiteralPath $folder -PathType Container)) { $null = New-Item -ItemType Directory -Path $folder -Force -ErrorAction Stop }
++        Set-Content -LiteralPath $Path -Value $Text -NoNewline -Encoding utf8NoBOM -ErrorAction Stop
++    }
 +}
 +
  function Invoke-TestSuiteLauncher {
@@ -3117,7 +3123,7 @@ index a424f75da..1a91598f2 100644
      .PARAMETER ArgumentList
          The suite name followed by the extra arguments.
      .PARAMETER RepositoryRoot
-@@ -119,6 +220,8 @@ function Invoke-TestSuiteLauncher {
+@@ -119,6 +222,8 @@ function Invoke-TestSuiteLauncher {
          Seam that writes one line to standard error.
      .PARAMETER RecordClassifierInput
          Seam that receives the extra arguments exactly as the classifier receives them.
@@ -3126,7 +3132,7 @@ index a424f75da..1a91598f2 100644
      #>
      [CmdletBinding()]
      [OutputType([int])]
-@@ -143,7 +246,8 @@ function Invoke-TestSuiteLauncher {
+@@ -143,7 +248,8 @@ function Invoke-TestSuiteLauncher {
          [scriptblock] $Clock = { [datetime]::UtcNow },
          [scriptblock] $Sleep = { param([int] $Milliseconds) Start-Sleep -Milliseconds $Milliseconds },
          [scriptblock] $WriteStandardError = { param([string] $Line) [Console]::Error.WriteLine($Line) },
@@ -3136,7 +3142,7 @@ index a424f75da..1a91598f2 100644
      )
  
      # Step 0 (spec D32): load the helpers from .claude/hooks, else .codex/hooks.
-@@ -237,7 +341,9 @@ function Invoke-TestSuiteLauncher {
+@@ -237,7 +343,9 @@ function Invoke-TestSuiteLauncher {
              $writeSeam = & $seamOf 'WriteHolderText'
              Write-TestExecutionHolderRecord -Directory $lockState.Directory -Text $holderText @writeSeam
          }
@@ -3146,7 +3152,7 @@ index a424f75da..1a91598f2 100644
      } finally {
          if ($null -ne $lockState.Stream) {
              # Remove the record before releasing the lock, so a waiter that acquires next never loses its own record.
-@@ -246,6 +352,15 @@ function Invoke-TestSuiteLauncher {
+@@ -246,6 +354,15 @@ function Invoke-TestSuiteLauncher {
              $lockState.Stream.Dispose()
          }
      }
@@ -3587,7 +3593,7 @@ index f5f082a39..21a4c9469 100644
  ## Exit Codes and Messages
  
 diff --git a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1 b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1
-index a424f75da..1a91598f2 100644
+index a424f75da..762437c23 100644
 --- a/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1
 +++ b/extensions/drm-copilot/resources/codex-and-agents-customizations/.agents/skills/test-execution-policy/scripts/Invoke-TestSuite.ps1
 @@ -13,6 +13,15 @@
@@ -3606,7 +3612,7 @@ index a424f75da..1a91598f2 100644
      The script-file entry runs only when the script is not dot-sourced; it reads the optional hashtable
      variable TestSuiteLauncherSeams from the caller's scope and splats it onto Invoke-TestSuiteLauncher.
      Through pwsh -File, PowerShell splits a word that starts with '-' and contains ':' into two $args
-@@ -80,10 +89,102 @@ function New-TestSuiteProcessStartInfo {
+@@ -80,10 +89,104 @@ function New-TestSuiteProcessStartInfo {
      return $info
  }
  
@@ -3691,15 +3697,17 @@ index a424f75da..1a91598f2 100644
 +    .PARAMETER Text
 +        The record text.
 +    #>
-+    [CmdletBinding()]
++    [CmdletBinding(SupportsShouldProcess)]
 +    param(
 +        [Parameter(Mandatory)][string] $Path,
 +        [Parameter(Mandatory)][string] $Text
 +    )
 +
-+    $folder = Split-Path -Parent $Path
-+    if (-not (Test-Path -LiteralPath $folder -PathType Container)) { $null = New-Item -ItemType Directory -Path $folder -Force -ErrorAction Stop }
-+    Set-Content -LiteralPath $Path -Value $Text -NoNewline -Encoding utf8NoBOM -ErrorAction Stop
++    if ($PSCmdlet.ShouldProcess($Path, 'Write the test-suite run-scope record')) {
++        $folder = Split-Path -Parent $Path
++        if (-not (Test-Path -LiteralPath $folder -PathType Container)) { $null = New-Item -ItemType Directory -Path $folder -Force -ErrorAction Stop }
++        Set-Content -LiteralPath $Path -Value $Text -NoNewline -Encoding utf8NoBOM -ErrorAction Stop
++    }
 +}
 +
  function Invoke-TestSuiteLauncher {
@@ -3710,7 +3718,7 @@ index a424f75da..1a91598f2 100644
      .PARAMETER ArgumentList
          The suite name followed by the extra arguments.
      .PARAMETER RepositoryRoot
-@@ -119,6 +220,8 @@ function Invoke-TestSuiteLauncher {
+@@ -119,6 +222,8 @@ function Invoke-TestSuiteLauncher {
          Seam that writes one line to standard error.
      .PARAMETER RecordClassifierInput
          Seam that receives the extra arguments exactly as the classifier receives them.
@@ -3719,7 +3727,7 @@ index a424f75da..1a91598f2 100644
      #>
      [CmdletBinding()]
      [OutputType([int])]
-@@ -143,7 +246,8 @@ function Invoke-TestSuiteLauncher {
+@@ -143,7 +248,8 @@ function Invoke-TestSuiteLauncher {
          [scriptblock] $Clock = { [datetime]::UtcNow },
          [scriptblock] $Sleep = { param([int] $Milliseconds) Start-Sleep -Milliseconds $Milliseconds },
          [scriptblock] $WriteStandardError = { param([string] $Line) [Console]::Error.WriteLine($Line) },
@@ -3729,7 +3737,7 @@ index a424f75da..1a91598f2 100644
      )
  
      # Step 0 (spec D32): load the helpers from .claude/hooks, else .codex/hooks.
-@@ -237,7 +341,9 @@ function Invoke-TestSuiteLauncher {
+@@ -237,7 +343,9 @@ function Invoke-TestSuiteLauncher {
              $writeSeam = & $seamOf 'WriteHolderText'
              Write-TestExecutionHolderRecord -Directory $lockState.Directory -Text $holderText @writeSeam
          }
@@ -3739,7 +3747,7 @@ index a424f75da..1a91598f2 100644
      } finally {
          if ($null -ne $lockState.Stream) {
              # Remove the record before releasing the lock, so a waiter that acquires next never loses its own record.
-@@ -246,6 +352,15 @@ function Invoke-TestSuiteLauncher {
+@@ -246,6 +354,15 @@ function Invoke-TestSuiteLauncher {
              $lockState.Stream.Dispose()
          }
      }
@@ -5886,10 +5894,10 @@ index 000000000..c489ccc5b
 +}
 diff --git a/tests/scripts/claude-skills/test-execution-policy/Invoke-TestSuite.RunScope.Tests.ps1 b/tests/scripts/claude-skills/test-execution-policy/Invoke-TestSuite.RunScope.Tests.ps1
 new file mode 100644
-index 000000000..666dfba73
+index 000000000..8b659d7d8
 --- /dev/null
 +++ b/tests/scripts/claude-skills/test-execution-policy/Invoke-TestSuite.RunScope.Tests.ps1
-@@ -0,0 +1,269 @@
+@@ -0,0 +1,283 @@
 +#Requires -Version 7.0
 +#Requires -Modules @{ ModuleName = 'Pester'; ModuleVersion = '5.0.0' }
 +<#
@@ -6157,5 +6165,19 @@ index 000000000..666dfba73
 +        # Assert
 +        Should -Invoke New-Item -Times 0 -Exactly
 +        Should -Invoke Set-Content -Times 1 -Exactly
++    }
++
++    It 'RSCOPE-LAUNCH-WRITER-WHATIF: -WhatIf creates no folder and writes no record' {
++        # Arrange
++        Mock Test-Path { $false }
++        Mock New-Item { }
++        Mock Set-Content { }
++
++        # Act
++        Write-TestSuiteRunScopeRecord -Path '/repo/artifacts/test-execution/run-scope.pester.json' -Text '{}' -WhatIf
++
++        # Assert
++        Should -Invoke New-Item -Times 0 -Exactly -Because 'ShouldProcess declines under -WhatIf'
++        Should -Invoke Set-Content -Times 0 -Exactly -Because 'ShouldProcess declines under -WhatIf'
 +    }
 +}

@@ -266,4 +266,18 @@ Describe 'Write-TestSuiteRunScopeRecord (issue #1228)' {
         Should -Invoke New-Item -Times 0 -Exactly
         Should -Invoke Set-Content -Times 1 -Exactly
     }
+
+    It 'RSCOPE-LAUNCH-WRITER-WHATIF: -WhatIf creates no folder and writes no record' {
+        # Arrange
+        Mock Test-Path { $false }
+        Mock New-Item { }
+        Mock Set-Content { }
+
+        # Act
+        Write-TestSuiteRunScopeRecord -Path '/repo/artifacts/test-execution/run-scope.pester.json' -Text '{}' -WhatIf
+
+        # Assert
+        Should -Invoke New-Item -Times 0 -Exactly -Because 'ShouldProcess declines under -WhatIf'
+        Should -Invoke Set-Content -Times 0 -Exactly -Because 'ShouldProcess declines under -WhatIf'
+    }
 }
