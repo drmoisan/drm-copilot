@@ -39,6 +39,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsValidation.ps
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerMutation.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsFamilyCheck.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsCoverageReport.psm1') -ErrorAction Stop
+Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsPagePlaceholder.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerBindRefs.psm1') -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath 'DocsLedgerBatch.psm1') -ErrorAction Stop
 
@@ -431,7 +432,7 @@ function Invoke-DocsCoverageCommand {
         Builds the read-only coverage report over the profile, snapshot, ledger, matrix, pin collection and page-path set.
     .DESCRIPTION
         Options: Profile. An absent ledger, matrix or pin collection is treated as empty. Exit 0
-        with the report and no finding; exit 1 with a null result when the profile does not load,
+        with the report, whose last keys are placeholders (DocsPagePlaceholder.psm1) and families (DocsFamilyCheck.psm1, issue #1221), and no finding; exit 1 with a null result when the profile does not load,
         the snapshot is absent (DOCS_INPUT_UNREADABLE) or an input fails parse, schema or element
         rebuild; exit 2 for a usage error before any read; exit 3 (DOCS_CLI_RUNTIME) for a read
         failure, uncomposable schemas or a non-UTC clock. The WriteText member is never read.
@@ -454,8 +455,9 @@ function Invoke-DocsCoverageCommand {
         $documents = Read-DocsLedgerCommandDocumentSet -Command $command -Profile $profileRead.Profile -ComposedSchemaSet $schemas -ReadBytes $Context.ReadBytes -TestFile $Context.TestFile -ListFile $Context.ListFile
         if ($null -ne $documents.Result) { return $documents.Result }
         $report = Get-DocsCoverageReport -SnapshotView $documents.View -Ledger $documents.Ledger -Matrix $documents.Matrix -PinSet $documents.PinSet
+        $report['placeholders'] = Get-DocsPlaceholderReport -PagePath $documents.PagePath -ReadBytes $Context.ReadBytes
         $report['families'] = Get-DocsCoverageFamilySection -Profile $profileRead.Profile -Evidence (Read-DocsFamilyEvidence -Profile $profileRead.Profile -TestFile $Context.TestFile -ListFile $Context.ListFile)
-        return New-DocsCommandResult -Command $command -ExitCode 0 -Finding @() -Result $report -Line (ConvertTo-DocsCoverageReportLine -Report $report)
+        return New-DocsCommandResult -Command $command -ExitCode 0 -Finding @() -Result $report -Line ([string[]] (ConvertTo-DocsCoverageReportLine -Report $report) + [string[]] (ConvertTo-DocsPlaceholderReportLine -Report $report['placeholders']))
     } catch {
         return New-DocsLedgerCommandRuntimeResult -Command $command -Message "The command failed: $($_.Exception.Message)"
     }

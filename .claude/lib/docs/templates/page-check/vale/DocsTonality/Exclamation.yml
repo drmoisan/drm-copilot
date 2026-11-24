@@ -1,0 +1,11 @@
+# Enforces .claude/rules/tonality.md "Humor and Joking — Prohibited"
+# (excitement markers): no sentence-ending exclamation marks.
+extends: existence
+message: "Avoid exclamation marks (tonality policy: calm, neutral phrasing)."
+level: error
+ignorecase: true
+scope: ~blockquote
+nonword: true
+tokens:
+  - '!\s*$'
+  - '!\s+[A-Z]'

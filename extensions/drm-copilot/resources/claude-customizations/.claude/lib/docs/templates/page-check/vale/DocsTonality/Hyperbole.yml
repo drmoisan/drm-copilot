@@ -1,0 +1,33 @@
+# Enforces .claude/rules/tonality.md "Hyperbole — Prohibited": no inflated or
+# sensational praise words in governed documentation.
+extends: existence
+message: "Avoid hyperbole: '%s' (tonality policy: measured, evidence-based wording)."
+level: error
+ignorecase: true
+scope: ~blockquote
+tokens:
+  - perfect
+  - perfectly
+  - flawless
+  - flawlessly
+  - amazing
+  - incredible
+  - incredibly
+  - revolutionary
+  - world-class
+  - best-in-class
+  - cutting-edge
+  - state-of-the-art
+  - seamless
+  - seamlessly
+  - effortless
+  - effortlessly
+  - blazing
+  - lightning-fast
+  - bulletproof
+  - rock-solid
+  - game-changing
+  - supercharge
+  - awesome
+  - fantastic
+  - magical

@@ -1,7 +1,9 @@
 # Documentation quality workflow, written by `Invoke-DocsCommand.ps1 -Command init -Write`.
-# PowerShell 7 is the only runtime this workflow uses. Every documentation command runs through
-# .claude/lib/docs/Invoke-DocsCommand.ps1. The validated revision reaches each step through env:
-# and never through an inline expression inside run:.
+# Every run step uses PowerShell 7 (shell: pwsh), and every documentation command runs through
+# .claude/lib/docs/Invoke-DocsCommand.ps1. Markdown lint uses the pinned markdownlint-cli2 action,
+# and prose lint uses Vale, a pinned, checksum-verified release binary. Every uses: reference is
+# pinned to a full commit SHA. Values reach each script through env: and never through an inline
+# expression inside run:.
 name: Documentation quality
 
 on:
@@ -34,7 +36,7 @@ jobs:
       DOCS_BASE_REF: ${{ inputs.base-ref }}
     steps:
       - name: Check out the head revision with full history
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
@@ -56,9 +58,54 @@ jobs:
         shell: pwsh
         run: pwsh -NoProfile -File .claude/lib/docs/Invoke-DocsCommand.ps1 -Command surface-delta -Base "$env:DOCS_BASE_REF"
 
+      - name: Resolve the lint scope from the documentation roots
+        id: docs-lint-scope
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        run: |
+          $docsProfile = Get-Content -Raw -LiteralPath 'docs/documentation-estate/docs-profile.json' | ConvertFrom-Json -AsHashtable
+          $roots = @(@($docsProfile['documentation_roots']) | Where-Object { $null -ne $_ } | ForEach-Object { [string] $_['path'] } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+          if ($roots.Count -eq 0) { throw 'DOCS_LINT_SCOPE_EMPTY: the docs profile lists no documentation_roots path.' }
+          $globs = @($roots | ForEach-Object { "$_/**/*.md" })
+          $records = @('globs<<DOCS_LINT_SCOPE_EOF') + $globs + @('DOCS_LINT_SCOPE_EOF', 'roots<<DOCS_LINT_SCOPE_EOF') + $roots + @('DOCS_LINT_SCOPE_EOF')
+          Add-Content -LiteralPath $env:GITHUB_OUTPUT -Value $records
+
+      - name: Lint Markdown pages
+        if: ${{ !cancelled() }}
+        uses: DavidAnson/markdownlint-cli2-action@696eb3f2509270d7b882d2aa68347bc676e7af34 # v25.0.0
+        with:
+          config: docs/documentation-estate/.markdownlint.json
+          globs: ${{ steps.docs-lint-scope.outputs.globs }}
+
+      - name: Install Vale
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        env:
+          VALE_VERSION: "3.25.1"
+          VALE_SHA256: "4bf5c5176b682b1da0830f471584d3494f1c2e27ee3029e1ad6f6661d4962182"
+        run: |
+          $archiveName = "vale_$($env:VALE_VERSION)_Linux_64-bit.tar.gz"
+          $archive = Join-Path -Path $env:RUNNER_TEMP -ChildPath $archiveName
+          Invoke-WebRequest -Uri ('https://github.com/vale-cli/vale/releases/download/v3.25.1/' + $archiveName) -OutFile $archive
+          $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $archive).Hash.ToLowerInvariant()
+          if ($actual -cne $env:VALE_SHA256) { throw "VALE_SHA256_MISMATCH: expected $($env:VALE_SHA256), got $actual" }
+          New-Item -ItemType Directory -Path "$env:RUNNER_TEMP/vale" -Force | Out-Null
+          tar -xzf $archive -C "$env:RUNNER_TEMP/vale" vale
+          & "$env:RUNNER_TEMP/vale/vale" --version
+
+      - name: Lint prose with Vale
+        if: ${{ !cancelled() }}
+        shell: pwsh
+        env:
+          DOCS_LINT_ROOTS: ${{ steps.docs-lint-scope.outputs.roots }}
+        run: |
+          $valeRoots = @($env:DOCS_LINT_ROOTS -split '\r?\n' | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+          & "$env:RUNNER_TEMP/vale/vale" --config docs/documentation-estate/.vale.ini --output line @valeRoots
+          exit $LASTEXITCODE
+
       - name: Upload the validation receipt
         if: ${{ always() }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: docs-validation-receipt
           path: docs/documentation-estate/docs-validation-receipt.json

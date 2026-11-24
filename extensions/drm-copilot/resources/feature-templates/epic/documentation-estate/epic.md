@@ -13,7 +13,7 @@ intent:
   nfrs:
     - The docs-complete receipt passes at the head revision of the integration branch before the epic closes.
     - No consumer identifier appears in documentation produced by the framework; repository specificity lives in the docs profile.
-    - Linting is optional; the page check is the required page gate.
+    - The init-written workflow runs markdownlint and Vale; the page check is the required page-structure gate.
     - PowerShell 7.4 or later is the only required runtime for the helpers.
 # PLANNING STATE: issue_num values 900001 to 900011 are placeholders. /epic-plan back-fills the
 # real issue numbers when each child is promoted; depends_on uses issue_num values.
@@ -79,7 +79,7 @@ revision of the integration branch and its receipt is pinned to that revision.
 ## Non-Goals
 
 - Building a documentation site or choosing a site generator.
-- Adopting a Markdown or prose linter as a required gate; linting stays optional.
+- Adding linters beyond the markdownlint and Vale steps of the init-written workflow.
 - Changing the code surface in order to make it easier to document.
 
 ## Shared Design
@@ -92,8 +92,8 @@ revision of the integration branch and its receipt is pinned to that revision.
 - `analysis_method`: every inventory snapshot element and every ledger entry records whether the
   element was found by the native Python analyzer (`native`) or by the PowerShell scanner
   (`scanner`). The optional python pack enables the native analyzer; without it the scanner is used.
-- Linting is optional: `init -Write` writes linter configuration as data, and `check` is the required
-  page gate.
+- Linting: `init -Write` writes linter configuration as data and a workflow that runs
+  markdownlint and Vale; `check` is the required page-structure gate.
 - Prerequisite: PowerShell 7.4 or later on PATH as `pwsh`, locally and on the CI runner.
 - Receipts: only the root session or CI persists a `docs-complete` receipt.
 

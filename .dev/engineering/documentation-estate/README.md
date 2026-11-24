@@ -33,7 +33,7 @@ subcommand or docs MCP tool has no heading and example in `command-reference.md`
 | Page | Content |
 |---|---|
 | [architecture.md](architecture.md) | Helper root, entry script and dispatch table, command context, schemas, analyzers, `analysis_method`, ledger, parity matrix, evidence pins, receipt, generated blocks, MCP wrappers and the opt-in hook |
-| [consumer-onboarding.md](consumer-onboarding.md) | Prerequisites, the optional python pack, optional linting, adoption steps, consumer CI and the epic template |
+| [consumer-onboarding.md](consumer-onboarding.md) | Prerequisites, the optional python pack, linting, adoption steps, consumer CI and the epic template |
 | [command-reference.md](command-reference.md) | Common parameters, exit codes, the JSON envelope, every subcommand and every docs MCP tool with examples |
 | [workflow.md](workflow.md) | Documentation roles and skills, the authoring sequence, receipt persistence, the integration-PR gate and the surface-delta review step |
 

@@ -187,53 +187,53 @@ Autonomous mode; each decision takes the recommended option.
 
 ### Workflow template
 
-- [ ] A Pester content test of `.claude/lib/docs/templates/_docs-quality.yml` passes and asserts a step that uses `DavidAnson/markdownlint-cli2-action@696eb3f2509270d7b882d2aa68347bc676e7af34 # v25.0.0` with `config: docs/documentation-estate/.markdownlint.json` and `globs: ${{ steps.docs-lint-scope.outputs.globs }}`.
-- [ ] A Pester content test passes and asserts a lint-scope step with `id: docs-lint-scope` that reads `docs/documentation-estate/docs-profile.json`, writes the `globs` and `roots` outputs to `$env:GITHUB_OUTPUT`, and contains the text `DOCS_LINT_SCOPE_EMPTY`.
-- [ ] A Pester content test passes and asserts a Vale install step whose `env:` sets `VALE_VERSION: "3.25.1"` and `VALE_SHA256` to `4bf5c5176b682b1da0830f471584d3494f1c2e27ee3029e1ad6f6661d4962182`, whose script downloads from `https://github.com/vale-cli/vale/releases/download/v3.25.1/`, calls `Get-FileHash -Algorithm SHA256`, compares with `-cne`, and contains `throw` with `VALE_SHA256_MISMATCH` at a position before the first `tar` call.
-- [ ] Recorded evidence under `evidence/other/` shows a run of the install sequence with an altered expected hash that exits non-zero, reports `VALE_SHA256_MISMATCH`, and leaves no extracted `vale` binary.
-- [ ] A Pester content test passes and asserts a Vale run step whose `env:` sets `DOCS_LINT_ROOTS: ${{ steps.docs-lint-scope.outputs.roots }}` and whose script invokes Vale with `--config docs/documentation-estate/.vale.ini` and ends with `exit $LASTEXITCODE`.
-- [ ] A Pester content test passes and asserts that every `uses:` line in the template references a 40-character lowercase hexadecimal commit SHA followed by a `# vX.Y.Z` comment, and that the checkout and upload-artifact references equal the commits in the `### Workflow pins` table.
-- [ ] A Pester content test passes and asserts `permissions:` with `contents: read` at the workflow level and the job level, and no other permission scope.
-- [ ] A Pester content test passes and asserts that no `run:` block body (including every line of a `run: |` block) contains `${{`.
-- [ ] A Pester content test passes and asserts that every run step sets `shell: pwsh`, that the lint-scope, Markdown lint, Vale install, and Vale run steps carry `if: ${{ !cancelled() }}` and appear in that order after the documentation-command steps, and that the upload step carries `if: ${{ always() }}`.
-- [ ] The existing Pester assertions that the template contains none of the tokens `setup-python`, `setup-node`, `python`, `npm`, and `node` pass unchanged.
-- [ ] Recorded evidence under `evidence/other/` shows `actionlint` 1.7.12 run over the template with exit code 0.
+- [x] A Pester content test of `.claude/lib/docs/templates/_docs-quality.yml` passes and asserts a step that uses `DavidAnson/markdownlint-cli2-action@696eb3f2509270d7b882d2aa68347bc676e7af34 # v25.0.0` with `config: docs/documentation-estate/.markdownlint.json` and `globs: ${{ steps.docs-lint-scope.outputs.globs }}`.
+- [x] A Pester content test passes and asserts a lint-scope step with `id: docs-lint-scope` that reads `docs/documentation-estate/docs-profile.json`, writes the `globs` and `roots` outputs to `$env:GITHUB_OUTPUT`, and contains the text `DOCS_LINT_SCOPE_EMPTY`.
+- [x] A Pester content test passes and asserts a Vale install step whose `env:` sets `VALE_VERSION: "3.25.1"` and `VALE_SHA256` to `4bf5c5176b682b1da0830f471584d3494f1c2e27ee3029e1ad6f6661d4962182`, whose script downloads from `https://github.com/vale-cli/vale/releases/download/v3.25.1/`, calls `Get-FileHash -Algorithm SHA256`, compares with `-cne`, and contains `throw` with `VALE_SHA256_MISMATCH` at a position before the first `tar` call.
+- [x] Recorded evidence under `evidence/other/` shows a run of the install sequence with an altered expected hash that exits non-zero, reports `VALE_SHA256_MISMATCH`, and leaves no extracted `vale` binary.
+- [x] A Pester content test passes and asserts a Vale run step whose `env:` sets `DOCS_LINT_ROOTS: ${{ steps.docs-lint-scope.outputs.roots }}` and whose script invokes Vale with `--config docs/documentation-estate/.vale.ini` and ends with `exit $LASTEXITCODE`.
+- [x] A Pester content test passes and asserts that every `uses:` line in the template references a 40-character lowercase hexadecimal commit SHA followed by a `# vX.Y.Z` comment, and that the checkout and upload-artifact references equal the commits in the `### Workflow pins` table.
+- [x] A Pester content test passes and asserts `permissions:` with `contents: read` at the workflow level and the job level, and no other permission scope.
+- [x] A Pester content test passes and asserts that no `run:` block body (including every line of a `run: |` block) contains `${{`.
+- [x] A Pester content test passes and asserts that every run step sets `shell: pwsh`, that the lint-scope, Markdown lint, Vale install, and Vale run steps carry `if: ${{ !cancelled() }}` and appear in that order after the documentation-command steps, and that the upload step carries `if: ${{ always() }}`.
+- [x] The existing Pester assertions that the template contains none of the tokens `setup-python`, `setup-node`, `python`, `npm`, and `node` pass unchanged.
+- [x] Recorded evidence under `evidence/other/` shows `actionlint` 1.7.12 run over the template with exit code 0.
 
 ### Tonality style and Vale configuration
 
-- [ ] A Pester test passes and asserts that `Invoke-DocsInitCommand -Write` against an in-memory context writes `Certainty.yml`, `Exclamation.yml`, `Filler.yml`, `Hyperbole.yml`, and `Intensifiers.yml` under `docs/documentation-estate/.vale/styles/DocsTonality/` with content equal to the template sources.
-- [ ] A Pester content test passes for each DocsTonality file and asserts `extends: existence`, `ignorecase: true`, `scope: ~blockquote`, a leading comment naming `.claude/rules/tonality.md`, and no occurrence of `drm-copilot`, `rgf`, or `Rgf`; it asserts `level: error` for Certainty, Exclamation, Filler, and Hyperbole and `level: warning` for Intensifiers.
-- [ ] A Pester content test passes and asserts that the Hyperbole token list includes `perfect` and `world-class`, and that Exclamation sets `nonword: true` with the tokens `'!\s*$'` and `'!\s+[A-Z]'`.
-- [ ] A Pester test passes and asserts that `Get-DocsInitTemplate` returns the 1219 anchor rows after the 1034 workflow row, that the 1021 rows and the 1034 row are unchanged, and that the only row with a `.github/workflows/` destination is `.github/workflows/_docs-quality.yml`.
-- [ ] A Pester content test passes and asserts that the `.vale.ini` template contains the line `BasedOnStyles = Vale, DocsBase, DocsTonality` and the line `Vale.Spelling = warning` under `[*.md]`.
-- [ ] Recorded evidence under `evidence/other/` shows Vale 3.25.1, verified against the upstream checksum for the asset used, run with `--config` pointing at the init-written `.vale.ini` over a page containing the word `perfect`, with `EXIT_CODE: 1`, `ExpectedExitCode: 1`, and an output summary naming `DocsTonality.Hyperbole` at error level.
+- [x] A Pester test passes and asserts that `Invoke-DocsInitCommand -Write` against an in-memory context writes `Certainty.yml`, `Exclamation.yml`, `Filler.yml`, `Hyperbole.yml`, and `Intensifiers.yml` under `docs/documentation-estate/.vale/styles/DocsTonality/` with content equal to the template sources.
+- [x] A Pester content test passes for each DocsTonality file and asserts `extends: existence`, `ignorecase: true`, `scope: ~blockquote`, a leading comment naming `.claude/rules/tonality.md`, and no occurrence of `drm-copilot`, `rgf`, or `Rgf`; it asserts `level: error` for Certainty, Exclamation, Filler, and Hyperbole and `level: warning` for Intensifiers.
+- [x] A Pester content test passes and asserts that the Hyperbole token list includes `perfect` and `world-class`, and that Exclamation sets `nonword: true` with the tokens `'!\s*$'` and `'!\s+[A-Z]'`.
+- [x] A Pester test passes and asserts that `Get-DocsInitTemplate` returns the 1219 anchor rows after the 1034 workflow row, that the 1021 rows and the 1034 row are unchanged, and that the only row with a `.github/workflows/` destination is `.github/workflows/_docs-quality.yml`.
+- [x] A Pester content test passes and asserts that the `.vale.ini` template contains the line `BasedOnStyles = Vale, DocsBase, DocsTonality` and the line `Vale.Spelling = warning` under `[*.md]`.
+- [x] Recorded evidence under `evidence/other/` shows Vale 3.25.1, verified against the upstream checksum for the asset used, run with `--config` pointing at the init-written `.vale.ini` over a page containing the word `perfect`, with `EXIT_CODE: 1`, `ExpectedExitCode: 1`, and an output summary naming `DocsTonality.Hyperbole` at error level.
 
 ### Placeholder counter
 
-- [ ] Pester tests in `tests/scripts/claude-lib/docs/DocsPagePlaceholder.Tests.ps1` pass and assert counts of 0, 1, and 3 for pages with zero, one, and three occurrences, and a count of 2 for two occurrences on one line.
-- [ ] A Pester test passes and asserts that the token wrapped across one line break inside a paragraph counts 1, and that the words separated by a blank line count 0.
-- [ ] A Pester test passes and asserts that `sme input required` and `SME Input Required` count 0.
-- [ ] Pester tests pass and assert a count of 0 for the token inside front matter, inside a backtick fenced block, inside a tilde fenced block, inside an inline code span, and inside an HTML comment.
-- [ ] A Pester test passes and asserts that a page with an unterminated front matter block containing the token counts 1.
-- [ ] A Pester test passes and asserts that a CRLF page built in memory gives the same count as its LF form.
-- [ ] Pester tests pass and assert that `Get-DocsPlaceholderReport` skips a non-`.md` page, skips a page whose bytes are not valid UTF-8, sums `total` across pages, omits pages with a count of 0 from `pages`, and orders `pages` ordinally by `page_path`.
-- [ ] A Pester test passes and asserts that `ConvertTo-DocsPlaceholderReportLine` returns `placeholders: token="SME input required" total=<n> pages=<m>` followed by one `placeholder <page_path> count=<n>` line per listed page in `pages` order.
-- [ ] A Pester test of `Invoke-DocsCoverageCommand` passes and asserts that the result keys equal the prior key set plus `placeholders`, that the fixture result has `placeholders.total` equal to 0, and that the context members used are `ListFile`, `ReadBytes`, and `TestFile` with no `WriteText` call.
-- [ ] A Pester test passes and asserts that the coverage command exit code for a fixture whose pages contain the token equals the exit code for the same fixture without the token.
-- [ ] `git diff` of the branch against its merge base shows no change to `.claude/lib/docs/DocsCoverageReport.psm1`, and `DocsCoverageReport.Tests.ps1` and `DocsCoverageReport.Properties.Tests.ps1` pass unchanged.
-- [ ] `DocsPagePlaceholder.psm1` reaches at least 85% line coverage in the PowerShell coverage run, recorded under `evidence/qa-gates/`.
+- [x] Pester tests in `tests/scripts/claude-lib/docs/DocsPagePlaceholder.Tests.ps1` pass and assert counts of 0, 1, and 3 for pages with zero, one, and three occurrences, and a count of 2 for two occurrences on one line.
+- [x] A Pester test passes and asserts that the token wrapped across one line break inside a paragraph counts 1, and that the words separated by a blank line count 0.
+- [x] A Pester test passes and asserts that `sme input required` and `SME Input Required` count 0.
+- [x] Pester tests pass and assert a count of 0 for the token inside front matter, inside a backtick fenced block, inside a tilde fenced block, inside an inline code span, and inside an HTML comment.
+- [x] A Pester test passes and asserts that a page with an unterminated front matter block containing the token counts 1.
+- [x] A Pester test passes and asserts that a CRLF page built in memory gives the same count as its LF form.
+- [x] Pester tests pass and assert that `Get-DocsPlaceholderReport` skips a non-`.md` page, skips a page whose bytes are not valid UTF-8, sums `total` across pages, omits pages with a count of 0 from `pages`, and orders `pages` ordinally by `page_path`.
+- [x] A Pester test passes and asserts that `ConvertTo-DocsPlaceholderReportLine` returns `placeholders: token="SME input required" total=<n> pages=<m>` followed by one `placeholder <page_path> count=<n>` line per listed page in `pages` order.
+- [x] A Pester test of `Invoke-DocsCoverageCommand` passes and asserts that the result keys equal the prior key set plus `placeholders`, that the fixture result has `placeholders.total` equal to 0, and that the context members used are `ListFile`, `ReadBytes`, and `TestFile` with no `WriteText` call.
+- [x] A Pester test passes and asserts that the coverage command exit code for a fixture whose pages contain the token equals the exit code for the same fixture without the token.
+- [x] `git diff` of the branch against its merge base shows no change to `.claude/lib/docs/DocsCoverageReport.psm1`, and `DocsCoverageReport.Tests.ps1` and `DocsCoverageReport.Properties.Tests.ps1` pass unchanged.
+- [x] `DocsPagePlaceholder.psm1` reaches at least 85% line coverage in the PowerShell coverage run, recorded under `evidence/qa-gates/`.
 
 ### Documentation, parity, and limits
 
-- [ ] The docs-init skill on every surface (`.agents`, generated `.claude`, and both bundle copies) and `.dev/engineering/documentation-estate/consumer-onboarding.md` contain no sentence stating that no workflow step runs Vale or markdownlint, and contain the replacement statement; `docs-authoring-roles.Skills.Tests.ps1` and `DocumentationEstateOnboarding.Tests.ps1` pass with the updated token.
-- [ ] `consumer-onboarding.md` no longer states that PowerShell is the only runtime the workflow uses, and `command-reference.md` `### coverage` names the `placeholders` key and the token `SME input required`.
-- [ ] Every new or changed file under `.claude/lib/docs/` is byte-identical to its copy under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`, and `core.json` lists `DocsPagePlaceholder.psm1` and the five DocsTonality templates; `test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, and `test_push_down_codex_and_agents_resource_contracts.py` pass.
-- [ ] `Invoke-HarnessGeneration.ps1 -Check` exits 0 and `HarnessGeneration.RepoGate.Tests.ps1` passes.
-- [ ] Recorded evidence shows `DocsLedgerCommands.psm1` at no more than 762 logical lines after the change, and every new or changed production, test, and script file at or below 800 logical lines.
-- [ ] One parallel Pester gate run (`Invoke-PoshQCParallelTest` through the test-execution launcher) passes with the PoshQC format and analyze stages clean, recorded under `evidence/qa-gates/`.
+- [x] The docs-init skill on every surface (`.agents`, generated `.claude`, and both bundle copies) and `.dev/engineering/documentation-estate/consumer-onboarding.md` contain no sentence stating that no workflow step runs Vale or markdownlint, and contain the replacement statement; `docs-authoring-roles.Skills.Tests.ps1` and `DocumentationEstateOnboarding.Tests.ps1` pass with the updated token.
+- [x] `consumer-onboarding.md` no longer states that PowerShell is the only runtime the workflow uses, and `command-reference.md` `### coverage` names the `placeholders` key and the token `SME input required`.
+- [x] Every new or changed file under `.claude/lib/docs/` is byte-identical to its copy under `extensions/drm-copilot/resources/claude-customizations/.claude/lib/docs/`, and `core.json` lists `DocsPagePlaceholder.psm1` and the five DocsTonality templates; `test_push_down_claude_resource_contracts.py`, `test_push_down_claude_pack_manifest_completeness.py`, `test_push_down_pack_manifest_dependency_closure.py`, and `test_push_down_codex_and_agents_resource_contracts.py` pass.
+- [x] `Invoke-HarnessGeneration.ps1 -Check` exits 0 and `HarnessGeneration.RepoGate.Tests.ps1` passes.
+- [x] Recorded evidence shows `DocsLedgerCommands.psm1` at no more than 762 logical lines after the change, and every new or changed production, test, and script file at or below 800 logical lines.
+- [x] One parallel Pester gate run (`Invoke-PoshQCParallelTest` through the test-execution launcher) passes with the PoshQC format and analyze stages clean, recorded under `evidence/qa-gates/`.
 
 ## Definition of Done
 
-- [ ] Every acceptance criterion above is mapped to a test or an evidence artifact in the plan.
-- [ ] The toolchain loop (format, lint, architecture and contract checks, tests) completes in one clean pass.
-- [ ] Evidence is recorded append-only under the feature `evidence/` folder.
+- [x] Every acceptance criterion above is mapped to a test or an evidence artifact in the plan.
+- [x] The toolchain loop (format, lint, architecture and contract checks, tests) completes in one clean pass.
+- [x] Evidence is recorded append-only under the feature `evidence/` folder.

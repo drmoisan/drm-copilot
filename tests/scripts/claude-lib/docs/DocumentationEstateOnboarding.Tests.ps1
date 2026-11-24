@@ -171,12 +171,12 @@ Describe 'documentation-estate onboarding pages' {
         $text.Contains('records `analysis_method: scanner`') | Should -BeTrue
     }
 
-    It 'states that linting is optional and check is the required page gate' {
+    It 'states that lint steps are part of the written workflow and check is the required page gate' {
         # Arrange
         $text = Get-NormalizedText -Text $script:PageText['consumer-onboarding.md']
 
         # Assert
-        $text.Contains('Linting is optional') | Should -BeTrue
+        $text.Contains('Lint steps are part of the written workflow') | Should -BeTrue
         $text.Contains('`check` is the required page gate') | Should -BeTrue
     }
 
@@ -221,7 +221,7 @@ Describe 'documentation-estate onboarding statements of issue #1169' {
         }
 
         $script:StatementCase = @(
-            @{ Page = 'consumer-onboarding.md'; Heading = '## Linting'; Token = @('--config docs/documentation-estate/.vale.ini', 'VALE_CONFIG_PATH', 'docs/documentation-estate/.markdownlint.json', 'No workflow step runs Vale or markdownlint', 'policy-level control') }
+            @{ Page = 'consumer-onboarding.md'; Heading = '## Linting'; Token = @('--config docs/documentation-estate/.vale.ini', 'VALE_CONFIG_PATH', 'docs/documentation-estate/.markdownlint.json', 'The written workflow runs markdownlint', 'DocsTonality', 'policy-level control') }
             @{ Page = 'command-reference.md'; Heading = '### `validate`'; Token = @('defaults to the snapshot revision') }
             @{ Page = 'workflow.md'; Heading = '## Sequence'; Token = @('Commit, Receipt and Pull Request') }
             @{ Page = 'workflow.md'; Heading = '## Integration-PR Gate'; Token = @('RECEIPT_REVISION_NOT_ANCESTOR', 'RECEIPT_SOURCE_DRIFT') }
@@ -241,6 +241,22 @@ Describe 'documentation-estate onboarding statements of issue #1169' {
             $section.Length | Should -BeGreaterThan 0 -Because "$($case.Page) has the section $($case.Heading)"
             foreach ($token in $case.Token) { $section.Contains($token, [System.StringComparison]::Ordinal) | Should -BeTrue -Because "$($case.Heading) of $($case.Page) states '$token'" }
         }
+    }
+
+    It 'states the issue #1219 lint and placeholder statements' {
+        # Arrange
+        $linting = Get-PageSectionText -PageText $script:PageText['consumer-onboarding.md'] -Heading '## Linting'
+        $consumerCi = Get-PageSectionText -PageText $script:PageText['consumer-onboarding.md'] -Heading '## Consumer CI'
+        $coverage = Get-PageSectionText -PageText $script:PageText['command-reference.md'] -Heading '### `coverage`'
+
+        # Assert
+        $linting.Length | Should -BeGreaterThan 0
+        $consumerCi.Length | Should -BeGreaterThan 0
+        $coverage.Length | Should -BeGreaterThan 0
+        $linting.Contains('No workflow step runs Vale or markdownlint', [System.StringComparison]::Ordinal) | Should -BeFalse
+        $consumerCi.Contains('PowerShell is the only runtime', [System.StringComparison]::Ordinal) | Should -BeFalse
+        $coverage.Contains('placeholders', [System.StringComparison]::Ordinal) | Should -BeTrue
+        $coverage.Contains('SME input required', [System.StringComparison]::Ordinal) | Should -BeTrue
     }
 
     It 'fails the statement check for an in-memory <Page> with its first token removed' -ForEach @(

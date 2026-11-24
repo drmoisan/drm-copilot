@@ -30,20 +30,30 @@ nothing for a repository that has no Python.
 
 ## Linting
 
-Linting is optional. `init -Write` writes linter configuration as data under
+Lint steps are part of the written workflow. `init -Write` writes linter configuration as data under
 `docs/documentation-estate/`: `docs/documentation-estate/.markdownlint.json`,
 `docs/documentation-estate/.vale.ini`,
 `docs/documentation-estate/.vale/styles/DocsBase/HeadingPunctuation.yml`,
-`docs/documentation-estate/.vale/styles/DocsBase/Placeholders.yml` and an empty
+`docs/documentation-estate/.vale/styles/DocsBase/Placeholders.yml`, the five `DocsTonality`
+styles under `docs/documentation-estate/.vale/styles/DocsTonality/` (`Certainty.yml`,
+`Exclamation.yml`, `Filler.yml`, `Hyperbole.yml` and `Intensifiers.yml`) and an empty
 `docs/documentation-estate/.vale/styles/config/vocabularies/Project/accept.txt`. No Node.js or
 Python linter is required to adopt the tooling. `check` is the required page gate: it checks page
 structure, metadata and links without any external linter.
 
-No workflow step runs Vale or markdownlint. To lint, pass
-`--config docs/documentation-estate/.vale.ini` to Vale, or set `VALE_CONFIG_PATH` to that path,
-and pass `docs/documentation-estate/.markdownlint.json` to markdownlint as its configuration file.
-Vale resolves `StylesPath = .vale/styles` relative to the `.vale.ini` that sets it. An estate
-initialized earlier keeps its root-level linter files; they are not migrated.
+The written workflow runs markdownlint through the pinned markdownlint-cli2 action with
+`docs/documentation-estate/.markdownlint.json` over the Markdown pages of the profile
+`documentation_roots`, and runs the pinned, checksum-verified Vale release with
+`--config docs/documentation-estate/.vale.ini`, which loads the `DocsTonality` style. The
+`DocsTonality` rules report hyperbole, overstated certainty, filler and exclamation marks at error
+level and intensifiers at warning level; an error-level alert fails the Vale step. Consumer pages
+can fail default markdownlint rules or error-level tonality rules on the first run. To lint
+locally, pass `--config docs/documentation-estate/.vale.ini` to Vale, or set `VALE_CONFIG_PATH` to
+that path, and pass `docs/documentation-estate/.markdownlint.json` to markdownlint as its
+configuration file. Vale resolves `StylesPath = .vale/styles` relative to the `.vale.ini` that sets
+it. An estate initialized earlier receives the new workflow, `.vale.ini` and `DocsTonality` files
+only through `init -Write -Force` or by copying them; it is not migrated, and it keeps its
+root-level linter files.
 
 The docs-only exemptions of the pull-request and merge gates admit
 `.github/workflows/_docs-quality.yml` as their one path outside `docs/`. The admission applies to
@@ -83,8 +93,14 @@ control.
 runnable through `workflow_dispatch`) that runs the documentation commands through
 `.claude/lib/docs/Invoke-DocsCommand.ps1` at the head revision, with an optional `surface-delta`
 step against a `base-ref` input. A repository calls it from its own pull-request workflow. It
-assumes `pwsh` (PowerShell 7.4 or later) on the runner (epic owner question Q4), and PowerShell is
-the only runtime it uses.
+assumes `pwsh` (PowerShell 7.4 or later) on the runner (epic owner question Q4), and every run step
+uses PowerShell 7. After the documentation commands, under `if: ${{ !cancelled() }}`, the workflow
+resolves the lint scope from the profile `documentation_roots` (step `docs-lint-scope`, which fails
+with `DOCS_LINT_SCOPE_EMPTY` when no root exists), runs markdownlint through the
+`DavidAnson/markdownlint-cli2-action` action, downloads Vale 3.25.1, verifies its SHA-256 before
+extraction (a mismatch fails with `VALE_SHA256_MISMATCH`), and runs Vale over the documentation
+roots. The receipt upload runs under `if: ${{ always() }}`. Every `uses:` reference is pinned to a
+full commit SHA, and the workflow grants only `contents: read`.
 
 ## Using the Epic Template
 
