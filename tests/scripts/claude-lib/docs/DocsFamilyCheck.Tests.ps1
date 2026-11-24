@@ -61,6 +61,36 @@ BeforeAll {
         param([object[]] $Finding, [string] $Code)
         , @($Finding | Where-Object { $_['code'] -ceq $Code })
     }
+
+    function New-TestCaseInsensitiveSeam {
+        # TestFile and ListFile over a case-insensitive file system (Windows, default macOS):
+        # TestFile ignores case; ListFile reports the stored names, so only a listing shows the real case.
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Justification = 'Builds in-memory seam closures only.')]
+        param([string[]] $Path = @())
+        $stored = [string[]] @($Path)
+        $present = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+        foreach ($entry in $stored) { [void] $present.Add($entry) }
+        $callLog = [System.Collections.Generic.List[string]]::new()
+        $testFile = {
+            param($RelativePath)
+            $callLog.Add("TestFile $RelativePath")
+            return $present.Contains([string] $RelativePath)
+        }.GetNewClosure()
+        $listFile = {
+            param($RelativeRoot)
+            $callLog.Add("ListFile $RelativeRoot")
+            $root = [string] $RelativeRoot
+            if ($root.Length -eq 0) {
+                [string[]] $listed = @($stored | Where-Object { -not $_.Contains('/') })
+            } else {
+                $prefix = $root.TrimEnd('/') + '/'
+                [string[]] $listed = @($stored | Where-Object { $_.StartsWith($prefix, [System.StringComparison]::Ordinal) })
+            }
+            [Array]::Sort($listed, [System.StringComparer]::Ordinal)
+            return , $listed
+        }.GetNewClosure()
+        @{ TestFile = $testFile; ListFile = $listFile; CallLog = $callLog }
+    }
 }
 
 AfterAll {
@@ -107,7 +137,7 @@ Describe 'Read-DocsFamilyEvidence' {
         $evidence = Read-TestEvidence -ProfileDocument $profileDocument -Test $test
 
         # Assert
-        @($test.CallLog | ForEach-Object { "$($_.Member) $($_.RelativePath)" }) | Should -Be @('ListFile docs/security', 'TestFile SECURITY.md', 'TestFile CODEOWNERS')
+        @($test.CallLog | ForEach-Object { "$($_.Member) $($_.RelativePath)" }) | Should -Be @('ListFile docs/security', 'TestFile SECURITY.md', 'TestFile CODEOWNERS', 'ListFile ') -Because 'the positive SECURITY.md probe is confirmed by one listing of the repository root'
         $evidence.RootFile['SECURITY.md'] | Should -BeTrue
         $evidence.RootFile['CODEOWNERS'] | Should -BeFalse -Because '.github/CODEOWNERS does not satisfy the repository-root probe'
     }
@@ -126,6 +156,66 @@ Describe 'Read-DocsFamilyEvidence' {
         $listCalls.Count | Should -Be 1
         $listCalls[0].RelativePath | Should -BeExactly 'docs/ops'
         @($status.entries | ForEach-Object { $_['page_count'] }) | Should -Be @(1, 1)
+    }
+}
+
+Describe 'Read-DocsFamilyEvidence root-file name case' {
+    It 'does not accept a wrong-case root security.md or codeowners from a case-insensitive TestFile' {
+        # Arrange
+        $profileDocument = Get-TestProfile -Family @((Get-TestFamily -Id 'security' -Directory 'docs/security'))
+        $seam = New-TestCaseInsensitiveSeam -Path @('security.md', 'codeowners', 'docs/security/overview.md')
+
+        # Act
+        $evidence = Read-DocsFamilyEvidence -Profile $profileDocument -TestFile $seam.TestFile -ListFile $seam.ListFile
+        $status = Get-DocsFamilyStatus -Profile $profileDocument -Evidence $evidence
+
+        # Assert
+        $evidence.RootFile['SECURITY.md'] | Should -BeFalse -Because 'a root security.md is not the exact name SECURITY.md'
+        $evidence.RootFile['CODEOWNERS'] | Should -BeFalse -Because 'a root codeowners is not the exact name CODEOWNERS'
+        $status.entries[0]['missing_root_files'] | Should -BeExactly @('SECURITY.md', 'CODEOWNERS')
+    }
+
+    It 'accepts the exact root names from a case-insensitive TestFile after one root listing' {
+        # Arrange
+        $profileDocument = Get-TestProfile -Family @((Get-TestFamily -Id 'security' -Directory 'docs/security'))
+        $seam = New-TestCaseInsensitiveSeam -Path @('SECURITY.md', 'CODEOWNERS', 'docs/security/overview.md')
+
+        # Act
+        $evidence = Read-DocsFamilyEvidence -Profile $profileDocument -TestFile $seam.TestFile -ListFile $seam.ListFile
+
+        # Assert
+        $evidence.RootFile['SECURITY.md'] | Should -BeTrue
+        $evidence.RootFile['CODEOWNERS'] | Should -BeTrue
+        @($seam.CallLog) | Should -BeExactly @('ListFile docs/security', 'TestFile SECURITY.md', 'TestFile CODEOWNERS', 'ListFile ') -Because 'the positive probes are confirmed by one listing of the repository root'
+    }
+
+    It 'reports DOCS_FAMILY_ROOT_FILE_MISSING for a wrong-case root CODEOWNERS beside an exact SECURITY.md' {
+        # Arrange
+        $profileDocument = Get-TestProfile -Family @((Get-TestFamily -Id 'security' -Directory 'docs/security'))
+        $seam = New-TestCaseInsensitiveSeam -Path @('SECURITY.md', 'codeowners', 'docs/security/overview.md')
+
+        # Act
+        $evidence = Read-DocsFamilyEvidence -Profile $profileDocument -TestFile $seam.TestFile -ListFile $seam.ListFile
+        $findings = Get-DocsFamilyFinding -Profile $profileDocument -Evidence $evidence -ProfilePath $script:ProfilePath
+
+        # Assert
+        $root = Get-TestCode -Finding $findings -Code 'DOCS_FAMILY_ROOT_FILE_MISSING'
+        $root.Count | Should -Be 1 -Because 'only the wrong-case CODEOWNERS is missing'
+        $root[0]['related_paths'] | Should -BeExactly @('CODEOWNERS')
+    }
+
+    It 'makes no root listing when both root probes are negative' {
+        # Arrange
+        $profileDocument = Get-TestProfile -Family @((Get-TestFamily -Id 'security' -Directory 'docs/security'))
+        $seam = New-TestCaseInsensitiveSeam -Path @('docs/security/overview.md', '.github/CODEOWNERS', 'docs/CODEOWNERS')
+
+        # Act
+        $evidence = Read-DocsFamilyEvidence -Profile $profileDocument -TestFile $seam.TestFile -ListFile $seam.ListFile
+
+        # Assert
+        @($seam.CallLog) | Should -BeExactly @('ListFile docs/security', 'TestFile SECURITY.md', 'TestFile CODEOWNERS') -Because 'no probe is positive, so the root is not listed'
+        $evidence.RootFile['SECURITY.md'] | Should -BeFalse
+        $evidence.RootFile['CODEOWNERS'] | Should -BeFalse -Because '.github/CODEOWNERS and docs/CODEOWNERS do not satisfy the repository-root rule'
     }
 }
 

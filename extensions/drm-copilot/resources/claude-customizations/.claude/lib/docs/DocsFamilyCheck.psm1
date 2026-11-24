@@ -6,8 +6,10 @@
 .DESCRIPTION
     Read-DocsFamilyEvidence lists each distinct documentation family directory of a docs profile
     through the ListFile seam and, when the profile declares the security family, probes the
-    repository-root files SECURITY.md and CODEOWNERS through the TestFile seam. It makes no seam
-    call for a profile without documentation families.
+    repository-root files SECURITY.md and CODEOWNERS through the TestFile seam, confirming a
+    positive probe against one ListFile listing of the repository root (empty path) so that only
+    the exact names, compared ordinally, satisfy the rule on every host. It makes no seam call for
+    a profile without documentation families.
 
     Get-DocsFamilyStatus returns one status entry per required_families item, in profile order,
     and the legacy exclusion list sorted by path. Get-DocsFamilyFinding returns the family
@@ -100,9 +102,12 @@ function Read-DocsFamilyEvidence {
     .DESCRIPTION
         PagePath maps each distinct family directory (trailing '/' removed, ordinal) to the paths
         ListFile returned for it; ListFile is called once per distinct directory. RootFile maps
-        SECURITY.md and CODEOWNERS to the TestFile answer for the repository-root path, and is
-        filled only when a required_families entry has the id security. A profile without
-        required_families makes no seam call.
+        SECURITY.md and CODEOWNERS to $true only when TestFile answers $true for the
+        repository-root path and the root listing (one ListFile call with the empty path, made only
+        when a probe is positive) contains the name under an ordinal comparison, so a wrong-case
+        file does not satisfy the rule on any host. RootFile is filled only when a
+        required_families entry has the id security. A profile without required_families makes
+        no seam call.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -125,6 +130,14 @@ function Read-DocsFamilyEvidence {
     }
     if ($hasSecurity) {
         foreach ($name in $script:DocsFamilyRootFileName) { $rootFile[$name] = [bool] (& $TestFile $name) }
+        # TestFile is case-insensitive on Windows and default macOS, so a positive probe is
+        # confirmed against one listing of the repository root, compared ordinally.
+        if ($rootFile.ContainsValue($true)) {
+            $rootListing = & $ListFile ''
+            $rootName = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+            foreach ($entry in @($rootListing)) { if ($entry -is [string]) { [void] $rootName.Add($entry) } }
+            foreach ($name in $script:DocsFamilyRootFileName) { $rootFile[$name] = $rootFile[$name] -and $rootName.Contains($name) }
+        }
     }
     return @{ PagePath = $pagePath; RootFile = $rootFile }
 }

@@ -96,6 +96,8 @@ function New-DocsLedgerTestContext {
         WriteTextFailure map a path to the message thrown when that path is read or written.
         ReadText and ReadBytes of an absent path throw an item-not-found error; WriteText with
         Mode 'create' on an existing path throws, as the real member does. InvokeProcess throws.
+        ListFile returns the stored paths under RelativeRoot, ordinal-sorted; an empty RelativeRoot
+        returns the stored paths that contain no '/' (the repository-root files).
         The context carries the twelve members of New-DocsCommandContext (issue #1169):
         ResolveRevision returns the RevisionMap entry for a ref or $null; ReadRevisionText returns
         $null; TestAncestor and ListChangedPath return the AncestorMap and ChangedPathMap entries
@@ -163,8 +165,13 @@ function New-DocsLedgerTestContext {
     $listFile = {
         param($RelativeRoot)
         $callLog.Add([pscustomobject]@{ Member = 'ListFile'; RelativePath = [string] $RelativeRoot; Mode = $null })
-        $prefix = ([string] $RelativeRoot).TrimEnd('/') + '/'
-        [string[]] $matched = @($files.Keys | Where-Object { ([string] $_).StartsWith($prefix, [System.StringComparison]::Ordinal) })
+        if ([string]::IsNullOrEmpty([string] $RelativeRoot)) {
+            # The repository root: its top-level files only, as the real member lists them.
+            [string[]] $matched = @($files.Keys | Where-Object { -not ([string] $_).Contains('/') })
+        } else {
+            $prefix = ([string] $RelativeRoot).TrimEnd('/') + '/'
+            [string[]] $matched = @($files.Keys | Where-Object { ([string] $_).StartsWith($prefix, [System.StringComparison]::Ordinal) })
+        }
         [Array]::Sort($matched, [System.StringComparer]::Ordinal)
         return , $matched
     }.GetNewClosure()

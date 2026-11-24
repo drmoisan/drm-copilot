@@ -54,6 +54,20 @@ Describe 'New-DocsLedgerTestContext' {
         @($test.Context.PSObject.Properties | ForEach-Object { $_.Name }) | Should -Be @('RepositoryRoot', 'ReadText', 'ReadBytes', 'TestFile', 'ListFile', 'WriteText', 'UtcNow', 'InvokeProcess', 'ResolveRevision', 'ReadRevisionText', 'TestAncestor', 'ListChangedPath')
     }
 
+    It 'lists only the top-level files for the empty relative root' {
+        # Arrange (issue #1221 remediation cycle 1)
+        $test = New-DocsLedgerTestContext -File @{ 'SECURITY.md' = '# s'; 'CODEOWNERS' = '* @team'; 'docs/a.md' = '# a'; '.github/CODEOWNERS' = '* @team' }
+
+        # Act
+        $listed = & $test.Context.ListFile ''
+
+        # Assert
+        @($listed) | Should -BeExactly @('CODEOWNERS', 'SECURITY.md') -Because 'only paths without a / are repository-root files, in ordinal order'
+        $test.CallLog.Count | Should -Be 1
+        $test.CallLog[0].Member | Should -BeExactly 'ListFile'
+        $test.CallLog[0].RelativePath | Should -BeExactly ''
+    }
+
     It 'answers the revision members from the in-memory maps and $null for an unmapped key (issue #1169)' {
         # Arrange
         $one = '1111111111111111111111111111111111111111'

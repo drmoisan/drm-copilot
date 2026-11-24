@@ -25,7 +25,7 @@ The run is autonomous. Each decision below is recorded here so that the planner,
 4. **D4 — Listing.** Each distinct family `directory` is listed through the context `ListFile` seam, not derived from the `documentation_roots` page set, so family directories outside `documentation_roots` are evaluated.
 5. **D5 — Family page.** A family page is any listed path that starts with `<directory>/`, ends with `.md` (ordinal comparison), and is not a `legacy_exclusions[].path`. `README.md` and `index.md` count. A page with `surface_refs: []` is accepted with no change to page checks.
 6. **D6 — Legacy reporting.** All legacy entries are reported as one info finding whose `related_paths` names every entry path and whose message lists each path with its reason and the entry count. This keeps the command result below the 100-finding limit. The coverage section lists every entry with its reason.
-7. **D7 — Root files.** The root-file rule applies to the family whose `id` is `security` when it is not excluded. It probes `SECURITY.md` and `CODEOWNERS` at the repository root only. `.github/CODEOWNERS` and `docs/CODEOWNERS` do not satisfy it.
+7. **D7 — Root files.** The root-file rule applies to the family whose `id` is `security` when it is not excluded. It probes `SECURITY.md` and `CODEOWNERS` at the repository root only. `.github/CODEOWNERS` and `docs/CODEOWNERS` do not satisfy it. The names `SECURITY.md` and `CODEOWNERS` are compared ordinally (case-sensitive) on every host, so a root `security.md` or `codeowners` does not satisfy the rule.
 8. **D8 — Exclusion and `required: false`.** A family with an `exclusion` is `not-applicable` whether `required` is true or false. A `required: false` family without an exclusion produces no finding and appears only in the coverage section.
 9. **D9 — Coverage section.** A `families` key (`entries`, `legacy_exclusions`) is always added to the coverage result by `Get-DocsCoverageFamilySection`, assigned in `Invoke-DocsCoverageCommand` after the `Get-DocsCoverageReport` call, and rendered by `ConvertTo-DocsCoverageFamilyLine`, called by one line at the end of `ConvertTo-DocsCoverageReportLine`. `Get-DocsCoverageReport` (signature and return literal) is unchanged, to coexist with the docs-prose-markdown-lint placeholder-count section.
 10. **D10 — TypeScript.** No TypeScript logic change and no new TypeScript file. The `run_docs_coverage` and `validate_docs_artifacts` descriptions in `extensions/drm-copilot/src/mcp-docs-tool-definitions.ts` are updated, and Jest pass-through cases are added. `jest.config.cjs` and `jest.docs-coverage.json` are unchanged.
@@ -48,7 +48,7 @@ The run is autonomous. Each decision below is recorded here so that the planner,
 
 - Makes no context call when the profile has an empty or absent `required_families` and an empty or absent `legacy_exclusions`.
 - For each distinct `directory` of `required_families[]` (trailing `/` trimmed, duplicates collapsed, ordinal comparison), calls `ListFile` once and keeps the listing.
-- When an entry with `id` `security` exists, calls `TestFile` for `SECURITY.md` and `CODEOWNERS` at the repository root.
+- When an entry with `id` `security` exists, calls `TestFile` for `SECURITY.md` and `CODEOWNERS` at the repository root; when either probe is positive, calls `ListFile` once with the empty path (the repository-root file names) and keeps a name only when that listing contains it under an ordinal (exact) match (remediation cycle 1).
 - Returns `@{ PagePath = <ordinal map directory -> string[]>; RootFile = <ordinal map name -> bool> }`.
 
 ### Family status
@@ -192,7 +192,7 @@ The run is autonomous. Each decision below is recorded here so that the planner,
 | `tests/scripts/claude-runtime/docs-authoring-roles.WorkflowText.Tests.ps1` | family-step token rows |
 | `.dev/engineering/documentation-estate/architecture.md` | one bullet |
 
-Not edited: `DocsCompleteGate.psm1`, `DocsReceipt.psm1`, `DocsReceiptRevision.psm1`, receipt and envelope schemas, `DocsPageMetadata.psm1`, `DocsPageFrontMatter.psm1`, `Invoke-DocsCommand.ps1`, the docs profile schema, `DocsProfile.psm1`, `DocsProfileFamilies.psm1`, `docs-handlers.ts`, `docs-command-envelope.ts`, `jest.config.cjs`, `jest.docs-coverage.json`.
+Not edited: `DocsCompleteGate.psm1`, `DocsReceipt.psm1`, `DocsReceiptRevision.psm1`, receipt and envelope schemas, `DocsPageMetadata.psm1`, `DocsPageFrontMatter.psm1`, the docs profile schema, `DocsProfile.psm1`, `DocsProfileFamilies.psm1`, `docs-handlers.ts`, `docs-command-envelope.ts`, `jest.config.cjs`, `jest.docs-coverage.json`. Remediation cycle 1 edits `Get-DocsContextFileList` in `Invoke-DocsCommand.ps1` so that an empty path lists the repository-root file names.
 
 ## Out of Scope
 
