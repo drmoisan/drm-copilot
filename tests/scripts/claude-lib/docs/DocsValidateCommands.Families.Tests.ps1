@@ -179,7 +179,7 @@ Describe 'Invoke-DocsValidateCommand documentation family evidence' {
         $readLog | Should -Not -Contain 'TestFile SECURITY.md'
     }
 
-    It 'records the same context reads for a profile without families as the matrix mode, which reads the same inputs' {
+    It 'records the matrix-mode context reads plus one ReadText per page for a profile without families' {
         # Arrange
         $complete = Get-TestEstate -ProfileDocument (New-DocsLedgerTestProfile)
         $matrix = Get-TestEstate -ProfileDocument (New-DocsLedgerTestProfile)
@@ -188,10 +188,13 @@ Describe 'Invoke-DocsValidateCommand documentation family evidence' {
         $completeRun = Invoke-TestValidate -Argument @('-Mode', 'docs-complete', '-Revision', $script:Revision) -Test $complete
         $matrixRun = Invoke-TestValidate -Argument @('-Mode', 'matrix', '-Revision', $script:Revision) -Test $matrix
 
-        # Assert
+        # Assert: issue #1220 reads the page front matter through ReadText in docs-complete mode only.
         $completeRun.Outcome.ExitCode | Should -Be 0
         $matrixRun.Outcome.ExitCode | Should -Be 0
-        @($complete.CallLog | ForEach-Object { "$($_.Member) $($_.RelativePath)" }) | Should -Be @($matrix.CallLog | ForEach-Object { "$($_.Member) $($_.RelativePath)" })
+        $completeLog = @($complete.CallLog | ForEach-Object { "$($_.Member) $($_.RelativePath)" })
+        $pageReads = @($completeLog | Where-Object { $_.StartsWith('ReadText ', [System.StringComparison]::Ordinal) -and $_.EndsWith('.md', [System.StringComparison]::Ordinal) })
+        $pageReads | Should -Be @("ReadText $script:Page")
+        @($completeLog | Where-Object { $pageReads -cnotcontains $_ }) | Should -Be @($matrix.CallLog | ForEach-Object { "$($_.Member) $($_.RelativePath)" })
         $completeReadLog = Get-TestReadLog -Test $complete
         $completeReadLog | Should -Not -Contain 'TestFile SECURITY.md'
     }
