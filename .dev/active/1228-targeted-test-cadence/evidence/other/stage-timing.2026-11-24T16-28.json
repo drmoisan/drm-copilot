@@ -1,0 +1,71 @@
+{
+  "issue-num": "1228",
+  "stage_timing": [
+    {
+      "ended_at": "2026-11-23T12:15:35Z",
+      "started_at": "2026-11-23T11:50:52Z",
+      "attempt": 1,
+      "stage": "S2_research"
+    },
+    {
+      "stage": "S3_promotion_feature_documents",
+      "attempt": 1,
+      "started_at": "2026-11-23T12:15:35Z",
+      "ended_at": "2026-11-23T12:21:00Z"
+    },
+    {
+      "stage": "S4_atomic_planning",
+      "attempt": 1,
+      "started_at": "2026-11-23T12:21:00Z",
+      "ended_at": "2026-11-23T12:51:11Z"
+    },
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 1,
+      "started_at": "2026-11-23T12:51:11Z",
+      "ended_at": "2026-11-24T03:34:41Z"
+    },
+    {
+      "stage": "S5_atomic_execution",
+      "attempt": 2,
+      "started_at": "2026-11-24T03:35:36Z",
+      "ended_at": "2026-11-24T07:03:04Z"
+    },
+    {
+      "stage": "S6_pre_review_commit",
+      "attempt": 1,
+      "started_at": "2026-11-24T07:03:04Z",
+      "ended_at": "2026-11-24T07:05:32Z"
+    },
+    {
+      "stage": "S7_feature_review",
+      "attempt": 1,
+      "started_at": "2026-11-24T07:05:32Z",
+      "ended_at": "2026-11-24T07:25:01Z"
+    },
+    {
+      "stage": "remediation.cycle_1",
+      "attempt": 1,
+      "started_at": "2026-11-24T07:25:01Z",
+      "ended_at": "2026-11-24T11:23:01Z"
+    },
+    {
+      "stage": "remediation.cycle_2",
+      "attempt": 1,
+      "started_at": "2026-11-24T11:23:01Z",
+      "ended_at": "2026-11-24T15:48:35Z"
+    },
+    {
+      "stage": "remediation.cycle_3",
+      "attempt": 1,
+      "started_at": "2026-11-24T15:48:35Z",
+      "ended_at": "2026-11-24T16:28:08Z"
+    },
+    {
+      "stage": "S8_create_pr",
+      "attempt": 1,
+      "started_at": "2026-11-24T16:28:08Z",
+      "ended_at": null
+    }
+  ]
+}
