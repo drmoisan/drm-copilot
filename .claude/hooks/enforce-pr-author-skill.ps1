@@ -43,7 +43,14 @@
                     DOCS_ONLY_EXEMPTION_EMPTY_DIFF         - the diff lists no path.
                     DOCS_ONLY_EXEMPTION_NON_DOCS_PATH      - a listed path is outside docs/.
                   The exemption never applies under epic scope.
-      Receipt - preflight passed or docs-only exemption applied: the SHA-256 receipt is
+      Release - issue #1231: when the docs-only and cleanup exemptions do not apply, a
+                checkpoint-free gh pr create --head <b> --base <base> proceeds to receipt
+                verification when .claude/release-commit-allowance.json beneath the resolved
+                worktree lists every path of the origin/<base>...HEAD diff in one allowance whose
+                branch pattern matches <b>, and refs/remotes/origin/<b> equals HEAD
+                (enforce-pr-author-skill.release.ps1). Otherwise '; release exemption not applied:
+                RELEASE_EXEMPTION_<CODE>: <detail>' is appended; without the file nothing is added.
+      Receipt - preflight passed or an exemption applied: the SHA-256 receipt is
                 verified in the ordered checks (Section below). The first failing check blocks.
 
     Receipt verification decision order on the --body-file-with-context path:

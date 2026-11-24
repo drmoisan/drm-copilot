@@ -53,6 +53,13 @@
     model_routing_receipts in the parallel checkpoint beneath the resolved root
     (Get-ModelRoutingParallelRecordsDecision), after the cleanup leg and before the docs-estate leg.
 
+    Release delegation leg (issue #1231): after the docs-estate leg, a checkpoint-free
+    Agent(pr-author) with one 'branch:' and one 'base:' line is allowed when
+    .claude/release-commit-allowance.json beneath the resolved root lists every path of the
+    origin/<base>...HEAD diff in one allowance whose pattern matches the branch
+    (Get-ModelRoutingReleaseDecision). Its suffix ' Release delegation leg not applied: <CODE>: ...'
+    follows the docs-estate suffix; without the file the suffix is empty.
+
 .NOTES
     Compatible with PowerShell 7+. Read-only presence-gating deterrent.
 #>
@@ -78,6 +85,8 @@ try { Import-Module (Join-Path $PSScriptRoot '../lib/worktree-resolution/Worktre
 try { Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateModelReceipts.psm1') -ErrorAction Stop } catch { Add-HookDependencyFailure -Name 'OrchestratorStateModelReceipts.psm1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'hook-parallel-records-context.ps1') } catch { Add-HookDependencyFailure -Name 'hook-parallel-records-context.ps1' -ErrorRecord $_ }
 try { . (Join-Path $PSScriptRoot 'enforce-model-routing-receipt-parallel.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-model-routing-receipt-parallel.ps1' -ErrorRecord $_ }
+# Release delegation leg (issue #1231): the checkpoint-free Agent(pr-author) of a release run.
+try { . (Join-Path $PSScriptRoot 'enforce-model-routing-receipt-release.ps1') } catch { Add-HookDependencyFailure -Name 'enforce-model-routing-receipt-release.ps1' -ErrorRecord $_ }
 function Get-ModelRoutingCheckpoint {
     <#
     .SYNOPSIS
@@ -386,6 +395,7 @@ function Invoke-ModelRoutingReceiptDecision {
     # leg; without a docs profile beneath the resolved root its suffix is empty.
     $parallelSuffix = ''
     $docsSuffix = ''
+    $releaseSuffix = ''
     if ($subagent -eq 'pr-author' -and $null -eq $checkpoint) {
         # Issue #1182: the Run Closing records delegation of a closed parallel run reads its receipt
         # from the parallel checkpoint; any other prompt declines with an empty suffix.
@@ -399,13 +409,19 @@ function Invoke-ModelRoutingReceiptDecision {
             return $allow
         }
         $docsSuffix = [string]$docs.DenySuffix
+        # Issue #1231: the release delegation leg; without an allowance file its suffix is empty.
+        $release = Get-ModelRoutingReleaseDecision -PromptText $prompt -WorktreeRoot $resolution.WorktreeRoot
+        if ($release.Allowed) {
+            return $allow
+        }
+        $releaseSuffix = [string]$release.DenySuffix
     }
 
     return [ordered]@{
         hookSpecificOutput = [ordered]@{
             hookEventName            = 'PreToolUse'
             permissionDecision       = 'deny'
-            permissionDecisionReason = "MODEL_ROUTING_RECEIPT_BLOCKED: cannot delegate to '$subagent' before a model_routing_receipts entry for it is recorded in the orchestrator checkpoint. Perform Model Selection (record the complexity assessment and routing receipt) before delegating." + $parallelSuffix + $docsSuffix
+            permissionDecisionReason = "MODEL_ROUTING_RECEIPT_BLOCKED: cannot delegate to '$subagent' before a model_routing_receipts entry for it is recorded in the orchestrator checkpoint. Perform Model Selection (record the complexity assessment and routing receipt) before delegating." + $parallelSuffix + $docsSuffix + $releaseSuffix
         }
     }
 }
